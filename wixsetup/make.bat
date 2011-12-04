@@ -1,4 +1,4 @@
-call "%VS90COMNTOOLS%vsvars32.bat"
+rem call "%VS90COMNTOOLS%vsvars32.bat"
 call qtvars.bat
 
 set "CURRENTDIR=%cd%"
@@ -21,7 +21,7 @@ MSBuild ..\common\src\common.vcproj /t:Rebuild /p:Configuration=Release
 MSBuild ..\client\src\client.vcproj /t:Rebuild /p:Configuration=Release
 MSBuild ..\server\src\server.vcproj /t:Rebuild /p:Configuration=Release
 
-rem MSBuild PropsCA\PropsCA.vcproj /t:Rebuild /p:Configuration=Release
-rem MSBuild EveAssocCA\EveAssocCA.vcproj /t:Rebuild /p:Configuration=Release
+MSBuild PropsCA\PropsCA.vcproj /t:Rebuild /p:Configuration=Release
+MSBuild EveAssocCA\EveAssocCA.vcproj /t:Rebuild /p:Configuration=Release
 
-rem @start /B /WAIT make.py
+@start /B /WAIT make.py

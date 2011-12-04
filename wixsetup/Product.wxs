@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-  <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
+  <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="CE572797-45BF-4f1c-A783-369EA79C597E">
     <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated"/>
 
     <?ifdef env.CommonProgramFiles(x86) ?>
@@ -26,7 +26,7 @@
     <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(env.APPLICATION_NAME) when setup exits."  />
     <Property Id="MEDIAFOLDER" Secure="yes" />
-    <PropertyRef Id="FILETYPES"/>
+<!--    <PropertyRef Id="FILETYPES"/> -->
 
     <!--[%LocalAppData]-->
     <Property Id="XMLSETTINGS" Value="%LocalAppData%\$(env.ORGANIZATION_NAME)\$(env.APPLICATION_NAME)\settings.xml" />
@@ -46,7 +46,7 @@
     <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
     <CustomAction Id="SetProperties" BinaryKey="PropsCA.dll" DllEntry="SetProperties" Execute="firstSequence" />
 
-    <Upgrade Id="286227c5-25b4-4796-aa48-2d9822e10b0d">
+    <Upgrade Id="CE572797-45BF-4f1c-A783-369EA79C597E">
       <UpgradeVersion
          Minimum="0.1.0" Maximum="$(env.APPLICATION_VERSION)"
          Property="PREVIOUSVERSIONSINSTALLED"
@@ -58,11 +58,11 @@
     <CustomAction Id="ResetMediaFolder" Property="MEDIAFOLDER" Value="" />
     <CustomAction Id="StartAppOnExit" FileKey="UniclientEXE" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
     
-    <CustomAction Id="SaveAssociations" BinaryKey="EveAssocCA.dll" DllEntry="SaveAssociations" Execute="deferred"/>
+<!--    <CustomAction Id="SaveAssociations" BinaryKey="EveAssocCA.dll" DllEntry="SaveAssociations" Execute="deferred"/>
     <CustomAction Id="SaveAssociations.SetProperty" Return="check" Property="SaveAssociations" Value="[FILETYPES]"/>
 
     <CustomAction Id="RestoreAssociations" BinaryKey="EveAssocCA.dll" DllEntry="RestoreAssociations" Execute="deferred"/>
-    <CustomAction Id="RestoreAssociations.SetProperty" Return="check" Property="RestoreAssociations" Value="[FILETYPES]"/>
+    <CustomAction Id="RestoreAssociations.SetProperty" Return="check" Property="RestoreAssociations" Value="[FILETYPES]"/> -->
     
     <InstallUISequence>
       <Custom Action="SetProperties" Before="SetMoviesFolder" />
@@ -78,18 +78,18 @@
     <InstallExecuteSequence>
       <RemoveExistingProducts Before="InstallInitialize" />
 
-      <Custom Action="SaveAssociations.SetProperty" After="WriteRegistryValues">NOT Installed</Custom>
+<!--      <Custom Action="SaveAssociations.SetProperty" After="WriteRegistryValues">NOT Installed</Custom>
       <Custom Action="SaveAssociations" After="SaveAssociations.SetProperty">NOT Installed</Custom>
 
       <Custom Action="RestoreAssociations.SetProperty" Before="RestoreAssociations">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="RestoreAssociations" Before="RemoveRegistryValues">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RestoreAssociations" Before="RemoveRegistryValues">Installed AND NOT UPGRADINGPRODUCTCODE</Custom> -->
     </InstallExecuteSequence>
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="MEDIAFOLDER" Name="EVE Media">
-        <Component Id="MediaFolderComponent" Guid="2B72351D-264E-44a5-8E1F-B8C82BB80817" Permanent="yes">
+        <Component Id="MediaFolderComponent" Guid="B18DDA95-906F-4578-9F26-EC140C4C02A0" Permanent="yes">
           <CreateFolder Directory="MEDIAFOLDER"/>
           <Shortcut Id="mediaFolderShortcut" Directory="DesktopFolder" Name="EVE Media Folder" Target="[MEDIAFOLDER]" />
           <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
@@ -99,9 +99,9 @@
       <Directory Id="LocalAppDataFolder" Name="LocalAppDataFolder">
         <Directory Id="LocalNetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="LocalUniversalClient" Name="$(env.APPLICATION_NAME)">
-            <Component Id='Settings' Guid='D5B8FC1A-6828-4e66-B1D1-13BD2FD6EDA8' Permanent='yes'>
+            <Component Id='Settings' Guid='{77C76F04-AC53-4045-9337-B9F513F2D15F}' Permanent='yes'>
               <CreateFolder Directory='LocalUniversalClient'/>
-              <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../resource/settings.xml.tmpl' Vital='yes'/>
+              <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../client/resource/settings.xml.tmpl' Vital='yes'/>
               <util:XmlConfig Id='XmlSettings1' Action='create' Value='[MEDIAFOLDER]' Node='value'
                               ElementPath='//settings/config/mediaRoot' File='[LocalUniversalClient]/settings.xml' On='install' Sequence='1' />
             </Component>
@@ -112,8 +112,8 @@
       <Directory Id="ProgramFilesFolder">
         <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
-            <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
-              <File Id="UniclientEXE" Name="EvePlayer-Beta.exe" Source="../bin/release/EvePlayer-Beta.exe" KeyPath="yes">
+            <Component Id="MainExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
+              <File Id="UniclientEXE" Name="EvePlayer-Beta.exe" Source="../client/bin/release/client.exe" KeyPath="yes">
                 <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any" IgnoreFailure="yes"/>
                 
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
@@ -127,7 +127,7 @@
               </File>
             </Component>
 
-            <Component Id="DummyFileAssocationFeatureComponent" Guid="1CF8A9DB-87DF-4b66-856F-B10B9770FBE0">
+            <Component Id="DummyFileAssocationFeatureComponent" Guid="EC44416C-FEE3-41c2-B9D1-BA1B8E85A97B">
 
               <!--
 												Fix ICE18 error. The validator thinks that the install folder
@@ -138,7 +138,7 @@
               <CreateFolder />
             </Component>
 
-            <Component Id="EveDVDMovie" Guid="515E9EA0-B5FF-41bb-A59D-D339D786D59E" DiskId="1">
+            <Component Id="EveDVDMovie" Guid="547ED48E-70B1-46d0-8331-29812FE44EDC" DiskId="1">
               <RegistryValue Root="HKCR" Type="string" Key="EVE.DVDMovie" Value="EVE DVD movie" KeyPath="yes" />
               <RegistryValue Root="HKCR" Type="string" Key="EVE.DVDMovie\shell\open\command" Value="&quot;[#UniclientEXE]&quot; %1"/>
               <RegistryValue Root="HKCR" Type="string" Key="EVE.DVDMovie\DefaultIcon" Value="&quot;[#UniclientEXE]&quot;" />
@@ -153,7 +153,7 @@
               </RegistryKey>
             </Component>
 
-            <Component Id="EveMovieFiles" Guid="CEB4BFE6-9E08-4ef9-8D4B-49FA14E76204" DiskId="1">
+            <Component Id="EveMovieFiles" Guid="{F192E9DC-D225-4b9f-8A54-0B3502FD2E9E}" DiskId="1">
               <RegistryValue Root="HKCR" Type="string" Key="EVE.MovieFiles" Value="EVE movie files" KeyPath="yes" />
               <RegistryValue Root="HKCR" Type="string" Key="EVE.MovieFiles\shell\open\command" Value="&quot;[#UniclientEXE]&quot; %1"/>
               <RegistryValue Root="HKCR" Type="string" Key="EVE.MovieFiles\DefaultIcon" Value="&quot;[#UniclientEXE]&quot;" />
@@ -168,7 +168,7 @@
               </RegistryKey>
             </Component>
             
-            <Component Id="EveDirectoryPlayWithMenuItem" Guid="AA081E9B-26A0-4333-9BBA-975733254DC2" DiskId="1">
+            <Component Id="EveDirectoryPlayWithMenuItem" Guid="{53CE94C5-C287-4bd6-8ABC-D043BFE6D9F9}" DiskId="1">
               <RegistryValue Root="HKCR" Key="Directory\shell\play.EvePlayer.exe" Value="Play with $(env.APPLICATION_NAME)" Type="string" />
               <RegistryValue Root="HKCR" Key="Directory\shell\play.EvePlayer.exe\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" Type="string" />
             </Component>
@@ -180,7 +180,7 @@
                 </Extension>
               </ProgId> -->
 
-            <Component Id="EveApplication" Guid="2CB8AFBB-FE1F-4683-A07A-D3736DD30065" DiskId="1">
+            <Component Id="EveApplication" Guid="{F59D1BD6-8B89-4d2a-A9A5-86CB1ECCC633}" DiskId="1">
               <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe" Name="FriendlyAppName" Value="EVE media player"/>
               <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe\shell\Open" Value="Play with EVE media player"/>
               <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe\shell\Open\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" />
@@ -192,16 +192,16 @@
               <RegistryValue Root="HKLM" Type="string" Key="Software\RegisteredApplications" Name="EVE media player" Value="Software\Clients\Media\EVE media player\Capabilities"/>
             </Component>
             
-            <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
-              <File Id="avcodecDll" Name="avcodec-53.dll" Source="../bin/release/avcodec-53.dll"/>
-              <File Id="avdeviceDll" Name="avdevice-53.dll" Source="../bin/release/avdevice-53.dll"/>
-              <File Id="avfilterDll" Name="avfilter-2.dll" Source="../bin/release/avfilter-2.dll"/>
-              <File Id="avformatDll" Name="avformat-53.dll" Source="../bin/release/avformat-53.dll"/>
-              <File Id="avutilDll" Name="avutil-51.dll" Source="../bin/release/avutil-51.dll"/>
-              <File Id="swscaleDll" Name="swscale-2.dll" Source="../bin/release/swscale-2.dll"/>
+            <Component Id="FFmpegLibraries" Guid="{5D256521-DE39-4264-A44F-69728AA650EF}">
+              <File Id="avcodecDll" Name="avcodec-53.dll" Source="../client/bin/release/avcodec-53.dll"/>
+              <File Id="avdeviceDll" Name="avdevice-53.dll" Source="../client/bin/release/avdevice-53.dll"/>
+              <File Id="avfilterDll" Name="avfilter-2.dll" Source="../client/bin/release/avfilter-2.dll"/>
+              <File Id="avformatDll" Name="avformat-53.dll" Source="../client/bin/release/avformat-53.dll"/>
+              <File Id="avutilDll" Name="avutil-51.dll" Source="../client/bin/release/avutil-51.dll"/>
+              <File Id="swscaleDll" Name="swscale-2.dll" Source="../client/bin/release/swscale-2.dll"/>
             </Component>
 
-            <Component Id="QTLibraries" Guid="3E273FF1-35A7-44da-864C-61EE9E9B7EA8">
+            <Component Id="QTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
               <File Id="QtCore4.dll" Name="QtCore4.dll" Source="$(env.QTDIR)\bin\QtCore4.dll"/>
               <File Id="QtGui4.dll" Name="QtGui4.dll" Source="$(env.QTDIR)\bin\QtGui4.dll"/>
               <File Id="QtMultimedia4.dll" Name="QtMultimedia4.dll" Source="$(env.QTDIR)\bin\QtMultimedia4.dll"/>
@@ -214,32 +214,32 @@
             </Component>
 
             <Directory Id="imageformats" Name="imageformats">
-		<Component Id="imageformats" Guid="29A1DA63-58E5-44ce-9AEF-0D2606D3ECB5">
+		            <Component Id="imageformats" Guid="{74793EF7-61C1-4e9c-81D6-A120E85D984F}">
                   <File Id="qgif4.dll" Name="qgif4.dll" Source="$(env.QTDIR)\plugins\imageformats\qgif4.dll"/>
                   <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="$(env.QTDIR)\plugins\imageformats\qjpeg4.dll"/>
                   <File Id="qtiff4.dll" Name="qtiff4.dll" Source="$(env.QTDIR)\plugins\imageformats\qtiff4.dll"/>
                 </Component>
             </Directory>
 
-            <Component Id="OpenAL" Guid="5C74B9BD-A9D5-4c91-AE84-EFC2B51D1E12">
-              <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="..\contrib\openal\bin\Win32\OpenAL32.dll"/>
-              <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="..\contrib\openal\bin\Win32\wrap_oal.dll"/>
+            <Component Id="OpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
+              <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="..\client\contrib\openal\bin\Win32\OpenAL32.dll"/>
+              <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="..\client\contrib\openal\bin\Win32\wrap_oal.dll"/>
             </Component>
             
-            <Component Id="OpenSSL" Guid="85E3A7D4-82AE-45ba-BD50-38ECD08F2256">
-              <File Id="libeay32.dll" Name="libeay32.dll" Source="..\contrib\openssl\libeay32.dll"/>
-              <File Id="ssleay32.dll" Name="ssleay32.dll" Source="..\contrib\openssl\ssleay32.dll"/>
+            <Component Id="OpenSSL" Guid="{D7E994B3-B437-4993-A04E-C15AF9DF8312}">
+              <File Id="libeay32.dll" Name="libeay32.dll" Source="..\client\contrib\openssl\libeay32.dll"/>
+              <File Id="ssleay32.dll" Name="ssleay32.dll" Source="..\client\contrib\openssl\ssleay32.dll"/>
             </Component>
 
             <Directory Id="styles" Name="styles">
-              <Component Id="bespin" Guid="0A5A045F-8D7A-4437-9A81-1CFF73031E2C">
-                <File Id="bespin.dll" Name="bespin.dll" Source="..\contrib\bespin\bin\msvc-x86\release\styles\bespin.dll"/>
+              <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
+                <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\release\styles\bespin.dll"/>
               </Component>
             </Directory>
 
             <Directory Id="arecontvision" Name="arecontvision">
-              <Component Id="arecontvision" Guid="3A62601C-9F6A-45b0-AEFB-8C5DD70437F0">
-                <File Id="devicesxml" Name="devices.xml" Source="../resource/arecontvision/devices.xml"/>
+              <Component Id="arecontvision" Guid="{94FE9A39-0F46-4c79-A12F-7FCA2E3B5D16}">
+                <File Id="devicesxml" Name="devices.xml" Source="../client/resource/arecontvision/devices.xml"/>
               </Component>
             </Directory>
           </Directory>
@@ -252,7 +252,7 @@
 
       <Directory Id="ProgramMenuFolder" Name="Programs">
         <Directory Id="ProgramMenuDir" Name="$(env.ORGANIZATION_NAME)">
-          <Component Id="ProgramMenuDir" Guid="2F76AF65-B091-45b1-88E8-B1954ED66626">
+          <Component Id="ProgramMenuDir" Guid="{A4C7D09A-756B-45b6-B3A2-1B2D6DCF5D2A}">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
           </Component>
@@ -273,8 +273,16 @@
         <MergeRef Id="VCRedist2"/>
     </Feature>
 
-    <Feature Id="ProductFeature" Title="$(env.APPLICATION_NAME) files" Level="1"
-           ConfigurableDirectory="INSTALLDIR" Absent="disallow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+    <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Application Server" Level="1"
+       ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+    </Feature>
+
+    <Feature Id="ServerFeature" Title="$(env.APPLICATION_NAME) Media Server" Level="1"
+       ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+    </Feature>
+    
+    <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME) Client" Level="1"
+           ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="FFmpegLibraries"/>
       <ComponentRef Id="QTLibraries" />
@@ -298,7 +306,7 @@
     </Feature>
 
 
-    <FeatureRef Id='EveMediaPlayerFileAssociations' />
+    <!--    <FeatureRef Id='EveMediaPlayerFileAssociations' /> -->
     
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="WIXUI_MEDIAFOLDER" Value="MEDIAFOLDER" />
