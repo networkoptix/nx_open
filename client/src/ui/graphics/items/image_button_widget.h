@@ -27,6 +27,8 @@ signals:
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 
+    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+
 private:
     QPixmap m_pixmap;
 };
