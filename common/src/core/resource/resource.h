@@ -177,7 +177,7 @@ public:
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
 
-
+    Q_PROPERTY (QString url READ getUrl WRITE setUrl)
 Q_SIGNALS:
     void onParameterChanged(const QString &paramname, const QString &value);
     void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
