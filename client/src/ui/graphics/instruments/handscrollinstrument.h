@@ -2,7 +2,7 @@
 #define QN_HAND_SCROLL_INSTRUMENT_H
 
 #include <QCursor>
-#include <ui\processors\kineticprocesshandler.h>
+#include <ui/processors/kineticprocesshandler.h>
 #include "dragprocessinginstrument.h"
 
 class HandScrollInstrument: public DragProcessingInstrument, protected KineticProcessHandler {

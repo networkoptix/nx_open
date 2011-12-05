@@ -36,7 +36,7 @@ void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrum
 
 template<class T>
 void InstrumentEventDispatcher<T>::uninstallInstrumentInternal(Instrument *instrument, T *target) {
-    QSet<QPair<Instrument *, T*> >::iterator pos = m_instrumentTargets.find(qMakePair(instrument, target));
+    typename QSet<QPair<Instrument *, T*> >::iterator pos = m_instrumentTargets.find(qMakePair(instrument, target));
     if(pos == m_instrumentTargets.end())
         return;
 
@@ -67,7 +67,7 @@ void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, Ins
         return;
     }
 
-    if (instrument->thread() != thread()) {
+    if (instrument->thread() != this->thread()) {
         qnWarning("Cannot install instrument for an instrument event dispatcher in a different thread.");
         return;
     }
@@ -127,7 +127,7 @@ void InstrumentEventDispatcher<T>::unregisterTarget(T *target) {
 
 template<class T>
 bool InstrumentEventDispatcher<T>::dispatch(T *target, QEvent *event) {
-    QHash<QPair<T *, QEvent::Type>, QList<Instrument *> >::iterator pos = m_instrumentsByTarget.find(qMakePair(target, event->type()));
+    typename QHash<QPair<T *, QEvent::Type>, QList<Instrument *> >::iterator pos = m_instrumentsByTarget.find(qMakePair(target, event->type()));
     if (pos == m_instrumentsByTarget.end()) {
 #ifdef _DEBUG
         if(!m_targets.contains(target))
