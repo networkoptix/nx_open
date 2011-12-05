@@ -61,7 +61,7 @@ void MagnitudeCalculator::registerCalculator(MagnitudeCalculator *calculator) {
 }
 
 qreal MagnitudeCalculator::calculate(const QVariant &value) const {
-    assert(value.userType() == m_type);
+    assert(value.userType() == m_type || m_type == 0);
 
     return calculate(value.data());
 }
@@ -71,7 +71,6 @@ qreal MagnitudeCalculator::calculate(const void *value) const {
 
     return calculateInternal(value);
 }
-
 
 
 qreal calculateMagnitude(float value) {

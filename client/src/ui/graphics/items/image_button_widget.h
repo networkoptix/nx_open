@@ -3,7 +3,7 @@
 
 #include <QGraphicsWidget>
 #include <QPixmap>
-#include "clickable.h"
+#include <ui/processors/clickable.h>
 
 class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
     Q_OBJECT;
@@ -26,6 +26,8 @@ signals:
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
+
+    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
     QPixmap m_pixmap;
