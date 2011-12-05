@@ -3,6 +3,7 @@
 
 #include "kineticprocessor.h"
 #include <limits>
+#include <cmath>
 
 /**
  * Kinetic processor that introduces speed cutting threshold 

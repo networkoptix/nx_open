@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 
 
     // ### local (aka "dummy") video server resource
-    qnResPool->addResource(QnResourcePtr(new QnLocalVideoServer));
+    //qnResPool->addResource(QnResourcePtr(new QnLocalVideoServer));
 
 
     CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
