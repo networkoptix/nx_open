@@ -823,7 +823,7 @@ void GraphicsView::stopAnimation()
     //mSteadyShow.stopAnimation();
 }
 
-void GraphicsView::mousePressEvent ( QMouseEvent * event)
+void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
     //mpe
     if (!mViewStarted)
@@ -1130,7 +1130,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     showStop_helper();
 }
 
-void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     //mre
 
@@ -1834,7 +1834,7 @@ void GraphicsView::onRecordingFailed(QString errMessage)
     QMessageBox::warning(0, QObject::tr("Can' start video recording"), errMessage, QMessageBox::Ok, QMessageBox::NoButton);
 }
 
-void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
+void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!mViewStarted)
         return;
@@ -3630,10 +3630,10 @@ void GraphicsView::onOpenFile()
 {
     if (m_openMediaDialog.exec() && !m_openMediaDialog.selectedFiles().isEmpty())
     {
-        QString selectedFilter = m_openMediaDialog.selectedFilter();
+        //QString selectedFilter = m_openMediaDialog.selectedFilter();
         QStringList srcFiles = m_openMediaDialog.selectedFiles();
         QStringList dstFiles;
-        foreach (QString file, srcFiles)
+        foreach (const QString &file, srcFiles)
             QnFileProcessor::findAcceptedFiles(file, &dstFiles);
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
     }
