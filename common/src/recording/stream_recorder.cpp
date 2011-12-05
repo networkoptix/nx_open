@@ -183,7 +183,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
 
     if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(m_endDateTime, m_fileName);
+        qnStorageMan->fileStarted(m_startDateTime, m_fileName);
     }
 
     outputCtx->video_codec = mediaData->compressionType;
