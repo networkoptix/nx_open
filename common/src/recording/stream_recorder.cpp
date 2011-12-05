@@ -44,7 +44,8 @@ void QnStreamRecorder::close()
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+m_startDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_startOffset+m_endDateTime/1000).toAscii().data(), 0);
             //qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
-            qnStorageMan->fileFinished(m_endDateTime - m_startDateTime, m_fileName);
+            if (m_truncateInterval != 0)
+                qnStorageMan->fileFinished(m_endDateTime - m_startDateTime, m_fileName);
         }
 
         if (m_packetWrited)
