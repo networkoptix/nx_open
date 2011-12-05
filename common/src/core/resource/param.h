@@ -32,6 +32,7 @@ struct QN_EXPORT QnParamType
 
     bool ui;
     bool readonly;
+    bool isStatic;
 
     bool setDefVal(QnValue val); // safe way to set value
 };
@@ -49,6 +50,7 @@ struct QN_EXPORT QnParam
     const QString& group() const { return m_paramType->group; }
     const QString& subgroup() const { return m_paramType->subgroup; }
     bool  isUiParam() const  { return m_paramType->ui; }
+    bool isStatic() const { return m_paramType->isStatic; }
     const QnValue& minValue() const { return m_paramType->min_val; }
     const QnValue& maxValue() const { return m_paramType->max_val; }
     QnParamType::DataType type() const { return m_paramType->type;}

@@ -178,6 +178,7 @@ public:
     void disconnectAllConsumers();
 
     Q_PROPERTY (QString url READ getUrl WRITE setUrl)
+    Q_PROPERTY (QString name READ getName WRITE setName USER false) // do not show at GUI
 Q_SIGNALS:
     void onParameterChanged(const QString &paramname, const QString &value);
     void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
