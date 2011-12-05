@@ -3,7 +3,7 @@
 
 #include <QGraphicsWidget>
 #include <QPixmap>
-#include "clickable.h"
+#include <ui/processors/clickable.h>
 
 class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
     Q_OBJECT;
