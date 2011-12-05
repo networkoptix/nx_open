@@ -22,9 +22,10 @@ m_firstTimestamp(-1),
 m_formatCtx(0),
 m_truncateInterval(0),
 m_currentChunkLen(0),
-m_prevDateTime(-1),
-m_currentDateTime(-1),
-m_lastPacketTime(0)
+m_startDateTime(-1),
+m_endDateTime(-1),
+m_lastPacketTime(0),
+m_startOffset(0)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -38,12 +39,12 @@ void QnStreamRecorder::close()
 {
     if (m_formatCtx) 
     {
-        if (m_truncateInterval > 0)
+        if (m_startDateTime != -1)
         {
-            av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_prevDateTime/1000).toAscii().data(), 0);
-            av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_currentDateTime/1000).toAscii().data(), 0);
+            av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+m_startDateTime/1000).toAscii().data(), 0);
+            av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_startOffset+m_endDateTime/1000).toAscii().data(), 0);
             //qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
-            qnStorageMan->fileFinished(m_currentDateTime - m_prevDateTime, m_fileName);
+            qnStorageMan->fileFinished(m_endDateTime - m_startDateTime, m_fileName);
         }
 
         if (m_packetWrited)
@@ -93,7 +94,9 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
     if (m_firstTimestamp == -1)
         m_firstTimestamp = md->timestamp;
-    
+
+    m_endDateTime = md->timestamp;
+
     if (md->flags & AV_PKT_FLAG_KEY)
     {
         m_gotKeyFrame[channel] = true;
@@ -103,9 +106,11 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
             while (m_currentChunkLen <= 0)
                 m_currentChunkLen += m_truncateInterval;
             //cl_log.log("chunkLen=" , m_currentChunkLen/1000000.0, cl_logALWAYS);
-            m_prevDateTime = m_currentDateTime;
-            m_currentDateTime = md->timestamp;
+            //m_startDateTime = m_endDateTime;
+            //m_endDateTime = md->timestamp;
             close();
+            m_startDateTime = m_endDateTime;
+
             return processData(data);
         }
     }
@@ -140,8 +145,8 @@ void QnStreamRecorder::endOfRun()
 
 bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 {
-    if (m_currentDateTime == -1)
-        m_currentDateTime = mediaData->timestamp;
+    if (m_startDateTime == -1)
+        m_startDateTime = mediaData->timestamp;
     //QnResourcePtr resource = mediaData->dataProvider->getResource();
     // allocate container
     AVOutputFormat * outputCtx = av_guess_format("matroska",NULL,NULL);
@@ -159,7 +164,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        m_fileName = qnStorageMan->getFileName(m_currentDateTime, netResource);
+        m_fileName = qnStorageMan->getFileName(m_endDateTime, netResource);
     }
     else {
         m_fileName = m_fixedFileName;
@@ -177,7 +182,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
 
     if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(m_currentDateTime, m_fileName);
+        qnStorageMan->fileStarted(m_endDateTime, m_fileName);
     }
 
     outputCtx->video_codec = mediaData->compressionType;
@@ -278,4 +283,9 @@ void QnStreamRecorder::setTruncateInterval(int seconds)
 void QnStreamRecorder::setFileName(const QString& fileName)
 {
     m_fixedFileName = fileName;
+}
+
+void QnStreamRecorder::setStartOffset(qint64 value)
+{
+    m_startOffset = value;
 }

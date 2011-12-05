@@ -5,17 +5,6 @@
 #include "core/resource/resource.h"
 #include "api/VideoServerConnection.h"
 
-class QnLocalVideoServer : public QnResource
-{
-public:
-    QnLocalVideoServer();
-    virtual ~QnLocalVideoServer();
-
-    virtual QString getUniqueId() const;
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
-};
-
-
 class QnVideoServer : public QnResource
 {
 public:
