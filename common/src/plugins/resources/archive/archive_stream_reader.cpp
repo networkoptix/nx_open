@@ -614,6 +614,8 @@ bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
 
 void QnArchiveStreamReader::setReverseMode(bool value)
 {
+    if (value != m_reverseMode)
+        m_lastJumpTime = AV_NOPTS_VALUE;
     m_reverseMode = value;
 }
 

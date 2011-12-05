@@ -367,6 +367,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     int sign = value ? -1 : 1;
+    if (value && m_position == DATETIME_NOW)
+        m_position = AV_NOPTS_VALUE;
     m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
 }
 
