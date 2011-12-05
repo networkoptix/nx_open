@@ -44,7 +44,7 @@ template<class T>
 class InstrumentEventDispatcher: public InstrumentEventDispatcherBase<T>, public InstallationMode {
     typedef InstrumentEventDispatcherBase<T> base_type;
 
-    friend class base_type; /* Calls dispatch. */
+    friend class InstrumentEventDispatcherBase<T>; /* Calls dispatch. */
 
 public:
     static const Instrument::WatchedType TARGET_TYPE = instrument_watched_type<T>::value;
@@ -101,8 +101,8 @@ private:
         return true;
     }
 
-    template<class T>
-    bool registeredNotify(Instrument *instrument, T *target) const {
+    template<class Y>
+    bool registeredNotify(Instrument *instrument, Y *target) const {
         return instrument->registeredNotify(target);
     }
 
@@ -110,8 +110,8 @@ private:
         return;
     }
 
-    template<class T>
-    void unregisteredNotify(Instrument *instrument, T *target) const {
+    template<class Y>
+    void unregisteredNotify(Instrument *instrument, Y *target) const {
         return instrument->unregisteredNotify(target);
     }
 

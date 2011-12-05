@@ -4,14 +4,6 @@
 #include <cmath> /* For std::floor, std::ceil. */
 
 namespace {
-    uint qHash(const QPoint &value)
-    {
-        using ::qHash;
-
-        /* 1021 is a prime. */
-        return qHash(value.x() * 1021) + qHash(value.y());
-    }
-
     QSizeF operator*(const QSizeF &l, const QSizeF &r)
     {
         return QSizeF(l.width() * r.width(), l.height() * r.height());
@@ -33,6 +25,15 @@ namespace {
     }
 
 }
+
+static uint qHash(const QPoint &value)
+{
+    using ::qHash;
+
+    /* 1021 is a prime. */
+    return qHash(value.x() * 1021) + qHash(value.y());
+}
+
 
 void CellLayoutPrivate::ensureBounds() const
 {
