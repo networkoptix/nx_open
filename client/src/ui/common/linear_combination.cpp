@@ -69,7 +69,7 @@ void LinearCombinator::registerCombinator(LinearCombinator *combinator) {
 }
 
 QVariant LinearCombinator::combine(qreal a, const QVariant &x, qreal b, const QVariant &y) const {
-    assert(x.userType() == m_type && y.userType() == m_type);
+    assert((x.userType() == m_type && y.userType() == m_type) || m_type == 0);
 
     QVariant result(m_type, static_cast<const void *>(NULL));
     calculateInternal(a, x.data(), b, y.data(), result.data());
