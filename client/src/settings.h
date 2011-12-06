@@ -47,11 +47,9 @@ public:
     bool isAfterFirstRun() const;
     QString mediaRoot() const;
     QStringList auxMediaRoots() const;
-
-    bool haveValidSerialNumber() const;
-    void setSerialNumber(const QString& serial);
-
     void addAuxMediaRoot(const QString& root);
+
+    static bool haveValidLicense();
 
 private:
     Settings();
@@ -68,9 +66,6 @@ private:
     QString m_fileName;
 
     Data m_data;
-
-    QString m_serialNumber;
-    bool m_haveValidSerialNumber;
 };
 
 #endif //global_settings_h1933

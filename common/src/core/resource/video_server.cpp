@@ -2,6 +2,30 @@
 
 #include <QtCore/QUrl>
 
+QnLocalVideoServer::QnLocalVideoServer()
+: QnResource()
+{
+    //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer")));
+    addFlag(server | local);
+    setName(QLatin1String("Local"));
+    setId(QnId());
+}
+
+QnLocalVideoServer::~QnLocalVideoServer()
+{
+}
+
+QString QnLocalVideoServer::getUniqueId() const
+{
+    return QLatin1String("LocalServer");
+}
+
+QnAbstractStreamDataProvider *QnLocalVideoServer::createDataProviderInternal(ConnectionRole role)
+{
+    Q_UNUSED(role)
+        return 0;
+}
+
 QnVideoServer::QnVideoServer():
     QnResource()
     //,m_rtspListener(0)

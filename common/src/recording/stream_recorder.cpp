@@ -25,7 +25,8 @@ m_currentChunkLen(0),
 m_startDateTime(-1),
 m_endDateTime(-1),
 m_lastPacketTime(0),
-m_startOffset(0)
+m_startOffset(0),
+m_forceDefaultCtx(true)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -165,7 +166,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        m_fileName = qnStorageMan->getFileName(m_endDateTime, netResource);
+        m_fileName = qnStorageMan->getFileName(m_startDateTime, netResource);
     }
     else {
         m_fileName = m_fixedFileName;
@@ -216,7 +217,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
 
         AVCodecContext* videoCodecCtx = videoStream->codec;
-        if (mediaData->context) {
+        // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
+        // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
+        if (mediaData->context && !m_forceDefaultCtx) 
+        {
             avcodec_copy_context(videoCodecCtx, mediaData->context->ctx());
         }
         else {

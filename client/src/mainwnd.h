@@ -33,10 +33,12 @@ private Q_SLOTS:
     void itemActivated(uint resourceId);
     void handleMessage(const QString &message);
 
+    void activate();
+    void toggleFullScreen();
+    void editPreferences();
+
 private:
     void destroyNavigator(CLLayoutNavigator *&nav);
-
-    void activate();
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;

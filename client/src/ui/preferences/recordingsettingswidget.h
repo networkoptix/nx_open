@@ -2,7 +2,8 @@
 #define VIDEORECORDINGDIALOG_H
 
 #include <QtGui/QWidget>
-#include "videorecordersettings.h"
+
+#include "ui/videorecordersettings.h"
 
 namespace Ui {
     class RecordingSettings;
@@ -19,10 +20,10 @@ public:
 
     VideoRecorderSettings::CaptureMode captureMode() const;
     void setCaptureMode(VideoRecorderSettings::CaptureMode c);
-    
+
     VideoRecorderSettings::DecoderQuality decoderQuality() const;
     void setDecoderQuality(VideoRecorderSettings::DecoderQuality q);
-    
+
     VideoRecorderSettings::Resolution resolution() const;
     void setResolution(VideoRecorderSettings::Resolution r);
 
@@ -39,7 +40,6 @@ public slots:
     void accept();
     void onComboboxChanged(int index);
 private:
-    void setDefaultSoundIcon(QLabel* l);
     void additionalAdjustSize();
 private slots:
     void onMonitorChanged(int);

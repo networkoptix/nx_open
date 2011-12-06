@@ -33,6 +33,7 @@ protected:
 	bool m_firstTime;
 	bool m_gotKeyFrame[CL_MAX_CHANNELS];
 private:
+    bool m_forceDefaultCtx;
     AVFormatContext* m_formatCtx;
     bool m_packetWrited;
     qint64 m_firstTimestamp;

@@ -1,9 +1,8 @@
 #include "settings.h"
-#include "serial.h"
+
+#include "license.h"
 #include "utils/common/util.h"
 #include "utils/common/log.h"
-
-
 
 bool global_show_item_text = false;
 qreal global_rotation_angel = 0;
@@ -74,47 +73,42 @@ void Settings::load(const QString& fileName)
     reset();
 
     QFile settingsFile(m_fileName);
-
     if (settingsFile.exists())
     {
         if (settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             QXmlStreamReader xml(&settingsFile);
+            while (!xml.atEnd())
+            {
+                xml.readNext();
 
-			while (!xml.atEnd())
-			{
-				xml.readNext();
+                if (xml.isStartElement())
+                {
+                    if (xml.name() == QLatin1String("mediaRoot"))
+                        m_data.mediaRoot = fromNativePath(xml.readElementText());
+                    else if (xml.name() == QLatin1String("auxMediaRoot"))
+                        m_data.auxMediaRoots.push_back(fromNativePath(xml.readElementText()));
+                    else if (xml.name() == QLatin1String("afterFirstRun"))
+                        m_data.afterFirstRun = xml.readElementText() == QLatin1String("true");
+                    else if (xml.name() == QLatin1String("maxVideoItems"))
+                        m_data.maxVideoItems = qBound(0, xml.readElementText().toInt(), 32);
+                    else if (xml.name() == QLatin1String("downmixAudio"))
+                        m_data.downmixAudio = xml.readElementText() == QLatin1String("true");
+                }
+            }
 
-				if (xml.isStartElement())
-				{
-					if (xml.name() == QLatin1String("mediaRoot"))
-						m_data.mediaRoot = fromNativePath(xml.readElementText());
-					else if (xml.name() == QLatin1String("auxMediaRoot"))
-						m_data.auxMediaRoots.push_back(fromNativePath(xml.readElementText()));
-					else if (xml.name() == QLatin1String("serialNumber"))
-						setSerialNumber(xml.readElementText());
-					else if (xml.name() == QLatin1String("afterFirstRun"))
-						m_data.afterFirstRun = xml.readElementText() == QLatin1String("true");
-					else if (xml.name() == QLatin1String("maxVideoItems"))
-						m_data.maxVideoItems = qBound(0, xml.readElementText().toInt(), 32);
-					else if (xml.name() == QLatin1String("downmixAudio"))
-						m_data.downmixAudio = xml.readElementText() == QLatin1String("true");
-				}
-			}
-
-			if (xml.hasError())
-			{
-				reset();
-			}
-		} else
-		{
-			cl_log.log(QLatin1String("Can't open settings file"), cl_logERROR);
-		}
-
-	} else
-	{
-		cl_log.log(QLatin1String("No settings file"), cl_logERROR);
-	}
+            if (xml.hasError())
+                reset();
+        }
+        else
+        {
+            cl_log.log(QLatin1String("Can't open settings file"), cl_logERROR);
+        }
+    }
+    else
+    {
+        cl_log.log(QLatin1String("No settings file"), cl_logERROR);
+    }
 
     if (m_data.mediaRoot.isEmpty())
         m_data.mediaRoot = getMoviesDirectory() + QLatin1String("/EVE Media/");
@@ -135,31 +129,26 @@ void Settings::save()
     QXmlStreamWriter stream(&settingsFile);
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
-
-    stream.writeStartElement(QLatin1String("settings"));
-    stream.writeStartElement(QLatin1String("config"));
-
-    stream.writeTextElement(QLatin1String("mediaRoot"), QDir::toNativeSeparators(m_data.mediaRoot));
-
-    foreach(QString auxMediaRoot, m_data.auxMediaRoots)
     {
-        stream.writeTextElement(QLatin1String("auxMediaRoot"), QDir::toNativeSeparators(auxMediaRoot));
+        stream.writeStartElement(QLatin1String("settings"));
+        {
+            stream.writeStartElement(QLatin1String("config"));
+            {
+                stream.writeTextElement(QLatin1String("mediaRoot"), QDir::toNativeSeparators(m_data.mediaRoot));
+
+                foreach (const QString &auxMediaRoot, m_data.auxMediaRoots)
+                    stream.writeTextElement(QLatin1String("auxMediaRoot"), QDir::toNativeSeparators(auxMediaRoot));
+
+                stream.writeTextElement(QLatin1String("afterFirstRun"), QLatin1String("true"));
+
+                stream.writeTextElement(QLatin1String("maxVideoItems"), QString::number(m_data.maxVideoItems));
+
+                stream.writeTextElement(QLatin1String("downmixAudio"), m_data.downmixAudio ? QLatin1String("true") : QLatin1String("false"));
+            }
+            stream.writeEndElement(); // config
+        }
+        stream.writeEndElement(); // settings
     }
-
-    if (!m_serialNumber.isEmpty())
-    {
-        stream.writeTextElement(QLatin1String("serialNumber"), m_serialNumber);
-    }
-
-    stream.writeTextElement(QLatin1String("afterFirstRun"), QLatin1String("true"));
-
-    stream.writeTextElement(QLatin1String("maxVideoItems"), QString::number(m_data.maxVideoItems));
-
-    stream.writeTextElement(QLatin1String("downmixAudio"), m_data.downmixAudio ? QLatin1String("true") : QLatin1String("false"));
-
-    stream.writeEndElement(); // config
-    stream.writeEndElement(); // settings
-
     stream.writeEndDocument();
 
     settingsFile.close();
@@ -218,21 +207,9 @@ void Settings::addAuxMediaRoot(const QString& root)
     m_data.auxMediaRoots.append(fromNativePath(root));
 }
 
-void Settings::setSerialNumber(const QString& serial)
+bool Settings::haveValidLicense()
 {
-    QWriteLocker _lock(&m_RWLock);
-
-    SerialChecker serialChecker;
-    if (serialChecker.isValidSerial(serial))
-    {
-        m_serialNumber = serial;
-        m_haveValidSerialNumber = true;
-    }
-}
-
-bool Settings::haveValidSerialNumber() const
-{
-    return m_haveValidSerialNumber;
+    return QnLicense::defaultLicense().isValid();
 }
 
 /// Private methods. No internal synchronization needed.
@@ -267,5 +244,4 @@ void Settings::reset()
 #endif
     m_data.afterFirstRun = false;
     m_data.allowChangeIP = false;
-    m_haveValidSerialNumber = false;
 }
