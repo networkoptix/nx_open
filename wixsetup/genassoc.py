@@ -18,12 +18,12 @@ footer_string = """
 
 component_template_string = """     <Component Id="Eve${capitalized_ext}FileAssociation" Guid="${guid}" DiskId="1">
               <RegistryValue Root="HKCR" Type="string" Key="EVE.${ext}" Value="EVE media file (.${ext})" KeyPath="yes" />
-              <RegistryValue Root="HKCR" Type="string" Key="EVE.${ext}\shell\open\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;"/>
-              <RegistryValue Root="HKCR" Type="string" Key="EVE.${ext}\DefaultIcon" Value="&quot;[#UniclientEXE]&quot;" />
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.${ext}\shell\open\command" Value="&quot;[#ClientExe]&quot; &quot;%1&quot;"/>
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.${ext}\DefaultIcon" Value="&quot;[#ClientExe]&quot;" />
               <RegistryValue Root="HKCR" Type="string" Key=".${ext}" Value="EVE.${ext}" />
               
               <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.${ext}\shell\play.EvePlayer.exe" Value="Play with $$(env.APPLICATION_NAME)" Type="string" />
-              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.${ext}\shell\play.EvePlayer.exe\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" Type="string" />
+              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.${ext}\shell\play.EvePlayer.exe\command" Value="&quot;[#ClientExe]&quot; &quot;%1&quot;" Type="string" />
 
               <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe\SupportedTypes" Name=".${ext}" Value=""/>
               <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player\Capabilities\FileAssociations" Name=".${ext}" Value="EVE.${ext}"/>

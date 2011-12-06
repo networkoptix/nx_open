@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (c) Microsoft Corporation.  All rights reserved.
     
@@ -13,24 +13,39 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <UI>
-            <Dialog Id="AppServerDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
-                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+            <Dialog Id="MediaServerDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="no" Text="!(loc.WixUINext)" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="no" Text="!(loc.WixUICancel)">
                     <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
                 </Control>
-                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="" />
+                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" />
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="Media Server Configuration" />
                 <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
-                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
-                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
-                <Control Id="FolderLabel" Type="Text" X="20" Y="60" Width="290" Height="30" NoPrefix="yes" Text="Please Set Media Server Parameters" />
-                <Control Id="Folder" Type="Edit" X="90" Y="82" Width="198" Height="15" Property="WIXUI_MEDIAFOLDER" Indirect="yes" />
-                <Control Type="Text" Id="PortLabel" Width="50" Height="17" X="22" Y="86" Text="Port" />
-                <Control Type="Text" Id="LoginLabel" Width="50" Height="17" X="22" Y="116" Text="Login" />
-                <Control Type="Text" Id="PasswordLabel" Width="50" Height="17" X="22" Y="142" Text="Password" />
-                <Control Type="Edit" Id="Port" Width="197" Height="15" X="90" Y="120" />
-                <Control Type="Edit" Id="Password" Width="197" Height="15" X="90" Y="142" />
+                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
+                <Control Type="Text" Id="PortLabel" Width="21" Height="17" X="269" Y="68" Text="Port" />
+                <Control Type="Text" Id="LoginLabel" Width="32" Height="17" X="25" Y="92" Text="Login" />
+                <Control Type="Text" Id="PasswordLabel" Width="46" Height="15" X="190" Y="92" Text="Password" />
+                <Control Type="Edit" Id="Port" Width="55" Height="15" X="296" Y="67" Property="SERVER_PORT" />
+                <Control Type="Edit" Id="Login" X="75" Y="89" Width="101" Height="15" Property="SERVER_LOGIN" />
+                <Control Type="Edit" Id="Password" Width="111" Height="15" X="241" Y="89" Property="SERVER_PASSWORD" />
+                <Control Id="groupBox2" Type="GroupBox" Height="104" Width="345" X="15" Y="119" Text="Media Server" />
+                <Control Id="label1" Type="Text" Height="17" Width="70" X="25" Y="131" Text="RTSP Port" />
+                <Control Id="textBox1" Type="Edit" Height="15" Width="105" X="93" Y="129" Property="SERVER_RTSP_PORT" />
+                <Control Id="label2" Type="Text" Height="17" Width="34" X="233" Y="130" Text="API Port" />
+                <Control Id="textBox2" Type="Edit" Height="15" Width="80" X="273" Y="128" Property="SERVER_API_PORT" />
+                <Control Id="label3" Type="Text" Height="17" Width="70" X="25" Y="161" Text="Directory" />
+                <Control Id="ServerMediaDir" Type="PathEdit" Height="15" Width="197" X="93" Y="158" Property="WIXUI_SERVER_DIRECTORY" Indirect="yes" />
+                <Control Id="checkBox1" Type="CheckBox" Height="18" Width="91" X="269" Y="184" Text="Allow to change IP" Property="WIXUI_SERVER_ALLOWCHANGEIP" Indirect="yes"/>
+                <Control Id="groupBox1" Type="GroupBox" Height="66" Width="345" X="15" Y="49" Text="Application Server" />
+                <Control Id="ChangeServerMediaDir" Type="PushButton" Height="17" Width="56" X="296" Y="158" Text="Browse" />
+                <Control Id="Host" Type="Edit" Height="15" Width="182" X="75" Y="65" Property="SERVER_HOST" />
+                <Control Id="HostLabel" Type="Text" Height="17" Width="32" X="25" Y="68" Text="Host" />
+                <Control Id="KeepFreeSpaceLabel" Type="Text" Height="17" Width="82" X="133" Y="188" Text="Keep free space (Gb)" />
+                <Control Id="KeepFreeSpace" Type="Edit" Height="15" Width="24" X="233" Y="188" Property="SERVER_KEEP" />
+                <Control Id="AmountLabel" Type="Text" Height="17" Width="70" X="25" Y="188" Text="Amount (days)" />
+                <Control Id="Amount" Type="Edit" Height="15" Width="26" X="93" Y="188" Property="SERVER_AMOUNT" />
             </Dialog>
         </UI>
     </Fragment>
