@@ -13,6 +13,8 @@ public:
     CLAbstractUnmovedItem(QString name = QString(), QGraphicsItem* parent = 0);
     virtual ~CLAbstractUnmovedItem();
 
+    bool mouseOver() const;
+
     void setStaticPos(const QPoint &p); // sets pos in term of point view coordinates
     void adjust(); // adjusts position and size of the item on the scene after scene transformation is done
 
@@ -20,7 +22,7 @@ public:
 
     virtual void hideIfNeeded(int duration);
 
-    virtual bool preferNonSteadyMode() const;
+    virtual bool preferNonSteadyMode() const { return mouseOver(); }
 
     virtual void hide(int duration) = 0;
     virtual void show(int duration) = 0;

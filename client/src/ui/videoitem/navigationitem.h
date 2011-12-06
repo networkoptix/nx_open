@@ -49,7 +49,7 @@ class VolumeSlider;
 
 class NavigationItem : public CLUnMovedInteractiveOpacityItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef CLUnMovedInteractiveOpacityItem base_type;
 
@@ -67,8 +67,6 @@ public:
 
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {}
     QRectF boundingRect() const;
-
-    inline bool mouseOver() const { return m_mouseOver; }
 
     inline bool isPlaying() const { return m_playing; }
 
@@ -117,8 +115,6 @@ private Q_SLOTS:
 
 
 protected:
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
 private:
@@ -141,7 +137,6 @@ private:
     int m_timerId;
     qint64 m_currentTime;
     bool m_playing;
-    bool m_mouseOver;
 
     QnTimePeriod m_timePeriod;
 

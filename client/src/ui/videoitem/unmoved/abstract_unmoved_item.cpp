@@ -21,7 +21,7 @@ void CLAbstractUnmovedItem::hideIfNeeded(int duration)
     hide(duration);
 }
 
-bool CLAbstractUnmovedItem::preferNonSteadyMode() const
+bool CLAbstractUnmovedItem::mouseOver() const
 {
     //return isUnderMouse(); //qt bug 18797 When setting the flag ItemIgnoresTransformations for an item, it will receive mouse events as if it was transformed by the view.
     return m_underMouse;

@@ -150,7 +150,6 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     base_type(QString("name:)"), 0, 0.5, 0.95),
     m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
-    m_mouseOver(false),
     restoreInfoTextData(0)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -700,18 +699,6 @@ void NavigationItem::stepForward()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->nextFrame();
     //m_camera->getCamCamDisplay()->setSingleShotMode(true);
-}
-
-void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
-{
-    m_mouseOver = true;
-    base_type::hoverEnterEvent(e);
-}
-
-void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
-{
-    m_mouseOver = false;
-    base_type::hoverLeaveEvent(e);
 }
 
 void NavigationItem::onSliderPressed()
