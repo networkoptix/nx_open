@@ -248,7 +248,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gr
         layout()->pinItem(item, newGeometry);
     }
 
-    display()->ensureVisible(item);
+    display()->fitInView();
 }
 
 void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {

@@ -424,7 +424,7 @@ void QnWorkbenchDisplay::fitInView() {
     if(zoomedItem != NULL) {
         m_viewportAnimator->moveTo(itemGeometry(zoomedItem), zoomAnimationDurationMsec);
     } else {
-        m_viewportAnimator->moveTo(layoutBoundingGeometry(), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(fitInViewGeometry(), zoomAnimationDurationMsec);
     }
 }
 
@@ -608,6 +608,10 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 }
 
 QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
+    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-1, -1, 1, 1));
+}
+
+QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
     return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-0.1, -0.1, 0.1, 0.1));
 }
 
@@ -821,7 +825,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
 
             m_viewportAnimator->moveTo(itemGeometry(item), zoomAnimationDurationMsec);
         } else {
-            m_viewportAnimator->moveTo(layoutBoundingGeometry(), zoomAnimationDurationMsec);
+            m_viewportAnimator->moveTo(fitInViewGeometry(), zoomAnimationDurationMsec);
         }
 
         synchronizeSceneBounds();

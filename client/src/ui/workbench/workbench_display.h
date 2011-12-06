@@ -188,6 +188,8 @@ public:
      */
     QRectF layoutBoundingGeometry() const;
 
+    QRectF fitInViewGeometry() const;
+
     /**
      * \returns                         Current viewport geometry, in scene coordinates.
      */
