@@ -265,7 +265,7 @@ class TimeLine : public GraphicsFrame
 public:
     TimeLine(TimeSlider *parent) :
         GraphicsFrame(parent), m_parent(parent),
-        m_rangeSelectionState(NoSelection),
+        m_rangeSelectionState(NoRangeSelected),
         m_dragging(false),
         m_scaleSpeed(1.0),
         m_prevWheelDelta(INT_MAX),
@@ -320,7 +320,7 @@ private:
     QPropertyAnimation *m_wheelAnimation;
 
     enum {
-        NoSelection,
+        NoRangeSelected = 0,
         SelectingRangeBegin,
         SelectingRangeEnd,
         RangeSelected
@@ -593,17 +593,20 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     // draw selection range
-    if (m_rangeSelectionState != NoSelection && m_selectedRange.first != m_selectedRange.second)
+    if (m_rangeSelectionState != NoRangeSelected)
     {
-        const qreal rangeBegin = m_selectedRange.first != 0 ? valueToPos(m_selectedRange.first) : 0.0;
-        const qreal rangeEnd = m_selectedRange.second != 0 ? valueToPos(m_selectedRange.second) : 0.0;
+        const qreal rangeBegin = m_rangeSelectionState >= SelectingRangeBegin ? valueToPos(m_selectedRange.first) : 0.0;
+        const qreal rangeEnd = m_rangeSelectionState >= SelectingRangeEnd ? valueToPos(m_selectedRange.second) : 0.0;
 
-        if (m_selectedRange.first != 0 && m_selectedRange.second != 0)
-            painter->fillRect(QRectF(QPointF(rangeBegin, 0), QPointF(rangeEnd, rect().height())), QColor(120, 150, 180, 150));
+        if (m_rangeSelectionState >= SelectingRangeEnd)
+        {
+            const QColor selectionColor(120, 150, 180, m_rangeSelectionState == RangeSelected ? 150 : 50);
+            painter->fillRect(QRectF(QPointF(rangeBegin, 0), QPointF(rangeEnd, rect().height())), selectionColor);
+        }
         painter->setPen(QPen(Qt::red, 0));
-        if (m_selectedRange.first != 0)
+        if (m_rangeSelectionState >= SelectingRangeBegin)
             painter->drawLine(QLineF(rangeBegin, 0, rangeBegin, rect().height()));
-        if (m_selectedRange.second != 0)
+        if (m_rangeSelectionState >= SelectingRangeEnd)
             painter->drawLine(QLineF(rangeEnd, 0, rangeEnd, rect().height()));
     }
 
@@ -639,7 +642,7 @@ void TimeLine::setSelectionRange(const QPair<qint64, qint64> &range)
     }
 
     m_rangeSelectionState = range.first == range.second || range.second == 0
-                            ? range.first == 0 ? NoSelection
+                            ? range.first == 0 ? NoRangeSelected
                                                : SelectingRangeEnd
                             : RangeSelected;
 
@@ -746,7 +749,7 @@ void TimeLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_parent->setMoving(false);
 
         if (!wasDragging) {
-            if (event->modifiers() == Qt::ShiftModifier && (m_rangeSelectionState == NoSelection || m_rangeSelectionState == RangeSelected)) {
+            if (event->modifiers() == Qt::ShiftModifier && (m_rangeSelectionState == NoRangeSelected || m_rangeSelectionState == RangeSelected)) {
                 resetSelectionRange();
                 m_rangeSelectionState = SelectingRangeBegin;
             }
