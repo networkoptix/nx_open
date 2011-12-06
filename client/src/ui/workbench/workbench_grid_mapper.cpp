@@ -2,23 +2,19 @@
 #include <cmath>
 
 namespace {
-    QSizeF operator*(const QSizeF &l, const QSizeF &r)
-    {
+    QSizeF operator*(const QSizeF &l, const QSizeF &r) {
         return QSizeF(l.width() * r.width(), l.height() * r.height());
     }
 
-    QSizeF operator/(const QSizeF &l, const QSizeF &r)
-    {
+    QSizeF operator/(const QSizeF &l, const QSizeF &r) {
         return QSizeF(l.width() / r.width(), l.height() / r.height());
     }
 
-    QPointF operator*(const QPointF &l, const QPointF &r)
-    {
+    QPointF operator*(const QPointF &l, const QPointF &r) {
         return QPointF(l.x() * r.x(), l.y() * r.y());
     }
 
-    QPointF operator/(const QPointF &l, const QPointF &r)
-    {
+    QPointF operator/(const QPointF &l, const QPointF &r) {
         return QPointF(l.x() / r.x(), l.y() / r.y());
     }
 }

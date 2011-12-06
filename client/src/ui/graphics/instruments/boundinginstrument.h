@@ -57,6 +57,13 @@ public:
 
     /**
      * \param view                      Graphics view to use.
+     * \param sizeLowerExtension        Extension of the lower bound of viewport size, relative to this lower bound.
+     * \param sizeLowerExtension        Extension of the upper bound of viewport size, relative to this upper bound.
+     */
+    void setSizeBoundsExtension(QGraphicsView *view, const QSizeF &sizeLowerExtension, const QSizeF &sizeUpperExtension);
+
+    /**
+     * \param view                      Graphics view to use.
      * \param multiplier                Viewport movement speed, in viewports per second.
      */
     void setMovementSpeed(QGraphicsView *view, qreal multiplier);

@@ -128,6 +128,14 @@ QRectF QnSceneUtility::dilated(const QRectF &rect, const QSizeF &amount) {
     return rect.adjusted(-amount.width(), -amount.height(), amount.width(), amount.height());
 }
 
+QRectF QnSceneUtility::dilated(const QRectF &rect, const MarginsF &amount) {
+    return rect.adjusted(-amount.left(), -amount.top(), amount.right(), amount.bottom());
+}
+
+QSizeF QnSceneUtility::dilated(const QSizeF &size, const MarginsF &amount) {
+    return QSizeF(size.width() + amount.left() + amount.right(), size.height() + amount.top() + amount.bottom());
+}
+
 bool QnSceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
     return size.width() > otherSize.width() && size.height() > otherSize.height();
 }

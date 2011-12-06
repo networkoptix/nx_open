@@ -515,14 +515,10 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 }
 
 void QnWorkbenchController::at_viewport_resized() {
-    display()->boundingInstrument()->setPositionBoundsExtension(
-        display()->view(), 
-        MarginsF(
-            0.0,
-            0.0,
-            0.0,
-            m_navigationItem->graphicsWidget()->geometry().height() / display()->view()->viewport()->height()
-        )
-    );
+    /* Navigation item height to viewport height ratio. */
+    qreal k = m_navigationItem->graphicsWidget()->geometry().height() / display()->view()->viewport()->height();
+
+    display()->boundingInstrument()->setPositionBoundsExtension(display()->view(), MarginsF(0.0, 0.0, 0.0, k));
+    display()->boundingInstrument()->setSizeBoundsExtension(display()->view(), QSizeF(0.0, k / (1 - k)), QSizeF(0.0, k / (1 - k)));
 }
 

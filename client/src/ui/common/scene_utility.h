@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include <QPoint>
 #include <QSize>
+#include "margins.h"
 
 class QRect;
 class QRectF;
@@ -148,6 +149,24 @@ public:
      * \returns                         Dilated rectangle.
      */
     static QRectF dilated(const QRectF &rect, const QSizeF &amount);
+
+    /**
+     * Dilates the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to dilate.
+     * \param amount                    Dilation amount.
+     * \returns                         Dilated rectangle.
+     */
+    static QRectF dilated(const QRectF &rect, const MarginsF &amount);
+
+    /**
+     * Dilates the given size by the given amount.
+     * 
+     * \param size                      Size to dilate.
+     * \param amount                    Dilation amount.
+     * \returns                         Dilated size.
+     */
+    static QSizeF dilated(const QSizeF &size, const MarginsF &amount);
 
     /**
      * \param size                      Size to check for containment.
