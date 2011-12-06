@@ -308,7 +308,7 @@ QnParamList& QnResource::getResourceParamList() const
     for (int i = 0; i < metaObject()->propertyCount(); ++i)
     {
         QMetaProperty prop =  metaObject()->property(i);
-        QnParamTypePtr paramType;
+        QnParamTypePtr paramType(new QnParamType());
         paramType->type = variantTypeToPropType(prop.type());
         paramType->name = prop.name();
         paramType->ui = prop.isUser();
