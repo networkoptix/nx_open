@@ -51,13 +51,17 @@ win* {
     } else {
         OPENAL_LIBS_PATH = $$PWD/../contrib/openal/bin/win64
     }
-
     INCLUDEPATH += $$PWD/../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
+
+    INCLUDEPATH += $$PWD/../contrib/openssl/include
+    LIBS += -L$$PWD/../contrib/openssl/bin -llibeay32
 }
 
 mac {
-  LIBS += -framework OpenAL
+    LIBS += -framework OpenAL
+
+    LIBS += -lcrypto
 }
 
 # Clone ssh://hg@vigasin.com/evetools to the same diectory netoptix_vms is located
