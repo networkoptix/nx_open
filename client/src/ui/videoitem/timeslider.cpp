@@ -22,6 +22,8 @@
 
 #include <qmath.h>
 
+//#define TIMESLIDER_ANIMATED_DRAG
+
 namespace {
 
 QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
@@ -276,7 +278,10 @@ public:
 
         setAcceptHoverEvents(true);
 
+#ifdef TIMESLIDER_ANIMATED_DRAG
+        m_length = 0;
         m_lineAnimation = new QPropertyAnimation(m_parent, "currentValue", this);
+#endif
         m_wheelAnimation = new QPropertyAnimation(m_parent, "scalingFactor", this);
 
         connect(m_wheelAnimation, SIGNAL(finished()), m_parent, SLOT(onWheelAnimationFinished()));
@@ -315,8 +320,10 @@ private:
 private:
     TimeSlider *m_parent;
     QPointF m_previousPos;
+#ifdef TIMESLIDER_ANIMATED_DRAG
     int m_length;
     QPropertyAnimation *m_lineAnimation;
+#endif
     QPropertyAnimation *m_wheelAnimation;
 
     enum {
@@ -689,12 +696,14 @@ void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         event->accept();
 
+#ifdef TIMESLIDER_ANIMATED_DRAG
+        m_length = 0;
         m_lineAnimation->stop();
+#endif
         if (qFuzzyIsNull(m_parent->scalingFactor()))
             m_parent->setCurrentValue(posToValue(event->pos().x()));
         m_parent->setMoving(true);
         m_previousPos = event->pos();
-        m_length = 0;
     }
 }
 
@@ -710,7 +719,9 @@ void TimeLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         setDragging(true);
         m_previousPos = event->pos();
-        m_length = dpos.x();
+#ifdef TIMESLIDER_ANIMATED_DRAG
+        m_length += dpos.x();
+#endif
 
         qint64 dtime = qRound64((double(m_parent->sliderRange()) / rect().width()) * dpos.x());
         if (bUnscaled) {
@@ -734,15 +745,17 @@ void TimeLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         if (wasDragging) {
             setDragging(false);
 
+#ifdef TIMESLIDER_ANIMATED_DRAG
             if (qAbs(m_length) > 5) {
-                int dx = m_length*2/**(35.0/t.elapsed())*/;
+                const int dx = m_length*2/**(35.0/t.elapsed())*/;
 
                 m_lineAnimation->setStartValue(m_parent->viewPortPos());
                 m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
                 m_lineAnimation->setEndValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * dx));
                 m_lineAnimation->setDuration(1000);
-                //m_lineAnimation->start();
+                m_lineAnimation->start();
             }
+#endif
         } else {
             m_parent->setCurrentValue(posToValue(event->pos().x()));
         }
