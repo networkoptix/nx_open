@@ -2,6 +2,10 @@
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
 
+#ifdef Q_OS_MAC
+#include <netinet/tcp.h>
+#endif
+
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {

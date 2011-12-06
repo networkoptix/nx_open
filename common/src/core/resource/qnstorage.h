@@ -24,6 +24,8 @@ public:
     void setIndex(quint16 value);
     quint16 getIndex() const;
 
+    Q_PROPERTY (qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
+
 protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
 private:

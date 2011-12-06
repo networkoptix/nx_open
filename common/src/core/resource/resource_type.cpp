@@ -94,6 +94,7 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
 
     return *m_allParamTypeListCache.data();
 }
+
 // =============================== QnResourceTypePool ========================
 
 QnResourceTypePool* QnResourceTypePool::instance()

@@ -5,6 +5,7 @@
 
 /**
  * A mixin class that lets graphics items handle mouse clicks properly.
+ * Not a processor because the logic it implements is pretty simple.
  * 
  * Registered clicks are to be processed by overriding the <tt>clickedNotify</tt> 
  * function in derived class.

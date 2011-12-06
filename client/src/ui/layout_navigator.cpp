@@ -3,7 +3,7 @@
 #include "video_cam_layout/layout_manager.h"
 #include "camera/gl_renderer.h"
 #include "settings.h"
-#include "preferences_wnd.h"
+#include "ui/preferences/preferences_wnd.h"
 
 extern QString start_screen;
 
@@ -158,9 +158,9 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
         if (itemname==button_layout)
         {
 #ifndef CL_TRIAL_MODE
-                       if (!Settings::instance().haveValidSerialNumber())
+            if (!Settings::haveValidLicense())
             {
-                UIOKMessage(0, tr("License"), tr("Please enter license key. Press Setup button and go to About section."));
+                UIOKMessage(0, tr("License activation requred"), tr("Please activate your License. Press Setup button and go to License section."));
                 return;
             }
 #endif

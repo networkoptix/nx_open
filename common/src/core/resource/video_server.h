@@ -15,7 +15,6 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 };
 
-
 class QnVideoServer : public QnResource
 {
 public:
@@ -33,6 +32,7 @@ public:
     void setGuid(const QString& guid);
     QString getGuid() const;
 
+    Q_PROPERTY (QString apiUrl READ getApiUrl WRITE setApiUrl)
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;

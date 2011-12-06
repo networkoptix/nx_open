@@ -65,7 +65,7 @@ public:
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
-    qint64 recreateFile(const QString& fileName);
+    qint64 recreateFile(const QString& fileName, qint64 startTime);
 private:
     mutable QMutex m_mutex;
     QFile m_file;

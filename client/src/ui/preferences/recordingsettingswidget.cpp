@@ -1,6 +1,6 @@
 #include "recordingsettingswidget.h"
-#include "ui_recordingsettings.h"
-#include "skin.h"
+#include "ui_recordingsettingswidget.h"
+#include "ui/skin.h"
 
 #include <QtCore/QSettings>
 #include <QtGui/QApplication>
@@ -8,16 +8,17 @@
 #include <QtGui/QFileDialog>
 #include "QtMultimedia/QAudioDeviceInfo"
 
-#ifdef _WIN32
-#include "../device_plugins/desktop/win_audio_helper.h"
+#ifdef Q_OS_WIN32
+#include "device_plugins/desktop/win_audio_helper.h"
 #endif
 
 static const int ICON_SIZE = 32;
 
-void RecordingSettingsWidget::setDefaultSoundIcon(QLabel* l)
+static inline void setDefaultSoundIcon(QLabel *label)
 {
-    l->setPixmap(Skin::pixmap(QLatin1String("microphone.png")).scaled(ICON_SIZE, ICON_SIZE));
+    label->setPixmap(Skin::pixmap(QLatin1String("microphone.png")).scaled(ICON_SIZE, ICON_SIZE));
 }
+
 
 RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -111,7 +112,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
 void RecordingSettingsWidget::onComboboxChanged(int index)
 {
     additionalAdjustSize();
-#ifdef _WIN32
+#ifdef Q_OS_WIN32
     QComboBox* c = (QComboBox*) sender();
     WinAudioExtendInfo info(c->itemText(index));
     QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->label_primaryDeviceIcon : ui->label_secondaryDeviceIcon;

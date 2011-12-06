@@ -97,7 +97,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     return true;
 }
 
-qint64 DeviceFileCatalog::recreateFile(const QString& fileName)
+qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime)
 {
     cl_log.log("recreate broken file", fileName, cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
@@ -110,6 +110,8 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName)
     reader->setArchiveDelegate(avi);
     QnStreamRecorder recorder(res);
     recorder.setFileName(fileName + ".new");
+    recorder.setStartOffset(startTime);
+
     QnAbstractMediaDataPtr packet;
     while (packet = avi->getNextData())
     {
@@ -146,7 +148,7 @@ void DeviceFileCatalog::deserializeTitleFile()
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             needRewriteFile = true;
-            chunk.duration = recreateFile(fullFileName(chunk));
+            chunk.duration = recreateFile(fullFileName(chunk), chunk.startTime);
         }
         if (fileExists(chunk)) 
         {

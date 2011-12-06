@@ -51,13 +51,17 @@ win* {
     } else {
         OPENAL_LIBS_PATH = $$PWD/../contrib/openal/bin/win64
     }
-
     INCLUDEPATH += $$PWD/../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
+
+    INCLUDEPATH += $$PWD/../contrib/openssl/include
+    LIBS += -L$$PWD/../contrib/openssl/bin -llibeay32
 }
 
 mac {
-  LIBS += -framework OpenAL
+    LIBS += -framework OpenAL
+
+    LIBS += -lcrypto
 }
 
 win32 {
@@ -140,7 +144,8 @@ PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 RESOURCES += ../build/skin.qrc
-FORMS += preferences.ui licensekey.ui recordingsettings.ui ui/dialogs/tagseditdialog.ui \
+FORMS += ui/preferences/licensewidget.ui ui/preferences/preferences.ui ui/preferences/recordingsettingswidget.ui \
+         ui/dialogs/tagseditdialog.ui \
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO

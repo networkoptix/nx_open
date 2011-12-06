@@ -5,6 +5,8 @@
 
 #include <functional> /* For std::binary_function. */
 
+#include <QtAlgorithms>
+
 #include <camera/resource_display.h>
 #include <camera/camera.h>
 
@@ -37,6 +39,12 @@
 #include "workbench.h"
 
 namespace {
+    struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
+        bool operator()(QGraphicsItem *l, QGraphicsItem *r) const {
+            return l->zValue() < r->zValue();
+        }
+    };
+
     void calculateExpansionValues(qreal start, qreal end, qreal center, qreal newLength, qreal *deltaStart, qreal *deltaEnd) {
         qreal newStart = center - newLength / 2;
         qreal newEnd = center + newLength / 2;
@@ -428,12 +436,6 @@ void QnWorkbenchDisplay::ensureVisible(QnWorkbenchItem *item) {
 
 void QnWorkbenchDisplay::bringToFront(const QList<QGraphicsItem *> &items) {
     QList<QGraphicsItem *> localItems = items;
-
-    struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *l, QGraphicsItem *r) const {
-            return l->zValue() < r->zValue();
-        }
-    };
 
     /* Sort by z order first, so that relative z order is preserved. */
     qSort(localItems.begin(), localItems.end(), GraphicsItemZLess());

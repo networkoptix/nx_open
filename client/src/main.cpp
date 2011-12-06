@@ -3,7 +3,6 @@
 
 #include "version.h"
 #include "mainwnd.h"
-#include "serial.h"
 #include "settings.h"
 
 #include "decoders/video/ipp_h264_decoder.h"
@@ -126,7 +125,7 @@ void addTestData()
     resource2->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource2));
     */
-    
+
     /*
     QnNetworkResourceList testList;
     testList << testCamera;
@@ -238,7 +237,7 @@ int main(int argc, char *argv[])
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-    
+
 #ifdef Q_OS_WIN
 //    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
@@ -312,7 +311,7 @@ int main(int argc, char *argv[])
     //=========================================================
 
     initContextMenu();
-    
+
     MainWnd mainWindow(argc, argv);
     mainWindow.show();
 

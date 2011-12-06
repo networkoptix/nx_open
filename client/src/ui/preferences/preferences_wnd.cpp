@@ -1,27 +1,42 @@
 #include "preferences_wnd.h"
+
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "ui/video_cam_layout/layout_manager.h"
-#include "ui_common.h"
-#include "ui_licensekey.h"
-#include "version.h"
+#include "ui/ui_common.h"
+#include "licensewidget.h"
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
-#include "core/resourcemanagment/resource_pool.h"
+
 #include "core/resource/directory_browser.h"
-#include "utils/network/nettools.h"
 #include "core/resource/network_resource.h"
+#include "core/resource/resource.h"
+#include "core/resourcemanagment/resource_pool.h"
 #include "utils/common/util.h"
+#include "utils/network/nettools.h"
+#include "version.h"
+
+static inline QString cameraInfoString(QnResourcePtr resource)
+{
+    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (networkResource) {
+        return PreferencesWindow::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
+            .arg(networkResource->getName())
+            .arg(networkResource->getMAC().toString())
+            .arg(networkResource->getHostAddress().toString())
+            .arg(networkResource->getDiscoveryAddr().toString());
+    }
+
+    return resource->getName();
+}
 
 
-
-PreferencesWindow::PreferencesWindow(QWidget *parent) :
-    QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
+PreferencesWindow::PreferencesWindow(QWidget *parent)
+    : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
+      videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
 {
     setupUi(this);
-    
-#ifdef CL_TRIAL_MODE
-    tabWidget->removeTab(tabWidget->indexOf(licenseTab));
-#endif
+
+    //setWindowOpacity(.90);
 
     QString label = creditsLabel->text().replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR)).replace(QLatin1String("FFMPEG_VERSION"), QLatin1String(FFMPEG_VERSION));
 #ifndef Q_OS_DARWIN
@@ -32,21 +47,23 @@ PreferencesWindow::PreferencesWindow(QWidget *parent) :
     creditsLabel->setText(label);
     Settings::instance().fillData(m_settingsData);
 
-    videoRecorderWidget = new RecordingSettingsWidget;
+#ifdef Q_OS_WIN
+    videoRecorderWidget = new RecordingSettingsWidget(this);
     tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
+#endif
 
-    youTubeSettingsWidget = new YouTubeSettingsWidget;
+    youTubeSettingsWidget = new YouTubeSettingsWidget(this);
     tabWidget->insertTab(5, youTubeSettingsWidget, tr("YouTube"));
+
+#ifndef CL_TRIAL_MODE
+    licenseWidget = new LicenseWidget(this);
+    tabWidget->insertTab(6, licenseWidget, tr("License"));
+#endif
 
     updateView();
     updateCameras();
 
     //connect(CLDeviceSearcher::instance(), SIGNAL(newNetworkDevices()), this, SLOT(updateCameras())); todo
-    //setWindowOpacity(.90);
-
-    resizeEvent(0);
-
-    setWindowTitle(tr("Preferences Editor"));
 }
 
 PreferencesWindow::~PreferencesWindow()
@@ -67,7 +84,9 @@ void PreferencesWindow::accept()
     checkLst.push_back(QDir::toNativeSeparators(settings.mediaRoot()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst);
 
-    videoRecorderWidget->accept();
+    if (videoRecorderWidget)
+        videoRecorderWidget->accept();
+
     youTubeSettingsWidget->accept();
 
     QDialog::accept();
@@ -79,56 +98,29 @@ void PreferencesWindow::updateView()
     mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
     auxMediaRootsList->clear();
-    foreach (const QString& auxMediaRoot, m_settingsData.auxMediaRoots)
-    {
+    foreach (const QString &auxMediaRoot, m_settingsData.auxMediaRoots)
         auxMediaRootsList->addItem(QDir::toNativeSeparators(auxMediaRoot));
-    }
 
     allowChangeIPCheckBox->setChecked(m_settingsData.allowChangeIP);
 
-    if (Settings::instance().haveValidSerialNumber())
-    {
-        QPalette palette = licenseInfoLabel->palette();
-        palette.setColor(QPalette::Foreground, Qt::black);
-        licenseInfoLabel->setPalette(palette);
-
-        licenseInfoLabel->setText(tr("You have valid license installed"));
-
-        licenseButton->setEnabled(false);
-    }
-    else
-    {
-        QPalette palette = licenseInfoLabel->palette();
-        palette.setColor(QPalette::Foreground, Qt::red);
-        licenseInfoLabel->setPalette(palette);
-
-        licenseInfoLabel->setText(tr("You do not have valid license installed"));
-        licenseButton->setEnabled(true);
-    }
-
-    QList<QNetworkAddressEntry> ipv4entries = getAllIPv4AddressEntries();
+    const QList<QNetworkAddressEntry> ipv4entries = getAllIPv4AddressEntries();
 
     networkInterfacesList->clear();
-    foreach (QNetworkAddressEntry entry, ipv4entries)
-    {
-        QString entryString = tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString());
-        networkInterfacesList->addItem(entryString);
-    }
+    foreach (const QNetworkAddressEntry &entry, ipv4entries)
+        networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
     camerasList->clear();
-    foreach(CameraNameAndInfo camera, m_cameras)
-    {
+    foreach (const CameraNameAndInfo &camera, m_cameras)
         camerasList->addItem(camera.first);
-    }
 
-    if (ipv4entries.size() == 0)
+    if (ipv4entries.isEmpty())
         cameraStatusLabel->setText(tr("No IP addresses detected. Ensure you either have static IP or there is DHCP server in your network."));
-    if (ipv4entries.size() > 0 && m_cameras.size() == 0)
+    else if (m_cameras.isEmpty())
         cameraStatusLabel->setText(tr("No cameras detected. If you're connected to router check that it doesn't block broadcasts."));
     else
         cameraStatusLabel->setText(QString());
 
-    totalCamerasLabel->setText(QString::fromLatin1("Total %1 cameras detected").arg(m_cameras.size()));
+    totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
 
     maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
 
@@ -140,31 +132,10 @@ void PreferencesWindow::updateCameras()
     cl_log.log("Updating camera list", cl_logALWAYS);
 
     m_cameras.clear();
-    QnResourceList rlist = qnResPool->getResourcesWithFlag(QnResource::live);
-    foreach(QnResourcePtr res, rlist)
-    {
-        m_cameras.append(CameraNameAndInfo(res->getName(), cameraInfoString(res)));
-    }
+    foreach(QnResourcePtr resource, qnResPool->getResourcesWithFlag(QnResource::live))
+        m_cameras.append(CameraNameAndInfo(resource->getName(), cameraInfoString(resource)));
 
     updateView();
-}
-
-QString PreferencesWindow::cameraInfoString(QnResourcePtr device)
-{
-    QnNetworkResourcePtr networkDevice = qSharedPointerDynamicCast<QnNetworkResource> (device);
-    if (networkDevice)
-        return QString::fromLatin1("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
-                .arg(device->getName())
-                .arg(networkDevice->getMAC().toString())
-                .arg(networkDevice->getHostAddress().toString())
-                .arg(networkDevice->getDiscoveryAddr().toString());
-    else
-        return device->getName();
-}
-
-void PreferencesWindow::resizeEvent ( QResizeEvent * /*event*/)
-{
-//    QSize sz = this->size();
 }
 
 void PreferencesWindow::mainMediaFolderBrowse()
@@ -213,37 +184,16 @@ void PreferencesWindow::auxMediaFolderBrowse()
 
 void PreferencesWindow::auxMediaFolderRemove()
 {
-    foreach(QListWidgetItem* item, auxMediaRootsList->selectedItems())
-    {
+    foreach (QListWidgetItem *item, auxMediaRootsList->selectedItems())
         m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
-    }
 
     updateView();
 }
 
 void PreferencesWindow::cameraSelected(int row)
 {
-    if (row < 0 || row >= m_cameras.size())
-        return;
-
-    cameraInfoLabel->setText(m_cameras[row].second);
-}
-
-void PreferencesWindow::enterLicenseClick()
-{
-    QDialog* dialog = new QDialog(this);
-    Ui::LicenseKeyDialog uiDialog;
-    uiDialog.setupUi(dialog);
-
-    if (dialog->exec() == QDialog::Accepted)
-    {
-        // Set directly to global settings
-        Settings::instance().setSerialNumber(uiDialog.licenseKeyEdit->text());
-        updateView();
-    }
-
-    delete dialog;
-
+    if (row >= 0 && row < m_cameras.size())
+        cameraInfoLabel->setText(m_cameras[row].second);
 }
 
 void PreferencesWindow::setCurrentTab(int index)

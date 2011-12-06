@@ -4,6 +4,7 @@
 #include "core/dataprovider/streamdata_statistics.h"
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
+#include "../datapacket/mediadatapacket.h"
 
 class QnVideoResourceLayout;
 class QnResourceAudioLayout;
@@ -25,6 +26,8 @@ public:
 	QnStreamQuality getQuality() const;
 
 protected:
+    virtual QnAbstractMediaDataPtr getNextData() = 0;
+
     virtual void sleepIfNeeded() {}
 
     virtual void beforeRun();
