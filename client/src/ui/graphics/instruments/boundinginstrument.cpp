@@ -68,28 +68,6 @@ namespace {
         }
     }
 
-    MarginsF operator*(const MarginsF &l, const QSizeF &r) {
-        return MarginsF(
-            l.left()   * r.width(),
-            l.top()    * r.height(),
-            l.right()  * r.width(),
-            l.bottom() * r.height()
-        );
-    }
-
-    MarginsF operator-(const MarginsF &l, const MarginsF &r) {
-        return MarginsF(
-            l.left()   - r.left(),
-            l.top()    - r.top(),
-            l.right()  - r.right(),
-            l.bottom() - r.bottom()
-        );
-    }
-
-    QSizeF operator*(const QSizeF &l, const QSizeF &r) {
-        return QSizeF(l.width() * r.width(), l.height() * r.height());
-    }
-
 } // anonymous namespace
 
 
@@ -346,9 +324,9 @@ protected:
             return;
 
         m_sceneViewportRect = m_sceneToViewport.inverted().mapRect(QRectF(m_viewportRect));
-        m_centerPositionBounds = truncated(dilated(m_positionBounds, (m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5)) * m_sceneViewportRect.size()));
-        m_upperScale = 1.0 / scaleFactor(m_sceneViewportRect.size(), m_sizeUpperBounds + m_sizeUpperExtension * m_sizeUpperBounds, m_upperMode);
-        m_lowerScale = 1.0 / scaleFactor(m_sceneViewportRect.size(), m_sizeLowerBounds + m_sizeLowerExtension * m_sizeLowerBounds, m_lowerMode);
+        m_centerPositionBounds = truncated(dilated(m_positionBounds, cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size())));
+        m_upperScale = 1.0 / scaleFactor(m_sceneViewportRect.size(), m_sizeUpperBounds + cwiseMul(m_sizeUpperExtension, m_sizeUpperBounds), m_upperMode);
+        m_lowerScale = 1.0 / scaleFactor(m_sceneViewportRect.size(), m_sizeLowerBounds + cwiseMul(m_sizeLowerExtension, m_sizeLowerBounds), m_lowerMode);
         m_center = m_sceneViewportRect.center();
         m_parametersValid = true;
     }

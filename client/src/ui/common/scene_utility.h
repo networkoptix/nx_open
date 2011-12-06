@@ -18,6 +18,18 @@ class QTransform;
 
 class QnSceneUtility {
 public:
+    static QPointF cwiseMul(const QPointF &l, const QPointF &r);
+    static QPointF cwiseDiv(const QPointF &l, const QPointF &r);
+    static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
+    static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
+    static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
+    static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
+    static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
+    static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
+
+    static QSizeF sizeDelta(const MarginsF &margins);
+    static QSize sizeDelta(const QMargins &margins);
+
     /**
      * \param                           Size.
      * \returns                         Given size converted to a point.
@@ -167,6 +179,24 @@ public:
      * \returns                         Dilated size.
      */
     static QSizeF dilated(const QSizeF &size, const MarginsF &amount);
+
+    /**
+     * Erodes the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded rectangle.
+     */
+    static QRectF eroded(const QRectF &rect, const MarginsF &amount);
+
+    /**
+     * Erodes the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded rectangle.
+     */
+    static QRect eroded(const QRect &rect, const QMargins &amount);
 
     /**
      * \param size                      Size to check for containment.

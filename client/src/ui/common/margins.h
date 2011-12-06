@@ -74,6 +74,24 @@ public:
             l.m_bottom != r.m_bottom;
     }
 
+    friend inline MarginsF operator-(const MarginsF &l, const MarginsF &r) {
+        return MarginsF(
+            l.left()   - r.left(),
+            l.top()    - r.top(),
+            l.right()  - r.right(),
+            l.bottom() - r.bottom()
+        );
+    }
+
+    friend inline MarginsF operator+(const MarginsF &l, const MarginsF &r) {
+        return MarginsF(
+            l.left()   + r.left(),
+            l.top()    + r.top(),
+            l.right()  + r.right(),
+            l.bottom() + r.bottom()
+        );
+    }
+
 private:
     qreal m_left;
     qreal m_top;

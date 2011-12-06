@@ -2,6 +2,8 @@
 #define QN_VIEWPORT_ANIMATOR_H
 
 #include <QObject>
+#include <QMargins>
+#include <QAbstractAnimation>
 #include <ui/common/scene_utility.h>
 
 class QParallelAnimationGroup;
@@ -28,6 +30,14 @@ public:
     }
 
     void setView(QGraphicsView *view);
+
+    const QMargins &viewportMargins() const {
+        return m_viewportMargins;
+    }
+
+    void setViewportMargins(const QMargins &margins) {
+        m_viewportMargins = margins;
+    }
 
     /**
      * Starts animated move of a viewport to the given rect. When animation
@@ -80,6 +90,9 @@ private slots:
 private:
     /** Current graphics view. */
     QGraphicsView *m_view;
+
+    /** Viewport margins. */
+    QMargins m_viewportMargins;
 
     /** Movement speed, in viewports per second. */
     qreal m_movementSpeed;

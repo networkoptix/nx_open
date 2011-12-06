@@ -193,6 +193,13 @@ public:
      */
     QRectF viewportGeometry() const;
 
+    /**
+     * This function can be used in case the "actual" viewport differs from the 
+     * "real" one. This can be the case if control panels are drawn on the scene.
+     *
+     * \param margins                   New viewport margins. 
+     */
+    void setViewportMargins(const QMargins &margins);
 
     void fitInView();
 
@@ -258,6 +265,9 @@ protected:
     void changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
 
 protected slots:
+    void synchronizeSceneBoundsExtension();
+    void synchronizeRaisedGeometry();
+
     void at_viewport_animationFinished();
 
     void at_workbench_itemAdded(QnWorkbenchItem *item);
@@ -271,8 +281,6 @@ protected slots:
     void at_item_geometryDeltaChanged();
     void at_item_rotationChanged();
     void at_item_flagsChanged();
-
-    void at_viewport_transformationChanged();
 
     void at_activityStopped();
     void at_activityStarted();
@@ -314,6 +322,8 @@ private:
     /** Current workbench mode. */
     QnWorkbench::Mode m_mode;
 
+    /** Viewport margins. */
+    QMargins m_viewportMargins;
 
     /* Instruments. */
 

@@ -6,6 +6,66 @@
 #include <QCursor>
 #include <utils/common/checked_cast.h>
 
+QPointF QnSceneUtility::cwiseMul(const QPointF &l, const QPointF &r) {
+    return QPointF(l.x() * r.x(), l.y() * r.y());
+}
+
+QPointF QnSceneUtility::cwiseDiv(const QPointF &l, const QPointF &r) {
+    return QPointF(l.x() / r.x(), l.y() / r.y());
+}
+
+QSizeF QnSceneUtility::cwiseMul(const QSizeF &l, const QSizeF &r) {
+    return QSizeF(l.width() * r.width(), l.height() * r.height());
+}
+
+QSizeF QnSceneUtility::cwiseDiv(const QSizeF &l, const QSizeF &r) {
+    return QSizeF(l.width() / r.width(), l.height() / r.height());
+}
+
+MarginsF QnSceneUtility::cwiseMul(const MarginsF &l, const QSizeF &r) {
+    return MarginsF(
+        l.left()   * r.width(),
+        l.top()    * r.height(),
+        l.right()  * r.width(),
+        l.bottom() * r.height()
+    );
+}
+
+MarginsF QnSceneUtility::cwiseDiv(const MarginsF &l, const QSizeF &r) {
+    return MarginsF(
+        l.left()   / r.width(),
+        l.top()    / r.height(),
+        l.right()  / r.width(),
+        l.bottom() / r.height()
+    );
+}
+
+MarginsF QnSceneUtility::cwiseMul(const MarginsF &l, const MarginsF &r) {
+    return MarginsF(
+        l.left()   * r.left(), 
+        l.top()    * r.top(), 
+        l.right()  * r.right(), 
+        l.bottom() * r.bottom()
+    );
+}
+
+MarginsF QnSceneUtility::cwiseDiv(const MarginsF &l, const MarginsF &r) {
+    return MarginsF(
+        l.left()   / r.left(), 
+        l.top()    / r.top(), 
+        l.right()  / r.right(), 
+        l.bottom() / r.bottom()
+    );
+}
+
+QSizeF QnSceneUtility::sizeDelta(const MarginsF &margins) {
+    return QSizeF(margins.left() + margins.right(), margins.top() + margins.bottom());
+}
+
+QSize QnSceneUtility::sizeDelta(const QMargins &margins) {
+    return QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
+}
+
 qreal QnSceneUtility::length(const QPointF &point) {
     return std::sqrt(point.x() * point.x() + point.y() * point.y());
 }
@@ -134,6 +194,14 @@ QRectF QnSceneUtility::dilated(const QRectF &rect, const MarginsF &amount) {
 
 QSizeF QnSceneUtility::dilated(const QSizeF &size, const MarginsF &amount) {
     return QSizeF(size.width() + amount.left() + amount.right(), size.height() + amount.top() + amount.bottom());
+}
+
+QRectF QnSceneUtility::eroded(const QRectF &rect, const MarginsF &amount) {
+    return rect.adjusted(amount.left(), amount.top(), -amount.right(), -amount.bottom());
+}
+
+QRect QnSceneUtility::eroded(const QRect &rect, const QMargins &amount) {
+    return rect.adjusted(amount.left(), amount.top(), -amount.right(), -amount.bottom());
 }
 
 bool QnSceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {

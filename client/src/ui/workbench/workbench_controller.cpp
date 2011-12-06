@@ -1,5 +1,6 @@
 #include "workbench_controller.h"
 #include <cassert>
+#include <cmath> /* For std::floor. */
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGLWidget>
@@ -29,7 +30,6 @@
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
 #include <ui/graphics/instruments/resizehoverinstrument.h>
-#include <ui/graphics/instruments/signalinginstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 
@@ -77,7 +77,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_uiElementsInstrument = new UiElementsInstrument(this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     m_dragInstrument = new DragInstrument(this);
-    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -104,7 +103,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* View/viewport instruments. */
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
-    m_manager->installInstrument(resizeSignalingInstrument, InstallationMode::INSTALL_BEFORE, m_uiElementsInstrument);
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::INSTALL_AFTER, m_display->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_dragInstrument);
@@ -122,7 +120,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),               this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
-    connect(resizeSignalingInstrument,  SIGNAL(activated(QWidget *, QEvent *)),                                     this,                           SLOT(at_viewport_resized()));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -172,14 +169,14 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     verticalLayout->addItem(m_navigationItem->graphicsWidget());
     m_navigationItem->setPos(0, -1000.0); /* Temporary hack to not let it intercept mouse events. */
 
-    /* Connect to workbench. */
-    
+    connect(m_navigationItem->graphicsWidget(), SIGNAL(geometryChanged()),                                          this,                           SLOT(at_navigationItem_geometryChanged()));
+
     /* Connect to display. */
-    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                           this,                   SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
-    connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                this,                   SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                     this,                   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                  this,                           SLOT(at_viewportGrabbed()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                this,                           SLOT(at_viewportUngrabbed()));
+    connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -514,11 +511,13 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
         m_navigationItem->removeReserveCamera(widget->display()->camera());
 }
 
-void QnWorkbenchController::at_viewport_resized() {
-    /* Navigation item height to viewport height ratio. */
-    qreal k = m_navigationItem->graphicsWidget()->geometry().height() / display()->view()->viewport()->height();
-
-    display()->boundingInstrument()->setPositionBoundsExtension(display()->view(), MarginsF(0.0, 0.0, 0.0, k));
-    display()->boundingInstrument()->setSizeBoundsExtension(display()->view(), QSizeF(0.0, k / (1 - k)), QSizeF(0.0, k / (1 - k)));
+void QnWorkbenchController::at_navigationItem_geometryChanged() {
+    m_display->setViewportMargins(QMargins(
+        0,
+        0,
+        0,
+        std::floor(m_navigationItem->graphicsWidget()->size().height())
+    ));
 }
+
 
