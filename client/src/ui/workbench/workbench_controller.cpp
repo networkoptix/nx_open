@@ -37,12 +37,12 @@
 
 #include <file_processor.h>
 
+#include "grid_walker.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
 #include "workbench_display.h"
-
 
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
@@ -243,8 +243,12 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gr
 
     layout()->addItem(item);
     if(!item->isPinned()) {
-        /* Place already taken, pick closest one. */
-        QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size());
+        /* Place already taken, pick closest one. Use AR-based metric. */
+        QSize viewportSize = display()->view()->viewport()->size();
+        QSizeF cellSize = display()->workbench()->mapper()->step();
+        qreal aspectRatio = (static_cast<qreal>(viewportSize.width()) /  viewportSize.height()) / (cellSize.width() / cellSize.height());
+        QnAspectRatioGridWalker walker(aspectRatio);
+        QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size(), &walker);
         layout()->pinItem(item, newGeometry);
     }
 
