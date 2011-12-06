@@ -10,8 +10,10 @@
 #include <QtGui/QTabWidget>
 #include <QtGui/QToolBar>
 
-#include <ui/context_menu_helper.h>
-#include <ui/navigationtreewidget.h>
+#include "ui/context_menu_helper.h"
+#include "ui/navigationtreewidget.h"
+
+#include "ui/preferences/preferences_wnd.h"
 
 #include <ui/mixins/sync_play_mixin.h>
 #include <ui/mixins/render_watch_mixin.h>
@@ -31,8 +33,8 @@
 #include "settings.h"
 #include "version.h"
 
-
 MainWnd *MainWnd::s_instance = 0;
+
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
       m_normalView(NULL),
@@ -118,6 +120,18 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     toolBar->addAction(&cm_preferences);
     addToolBar(Qt::TopToolBarArea, toolBar);
 
+
+    // actions
+    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
+    addAction(&cm_exit);
+
+    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+    addAction(&cm_toggle_fullscreen);
+
+    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
+    addAction(&cm_preferences);
+
+
 #if 0
     if (!files.isEmpty())
         show();
@@ -190,7 +204,7 @@ void MainWnd::goToNewLayoutContent(LayoutContent* newl)
 
 void MainWnd::handleMessage(const QString &message)
 {
-    const QStringList files = message.split(QLatin1Char('\0'), QString::SkipEmptyParts);
+    const QStringList files = message.split(QLatin1Char('\0'), QString::SkipEmptyParts); // ### QString doesn't support \0 in the string
 
     addFilesToCurrentOrNewLayout(files);
     activate();
@@ -226,4 +240,20 @@ void MainWnd::activate()
         showNormal();
     raise();
     activateWindow();
+}
+
+void MainWnd::toggleFullScreen()
+{
+    if (isFullScreen()) {
+        showNormal();
+        resize(600, 400);
+    } else {
+        showFullScreen();
+    }
+}
+
+void MainWnd::editPreferences()
+{
+    PreferencesWindow dialog(this);
+    dialog.exec();
 }

@@ -11,12 +11,10 @@
 #include "youtubeuploadprogressdialog_p.h"
 #include "core/resource/resource.h"
 
-
 #define USE_PREFERENCESWND
 #ifdef USE_PREFERENCESWND
-#include "ui/preferences_wnd.h"
+#include "ui/preferences/preferences_wnd.h"
 #endif
-
 
 YouTubeUploadDialog::YouTubeUploadDialog(QnResourcePtr dev, QWidget *parent) :
     QDialog(parent),

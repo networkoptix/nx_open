@@ -15,7 +15,6 @@
 #include "video_cam_layout/layout_manager.h"
 #include "view_drag_and_drop.h"
 #include "layout_editor_wnd.h"
-#include "preferences_wnd.h"
 #include "videoitem/layout_item.h"
 #include "videoitem/unmoved/unmoved_pixture_button.h"
 #include "videoitem/search/search_filter_item.h"
@@ -28,7 +27,8 @@
 #include "ui/ui_common.h"
 #include "ui/skin.h"
 #include "ui/animation/property_animation.h"
-#include "ui/recordingsettingswidget.h"
+#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
 #include "youtube/youtubeuploaddialog.h"
 #include "videorecordersettings.h"
@@ -222,13 +222,11 @@ GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget* mainWnd) :
     connect(&cm_recording_settings, SIGNAL(triggered()), this, SLOT(recordingSettings()));
     addAction(&cm_screen_recording);
 
-    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+    //connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen())); // ### connected in mainwnd
     addAction(&cm_toggle_fullscreen);
 
-    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(onPreferences_helper()));
     addAction(&cm_preferences);
 
-    connect(&cm_exit, SIGNAL(triggered()), mMainWnd, SLOT(close()));
     addAction(&cm_exit);
 
     connect(&cm_add_layout, SIGNAL(triggered()), this, SLOT(contextMenuHelper_addNewLayout()));
@@ -2836,12 +2834,6 @@ void GraphicsView::onExportRange(qint64 begin, qint64 end)
 {
     // ### implement
     qWarning() << "GraphicsView::onExportRange:" << begin << end;
-}
-
-void GraphicsView::onPreferences_helper()
-{
-    PreferencesWindow dialog(this);
-    dialog.exec();
 }
 
 void GraphicsView::toggleRecording()
