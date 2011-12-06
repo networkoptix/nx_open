@@ -29,6 +29,7 @@
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
 #include <ui/graphics/instruments/resizehoverinstrument.h>
+#include <ui/graphics/instruments/signalinginstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 
@@ -76,6 +77,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_uiElementsInstrument = new UiElementsInstrument(this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     m_dragInstrument = new DragInstrument(this);
+    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -102,6 +104,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* View/viewport instruments. */
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
+    m_manager->installInstrument(resizeSignalingInstrument, InstallationMode::INSTALL_BEFORE, m_uiElementsInstrument);
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::INSTALL_AFTER, m_display->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_dragInstrument);
@@ -119,6 +122,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),               this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
+    connect(resizeSignalingInstrument,  SIGNAL(activated(QWidget *, QEvent *)),                                     this,                           SLOT(at_viewport_resized()));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -509,3 +513,16 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
     if(cameraResource != NULL)
         m_navigationItem->removeReserveCamera(widget->display()->camera());
 }
+
+void QnWorkbenchController::at_viewport_resized() {
+    display()->boundingInstrument()->setPositionBoundsExtension(
+        display()->view(), 
+        MarginsF(
+            0.0,
+            0.0,
+            0.0,
+            m_navigationItem->graphicsWidget()->geometry().height() / display()->view()->viewport()->height()
+        )
+    );
+}
+

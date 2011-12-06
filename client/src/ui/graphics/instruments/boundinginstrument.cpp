@@ -8,6 +8,8 @@
 #include <ui/animation/animation_event.h>
 #include "instrumentmanager.h"
 
+#include <QMargins>
+
 namespace {
 
     qreal calculateCorrection(qreal oldValue, qreal newValue, qreal lowerBound, qreal upperBound) {
@@ -77,7 +79,8 @@ public:
 
     ViewData(QGraphicsView *view): m_view(NULL) {
         qreal t = 1.0e3;
-        setPositionBounds(QRectF(QPointF(-t, -t), QPointF(t, t)), 0.0);
+        setPositionBounds(QRectF(QPointF(-t, -t), QPointF(t, t)));
+        setPositionBoundsExtension(MarginsF(0.0, 0.0, 0.0, 0.0));
         setMovementSpeed(1.0);
         setSizeBounds(QSizeF(1 / t, 1 / t), Qt::KeepAspectRatioByExpanding, QSizeF(t, t), Qt::KeepAspectRatio);
         setScalingSpeed(1.0);
@@ -216,14 +219,30 @@ public:
         return m_view;
     }
 
-    void setPositionBounds(const QRectF &positionBounds, qreal extension) {
+    void setPositionBounds(const QRectF &positionBounds) {
         m_positionBounds = positionBounds;
+
+        if(m_view != NULL) {
+            updateSceneRect();
+            invalidateParameters();
+        }
+    }
+
+    const QRectF &positionBounds() const {
+        return m_positionBounds;
+    }
+
+    void setPositionBoundsExtension(const MarginsF &extension) {
         m_positionBoundsExtension = extension;
 
         if(m_view != NULL) {
             updateSceneRect();
             invalidateParameters();
         }
+    }
+
+    const MarginsF &positionBoundsExtension() const {
+        return m_positionBoundsExtension;
     }
 
     void setSizeBounds(const QSizeF &sizeLowerBound, Qt::AspectRatioMode lowerMode, const QSizeF &sizeUpperBound, Qt::AspectRatioMode upperMode) {
@@ -296,7 +315,12 @@ protected:
             return;
 
         m_sceneViewportRect = m_sceneToViewport.inverted().mapRect(QRectF(m_viewportRect));
-        m_centerPositionBounds = truncated(QnSceneUtility::dilated(m_positionBounds, (m_positionBoundsExtension - 0.5) * m_sceneViewportRect.size()));
+        m_centerPositionBounds = truncated(m_positionBounds.adjusted(
+            -(m_positionBoundsExtension.left()   - 0.5) * m_sceneViewportRect.width(),
+            -(m_positionBoundsExtension.top()    - 0.5) * m_sceneViewportRect.height(),
+             (m_positionBoundsExtension.right()  - 0.5) * m_sceneViewportRect.width(),
+             (m_positionBoundsExtension.bottom() - 0.5) * m_sceneViewportRect.height()
+        ));
         m_upperScale = 1.0 / scaleFactor(m_sceneViewportRect.size(), m_sizeUpperBounds, m_upperMode);
         m_lowerScale = 1.0 / scaleFactor(m_sceneViewportRect.size(), m_sizeLowerBounds, m_lowerMode);
         m_center = m_sceneViewportRect.center();
@@ -332,9 +356,9 @@ public:
     /** Viewport position boundary, in scene coordinates. */
     QRectF m_positionBounds;
 
-    /** Viewport position boundary extension multiplier. 
-     * Viewport size is multiplied  by this factor and added to the sides of position boundary. */
-    qreal m_positionBoundsExtension;
+    /** Viewport position boundary extension multipliers. 
+     * Viewport size is multiplied by the extension factor and added to the sides of position boundary. */
+    MarginsF m_positionBoundsExtension;
 
     /** Viewport lower size boundary, in scene coordinates. */
     QSizeF m_sizeLowerBounds;
@@ -473,14 +497,44 @@ BoundingInstrument::ViewData *BoundingInstrument::checkView(QGraphicsView *view)
     return d;
 }
 
-void BoundingInstrument::setPositionBounds(QGraphicsView *view, const QRectF &positionBounds, qreal extension) {
+void BoundingInstrument::setPositionBounds(QGraphicsView *view, const QRectF &positionBounds) {
     if(view == NULL) {
         foreach(ViewData *d, m_data)
-            d->setPositionBounds(positionBounds, extension);
+            d->setPositionBounds(positionBounds);
     } else if(ViewData *d = checkView(view)) {
-        d->setPositionBounds(positionBounds, extension);
+        d->setPositionBounds(positionBounds);
     }
 }
+
+QRectF BoundingInstrument::positionBounds(QGraphicsView *view) const {
+    if(ViewData *d = checkView(view)) {
+        return d->positionBounds();
+    } else {
+        qnWarning("Given graphics view is not registered with this bounding instrument.");
+
+        return QRectF();
+    }
+}
+
+void BoundingInstrument::setPositionBoundsExtension(QGraphicsView *view, const MarginsF &extension) {
+    if(view == NULL) {
+        foreach(ViewData *d, m_data)
+            d->setPositionBoundsExtension(extension);
+    } else if(ViewData *d = checkView(view)) {
+        d->setPositionBoundsExtension(extension);
+    }
+}
+
+MarginsF BoundingInstrument::positionBoundsExtension(QGraphicsView *view) const {
+    if(ViewData *d = checkView(view)) {
+        return d->positionBoundsExtension();
+    } else {
+        qnWarning("Given graphics view is not registered with this bounding instrument.");
+
+        return MarginsF();
+    }
+}
+
 
 void BoundingInstrument::setSizeBounds(QGraphicsView *view, const QSizeF &sizeLowerBound, Qt::AspectRatioMode lowerMode, const QSizeF &sizeUpperBound, Qt::AspectRatioMode upperMode) {
     if(view == NULL) {

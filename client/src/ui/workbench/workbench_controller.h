@@ -81,6 +81,8 @@ protected slots:
     void at_viewportGrabbed();
     void at_viewportUngrabbed();
 
+    void at_viewport_resized();
+
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);

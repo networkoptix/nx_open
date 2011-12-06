@@ -600,7 +600,7 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 }
 
 QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
-    return m_workbench->mapper()->mapFromGrid(m_workbench->layout()->boundingRect().adjusted(-1, -1, 1, 1));
+    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-0.1, -0.1, 0.1, 0.1));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -711,7 +711,7 @@ void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget) {
 void QnWorkbenchDisplay::synchronizeSceneBounds() {
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
     QRectF rect = zoomedItem != NULL ? itemGeometry(zoomedItem) : layoutBoundingGeometry();
-    m_boundingInstrument->setPositionBounds(m_view, rect, 0.0);
+    m_boundingInstrument->setPositionBounds(m_view, rect);
     m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, rect.size(), Qt::KeepAspectRatioByExpanding);
 }
 
