@@ -315,7 +315,7 @@ QnParamList& QnResource::getResourceParamList() const
         paramType->isStatic = true;
         //paramType = resType->addParamType(paramType);
         QnParam newParam(paramType);
-        m_resourceParamList.put(newParam);
+        resourceParamList.put(newParam);
     }
 
     // 2. read AppServer params
