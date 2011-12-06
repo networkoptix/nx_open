@@ -47,7 +47,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 	{
 	}
 
-	enum DataType {VIDEO, AUDIO, CONTAINER};
+	enum DataType {VIDEO, AUDIO, CONTAINER, META_V1};
 
 	CLByteArray data;
 	DataType dataType;
@@ -95,6 +95,45 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 };
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
+
+
+struct QnMetaDataV1 : public QnAbstractMediaData
+{
+    enum {MD_WIDTH = 42, MD_HIGHT = 32};
+    QnMetaDataV1()
+        : QnAbstractMediaData(0, MD_WIDTH*MD_HIGHT/8 + 1)
+    {
+        dataType = META_V1;
+        //useTwice = false;
+
+        flags = 0;
+        i_mask = 0x01;
+        
+    }
+
+    // ti check if we've got motion at 
+    bool isMotionAt(int x, int y) const
+    {
+        Q_ASSERT(x<MD_WIDTH);
+        Q_ASSERT(y<MD_HIGHT);
+
+        int shift = y*x;
+        unsigned char b = *((unsigned char*)data.data() + shift/8 );
+        return (b >> (shift&7) ) & 0x01;
+    }
+
+    bool isInput(int index) const
+    {
+        unsigned char b = *((unsigned char*)data.data() + MD_WIDTH * MD_HIGHT/8);
+        return (b>>index) & 1 ;
+    }
+
+    unsigned char i_mask;
+
+};
+
+typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
+
 
 class QnCodecAudioFormat: public QAudioFormat
 {
