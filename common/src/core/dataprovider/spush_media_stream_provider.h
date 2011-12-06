@@ -15,7 +15,7 @@ public:
 	virtual ~CLServerPushStreamreader(){stop();}
 
 protected:
-	virtual QnAbstractMediaDataPtr getNextData() = 0;
+	
     virtual void openStream() = 0;
     virtual void closeStream() = 0;
     virtual bool isStreamOpened() const = 0;
