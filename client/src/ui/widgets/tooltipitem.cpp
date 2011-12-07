@@ -6,6 +6,7 @@ ToolTipItem::ToolTipItem(QGraphicsItem *parent):
     QGraphicsItem(parent),
     m_parametersValid(false)
 {
+    setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 }

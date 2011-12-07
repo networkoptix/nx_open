@@ -123,12 +123,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
-    
+
     connect(m_display,                  SIGNAL(viewportGrabbed()),                                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                m_handScrollInstrument,         SLOT(recursiveEnable()));
     connect(m_display,                  SIGNAL(viewportGrabbed()),                                                  m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                m_wheelZoomInstrument,          SLOT(recursiveEnable()));
-    
+
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),         itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),        itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
     connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
@@ -144,7 +144,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),        m_dragInstrument,               SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),         m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),        m_rubberBandInstrument,         SLOT(recursiveEnable()));
-    
+
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),        m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),       m_dragInstrument,               SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),        m_rubberBandInstrument,         SLOT(recursiveDisable()));
@@ -160,16 +160,13 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsWidget->setLayout(verticalLayout);
 
-    m_navigationItem = new NavigationItem();
-    m_navigationItem->setParentItem(controlsWidget);
+    m_navigationItem = new NavigationItem(controlsWidget);
 
     verticalLayout->addStretch(0x1000);
 
-    m_navigationItem->graphicsWidget()->setParentItem(NULL);
-    verticalLayout->addItem(m_navigationItem->graphicsWidget());
-    m_navigationItem->setPos(0, -1000.0); /* Temporary hack to not let it intercept mouse events. */
+    verticalLayout->addItem(m_navigationItem);
 
-    connect(m_navigationItem->graphicsWidget(), SIGNAL(geometryChanged()),                                          this,                           SLOT(at_navigationItem_geometryChanged()));
+    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -343,7 +340,7 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
         if(models.size() == 1) {
             QnWorkbenchItem *draggedModel = models[0];
 
-            /* Find item that dragged item was dropped on. */ 
+            /* Find item that dragged item was dropped on. */
             QPoint cursorPos = QCursor::pos();
             QnWorkbenchItem *replacedModel = layout()->item(mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
 
@@ -479,7 +476,7 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         return;
 
     m_widgetByRole[role] = widget;
-    
+
     switch(role) {
     case QnWorkbench::FOCUSED:
         /* Update navigation item's target. */
@@ -520,7 +517,7 @@ void QnWorkbenchController::at_navigationItem_geometryChanged() {
         0,
         0,
         0,
-        std::floor(m_navigationItem->graphicsWidget()->size().height())
+        std::floor(m_navigationItem->size().height())
     ));
 }
 

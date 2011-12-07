@@ -86,6 +86,7 @@ class MySlider : public GraphicsSlider
 public:
     MySlider(TimeSlider *parent);
 
+    ToolTipItem *toolTipItem() const;
     void setToolTipItem(ToolTipItem *toolTip);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -131,6 +132,11 @@ void MySlider::setEndSize(int size)
     m_endSize = size;
 }
 
+ToolTipItem *MySlider::toolTipItem() const
+{
+    return m_toolTip;
+}
+
 void MySlider::setToolTipItem(ToolTipItem *toolTip)
 {
     if (m_toolTip == toolTip)
@@ -149,15 +155,8 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    ensureHandleRect();
-
-    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
     QRectF r = contentsRect();
 
-#ifdef Q_OS_WIN
-    painter->fillRect(rect(), QColor(128,128,128,128));
-#endif
     painter->setPen(QPen(Qt::gray, 2));
     painter->drawRect(r);
 
@@ -213,6 +212,9 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
     painter->fillRect(r, linearGrad);
 
+    ensureHandleRect();
+    // ### use Skin::cached(const QString &name, const QSizeF &size, Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation)
+    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
 
@@ -229,8 +231,10 @@ void MySlider::sliderChange(SliderChange change)
 
 QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemToolTipHasChanged && m_toolTip)
+    if (change == ItemToolTipHasChanged && m_toolTip) {
         m_toolTip->setText(value.toString());
+        m_toolTip->setVisible(!m_toolTip->text().isEmpty());
+    }
 
     return GraphicsSlider::itemChange(change, value);
 }
@@ -466,9 +470,6 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->drawRect(r);
     drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
     painter->setPen(pal.color(QPalette::Text));
-
-    if(qFuzzyIsNull(r.width()))
-        return;
 
     qint64 timezoneOffset = 0;
     if (m_parent->minimumValue() != 0) {
@@ -852,6 +853,11 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
 TimeSlider::~TimeSlider()
 {
     m_animation->stop();
+}
+
+ToolTipItem *TimeSlider::toolTipItem() const
+{
+    return m_slider->toolTipItem();
 }
 
 void TimeSlider::setToolTipItem(ToolTipItem *toolTip)

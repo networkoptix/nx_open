@@ -424,7 +424,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (onUserInput(true, true))
         return;
 
-    if (m_navigationItem && m_navigationItem->mouseOver())
+    if (m_navigationItem && m_navigationItem->isMouseOver())
     {
         // do not zoom scene if mouse is over m_navigationItem
         QGraphicsView::wheelEvent(e);
@@ -439,11 +439,11 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     }
 
     /*/
-    if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
+    if (m_navigationItem && ( m_navigationItem->isMouseOver() || m_navigationItem->isActive()))
     {
         // scene should not be zoomed if mouse is over time slider or if time slider is active
 
-        if (!m_navigationItem->mouseOver() && m_navigationItem->isActive())
+        if (!m_navigationItem->isMouseOver() && m_navigationItem->isActive())
             return; // if mouse is not over time line but time line is still active event must be ignored
 
         QGraphicsView::wheelEvent(e);
@@ -723,8 +723,10 @@ void GraphicsView::initDecoration()
 
 void GraphicsView::adjustAllStaticItems()
 {
-    if (m_navigationItem)
+    if (m_navigationItem) {
         m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
+        m_navigationItem->resize(width(), NavigationItem::DEFAULT_HEIGHT);
+    }
 
     foreach (CLAbstractUnmovedItem *item, m_staticItems)
         item->adjust();
@@ -2003,14 +2005,14 @@ void GraphicsView::goToSteadyMode(bool steady)
             onUserInput(false, false);
             return;
         }
-        if (m_navigationItem && m_navigationItem->preferNonSteadyMode())
+        if (m_navigationItem && m_navigationItem->isMouseOver())
         {
             onUserInput(false, false);
             return;
         }
         foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item != bk_item && item->preferNonSteadyMode())
+            if (item != bk_item && item->isMouseOver())
             {
                 onUserInput(false, false);
                 return;
@@ -2416,12 +2418,12 @@ NavigationItem *GraphicsView::getNavigationItem()
     if (!m_navigationItem) {
         m_navigationItem.reset(new NavigationItem);
         m_navigationItem->setVisible(false);
-        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
-        m_navigationItem->graphicsWidget()->resize(width(), NavigationItem::DEFAULT_HEIGHT);
         m_navigationItem->setZValue(INT_MAX);
         scene()->addItem(m_navigationItem.data());
 
         connect(m_navigationItem.data(), SIGNAL(exportRange(qint64,qint64)), this, SIGNAL(onExportRange(qint64,qint64)));
+
+        adjustAllStaticItems();
     }
     return m_navigationItem.data();
 }
@@ -2486,10 +2488,6 @@ void GraphicsView::resizeEvent(QResizeEvent *event)
     if (!mViewStarted)
         return;
 
-    if (m_navigationItem) {
-        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
-        m_navigationItem->graphicsWidget()->resize(event->size().width(), NavigationItem::DEFAULT_HEIGHT);
-    }
     updateDecorations();
 
     if (m_selectedWnd && m_selectedWnd->isFullScreen())

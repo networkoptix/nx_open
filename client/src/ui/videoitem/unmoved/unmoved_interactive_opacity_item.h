@@ -1,25 +1,25 @@
 #ifndef CLUnMovedInteractiveOpacityItem_1758_h
 #define CLUnMovedInteractiveOpacityItem_1758_h
 
-#include "abstract_unmoved_opacity_item.h"
+#include "abstract_unmoved_item.h"
 
-class CLUnMovedInteractiveOpacityItem: public CLAbstractUnMovedOpacityItem
+class CLUnMovedInteractiveOpacityItem : public CLAbstractUnmovedItem
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	CLUnMovedInteractiveOpacityItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity);
-	~CLUnMovedInteractiveOpacityItem();
+    CLUnMovedInteractiveOpacityItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity);
+    ~CLUnMovedInteractiveOpacityItem();
 
-    virtual void hide(int duration);
-    virtual void show(int duration);
-
-protected:
-	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    virtual void setVisible(bool visible, int duration = 0);
 
 protected:
-	qreal m_normal_opacity;
-	qreal m_active_opacity;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
+protected:
+    const qreal m_normal_opacity;
+    const qreal m_active_opacity;
 };
 
 #endif //CLUnMovedInteractiveOpacityItem
