@@ -219,7 +219,7 @@ public:
      * \param view                      Graphics view to move viewport of.
      * \param viewportPositionDelta     Move delta, in viewport coordinates.
      */
-    static void moveViewportF(QGraphicsView *view, const QPointF &viewportPositionDelta);
+    static void moveViewport(QGraphicsView *view, const QPointF &viewportPositionDelta);
 
     /**
      * Moves the given viewport.
@@ -227,7 +227,7 @@ public:
      * \param view                      Graphics view to move viewport of.
      * \param scenePositionDelta        Move delta, in scene coordinates.
      */
-    static void moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta);
+    static void moveViewportScene(QGraphicsView *view, const QPointF &scenePositionDelta);
 
     /**
      * Centers the given viewport on the given position.
@@ -235,7 +235,7 @@ public:
      * \param view                      Graphics view to center viewport of.
      * \param centerPosition            Position to center on.
      */
-    static void moveViewportTo(QGraphicsView *view, const QPointF &centerPosition);
+    static void moveViewportSceneTo(QGraphicsView *view, const QPointF &centerPosition);
 
     /**
      * Scales the given viewport.

@@ -211,17 +211,17 @@ bool QnSceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
 void QnSceneUtility::moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta) {
     assert(view != NULL);
 
-    moveViewport(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
+    moveViewportScene(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
 }
 
-void QnSceneUtility::moveViewportF(QGraphicsView *view, const QPointF &viewportPositionDelta) {
+void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &viewportPositionDelta) {
     assert(view != NULL);
 
     QTransform viewportToScene = view->viewportTransform().inverted();
-    moveViewport(view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
+    moveViewportScene(view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
 }
 
-void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta) {
+void QnSceneUtility::moveViewportScene(QGraphicsView *view, const QPointF &scenePositionDelta) {
     assert(view != NULL);
 
     QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
@@ -235,10 +235,10 @@ void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &scenePosit
     view->setInteractive(oldInteractive);
 }
 
-void QnSceneUtility::moveViewportTo(QGraphicsView *view, const QPointF &centerPosition) {
+void QnSceneUtility::moveViewportSceneTo(QGraphicsView *view, const QPointF &centerPosition) {
     assert(view != NULL);
 
-    moveViewport(view, centerPosition - view->mapToScene(view->viewport()->rect().center()));
+    moveViewportScene(view, centerPosition - view->mapToScene(view->viewport()->rect().center()));
 }
 
 namespace {

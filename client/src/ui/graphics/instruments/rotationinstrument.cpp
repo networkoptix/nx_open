@@ -346,7 +346,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
 
         if(!qFuzzyCompare(target()->transformOriginPoint(), itemOrigin)) {
             QPointF newSceneOrigin = target()->mapToScene(itemOrigin);
-            moveViewport(info->view(), newSceneOrigin - sceneOrigin);
+            moveViewportScene(info->view(), newSceneOrigin - sceneOrigin);
             sceneOrigin = newSceneOrigin;
         }
     }

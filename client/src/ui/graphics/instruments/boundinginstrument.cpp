@@ -11,10 +11,27 @@
 namespace {
 
     qreal calculateCorrection(qreal oldValue, qreal newValue, qreal lowerBound, qreal upperBound) {
-        if(oldValue >= lowerBound && oldValue <= upperBound)
-            return 0.0;
+        if(oldValue > newValue)
+            return -calculateCorrection(newValue, oldValue, lowerBound, upperBound);
+        /* Here oldValue <= newValue. */
 
-        return (oldValue - newValue) * 0.5;
+        qreal result = 0.0;
+
+        /* Adjust for boundary intersections. */
+        if(oldValue < lowerBound && lowerBound < newValue) {
+            result += -(lowerBound - oldValue) * 0.5;
+            oldValue = lowerBound;
+        }
+        if(oldValue < upperBound && upperBound < newValue) {
+            result += -(newValue - upperBound) * 0.5;
+            newValue = upperBound;
+        }
+
+        /* At this point, both old & new values lie in the same section. */
+        if(oldValue < lowerBound || newValue > upperBound)
+            result += -(newValue - oldValue) * 0.5;
+
+        return result;
     }
 
     QPointF calculateCorrection(QPointF oldValue, QPointF newValue, QRectF bounds) {
@@ -122,7 +139,7 @@ public:
 
             /* Calculate relative correction and move viewport. */
             qreal correction = logFactor / (logScale - logOldScale);
-            QnSceneUtility::moveViewport(m_view, (m_center - oldCenter) * correction);
+            QnSceneUtility::moveViewportScene(m_view, (m_center - oldCenter) * correction);
 
             updateParameters();
             ensureParameters();
@@ -132,7 +149,7 @@ public:
         if(!m_centerPositionBounds.contains(m_center) && !qFuzzyCompare(m_center, oldCenter)) {
             QPointF correction = calculateCorrection(oldCenter, m_center, m_centerPositionBounds);
 
-            QnSceneUtility::moveViewport(m_view, correction);
+            QnSceneUtility::moveViewportScene(m_view, correction);
 
             updateParameters();
         }
@@ -202,7 +219,7 @@ public:
                 if(std::abs(delta.y()) > std::abs(direction.y()))
                     delta.ry() = direction.y();
 
-                QnSceneUtility::moveViewport(m_view, delta);
+                QnSceneUtility::moveViewportScene(m_view, delta);
             }
         }
 

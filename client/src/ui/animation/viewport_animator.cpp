@@ -11,7 +11,7 @@ namespace {
     class ViewportPositionSetter {
     public:
         void operator()(QObject *view, const QVariant &value) const {
-            QnSceneUtility::moveViewportTo(checked_cast<QGraphicsView *>(view), value.toPointF());
+            QnSceneUtility::moveViewportSceneTo(checked_cast<QGraphicsView *>(view), value.toPointF());
         }
     };
 
