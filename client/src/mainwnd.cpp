@@ -204,8 +204,7 @@ void MainWnd::goToNewLayoutContent(LayoutContent* newl)
 
 void MainWnd::handleMessage(const QString &message)
 {
-    const QStringList files = message.split(QLatin1Char('\0'), QString::SkipEmptyParts); // ### QString doesn't support \0 in the string
-
+    const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     addFilesToCurrentOrNewLayout(files);
     activate();
 }

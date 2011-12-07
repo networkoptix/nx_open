@@ -67,15 +67,6 @@ class QLabelKillsWheelEvent : public QLabel
 protected:
     void wheelEvent(QWheelEvent *) {}
 };
-
-class QGraphicsWidgetKillsWheelEvent : public QGraphicsWidget
-{
-public:
-    QGraphicsWidgetKillsWheelEvent(QGraphicsItem *parent = 0) : QGraphicsWidget(parent) {}
-
-protected:
-    void wheelEvent(QGraphicsSceneWheelEvent *) {}
-};
 // ###
 
 
@@ -146,37 +137,43 @@ private:
 };
 
 
-NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
-    base_type(QString("name:)"), 0, 0.5, 0.95),
+#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
+qreal NavigationItem::m_normal_opacity = 0.5;
+qreal NavigationItem::m_active_opacity = 0.95;
+extern int global_opacity_change_period;
+#endif
+
+NavigationItem::NavigationItem(QGraphicsItem *parent)
+    : QGraphicsWidget(parent),
     m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
-    m_mouseOver(false),
     restoreInfoTextData(0)
 {
+#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
+    m_underMouse = false;
+    m_animation = 0;
+    setAcceptHoverEvents(true);
+    setOpacity(m_normal_opacity);
+#endif
+
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, false);
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-    setFlag(QGraphicsItem::ItemHasNoContents, true);
     setFlag(QGraphicsItem::ItemIsPanel, true);
-
-    setAcceptHoverEvents(true);
 
     setCursor(Qt::ArrowCursor);
 
-    m_timePeriodUpdater = new detail::QnTimePeriodUpdater(this);
-    connect(m_timePeriodUpdater, SIGNAL(ready(const QnTimePeriodList &)), this, SLOT(onTimePeriodUpdaterReady(const QnTimePeriodList &)));
-
-    m_graphicsWidget = new QGraphicsWidgetKillsWheelEvent(this);
-    m_graphicsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_graphicsWidget->setCursor(Qt::ArrowCursor);
-    m_graphicsWidget->setAutoFillBackground(true);
+    setAutoFillBackground(true);
 
     {
-        QPalette palette = m_graphicsWidget->palette();
-        palette.setColor(QPalette::Window, Qt::black);
-        m_graphicsWidget->setPalette(palette);
+        QPalette pal = palette();
+        pal.setColor(QPalette::Window, Qt::black);
+        setPalette(pal);
     }
+
+    m_timePeriodUpdater = new detail::QnTimePeriodUpdater(this);
+    connect(m_timePeriodUpdater, SIGNAL(ready(const QnTimePeriodList &)), this, SLOT(onTimePeriodUpdaterReady(const QnTimePeriodList &)));
 
     m_backwardButton = new ImageButton(this);
     m_backwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_backward_grey.png")), ImageButton::Active, ImageButton::Background);
@@ -231,7 +228,6 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_speedSlider = new SpeedSlider(Qt::Horizontal, this);
     m_speedSlider->setObjectName("SpeedSlider");
     m_speedSlider->setToolTipItem(new SliderToolTipItem(m_speedSlider));
-    m_speedSlider->setCursor(Qt::ArrowCursor);
 
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
     connect(m_speedSlider, SIGNAL(frameBackward()), this, SLOT(stepBackward()));
@@ -251,16 +247,15 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_timeSlider->setObjectName("TimeSlider");
     m_timeSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_timeSlider->setToolTipItem(new TimeSliderToolTipItem(m_timeSlider));
-    m_timeSlider->setCursor(Qt::ArrowCursor);
-    m_graphicsWidget->resize(m_timeSlider->size());
-
+    m_timeSlider->toolTipItem()->setVisible(false);
     m_timeSlider->setEndSize(SLIDER_NOW_AREA_WIDTH);
 
+    m_timeSlider->setAutoFillBackground(true);
     {
-        QPalette palette = m_timeSlider->palette();
-        palette.setColor(QPalette::Window, QColor(15, 15, 15));
-        palette.setColor(QPalette::WindowText, QColor(63, 159, 216));
-        m_timeSlider->setPalette(palette);
+        QPalette pal = m_timeSlider->palette();
+        pal.setColor(QPalette::Window, QColor(15, 15, 15, 128));
+        pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
+        m_timeSlider->setPalette(pal);
     }
 
     connect(m_timeSlider, SIGNAL(currentValueChanged(qint64)), this, SLOT(onValueChanged(qint64)));
@@ -279,7 +274,6 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_muteButton->setMaximumSize(m_muteButton->preferredSize());
     m_muteButton->setCheckable(true);
     m_muteButton->setChecked(m_volumeSlider->isMute());
-    m_muteButton->setCursor(Qt::ArrowCursor);
 
     m_liveButton = new ImageButton(this);
     //m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
@@ -287,14 +281,12 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_liveButton->setPreferredSize(20, 20);
     m_liveButton->setMaximumSize(m_liveButton->preferredSize());
     m_liveButton->setEnabled(false);
-    m_liveButton->setCursor(Qt::ArrowCursor);
     m_liveButton->hide();
 
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
-    m_volumeSlider->setCursor(Qt::ArrowCursor);
 
     connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
     connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
@@ -306,6 +298,7 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
 
     QGraphicsProxyWidget *timeLabelProxyWidget = new QGraphicsProxyWidget(this);
     timeLabelProxyWidget->setWidget(m_timeLabel);
+
 
     QGraphicsLinearLayout *rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutH->setContentsMargins(0, 0, 0, 0);
@@ -328,7 +321,6 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     rightLayoutV->setAlignment(rightLayoutH, Qt::AlignBottom);
     rightLayoutV->addStretch();
 
-
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->setSpacing(10);
@@ -338,28 +330,83 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     mainLayout->setAlignment(m_timeSlider, Qt::AlignCenter);
     mainLayout->addItem(rightLayoutV);
     mainLayout->setAlignment(rightLayoutV, Qt::AlignRight | Qt::AlignVCenter);
-    m_graphicsWidget->setLayout(mainLayout);
+    setLayout(mainLayout);
 
 
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
     playAction->setShortcut(tr("Space"));
     playAction->setShortcutContext(Qt::ApplicationShortcut);
     connect(playAction, SIGNAL(triggered()), m_playButton, SLOT(click()));
-    m_graphicsWidget->addAction(playAction);
+    addAction(playAction);
+
 
     setVideoCamera(0);
 }
 
 NavigationItem::~NavigationItem()
 {
+#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
+    stopAnimation();
+#endif
+
     delete m_timeSlider;
     delete m_timeLabel;
 }
 
-QRectF NavigationItem::boundingRect() const
+#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
+void NavigationItem::setVisibleAnimated(bool visible, int duration)
 {
-    return m_graphicsWidget->boundingRect();
+    changeOpacity(visible ? m_normal_opacity : 0.0, duration);
 }
+
+void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    QGraphicsWidget::hoverEnterEvent(event);
+
+    m_underMouse = true;
+
+    changeOpacity(m_active_opacity, global_opacity_change_period);
+}
+
+void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    QGraphicsWidget::hoverLeaveEvent(event);
+
+    m_underMouse = false;
+
+    changeOpacity(m_normal_opacity, global_opacity_change_period);
+}
+
+void NavigationItem::changeOpacity(qreal new_opacity, int duration)
+{
+    stopAnimation();
+
+    if (duration == 0 || qFuzzyCompare(new_opacity, opacity()))
+    {
+        setOpacity(new_opacity);
+    }
+    else
+    {
+        m_animation = new QPropertyAnimation(this, "opacity", this);
+        m_animation->setDuration(duration);
+        m_animation->setStartValue(opacity());
+        m_animation->setEndValue(new_opacity);
+        m_animation->start();
+
+        connect(m_animation, SIGNAL(finished()), this, SLOT(stopAnimation()));
+    }
+}
+
+void NavigationItem::stopAnimation()
+{
+    if (m_animation)
+    {
+        m_animation->stop();
+        m_animation->deleteLater();
+        m_animation = 0;
+    }
+}
+#endif // EMULATE_CLUnMovedInteractiveOpacityItem
 
 void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 {
@@ -449,7 +496,7 @@ void NavigationItem::timerEvent(QTimerEvent *event)
     if (event->timerId() == m_timerId)
         updateSlider();
 
-    base_type::timerEvent(event);
+    QGraphicsWidget::timerEvent(event);
 }
 
 void NavigationItem::updateSlider()
@@ -700,18 +747,6 @@ void NavigationItem::stepForward()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->nextFrame();
     //m_camera->getCamCamDisplay()->setSingleShotMode(true);
-}
-
-void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
-{
-    m_mouseOver = true;
-    base_type::hoverEnterEvent(e);
-}
-
-void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
-{
-    m_mouseOver = false;
-    base_type::hoverLeaveEvent(e);
 }
 
 void NavigationItem::onSliderPressed()
