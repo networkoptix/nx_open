@@ -723,6 +723,9 @@ void GraphicsView::initDecoration()
 
 void GraphicsView::adjustAllStaticItems()
 {
+    if (m_navigationItem)
+        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
+
     foreach (CLAbstractUnmovedItem *item, m_staticItems)
         item->adjust();
 
@@ -2000,7 +2003,11 @@ void GraphicsView::goToSteadyMode(bool steady)
             onUserInput(false, false);
             return;
         }
-
+        if (m_navigationItem && m_navigationItem->preferNonSteadyMode())
+        {
+            onUserInput(false, false);
+            return;
+        }
         foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
             if (item != bk_item && item->preferNonSteadyMode())
@@ -2012,15 +2019,11 @@ void GraphicsView::goToSteadyMode(bool steady)
 
         foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item == bk_item)
-                continue;
-
-            if(item == m_navigationItem.data() && m_camLayout.hasLiveCameras())
-                continue;
-
-            item->hideIfNeeded(500);
+            if (item != bk_item)
+                item->hideIfNeeded(500);
         }
-
+        if (m_navigationItem && !m_camLayout.hasLiveCameras())
+            m_navigationItem->hideIfNeeded(500);
         if (m_searchItem)
         {
             m_searchItem->setVisible(false);
@@ -2037,7 +2040,8 @@ void GraphicsView::goToSteadyMode(bool steady)
             if (item != bk_item)
                 item->show(500);
         }
-
+        if (m_navigationItem)
+            m_navigationItem->show(500);
         if (m_searchItem)
         {
             m_searchItem->setVisible(true);
@@ -2410,18 +2414,16 @@ void GraphicsView::updatePageSelector()
 NavigationItem *GraphicsView::getNavigationItem()
 {
     if (!m_navigationItem) {
-        m_navigationItem = new NavigationItem();
-        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
+        m_navigationItem.reset(new NavigationItem);
         m_navigationItem->setVisible(false);
+        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
         m_navigationItem->graphicsWidget()->resize(width(), NavigationItem::DEFAULT_HEIGHT);
         m_navigationItem->setZValue(INT_MAX);
-        scene()->addItem(m_navigationItem);
+        scene()->addItem(m_navigationItem.data());
 
         connect(m_navigationItem.data(), SIGNAL(exportRange(qint64,qint64)), this, SIGNAL(onExportRange(qint64,qint64)));
-
-        addStaticItem(m_navigationItem, false);
     }
-    return m_navigationItem;
+    return m_navigationItem.data();
 }
 
 void GraphicsView::updateDecorations()
@@ -2485,7 +2487,7 @@ void GraphicsView::resizeEvent(QResizeEvent *event)
         return;
 
     if (m_navigationItem) {
-        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
+        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
         m_navigationItem->graphicsWidget()->resize(event->size().width(), NavigationItem::DEFAULT_HEIGHT);
     }
     updateDecorations();
