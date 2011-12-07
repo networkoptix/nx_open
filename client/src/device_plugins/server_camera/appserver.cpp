@@ -18,6 +18,7 @@ QString QnAppServerResourceSearcher::manufacture() const
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
     QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
+    cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
     QHostAddress host(appserverUrl.host());
     int port = appserverUrl.port();
 

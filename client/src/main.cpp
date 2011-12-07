@@ -155,6 +155,7 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
     EveApplication application(argc, argv);
+    application.setQuitOnLastWindowClosed(true);
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
@@ -177,14 +178,7 @@ int main(int argc, char *argv[])
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
 
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
-    {
-        application.quit();
-
         return 0;
-    }
-
-    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
-    cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
 
 #ifdef _DEBUG
      //cl_log.setLogLevel(cl_logDEBUG1);
@@ -249,9 +243,8 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().start();
 
     CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
-    //============================
 
-    qApp->setQuitOnLastWindowClosed(true);
+    //============================
 
     QnStoragePtr storage0(new QnStorage());
     storage0->setUrl(getRecordingDir());
