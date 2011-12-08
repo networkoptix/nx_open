@@ -9,10 +9,15 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 
+struct QnTimePeriod;
+typedef QVector<QnTimePeriod> QnTimePeriodList;
+
 struct QnTimePeriod
 {
     QnTimePeriod(): startTimeUSec(0), durationUSec(0) {}
     QnTimePeriod(qint64 startTimeUSec, qint64 durationUSec): startTimeUSec(startTimeUSec), durationUSec(durationUSec) {}
+
+    static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
 
     /** Start time in microseconds. */
     qint64 startTimeUSec;
@@ -23,7 +28,6 @@ struct QnTimePeriod
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationUSec;
 };
-typedef QVector<QnTimePeriod> QnTimePeriodList;
 
 class DeviceFileCatalog: public QObject
 {

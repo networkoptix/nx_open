@@ -2,6 +2,7 @@
 
 #include "libavformat/avformat.h"
 #include "utils/media/ffmpeg_helper.h"
+#include "utils/media/sse_helper.h"
 
 extern QMutex global_ffmpeg_mutex;
 
@@ -46,4 +47,22 @@ AVCodecContext* QnMediaContext::ctx() const
 bool QnMediaContext::equalTo(QnMediaContext* other) const
 {
     return m_ctx->codec_id == other->m_ctx->codec_id;
+}
+
+// ----------------------------------- QnMetaDataV1 -----------------------------------------
+
+void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
+{
+    if (m_firstTimestamp == AV_NOPTS_VALUE)
+        m_firstTimestamp = timestamp;
+    else 
+        m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
+
+    __m128i* dst = (__m128i*) data.data();
+    __m128i* src = (__m128i*) image;
+    for (int i = 0; i < MD_WIDTH*MD_HIGHT/128; ++i)
+    {
+        _mm_or_si128(*dst++, *src++);
+
+    }
 }

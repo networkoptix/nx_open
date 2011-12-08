@@ -117,8 +117,7 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMks)
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
     QMutexLocker lock(&m_mutex);
-    QnTimePeriodList result;
-    QList<QVector<QnTimePeriod> > cameras;
+    QVector<QnTimePeriodList> cameras;
     for (int i = 0; i < resList.size(); ++i)
     {
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
@@ -130,39 +129,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
         }
     }
 
-    int minIndex = 0;
-    while (minIndex != -1)
-    {
-        qint64 minStartTime = 0x7fffffffffffffffll;
-        minIndex = -1;
-        for (int i = 0; i < cameras.size(); ++i) {
-            if (!cameras[i].isEmpty() && cameras[i][0].startTimeUSec < minStartTime) {
-                minIndex = i;
-                minStartTime = cameras[i][0].startTimeUSec;
-            }
-        }
-
-        if (minIndex >= 0)
-        {
-            // add chunk to merged data
-            if (result.isEmpty()) {
-                result << cameras[minIndex][0];
-            }
-            else {
-                QnTimePeriod& last = result.last();
-                if (last.startTimeUSec <= minStartTime && last.startTimeUSec+last.durationUSec > minStartTime)
-                    last.durationUSec = qMax(last.durationUSec, minStartTime + cameras[minIndex][0].durationUSec - last.startTimeUSec);
-                else {
-                    result << cameras[minIndex][0];
-                    if (cameras[minIndex][0].durationUSec == -1)
-                        break;
-                }
-            } 
-            cameras[minIndex].pop_front();
-        }
-    }
-
-    return result;
+    return QnTimePeriod::mergeTimePeriods(cameras);
 }
 
 void QnStorageManager::clearSpace(QnStoragePtr storage)

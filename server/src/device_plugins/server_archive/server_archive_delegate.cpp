@@ -166,3 +166,8 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     //    m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
     return rez;
 }
+
+void QnServerArchiveDelegate::setPlaybackMask(const QnTimePeriodList& periods)
+{
+    m_mask = periods;
+}

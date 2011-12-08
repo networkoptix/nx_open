@@ -349,3 +349,39 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
     return first.startTime < other.startTime; 
 }
 
+QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> periods)
+{
+    QnTimePeriodList result;
+    int minIndex = 0;
+    while (minIndex != -1)
+    {
+        qint64 minStartTime = 0x7fffffffffffffffll;
+        minIndex = -1;
+        for (int i = 0; i < periods.size(); ++i) {
+            if (!periods[i].isEmpty() && periods[i][0].startTimeUSec < minStartTime) {
+                minIndex = i;
+                minStartTime = periods[i][0].startTimeUSec;
+            }
+        }
+
+        if (minIndex >= 0)
+        {
+            // add chunk to merged data
+            if (result.isEmpty()) {
+                result << periods[minIndex][0];
+            }
+            else {
+                QnTimePeriod& last = result.last();
+                if (last.startTimeUSec <= minStartTime && last.startTimeUSec+last.durationUSec > minStartTime)
+                    last.durationUSec = qMax(last.durationUSec, minStartTime + periods[minIndex][0].durationUSec - last.startTimeUSec);
+                else {
+                    result << periods[minIndex][0];
+                    if (periods[minIndex][0].durationUSec == -1)
+                        break;
+                }
+            } 
+            periods[minIndex].pop_front();
+        }
+    }
+    return result;
+}
