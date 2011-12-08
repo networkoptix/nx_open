@@ -28,6 +28,10 @@ struct QnTimePeriod
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationUSec;
 };
+bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
+bool operator < (qint64 first, const QnTimePeriod& other);
+bool operator < (const QnTimePeriod& other, qint64 first);
+
 
 class DeviceFileCatalog: public QObject
 {

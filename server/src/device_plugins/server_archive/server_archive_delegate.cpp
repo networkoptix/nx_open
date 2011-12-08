@@ -34,7 +34,6 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
-
     m_resource = resource;
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     Q_ASSERT(netResource != 0);
@@ -54,7 +53,38 @@ void QnServerArchiveDelegate::close()
     m_opened = false;
 }
 
-qint64 QnServerArchiveDelegate::seek(qint64 time)
+qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
+{
+    qint64 timeMs = time/1000;
+    if (timeMs >= m_lastTimePeriod.startTimeUSec && timeMs < m_lastTimePeriod.startTimeUSec + m_lastTimePeriod.durationUSec)
+        return time;
+
+    QnTimePeriodList::iterator itr = qUpperBound(m_mask.begin(), m_mask.end(), timeMs);
+    if (itr != m_mask.begin())
+    {
+        --itr;
+        if (itr->startTimeUSec + itr->durationUSec < time) 
+        {
+            if (!m_reverseMode)
+            {
+                ++itr;
+                m_lastTimePeriod = *itr;
+                time = itr->startTimeUSec;
+            }
+            else {
+                m_lastTimePeriod = *itr;
+                time = itr->startTimeUSec + itr->durationUSec;
+            }
+        }
+    }
+    else {
+        m_lastTimePeriod = *itr;
+        time = itr->startTimeUSec;
+    }
+    return time*1000;
+}
+
+qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
 {
     QTime t;
     t.start();
@@ -103,6 +133,14 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
     return rez;
 }
 
+qint64 QnServerArchiveDelegate::seek(qint64 time)
+{
+    // change time by playback mask
+    if (!m_mask.isEmpty())
+        time = correctTimeByMask(time);
+    return seekInternal(time);
+}
+
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
@@ -126,7 +164,15 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     }
     if (data) {
         data->timestamp +=m_currentChunk.startTime;
-        //cl_log.log("serverArchiveDelegate. dataTime= ",QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString(), cl_logALWAYS);
+        if (!m_mask.isEmpty())
+        {
+            qint64 newTime = correctTimeByMask(data->timestamp);
+            if (newTime != data->timestamp) {
+                seekInternal(newTime);
+                return getNextData();
+            }
+        }
+
     }
     return data;
 }

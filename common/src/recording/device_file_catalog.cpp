@@ -7,6 +7,21 @@
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
+bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
+{
+    return first.startTimeUSec < other.startTimeUSec; 
+}
+
+bool operator < (qint64 first, const QnTimePeriod& other) 
+{ 
+    return first < other.startTimeUSec; 
+}
+
+bool operator < (const QnTimePeriod& other, qint64 first) 
+{ 
+    return other.startTimeUSec < first; 
+}
+
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
