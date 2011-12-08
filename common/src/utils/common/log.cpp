@@ -212,3 +212,23 @@ QString CLLog::backupFileName(quint8 num) const
 	return result;
 }
 
+void qDebugCLLogHandler(QtMsgType type, const char *msg)
+{
+	switch (type) {
+		case QtDebugMsg:
+			cl_log.log(msg, cl_logINFO);
+			break;
+		case QtWarningMsg:
+			cl_log.log(msg, cl_logWARNING);
+			break;
+		case QtCriticalMsg:
+			cl_log.log(msg, cl_logERROR);
+			break;
+		case QtFatalMsg:
+			cl_log.log(msg, cl_logERROR);
+			break;
+		default:
+			cl_log.log(msg, cl_logINFO);
+	}
+}
+

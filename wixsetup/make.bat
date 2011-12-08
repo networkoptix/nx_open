@@ -1,7 +1,7 @@
 rem call "%VS90COMNTOOLS%vsvars32.bat"
 call qtvars.bat
 
-set "CURRENTDIR=%cd%"
+rem set "CURRENTDIR=%cd%"
 
 rem cd ..\common
 rem @start /B /WAIT convert.py
@@ -14,8 +14,9 @@ rem @start /B /WAIT convert.py
 
 rem cd ..\appserver
 rem @start /B /WAIT convert.py
+rem @start /B /WAIT setup.py build
 
-cd %CURRENTDIR%
+rem cd %CURRENTDIR%
 
 rem MSBuild ..\common\src\common.vcproj /t:Rebuild /p:Configuration=Release
 rem MSBuild ..\client\src\client.vcproj /t:Rebuild /p:Configuration=Release
