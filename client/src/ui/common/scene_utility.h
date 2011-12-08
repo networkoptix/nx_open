@@ -18,6 +18,7 @@ class QTransform;
 
 class QnSceneUtility {
 public:
+    /* Some coefficient-wise arithmetic functions follow. */
     static QPointF cwiseMul(const QPointF &l, const QPointF &r);
     static QPointF cwiseDiv(const QPointF &l, const QPointF &r);
     static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
@@ -27,8 +28,43 @@ public:
     static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
 
+    /**
+     * \param margins                   Margins.
+     * \returns                         Amount by which the size of some rectangle 
+     *                                  will change if the given margins are applied to it.
+     */
     static QSizeF sizeDelta(const MarginsF &margins);
+
+    /**
+     * \param margins                   Margins.
+     * \returns                         Amount by which the size of some rectangle 
+     *                                  will change if the given margins are applied to it.
+     */
     static QSize sizeDelta(const QMargins &margins);
+
+    /**
+     * \param                           Size.
+     * \returns                         Aspect ratio of the given size.
+     */
+    static qreal aspectRatio(const QSizeF &size);
+
+    /**
+     * \param                           Size.
+     * \returns                         Aspect ratio of the given size.
+     */
+    static qreal aspectRatio(const QSize &size);
+
+    /**
+     * \param                           Rectangle.
+     * \returns                         Aspect ratio of the given rectangle.
+     */
+    static qreal aspectRatio(const QRect &rect);
+
+    /**
+     * \param                           Rectangle.
+     * \returns                         Aspect ratio of the given rectangle.
+     */
+    static qreal aspectRatio(const QRectF &rect);
 
     /**
      * \param                           Size.
@@ -199,6 +235,15 @@ public:
     static QRect eroded(const QRect &rect, const QMargins &amount);
 
     /**
+     * Erodes the given size by the given amount.
+     * 
+     * \param size                      Size to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded size.
+     */
+    static QSizeF eroded(const QSizeF &size, const MarginsF &amount);
+
+    /**
      * \param size                      Size to check for containment.
      * \param otherSize                 Reference size.
      * \returns                         Whether the reference size contains the given size.
@@ -233,9 +278,9 @@ public:
      * Centers the given viewport on the given position.
      * 
      * \param view                      Graphics view to center viewport of.
-     * \param centerPosition            Position to center on.
+     * \param sceneCenter               Position to center on, in scene coordinates.
      */
-    static void moveViewportSceneTo(QGraphicsView *view, const QPointF &centerPosition);
+    static void moveViewportSceneTo(QGraphicsView *view, const QPointF &sceneCenter);
 
     /**
      * Scales the given viewport.

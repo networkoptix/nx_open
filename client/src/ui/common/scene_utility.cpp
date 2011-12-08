@@ -66,6 +66,22 @@ QSize QnSceneUtility::sizeDelta(const QMargins &margins) {
     return QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
 }
 
+qreal QnSceneUtility::aspectRatio(const QSizeF &size) {
+    return size.width() / size.height();
+}
+
+qreal QnSceneUtility::aspectRatio(const QSize &size) {
+    return static_cast<qreal>(size.width()) / size.height();
+}
+
+qreal QnSceneUtility::aspectRatio(const QRect &rect) {
+    return aspectRatio(rect.size());
+}
+
+qreal QnSceneUtility::aspectRatio(const QRectF &rect) {
+    return aspectRatio(rect.size());
+}
+
 qreal QnSceneUtility::length(const QPointF &point) {
     return std::sqrt(point.x() * point.x() + point.y() * point.y());
 }
@@ -193,7 +209,7 @@ QRectF QnSceneUtility::dilated(const QRectF &rect, const MarginsF &amount) {
 }
 
 QSizeF QnSceneUtility::dilated(const QSizeF &size, const MarginsF &amount) {
-    return QSizeF(size.width() + amount.left() + amount.right(), size.height() + amount.top() + amount.bottom());
+    return size + sizeDelta(amount);
 }
 
 QRectF QnSceneUtility::eroded(const QRectF &rect, const MarginsF &amount) {
@@ -202,6 +218,10 @@ QRectF QnSceneUtility::eroded(const QRectF &rect, const MarginsF &amount) {
 
 QRect QnSceneUtility::eroded(const QRect &rect, const QMargins &amount) {
     return rect.adjusted(amount.left(), amount.top(), -amount.right(), -amount.bottom());
+}
+
+QSizeF QnSceneUtility::eroded(const QSizeF &size, const MarginsF &amount) {
+    return size - sizeDelta(amount);
 }
 
 bool QnSceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
@@ -235,10 +255,13 @@ void QnSceneUtility::moveViewportScene(QGraphicsView *view, const QPointF &scene
     view->setInteractive(oldInteractive);
 }
 
-void QnSceneUtility::moveViewportSceneTo(QGraphicsView *view, const QPointF &centerPosition) {
+void QnSceneUtility::moveViewportSceneTo(QGraphicsView *view, const QPointF &sceneCenter) {
     assert(view != NULL);
 
-    moveViewportScene(view, centerPosition - view->mapToScene(view->viewport()->rect().center()));
+    QTransform viewportToScene = view->viewportTransform().inverted();
+    QPointF currentSceneCenter = viewportToScene.map(QRectF(view->viewport()->rect()).center());
+
+    moveViewportScene(view, sceneCenter - currentSceneCenter);
 }
 
 namespace {

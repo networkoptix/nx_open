@@ -241,10 +241,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gr
     layout()->addItem(item);
     if(!item->isPinned()) {
         /* Place already taken, pick closest one. Use AR-based metric. */
-        QSize viewportSize = display()->view()->viewport()->size();
-        QSizeF cellSize = display()->workbench()->mapper()->step();
-        qreal aspectRatio = (static_cast<qreal>(viewportSize.width()) /  viewportSize.height()) / (cellSize.width() / cellSize.height());
-        QnAspectRatioGridWalker walker(aspectRatio);
+        QnAspectRatioGridWalker walker(aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
         QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size(), &walker);
         layout()->pinItem(item, newGeometry);
     }

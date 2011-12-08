@@ -96,12 +96,16 @@ void QnViewportAnimator::moveTo(const QRectF &rect, int timeLimitMsecs) {
     if(timeLimitMsecs == -1)
         timeLimitMsecs = std::numeric_limits<int>::max();
 
-    /* Adjust for margins. */
     QSizeF viewportSize = m_view->viewport()->size();
-    MarginsF extension = cwiseDiv(m_viewportMargins, viewportSize);
-    extension = cwiseMul(cwiseDiv(extension, MarginsF(1.0, 1.0, 1.0, 1.0) - extension), rect.size());
-    QRectF actualRect = dilated(rect, extension);
+    QRectF actualRect = rect;
 
+    /* Extend to match aspect ratio. */
+    actualRect = expanded(aspectRatio(eroded(viewportSize, m_viewportMargins)), rect, Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+
+    /* Adjust for margins. */
+    MarginsF extension = cwiseDiv(m_viewportMargins, viewportSize);
+    extension = cwiseMul(cwiseDiv(extension, MarginsF(1.0, 1.0, 1.0, 1.0) - extension), actualRect.size());
+    actualRect = dilated(actualRect, extension);
 
     QRectF viewportRect = mapRectToScene(m_view, m_view->viewport()->rect());
     if(qFuzzyCompare(viewportRect, actualRect)) {

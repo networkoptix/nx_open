@@ -13,6 +13,7 @@ public:
     QnServerArchiveDelegate();
     virtual ~QnServerArchiveDelegate();
 
+    void setPlaybackMask(const QnTimePeriodList& periods);
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();
@@ -27,6 +28,8 @@ public:
     virtual void onReverseMode(qint64 displayTime, bool value);
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk);
+    qint64 correctTimeByMask(qint64 time);
+    qint64 seekInternal(qint64 time);
 private:
     bool m_opened;
     QnResourcePtr m_resource;
@@ -37,6 +40,9 @@ private:
     QnAviResourcePtr m_fileRes;
     bool m_reverseMode;
     int m_selectedAudioChannel;
+
+    QnTimePeriodList m_mask;
+    QnTimePeriod m_lastTimePeriod;
 };
 
 #endif // _SERVER_ARCHIVE_DELEGATE_H__
