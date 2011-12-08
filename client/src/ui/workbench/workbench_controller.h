@@ -85,6 +85,8 @@ protected slots:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
+    void at_navigationItem_geometryChanged();
+
 private:
     /** Display synchronizer. */
     QnWorkbenchDisplay *m_display;

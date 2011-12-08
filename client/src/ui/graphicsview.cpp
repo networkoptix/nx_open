@@ -424,7 +424,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (onUserInput(true, true))
         return;
 
-    if (m_navigationItem && m_navigationItem->mouseOver())
+    if (m_navigationItem && m_navigationItem->isMouseOver())
     {
         // do not zoom scene if mouse is over m_navigationItem
         QGraphicsView::wheelEvent(e);
@@ -439,11 +439,11 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     }
 
     /*/
-    if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
+    if (m_navigationItem && ( m_navigationItem->isMouseOver() || m_navigationItem->isActive()))
     {
         // scene should not be zoomed if mouse is over time slider or if time slider is active
 
-        if (!m_navigationItem->mouseOver() && m_navigationItem->isActive())
+        if (!m_navigationItem->isMouseOver() && m_navigationItem->isActive())
             return; // if mouse is not over time line but time line is still active event must be ignored
 
         QGraphicsView::wheelEvent(e);
@@ -723,6 +723,11 @@ void GraphicsView::initDecoration()
 
 void GraphicsView::adjustAllStaticItems()
 {
+    if (m_navigationItem) {
+        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
+        m_navigationItem->resize(width(), NavigationItem::DEFAULT_HEIGHT);
+    }
+
     foreach (CLAbstractUnmovedItem *item, m_staticItems)
         item->adjust();
 
@@ -2000,10 +2005,14 @@ void GraphicsView::goToSteadyMode(bool steady)
             onUserInput(false, false);
             return;
         }
-
+        if (m_navigationItem && m_navigationItem->isMouseOver())
+        {
+            onUserInput(false, false);
+            return;
+        }
         foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item != bk_item && item->preferNonSteadyMode())
+            if (item != bk_item && item->isMouseOver())
             {
                 onUserInput(false, false);
                 return;
@@ -2012,15 +2021,11 @@ void GraphicsView::goToSteadyMode(bool steady)
 
         foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item == bk_item)
-                continue;
-
-            if(item == m_navigationItem.data() && m_camLayout.hasLiveCameras())
-                continue;
-
-            item->hideIfNeeded(500);
+            if (item != bk_item)
+                item->hideIfNeeded(500);
         }
-
+        if (m_navigationItem && !m_camLayout.hasLiveCameras())
+            m_navigationItem->hideIfNeeded(500);
         if (m_searchItem)
         {
             m_searchItem->setVisible(false);
@@ -2037,7 +2042,8 @@ void GraphicsView::goToSteadyMode(bool steady)
             if (item != bk_item)
                 item->show(500);
         }
-
+        if (m_navigationItem)
+            m_navigationItem->show(500);
         if (m_searchItem)
         {
             m_searchItem->setVisible(true);
@@ -2410,18 +2416,16 @@ void GraphicsView::updatePageSelector()
 NavigationItem *GraphicsView::getNavigationItem()
 {
     if (!m_navigationItem) {
-        m_navigationItem = new NavigationItem();
-        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
+        m_navigationItem.reset(new NavigationItem);
         m_navigationItem->setVisible(false);
-        m_navigationItem->graphicsWidget()->resize(width(), NavigationItem::DEFAULT_HEIGHT);
         m_navigationItem->setZValue(INT_MAX);
-        scene()->addItem(m_navigationItem);
+        scene()->addItem(m_navigationItem.data());
 
         connect(m_navigationItem.data(), SIGNAL(exportRange(qint64,qint64)), this, SIGNAL(onExportRange(qint64,qint64)));
 
-        addStaticItem(m_navigationItem, false);
+        adjustAllStaticItems();
     }
-    return m_navigationItem;
+    return m_navigationItem.data();
 }
 
 void GraphicsView::updateDecorations()
@@ -2484,10 +2488,6 @@ void GraphicsView::resizeEvent(QResizeEvent *event)
     if (!mViewStarted)
         return;
 
-    if (m_navigationItem) {
-        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
-        m_navigationItem->graphicsWidget()->resize(event->size().width(), NavigationItem::DEFAULT_HEIGHT);
-    }
     updateDecorations();
 
     if (m_selectedWnd && m_selectedWnd->isFullScreen())

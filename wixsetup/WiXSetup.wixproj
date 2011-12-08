@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -12,19 +13,29 @@
     <IncludeSearchPaths>
     </IncludeSearchPaths>
     <Name>WiXSetup</Name>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug</DefineConstants>
+    <DefineConstants>Debug=</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <StartAction>Project</StartAction>
+  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MediaDirDlg.wxs" />
+    <Compile Include="AppServerDlg.wxs" />
+    <Compile Include="ClientDlg.wxs" />
+    <Compile Include="DowngradeWarningDlg.wxs" />
+    <Compile Include="FileAssociations.wxs" />
+    <Compile Include="MyFeaturesDlg.wxs" />
+    <Compile Include="MediaServerDlg.wxs" />
     <Compile Include="Product.wxs" />
+    <Compile Include="SelectionWarning.wxs" />
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixFirewallExtension">

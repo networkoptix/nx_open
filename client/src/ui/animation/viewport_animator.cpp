@@ -1,6 +1,7 @@
 #include "viewport_animator.h"
 #include <cmath> /* For std::log, std::exp. */
 #include <limits>
+#include <QParallelAnimationGroup>
 #include <ui/common/scene_utility.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -10,7 +11,7 @@ namespace {
     class ViewportPositionSetter {
     public:
         void operator()(QObject *view, const QVariant &value) const {
-            QnSceneUtility::moveViewportTo(checked_cast<QGraphicsView *>(view), value.toPointF());
+            QnSceneUtility::moveViewportSceneTo(checked_cast<QGraphicsView *>(view), value.toPointF());
         }
     };
 
@@ -95,15 +96,26 @@ void QnViewportAnimator::moveTo(const QRectF &rect, int timeLimitMsecs) {
     if(timeLimitMsecs == -1)
         timeLimitMsecs = std::numeric_limits<int>::max();
 
+    QSizeF viewportSize = m_view->viewport()->size();
+    QRectF actualRect = rect;
+
+    /* Extend to match aspect ratio. */
+    actualRect = expanded(aspectRatio(eroded(viewportSize, m_viewportMargins)), rect, Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+
+    /* Adjust for margins. */
+    MarginsF extension = cwiseDiv(m_viewportMargins, viewportSize);
+    extension = cwiseMul(cwiseDiv(extension, MarginsF(1.0, 1.0, 1.0, 1.0) - extension), actualRect.size());
+    actualRect = dilated(actualRect, extension);
+
     QRectF viewportRect = mapRectToScene(m_view, m_view->viewport()->rect());
-    if(qFuzzyCompare(viewportRect, rect)) {
+    if(qFuzzyCompare(viewportRect, actualRect)) {
         m_animationGroup->stop();
         return;
     }
 
     qreal timeLimit = timeLimitMsecs / 1000.0;
-    qreal movementTime = length(rect.center() - viewportRect.center()) / (m_movementSpeed * length(viewportRect.size() + rect.size()) / 2);
-    qreal scalingTime = std::abs(std::log(scaleFactor(viewportRect.size(), rect.size(), Qt::KeepAspectRatioByExpanding)) / m_logScalingSpeed);
+    qreal movementTime = length(actualRect.center() - viewportRect.center()) / (m_movementSpeed * length(viewportRect.size() + actualRect.size()) / 2);
+    qreal scalingTime = std::abs(std::log(scaleFactor(viewportRect.size(), actualRect.size(), Qt::KeepAspectRatioByExpanding)) / m_logScalingSpeed);
 
     int durationMsecs = 1000 * qMin(timeLimit, qMax(movementTime, scalingTime));
     if(durationMsecs == 0) {
@@ -111,17 +123,17 @@ void QnViewportAnimator::moveTo(const QRectF &rect, int timeLimitMsecs) {
         return;
     }
 
-    m_targetRect = rect;
+    m_targetRect = actualRect;
 
     bool alreadyAnimating = isAnimating();
     bool signalsBlocked = blockSignals(true); /* Don't emit animationFinished() now. */
 
     m_scaleAnimation->setStartValue(viewportRect.size());
-    m_scaleAnimation->setEndValue(rect.size());
+    m_scaleAnimation->setEndValue(actualRect.size());
     m_scaleAnimation->setDuration(durationMsecs);
 
     m_positionAnimation->setStartValue(viewportRect.center());
-    m_positionAnimation->setEndValue(rect.center());
+    m_positionAnimation->setEndValue(actualRect.center());
     m_positionAnimation->setDuration(durationMsecs);
 
     m_animationGroup->setCurrentTime(0);

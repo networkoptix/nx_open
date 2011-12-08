@@ -34,7 +34,7 @@ void QnBlueBackgroundPainter::installedNotify() {
     QnLayerPainter::installedNotify();
 }
 
-void QnBlueBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect )
+void QnBlueBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
 {
 	qreal pos = position();
 

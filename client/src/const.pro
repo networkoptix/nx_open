@@ -64,7 +64,6 @@ mac {
     LIBS += -lcrypto
 }
 
-# Clone ssh://hg@vigasin.com/evetools to the same diectory netoptix_vms is located
 win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
@@ -82,11 +81,11 @@ mac {
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-CONFIG(debug) {
+CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
   LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
 }
-CONFIG(release) {
+CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
   LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
 }

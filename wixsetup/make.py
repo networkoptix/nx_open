@@ -5,7 +5,7 @@ import os, sys
 sys.path.append('..')
 
 from version import *
-from genassoc import gen_assoc, gen_file_exts
+# from genassoc import gen_assoc, gen_file_exts
 from string import Template
 
 def gen_strings():
@@ -20,17 +20,17 @@ os.putenv('APPLICATION_NAME', APPLICATION_NAME)
 os.putenv('APPLICATION_VERSION', APPLICATION_VERSION)
 
 # Generate Associations.wxs
-gen_assoc()
+# gen_assoc()
 
 # Generate FileExtensions.wxs
-gen_file_exts()
+# gen_file_exts()
 
 # Generate CustomStrings.wxl
 gen_strings()
 
 os.system(r'candle -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll *.wxs' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION))
 
-output_file = 'bin/Release/EVEMediaPlayerSetup-%s.msi' % APPLICATION_VERSION
+output_file = 'bin/VMS-%s.msi' % APPLICATION_VERSION
 try:
     os.unlink(output_file)
 except OSError:

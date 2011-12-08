@@ -54,10 +54,12 @@ void HandScrollInstrument::startDrag(DragInfo *info) {
 }
 
 void HandScrollInstrument::dragMove(DragInfo *info) {
-    QPointF delta = -(info->mouseScreenPos() - info->lastMouseScreenPos());
+    QPoint delta = -(info->mouseScreenPos() - info->lastMouseScreenPos());
+    if(delta.isNull())
+        return;
 
-    kineticProcessor()->shift(delta);
-    moveViewportF(info->view(), delta);
+    kineticProcessor()->shift(QPointF(delta));
+    moveViewport(info->view(), delta);
 }
 
 void HandScrollInstrument::finishDrag(DragInfo *info) {
@@ -78,7 +80,7 @@ void HandScrollInstrument::kineticMove(const QVariant &distance) {
     if(view == NULL)
         return;
 
-    moveViewportF(view, distance.toPointF());
+    moveViewport(view, distance.toPointF());
 }
 
 void HandScrollInstrument::finishKinetic() {

@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include <QPoint>
 #include <QSize>
+#include "margins.h"
 
 class QRect;
 class QRectF;
@@ -17,6 +18,54 @@ class QTransform;
 
 class QnSceneUtility {
 public:
+    /* Some coefficient-wise arithmetic functions follow. */
+    static QPointF cwiseMul(const QPointF &l, const QPointF &r);
+    static QPointF cwiseDiv(const QPointF &l, const QPointF &r);
+    static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
+    static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
+    static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
+    static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
+    static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
+    static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
+
+    /**
+     * \param margins                   Margins.
+     * \returns                         Amount by which the size of some rectangle 
+     *                                  will change if the given margins are applied to it.
+     */
+    static QSizeF sizeDelta(const MarginsF &margins);
+
+    /**
+     * \param margins                   Margins.
+     * \returns                         Amount by which the size of some rectangle 
+     *                                  will change if the given margins are applied to it.
+     */
+    static QSize sizeDelta(const QMargins &margins);
+
+    /**
+     * \param                           Size.
+     * \returns                         Aspect ratio of the given size.
+     */
+    static qreal aspectRatio(const QSizeF &size);
+
+    /**
+     * \param                           Size.
+     * \returns                         Aspect ratio of the given size.
+     */
+    static qreal aspectRatio(const QSize &size);
+
+    /**
+     * \param                           Rectangle.
+     * \returns                         Aspect ratio of the given rectangle.
+     */
+    static qreal aspectRatio(const QRect &rect);
+
+    /**
+     * \param                           Rectangle.
+     * \returns                         Aspect ratio of the given rectangle.
+     */
+    static qreal aspectRatio(const QRectF &rect);
+
     /**
      * \param                           Size.
      * \returns                         Given size converted to a point.
@@ -150,6 +199,51 @@ public:
     static QRectF dilated(const QRectF &rect, const QSizeF &amount);
 
     /**
+     * Dilates the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to dilate.
+     * \param amount                    Dilation amount.
+     * \returns                         Dilated rectangle.
+     */
+    static QRectF dilated(const QRectF &rect, const MarginsF &amount);
+
+    /**
+     * Dilates the given size by the given amount.
+     * 
+     * \param size                      Size to dilate.
+     * \param amount                    Dilation amount.
+     * \returns                         Dilated size.
+     */
+    static QSizeF dilated(const QSizeF &size, const MarginsF &amount);
+
+    /**
+     * Erodes the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded rectangle.
+     */
+    static QRectF eroded(const QRectF &rect, const MarginsF &amount);
+
+    /**
+     * Erodes the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded rectangle.
+     */
+    static QRect eroded(const QRect &rect, const QMargins &amount);
+
+    /**
+     * Erodes the given size by the given amount.
+     * 
+     * \param size                      Size to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded size.
+     */
+    static QSizeF eroded(const QSizeF &size, const MarginsF &amount);
+
+    /**
      * \param size                      Size to check for containment.
      * \param otherSize                 Reference size.
      * \returns                         Whether the reference size contains the given size.
@@ -170,7 +264,7 @@ public:
      * \param view                      Graphics view to move viewport of.
      * \param viewportPositionDelta     Move delta, in viewport coordinates.
      */
-    static void moveViewportF(QGraphicsView *view, const QPointF &viewportPositionDelta);
+    static void moveViewport(QGraphicsView *view, const QPointF &viewportPositionDelta);
 
     /**
      * Moves the given viewport.
@@ -178,15 +272,15 @@ public:
      * \param view                      Graphics view to move viewport of.
      * \param scenePositionDelta        Move delta, in scene coordinates.
      */
-    static void moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta);
+    static void moveViewportScene(QGraphicsView *view, const QPointF &scenePositionDelta);
 
     /**
      * Centers the given viewport on the given position.
      * 
      * \param view                      Graphics view to center viewport of.
-     * \param centerPosition            Position to center on.
+     * \param sceneCenter               Position to center on, in scene coordinates.
      */
-    static void moveViewportTo(QGraphicsView *view, const QPointF &centerPosition);
+    static void moveViewportSceneTo(QGraphicsView *view, const QPointF &sceneCenter);
 
     /**
      * Scales the given viewport.

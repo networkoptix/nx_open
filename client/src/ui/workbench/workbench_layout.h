@@ -8,6 +8,7 @@
 #include <utils/common/rect_set.h>
 
 class QnWorkbenchItem;
+class QnGridWalker;
 
 /**
  * Layout of a workbench. 
@@ -128,10 +129,11 @@ public:
     /**
      * \param pos                       Desired position.
      * \param size                      Desired slot size.
+     * \param walker                    Grid walker to use.
      * \returns                         Geometry of the free slot of desired size whose upper-left corner 
-     *                                  is closest (in L_inf sense) to the given position.
+     *                                  is closest (as defined by the grid walker) to the given position.
      */
-    QRect closestFreeSlot(const QPoint &pos, const QSize &size) const;
+    QRect closestFreeSlot(const QPoint &pos, const QSize &size, QnGridWalker *walker = NULL) const;
 
 signals:
     void aboutToBeDestroyed();
