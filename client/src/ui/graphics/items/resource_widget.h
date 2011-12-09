@@ -178,6 +178,10 @@ signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
 
+public slots:
+    void showActivityDecorations();
+    void hideActivityDecorations();
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -208,7 +212,12 @@ private:
      */
     QRectF channelRect(int channel) const;
 
-    void drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect);
+    enum OverlayIcon {
+        PAUSED,
+        LOADING
+    };
+
+    void drawOverlayIcon(OverlayIcon icon, QColor fillColor, qreal data, const QRectF &rect);
 
     void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
 private:
@@ -253,6 +262,9 @@ private:
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
+
+    /** Whether activity decorations are visible. */
+    bool m_activityDecorationsVisible;
 
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;

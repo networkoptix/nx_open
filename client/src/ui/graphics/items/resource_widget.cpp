@@ -5,6 +5,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
+#include <ui/graphics/painters/paused_painter.h>
 #include <camera/resource_display.h>
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
@@ -39,6 +40,9 @@ namespace {
 
     /** Default progress painter. */
     Q_GLOBAL_STATIC_WITH_ARGS(QnLoadingProgressPainter, progressPainter, (0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255)));
+
+    /** Default paused painter. */
+    Q_GLOBAL_STATIC(QnPausedPainter, pausedPainter);
 }
 
 QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent):
@@ -51,6 +55,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_enclosingAspectRatio(1.0),
     m_frameWidth(0.0),
     m_aboutToBeDestroyedEmitted(false),
+    m_activityDecorationsVisible(false),
     m_lastNewFrameTimeMSec(QDateTime::currentMSecsSinceEpoch())
 {
     /* Set up shadow. */
@@ -296,6 +301,14 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     );
 }
 
+void QnResourceWidget::showActivityDecorations() {
+    m_activityDecorationsVisible = true;
+}
+
+void QnResourceWidget::hideActivityDecorations() {
+    m_activityDecorationsVisible = false;
+}
+
 void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time)
 {
     QString text = QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
@@ -330,12 +343,23 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->beginNativePainting();
     for(int i = 0; i < m_channelCount; i++) {
         QRectF rect = channelRect(i);
+        QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect);
+        
+        /* Update time since the last new frame. */
+        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+        if(status == QnRenderStatus::RENDERED_NEW_FRAME || m_display->isPaused())
+            m_lastNewFrameTimeMSec = currentTimeMSec;
 
-        if(m_display->isPaused()) {
-
-        } else {
-            QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect);
-            drawLoadingProgress(status, rect);
+        /* Draw overlay icon if needed. */
+        if(m_display->isPaused() && m_activityDecorationsVisible) {
+            drawOverlayIcon(PAUSED, QColor(0, 0, 0, 128), 0.0, rect);
+        } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec)) {
+            drawOverlayIcon(
+                LOADING,
+                QColor(0, 0, 0, status == QnRenderStatus::RENDERED_OLD_FRAME ? 128 : 255),
+                static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
+                rect
+            );
         }
     }
     painter->endNativePainting();
@@ -343,31 +367,19 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         drawCurrentTime(painter, channelRect(i), m_renderer->lastDisplayedTime(i));
 }
 
-void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) {
-    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
-
-    if(status == QnRenderStatus::RENDERED_NEW_FRAME) {
-        m_lastNewFrameTimeMSec = currentTimeMSec;
-        return;
-    }
-        
-    if(status == QnRenderStatus::RENDERED_OLD_FRAME && currentTimeMSec - m_lastNewFrameTimeMSec < defaultLoadingTimeoutMSec)
-        return;
-
+void QnResourceWidget::drawOverlayIcon(OverlayIcon icon, QColor fillColor, qreal data, const QRectF &rect) {
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    if(status == QnRenderStatus::RENDERED_OLD_FRAME) {
-        glColor4f(0.0, 0.0, 0.0, 0.5);
-    } else {
-        glColor4f(0.0, 0.0, 0.0, 1.0);
+    if(fillColor.alpha() != 0) {
+        glColor(fillColor);
+        glBegin(GL_QUADS);
+        glVertices(rect);
+        glEnd();
     }
-    glBegin(GL_QUADS);
-    glVertices(rect);
-    glEnd();
 
-    QRectF progressRect = expanded(
+    QRectF iconRect = expanded(
         1.0, 
         QRectF(
             rect.center() - toPoint(rect.size()) / 8,
@@ -377,9 +389,18 @@ void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, 
     );
     
     glPushMatrix();
-    glTranslatef(progressRect.center().x(), progressRect.center().y(), 1.0);
-    glScalef(progressRect.width() / 2, progressRect.height() / 2, 1.0);
-    progressPainter()->paint(static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec);
+    glTranslatef(iconRect.center().x(), iconRect.center().y(), 1.0);
+    glScalef(iconRect.width() / 2, iconRect.height() / 2, 1.0);
+    switch(icon) {
+    case LOADING: 
+        progressPainter()->paint(data);
+        break;
+    case PAUSED:
+        pausedPainter()->paint(0.5);
+        break;
+    default:
+        break;
+    }
     glPopMatrix();
 
     glPopAttrib();

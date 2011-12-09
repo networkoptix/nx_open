@@ -160,9 +160,7 @@ void QnResourceDisplay::pause() {
 }
 
 bool QnResourceDisplay::isPaused() {
-    //return m_archiveReader->
-
-    return false;
+    return m_archiveReader->isMediaPaused();
 }
 
 void QnResourceDisplay::addRenderer(CLAbstractRenderer *renderer) {

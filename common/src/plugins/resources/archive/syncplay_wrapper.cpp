@@ -89,7 +89,7 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
 
 bool QnArchiveSyncPlayWrapper::isMediaPaused() const
 {
-    Q_D(QnArchiveSyncPlayWrapper);
+    Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     bool rez = true;
     foreach(ReaderInfo info, d->readers)
