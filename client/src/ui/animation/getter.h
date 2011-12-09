@@ -50,11 +50,22 @@ public:
     QnPropertyGetter(const QByteArray &propertyName): m_propertyName(propertyName) {}
 
     virtual QVariant operator()(const QObject *object) const override {
-        object->property(m_propertyName.constData());
+        return object->property(m_propertyName.constData());
     }
 
 private:
     QByteArray m_propertyName;
+};
+
+
+/**
+ * Getter for color properties that converts QColor to QVector4D.
+ */
+class QnColorPropertyGetter: public QnPropertyGetter {
+public:
+    QnColorPropertyGetter(const QByteArray &propertyName): QnPropertyGetter(propertyName) {}
+
+    virtual QVariant operator()(const QObject *object) const override;
 };
 
 

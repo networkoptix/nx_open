@@ -21,6 +21,7 @@
 #include <ui/graphics/instruments/forwardinginstrument.h>
 #include <ui/graphics/instruments/stopinstrument.h>
 #include <ui/graphics/instruments/signalinginstrument.h>
+#include <ui/graphics/instruments/animationinstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
@@ -107,6 +108,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
     
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
+    AnimationInstrument *animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
@@ -118,6 +120,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
     m_instrumentManager->installInstrument(m_activityListenerInstrument);
+    m_instrumentManager->installInstrument(animationInstrument);
 
     m_activityListenerInstrument->recursiveDisable();
 

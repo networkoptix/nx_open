@@ -9,6 +9,7 @@ class QVector3D;
 class QVector4D;
 class QVariant;
 
+qreal calculateMagnitude(int value);
 qreal calculateMagnitude(float value);
 qreal calculateMagnitude(double value);
 qreal calculateMagnitude(const QPointF &value);

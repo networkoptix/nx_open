@@ -4,6 +4,12 @@
 #include <QVariant>
 #include <utils/common/warnings.h>
 
+namespace {
+    /** Minimal duration for the animation.
+     * If duration is less than this value, then the animation will be applied immediately. */
+    int minimalDurationMSec = 17;
+}
+
 QnAbstractAnimator::QnAbstractAnimator(QObject *parent):
     QObject(parent),
     m_group(NULL),
@@ -59,6 +65,10 @@ void QnAbstractAnimator::start() {
     setState(RUNNING);
 }
 
+void QnAbstractAnimator::pause() {
+    setState(PAUSED);
+}
+
 void QnAbstractAnimator::stop() {
     setState(STOPPED);
 }
@@ -82,6 +92,8 @@ void QnAbstractAnimator::setState(State newState) {
 }
 
 void QnAbstractAnimator::tick(int deltaTime) {
+    ensureDuration();
+
     m_currentTime += deltaTime;
     if(m_currentTime > m_duration)
         m_currentTime = m_duration;
@@ -112,6 +124,8 @@ void QnAbstractAnimator::updateState(State newState) {
         m_currentTime = 0;
         startListening();
         emit started();
+        if(duration() < minimalDurationMSec)
+            tick(duration());
         break;
     default:
         break;
