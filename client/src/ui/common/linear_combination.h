@@ -9,6 +9,7 @@ class QVector2D;
 class QVector3D;
 class QVector4D;
 
+int linearCombine(qreal a, int x, qreal b, int y);
 float linearCombine(qreal a, float x, qreal b, float y);
 double linearCombine(qreal a, double x, qreal b, double y);
 QPointF linearCombine(qreal a, const QPointF &x, qreal b, const QPointF &y);

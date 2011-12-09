@@ -35,6 +35,7 @@ namespace {
     public:
         Storage() {
             add(new NoopMagnitudeCalculator());
+            add(new StandardMagnitudeCalculator<int>());
             add(new StandardMagnitudeCalculator<float>());
             add(new StandardMagnitudeCalculator<double>());
             add(new StandardMagnitudeCalculator<QPointF>());
@@ -63,7 +64,7 @@ void MagnitudeCalculator::registerCalculator(MagnitudeCalculator *calculator) {
 qreal MagnitudeCalculator::calculate(const QVariant &value) const {
     assert(value.userType() == m_type || m_type == 0);
 
-    return calculate(value.data());
+    return calculate(value.constData());
 }
 
 qreal MagnitudeCalculator::calculate(const void *value) const {
@@ -72,6 +73,9 @@ qreal MagnitudeCalculator::calculate(const void *value) const {
     return calculateInternal(value);
 }
 
+qreal calculateMagnitude(int value) {
+    return std::abs(value);
+}
 
 qreal calculateMagnitude(float value) {
     return std::abs(value);
@@ -96,3 +100,4 @@ qreal calculateMagnitude(const QVector3D &value) {
 qreal calculateMagnitude(const QVector4D &value) {
     return value.length();
 }
+

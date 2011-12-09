@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QVariant>
 #include "animation_timer_listener.h"
+#include "setter.h"
+#include "getter.h"
 
 class QnAnimatorGroup;
 
@@ -31,7 +33,7 @@ public:
     enum State { 
         STOPPED = 0, /**< Animator is stopped. */
         PAUSED  = 1, /**< Animator is paused. */
-        RUNNING = 3  /**< Animator is running. */
+        RUNNING = 2  /**< Animator is running. */
     };
 
     /**
@@ -103,12 +105,17 @@ public:
 
 public slots:
     /**
-     * Starts this animator if it's not already started.
+     * Starts this animator.
      */
     void start();
 
     /**
-     * Stops this animator if it's not already stopped.
+     * Pauses this animator.
+     */
+    void pause();
+
+    /**
+     * Stops this animator.
      */
     void stop();
 
