@@ -139,6 +139,21 @@ void addTestData()
 }
 #endif
 
+void initAppServerConnection()
+{
+    // Use user scope
+    QSettings settings;
+
+	QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+    int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+
+	QAuthenticator auth;
+	auth.setUser(settings.value("appserverLogin", "appserver").toString());
+	auth.setPassword(settings.value("appserverPassword", "123").toString());
+
+    QnAppServerConnectionFactory::initialize(QHostAddress(hostString), port, auth);
+}
+
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
@@ -166,6 +181,8 @@ int main(int argc, char *argv[])
         if (application.sendMessage(argsMessage))
             return 0;
     }
+
+    initAppServerConnection();
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
