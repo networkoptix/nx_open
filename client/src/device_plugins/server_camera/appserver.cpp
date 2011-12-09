@@ -43,7 +43,7 @@ QnResourceList QnAppServerResourceSearcher::findResources()
 
 QnResourcePtr QnAppServerResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
 {
-    return QnResourcePtr();
+    return QnResourcePtr(0);
 }
 
 bool QnAppServerResourceSearcher::isResourceTypeSupported(const QnId& resourceTypeId) const

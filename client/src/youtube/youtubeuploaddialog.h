@@ -2,10 +2,9 @@
 #define YOUTUBEUPLOADDIALOG_H
 
 #include <QtGui/QDialog>
+
 #include "core/resource/resource.h"
 
-
-class QnResource;
 class YouTubeUploader;
 
 namespace Ui {
@@ -17,7 +16,7 @@ class YouTubeUploadDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit YouTubeUploadDialog(QnResourcePtr dev = QnResourcePtr(), QWidget *parent = 0);
+    explicit YouTubeUploadDialog(QnResourcePtr resource = QnResourcePtr(0), QWidget *parent = 0);
     ~YouTubeUploadDialog();
 
 public Q_SLOTS:
