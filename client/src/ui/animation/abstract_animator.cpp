@@ -98,22 +98,18 @@ void QnAbstractAnimator::updateState(State newState) {
 
     switch(newState) {
     case STOPPED: /* PAUSED -> STOPPED. */
-        m_currentTime = 0;
-        m_duration = -1;
-
-        stopListening();
         emit finished();
         break;
     case PAUSED:
         if(oldState == STOPPED) { /* STOPPED -> PAUSED. */
-            
+            /* Nothing to do here. */            
         } else { /* RUNNING -> PAUSED. */
-
+            m_currentTime = 0;
+            stopListening();
         }
         break;
     case RUNNING: /* PAUSED -> RUNNING. */
         m_currentTime = 0;
-
         startListening();
         emit started();
         break;

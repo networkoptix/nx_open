@@ -13,7 +13,7 @@ class QnAbstractSetter;
 class QnAbstractGetter;
 
 class QnVariantAnimator: public QnAbstractAnimator {
-    Q_OBJECT
+    Q_OBJECT;
 
     typedef QnAbstractAnimator base_type;
 
@@ -80,6 +80,9 @@ protected:
     virtual QVariant interpolated(const QVariant &from, const QVariant &to, qreal progress) const;
 
     void setType(int newType);
+
+private slots:
+    void at_target_destroyed();
 
 private:
     void setTargetObjectInternal(QObject *target);

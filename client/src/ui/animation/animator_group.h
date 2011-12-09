@@ -4,8 +4,14 @@
 #include "abstract_animator.h"
 
 class QnAnimatorGroup: public QnAbstractAnimator {
+    Q_OBJECT;
+
+    typedef QnAbstractAnimator base_type;
+
 public:
     QnAnimatorGroup(QObject *parent = NULL);
+
+    virtual ~QnAnimatorGroup();
 
     void addAnimator(QnAbstractAnimator *animator);
     

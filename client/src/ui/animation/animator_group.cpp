@@ -2,7 +2,6 @@
 #include <QEvent>
 #include <utils/common/warnings.h>
 
-#if 0
 QnAnimatorGroup::QnAnimatorGroup(QObject *parent):
     QnAbstractAnimator(parent)
 {}
@@ -69,13 +68,11 @@ QnAbstractAnimator *QnAnimatorGroup::takeAnimator(int index) {
     animator->m_group = NULL;
     m_animators.removeAt(index);
     
-    /* Removing from list before doing setParent to avoid inifinite recursion in ChildRemoved event. */
+    /* Removing from list before doing setParent to avoid infinite recursion in ChildRemoved event. */
     animator->setParent(0); 
 
-    if (m_animators.isEmpty()) {
-        currentTime = 0;
-        q->stop();
-    }
+    if (m_animators.isEmpty())
+        stop();
 
     return animator;
 }
@@ -101,11 +98,19 @@ bool QnAnimatorGroup::event(QEvent *event) {
 }
 
 void QnAnimatorGroup::updateState(State newState) {
+    if(newState == RUNNING)
+        foreach(QnAbstractAnimator *animator, m_animators)
+            animator->setDurationOverride(duration());
 
+    foreach(QnAbstractAnimator *animator, m_animators)
+        animator->setState(newState);
+
+    base_type::updateState(newState);
 }
 
 void QnAnimatorGroup::updateCurrentTime(int deltaTime) {
-    foreach()
+    foreach(QnAbstractAnimator *animator, m_animators)
+        animator->updateCurrentTime(deltaTime);
 }
 
 int QnAnimatorGroup::estimatedDuration() const {
@@ -114,4 +119,4 @@ int QnAnimatorGroup::estimatedDuration() const {
         result = qMax(result, animator->estimatedDuration());
     return result;
 }
-#endif
+
