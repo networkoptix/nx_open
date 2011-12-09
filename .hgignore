@@ -53,3 +53,5 @@ server/src/Makefile
 server/src/server.mak*
 
 winbuild/msvc2010/setup.bat
+
+wixsetup/CustomStrings.wxl

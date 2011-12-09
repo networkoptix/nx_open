@@ -24,53 +24,27 @@
     <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
     <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
     <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
-    <Control Type="GroupBox" Id="groupBox1" Height="46" Width="345" X="16" Y="52" Text="Operating mode" />
-    <Control Type="RadioButtonGroup" Id="radioButtonGroupBox1" Height="24" Width="331" X="26" Y="66" Property="CLIENT_VMS_MODE">
-        <RadioButtonGroup Property="CLIENT_VMS_MODE">
-            <RadioButton X="10" Y="2" Height="18" Width="100" Text="VMS Client" Value="1" />
-            <RadioButton X="154" Y="2" Height="18" Width="100" Text="Local Media Player" Value="0" />
-        </RadioButtonGroup>
+    <Control Type="GroupBox" Id="AppServerGroupBox" Height="53" Width="345" X="11" Y="56" Text="Application Server"/>
+    <Control Type="Text" Id="HostLabel" Height="17" Width="26" X="21" Y="73" Text="Host" />
+    <Control Type="Text" Id="PortLabel" Width="20" Height="17" X="290" Y="72" Text="Port" />
+    <Control Type="Text" Id="LoginLabel" Width="26" Height="17" X="21" Y="92" Text="Login" />
+    <Control Type="Text" Id="PasswordLabel" Width="50" Height="13" X="195" Y="92" Text="Password" />
+    <Control Type="Edit" Id="Host" Width="210" Height="15" X="64" Y="70" Property="CLIENT_APPSERVER_HOST">
+        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1" OR &AppServerFeature=3 OR &ServerFeature=3]]></Condition>
+        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1" AND &AppServerFeature<>3 AND &ServerFeature<>3]]></Condition>
     </Control>
-    <Control Type="GroupBox" Id="AppServerGroupBox" Height="53" Width="345" X="16" Y="103" Text="Application Server">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
+    <Control Type="Edit" Id="Port" X="315" Y="70" Width="36" Height="15" Property="CLIENT_APPSERVER_PORT">
+        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1" OR &AppServerFeature=3 OR &ServerFeature=3]]></Condition>
+        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1" AND &AppServerFeature<>3 AND &ServerFeature<>3]]></Condition>
     </Control>
-    <Control Type="Text" Id="HostLabel" Height="17" Width="26" X="26" Y="116" Text="Host">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
+    <Control Type="Edit" Id="Login" Height="15" Width="114" X="64" Y="89" Property="CLIENT_APPSERVER_LOGIN">
+        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1" OR &AppServerFeature=3 OR &ServerFeature=3]]></Condition>
+        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1" AND &AppServerFeature<>3 AND &ServerFeature<>3]]></Condition>
     </Control>
-    <Control Type="Text" Id="PortLabel" Width="20" Height="17" X="296" Y="116" Text="Port">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
+    <Control Type="Edit" Id="Password" Width="100" Height="15" X="250" Y="89" Property="CLIENT_APPSERVER_PASSWORD">
+        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1" OR &AppServerFeature=3 OR &ServerFeature=3]]></Condition>
+        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1" AND &AppServerFeature<>3 AND &ServerFeature<>3]]></Condition>
     </Control>
-    <Control Type="Text" Id="LoginLabel" Width="26" Height="17" X="26" Y="135" Text="Login">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
-    </Control>
-    <Control Type="Text" Id="PasswordLabel" Width="50" Height="13" X="200" Y="135" Text="Password">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
-    </Control>
-    <Control Type="Edit" Id="Host" Width="210" Height="15" X="70" Y="113" Property="CLIENT_APPSERVER_HOST">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
-    </Control>
-    <Control Type="Edit" Id="Port" X="320" Y="113" Width="36" Height="15" Property="CLIENT_APPSERVER_PORT">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
-    </Control>
-    <Control Type="Edit" Id="Login" Height="15" Width="114" X="70" Y="133" Property="CLIENT_APPSERVER_LOGIN">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
-    </Control>
-    <Control Type="Edit" Id="Password" Width="100" Height="15" X="256" Y="133" Property="CLIENT_APPSERVER_PASSWORD">
-        <Condition Action="disable"><![CDATA[CLIENT_VMS_MODE <> "1"]]></Condition>
-        <Condition Action="enable"><![CDATA[CLIENT_VMS_MODE = "1"]]></Condition>
-    </Control>
-    <Control Id="groupBox2" Type="GroupBox" Height="48" Width="345" X="15" Y="161" Text="Configuration" />
-    <Control Id="ClientMediaDir" Type="Edit" Height="15" Width="197" X="92" Y="181" Property="WIXUI_CLIENT_DIRECTORY" Indirect="yes"/>
-    <Control Id="ChangeClientMediaDir" Type="PushButton" Height="17" Width="56" X="296" Y="181" Text="Browse" />
-    <Control Id="label3" Type="Text" Height="17" Width="70" X="24" Y="184" Text="Media folder" />
 </Dialog>
 		</UI>
 	</Fragment>
