@@ -7,6 +7,7 @@ class QPointF;
 class QVector2D;
 class QVector3D;
 class QVector4D;
+class QColor;
 class QVariant;
 
 qreal calculateMagnitude(int value);
@@ -16,6 +17,7 @@ qreal calculateMagnitude(const QPointF &value);
 qreal calculateMagnitude(const QVector2D &value);
 qreal calculateMagnitude(const QVector3D &value);
 qreal calculateMagnitude(const QVector4D &value);
+qreal calculateMagnitude(const QColor &value);
 
 template<class T>
 qreal calculateMagnitude(const T &value, ...) {

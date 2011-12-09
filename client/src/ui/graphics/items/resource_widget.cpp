@@ -330,8 +330,13 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->beginNativePainting();
     for(int i = 0; i < m_channelCount; i++) {
         QRectF rect = channelRect(i);
-        QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect);
-        drawLoadingProgress(status, rect);
+
+        if(m_display->isPaused()) {
+
+        } else {
+            QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect);
+            drawLoadingProgress(status, rect);
+        }
     }
     painter->endNativePainting();
     for(int i = 0; i < m_channelCount; i++) 

@@ -4,6 +4,7 @@
 #include <QVector2D>
 #include <QVector3D>
 #include <QVector4D>
+#include <QColor>
 #include <QVariant>
 #include <QMetaType>
 #include "protected_storage.h"
@@ -44,6 +45,7 @@ namespace {
             add(new StandardLinearCombinator<QVector2D>());
             add(new StandardLinearCombinator<QVector3D>());
             add(new StandardLinearCombinator<QVector4D>());
+            add(new StandardLinearCombinator<QColor>());
         }
 
         void add(LinearCombinator *calculator) {
@@ -122,4 +124,13 @@ QVector3D linearCombine(qreal a, const QVector3D &x, qreal b, const QVector3D &y
 
 QVector4D linearCombine(qreal a, const QVector4D &x, qreal b, const QVector4D &y) {
     return linearCombineInternal(a, x, b, y);
+}
+
+QColor linearCombine(qreal a, const QColor &x, qreal b, const QColor &y) {
+    return QColor(
+        qBound(0, linearCombine(a, x.red(),   b, y.red()),   255),
+        qBound(0, linearCombine(a, x.green(), b, y.green()), 255),
+        qBound(0, linearCombine(a, x.blue(),  b, y.blue()),  255),
+        qBound(0, linearCombine(a, x.alpha(), b, y.alpha()), 255)
+    );
 }
