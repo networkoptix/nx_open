@@ -14,6 +14,8 @@ public:
     virtual void pauseMedia() = 0;
     virtual void resumeMedia() = 0;
     virtual void setSingleShotMode(bool single) = 0;
+
+    virtual bool isMediaPaused() const = 0;
 };
 
 class QnAbstractArchiveReader : public QnClientPullMediaStreamProvider, public QnAbstractNavigator
