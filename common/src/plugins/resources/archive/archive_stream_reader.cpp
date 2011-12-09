@@ -106,6 +106,11 @@ void QnArchiveStreamReader::pauseMedia()
 	m_singleQuantProcessed = true;
 }
 
+bool QnArchiveStreamReader::isMediaPaused() const
+{
+    return m_singleShot && m_singleQuantProcessed;
+}
+
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
 {
     QMutexLocker mutex(&m_jumpMtx);

@@ -6,6 +6,7 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QVariant>
+#include <QColor>
 #include <QMetaType>
 #include "protected_storage.h"
 
@@ -42,6 +43,7 @@ namespace {
             add(new StandardMagnitudeCalculator<QVector2D>());
             add(new StandardMagnitudeCalculator<QVector3D>());
             add(new StandardMagnitudeCalculator<QVector4D>());
+            add(new StandardMagnitudeCalculator<QColor>());
         }
 
         void add(MagnitudeCalculator *calculator) {
@@ -101,3 +103,6 @@ qreal calculateMagnitude(const QVector4D &value) {
     return value.length();
 }
 
+qreal calculateMagnitude(const QColor &value) {
+    return calculateMagnitude(QVector4D(value.redF(), value.greenF(), value.blueF(), value.alphaF()));
+}

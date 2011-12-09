@@ -39,6 +39,7 @@ public:
     virtual void nextFrame();
     virtual void previousFrame(qint64 mksec);
     virtual void pauseMedia();
+    virtual bool isMediaPaused() const;
     virtual void resumeMedia();
     virtual QnAbstractMediaDataPtr getNextData();
 protected:
