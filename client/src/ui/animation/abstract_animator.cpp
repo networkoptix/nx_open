@@ -6,10 +6,11 @@
 
 QnAbstractAnimator::QnAbstractAnimator(QObject *parent):
     QObject(parent),
+    m_group(NULL),
     m_state(STOPPED),
-    m_type(QMetaType::Void),
     m_timeLimitMSec(-1),
     m_durationOverride(-1),
+    m_durationValid(false),
     m_duration(-1),
     m_currentTime(0)
 {}
@@ -19,9 +20,40 @@ QnAbstractAnimator::~QnAbstractAnimator() {
 }
 
 void QnAbstractAnimator::setTimeLimit(int timeLimitMSec) {
+    if(isRunning()) {
+        qnWarning("Cannot change time limit of a running animation.");
+        return;
+    }
+
     m_timeLimitMSec = timeLimitMSec;
 }
 
+void QnAbstractAnimator::ensureDuration() const {
+    if(m_durationValid)
+        return;
+
+    if(m_durationOverride >= 0) {
+        m_duration = m_durationOverride;
+    } else {
+        m_duration = estimatedDuration();
+        if(m_timeLimitMSec >= 0)
+            m_duration = qMin(m_duration, m_timeLimitMSec);
+    }
+    m_durationValid = true;
+}
+
+void QnAbstractAnimator::invalidateDuration() {
+    assert(!isRunning()); /* Cannot invalidate duration of a running animation. */
+
+    m_durationValid = false;
+}
+
+
+int QnAbstractAnimator::duration() const {
+    ensureDuration();
+
+    return m_duration;
+}
 
 void QnAbstractAnimator::start() {
     setState(RUNNING);
@@ -32,43 +64,21 @@ void QnAbstractAnimator::stop() {
 }
 
 void QnAbstractAnimator::setDurationOverride(int durationOverride) {
+    assert(!isRunning()); /* Cannot override duration of a running animation. */
+
     m_durationOverride = durationOverride;
 }
 
 void QnAbstractAnimator::setState(State newState) {
-    assert(newState == STOPPED || newState == RUNNING);
+    assert(newState == STOPPED || newState == PAUSED || newState == RUNNING);
 
-    if(m_state == newState)
-        return;
-
-    State oldState = m_state;
-    updateState(newState);
-    emitStateChangedSignals(oldState);
-}
-
-void QnAbstractAnimator::emitStateChangedSignals(State oldState) {
-    if(m_state == oldState)
-        return;
-
-    switch(m_state) {
-    case STOPPED:
-        emit finished();
-        break;
-    case RUNNING:
-        emit started();
-        break;
-    default:
-        break;
+    int d = newState > m_state ? 1 : -1;
+    for(int i = m_state; i != newState;) {
+        i += d;
+        updateState(static_cast<State>(i));
+        if(m_state != i)
+            break; /* The transition may not happen, so the check is needed. */
     }
-}
-
-void QnAbstractAnimator::setType(int newType) {
-    assert(newType >= 0);
-
-    if(m_type == newType)
-        return;
-
-    updateType(newType);
 }
 
 void QnAbstractAnimator::tick(int deltaTime) {
@@ -76,63 +86,39 @@ void QnAbstractAnimator::tick(int deltaTime) {
     if(m_currentTime > m_duration)
         m_currentTime = m_duration;
 
-    updateCurrentValue(interpolated(deltaTime));
+    updateCurrentTime(m_currentTime);
 
     if(m_currentTime == m_duration)
         stop();
 }
 
 void QnAbstractAnimator::updateState(State newState) {
+    State oldState = m_state;
     m_state = newState;
 
-    switch(m_state) {
-    case STOPPED:
+    switch(newState) {
+    case STOPPED: /* PAUSED -> STOPPED. */
         m_currentTime = 0;
         m_duration = -1;
 
         stopListening();
+        emit finished();
         break;
-    case RUNNING:
-        m_startValue = currentValue();
+    case PAUSED:
+        if(oldState == STOPPED) { /* STOPPED -> PAUSED. */
+            
+        } else { /* RUNNING -> PAUSED. */
 
-        m_currentTime = 0;
-        if(m_durationOverride >= 0) {
-            m_duration = m_durationOverride;
-        } else {
-            m_duration = requiredTime(m_startValue, m_targetValue);
-            if(m_timeLimitMSec >= 0)
-                m_duration = qMin(m_duration, m_timeLimitMSec);
         }
+        break;
+    case RUNNING: /* PAUSED -> RUNNING. */
+        m_currentTime = 0;
 
         startListening();
+        emit started();
         break;
     default:
         break;
     };
 }
-
-void QnAbstractAnimator::updateType(int newType) {
-    m_type = newType;
-    m_startValue = QVariant(newType, static_cast<void *>(NULL));
-    m_targetValue = QVariant(newType, static_cast<void *>(NULL));
-}
-
-void QnAbstractAnimator::updateTargetValue(const QVariant &newTargetValue) {
-    if(newTargetValue.userType() != m_type) {
-        qnWarning("Value of invalid type was provided - expected '%1', got '%2'.", QMetaType::typeName(m_type), QMetaType::typeName(newTargetValue.userType()));
-        return;
-    }
-
-    if(!isRunning()) {
-        m_targetValue = newTargetValue;
-        return;
-    }
-
-    State oldState = m_state;
-    updateState(STOPPED);
-    m_targetValue = newTargetValue;
-    updateState(RUNNING);
-    emitStateChangedSignals(oldState);
-}
-
 

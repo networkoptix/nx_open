@@ -7,9 +7,11 @@
 #include "getter.h"
 #include "setter.h"
 
+#if 0
 
 QnVariantAnimator::QnVariantAnimator(QObject *parent):
     QnAbstractAnimator(parent),
+    m_type(QMetaType::Void),
     m_target(NULL),
     m_speed(1.0),
     m_magnitudeCalculator(NULL),
@@ -27,6 +29,12 @@ void QnVariantAnimator::setSpeed(qreal speed) {
         qnWarning("Invalid non-positive speed %1.", speed);
         return;
     }
+
+    if(isRunning()) {
+        qnWarning("Cannot change speed of a running animator.");
+        return;
+    }
+
 
     m_speed = speed;
 }
@@ -60,6 +68,10 @@ void QnVariantAnimator::setTargetObject(QObject *target) {
     setTargetObjectInternal(target);
 }
 
+void QnVariantAnimator::at_target_destroyed() {
+    setTargetObjectInternal(NULL);
+}
+
 void QnVariantAnimator::setTargetObjectInternal(QObject *target) {
     if(m_target != NULL)
         disconnect(m_target, NULL, this, NULL);
@@ -73,6 +85,36 @@ void QnVariantAnimator::setTargetObjectInternal(QObject *target) {
     }
 
     setType(currentValue().userType());
+}
+
+void QnVariantAnimator::setTargetValue(const QVariant &targetValue) {
+    if(isRunning()) {
+        qnWarning("Cannot change target value of a running animator.");
+        return;
+    }
+
+    updateTargetValue(targetValue);
+}
+
+void QnVariantAnimator::setType(int newType) {
+    assert(newType >= 0);
+
+    if(m_type == newType)
+        return;
+
+    updateType(newType);
+}
+
+int QnVariantAnimator::estimatedDuration() const {
+    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, m_startValue, -1.0, m_targetValue)) / m_speed * 1000;
+}
+
+void QnVariantAnimator::updateCurrentTime(int currentTime) {
+    updateCurrentValue(interpolated(startValue(), targetValue(), static_cast<qreal>(currentTime) / duration()));
+}
+
+QVariant QnVariantAnimator::interpolated(const QVariant &from, const QVariant &to, qreal progress) const {
+    return m_linearCombinator->combine(1 - progress, from, progress, to);
 }
 
 QVariant QnVariantAnimator::currentValue() const {
@@ -89,19 +131,10 @@ void QnVariantAnimator::updateCurrentValue(const QVariant &value) const {
     setter()->operator()(m_target, value);
 }
 
-QVariant QnVariantAnimator::interpolated(int deltaTime) const {
-    Q_UNUSED(deltaTime);
-
-    qreal k = static_cast<qreal>(currentTime()) / duration();
-    return m_linearCombinator->combine(1 - k, startValue(), k, targetValue());
-}
-
-int QnVariantAnimator::requiredTime(const QVariant &from, const QVariant &to) const {
-    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, from, -1.0, to)) / m_speed * 1000;
-}
-
 void QnVariantAnimator::updateState(State newState) {
-    if(newState == RUNNING) {
+    State oldState = state();
+
+    if(oldState == STOPPED) {
         if(getter() == NULL) {
             qnWarning("Getter not set, cannot start animator.");
             return;
@@ -116,16 +149,16 @@ void QnVariantAnimator::updateState(State newState) {
             return; /* This is a normal use case, don't emit warnings. */
     }
 
-    base_type::updateState(newState);
+    if(newState == RUNNING)
+        m_startValue = currentValue();
 
-    if(newState == RUNNING) {
-        qreal k = duration() / 1000.0;
-        m_delta = m_linearCombinator->combine(1.0 / k, targetValue(), -1.0 / k, startValue());
-    }
+    base_type::updateState(newState);
 }
 
 void QnVariantAnimator::updateType(int newType) {
-    base_type::updateType(newType);
+    m_type = newType;
+    m_startValue = QVariant(newType, static_cast<void *>(NULL));
+    m_targetValue = QVariant(newType, static_cast<void *>(NULL));
 
     m_linearCombinator = LinearCombinator::forType(type());
     if(m_linearCombinator == NULL) {
@@ -140,11 +173,28 @@ void QnVariantAnimator::updateType(int newType) {
     }
 }
 
-void QnVariantAnimator::at_target_destroyed() {
-    setTargetObjectInternal(NULL);
+void QnVariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
+    assert(!isRunning());
+
+    if(newTargetValue.userType() != m_type) {
+        qnWarning("Value of invalid type was provided - expected '%1', got '%2'.", QMetaType::typeName(m_type), QMetaType::typeName(newTargetValue.userType()));
+        return;
+    }
+
+    if(!isRunning()) {
+        m_targetValue = newTargetValue;
+        return;
+    }
+
+    State oldState = state();
+    updateState(STOPPED);
+    m_targetValue = newTargetValue;
+    updateState(RUNNING);
+    emitStateChangedSignals(oldState);
 }
 
 
 
 
+#endif
 

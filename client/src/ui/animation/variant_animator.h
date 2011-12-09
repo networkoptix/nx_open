@@ -13,7 +13,7 @@ class QnAbstractSetter;
 class QnAbstractGetter;
 
 class QnVariantAnimator: public QnAbstractAnimator {
-    Q_OBJECT;
+    //Q_OBJECT;
 
     typedef QnAbstractAnimator base_type;
 
@@ -46,18 +46,40 @@ public:
 
     void setTargetObject(QObject *target);
 
+    int type() const {
+        return m_type;
+    }
+
+    const QVariant &targetValue() const {
+        return m_targetValue;
+    }
+
+    const QVariant &startValue() const {
+        return m_startValue;
+    }
+
+    void setTargetValue(const QVariant &targetValue);
+
 protected:
-    virtual QVariant currentValue() const override;
+    virtual int estimatedDuration() const override;
 
-    virtual void updateCurrentValue(const QVariant &value) const override;
+    virtual void updateCurrentTime(int currentTime) override;
 
-    virtual QVariant interpolated(int deltaTime) const override;
 
-    virtual int requiredTime(const QVariant &from, const QVariant &to) const override;
 
-    virtual void updateState(State newState);
+    virtual QVariant currentValue() const;
+
+    virtual void updateCurrentValue(const QVariant &value) const;
+
+    virtual void updateTargetValue(const QVariant &newTargetValue);
 
     virtual void updateType(int newType);
+
+    virtual void updateState(State newState) override;
+
+    virtual QVariant interpolated(const QVariant &from, const QVariant &to, qreal progress) const;
+
+    void setType(int newType);
 
 private slots:
     void at_target_destroyed();
@@ -68,9 +90,11 @@ private:
 private:
     QScopedPointer<QnAbstractGetter> m_getter;
     QScopedPointer<QnAbstractSetter> m_setter;
+    int m_type;
+    QVariant m_startValue;
+    QVariant m_targetValue;
     QObject *m_target;
     qreal m_speed;
-    QVariant m_delta;
     MagnitudeCalculator *m_magnitudeCalculator;
     LinearCombinator *m_linearCombinator;
 };

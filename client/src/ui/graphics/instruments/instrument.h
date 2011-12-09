@@ -459,6 +459,9 @@ protected:
 
     /**
      * Extension point for instrument disabling.
+     * 
+     * Scene may be NULL inside this call, which would mean that scene is being
+     * destroyed.
      */
     virtual void aboutToBeDisabledNotify() {}
 

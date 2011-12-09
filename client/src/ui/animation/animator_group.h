@@ -1,8 +1,6 @@
 #ifndef QN_ANIMATOR_GROUP_H
 #define QN_ANIMATOR_GROUP_H
 
-#include <QAnimationGroup>
-
 #include "abstract_animator.h"
 
 class QnAnimatorGroup: public QnAbstractAnimator {
@@ -15,18 +13,27 @@ public:
 
     int animatorCount() const;
 
-    void clear()
+    void clear();
 
-    int indexOfAnimator(QnAbstractAnimator *animation) const
+    int indexOfAnimator(QnAbstractAnimator *animator) const;
 
-    void insertAnimator(int index, QnAbstractAnimator *animation)
+    void insertAnimator(int index, QnAbstractAnimator *animator);
 
-    void removeAnimator(QnAbstractAnimator *animation)
+    void removeAnimator(QnAbstractAnimator *animator);
 
-    QnAbstractAnimator *takeAnimation(int index)
+    QnAbstractAnimator *takeAnimator(int index);
+
+protected:
+    virtual bool event(QEvent *event) override;
+
+    virtual void updateState(State newState) override;
+
+    virtual void updateCurrentTime(int deltaTime) override;
+
+    virtual int estimatedDuration() const override;
 
 private:
-
+    QList<QnAbstractAnimator *> m_animators;
 };
 
 #endif // QN_ANIMATOR_GROUP_H
