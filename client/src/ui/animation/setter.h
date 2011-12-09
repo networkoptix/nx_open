@@ -58,4 +58,15 @@ private:
 };
 
 
+/**
+ * Getter for color properties that converts QVector4D to QColor.
+ */
+class QnColorPropertySetter: public QnPropertySetter {
+public:
+    QnColorPropertySetter(const QByteArray &propertyName): QnPropertySetter(propertyName) {}
+
+    virtual void operator()(QObject *object, const QVariant &value) const override;
+};
+
+
 #endif // QN_SETTER_H

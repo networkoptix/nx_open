@@ -6,6 +6,7 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QVariant>
+#include <QColor>
 #include <QMetaType>
 #include "protected_storage.h"
 
@@ -35,12 +36,14 @@ namespace {
     public:
         Storage() {
             add(new NoopMagnitudeCalculator());
+            add(new StandardMagnitudeCalculator<int>());
             add(new StandardMagnitudeCalculator<float>());
             add(new StandardMagnitudeCalculator<double>());
             add(new StandardMagnitudeCalculator<QPointF>());
             add(new StandardMagnitudeCalculator<QVector2D>());
             add(new StandardMagnitudeCalculator<QVector3D>());
             add(new StandardMagnitudeCalculator<QVector4D>());
+            add(new StandardMagnitudeCalculator<QColor>());
         }
 
         void add(MagnitudeCalculator *calculator) {
@@ -61,9 +64,9 @@ void MagnitudeCalculator::registerCalculator(MagnitudeCalculator *calculator) {
 }
 
 qreal MagnitudeCalculator::calculate(const QVariant &value) const {
-    assert(value.userType() == m_type);
+    assert(value.userType() == m_type || m_type == 0);
 
-    return calculate(value.data());
+    return calculate(value.constData());
 }
 
 qreal MagnitudeCalculator::calculate(const void *value) const {
@@ -72,7 +75,9 @@ qreal MagnitudeCalculator::calculate(const void *value) const {
     return calculateInternal(value);
 }
 
-
+qreal calculateMagnitude(int value) {
+    return std::abs(value);
+}
 
 qreal calculateMagnitude(float value) {
     return std::abs(value);
@@ -96,4 +101,8 @@ qreal calculateMagnitude(const QVector3D &value) {
 
 qreal calculateMagnitude(const QVector4D &value) {
     return value.length();
+}
+
+qreal calculateMagnitude(const QColor &value) {
+    return calculateMagnitude(QVector4D(value.redF(), value.greenF(), value.blueF(), value.alphaF()));
 }

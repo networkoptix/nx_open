@@ -7,6 +7,21 @@
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
+bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
+{
+    return first.startTimeUSec < other.startTimeUSec; 
+}
+
+bool operator < (qint64 first, const QnTimePeriod& other) 
+{ 
+    return first < other.startTimeUSec; 
+}
+
+bool operator < (const QnTimePeriod& other, qint64 first) 
+{ 
+    return other.startTimeUSec < first; 
+}
+
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
@@ -97,7 +112,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     return true;
 }
 
-qint64 DeviceFileCatalog::recreateFile(const QString& fileName)
+qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime)
 {
     cl_log.log("recreate broken file", fileName, cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
@@ -110,6 +125,8 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName)
     reader->setArchiveDelegate(avi);
     QnStreamRecorder recorder(res);
     recorder.setFileName(fileName + ".new");
+    recorder.setStartOffset(startTime);
+
     QnAbstractMediaDataPtr packet;
     while (packet = avi->getNextData())
     {
@@ -146,7 +163,7 @@ void DeviceFileCatalog::deserializeTitleFile()
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             needRewriteFile = true;
-            chunk.duration = recreateFile(fullFileName(chunk));
+            chunk.duration = recreateFile(fullFileName(chunk), chunk.startTime);
         }
         if (fileExists(chunk)) 
         {
@@ -347,3 +364,39 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
     return first.startTime < other.startTime; 
 }
 
+QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> periods)
+{
+    QnTimePeriodList result;
+    int minIndex = 0;
+    while (minIndex != -1)
+    {
+        qint64 minStartTime = 0x7fffffffffffffffll;
+        minIndex = -1;
+        for (int i = 0; i < periods.size(); ++i) {
+            if (!periods[i].isEmpty() && periods[i][0].startTimeUSec < minStartTime) {
+                minIndex = i;
+                minStartTime = periods[i][0].startTimeUSec;
+            }
+        }
+
+        if (minIndex >= 0)
+        {
+            // add chunk to merged data
+            if (result.isEmpty()) {
+                result << periods[minIndex][0];
+            }
+            else {
+                QnTimePeriod& last = result.last();
+                if (last.startTimeUSec <= minStartTime && last.startTimeUSec+last.durationUSec > minStartTime)
+                    last.durationUSec = qMax(last.durationUSec, minStartTime + periods[minIndex][0].durationUSec - last.startTimeUSec);
+                else {
+                    result << periods[minIndex][0];
+                    if (periods[minIndex][0].durationUSec == -1)
+                        break;
+                }
+            } 
+            periods[minIndex].pop_front();
+        }
+    }
+    return result;
+}

@@ -10,8 +10,10 @@
 #include <QtGui/QTabWidget>
 #include <QtGui/QToolBar>
 
-#include <ui/context_menu_helper.h>
-#include <ui/navigationtreewidget.h>
+#include "ui/context_menu_helper.h"
+#include "ui/navigationtreewidget.h"
+
+#include "ui/preferences/preferences_wnd.h"
 
 #include <ui/mixins/sync_play_mixin.h>
 #include <ui/mixins/render_watch_mixin.h>
@@ -31,8 +33,8 @@
 #include "settings.h"
 #include "version.h"
 
-
 MainWnd *MainWnd::s_instance = 0;
+
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
       m_normalView(NULL),
@@ -42,7 +44,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         qnWarning("Several instances of main window created, expect problems.");
     else
         s_instance = this;
-    
+
     /* Set up QWidget. */
     setWindowTitle(APPLICATION_NAME);
     setAttribute(Qt::WA_QuitOnClose);
@@ -65,7 +67,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-   
+
     const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
     QnWorkbench *workbench = new QnWorkbench(this);
@@ -81,7 +83,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     new QnSyncPlayMixin(display, this);
 
     /* Process input files. */
-    QStringList files;
     for (int i = 1; i < argc; ++i)
         m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
 
@@ -89,8 +90,16 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     QTabWidget *tabWidget = new QTabWidget(this);
     tabWidget->addTab(view, QIcon(), tr("Scene"));
     tabWidget->addTab(new QWidget(tabWidget), QIcon(), tr("Grid/Properies"));
-    tabWidget->setContentsMargins(0, 0, 0, 0);
     setCentralWidget(tabWidget);
+
+    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
+    // Looks like QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
+#ifdef Q_OS_WIN
+    setContentsMargins(0, 1, 0, 0);
+#else
+    setContentsMargins(0, 0, 0, 0);
+#endif
+
 
     // dock widgets
     NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(tabWidget);
@@ -106,18 +115,29 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     // toolbars
     QToolBar *toolBar = new QToolBar(this);
-    //toolBar->addActions(m_normalView->getView().actions());
     toolBar->addAction(&cm_exit);
     toolBar->addAction(&cm_toggle_fullscreen);
     toolBar->addAction(&cm_preferences);
     addToolBar(Qt::TopToolBarArea, toolBar);
 
+
+    // actions
+    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
+    addAction(&cm_exit);
+
+    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+    addAction(&cm_toggle_fullscreen);
+
+    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
+    addAction(&cm_preferences);
+
+
 #if 0
     if (!files.isEmpty())
         show();
     else
-        showFullScreen();
 #endif
+        showFullScreen();
 }
 
 MainWnd::~MainWnd()
@@ -131,11 +151,11 @@ void MainWnd::itemActivated(uint resourceId)
 {
     // ### rewrite from scratch ;)
     QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId)));
-    
+
     QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
     if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).empty()) {
         QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
-        
+
         m_controller->drop(resource, gridPos);
     }
 }
@@ -184,8 +204,7 @@ void MainWnd::goToNewLayoutContent(LayoutContent* newl)
 
 void MainWnd::handleMessage(const QString &message)
 {
-    const QStringList files = message.split(QLatin1Char('\0'), QString::SkipEmptyParts);
-
+    const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     addFilesToCurrentOrNewLayout(files);
     activate();
 }
@@ -220,4 +239,20 @@ void MainWnd::activate()
         showNormal();
     raise();
     activateWindow();
+}
+
+void MainWnd::toggleFullScreen()
+{
+    if (isFullScreen()) {
+        showNormal();
+        resize(600, 400);
+    } else {
+        showFullScreen();
+    }
+}
+
+void MainWnd::editPreferences()
+{
+    PreferencesWindow dialog(this);
+    dialog.exec();
 }

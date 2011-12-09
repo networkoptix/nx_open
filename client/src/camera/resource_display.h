@@ -117,6 +117,11 @@ public:
      */
     void setCurrentTimeUSec(qint64 usec) const;
 
+    /**
+     * \returns                         Whether this display is paused. 
+     */
+    bool isPaused();
+
     void start();
 
     void play();

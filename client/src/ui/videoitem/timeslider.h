@@ -22,6 +22,7 @@ public:
     explicit TimeSlider(QGraphicsItem *parent = 0);
     ~TimeSlider();
 
+    ToolTipItem *toolTipItem() const;
     void setToolTipItem(ToolTipItem *toolTip);
 
     qint64 length() const;

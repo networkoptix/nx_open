@@ -1,6 +1,7 @@
 #include "workbench_layout.h"
 #include <utils/common/warnings.h>
 #include "workbench_item.h"
+#include "grid_walker.h"
 
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
     QObject(parent)
@@ -211,54 +212,16 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
     return pos == m_itemsByUid.end() ? m_noItems : pos.value();
 }
 
-namespace {
-    bool isFree(const QnMatrixMap<QnWorkbenchItem *> &map, const QPoint &pos, const QSize &size, int dr, int dc, QRect *result) {
-        QRect rect = QRect(pos + QPoint(dc, dr), size);
-
-        if(!map.isOccupied(rect)) {
-            *result = rect;
-            return true;
-        } else {
-            return false;
-        }
+QRect QnWorkbenchLayout::closestFreeSlot(const QPoint &pos, const QSize &size, QnGridWalker *walker) const {
+    if(walker == NULL) {
+        QnAspectRatioGridWalker aspectRatioWalker(1.0);
+        return closestFreeSlot(pos, size, &aspectRatioWalker);
     }
-}
 
-QRect QnWorkbenchLayout::closestFreeSlot(const QPoint &pos, const QSize &size) const {
-    QRect result;
-
-    for(int l = 0; ; l++) {
-        int dr, dc;
-
-        /* Iterate in the following order:
-         *  213
-         *  2.3
-         *  444
-         */
-
-        /* 1. */
-        dr = -l;
-        for(dc = -l + 1; dc <= l - 1; dc++)
-            if(isFree(m_itemMap, pos, size, dr, dc, &result))
-                return result;
-
-        /* 2. */
-        dc = -l;
-        for(dr = -l; dr <= l - 1; dr++)
-            if(isFree(m_itemMap, pos, size, dr, dc, &result))
-                return result;
-
-        /* 3. */
-        dc = l;
-        for(dr = -l; dr <= l - 1; dr++)
-            if(isFree(m_itemMap, pos, size, dr, dc, &result))
-                return result;
-
-        /* 4. */
-        dr = l;
-        for(dc = -l; dc <= l; dc++)
-            if(isFree(m_itemMap, pos, size, dr, dc, &result))
-                return result;
+    while(true) {
+        QRect rect = QRect(pos + walker->next(), size);
+        if(!m_itemMap.isOccupied(rect))
+            return rect;
     }
 }
 

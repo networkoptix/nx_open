@@ -21,6 +21,7 @@
 #include <ui/graphics/instruments/forwardinginstrument.h>
 #include <ui/graphics/instruments/stopinstrument.h>
 #include <ui/graphics/instruments/signalinginstrument.h>
+#include <ui/graphics/instruments/animationinstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
@@ -107,9 +108,11 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
     
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
+    AnimationInstrument *animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
-    m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
+    m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
+    m_widgetActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
     
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
@@ -117,14 +120,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
-    m_instrumentManager->installInstrument(m_activityListenerInstrument);
+    m_instrumentManager->installInstrument(m_curtainActivityInstrument);
+    m_instrumentManager->installInstrument(m_widgetActivityInstrument);
+    m_instrumentManager->installInstrument(animationInstrument);
 
-    m_activityListenerInstrument->recursiveDisable();
+    m_curtainActivityInstrument->recursiveDisable();
 
-    connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(at_viewport_transformationChanged()));
-    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(at_viewport_transformationChanged()));
-    connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
-    connect(m_activityListenerInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
+    connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(synchronizeRaisedGeometry()));
+    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeRaisedGeometry()));
+    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeSceneBoundsExtension()));
+    connect(m_curtainActivityInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
+    connect(m_curtainActivityInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
     (new QAnimationTimer(this))->addListener(this);
@@ -423,7 +429,7 @@ void QnWorkbenchDisplay::fitInView() {
     if(zoomedItem != NULL) {
         m_viewportAnimator->moveTo(itemGeometry(zoomedItem), zoomAnimationDurationMsec);
     } else {
-        m_viewportAnimator->moveTo(layoutBoundingGeometry(), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(fitInViewGeometry(), zoomAnimationDurationMsec);
     }
 }
 
@@ -504,7 +510,9 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     synchronize(widget, false);
     bringToFront(widget);
 
-    connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
+    connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
+    connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
+    connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
 
     emit widgetAdded(widget);
 }
@@ -528,6 +536,13 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     if(destroyWidget)
         delete widget;
+}
+
+void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins) {
+    m_viewportMargins = margins;
+    m_viewportAnimator->setViewportMargins(margins);
+
+    synchronizeSceneBoundsExtension();
 }
 
 
@@ -600,14 +615,18 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 }
 
 QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
-    return m_workbench->mapper()->mapFromGrid(m_workbench->layout()->boundingRect().adjusted(-1, -1, 1, 1));
+    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-1, -1, 1, 1));
+}
+
+QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
+    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-0.1, -0.1, 0.1, 0.1));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
     if(m_view == NULL) {
         return QRectF();
     } else {
-        return mapRectToScene(m_view, m_view->viewport()->rect());
+        return mapRectToScene(m_view, eroded(m_view->viewport()->rect(), m_viewportMargins));
     }
 }
 
@@ -711,8 +730,30 @@ void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget) {
 void QnWorkbenchDisplay::synchronizeSceneBounds() {
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
     QRectF rect = zoomedItem != NULL ? itemGeometry(zoomedItem) : layoutBoundingGeometry();
-    m_boundingInstrument->setPositionBounds(m_view, rect, 0.0);
+    m_boundingInstrument->setPositionBounds(m_view, rect);
     m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, rect.size(), Qt::KeepAspectRatioByExpanding);
+}
+
+void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
+    QSizeF viewportSize = m_view->viewport()->size();
+    MarginsF positionExtension = cwiseDiv(m_viewportMargins, viewportSize);
+
+    m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
+
+    QSizeF sizeExtension = sizeDelta(positionExtension);
+    sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
+    
+    m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
+    m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
+}
+
+void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
+    QnWorkbenchItem *raisedItem = m_itemByRole[QnWorkbench::RAISED];
+    if(raisedItem == NULL)
+        return;
+
+    QnResourceWidget *widget = this->widget(raisedItem);
+    synchronizeGeometry(widget, animator(widget)->isAnimating());
 }
 
 
@@ -780,18 +821,18 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         if(oldItem != NULL) {
             synchronize(oldItem, true);
 
-            m_activityListenerInstrument->recursiveDisable();
+            m_curtainActivityInstrument->recursiveDisable();
         }
 
         if(item != NULL) {
             bringToFront(item);
             synchronize(item, true);
 
-            m_activityListenerInstrument->recursiveEnable();
+            m_curtainActivityInstrument->recursiveEnable();
 
             m_viewportAnimator->moveTo(itemGeometry(item), zoomAnimationDurationMsec);
         } else {
-            m_viewportAnimator->moveTo(layoutBoundingGeometry(), zoomAnimationDurationMsec);
+            m_viewportAnimator->moveTo(fitInViewGeometry(), zoomAnimationDurationMsec);
         }
 
         synchronizeSceneBounds();
@@ -821,15 +862,6 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
     changeItem(role, m_workbench->item(role));
-}
-
-void QnWorkbenchDisplay::at_viewport_transformationChanged() {
-    QnWorkbenchItem *raisedItem = m_itemByRole[QnWorkbench::RAISED];
-    if(raisedItem == NULL)
-        return;
-
-    QnResourceWidget *widget = this->widget(raisedItem);
-    synchronizeGeometry(widget, animator(widget)->isAnimating());
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

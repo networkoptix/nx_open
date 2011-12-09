@@ -22,6 +22,8 @@
 
 #include <qmath.h>
 
+//#define TIMESLIDER_ANIMATED_DRAG
+
 namespace {
 
 QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
@@ -84,6 +86,7 @@ class MySlider : public GraphicsSlider
 public:
     MySlider(TimeSlider *parent);
 
+    ToolTipItem *toolTipItem() const;
     void setToolTipItem(ToolTipItem *toolTip);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -129,6 +132,11 @@ void MySlider::setEndSize(int size)
     m_endSize = size;
 }
 
+ToolTipItem *MySlider::toolTipItem() const
+{
+    return m_toolTip;
+}
+
 void MySlider::setToolTipItem(ToolTipItem *toolTip)
 {
     if (m_toolTip == toolTip)
@@ -147,15 +155,8 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    ensureHandleRect();
-
-    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
     QRectF r = contentsRect();
 
-#ifdef Q_OS_WIN
-    painter->fillRect(rect(), QColor(128,128,128,128));
-#endif
     painter->setPen(QPen(Qt::gray, 2));
     painter->drawRect(r);
 
@@ -211,6 +212,9 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
     painter->fillRect(r, linearGrad);
 
+    ensureHandleRect();
+    // ### use Skin::cached(const QString &name, const QSizeF &size, Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation)
+    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
 
@@ -227,8 +231,10 @@ void MySlider::sliderChange(SliderChange change)
 
 QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemToolTipHasChanged && m_toolTip)
+    if (change == ItemToolTipHasChanged && m_toolTip) {
         m_toolTip->setText(value.toString());
+        m_toolTip->setVisible(!m_toolTip->text().isEmpty());
+    }
 
     return GraphicsSlider::itemChange(change, value);
 }
@@ -265,6 +271,7 @@ class TimeLine : public GraphicsFrame
 public:
     TimeLine(TimeSlider *parent) :
         GraphicsFrame(parent), m_parent(parent),
+        m_rangeSelectionState(NoRangeSelected),
         m_dragging(false),
         m_scaleSpeed(1.0),
         m_prevWheelDelta(INT_MAX),
@@ -275,7 +282,10 @@ public:
 
         setAcceptHoverEvents(true);
 
+#ifdef TIMESLIDER_ANIMATED_DRAG
+        m_length = 0;
         m_lineAnimation = new QPropertyAnimation(m_parent, "currentValue", this);
+#endif
         m_wheelAnimation = new QPropertyAnimation(m_parent, "scalingFactor", this);
 
         connect(m_wheelAnimation, SIGNAL(finished()), m_parent, SLOT(onWheelAnimationFinished()));
@@ -300,6 +310,7 @@ public:
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -313,9 +324,19 @@ private:
 private:
     TimeSlider *m_parent;
     QPointF m_previousPos;
+#ifdef TIMESLIDER_ANIMATED_DRAG
     int m_length;
     QPropertyAnimation *m_lineAnimation;
+#endif
     QPropertyAnimation *m_wheelAnimation;
+
+    enum {
+        NoRangeSelected = 0,
+        SelectingRangeBegin,
+        SelectingRangeEnd,
+        RangeSelected
+    } m_rangeSelectionState;
+
     bool m_dragging;
     double m_scaleSpeed;
     int m_prevWheelDelta;
@@ -386,12 +407,12 @@ bool isTimeAcceptedStd(const IntervalInfo& interval, qint64 time)
     return time % interval.interval == 0;
 }
 
-bool isTimeAcceptedForMonth(const IntervalInfo& interval, qint64 time)
+bool isTimeAcceptedForMonth(const IntervalInfo& /*interval*/, qint64 time)
 {
     return QDateTime::fromMSecsSinceEpoch(time).date().day() == 1;
 }
 
-bool isTimeAcceptedForYear(const IntervalInfo& interval, qint64 time)
+bool isTimeAcceptedForYear(const IntervalInfo& /*interval*/, qint64 time)
 {
     return QDateTime::fromMSecsSinceEpoch(time).date().dayOfYear() == 1;
 }
@@ -438,18 +459,17 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 {
     GraphicsFrame::paint(painter, option, widget);
 
-    qreal halfHandleThickness = m_parent->m_slider->handleRect().width() / 2.0;
+    const qreal halfHandleThickness = m_parent->m_slider->handleRect().width() / 2.0;
+    const QRectF r(halfHandleThickness, 0, rect().width() - halfHandleThickness * 2, rect().height() - frameWidth() * 2);
+    if (qFuzzyIsNull(r.width()))
+        return;
 
     const QPalette pal = m_parent->palette();
     painter->setBrush(pal.brush(QPalette::Base));
     painter->setPen(pal.color(QPalette::Base));
-    const QRectF r(halfHandleThickness, 0, rect().width() - halfHandleThickness * 2, rect().height() - 2*frameWidth());
     painter->drawRect(r);
     drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
     painter->setPen(pal.color(QPalette::Text));
-
-    if(qFuzzyIsNull(r.width()))
-        return;
 
     qint64 timezoneOffset = 0;
     if (m_parent->minimumValue() != 0) {
@@ -581,17 +601,20 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     // draw selection range
-    if (m_selectedRange.first != m_selectedRange.second)
+    if (m_rangeSelectionState != NoRangeSelected)
     {
-        const qreal rangeBegin = m_selectedRange.first != 0 ? valueToPos(m_selectedRange.first) : 0;
-        const qreal rangeEnd = m_selectedRange.second != 0 ? valueToPos(m_selectedRange.second) : 0;
+        const qreal rangeBegin = m_rangeSelectionState >= SelectingRangeBegin ? valueToPos(m_selectedRange.first) : 0.0;
+        const qreal rangeEnd = m_rangeSelectionState >= SelectingRangeEnd ? valueToPos(m_selectedRange.second) : 0.0;
 
-        if (m_selectedRange.first != 0 && m_selectedRange.second != 0)
-            painter->fillRect(QRectF(QPointF(rangeBegin, 0), QPointF(rangeEnd, rect().height())), QColor(200, 200, 220, 50));
+        if (m_rangeSelectionState >= SelectingRangeEnd)
+        {
+            const QColor selectionColor(120, 150, 180, m_rangeSelectionState == RangeSelected ? 150 : 50);
+            painter->fillRect(QRectF(QPointF(rangeBegin, 0), QPointF(rangeEnd, rect().height())), selectionColor);
+        }
         painter->setPen(QPen(Qt::red, 0));
-        if (m_selectedRange.first != 0)
+        if (m_rangeSelectionState >= SelectingRangeBegin)
             painter->drawLine(QLineF(rangeBegin, 0, rangeBegin, rect().height()));
-        if (m_selectedRange.second != 0)
+        if (m_rangeSelectionState >= SelectingRangeEnd)
             painter->drawLine(QLineF(rangeEnd, 0, rangeEnd, rect().height()));
     }
 
@@ -618,7 +641,7 @@ QPair<qint64, qint64> TimeLine::selectionRange() const
 
 void TimeLine::setSelectionRange(const QPair<qint64, qint64> &range)
 {
-    if (range.first <= range.second) {
+    if (range.first <= range.second || range.second == 0) {
         m_selectedRange.first = range.first;
         m_selectedRange.second = range.second;
     } else {
@@ -626,56 +649,80 @@ void TimeLine::setSelectionRange(const QPair<qint64, qint64> &range)
         m_selectedRange.second = range.first;
     }
 
+    m_rangeSelectionState = range.first == range.second || range.second == 0
+                            ? range.first == 0 ? NoRangeSelected
+                                               : SelectingRangeEnd
+                            : RangeSelected;
+
     update();
 }
 
 void TimeLine::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
-    QAction *rangeBeginAction = menu.addAction(tr("Select Range Begin"));
-    QAction *rangeEndAction = menu.addAction(tr("Select Range End"));
+    QAction *selectRangeAction = menu.addAction(tr("Select Range"));
     menu.addSeparator();
     QAction *clearRangeAction = menu.addAction(tr("Clear Range"));
+    clearRangeAction->setEnabled(m_rangeSelectionState == RangeSelected);
     QAction *exportRangeAction = menu.addAction(tr("Export Selected Range..."));
-    exportRangeAction->setEnabled(m_selectedRange.first != m_selectedRange.second);
+    exportRangeAction->setEnabled(m_rangeSelectionState == RangeSelected);
 
     QAction *selectedAction = menu.exec(event->screenPos());
 
-    if (selectedAction == rangeBeginAction || selectedAction == rangeEndAction)
-        setSelectionRange(posToValue(event->pos().x()), qMax(m_selectedRange.first, m_selectedRange.second));
-    else if (selectedAction == clearRangeAction)
+    if (selectedAction == selectRangeAction) {
         resetSelectionRange();
-    else if (selectedAction == exportRangeAction)
+        m_rangeSelectionState = SelectingRangeBegin;
+    } else if (selectedAction == clearRangeAction) {
+        resetSelectionRange();
+    } else if (selectedAction == exportRangeAction) {
         Q_EMIT m_parent->exportRange(m_selectedRange.first, m_selectedRange.second);
-}
-
-void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *me)
-{
-    if (me->button() == Qt::LeftButton) {
-        me->accept();
-        m_lineAnimation->stop();
-        if (qFuzzyIsNull(m_parent->scalingFactor()))
-            m_parent->setCurrentValue(posToValue(me->pos().x()));
-        m_parent->setMoving(true);
-        m_previousPos = me->pos();
-        m_length = 0;
     }
 }
 
-void TimeLine::mouseMoveEvent(QGraphicsSceneMouseEvent *me)
+void TimeLine::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-    if (me->buttons() & Qt::LeftButton) {
-        me->accept();
+    event->accept();
+    if (m_rangeSelectionState == SelectingRangeBegin || m_rangeSelectionState == SelectingRangeEnd) {
+        const qint64 value = posToValue(event->pos().x());
+        if (m_rangeSelectionState == SelectingRangeBegin)
+            m_selectedRange.first = value;
+        else
+            m_selectedRange.second = value;
+        update();
+    }
+}
+
+void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        event->accept();
+
+#ifdef TIMESLIDER_ANIMATED_DRAG
+        m_length = 0;
+        m_lineAnimation->stop();
+#endif
+        if (qFuzzyIsNull(m_parent->scalingFactor()))
+            m_parent->setCurrentValue(posToValue(event->pos().x()));
+        m_parent->setMoving(true);
+        m_previousPos = event->pos();
+    }
+}
+
+void TimeLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->buttons() & Qt::LeftButton) {
+        event->accept();
 
         const bool bUnscaled = qFuzzyIsNull(m_parent->scalingFactor());
-        // in fact, we need to use (width - slider handle thinkness/2), but it is ok without it
-        const QPointF dpos = bUnscaled ? me->pos() - m_previousPos : m_previousPos - me->pos();
+        const QPointF dpos = bUnscaled ? event->pos() - m_previousPos : m_previousPos - event->pos();
         if (!isDragging() && qAbs(dpos.x()) < QApplication::startDragDistance())
             return;
 
         setDragging(true);
-        m_previousPos = me->pos();
-        m_length = dpos.x();
+        m_previousPos = event->pos();
+#ifdef TIMESLIDER_ANIMATED_DRAG
+        m_length += dpos.x();
+#endif
 
         qint64 dtime = qRound64((double(m_parent->sliderRange()) / rect().width()) * dpos.x());
         if (bUnscaled) {
@@ -690,26 +737,48 @@ void TimeLine::mouseMoveEvent(QGraphicsSceneMouseEvent *me)
     }
 }
 
-void TimeLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
+void TimeLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (me->button() == Qt::LeftButton) {
-        me->accept();
-        if (isDragging()) {
+    if (event->button() == Qt::LeftButton) {
+        event->accept();
+
+        const bool wasDragging = isDragging();
+        if (wasDragging) {
             setDragging(false);
 
+#ifdef TIMESLIDER_ANIMATED_DRAG
             if (qAbs(m_length) > 5) {
-                int dx = m_length*2/**(35.0/t.elapsed())*/;
+                const int dx = m_length*2/**(35.0/t.elapsed())*/;
 
                 m_lineAnimation->setStartValue(m_parent->viewPortPos());
                 m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
                 m_lineAnimation->setEndValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * dx));
                 m_lineAnimation->setDuration(1000);
-                //m_lineAnimation->start();
+                m_lineAnimation->start();
             }
+#endif
         } else {
-            m_parent->setCurrentValue(posToValue(me->pos().x()));
+            m_parent->setCurrentValue(posToValue(event->pos().x()));
         }
         m_parent->setMoving(false);
+
+        if (!wasDragging) {
+            if (event->modifiers() == Qt::ShiftModifier && (m_rangeSelectionState == NoRangeSelected || m_rangeSelectionState == RangeSelected)) {
+                resetSelectionRange();
+                m_rangeSelectionState = SelectingRangeBegin;
+            }
+            if (m_rangeSelectionState == SelectingRangeBegin || m_rangeSelectionState == SelectingRangeEnd) {
+                const qint64 value = posToValue(event->pos().x());
+                if (m_rangeSelectionState == SelectingRangeBegin) {
+                    m_selectedRange.first = value;
+                    m_rangeSelectionState = SelectingRangeEnd;
+                } else {
+                    m_selectedRange.second = value;
+                    m_rangeSelectionState = RangeSelected;
+                }
+                update();
+            }
+        }
     }
 }
 
@@ -784,6 +853,11 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
 TimeSlider::~TimeSlider()
 {
     m_animation->stop();
+}
+
+ToolTipItem *TimeSlider::toolTipItem() const
+{
+    return m_slider->toolTipItem();
 }
 
 void TimeSlider::setToolTipItem(ToolTipItem *toolTip)
@@ -876,7 +950,7 @@ void TimeSlider::setCurrentValue(qint64 value)
     updateSlider();
     update();
 
-    if (!m_isUserInput/* && !isMoving()*/)
+    if (!m_isUserInput)
         centraliseSlider();
 
     Q_EMIT currentValueChanged(m_currentValue);

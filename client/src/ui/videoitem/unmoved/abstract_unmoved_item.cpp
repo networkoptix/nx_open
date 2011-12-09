@@ -1,47 +1,38 @@
 #include "abstract_unmoved_item.h"
 
+#include "ui/animation/property_animation.h"
+
 CLAbstractUnmovedItem::CLAbstractUnmovedItem(QString name, QGraphicsItem* parent) :
     CLAbstractSubItemContainer(parent),
     m_name(name),
     m_view(0),
-    m_underMouse(false)
+    m_underMouse(false),
+    m_animation(0)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations);
     //setFlag(QGraphicsItem::ItemIsMovable);
 
-    setAcceptsHoverEvents(true);
+    setAcceptHoverEvents(true);
 }
 
 CLAbstractUnmovedItem::~CLAbstractUnmovedItem()
 {
+    stopAnimation();
 }
 
-void CLAbstractUnmovedItem::hideIfNeeded(int duration)
+QString CLAbstractUnmovedItem::getName() const
 {
-    hide(duration);
+    return m_name;
 }
 
-bool CLAbstractUnmovedItem::preferNonSteadyMode() const
+QPoint CLAbstractUnmovedItem::staticPos() const
 {
-    //return isUnderMouse(); //qt bug 18797 When setting the flag ItemIgnoresTransformations for an item, it will receive mouse events as if it was transformed by the view.
-    return m_underMouse;
+    return m_pos;
 }
 
-void CLAbstractUnmovedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void CLAbstractUnmovedItem::setStaticPos(const QPoint &staticPos)
 {
-    CLAbstractSubItemContainer::hoverEnterEvent(event);
-    m_underMouse = true;
-}
-
-void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    CLAbstractSubItemContainer::hoverLeaveEvent(event);
-    m_underMouse = false;
-}
-
-void CLAbstractUnmovedItem::setStaticPos(const QPoint &p)
-{
-    m_pos = p;
+    m_pos = staticPos;
 }
 
 void CLAbstractUnmovedItem::adjust()
@@ -55,7 +46,43 @@ void CLAbstractUnmovedItem::adjust()
     setPos(m_view->mapToScene(m_pos));
 }
 
-QString CLAbstractUnmovedItem::getName() const
+void CLAbstractUnmovedItem::hideIfNeeded(int duration)
 {
-    return m_name;
+    hide(duration);
+}
+
+void CLAbstractUnmovedItem::setVisible(bool visible, int duration)
+{
+    Q_UNUSED(duration)
+    QGraphicsItem::setVisible(visible);
+}
+
+void CLAbstractUnmovedItem::changeOpacity(qreal new_opacity, int duration)
+{
+    stopAnimation();
+
+    if (duration == 0 || qFuzzyCompare(new_opacity, opacity()))
+    {
+        setOpacity(new_opacity);
+    }
+    else
+    {
+        m_animation = AnimationManager::instance().addAnimation(this, "opacity");
+        m_animation->setDuration(duration);
+        m_animation->setStartValue(opacity());
+        m_animation->setEndValue(new_opacity);
+        m_animation->start();
+
+        connect(m_animation, SIGNAL(finished()), this, SLOT(stopAnimation()));
+    }
+}
+
+void CLAbstractUnmovedItem::stopAnimation()
+{
+    if (m_animation)
+    {
+        m_animation->stop();
+        m_animation->deleteLater();
+        m_animation = 0;
+    }
 }

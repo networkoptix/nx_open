@@ -9,10 +9,15 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 
+struct QnTimePeriod;
+typedef QVector<QnTimePeriod> QnTimePeriodList;
+
 struct QnTimePeriod
 {
     QnTimePeriod(): startTimeUSec(0), durationUSec(0) {}
     QnTimePeriod(qint64 startTimeUSec, qint64 durationUSec): startTimeUSec(startTimeUSec), durationUSec(durationUSec) {}
+
+    static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
 
     /** Start time in microseconds. */
     qint64 startTimeUSec;
@@ -23,7 +28,10 @@ struct QnTimePeriod
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationUSec;
 };
-typedef QVector<QnTimePeriod> QnTimePeriodList;
+bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
+bool operator < (qint64 first, const QnTimePeriod& other);
+bool operator < (const QnTimePeriod& other, qint64 first);
+
 
 class DeviceFileCatalog: public QObject
 {
@@ -65,7 +73,7 @@ public:
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
-    qint64 recreateFile(const QString& fileName);
+    qint64 recreateFile(const QString& fileName, qint64 startTime);
 private:
     mutable QMutex m_mutex;
     QFile m_file;

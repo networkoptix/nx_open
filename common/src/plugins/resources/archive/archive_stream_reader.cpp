@@ -106,6 +106,11 @@ void QnArchiveStreamReader::pauseMedia()
 	m_singleQuantProcessed = true;
 }
 
+bool QnArchiveStreamReader::isMediaPaused() const
+{
+    return m_singleShot && m_singleQuantProcessed;
+}
+
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
 {
     QMutexLocker mutex(&m_jumpMtx);
@@ -614,6 +619,8 @@ bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
 
 void QnArchiveStreamReader::setReverseMode(bool value)
 {
+    if (value != m_reverseMode)
+        m_lastJumpTime = AV_NOPTS_VALUE;
     m_reverseMode = value;
 }
 

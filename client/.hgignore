@@ -1,6 +1,7 @@
-syntax: glob
+syntax: regexp
+^bin
 
-bin
+syntax: glob
 build
 Debug
 Release

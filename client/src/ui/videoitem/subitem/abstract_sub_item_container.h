@@ -1,6 +1,8 @@
 #ifndef abstract_sub_item_container_h1031
 #define abstract_sub_item_container_h1031
 
+#include <QtGui/QGraphicsItem>
+
 class CLAbstractSubItem;
 
 enum CLSubItemType { CloseSubItem, ArchiveNavigatorSubItem, RecordingSubItem, PlaySubItem, PauseSubItem, StepForwardSubItem, StepBackwardSubItem, RewindBackwardSubItem, RewindForwardSubItem, MakeScreenshotSubItem };
@@ -8,6 +10,8 @@ enum CLSubItemType { CloseSubItem, ArchiveNavigatorSubItem, RecordingSubItem, Pl
 class CLAbstractSubItemContainer : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
 public:
     CLAbstractSubItemContainer(QGraphicsItem* parent);
 

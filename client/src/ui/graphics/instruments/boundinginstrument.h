@@ -4,6 +4,7 @@
 #include <QRect>
 #include <QTransform>
 #include <ui/animation/animation_timer.h>
+#include <ui/common/margins.h>
 #include "instrument.h"
 
 class BoundingInstrument: public Instrument, protected AnimationTimerListener {
@@ -24,9 +25,26 @@ public:
     /**
      * \param view                      Graphics view to use.
      * \param positionBounds            Rectangular area to which viewport movement is restricted, in scene coordinates.
-     * \param extension                 Extension of this area, in viewports.
      */
-    void setPositionBounds(QGraphicsView *view, const QRectF &positionBounds, qreal extension);
+    void setPositionBounds(QGraphicsView *view, const QRectF &positionBounds);
+
+    /**
+     * \param view                      Graphics view to use.
+     * \returns                         Rectangular area to which viewport movement is restricted, in scene coordinates.
+     */
+    QRectF positionBounds(QGraphicsView *view) const;
+
+    /**
+     * \param view                      Graphics view to use.
+     * \param extension                 Extension of the area to which viewport movement is restricted, in viewports.
+     */
+    void setPositionBoundsExtension(QGraphicsView *view, const MarginsF &extension);
+
+    /**
+     * \param view                      Graphics view to use.
+     * \returns                         Extension of the area to which viewport movement is restricted, in viewports.
+     */
+    MarginsF positionBoundsExtension(QGraphicsView *view) const;
 
     /**
      * \param view                      Graphics view to use.
@@ -36,6 +54,13 @@ public:
      * \param upperMode                 Mode for the upper bound.
      */
     void setSizeBounds(QGraphicsView *view, const QSizeF &sizeLowerBound, Qt::AspectRatioMode lowerMode, const QSizeF &sizeUpperBound, Qt::AspectRatioMode upperMode);
+
+    /**
+     * \param view                      Graphics view to use.
+     * \param sizeLowerExtension        Extension of the lower bound of viewport size, relative to this lower bound.
+     * \param sizeLowerExtension        Extension of the upper bound of viewport size, relative to this upper bound.
+     */
+    void setSizeBoundsExtension(QGraphicsView *view, const QSizeF &sizeLowerExtension, const QSizeF &sizeUpperExtension);
 
     /**
      * \param view                      Graphics view to use.

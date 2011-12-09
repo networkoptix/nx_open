@@ -64,4 +64,6 @@ QN_EXPORT extern CLLog cl_log;
 	if (level > cl_log.getLoglevel());\
 	else
 
+QN_EXPORT void qDebugCLLogHandler(QtMsgType type, const char *msg);
+
 #endif //log_h_109

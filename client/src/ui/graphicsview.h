@@ -177,7 +177,6 @@ private Q_SLOTS:
     void onSecTimer();
     void onDecorationItemPressed(const QString &);
     void onArrange_helper_finished();
-    void onPreferences_helper();
     void toggleRecording();
     void recordingSettings();
     void toggleFullScreen();
@@ -262,7 +261,7 @@ protected:
 
     CLAbstractSceneItem* m_lastPressedItem;
 
-    QPointer<NavigationItem> m_navigationItem;
+    QScopedPointer<NavigationItem> m_navigationItem;
 
 
 private:

@@ -14,6 +14,7 @@ QnParamType::QnParamType()
     type = None;
     readonly = false;
     ui = false;
+    isStatic = false;
 }
 
 bool QnParamType::setDefVal(QnValue val) // safe way to set value

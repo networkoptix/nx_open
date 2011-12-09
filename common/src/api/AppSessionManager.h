@@ -22,6 +22,7 @@ public:
 
     int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers);
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);
+    int addStorage(const ::xsd::api::storages::Storage&);
 
 private:
     int addObject(const QString& objectName, const QByteArray& body, QByteArray& response);

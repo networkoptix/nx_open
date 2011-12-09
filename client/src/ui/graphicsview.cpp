@@ -15,7 +15,6 @@
 #include "video_cam_layout/layout_manager.h"
 #include "view_drag_and_drop.h"
 #include "layout_editor_wnd.h"
-#include "preferences_wnd.h"
 #include "videoitem/layout_item.h"
 #include "videoitem/unmoved/unmoved_pixture_button.h"
 #include "videoitem/search/search_filter_item.h"
@@ -28,7 +27,8 @@
 #include "ui/ui_common.h"
 #include "ui/skin.h"
 #include "ui/animation/property_animation.h"
-#include "ui/recordingsettingswidget.h"
+#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
 #include "youtube/youtubeuploaddialog.h"
 #include "videorecordersettings.h"
@@ -222,13 +222,11 @@ GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget* mainWnd) :
     connect(&cm_recording_settings, SIGNAL(triggered()), this, SLOT(recordingSettings()));
     addAction(&cm_screen_recording);
 
-    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+    //connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen())); // ### connected in mainwnd
     addAction(&cm_toggle_fullscreen);
 
-    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(onPreferences_helper()));
     addAction(&cm_preferences);
 
-    connect(&cm_exit, SIGNAL(triggered()), mMainWnd, SLOT(close()));
     addAction(&cm_exit);
 
     connect(&cm_add_layout, SIGNAL(triggered()), this, SLOT(contextMenuHelper_addNewLayout()));
@@ -426,7 +424,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (onUserInput(true, true))
         return;
 
-    if (m_navigationItem && m_navigationItem->mouseOver())
+    if (m_navigationItem && m_navigationItem->isMouseOver())
     {
         // do not zoom scene if mouse is over m_navigationItem
         QGraphicsView::wheelEvent(e);
@@ -441,11 +439,11 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     }
 
     /*/
-    if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
+    if (m_navigationItem && ( m_navigationItem->isMouseOver() || m_navigationItem->isActive()))
     {
         // scene should not be zoomed if mouse is over time slider or if time slider is active
 
-        if (!m_navigationItem->mouseOver() && m_navigationItem->isActive())
+        if (!m_navigationItem->isMouseOver() && m_navigationItem->isActive())
             return; // if mouse is not over time line but time line is still active event must be ignored
 
         QGraphicsView::wheelEvent(e);
@@ -725,6 +723,11 @@ void GraphicsView::initDecoration()
 
 void GraphicsView::adjustAllStaticItems()
 {
+    if (m_navigationItem) {
+        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
+        m_navigationItem->resize(width(), NavigationItem::DEFAULT_HEIGHT);
+    }
+
     foreach (CLAbstractUnmovedItem *item, m_staticItems)
         item->adjust();
 
@@ -823,7 +826,7 @@ void GraphicsView::stopAnimation()
     //mSteadyShow.stopAnimation();
 }
 
-void GraphicsView::mousePressEvent ( QMouseEvent * event)
+void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
     //mpe
     if (!mViewStarted)
@@ -1130,7 +1133,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     showStop_helper();
 }
 
-void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     //mre
 
@@ -1834,7 +1837,7 @@ void GraphicsView::onRecordingFailed(QString errMessage)
     QMessageBox::warning(0, QObject::tr("Can' start video recording"), errMessage, QMessageBox::Ok, QMessageBox::NoButton);
 }
 
-void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
+void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!mViewStarted)
         return;
@@ -2002,10 +2005,14 @@ void GraphicsView::goToSteadyMode(bool steady)
             onUserInput(false, false);
             return;
         }
-
+        if (m_navigationItem && m_navigationItem->isMouseOver())
+        {
+            onUserInput(false, false);
+            return;
+        }
         foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item != bk_item && item->preferNonSteadyMode())
+            if (item != bk_item && item->isMouseOver())
             {
                 onUserInput(false, false);
                 return;
@@ -2014,15 +2021,11 @@ void GraphicsView::goToSteadyMode(bool steady)
 
         foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item == bk_item)
-                continue;
-
-            if(item == m_navigationItem.data() && m_camLayout.hasLiveCameras())
-                continue;
-
-            item->hideIfNeeded(500);
+            if (item != bk_item)
+                item->hideIfNeeded(500);
         }
-
+        if (m_navigationItem && !m_camLayout.hasLiveCameras())
+            m_navigationItem->hideIfNeeded(500);
         if (m_searchItem)
         {
             m_searchItem->setVisible(false);
@@ -2039,7 +2042,8 @@ void GraphicsView::goToSteadyMode(bool steady)
             if (item != bk_item)
                 item->show(500);
         }
-
+        if (m_navigationItem)
+            m_navigationItem->show(500);
         if (m_searchItem)
         {
             m_searchItem->setVisible(true);
@@ -2412,18 +2416,16 @@ void GraphicsView::updatePageSelector()
 NavigationItem *GraphicsView::getNavigationItem()
 {
     if (!m_navigationItem) {
-        m_navigationItem = new NavigationItem();
-        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
+        m_navigationItem.reset(new NavigationItem);
         m_navigationItem->setVisible(false);
-        m_navigationItem->graphicsWidget()->resize(width(), NavigationItem::DEFAULT_HEIGHT);
         m_navigationItem->setZValue(INT_MAX);
-        scene()->addItem(m_navigationItem);
+        scene()->addItem(m_navigationItem.data());
 
         connect(m_navigationItem.data(), SIGNAL(exportRange(qint64,qint64)), this, SIGNAL(onExportRange(qint64,qint64)));
 
-        addStaticItem(m_navigationItem, false);
+        adjustAllStaticItems();
     }
-    return m_navigationItem;
+    return m_navigationItem.data();
 }
 
 void GraphicsView::updateDecorations()
@@ -2486,10 +2488,6 @@ void GraphicsView::resizeEvent(QResizeEvent *event)
     if (!mViewStarted)
         return;
 
-    if (m_navigationItem) {
-        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
-        m_navigationItem->graphicsWidget()->resize(event->size().width(), NavigationItem::DEFAULT_HEIGHT);
-    }
     updateDecorations();
 
     if (m_selectedWnd && m_selectedWnd->isFullScreen())
@@ -2836,12 +2834,6 @@ void GraphicsView::onExportRange(qint64 begin, qint64 end)
 {
     // ### implement
     qWarning() << "GraphicsView::onExportRange:" << begin << end;
-}
-
-void GraphicsView::onPreferences_helper()
-{
-    PreferencesWindow dialog(this);
-    dialog.exec();
 }
 
 void GraphicsView::toggleRecording()
@@ -3630,10 +3622,10 @@ void GraphicsView::onOpenFile()
 {
     if (m_openMediaDialog.exec() && !m_openMediaDialog.selectedFiles().isEmpty())
     {
-        QString selectedFilter = m_openMediaDialog.selectedFilter();
+        //QString selectedFilter = m_openMediaDialog.selectedFilter();
         QStringList srcFiles = m_openMediaDialog.selectedFiles();
         QStringList dstFiles;
-        foreach (QString file, srcFiles)
+        foreach (const QString &file, srcFiles)
             QnFileProcessor::findAcceptedFiles(file, &dstFiles);
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
     }

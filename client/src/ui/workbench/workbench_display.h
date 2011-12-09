@@ -94,7 +94,7 @@ public:
      * \returns                         Activity listener instrument used by this workbench manager.
      */
     ActivityListenerInstrument *activityListenerInstrument() const {
-        return m_activityListenerInstrument;
+        return m_curtainActivityInstrument;
     }
 
     /**
@@ -188,11 +188,20 @@ public:
      */
     QRectF layoutBoundingGeometry() const;
 
+    QRectF fitInViewGeometry() const;
+
     /**
      * \returns                         Current viewport geometry, in scene coordinates.
      */
     QRectF viewportGeometry() const;
 
+    /**
+     * This function can be used in case the "actual" viewport differs from the 
+     * "real" one. This can be the case if control panels are drawn on the scene.
+     *
+     * \param margins                   New viewport margins. 
+     */
+    void setViewportMargins(const QMargins &margins);
 
     void fitInView();
 
@@ -258,6 +267,9 @@ protected:
     void changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
 
 protected slots:
+    void synchronizeSceneBoundsExtension();
+    void synchronizeRaisedGeometry();
+
     void at_viewport_animationFinished();
 
     void at_workbench_itemAdded(QnWorkbenchItem *item);
@@ -271,8 +283,6 @@ protected slots:
     void at_item_geometryDeltaChanged();
     void at_item_rotationChanged();
     void at_item_flagsChanged();
-
-    void at_viewport_transformationChanged();
 
     void at_activityStopped();
     void at_activityStarted();
@@ -314,6 +324,8 @@ private:
     /** Current workbench mode. */
     QnWorkbench::Mode m_mode;
 
+    /** Viewport margins. */
+    QMargins m_viewportMargins;
 
     /* Instruments. */
 
@@ -323,8 +335,11 @@ private:
     /** Transformation listener instrument. */
     TransformListenerInstrument *m_transformListenerInstrument;
 
-    /** Activity listener instrument. */
-    ActivityListenerInstrument *m_activityListenerInstrument;
+    /** Activity listener instrument for curtain item. */
+    ActivityListenerInstrument *m_curtainActivityInstrument;
+
+    /** Activity listener instrument for resource widgets. */
+    ActivityListenerInstrument *m_widgetActivityInstrument;
 
     /** Bounding instrument. */
     BoundingInstrument *m_boundingInstrument;

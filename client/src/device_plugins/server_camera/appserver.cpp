@@ -1,7 +1,10 @@
+#include "appserver.h"
+
 #include "api/AppServerConnection.h"
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "device_plugins/server_camera/server_camera.h"
-#include "appserver.h"
+#include "settings.h"
+#include "version.h"
 
 QnAppServerResourceSearcher& QnAppServerResourceSearcher::instance()
 {
@@ -12,23 +15,16 @@ QnAppServerResourceSearcher& QnAppServerResourceSearcher::instance()
 
 QString QnAppServerResourceSearcher::manufacture() const
 {
-    return "Network Optix";
+    return QLatin1String("Network Optix");
 }
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
-    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
-    QHostAddress host(appserverUrl.host());
-    int port = appserverUrl.port();
-
-    QAuthenticator auth;
-    auth.setUser("appserver");
-    auth.setPassword("123");
-    QnAppServerConnection appServerConnection(host, port, auth, QnServerCameraFactory::instance());
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnServerCameraFactory::instance());
 
     QnResourceList resources;
 
-    appServerConnection.getResources(resources);
+    appServerConnection->getResources(resources);
 
     return resources;
 }

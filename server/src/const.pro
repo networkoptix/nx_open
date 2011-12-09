@@ -1,11 +1,13 @@
 INCLUDEPATH += ../../common/src
 
+include(../contrib/qtservice/src/qtservice.pri)
+
 win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
 }
 
 QT = core gui network xml opengl multimedia webkit
-CONFIG += x86 precompile_header
+CONFIG += console x86 precompile_header
 CONFIG -= flat
 TEMPLATE = app
 VERSION = 0.0.1
@@ -16,12 +18,11 @@ BUILDLIB = %BUILDLIB
 FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
-TARGET = server
+TARGET = mediaserver
 
 win32: RC_FILE = server.rc
 
 CONFIG(debug, debug|release) {
-  CONFIG += console
   DESTDIR = ../bin/debug
   OBJECTS_DIR  = ../build/debug
   MOC_DIR = ../build/debug/generated

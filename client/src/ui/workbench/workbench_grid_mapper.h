@@ -110,6 +110,12 @@ public:
     QPointF mapFromGrid(const QPoint &gridPos) const;
 
     /**
+     * \param gridPos                   Coordinate of a point on a grid.
+     * \return                          Position in scene coordinates of the given point.
+     */
+    QPointF mapFromGrid(const QPointF &gridPos) const;
+
+    /**
      * \param size                      Size in scene coordinates.
      * \returns                         Smallest size in grid cells that fits the given size.
      */
@@ -122,6 +128,12 @@ public:
     QSizeF mapFromGrid(const QSize &gridSize) const;
 
     /**
+     * \param gridSize                  Size in grid cells.
+     * \returns                         Corresponding size in scene coordinates.
+     */
+    QSizeF mapFromGrid(const QSizeF &gridSize) const;
+
+    /**
      * \param rect                      Rectangle in scene coordinates to map to grid coordinates.
      * \returns                         Smallest grid rectangle that fits the given rectangle.
      */
@@ -132,6 +144,12 @@ public:
      * \returns                         Corresponding rectangle in scene coordinates.
      */
     QRectF mapFromGrid(const QRect &gridRect) const;
+
+    /**
+     * \param gridRect                  Rectangle in grid cells.
+     * \returns                         Corresponding rectangle in scene coordinates.
+     */
+    QRectF mapFromGrid(const QRectF &gridRect) const;
 
 signals:
     void originChanged(const QPointF &oldOrigin, const QPointF &newOrigin);

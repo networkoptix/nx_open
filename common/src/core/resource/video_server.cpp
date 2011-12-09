@@ -3,7 +3,7 @@
 #include <QtCore/QUrl>
 
 QnLocalVideoServer::QnLocalVideoServer()
-    : QnResource()
+: QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer")));
     addFlag(server | local);
@@ -23,9 +23,8 @@ QString QnLocalVideoServer::getUniqueId() const
 QnAbstractStreamDataProvider *QnLocalVideoServer::createDataProviderInternal(ConnectionRole role)
 {
     Q_UNUSED(role)
-    return 0;
+        return 0;
 }
-
 
 QnVideoServer::QnVideoServer():
     QnResource()

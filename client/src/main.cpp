@@ -3,7 +3,6 @@
 
 #include "version.h"
 #include "mainwnd.h"
-#include "serial.h"
 #include "settings.h"
 
 #include "decoders/video/ipp_h264_decoder.h"
@@ -126,7 +125,7 @@ void addTestData()
     resource2->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource2));
     */
-    
+
     /*
     QnNetworkResourceList testList;
     testList << testCamera;
@@ -139,6 +138,21 @@ void addTestData()
 
 }
 #endif
+
+void initAppServerConnection()
+{
+    // Use user scope
+    QSettings settings;
+
+	QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+    int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+
+	QAuthenticator auth;
+	auth.setUser(settings.value("appserverLogin", "appserver").toString());
+	auth.setPassword(settings.value("appserverPassword", "123").toString());
+
+    QnAppServerConnectionFactory::initialize(QHostAddress(hostString), port, auth);
+}
 
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
@@ -156,14 +170,11 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
     EveApplication application(argc, argv);
+    application.setQuitOnLastWindowClosed(true);
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
-    {
-        argsMessage += fromNativePath(QString::fromLocal8Bit(argv[i]));
-        if (i < argc-1)
-            argsMessage += QLatin1Char('\0'); // ### QString doesn't support \0 in the string
-    }
+        argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
 
     while (application.isRunning())
     {
@@ -171,21 +182,15 @@ int main(int argc, char *argv[])
             return 0;
     }
 
-    QString dataLocation = getDataDirectory();
+    initAppServerConnection();
+
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
-    QDir dataDirectory;
-    dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
-
-    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
-    {
-        application.quit();
-
+    const QString dataLocation = getDataDirectory();
+    if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
         return 0;
-    }
-
-    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
-    cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
+    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
+        return 0;
 
 #ifdef _DEBUG
      //cl_log.setLogLevel(cl_logDEBUG1);
@@ -202,7 +207,7 @@ int main(int argc, char *argv[])
     }
 
     Settings& settings = Settings::instance();
-    settings.load(getDataDirectory() + QLatin1String("/settings.xml"));
+    settings.load(dataLocation + QLatin1String("/settings.xml"));
 
     if (!settings.isAfterFirstRun() && !getMoviesDirectory().isEmpty())
         settings.addAuxMediaRoot(getMoviesDirectory());
@@ -238,7 +243,7 @@ int main(int argc, char *argv[])
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-    
+
 #ifdef Q_OS_WIN
 //    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
@@ -250,9 +255,8 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().start();
 
     CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
-    //============================
 
-    qApp->setQuitOnLastWindowClosed(true);
+    //============================
 
     QnStoragePtr storage0(new QnStorage());
     storage0->setUrl(getRecordingDir());
@@ -312,7 +316,7 @@ int main(int argc, char *argv[])
     //=========================================================
 
     initContextMenu();
-    
+
     MainWnd mainWindow(argc, argv);
     mainWindow.show();
 

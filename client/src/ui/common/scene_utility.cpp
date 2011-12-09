@@ -6,6 +6,82 @@
 #include <QCursor>
 #include <utils/common/checked_cast.h>
 
+QPointF QnSceneUtility::cwiseMul(const QPointF &l, const QPointF &r) {
+    return QPointF(l.x() * r.x(), l.y() * r.y());
+}
+
+QPointF QnSceneUtility::cwiseDiv(const QPointF &l, const QPointF &r) {
+    return QPointF(l.x() / r.x(), l.y() / r.y());
+}
+
+QSizeF QnSceneUtility::cwiseMul(const QSizeF &l, const QSizeF &r) {
+    return QSizeF(l.width() * r.width(), l.height() * r.height());
+}
+
+QSizeF QnSceneUtility::cwiseDiv(const QSizeF &l, const QSizeF &r) {
+    return QSizeF(l.width() / r.width(), l.height() / r.height());
+}
+
+MarginsF QnSceneUtility::cwiseMul(const MarginsF &l, const QSizeF &r) {
+    return MarginsF(
+        l.left()   * r.width(),
+        l.top()    * r.height(),
+        l.right()  * r.width(),
+        l.bottom() * r.height()
+    );
+}
+
+MarginsF QnSceneUtility::cwiseDiv(const MarginsF &l, const QSizeF &r) {
+    return MarginsF(
+        l.left()   / r.width(),
+        l.top()    / r.height(),
+        l.right()  / r.width(),
+        l.bottom() / r.height()
+    );
+}
+
+MarginsF QnSceneUtility::cwiseMul(const MarginsF &l, const MarginsF &r) {
+    return MarginsF(
+        l.left()   * r.left(), 
+        l.top()    * r.top(), 
+        l.right()  * r.right(), 
+        l.bottom() * r.bottom()
+    );
+}
+
+MarginsF QnSceneUtility::cwiseDiv(const MarginsF &l, const MarginsF &r) {
+    return MarginsF(
+        l.left()   / r.left(), 
+        l.top()    / r.top(), 
+        l.right()  / r.right(), 
+        l.bottom() / r.bottom()
+    );
+}
+
+QSizeF QnSceneUtility::sizeDelta(const MarginsF &margins) {
+    return QSizeF(margins.left() + margins.right(), margins.top() + margins.bottom());
+}
+
+QSize QnSceneUtility::sizeDelta(const QMargins &margins) {
+    return QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
+}
+
+qreal QnSceneUtility::aspectRatio(const QSizeF &size) {
+    return size.width() / size.height();
+}
+
+qreal QnSceneUtility::aspectRatio(const QSize &size) {
+    return static_cast<qreal>(size.width()) / size.height();
+}
+
+qreal QnSceneUtility::aspectRatio(const QRect &rect) {
+    return aspectRatio(rect.size());
+}
+
+qreal QnSceneUtility::aspectRatio(const QRectF &rect) {
+    return aspectRatio(rect.size());
+}
+
 qreal QnSceneUtility::length(const QPointF &point) {
     return std::sqrt(point.x() * point.x() + point.y() * point.y());
 }
@@ -128,6 +204,26 @@ QRectF QnSceneUtility::dilated(const QRectF &rect, const QSizeF &amount) {
     return rect.adjusted(-amount.width(), -amount.height(), amount.width(), amount.height());
 }
 
+QRectF QnSceneUtility::dilated(const QRectF &rect, const MarginsF &amount) {
+    return rect.adjusted(-amount.left(), -amount.top(), amount.right(), amount.bottom());
+}
+
+QSizeF QnSceneUtility::dilated(const QSizeF &size, const MarginsF &amount) {
+    return size + sizeDelta(amount);
+}
+
+QRectF QnSceneUtility::eroded(const QRectF &rect, const MarginsF &amount) {
+    return rect.adjusted(amount.left(), amount.top(), -amount.right(), -amount.bottom());
+}
+
+QRect QnSceneUtility::eroded(const QRect &rect, const QMargins &amount) {
+    return rect.adjusted(amount.left(), amount.top(), -amount.right(), -amount.bottom());
+}
+
+QSizeF QnSceneUtility::eroded(const QSizeF &size, const MarginsF &amount) {
+    return size - sizeDelta(amount);
+}
+
 bool QnSceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
     return size.width() > otherSize.width() && size.height() > otherSize.height();
 }
@@ -135,17 +231,17 @@ bool QnSceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
 void QnSceneUtility::moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta) {
     assert(view != NULL);
 
-    moveViewport(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
+    moveViewportScene(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
 }
 
-void QnSceneUtility::moveViewportF(QGraphicsView *view, const QPointF &viewportPositionDelta) {
+void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &viewportPositionDelta) {
     assert(view != NULL);
 
     QTransform viewportToScene = view->viewportTransform().inverted();
-    moveViewport(view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
+    moveViewportScene(view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
 }
 
-void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta) {
+void QnSceneUtility::moveViewportScene(QGraphicsView *view, const QPointF &scenePositionDelta) {
     assert(view != NULL);
 
     QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
@@ -159,10 +255,13 @@ void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &scenePosit
     view->setInteractive(oldInteractive);
 }
 
-void QnSceneUtility::moveViewportTo(QGraphicsView *view, const QPointF &centerPosition) {
+void QnSceneUtility::moveViewportSceneTo(QGraphicsView *view, const QPointF &sceneCenter) {
     assert(view != NULL);
 
-    moveViewport(view, centerPosition - view->mapToScene(view->viewport()->rect().center()));
+    QTransform viewportToScene = view->viewportTransform().inverted();
+    QPointF currentSceneCenter = viewportToScene.map(QRectF(view->viewport()->rect()).center());
+
+    moveViewportScene(view, sceneCenter - currentSceneCenter);
 }
 
 namespace {

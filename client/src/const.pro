@@ -51,16 +51,19 @@ win* {
     } else {
         OPENAL_LIBS_PATH = $$PWD/../contrib/openal/bin/win64
     }
-
     INCLUDEPATH += $$PWD/../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
+
+    INCLUDEPATH += $$PWD/../contrib/openssl/include
+    LIBS += -L$$PWD/../contrib/openssl/bin -llibeay32
 }
 
 mac {
-  LIBS += -framework OpenAL
+    LIBS += -framework OpenAL
+
+    LIBS += -lcrypto
 }
 
-# Clone ssh://hg@vigasin.com/evetools to the same diectory netoptix_vms is located
 win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
@@ -78,11 +81,11 @@ mac {
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-CONFIG(debug) {
+CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
   LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
 }
-CONFIG(release) {
+CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
   LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
 }
@@ -141,7 +144,8 @@ PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 RESOURCES += ../build/skin.qrc
-FORMS += preferences.ui licensekey.ui recordingsettings.ui ui/dialogs/tagseditdialog.ui \
+FORMS += ui/preferences/licensewidget.ui ui/preferences/preferences.ui ui/preferences/recordingsettingswidget.ui \
+         ui/dialogs/tagseditdialog.ui \
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO

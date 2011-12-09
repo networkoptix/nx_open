@@ -16,7 +16,7 @@ public:
     ActivityListenerInstrument(int activityTimeoutMSec, QObject *parent = NULL);
     virtual ~ActivityListenerInstrument();
 
-    int activityTimeoutMsed() const {
+    int activityTimeoutMSec() const {
         return m_activityTimeoutMSec;
     }
 

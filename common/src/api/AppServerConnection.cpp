@@ -97,6 +97,18 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
     return 1;
 }
 
+int QnAppServerConnection::addStorage(const QnStorage& storageIn)
+{
+    xsd::api::storages::Storage storage(storageIn.getId().toString().toStdString(),
+                                         storageIn.getName().toStdString(),
+                                         storageIn.getUrl().toStdString(),
+                                         storageIn.getTypeId().toString().toStdString(),
+                                         storageIn.getSpaceLimit(),
+                                         storageIn.getMaxStoreTime());
+
+    return m_sessionManager->addStorage(storage);
+}
+
 int QnAppServerConnection::getServers(QnResourceList& servers)
 {
     // todo: implement me
@@ -120,4 +132,22 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
 QString QnAppServerConnection::getLastError() const
 {
     return m_sessionManager->getLastError();
+}
+
+QHostAddress QnAppServerConnectionFactory::m_host;
+int QnAppServerConnectionFactory::m_port;
+QAuthenticator QnAppServerConnectionFactory::m_auth;
+
+void QnAppServerConnectionFactory::initialize(const QHostAddress& host, int port, const QAuthenticator& auth)
+{
+    m_host = host;
+    m_port = port;
+    m_auth = auth;
+}
+
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory& resourceFactory)
+{
+    cl_log.log(QString("Connection to application server http://%1:%2").arg(m_host.toString()).arg(m_port), cl_logALWAYS);
+
+    return QnAppServerConnectionPtr(new QnAppServerConnection(m_host, m_port, m_auth, resourceFactory));
 }
