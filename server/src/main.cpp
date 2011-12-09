@@ -313,7 +313,7 @@ public:
 
 			QnStoragePtr storage(new QnStorage());
             storage->setName("Initial");
-			storage->setUrl(settings.value("mediaDir", "c:/records").replace("\\", "/").toString());
+			storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
 			storage->setSpaceLimit(100ll * 1000 * 1024);
 
             appServerConnection->addStorage(*storage);
