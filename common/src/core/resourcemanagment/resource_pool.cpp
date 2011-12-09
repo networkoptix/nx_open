@@ -2,7 +2,6 @@
 
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
-
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive)
 {
@@ -129,7 +128,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag)
+QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag) const
 {
     QnResourceList result;
 
@@ -137,6 +136,20 @@ QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag)
     foreach (QnResourcePtr resource, m_resources)
     {
         if (resource->checkFlag(flag))
+            result.append(resource);
+    }
+
+    return result;
+}
+
+QnResourceList QnResourcePool::getResourcesWithParentId(const QnId &id) const
+{
+    QnResourceList result;
+
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (QnResourcePtr resource, m_resources)
+    {
+        if (resource->getParentId() == id)
             result.append(resource);
     }
 
