@@ -7,7 +7,6 @@
 #include "getter.h"
 #include "setter.h"
 
-#if 0
 
 QnVariantAnimator::QnVariantAnimator(QObject *parent):
     QnAbstractAnimator(parent),
@@ -35,8 +34,8 @@ void QnVariantAnimator::setSpeed(qreal speed) {
         return;
     }
 
-
     m_speed = speed;
+    invalidateDuration();
 }
 
 void QnVariantAnimator::setGetter(QnAbstractGetter *getter) {
@@ -47,6 +46,7 @@ void QnVariantAnimator::setGetter(QnAbstractGetter *getter) {
 
     m_getter.reset(getter);
 
+    invalidateDuration();
     setType(currentValue().userType());
 }
 
@@ -84,15 +84,11 @@ void QnVariantAnimator::setTargetObjectInternal(QObject *target) {
         stop();
     }
 
+    invalidateDuration();
     setType(currentValue().userType());
 }
 
 void QnVariantAnimator::setTargetValue(const QVariant &targetValue) {
-    if(isRunning()) {
-        qnWarning("Cannot change target value of a running animator.");
-        return;
-    }
-
     updateTargetValue(targetValue);
 }
 
@@ -149,8 +145,10 @@ void QnVariantAnimator::updateState(State newState) {
             return; /* This is a normal use case, don't emit warnings. */
     }
 
-    if(newState == RUNNING)
+    if(newState == RUNNING) {
         m_startValue = currentValue();
+        invalidateDuration();
+    }
 
     base_type::updateState(newState);
 }
@@ -171,30 +169,25 @@ void QnVariantAnimator::updateType(int newType) {
         qnWarning("No magnitude calculator registered for type '%1'", QMetaType::typeName(type()));
         m_magnitudeCalculator = MagnitudeCalculator::forType(0);
     }
+
+    invalidateDuration();
 }
 
 void QnVariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
-    assert(!isRunning());
-
     if(newTargetValue.userType() != m_type) {
         qnWarning("Value of invalid type was provided - expected '%1', got '%2'.", QMetaType::typeName(m_type), QMetaType::typeName(newTargetValue.userType()));
         return;
     }
 
-    if(!isRunning()) {
-        m_targetValue = newTargetValue;
+    if(isRunning()) {
+        qnWarning("Cannot change target value of a running animator.");
         return;
     }
 
-    State oldState = state();
-    updateState(STOPPED);
     m_targetValue = newTargetValue;
-    updateState(RUNNING);
-    emitStateChangedSignals(oldState);
+    invalidateDuration();
 }
 
 
 
-
-#endif
 

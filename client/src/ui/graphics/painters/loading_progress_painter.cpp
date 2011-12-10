@@ -1,24 +1,11 @@
 #include "loading_progress_painter.h"
 #include <cmath> /* For std::fmod, std::sin and std::cos. */
 #include <utils/common/qt_opengl.h>
+#include <ui/common/linear_combination.h>
 
 namespace {
     void glVertexPolar(qreal alpha, qreal r) {
         glVertex(r * std::cos(alpha), r * std::sin(alpha));
-    }
-
-    template<class T> 
-    T interpolate(const T &f, const T &t, qreal progress) {
-        return T(f + (t - f) * progress);
-    }
-
-    QColor interpolate(const QColor &f,const QColor &t, qreal progress) {
-        return QColor(
-            qBound(0, interpolate(f.red(),   t.red(),   progress), 255),
-            qBound(0, interpolate(f.green(), t.green(), progress), 255),
-            qBound(0, interpolate(f.blue(),  t.blue(),  progress), 255),
-            qBound(0, interpolate(f.alpha(), t.alpha(), progress), 255)
-        );
     }
 
 } // anonymous namespace
@@ -31,6 +18,7 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
     m_list = glGenLists(1);
 
     /* Compile the display list. */
+    LinearCombinator *combinator = LinearCombinator::forType(QMetaType::QColor);
     glNewList(m_list, GL_COMPILE);
     glBegin(GL_QUADS);
     for(int i = 0; i < sectorCount; i++) {
@@ -39,7 +27,8 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
         qreal r0 = innerRadius;
         qreal r1 = 1;
 
-        glColor(interpolate(startColor, endColor, static_cast<qreal>(i) / (sectorCount - 1)));
+        qreal k = static_cast<qreal>(i) / (sectorCount - 1);
+        glColor(combinator->combine(1 - k, startColor, k, endColor).value<QColor>());
         glVertexPolar(a0, r0);
         glVertexPolar(a1, r0);
         glVertexPolar(a1, r1);

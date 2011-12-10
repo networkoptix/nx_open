@@ -32,6 +32,7 @@ public:
     virtual void pauseMedia();
     virtual void resumeMedia();
     virtual void setSingleShotMode(bool single);
+    virtual bool isMediaPaused() const;
     //
 
 public slots:

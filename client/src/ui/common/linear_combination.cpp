@@ -4,6 +4,7 @@
 #include <QVector2D>
 #include <QVector3D>
 #include <QVector4D>
+#include <QColor>
 #include <QVariant>
 #include <QMetaType>
 #include "protected_storage.h"
@@ -11,7 +12,7 @@
 namespace {
     template<class T>
     T linearCombineInternal(qreal a, const T &x, qreal b, const T &y) {
-        return a * x + b * y;
+        return static_cast<T>(a * x + b * y);
     }
 
     template<class T>
@@ -37,12 +38,14 @@ namespace {
     public:
         Storage() {
             add(new NoopLinearCombinator());
+            add(new StandardLinearCombinator<int>());
             add(new StandardLinearCombinator<float>());
             add(new StandardLinearCombinator<double>());
             add(new StandardLinearCombinator<QPointF>());
             add(new StandardLinearCombinator<QVector2D>());
             add(new StandardLinearCombinator<QVector3D>());
             add(new StandardLinearCombinator<QVector4D>());
+            add(new StandardLinearCombinator<QColor>());
         }
 
         void add(LinearCombinator *calculator) {
@@ -72,7 +75,7 @@ QVariant LinearCombinator::combine(qreal a, const QVariant &x, qreal b, const QV
     assert((x.userType() == m_type && y.userType() == m_type) || m_type == 0);
 
     QVariant result(m_type, static_cast<const void *>(NULL));
-    calculateInternal(a, x.data(), b, y.data(), result.data());
+    calculateInternal(a, x.constData(), b, y.constData(), result.data());
     return result;
 }
 
@@ -87,12 +90,16 @@ QVariant LinearCombinator::combine(qreal a, const QVariant &x) const {
 }
 
 void LinearCombinator::combine(qreal a, const void *x, void *result) const {
-    combine(a, x, 0.0, m_zero.data(), result);
+    combine(a, x, 0.0, m_zero.constData(), result);
 }
 
 void LinearCombinator::initZero() {
     QVariant tmp(m_type, static_cast<const void *>(NULL));
     m_zero = combine(0.0, tmp, 0.0, tmp);
+}
+
+int linearCombine(qreal a, int x, qreal b, int y) {
+    return linearCombineInternal(a, x, b, y);
 }
 
 float linearCombine(qreal a, float x, qreal b, float y) {
@@ -117,4 +124,13 @@ QVector3D linearCombine(qreal a, const QVector3D &x, qreal b, const QVector3D &y
 
 QVector4D linearCombine(qreal a, const QVector4D &x, qreal b, const QVector4D &y) {
     return linearCombineInternal(a, x, b, y);
+}
+
+QColor linearCombine(qreal a, const QColor &x, qreal b, const QColor &y) {
+    return QColor(
+        qBound(0, linearCombine(a, x.red(),   b, y.red()),   255),
+        qBound(0, linearCombine(a, x.green(), b, y.green()), 255),
+        qBound(0, linearCombine(a, x.blue(),  b, y.blue()),  255),
+        qBound(0, linearCombine(a, x.alpha(), b, y.alpha()), 255)
+    );
 }
