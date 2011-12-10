@@ -106,6 +106,11 @@ QString serverGuid()
 
     if (guid.isEmpty())
     {
+        if (!settings.isWritable())
+        {
+            return guid;
+        }
+
         guid = QUuid::createUuid().toString();
         settings.setValue("serverGuid", guid);
     }
@@ -113,7 +118,7 @@ QString serverGuid()
     return guid;
 }
 
-QnVideoServerPtr registerServer(QnAppServerConnection& appServerConnection, const QString& myAddress)
+QnVideoServerPtr registerServer(QnAppServerConnectionPtr appServerConnection, const QString& myAddress)
 {
     QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
@@ -123,11 +128,11 @@ QnVideoServerPtr registerServer(QnAppServerConnection& appServerConnection, cons
     server.setGuid(serverGuid());
 
     server.setName(QString("Server ") + myAddress);
-    server.setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(DEFAUT_RTSP_PORT));
-    server.setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(DEFAULT_REST_PORT));
+    server.setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    server.setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 
     QnVideoServerList servers;
-    appServerConnection.addServer(server, servers);
+    appServerConnection->addServer(server, servers);
 
     Q_ASSERT(!servers.isEmpty());
 
@@ -243,33 +248,38 @@ public:
 
 	void run()
 	{
-		QUrl appserverUrl = QUrl(QSettings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME).value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
-		cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
+        // Use system scope
+        QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
-		QHostAddress host(appserverUrl.host());
-		int port = appserverUrl.port();
+		QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+        int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
 
 		QAuthenticator auth;
-		auth.setUser("appserver");
-		auth.setPassword("123");
-		QnAppServerConnection appServerConnection(host, port, auth, QnResourceDiscoveryManager::instance());
+		auth.setUser(settings.value("appserverLogin", "appserver").toString());
+		auth.setPassword(settings.value("appserverPassword", "123").toString());
+
+        QnAppServerConnectionFactory::initialize(QHostAddress(hostString), port, auth);
+
+        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnResourceDiscoveryManager::instance());
 
 		QList<QnResourceTypePtr> resourceTypeList;
 
 		for(;;)
 		{
-			if (appServerConnection.getResourceTypes(resourceTypeList) == 0)
+			if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
 				break;
 
-			qDebug() << "Can't get resource types: " << appServerConnection.getLastError();
+			qDebug() << "Can't get resource types: " << appServerConnection->getLastError();
 			QnSleep::msleep(1000);
 		}
 
 		qnResTypePool->addResourceTypeList(resourceTypeList);
 
-		QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverUrl.host()));
+		QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(hostString));
+        if (videoServer.isNull())
+            return;
 
-		m_processor = new QnAppserverResourceProcessor(videoServer->getId(), host, port, auth, QnResourceDiscoveryManager::instance());
+		m_processor = new QnAppserverResourceProcessor(videoServer->getId(), QnResourceDiscoveryManager::instance());
 
 		QUrl rtspUrl(videoServer->getUrl());
 		QUrl apiUrl(videoServer->getApiUrl());
@@ -283,7 +293,7 @@ public:
 
 		// Get storages sample code.
 		QnResourceList storages;
-		appServerConnection.getStorages(storages);
+		appServerConnection->getStorages(storages);
 
 		bool storageAdded = false;
 		foreach (QnResourcePtr resource, storages)
@@ -299,14 +309,14 @@ public:
 
 		if (!storageAdded)
 		{
-			QString errorMessage = QString("AppServer has no storages defined. Go to http://%1:%2/admin and add storage for server ID=%3").arg(host.toString()).arg(port).arg(videoServer->getId().toString());
-			qDebug() << errorMessage;
-			cl_log.log(errorMessage, cl_logERROR);
+			cl_log.log("Creating new storage", cl_logINFO);
+
 			QnStoragePtr storage(new QnStorage());
-			storage->setUrl("c:/records");
-			//storage->setIndex(65535);
-			//storage0->setSpaceLimit(238500ll * 1000 * 1024);
+            storage->setName("Initial");
+			storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
 			storage->setSpaceLimit(100ll * 1000 * 1024);
+
+            appServerConnection->addStorage(*storage);
 
 			qnResPool->addResource(storage);
 			qnStorageMan->addStorage(storage);
@@ -327,6 +337,7 @@ public:
 		//CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
 		//CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 	}
+
 private:
 	int m_argc;
 	char** m_argv;
@@ -350,6 +361,14 @@ protected:
     void start()
     {
         QCoreApplication *app = application();
+        QString guid = serverGuid();
+
+        if (guid.isEmpty())
+        {
+            cl_log.log("Can't save guid. Run once as administrator.", cl_logERROR);
+            qApp->quit();
+            return;
+        }
 
 		serverMain(app->argc(), app->argv());
 		m_main.start();
@@ -358,9 +377,9 @@ protected:
 	void stop()
 	{
 		stopServer(0);
-
 		xercesc::XMLPlatformUtils::Terminate ();
 	}
+
 private:
 	QnMain m_main;
 };

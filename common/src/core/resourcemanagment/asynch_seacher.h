@@ -20,7 +20,6 @@ class QnResourceDiscoveryManager : public CLLongRunnable, public QnResourceFacto
     typedef QList<QnResourceProcessor*> ResourceProcessorList;
 
 public:
-
     ~QnResourceDiscoveryManager();
 
     static QnResourceDiscoveryManager& instance();

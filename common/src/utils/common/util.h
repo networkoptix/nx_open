@@ -67,7 +67,8 @@ static const qint64 INT64_MIN = 0x8000000000000000ll;
 
 static const qint64 DATETIME_NOW = INT64_MAX;
 
-static const char *DEFAULT_APPSERVER_URL = "http://127.0.0.1:8000";
+static const char *DEFAULT_APPSERVER_HOST = "127.0.0.1";
+static const int DEFAULT_APPSERVER_PORT = 8000;
 
 static const int MAX_RTSP_DATA_LEN = 65535 - 16;
 
