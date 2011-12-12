@@ -19,7 +19,7 @@ public:
     bool saveToArchive(QnMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime);
 
-    static void createMask(const QRegion& region,  __m128i* mask, int& maskStart, int& maskEnd);
+    static void createMask(const QRegion& region,  __m128i* mask, int& msMaskStart, int& msMaskEnd);
 private:
     QString getFilePrefix(const QDateTime& datetime);
     void dateBounds(const QDateTime& datetime, qint64& minDate, qint64& maxDate);

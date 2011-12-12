@@ -33,7 +33,7 @@ private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk);
     qint64 correctTimeByMask(qint64 time);
     qint64 seekInternal(qint64 time);
-    void loadPlaybackMask(qint64 time);
+    void loadPlaybackMask(qint64 msTime);
 private:
     bool m_opened;
     QnResourcePtr m_resource;

@@ -3,8 +3,9 @@
 #include "utils/common/util.h"
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
+#include "utils/common/sleep.h"
 
-static const qint64 MOTION_LOAD_STEP = 1000000ll * 3600;
+static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
@@ -58,28 +59,40 @@ void QnServerArchiveDelegate::close()
     m_opened = false;
 }
 
-void QnServerArchiveDelegate::loadPlaybackMask(qint64 time)
+void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
 {
-    if (time >= m_playbackMaskStart && time < m_playbackMaskEnd)
+    if (msTime >= m_playbackMaskStart && msTime < m_playbackMaskEnd)
         return;
 
-    qint64 loadMin = time - MOTION_LOAD_STEP;
-    qint64 loadMax = time + MOTION_LOAD_STEP;
+    qint64 loadMin = msTime - MOTION_LOAD_STEP;
+    qint64 loadMax = msTime + MOTION_LOAD_STEP;
+
     if (!m_playbackMask.isEmpty()) {
-        loadMin = qMax(loadMin, m_playbackMask.last().startTimeUSec);
-        loadMax = qMin(loadMax, m_playbackMask.first().startTimeUSec);
+        if (m_playbackMaskStart <= loadMin)
+            loadMin = m_playbackMask.last().startTimeUSec;
+        if (m_playbackMaskEnd >= loadMax)
+            loadMax = m_playbackMask.first().startTimeUSec;
+        if (loadMax - loadMin <= 0)
+            return;
     }
+
     QnTimePeriodList newMask = QnMotionHelper::instance()->mathImage(m_motionRegion, m_resource, loadMin, loadMax);
     QVector<QnTimePeriodList> periods;
     periods << m_playbackMask << newMask;
     m_playbackMask = QnTimePeriod::mergeTimePeriods(periods);
+
+    if (!m_playbackMask.isEmpty()) {
+        m_playbackMaskStart = m_playbackMask.first().startTimeUSec;
+        m_playbackMaskEnd = m_playbackMask.last().startTimeUSec + m_playbackMask.last().durationUSec;
+    }
 }
 
 qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
 {
-    loadPlaybackMask(time);
-
     qint64 timeMs = time/1000;
+
+    loadPlaybackMask(timeMs);
+
     if (timeMs >= m_lastTimePeriod.startTimeUSec && timeMs < m_lastTimePeriod.startTimeUSec + m_lastTimePeriod.durationUSec)
         return time;
 
@@ -87,25 +100,28 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
     if (itr != m_playbackMask.begin())
     {
         --itr;
-        if (itr->startTimeUSec + itr->durationUSec < time) 
+        if (itr->startTimeUSec + itr->durationUSec < timeMs) 
         {
+            m_lastTimePeriod = *itr;
+        }
+        else {
             if (!m_reverseMode)
             {
                 ++itr;
                 m_lastTimePeriod = *itr;
-                time = itr->startTimeUSec;
+                timeMs = itr->startTimeUSec;
             }
             else {
                 m_lastTimePeriod = *itr;
-                time = itr->startTimeUSec + itr->durationUSec;
+                timeMs = itr->startTimeUSec + itr->durationUSec;
             }
         }
     }
     else {
         m_lastTimePeriod = *itr;
-        time = itr->startTimeUSec;
+        timeMs = itr->startTimeUSec;
     }
-    return time*1000;
+    return timeMs*1000;
 }
 
 qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
@@ -167,6 +183,8 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
 {
+    int waitMotionCnt = 0;
+begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
     if (!data)
     {
@@ -186,14 +204,18 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
         if (data)
             data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
     }
-    if (data) {
+    if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) {
         data->timestamp +=m_currentChunk.startTime;
         if (!m_playbackMask.isEmpty())
         {
             qint64 newTime = correctTimeByMask(data->timestamp);
-            if (newTime != data->timestamp) {
+            if (newTime != data->timestamp) 
+            {
+                if (waitMotionCnt > 1)
+                    QnSleep::msleep(10);
                 seekInternal(newTime);
-                return getNextData();
+                waitMotionCnt++;
+                goto begin_label;
             }
         }
 
@@ -241,7 +263,7 @@ void QnServerArchiveDelegate::setMotionRegion(const QRegion& region)
 {
     if (region != m_motionRegion) {
         m_motionRegion = region;
-        m_playbackMaskEnd = m_playbackMaskEnd = AV_NOPTS_VALUE;
+        m_playbackMaskStart = m_playbackMaskEnd = AV_NOPTS_VALUE;
         m_playbackMask.clear();
     }
 }
