@@ -1,8 +1,7 @@
 #ifndef APPSERVERCONNECTIONIMPL_H
 #define APPSERVERCONNECTIONIMPL_H
 
-#include <QHostAddress>
-#include <QAuthenticator>
+#include <QtCore/QUrl>
 
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
@@ -34,7 +33,7 @@ public:
     QString getLastError() const;
 
 private:
-    QnAppServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QnResourceFactory& resourceFactory);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 
 private:
     QSharedPointer<AppSessionManager> m_sessionManager;
@@ -49,13 +48,8 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
-    static void initialize(const QHostAddress& host, int port, const QAuthenticator& auth);
-    static QnAppServerConnectionPtr createConnection(QnResourceFactory& resourceFactory);
-
-private:
-    static QHostAddress m_host;
-    static int m_port;
-    static QAuthenticator m_auth;
+    static void initialize(const QUrl &url);
+    static QnAppServerConnectionPtr createConnection(QnResourceFactory &resourceFactory);
 };
 
 #endif // APPSERVERCONNECTIONIMPL_H

@@ -1,5 +1,7 @@
 #include "settings.h"
 
+#include <QtCore/QSettings>
+
 #include "license.h"
 #include "utils/common/util.h"
 #include "utils/common/log.h"
@@ -205,6 +207,89 @@ void Settings::addAuxMediaRoot(const QString& root)
         return;
 
     m_data.auxMediaRoots.append(fromNativePath(root));
+}
+
+static inline Settings::ConnectionData readConnectionData(QSettings *settings)
+{
+    Settings::ConnectionData connection;
+    connection.name = settings->value(QLatin1String("name")).toString();
+    connection.url = settings->value(QLatin1String("url")).toUrl();
+    if (connection.url.scheme().isEmpty())
+        connection.url.setScheme(QLatin1String("http"));
+
+    return connection;
+}
+
+static inline void writeConnectionData(QSettings *settings, const Settings::ConnectionData &connection)
+{
+    settings->setValue(QLatin1String("name"), connection.name);
+    settings->setValue(QLatin1String("url"), connection.url);
+}
+
+Settings::ConnectionData Settings::lastUsedConnection()
+{
+    ConnectionData connection;
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("AppServerConnections"));
+    settings.beginGroup(QLatin1String("lastUsed"));
+    connection = readConnectionData(&settings);
+    settings.endGroup();
+    settings.endGroup();
+
+    return connection;
+}
+
+void Settings::setLastUsedConnection(const Settings::ConnectionData &connection)
+{
+    QSettings settings;
+    settings.beginGroup(QLatin1String("AppServerConnections"));
+    settings.beginGroup(QLatin1String("lastUsed"));
+    writeConnectionData(&settings, connection);
+    settings.endGroup();
+    settings.endGroup();
+}
+
+QList<Settings::ConnectionData> Settings::connections()
+{
+    QList<ConnectionData> connections;
+
+    QSettings settings;
+    const int size = settings.beginReadArray(QLatin1String("AppServerConnections"));
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        ConnectionData connection = readConnectionData(&settings);
+        if (connection.url.isValid())
+            connections.append(connection);
+    }
+    settings.endArray();
+
+    return connections;
+}
+
+void Settings::setConnections(const QList<Settings::ConnectionData> &connections)
+{
+    ConnectionData lastUsed = lastUsedConnection();
+
+    QSettings settings;
+    settings.beginWriteArray(QLatin1String("AppServerConnections"));
+    settings.remove(QLatin1String("")); // clear
+    int i = 0;
+    foreach (const ConnectionData &connection, connections) {
+        if (!connection.url.isValid())
+            continue;
+
+        if (connection.name.trimmed().isEmpty()) {
+            // special case: the last used connection
+            lastUsed = connection;
+        } else {
+            settings.setArrayIndex(i++);
+            writeConnectionData(&settings, connection);
+        }
+    }
+    settings.endArray();
+
+    setLastUsedConnection(lastUsed);
 }
 
 bool Settings::haveValidLicense()
