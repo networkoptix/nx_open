@@ -1,5 +1,6 @@
 #include "motion_archive.h"
 #include <QDateTime>
+#include <QDir>
 #include "utils/common/util.h"
 
 static const char version = 1;
@@ -28,7 +29,8 @@ struct IndexHeader
 
 
 QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource): 
-    m_resource(resource)
+    m_resource(resource),
+    m_lastDetailedData(new QnMetaDataV1())
 {
     m_lastDateForCurrentFile = 0;
     m_firstTime = 0;
@@ -36,7 +38,7 @@ QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource):
 
 QString QnMotionArchive::getFilePrefix(const QDateTime& datetime)
 {
-    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata") + m_resource->getMAC().toString() + QString("/") + datetime.toString("yyyy/mm/");
+    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + m_resource->getMAC().toString() + QString("/") + datetime.toString("yyyy/MM/");
 }
 
 void QnMotionArchive::fillFileNames(const QDateTime& datetime, QFile& motionFile, QFile& indexFile)
@@ -44,6 +46,9 @@ void QnMotionArchive::fillFileNames(const QDateTime& datetime, QFile& motionFile
     QString fileName = getFilePrefix(datetime);
     motionFile.setFileName(fileName+"motion_detailed_data.bin");
     indexFile.setFileName(fileName+"motion_detailed_index.bin");
+    QMutex m_fileAccessMutex;
+    QDir dir;
+    dir.mkpath(fileName);
 }
 
 inline void setBit(quint8* data, int x, int y)
@@ -167,13 +172,13 @@ void QnMotionArchive::dateBounds(const QDateTime& datetime, qint64& minDate, qin
     maxDate = nextMonth.toMSecsSinceEpoch()-1;
 }
 
-bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
+bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
 {
     qint64 timestamp = data->timestamp/1000;
     QDateTime datetime = QDateTime::fromMSecsSinceEpoch(timestamp);
     if (timestamp > m_lastDateForCurrentFile)
     {
-        
+
         dateBounds(datetime, m_firstTime, m_lastDateForCurrentFile);
 
         //QString fileName = getFilePrefix(datetime);
@@ -182,19 +187,19 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
         fillFileNames(datetime, m_detailedMotionFile, m_detailedIndexFile);
         if (!m_detailedMotionFile.open(QFile::WriteOnly | QFile::Append))
             return false;
-        
+
         if (!m_detailedIndexFile.open(QFile::WriteOnly | QFile::Append))
             return false;
 
         // truncate biggest file. So, it is error checking
-        int indexRecords = (m_detailedIndexFile.size() - MOTION_INDEX_HEADER_SIZE) / MOTION_INDEX_RECORD_SIZE;
+        int indexRecords = qMax((m_detailedIndexFile.size() - MOTION_INDEX_HEADER_SIZE) / MOTION_INDEX_RECORD_SIZE, 0ll);
         int dataRecords  = m_detailedMotionFile.size() / MOTION_DATA_RECORD_SIZE;
         if (indexRecords > dataRecords) {
             QMutexLocker lock(&m_fileAccessMutex);
             if (!m_detailedIndexFile.resize(dataRecords*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE))
                 return false;
         }
-        else {
+        else if ((indexRecords < dataRecords)) {
             QMutexLocker lock(&m_fileAccessMutex);
             if (!m_detailedMotionFile.resize(indexRecords*MOTION_DATA_RECORD_SIZE))
                 return false;
@@ -213,7 +218,27 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
     int duration = int(data->m_duration);
     m_detailedIndexFile.write((const char*) &relTime, 4);
     m_detailedIndexFile.write((const char*) &duration, 4);
-    
-    m_detailedMotionFile.write(data->data.constData(), data->data.size());
-    
+
+    m_detailedMotionFile.write(data->data.constData(), data->data.capacity());
+
+    m_detailedIndexFile.flush();
+    m_detailedMotionFile.flush();
+    return true;
+}
+
+bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
+{
+    bool rez = true;
+    if (data->timestamp - m_lastDetailedData->timestamp < DETAILED_AGGREGATE_INTERVAL*1000000ll)
+    {
+        // aggregate data
+        m_lastDetailedData->addMotion(data);
+    }
+    else {
+        // save to disk
+        m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
+        rez = saveToArchiveInternal(m_lastDetailedData);
+        m_lastDetailedData = data;
+    }
+    return rez;
 }

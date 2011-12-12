@@ -14,13 +14,16 @@ class QnMotionArchive;
 class QnMotionHelper
 {
 public:
-    QnMotionHelper();
+
+    static QnMotionHelper* instance();
+    virtual ~QnMotionHelper();
 
     // write motion data to file
     void saveToArchive(QnMetaDataV1Ptr data);
 
     QnTimePeriodList mathImage(const QRegion& region, QnResourceList resList, qint64 startTime, qint64 endTime);
 
+    QnMotionHelper();
 private:
     // create Find mask by region
     void createMask(const QRegion& region);
@@ -32,6 +35,7 @@ private:
 private:
     typedef QMap<QnNetworkResourcePtr, QnMotionArchive*> MotionWriters;
     MotionWriters m_writers;
+    QMutex m_mutex;
 };
 
 #endif // __MOTION_HELPER_H__

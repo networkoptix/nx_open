@@ -326,6 +326,8 @@ public:
 		QnResourceDiscoveryManager::instance().start();
 		//CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
 		//CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
+
+        exec();
 	}
 private:
 	int m_argc;

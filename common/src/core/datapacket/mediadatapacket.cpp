@@ -51,6 +51,26 @@ bool QnMediaContext::equalTo(QnMediaContext* other) const
 
 // ----------------------------------- QnMetaDataV1 -----------------------------------------
 
+QnMetaDataV1::QnMetaDataV1():
+    QnAbstractMediaData(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HIGHT/8)
+{
+    dataType = META_V1;
+    //useTwice = false;
+
+    flags = 0;
+    i_mask = 0x01;
+    m_input = 0;
+    m_duration = 0;
+    m_firstTimestamp = AV_NOPTS_VALUE;
+    timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+    memset(data.data(), 0, data.capacity());
+}
+
+void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
+{
+    addMotion((const quint8*) data->data.data(), data->timestamp);
+}
+
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
     if (m_firstTimestamp == AV_NOPTS_VALUE)
@@ -65,4 +85,24 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
         _mm_or_si128(*dst++, *src++);
 
     }
+}
+
+bool QnMetaDataV1::isMotionAt(int x, int y) const
+{
+    Q_ASSERT(x<MD_WIDTH);
+    Q_ASSERT(y<MD_HIGHT);
+
+    int shift = x*MD_HIGHT + y;
+    unsigned char b = *((unsigned char*)data.data() + shift/8 );
+    return b & (128 >> (shift&7));
+}
+
+void QnMetaDataV1::setMotionAt(int x, int y) 
+{
+    Q_ASSERT(x<MD_WIDTH);
+    Q_ASSERT(y<MD_HIGHT);
+
+    int shift = x*MD_HIGHT + y;
+    quint8* b = (quint8*)data.data() + shift/8;
+    *b |= (128 >> (shift&7));
 }

@@ -6,8 +6,17 @@ QnMotionHelper::QnMotionHelper()
 {
 }
 
+QnMotionHelper::~QnMotionHelper()
+{
+    QMutexLocker lock(&m_mutex);
+    foreach(QnMotionArchive* writer, m_writers.values())
+        delete writer;
+    m_writers.clear();
+}
+
 QnMotionArchive* QnMotionHelper::getArchive(QnResourcePtr res)
 {
+    QMutexLocker lock(&m_mutex);
     QnNetworkResourcePtr netres = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (!netres)
         return 0;
@@ -37,4 +46,11 @@ QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourceList
             data << archive->mathPeriod(region, startTime, endTime);
     }
     return QnTimePeriod::mergeTimePeriods(data);
+}
+
+Q_GLOBAL_STATIC(QnMotionHelper, inst);
+
+QnMotionHelper* QnMotionHelper::instance()
+{
+    return inst();
 }
