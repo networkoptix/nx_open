@@ -232,27 +232,33 @@ void initAppServerConnection(const QSettings &settings)
     QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
     QHostAddress host(hostString);
-    if (host.toIPv4Address() == 0)
+    while (host.toIPv4Address() == 0)
     {
-        for (;;)
+        QHostInfo info = QHostInfo::fromName(hostString);
+        if (info.error() != QHostInfo::NoError)
         {
-            QHostInfo info = QHostInfo::fromName(hostString);
-            if (info.error() != QHostInfo::NoError)
-            {
-                cl_log.log("Couldn't resolve", hostString, cl_logERROR);
-                QnSleep::msleep(1000);
-                return;
-            }
+            cl_log.log("Couldn't resolve", hostString, cl_logERROR);
+            QnSleep::msleep(1000);
+            continue;
+        }
 
-            foreach (QHostAddress address, info.addresses())
+        foreach (QHostAddress address, info.addresses())
+        {
+            if (address.toIPv4Address() != 0)
             {
-                if (address.toIPv4Address() != 0)
-                {
-                    host = address;
-                    break;
-                }
+                host = address;
+                break;
             }
         }
+
+        if (host.toIPv4Address() == 0)
+        {
+            cl_log.log("No ipv4 address associated with host ", hostString, cl_logERROR);
+            QnSleep::msleep(1000);
+            continue;
+        }
+
+        break;
     }
 
     QUrl appServerUrl;
