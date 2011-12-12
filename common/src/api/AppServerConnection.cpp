@@ -146,6 +146,9 @@ Q_GLOBAL_STATIC(QUrl, theAppServerConnectionFactoryDefaultUrl)
 
 void QnAppServerConnectionFactory::initialize(const QUrl &url)
 {
+    Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url has passed");
+    Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
+
     *theAppServerConnectionFactoryDefaultUrl() = url;
 }
 
@@ -153,7 +156,7 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResour
 {
     const QUrl &url = *theAppServerConnectionFactoryDefaultUrl();
 
-    cl_log.log(QLatin1String("Connection to application server ") + url.toString(), cl_logALWAYS);
+    cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
 
     return QnAppServerConnectionPtr(new QnAppServerConnection(url, resourceFactory));
 }

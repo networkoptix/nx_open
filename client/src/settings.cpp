@@ -214,8 +214,6 @@ static inline Settings::ConnectionData readConnectionData(QSettings *settings)
     Settings::ConnectionData connection;
     connection.name = settings->value(QLatin1String("name")).toString();
     connection.url = settings->value(QLatin1String("url")).toUrl();
-    if (connection.url.scheme().isEmpty())
-        connection.url.setScheme(QLatin1String("http"));
 
     return connection;
 }
