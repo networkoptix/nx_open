@@ -4,6 +4,7 @@
 #include <QUdpSocket>
 #include <QUrl>
 #include <QUuid>
+#include <QHostInfo>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -258,7 +259,32 @@ public:
 		auth.setUser(settings.value("appserverLogin", "appserver").toString());
 		auth.setPassword(settings.value("appserverPassword", "123").toString());
 
-        QnAppServerConnectionFactory::initialize(QHostAddress(hostString), port, auth);
+
+        QHostAddress host(hostString);
+        if (host.toIPv4Address() == 0)
+        {
+            for (;;)
+            {
+                QHostInfo info = QHostInfo::fromName(hostString);
+                if (info.error() != QHostInfo::NoError)
+                {
+                    cl_log.log("Couldn't resolve", hostString, cl_logERROR);
+                    QnSleep::msleep(1000);
+                    return;
+                }
+
+                foreach (QHostAddress address, info.addresses())
+                {
+                    if (address.toIPv4Address() != 0)
+                    {
+                        host = address;
+                        break;
+                    }
+                }
+            }
+        }
+
+        QnAppServerConnectionFactory::initialize(host, port, auth);
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnResourceDiscoveryManager::instance());
 

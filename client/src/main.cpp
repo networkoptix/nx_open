@@ -15,6 +15,7 @@
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
+#include "utils/common/sleep.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "core/resourcemanagment/resource_pool.h"
@@ -32,6 +33,7 @@
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
 
+#include <QHostInfo>
 #include <xercesc/util/PlatformUtils.hpp>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -151,7 +153,27 @@ void initAppServerConnection()
 	auth.setUser(settings.value("appserverLogin", "appserver").toString());
 	auth.setPassword(settings.value("appserverPassword", "123").toString());
 
-    QnAppServerConnectionFactory::initialize(QHostAddress(hostString), port, auth);
+    QHostAddress host(hostString);
+    if (host.toIPv4Address() == 0)
+    {
+        QHostInfo info = QHostInfo::fromName(hostString);
+        if (info.error() != QHostInfo::NoError)
+        {
+            cl_log.log("Couldn't resolve", hostString, cl_logERROR);
+            return;
+        }
+
+        foreach (QHostAddress address, info.addresses())
+        {
+            if (address.toIPv4Address() != 0)
+            {
+                host = address;
+                break;
+            }
+        }
+    }
+
+    QnAppServerConnectionFactory::initialize(host, port, auth);
 }
 
 #ifndef API_TEST_MAIN
