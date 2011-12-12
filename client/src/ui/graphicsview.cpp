@@ -2998,7 +2998,7 @@ void GraphicsView::toggleRecording()
 void GraphicsView::recordingSettings()
 {
     PreferencesWindow preferencesDialog(this);
-    preferencesDialog.setCurrentTab(3);
+    preferencesDialog.setCurrentTab(4);
     preferencesDialog.exec();
 }
 
