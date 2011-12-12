@@ -29,8 +29,8 @@
         <Property Id="NEWERFOUND" Secure="yes"/>
         <Property Id="ALLUSERS" Secure="yes"/>
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
-        <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
-        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(env.APPLICATION_NAME) when setup exits."  />
+<!--        <Property Id="LAUNCHAPPONEXIT" Secure="yes" /> -->
+<!--        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(env.APPLICATION_NAME) Client when setup exits."  /> -->
         
         <!-- AppServer properties-->
         <Property Id="APPSERVER_PORT" Secure="yes" Value="8000"/>
@@ -65,6 +65,10 @@
         <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="" />
         <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="" />
         
+        <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
+              Value="&quot;[#dbconfigexe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
+        <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+              Execute="deferred" Return="check" Impersonate="no" />
         
         <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
@@ -87,6 +91,8 @@
         </InstallUISequence>
         
         <InstallExecuteSequence>
+            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles">NOT Installed</Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd">NOT Installed</Custom>
             <RemoveExistingProducts Before="InstallInitialize" />
         </InstallExecuteSequence>
         
@@ -121,6 +127,7 @@
                                     <Shortcut Id="StartmenuStopAppServer" Directory="ProgramMenuAppServerDir" Name="Stop $(env.APPLICATION_NAME) Application Server"
                                               WorkingDirectory='VmsAppServerDir' Advertise="yes" Icon="icon_menu.exe" Arguments="-t"/>
                                 </File>
+                                <File Id="dbconfigexe" Name="dbconfig.exe" Source="../appserver/build/exe.win32-2.7/dbconfig.exe"/>
                                 <File Id="bz2pyd" Name="bz2.pyd" Source="../appserver/build/exe.win32-2.7/bz2.pyd"/>
                                 <File Id="cx_Freezeutilpyd" Name="cx_Freeze.util.pyd" Source="../appserver/build/exe.win32-2.7/cx_Freeze.util.pyd"/>
                                 <File Id="cx_Logging" Name="cx_Logging.pyd" Source="../appserver/build/exe.win32-2.7/cx_Logging.pyd"/>
@@ -147,6 +154,7 @@
                                 <File Id="_socketpyd" Name="_socket.pyd" Source="../appserver/build/exe.win32-2.7/_socket.pyd"/>
                                 <File Id="_sqlite3pyd" Name="_sqlite3.pyd" Source="../appserver/build/exe.win32-2.7/_sqlite3.pyd"/>
                                 <File Id="_sslpyd" Name="_ssl.pyd" Source="../appserver/build/exe.win32-2.7/_ssl.pyd"/>
+                                <File Id="win32comshellshellpyd" Name="win32com.shell.shell.pyd" Source="../appserver/build/exe.win32-2.7/win32com.shell.shell.pyd"/>
                                 
                                 <ServiceInstall Id="VmsAppServerService"
                                                 Name="VmsAppServer"
