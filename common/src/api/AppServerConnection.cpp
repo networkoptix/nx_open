@@ -1,5 +1,8 @@
 #include "AppServerConnection.h"
 
+#include <QtNetwork/QAuthenticator>
+#include <QtNetwork/QHostAddress>
+
 #include "api/parsers/parse_cameras.h"
 #include "api/parsers/parse_layouts.h"
 #include "api/parsers/parse_users.h"
@@ -10,10 +13,14 @@
 #include "api/Types.h"
 #include "api/AppSessionManager.h"
 
-QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QnResourceFactory& resourceFactory)
-    :m_sessionManager(new AppSessionManager(host, port, auth)),
-      m_resourceFactory(resourceFactory)
+QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory)
+    : m_resourceFactory(resourceFactory)
 {
+    QAuthenticator auth;
+    auth.setUser(url.userName());
+    auth.setPassword(url.password());
+
+    m_sessionManager = QSharedPointer<AppSessionManager>(new AppSessionManager(QHostAddress(url.host()), url.port(), auth));
 }
 
 bool QnAppServerConnection::isConnected() const
@@ -134,20 +141,22 @@ QString QnAppServerConnection::getLastError() const
     return m_sessionManager->getLastError();
 }
 
-QHostAddress QnAppServerConnectionFactory::m_host;
-int QnAppServerConnectionFactory::m_port;
-QAuthenticator QnAppServerConnectionFactory::m_auth;
 
-void QnAppServerConnectionFactory::initialize(const QHostAddress& host, int port, const QAuthenticator& auth)
+Q_GLOBAL_STATIC(QUrl, theAppServerConnectionFactoryDefaultUrl)
+
+void QnAppServerConnectionFactory::initialize(const QUrl &url)
 {
-    m_host = host;
-    m_port = port;
-    m_auth = auth;
+    Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url has passed");
+    Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
+
+    *theAppServerConnectionFactoryDefaultUrl() = url;
 }
 
-QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory& resourceFactory)
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory &resourceFactory)
 {
-    cl_log.log(QString("Connection to application server http://%1:%2").arg(m_host.toString()).arg(m_port), cl_logALWAYS);
+    const QUrl &url = *theAppServerConnectionFactoryDefaultUrl();
 
-    return QnAppServerConnectionPtr(new QnAppServerConnection(m_host, m_port, m_auth, resourceFactory));
+    cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
+
+    return QnAppServerConnectionPtr(new QnAppServerConnection(url, resourceFactory));
 }

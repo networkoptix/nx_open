@@ -141,17 +141,26 @@ void addTestData()
 
 void initAppServerConnection()
 {
-    // Use user scope
+    QUrl appServerUrl;
+
+    // ### remove
     QSettings settings;
+    appServerUrl.setScheme(QLatin1String("http"));
+    appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+    appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
+    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+    { // ### uncomment to convert/save it
+//        Settings::ConnectionData connection;
+//        connection.url = appServerUrl;
+//        Settings::setLastUsedConnection(connection);
+    } // ###
 
-	QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-    int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+    const Settings::ConnectionData connection = Settings::lastUsedConnection();
+    if (connection.url.isValid())
+        appServerUrl = connection.url;
 
-	QAuthenticator auth;
-	auth.setUser(settings.value("appserverLogin", "appserver").toString());
-	auth.setPassword(settings.value("appserverPassword", "123").toString());
-
-    QnAppServerConnectionFactory::initialize(QHostAddress(hostString), port, auth);
+    QnAppServerConnectionFactory::initialize(appServerUrl);
 }
 
 #ifndef API_TEST_MAIN

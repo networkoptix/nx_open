@@ -1,9 +1,10 @@
-#include <QCoreApplication>
-#include <QDir>
-#include <QSettings>
-#include <QUdpSocket>
-#include <QUrl>
-#include <QUuid>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
+#include <QtCore/QSettings>
+#include <QtCore/QUrl>
+#include <QtCore/QUuid>
+
+#include <QtNetwork/QUdpSocket>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -17,7 +18,6 @@
 #include "recording/storage_manager.h"
 #include "api/AppServerConnection.h"
 #include "appserver/processor.h"
-#include <QAuthenticator>
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
@@ -146,9 +146,9 @@ void stopServer(int signal)
     QnRecordingManager::instance()->stop();
 }
 
-#ifdef WIN32
+#ifdef Q_OS_WIN
 #include <windows.h>
-#include <stdio.h> 
+#include <stdio.h>
 BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 {
     stopServer(dwCtrlType);
@@ -158,11 +158,14 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 
 int serverMain(int argc, char *argv[])
 {
-    xercesc::XMLPlatformUtils::Initialize ();
+    Q_UNUSED(argc)
+    Q_UNUSED(argv)
 
-#ifdef WIN32
+    xercesc::XMLPlatformUtils::Initialize();
+
+#ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
-#endif    
+#endif
     signal(SIGINT, stopServer);
     signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
@@ -215,24 +218,43 @@ int serverMain(int argc, char *argv[])
     addTestData();
 #endif
 
-	QDir stateDirectory;
-	stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-	QnFileDeletor fileDeletor(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+    QDir stateDirectory;
+    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
+    QnFileDeletor fileDeletor(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
-	return 0;
+    return 0;
+}
+
+void initAppServerConnection(const QSettings &settings)
+{
+    QUrl appServerUrl;
+
+    // ### remove
+    appServerUrl.setScheme(QLatin1String("http"));
+    appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+    appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
+    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+    // ###
+
+    /*const Settings::ConnectionData connection = Settings::lastUsedConnection();
+    if (connection.url.isValid())
+        appServerUrl = connection.url;*/
+
+    QnAppServerConnectionFactory::initialize(appServerUrl);
 }
 
 class QnMain : public QThread
 {
 public:
-	QnMain(int argc, char* argv[])
-		: m_argc(argc),
-		m_argv(argv),
-		m_processor(0),
+    QnMain(int argc, char* argv[])
+        : m_argc(argc),
+        m_argv(argv),
+        m_processor(0),
         m_rtspListener(0),
         m_restServer(0)
-	{
-	}
+    {
+    }
 
     ~QnMain()
     {
@@ -246,103 +268,96 @@ public:
             delete m_processor;
     }
 
-	void run()
-	{
+    void run()
+    {
         // Use system scope
         QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
-		QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-        int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
-
-		QAuthenticator auth;
-		auth.setUser(settings.value("appserverLogin", "appserver").toString());
-		auth.setPassword(settings.value("appserverPassword", "123").toString());
-
-        QnAppServerConnectionFactory::initialize(QHostAddress(hostString), port, auth);
+        initAppServerConnection(settings);
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnResourceDiscoveryManager::instance());
 
-		QList<QnResourceTypePtr> resourceTypeList;
+        QList<QnResourceTypePtr> resourceTypeList;
 
-		for(;;)
-		{
-			if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
-				break;
+        for(;;)
+        {
+            if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
+                break;
 
-			qDebug() << "Can't get resource types: " << appServerConnection->getLastError();
-			QnSleep::msleep(1000);
-		}
+            qDebug() << "Can't get resource types: " << appServerConnection->getLastError();
+            QnSleep::msleep(1000);
+        }
 
-		qnResTypePool->addResourceTypeList(resourceTypeList);
+        qnResTypePool->addResourceTypeList(resourceTypeList);
 
-		QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(hostString));
+        QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(hostString));
         if (videoServer.isNull())
             return;
 
-		m_processor = new QnAppserverResourceProcessor(videoServer->getId(), QnResourceDiscoveryManager::instance());
+        m_processor = new QnAppserverResourceProcessor(videoServer->getId(), QnResourceDiscoveryManager::instance());
 
-		QUrl rtspUrl(videoServer->getUrl());
-		QUrl apiUrl(videoServer->getApiUrl());
+        QUrl rtspUrl(videoServer->getUrl());
+        QUrl apiUrl(videoServer->getApiUrl());
 
-		m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-		m_rtspListener->start();
+        m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
+        m_rtspListener->start();
 
-		m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
-		m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
-		m_restServer->registerHandler("xsd/*", new QnXsdHelperHandler());
+        m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
+        m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
+        m_restServer->registerHandler("xsd/*", new QnXsdHelperHandler());
 
-		// Get storages sample code.
-		QnResourceList storages;
-		appServerConnection->getStorages(storages);
+        // Get storages sample code.
+        QnResourceList storages;
+        appServerConnection->getStorages(storages);
 
-		bool storageAdded = false;
-		foreach (QnResourcePtr resource, storages)
-		{
-			QnStoragePtr storage = resource.dynamicCast<QnStorage>();
-			if (storage->getParentId() == videoServer->getId())
-			{
-				storageAdded = true;
-				qnResPool->addResource(storage);
-				qnStorageMan->addStorage(storage);
-			}
-		}
+        bool storageAdded = false;
+        foreach (QnResourcePtr resource, storages)
+        {
+            QnStoragePtr storage = resource.dynamicCast<QnStorage>();
+            if (storage->getParentId() == videoServer->getId())
+            {
+                storageAdded = true;
+                qnResPool->addResource(storage);
+                qnStorageMan->addStorage(storage);
+            }
+        }
 
-		if (!storageAdded)
-		{
-			cl_log.log("Creating new storage", cl_logINFO);
+        if (!storageAdded)
+        {
+            cl_log.log("Creating new storage", cl_logINFO);
 
-			QnStoragePtr storage(new QnStorage());
+            QnStoragePtr storage(new QnStorage());
             storage->setName("Initial");
-			storage->setUrl(settings.value("mediaDir", "c:/records").replace("\\", "/").toString());
-			storage->setSpaceLimit(100ll * 1000 * 1024);
+            storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
+            storage->setSpaceLimit(100ll * 1000 * 1024);
 
             appServerConnection->addStorage(*storage);
 
-			qnResPool->addResource(storage);
-			qnStorageMan->addStorage(storage);
-		}
-		qnStorageMan->loadFullFileCatalog();
+            qnResPool->addResource(storage);
+            qnStorageMan->addStorage(storage);
+        }
+        qnStorageMan->loadFullFileCatalog();
 
-		QnRecordingManager::instance()->start();
-		// ------------------------------------------
+        QnRecordingManager::instance()->start();
+        // ------------------------------------------
 
 
-		//===========================================================================
-		//IPPH264Decoder::dll.init();
+        //===========================================================================
+        //IPPH264Decoder::dll.init();
 
-		//============================
-		QnResourceDiscoveryManager::instance().addResourceProcessor(m_processor);
-		QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-		QnResourceDiscoveryManager::instance().start();
-		//CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
-		//CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-	}
+        //============================
+        QnResourceDiscoveryManager::instance().addResourceProcessor(m_processor);
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().start();
+        //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
+        //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
+    }
 
 private:
-	int m_argc;
-	char** m_argv;
+    int m_argc;
+    char** m_argv;
 
-	QnAppserverResourceProcessor* m_processor;
+    QnAppserverResourceProcessor* m_processor;
     QnRtspListener* m_rtspListener;
     QnRestServer* m_restServer;
 };
@@ -351,8 +366,8 @@ class QnVideoService : public QtService<QCoreApplication>
 {
 public:
     QnVideoService(int argc, char **argv)
-		: QtService<QCoreApplication>(argc, argv, "Network Optix VMS Media Server"),
-		m_main(argc, argv)
+        : QtService<QCoreApplication>(argc, argv, "Network Optix VMS Media Server"),
+        m_main(argc, argv)
     {
         setServiceDescription("Network Optix VMS Media Server.");
     }
@@ -370,22 +385,22 @@ protected:
             return;
         }
 
-		serverMain(app->argc(), app->argv());
-		m_main.start();
+        serverMain(app->argc(), app->argv());
+        m_main.start();
     }
 
-	void stop()
-	{
-		stopServer(0);
-		xercesc::XMLPlatformUtils::Terminate ();
-	}
+    void stop()
+    {
+        stopServer(0);
+        xercesc::XMLPlatformUtils::Terminate ();
+    }
 
 private:
-	QnMain m_main;
+    QnMain m_main;
 };
 
 int main(int argc, char* argv[])
 {
-	QnVideoService service(argc, argv);
-	return service.exec();;
+    QnVideoService service(argc, argv);
+    return service.exec();
 }

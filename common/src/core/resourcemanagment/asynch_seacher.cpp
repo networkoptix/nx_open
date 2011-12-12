@@ -8,8 +8,6 @@
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
 
-Q_GLOBAL_STATIC(QnResourceDiscoveryManager, resourceDiscoveryManager)
-
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 {
 }
@@ -21,7 +19,9 @@ QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
 
 QnResourceDiscoveryManager& QnResourceDiscoveryManager::instance()
 {
-    return *resourceDiscoveryManager();
+    static QnResourceDiscoveryManager instance;
+
+    return instance;
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)

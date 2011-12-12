@@ -3,6 +3,7 @@
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/ui_common.h"
+#include "connectionssettingswidget.h"
 #include "licensewidget.h"
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
@@ -32,7 +33,7 @@ static inline QString cameraInfoString(QnResourcePtr resource)
 
 PreferencesWindow::PreferencesWindow(QWidget *parent)
     : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
-      videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
+      connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
 {
     setupUi(this);
 
@@ -60,8 +61,12 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
     tabWidget->insertTab(6, licenseWidget, tr("License"));
 #endif
 
+    connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
+    tabWidget->insertTab(2, connectionsSettingsWidget, tr("Connections"));
+
     updateView();
     updateCameras();
+    updateStoredConnections();
 
     //connect(CLDeviceSearcher::instance(), SIGNAL(newNetworkDevices()), this, SLOT(updateCameras())); todo
 }
@@ -83,6 +88,19 @@ void PreferencesWindow::accept()
     QStringList checkLst(settings.auxMediaRoots());
     checkLst.push_back(QDir::toNativeSeparators(settings.mediaRoot()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst);
+
+    if (connectionsSettingsWidget) {
+        QList<Settings::ConnectionData> connections;
+        foreach (const ConnectionsSettingsWidget::ConnectionData &conn, connectionsSettingsWidget->connections()) {
+            Settings::ConnectionData connection;
+            connection.name = conn.name;
+            connection.url = conn.url;
+
+            if (!connection.name.isEmpty() && connection.url.isValid())
+                connections.append(connection);
+        }
+        Settings::setConnections(connections);
+    }
 
     if (videoRecorderWidget)
         videoRecorderWidget->accept();
@@ -125,6 +143,20 @@ void PreferencesWindow::updateView()
     maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
 
     downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
+}
+
+void PreferencesWindow::updateStoredConnections()
+{
+    QList<ConnectionsSettingsWidget::ConnectionData> connections;
+    foreach (const Settings::ConnectionData &conn, Settings::connections()) {
+        ConnectionsSettingsWidget::ConnectionData connection;
+        connection.name = conn.name;
+        connection.url = conn.url;
+
+        if (!connection.name.trimmed().isEmpty()) // the last used one
+            connections.append(connection);
+    }
+    connectionsSettingsWidget->setConnections(connections);
 }
 
 void PreferencesWindow::updateCameras()

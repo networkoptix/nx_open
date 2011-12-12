@@ -1,6 +1,8 @@
 #ifndef TAGSEDITDIALOG_H
 #define TAGSEDITDIALOG_H
 
+#include <QtCore/QStringList>
+
 #include <QtGui/QDialog>
 
 class QSortFilterProxyModel;
@@ -23,9 +25,9 @@ public Q_SLOTS:
     virtual void reset();
 
 protected:
-    void changeEvent(QEvent *e);
-    void keyPressEvent(QKeyEvent *e);
-    void showEvent(QShowEvent *e);
+    void changeEvent(QEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void showEvent(QShowEvent *event);
 
     void retranslateUi();
 
@@ -43,7 +45,7 @@ private:
 private:
     Q_DISABLE_COPY(TagsEditDialog)
 
-    Ui::TagsEditDialog *ui;
+    QScopedPointer<Ui::TagsEditDialog> ui;
 
     QStringList m_objectIds;
 

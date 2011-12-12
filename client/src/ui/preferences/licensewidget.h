@@ -20,7 +20,7 @@ public:
     ~LicenseWidget();
 
 protected:
-    void changeEvent(QEvent *e);
+    void changeEvent(QEvent *event);
 
 private Q_SLOTS:
     void setOnlineActivation(bool online);
@@ -41,7 +41,7 @@ private:
 private:
     Q_DISABLE_COPY(LicenseWidget)
 
-    Ui::LicenseWidget *ui;
+    QScopedPointer<Ui::LicenseWidget> ui;
 
     QNetworkAccessManager *m_httpClient;
 };

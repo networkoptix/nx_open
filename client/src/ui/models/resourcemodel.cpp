@@ -1,24 +1,20 @@
 #include "resourcemodel.h"
 
 #include "core/resourcemanagment/resource_pool.h"
+
 #include "ui/skin.h"
 
 ResourceModel::ResourceModel(QObject *parent)
     : QStandardItemModel(parent)
 {
-    foreach (QnResourcePtr server, qnResPool->getResourcesWithFlag(QnResource::server))
-    {
-        const uint serverId = server->getId().hash();
-
+    foreach (QnResourcePtr server, qnResPool->getResourcesWithFlag(QnResource::server)) {
         QStandardItem *root = new QStandardItem(QIcon(), server->getName());
-        root->setData(serverId, Qt::UserRole + 1);
+        root->setData(server->getId().hash(), Qt::UserRole + 1);
         root->setData(server->toSearchString(), Qt::UserRole + 2);
         root->setEditable(false);
         root->setSelectable(false);
-        foreach (QnResourcePtr resource, qnResPool->getResources())
-        {
-            if (resource->getParentId().hash() == serverId && !resource->checkFlag(QnResource::server))
-            {
+        foreach (QnResourcePtr resource, qnResPool->getResourcesWithParentId(server->getId())) {
+            if (!resource->checkFlag(QnResource::server)) {
                 QStandardItem *child = new QStandardItem(QIcon(), resource->getName());
                 child->setData(resource->getId().hash(), Qt::UserRole + 1);
                 child->setData(resource->toSearchString(), Qt::UserRole + 2);
@@ -40,7 +36,7 @@ ResourceModel::~ResourceModel()
 
 QStandardItem *ResourceModel::itemFromResourceId(uint id) const
 {
-    QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
+    const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
     return !indexList.isEmpty() ? itemFromIndex(indexList.first()) : 0;
 }
 

@@ -31,10 +31,15 @@ QnResourceList QnAppServerResourceSearcher::findResources()
 
 QnResourcePtr QnAppServerResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
 {
-    return QnResourcePtr();
+    Q_UNUSED(resourceTypeId)
+    Q_UNUSED(parameters)
+
+    return QnResourcePtr(0);
 }
 
 bool QnAppServerResourceSearcher::isResourceTypeSupported(const QnId& resourceTypeId) const
 {
+    Q_UNUSED(resourceTypeId)
+
     return true;
 }
