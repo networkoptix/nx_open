@@ -22,6 +22,7 @@ public:
     void saveToArchive(QnMetaDataV1Ptr data);
 
     QnTimePeriodList mathImage(const QRegion& region, QnResourceList resList, qint64 startTime, qint64 endTime);
+    QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 startTime, qint64 endTime);
 
     QnMotionHelper();
 private:

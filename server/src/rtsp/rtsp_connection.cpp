@@ -3,6 +3,7 @@
 #include <QHttpRequestHeader>
 #include <qDebug>
 #include <QRegion>
+#include <QBuffer>
 
 #include "libavutil/avutil.h"
 #include "libavcodec/avcodec.h"
@@ -389,16 +390,17 @@ int QnRtspConnectionProcessor::composePlay()
         if (serverArchive) 
         {
             QnTimePeriodList motionPeriods;
+            QRegion region;
             if (!d->requestHeaders.value("x-motion-region").isNull())
             {
-                QString str = d->requestHeaders.value("x-motion-region");
-                QTextStream text(&str);
-                QDataStream stream(text.device());
-                QRegion region;
+                QBuffer buffer;
+                buffer.open(QIODevice::ReadWrite);
+                QDataStream stream(&buffer);
+                stream << QByteArray::fromBase64(d->requestHeaders.value("x-motion-region").toUtf8());
+                buffer.seek(0);
                 stream >> region;
-                //motionPeriods = QnMotionHelper::instance()->mathImage(region);
             }
-            serverArchive->setPlaybackMask(motionPeriods);
+            serverArchive->setMotionRegion(region);
         }
 
         if (!d->requestHeaders.value("Range").isNull())

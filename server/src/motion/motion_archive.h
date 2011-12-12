@@ -18,8 +18,9 @@ public:
     QnMotionArchive(QnNetworkResourcePtr resource);
     bool saveToArchive(QnMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime);
+
+    static void createMask(const QRegion& region,  __m128i* mask, int& maskStart, int& maskEnd);
 private:
-    void createMask(const QRegion& region,  __m128i* mask, int& maskStart, int& maskEnd);
     QString getFilePrefix(const QDateTime& datetime);
     void dateBounds(const QDateTime& datetime, qint64& minDate, qint64& maxDate);
     bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);

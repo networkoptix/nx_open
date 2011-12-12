@@ -36,6 +36,15 @@ void QnMotionHelper::saveToArchive(QnMetaDataV1Ptr data)
 
 }
 
+QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourcePtr res, qint64 startTime, qint64 endTime)
+{
+    QnTimePeriodList rez;
+    QnMotionArchive* archive = getArchive(res);
+    if (archive) 
+        rez =  archive->mathPeriod(region, startTime, endTime);
+    return rez;
+}
+
 QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourceList resList, qint64 startTime, qint64 endTime)
 {
     QVector<QnTimePeriodList> data;

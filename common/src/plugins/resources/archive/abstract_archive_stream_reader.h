@@ -16,6 +16,9 @@ public:
     virtual void setSingleShotMode(bool single) = 0;
 
     virtual bool isMediaPaused() const = 0;
+
+    // playback filter by motion detection mask
+    virtual bool setMotionRegion(const QRegion& region) = 0;
 };
 
 class QnAbstractArchiveReader : public QnClientPullMediaStreamProvider, public QnAbstractNavigator

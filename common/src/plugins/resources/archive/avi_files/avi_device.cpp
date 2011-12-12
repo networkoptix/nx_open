@@ -37,12 +37,6 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 
-#ifdef RTSP_SERVER_TEST
-    if (role == QnResource::Role_Default && !checkFlag(local)){
-        result->setArchiveDelegate(new QnRtspClientArchiveDelegate());
-        return result;
-    }
-#endif
     result->setArchiveDelegate(new QnAviArchiveDelegate());
     return result;
 }

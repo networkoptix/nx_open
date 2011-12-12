@@ -135,6 +135,10 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true;
 
+    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+    if (metadata)
+        return true;
+
     if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
     {
         m_dataQueue.clear();

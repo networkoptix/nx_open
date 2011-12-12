@@ -12,7 +12,7 @@
 struct AVFormatContext;
 class CLCustomDeviceVideoLayout;
 
-class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
+class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate, public QnAbstractFilterPlaybackDelegate
 {
 public:
     QnRtspClientArchiveDelegate();
@@ -32,6 +32,9 @@ public:
     virtual bool isRealTimeSource() const;
     virtual void beforeClose();
     virtual void setSingleshotMode(bool value);
+    
+    // QnAbstractMaskedReader
+    virtual void setMotionRegion(const QRegion& region);
 protected:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);

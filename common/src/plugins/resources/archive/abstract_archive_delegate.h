@@ -1,6 +1,7 @@
 #ifndef __ABSTRACT_ARCHIVE_DELEGATE_H
 #define __ABSTRACT_ARCHIVE_DELEGATE_H
 
+#include <QRegion>
 #include <QObject>
 #include <QVector>
 #include "core/resource/resource.h"
@@ -8,6 +9,12 @@
 
 class QnVideoResourceLayout;
 class QnResourceAudioLayout;
+
+class QnAbstractFilterPlaybackDelegate
+{
+    public:
+        virtual void setMotionRegion(const QRegion& region) = 0;
+};
 
 class QnAbstractArchiveDelegate: public QObject
 {
