@@ -150,7 +150,11 @@ void initAppServerConnection()
     appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
-    // ###
+    { // ### uncomment to convert/save it
+//        Settings::ConnectionData connection;
+//        connection.url = appServerUrl;
+//        Settings::setLastUsedConnection(connection);
+    } // ###
 
     const Settings::ConnectionData connection = Settings::lastUsedConnection();
     if (connection.url.isValid())
