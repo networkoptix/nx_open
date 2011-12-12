@@ -20,6 +20,8 @@ LicenseWidget::LicenseWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->serialKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
+
     connect(ui->licenseGoupBox, SIGNAL(toggled(bool)), this, SLOT(setOnlineActivation(bool)));
     connect(ui->browseLicenseFileButton, SIGNAL(clicked()), this, SLOT(browseLicenseFileButtonClicked()));
     connect(ui->licenseDetailsButton, SIGNAL(clicked()), this, SLOT(licenseDetailsButtonClicked()));
@@ -34,16 +36,16 @@ LicenseWidget::LicenseWidget(QWidget *parent) :
 
 LicenseWidget::~LicenseWidget()
 {
-    delete ui;
 }
 
-void LicenseWidget::changeEvent(QEvent *e)
+void LicenseWidget::changeEvent(QEvent *event)
 {
-    QWidget::changeEvent(e);
+    QWidget::changeEvent(event);
 
-    switch (e->type()) {
+    switch (event->type()) {
     case QEvent::LanguageChange:
         ui->retranslateUi(this);
+        //retranslateUi();
         break;
     default:
         break;
@@ -78,8 +80,7 @@ void LicenseWidget::browseLicenseFileButtonClicked()
     dialog.setNameFilters(QStringList() << tr("All files (*.*)"));
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     dialog.setFileMode(QFileDialog::ExistingFile);
-    if (dialog.exec() && !dialog.selectedFiles().isEmpty())
-    {
+    if (dialog.exec() && !dialog.selectedFiles().isEmpty()) {
         QFile file(dialog.selectedFiles().first());
         if (file.open(QIODevice::ReadOnly | QIODevice::Text))
             ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(file.readAll()));
@@ -139,8 +140,7 @@ void LicenseWidget::updateFromServer(const QString &serialKey, const QString &ha
 
 void LicenseWidget::downloadError()
 {
-    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
-    {
+    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
         disconnect(reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
 
         ui->licenseGoupBox->setChecked(false);
@@ -154,8 +154,7 @@ void LicenseWidget::downloadError()
 
 void LicenseWidget::downloadFinished()
 {
-    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
-    {
+    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
         validateLicense(QnLicense::fromString(reply->readAll()));
 
         reply->deleteLater();
@@ -164,8 +163,7 @@ void LicenseWidget::downloadFinished()
 
 void LicenseWidget::updateControls(const QnLicense &license)
 {
-    if (QnLicense::defaultLicense().isValid())
-    {
+    if (QnLicense::defaultLicense().isValid()) {
         QPalette palette = ui->infoLabel->palette();
         palette.setColor(QPalette::Foreground, parentWidget() ? parentWidget()->palette().color(QPalette::Foreground) : Qt::black);
         ui->infoLabel->setPalette(palette);
@@ -173,9 +171,7 @@ void LicenseWidget::updateControls(const QnLicense &license)
         ui->infoLabel->setText(tr("You have a valid License installed"));
 
         ui->licenseDetailsButton->setEnabled(true);
-    }
-    else
-    {
+    } else {
         QPalette palette = ui->infoLabel->palette();
         palette.setColor(QPalette::Foreground, Qt::red);
         ui->infoLabel->setPalette(palette);
@@ -183,8 +179,7 @@ void LicenseWidget::updateControls(const QnLicense &license)
         ui->infoLabel->setText(tr("You do not have a valid License installed"));
     }
 
-    if (license.isValid())
-    {
+    if (license.isValid()) {
         ui->serialKeyEdit->setText(license.serialKey());
         ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(license.toString()));
 
@@ -197,26 +192,20 @@ void LicenseWidget::updateControls(const QnLicense &license)
 
 void LicenseWidget::validateLicense(const QnLicense &license)
 {
-    if (license.isValid())
-    {
+    if (license.isValid()) {
         QnLicense::setDefaultLicense(license);
 
         updateControls(license);
 
         QMessageBox::information(this, tr("License Activation"),
                                  tr("License was succesfully activated."));
-    }
-    else if (QnLicense::defaultLicense().isValid())
-    {
+    } else if (QnLicense::defaultLicense().isValid()) {
         if (QMessageBox::question(this, tr("License Activation"),
                                   tr("License was not activated but you have a valid License already installed.\nWould you like to try again."),
-                                  QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Cancel)
-        {
+                                  QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Cancel) {
             updateControls(QnLicense::defaultLicense());
         }
-    }
-    else
-    {
+    } else {
         QMessageBox::warning(this, tr("License Activation"),
                              tr("Invalid License. Contact our support team to get a valid License."));
     }
