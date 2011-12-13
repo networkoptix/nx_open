@@ -5,12 +5,16 @@
 #include <QScopedPointer>
 #include <QVariant>
 #include "abstract_animator.h"
+#include "setter.h"
+#include "getter.h"
+#include "converter.h"
 
 class MagnitudeCalculator;
 class LinearCombinator;
 
 class QnAbstractSetter;
 class QnAbstractGetter;
+class QnAbstractConverter;
 
 class QnVariantAnimator: public QnAbstractAnimator {
     Q_OBJECT;
@@ -39,6 +43,12 @@ public:
     }
 
     void setSetter(QnAbstractSetter *setter);
+
+    QnAbstractConverter *converter() const {
+        return m_converter.data();
+    }
+
+    void setConverter(QnAbstractConverter *converter);
 
     QObject *targetObject() const {
         return m_target;
@@ -90,6 +100,7 @@ private:
 private:
     QScopedPointer<QnAbstractGetter> m_getter;
     QScopedPointer<QnAbstractSetter> m_setter;
+    QScopedPointer<QnAbstractConverter> m_converter;
     int m_type;
     QVariant m_startValue;
     QVariant m_targetValue;

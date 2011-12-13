@@ -136,7 +136,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     (new QAnimationTimer(this))->addListener(this);
 
     /* Create curtain animator. */
-    m_curtainAnimator = new QnCurtainAnimator(1000, this);
+    m_curtainAnimator = new QnCurtainAnimator(1000, animationInstrument->animationTimer(), this);
     connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(at_curtained()));
     connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
 
@@ -242,6 +242,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), CURTAIN_LAYER);
+    m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Init workbench. */
