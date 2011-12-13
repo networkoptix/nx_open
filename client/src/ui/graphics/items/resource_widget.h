@@ -2,6 +2,7 @@
 #define QN_RESOURCE_WIDGET_H
 
 #include <QWeakPointer>
+#include <QVector>
 #include <camera/render_status.h>
 #include <ui/widgets2/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
@@ -213,13 +214,25 @@ private:
     QRectF channelRect(int channel) const;
 
     enum OverlayIcon {
+        NO_ICON,
         PAUSED,
         LOADING
     };
 
-    void drawOverlayIcon(OverlayIcon icon, QColor fillColor, qreal data, const QRectF &rect);
+    struct OverlayState {
+        OverlayState(): icon(NO_ICON), changeTimeMSec(0), fadeInNeeded(false) {}
+
+        OverlayIcon icon;
+        qint64 changeTimeMSec;
+        bool fadeInNeeded;
+    };
+
+    void setOverlayIcon(int channel, OverlayIcon icon);
+
+    void drawOverlayIcon(int channel, const QRectF &rect);
 
     void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
+
 private:
     /** Layout item. */
     QnWorkbenchItem *m_item;
@@ -269,8 +282,8 @@ private:
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;
 
-    /** Time when the current overlay icon has appeared. */
-    //qint64 m_overlayDisplayTimeMSec;
+    /** Current per-channel overlay state. */
+    QVector<OverlayState> m_overlayState;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

@@ -94,6 +94,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
+    /* Set up overlay icons. */
+    m_overlayState.resize(m_channelCount);
+
     m_display->start();
 }
 
@@ -353,17 +356,24 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         if(status == QnRenderStatus::RENDERED_NEW_FRAME || m_display->isPaused())
             m_lastNewFrameTimeMSec = currentTimeMSec;
 
-        /* Draw overlay icon if needed. */
+        /* Set overlay icon. */
         if(m_display->isPaused() && m_activityDecorationsVisible) {
-            drawOverlayIcon(PAUSED, QColor(0, 0, 0, 128), 0.0, rect);
+            setOverlayIcon(i, PAUSED);
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec)) {
-            drawOverlayIcon(
-                LOADING,
-                QColor(0, 0, 0, status == QnRenderStatus::RENDERED_OLD_FRAME ? 128 : 255),
-                static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
-                rect
-            );
+            setOverlayIcon(i, LOADING);
+
+            /* Draw black rectangle if there is nothing to draw. */
+            if(status != QnRenderStatus::RENDERED_OLD_FRAME) {
+                glBegin(GL_QUADS);
+                glColor4f(0.0, 0.0, 0.0, 1.0);
+                glVertices(rect);
+                glEnd();
+            }
+        } else {
+            setOverlayIcon(i, NO_ICON);
         }
+
+        drawOverlayIcon(i, rect);
     }
     painter->endNativePainting();
     for(int i = 0; i < m_channelCount; i++) {
@@ -373,17 +383,32 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 }
 
-void QnResourceWidget::drawOverlayIcon(OverlayIcon icon, QColor fillColor, qreal data, const QRectF &rect) {
+void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
+    OverlayState &state = m_overlayState[channel];
+    if(state.icon == icon)
+        return;
+
+    state.fadeInNeeded = state.icon == NO_ICON;
+    state.changeTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    state.icon = icon;
+}
+
+void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
+    OverlayState &state = m_overlayState[channel];
+    if(state.icon == NO_ICON)
+        return;
+
+    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    qreal fadeMultiplier = state.fadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.changeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0;
+
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    if(fillColor.alpha() != 0) {
-        glColor(fillColor);
-        glBegin(GL_QUADS);
-        glVertices(rect);
-        glEnd();
-    }
+    glColor4f(0.0, 0.0, 0.0, 0.5 * fadeMultiplier);
+    glBegin(GL_QUADS);
+    glVertices(rect);
+    glEnd();
 
     QRectF iconRect = expanded(
         1.0, 
@@ -397,12 +422,15 @@ void QnResourceWidget::drawOverlayIcon(OverlayIcon icon, QColor fillColor, qreal
     glPushMatrix();
     glTranslatef(iconRect.center().x(), iconRect.center().y(), 1.0);
     glScalef(iconRect.width() / 2, iconRect.height() / 2, 1.0);
-    switch(icon) {
+    switch(state.icon) {
     case LOADING: 
-        progressPainter()->paint(data);
+        progressPainter()->paint(
+            static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec, 
+            fadeMultiplier
+        );
         break;
     case PAUSED:
-        pausedPainter()->paint(0.5);
+        pausedPainter()->paint(0.5 * fadeMultiplier);
         break;
     default:
         break;

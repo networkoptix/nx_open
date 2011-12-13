@@ -14,6 +14,23 @@ namespace {
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
     m_sectorCount(sectorCount)
 {
+    /* Create shader. */
+    m_program = new QGLShaderProgram();
+    m_program->addShaderFromSourceCode(QGLShader::Vertex, "                       \
+        void main() {                                                           \
+            gl_FrontColor = gl_Color;                                           \
+            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;             \
+        }                                                                       \
+    ");
+    m_program->addShaderFromSourceCode(QGLShader::Fragment, "                     \
+        uniform vec4 colorMultiplier;                                           \
+        void main() {                                                           \
+            gl_FragColor = gl_Color * colorMultiplier;                          \
+        }                                                                       \
+    ");
+    m_program->link();
+    m_colorMultiplierLocation = m_program->uniformLocation("colorMultiplier");
+
     /* Create display list. */
     m_list = glGenLists(1);
 
@@ -43,12 +60,15 @@ QnLoadingProgressPainter::~QnLoadingProgressPainter() {
 }
 
 void QnLoadingProgressPainter::paint() {
-    glCallList(m_list);
+    paint(0.0, 1.0);
 }
 
-void QnLoadingProgressPainter::paint(qreal progress) {
+void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     glPushMatrix();
     glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
-    paint();
+    m_program->bind();
+    m_program->setUniformValue(m_colorMultiplierLocation, QVector4D(1.0, 1.0, 1.0, opacity));
+    glCallList(m_list);
+    m_program->release();
     glPopMatrix();
 }

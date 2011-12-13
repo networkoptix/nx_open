@@ -3,6 +3,8 @@
 
 #include <QColor>
 
+class QGLShaderProgram;
+
 class QnLoadingProgressPainter {
 public:
     /**
@@ -18,11 +20,13 @@ public:
 
     void paint();
 
-    void paint(qreal progress);
+    void paint(qreal progress, qreal opacity);
 
 private:
     int m_sectorCount;
     unsigned m_list;
+    QGLShaderProgram *m_program;
+    int m_colorMultiplierLocation;
 };
 
 #endif // QN_LOADING_PROGRESS_PAINTER_H
