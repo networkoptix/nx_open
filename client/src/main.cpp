@@ -15,6 +15,7 @@
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
+#include "utils/common/sleep.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "core/resourcemanagment/resource_pool.h"
@@ -32,6 +33,7 @@
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
 
+#include <QHostInfo>
 #include <xercesc/util/PlatformUtils.hpp>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -141,12 +143,35 @@ void addTestData()
 
 void initAppServerConnection()
 {
+    QSettings settings;
+
+    QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+
+    QHostAddress host(hostString);
+    if (host.toIPv4Address() == 0)
+    {
+        QHostInfo info = QHostInfo::fromName(hostString);
+        if (info.error() != QHostInfo::NoError)
+        {
+            cl_log.log("Couldn't resolve", hostString, cl_logERROR);
+            return;
+        }
+
+        foreach (QHostAddress address, info.addresses())
+        {
+            if (address.toIPv4Address() != 0)
+            {
+                host = address;
+                break;
+            }
+        }
+    }
+
     QUrl appServerUrl;
 
     // ### remove
-    QSettings settings;
     appServerUrl.setScheme(QLatin1String("http"));
-    appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+    appServerUrl.setHost(host.toString());
     appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());

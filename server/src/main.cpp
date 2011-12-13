@@ -5,6 +5,8 @@
 #include <QtCore/QUuid>
 
 #include <QtNetwork/QUdpSocket>
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QHostInfo>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -227,19 +229,46 @@ int serverMain(int argc, char *argv[])
 
 void initAppServerConnection(const QSettings &settings)
 {
+    QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+
+    QHostAddress host(hostString);
+    while (host.toIPv4Address() == 0)
+    {
+        QHostInfo info = QHostInfo::fromName(hostString);
+        if (info.error() != QHostInfo::NoError)
+        {
+            cl_log.log("Couldn't resolve", hostString, cl_logERROR);
+            QnSleep::msleep(1000);
+            continue;
+        }
+
+        foreach (QHostAddress address, info.addresses())
+        {
+            if (address.toIPv4Address() != 0)
+            {
+                host = address;
+                break;
+            }
+        }
+
+        if (host.toIPv4Address() == 0)
+        {
+            cl_log.log("No ipv4 address associated with host ", hostString, cl_logERROR);
+            QnSleep::msleep(1000);
+            continue;
+        }
+
+        break;
+    }
+
     QUrl appServerUrl;
 
     // ### remove
     appServerUrl.setScheme(QLatin1String("http"));
-    appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+    appServerUrl.setHost(host.toString());
     appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
-    // ###
-
-    /*const Settings::ConnectionData connection = Settings::lastUsedConnection();
-    if (connection.url.isValid())
-        appServerUrl = connection.url;*/
 
     QnAppServerConnectionFactory::initialize(appServerUrl);
 }
@@ -289,6 +318,8 @@ public:
         }
 
         qnResTypePool->addResourceTypeList(resourceTypeList);
+
+        QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
         QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(hostString));
         if (videoServer.isNull())

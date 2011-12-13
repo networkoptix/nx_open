@@ -7,7 +7,8 @@
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
-m_qulity(QnQualityLowest)
+m_qulity(QnQualityLowest),
+m_fps(MAX_LIVE_FPS)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
@@ -37,6 +38,26 @@ QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 {
 	QMutexLocker mtx(&m_mutex);
 	return m_qulity;
+}
+
+// for live providers only 
+void QnAbstractMediaStreamDataProvider::setFps(float f)
+{
+    QMutexLocker mtx(&m_mutex);
+    m_fps = f;
+    updateStreamParamsBasedOnFps();
+}
+
+float QnAbstractMediaStreamDataProvider::getFps() const
+{
+    QMutexLocker mtx(&m_mutex);
+    return m_fps;
+}
+
+bool QnAbstractMediaStreamDataProvider::isMaxFps() const
+{
+    QMutexLocker mtx(&m_mutex);
+    return abs( m_fps - MAX_LIVE_FPS)< .1;
 }
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()

@@ -73,10 +73,14 @@ protected slots:
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
     void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
-    void at_scene_clicked(QGraphicsView *view);
-    void at_scene_doubleClicked(QGraphicsView *view);
+    void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
+    void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
+    void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
+    void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
     void at_viewportGrabbed();
     void at_viewportUngrabbed();

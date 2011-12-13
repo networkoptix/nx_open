@@ -12,7 +12,7 @@ public:
     QnResourceConsumer(QnResourcePtr resource);
     virtual ~QnResourceConsumer();
 
-    QnResourcePtr getResource() const;
+    const QnResourcePtr &getResource() const;
 
     bool isConnectedToTheResource() const;
 
