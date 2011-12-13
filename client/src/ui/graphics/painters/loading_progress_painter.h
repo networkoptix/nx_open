@@ -2,6 +2,7 @@
 #define QN_LOADING_PROGRESS_PAINTER_H
 
 #include <QColor>
+#include <QScopedPointer>
 
 class QGLShaderProgram;
 
@@ -25,7 +26,7 @@ public:
 private:
     int m_sectorCount;
     unsigned m_list;
-    QGLShaderProgram *m_program;
+    QScopedPointer<QGLShaderProgram> m_program;
     int m_colorMultiplierLocation;
 };
 

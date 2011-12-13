@@ -15,14 +15,14 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
     m_sectorCount(sectorCount)
 {
     /* Create shader. */
-    m_program = new QGLShaderProgram();
-    m_program->addShaderFromSourceCode(QGLShader::Vertex, "                       \
+    m_program.reset(new QGLShaderProgram());
+    m_program->addShaderFromSourceCode(QGLShader::Vertex, "                     \
         void main() {                                                           \
             gl_FrontColor = gl_Color;                                           \
             gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;             \
         }                                                                       \
     ");
-    m_program->addShaderFromSourceCode(QGLShader::Fragment, "                     \
+    m_program->addShaderFromSourceCode(QGLShader::Fragment, "                   \
         uniform vec4 colorMultiplier;                                           \
         void main() {                                                           \
             gl_FragColor = gl_Color * colorMultiplier;                          \
