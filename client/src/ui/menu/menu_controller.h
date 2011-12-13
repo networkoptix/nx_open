@@ -6,6 +6,10 @@
 
 class QAction;
 
+namespace detail {
+    class ActionFactory;
+}
+
 class QnMenuController: public QObject {
     Q_OBJECT;
 public:
@@ -83,6 +87,8 @@ public:
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
 
 protected:
+    friend class detail::ActionFactory;
+
     struct ActionData {
         ActionId id;
         ActionFlags flags;
