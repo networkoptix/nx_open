@@ -20,6 +20,8 @@ protected:
 
 private:
 	void run(); // in a loop: takes images from camera and put into queue
+
+    CLAdaptiveSleep m_fpsSleep;
     
 };
 

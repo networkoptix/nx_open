@@ -9,6 +9,8 @@
 class QnVideoResourceLayout;
 class QnResourceAudioLayout;
 
+#define MAX_LIVE_FPS 10000000.0
+
 class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
 {
 public:
@@ -25,6 +27,12 @@ public:
 	virtual void setQuality(QnStreamQuality q);
 	QnStreamQuality getQuality() const;
 
+    // for live providers only 
+    virtual void setFps(float f);
+    float getFps() const;
+    bool isMaxFps() const;
+
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 
@@ -38,15 +46,17 @@ protected:
     virtual bool afterGetData(QnAbstractDataPacketPtr data);
 
     virtual void updateStreamParamsBasedOnQuality(){};
+    virtual void updateStreamParamsBasedOnFps(){};
 
 protected:
     int m_channel_number;
-
 
 	QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	//int m_NumaberOfVideoChannels;
 	QnStreamQuality m_qulity;
+
+    float m_fps; // used only for live providers 
 
     int mFramesLost;
     QnMediaResourcePtr m_mediaResource;
