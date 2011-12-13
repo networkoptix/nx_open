@@ -1,9 +1,14 @@
 #include "utils/common/sleep.h"
 #include "cpull_media_stream_provider.h"
 
+namespace {
+
+}
+
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
-QnAbstractMediaStreamDataProvider(dev)
+    QnAbstractMediaStreamDataProvider(dev),
+    m_fpsSleep(0)
 {
 }
 

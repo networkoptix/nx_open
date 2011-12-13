@@ -10,74 +10,83 @@ const int MAX_VALID_SLEEP_TIME = 5000000;
 class CLAdaptiveSleep
 {
 public:
-	CLAdaptiveSleep(int max_overdraft ):
-	  m_firstTime(true),
-	  m_max_overdraft(max_overdraft)
-	  {
+    /**
+     * Constructor.
+     * 
+     * The only parameter defines the maximal difference between expected and
+     * actual time slept, in microseconds. When this threshold is reached,
+     * timer (the 'expected' time slept) is readjusted to be in line with the
+     * actual time slept.
+     * 
+     * Pass zero to disable the adjustment.
+     * 
+     * \param maxOverdraftUSec          Maximal difference between expected and
+     *                                  actual time slept, in microseconds. 
+     */
+    CLAdaptiveSleep(int maxOverdraftUSec):
+        m_firstTime(true),
+        m_maxOverdraft(maxOverdraftUSec)
+    {};
 
-	  };
-
-      void setMaxOverdraft(int max_overdraft) 
-      {
-        m_max_overdraft = max_overdraft;
+    void setMaxOverdraft(int maxOverdraftUSec) 
+    {
+        m_maxOverdraft = maxOverdraftUSec;
         afterdelay();
-      }
+    }
 
-      int sleep(qint64 mksec, qint64 maxSleepTime = INT_MAX)
-      {
+    int sleep(qint64 usec, qint64 maxSleepTime = INT_MAX)
+    {
+        if (m_firstTime)
+        {
+            m_firstTime = false;
+            m_prevEndTime.start();
+            m_totalTime = 0;
+        }
 
-          if (m_firstTime)
-          {
-              m_firstTime = false;
-              m_prevEndTime.start();
-              m_totalTime = 0;
-          }
+        m_totalTime += usec;
 
-          m_totalTime += mksec;
+        qint64 now = (qint64)m_prevEndTime.elapsed() * 1000;
+        qint64 havetowait = m_totalTime - now;
 
-          qint64 now = (qint64)m_prevEndTime.elapsed()*1000;
-          qint64 havetowait = m_totalTime - now;
+        if (havetowait<=0)
+        {
+            if (-havetowait > m_maxOverdraft && m_maxOverdraft > 0)
+                afterdelay();
+            return havetowait;
+        }
+        //cl_log.log("sleep time=", havetowait/1000000.0, cl_logALWAYS);
+        if (havetowait < MAX_VALID_SLEEP_TIME)
+            QnSleep::msleep(qMin(havetowait / 1000, maxSleepTime / 1000));
+        else
+            afterdelay();
+        return havetowait;
+    }
 
-          if (havetowait<=0)
-          {
-              if (-havetowait > m_max_overdraft && m_max_overdraft > 0)
-                  afterdelay();
-              return havetowait;
-          }
-          //cl_log.log("sleep time=", havetowait/1000000.0, cl_logALWAYS);
-          if (havetowait < MAX_VALID_SLEEP_TIME)
-            QnSleep::msleep(qMin(havetowait/1000, maxSleepTime/1000));
-          else
-              afterdelay();
-          return havetowait;
-      }
-
-      int addQuant(qint64 mksec)
-      {
-          if (m_firstTime)
-          {
-              m_firstTime = false;
-              m_prevEndTime.start();
-              m_totalTime = 0;
-          }
-          m_totalTime += mksec;
-          qint64 now = (qint64)m_prevEndTime.elapsed()*1000;
-          qint64 havetowait = m_totalTime - now;
-          return havetowait;
-      }
+    int addQuant(qint64 usec)
+    {
+        if (m_firstTime)
+        {
+            m_firstTime = false;
+            m_prevEndTime.start();
+            m_totalTime = 0;
+        }
+        m_totalTime += usec;
+        qint64 now = (qint64) m_prevEndTime.elapsed() * 1000;
+        qint64 havetowait = m_totalTime - now;
+        return havetowait;
+    }
 
 
-	void afterdelay()
-	{
-		m_firstTime = true;
-	}
+    void afterdelay()
+    {
+        m_firstTime = true;
+    }
 
 private:
-	QTime  m_prevEndTime;
-	bool m_firstTime;
-	qint64 m_max_overdraft;
+    QTime m_prevEndTime;
+    bool m_firstTime;
+    qint64 m_maxOverdraft;
     qint64 m_totalTime;
-
 };
 
 #endif //cl_adaptive_sleep_137
