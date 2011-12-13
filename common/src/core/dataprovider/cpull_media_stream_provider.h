@@ -11,18 +11,15 @@ struct QnAbstractMediaData;
 class QnClientPullMediaStreamProvider : public QnAbstractMediaStreamDataProvider
 {
 public:
-	QnClientPullMediaStreamProvider(QnResourcePtr dev );
-	virtual ~QnClientPullMediaStreamProvider(){stop();}
+    QnClientPullMediaStreamProvider(QnResourcePtr dev);
+    virtual ~QnClientPullMediaStreamProvider() {stop();}
 
 protected:
-	
-	
 
 private:
-	void run(); // in a loop: takes images from camera and put into queue
+    void run(); // in a loop: takes images from camera and put into queue
 
     CLAdaptiveSleep m_fpsSleep;
-    
 };
 
-#endif //client_pull_stream_reader_h1226
+#endif // client_pull_stream_reader_h1226

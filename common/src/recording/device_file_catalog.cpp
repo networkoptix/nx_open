@@ -28,7 +28,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
     m_mutex(QMutex::Recursive),
     m_duplicateName(false)
 {
-    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/") + m_macAddress + QString("/title.csv");
+    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + m_macAddress + QString("/title.csv");
     m_file.setFileName(devTitleFile);
     QDir dir;
     dir.mkpath(QFileInfo(devTitleFile).absolutePath());
@@ -114,7 +114,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime)
 {
-    cl_log.log("recreate broken file", fileName, cl_logWARNING);
+    cl_log.log("recreate broken file ", fileName, cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
     QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
     if (!avi->open(res)) {

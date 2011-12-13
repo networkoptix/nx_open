@@ -96,23 +96,13 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 
+class QnMetaDataV1;
+typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 
 enum {MD_WIDTH = 44, MD_HIGHT = 32};
 struct QnMetaDataV1 : public QnAbstractMediaData
 {
-    QnMetaDataV1()
-        : QnAbstractMediaData(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HIGHT/8)
-    {
-        dataType = META_V1;
-        //useTwice = false;
-
-        flags = 0;
-        i_mask = 0x01;
-        m_input = 0;
-        m_duration = 0;
-        m_firstTimestamp = AV_NOPTS_VALUE;
-        memset(data.data(), 0, data.size());
-    }
+    QnMetaDataV1();
 
     /** 
     * Merge existing motion image with new motion image. Matrix is allowed col to col 
@@ -125,17 +115,12 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     * \/  \/
     */
     void addMotion(const quint8* data, qint64 timestamp);
+    void addMotion(QnMetaDataV1Ptr data);
 
     // ti check if we've got motion at 
-    bool isMotionAt(int x, int y) const
-    {
-        Q_ASSERT(x<MD_WIDTH);
-        Q_ASSERT(y<MD_HIGHT);
+    bool isMotionAt(int x, int y) const;
 
-        int shift = y*x;
-        unsigned char b = *((unsigned char*)data.data() + shift/8 );
-        return (b >> (shift&7) ) & 0x01;
-    }
+    void setMotionAt(int x, int y);
 
     bool isInput(int index) const
     {
@@ -150,8 +135,6 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     qint64 m_firstTimestamp;
 
 };
-
-typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 
 
 class QnCodecAudioFormat: public QAudioFormat

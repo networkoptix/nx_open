@@ -2,7 +2,9 @@
 
 #include <QtCore/QList>
 
+#include <utils/common/warnings.h>
 #include "device_settings_dlg.h"
+
 
 typedef QList<CLAbstractDlgManufacture *> Manufactures;
 Q_GLOBAL_STATIC(Manufactures, manufactures)
@@ -37,6 +39,10 @@ CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr
 
 void CLDeviceSettingsDlgFactory::registerDlgManufacture(CLAbstractDlgManufacture *manufacture)
 {
-    if (manufacture)
-        manufactures()->append(manufacture);
+    if(manufacture == NULL) {
+        qnNullWarning(manufacture);
+        return;
+    }
+
+    manufactures()->append(manufacture);
 }

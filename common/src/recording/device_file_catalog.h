@@ -27,6 +27,7 @@ struct QnTimePeriod
      * -1 if duration is infinite or unknown. It may be the case if this time period 
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationUSec;
+
 };
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
 bool operator < (qint64 first, const QnTimePeriod& other);

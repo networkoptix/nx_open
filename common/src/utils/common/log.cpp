@@ -216,7 +216,7 @@ void qDebugCLLogHandler(QtMsgType type, const char *msg)
 {
 	switch (type) {
 		case QtDebugMsg:
-			cl_log.log(msg, cl_logINFO);
+            cl_log.log(QString::fromLocal8Bit(msg), cl_logINFO);
 			break;
 		case QtWarningMsg:
 			cl_log.log(msg, cl_logWARNING);

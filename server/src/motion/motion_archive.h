@@ -18,12 +18,14 @@ public:
     QnMotionArchive(QnNetworkResourcePtr resource);
     bool saveToArchive(QnMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime);
+
+    static void createMask(const QRegion& region,  __m128i* mask, int& msMaskStart, int& msMaskEnd);
 private:
-    void createMask(const QRegion& region,  __m128i* mask, int& maskStart, int& maskEnd);
     QString getFilePrefix(const QDateTime& datetime);
     void dateBounds(const QDateTime& datetime, qint64& minDate, qint64& maxDate);
     bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);
     void fillFileNames(const QDateTime& datetime, QFile& motionFile, QFile& indexFile);
+    bool saveToArchiveInternal(QnMetaDataV1Ptr data);
 private:
     QnNetworkResourcePtr m_resource;
     qint64 m_lastDateForCurrentFile;
@@ -33,6 +35,7 @@ private:
     qint64 m_firstTime;
     __m128i m_mask[MD_WIDTH * MD_HIGHT / 128];
     QMutex m_fileAccessMutex;
+    QnMetaDataV1Ptr m_lastDetailedData;
 };
 
 #endif // __MOTION_WRITER_H__

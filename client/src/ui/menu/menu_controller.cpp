@@ -44,11 +44,11 @@ QnMenuController::QnMenuController(QObject *parent):
     factory(ITEM_REMOVE,                    tr("Remove"),                       tr(""),                 TREE_SCOPE);
     factory(ITEM_BRING_TO_FRONT,            tr("Bring to front"),               tr("Alt+F"),            SCENE_SCOPE);
     factory(ITEM_SEND_TO_BACK,              tr("Send to back"),                 tr("Alt+B"),            SCENE_SCOPE);
-    factory(ITEM_PROPERTIES,                tr("Properties"),                   tr("Alt+P"),            APP_SCOPE);
+    factory(ITEM_PROPERTIES,                tr("Properties"),                   tr("Alt+P"),            GLOBAL_SCOPE);
     
-    factory(MEDIA_EDIT_TAGS,                tr("Edit tags"),                    tr(""),                 APP_SCOPE | SINGLE_TARGET);
-    factory(MEDIA_VIEW_IN_FULLSCREEN,       tr("View in full screen"),          tr(""),                 SCENE_SCOPE | SINGLE_TARGET);
-    factory(MEDIA_TOGGLE_PIN,               tr("Toggle pin"),                   tr("Alt+P"),            SCENE_SCOPE);
+    factory(MEDIA_EDIT_TAGS,                tr("Edit tags"),                    tr(""),                 GLOBAL_SCOPE | NO_MULTI_TARGET);
+    factory(MEDIA_VIEW_IN_FULLSCREEN,       tr("View in full screen"),          tr(""),                 SCENE_SCOPE | NO_MULTI_TARGET);
+    factory(MEDIA_TOGGLE_PIN,               tr("Toggle pin"),                   tr("Alt+P"),            SCENE_SCOPE); // TODO: duplicate hotkey
     factory(MEDIA_ROTATE,                   tr("Rotate..."),                    tr(""),                 SCENE_SCOPE | IS_MENU);
     factory.pushParent(MEDIA_ROTATE);
         factory(MEDIA_ROTATE_90CW,          tr("Rotate 90 degrees CW"),         tr(""),                 SCENE_SCOPE);
@@ -56,38 +56,40 @@ QnMenuController::QnMenuController(QObject *parent):
         factory(MEDIA_ROTATE_180,           tr("Rotate 180 degrees"),           tr(""),                 SCENE_SCOPE);
     factory.popParent();
     
-    factory(LOCAL_OPEN_IN_FOLDER,           tr("Open in folder"),               tr(""),                 APP_SCOPE | SINGLE_TARGET);
-    factory(LOCAL_DELETE_FROM_DISK,         tr("Delete from disk"),             tr(""),                 APP_SCOPE);
+    factory(LOCAL_OPEN_IN_FOLDER,           tr("Open in folder"),               tr(""),                 GLOBAL_SCOPE | NO_MULTI_TARGET);
+    factory(LOCAL_DELETE_FROM_DISK,         tr("Delete from disk"),             tr(""),                 GLOBAL_SCOPE);
     
-    factory(VIDEO_UPLOAD_TO_YOUTUBE,        tr("Upload to YouTube"),            tr(""),                 APP_SCOPE);
+    factory(VIDEO_UPLOAD_TO_YOUTUBE,        tr("Upload to YouTube"),            tr(""),                 GLOBAL_SCOPE);
 
-    factory(CAMERA_EXPORT_SELECTION,        tr("Export selection"),             tr(""),                 APP_SCOPE);
-    factory(CAMERA_START_STOP_RECORDING,    tr("Start/stop recording"),         tr(""),                 APP_SCOPE);
-    factory(CAMERA_TAKE_SCREENSHOT,         tr("Take screenshot"),              tr(""),                 APP_SCOPE);
+    factory(CAMERA_EXPORT_SELECTION,        tr("Export selection"),             tr(""),                 GLOBAL_SCOPE);
+    factory(CAMERA_START_STOP_RECORDING,    tr("Start/stop recording"),         tr(""),                 GLOBAL_SCOPE);
+    factory(CAMERA_TAKE_SCREENSHOT,         tr("Take screenshot"),              tr(""),                 GLOBAL_SCOPE);
     
-    factory(LAYOUT_RENAME,                  tr("Rename"),                       tr(""),                 APP_SCOPE);
-    factory(LAYOUT_ADD,                     tr("Add..."),                       tr(""),                 APP_SCOPE | IS_MENU);
+    factory(LAYOUT_RENAME,                  tr("Rename"),                       tr(""),                 TREE_SCOPE);
+    factory(LAYOUT_ADD,                     tr("Add..."),                       tr(""),                 GLOBAL_SCOPE | IS_MENU);
     factory.pushParent(LAYOUT_ADD);
-        factory(LAYOUT_ADD_FILES,           tr("Add files"),                    tr(""),                 APP_SCOPE);
-        factory(LAYOUT_ADD_FOLDER,          tr("Add folder"),                   tr(""),                 APP_SCOPE);
-        factory(LAYOUT_ADD_CAMERAS,         tr("Add cameras"),                  tr(""),                 APP_SCOPE);
+        factory(LAYOUT_ADD_FILES,           tr("Add files"),                    tr(""),                 GLOBAL_SCOPE);
+        factory(LAYOUT_ADD_FOLDER,          tr("Add folder"),                   tr(""),                 GLOBAL_SCOPE);
+        factory(LAYOUT_ADD_CAMERAS,         tr("Add cameras"),                  tr(""),                 GLOBAL_SCOPE);
     factory.popParent();
 
-    factory(SERVER_NEW_CAMERA,              tr("New camera"),                   tr(""),                 APP_SCOPE);
+    factory(SERVER_NEW_CAMERA,              tr("New camera"),                   tr(""),                 GLOBAL_SCOPE);
 
-    factory(SCENE_UNDO,                     tr("Undo"),                         tr(""),                 SCENE_SCOPE);
-    factory(SCENE_REDO,                     tr("Redo"),                         tr(""),                 SCENE_SCOPE);
-    factory(SCENE_SAVE_LAYOUT,              tr("Save layout"),                  tr(""),                 SCENE_SCOPE);
-    factory(SCENE_SAVE_LAYOUT_AS,           tr("Save layout as..."),            tr(""),                 SCENE_SCOPE);
+    factory(SCENE_UNDO,                     tr("Undo"),                         tr("Ctrl+Z"),           SCENE_SCOPE);
+    factory(SCENE_REDO,                     tr("Redo"),                         tr("Ctrl+Shift+Z"),     SCENE_SCOPE);
+    factory(SCENE_SAVE_LAYOUT,              tr("Save layout"),                  tr("Ctrl+S"),           SCENE_SCOPE);
+    factory(SCENE_SAVE_LAYOUT_AS,           tr("Save layout as..."),            tr("Ctrl+Shift+S"),     SCENE_SCOPE);
 
-    factory(APP_OPEN_FILE,                  tr("Open file"),                    tr(""),                 APP_SCOPE);
-    factory(APP_NEW_LAYOUT,                 tr("New layout"),                   tr(""),                 APP_SCOPE);
-    factory(APP_SYSTEM_SETTINGS,            tr("System settings"),              tr(""),                 APP_SCOPE);
-    factory(APP_FULLSCREEN,                 tr("Fullscreen"),                   tr(""),                 APP_SCOPE);
-    factory(APP_RECORD,                     tr("Screen recording..."),          tr(""),                 APP_SCOPE);
-    factory(APP_RECORD_START_STOP,          tr("Start/stop screen recording"),  tr(""),                 APP_SCOPE);
-    factory(APP_RECORD_SETTINGS,            tr("Screen recording settings"),    tr(""),                 APP_SCOPE);
-    factory(APP_EXIT,                       tr("Exit"),                         tr(""),                 APP_SCOPE);
+    factory(APP_OPEN_FILE,                  tr("Open file"),                    tr("Ctrl+O"),           GLOBAL_SCOPE);
+    factory(APP_NEW_LAYOUT,                 tr("New layout"),                   tr("Ctrl+L"),           GLOBAL_SCOPE);
+    factory(APP_SYSTEM_SETTINGS,            tr("System settings"),              tr("Ctrl+P"),           GLOBAL_SCOPE);
+    factory(APP_FULLSCREEN,                 tr("Fullscreen"),                   tr("Alt+Enter"),        GLOBAL_SCOPE);
+    factory(APP_RECORD,                     tr("Screen recording..."),          tr(""),                 GLOBAL_SCOPE | IS_MENU);
+    factory.pushParent(APP_RECORD);
+        factory(APP_RECORD_START_STOP,      tr("Start/stop screen recording"),  tr("Alt+R"),            GLOBAL_SCOPE);
+        factory(APP_RECORD_SETTINGS,        tr("Screen recording settings"),    tr(""),                 GLOBAL_SCOPE);
+    factory.popParent();
+    factory(APP_EXIT,                       tr("Exit"),                         tr("Alt+F4"),           GLOBAL_SCOPE);
 
     assert(m_infoByAction.size() == ACTION_COUNT);
 }

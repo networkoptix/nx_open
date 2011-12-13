@@ -75,13 +75,23 @@ public:
     };
 
     enum ActionFlag {
-        SCENE_SCOPE     = 0x0001,   /**< ActionId appears in scene menu. */
-        TREE_SCOPE      = 0x0002,   /**< ActionId appears in tree menu. */
-        SINGLE_TARGET   = 0x0010,   /**< ActionId appears only when menu is requested for a single target. */
-        IS_MENU         = 0x0020,   /**< ActionId is actually a menu with sub-actions. */
-        IS_SEPARATOR    = 0x0040,   /**< ActionId is actually a menu separator. */
+        SCENE_SCOPE         = 0x00000001,   /**< Action appears in scene menu. */
+        TREE_SCOPE          = 0x00000002,   /**< Action appears in tree menu. */
+        GLOBAL_SCOPE        = SCENE_SCOPE | TREE_SCOPE,
+        
+        IMAGE_TARGET        = 0x00000100,   /**< Action is applicable to still images. */
+        VIDEO_TARGET        = 0x00000200,   /**< Action is applicable to videos. */
+        CAMERA_TARGET       = 0x00000400,   /**< Action is applicable to cameras. */
+        SERVER_TARGET       = 0x00000800,   /**< Action is applicable to servers. */
+        LAYOUT_TARGET       = 0x00001000,   /**< Action is applicable to layouts. */
+        EMPTY_TARGET        = 0x00002000,   /**< Action is applicable even when there are no targets. */
+        MEDIA_TARGET        = VIDEO_TARGET | IMAGE_TARGET,
+        
+        NO_MULTI_TARGET     = 0x00010000,   /**< Action cannot be applied to multiple targets. */
+        NO_REMOTE_TARGET    = 0x00020000,   /**< Action cannot be applied to non-local targets. */
 
-        APP_SCOPE       = SCENE_SCOPE | TREE_SCOPE,
+        IS_MENU             = 0x01000000,   /**< Action is actually a menu with sub-actions. */
+        IS_SEPARATOR        = 0x02000000,   /**< Action is actually a menu separator. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);

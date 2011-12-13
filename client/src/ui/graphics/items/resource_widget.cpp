@@ -363,8 +363,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         }
     }
     painter->endNativePainting();
-    for(int i = 0; i < m_channelCount; i++) 
-        drawCurrentTime(painter, channelRect(i), m_renderer->lastDisplayedTime(i));
+    for(int i = 0; i < m_channelCount; i++) {
+        qint64 time = m_renderer->lastDisplayedTime(i);
+        if (time > 1000000ll * 3600*24)
+            drawCurrentTime(painter, channelRect(i), time); // do not show time for regular media files
+    }
 }
 
 void QnResourceWidget::drawOverlayIcon(OverlayIcon icon, QColor fillColor, qreal data, const QRectF &rect) {

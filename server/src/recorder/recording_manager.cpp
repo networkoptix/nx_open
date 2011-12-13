@@ -7,6 +7,7 @@
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
+#include "server_stream_recorder.h"
 
 static const int TRUNCATE_INTERVAL = 60; // seconds
 
@@ -44,7 +45,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
         QnSequrityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSequrityCamResource>(res);
         cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
         QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader();
-        QnStreamRecorder* recorder = new QnStreamRecorder(res);
+        QnStreamRecorder* recorder = new QnServerStreamRecorder(res);
         recorder->setTruncateInterval(TRUNCATE_INTERVAL);
         connect(recorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(recordingFailed(QString)));
         reader->addDataProcessor(recorder);

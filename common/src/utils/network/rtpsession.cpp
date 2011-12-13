@@ -359,6 +359,17 @@ RTPIODevice*  RTPSession::sendSetup()
     return &m_rtpIo;
 }
 
+void RTPSession::addAdditionAttrs(QByteArray& request)
+{
+    for (QMap<QByteArray, QByteArray>::const_iterator i = m_additionAttrs.begin(); i != m_additionAttrs.end(); ++i)
+    {
+        request += i.key();
+        request += ": ";
+        request += i.value();
+        request += "\r\n";
+    }
+}
+
 bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
 {
 
@@ -392,6 +403,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     }
 
     request += "Scale: " + QString::number(scale) + QString("\r\n");
+    addAdditionAttrs(request);
     
     request += "\r\n";
 
@@ -796,4 +808,14 @@ qint64 RTPSession::endTime() const
 float RTPSession::getScale() const
 {
     return m_scale;
+}
+
+void RTPSession::setAdditionAttribute(const QByteArray& name, const QByteArray& value)
+{
+    m_additionAttrs.insert(name, value);
+}
+
+void RTPSession::removeAdditionAttribute(const QByteArray& name)
+{
+    m_additionAttrs.remove(name);
 }

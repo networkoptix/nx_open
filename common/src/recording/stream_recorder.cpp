@@ -68,12 +68,14 @@ void QnStreamRecorder::close()
 	m_firstTime = true;
 }
 
+
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr md = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (md == 0)
-        return true; // skip non media data at current version
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    if (!md)
+        return true; // skip unknown data
+
+    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
 
     if (m_firstTime)
     {
@@ -113,7 +115,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
             close();
             m_startDateTime = m_endDateTime;
 
-            return processData(data);
+            return processData(md);
         }
     }
     else if (vd && !m_gotKeyFrame[channel]) // did not got key frame so far

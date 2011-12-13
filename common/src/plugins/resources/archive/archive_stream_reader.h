@@ -42,6 +42,8 @@ public:
     virtual bool isMediaPaused() const;
     virtual void resumeMedia();
     virtual QnAbstractMediaDataPtr getNextData();
+
+    bool setMotionRegion(const QRegion& region);
 protected:
     virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);
 

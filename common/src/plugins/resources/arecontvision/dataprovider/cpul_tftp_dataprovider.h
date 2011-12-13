@@ -39,6 +39,8 @@ protected:
     bool m_dualsensor;
     QString m_name;
 
+    bool m_motionSended;
+
 };
 
 #endif //cpull_httpreader_1119

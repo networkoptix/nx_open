@@ -44,6 +44,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
+
 }
 
 /*
@@ -720,4 +721,19 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     if (isSingleShotMode())
         CLLongRunnable::resume();
     return needJump;
+}
+
+bool QnArchiveStreamReader::setMotionRegion(const QRegion& region)
+{
+    if (m_navDelegate) {
+        return m_navDelegate->setMotionRegion(region);
+    }
+    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
+    if (maskedDelegate) {
+        maskedDelegate->setMotionRegion(region);
+        return true;
+    }
+    else {
+        return false;
+    }
 }
