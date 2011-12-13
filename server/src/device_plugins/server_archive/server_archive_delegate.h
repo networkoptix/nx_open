@@ -51,6 +51,8 @@ private:
     qint64 m_playbackMaskEnd;
 
     QnTimePeriod m_lastTimePeriod;
+    qint64 m_lastSeekTime;
+    bool m_afterSeek;
 };
 
 #endif // _SERVER_ARCHIVE_DELEGATE_H__

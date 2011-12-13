@@ -145,7 +145,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     m_netState.updateNetState(); // update net state before search
 
     //====================================
-    CL_LOG(cl_logDEBUG1) cl_log.log("looking for resources...", cl_logDEBUG1);
+    //CL_LOG(cl_logDEBUG1) cl_log.log("looking for resources...", cl_logDEBUG1);
 
     QnResourceList resources;
     QnResourceList::iterator it;
@@ -172,7 +172,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             ++it;
     }
 
-    qDebug() << resources.size();
+    //qDebug() << resources.size();
     //assemble list of existing ip
 
     // from pool
@@ -250,9 +250,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     // resources contains only new network conflicting resources
 
     // now resources list has only network resources
-
-    cl_log.log("Found ", resources.size(), " conflicting resources.", cl_logDEBUG1);
-    cl_log.log("Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+    if (resources.size()) {
+        cl_log.log("Found ", resources.size(), " conflicting resources.", cl_logDEBUG1);
+        cl_log.log("Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+    }
     //======================================
 
     time.restart();
@@ -299,8 +300,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     }
 
     resources = swapList;
-
-    qDebug() << "Returning " << resources.size() << " resources";
+    if (resources.size())
+        qDebug() << "Returning " << resources.size() << " resources";
 
     return resources;
 }

@@ -15,7 +15,9 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_selectedAudioChannel(0),
     m_opened(false),
     m_playbackMaskStart(AV_NOPTS_VALUE),
-    m_playbackMaskEnd(AV_NOPTS_VALUE)
+    m_playbackMaskEnd(AV_NOPTS_VALUE),
+    m_lastSeekTime(AV_NOPTS_VALUE),
+    m_afterSeek(false)
 {
     m_aviDelegate = new QnAviArchiveDelegate();
 }
@@ -57,6 +59,8 @@ void QnServerArchiveDelegate::close()
     m_chunkSequence = 0;
     m_reverseMode = false;
     m_opened = false;
+    m_lastSeekTime = AV_NOPTS_VALUE;
+    m_afterSeek = false;
 }
 
 void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
@@ -82,8 +86,8 @@ void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
     m_playbackMask = QnTimePeriod::mergeTimePeriods(periods);
 
     if (!m_playbackMask.isEmpty()) {
-        m_playbackMaskStart = m_playbackMask.first().startTimeUSec;
-        m_playbackMaskEnd = m_playbackMask.last().startTimeUSec + m_playbackMask.last().durationUSec;
+        m_playbackMaskStart = qMin(loadMin, m_playbackMask.first().startTimeUSec);
+        m_playbackMaskEnd = qMin(QDateTime::currentDateTime().toMSecsSinceEpoch(), qMax(loadMax, m_playbackMask.last().startTimeUSec + m_playbackMask.last().durationUSec));
     }
 }
 
@@ -93,16 +97,21 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
 
     loadPlaybackMask(timeMs);
 
+
+
     if (timeMs >= m_lastTimePeriod.startTimeUSec && timeMs < m_lastTimePeriod.startTimeUSec + m_lastTimePeriod.durationUSec)
         return time;
+
+    qDebug() << "inputTime=" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
 
     QnTimePeriodList::iterator itr = qUpperBound(m_playbackMask.begin(), m_playbackMask.end(), timeMs);
     if (itr != m_playbackMask.begin())
     {
         --itr;
-        if (itr->startTimeUSec + itr->durationUSec < timeMs) 
+        if (itr->startTimeUSec + itr->durationUSec > timeMs) 
         {
             m_lastTimePeriod = *itr;
+            qDebug() << "found period:" << QDateTime::fromMSecsSinceEpoch(itr->startTimeUSec).toString("hh:mm:ss.zzz") << "duration=" << itr->durationUSec/1000.0;
         }
         else {
             if (!m_reverseMode)
@@ -110,6 +119,7 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
                 ++itr;
                 m_lastTimePeriod = *itr;
                 timeMs = itr->startTimeUSec;
+                qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeUSec).toString("hh:mm:ss.zzz");
             }
             else {
                 m_lastTimePeriod = *itr;
@@ -119,6 +129,7 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
     }
     else {
         m_lastTimePeriod = *itr;
+        qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeUSec).toString("hh:mm:ss.zzz");
         timeMs = itr->startTimeUSec;
     }
     return timeMs*1000;
@@ -170,6 +181,8 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
     str.flush();
     cl_log.log(s, cl_logALWAYS);
     */
+    m_lastSeekTime = rez;
+    m_afterSeek = true;
     return rez;
 }
 
@@ -208,17 +221,27 @@ begin_label:
         data->timestamp +=m_currentChunk.startTime;
         if (!m_playbackMask.isEmpty())
         {
-            qint64 newTime = correctTimeByMask(data->timestamp);
-            if (newTime != data->timestamp) 
+            bool afterSeekIgnore = m_lastSeekTime != AV_NOPTS_VALUE && data->timestamp < m_lastSeekTime;
+            if (!afterSeekIgnore)
             {
-                if (waitMotionCnt > 1)
-                    QnSleep::msleep(10);
-                seekInternal(newTime);
-                waitMotionCnt++;
-                goto begin_label;
+                qint64 newTime = correctTimeByMask(data->timestamp);
+                if (newTime != data->timestamp) 
+                {
+                    if (waitMotionCnt > 1)
+                        QnSleep::msleep(10);
+
+                    seekInternal(newTime);
+                    waitMotionCnt++;
+                    goto begin_label;
+                }
             }
         }
 
+    }
+    if (m_afterSeek)
+    {
+        data->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        m_afterSeek = false;
     }
     return data;
 }

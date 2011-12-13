@@ -114,7 +114,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime)
 {
-    cl_log.log("recreate broken file", fileName, cl_logWARNING);
+    cl_log.log("recreate broken file ", fileName, cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
     QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
     if (!avi->open(res)) {

@@ -45,11 +45,45 @@ m_black_white(false)
     m_dualsensor = avRes->isDualSensor();
     m_name = avRes->getName();
 
-
+    m_motionSended = true;
 }
+
+
 
 QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
+#if 0
+    // for debug purpose only
+    if (!m_motionSended)
+    {
+        QnMetaDataV1Ptr motion(new QnMetaDataV1());
+        int secs = QDateTime::currentDateTime().time().second();
+        int x = 0, y = 0;
+        if (secs < 15) {
+
+        }
+        else if (secs < 30) {
+            x += MD_WIDTH/2;
+        }
+        else if (secs < 45) {
+            y += MD_HIGHT/2;
+        }
+        else {
+            x += MD_WIDTH/2;
+            y += MD_HIGHT/2;
+        }
+        for (int x1 = 0; x1 < MD_WIDTH/2; x1++)
+        {
+            for (int y1 = 0; y1 < MD_HIGHT/2; y1++)
+            {
+                motion->setMotionAt(x1+x, y1+y);
+            }
+        }
+        m_motionSended = true;
+        return motion;
+    }
+    m_motionSended = false;
+#endif
 
 	QString request;
 	QTextStream os(&request);
