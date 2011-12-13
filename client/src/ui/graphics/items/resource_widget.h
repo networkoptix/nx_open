@@ -268,6 +268,9 @@ private:
 
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;
+
+    /** Time when the current overlay icon has appeared. */
+    //qint64 m_overlayDisplayTimeMSec;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

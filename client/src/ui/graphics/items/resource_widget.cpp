@@ -38,6 +38,9 @@ namespace {
     /** Default period of progress circle. */
     const qint64 defaultProgressPeriodMSec = 1000;
 
+    /** Default duration of "fade-in" effect for overlay icons. */
+    const qint64 defaultOverlayFadeInDurationMSec = 500;
+
     /** Default progress painter. */
     Q_GLOBAL_STATIC_WITH_ARGS(QnLoadingProgressPainter, progressPainter, (0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255)));
 
