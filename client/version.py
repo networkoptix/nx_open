@@ -1,3 +1,3 @@
 ORGANIZATION_NAME    = 'Network Optix'
-APPLICATION_NAME     = 'EVE media player'
+APPLICATION_NAME     = 'VMS Client'
 APPLICATION_VERSION  = '1.2.6'
