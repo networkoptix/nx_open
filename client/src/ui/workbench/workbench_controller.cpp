@@ -5,6 +5,8 @@
 #include <QGraphicsView>
 #include <QGLWidget>
 #include <QGraphicsLinearLayout>
+#include <QAction>
+#include <QMenu>
 
 #include <core/resourcemanagment/security_cam_resource.h>
 
@@ -44,6 +46,15 @@
 #include "workbench.h"
 #include "workbench_display.h"
 
+namespace {
+    QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
+        QAction *result = new QAction(text, parent);
+        result->setShortcut(shortcut);
+        return result;
+    }
+
+
+} // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
@@ -66,8 +77,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
 
     /* Install and configure instruments. */
-    ClickInstrument *itemClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::ITEM, this);
-    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::SCENE, this);
+    ClickInstrument *itemClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, Instrument::ITEM, this);
+    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, Instrument::SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
@@ -112,8 +123,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemClickInstrument,        SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)), this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                        this,                           SLOT(at_scene_clicked(QGraphicsView *)));
-    connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *)));
+    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
+    connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),               this,                           SLOT(at_dragStarted(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),              this,                           SLOT(at_dragFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *)),                this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *)));
@@ -174,6 +185,27 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                this,                           SLOT(at_viewportUngrabbed()));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+
+#if 0
+    /* Set up context menu. */
+    QAction *addFilesAction             = newAction(tr("Add file(s)"),          tr("Ins"),          this);
+    QAction *addFolderAction            = newAction(tr("Add folder"),           tr("Shift+Ins"),    this);
+    QAction *addCameraAction            = newAction(tr("Add camera"),           tr("Ctrl+Ins"),     this);
+    QAction *newCameraAction            = newAction(tr("New camera"),           tr("Ctrl+C"),       this);
+    QAction *newLayoutAction            = newAction(tr("New layout"),           tr("Ctrl+L"),       this);
+    QAction *undoAction                 = newAction(tr("Undo"),                 tr("Ctrl+Z"),       this);
+    QAction *redoAction                 = newAction(tr("Redo"),                 tr("Ctrl+Shift+Z"), this);
+    QAction *fitInViewAction            = newAction(tr("Fit in view"),          tr("Ctrl+V"),       this);
+    QAction *fullscreenAction           = newAction(tr("Toggle fullscreen"),    tr("Ctrl+Enter"),   this);
+    QAction *startStopRecordingAction   = newAction(tr("Start/stop"),           tr("Alt+R"),        this);
+    QAction *recordingSettingsAction    = newAction(tr("Settings"),             QString(),          this);
+    QAction *saveLayoutAction           = newAction(tr("Save layout"),          tr("Ctrl+S"),       this);
+    QAction *saveLayoutAsAction         = newAction(tr("Save layout as..."),    tr("Ctrl+Shift+S"), this);
+    QAction *preferencesAction          = newAction(tr("Preferences"),          tr("Ctrl+P"),       this);
+    QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
+    QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
+#endif
+
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -388,23 +420,25 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
 }
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget) {
-    qDebug("ROTATION STARTED");
-
     m_display->bringToFront(widget);
 }
 
 void QnWorkbenchController::at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget) {
-    qDebug("ROTATION FINISHED");
-
     if(widget == NULL)
         return; /* We may get NULL if the widget being rotated gets deleted. */
 
     widget->item()->setRotation(widget->rotation());
 }
 
-void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
-    qDebug("CLICKED");
+void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
+    if(info.button() == Qt::LeftButton) {
+        at_item_leftClicked(view, item, info);
+    } else {
+        at_item_rightClicked(view, item, info);
+    }
+}
 
+void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
     if(info.modifiers() != 0)
         return;
 
@@ -418,9 +452,16 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item
     workbench()->setItem(QnWorkbench::FOCUSED, workbenchItem);
 }
 
-void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
-    qDebug("DOUBLE CLICKED");
+void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+    if(info.modifiers() != 0)
+        return;
 
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    if(widget == NULL)
+        return;
+}
+
+void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
@@ -443,14 +484,26 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     }
 }
 
-void QnWorkbenchController::at_scene_clicked(QGraphicsView *) {
+void QnWorkbenchController::at_scene_clicked(QGraphicsView *view, const ClickInfo &info) {
+    if(info.button() == Qt::LeftButton) {
+        at_scene_leftClicked(view, info);
+    } else {
+        at_scene_rightClicked(view, info);
+    }
+}
+
+void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *view, const ClickInfo &) {
     if(workbench() == NULL)
         return;
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
 }
 
-void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *) {
+void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const ClickInfo &) {
+
+}
+
+void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
     if(workbench() == NULL)
         return;
 

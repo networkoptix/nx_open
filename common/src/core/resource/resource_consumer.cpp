@@ -1,6 +1,6 @@
 #include "resource_consumer.h"
-#include "resource.h"
 
+#include "resource.h"
 
 QnResourceConsumer::QnResourceConsumer(QnResourcePtr resource):
     m_resource(resource)
@@ -29,4 +29,4 @@ void QnResourceConsumer::disconnectFromResource()
         return;
 
     m_resource->removeConsumer(this);
-};
+}

@@ -8,8 +8,6 @@
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
 
-Q_GLOBAL_STATIC(QnResourceDiscoveryManager, resourceDiscoveryManager)
-
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 {
 }
@@ -21,7 +19,9 @@ QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
 
 QnResourceDiscoveryManager& QnResourceDiscoveryManager::instance()
 {
-    return *resourceDiscoveryManager();
+    static QnResourceDiscoveryManager instance;
+
+    return instance;
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
@@ -68,24 +68,11 @@ void QnResourceDiscoveryManager::pleaseStop()
 
 bool QnResourceDiscoveryManager::getResourceTypes()
 {
-    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
-    QString user = QLatin1String("appserver");
-    QString password = QLatin1String("123");
-
-    QHostAddress host(appserverUrl.host());
-    int port = appserverUrl.port();
-
-    QAuthenticator auth;
-    auth.setUser(user);
-    auth.setPassword(password);
-
-    cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
-
     QnDummyResourceFactory dummyFactory;
-    QnAppServerConnection appServerConnection(host, port, auth, dummyFactory);
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(dummyFactory);
 
     QList<QnResourceTypePtr> resourceTypeList;
-    if (appServerConnection.getResourceTypes(resourceTypeList) == 0)
+    if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
     {
         qnResTypePool->addResourceTypeList(resourceTypeList);
         qDebug() << "Got " << resourceTypeList.size() << " resource types";

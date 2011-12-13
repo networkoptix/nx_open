@@ -62,16 +62,16 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
         setUrl(parameters[URL]);
 }
 
-void QnResource::setParentId(const QnId& parent)
-{
-    QMutexLocker locker(&m_mutex);
-    m_parentId = parent;
-}
-
 QnId QnResource::getParentId() const
 {
     QMutexLocker locker(&m_mutex);
     return m_parentId;
+}
+
+void QnResource::setParentId(const QnId& parent)
+{
+    QMutexLocker locker(&m_mutex);
+    m_parentId = parent;
 }
 
 
@@ -342,11 +342,16 @@ QnId QnResource::getTypeId() const
     return m_typeId;
 }
 
-
 void QnResource::setTypeId(const QnId& id)
 {
     QMutexLocker locker(&m_mutex);
     m_typeId = id;
+}
+
+QnResource::Status QnResource::getStatus() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_status;
 }
 
 void QnResource::setStatus(QnResource::Status status)
@@ -364,12 +369,6 @@ void QnResource::setStatus(QnResource::Status status)
         m_status = status;
     }
     emit onStatusChanged(old_status, status);
-}
-
-QnResource::Status QnResource::getStatus() const
-{
-    QMutexLocker locker(&m_mutex);
-    return m_status;
 }
 
 

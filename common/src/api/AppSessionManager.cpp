@@ -79,6 +79,19 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
     return status;
 }
 
+int AppSessionManager::addStorage(const ::xsd::api::storages::Storage& storage)
+{
+    std::ostringstream os;
+
+    ::xsd::api::storages::Storages storages;
+    storages.storage().push_back(storage);
+    ::xsd::api::storages::storages(os, storages, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
+
+    QByteArray reply;
+
+    return addObject("storage", os.str().c_str(), reply);
+}
+
 int AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
 {
     QTextStream stream(&reply);

@@ -111,7 +111,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     AnimationInstrument *animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
-    m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
+    m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
+    m_widgetActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
     
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
@@ -119,16 +120,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
-    m_instrumentManager->installInstrument(m_activityListenerInstrument);
+    m_instrumentManager->installInstrument(m_curtainActivityInstrument);
+    m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(animationInstrument);
 
-    m_activityListenerInstrument->recursiveDisable();
+    m_curtainActivityInstrument->recursiveDisable();
 
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeSceneBoundsExtension()));
-    connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
-    connect(m_activityListenerInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
+    connect(m_curtainActivityInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
+    connect(m_curtainActivityInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
     (new QAnimationTimer(this))->addListener(this);
@@ -508,7 +510,9 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     synchronize(widget, false);
     bringToFront(widget);
 
-    connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
+    connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
+    connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
+    connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
 
     emit widgetAdded(widget);
 }
@@ -817,14 +821,14 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         if(oldItem != NULL) {
             synchronize(oldItem, true);
 
-            m_activityListenerInstrument->recursiveDisable();
+            m_curtainActivityInstrument->recursiveDisable();
         }
 
         if(item != NULL) {
             bringToFront(item);
             synchronize(item, true);
 
-            m_activityListenerInstrument->recursiveEnable();
+            m_curtainActivityInstrument->recursiveEnable();
 
             m_viewportAnimator->moveTo(itemGeometry(item), zoomAnimationDurationMsec);
         } else {

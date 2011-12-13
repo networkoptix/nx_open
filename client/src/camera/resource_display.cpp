@@ -123,13 +123,6 @@ const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
     return m_mediaResource->getVideoLayout(m_mediaProvider);
 }
 
-void QnResourceDisplay::start() {
-    m_started = true;
-
-    if(m_camera != NULL)
-        m_camera->startDisplay();
-}
-
 qint64 QnResourceDisplay::lengthUSec() const {
     return m_archiveReader == NULL ? -1 : m_archiveReader->lengthMksec();
 }
@@ -145,6 +138,13 @@ void QnResourceDisplay::setCurrentTimeUSec(qint64 usec) const {
     }
 
     m_archiveReader->previousFrame(usec);
+}
+
+void QnResourceDisplay::start() {
+    m_started = true;
+
+    if(m_camera != NULL)
+        m_camera->startDisplay();
 }
 
 void QnResourceDisplay::play() {
@@ -166,6 +166,10 @@ void QnResourceDisplay::pause() {
     m_archiveReader->pauseDataProcessors();
 
     //m_camera->getCamCamDisplay()->pauseAudio();
+}
+
+bool QnResourceDisplay::isPaused() {
+    return m_archiveReader->isMediaPaused();
 }
 
 void QnResourceDisplay::addRenderer(CLAbstractRenderer *renderer) {

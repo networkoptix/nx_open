@@ -1,5 +1,8 @@
 #include "AppServerConnection.h"
 
+#include <QtNetwork/QAuthenticator>
+#include <QtNetwork/QHostAddress>
+
 #include "api/parsers/parse_cameras.h"
 #include "api/parsers/parse_layouts.h"
 #include "api/parsers/parse_users.h"
@@ -10,10 +13,14 @@
 #include "api/Types.h"
 #include "api/AppSessionManager.h"
 
-QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QnResourceFactory& resourceFactory)
-    :m_sessionManager(new AppSessionManager(host, port, auth)),
-      m_resourceFactory(resourceFactory)
+QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory)
+    : m_resourceFactory(resourceFactory)
 {
+    QAuthenticator auth;
+    auth.setUser(url.userName());
+    auth.setPassword(url.password());
+
+    m_sessionManager = QSharedPointer<AppSessionManager>(new AppSessionManager(QHostAddress(url.host()), url.port(), auth));
 }
 
 bool QnAppServerConnection::isConnected() const
@@ -97,6 +104,18 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
     return 1;
 }
 
+int QnAppServerConnection::addStorage(const QnStorage& storageIn)
+{
+    xsd::api::storages::Storage storage(storageIn.getId().toString().toStdString(),
+                                         storageIn.getName().toStdString(),
+                                         storageIn.getUrl().toStdString(),
+                                         storageIn.getTypeId().toString().toStdString(),
+                                         storageIn.getSpaceLimit(),
+                                         storageIn.getMaxStoreTime());
+
+    return m_sessionManager->addStorage(storage);
+}
+
 int QnAppServerConnection::getServers(QnResourceList& servers)
 {
     // todo: implement me
@@ -120,4 +139,24 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
 QString QnAppServerConnection::getLastError() const
 {
     return m_sessionManager->getLastError();
+}
+
+
+Q_GLOBAL_STATIC(QUrl, theAppServerConnectionFactoryDefaultUrl)
+
+void QnAppServerConnectionFactory::initialize(const QUrl &url)
+{
+    Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url has passed");
+    Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
+
+    *theAppServerConnectionFactoryDefaultUrl() = url;
+}
+
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory &resourceFactory)
+{
+    const QUrl &url = *theAppServerConnectionFactoryDefaultUrl();
+
+    cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
+
+    return QnAppServerConnectionPtr(new QnAppServerConnection(url, resourceFactory));
 }

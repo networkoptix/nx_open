@@ -110,6 +110,10 @@ void QnClientPullMediaStreamProvider::run()
             m_stat[videoData->channelNumber].onData(videoData->data.size());
 
 		putData(data);
+
+        if (videoData && !isMaxFps())
+            m_fpsSleep.sleep(1000*1000/getFps());
+
 	}
 
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);

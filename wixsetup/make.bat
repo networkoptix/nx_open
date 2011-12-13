@@ -1,28 +1,28 @@
-rem call "%VS90COMNTOOLS%vsvars32.bat"
+call "%VS90COMNTOOLS%vsvars32.bat"
 call qtvars.bat
 
-rem set "CURRENTDIR=%cd%"
+set "CURRENTDIR=%cd%"
 
-rem cd ..\common
-rem @start /B /WAIT convert.py
+cd ..\common
+@start /B /WAIT convert.py
 
-rem cd ..\client
-rem @start /B /WAIT convert.py
+cd ..\client
+@start /B /WAIT convert.py
 
-rem cd ..\server
-rem @start /B /WAIT convert.py
+cd ..\server
+@start /B /WAIT convert.py
 
-rem cd ..\appserver
-rem @start /B /WAIT convert.py
-rem @start /B /WAIT setup.py build
+cd ..\appserver
+@start /B /WAIT convert.py
+@start /B /WAIT setup.py build
 
-rem cd %CURRENTDIR%
+cd %CURRENTDIR%
 
-rem MSBuild ..\common\src\common.vcproj /t:Rebuild /p:Configuration=Release
-rem MSBuild ..\client\src\client.vcproj /t:Rebuild /p:Configuration=Release
-rem MSBuild ..\server\src\server.vcproj /t:Rebuild /p:Configuration=Release
+MSBuild ..\common\src\common.vcproj /t:Rebuild /p:Configuration=Release
+MSBuild ..\client\src\client.vcproj /t:Rebuild /p:Configuration=Release
+MSBuild ..\server\src\server.vcproj /t:Rebuild /p:Configuration=Release
 
-rem MSBuild PropsCA\PropsCA.vcproj /t:Rebuild /p:Configuration=Release
-rem MSBuild EveAssocCA\EveAssocCA.vcproj /t:Rebuild /p:Configuration=Release
+MSBuild PropsCA\PropsCA.vcproj /t:Rebuild /p:Configuration=Release
+MSBuild EveAssocCA\EveAssocCA.vcproj /t:Rebuild /p:Configuration=Release
 
 @start /B /WAIT make.py

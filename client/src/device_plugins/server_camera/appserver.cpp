@@ -4,6 +4,7 @@
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "settings.h"
+#include "version.h"
 
 QnAppServerResourceSearcher& QnAppServerResourceSearcher::instance()
 {
@@ -19,34 +20,26 @@ QString QnAppServerResourceSearcher::manufacture() const
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
-    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
-    QString user = QLatin1String("appserver");
-    QString password = QLatin1String("123");
-
-    QHostAddress host(appserverUrl.host());
-    int port = appserverUrl.port();
-
-    QAuthenticator auth;
-    auth.setUser(user);
-    auth.setPassword(password);
-
-    cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
-
-    QnAppServerConnection appServerConnection(host, port, auth, QnServerCameraFactory::instance());
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnServerCameraFactory::instance());
 
     QnResourceList resources;
 
-    appServerConnection.getResources(resources);
+    appServerConnection->getResources(resources);
 
     return resources;
 }
 
 QnResourcePtr QnAppServerResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
 {
-    return QnResourcePtr();
+    Q_UNUSED(resourceTypeId)
+    Q_UNUSED(parameters)
+
+    return QnResourcePtr(0);
 }
 
 bool QnAppServerResourceSearcher::isResourceTypeSupported(const QnId& resourceTypeId) const
 {
+    Q_UNUSED(resourceTypeId)
+
     return true;
 }

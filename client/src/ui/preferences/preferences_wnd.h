@@ -5,6 +5,7 @@
 
 #include "settings.h"
 
+class ConnectionsSettingsWidget;
 class LicenseWidget;
 class RecordingSettingsWidget;
 class YouTubeSettingsWidget;
@@ -21,9 +22,11 @@ public:
 
 private:
     void updateView();
+    void updateStoredConnections();
 
 private:
     Settings::Data m_settingsData;
+    ConnectionsSettingsWidget *connectionsSettingsWidget;
     RecordingSettingsWidget *videoRecorderWidget;
     YouTubeSettingsWidget *youTubeSettingsWidget;
     LicenseWidget *licenseWidget;

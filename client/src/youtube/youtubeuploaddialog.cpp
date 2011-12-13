@@ -9,14 +9,13 @@
 #include "youtube_uploader.h"
 #include "youtubesettingswidget.h"
 #include "youtubeuploadprogressdialog_p.h"
-#include "core/resource/resource.h"
 
 #define USE_PREFERENCESWND
 #ifdef USE_PREFERENCESWND
 #include "ui/preferences/preferences_wnd.h"
 #endif
 
-YouTubeUploadDialog::YouTubeUploadDialog(QnResourcePtr dev, QWidget *parent) :
+YouTubeUploadDialog::YouTubeUploadDialog(QnResourcePtr resource, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::YouTubeUploadDialog)
 {
@@ -24,10 +23,10 @@ YouTubeUploadDialog::YouTubeUploadDialog(QnResourcePtr dev, QWidget *parent) :
 
     connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(browseFile()));
 
-    if (dev) {
-        ui->filePathLabel->setText(dev->getUniqueId());
-        ui->titleLineEdit->setText(dev->getName());
-        ui->tagsLineEdit->setText(dev->tagList().join(QLatin1String(", ")).toUpper());
+    if (resource) {
+        ui->filePathLabel->setText(resource->getUniqueId());
+        ui->titleLineEdit->setText(resource->getName());
+        ui->tagsLineEdit->setText(resource->tagList().join(QLatin1String(", ")).toUpper());
     }
 
     // ### unused for now

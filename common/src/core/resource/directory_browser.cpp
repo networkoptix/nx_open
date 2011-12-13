@@ -156,5 +156,5 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
     else if (m_fileTypeSupport.isMovieFileExt(xfile))
         return QnResourcePtr(new QnAviResource(xfile));
     else
-        return QnResourcePtr();
+        return QnResourcePtr(0);
 }

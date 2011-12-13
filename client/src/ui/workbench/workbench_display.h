@@ -94,7 +94,7 @@ public:
      * \returns                         Activity listener instrument used by this workbench manager.
      */
     ActivityListenerInstrument *activityListenerInstrument() const {
-        return m_activityListenerInstrument;
+        return m_curtainActivityInstrument;
     }
 
     /**
@@ -335,8 +335,11 @@ private:
     /** Transformation listener instrument. */
     TransformListenerInstrument *m_transformListenerInstrument;
 
-    /** Activity listener instrument. */
-    ActivityListenerInstrument *m_activityListenerInstrument;
+    /** Activity listener instrument for curtain item. */
+    ActivityListenerInstrument *m_curtainActivityInstrument;
+
+    /** Activity listener instrument for resource widgets. */
+    ActivityListenerInstrument *m_widgetActivityInstrument;
 
     /** Bounding instrument. */
     BoundingInstrument *m_boundingInstrument;

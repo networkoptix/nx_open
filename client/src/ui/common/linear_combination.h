@@ -8,6 +8,7 @@ class QPointF;
 class QVector2D;
 class QVector3D;
 class QVector4D;
+class QColor;
 
 int linearCombine(qreal a, int x, qreal b, int y);
 float linearCombine(qreal a, float x, qreal b, float y);
@@ -16,6 +17,7 @@ QPointF linearCombine(qreal a, const QPointF &x, qreal b, const QPointF &y);
 QVector2D linearCombine(qreal a, const QVector2D &x, qreal b, const QVector2D &y);
 QVector3D linearCombine(qreal a, const QVector3D &x, qreal b, const QVector3D &y);
 QVector4D linearCombine(qreal a, const QVector4D &x, qreal b, const QVector4D &y);
+QColor linearCombine(qreal a, const QColor &x, qreal b, const QColor &y);
 
 template<class T>
 T linearCombine(qreal a, const T &x, qreal b, const T &y) {

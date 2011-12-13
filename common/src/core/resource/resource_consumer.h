@@ -1,6 +1,8 @@
 #ifndef resource_consumer_h_1921
 #define resource_consumer_h_1921
 
+#include <QtCore/QSharedPointer>
+
 class QnResource;
 typedef QSharedPointer<QnResource> QnResourcePtr;
 
@@ -21,4 +23,4 @@ protected:
     QnResourcePtr m_resource;
 };
 
-#endif //resource_consumer_h_1921
+#endif // resource_consumer_h_1921

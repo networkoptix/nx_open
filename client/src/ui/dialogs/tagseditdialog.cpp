@@ -6,17 +6,16 @@
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
 
-#include "ui/skin.h"
 #include "core/resource/resource.h"
 #include "core/resourcemanagment/resource_pool.h"
+
+#include "ui/skin.h"
 
 TagsEditDialog::TagsEditDialog(const QStringList &objectIds, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::TagsEditDialog),
     m_objectIds(objectIds)
 {
-    setWindowTitle(tr("Edit File Tags"));
-
     ui->setupUi(this);
 
     m_objectTagsModel = new QStandardItemModel;
@@ -57,9 +56,6 @@ TagsEditDialog::TagsEditDialog(const QStringList &objectIds, QWidget *parent) :
     connect(ui->addTagsButton, SIGNAL(clicked()), this, SLOT(addTags()));
     connect(ui->removeTagsButton, SIGNAL(clicked()), this, SLOT(removeTags()));
 
-    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
     if (QPushButton *button = ui->buttonBox->button(QDialogButtonBox::RestoreDefaults))
         connect(button, SIGNAL(clicked()), this, SLOT(reset()));
 
@@ -70,16 +66,14 @@ TagsEditDialog::TagsEditDialog(const QStringList &objectIds, QWidget *parent) :
 
 TagsEditDialog::~TagsEditDialog()
 {
-    delete ui;
 }
 
 void TagsEditDialog::accept()
 {
     QSet<QString> oldIntersectedObjectTagsSet;
-    if (!m_objectIds.isEmpty())
-    {
+    if (!m_objectIds.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(m_objectIds.at(0));
-        if (resource != 0) {
+        if (resource) {
             oldIntersectedObjectTagsSet = resource->tagList().toSet();
             for (int i = 1; i < m_objectIds.size(); ++i) {
                 resource = qnResPool->getResourceByUniqId(m_objectIds.at(i));
@@ -90,26 +84,24 @@ void TagsEditDialog::accept()
     }
 
     QSet<QString> intersectedObjectTagsSet;
-    for (int row = 0; row < m_objectTagsModel->rowCount(); ++row)
-    {
+    for (int row = 0, rowCount = m_objectTagsModel->rowCount(); row < rowCount; ++row) {
         QStandardItem *item = m_objectTagsModel->item(row);
         if (item->flags() != Qt::NoItemFlags)
             intersectedObjectTagsSet.insert(item->text());
     }
 
-    foreach (const QString &objectId, m_objectIds)
-    {
+    foreach (const QString &objectId, m_objectIds) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(objectId);
-        if (resource == 0)
-            continue;
-        QSet<QString> oldObjectTags = resource->tagList().toSet();
-        QSet<QString> objectTags = oldObjectTags;
-        if (!oldIntersectedObjectTagsSet.isEmpty())
-            objectTags = objectTags.subtract(oldIntersectedObjectTagsSet.subtract(intersectedObjectTagsSet));
-        if (!intersectedObjectTagsSet.isEmpty())
-            objectTags = objectTags.unite(intersectedObjectTagsSet.subtract(oldIntersectedObjectTagsSet));
-        if (objectTags != oldObjectTags)
-            resource->setTags(objectTags.toList());
+        if (resource) {
+            QSet<QString> oldObjectTags = resource->tagList().toSet();
+            QSet<QString> objectTags = oldObjectTags;
+            if (!oldIntersectedObjectTagsSet.isEmpty())
+                objectTags = objectTags.subtract(oldIntersectedObjectTagsSet.subtract(intersectedObjectTagsSet));
+            if (!intersectedObjectTagsSet.isEmpty())
+                objectTags = objectTags.unite(intersectedObjectTagsSet.subtract(oldIntersectedObjectTagsSet));
+            if (objectTags != oldObjectTags)
+                resource->setTags(objectTags.toList());
+        }
     }
 
     QDialog::accept();
@@ -124,14 +116,11 @@ void TagsEditDialog::reset()
 
     QSet<QString> intersectedObjectTagsSet;
     QSet<QString> allObjectTagsSet;
-    if (!m_objectIds.isEmpty())
-    {
+    if (!m_objectIds.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(m_objectIds.at(0));
-        if (resource) 
-        {
+        if (resource) {
             allObjectTagsSet = intersectedObjectTagsSet = resource->tagList().toSet();
-            for (int i = 1; i < m_objectIds.size(); ++i)
-            {
+            for (int i = 1; i < m_objectIds.size(); ++i) {
                 resource = qnResPool->getResourceByUniqId(m_objectIds.at(i));
                 if (resource) {
                     QSet<QString> objectTags = resource->tagList().toSet();
@@ -142,8 +131,7 @@ void TagsEditDialog::reset()
         }
         QStringList allObjectTags = allObjectTagsSet.toList();
         qSort(allObjectTags);
-        foreach (const QString &tag, allObjectTags)
-        {
+        foreach (const QString &tag, allObjectTags) {
             QStandardItem *item = new QStandardItem(tag);
             if (intersectedObjectTagsSet.contains(tag))
                 item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
@@ -155,8 +143,7 @@ void TagsEditDialog::reset()
 
     QStringList allTags = qnResPool->allTags();
     qSort(allTags);
-    foreach (const QString &tag, allTags)
-    {
+    foreach (const QString &tag, allTags) {
         QStandardItem *item = new QStandardItem(tag);
         if (!intersectedObjectTagsSet.contains(tag))
             item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
@@ -166,11 +153,17 @@ void TagsEditDialog::reset()
     }
 }
 
-void TagsEditDialog::changeEvent(QEvent *e)
+void TagsEditDialog::retranslateUi()
 {
-    QDialog::changeEvent(e);
+    m_objectTagsModel->setHorizontalHeaderLabels(QStringList() << tr("Assigned Tags"));
+    m_allTagsModel->setHorizontalHeaderLabels(QStringList() << tr("All Tags"));
+}
 
-    switch (e->type()) {
+void TagsEditDialog::changeEvent(QEvent *event)
+{
+    QDialog::changeEvent(event);
+
+    switch (event->type()) {
     case QEvent::LanguageChange:
         ui->retranslateUi(this);
         retranslateUi();
@@ -180,20 +173,19 @@ void TagsEditDialog::changeEvent(QEvent *e)
     }
 }
 
-void TagsEditDialog::keyPressEvent(QKeyEvent *e)
+void TagsEditDialog::keyPressEvent(QKeyEvent *event)
 {
-    if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         return;
 
-    QDialog::keyPressEvent(e);
+    QDialog::keyPressEvent(event);
 }
 
-void TagsEditDialog::showEvent(QShowEvent *e)
+void TagsEditDialog::showEvent(QShowEvent *event)
 {
-    QDialog::showEvent(e);
+    QDialog::showEvent(event);
 
-    if (ui->newTagLineEdit->height() != ui->tagsFilterLineEdit->height())
-    {
+    if (ui->newTagLineEdit->height() != ui->tagsFilterLineEdit->height()) {
         const int maxHeight = qMax(ui->newTagLineEdit->height(), ui->tagsFilterLineEdit->height());
         ui->newTagLineEdit->setMaximumHeight(maxHeight);
         ui->tagsFilterLineEdit->setMaximumHeight(maxHeight);
@@ -202,12 +194,6 @@ void TagsEditDialog::showEvent(QShowEvent *e)
         if (ui->clearFilterButton->height() > maxHeight)
             ui->clearFilterButton->setMaximumSize(maxHeight, maxHeight);
     }
-}
-
-void TagsEditDialog::retranslateUi()
-{
-    m_objectTagsModel->setHorizontalHeaderLabels(QStringList() << tr("Assigned Tags"));
-    m_allTagsModel->setHorizontalHeaderLabels(QStringList() << tr("All Tags"));
 }
 
 void TagsEditDialog::addTag()
@@ -237,22 +223,18 @@ void TagsEditDialog::removeTags()
 
 void TagsEditDialog::filterChanged(const QString &filter)
 {
-    if (!filter.isEmpty())
-    {
+    if (!filter.isEmpty()) {
         ui->clearFilterButton->show();
         m_allTagsProxyModel->setFilterWildcard(QLatin1Char('*') + filter + QLatin1Char('*'));
-    }
-    else
-    {
+    } else {
         ui->clearFilterButton->hide();
-        m_allTagsProxyModel->setFilterFixedString(filter);
+        m_allTagsProxyModel->invalidate();
     }
 }
 
 void TagsEditDialog::addTags(const QStringList &tags)
 {
-    foreach (const QString &tag, tags)
-    {
+    foreach (const QString &tag, tags) {
         if (tag.isEmpty())
             continue;
 
@@ -279,8 +261,7 @@ void TagsEditDialog::addTags(const QStringList &tags)
 
 void TagsEditDialog::removeTags(const QStringList &tags)
 {
-    foreach (const QString &tag, tags)
-    {
+    foreach (const QString &tag, tags) {
         if (tag.isEmpty())
             continue;
 

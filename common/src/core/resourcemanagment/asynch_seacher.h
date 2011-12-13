@@ -20,7 +20,6 @@ class QnResourceDiscoveryManager : public CLLongRunnable, public QnResourceFacto
     typedef QList<QnResourceProcessor*> ResourceProcessorList;
 
 public:
-
     ~QnResourceDiscoveryManager();
 
     static QnResourceDiscoveryManager& instance();
@@ -60,8 +59,6 @@ private:
     ResourceProcessorList m_resourceProcessors;
 
     CLNetState m_netState;
-
-    friend static QnResourceDiscoveryManager *resourceDiscoveryManager(); // protected c-tor
 };
 
 #endif //cl_asynch_device_sarcher_h_423
