@@ -4,7 +4,7 @@
 #include <QColor>
 #include <QScopedPointer>
 
-class QGLShaderProgram;
+class QnColorShaderProgram;
 
 class QnLoadingProgressPainter {
 public:
@@ -26,8 +26,7 @@ public:
 private:
     int m_sectorCount;
     unsigned m_list;
-    QScopedPointer<QGLShaderProgram> m_program;
-    int m_colorMultiplierLocation;
+    QScopedPointer<QnColorShaderProgram> m_program;
 };
 
 #endif // QN_LOADING_PROGRESS_PAINTER_H

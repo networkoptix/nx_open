@@ -2,6 +2,7 @@
 #include <cmath> /* For std::fmod, std::sin and std::cos. */
 #include <utils/common/qt_opengl.h>
 #include <ui/common/linear_combination.h>
+#include "color_shader_program.h"
 
 namespace {
     void glVertexPolar(qreal alpha, qreal r) {
@@ -12,25 +13,9 @@ namespace {
 
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
-    m_sectorCount(sectorCount)
+    m_sectorCount(sectorCount),
+    m_program(new QnColorShaderProgram())
 {
-    /* Create shader. */
-    m_program.reset(new QGLShaderProgram());
-    m_program->addShaderFromSourceCode(QGLShader::Vertex, "                     \
-        void main() {                                                           \
-            gl_FrontColor = gl_Color;                                           \
-            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;             \
-        }                                                                       \
-    ");
-    m_program->addShaderFromSourceCode(QGLShader::Fragment, "                   \
-        uniform vec4 colorMultiplier;                                           \
-        void main() {                                                           \
-            gl_FragColor = gl_Color * colorMultiplier;                          \
-        }                                                                       \
-    ");
-    m_program->link();
-    m_colorMultiplierLocation = m_program->uniformLocation("colorMultiplier");
-
     /* Create display list. */
     m_list = glGenLists(1);
 
@@ -67,7 +52,7 @@ void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     glPushMatrix();
     glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
     m_program->bind();
-    m_program->setUniformValue(m_colorMultiplierLocation, QVector4D(1.0, 1.0, 1.0, opacity));
+    m_program->setColorMultiplier(QVector4D(1.0, 1.0, 1.0, opacity));
     glCallList(m_list);
     m_program->release();
     glPopMatrix();
