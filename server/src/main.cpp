@@ -61,7 +61,40 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
     cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
 }
 
-QString defaultLocalAddress(const QString& target)
+QHostAddress resolveHost(const QString& hostString)
+{
+    QHostAddress host(hostString);
+    if (host.toIPv4Address() != 0)
+        return host;
+
+    QHostInfo info = QHostInfo::fromName(hostString);
+
+    // Can't resolve
+    if (info.error() != QHostInfo::NoError)
+    {
+        cl_log.log("Couldn't resolve host ", hostString, cl_logERROR);
+        return QHostAddress();
+    }
+
+    // Initialize to zero
+    host = QHostAddress();
+    foreach (QHostAddress address, info.addresses())
+    {
+        if (address.toIPv4Address() != 0)
+        {
+            host = address;
+            break;
+        }
+    }
+
+    if (host.toIPv4Address() == 0)
+        cl_log.log("No ipv4 address associated with host ", hostString, cl_logERROR);
+
+    return host;
+}
+
+
+QString defaultLocalAddress(const QHostAddress& target)
 {
     {
         QUdpSocket socket;
@@ -231,34 +264,14 @@ void initAppServerConnection(const QSettings &settings)
 {
     QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
-    QHostAddress host(hostString);
+    QHostAddress host = resolveHost(hostString);
     while (host.toIPv4Address() == 0)
     {
-        QHostInfo info = QHostInfo::fromName(hostString);
-        if (info.error() != QHostInfo::NoError)
-        {
-            cl_log.log("Couldn't resolve", hostString, cl_logERROR);
-            QnSleep::msleep(1000);
-            continue;
-        }
+        // resolveHost writes error to log.
+        // Just retry hoping resolving problem caused by temporary network failure
+        host = resolveHost(hostString);
 
-        foreach (QHostAddress address, info.addresses())
-        {
-            if (address.toIPv4Address() != 0)
-            {
-                host = address;
-                break;
-            }
-        }
-
-        if (host.toIPv4Address() == 0)
-        {
-            cl_log.log("No ipv4 address associated with host ", hostString, cl_logERROR);
-            QnSleep::msleep(1000);
-            continue;
-        }
-
-        break;
+        QnSleep::msleep(1000);
     }
 
     QUrl appServerUrl;
@@ -319,9 +332,15 @@ public:
 
         qnResTypePool->addResourceTypeList(resourceTypeList);
 
-        QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-
-        QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(hostString));
+        QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+        
+        QHostAddress appserverHost;
+        do
+        {
+            appserverHost = resolveHost(appserverHostString);
+        } while (appserverHost.toIPv4Address() == 0);
+        
+        QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverHost));
         if (videoServer.isNull())
             return;
 
@@ -362,7 +381,10 @@ public:
             storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
             storage->setSpaceLimit(100ll * 1000 * 1024);
 
-            appServerConnection->addStorage(*storage);
+            if (appServerConnection->addStorage(*storage))
+            {
+                qDebug() << "Couldn't add storage: " << appServerConnection->getLastError();
+            }
 
             qnResPool->addResource(storage);
             qnStorageMan->addStorage(storage);
