@@ -16,7 +16,7 @@ QnStorageManager::QnStorageManager():
 
 void QnStorageManager::loadFullFileCatalog()
 {
-    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog"));
+    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media"));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list)
     {
@@ -26,7 +26,7 @@ void QnStorageManager::loadFullFileCatalog()
 
 bool QnStorageManager::deserializeStorageFile()
 {
-    QFile storageFile(closeDirPath(getDataDirectory()) + QString("record_catalog/storage_index.csv"));
+    QFile storageFile(closeDirPath(getDataDirectory()) + QString("record_catalog/media/storage_index.csv"));
     if (!storageFile.exists())
         return true;
     if (!storageFile.open(QFile::ReadOnly))
@@ -45,7 +45,7 @@ bool QnStorageManager::deserializeStorageFile()
 
 bool QnStorageManager::serializeStorageFile()
 {
-    QString baseName = closeDirPath(getDataDirectory()) + QString("record_catalog/storage_index.csv");
+    QString baseName = closeDirPath(getDataDirectory()) + QString("record_catalog/media/storage_index.csv");
     QFile storageFile(baseName + ".new");
     if (!storageFile.open(QFile::WriteOnly | QFile::Truncate))
         return false;

@@ -1,11 +1,14 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
+#include <QRegion>
+
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "recording/device_file_catalog.h"
 #include "recording/storage_manager.h"
+#include "utils/media/sse_helper.h"
 
 class QnServerArchiveDelegate: public QnAbstractArchiveDelegate
 {
@@ -13,7 +16,7 @@ public:
     QnServerArchiveDelegate();
     virtual ~QnServerArchiveDelegate();
 
-    void setPlaybackMask(const QnTimePeriodList& periods);
+    void setMotionRegion(const QRegion& region);
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();
@@ -30,6 +33,7 @@ private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk);
     qint64 correctTimeByMask(qint64 time);
     qint64 seekInternal(qint64 time);
+    void loadPlaybackMask(qint64 msTime);
 private:
     bool m_opened;
     QnResourcePtr m_resource;
@@ -41,8 +45,14 @@ private:
     bool m_reverseMode;
     int m_selectedAudioChannel;
 
-    QnTimePeriodList m_mask;
+    QRegion m_motionRegion;
+    QnTimePeriodList m_playbackMask;
+    qint64 m_playbackMaskStart;
+    qint64 m_playbackMaskEnd;
+
     QnTimePeriod m_lastTimePeriod;
+    qint64 m_lastSeekTime;
+    bool m_afterSeek;
 };
 
 #endif // _SERVER_ARCHIVE_DELEGATE_H__

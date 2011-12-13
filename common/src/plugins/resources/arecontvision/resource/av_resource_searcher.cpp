@@ -56,7 +56,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 	QnResourceList result;
 
 	QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
-
+#if 0
 	CL_LOG(cl_logDEBUG1)
 	{
 		QString log;
@@ -70,11 +70,13 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 			cl_log.log(slog, cl_logDEBUG1);
 		}
 	}
-
+#endif
 	for (int i = 0; i < ipaddrs.size();++i)
 	{
 		QUdpSocket sock;
-		sock.bind(ipaddrs.at(i), 0);
+		if (!sock.bind(ipaddrs.at(i), 0))
+            continue;
+        
 
 		// sending broadcast
 		QByteArray datagram = "Arecont_Vision-AV2000\1";

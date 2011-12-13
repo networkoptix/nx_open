@@ -380,3 +380,20 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
         return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
 
+void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
+{
+    if (region.isEmpty())
+    {
+        m_rtspSession.removeAdditionAttribute("x-motion-region");
+    }
+    else 
+    {
+        QBuffer buffer;
+        buffer.open(QIODevice::WriteOnly);
+        QDataStream stream(&buffer);
+        stream << region;
+        buffer.close();
+        QByteArray s = buffer.data().toBase64();
+        m_rtspSession.setAdditionAttribute("x-motion-region", s);
+    }
+}

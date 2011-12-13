@@ -2,6 +2,8 @@
 #include <QTextStream>
 #include <QHttpRequestHeader>
 #include <qDebug>
+#include <QRegion>
+#include <QBuffer>
 
 #include "libavutil/avutil.h"
 #include "libavcodec/avcodec.h"
@@ -22,6 +24,7 @@
 #include "recorder/recording_manager.h"
 #include "utils/common/util.h"
 #include "rtsp_data_consumer.h"
+#include "device_plugins/server_archive/server_archive_delegate.h"
 
 class QnTcpListener;
 
@@ -383,6 +386,23 @@ int QnRtspConnectionProcessor::composePlay()
     else if (d->archiveDP) 
     {
         d->archiveDP->setReverseMode(d->rtspScale < 0);
+        QnServerArchiveDelegate* serverArchive = dynamic_cast<QnServerArchiveDelegate*>(d->archiveDP->getArchiveDelegate());
+        if (serverArchive) 
+        {
+            QnTimePeriodList motionPeriods;
+            QRegion region;
+            if (!d->requestHeaders.value("x-motion-region").isNull())
+            {
+                QBuffer buffer;
+                buffer.open(QIODevice::ReadWrite);
+                QDataStream stream(&buffer);
+                stream << QByteArray::fromBase64(d->requestHeaders.value("x-motion-region").toUtf8());
+                buffer.seek(0);
+                stream >> region;
+            }
+            serverArchive->setMotionRegion(region);
+        }
+
         if (!d->requestHeaders.value("Range").isNull())
         {
             //d->archiveDP->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);

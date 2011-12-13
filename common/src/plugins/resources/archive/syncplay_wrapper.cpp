@@ -87,6 +87,16 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
     }
 }
 
+bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    bool rez = true;
+    foreach(ReaderInfo info, d->readers)
+        rez &= info.reader->setMotionRegion(region);
+    return rez;
+}
+
 bool QnArchiveSyncPlayWrapper::isMediaPaused() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
