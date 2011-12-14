@@ -210,7 +210,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *preferencesAction          = newAction(tr("Preferences"),          tr("Ctrl+P"),       this);
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
-    QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
+    //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
     QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
     
@@ -220,8 +220,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_contextMenu = new QMenu();
     m_contextMenu->addAction(showMotionAction);
     m_contextMenu->addAction(hideMotionAction);
-    m_contextMenu->addSeparator();
-    m_contextMenu->addAction(exitAction);
+    //m_contextMenu->addSeparator();
+    //m_contextMenu->addAction(exitAction);
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -338,6 +338,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     }
 
     m_display->synchronize(widget->item());
+    m_display->fitInView();
 }
 
 void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
