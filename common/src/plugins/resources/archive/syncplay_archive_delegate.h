@@ -8,7 +8,7 @@ class QnAbstractArchiveReader;
 class QnArchiveSyncPlayWrapper;
 class QnAbstractArchiveDelegate;
 
-class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate
+class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate, public QnAbstractFilterPlaybackDelegate
 {
 public:
     QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
@@ -27,12 +27,10 @@ public:
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
     virtual void setSingleshotMode(bool value);
 
-    //qint64 getNextTime() const;
     virtual AVCodecContext* setAudioChannel(int num);
 
-    //void jumpToPreviousFrame (qint64 time);
-    //void jumpTo (qint64 time);
-
+    virtual void setMotionRegion(const QRegion& region);
+    virtual void setSendMotion(bool value);
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

@@ -98,36 +98,17 @@ AVCodecContext* QnSyncPlayArchiveDelegate::setAudioChannel(int num)
 QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
 {
     return m_ownerDelegate->getNextData();
-    /*
-    QMutexLocker lock(&m_mutex);
-    QnAbstractMediaDataPtr rez;
-    if (m_usePrebuffer)
-    {
-        rez = m_nextData ? m_nextData : m_ownerDelegate->getNextData();
-        m_nextData = m_ownerDelegate->getNextData();
-    }
-    else 
-    {
-        rez = m_nextData ? m_nextData : m_ownerDelegate->getNextData();
-        m_nextData.clear();
-    }
-    return rez;
-    */
 }
 
-/*
-void QnSyncPlayArchiveDelegate::setPrebuffering(bool value)
+void QnSyncPlayArchiveDelegate::setMotionRegion(const QRegion& region)
 {
-    QMutexLocker lock(&m_mutex);
-    m_usePrebuffer = value;
-    if (value && !m_nextData) 
-        m_nextData = m_ownerDelegate->getNextData();
+    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_ownerDelegate);
+    if (maskedDelegate)
+        maskedDelegate->setMotionRegion(region);
 }
-*/
-
-/*
-qint64 QnSyncPlayArchiveDelegate::getNextTime() const
+void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
 {
-    return m_nextData ? m_nextData->timestamp : AV_NOPTS_VALUE;
+    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_ownerDelegate);
+    if (maskedDelegate)
+        maskedDelegate->setSendMotion(value);
 }
-*/
