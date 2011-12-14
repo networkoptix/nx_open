@@ -74,7 +74,7 @@ struct QnEmptyMediaData : public QnAbstractMediaData
     }
 };
 
-class QnMetaDataV1;
+struct QnMetaDataV1;
 typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 
 
@@ -103,7 +103,6 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 
-class QnMetaDataV1;
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 struct QnMetaDataV1 : public QnAbstractMediaData
 {
