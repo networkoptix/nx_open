@@ -90,8 +90,11 @@ bool QnArchiveSyncPlayWrapper::setSendMotion(bool value)
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     bool rez = true;
-    foreach(ReaderInfo info, d->readers)
+    foreach(ReaderInfo info, d->readers) {
+        info.reader->setNavDelegate(0);
         rez &= info.reader->setSendMotion(value);
+        info.reader->setNavDelegate(this);
+    }
     return rez;
 }
 
@@ -100,8 +103,11 @@ bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     bool rez = true;
-    foreach(ReaderInfo info, d->readers)
+    foreach(ReaderInfo info, d->readers) {
+        info.reader->setNavDelegate(0);
         rez &= info.reader->setMotionRegion(region);
+        info.reader->setNavDelegate(this);
+    }
     return rez;
 }
 
