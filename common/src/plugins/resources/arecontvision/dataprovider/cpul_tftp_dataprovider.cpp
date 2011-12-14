@@ -51,11 +51,7 @@ m_black_white(false)
 
 QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
-#if 0
-        motion->m_duration = 1000 * 1000;
-            y += MD_HIGHT/2;
-            y += MD_HIGHT/2;
-            for (int y1 = 0; y1 < MD_HIGHT/2; y1++)
+    if (needMetaData())
         return getMetaData();
 
 	QString request;
@@ -425,19 +421,19 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
             x += MD_WIDTH/2;
         }
         else if (secs < 45) {
-            y += MD_HIGHT/2;
+            y += MD_HEIGHT/2;
         }
         else {
             x += MD_WIDTH/2;
-            y += MD_HIGHT/2;
+            y += MD_HEIGHT/2;
         }
         for (int x1 = 0; x1 < MD_WIDTH/2; x1++)
         {
-            for (int y1 = 0; y1 < MD_HIGHT/2; y1++)
+            for (int y1 = 0; y1 < MD_HEIGHT/2; y1++)
             {
                 motion->setMotionAt(x1+x, y1+y);
             }
         }
-
+        motion->m_duration = 1000 * 1000ll * 10;
         return motion;
 }
