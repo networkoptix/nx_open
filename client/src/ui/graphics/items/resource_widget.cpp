@@ -328,6 +328,8 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnM
     {
         painter->drawLine(QPointF(0.0, y*yStep), QPointF(rect.width(), y*yStep));
     }
+    if (!motion)
+        return;
     painter->setPen(QPen(0x00ff0080));
     for (int y = 0; y < MD_HEIGHT; ++y)
     {
@@ -414,9 +416,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             drawCurrentTime(painter, channelRect(i), time); // do not show time for regular media files
 
         /* Motion grid. */
-        QnMetaDataV1Ptr motion = m_renderer->lastFrameMetadata(i);
-        if (motion && m_displayMotionGrid)
-            drawMotionGrid(painter, channelRect(i), motion);
+        if (m_displayMotionGrid)
+            drawMotionGrid(painter, channelRect(i), m_renderer->lastFrameMetadata(i));
     }
 }
 
