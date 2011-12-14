@@ -53,6 +53,8 @@ public:
 
     //virtual QnMediaInfo getMediaInfo() const;
 
+    int totalMdZones() const;
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
@@ -70,6 +72,10 @@ public:
 protected:
 
     QString m_description;
+
+private:
+    
+    int m_totalMdZones;
 
 };
 
