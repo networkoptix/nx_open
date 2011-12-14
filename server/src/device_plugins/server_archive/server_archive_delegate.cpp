@@ -31,12 +31,12 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 
 qint64 QnServerArchiveDelegate::startTime()
 {
-    return m_catalog ? m_catalog->minTime() : 0;
+    return m_catalog ? m_catalog->minTime()*1000 : 0;
 }
 
 qint64 QnServerArchiveDelegate::endTime()
 {
-    return m_catalog  ? m_catalog->maxTime() : 0;
+    return m_catalog  ? m_catalog->maxTime()*1000 : 0;
 }
 
 bool QnServerArchiveDelegate::open(QnResourcePtr resource)
@@ -74,21 +74,21 @@ void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
 
     if (!m_playbackMask.isEmpty()) {
         if (m_playbackMaskStart <= loadMin)
-            loadMin = m_playbackMask.last().startTimeUSec;
+            loadMin = m_playbackMask.last().startTimeMs;
         if (m_playbackMaskEnd >= loadMax)
-            loadMax = m_playbackMask.first().startTimeUSec;
+            loadMax = m_playbackMask.first().startTimeMs;
         if (loadMax - loadMin <= 0)
             return;
     }
 
-    QnTimePeriodList newMask = QnMotionHelper::instance()->mathImage(m_motionRegion, m_resource, loadMin, loadMax);
+    QnTimePeriodList newMask = QnMotionHelper::instance()->mathImage(m_motionRegion, m_resource, loadMin, loadMax, 1);
     QVector<QnTimePeriodList> periods;
     periods << m_playbackMask << newMask;
     m_playbackMask = QnTimePeriod::mergeTimePeriods(periods);
 
     if (!m_playbackMask.isEmpty()) {
-        m_playbackMaskStart = qMin(loadMin, m_playbackMask.first().startTimeUSec);
-        m_playbackMaskEnd = qMin(QDateTime::currentDateTime().toMSecsSinceEpoch(), qMax(loadMax, m_playbackMask.last().startTimeUSec + m_playbackMask.last().durationUSec));
+        m_playbackMaskStart = qMin(loadMin, m_playbackMask.first().startTimeMs);
+        m_playbackMaskEnd = qMin(QDateTime::currentDateTime().toMSecsSinceEpoch(), qMax(loadMax, m_playbackMask.last().startTimeMs + m_playbackMask.last().durationMs));
     }
 }
 
@@ -100,7 +100,7 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
 
 
 
-    if (timeMs >= m_lastTimePeriod.startTimeUSec && timeMs < m_lastTimePeriod.startTimeUSec + m_lastTimePeriod.durationUSec)
+    if (timeMs >= m_lastTimePeriod.startTimeMs && timeMs < m_lastTimePeriod.startTimeMs + m_lastTimePeriod.durationMs)
         return time;
 
     qDebug() << "inputTime=" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
@@ -109,29 +109,29 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
     if (itr != m_playbackMask.begin())
     {
         --itr;
-        if (itr->startTimeUSec + itr->durationUSec > timeMs) 
+        if (itr->startTimeMs + itr->durationMs > timeMs) 
         {
             m_lastTimePeriod = *itr;
-            qDebug() << "found period:" << QDateTime::fromMSecsSinceEpoch(itr->startTimeUSec).toString("hh:mm:ss.zzz") << "duration=" << itr->durationUSec/1000.0;
+            //qDebug() << "found period:" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz") << "duration=" << itr->durationMs/1000.0;
         }
         else {
             if (!m_reverseMode)
             {
                 ++itr;
                 m_lastTimePeriod = *itr;
-                timeMs = itr->startTimeUSec;
-                qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeUSec).toString("hh:mm:ss.zzz");
+                timeMs = itr->startTimeMs;
+                //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
             }
             else {
                 m_lastTimePeriod = *itr;
-                timeMs = itr->startTimeUSec + itr->durationUSec;
+                timeMs = itr->startTimeMs + itr->durationMs;
             }
         }
     }
     else {
         m_lastTimePeriod = *itr;
-        qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeUSec).toString("hh:mm:ss.zzz");
-        timeMs = itr->startTimeUSec;
+        //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
+        timeMs = itr->startTimeMs;
     }
     return timeMs*1000;
 }
@@ -151,7 +151,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
     cl_log.log(s, cl_logALWAYS);
 	*/
 
-    if (newChunk.startTime != m_currentChunk.startTime)
+    if (newChunk.startTimeMs != m_currentChunk.startTimeMs)
     {
         bool isStreamsFound = m_aviDelegate->isStreamsFound();
         if (!switchToChunk(newChunk))
@@ -162,18 +162,18 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
 
     //int duration = m_currentChunk.duration;
     qint64 chunkOffset = 0;
-    if (m_currentChunk.duration == -1) // last live chunk
+    if (m_currentChunk.durationMs == -1) // last live chunk
     {
         // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
-        chunkOffset = qBound(0ll, time - m_currentChunk.startTime, BACKWARD_SEEK_STEP);
+        chunkOffset = qBound(0ll, time - m_currentChunk.startTimeMs*1000, BACKWARD_SEEK_STEP);
     }
     else {
-        chunkOffset = qBound(0ll, time - m_currentChunk.startTime, m_currentChunk.duration - BACKWARD_SEEK_STEP);
+        chunkOffset = qBound(0ll, time - m_currentChunk.startTimeMs*1000, m_currentChunk.durationMs*1000 - BACKWARD_SEEK_STEP);
     }
     qint64 seekRez = m_aviDelegate->seek(chunkOffset);
     if (seekRez == -1)
         return seekRez;
-    qint64 rez = m_currentChunk.startTime + seekRez;
+    qint64 rez = m_currentChunk.startTimeMs + seekRez;
     //cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
     /*
     QString s;
@@ -189,6 +189,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
 
 qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
+    m_tmpData.clear();
     // change time by playback mask
     if (!m_motionRegion.isEmpty())
         time = correctTimeByMask(time);
@@ -212,7 +213,7 @@ begin_label:
         DeviceFileCatalog::Chunk chunk;
         do {
             chunk = m_chunkSequence->getNextChunk(m_resource);
-            if (chunk.startTime == -1) 
+            if (chunk.startTimeMs == -1) 
             {
                 if (m_reverseMode) {
                     data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
@@ -227,7 +228,7 @@ begin_label:
     }
     if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) 
     {
-        data->timestamp +=m_currentChunk.startTime;
+        data->timestamp +=m_currentChunk.startTimeMs*1000;
 
         if (!m_playbackMask.isEmpty()) 
         {
@@ -259,7 +260,10 @@ begin_label:
         if (!m_motionConnection)
             m_motionConnection = QnMotionHelper::instance()->createConnection(m_resource);
         QnMetaDataV1Ptr motion = m_motionConnection->getMotionData(data->timestamp);
-        if (motion) {
+        if (motion) 
+        {
+            motion->flags = data->flags;
+            motion->opaque = data->opaque;
             m_tmpData = data;
             return motion;
         }
@@ -291,7 +295,7 @@ AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
 
 bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newChunk)
 {
-    if (newChunk.startTime == -1)
+    if (newChunk.startTimeMs == -1)
         return false;
     m_currentChunk = newChunk;
     QString url = m_catalog->fullFileName(m_currentChunk);

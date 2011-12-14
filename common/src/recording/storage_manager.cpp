@@ -101,11 +101,11 @@ QnStorageManager* QnStorageManager::instance()
     return inst();
 }
 
-QString QnStorageManager::dateTimeStr(qint64 dateTimeMks)
+QString QnStorageManager::dateTimeStr(qint64 dateTimeMs)
 {
     QString text;
     QTextStream str(&text);
-    QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(dateTimeMks/1000);
+    QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(dateTimeMs);
     str << QString::number(fileDate.date().year()) << '/';
     str << strPadLeft(QString::number(fileDate.date().month()), 2, '0') << '/';
     str << strPadLeft(QString::number(fileDate.date().day()), 2, '0') << '/';
@@ -211,7 +211,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac)
     return fileCatalog;
 }
 
-bool QnStorageManager::fileFinished(int duration, const QString& fileName)
+bool QnStorageManager::fileFinished(int durationMs, const QString& fileName)
 {
     QMutexLocker lock(&m_mutex);
     for(QMap<int, QnStoragePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
@@ -229,14 +229,14 @@ bool QnStorageManager::fileFinished(int duration, const QString& fileName)
             if (catalog == 0)
                 return false;
             QFileInfo fi(fileName);
-            catalog->updateDuration(duration);
+            catalog->updateDuration(durationMs);
             return true;
         }
     }
     return false;
 }
 
-bool QnStorageManager::fileStarted(const qint64& startDate, const QString& fileName)
+bool QnStorageManager::fileStarted(const qint64& startDateMs, const QString& fileName)
 {
     QMutexLocker lock(&m_mutex);
     for(QMap<int, QnStoragePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
@@ -253,7 +253,7 @@ bool QnStorageManager::fileStarted(const qint64& startDate, const QString& fileN
             if (catalog == 0)
                 return false;
             QFileInfo fi(fileName);
-            catalog->addRecord(DeviceFileCatalog::Chunk(startDate, itr.key(), fi.baseName().toInt(), -1));
+            catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, itr.key(), fi.baseName().toInt(), -1));
             return true;
         }
     }
@@ -284,7 +284,7 @@ void QnChunkSequence::addResource(QnNetworkResourcePtr res)
     //QString root = qnStorageMan->storageRoots().begin().value()->getUrl(); // index stored at primary storage
     info.m_catalog = qnStorageMan->getFileCatalog(res->getMAC().toString());
     connect(info.m_catalog.data(), SIGNAL(firstDataRemoved(int)), this, SLOT(onFirstDataRemoved(int)));
-    info.m_startTime = m_startTime;
+    info.m_startTimeMs = m_startTime;
     info.m_index = -1;
     m_cache.insert(res, info);
 }
@@ -303,8 +303,7 @@ void QnChunkSequence::onFirstDataRemoved(int n)
     }
 }
 
-/*
-DeviceFileCatalog::Chunk QnChunkSequence::getPrevChunk(QnResourcePtr res)
+DeviceFileCatalog::Chunk QnChunkSequence::findChunk(QnResourcePtr res, qint64 timeUsec, DeviceFileCatalog::FindMethod findMethod)
 {
     QMap<QnResourcePtr, CacheInfo>::iterator resourceItr = m_cache.find(res);
     if (resourceItr == m_cache.end())
@@ -312,45 +311,21 @@ DeviceFileCatalog::Chunk QnChunkSequence::getPrevChunk(QnResourcePtr res)
 
     CacheInfo& info = resourceItr.value();
 
-    // we can reset index in any time if we are going to search from begin again
-    if (info.m_index == -1) {
-        info.m_index = info.m_catalog->findFileIndex(0);
-    }
-
-    if (info.m_index != -1 && info.m_index > 0) 
-    {
-        DeviceFileCatalog::Chunk chunk = info.m_catalog->chunkAt(info.m_index-1);
-        info.m_startTime = chunk.startTime;
-        info.m_index--;
-        return chunk;
-    }
-    return DeviceFileCatalog::Chunk();
-}
-*/
-
-DeviceFileCatalog::Chunk QnChunkSequence::findChunk(QnResourcePtr res, qint64 time, DeviceFileCatalog::FindMethod findMethod)
-{
-    QMap<QnResourcePtr, CacheInfo>::iterator resourceItr = m_cache.find(res);
-    if (resourceItr == m_cache.end())
-        return DeviceFileCatalog::Chunk();
-
-    CacheInfo& info = resourceItr.value();
-
-    if (time != -1) {
+    if (timeUsec != -1) {
         info.m_index = -1;
-        info.m_startTime = time;
+        info.m_startTimeMs = timeUsec/1000;
     }
     // we can reset index in any time if we are going to search from begin again
     if (info.m_index == -1) {
-        info.m_index = info.m_catalog->findFileIndex(info.m_startTime, findMethod);
+        info.m_index = info.m_catalog->findFileIndex(info.m_startTimeMs, findMethod);
     }
 
     if (info.m_index != -1) 
     {
         DeviceFileCatalog::Chunk chunk = info.m_catalog->chunkAt(info.m_index);
-        if (chunk.startTime != -1) 
+        if (chunk.startTimeMs != -1) 
         {
-            info.m_startTime = chunk.startTime;
+            info.m_startTimeMs = chunk.startTimeMs;
             info.m_index++;
         }
         else {
@@ -365,14 +340,4 @@ DeviceFileCatalog::Chunk QnChunkSequence::findChunk(QnResourcePtr res, qint64 ti
 DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res)
 {
     return findChunk(res, -1, DeviceFileCatalog::OnRecordHole_NextChunk);
-}
-
-qint64 QnChunkSequence::nextChunkStartTime(QnResourcePtr res)
-{
-    QMap<QnResourcePtr, CacheInfo>::iterator resourceItr = m_cache.find(res);
-    if (resourceItr == m_cache.end())
-        return -1;
-
-    CacheInfo& info = resourceItr.value();
-    return info.m_catalog->chunkAt(info.m_index+1).startTime;
 }

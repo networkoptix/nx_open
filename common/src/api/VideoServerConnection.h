@@ -1,6 +1,7 @@
 #ifndef __VIDEO_SERVER_CONNECTION_H_
 #define __VIDEO_SERVER_CONNECTION_H_
 
+#include <QRegion>
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QAuthenticator>
@@ -17,12 +18,12 @@ public:
     QnVideoServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QObject *parent = NULL);
     virtual ~QnVideoServerConnection();
 
-    QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeUSec = 0, qint64 endTimeUSec = INT64_MAX, qint64 detail = 1);
+    QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QRegion& motionRegion = QRegion());
 
-    void asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, QObject *target, const char *slot);
+    void asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot);
 
 protected:
-    QnRequestParamList createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail);
+    QnRequestParamList createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QRegion& motionRegion);
 
 private:
     QScopedPointer<VideoServerSessionManager> m_sessionManager;

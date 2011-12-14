@@ -14,19 +14,19 @@ typedef QVector<QnTimePeriod> QnTimePeriodList;
 
 struct QnTimePeriod
 {
-    QnTimePeriod(): startTimeUSec(0), durationUSec(0) {}
-    QnTimePeriod(qint64 startTimeUSec, qint64 durationUSec): startTimeUSec(startTimeUSec), durationUSec(durationUSec) {}
+    QnTimePeriod(): startTimeMs(0), durationMs(0) {}
+    QnTimePeriod(qint64 _startTimeMs, int _durationMs): startTimeMs(_startTimeMs), durationMs(_durationMs) {}
 
     static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
 
-    /** Start time in microseconds. */
-    qint64 startTimeUSec;
+    /** Start time in milliseconds. */
+    qint64 startTimeMs;
 
-    /** Duration in microseconds. 
+    /** Duration in milliseconds. 
      * 
      * -1 if duration is infinite or unknown. It may be the case if this time period 
      * represents a video chunk that is being recorded at the moment. */
-    qint64 durationUSec;
+    qint64 durationMs;
 
 };
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
@@ -42,14 +42,14 @@ signals:
 public:
     struct Chunk
     {
-        Chunk(): startTime(-1), storageIndex(0), fileIndex(0), duration(0) {}
+        Chunk(): startTimeMs(-1), storageIndex(0), fileIndex(0), durationMs(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration) : 
-            startTime(_startTime), storageIndex(_storageIndex), fileIndex(_fileIndex), duration(_duration) {}
+            startTimeMs(_startTime), storageIndex(_storageIndex), fileIndex(_fileIndex), durationMs(_duration) {}
 
-        qint64 startTime;
+        qint64 startTimeMs; // chunk startTime at ms
         quint16 storageIndex;
         quint16 fileIndex;
-        int duration; // chunk duration at ms
+        int durationMs; // chunk duration at ms
     };
 
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
@@ -57,9 +57,9 @@ public:
     DeviceFileCatalog(const QString& macAddress);
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
-    void updateDuration(int duration);
+    void updateDuration(int durationMs);
     bool deleteFirstRecord();
-    int findFileIndex(qint64 startTime, FindMethod method) const;
+    int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;
     qint64 minTime() const;
@@ -74,7 +74,7 @@ public:
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
-    qint64 recreateFile(const QString& fileName, qint64 startTime);
+    qint64 recreateFile(const QString& fileName, qint64 startTimeMs);
 private:
     mutable QMutex m_mutex;
     QFile m_file;

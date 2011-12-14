@@ -36,12 +36,12 @@ void QnMotionHelper::saveToArchive(QnMetaDataV1Ptr data)
 
 }
 
-QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime)
+QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QnTimePeriodList rez;
     QnMotionArchive* archive = getArchive(res);
     if (archive) 
-        rez =  archive->mathPeriod(region, msStartTime, msEndTime);
+        rez =  archive->mathPeriod(region, msStartTime, msEndTime, detailLevel);
     return rez;
 }
 
@@ -55,14 +55,14 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(QnResourcePtr res)
 }
 
 
-QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime)
+QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QVector<QnTimePeriodList> data;
     foreach(QnResourcePtr res, resList)
     {
         QnMotionArchive* archive = getArchive(res);
         if (archive) 
-            data << archive->mathPeriod(region, msStartTime, msEndTime);
+            data << archive->mathPeriod(region, msStartTime, msEndTime, detailLevel);
     }
     return QnTimePeriod::mergeTimePeriods(data);
 }

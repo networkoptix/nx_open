@@ -44,9 +44,8 @@ void QnStreamRecorder::close()
         {
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+m_startDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_startOffset+m_endDateTime/1000).toAscii().data(), 0);
-            //qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
             if (m_truncateInterval != 0)
-                qnStorageMan->fileFinished(m_endDateTime - m_startDateTime, m_fileName);
+                qnStorageMan->fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
         }
 
         if (m_packetWrited)
@@ -168,7 +167,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        m_fileName = qnStorageMan->getFileName(m_startDateTime, netResource);
+        m_fileName = qnStorageMan->getFileName(m_startDateTime/1000, netResource);
     }
     else {
         m_fileName = m_fixedFileName;
@@ -186,7 +185,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
 
     if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(m_startDateTime, m_fileName);
+        qnStorageMan->fileStarted(m_startDateTime/1000, m_fileName);
     }
 
     outputCtx->video_codec = mediaData->compressionType;
