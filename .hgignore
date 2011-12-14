@@ -24,6 +24,7 @@ Debug
 Release
 
 appserver/db/appserver.db
+appserver/db/appserver_debug.db
 appserver/protocol/*.py
 
 bin
