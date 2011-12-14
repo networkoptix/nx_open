@@ -37,6 +37,11 @@ namespace {
 } // anonymous namespace
 
 
+//void ViewportRectAccessor: public  {
+
+//};
+
+
 QnViewportAnimator::QnViewportAnimator(QObject *parent):
     QObject(parent),
     m_view(NULL),
