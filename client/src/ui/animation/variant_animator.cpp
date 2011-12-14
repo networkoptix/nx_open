@@ -35,25 +35,16 @@ void QnVariantAnimator::setSpeed(qreal speed) {
     invalidateDuration();
 }
 
-void QnVariantAnimator::setGetter(QnAbstractGetter *getter) {
+void QnVariantAnimator::setAccessor(QnAbstractAccessor *accessor) {
     if(isRunning()) {
-        qnWarning("Cannot change getter of a running animator.");
+        qnWarning("Cannot change accessor of a running animator.");
         return;
     }
 
-    m_getter.reset(getter);
+    m_accessor.reset(accessor);
 
     invalidateDuration();
     setType(currentValue().userType());
-}
-
-void QnVariantAnimator::setSetter(QnAbstractSetter *setter) {
-    if(isRunning()) {
-        qnWarning("Cannot change setter of a running animator.");
-        return;
-    }
-
-    m_setter.reset(setter);
 }
 
 void QnVariantAnimator::setConverter(QnAbstractConverter *converter) {
@@ -123,33 +114,28 @@ QVariant QnVariantAnimator::interpolated(const QVariant &from, const QVariant &t
 }
 
 QVariant QnVariantAnimator::currentValue() const {
-    if(getter() == NULL || targetObject() == NULL)
+    if(accessor() == NULL || targetObject() == NULL)
         return QVariant(type(), static_cast<void *>(NULL));
 
-    QVariant result = (*getter())(targetObject());
+    QVariant result = accessor()->get(targetObject());
     if(converter() != NULL)
         result = converter()->convertFrom(result);
     return result;
 }
 
 void QnVariantAnimator::updateCurrentValue(const QVariant &value) const {
-    if(setter() == NULL || targetObject() == NULL)
+    if(accessor() == NULL || targetObject() == NULL)
         return;
 
-    setter()->operator()(m_target, converter() == NULL ? value : converter()->convertTo(value));
+    accessor()->set(m_target, converter() == NULL ? value : converter()->convertTo(value));
 }
 
 void QnVariantAnimator::updateState(State newState) {
     State oldState = state();
 
     if(oldState == STOPPED) {
-        if(getter() == NULL) {
-            qnWarning("Getter not set, cannot start animator.");
-            return;
-        }
-
-        if(setter() == NULL) {
-            qnWarning("Setter not set, cannot start animator.");
+        if(accessor() == NULL) {
+            qnWarning("Accessor not set, cannot start animator.");
             return;
         }
 

@@ -32,15 +32,13 @@ QnCurtainAnimator::QnCurtainAnimator(int durationMSec, AnimationTimer *timer, QO
     qreal speed = 1.0 / (durationMSec / 1000.0);
 
     m_curtainColorAnimator = new QnVariantAnimator(this);
-    m_curtainColorAnimator->setSetter(new QnPropertySetter("color"));
-    m_curtainColorAnimator->setGetter(new QnPropertyGetter("color"));
+    m_curtainColorAnimator->setAccessor(new QnPropertyAccessor("color"));
     m_curtainColorAnimator->setConverter(new QnVectorToColorConverter());
     m_curtainColorAnimator->setTargetObject(NULL);
     m_curtainColorAnimator->setSpeed(speed);
 
     m_frameColorAnimator = new QnVariantAnimator(this);
-    m_frameColorAnimator->setSetter(new QnPropertySetter("frameColor"));
-    m_frameColorAnimator->setGetter(new QnPropertyGetter("frameColor"));
+    m_frameColorAnimator->setAccessor(new QnPropertyAccessor("frameColor"));
     m_frameColorAnimator->setConverter(new QnVectorToColorConverter());
     m_frameColorAnimator->setTargetObject(NULL);
     m_frameColorAnimator->setSpeed(speed);
