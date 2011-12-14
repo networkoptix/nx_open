@@ -5,67 +5,84 @@
 #ifndef ETKSYNCHTTP_H
 #define ETKSYNCHTTP_H
 
-#include <QAuthenticator>
-#include <QHostAddress>
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
 
-class QIODevice;
-class QByteArray;
+#include <QtNetwork/QNetworkReply>
+
+class QAuthenticator;
+class QNetworkAccessManager;
+class QNetworkProxy;
 
 /**
  * Provide a synchronous api over QHttp
  * Uses a QEventLoop to block until the request is completed
- * 
+ *
  * @author Iulian M <eti@erata.net>
  * Improved by Ivan Vigasin <ivigasin@networkoptix.com>.
  */
 class SyncHTTP : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
+
 public:
-    SyncHTTP(const QHostAddress &hostName, quint16 port = 80, const QAuthenticator &auth = QAuthenticator());
+    SyncHTTP(const QUrl &url, QObject *parent = 0);
     virtual ~SyncHTTP();
 
     /**
      * Send GET request and wait until finished.
      */
-    int syncGet(const QString &path, QIODevice *to);
+    int syncGet(const QUrl &url, QIODevice *to = 0);
 
     /**
-     * Send POST request and wait until finished. 
+     * Send POST request and wait until finished.
      */
-    int syncPost(const QString &path, QIODevice *data, QIODevice *to);
+    int syncPost(const QUrl &url, QIODevice *data, QIODevice *to = 0);
 
     /**
-     * Send POST request and wait until finished. 
+     * Send POST request and wait until finished.
      */
-    int syncPost(const QString &path, const QByteArray &data, QIODevice *to);
+    int syncPost(const QUrl &url, const QByteArray &data, QIODevice *to = 0);
 
     /**
      * Send asynchronous GET request. Given slot should take a pointer to QNetworkReply.
      */
-    void asyncGet(const QString &path, QObject *target, const char *slot);
+    QNetworkReply *asyncGet(const QUrl &url, QObject *target, const char *slot);
 
     /**
      * Send asynchronous POST request. Given slot should take a pointer to QNetworkReply.
      */
-    void asyncPost(const QString &path, QIODevice *data, QObject *target, const char *slot);
+    QNetworkReply *asyncPost(const QUrl &url, QIODevice *data, QObject *target, const char *slot);
 
     /**
      * Send asynchronous POST request. Given slot should take a pointer to QNetworkReply.
      */
-    void asyncPost(const QString &path, const QByteArray &data, QObject *target, const char *slot);
+    QNetworkReply *asyncPost(const QUrl &url, const QByteArray &data, QObject *target, const char *slot);
+
+Q_SIGNALS:
+    void error(int error);
+    void authenticationRequired(QAuthenticator *authenticator);
+#ifndef QT_NO_NETWORKPROXY
+    void proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator);
+#endif
 
 protected:
-    template<class Sender>
-    int syncRequest(const Sender &sender, const QString &path, QIODevice *data, QIODevice *to);
+    enum Operation {
+        GetOperation,
+        PostOperation
+    };
 
-    template<class Sender>
-    void asyncRequest(const Sender &sender, const QString &path, QIODevice *data, QObject *target, const char *slot);
+    QNetworkReply *asyncRequest(Operation op, const QUrl &url, QIODevice *data, QObject *target, const char *slot);
+    int syncRequest(Operation op, const QUrl &url, QIODevice *data, QIODevice *outgoingData);
+
+private Q_SLOTS:
+    void onError(QNetworkReply::NetworkError error);
+    void onAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
 
 private:
-    QHostAddress m_hostName;
-    quint16 m_port;
-    QString m_credentials;
+    QUrl m_url;
+    QByteArray m_credentials;
+    QNetworkAccessManager *m_accessManager;
 };
 
 #endif

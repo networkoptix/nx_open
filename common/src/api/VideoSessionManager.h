@@ -5,7 +5,7 @@
 #include "Types.h"
 
 namespace detail {
-    class VideoServerSessionManagerReplyProcessor: public QObject 
+    class VideoServerSessionManagerReplyProcessor: public QObject
     {
         Q_OBJECT;
     public:
@@ -19,11 +19,12 @@ namespace detail {
     };
 }
 
-class VideoServerSessionManager: public SessionManager 
+class VideoServerSessionManager: public SessionManager
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
-    VideoServerSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth, QObject *parent = NULL);
+    VideoServerSessionManager(const QUrl &url, QObject *parent = 0);
 
     int recordedTimePeriods(const QnRequestParamList& params, QnApiRecordedTimePeriodsResponsePtr& timePeriodList);
 

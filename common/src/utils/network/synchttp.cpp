@@ -1,105 +1,120 @@
 #include "synchttp.h"
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 
-namespace {
-    struct Poster {
-        QNetworkReply *operator()(QNetworkAccessManager *manager, const QNetworkRequest &request, QIODevice *data) const {
-            return manager->post(request, data);
-        }
-    };
+#include <QtCore/QBuffer>
+#include <QtCore/QEventLoop>
 
-    struct Getter {
-        QNetworkReply *operator()(QNetworkAccessManager *manager, const QNetworkRequest &request, QIODevice *) const {
-            return manager->get(request);
-        }
-    };
-}
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
 
-SyncHTTP::SyncHTTP (const QHostAddress & hostName, quint16 port, const QAuthenticator &auth)
-    : m_hostName(hostName),
-      m_port(port)
+SyncHTTP::SyncHTTP(const QUrl &url, QObject *parent)
+    : QObject(parent),
+      m_url(url)
 {
-    m_credentials = auth.user() + ":" + auth.password();
-    m_credentials = "Basic " + m_credentials.toAscii().toBase64();
+    if (!m_url.userInfo().isEmpty())
+        m_credentials = "Basic " + m_url.userInfo().toLatin1().toBase64();
+    m_url.setUserInfo(QString());
+    m_url.setPath(QString());
 }
 
 SyncHTTP::~SyncHTTP ()
 {
 }
 
-template<class Sender>
-int SyncHTTP::syncRequest(const Sender &sender, const QString &path, QIODevice *data, QIODevice *to) 
+QNetworkReply *SyncHTTP::asyncGet(const QUrl &url, QObject *target, const char *slot)
 {
-    /* Prepare request. */
-    QNetworkRequest request(QUrl("http://" + m_hostName.toString() + ":" + QString::number(m_port) + "/" + path));
-    request.setRawHeader(QByteArray("Authorization"), m_credentials.toAscii());
+    return asyncRequest(GetOperation, url, 0, target, slot);
+}
 
-    /* Prepare network & sync machinery. */
-    QNetworkAccessManager accessManager;
+QNetworkReply *SyncHTTP::asyncPost(const QUrl &url, QIODevice *data, QObject *target, const char *slot)
+{
+    return asyncRequest(PostOperation, url, data, target, slot);
+}
+
+QNetworkReply *SyncHTTP::asyncPost(const QUrl &url, const QByteArray &data, QObject *target, const char *slot)
+{
+    QBuffer *buffer = new QBuffer;
+    buffer->setData(data);
+    buffer->open(QIODevice::ReadOnly);
+
+    QNetworkReply *reply = asyncPost(url, buffer, target, slot);
+    buffer->setParent(reply);
+    return reply;
+}
+
+int SyncHTTP::syncGet(const QUrl &url, QIODevice *to)
+{
+    return syncRequest(GetOperation, url, NULL, to);
+}
+
+int SyncHTTP::syncPost(const QUrl &url, QIODevice *data, QIODevice *to)
+{
+    return syncRequest(PostOperation, url, data, to);
+}
+
+int SyncHTTP::syncPost(const QUrl &url, const QByteArray &data, QIODevice *to)
+{
+    QBuffer buffer;
+    buffer.setData(data);
+    buffer.open(QIODevice::ReadOnly);
+
+    return syncPost(url, &buffer, to);
+}
+
+QNetworkReply *SyncHTTP::asyncRequest(Operation op, const QUrl &url, QIODevice *data, QObject *target, const char *slot)
+{
+    QNetworkRequest request(url.isValid() && !url.isRelative() ? url : m_url.resolved(url));
+    if (!m_credentials.isEmpty())
+        request.setRawHeader("Authorization", m_credentials);
+
+    QNetworkAccessManager *accessManager = new QNetworkAccessManager(this); // ###
+    connect(accessManager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+            this, SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
+    connect(accessManager, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)),
+            this, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)));
+    if (target && slot)
+        connect(accessManager, SIGNAL(finished(QNetworkReply*)), target, slot, Qt::UniqueConnection);
+
+    QNetworkReply *reply = 0;
+    switch (op) {
+    case GetOperation:
+        reply = accessManager->get(request);
+        break;
+    case PostOperation:
+        reply = accessManager->post(request, data);
+        break;
+    default:
+        qWarning("SyncHTTP::asyncRequest(): Unsupported operation");
+        break;
+    }
+
+    if (reply) {
+        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onError(QNetworkReply::NetworkError)));
+        connect(reply, SIGNAL(destroyed()), accessManager, SLOT(deleteLater()));
+    }
+
+    return reply;
+}
+
+int SyncHTTP::syncRequest(Operation op, const QUrl &url, QIODevice *data, QIODevice *outgoingData)
+{
     QEventLoop loop;
-    connect(&accessManager, SIGNAL(finished(QNetworkReply*)), &loop, SLOT(quit()));
 
-    /* Send request. */
-    QScopedPointer<QNetworkReply> reply(sender(&accessManager, request, data));
+    QNetworkReply *reply = asyncRequest(op, url, data, &loop, SLOT(quit()));
 
-    /* Wait for the request to finish. */
     loop.exec();
 
-    /* Prepare result. */
     int error = reply->error();
-    if(to != NULL)
-        to->write(reply->readAll());
+    if (outgoingData)
+        outgoingData->write(reply->readAll());
     return error;
 }
 
-int SyncHTTP::syncGet(const QString &path, QIODevice *to)
+void SyncHTTP::onError(QNetworkReply::NetworkError err)
 {
-    return syncRequest(Getter(), path, NULL, to);
+    Q_EMIT error(int(err));
 }
 
-int SyncHTTP::syncPost(const QString & path, QIODevice * data, QIODevice * to)
+void SyncHTTP::onAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
 {
-    return syncRequest(Poster(), path, data, to);
-}
-
-int SyncHTTP::syncPost(const QString& path, const QByteArray& data, QIODevice* to)
-{
-    QBuffer buffer;
-    buffer.setData(data);
-    return syncPost(path, &buffer, to);
-}
-
-template<class Sender>
-void SyncHTTP::asyncRequest(const Sender &sender, const QString &path, QIODevice *data, QObject *target, const char *slot) 
-{
-    /* Prepare request. */
-    QNetworkRequest request(QUrl("http://" + m_hostName.toString() + ":" + QString::number(m_port) + "/" + path));
-    request.setRawHeader(QByteArray("Authorization"), m_credentials.toAscii());
-
-    /* Prepare network machinery. */
-    QNetworkAccessManager *accessManager = new QNetworkAccessManager();
-    connect(accessManager, SIGNAL(finished(QNetworkReply*)), accessManager, SLOT(deleteLater()));
-    connect(accessManager, SIGNAL(finished(QNetworkReply*)), target, slot);
-
-    /* Send request. */
-    sender(accessManager, request, data);
-}
-
-void SyncHTTP::asyncGet(const QString &path, QObject *target, const char *slot) 
-{
-    asyncRequest(Getter(), path, NULL, target, slot);
-}
-
-void SyncHTTP::asyncPost(const QString &path, QIODevice *data, QObject *target, const char *slot) 
-{
-    asyncRequest(Poster(), path, data, target, slot);
-}
-
-void SyncHTTP::asyncPost(const QString &path, const QByteArray &data, QObject *target, const char *slot) 
-{
-    QBuffer buffer;
-    buffer.setData(data);
-    return asyncPost(path, &buffer, target, slot);
+    Q_EMIT authenticationRequired(authenticator);
 }

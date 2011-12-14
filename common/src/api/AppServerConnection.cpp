@@ -14,13 +14,9 @@
 #include "api/AppSessionManager.h"
 
 QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory)
-    : m_resourceFactory(resourceFactory)
+    : m_sessionManager(new AppSessionManager(url)),
+      m_resourceFactory(resourceFactory)
 {
-    QAuthenticator auth;
-    auth.setUser(url.userName());
-    auth.setPassword(url.password());
-
-    m_sessionManager = QSharedPointer<AppSessionManager>(new AppSessionManager(QHostAddress(url.host()), url.port(), auth));
 }
 
 bool QnAppServerConnection::isConnected() const
@@ -137,25 +133,38 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
     return status;
 }
 
-QString QnAppServerConnection::getLastError() const
+QString QnAppServerConnection::lastError() const
 {
-    return m_sessionManager->getLastError();
+    return m_sessionManager->lastError();
 }
 
 
-Q_GLOBAL_STATIC(QUrl, theAppServerConnectionFactoryDefaultUrl)
+Q_GLOBAL_STATIC(QnAppServerConnectionFactory, theAppServerConnectionFactory)
 
-void QnAppServerConnectionFactory::initialize(const QUrl &url)
+QUrl QnAppServerConnectionFactory::defaultUrl()
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+//        QMutexLocker locker(&factory->m_mutex);
+        return factory->m_url;
+    }
+
+    return QUrl();
+}
+
+void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 {
     Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url has passed");
     Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
-    *theAppServerConnectionFactoryDefaultUrl() = url;
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+//        QMutexLocker locker(&factory->m_mutex);
+        factory->m_url = url;
+    }
 }
 
 QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory &resourceFactory)
 {
-    const QUrl &url = *theAppServerConnectionFactoryDefaultUrl();
+    QUrl url = defaultUrl();
 
     cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
 

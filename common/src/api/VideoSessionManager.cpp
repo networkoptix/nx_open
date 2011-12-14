@@ -10,7 +10,7 @@
 namespace {
     const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;
 
-    int parseRecordedTimePeriods(const QByteArray &reply, QnApiRecordedTimePeriodsResponsePtr *result) 
+    int parseRecordedTimePeriods(const QByteArray &reply, QnApiRecordedTimePeriodsResponsePtr *result)
     {
         using xsd::api::recordedTimePeriods::recordedTimePeriods;
 
@@ -34,7 +34,7 @@ namespace {
 } // anonymous namespace
 
 
-void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply) 
+void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply)
 {
     QnApiRecordedTimePeriodsResponsePtr result;
     if(status == 0)
@@ -45,8 +45,8 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
     deleteLater();
 }
 
-VideoServerSessionManager::VideoServerSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth, QObject *parent):
-    SessionManager(host, port, auth, parent)
+VideoServerSessionManager::VideoServerSessionManager(const QUrl &url, QObject *parent)
+    : SessionManager(url, parent)
 {
 }
 
@@ -59,7 +59,7 @@ int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& par
     return parseRecordedTimePeriods(reply, &timePeriodList);
 }
 
-void VideoServerSessionManager::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot) 
+void VideoServerSessionManager::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot)
 {
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnApiRecordedTimePeriodsResponsePtr &)), target, slot);

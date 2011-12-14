@@ -7,6 +7,7 @@
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QHostInfo>
+#include <QtNetwork/QNetworkInterface>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -78,7 +79,7 @@ QHostAddress resolveHost(const QString& hostString)
 
     // Initialize to zero
     host = QHostAddress();
-    foreach (QHostAddress address, info.addresses())
+    foreach (const QHostAddress &address, info.addresses())
     {
         if (address.toIPv4Address() != 0)
         {
@@ -116,7 +117,7 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 QString localMac(const QString& myAddress)
 {
-    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if (interface.allAddresses().contains(QHostAddress(myAddress)))
             return interface.hardwareAddress();
@@ -262,28 +263,16 @@ int serverMain(int argc, char *argv[])
 
 void initAppServerConnection(const QSettings &settings)
 {
-    QString hostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-
-    QHostAddress host = resolveHost(hostString);
-    while (host.toIPv4Address() == 0)
-    {
-        // resolveHost writes error to log.
-        // Just retry hoping resolving problem caused by temporary network failure
-        host = resolveHost(hostString);
-
-        QnSleep::msleep(1000);
-    }
-
     QUrl appServerUrl;
 
     // ### remove
     appServerUrl.setScheme(QLatin1String("http"));
-    appServerUrl.setHost(host.toString());
+    appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
-    QnAppServerConnectionFactory::initialize(appServerUrl);
+    QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
 }
 
 class QnMain : public QThread
@@ -326,7 +315,7 @@ public:
             if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
                 break;
 
-            qDebug() << "Can't get resource types: " << appServerConnection->getLastError();
+            qDebug() << "Can't get resource types: " << appServerConnection->lastError();
             QnSleep::msleep(1000);
         }
 
@@ -383,9 +372,7 @@ public:
             storage->setSpaceLimit(100ll * 1000 * 1024);
 
             if (appServerConnection->addStorage(*storage))
-            {
-                qDebug() << "Couldn't add storage: " << appServerConnection->getLastError();
-            }
+                qDebug() << "Couldn't add storage: " << appServerConnection->lastError();
 
             qnResPool->addResource(storage);
             qnStorageMan->addStorage(storage);
