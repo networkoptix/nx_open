@@ -22,8 +22,7 @@ QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
     m_channelRenderers.clear();
 }
 
-qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const 
-{ 
+qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const { 
     return m_channelRenderers[channel]->lastDisplayedTime();
 }
 
