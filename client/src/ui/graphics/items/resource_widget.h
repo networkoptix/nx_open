@@ -288,6 +288,7 @@ private:
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;
 
+    bool m_motionGridEnabled;
 };
 
 #endif // QN_RESOURCE_WIDGET_H
