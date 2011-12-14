@@ -1,9 +1,11 @@
 #include "navigationtreewidget.h"
 
+#include <QtCore/QEvent>
 #include <QtGui/QAction>
 #include <QtGui/QBoxLayout>
 #include <QtGui/QItemSelectionModel>
 #include <QtGui/QLineEdit>
+#include <QtGui/QMouseEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QTabWidget>
@@ -16,6 +18,8 @@
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/models/resourcemodel.h"
 #include "ui/skin.h"
+#include "ui/processors/dragprocessor.h"
+#include "utils/common/checked_cast.h"
 
 class NavigationTreeSortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -75,6 +79,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_resourcesTreeView->setSortingEnabled(false); // ###
     m_resourcesTreeView->setUniformRowHeights(true);
     m_resourcesTreeView->setWordWrap(false);
+    m_resourcesTreeView->installEventFilter(this);
 
     connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
@@ -86,6 +91,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_searchTreeView->setSortingEnabled(false); // ###
     m_searchTreeView->setUniformRowHeights(true);
     m_searchTreeView->setWordWrap(false);
+    m_searchTreeView->installEventFilter(this);
 
     connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
@@ -137,11 +143,30 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     setMaximumWidth(350);
     setAcceptDrops(true);
 
+    m_dragProcessor = new DragProcessor(this);
+
     filterChanged(QString());
 }
 
 NavigationTreeWidget::~NavigationTreeWidget()
 {
+}
+
+bool NavigationTreeWidget::eventFilter(QObject *watched, QEvent *event) {
+    QWidget *widget = checked_cast<QWidget *>(watched);
+
+    if(event->type() == QEvent::MouseButtonPress) 
+    {
+        QMouseEvent *e = static_cast<QMouseEvent *>(event);
+        if(e->button() == Qt::LeftButton)
+            m_dragProcessor->widgetEvent(widget, event);
+    } 
+    else 
+    {
+        m_dragProcessor->widgetEvent(widget, event);
+    }
+
+    return false;
 }
 
 void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
@@ -234,4 +259,29 @@ void NavigationTreeWidget::open()
     QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         itemActivated(index);
+}
+
+void NavigationTreeWidget::startDragProcess( DragInfo *info )
+{
+    qDebug() << "startDragProcess";
+}
+
+void NavigationTreeWidget::startDrag( DragInfo *info )
+{
+    qDebug() << "startDrag";
+}
+
+void NavigationTreeWidget::dragMove( DragInfo *info )
+{
+    qDebug() << "dragMove";
+}
+
+void NavigationTreeWidget::finishDrag( DragInfo *info )
+{
+    qDebug() << "finishDrag";
+}
+
+void NavigationTreeWidget::finishDragProcess( DragInfo *info )
+{
+    qDebug() << "finishDragProcess";
 }

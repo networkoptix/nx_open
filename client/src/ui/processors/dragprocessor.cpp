@@ -358,6 +358,25 @@ void DragProcessor::mouseReleaseEventInternal(T *object, Event *event) {
     }
 }
 
+void DragProcessor::widgetEvent(QWidget *widget, QEvent *event) {
+    switch(event->type()) {
+    case QEvent::MouseButtonPress:
+        widgetMousePressEvent(widget, static_cast<QMouseEvent *>(event));
+        break;
+    case QEvent::MouseMove:
+        widgetMouseMoveEvent(widget, static_cast<QMouseEvent *>(event));
+        break;
+    case QEvent::MouseButtonRelease:
+        widgetMouseReleaseEvent(widget, static_cast<QMouseEvent *>(event));
+        break;
+    case QEvent::Paint:
+        widgetPaintEvent(widget, static_cast<QPaintEvent *>(event));
+        break;
+    default:
+        break;
+    }
+}
+
 void DragProcessor::widgetMousePressEvent(QWidget *widget, QMouseEvent *event) {
     mousePressEventInternal(widget, event);
 }

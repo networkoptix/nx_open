@@ -93,6 +93,8 @@ public:
     /* Set of widget-level event handler functions that are to be used from user code
      * in case drag processor is used outside the graphics view framework. */
 
+    void widgetEvent(QWidget *widget, QEvent *event);
+
     void widgetMousePressEvent(QWidget *widget, QMouseEvent *event);
 
     void widgetMouseMoveEvent(QWidget *widget, QMouseEvent *event);
