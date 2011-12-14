@@ -27,6 +27,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void filterChanged(const QString &filter);
     void itemActivated(const QModelIndex &index);
+    void open();
 
 private:
     QTabWidget *m_tabWidget;
@@ -36,9 +37,10 @@ private:
     QLineEdit *m_filterLineEdit;
     QToolButton *m_clearFilterButton;
 
-    QAbstractItemModel *m_model;
-    QSortFilterProxyModel *m_proxyModel;
-    QTreeView *m_navigationTreeView;
+    QAbstractItemModel *m_resourcesModel;
+    QTreeView *m_resourcesTreeView;
+    QSortFilterProxyModel *m_searchProxyModel;
+    QTreeView *m_searchTreeView;
 };
 
 #endif // NAVIGATIONTREEWIDGET_H

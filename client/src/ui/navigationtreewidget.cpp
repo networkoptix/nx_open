@@ -65,28 +65,41 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
 
 
-    m_navigationTreeView = new QTreeView(this);
+    m_resourcesModel = new ResourceModel(this);
 
-    m_model = new ResourceModel(m_navigationTreeView);
+    m_resourcesTreeView = new QTreeView(this);
+    m_resourcesTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_resourcesTreeView->setAllColumnsShowFocus(true);
+    m_resourcesTreeView->setRootIsDecorated(true);
+    m_resourcesTreeView->setHeaderHidden(true); // ###
+    m_resourcesTreeView->setSortingEnabled(false); // ###
+    m_resourcesTreeView->setUniformRowHeights(true);
+    m_resourcesTreeView->setWordWrap(false);
 
-    m_proxyModel = new NavigationTreeSortFilterProxyModel(m_model);
-    m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    m_proxyModel->setFilterKeyColumn(0);
-    m_proxyModel->setFilterRole(Qt::UserRole + 2);
-    m_proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    m_proxyModel->setDynamicSortFilter(true);
-    m_proxyModel->setSourceModel(m_model);
+    connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
-    m_navigationTreeView->setModel(m_proxyModel);
-    m_navigationTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_navigationTreeView->setAllColumnsShowFocus(true);
-    m_navigationTreeView->setRootIsDecorated(true);
-    m_navigationTreeView->setHeaderHidden(true); // ###
-    m_navigationTreeView->setSortingEnabled(false); // ###
-    m_navigationTreeView->setUniformRowHeights(true);
-    m_navigationTreeView->setWordWrap(false);
+    m_searchTreeView = new QTreeView(this);
+    m_searchTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_searchTreeView->setAllColumnsShowFocus(true);
+    m_searchTreeView->setRootIsDecorated(true);
+    m_searchTreeView->setHeaderHidden(true); // ###
+    m_searchTreeView->setSortingEnabled(false); // ###
+    m_searchTreeView->setUniformRowHeights(true);
+    m_searchTreeView->setWordWrap(false);
 
-    connect(m_navigationTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
+    connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
+
+    m_searchProxyModel = new NavigationTreeSortFilterProxyModel(m_searchTreeView);
+    m_searchProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_searchProxyModel->setFilterKeyColumn(0);
+    m_searchProxyModel->setFilterRole(Qt::UserRole + 2);
+    m_searchProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    m_searchProxyModel->setDynamicSortFilter(true);
+    m_searchProxyModel->setSourceModel(m_resourcesModel);
+
+    m_resourcesTreeView->setModel(m_resourcesModel);
+    m_searchTreeView->setModel(m_searchProxyModel);
+    QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
 
 
     QHBoxLayout *topLayout = new QHBoxLayout;
@@ -95,33 +108,36 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     topLayout->addWidget(m_nextItemButton);
     topLayout->addWidget(m_filterLineEdit);
     topLayout->addWidget(m_clearFilterButton);
-/*
+#if 1
     QWidget *searchTab = new QWidget(this);
 
     QVBoxLayout *searchTabLayout = new QVBoxLayout;
     searchTabLayout->setContentsMargins(0, 0, 0, 0);
     searchTabLayout->addLayout(topLayout);
-    //searchTabLayout->addWidget(m_navigationTreeView);
+    searchTabLayout->addWidget(m_searchTreeView);
     searchTab->setLayout(searchTabLayout);
 
     m_tabWidget = new QTabWidget(this);
-    m_tabWidget->addTab(m_navigationTreeView, tr("Resources"));
+    m_tabWidget->addTab(m_resourcesTreeView, tr("Resources"));
     m_tabWidget->addTab(searchTab, tr("Search"));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
-*/
+#else
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addLayout(topLayout);
-    mainLayout->addWidget(m_navigationTreeView);
+    mainLayout->addWidget(m_resourcesTreeView);
     setLayout(mainLayout);
+#endif
 
     setMinimumWidth(200);
     setMaximumWidth(350);
     setAcceptDrops(true);
+
+    filterChanged(QString());
 }
 
 NavigationTreeWidget::~NavigationTreeWidget()
@@ -131,11 +147,16 @@ NavigationTreeWidget::~NavigationTreeWidget()
 void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
 {
     QnResourceList resources;
-    foreach (const QModelIndex &index, m_navigationTreeView->selectionModel()->selectedRows())
+    QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
+    foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         resources.append(qnResPool->getResourceById(QnId(QString::number(index.data(Qt::UserRole + 1).toUInt()))));
 
     QMenu menu;
 
+    QAction *openAction = new QAction(tr("Open"), &menu);
+    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+    menu.addAction(openAction);
+    menu.addSeparator();
     if (resources.size() == 1)
     {
         const QnResourcePtr resource = resources.first();
@@ -192,16 +213,25 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
     if (!filter.isEmpty())
     {
         m_clearFilterButton->show();
-        m_proxyModel->setFilterWildcard(QLatin1Char('*') + filter + QLatin1Char('*'));
+        m_searchProxyModel->setFilterWildcard(QLatin1Char('*') + filter + QLatin1Char('*'));
+        m_searchTreeView->expandAll();
     }
     else
     {
         m_clearFilterButton->hide();
-        m_proxyModel->invalidate();
+        //m_searchProxyModel->invalidate();
+        m_searchProxyModel->setFilterRegExp(QLatin1String("^$")); // ###
     }
 }
 
 void NavigationTreeWidget::itemActivated(const QModelIndex &index)
 {
     Q_EMIT activated(index.data(Qt::UserRole + 1).toUInt());
+}
+
+void NavigationTreeWidget::open()
+{
+    QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
+    foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
+        itemActivated(index);
 }
