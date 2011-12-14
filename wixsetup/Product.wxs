@@ -91,8 +91,8 @@
         </InstallUISequence>
         
         <InstallExecuteSequence>
-            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles">NOT Installed</Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd">NOT Installed</Custom>
+            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
             <RemoveExistingProducts Before="InstallInitialize" />
         </InstallExecuteSequence>
         
@@ -123,9 +123,9 @@
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="VMS Application Server" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuStartAppServer" Directory="ProgramMenuAppServerDir" Name="Start $(env.APPLICATION_NAME) Application Server"
-                                              WorkingDirectory='VmsAppServerDir' Advertise="yes" Icon="icon_menu.exe" />
+                                              WorkingDirectory='VmsAppServerDir' Advertise="no" Icon="icon_menu.exe"/>
                                     <Shortcut Id="StartmenuStopAppServer" Directory="ProgramMenuAppServerDir" Name="Stop $(env.APPLICATION_NAME) Application Server"
-                                              WorkingDirectory='VmsAppServerDir' Advertise="yes" Icon="icon_menu.exe" Arguments="-t"/>
+                                              WorkingDirectory='VmsAppServerDir' Advertise="no" Icon="icon_menu.exe" Arguments="-t"/>
                                 </File>
                                 <File Id="dbconfigexe" Name="dbconfig.exe" Source="../appserver/build/exe.win32-2.7/dbconfig.exe"/>
                                 <File Id="bz2pyd" Name="bz2.pyd" Source="../appserver/build/exe.win32-2.7/bz2.pyd"/>
@@ -204,15 +204,15 @@
                             </Directory>
                         </Directory>
                         
-                        <Directory Id="VmsServerDir" Name="Server">
+                        <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../server/bin/release/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="VMS Media Server" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuStartMediaServer" Directory="ProgramMenuMediaServerDir" Name="Start $(env.APPLICATION_NAME) Media Server"
-                                              WorkingDirectory='VmsMediaServerDir' Advertise="yes" Icon="icon_menu.exe" />
+                                              WorkingDirectory='VmsMediaServerDir' Advertise="no" Icon="icon_menu.exe" />
                                     <Shortcut Id="StartmenuStopMediaServer" Directory="ProgramMenuMediaServerDir" Name="Stop $(env.APPLICATION_NAME) Media Server"
-                                              WorkingDirectory='VmsMediaServerDir' Advertise="yes" Icon="icon_menu.exe" Arguments="-t"/>
+                                              WorkingDirectory='VmsMediaServerDir' Advertise="no" Icon="icon_menu.exe" Arguments="-t"/>
                                 </File>
                                 
                                 <ServiceInstall Id="VmsMediaServerService"
