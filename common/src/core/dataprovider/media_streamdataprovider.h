@@ -10,6 +10,7 @@ class QnVideoResourceLayout;
 class QnResourceAudioLayout;
 
 #define MAX_LIVE_FPS 10000000.0
+#define META_DATA_DURATION_MS 300
 
 class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
 {
@@ -48,6 +49,8 @@ protected:
     virtual void updateStreamParamsBasedOnQuality(){};
     virtual void updateStreamParamsBasedOnFps(){};
 
+    bool needMetaData() const; // used for live only 
+
 protected:
     int m_channel_number;
 
@@ -56,7 +59,9 @@ protected:
 	//int m_NumaberOfVideoChannels;
 	QnStreamQuality m_qulity;
 
-    float m_fps; // used only for live providers 
+    float m_fps; //used only for live providers
+    unsigned int m_framesSinceLastMetaData; // used only for live providers
+    QTime m_timeSinceLastMetaData; //used only for live providers
 
     int mFramesLost;
     QnMediaResourcePtr m_mediaResource;

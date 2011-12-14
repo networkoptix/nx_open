@@ -23,7 +23,9 @@ protected:
 
     virtual QnAbstractMediaDataPtr getNextData();
 	
-    
+private:
+
+    QnMetaDataV1Ptr getMetaData();
 
 protected:
 
@@ -39,7 +41,6 @@ protected:
     bool m_dualsensor;
     QString m_name;
 
-    bool m_motionSended;
 
 };
 

@@ -169,6 +169,11 @@ void QnResourceDisplay::pause() {
 }
 
 bool QnResourceDisplay::isPaused() {
+
+    if(m_archiveReader == NULL)
+        return false;
+
+
     return m_archiveReader->isMediaPaused();
 }
 

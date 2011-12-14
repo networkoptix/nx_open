@@ -203,11 +203,13 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
 
     QnParam& param = getResourceParamList().get(name);
 
+    /*
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         return false;
     }
+    /**/
 
 
     if (domain == QnDomainPhysical)
