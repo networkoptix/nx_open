@@ -18,9 +18,6 @@
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/models/resourcemodel.h"
 #include "ui/skin.h"
-#include "ui/processors/dragprocessor.h"
-#include "utils/common/checked_cast.h"
-#include "view_drag_and_drop.h"
 
 class NavigationTreeSortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -40,9 +37,6 @@ protected:
 NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     : QWidget(parent)
 {
-    m_dragProcessor = new DragProcessor(this);
-    m_dragProcessor->setHandler(this);
-
     m_previousItemButton = new QToolButton(this);
     m_previousItemButton->setText(QLatin1String("<"));
     m_previousItemButton->setToolTip(tr("Previous Item"));
@@ -83,7 +77,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_resourcesTreeView->setSortingEnabled(false); // ###
     m_resourcesTreeView->setUniformRowHeights(true);
     m_resourcesTreeView->setWordWrap(false);
-    m_resourcesTreeView->viewport()->installEventFilter(this);
+    m_resourcesTreeView->setDragDropMode(QAbstractItemView::DragOnly);
 
     connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
@@ -95,7 +89,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_searchTreeView->setSortingEnabled(false); // ###
     m_searchTreeView->setUniformRowHeights(true);
     m_searchTreeView->setWordWrap(false);
-    m_searchTreeView->viewport()->installEventFilter(this);
+    m_searchTreeView->setDragDropMode(QAbstractItemView::DragOnly);
 
     connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
@@ -152,26 +146,6 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
 NavigationTreeWidget::~NavigationTreeWidget()
 {
-}
-
-bool NavigationTreeWidget::eventFilter(QObject *watched, QEvent *event) {
-    QWidget *widget = checked_cast<QWidget *>(watched);
-
-    if(event->type() == QEvent::MouseButtonPress) 
-    {
-        QMouseEvent *e = static_cast<QMouseEvent *>(event);
-        if(e->button() == Qt::LeftButton)
-            m_dragProcessor->widgetEvent(widget, event);
-    } 
-    else 
-    {
-        m_dragProcessor->widgetEvent(widget, event);
-    }
-
-    if(m_dragProcessor->state() >= DragProcessor::PREPAIRING && event->type() == QEvent::MouseMove)
-        return true; /* Don't let default event handler kick in, it will change selection. */
-
-    return false;
 }
 
 void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
@@ -266,32 +240,3 @@ void NavigationTreeWidget::open()
         itemActivated(index);
 }
 
-void NavigationTreeWidget::startDrag(DragInfo *info)
-{
-    qDebug("startDrag");
-
-    QTreeView *treeView = checked_cast<QTreeView *>(info->widget()->parent());
-
-    QSet<uint> resourceIds;
-    foreach(const QModelIndex &index, treeView->selectionModel()->selectedIndexes())
-        resourceIds.insert(index.data(Qt::UserRole + 1).toUInt());
-    if(resourceIds.empty())
-        return;
-
-    QnResourceList resources;
-    foreach(uint resourceId, resourceIds)
-        resources.push_back(qnResPool->getResourceById(QVariant(resourceId)));
-
-    QDrag *drag = new QDrag(info->widget());
-    
-    QMimeData *mimeData = new QMimeData();
-    mimeData->setData(resourcesMime(), serializeResources(resources));
-    drag->setMimeData(mimeData);
-
-    qDebug("startDrag:exec");
-
-    m_dragProcessor->reset();
-
-    Qt::DropAction dropAction = drag->exec(Qt::CopyAction);
-    Q_UNUSED(dropAction);
-}

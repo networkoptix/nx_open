@@ -2,7 +2,6 @@
 #define NAVIGATIONTREEWIDGET_H
 
 #include <QtGui/QWidget>
-#include "ui/processors/dragprocesshandler.h"
 
 class QAbstractItemModel;
 class QLineEdit;
@@ -11,7 +10,7 @@ class QTabWidget;
 class QToolButton;
 class QTreeView;
 
-class NavigationTreeWidget : public QWidget, protected DragProcessHandler
+class NavigationTreeWidget : public QWidget
 {
     Q_OBJECT
 
@@ -19,12 +18,8 @@ public:
     NavigationTreeWidget(QWidget *parent = 0);
     ~NavigationTreeWidget();
 
-    bool eventFilter(QObject *watched, QEvent *event) override;
-
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
-
-    virtual void startDrag(DragInfo *info) override;
 
 Q_SIGNALS:
     void activated(uint resourceId);
@@ -46,8 +41,6 @@ private:
     QTreeView *m_resourcesTreeView;
     QSortFilterProxyModel *m_searchProxyModel;
     QTreeView *m_searchTreeView;
-
-    DragProcessor *m_dragProcessor;
 };
 
 #endif // NAVIGATIONTREEWIDGET_H
