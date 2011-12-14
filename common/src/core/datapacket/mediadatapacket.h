@@ -39,7 +39,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         channelNumber(0),
         subChannelNumber(0),
         context(0),
-        opaque(0)
+        opaque(0),
+        compressionType(CODEC_ID_NONE)
 	{
 	}
 
@@ -73,6 +74,9 @@ struct QnEmptyMediaData : public QnAbstractMediaData
     }
 };
 
+class QnMetaDataV1;
+typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
+
 
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
@@ -87,19 +91,20 @@ struct QnCompressedVideoData : public QnAbstractMediaData
         width = height = -1;
 	}
 
+
 	int width;
 	int height;
 	//bool keyFrame;
     //int flags;
 	bool ignore;
+    QnMetaDataV1Ptr motion;
+    
 };
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 
-struct QnMetaDataV1;
-typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
-
-enum {MD_WIDTH = 44, MD_HIGHT = 32};
+class QnMetaDataV1;
+enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 struct QnMetaDataV1 : public QnAbstractMediaData
 {
     QnMetaDataV1();
@@ -128,6 +133,8 @@ struct QnMetaDataV1 : public QnAbstractMediaData
         //return (b>>index) & 1 ;
         return (m_input >> index) & 1;
     }
+
+    bool containTime(const qint64 timeUsec) const;
 
     unsigned char i_mask;
     quint8 m_input;

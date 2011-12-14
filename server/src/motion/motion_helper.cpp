@@ -45,6 +45,16 @@ QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourcePtr 
     return rez;
 }
 
+QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(QnResourcePtr res)
+{
+    QnMotionArchive* archive = getArchive(res);
+    if (archive) 
+        return archive->createConnection();
+    else
+        return QnMotionArchiveConnectionPtr();
+}
+
+
 QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime)
 {
     QVector<QnTimePeriodList> data;

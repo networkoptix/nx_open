@@ -8,7 +8,9 @@
 
 class RTPSession;
 
+static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 5;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 5;
+static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
 
 struct RtspStatistic {
     quint32 timestamp;

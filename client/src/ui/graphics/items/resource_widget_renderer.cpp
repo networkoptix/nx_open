@@ -26,6 +26,12 @@ qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const {
     return m_channelRenderers[channel]->lastDisplayedTime();
 }
 
+QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const 
+{ 
+    return m_channelRenderers[channel]->lastFrameMetadata();
+}
+
+
 QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect) {
     frameDisplayed();
 

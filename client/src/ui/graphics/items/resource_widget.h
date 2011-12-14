@@ -10,6 +10,7 @@
 #include <ui/common/frame_section_queryable.h>
 #include <core/resource/resource_consumer.h>
 #include "polygonal_shadow_item.h"
+#include "core/datapacket/mediadatapacket.h"
 
 class QGraphicsLinearLayout;
 
@@ -173,6 +174,11 @@ public:
      */
     void removeButton(QGraphicsLayoutItem *button);
 
+    /**
+     * Display grid with motion detection over a video
+     */
+    void displayMotionGrid(bool value);
+
     using base_type::mapRectToScene;
 
 signals:
@@ -232,7 +238,7 @@ private:
     void drawOverlayIcon(int channel, const QRectF &rect);
 
     void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
-
+    void drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion);
 private:
     /** Layout item. */
     QnWorkbenchItem *m_item;
@@ -282,8 +288,6 @@ private:
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;
 
-    /** Current per-channel overlay state. */
-    QVector<OverlayState> m_overlayState;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

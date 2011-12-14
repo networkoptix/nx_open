@@ -2,6 +2,7 @@
 #define frame_info_1730
 
 #include "libavcodec/avcodec.h"
+#include "core/datapacket/mediadatapacket.h"
 
 #define AV_REVERSE_PACKET 128
 #define AV_REVERSE_BLOCK_START 64
@@ -35,6 +36,8 @@ public:
 
     /** Number of the video channel in video layout. */
     int channel;
+
+    QnMetaDataV1Ptr metadata; // addition data associated with video frame
 
 private:
     static void downscalePlate_factor2(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);

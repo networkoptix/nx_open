@@ -51,7 +51,11 @@ m_black_white(false)
 
 QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
-    if (needMetaData())
+#if 0
+        motion->m_duration = 1000 * 1000;
+            y += MD_HIGHT/2;
+            y += MD_HIGHT/2;
+            for (int y1 = 0; y1 < MD_HIGHT/2; y1++)
         return getMetaData();
 
 	QString request;

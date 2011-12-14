@@ -19,6 +19,9 @@ public:
 
     // playback filter by motion detection mask
     virtual bool setMotionRegion(const QRegion& region) = 0;
+
+    // delivery motion data to a client
+    virtual bool setSendMotion(bool value) = 0;
 };
 
 class QnAbstractArchiveReader : public QnClientPullMediaStreamProvider, public QnAbstractNavigator

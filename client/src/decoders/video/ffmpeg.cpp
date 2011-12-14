@@ -9,6 +9,7 @@
 extern QMutex global_ffmpeg_mutex;
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
+static const int MAX_DECODE_THREAD = 4;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
 static const quint32 LONG_NAL_PREFIX = htonl(1);
@@ -101,12 +102,13 @@ void CLFFmpegVideoDecoder::closeDecoder()
 	av_free(m_deinterlacedFrame);
 	av_free(m_context);
     delete m_frameTypeExtractor;
+    m_motionMap.clear();
 }
 
 void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDataPtr data)
 {
     if (m_context->thread_count == 1) {
-        m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+        m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
     }
     if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
     {
@@ -235,7 +237,18 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     avcodec_open(m_context, m_codec);
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
+    m_motionMap.clear();
 }
+
+int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
+{
+    for (int i = 0; i < m_motionMap.size(); ++i) {
+        if (m_motionMap[i].first == pkt_dts)
+            return i;
+    }
+    return -1;
+}
+
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame)
@@ -301,7 +314,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     avpkt.dts = avpkt.pts = data->timestamp;
     // HACK for CorePNG to decode as normal PNG by default
     avpkt.flags = AV_PKT_FLAG_KEY;
-
+    
     // from avcodec_decode_video2() docs:
     // 1) The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than
     // the actual read bytes because some optimized bitstream readers read 32 or 64
@@ -337,6 +350,12 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
             resetDecoder(data);
         }
     }
+    if (data->motion) {
+        while (m_motionMap.size() > MAX_DECODE_THREAD+1)
+            m_motionMap.remove(0);
+        m_motionMap << QPair<qint64, QnMetaDataV1Ptr>(data->timestamp, data->motion);
+    }
+
     // -------------------------
     Q_ASSERT(m_context->codec);
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
@@ -367,6 +386,12 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
 
     if (got_picture)
     {
+        int motionIndex = findMotionInfo(m_frame->pkt_dts);
+        if (motionIndex >= 0) {
+            outFrame->metadata = m_motionMap[motionIndex].second;
+            m_motionMap.remove(motionIndex);
+        }
+
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height || 
             outFrame->format != m_context->pix_fmt || outFrame->linesize[0] != m_frame->linesize[0]))

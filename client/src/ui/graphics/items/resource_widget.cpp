@@ -59,7 +59,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_frameWidth(0.0),
     m_aboutToBeDestroyedEmitted(false),
     m_activityDecorationsVisible(false),
-    m_lastNewFrameTimeMSec(QDateTime::currentMSecsSinceEpoch())
+    m_lastNewFrameTimeMSec(QDateTime::currentMSecsSinceEpoch()),
+    m_motionGridEnabled(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -315,6 +316,32 @@ void QnResourceWidget::hideActivityDecorations() {
     m_activityDecorationsVisible = false;
 }
 
+void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion)
+{
+    double xStep = rect.width() / (double) MD_WIDTH;
+    double yStep = rect.height() / (double) MD_HEIGHT;
+    for (int x = 0; x < MD_WIDTH; ++x)
+        painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
+    {
+    }
+    for (int y = 0; y < MD_HEIGHT; ++y)
+    {
+        painter->drawLine(QPointF(0.0, y*yStep), QPointF(rect.width(), y*yStep));
+    }
+    painter->setPen(QPen(0x00ff0080));
+    for (int y = 0; y < MD_HEIGHT; ++y)
+    {
+        for (int x = 0; x < MD_WIDTH; ++x)
+        {
+            if (motion->isMotionAt(x,y))
+            {
+                painter->drawRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
+            }
+        }
+    }
+
+}
+
 void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time)
 {
     QString text = QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
@@ -380,6 +407,9 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         qint64 time = m_renderer->lastDisplayedTime(i);
         if (time > 1000000ll * 3600*24)
             drawCurrentTime(painter, channelRect(i), time); // do not show time for regular media files
+        QnMetaDataV1Ptr motion = m_renderer->lastFrameMetadata(i);
+        if (motion && m_motionGridEnabled)
+            drawMotionGrid(painter, channelRect(i), motion);
     }
 }
 
@@ -565,4 +595,9 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
 
     m_aboutToBeDestroyedEmitted = true;
     emit aboutToBeDestroyed();
+}
+
+void QnResourceWidget::displayMotionGrid(bool value)
+{
+    m_motionGridEnabled = value;
 }
