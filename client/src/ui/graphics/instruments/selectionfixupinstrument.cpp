@@ -14,19 +14,19 @@ namespace {
         }
 
     protected:
-        virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override {
+        virtual bool mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
             fixButtonDownPositions(event);
             
             return false;
         }
 
-        virtual bool mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override {
+        virtual bool mouseMoveEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
             fixButtonDownPositions(event);
 
             return false;
         }
 
-        virtual bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override {
+        virtual bool mouseReleaseEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
             fixButtonDownPositions(event);
 
             return false;

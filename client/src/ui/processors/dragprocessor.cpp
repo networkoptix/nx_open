@@ -196,8 +196,19 @@ void DragProcessor::transition(QEvent *event, State state) {
     transitionInternal(event, state);
 }
 
+void DragProcessor::transition(QEvent *event, QWidget *widget, State state) {
+    m_object = widget;
+    m_info.m_widget = widget;
+    m_info.m_view = NULL;
+    m_info.m_scene = NULL;
+    m_info.m_item = NULL;
+
+    transitionInternal(event, state);
+}
+
 void DragProcessor::transition(QEvent *event, QGraphicsView *view, State state) {
     m_object = view;
+    m_info.m_widget = NULL;
     m_info.m_view = view;
     m_info.m_scene = NULL;
     m_info.m_item = NULL;
@@ -207,6 +218,7 @@ void DragProcessor::transition(QEvent *event, QGraphicsView *view, State state) 
 
 void DragProcessor::transition(QEvent *event, QGraphicsScene *scene, State state) {
     m_object = scene;
+    m_info.m_widget = NULL;
     m_info.m_view = NULL;
     m_info.m_scene = scene;
     m_info.m_item = NULL;
@@ -220,6 +232,7 @@ void DragProcessor::transition(QEvent *event, QGraphicsItem *item, State state) 
         m_object = object;
     else
         m_object = this; /* Unsafe, but we have no other options. */
+    m_info.m_widget = NULL;
     m_info.m_view = NULL;
     m_info.m_scene = NULL;
     m_info.m_item = item;
@@ -227,13 +240,17 @@ void DragProcessor::transition(QEvent *event, QGraphicsItem *item, State state) 
     transitionInternal(event, state);
 }
 
-QPoint DragProcessor::screenPos(QGraphicsView *, QMouseEvent *event) {
+QPoint DragProcessor::screenPos(QWidget *, QMouseEvent *event) {
     return event->globalPos();
 }
 
 template<class T>
 QPoint DragProcessor::screenPos(T *, QGraphicsSceneMouseEvent *event) {
     return event->screenPos();
+}
+
+QPointF DragProcessor::scenePos(QWidget *, QMouseEvent *) {
+    return QPointF(); /* No scene involved. */
 }
 
 QPointF DragProcessor::scenePos(QGraphicsView *view, QMouseEvent *event) {
@@ -341,6 +358,18 @@ void DragProcessor::mouseReleaseEventInternal(T *object, Event *event) {
     }
 }
 
+void DragProcessor::widgetMousePressEvent(QWidget *widget, QMouseEvent *event) {
+    mousePressEventInternal(widget, event);
+}
+
+void DragProcessor::widgetMouseMoveEvent(QWidget *widget, QMouseEvent *event) {
+    mouseMoveEventInternal(widget, event);
+}
+
+void DragProcessor::widgetMouseReleaseEvent(QWidget *widget, QMouseEvent *event) {
+    mouseReleaseEventInternal(widget, event);
+}
+
 void DragProcessor::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     m_viewport = viewport;
 
@@ -353,6 +382,21 @@ void DragProcessor::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
 
 void DragProcessor::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
     mouseReleaseEventInternal(this->view(viewport), event);
+}
+
+void DragProcessor::widgetPaintEvent(QWidget *widget, QPaintEvent *event) {
+    checkThread(widget);
+
+    if(m_state == DRAGGING) {
+        /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release event). */
+        if (!(QApplication::mouseButtons() & m_info.m_triggerButton)) {
+            transition(event, WAITING);
+            return;
+        }
+
+        QPoint screenPos = QCursor::pos();
+        drag(event, screenPos, QPointF());
+    }
 }
 
 void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *event) {
