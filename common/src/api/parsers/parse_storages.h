@@ -19,8 +19,7 @@ void parseStorages(QList<ResourcePtr>& storages, const QnApiStorages& xsdStorage
         storage->setId(i->id().c_str());
         storage->setName(i->name().c_str());
         storage->setTypeId(i->typeId().c_str());
-        if (i->parentId().present())
-            storage->setParentId((*i->parentId()).c_str());
+        storage->setParentId(i->parentId().c_str());
 
         storage->setUrl(i->url().c_str());
 

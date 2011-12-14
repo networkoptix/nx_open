@@ -110,6 +110,7 @@ int QnAppServerConnection::addStorage(const QnStorage& storageIn)
                                          storageIn.getName().toStdString(),
                                          storageIn.getUrl().toStdString(),
                                          storageIn.getTypeId().toString().toStdString(),
+                                         storageIn.getParentId().toString().toStdString(),
                                          storageIn.getSpaceLimit(),
                                          storageIn.getMaxStoreTime());
 

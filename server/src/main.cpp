@@ -377,6 +377,7 @@ public:
             cl_log.log("Creating new storage", cl_logINFO);
 
             QnStoragePtr storage(new QnStorage());
+            storage->setParentId(videoServer->getId());
             storage->setName("Initial");
             storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
             storage->setSpaceLimit(100ll * 1000 * 1024);
