@@ -378,14 +378,40 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
 {
+    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+#if 1
+    // for debug purpose only
+    int secs = QDateTime::currentDateTime().time().second();
+    int x = 0, y = 0;
+    if (secs < 15) {
+
+    }
+    else if (secs < 30) {
+        x += MD_WIDTH/2;
+    }
+    else if (secs < 45) {
+        y += MD_HEIGHT/2;
+    }
+    else {
+        x += MD_WIDTH/2;
+        y += MD_HEIGHT/2;
+    }
+    for (int x1 = 0; x1 < MD_WIDTH/2; x1++)
+    {
+        for (int y1 = 0; y1 < MD_HEIGHT/2; y1++)
+        {
+            motion->setMotionAt(x1+x, y1+y);
+        }
+    }
+    motion->m_duration = 1000 * 1000ll * 10;
+    return motion;
+#endif
 
         //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
 
         QnValue mdresult;
         if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
             return QnMetaDataV1Ptr(0);
-
-        QnMetaDataV1Ptr motion(new QnMetaDataV1());
 
         if (QString(mdresult) == "no motion")
             return motion; // no motion detected 
@@ -412,28 +438,4 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
         
 
         
-        int secs = QDateTime::currentDateTime().time().second();
-        int x = 0, y = 0;
-        if (secs < 15) {
-
-        }
-        else if (secs < 30) {
-            x += MD_WIDTH/2;
-        }
-        else if (secs < 45) {
-            y += MD_HEIGHT/2;
-        }
-        else {
-            x += MD_WIDTH/2;
-            y += MD_HEIGHT/2;
-        }
-        for (int x1 = 0; x1 < MD_WIDTH/2; x1++)
-        {
-            for (int y1 = 0; y1 < MD_HEIGHT/2; y1++)
-            {
-                motion->setMotionAt(x1+x, y1+y);
-            }
-        }
-        motion->m_duration = 1000 * 1000ll * 10;
-        return motion;
 }
