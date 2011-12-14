@@ -129,6 +129,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeSceneBoundsExtension()));
+    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(fitInView()));
     connect(m_curtainActivityInstrument,   SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
     connect(m_curtainActivityInstrument,   SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
@@ -142,8 +143,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
 
     /* Create viewport animator. */
     m_viewportAnimator = new QnViewportAnimator(this);
-    m_viewportAnimator->setMovementSpeed(4.0);
-    m_viewportAnimator->setScalingSpeed(32.0);
+    m_viewportAnimator->setMovementSpeed(1.0);
+    m_viewportAnimator->setScalingSpeed(16.0);
     connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 this,                   SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 m_boundingInstrument,   SLOT(recursiveDisable()));
     connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                this,                   SIGNAL(viewportUngrabbed()));
