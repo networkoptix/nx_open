@@ -507,7 +507,10 @@ void NavigationItem::updateSlider()
     if (m_timeSlider->isMoving())
         return;
 
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
+    QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
+    if (!reader)
+        return;
+
     qint64 startTime = reader->startTime();
     qint64 endTime = reader->endTime();
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
@@ -652,7 +655,11 @@ void NavigationItem::play()
 
     setActive(true);
 
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+
+    if (!reader)
+        return;
+
     if (reader->onPause() && reader->isRealTimeSource()) {
         reader->resumeMedia();
         reader->jumpToPreviousFrame(m_camera->getCurrentTime());

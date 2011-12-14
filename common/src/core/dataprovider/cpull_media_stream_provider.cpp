@@ -8,7 +8,7 @@ namespace {
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
     QnAbstractMediaStreamDataProvider(dev),
-    m_fpsSleep(0)
+    m_fpsSleep(100*1000)
 {
 }
 
