@@ -15,7 +15,8 @@ DragProcessor::DragProcessor(QObject *parent):
     m_handler(NULL),
     m_state(WAITING),
     m_dragTimerId(0),
-    m_transitionCounter(0)
+    m_transitionCounter(0),
+    m_firstDragSent(false)
 {}
 
 DragProcessor::~DragProcessor() {
@@ -95,7 +96,7 @@ void DragProcessor::transitionInternalHelper(State newState) {
         switch(m_state) {
         case PREPAIRING:
             killDragTimer();
-            m_state = newState;
+            m_state = WAITING;
             if(m_handler != NULL)
                 m_handler->finishDragProcess(&m_info);
             break;
@@ -109,7 +110,7 @@ void DragProcessor::transitionInternalHelper(State newState) {
                     m_handler->finishDragProcess(&m_info);
                 }
             } else {
-                m_state = newState;
+                m_state = WAITING;
             }
             break;
         default:
@@ -129,12 +130,12 @@ void DragProcessor::transitionInternalHelper(State newState) {
         startDragTimer();
         switch(m_state) {
         case WAITING:
-            m_state = newState;
+            m_state = PREPAIRING;
             if(m_handler != NULL)
                 m_handler->startDragProcess(&m_info);
             break;
         case DRAGGING:
-            m_state = newState;
+            m_state = PREPAIRING;
             if(m_handler != NULL)
                 m_handler->finishDrag(&m_info);
             break;
@@ -154,11 +155,11 @@ void DragProcessor::transitionInternalHelper(State newState) {
                     m_handler->startDrag(&m_info);
                 }
             } else {
-                m_state = newState;
+                m_state = DRAGGING;
             }
             break;
         case PREPAIRING:
-            m_state = newState;
+            m_state = DRAGGING;
             killDragTimer();
             if(m_handler != NULL)
                 m_handler->startDrag(&m_info);
@@ -166,6 +167,8 @@ void DragProcessor::transitionInternalHelper(State newState) {
         default:
             return;
         }
+        if(transitionCounter == m_transitionCounter)
+            m_firstDragSent = false;
         break;
     default:
         return;
@@ -262,8 +265,16 @@ void DragProcessor::mousePressEventInternal(T *object, Event *event) {
     }
 }
 
-void DragProcessor::timerEvent(QTimerEvent *) {
+void DragProcessor::timerEvent(QTimerEvent *event) {
     transition(static_cast<QMouseEvent *>(NULL), DRAGGING);
+
+    /* Send drag right away. */
+    if(m_state == DRAGGING) {
+        /* Using press pos here is not 100% correct, but we don't want to 
+         * complicate the event handling logic even further to store the
+         * current mouse pos. */
+        drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos); 
+    }
 }
 
 template<class T, class Event>
@@ -273,7 +284,7 @@ void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
     if (m_state == WAITING)
         return;
 
-    /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release event). */
+    /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release event). */
     if (!(event->buttons() & m_info.m_triggerButton)) {
         transition(event, object, WAITING);
         return;
@@ -300,9 +311,11 @@ void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &
     m_info.m_mouseScenePos = scenePos;
     m_info.m_event = event;
 
-    if(!(m_flags & DONT_COMPRESS))
-        if(m_info.m_mouseScreenPos == m_info.m_lastMouseScreenPos && qFuzzyCompare(m_info.m_mouseScenePos, m_info.m_lastMouseScenePos))
-            return;
+    if(!m_firstDragSent) {
+        m_firstDragSent = true;
+    } else if(!(m_flags & DONT_COMPRESS) && m_info.m_mouseScreenPos == m_info.m_lastMouseScreenPos && qFuzzyCompare(m_info.m_mouseScenePos, m_info.m_lastMouseScenePos)) {
+        return;
+    }
 
     if(m_handler != NULL)
         m_handler->dragMove(&m_info);

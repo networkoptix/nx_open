@@ -2,15 +2,6 @@
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 
-namespace {
-    struct ItemIsSelectable: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *item) const {
-            return item->flags() & QGraphicsItem::ItemIsSelectable;
-        }
-    };
-
-} // anonymous namespace
-
 SelectionFixupInstrument::SelectionFixupInstrument(QObject *parent):
     DragProcessingInstrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
 {}

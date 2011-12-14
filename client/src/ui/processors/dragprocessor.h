@@ -188,6 +188,9 @@ private:
     /** Identifier of a timer used to track mouse press time. */
     int m_dragTimerId;
 
+    /** Whether the first drag notification was sent. */
+    bool m_firstDragSent;
+
     /** Drag information. */
     DragInfo m_info;
 };

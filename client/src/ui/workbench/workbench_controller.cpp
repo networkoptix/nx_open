@@ -586,3 +586,4 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
         widget->setMotionGridDisplayed(display);
     }
 }
+
