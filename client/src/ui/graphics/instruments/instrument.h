@@ -367,7 +367,7 @@ protected:
     friend class InstrumentManagerPrivate; /* Messes with our internals. */
     template<class T>
     friend class InstrumentEventDispatcher; /* Calls event handlers and itemRegisteredNotify. */
-
+    friend class RedirectingInstrument; /* Calls event handlers. */
 
     /**
      * Ensure that this instrument is uninstalled.

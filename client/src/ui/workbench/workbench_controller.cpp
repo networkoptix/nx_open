@@ -91,6 +91,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_dragInstrument = new DragInstrument(this);
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SignalingInstrument *itemContextMenuInstrument = new SignalingInstrument(Instrument::ITEM, Instrument::makeSet(QEvent::GraphicsSceneContextMenu), this);
+    SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -99,8 +100,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
     m_manager->installInstrument(m_resizingInstrument->resizeHoverInstrument());
-    m_manager->installInstrument(new SelectionFixupInstrument(this));
+    m_manager->installInstrument(selectionFixupInstrument);
     m_manager->installInstrument(itemMouseForwardingInstrument);
+    m_manager->installInstrument(selectionFixupInstrument->preForwardingInstrument());
     m_manager->installInstrument(itemClickInstrument);
     m_manager->installInstrument(itemContextMenuInstrument);
 
@@ -432,10 +434,12 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
     foreach(QnWorkbenchItem *model, workbenchItems)
         m_display->synchronize(model);
 
+#if 0
     /* Deselect items that were dragged. */
     if(!delta.isNull())
         foreach(QnResourceWidget *widget, widgets)
             widget->setSelected(false);
+#endif
 }
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QnResourceWidget *widget) {

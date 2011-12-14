@@ -286,7 +286,7 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
     return base_type::itemChange(change, value);
 }
 
-void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) override {
+void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
     invalidateShadowShape();
 
     base_type::resizeEvent(event);
@@ -478,7 +478,7 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     glPopAttrib();
 }
 
-void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
+void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)  {
     QSizeF size = this->size();
     qreal w = size.width();
     qreal h = size.height();
@@ -557,7 +557,7 @@ namespace {
 
 } // anonymous namespace
 
-Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const override {
+Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
     return Qn::toQtFrameSection(static_cast<Qn::WindowFrameSection>(static_cast<int>(windowFrameSectionsAt(QRectF(pos, QSizeF(0.0, 0.0))))));
 }
 

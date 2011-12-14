@@ -358,9 +358,17 @@ void DragProcessor::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
 void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *event) {
     checkThread(viewport);
 
-    if(m_state == DRAGGING && viewport == m_viewport) {
-        QPoint screenPos = QCursor::pos();
-        drag(event, screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)));
+    if(m_state == DRAGGING) {
+        /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release event). */
+        if (!(QApplication::mouseButtons() & m_info.m_triggerButton)) {
+            transition(event, WAITING);
+            return;
+        }
+
+        if(viewport == m_viewport) {
+            QPoint screenPos = QCursor::pos();
+            drag(event, screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)));
+        }
     }
 }
 
