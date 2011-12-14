@@ -1,19 +1,18 @@
 #ifndef _APP_SESSION_MANAGER_H
 #define _APP_SESSION_MANAGER_H
 
-#include <QString>
-#include <QList>
-#include <QAuthenticator>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
-#include "utils/network/simple_http_client.h"
 #include "api/Types.h"
+#include "utils/network/simple_http_client.h"
 #include "SessionManager.h"
 
-class AppSessionManager: public SessionManager
+class AppSessionManager : public SessionManager
 {
+    Q_OBJECT
+
 public:
-    AppSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth);
+    AppSessionManager(const QUrl &url);
 
     int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes);
     int getResources(QnApiResourceResponsePtr& resources);

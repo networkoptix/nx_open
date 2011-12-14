@@ -1,6 +1,7 @@
 #ifndef APPSERVERCONNECTIONIMPL_H
 #define APPSERVERCONNECTIONIMPL_H
 
+#include <QtCore/QMutex>
 #include <QtCore/QUrl>
 
 #include "core/resource/resource_type.h"
@@ -30,7 +31,7 @@ public:
 
     bool isConnected() const;
 
-    QString getLastError() const;
+    QString lastError() const;
 
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
@@ -48,8 +49,14 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
-    static void initialize(const QUrl &url);
+    static QUrl defaultUrl();
+    static void setDefaultUrl(const QUrl &url);
+
     static QnAppServerConnectionPtr createConnection(QnResourceFactory &resourceFactory);
+
+private:
+    QMutex m_mutex;
+    QUrl m_url;
 };
 
 #endif // APPSERVERCONNECTIONIMPL_H

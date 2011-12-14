@@ -55,11 +55,7 @@ QnAbstractStreamDataProvider* QnVideoServer::createDataProviderInternal(Connecti
 void QnVideoServer::setApiUrl(const QString& restUrl)
 {
     m_apiUrl = restUrl;
-    QUrl u(restUrl);
-    QAuthenticator auth;
-    auth.setUser(u.userName());
-    auth.setPassword(u.password());
-    m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(QHostAddress(u.host()), u.port(), auth));
+    m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(restUrl));
 }
 
 QString QnVideoServer::getApiUrl() const

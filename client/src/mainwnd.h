@@ -1,8 +1,9 @@
 #ifndef MAINWND_H
 #define MAINWND_H
 
-#include <QScopedPointer>
 #include <QtGui/QMainWindow>
+
+class QSplitter;
 
 class CLLayoutNavigator;
 class LayoutContent;
@@ -37,6 +38,9 @@ private Q_SLOTS:
     void toggleFullScreen();
     void editPreferences();
 
+    void appServerError(int error);
+    void appServerAuthenticationRequired();
+
 private:
     void destroyNavigator(CLLayoutNavigator *&nav);
 
@@ -44,6 +48,8 @@ private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
     CLLayoutNavigator *m_normalView;
+    QSplitter *m_splitter;
+
     static MainWnd *s_instance;
 };
 
