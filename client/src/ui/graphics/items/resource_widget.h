@@ -225,12 +225,13 @@ private:
         LOADING
     };
 
-    struct OverlayState {
-        OverlayState(): icon(NO_ICON), changeTimeMSec(0), fadeInNeeded(false) {}
+    struct ChannelState {
+        ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {}
 
         OverlayIcon icon;
-        qint64 changeTimeMSec;
-        bool fadeInNeeded;
+        qint64 iconChangeTimeMSec;
+        bool iconFadeInNeeded;
+        qint64 lastNewFrameTimeMSec;
     };
 
     void setOverlayIcon(int channel, OverlayIcon icon);
@@ -285,11 +286,8 @@ private:
     /** Whether activity decorations are visible. */
     bool m_activityDecorationsVisible;
 
-    /** Time when the last new frame was rendered, in milliseconds. */
-    qint64 m_lastNewFrameTimeMSec;
-
-    /** Per-channel state of overlay icon. */
-    QVector<OverlayState> m_overlayState;
+    /** Additional per-channel state. */
+    QVector<ChannelState> m_channelState;
 
     bool m_motionGridEnabled;
 };

@@ -59,7 +59,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_frameWidth(0.0),
     m_aboutToBeDestroyedEmitted(false),
     m_activityDecorationsVisible(false),
-    m_lastNewFrameTimeMSec(QDateTime::currentMSecsSinceEpoch()),
     m_motionGridEnabled(false)
 {
     /* Set up shadow. */
@@ -96,7 +95,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_display->addRenderer(m_renderer);
 
     /* Set up overlay icons. */
-    m_overlayState.resize(m_channelCount);
+    m_channelState.resize(m_channelCount);
 
     m_display->start();
 }
@@ -371,22 +370,23 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         m_channelScreenSize = channelScreenSize;
         m_renderer->setChannelScreenSize(m_channelScreenSize);
     }
-    
-    /* Draw content. */
+
+    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+
     painter->beginNativePainting();
     for(int i = 0; i < m_channelCount; i++) {
+        /* Draw content. */
         QRectF rect = channelRect(i);
         QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect);
-        
-        /* Update time since the last new frame. */
-        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
-        if(status == QnRenderStatus::RENDERED_NEW_FRAME || m_display->isPaused())
-            m_lastNewFrameTimeMSec = currentTimeMSec;
+
+        /* Update channel state. */
+        if(status == QnRenderStatus::RENDERED_NEW_FRAME)
+            m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
 
         /* Set overlay icon. */
         if(m_display->isPaused() && m_activityDecorationsVisible) {
             setOverlayIcon(i, PAUSED);
-        } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec)) {
+        } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
             setOverlayIcon(i, LOADING);
 
             /* Draw black rectangle if there is nothing to draw. */
@@ -400,13 +400,19 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             setOverlayIcon(i, NO_ICON);
         }
 
+        /* Draw overlay icon. */
         drawOverlayIcon(i, rect);
     }
     painter->endNativePainting();
+
+    /* Draw decorations */
     for(int i = 0; i < m_channelCount; i++) {
+        /* Current time. */
         qint64 time = m_renderer->lastDisplayedTime(i);
         if (time > 1000000ll * 3600*24)
             drawCurrentTime(painter, channelRect(i), time); // do not show time for regular media files
+
+        /* Motion grid. */
         QnMetaDataV1Ptr motion = m_renderer->lastFrameMetadata(i);
         if (motion && m_motionGridEnabled)
             drawMotionGrid(painter, channelRect(i), motion);
@@ -414,22 +420,22 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 }
 
 void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
-    OverlayState &state = m_overlayState[channel];
+    ChannelState &state = m_channelState[channel];
     if(state.icon == icon)
         return;
 
-    state.fadeInNeeded = state.icon == NO_ICON;
-    state.changeTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    state.iconFadeInNeeded = state.icon == NO_ICON;
+    state.iconChangeTimeMSec = QDateTime::currentMSecsSinceEpoch();
     state.icon = icon;
 }
 
 void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
-    OverlayState &state = m_overlayState[channel];
+    ChannelState &state = m_channelState[channel];
     if(state.icon == NO_ICON)
         return;
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
-    qreal fadeMultiplier = state.fadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.changeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0;
+    qreal fadeMultiplier = state.iconFadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.iconChangeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0;
 
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
