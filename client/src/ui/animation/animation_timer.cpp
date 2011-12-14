@@ -126,6 +126,8 @@ void AnimationTimer::removeListener(AnimationTimerListener *listener) {
 }
 
 void AnimationTimer::listenerStartedListening(AnimationTimerListener *listener) {
+    Q_UNUSED(listener);
+
     bool oldActive = isActive();
     m_activeListeners++;
 
@@ -134,6 +136,8 @@ void AnimationTimer::listenerStartedListening(AnimationTimerListener *listener) 
 }
 
 void AnimationTimer::listenerStoppedListening(AnimationTimerListener *listener) {
+    Q_UNUSED(listener);
+
     bool oldActive = isActive();
     m_activeListeners--;
 

@@ -17,7 +17,8 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_playbackMaskStart(AV_NOPTS_VALUE),
     m_playbackMaskEnd(AV_NOPTS_VALUE),
     m_lastSeekTime(AV_NOPTS_VALUE),
-    m_afterSeek(false)
+    m_afterSeek(false),
+    m_sendMotion(false)
 {
     m_aviDelegate = new QnAviArchiveDelegate();
 }
@@ -196,6 +197,13 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
 {
+    if (m_tmpData)
+    {
+        QnAbstractMediaDataPtr rez = m_tmpData;
+        m_tmpData.clear();
+        return rez;
+    }
+
     int waitMotionCnt = 0;
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
@@ -217,9 +225,11 @@ begin_label:
         if (data)
             data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
     }
-    if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) {
+    if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) 
+    {
         data->timestamp +=m_currentChunk.startTime;
-        if (!m_playbackMask.isEmpty())
+
+        if (!m_playbackMask.isEmpty()) 
         {
             bool afterSeekIgnore = m_lastSeekTime != AV_NOPTS_VALUE && data->timestamp < m_lastSeekTime;
             if (!afterSeekIgnore)
@@ -242,6 +252,17 @@ begin_label:
     {
         data->flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_afterSeek = false;
+    }
+    
+    if (m_sendMotion) 
+    {
+        if (!m_motionConnection)
+            m_motionConnection = QnMotionHelper::instance()->createConnection(m_resource);
+        QnMetaDataV1Ptr motion = m_motionConnection->getMotionData(data->timestamp);
+        if (motion) {
+            m_tmpData = data;
+            return motion;
+        }
     }
     return data;
 }
@@ -289,4 +310,9 @@ void QnServerArchiveDelegate::setMotionRegion(const QRegion& region)
         m_playbackMaskStart = m_playbackMaskEnd = AV_NOPTS_VALUE;
         m_playbackMask.clear();
     }
+}
+
+void QnServerArchiveDelegate::setSendMotion(bool value)
+{
+    m_sendMotion = value;
 }

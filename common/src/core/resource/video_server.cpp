@@ -82,7 +82,7 @@ QString QnVideoServer::getGuid() const
     return m_guid;
 }
 
-QnResourcePtr QnVideoServerFactory::createResource(const QnId &resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnVideoServerFactory::createResource(const QnId &/*resourceTypeId*/, const QnResourceParameters &parameters)
 {
     QnResourcePtr result(new QnVideoServer());
     result->deserialize(parameters);

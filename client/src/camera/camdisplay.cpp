@@ -401,7 +401,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_processedPackets = 0;
 }
 
-void CLCamDisplay::onJumpCanceled(qint64 time)
+void CLCamDisplay::onJumpCanceled(qint64 /*time*/)
 {
     skipPrevJumpSignal++;
 }
@@ -527,6 +527,12 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true;
 
+    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+    if (metadata) {
+        m_lastMetadata = metadata;
+        return true;
+    }
+
     m_processedPackets++;
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
@@ -550,6 +556,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     if (vd)
     {
         m_ignoringVideo = vd->ignore;
+        if (m_lastMetadata && m_lastMetadata->timestamp <= vd->timestamp && m_lastMetadata->timestamp+m_lastMetadata->m_duration >= vd->timestamp)
+            vd->motion = m_lastMetadata;
     }
     else if (ad)
     {

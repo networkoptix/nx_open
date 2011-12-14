@@ -79,12 +79,23 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
     reinitTime(getDisplayedTime());
     foreach(ReaderInfo info, d->readers)
     {
-        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        //syncDelegate->setPrebuffering(false);
         info.reader->setNavDelegate(0);
         info.reader->resumeMedia();
         info.reader->setNavDelegate(this);
     }
+}
+
+bool QnArchiveSyncPlayWrapper::setSendMotion(bool value)
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    bool rez = true;
+    foreach(ReaderInfo info, d->readers) {
+        info.reader->setNavDelegate(0);
+        rez &= info.reader->setSendMotion(value);
+        info.reader->setNavDelegate(this);
+    }
+    return rez;
 }
 
 bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
@@ -92,8 +103,11 @@ bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     bool rez = true;
-    foreach(ReaderInfo info, d->readers)
+    foreach(ReaderInfo info, d->readers) {
+        info.reader->setNavDelegate(0);
         rez &= info.reader->setMotionRegion(region);
+        info.reader->setNavDelegate(this);
+    }
     return rez;
 }
 
@@ -125,7 +139,6 @@ void QnArchiveSyncPlayWrapper::setSingleShotMode(bool value)
     QMutexLocker lock(&d->timeMutex);
     foreach(const ReaderInfo& info, d->readers)
     {
-        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         info.reader->setNavDelegate(0);
         info.reader->setSingleShotMode(value);
         info.reader->setNavDelegate(this);
@@ -145,8 +158,6 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
     {
         if (info.enabled)
         {
-            QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-            //syncDelegate->setPrebuffering(false);
             info.reader->setNavDelegate(0);
             rez |= info.reader->jumpTo(mksec, skipTime);
             info.reader->setNavDelegate(this);
@@ -162,9 +173,7 @@ void QnArchiveSyncPlayWrapper::nextFrame()
     qint64 mintTime = AV_NOPTS_VALUE;
     foreach(const ReaderInfo& info, d->readers)
     {
-        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         if (info.enabled) {
-            //syncDelegate->setPrebuffering(true);
             qint64 curTime = info.cam->getCurrentTime();
             if (mintTime == AV_NOPTS_VALUE)
                 mintTime = curTime;
@@ -174,8 +183,6 @@ void QnArchiveSyncPlayWrapper::nextFrame()
     }
     foreach(const ReaderInfo& info, d->readers)
     {
-        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-
         if (info.enabled) 
         {
             if (mintTime == AV_NOPTS_VALUE || info.cam->getCurrentTime() <= mintTime+SYNC_FOR_FRAME_EPS)
@@ -194,8 +201,6 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
     QMutexLocker lock(&d->timeMutex);
     foreach(const ReaderInfo& info, d->readers)
     {
-        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        //syncDelegate->setPrebuffering(false);
         info.reader->setNavDelegate(0);
         info.reader->previousFrame(mksec);
         info.reader->setNavDelegate(this);
@@ -241,8 +246,6 @@ void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
     d->blockSetSpeedSignal = true;
     foreach(ReaderInfo info, d->readers)
     {
-        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        //syncDelegate->setPrebuffering(false);
         if (info.reader != sender())
             info.reader->setSpeed(value);
     }
@@ -321,21 +324,21 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
     d->timer.restart();
 }
 
-void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec)
+void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 /*mksec*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->inJumpCount++;
 }
 
-void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 time)
+void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->inJumpCount--;
 }
 
-void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
+void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 /*mksec*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 

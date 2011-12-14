@@ -32,6 +32,7 @@ public:
     RenderStatus paint(int channel, const QRectF &rect);
 
     qint64 lastDisplayedTime(int channel) const;
+    QnMetaDataV1Ptr lastFrameMetadata(int channel) const;
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
@@ -41,17 +42,11 @@ signals:
     void sourceSizeChanged(const QSize &newSourceSize);
 
 private:
-    void checkThread(bool inDecodingThread) const;
-
-private:
     /** Renderers that are used to render the channels. */
     QList<CLGLRenderer *> m_channelRenderers;
 
     /** Current source size, in square pixels. */
     QSize m_sourceSize;
-
-    /** Display thread that this channelRenderer is associated with. Used only in debug for error checking. */
-    mutable QThread *m_decodingThread;
 
     /** Mutex that is used for synchronization. */
     mutable QMutex m_mutex;

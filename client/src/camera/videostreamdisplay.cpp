@@ -562,6 +562,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
                 return Status_Displayed;
         }
         outFrame->pkt_dts = m_tmpFrame.pkt_dts;
+        outFrame->metadata = m_tmpFrame.metadata;
     }
     outFrame->flags = data->flags;
     //outFrame->pts = data->timestamp;

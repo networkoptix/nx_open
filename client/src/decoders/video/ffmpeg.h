@@ -48,7 +48,7 @@ private:
 
     void openDecoder(const QnCompressedVideoDataPtr data);
     void closeDecoder();
-
+    int findMotionInfo(qint64 pkt_dts);
 
 private:
     AVCodecContext *m_passedContext;
@@ -86,6 +86,8 @@ private:
     int m_currentHeight;
 
     int m_forceSliceDecoding;
+    typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size
+    MotionMap m_motionMap; 
 };
 
 #endif //cl_ffmpeg_h

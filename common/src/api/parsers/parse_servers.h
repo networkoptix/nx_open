@@ -6,7 +6,7 @@
 #include "core/resource/video_server.h"
 
 template <class ResourcePtr>
-void parseServers(QList<ResourcePtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory)
+void parseServers(QList<ResourcePtr> &servers, const QnApiServers &xsdServers, QnResourceFactory &/*resourceFactory*/)
 {
     using xsd::api::servers::Servers;
     using xsd::api::resourceTypes::ParentIDs;

@@ -10,6 +10,7 @@
 #include <ui/common/frame_section_queryable.h>
 #include <core/resource/resource_consumer.h>
 #include "polygonal_shadow_item.h"
+#include "core/datapacket/mediadatapacket.h"
 
 class QGraphicsLinearLayout;
 
@@ -173,6 +174,20 @@ public:
      */
     void removeButton(QGraphicsLayoutItem *button);
 
+    /**
+     * \param displayed                 Whether a grid with motion detection should be 
+     *                                  displayed over a video.
+     */
+    void setMotionGridDisplayed(bool displayed);
+
+    /**
+     * \returns                         Whether a grid with motion detection is 
+     *                                  displayed over a video. 
+     */
+    bool isMotionGridDisplayed() const {
+        return m_displayMotionGrid;
+    }
+
     using base_type::mapRectToScene;
 
 signals:
@@ -219,12 +234,13 @@ private:
         LOADING
     };
 
-    struct OverlayState {
-        OverlayState(): icon(NO_ICON), changeTimeMSec(0), fadeInNeeded(false) {}
+    struct ChannelState {
+        ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {}
 
         OverlayIcon icon;
-        qint64 changeTimeMSec;
-        bool fadeInNeeded;
+        qint64 iconChangeTimeMSec;
+        bool iconFadeInNeeded;
+        qint64 lastNewFrameTimeMSec;
     };
 
     void setOverlayIcon(int channel, OverlayIcon icon);
@@ -232,6 +248,8 @@ private:
     void drawOverlayIcon(int channel, const QRectF &rect);
 
     void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
+
+    void drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion);
 
 private:
     /** Layout item. */
@@ -279,11 +297,11 @@ private:
     /** Whether activity decorations are visible. */
     bool m_activityDecorationsVisible;
 
-    /** Time when the last new frame was rendered, in milliseconds. */
-    qint64 m_lastNewFrameTimeMSec;
+    /** Additional per-channel state. */
+    QVector<ChannelState> m_channelState;
 
-    /** Current per-channel overlay state. */
-    QVector<OverlayState> m_overlayState;
+    /** Whether motion detection grid should be displayed. */
+    bool m_displayMotionGrid;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

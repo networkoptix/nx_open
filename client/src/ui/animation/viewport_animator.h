@@ -5,11 +5,11 @@
 #include <QMargins>
 #include <QAbstractAnimation>
 #include <ui/common/scene_utility.h>
+#include "variant_animator.h"
 
-class QParallelAnimationGroup;
 class QGraphicsView;
 
-class QnSetterAnimation;
+class QnAccessorAnimation;
 
 class QnViewportAnimator: public QObject, protected QnSceneUtility {
     Q_OBJECT;
@@ -107,10 +107,10 @@ private:
     QParallelAnimationGroup *m_animationGroup;
 
     /** Viewport scale animation. */
-    QnSetterAnimation *m_scaleAnimation;
+    QnAccessorAnimation *m_scaleAnimation;
 
     /** Viewport position animation. */
-    QnSetterAnimation *m_positionAnimation;
+    QnAccessorAnimation *m_positionAnimation;
 };
 
 #endif // QN_VIEWPORT_ANIMATOR_H

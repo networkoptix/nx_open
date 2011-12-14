@@ -286,24 +286,24 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize size) const
+QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
 {
     return QnQualityNormal;
 }
 
-QImage QnPlAreconVisionResource::getImage(int channnel, QDateTime time, QnStreamQuality quality)
+QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/)
 {
     return QImage();
 }
 
 
 
-void QnPlAreconVisionResource::setIframeDistance(int frames, int timems)
+void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
 
-void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
+void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
 {
     QnValue maxSensorWidth;
     QnValue maxSensorHight;

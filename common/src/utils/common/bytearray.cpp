@@ -143,3 +143,15 @@ void CLByteArray::removeZerosAtTheEnd()
     while (m_size>0 && m_data[m_size-1] == 0)
         --m_size;
 }
+
+void CLByteArray::fill(quint8 filler, int size)
+{
+    // if we do not have enough space
+    if (size > m_capacity - m_size && !reallocate(m_capacity * 2 + size)) 
+    {
+        qWarning() << Q_FUNC_INFO << "Unable to increase capacity";
+        return;
+    }
+    memset(m_data + m_size, filler, size);
+    m_size += size;
+}

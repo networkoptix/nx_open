@@ -187,7 +187,7 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
     return true;
 }
 
-void QnResource::getParamAsynch(const QString& name, QnValue& val, QnDomain domain )
+void QnResource::getParamAsynch(const QString &/*name*/, QnValue &/*val*/, QnDomain /*domain*/)
 {
 
 }

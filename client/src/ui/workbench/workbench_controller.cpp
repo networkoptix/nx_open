@@ -32,6 +32,7 @@
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
 #include <ui/graphics/instruments/resizehoverinstrument.h>
+#include <ui/graphics/instruments/signalinginstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 
@@ -77,8 +78,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
 
     /* Install and configure instruments. */
-    ClickInstrument *itemClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, Instrument::ITEM, this);
-    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, Instrument::SCENE, this);
+    ClickInstrument *itemClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::ITEM, this);
+    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
@@ -89,6 +90,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     m_dragInstrument = new DragInstrument(this);
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
+    SignalingInstrument *itemContextMenuInstrument = new SignalingInstrument(Instrument::ITEM, Instrument::makeSet(QEvent::GraphicsSceneContextMenu), this);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -100,6 +102,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(new SelectionFixupInstrument(this));
     m_manager->installInstrument(itemMouseForwardingInstrument);
     m_manager->installInstrument(itemClickInstrument);
+    m_manager->installInstrument(itemContextMenuInstrument);
 
     /* Scene instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
@@ -121,9 +124,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_archiveDropInstrument);
 
-    connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemClickInstrument,        SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)), this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
+    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                        this,                           SLOT(at_scene_leftClicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),               this,                           SLOT(at_dragStarted(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),              this,                           SLOT(at_dragFinished(QGraphicsView *, QList<QGraphicsItem *>)));
@@ -131,6 +134,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),               this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
+    connect(itemContextMenuInstrument,  SIGNAL(activated(QGraphicsItem *, QEvent *)),                               this,                           SLOT(at_item_contextMenuRequested(QGraphicsItem *, QEvent *)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -203,9 +207,19 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *saveLayoutAsAction         = newAction(tr("Save layout as..."),    tr("Ctrl+Shift+S"), this);
     QAction *preferencesAction          = newAction(tr("Preferences"),          tr("Ctrl+P"),       this);
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
-    QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
 #endif
+    QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
+    QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
+    QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
+    
+    connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
 
+    m_contextMenu = new QMenu();
+    m_contextMenu->addAction(showMotionAction);
+    m_contextMenu->addAction(hideMotionAction);
+    m_contextMenu->addSeparator();
+    m_contextMenu->addAction(exitAction);
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -424,23 +438,15 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
             widget->setSelected(false);
 }
 
-void QnWorkbenchController::at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget) {
+void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QnResourceWidget *widget) {
     m_display->bringToFront(widget);
 }
 
-void QnWorkbenchController::at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget) {
+void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidget *widget) {
     if(widget == NULL)
         return; /* We may get NULL if the widget being rotated gets deleted. */
 
     widget->item()->setRotation(widget->rotation());
-}
-
-void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
-    if(info.button() == Qt::LeftButton) {
-        at_item_leftClicked(view, item, info);
-    } else {
-        at_item_rightClicked(view, item, info);
-    }
 }
 
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -455,15 +461,6 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     workbench()->setItem(QnWorkbench::RAISED, workbench()->item(QnWorkbench::RAISED) == workbenchItem ? NULL : workbenchItem);
     workbench()->setItem(QnWorkbench::FOCUSED, workbenchItem);
-}
-
-void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
-    if(info.modifiers() != 0)
-        return;
-
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
-    if(widget == NULL)
-        return;
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
@@ -489,23 +486,11 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     }
 }
 
-void QnWorkbenchController::at_scene_clicked(QGraphicsView *view, const ClickInfo &info) {
-    if(info.button() == Qt::LeftButton) {
-        at_scene_leftClicked(view, info);
-    } else {
-        at_scene_rightClicked(view, info);
-    }
-}
-
-void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *view, const ClickInfo &) {
+void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInfo &) {
     if(workbench() == NULL)
         return;
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
-}
-
-void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const ClickInfo &) {
-
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
@@ -576,4 +561,29 @@ void QnWorkbenchController::at_navigationItem_geometryChanged() {
     ));
 }
 
+void QnWorkbenchController::at_item_contextMenuRequested(QGraphicsItem *item, QEvent *event) {
+    assert(event->type() == QEvent::GraphicsSceneContextMenu);
+
+    QGraphicsSceneContextMenuEvent *e = static_cast<QGraphicsSceneContextMenuEvent *>(event);
+
+    m_contextMenu->exec(e->screenPos());
+}
+
+void QnWorkbenchController::at_showMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), true);
+}
+
+void QnWorkbenchController::at_hideMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), false);
+}
+
+void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
+    foreach(QGraphicsItem *item, items) {
+        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        if(widget == NULL)
+            continue;
+
+        widget->setMotionGridDisplayed(display);
+    }
+}
 

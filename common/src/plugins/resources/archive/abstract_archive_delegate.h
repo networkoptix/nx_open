@@ -14,6 +14,7 @@ class QnAbstractFilterPlaybackDelegate
 {
     public:
         virtual void setMotionRegion(const QRegion& region) = 0;
+        virtual void setSendMotion(bool value) = 0;
 };
 
 class QnAbstractArchiveDelegate: public QObject

@@ -33,7 +33,7 @@ QString QnAviResource::toString() const
 	return m_name;
 }
 
-QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole role)
+QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 
@@ -45,7 +45,7 @@ const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMedia
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
-        archiveReader->getDPVideoLayout();
+        return archiveReader->getDPVideoLayout();
     else
         return QnMediaResource::getVideoLayout();
 }
@@ -54,7 +54,7 @@ const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMedia
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
-        archiveReader->getDPAudioLayout();
+        return archiveReader->getDPAudioLayout();
     else
         return QnMediaResource::getAudioLayout();
 }

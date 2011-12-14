@@ -44,6 +44,7 @@ public:
     virtual QnAbstractMediaDataPtr getNextData();
 
     bool setMotionRegion(const QRegion& region);
+    bool setSendMotion(bool value);
 protected:
     virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);
 

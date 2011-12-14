@@ -870,6 +870,10 @@ CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
             updateTexture();
             if (curImg->pkt_dts != AV_NOPTS_VALUE)
                 m_lastDisplayedTime = curImg->pkt_dts;
+            if (curImg->metadata)
+                m_lastDisplayedMetadata = curImg->metadata;
+            else
+                m_lastDisplayedMetadata.clear();
 
             result = RENDERED_NEW_FRAME;
         } 
@@ -931,6 +935,12 @@ qint64 CLGLRenderer::lastDisplayedTime() const
 {
     QMutexLocker locker(&m_displaySync);
     return m_lastDisplayedTime;
+}
+
+QnMetaDataV1Ptr CLGLRenderer::lastFrameMetadata() const
+{
+    QMutexLocker locker(&m_displaySync);
+    return m_lastDisplayedMetadata;
 }
 
 bool CLGLRenderer::isNoVideo() const

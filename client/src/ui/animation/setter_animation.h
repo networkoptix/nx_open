@@ -4,19 +4,19 @@
 #include <QVariantAnimation>
 #include <QScopedPointer>
 #include <QWeakPointer>
-#include "setter.h"
+#include "accessor.h"
 
-class QnSetterAnimation: public QVariantAnimation {
+class QnAccessorAnimation: public QVariantAnimation {
     Q_OBJECT;
 public:
-    QnSetterAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
+    QnAccessorAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
 
-    QnAbstractSetter *setter() const {
-        return m_setter.data();
+    QnAbstractAccessor *accessor() const {
+        return m_accessor.data();
     }
 
-    void setSetter(QnAbstractSetter *setter) {
-        m_setter.reset(setter);
+    void setAccessor(QnAbstractAccessor *accessor) {
+        m_accessor.reset(accessor);
     }
 
     QObject *targetObject() const {
@@ -29,23 +29,23 @@ public:
 
 public slots:
     void clear() {
-        m_setter.reset();
+        m_accessor.reset();
         m_target.clear();
     }
 
 protected:
     virtual void updateCurrentValue(const QVariant &value) override {
-        if(m_setter.isNull())
+        if(m_accessor.isNull())
             return;
 
         if(m_target.isNull())
             return;
 
-        m_setter->operator()(m_target.data(), value);
+        m_accessor->set(m_target.data(), value);
     }
 
 private:
-    QScopedPointer<QnAbstractSetter> m_setter;
+    QScopedPointer<QnAbstractAccessor> m_accessor;
     QWeakPointer<QObject> m_target;
 };
 

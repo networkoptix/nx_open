@@ -34,6 +34,7 @@ public:
     virtual void setSingleShotMode(bool single);
     virtual bool isMediaPaused() const;
     virtual bool setMotionRegion(const QRegion& region);
+    virtual bool setSendMotion(bool value);
     //
 
 public slots:

@@ -283,8 +283,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
         QnMediaContextPtr context;
         if (itr != m_contextMap.end())
             context = itr.value();
-        else 
-            return result;
+        //else 
+        //    return result;
 
         if (rtpHeader->padding)
             dataSize -= ntohl(rtpHeader->padding);
@@ -295,13 +295,33 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
         QnAbstractMediaDataPtr mediaPacket = qSharedPointerDynamicCast<QnAbstractMediaData>(nextPacket);
         if (!nextPacket)
         {
-            if (dataSize < 4)
+            if (dataSize < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
                 return result;
 
-            quint32 timestampHigh = ntohl(*(quint32*)payload);
-            dataSize-=4;
-            payload+=4; // deserialize timeStamp high part
-            if (context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO)
+            QnAbstractMediaData::DataType dataType = (QnAbstractMediaData::DataType) *payload++;
+            quint32 timestampHigh = ntohl(*(quint32*) payload);
+            dataSize -= RTSP_FFMPEG_GENERIC_HEADER_SIZE;
+            payload  += 4; // deserialize timeStamp high part
+            if (dataType == QnAbstractMediaData::META_V1)
+            {
+                if (dataSize != MD_WIDTH*MD_HEIGHT/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
+                {
+                    qWarning() << "Unexpected data size for metadata. got" << dataSize << "expected" << MD_WIDTH*MD_HEIGHT/8 << "bytes. Packet ignored.";
+                    return result;
+                }
+                if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
+                    return result;
+
+                QnMetaDataV1 *metadata = new QnMetaDataV1(); 
+                metadata->data.clear();
+                context.clear();
+                metadata->m_duration = ntohl(*((quint32*)payload))*1000;
+                dataSize -= RTSP_FFMPEG_METADATA_HEADER_SIZE;
+                payload += RTSP_FFMPEG_METADATA_HEADER_SIZE; // deserialize video flags
+
+                nextPacket = QnMetaDataV1Ptr(metadata);
+            }
+            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO)
             {
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
@@ -324,7 +344,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                     video->height = context->ctx()->coded_height;
                 }
             }
-            else if (context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
+            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
             {
                 QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
                 audio->format.fromAvStream(context->ctx());
@@ -332,13 +352,15 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             }
             else
             {
-                qWarning() << "Unsupported RTP media type " << context->ctx()->codec_type;
+                qWarning() << "Unsupported RTP media type " << (context ? context->ctx()->codec_type : 0);
                 return result;
             }
             m_nextDataPacket[ssrc] = nextPacket;
             mediaPacket = qSharedPointerDynamicCast<QnAbstractMediaData>(nextPacket);
-            if (mediaPacket) {
-                mediaPacket->compressionType = context->ctx()->codec_id;
+            if (mediaPacket) 
+            {
+                if (context)
+                    mediaPacket->compressionType = context->ctx()->codec_id;
                 mediaPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
                 int ssrcTmp = (ssrc - BASIC_FFMPEG_SSRC) / 2;
                 mediaPacket->channelNumber = ssrcTmp / MAX_CONTEXTS_AT_VIDEO;
@@ -380,6 +402,12 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
         return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
 
+void QnRtspClientArchiveDelegate::setSendMotion(bool value)
+{
+    m_rtspSession.setAdditionAttribute("x-send-motion", value ? "1" : "0");
+    //m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+}
+
 void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 {
     if (region.isEmpty())
@@ -396,4 +424,5 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
         QByteArray s = buffer.data().toBase64();
         m_rtspSession.setAdditionAttribute("x-motion-region", s);
     }
+    //m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
 }

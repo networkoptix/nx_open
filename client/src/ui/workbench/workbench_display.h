@@ -203,8 +203,6 @@ public:
      */
     void setViewportMargins(const QMargins &margins);
 
-    void fitInView();
-
     void ensureVisible(QnWorkbenchItem *item);
 
 
@@ -233,6 +231,8 @@ public:
     QPoint mapGlobalToGrid(const QPoint &globalPoint) const;
 
 
+public slots:
+    void fitInView();
 
 signals:
     void viewportGrabbed();

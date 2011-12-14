@@ -47,6 +47,8 @@ public:
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
     virtual qint64 lastDisplayedTime() const;
+    QnMetaDataV1Ptr lastFrameMetadata() const; 
+
     bool isNoVideo() const;
 
     void onNoVideo();
@@ -158,6 +160,7 @@ private:
     int m_videoWidth;
     int m_videoHeight;
     qint64 m_lastDisplayedTime;
+    QnMetaDataV1Ptr m_lastDisplayedMetadata;
 
     static QVector<uchar> m_staticYFiller;
     static QVector<uchar> m_staticUVFiller;

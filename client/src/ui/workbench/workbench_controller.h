@@ -10,6 +10,7 @@
 class QGraphicsScene;
 class QGraphicsView;
 class QGraphicsItem;
+class QMenu;
 
 class InstrumentManager;
 class HandScrollInstrument;
@@ -61,6 +62,7 @@ public:
 
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
+    void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
@@ -72,14 +74,10 @@ protected slots:
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
-    void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
-    void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
-    void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
     void at_viewportGrabbed();
@@ -90,6 +88,11 @@ protected slots:
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
     void at_navigationItem_geometryChanged();
+
+    void at_item_contextMenuRequested(QGraphicsItem *item, QEvent *event);
+
+    void at_showMotionAction_triggered();
+    void at_hideMotionAction_triggered();
 
 private:
     /** Display synchronizer. */
@@ -127,6 +130,9 @@ private:
 
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
+
+
+    QMenu *m_contextMenu;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

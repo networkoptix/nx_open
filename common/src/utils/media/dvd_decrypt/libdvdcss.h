@@ -88,6 +88,8 @@ struct dvdcss_s
 #include <stdarg.h>
 __forceinline void print_debug(dvdcss_t dvdcss, const char *msg,...)
 {
+    (void) dvdcss;
+
     va_list args;
 
     fprintf( stderr, "libdvdcss debug: " );

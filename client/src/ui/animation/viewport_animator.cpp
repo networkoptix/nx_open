@@ -27,7 +27,19 @@ namespace {
         Qt::AspectRatioMode m_mode;
     };
 
+    class EmptyGetter {
+    public:
+        QVariant operator()(const QObject *) const {
+            return QVariant();
+        }
+    };
+
 } // anonymous namespace
+
+
+//void ViewportRectAccessor: public  {
+
+//};
 
 
 QnViewportAnimator::QnViewportAnimator(QObject *parent):
@@ -64,12 +76,12 @@ void QnViewportAnimator::setView(QGraphicsView *view) {
 
         connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
 
-        m_scaleAnimation = new QnSetterAnimation(this);
-        m_scaleAnimation->setSetter(newSetter(ViewportScaleSetter(Qt::KeepAspectRatioByExpanding)));
+        m_scaleAnimation = new QnAccessorAnimation(this);
+        m_scaleAnimation->setAccessor(newAccessor(EmptyGetter(), ViewportScaleSetter(Qt::KeepAspectRatioByExpanding)));
         m_scaleAnimation->setTargetObject(view);
 
-        m_positionAnimation = new QnSetterAnimation(this);
-        m_positionAnimation->setSetter(newSetter(ViewportPositionSetter()));
+        m_positionAnimation = new QnAccessorAnimation(this);
+        m_positionAnimation->setAccessor(newAccessor(EmptyGetter(), ViewportPositionSetter()));
         m_positionAnimation->setTargetObject(view);
 
         m_animationGroup->addAnimation(m_scaleAnimation);

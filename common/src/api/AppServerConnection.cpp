@@ -117,7 +117,7 @@ int QnAppServerConnection::addStorage(const QnStorage& storageIn)
     return m_sessionManager->addStorage(storage);
 }
 
-int QnAppServerConnection::getServers(QnResourceList& servers)
+int QnAppServerConnection::getServers(QnResourceList& /*servers*/)
 {
     // todo: implement me
     return 0;
