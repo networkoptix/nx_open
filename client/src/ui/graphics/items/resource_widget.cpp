@@ -7,6 +7,7 @@
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <camera/resource_display.h>
+#include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
 #include <settings.h>
@@ -59,7 +60,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_frameWidth(0.0),
     m_aboutToBeDestroyedEmitted(false),
     m_activityDecorationsVisible(false),
-    m_motionGridEnabled(false)
+    m_displayMotionGrid(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -414,7 +415,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
         /* Motion grid. */
         QnMetaDataV1Ptr motion = m_renderer->lastFrameMetadata(i);
-        if (motion && m_motionGridEnabled)
+        if (motion && m_displayMotionGrid)
             drawMotionGrid(painter, channelRect(i), motion);
     }
 }
@@ -603,7 +604,11 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
     emit aboutToBeDestroyed();
 }
 
-void QnResourceWidget::displayMotionGrid(bool value)
-{
-    m_motionGridEnabled = value;
+void QnResourceWidget::setMotionGridDisplayed(bool displayed) {
+    if(m_displayMotionGrid == displayed)
+        return;
+
+    m_displayMotionGrid = displayed;
+
+    m_display->archiveReader()->setSendMotion(displayed);
 }

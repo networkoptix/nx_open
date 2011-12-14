@@ -62,6 +62,7 @@ public:
 
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
+    void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
@@ -89,6 +90,9 @@ protected slots:
     void at_navigationItem_geometryChanged();
 
     void at_item_contextMenuRequested(QGraphicsItem *item, QEvent *event);
+
+    void at_showMotionAction_triggered();
+    void at_hideMotionAction_triggered();
 
 private:
     /** Display synchronizer. */

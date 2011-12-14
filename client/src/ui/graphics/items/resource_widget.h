@@ -175,9 +175,18 @@ public:
     void removeButton(QGraphicsLayoutItem *button);
 
     /**
-     * Display grid with motion detection over a video
+     * \param displayed                 Whether a grid with motion detection should be 
+     *                                  displayed over a video.
      */
-    void displayMotionGrid(bool value);
+    void setMotionGridDisplayed(bool displayed);
+
+    /**
+     * \returns                         Whether a grid with motion detection is 
+     *                                  displayed over a video. 
+     */
+    bool isMotionGridDisplayed() const {
+        return m_displayMotionGrid;
+    }
 
     using base_type::mapRectToScene;
 
@@ -239,7 +248,9 @@ private:
     void drawOverlayIcon(int channel, const QRectF &rect);
 
     void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
+
     void drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion);
+
 private:
     /** Layout item. */
     QnWorkbenchItem *m_item;
@@ -289,7 +300,8 @@ private:
     /** Additional per-channel state. */
     QVector<ChannelState> m_channelState;
 
-    bool m_motionGridEnabled;
+    /** Whether motion detection grid should be displayed. */
+    bool m_displayMotionGrid;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

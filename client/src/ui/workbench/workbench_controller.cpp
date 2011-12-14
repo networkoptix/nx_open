@@ -209,8 +209,16 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
     QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
+    QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
+    QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
     
+    connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
+
     m_contextMenu = new QMenu();
+    m_contextMenu->addAction(showMotionAction);
+    m_contextMenu->addAction(hideMotionAction);
+    m_contextMenu->addSeparator();
     m_contextMenu->addAction(exitAction);
 }
 
@@ -559,4 +567,22 @@ void QnWorkbenchController::at_item_contextMenuRequested(QGraphicsItem *item, QE
     QGraphicsSceneContextMenuEvent *e = static_cast<QGraphicsSceneContextMenuEvent *>(event);
 
     m_contextMenu->exec(e->screenPos());
+}
+
+void QnWorkbenchController::at_showMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), true);
+}
+
+void QnWorkbenchController::at_hideMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), false);
+}
+
+void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
+    foreach(QGraphicsItem *item, items) {
+        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        if(widget == NULL)
+            continue;
+
+        widget->setMotionGridDisplayed(display);
+    }
 }
