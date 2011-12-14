@@ -288,6 +288,9 @@ private:
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;
 
+    /** Per-channel state of overlay icon. */
+    QVector<OverlayState> m_overlayState;
+
     bool m_motionGridEnabled;
 };
 
