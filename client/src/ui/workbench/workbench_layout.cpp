@@ -66,6 +66,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
         m_itemMap.clear(item->geometry());
     m_rectSet.remove(item->geometry());
     m_itemsByUid[item->resourceUniqueId()].remove(item);
+
     item->m_layout = NULL;
     m_items.remove(item);
 

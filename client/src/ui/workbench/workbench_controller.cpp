@@ -28,7 +28,7 @@
 #include <ui/graphics/instruments/forwardinginstrument.h>
 #include <ui/graphics/instruments/transformlistenerinstrument.h>
 #include <ui/graphics/instruments/selectionfixupinstrument.h>
-#include <ui/graphics/instruments/archivedropinstrument.h>
+#include <ui/graphics/instruments/dropinstrument.h>
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
 #include <ui/graphics/instruments/resizehoverinstrument.h>
@@ -85,7 +85,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
+    m_archiveDropInstrument = new DropInstrument(this, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     m_dragInstrument = new DragInstrument(this);

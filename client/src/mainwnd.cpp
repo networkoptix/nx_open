@@ -28,7 +28,6 @@
 
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/blue_background_painter.h"
-#include "ui/graphics/instruments/archivedropinstrument.h"
 
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"

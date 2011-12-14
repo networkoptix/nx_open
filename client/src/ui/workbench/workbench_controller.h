@@ -18,7 +18,7 @@ class WheelZoomInstrument;
 class DragInstrument;
 class RubberBandInstrument;
 class ResizingInstrument;
-class ArchiveDropInstrument;
+class DropInstrument;
 class UiElementsInstrument;
 class RotationInstrument;
 class ClickInfo;
@@ -120,7 +120,7 @@ private:
     ResizingInstrument *m_resizingInstrument;
 
     /** Archive drop instrument. */
-    ArchiveDropInstrument *m_archiveDropInstrument;
+    DropInstrument *m_archiveDropInstrument;
 
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;

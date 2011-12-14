@@ -1,14 +1,15 @@
-#ifndef QN_ARCHIVE_DROP_INSTRUMENT_H
-#define QN_ARCHIVE_DROP_INSTRUMENT_H
+#ifndef QN_DROP_INSTRUMENT_H
+#define QN_DROP_INSTRUMENT_H
 
 #include "instrument.h"
+#include <core\resource\resource.h>
 
 class QnWorkbenchController;
 
-class ArchiveDropInstrument: public Instrument {
+class DropInstrument: public Instrument {
     Q_OBJECT;
 public:
-    ArchiveDropInstrument(QnWorkbenchController *controller, QObject *parent = NULL);
+    DropInstrument(QnWorkbenchController *controller, QObject *parent = NULL);
 
 protected:
     virtual bool dragEnterEvent(QWidget *viewport, QDragEnterEvent *event) override;
@@ -21,7 +22,8 @@ private:
 
 private:
     QStringList m_files;
+    QnResourceList m_resources;
     QnWorkbenchController *m_controller;
 };
 
-#endif // QN_ARCHIVE_DROP_INSTRUMENT_H
+#endif // QN_DROP_INSTRUMENT_H

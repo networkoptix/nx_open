@@ -394,6 +394,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(CLAbstractRenderer *renderer) const
     return m_widgetByRenderer[renderer];
 }
 
+QnResourceWidget *QnWorkbenchDisplay::widget(const QnResourcePtr &resource) const {
+    return m_widgetByResource[resource];
+}
+
 QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbench::ItemRole role) const {
     return widget(m_itemByRole[role]);
 }
@@ -508,6 +512,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     m_widgetByItem.insert(item, widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
+    m_widgetByResource.insert(widget->resource(), widget);
     
     synchronize(widget, false);
     bringToFront(widget);
@@ -533,6 +538,7 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgetByItem.remove(item);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.remove(widget->renderer());
+    m_widgetByResource.remove(widget->resource());
 
     disconnect(widget, NULL, this, NULL);
 
