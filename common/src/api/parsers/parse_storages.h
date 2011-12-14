@@ -6,7 +6,7 @@
 #include "core/resource/qnstorage.h"
 
 template <class ResourcePtr>
-void parseStorages(QList<ResourcePtr>& storages, const QnApiStorages& xsdStorages, QnResourceFactory& resourceFactory)
+void parseStorages(QList<ResourcePtr>& storages, const QnApiStorages& xsdStorages, QnResourceFactory& /*resourceFactory*/)
 {
     using xsd::api::storages::Storages;
     using xsd::api::resourceTypes::ParentIDs;

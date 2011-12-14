@@ -401,7 +401,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_processedPackets = 0;
 }
 
-void CLCamDisplay::onJumpCanceled(qint64 time)
+void CLCamDisplay::onJumpCanceled(qint64 /*time*/)
 {
     skipPrevJumpSignal++;
 }

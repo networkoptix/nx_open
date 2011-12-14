@@ -48,12 +48,12 @@ QSize QnSequrityCamResource::getMaxSensorSize()
 
 }
 
-QRect QnSequrityCamResource::getCroping(QnDomain domain)
+QRect QnSequrityCamResource::getCroping(QnDomain /*domain*/)
 {
     return QRect(0, 0, 100, 100);
 }
 
-void QnSequrityCamResource::setCroping(QRect croping, QnDomain domain)
+void QnSequrityCamResource::setCroping(QRect croping, QnDomain /*domain*/)
 {
     setCropingPhysical(croping);
 }

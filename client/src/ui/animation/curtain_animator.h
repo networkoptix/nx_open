@@ -4,17 +4,18 @@
 #include <QObject>
 #include <QWeakPointer>
 
-class QParallelAnimationGroup;
-class QPropertyAnimation;
+class AnimationTimer;
 
 class QnCurtainItem;
 class QnResourceWidget;
+class QnVariantAnimator;
+class QnAnimatorGroup;
 
 class QnCurtainAnimator: public QObject {
     Q_OBJECT;
 
 public:
-    QnCurtainAnimator(int durationMSec, QObject *parent = NULL);
+    QnCurtainAnimator(int durationMSec, AnimationTimer *timer, QObject *parent = NULL);
 
     QnCurtainItem *curtainItem() const {
         return m_curtain;
@@ -35,19 +36,18 @@ private slots:
     void at_animation_finished();
 
 private:
-    void restoreBorderColor();
-    void initBorderColorAnimation(QObject *target);
+    void restoreFrameColor();
 
-    void restoreCurtainColor();
-    void initCurtainColorAnimation();
+    void setCurtained(bool curtained);
 
 private:
     QnCurtainItem *m_curtain;
+    QColor m_curtainColor;
+    QColor m_frameColor;
     bool m_curtained;
-    int m_durationMSec;
-    QParallelAnimationGroup *m_animationGroup;
-    QPropertyAnimation *m_curtainColorAnimation;
-    QPropertyAnimation *m_borderColorAnimation;
+    QnAnimatorGroup *m_animatorGroup;
+    QnVariantAnimator *m_curtainColorAnimator;
+    QnVariantAnimator *m_frameColorAnimator;
 };
 
 

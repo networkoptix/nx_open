@@ -45,7 +45,7 @@ const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMed
 }
 
 static QnEmptyAudioLayout audioLayout;
-const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
 {
     return &audioLayout;
 }

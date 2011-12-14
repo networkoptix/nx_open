@@ -2,6 +2,7 @@
 #define QN_RESOURCE_WIDGET_H
 
 #include <QWeakPointer>
+#include <QVector>
 #include <camera/render_status.h>
 #include <ui/widgets2/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
@@ -219,11 +220,22 @@ private:
     QRectF channelRect(int channel) const;
 
     enum OverlayIcon {
+        NO_ICON,
         PAUSED,
         LOADING
     };
 
-    void drawOverlayIcon(OverlayIcon icon, QColor fillColor, qreal data, const QRectF &rect);
+    struct OverlayState {
+        OverlayState(): icon(NO_ICON), changeTimeMSec(0), fadeInNeeded(false) {}
+
+        OverlayIcon icon;
+        qint64 changeTimeMSec;
+        bool fadeInNeeded;
+    };
+
+    void setOverlayIcon(int channel, OverlayIcon icon);
+
+    void drawOverlayIcon(int channel, const QRectF &rect);
 
     void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
     void drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion);
@@ -276,8 +288,6 @@ private:
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;
 
-    /** Display motion detection grid over video plane. */
-    bool m_motionGridEnabled;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

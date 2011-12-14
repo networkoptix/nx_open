@@ -41,7 +41,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
      * It may be NULL only when this function is called from constructor. */
     if(m_layout != NULL) {
         foreach(QnWorkbenchItem *item, m_layout->items())
-            at_layout_itemAboutToBeRemoved(item);
+            at_layout_itemRemoved(item);
 
         disconnect(m_layout, NULL, this, NULL);
     }
@@ -58,7 +58,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
      * It may be NULL only when this function is called from destructor. */
     if(m_layout != NULL) {
         connect(m_layout, SIGNAL(itemAdded(QnWorkbenchItem *)),             this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-        connect(m_layout, SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),  this, SLOT(at_layout_itemAboutToBeRemoved(QnWorkbenchItem *)));
+        connect(m_layout, SIGNAL(itemRemoved(QnWorkbenchItem *)),           this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
         connect(m_layout, SIGNAL(aboutToBeDestroyed()),                     this, SLOT(at_layout_aboutToBeDestroyed()));
 
         foreach(QnWorkbenchItem *item, m_layout->items())
@@ -101,12 +101,12 @@ void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
     emit itemAdded(item);
 }
 
-void QnWorkbench::at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item) {
+void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
     for(int i = 0; i < ITEM_ROLE_COUNT; i++)
         if(item == m_itemByRole[i])
             setItem(static_cast<ItemRole>(i), NULL);
 
-    emit itemAboutToBeRemoved(item);
+    emit itemRemoved(item);
 }
 
 void QnWorkbench::at_layout_aboutToBeDestroyed() {

@@ -46,7 +46,7 @@ public:
         }
     }
 
-    virtual unsigned int v_position(unsigned int channel) const
+    virtual unsigned int v_position(unsigned int /*channel*/) const
     {
         return 0;
     }
@@ -100,7 +100,7 @@ public:
         }
     }
 
-    virtual unsigned int v_position(unsigned int channel) const
+    virtual unsigned int v_position(unsigned int /*channel*/) const
     {
         return 0;
     }
@@ -227,7 +227,7 @@ bool CLArecontPanoramicResource::setCamQulity(int q)
 
 }
 
-const QnVideoResourceLayout* CLArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnVideoResourceLayout* CLArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
 {
     return m_vrl;
 }

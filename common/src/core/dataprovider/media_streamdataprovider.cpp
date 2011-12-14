@@ -90,6 +90,10 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
     mFramesLost = 0;
+
+    m_framesSinceLastMetaData = 0; 
+    m_timeSinceLastMetaData.restart();
+
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()
@@ -159,7 +163,13 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
 }
 
-const QnStatistics* QnAbstractMediaStreamDataProvider:: getStatistics(int channel) const
+const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel) const
 {
     return &m_stat[channel];
+}
+
+bool QnAbstractMediaStreamDataProvider::needMetaData() const
+{
+    return (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) && 
+        m_framesSinceLastMetaData > 0; // got at least one frame 
 }

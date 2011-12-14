@@ -136,9 +136,30 @@ public:
     QRect closestFreeSlot(const QPoint &pos, const QSize &size, QnGridWalker *walker = NULL) const;
 
 signals:
+    /**
+     * This signal is emitted when this layout is about to be destroyed 
+     * (i.e. its destructor has started).
+     */
     void aboutToBeDestroyed();
+
+    /**
+     * This signal is emitted whenever an item is added to this layout.
+     * At the time of emit all internal data structures are already updated
+     * to include the added item.
+     * 
+     * \param item                      Item that was added.
+     */
     void itemAdded(QnWorkbenchItem *item);
-    void itemAboutToBeRemoved(QnWorkbenchItem *item);
+
+    /**
+     * This signal is emitted whenever an item is about to be removed from
+     * this layout. At the time of emit the item is still valid, but
+     * all internal data structures are already updated not to include the
+     * removed item.
+     * 
+     * \param item                      Item that was removed.
+     */
+    void itemRemoved(QnWorkbenchItem *item);
 
 private:
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);

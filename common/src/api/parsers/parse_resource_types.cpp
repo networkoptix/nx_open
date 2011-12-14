@@ -9,7 +9,6 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiReso
     using xsd::api::resourceTypes::PropertyTypes;
     using xsd::api::resourceTypes::ParamType;
 
-    int n = 0;
     for (ResourceTypes::resourceType_const_iterator i (xsdResourceTypes.begin ());
              i != xsdResourceTypes.end ();
              ++i)
@@ -88,8 +87,11 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiReso
                 if (propertyTypesIter->description().present())
                     param->description = (*propertyTypesIter->description()).c_str();
 
-                param->ui = propertyTypesIter->ui();
-                param->readonly = propertyTypesIter->readonly();
+                if (propertyTypesIter->ui().present())
+                    param->ui = *propertyTypesIter->ui();
+
+                if (propertyTypesIter->readonly().present())
+                    param->readonly = *propertyTypesIter->readonly();
 
                 resourceType->addParamType(param);
             }

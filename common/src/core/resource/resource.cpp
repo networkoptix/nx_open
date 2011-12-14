@@ -187,7 +187,7 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
     return true;
 }
 
-void QnResource::getParamAsynch(const QString& name, QnValue& val, QnDomain domain )
+void QnResource::getParamAsynch(const QString &/*name*/, QnValue &/*val*/, QnDomain /*domain*/)
 {
 
 }
@@ -203,11 +203,13 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
 
     QnParam& param = getResourceParamList().get(name);
 
+    /*
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         return false;
     }
+    /**/
 
 
     if (domain == QnDomainPhysical)

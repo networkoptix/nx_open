@@ -108,6 +108,9 @@ void QnAbstractAnimator::updateState(State newState) {
     State oldState = m_state;
     m_state = newState;
 
+    if(newState == RUNNING && timer() == NULL && m_group == NULL)
+        qnWarning("This animator is not assigned to an animation timer, animation won't work.");
+
     switch(newState) {
     case STOPPED: /* PAUSED -> STOPPED. */
         emit finished();

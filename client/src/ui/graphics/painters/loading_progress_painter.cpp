@@ -2,6 +2,7 @@
 #include <cmath> /* For std::fmod, std::sin and std::cos. */
 #include <utils/common/qt_opengl.h>
 #include <ui/common/linear_combination.h>
+#include "color_shader_program.h"
 
 namespace {
     void glVertexPolar(qreal alpha, qreal r) {
@@ -12,7 +13,8 @@ namespace {
 
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
-    m_sectorCount(sectorCount)
+    m_sectorCount(sectorCount),
+    m_program(new QnColorShaderProgram())
 {
     /* Create display list. */
     m_list = glGenLists(1);
@@ -43,12 +45,15 @@ QnLoadingProgressPainter::~QnLoadingProgressPainter() {
 }
 
 void QnLoadingProgressPainter::paint() {
-    glCallList(m_list);
+    paint(0.0, 1.0);
 }
 
-void QnLoadingProgressPainter::paint(qreal progress) {
+void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     glPushMatrix();
     glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
-    paint();
+    m_program->bind();
+    m_program->setColorMultiplier(QVector4D(1.0, 1.0, 1.0, opacity));
+    glCallList(m_list);
+    m_program->release();
     glPopMatrix();
 }

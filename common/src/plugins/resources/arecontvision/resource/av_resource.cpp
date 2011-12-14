@@ -16,7 +16,8 @@
 
 const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
 
-QnPlAreconVisionResource::QnPlAreconVisionResource()
+QnPlAreconVisionResource::QnPlAreconVisionResource():
+m_totalMdZones(64)
 {
 }
 
@@ -227,11 +228,40 @@ void QnPlAreconVisionResource::beforeUse()
     if (!getParam("Net version", val, QnDomainPhysical))
         return;
 
-    if (!getDescription())
+    //if (!getDescription())
+    //    return;
+
+    setRegister(3, 21, 20); // sets I frame frequency to 1/20
+
+
+    if (!setParam("Enable motion detection", "on", QnDomainPhysical)) // enables motion detection; 
         return;
 
-    setRegister(3, 21, 20);
-    setRegister(7, 21, 20);
+    // check if we've got 1024 zones
+    setParam("TotalZones", 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it 
+    if (!getParam("TotalZones", val, QnDomainPhysical))
+        return;
+    if (val == 1024)
+        m_totalMdZones = 1024;
+
+    // lets set zone size
+    QnValue maxSensorWidth;
+    getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
+
+    //one zone - 32x32 pixels; zone sizes are 1-15
+
+    int optimal_zone_size_pixels = (int)maxSensorWidth / (m_totalMdZones == 64 ? 8 : 32);
+    
+    int zone_size = (optimal_zone_size_pixels%32) ? (optimal_zone_size_pixels/32 + 1) : optimal_zone_size_pixels/32;
+
+    if (zone_size>15)
+        zone_size = 15;
+
+    if (zone_size<1)
+        zone_size = 1;
+
+    setParam("Zone size", zone_size, QnDomainPhysical);
+
 
 }
 
@@ -256,24 +286,24 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize size) const
+QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
 {
     return QnQualityNormal;
 }
 
-QImage QnPlAreconVisionResource::getImage(int channnel, QDateTime time, QnStreamQuality quality)
+QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/)
 {
     return QImage();
 }
 
 
 
-void QnPlAreconVisionResource::setIframeDistance(int frames, int timems)
+void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
 
-void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
+void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
 {
     QnValue maxSensorWidth;
     QnValue maxSensorHight;
@@ -286,6 +316,10 @@ void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
     setParamAsynch("sensorheight", maxSensorHight, QnDomainPhysical);
 }
 
+int QnPlAreconVisionResource::totalMdZones() const
+{
+    return m_totalMdZones;
+}
 
 //===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)

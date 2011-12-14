@@ -273,7 +273,7 @@ protected slots:
     void at_viewport_animationFinished();
 
     void at_workbench_itemAdded(QnWorkbenchItem *item);
-    void at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *item);
+    void at_workbench_itemRemoved(QnWorkbenchItem *item);
     
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_modeChanged();

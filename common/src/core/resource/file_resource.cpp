@@ -12,7 +12,7 @@ QnLocalFileResource::QnLocalFileResource(const QString &filename)
     addFlag(QnResource::SINGLE_SHOT);
 }
 
-QnAbstractStreamDataProvider* QnLocalFileResource::createDataProviderInternal(ConnectionRole role)
+QnAbstractStreamDataProvider* QnLocalFileResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     return new CLSingleShotFileStreamreader(toSharedPointer());
 }

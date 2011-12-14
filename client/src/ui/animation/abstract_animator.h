@@ -4,8 +4,6 @@
 #include <QObject>
 #include <QVariant>
 #include "animation_timer_listener.h"
-#include "setter.h"
-#include "getter.h"
 
 class QnAnimatorGroup;
 
