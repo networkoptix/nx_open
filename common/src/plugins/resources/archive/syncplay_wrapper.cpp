@@ -87,6 +87,16 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
     }
 }
 
+bool QnArchiveSyncPlayWrapper::setSendMotion(bool value)
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    bool rez = true;
+    foreach(ReaderInfo info, d->readers)
+        rez &= info.reader->setSendMotion(value);
+    return rez;
+}
+
 bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
 {
     Q_D(const QnArchiveSyncPlayWrapper);

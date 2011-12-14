@@ -52,7 +52,7 @@ bool QnMediaContext::equalTo(QnMediaContext* other) const
 // ----------------------------------- QnMetaDataV1 -----------------------------------------
 
 QnMetaDataV1::QnMetaDataV1():
-    QnAbstractMediaData(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HIGHT/8)
+    QnAbstractMediaData(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
 {
     dataType = META_V1;
     //useTwice = false;
@@ -63,7 +63,7 @@ QnMetaDataV1::QnMetaDataV1():
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
-    memset(data.data(), 0, data.capacity());
+    data.fill(0, data.capacity());
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
@@ -80,9 +80,11 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
-    for (int i = 0; i < MD_WIDTH*MD_HIGHT/128; ++i)
+    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
     {
-        _mm_or_si128(*dst++, *src++);
+        *dst = _mm_or_si128(*dst, *src);
+        dst++;
+        src++;
 
     }
 }
@@ -90,9 +92,9 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 bool QnMetaDataV1::isMotionAt(int x, int y) const
 {
     Q_ASSERT(x<MD_WIDTH);
-    Q_ASSERT(y<MD_HIGHT);
+    Q_ASSERT(y<MD_HEIGHT);
 
-    int shift = x*MD_HIGHT + y;
+    int shift = x*MD_HEIGHT + y;
     unsigned char b = *((unsigned char*)data.data() + shift/8 );
     return b & (128 >> (shift&7));
 }
@@ -100,9 +102,17 @@ bool QnMetaDataV1::isMotionAt(int x, int y) const
 void QnMetaDataV1::setMotionAt(int x, int y) 
 {
     Q_ASSERT(x<MD_WIDTH);
-    Q_ASSERT(y<MD_HIGHT);
+    Q_ASSERT(y<MD_HEIGHT);
 
-    int shift = x*MD_HIGHT + y;
+    int shift = x*MD_HEIGHT + y;
     quint8* b = (quint8*)data.data() + shift/8;
     *b |= (128 >> (shift&7));
+}
+
+bool QnMetaDataV1::containTime(const qint64 timeUsec) const
+{
+    if (m_duration == 0)
+        return timestamp == timeUsec;
+    else
+        return timestamp <= timeUsec && timestamp + m_duration > timeUsec;
 }

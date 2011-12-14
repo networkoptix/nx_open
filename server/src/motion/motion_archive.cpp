@@ -7,45 +7,122 @@ static const char version = 1;
 static const quint16 DETAILED_AGGREGATE_INTERVAL = 5; // at seconds
 static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds
 
-#pragma pack(push, 1)
-struct IndexRecord
-{
-    int start;    // at ms since epoch + start offset from a file header
-    int duration; // at ms
-};
 bool operator < (const IndexRecord& first, const IndexRecord& other) { return first.start < other.start; }
 bool operator < (qint64 start, const IndexRecord& other) { return start < other.start; }
 bool operator < (const IndexRecord& other, qint64 start) { return other.start < start;}
 
+ // --------------- QnMotionArchiveConnection ---------------------
 
-struct IndexHeader
+QnMotionArchiveConnection::QnMotionArchiveConnection(QnMotionArchive* owner):
+    m_owner(owner),
+    m_minDate(AV_NOPTS_VALUE),
+    m_maxDate(AV_NOPTS_VALUE),
+    m_lastResult(new QnMetaDataV1())
 {
-    qint64 startTime;
-    qint16 interval;
-    qint8 version;
-    char dummy[5];
-};
-#pragma pack(pop)
+    m_lastTimeMs = AV_NOPTS_VALUE;
+    m_motionLoadedStart = m_motionLoadedEnd = -1;
+    m_motionBuffer = (quint8*) qMallocAligned(1024 * MOTION_DATA_RECORD_SIZE, 32);
+}
 
+QnMotionArchiveConnection::~QnMotionArchiveConnection()
+{
+    qFreeAligned(m_motionBuffer);
+}
+
+QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
+{
+    if (m_lastResult->containTime(timeUsec))
+        return QnMetaDataV1Ptr(); // do not duplicate data
+
+    qint64 timeMs = timeUsec/1000;
+
+    if (m_index.isEmpty() || timeMs < m_index.front().start + m_indexHeader.startTime || 
+        timeMs > m_index.last().start + +m_index.last().duration + m_indexHeader.startTime)
+    {
+        qint64 prevMaxDate = m_maxDate;
+        m_owner->dateBounds(timeMs, m_minDate, m_maxDate);
+        if (prevMaxDate != m_maxDate)
+        {
+            m_lastTimeMs = AV_NOPTS_VALUE;
+            m_motionLoadedStart = m_motionLoadedEnd = -1;
+            if (!m_owner->loadIndexFile(m_index, m_indexHeader, timeMs))
+            {
+                m_maxDate = AV_NOPTS_VALUE;
+                return QnMetaDataV1Ptr();
+            }
+            m_maxDate = qMin(m_maxDate, QDateTime::currentDateTime().toMSecsSinceEpoch());
+        }
+    }
+
+    if (m_lastTimeMs != AV_NOPTS_VALUE && timeMs > m_lastTimeMs)
+        m_indexItr = qUpperBound(m_indexItr, m_index.end(), timeMs - m_indexHeader.startTime);
+    else 
+        m_indexItr = qUpperBound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
+
+    if (m_indexItr > m_index.begin())
+        m_indexItr--;
+
+    qint64 foundStartTime = m_indexItr->start + m_indexHeader.startTime;
+    bool isMotionFound = foundStartTime <= timeMs && foundStartTime + m_indexItr->duration > timeMs;
+    if (!isMotionFound)
+        return QnMetaDataV1Ptr();
+
+    int indexOffset = m_indexItr - m_index.begin();
+    bool isMotionLoaded = m_motionLoadedStart <= indexOffset && m_motionLoadedEnd > indexOffset;
+    if (!isMotionLoaded)
+    {
+        m_owner->fillFileNames(timeMs, &m_motionFile, 0);
+        if (m_motionFile.open(QFile::ReadOnly)) 
+        {
+            m_motionLoadedStart = qMax(0, indexOffset - 512);
+            m_motionFile.seek(m_motionLoadedStart * MOTION_DATA_RECORD_SIZE);
+            int readed = qMax(0ll, m_motionFile.read((char*) m_motionBuffer, 1024 * MOTION_DATA_RECORD_SIZE));
+            m_motionLoadedEnd = m_motionLoadedStart + readed / MOTION_DATA_RECORD_SIZE;
+            isMotionLoaded = m_motionLoadedStart <= indexOffset && m_motionLoadedEnd > indexOffset;
+        }
+    }
+    if (!isMotionLoaded)
+        return QnMetaDataV1Ptr();
+
+
+    m_lastResult = QnMetaDataV1Ptr(new QnMetaDataV1());
+    m_lastResult->data.clear();
+    int motionIndex = indexOffset - m_motionLoadedStart;
+    m_lastResult->data.write((const char*) m_motionBuffer + motionIndex*MOTION_DATA_RECORD_SIZE, MOTION_DATA_RECORD_SIZE);
+    m_lastResult->timestamp = foundStartTime*1000;
+    m_lastResult->m_duration = m_indexItr->duration*1000;
+
+    //qDebug() << "motion=" << QDateTime::fromMSecsSinceEpoch(m_lastResult->timestamp/1000).toString("hh.mm.ss.zzz")
+    //         << "dur=" << m_lastResult->m_duration/1000.0
+    //         <<  "reqTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh.mm.ss.zzz");
+
+    return m_lastResult;
+}
+
+// ----------------------- QnMotionArchive ------------------
 
 QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource): 
-    m_resource(resource),
-    m_lastDetailedData(new QnMetaDataV1())
+m_resource(resource),
+m_lastDetailedData(new QnMetaDataV1())
 {
     m_lastDateForCurrentFile = 0;
     m_firstTime = 0;
 }
+
 
 QString QnMotionArchive::getFilePrefix(const QDateTime& datetime)
 {
     return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + m_resource->getMAC().toString() + QString("/") + datetime.toString("yyyy/MM/");
 }
 
-void QnMotionArchive::fillFileNames(const QDateTime& datetime, QFile& motionFile, QFile& indexFile)
+void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile)
 {
+    QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
     QString fileName = getFilePrefix(datetime);
-    motionFile.setFileName(fileName+"motion_detailed_data.bin");
-    indexFile.setFileName(fileName+"motion_detailed_index.bin");
+    if (motionFile)
+        motionFile->setFileName(fileName+"motion_detailed_data.bin");
+    if (indexFile)
+        indexFile->setFileName(fileName+"motion_detailed_index.bin");
     QMutex m_fileAccessMutex;
     QDir dir;
     dir.mkpath(fileName);
@@ -53,7 +130,7 @@ void QnMotionArchive::fillFileNames(const QDateTime& datetime, QFile& motionFile
 
 inline void setBit(quint8* data, int x, int y)
 {
-    int offset = (x * MD_HIGHT + y) / 8;
+    int offset = (x * MD_HEIGHT + y) / 8;
     data[offset] |= 0x80 >> (y&7);
 }
 
@@ -62,13 +139,13 @@ void QnMotionArchive::createMask(const QRegion& region,  __m128i* mask, int& mas
 
     maskStart = 0;
     maskEnd = 0;
-    memset(mask, 0, MD_WIDTH * MD_HIGHT / 8);
+    memset(mask, 0, MD_WIDTH * MD_HEIGHT / 8);
 
     for (int i = 0; i < region.rectCount(); ++i)
     {
         const QRect& rect = region.rects().at(i);
-        maskStart = qMin((rect.left() * MD_HIGHT + rect.top()) / 128, maskStart);
-        maskEnd = qMax((rect.right() * MD_HIGHT + rect.bottom()) / 128, maskEnd);
+        maskStart = qMin((rect.left() * MD_HEIGHT + rect.top()) / 128, maskStart);
+        maskEnd = qMax((rect.right() * MD_HEIGHT + rect.bottom()) / 128, maskEnd);
         for (int x = rect.left(); x <= rect.right(); ++x)
         {
             for (int y = rect.top(); y <= rect.bottom(); ++y)
@@ -95,38 +172,48 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     //qint64 msStartTime = startTime/1000; // convert from usec to ms
     //qint64 msEndTime = endTime/1000; // convert from usec to ms
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
-    __m128i mask[MD_WIDTH * MD_HIGHT / 128];
+    __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
     createMask(region, mask, maskStart, maskEnd);
     bool isFirstStep = true;
 
     while (msStartTime < msEndTime)
     {
+        QVector<IndexRecord> index;
+        IndexHeader indexHeader;
+        fillFileNames(msStartTime, &motionFile, 0);
+        if (!motionFile.open(QFile::ReadOnly) || !loadIndexFile(index, indexHeader, msStartTime)) {
+            qFreeAligned(buffer);
+            return rez;
+        }
+
+        /*
         QDateTime qmsStartTime = QDateTime::fromMSecsSinceEpoch(msStartTime);
-        fillFileNames(qmsStartTime, motionFile, indexFile);
-        
+        fillFileNames(qmsStartTime, &motionFile, &indexFile);
         if (!motionFile.open(QFile::ReadOnly) || !indexFile.open(QFile::ReadOnly)) {
             qFreeAligned(buffer);
             return rez;
         }
 
-        QVector<IndexRecord> index;
         qint64 indexSize = (indexFile.size()-MOTION_INDEX_HEADER_SIZE);
         if (indexSize == 0)
             return rez;
         index.resize(indexSize/MOTION_INDEX_RECORD_SIZE);
-        IndexHeader indexHeader;
         indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
         indexFile.read((char*) &index[0], indexSize);
+        */
 
         qint64 minTime, maxTime;
-        dateBounds(qmsStartTime, minTime, maxTime);
+        dateBounds(msStartTime, minTime, maxTime);
 
         QVector<IndexRecord>::iterator startItr = index.begin();
         QVector<IndexRecord>::iterator endItr = index.end();
 
-        if (isFirstStep)
-            startItr = qLowerBound(index.begin(), index.end(), msStartTime-indexHeader.startTime);
+        if (isFirstStep) {
+            startItr = qUpperBound(index.begin(), index.end(), msStartTime-indexHeader.startTime);
+            if (startItr > index.begin())
+                startItr--;
+        }
         if (maxTime <= msEndTime)
             endItr = qUpperBound(startItr, index.end(), msEndTime-indexHeader.startTime);
         int totalSteps = endItr - startItr;
@@ -167,8 +254,25 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     return rez;
 }
 
-void QnMotionArchive::dateBounds(const QDateTime& datetime, qint64& minDate, qint64& maxDate)
+bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime)
 {
+    QFile indexFile;
+    fillFileNames(msTime, 0, &indexFile);
+    if (!indexFile.open(QFile::ReadOnly)) 
+        return false;
+
+    qint64 indexSize = (indexFile.size()-MOTION_INDEX_HEADER_SIZE);
+    if (indexSize == 0)
+        return false;
+    index.resize(indexSize/MOTION_INDEX_RECORD_SIZE);
+    indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
+    indexFile.read((char*) &index[0], indexSize);
+    return true;
+}
+
+void QnMotionArchive::dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate)
+{
+    QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
     QDateTime monthStart(datetime.date().addDays(1-datetime.date().day()));
     minDate = monthStart.toMSecsSinceEpoch();
 
@@ -179,16 +283,15 @@ void QnMotionArchive::dateBounds(const QDateTime& datetime, qint64& minDate, qin
 bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
 {
     qint64 timestamp = data->timestamp/1000;
-    QDateTime datetime = QDateTime::fromMSecsSinceEpoch(timestamp);
     if (timestamp > m_lastDateForCurrentFile)
     {
 
-        dateBounds(datetime, m_firstTime, m_lastDateForCurrentFile);
+        dateBounds(timestamp, m_firstTime, m_lastDateForCurrentFile);
 
         //QString fileName = getFilePrefix(datetime);
         m_detailedMotionFile.close();
         m_detailedIndexFile.close();
-        fillFileNames(datetime, m_detailedMotionFile, m_detailedIndexFile);
+        fillFileNames(timestamp, &m_detailedMotionFile, &m_detailedIndexFile);
         if (!m_detailedMotionFile.open(QFile::WriteOnly | QFile::Append))
             return false;
 
@@ -233,8 +336,12 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
 bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
 {
     bool rez = true;
+
     if (data->timestamp - m_lastDetailedData->timestamp < DETAILED_AGGREGATE_INTERVAL*1000000ll)
     {
+        //qDebug() << "addMotion=" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz")
+        //    << "to" << QDateTime::fromMSecsSinceEpoch(m_lastDetailedData->timestamp).toString("hh.mm.ss.zzz");
+
         // aggregate data
         m_lastDetailedData->addMotion(data);
     }
@@ -243,6 +350,12 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
         m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
         rez = saveToArchiveInternal(m_lastDetailedData);
         m_lastDetailedData = data;
+        //qDebug() << "start new Motion" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz");
     }
     return rez;
+}
+
+QnMotionArchiveConnectionPtr QnMotionArchive::createConnection()
+{
+    return QnMotionArchiveConnectionPtr(new QnMotionArchiveConnection(this));
 }

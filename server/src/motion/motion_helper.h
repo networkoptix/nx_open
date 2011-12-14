@@ -8,8 +8,7 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/network_resource.h"
 #include "recording/device_file_catalog.h"
-
-class QnMotionArchive;
+#include "motion_archive.h"
 
 class QnMotionHelper
 {
@@ -23,6 +22,7 @@ public:
 
     QnTimePeriodList mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime);
     QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime);
+    QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res);
 
     QnMotionHelper();
 private:

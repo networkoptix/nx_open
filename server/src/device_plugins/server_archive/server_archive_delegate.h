@@ -9,6 +9,7 @@
 #include "recording/device_file_catalog.h"
 #include "recording/storage_manager.h"
 #include "utils/media/sse_helper.h"
+#include "motion/motion_archive.h"
 
 class QnServerArchiveDelegate: public QnAbstractArchiveDelegate
 {
@@ -17,6 +18,7 @@ public:
     virtual ~QnServerArchiveDelegate();
 
     void setMotionRegion(const QRegion& region);
+    void setSendMotion(bool value);
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();
@@ -53,6 +55,9 @@ private:
     QnTimePeriod m_lastTimePeriod;
     qint64 m_lastSeekTime;
     bool m_afterSeek;
+    QnMotionArchiveConnectionPtr m_motionConnection;
+    QnAbstractMediaDataPtr m_tmpData;
+    bool m_sendMotion;
 };
 
 #endif // _SERVER_ARCHIVE_DELEGATE_H__

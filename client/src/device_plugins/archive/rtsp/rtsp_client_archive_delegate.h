@@ -33,8 +33,11 @@ public:
     virtual void beforeClose();
     virtual void setSingleshotMode(bool value);
     
-    // QnAbstractMaskedReader
+    // filter input data by motion region
     virtual void setMotionRegion(const QRegion& region);
+
+    // Send motion data to client
+    virtual void setSendMotion(bool value);
 protected:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);

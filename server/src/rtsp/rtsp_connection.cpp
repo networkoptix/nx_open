@@ -359,7 +359,6 @@ int QnRtspConnectionProcessor::composePlay()
     }
     else 
         d->dataProcessor->clearUnprocessedData();
-    //d->dataProcessor->pause();
 
     if (d->liveMode && d->archiveDP)
         d->archiveDP->stop();
@@ -391,32 +390,33 @@ int QnRtspConnectionProcessor::composePlay()
         {
             QnTimePeriodList motionPeriods;
             QRegion region;
-            if (!d->requestHeaders.value("x-motion-region").isNull())
+            QString motionRegion = d->requestHeaders.value("x-motion-region").toUtf8();
+            if (!motionRegion.isNull())
             {
                 QBuffer buffer;
                 buffer.open(QIODevice::ReadWrite);
                 QDataStream stream(&buffer);
-                stream << QByteArray::fromBase64(d->requestHeaders.value("x-motion-region").toUtf8());
+                stream << QByteArray::fromBase64(motionRegion.toUtf8());
                 buffer.seek(0);
                 stream >> region;
+                serverArchive->setMotionRegion(region);
             }
-            serverArchive->setMotionRegion(region);
+
+            QString sendMotion = d->requestHeaders.value("x-send-motion");
+            if (!sendMotion.isNull()) {
+                serverArchive->setSendMotion(sendMotion == "1" || sendMotion == "true");
+            }
         }
 
         if (!d->requestHeaders.value("Range").isNull())
         {
-            //d->archiveDP->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
             d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
 
-            //if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
-            
             {
                 d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
                 d->archiveDP->jumpWithMarker(d->startTime, d->lastPlayCSeq);
             }
         }
-        //else
-        //    d->archiveDP->setSingleShotMode(false);
     }
     currentDP->start();
     d->dataProcessor->start();

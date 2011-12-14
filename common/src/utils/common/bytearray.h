@@ -63,6 +63,8 @@ public:
     //av cam
     void removeZerosAtTheEnd();
 
+    // fill data
+    void fill(quint8 filler, int size);
 private:
     Q_DISABLE_COPY(CLByteArray)
 

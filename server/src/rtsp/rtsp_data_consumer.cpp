@@ -136,8 +136,10 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         return true;
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
-    if (metadata)
-        return true;
+    if (metadata) {
+        //return true;
+        metadata = metadata;
+    }
 
     if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
     {
@@ -171,43 +173,47 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     m_waitSCeq = 0;
 
 
-    //if (!ctx)
-    //    return true;
-
     // one video channel may has several subchannels (video combined with frames from difference codecContext)
     // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
-    
+        
     quint32 ssrc = BASIC_FFMPEG_SSRC + rtspChannelNum * MAX_CONTEXTS_AT_VIDEO*2;
 
     ssrc += media->subChannelNumber*2;
     int subChannelNumber = media->subChannelNumber;
 
-    QList<QnMediaContextPtr>& ctxData = m_ctxSended[rtspChannelNum];
-    while (ctxData.size() <= subChannelNumber)
-        ctxData << QnMediaContextPtr(0);
-
-    QnMediaContextPtr currentContext = media->context;
-    if (currentContext == 0)
-        currentContext = getGeneratedContext(media->compressionType);
-    int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
     m_owner->clearBuffer();
-    if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
+    if (!metadata)
     {
-        ctxData[subChannelNumber] = currentContext;
-        QByteArray codecCtxData;
-        QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
-        buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
-        QMutexLocker lock(&m_owner->getSockMutex());
-        m_owner->bufferData(m_rtspTcpHeader, rtpHeaderSize);
-        Q_ASSERT(!codecCtxData.isEmpty());
-        m_owner->bufferData(codecCtxData);
+        QList<QnMediaContextPtr>& ctxData = m_ctxSended[rtspChannelNum];
+        while (ctxData.size() <= subChannelNumber)
+            ctxData << QnMediaContextPtr(0);
+
+        QnMediaContextPtr currentContext = media->context;
+        if (currentContext == 0)
+            currentContext = getGeneratedContext(media->compressionType);
+        int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
+        if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
+        {
+            ctxData[subChannelNumber] = currentContext;
+            QByteArray codecCtxData;
+            QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
+            buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
+            QMutexLocker lock(&m_owner->getSockMutex());
+            m_owner->bufferData(m_rtspTcpHeader, rtpHeaderSize);
+            Q_ASSERT(!codecCtxData.isEmpty());
+            m_owner->bufferData(codecCtxData);
+        }
     }
 
     // send data with RTP headers
     QnCompressedVideoData *video = media.dynamicCast<QnCompressedVideoData>().data();
     const char* curData = media->data.data();
     int sendLen = 0;
-    int ffHeaderSize = 4 + (video ? RTSP_FFMPEG_VIDEO_HEADER_SIZE : 0);
+    int ffHeaderSize = RTSP_FFMPEG_GENERIC_HEADER_SIZE;
+    if (video)
+        ffHeaderSize += RTSP_FFMPEG_VIDEO_HEADER_SIZE;
+    else if (metadata)
+        ffHeaderSize += RTSP_FFMPEG_METADATA_HEADER_SIZE;
 
     if (m_lastSendTime != DATETIME_NOW)
         m_lastSendTime = media->timestamp;
@@ -227,6 +233,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         if (ffHeaderSize) 
         {
+            quint8 packetType = media->dataType;
+            m_owner->bufferData((const char*) &packetType, 1);
             quint32 timestampHigh = htonl(media->timestamp >> 32);
             m_owner->bufferData((const char*) &timestampHigh, 4);
             if (video) 
@@ -236,6 +244,10 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
                 quint8 cseq = media->opaque;
                 m_owner->bufferData((const char*) &cseq, 1);
+            }
+            else if (metadata) {
+                quint32 metadataHeader = htonl(metadata->m_duration/1000);
+                m_owner->bufferData((const char*) &metadataHeader, 4);
             }
             ffHeaderSize = 0;
         }
