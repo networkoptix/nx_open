@@ -387,7 +387,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
 
         QnMetaDataV1Ptr motion(new QnMetaDataV1());
 
-        if (mdresult == "no motion")
+        if (QString(mdresult) == "no motion")
             return motion; // no motion detected 
         
 
@@ -395,7 +395,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
         //int total_zones = avRes->totalMdZones();
 
         QnValue zone_size;
-        avRes->getParam("Zone size", zone_size, QnDomainMemory);
+        //avRes->getParam("Zone size", zone_size, QnDomainMemory);
 
         int pixelZoneSize = (int)zone_size*32;
 
