@@ -14,7 +14,7 @@ class QN_EXPORT QnVideoServerConnection: public QObject
 {
     Q_OBJECT;
 public:
-    QnVideoServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QObject *parent = NULL);
+    QnVideoServerConnection(const QUrl &url, QObject *parent = 0);
     virtual ~QnVideoServerConnection();
 
     QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeUSec = 0, qint64 endTimeUSec = INT64_MAX, qint64 detail = 1);
