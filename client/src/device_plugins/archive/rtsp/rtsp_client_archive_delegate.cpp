@@ -179,7 +179,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 
         if (result && m_waitBOF)
         {
-            if (result->flags & QnAbstractMediaData::MediaFlags_BOF &&
+            if ((result->flags & QnAbstractMediaData::MediaFlags_BOF) &&
                 ((result->flags & QnAbstractMediaData::MediaFlags_LIVE) ||  m_sendedCSec == result->opaque))
             {
                 if (qAbs(result->timestamp - m_lastSeekTime) > 1000ll*1000*10)
@@ -302,6 +302,10 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             quint32 timestampHigh = ntohl(*(quint32*) payload);
             dataSize -= RTSP_FFMPEG_GENERIC_HEADER_SIZE;
             payload  += 4; // deserialize timeStamp high part
+
+            quint8 cseq = *payload++;
+            quint8 flags = *payload++;
+
             if (dataType == QnAbstractMediaData::META_V1)
             {
                 if (dataSize != MD_WIDTH*MD_HEIGHT/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
@@ -326,18 +330,13 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
 
-                quint32 videoHeader = ntohl(*(quint32*)payload);
-                quint8 flags = videoHeader >> 24;
-                quint32 fullPayloadLen = videoHeader & 0x00ffffff;
-                quint8 cseq = payload[4];
+                quint32 fullPayloadLen = (payload[0] << 16) + (payload[1] << 8) + payload[2];
 
                 dataSize -= RTSP_FFMPEG_VIDEO_HEADER_SIZE;
                 payload += RTSP_FFMPEG_VIDEO_HEADER_SIZE; // deserialize video flags
 
                 QnCompressedVideoData *video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
                 nextPacket = QnCompressedVideoDataPtr(video);
-                video->flags = flags;
-                video->opaque = cseq;
                 if (context) 
                 {
                     video->width = context->ctx()->coded_width;
@@ -355,10 +354,14 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                 qWarning() << "Unsupported RTP media type " << (context ? context->ctx()->codec_type : 0);
                 return result;
             }
+
             m_nextDataPacket[ssrc] = nextPacket;
             mediaPacket = qSharedPointerDynamicCast<QnAbstractMediaData>(nextPacket);
             if (mediaPacket) 
             {
+                mediaPacket->opaque = cseq;
+                mediaPacket->flags = flags;
+
                 if (context)
                     mediaPacket->compressionType = context->ctx()->codec_id;
                 mediaPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);

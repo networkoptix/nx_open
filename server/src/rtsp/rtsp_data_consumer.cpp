@@ -237,13 +237,14 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             m_owner->bufferData((const char*) &packetType, 1);
             quint32 timestampHigh = htonl(media->timestamp >> 32);
             m_owner->bufferData((const char*) &timestampHigh, 4);
+            quint8 cseq = media->opaque;
+            m_owner->bufferData((const char*) &cseq, 1);
+            quint8 flags = media->flags;
+            m_owner->bufferData((const char*) &flags, 1);
             if (video) 
             {
-                quint32 videoHeader = htonl((video->flags << 24) + (video->data.size() & 0x00ffffff));
-                m_owner->bufferData((const char*) &videoHeader, 4);
-
-                quint8 cseq = media->opaque;
-                m_owner->bufferData((const char*) &cseq, 1);
+                quint32 videoHeader = htonl(video->data.size() & 0x00ffffff);
+                m_owner->bufferData(((const char*) &videoHeader)+1, 3);
             }
             else if (metadata) {
                 quint32 metadataHeader = htonl(metadata->m_duration/1000);

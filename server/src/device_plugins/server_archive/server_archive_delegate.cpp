@@ -255,7 +255,7 @@ begin_label:
         m_afterSeek = false;
     }
     
-    if (m_sendMotion) 
+    if (data && m_sendMotion) 
     {
         if (!m_motionConnection)
             m_motionConnection = QnMotionHelper::instance()->createConnection(m_resource);
