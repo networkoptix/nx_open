@@ -96,7 +96,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 
-class QnMetaDataV1;
+struct QnMetaDataV1;
 typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 
 enum {MD_WIDTH = 44, MD_HIGHT = 32};

@@ -675,8 +675,7 @@ bool QnArchiveStreamReader::isSkippingFrames() const
     return m_skipFramesToTime != 0 || m_tmpSkipFramesToTime != 0;
 }
 
-void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime)
-
+void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, qint64 skipTime)
 {
     //cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     //cl_log.log("skipTime=", skipTime, cl_logALWAYS);

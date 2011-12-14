@@ -9,7 +9,6 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiReso
     using xsd::api::resourceTypes::PropertyTypes;
     using xsd::api::resourceTypes::ParamType;
 
-    int n = 0;
     for (ResourceTypes::resourceType_const_iterator i (xsdResourceTypes.begin ());
              i != xsdResourceTypes.end ();
              ++i)

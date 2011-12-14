@@ -137,12 +137,13 @@ qint64 getDiskFreeSpace(const QString& root)
     quint64 freeBytesAvailableToCaller = -1;
     quint64 totalNumberOfBytes = -1;
     quint64 totalNumberOfFreeBytes = -1;
-    BOOL rez = GetDiskFreeSpaceEx(
+    BOOL status = GetDiskFreeSpaceEx(
         (LPCWSTR) root.data(), // pointer to the directory name
         (PULARGE_INTEGER) &freeBytesAvailableToCaller, // receives the number of bytes on disk available to the caller
         (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
         (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
-        );
+    );
+    Q_UNUSED(status);
     return totalNumberOfFreeBytes;
 };
 #else 

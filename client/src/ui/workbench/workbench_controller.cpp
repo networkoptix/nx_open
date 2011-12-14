@@ -424,11 +424,11 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
             widget->setSelected(false);
 }
 
-void QnWorkbenchController::at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget) {
+void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QnResourceWidget *widget) {
     m_display->bringToFront(widget);
 }
 
-void QnWorkbenchController::at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget) {
+void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidget *widget) {
     if(widget == NULL)
         return; /* We may get NULL if the widget being rotated gets deleted. */
 
@@ -497,14 +497,14 @@ void QnWorkbenchController::at_scene_clicked(QGraphicsView *view, const ClickInf
     }
 }
 
-void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *view, const ClickInfo &) {
+void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInfo &) {
     if(workbench() == NULL)
         return;
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
 }
 
-void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const ClickInfo &) {
+void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &) {
 
 }
 

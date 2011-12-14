@@ -28,7 +28,7 @@ public:
         return QRectF();
     }
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override {
         return;
     }
 
@@ -69,7 +69,7 @@ void UiElementsInstrument::uninstalledNotify() {
         delete guard();
 }
 
-bool UiElementsInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+bool UiElementsInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     if(widget() == NULL)
         return false;
 

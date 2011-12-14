@@ -39,7 +39,7 @@ QString QnStorage::getUniqueId() const
     return QString("storage://") + getUrl();
 }
 
-QnAbstractStreamDataProvider* QnStorage::createDataProviderInternal(QnResource::ConnectionRole role)
+QnAbstractStreamDataProvider* QnStorage::createDataProviderInternal(QnResource::ConnectionRole /*role*/)
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Data provider for QnStorage is absent. Invalid call.");
     return 0;

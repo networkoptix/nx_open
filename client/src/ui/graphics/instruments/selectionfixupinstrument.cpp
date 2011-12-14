@@ -73,6 +73,6 @@ void SelectionFixupInstrument::startDrag(DragInfo *) {
     dragProcessor()->reset();
 }
 
-void SelectionFixupInstrument::finishDragProcess(DragInfo *info) {
+void SelectionFixupInstrument::finishDragProcess(DragInfo *) {
     m_isClick = false;
 }
