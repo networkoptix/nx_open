@@ -5,8 +5,7 @@
 #include <QScopedPointer>
 #include <QVariant>
 #include "abstract_animator.h"
-#include "setter.h"
-#include "getter.h"
+#include "accessor.h"
 #include "converter.h"
 
 class MagnitudeCalculator;
@@ -32,17 +31,11 @@ public:
 
     void setSpeed(qreal speed);
 
-    QnAbstractGetter *getter() const {
-        return m_getter.data();
+    QnAbstractAccessor *accessor() const {
+        return m_accessor.data();
     }
 
-    void setGetter(QnAbstractGetter *getter);
-
-    QnAbstractSetter *setter() const {
-        return m_setter.data();
-    }
-
-    void setSetter(QnAbstractSetter *setter);
+    void setAccessor(QnAbstractAccessor *accessor);
 
     QnAbstractConverter *converter() const {
         return m_converter.data();
@@ -75,8 +68,6 @@ protected:
 
     virtual void updateCurrentTime(int currentTime) override;
 
-
-
     virtual QVariant currentValue() const;
 
     virtual void updateCurrentValue(const QVariant &value) const;
@@ -98,8 +89,7 @@ private:
     void setTargetObjectInternal(QObject *target);
 
 private:
-    QScopedPointer<QnAbstractGetter> m_getter;
-    QScopedPointer<QnAbstractSetter> m_setter;
+    QScopedPointer<QnAbstractAccessor> m_accessor;
     QScopedPointer<QnAbstractConverter> m_converter;
     int m_type;
     QVariant m_startValue;
@@ -109,7 +99,5 @@ private:
     MagnitudeCalculator *m_magnitudeCalculator;
     LinearCombinator *m_linearCombinator;
 };
-
-
 
 #endif // QN_ANIMATOR_H
