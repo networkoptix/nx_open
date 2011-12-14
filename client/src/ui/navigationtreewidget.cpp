@@ -6,6 +6,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 #include <QtGui/QSortFilterProxyModel>
+#include <QtGui/QTabWidget>
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
 
@@ -39,23 +40,14 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_previousItemButton->setToolTip(tr("Previous Item"));
     m_previousItemButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_previousItemButton->setIcon(Skin::icon(QLatin1String("left-arrow.png"))); // ###
+    m_previousItemButton->hide(); // ###
 
     m_nextItemButton = new QToolButton(this);
     m_nextItemButton->setText(QLatin1String(">"));
     m_nextItemButton->setToolTip(tr("Next Item"));
     m_nextItemButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_nextItemButton->setIcon(Skin::icon(QLatin1String("right-arrow.png"))); // ###
-
-    m_newItemButton = new QToolButton(this);
-    m_newItemButton->setDefaultAction(&cm_new_item);
-    m_newItemButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    m_newItemButton->setPopupMode(QToolButton::InstantPopup);
-
-    m_removeItemButton = new QToolButton(this);
-    m_removeItemButton->setText(QLatin1String("-"));
-    m_removeItemButton->setToolTip(tr("Remove Item(s)"));
-    m_removeItemButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    m_removeItemButton->setIcon(Skin::icon(QLatin1String("close3.png"))); // ###
+    m_nextItemButton->hide(); // ###
 
 
     m_filterLineEdit = new QLineEdit(this);
@@ -67,6 +59,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_clearFilterButton->setToolTip(tr("Reset Filter"));
     m_clearFilterButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_clearFilterButton->setIcon(Skin::icon(QLatin1String("close2.png")));
+    m_clearFilterButton->setIconSize(QSize(16, 16));
 
     connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
@@ -96,26 +89,38 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     connect(m_navigationTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->setSpacing(3);
-    buttonsLayout->addWidget(m_previousItemButton);
-    buttonsLayout->addWidget(m_nextItemButton);
-    buttonsLayout->addWidget(m_newItemButton);
-    buttonsLayout->addWidget(m_removeItemButton);
-    buttonsLayout->addSpacerItem(new QSpacerItem(1, 1));
+    QHBoxLayout *topLayout = new QHBoxLayout;
+    topLayout->setSpacing(3);
+    topLayout->addWidget(m_previousItemButton);
+    topLayout->addWidget(m_nextItemButton);
+    topLayout->addWidget(m_filterLineEdit);
+    topLayout->addWidget(m_clearFilterButton);
+/*
+    QWidget *searchTab = new QWidget(this);
 
-    QHBoxLayout *filterLayout = new QHBoxLayout;
-    filterLayout->setSpacing(3);
-    filterLayout->addWidget(m_filterLineEdit);
-    filterLayout->addWidget(m_clearFilterButton);
+    QVBoxLayout *searchTabLayout = new QVBoxLayout;
+    searchTabLayout->setContentsMargins(0, 0, 0, 0);
+    searchTabLayout->addLayout(topLayout);
+    //searchTabLayout->addWidget(m_navigationTreeView);
+    searchTab->setLayout(searchTabLayout);
+
+    m_tabWidget = new QTabWidget(this);
+    m_tabWidget->addTab(m_navigationTreeView, tr("Resources"));
+    m_tabWidget->addTab(searchTab, tr("Search"));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->addLayout(buttonsLayout);
-    mainLayout->addLayout(filterLayout);
+    mainLayout->addWidget(m_tabWidget);
+    setLayout(mainLayout);
+*/
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->addLayout(topLayout);
     mainLayout->addWidget(m_navigationTreeView);
     setLayout(mainLayout);
 
+    setMinimumWidth(200);
+    setMaximumWidth(350);
     setAcceptDrops(true);
 }
 

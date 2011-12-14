@@ -6,6 +6,7 @@
 class QAbstractItemModel;
 class QLineEdit;
 class QSortFilterProxyModel;
+class QTabWidget;
 class QToolButton;
 class QTreeView;
 
@@ -28,10 +29,9 @@ private Q_SLOTS:
     void itemActivated(const QModelIndex &index);
 
 private:
+    QTabWidget *m_tabWidget;
     QToolButton *m_previousItemButton;
     QToolButton *m_nextItemButton;
-    QToolButton *m_newItemButton;
-    QToolButton *m_removeItemButton;
 
     QLineEdit *m_filterLineEdit;
     QToolButton *m_clearFilterButton;
