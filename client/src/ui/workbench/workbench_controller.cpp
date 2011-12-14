@@ -340,34 +340,34 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
 void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING FINISHED");
 
-    /* Get models and drag delta. */
+    /* Get workbench items and drag delta. */
     QList<QnResourceWidget *> widgets;
-    QList<QnWorkbenchItem *> models;
+    QList<QnWorkbenchItem *> workbenchItems;
     QPoint delta;
     foreach (QGraphicsItem *item, items) {
         QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
         if(widget == NULL)
             continue;
 
-        if(models.empty())
+        if(workbenchItems.empty())
             delta = mapper()->mapToGrid(widget->geometry()).topLeft() - widget->item()->geometry().topLeft();
 
         widgets.push_back(widget);
-        models.push_back(widget->item());
+        workbenchItems.push_back(widget->item());
     }
-    if(models.empty())
+    if(workbenchItems.empty())
         return;
 
     bool success = false;
-    if(delta == QPoint(0, 0)) {
+    if(delta.isNull()) {
         success = true;
     } else {
         QList<QRect> geometries;
         bool finished = false;
 
         /* Handle single widget case. */
-        if(models.size() == 1) {
-            QnWorkbenchItem *draggedModel = models[0];
+        if(workbenchItems.size() == 1) {
+            QnWorkbenchItem *draggedModel = workbenchItems[0];
 
             /* Find item that dragged item was dropped on. */
             QPoint cursorPos = QCursor::pos();
@@ -378,7 +378,7 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
                 QSizeF draggedSize = draggedModel->geometry().size();
                 QSizeF replacedSize = replacedModel->geometry().size();
                 if(replacedSize.width() >= draggedSize.width() && replacedSize.height() >= draggedSize.height()) {
-                    models.push_back(replacedModel);
+                    workbenchItems.push_back(replacedModel);
                     geometries.push_back(replacedModel->geometry());
                     geometries.push_back(draggedModel->geometry());
                     finished = true;
@@ -389,24 +389,24 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
         /* Handle all other cases. */
         if(!finished) {
             QList<QRect> replacedGeometries;
-            foreach (QnWorkbenchItem *model, models) {
+            foreach (QnWorkbenchItem *model, workbenchItems) {
                 QRect geometry = model->geometry().adjusted(delta.x(), delta.y(), delta.x(), delta.y());
                 geometries.push_back(geometry);
                 if(model->isPinned())
                     replacedGeometries.push_back(geometry);
             }
 
-            QList<QnWorkbenchItem *> replacedModels = layout()->items(replacedGeometries).subtract(models.toSet()).toList();
+            QList<QnWorkbenchItem *> replacedModels = layout()->items(replacedGeometries).subtract(workbenchItems.toSet()).toList();
             replacedGeometries.clear();
             foreach (QnWorkbenchItem *model, replacedModels)
                 replacedGeometries.push_back(model->geometry().adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
 
-            models.append(replacedModels);
+            workbenchItems.append(replacedModels);
             geometries.append(replacedGeometries);
             finished = true;
         }
 
-        success = layout()->moveItems(models, geometries);
+        success = layout()->moveItems(workbenchItems, geometries);
     }
 
     /* Adjust geometry deltas if everything went fine. */
@@ -415,8 +415,13 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
             updateGeometryDelta(widget);
 
     /* Re-sync everything. */
-    foreach(QnWorkbenchItem *model, models)
+    foreach(QnWorkbenchItem *model, workbenchItems)
         m_display->synchronize(model);
+
+    /* Deselect items that were dragged. */
+    if(!delta.isNull())
+        foreach(QnResourceWidget *widget, widgets)
+            widget->setSelected(false);
 }
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget) {

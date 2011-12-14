@@ -13,9 +13,7 @@ void CLServerPushStreamreader::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
-	setNeedKeyData();
-
-	int frames_lost = 0;
+    beforeRun();
 
 	while(!needToStop())
 	{
@@ -33,11 +31,11 @@ void CLServerPushStreamreader::run()
                 closeStream(); // to release resources 
 
                 setNeedKeyData();
-                frames_lost++;
+                mFramesLost++;
                 m_stat[0].onData(0);
                 m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-                if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+                if (mFramesLost==4) // if we lost 2 frames => connection is lost for sure (2)
                 {
                     m_stat[0].onLostConnection();
                     getResource()->setStatus(QnResource::Offline);
@@ -52,11 +50,11 @@ void CLServerPushStreamreader::run()
 		if (data==0)
 		{
 			setNeedKeyData();
-			frames_lost++;
+			mFramesLost++;
 			m_stat[0].onData(0);
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+			if (mFramesLost==4) // if we lost 2 frames => connection is lost for sure (2)
             {
 				m_stat[0].onLostConnection();
                 getResource()->setStatus(QnResource::Offline);
@@ -69,14 +67,14 @@ void CLServerPushStreamreader::run()
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
 
-		if (frames_lost>0) // we are alive again
+		if (mFramesLost>0) // we are alive again
 		{
-			if (frames_lost>=4)
+			if (mFramesLost>=4)
 			{
 				m_stat[0].onEvent(CL_STAT_CAMRESETED);
 			}
 
-			frames_lost = 0;
+			mFramesLost = 0;
 		}
 
 		if (videoData && needKeyData())
@@ -102,7 +100,16 @@ void CLServerPushStreamreader::run()
 		data->dataProvider = this;
 
         if (videoData)
+        {
             m_stat[videoData->channelNumber].onData(data->data.size());
+            ++m_framesSinceLastMetaData;
+        }
+        else if (qSharedPointerDynamicCast<QnMetaDataV1>(data))
+        {
+            m_framesSinceLastMetaData = 0;
+            m_timeSinceLastMetaData.restart();
+        }
+
 
         // check queue sizes
         if (dataCanBeAccepted())
@@ -117,6 +124,8 @@ void CLServerPushStreamreader::run()
 
     if (isStreamOpened())
         closeStream();
+
+    afterRun();
 
     CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }

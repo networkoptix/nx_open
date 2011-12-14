@@ -2,6 +2,9 @@
 #define QN_LOADING_PROGRESS_PAINTER_H
 
 #include <QColor>
+#include <QScopedPointer>
+
+class QnColorShaderProgram;
 
 class QnLoadingProgressPainter {
 public:
@@ -18,11 +21,12 @@ public:
 
     void paint();
 
-    void paint(qreal progress);
+    void paint(qreal progress, qreal opacity);
 
 private:
     int m_sectorCount;
     unsigned m_list;
+    QScopedPointer<QnColorShaderProgram> m_program;
 };
 
 #endif // QN_LOADING_PROGRESS_PAINTER_H

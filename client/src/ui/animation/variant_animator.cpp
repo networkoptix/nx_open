@@ -4,9 +4,6 @@
 #include <utils/common/warnings.h>
 #include <ui/common/linear_combination.h>
 #include <ui/common/magnitude.h>
-#include "getter.h"
-#include "setter.h"
-
 
 QnVariantAnimator::QnVariantAnimator(QObject *parent):
     QnAbstractAnimator(parent),
@@ -57,6 +54,18 @@ void QnVariantAnimator::setSetter(QnAbstractSetter *setter) {
     }
 
     m_setter.reset(setter);
+}
+
+void QnVariantAnimator::setConverter(QnAbstractConverter *converter) {
+    if(isRunning()) {
+        qnWarning("Cannot change converter of a running animator.");
+        return;
+    }
+
+    m_converter.reset(converter);
+
+    invalidateDuration();
+    setType(currentValue().userType());
 }
 
 void QnVariantAnimator::setTargetObject(QObject *target) {
@@ -117,14 +126,17 @@ QVariant QnVariantAnimator::currentValue() const {
     if(getter() == NULL || targetObject() == NULL)
         return QVariant(type(), static_cast<void *>(NULL));
 
-    return (*getter())(targetObject());
+    QVariant result = (*getter())(targetObject());
+    if(converter() != NULL)
+        result = converter()->convertFrom(result);
+    return result;
 }
 
 void QnVariantAnimator::updateCurrentValue(const QVariant &value) const {
     if(setter() == NULL || targetObject() == NULL)
         return;
 
-    setter()->operator()(m_target, value);
+    setter()->operator()(m_target, converter() == NULL ? value : converter()->convertTo(value));
 }
 
 void QnVariantAnimator::updateState(State newState) {
