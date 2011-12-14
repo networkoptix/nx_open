@@ -129,8 +129,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeSceneBoundsExtension()));
-    connect(m_curtainActivityInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
-    connect(m_curtainActivityInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
+    connect(m_curtainActivityInstrument,   SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
+    connect(m_curtainActivityInstrument,   SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
     (new QAnimationTimer(this))->addListener(this);
@@ -250,7 +250,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
     connect(m_workbench,            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
     connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-    connect(m_workbench,            SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),this,                   SLOT(at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *)));
+    connect(m_workbench,            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 
     /* Create items. */
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
@@ -774,11 +774,13 @@ void QnWorkbenchDisplay::at_viewport_animationFinished() {
 void QnWorkbenchDisplay::at_workbench_itemAdded(QnWorkbenchItem *item) {
     addItemInternal(item);
     synchronizeSceneBounds();
+    fitInView();
 }
 
-void QnWorkbenchDisplay::at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *item) {
+void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
     removeItemInternal(item, true);
     synchronizeSceneBounds();
+    fitInView();
 }
 
 void QnWorkbenchDisplay::at_workbench_aboutToBeDestroyed() {

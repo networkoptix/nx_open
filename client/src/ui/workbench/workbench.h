@@ -135,7 +135,7 @@ signals:
      * This signal is emitted whenever the layout of this workbench changes.
      * 
      * In most cases there is be no need to listen to this signal as
-     * workbench emits <tt>itemAboutToBeRemoved</tt> signal for each of the 
+     * workbench emits <tt>itemRemoved</tt> signal for each of the 
      * old layout items and <tt>itemAdded</tt> for each of the new
      * layout items when layout is changed.
      */
@@ -155,11 +155,11 @@ signals:
      * 
      * \param item                      Item that is about to be removed.
      */
-    void itemAboutToBeRemoved(QnWorkbenchItem *item);
+    void itemRemoved(QnWorkbenchItem *item);
 
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);
-    void at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item);
+    void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_aboutToBeDestroyed();
 
 private:

@@ -62,15 +62,14 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
         return;
     }
 
-    emit itemAboutToBeRemoved(item);
-
     if(item->isPinned())
         m_itemMap.clear(item->geometry());
     m_rectSet.remove(item->geometry());
     m_itemsByUid[item->resourceUniqueId()].remove(item);
-    
     item->m_layout = NULL;
     m_items.remove(item);
+
+    emit itemRemoved(item);
 }
 
 bool QnWorkbenchLayout::moveItem(QnWorkbenchItem *item, const QRect &geometry) {
