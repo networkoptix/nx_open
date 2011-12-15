@@ -562,147 +562,96 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(const quint8* dat
     return UnknownFrameType;
 }
 
+void QnFfmpegHelper::appendCtxField(QByteArray *dst, QnFfmpegHelper::CodecCtxField field, const char* data, int size)
+{
+    char f = (char) field;
+    dst->append(&f, 1);
+    int size1 = htonl(size);
+    dst->append((const char*) &size1, 4);
+    dst->append((const char*) data, size);
+}
+
 void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray *data)
 {
     data->clear();
-
-    // serialize context in way as avcodec_copy_context is works
-    AVCodecContext dest;
-    memcpy(&dest, ctx, sizeof(AVCodecContext));
-
-    dest.av_class = NULL;
-    dest.get_buffer = NULL;
-    dest.reget_buffer = NULL;
-    dest.get_format = NULL;
-    dest.release_buffer = NULL;
-    dest.execute = NULL;
-    dest.execute2 = NULL;
-
-
-    dest.priv_data       = NULL;
-    dest.codec           = NULL;
-    dest.palctrl         = NULL;
-    dest.slice_offset    = NULL;
-    dest.internal_buffer = NULL;
-    dest.hwaccel         = NULL;
-    dest.thread_opaque   = NULL;
-
-    data->append((const char*) &dest, sizeof(AVCodecContext));
-    if (ctx->rc_eq)
-        data->append(ctx->rc_eq);
-    if (ctx->extradata)
-        data->append((const char*) ctx->extradata, ctx->extradata_size);
-    if (ctx->intra_matrix)
-        data->append((const char*) ctx->intra_matrix, 64 * sizeof(int16_t));
+    data->append((const char*) &ctx->codec_id, 4);
+    
+    if (ctx->rc_eq) 
+        appendCtxField(data, Field_RC_EQ, ctx->rc_eq, strlen(ctx->rc_eq)+1); // +1 because of include \0 byte
+    if (ctx->extradata) 
+        appendCtxField(data, Field_EXTRADATA, (const char*) ctx->extradata, ctx->extradata_size);
+    if (ctx->intra_matrix) 
+        appendCtxField(data, Field_INTRA_MATRIX, (const char*) ctx->intra_matrix, 64 * sizeof(int16_t));
     if (ctx->inter_matrix)
-        data->append((const char*) ctx->inter_matrix, 64 * sizeof(int16_t));
+        appendCtxField(data, Field_INTER_MATRIX, (const char*) ctx->inter_matrix, 64 * sizeof(int16_t));
     if (ctx->rc_override)
-        data->append((const char*) ctx->rc_override, ctx->rc_override_count * sizeof(*ctx->rc_override));
+        appendCtxField(data, Field_OVERRIDE, (const char*) ctx->rc_override, ctx->rc_override_count * sizeof(*ctx->rc_override));
 }
 
 AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
 {
-    if (dataLen < sizeof(AVCodecContext))
-    {
-        qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
-        return 0;
-    }
+    AVCodec* codec = 0;
+    AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();
 
     QMutexLocker lock(&global_ffmpeg_mutex);
+    QByteArray tmpArray(data, dataLen);
+    QBuffer buffer(&tmpArray);
+    buffer.open(QIODevice::ReadOnly);
+    CodecID codecId = CODEC_ID_NONE;
+    int readed = buffer.read((char*) &codecId, 4);
+    if (readed < 4)
+        goto error_label;
+    codec = avcodec_find_decoder(codecId);
+
+    if (codec == 0 || avcodec_open(ctx, codec) < 0)
+        goto error_label;
     
-    AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();
-    AVCodecContext tmp;
-    memcpy(&tmp, ctx, sizeof(AVCodecContext));
-    memcpy(ctx, data, sizeof(AVCodecContext));
-
-    ctx->av_class = tmp.av_class;
-    ctx->get_buffer = tmp.get_buffer;
-    ctx->reget_buffer = tmp.reget_buffer;
-    ctx->get_format = tmp.get_format;
-    ctx->release_buffer = tmp.release_buffer;
-    ctx->execute = tmp.execute;
-    ctx->execute2 = tmp.execute2;
-
-
-    dataLen -= sizeof(AVCodecContext);
-    data += sizeof(AVCodecContext);
-
-    if (ctx->rc_eq && dataLen > 0)
+    char objectType;
+    
+    while (1)
     {
-        int len = qstrnlen(data, dataLen);
-        if (data[len] != 0)
+        int readed = buffer.read(&objectType, 1);
+        if (readed < 1)
+            break;
+        CodecCtxField field = (CodecCtxField) objectType;
+        int size;
+        if (buffer.read((char*) &size, 4) != 4)
+            goto error_label;
+        size = ntohl(size);
+        char* fieldData = (char*) av_malloc(size);
+        readed = buffer.read(fieldData, size);
+        if (readed != size) {
+            av_free(fieldData);
+            goto error_label;
+        }
+
+        switch (field)
         {
-            qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
-            av_free(ctx);
-            return 0;
-        }
-        ctx->rc_eq = av_strdup(data);
-        data += len;
-        dataLen -= len;
-    }
-
-    if (ctx->extradata)
-    {
-        if (dataLen >= ctx->extradata_size) {
-            ctx->extradata = (quint8*) av_malloc(ctx->extradata_size);
-            memcpy(ctx->extradata, data, ctx->extradata_size);
-            data += ctx->extradata_size;
-            dataLen -=  ctx->extradata_size;;
-        }
-        else {
-            av_free((void*) ctx->rc_eq);
-            av_free(ctx);
-            return 0;
+            case Field_RC_EQ:
+                ctx->rc_eq = fieldData;
+                break;
+            case Field_EXTRADATA:
+                ctx->extradata = (quint8*) fieldData;
+                ctx->extradata_size = size;
+                break;
+            case Field_INTRA_MATRIX:
+                ctx->intra_matrix = (quint16*) fieldData;
+                break;
+            case Field_INTER_MATRIX: 
+                ctx->inter_matrix = (quint16*) fieldData;
+                break;
+            case Field_OVERRIDE:
+                ctx->rc_override = (RcOverride*) fieldData;
+                ctx->rc_override_count = size / sizeof(*ctx->rc_override);
+                break;
         }
     }
 
-    if (ctx->intra_matrix)
-    {
-        if (dataLen >= 64 * sizeof(int16_t)) {
-            ctx->intra_matrix = (quint16*) av_malloc(64 * sizeof(int16_t));
-            memcpy(ctx->intra_matrix, data, 64 * sizeof(int16_t));
-            data += 64 * sizeof(int16_t);
-            dataLen -= 64 * sizeof(int16_t);
-        }
-        else {
-            av_free(ctx->extradata);
-            av_free((void*) ctx->rc_eq);
-            av_free(ctx);
-            return 0;
-        }
-    }
-
-    if (ctx->inter_matrix)
-    {
-        if (dataLen >= 64 * sizeof(int16_t)) {
-            ctx->inter_matrix = (quint16*) av_malloc(64 * sizeof(int16_t));
-            memcpy(ctx->inter_matrix, data, 64 * sizeof(int16_t));
-            data += 64 * sizeof(int16_t);
-            dataLen -= 64 * sizeof(int16_t);
-        }
-        else {
-            av_free(ctx->intra_matrix);
-            av_free(ctx->extradata);
-            av_free((void*) ctx->rc_eq);
-            av_free(ctx);
-            return 0;
-        }
-    }
-    int ovSize = ctx->rc_override_count * sizeof(*ctx->rc_override);
-    if (ctx->rc_override)
-    {
-        if (dataLen >= ovSize) {
-            ctx->rc_override = (RcOverride*) av_malloc(ovSize);
-            memcpy(ctx->rc_override, data, ovSize);
-        }
-        else {
-            av_free(ctx->inter_matrix);
-            av_free(ctx->intra_matrix);
-            av_free(ctx->extradata);
-            av_free((void*) ctx->rc_eq);
-            av_free(ctx);
-            return 0;
-        }
-    }
     return ctx;
+
+error_label:
+    qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
+    avcodec_close(ctx);
+    av_free(ctx);
+    return 0;
 }
