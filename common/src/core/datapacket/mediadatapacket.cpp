@@ -71,6 +71,19 @@ void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
     addMotion((const quint8*) data->data.data(), data->timestamp);
 }
 
+void QnMetaDataV1::removeMotion(const quint8* image, int startIndex, int endIndex)
+{
+    __m128i* dst = (__m128i*) data.data();
+    __m128i* src = (__m128i*) image;
+    for (int i = startIndex; i <= endIndex; ++i)
+    {
+        *dst = _mm_andnot_si128(*src, *dst);
+        dst++;
+        src++;
+
+    }
+}
+
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
     if (m_firstTimestamp == AV_NOPTS_VALUE)
