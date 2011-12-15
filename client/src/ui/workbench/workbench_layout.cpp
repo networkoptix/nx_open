@@ -48,6 +48,8 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     m_rectSet.insert(item->geometry());
     m_itemsByUid[item->resourceUniqueId()].insert(item);
 
+    updateBoundingRectInternal();
+
     emit itemAdded(item);
 }
 
@@ -69,6 +71,8 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
 
     item->m_layout = NULL;
     m_items.remove(item);
+
+    updateBoundingRectInternal();
 
     emit itemRemoved(item);
 }
@@ -95,6 +99,9 @@ bool QnWorkbenchLayout::moveItem(QnWorkbenchItem *item, const QRect &geometry) {
 void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem *item, const QRect &geometry) {
     m_rectSet.remove(item->geometry());
     m_rectSet.insert(geometry);
+
+    updateBoundingRectInternal();
+
     item->setGeometryInternal(geometry);
 }
 
@@ -223,5 +230,14 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPoint &pos, const QSize &size, Q
         if(!m_itemMap.isOccupied(rect))
             return rect;
     }
+}
+
+void QnWorkbenchLayout::updateBoundingRectInternal() {
+    QRect boundingRect = m_rectSet.boundingRect();
+    if(m_boundingRect == boundingRect)
+        return;
+
+    m_boundingRect = boundingRect;
+    emit boundingRectChanged();
 }
 

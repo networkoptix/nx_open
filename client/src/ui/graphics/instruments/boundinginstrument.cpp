@@ -106,126 +106,6 @@ public:
         setView(view);
     }
 
-    void correct() {
-        assert(m_view != NULL);
-
-        if(qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport))
-            return;
-
-        ensureParameters();
-
-        qreal oldUpperScale = m_upperScale;
-        qreal oldLowerScale = m_lowerScale;
-        QPointF oldCenter = m_center;
-
-        updateParameters();
-        ensureParameters();
-
-        /* Apply zoom correction. */
-        if((m_upperScale > 1.0 || m_lowerScale < 1.0) && !qFuzzyCompare(m_upperScale, oldUpperScale)) {
-            qreal logOldScale = 0.0, logScale = 0.0, logFactor = 0.0;
-
-            if(m_upperScale > 1.0) {
-                logOldScale = std::log(oldUpperScale);
-                logScale = std::log(m_upperScale);
-                logFactor = calculateCorrection(logOldScale, logScale, -std::numeric_limits<qreal>::max(), 0.0);
-            } else {
-                logOldScale = std::log(oldLowerScale);
-                logScale = std::log(m_lowerScale);
-                logFactor = calculateCorrection(logOldScale, logScale, 0.0, std::numeric_limits<qreal>::max());
-            }
-
-            QnSceneUtility::scaleViewport(m_view, std::exp(logFactor));
-
-            /* Calculate relative correction and move viewport. */
-            qreal correction = logFactor / (logScale - logOldScale);
-            QnSceneUtility::moveViewportScene(m_view, (m_center - oldCenter) * correction);
-
-            updateParameters();
-            ensureParameters();
-        }
-
-        /* Apply center correction. */
-        if(!m_centerPositionBounds.contains(m_center) && !qFuzzyCompare(m_center, oldCenter)) {
-            QPointF correction = calculateCorrection(oldCenter, m_center, m_centerPositionBounds);
-
-            QnSceneUtility::moveViewportScene(m_view, correction);
-
-            updateParameters();
-        }
-    }
-
-    bool enforceNeeded() const {
-        assert(m_view != NULL);
-
-        if(!m_isPositionEnforced && !m_isSizeEnforced)
-            return false;
-
-        ensureParameters();
-
-        if(m_isSizeEnforced && (m_upperScale > 1.0 || m_lowerScale < 1.0))
-            return true;
-
-        if(m_isPositionEnforced && !m_centerPositionBounds.contains(m_center)) {
-            QPointF direction = -calculateDistance(m_centerPositionBounds, m_center);
-            if(!qFuzzyIsNull(direction))
-                return true;
-        }
-
-        return false;
-    }
-
-    void enforce(qreal dt) {
-        assert(m_view != NULL);
-
-        if(!m_isPositionEnforced && !m_isSizeEnforced)
-            return;
-
-        if(qFuzzyIsNull(dt))
-            return;
-
-        ensureParameters();
-
-        /* Apply zoom correction. */
-        if(m_isSizeEnforced && (m_upperScale > 1.0 || m_lowerScale < 1.0)) {
-            qreal factor = 1.0;
-
-            if(m_upperScale > 1.0) {
-                factor = std::exp(-dt * m_logScaleSpeed * speedMultiplier(std::log(m_upperScale), std::log(2.0)));
-                if(m_upperScale * factor < 1.0)
-                    factor = 1.0 / m_upperScale;
-            } else {
-                factor = std::exp(-dt * m_logScaleSpeed * speedMultiplier(std::log(m_lowerScale), std::log(2.0)));
-                if(m_lowerScale * factor > 1.0)
-                    factor = 1.0 / m_lowerScale;
-            }
-
-            QnSceneUtility::scaleViewport(m_view, factor);
-        }
-
-        /* Apply move correction. */
-        if(m_isPositionEnforced && !m_centerPositionBounds.contains(m_center)) {
-            QPointF direction = -calculateDistance(m_centerPositionBounds, m_center);
-            if(!qFuzzyIsNull(direction)) {
-                QPointF speed = m_movementSpeed * QnSceneUtility::toPoint(m_sceneViewportRect.size());
-                QPointF delta = QPointF(
-                    dt * speed.x() * speedMultiplier(direction.x(), m_sceneViewportRect.width()),
-                    dt * speed.y() * speedMultiplier(direction.y(), m_sceneViewportRect.height())
-                );
-
-                if(std::abs(delta.x()) > std::abs(direction.x()))
-                    delta.rx() = direction.x();
-
-                if(std::abs(delta.y()) > std::abs(direction.y()))
-                    delta.ry() = direction.y();
-
-                QnSceneUtility::moveViewportScene(m_view, delta);
-            }
-        }
-
-        updateParameters();
-    }
-
     void update() {
         updateParameters();
         updateSceneRect();
@@ -311,15 +191,119 @@ public:
         }
     }
 
-    qint64 lastTickTime() const {
-        return m_lastTickTime;
-    }
-
     void setLastTickTime(qint64 lastTickTime) {
         m_lastTickTime = lastTickTime;
     }
 
+    void tick(qint64 time) {
+        assert(m_view != NULL);
+
+        correct();
+        enforce((time - m_lastTickTime) / 1000.0);
+        m_lastTickTime = time;
+    }
+
 protected:
+    void correct() {
+        if(qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport))
+            return;
+
+        ensureParameters();
+
+        qreal oldUpperScale = m_upperScale;
+        qreal oldLowerScale = m_lowerScale;
+        QPointF oldCenter = m_center;
+
+        m_anchor = m_view->mapFromGlobal(QCursor::pos());
+
+        updateParameters();
+        ensureParameters();
+
+        /* Apply zoom correction. */
+        if((m_upperScale > 1.0 || m_lowerScale < 1.0) && !qFuzzyCompare(m_upperScale, oldUpperScale)) {
+            qreal logOldScale = 0.0, logScale = 0.0, logFactor = 0.0;
+
+            if(m_upperScale > 1.0) {
+                logOldScale = std::log(oldUpperScale);
+                logScale = std::log(m_upperScale);
+                logFactor = calculateCorrection(logOldScale, logScale, -std::numeric_limits<qreal>::max(), 0.0);
+            } else {
+                logOldScale = std::log(oldLowerScale);
+                logScale = std::log(m_lowerScale);
+                logFactor = calculateCorrection(logOldScale, logScale, 0.0, std::numeric_limits<qreal>::max());
+            }
+
+            QnSceneUtility::scaleViewport(m_view, std::exp(logFactor));
+
+            /* Calculate relative correction and move viewport. */
+            qreal correction = logFactor / (logScale - logOldScale);
+            QnSceneUtility::moveViewportScene(m_view, (m_center - oldCenter) * correction);
+
+            updateParameters();
+            ensureParameters();
+        }
+
+        /* Apply center correction. */
+        if(!m_centerPositionBounds.contains(m_center) && !qFuzzyCompare(m_center, oldCenter)) {
+            QPointF correction = calculateCorrection(oldCenter, m_center, m_centerPositionBounds);
+
+            QnSceneUtility::moveViewportScene(m_view, correction);
+
+            updateParameters();
+        }
+    }
+
+    void enforce(qreal dt) {
+        assert(m_view != NULL);
+
+        if(!m_isPositionEnforced && !m_isSizeEnforced)
+            return;
+
+        if(qFuzzyIsNull(dt))
+            return;
+
+        ensureParameters();
+
+        /* Apply zoom correction. */
+        if(m_isSizeEnforced && (m_upperScale > 1.0 || m_lowerScale < 1.0)) {
+            qreal factor = 1.0;
+
+            if(m_upperScale > 1.0) {
+                factor = std::exp(-dt * m_logScaleSpeed * speedMultiplier(std::log(m_upperScale), std::log(2.0)));
+                if(m_upperScale * factor < 1.0)
+                    factor = 1.0 / m_upperScale;
+            } else {
+                factor = std::exp(-dt * m_logScaleSpeed * speedMultiplier(std::log(m_lowerScale), std::log(2.0)));
+                if(m_lowerScale * factor > 1.0)
+                    factor = 1.0 / m_lowerScale;
+            }
+
+            QnSceneUtility::scaleViewport(m_view, factor /*, QGraphicsView::AnchorUnderMouse*/); // TODO: do something about anchor.
+        }
+
+        /* Apply move correction. */
+        if(m_isPositionEnforced && !m_centerPositionBounds.contains(m_center)) {
+            QPointF direction = -calculateDistance(m_centerPositionBounds, m_center);
+            if(!qFuzzyIsNull(direction)) {
+                QPointF speed = m_movementSpeed * QnSceneUtility::toPoint(m_sceneViewportRect.size());
+                QPointF delta = QPointF(
+                    dt * speed.x() * speedMultiplier(direction.x(), m_sceneViewportRect.width()),
+                    dt * speed.y() * speedMultiplier(direction.y(), m_sceneViewportRect.height())
+                    );
+
+                if(std::abs(delta.x()) > std::abs(direction.x()))
+                    delta.rx() = direction.x();
+
+                if(std::abs(delta.y()) > std::abs(direction.y()))
+                    delta.ry() = direction.y();
+
+                QnSceneUtility::moveViewportScene(m_view, delta);
+            }
+        }
+
+        updateParameters();
+    }
+
     void updateParameters() {
         assert(m_view != NULL);
 
@@ -424,6 +408,9 @@ public:
     /** Last time the timer ticked. */
     qint64 m_lastTickTime;
 
+    /** Current transformation anchor. */
+    QPoint m_anchor;
+
     /** Whether stored parameter values are valid. */
     mutable bool m_parametersValid;
 
@@ -447,8 +434,6 @@ public:
 BoundingInstrument::BoundingInstrument(QObject *parent):
     Instrument(VIEWPORT, makeSet(QEvent::Paint, AnimationEvent::Animation), parent)
 {
-    animationTimer()->addListener(this);
-
     m_data[NULL] = new ViewData(NULL);
 }
 
@@ -489,16 +474,6 @@ void BoundingInstrument::unregisteredNotify(QGraphicsView *view) {
     delete d;
 }
 
-void BoundingInstrument::tick(int /*deltaTime*/) {
-    foreach(ViewData *d, m_data) {
-        if(d->view() == NULL)
-            continue;
-
-        if(d->enforceNeeded())
-            d->view()->update();
-    }
-}
-
 bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     QGraphicsView *view = this->view(viewport);
 
@@ -506,12 +481,7 @@ bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     if(d == NULL)
         return false;
 
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-    qreal dt = (currentTime - d->lastTickTime()) / 1000.0;
-    d->setLastTickTime(currentTime);
-
-    d->correct();
-    d->enforce(dt);
+    d->tick(QDateTime::currentMSecsSinceEpoch());
 
     return false;
 }

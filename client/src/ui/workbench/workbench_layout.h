@@ -122,8 +122,8 @@ public:
     /**
      * \returns                         Bounding rectangle of all pinned items in this layout.
      */
-    QRect boundingRect() const {
-        return m_rectSet.boundingRect();
+    const QRect &boundingRect() const {
+        return m_boundingRect;
     }
 
     /**
@@ -161,8 +161,14 @@ signals:
      */
     void itemRemoved(QnWorkbenchItem *item);
 
+    /**
+     * This signal is emitted whenever bounding rectangle of this layout changes. 
+     */
+    void boundingRectChanged();
+
 private:
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
+    void updateBoundingRectInternal();
 
 private:
     /** Matrix map from coordinate to item. */
@@ -173,6 +179,9 @@ private:
 
     /** Set of item borders for fast bounding rect calculation. */
     QnRectSet m_rectSet;
+
+    /** Current bounding rectangle. */
+    QRect m_boundingRect;
 
     /** Map from resource unique id to a set of items. */
     QHash<QString, QSet<QnWorkbenchItem *> > m_itemsByUid;

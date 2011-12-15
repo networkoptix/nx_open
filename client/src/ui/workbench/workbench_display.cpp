@@ -252,6 +252,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(m_workbench,            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
     connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
+    connect(m_workbench,            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
 
     /* Create items. */
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
@@ -736,10 +737,18 @@ void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget) {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBounds() {
+    QRectF sizeRect, moveRect;
+
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
-    QRectF rect = zoomedItem != NULL ? itemGeometry(zoomedItem) : layoutBoundingGeometry();
-    m_boundingInstrument->setPositionBounds(m_view, rect);
-    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, rect.size(), Qt::KeepAspectRatioByExpanding);
+    if(zoomedItem != NULL) {
+        sizeRect = moveRect = itemGeometry(zoomedItem);
+    } else {
+        moveRect = sizeRect = layoutBoundingGeometry();
+        //sizeRect = fitInViewGeometry();
+    }
+
+    m_boundingInstrument->setPositionBounds(m_view, moveRect);
+    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
