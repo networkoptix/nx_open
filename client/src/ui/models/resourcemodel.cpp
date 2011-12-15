@@ -137,12 +137,8 @@ bool ResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction actio
     QnResourceList resources;
     if (!mimeData->hasFormat(format))
        resources += deserializeResources(mimeData->data(format));
-    if (mimeData->hasUrls()) {
-        QStringList files;
-        foreach (const QString &file, QnFileProcessor::findAcceptedFiles(mimeData->urls()))
-            QnFileProcessor::findAcceptedFiles(file, &files);
-        resources += QnFileProcessor::createResourcesForFiles(files);
-    }
+    if (mimeData->hasUrls())
+        resources += QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
     foreach (const QnResourcePtr &resource, resources) {
         if (!resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::server))
             addResource(resource);

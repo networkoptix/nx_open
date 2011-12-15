@@ -3331,11 +3331,10 @@ void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
     cam->stopRecording();
     QFileInfoList records = tmpRecordedFiles(cam);
 
-    QStringList dstFiles;
-    foreach(QFileInfo info, records)
+    foreach (const QFileInfo &info, records)
     {
         QString id = info.absoluteFilePath();
-        QnFileProcessor::findAcceptedFiles(id, &dstFiles);
+        QStringList dstFiles = QnFileProcessor::findAcceptedFiles(id);
         //MainWnd::findAcceptedFiles(dstFiles, id);
         m_camLayout.addDevice(id, true);
         QnResourcePtr dev = qnResPool->getResourceByUniqId(id);
@@ -3624,9 +3623,7 @@ void GraphicsView::onOpenFile()
     {
         //QString selectedFilter = m_openMediaDialog.selectedFilter();
         QStringList srcFiles = m_openMediaDialog.selectedFiles();
-        QStringList dstFiles;
-        foreach (const QString &file, srcFiles)
-            QnFileProcessor::findAcceptedFiles(file, &dstFiles);
+        QStringList dstFiles = QnFileProcessor::findAcceptedFiles(srcFiles);
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
     }
 }
