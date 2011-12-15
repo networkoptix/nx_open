@@ -173,7 +173,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
     qint64 seekRez = m_aviDelegate->seek(chunkOffset);
     if (seekRez == -1)
         return seekRez;
-    qint64 rez = m_currentChunk.startTimeMs + seekRez;
+    qint64 rez = m_currentChunk.startTimeMs*1000 + seekRez;
     //cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
     /*
     QString s;
