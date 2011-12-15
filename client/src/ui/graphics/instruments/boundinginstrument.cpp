@@ -4,6 +4,7 @@
 #include <limits>
 #include <QGraphicsView>
 #include <QDateTime>
+#include <QMatrix4x4>
 #include <utils/common/warnings.h>
 #include <ui/animation/animation_event.h>
 #include "instrumentmanager.h"
@@ -88,6 +89,34 @@ namespace {
         return (value >= lo && value <= hi) || qFuzzyCompare(value, lo) || qFuzzyCompare(value, hi);
     }
 
+    QPointF calculateFixedPoint(const QTransform &t, bool *exists) {
+        /* Fill in row-major order. */
+        QMatrix4x4 m(
+            t.m11() - 1.0,  t.m21(),       0.0,   0.0,
+            t.m12(),        t.m22() - 1.0, 0.0,   0.0,
+            0.0,            0.0,           1.0,   0.0,
+            0.0,            0.0,           0.0,   1.0
+        );
+
+        if(qFuzzyIsNull(m(0, 0))) m(0, 0) = 0.0;
+        if(qFuzzyIsNull(m(1, 0))) m(1, 0) = 0.0;
+        if(qFuzzyIsNull(m(1, 1))) m(1, 1) = 0.0;
+        if(qFuzzyIsNull(m(0, 1))) m(0, 1) = 0.0;
+
+        bool invertible;
+        QVector4D v = m.inverted(&invertible) * QVector4D(
+            -t.m31(),
+            -t.m32(),
+            0.0,
+            0.0
+        );
+
+        if(exists != NULL)
+            *exists = invertible;
+
+        return QPointF(v.x(), v.y());
+    }
+
 } // anonymous namespace
 
 
@@ -105,7 +134,6 @@ public:
         setScalingSpeed(1.0);
         setPositionEnforced(false);
         setSizeEnforced(false);
-        m_inScaleBounds = true;
 
         setView(view);
     }
@@ -206,8 +234,15 @@ public:
 
         /* Correct motion. */
         if(!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {
+            /* Calculate old scale. */
             qreal logOldScale;
             calculateRelativeScale(&logOldScale);
+
+            /* Calculate fixed point. */
+            bool fixedPointExists;
+            QPoint fixedPoint = calculateFixedPoint(m_viewportToScene * m_view->viewportTransform(), &fixedPointExists).toPoint();
+            if(fixedPointExists && m_viewportRect.contains(fixedPoint))
+                m_fixedPoint = fixedPoint;
 
             updateParameters();
 
@@ -239,37 +274,24 @@ public:
 
         /* Enforce position */
         if((m_isPositionEnforced || m_isSizeEnforced) && dtMSec != 0) {
-            QPointF positionCorrection;
-
             /* Apply zoom correction. */
             qreal logScale, powFactor;
             calculateRelativeScale(&logScale, &powFactor);
             qreal logDirection = calculateDistance(logScale, -1.0, 1.0);
-            if(qFuzzyIsNull(logDirection)) {
-                m_inScaleBounds = true;
-            } else {
-                if(m_inScaleBounds) {
-                    m_inScaleBounds = false;
-                    m_scaleBoundCrossPoint = oldCenter;
-                }
+            if(!qFuzzyIsNull(logDirection) && m_isSizeEnforced) {
+                qreal logDelta = dt * (m_logScaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
+                if(std::abs(logDelta) > std::abs(logDirection))
+                    logDelta = logDirection;
 
-                if(m_isSizeEnforced) {
-                    qreal logDelta = dt * (m_logScaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
-                    if(std::abs(logDelta) > std::abs(logDirection))
-                        logDelta = logDirection;
+                QnSceneUtility::scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
 
-                    QnSceneUtility::scaleViewport(m_view, std::exp(logDelta * powFactor) /*, QGraphicsView::AnchorUnderMouse*/); // TODO: do something about anchor.
-
-                    /* Calculate relative correction and move viewport. */
-                    //qreal correction = logDelta / logDirection;
-                    //positionCorrection = (m_scaleBoundCrossPoint - m_sceneViewportCenter) * correction;
-                }
+                updateParameters();
             }
 
             /* Apply move correction. */
             QRectF centerPositionBounds = calculateCenterPositionBounds();
-            if(!qFuzzyIsNull(positionCorrection) || (m_isPositionEnforced && !centerPositionBounds.contains(m_sceneViewportCenter))) {
-                QPointF direction = calculateDistance(m_sceneViewportCenter + positionCorrection, centerPositionBounds) + positionCorrection;
+            if(m_isPositionEnforced && !centerPositionBounds.contains(m_sceneViewportCenter)) {
+                QPointF direction = calculateDistance(m_sceneViewportCenter, centerPositionBounds);
                 if(!qFuzzyIsNull(direction)) {
                     qreal viewportSize = (m_sceneViewportRect.width() + m_sceneViewportRect.height()) / 2;
                     qreal speed = m_movementSpeed * viewportSize;
@@ -293,8 +315,9 @@ protected:
         assert(m_view != NULL);
 
         m_sceneToViewport = m_view->viewportTransform();
+        m_viewportToScene = m_sceneToViewport.inverted();
         m_viewportRect = m_view->viewport()->rect();
-        m_sceneViewportRect = m_sceneToViewport.inverted().mapRect(QRectF(m_viewportRect));
+        m_sceneViewportRect = m_viewportToScene.mapRect(QRectF(m_viewportRect));
         m_sceneViewportCenter = m_sceneViewportRect.center();
     }
 
@@ -405,14 +428,14 @@ public:
     /** Time of the last tick. */
     qint64 m_lastTickTime;
 
-    /** Coordinates of the viewport center when the scale bounds were crossed, in scene coordinates. */
-    QPointF m_scaleBoundCrossPoint;
-
-    /** Whether scale bounds are currently satisfied. */
-    bool m_inScaleBounds;
+    /** Coordinates of the fixed point of last transformation, in viewport coordinates. */
+    QPoint m_fixedPoint;
 
     /** Scene-to-viewport transformation. */
     QTransform m_sceneToViewport;
+
+    /** Viewport-to-scene transformation. */
+    QTransform m_viewportToScene;
 
     /** Viewport rectangle, in viewport coordinates. */
     QRect m_viewportRect;
