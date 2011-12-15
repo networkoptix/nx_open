@@ -44,6 +44,21 @@ ResourceModel::~ResourceModel()
 {
 }
 
+QnResourcePtr ResourceModel::resourceFromIndex(const QModelIndex &index) const
+{
+    return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+}
+
+QnResourcePtr ResourceModel::resourceFromItem(QStandardItem *item) const
+{
+    return resourceFromIndex(item->index());
+}
+
+QStandardItem *ResourceModel::itemFromResource(QnResourcePtr resource) const
+{
+    return itemFromResourceId(resource->getId().hash());
+}
+
 QStandardItem *ResourceModel::itemFromResourceId(uint id) const
 {
     const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
@@ -102,7 +117,7 @@ QMimeData *ResourceModel::mimeData(const QModelIndexList &indexes) const
         if (types.contains(resourceFormat) || types.contains(urlFormat)) {
             QnResourceList resources;
             foreach (const QModelIndex &index, indexes) {
-                QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+                QnResourcePtr resource = resourceFromIndex(index);
                 if (resource)
                     resources.append(resource);
             }
