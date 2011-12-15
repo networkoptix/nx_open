@@ -8,6 +8,7 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/sse_helper.h"
 #include "recording/device_file_catalog.h"
+#include "core/resourcemanagment/security_cam_resource.h"
 
 static const int MOTION_INDEX_HEADER_SIZE = 16;
 static const int MOTION_INDEX_RECORD_SIZE = 8;
@@ -59,16 +60,21 @@ private:
 
 typedef QSharedPointer<QnMotionArchiveConnection> QnMotionArchiveConnectionPtr;
 
-class QnMotionArchive
+class QnMotionArchive: public QObject
 {
+    Q_OBJECT
 public:
     QnMotionArchive(QnNetworkResourcePtr resource);
     bool saveToArchive(QnMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection();
 
-    static void createMask(const QRegion& region,  __m128i* mask, int& msMaskStart, int& msMaskEnd);
+    // remove part of motion by mask
+    void maskMotion(QnMetaDataV1Ptr data);
+public slots:
+    void updateMotionMask(QRegion maskedRegion);
 private:
+    static void createMask(const QRegion& region,  __m128i* mask, int& msMaskStart, int& msMaskEnd);
     QString getFilePrefix(const QDateTime& datetime);
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
     bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);
@@ -80,14 +86,20 @@ private:
     friend class QnMotionArchiveConnection;
 private:
     QnNetworkResourcePtr m_resource;
+    QnSequrityCamResourcePtr m_camResource;
     qint64 m_lastDateForCurrentFile;
     
     QFile m_detailedMotionFile;
     QFile m_detailedIndexFile;
     qint64 m_firstTime;
-    __m128i m_mask[MD_WIDTH * MD_HEIGHT / 128];
     QMutex m_fileAccessMutex;
+    QMutex m_maskMutex;
     QnMetaDataV1Ptr m_lastDetailedData;
+
+    // motion mask
+    __m128i m_motionMask[MD_WIDTH * MD_HEIGHT / 128];
+    int m_motionMaskStart;
+    int m_motionMaskEnd;
 };
 
 #endif // __MOTION_WRITER_H__

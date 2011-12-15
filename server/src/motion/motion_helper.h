@@ -17,6 +17,9 @@ public:
     static QnMotionHelper* instance();
     virtual ~QnMotionHelper();
 
+    // remove part of motion by mask
+    void maskMotion(QnMetaDataV1Ptr data);
+
     // write motion data to file
     void saveToArchive(QnMetaDataV1Ptr data);
 

@@ -102,13 +102,29 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 // ----------------------- QnMotionArchive ------------------
 
 QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource): 
-m_resource(resource),
-m_lastDetailedData(new QnMetaDataV1())
+    m_resource(resource),
+    m_lastDetailedData(new QnMetaDataV1())
 {
+    m_camResource = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
     m_firstTime = 0;
+    if (m_camResource) {
+        connect(m_camResource.data(), SIGNAL(motionMaskChanged(QRegion)), this, SLOT(updateMotionMask(QRegion)), Qt::DirectConnection);
+        updateMotionMask(m_camResource->getMotionMask());
+    }
 }
 
+void QnMotionArchive::maskMotion(QnMetaDataV1Ptr data)
+{
+    data->removeMotion((const quint8*) m_motionMask, m_motionMaskStart, m_motionMaskEnd);
+}
+
+
+void QnMotionArchive::updateMotionMask(QRegion maskedRegion)
+{
+    QMutexLocker lock(&m_maskMutex);
+    createMask(maskedRegion, m_motionMask, m_motionMaskStart, m_motionMaskEnd);
+}
 
 QString QnMotionArchive::getFilePrefix(const QDateTime& datetime)
 {

@@ -36,6 +36,13 @@ void QnMotionHelper::saveToArchive(QnMetaDataV1Ptr data)
 
 }
 
+void QnMotionHelper::maskMotion(QnMetaDataV1Ptr data)
+{
+    QnMotionArchive* archive = getArchive(data->dataProvider->getResource());
+    if (archive)
+        archive->maskMotion(data);
+}
+
 QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QnTimePeriodList rez;
