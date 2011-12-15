@@ -52,6 +52,7 @@
 							<executable>${msbuild.exe}</executable>
 							<workingDirectory>${basedir}/src</workingDirectory>		
 							<arguments>
+								<argument>${artifactId}.vcproj</argument>
 								<argument>/t:Rebuild</argument>
 								<argument>/p:Configuration=${msbuild.configuration}</argument>
 							</arguments>

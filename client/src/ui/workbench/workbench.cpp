@@ -1,6 +1,5 @@
 #include "workbench.h"
-#include <cassert>
-#include <cstring> /* For std::memset. */
+
 #include <utils/common/warnings.h>
 #include "workbench_layout.h"
 #include "workbench_grid_mapper.h"
@@ -9,14 +8,17 @@
 QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
     m_mode(VIEWING),
-    m_layout(NULL),
-    m_dummyLayout(new QnWorkbenchLayout(this)),
-    m_mapper(new QnWorkbenchGridMapper(this))
+    m_layout(NULL)
 {
-    std::memset(m_itemByRole, 0, sizeof(m_itemByRole));
+    qRegisterMetaType<QnWorkbench::ItemRole>("QnWorkbench::ItemRole");
 
+    m_itemByRole[RAISED] = m_itemByRole[ZOOMED] = m_itemByRole[FOCUSED] = 0;
+
+    m_mapper = new QnWorkbenchGridMapper(this);
+
+    m_dummyLayout = new QnWorkbenchLayout(this);
     setLayout(m_dummyLayout);
-}    
+}
 
 QnWorkbench::~QnWorkbench() {
     clear();
@@ -39,7 +41,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
 
     QRect oldBoundingRect;
 
-    /* Clean up old layout. 
+    /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
     if(m_layout != NULL) {
         oldBoundingRect = m_layout->boundingRect();
@@ -58,7 +60,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
     }
     emit layoutChanged();
 
-    /* Set up new layout. 
+    /* Set up new layout.
      * It may be NULL only when this function is called from destructor. */
     if(m_layout != NULL) {
         connect(m_layout, SIGNAL(itemAdded(QnWorkbenchItem *)),             this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
@@ -84,13 +86,13 @@ void QnWorkbench::setMode(Mode mode) {
 }
 
 QnWorkbenchItem *QnWorkbench::item(ItemRole role) {
-    assert(role >= 0 && role < ITEM_ROLE_COUNT);
+    Q_ASSERT(role >= 0 && role < ITEM_ROLE_COUNT);
 
     return m_itemByRole[role];
 }
 
 void QnWorkbench::setItem(ItemRole role, QnWorkbenchItem *item) {
-    assert(role >= 0 && role < ITEM_ROLE_COUNT);
+    Q_ASSERT(role >= 0 && role < ITEM_ROLE_COUNT);
 
     if(m_itemByRole[role] == item)
         return;

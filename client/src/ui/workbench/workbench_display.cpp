@@ -624,7 +624,7 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 }
 
 QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
-    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-1, -1, 1, 1));
+    return fitInViewGeometry();
 }
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
@@ -743,8 +743,8 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
     if(zoomedItem != NULL) {
         sizeRect = moveRect = itemGeometry(zoomedItem);
     } else {
-        moveRect = sizeRect = layoutBoundingGeometry();
-        //sizeRect = fitInViewGeometry();
+        moveRect = layoutBoundingGeometry();
+        sizeRect = fitInViewGeometry();
     }
 
     m_boundingInstrument->setPositionBounds(m_view, moveRect);
@@ -755,12 +755,16 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     QSizeF viewportSize = m_view->viewport()->size();
     MarginsF positionExtension = cwiseDiv(m_viewportMargins, viewportSize);
 
-    m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
+    QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+    if(zoomedItem != NULL) {
+        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
+    } else {
+        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.25, 0.25, 0.25, 0.25));
+    }
 
     QSizeF sizeExtension = sizeDelta(positionExtension);
     sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
     
-    m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
     m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
 }
 
@@ -855,6 +859,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         }
 
         synchronizeSceneBounds();
+        synchronizeSceneBoundsExtension();
         break;
     }
     case QnWorkbench::FOCUSED: {
