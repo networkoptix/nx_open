@@ -755,7 +755,12 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     QSizeF viewportSize = m_view->viewport()->size();
     MarginsF positionExtension = cwiseDiv(m_viewportMargins, viewportSize);
 
-    m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.25, 0.25, 0.25, 0.25));
+    QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+    if(zoomedItem != NULL) {
+        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
+    } else {
+        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.25, 0.25, 0.25, 0.25));
+    }
 
     QSizeF sizeExtension = sizeDelta(positionExtension);
     sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
@@ -854,6 +859,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         }
 
         synchronizeSceneBounds();
+        synchronizeSceneBoundsExtension();
         break;
     }
     case QnWorkbench::FOCUSED: {
