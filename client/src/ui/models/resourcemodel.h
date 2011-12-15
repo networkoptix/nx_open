@@ -13,9 +13,9 @@ public:
     explicit ResourceModel(QObject *parent = 0);
     ~ResourceModel();
 
-    virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
-
-    virtual QStringList mimeTypes() const override;
+    QStringList mimeTypes() const;
+    QMimeData *mimeData(const QModelIndexList &indexes) const;
+    bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 
 private Q_SLOTS:
     void addResource(QnResourcePtr resource);

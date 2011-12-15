@@ -1,10 +1,13 @@
 #include "resourcemodel.h"
-#include <QMimeData>
+
+#include <QtCore/QMimeData>
 
 #include "core/resourcemanagment/resource_pool.h"
 
 #include "ui/skin.h"
 #include "ui/view_drag_and_drop.h"
+
+#include "file_processor.h"
 
 ResourceModel::ResourceModel(QObject *parent)
     : QStandardItemModel(parent)
@@ -30,6 +33,11 @@ ResourceModel::ResourceModel(QObject *parent)
 
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(addResource(QnResourcePtr)));
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(removeResource(QnResourcePtr)));
+
+    QHash<int, QByteArray> roles = roleNames();
+    roles.insert(Qt::UserRole + 1, "id");
+    roles.insert(Qt::UserRole + 2, "searchString");
+    setRoleNames(roles);
 }
 
 ResourceModel::~ResourceModel()
@@ -49,17 +57,15 @@ void ResourceModel::addResource(QnResourcePtr resource)
         parentId = 0;
     else if (resource->checkFlag(QnResource::remote))
         parentId = resource->getParentId().hash();
-    if (resource->checkFlag(QnResource::server))
-    {
+
+    if (resource->checkFlag(QnResource::server)) {
         QStandardItem *root = new QStandardItem(QIcon(), resource->getName());
         root->setData(resource->getId().hash(), Qt::UserRole + 1);
         root->setData(resource->toSearchString(), Qt::UserRole + 2);
         root->setEditable(false);
         root->setSelectable(false);
         appendRow(root);
-    }
-    else if (QStandardItem *root = itemFromResourceId(parentId))
-    {
+    } else if (QStandardItem *root = itemFromResourceId(parentId)) {
         QStandardItem *child = new QStandardItem(QIcon(), resource->getName());
         child->setData(resource->getId().hash(), Qt::UserRole + 1);
         child->setData(resource->toSearchString(), Qt::UserRole + 2);
@@ -71,32 +77,72 @@ void ResourceModel::addResource(QnResourcePtr resource)
 
 void ResourceModel::removeResource(QnResourcePtr resource)
 {
-    if (QStandardItem *child = itemFromResourceId(resource->getId().hash()))
-    {
+    if (QStandardItem *child = itemFromResourceId(resource->getId().hash())) {
         foreach (QStandardItem *item, takeRow(child->row()))
             delete item;
     }
 }
 
-QMimeData *ResourceModel::mimeData(const QModelIndexList &indexes) const {
-    QMimeData *result = new QMimeData();
+QStringList ResourceModel::mimeTypes() const
+{
+    QStringList mimeTypes = QStandardItemModel::mimeTypes();
+    mimeTypes.append(QLatin1String("text/uri-list"));
+    mimeTypes.append(resourcesMime());
 
-    QnResourceList resources;
-    foreach(const QModelIndex &index, indexes) {
-        QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
-        if(!resource.isNull())
-            resources.push_back(resource);
-    }
-
-    result->setData(resourcesMime(), serializeResources(resources));
-    
-    return result;
+    return mimeTypes;
 }
 
-QStringList ResourceModel::mimeTypes() const {
-    QStringList result;
+QMimeData *ResourceModel::mimeData(const QModelIndexList &indexes) const
+{
+    QMimeData *mimeData = QStandardItemModel::mimeData(indexes);
+    if (mimeData) {
+        const QStringList types = mimeTypes();
+        const QString resourceFormat = resourcesMime();
+        const QString urlFormat = QLatin1String("text/uri-list");
+        if (types.contains(resourceFormat) || types.contains(urlFormat)) {
+            QnResourceList resources;
+            foreach (const QModelIndex &index, indexes) {
+                QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+                if (resource)
+                    resources.append(resource);
+            }
+            if (types.contains(resourceFormat))
+                mimeData->setData(resourceFormat, serializeResources(resources));
+            if (types.contains(urlFormat)) {
+                QList<QUrl> urls;
+                foreach (const QnResourcePtr &resource, resources) {
+                    if (resource->checkFlag(QnResource::url))
+                        urls.append(QUrl::fromLocalFile(resource->getUrl()));
+                }
+                mimeData->setUrls(urls);
+            }
+        }
+    }
 
-    result.push_back(resourcesMime());
+    return mimeData;
+}
 
-    return result;
+bool ResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    // check if the action is supported
+    if (!mimeData || !(action == Qt::CopyAction || action == Qt::MoveAction))
+        return false;
+
+    // check if the format is supported
+    const QString format = resourcesMime();
+    if (!mimeData->hasFormat(format) && !mimeData->hasUrls())
+        return QStandardItemModel::dropMimeData(mimeData, action, row, column, parent);
+
+    // decode and insert
+    QnResourceList resources;
+    if (!mimeData->hasFormat(format))
+       resources += deserializeResources(mimeData->data(format));
+    if (mimeData->hasUrls())
+        resources += QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
+    foreach (const QnResourcePtr &resource, resources) {
+        if (!resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::server))
+            addResource(resource);
+    }
+
+    return true;
 }
