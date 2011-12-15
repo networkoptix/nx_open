@@ -13,16 +13,19 @@ public:
     explicit ResourceModel(QObject *parent = 0);
     ~ResourceModel();
 
-    virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
+    QStringList mimeTypes() const;
+    QMimeData *mimeData(const QModelIndexList &indexes) const;
+    bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 
-    virtual QStringList mimeTypes() const override;
+protected:
+    QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
+    QnResourcePtr resourceFromItem(QStandardItem *item) const;
+    QStandardItem *itemFromResource(QnResourcePtr resource) const;
+    QStandardItem *itemFromResourceId(uint id) const;
 
 private Q_SLOTS:
     void addResource(QnResourcePtr resource);
     void removeResource(QnResourcePtr resource);
-
-private:
-    QStandardItem *itemFromResourceId(uint id) const;
 };
 
 #endif // RESOURCEMODEL_H

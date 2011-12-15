@@ -870,10 +870,7 @@ CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
             updateTexture();
             if (curImg->pkt_dts != AV_NOPTS_VALUE)
                 m_lastDisplayedTime = curImg->pkt_dts;
-            if (curImg->metadata)
-                m_lastDisplayedMetadata = curImg->metadata;
-            else
-                m_lastDisplayedMetadata.clear();
+            m_lastDisplayedMetadata = curImg->metadata;
 
             result = RENDERED_NEW_FRAME;
         } 

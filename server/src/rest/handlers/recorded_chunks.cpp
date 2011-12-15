@@ -5,6 +5,7 @@
 #include "rest/server/rest_server.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "utils/common/util.h"
+#include "motion/motion_helper.h"
 
 QString QnRestXsdHelpHandler::getXsdUrl(TCPSocket* tcpSocket) const
 {
@@ -31,6 +32,15 @@ qint64 QnRecordedChunkListHandler::parseDateTime(const QString& dateTime)
         return dateTime.toLongLong();
 }
 
+QRect QnRecordedChunkListHandler::deserializeMotionRect(const QString& rectStr)
+{
+    QList<QString> params = rectStr.split(",");
+    if (params.size() != 4)
+        return QRect();
+    else
+        return QRect(params[0].toInt(), params[1].toInt(), params[2].toInt(), params[3].toInt());
+}
+
 int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
@@ -39,8 +49,16 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     QByteArray errStrMac;
     bool urlFound = false;
     bool useBinary = false;
+    QRegion motionRegion;
+
     for (int i = 0; i < params.size(); ++i)
     {
+        if (params[i].first == "motionRect")
+        {
+            QRect tmp = deserializeMotionRect(params[i].second);
+            if (tmp.width() > 0 && tmp.height() > 0)
+                motionRegion += tmp;
+        }
         if (params[i].first == "mac")
         {
             urlFound = true;
@@ -83,20 +101,24 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         return CODE_INVALID_PARAMETER;
     }
 
-    QnTimePeriodList periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
+    QnTimePeriodList periods;
+    if (motionRegion.isEmpty())
+        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
+    else
+        periods = QnMotionHelper::instance()->mathImage(motionRegion, resList, startTime, endTime, detailLevel);
     if (useBinary) {
         foreach(QnTimePeriod period, periods)
         {
-            qint64 start = htonll(period.startTimeUSec/1000);
-            qint64 duration = htonll(period.durationUSec/1000);
-            result.append((const char*) &start, 6);
-            result.append((const char*) &duration, 5);
+            qint64 start = htonll(period.startTimeMs);
+            qint64 duration = htonll(period.durationMs);
+            result.append((const char*) &start, 8);
+            result.append((const char*) &duration, 4);
         }
     }
     else {
         result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
         foreach(QnTimePeriod period, periods)
-            result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeUSec).arg(period.durationUSec));
+            result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeMs).arg(period.durationMs));
         result.append("</recordedTimePeriods>\n");
     }
 
@@ -115,6 +137,7 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
     rez += "<BR>Param <b>mac</b> - camera mac. Param can be repeated several times for many cameras.";
     rez += "<BR>Param <b>startTime</b> - Time interval start. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected.";
     rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above).";
+    rez += "<BR>Param <b>motionRect</b> - Match motion on a video by specified rect. Params can be used several times.";
     rez += "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel.";
 
     rez += "<BR><b>Return</b> XML</b> - with chunks merged for all cameras. Returned time and duration in microseconds. <a href=\"";

@@ -17,7 +17,7 @@ public:
     QnChunkSequence(const QnNetworkResourceList& resList, qint64 startTime);
     DeviceFileCatalog::Chunk findChunk(QnResourcePtr res, qint64 time, DeviceFileCatalog::FindMethod findMethod);
     DeviceFileCatalog::Chunk getNextChunk(QnResourcePtr res);
-    qint64 nextChunkStartTime(QnResourcePtr res);
+    //qint64 nextChunkStartTime(QnResourcePtr res);
     //DeviceFileCatalog::Chunk getPrevChunk(QnResourcePtr res);
 private slots:
     void onFirstDataRemoved(int n);
@@ -28,7 +28,7 @@ private:
     {
         DeviceFileCatalogPtr m_catalog;
         int m_index; // last find index
-        qint64 m_startTime;
+        qint64 m_startTimeMs;
     };
     QMap<QnResourcePtr, CacheInfo> m_cache;
     qint64 m_startTime;
@@ -44,10 +44,10 @@ public:
 
 
     QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource);
-    bool fileStarted(const qint64& startDate, const QString& fileName);
-    bool fileFinished(int duration, const QString& fileName);
+    bool fileStarted(const qint64& startDateMs, const QString& fileName);
+    bool fileFinished(int durationMs, const QString& fileName);
 
-    static QString dateTimeStr(qint64 dateTimeMks);
+    static QString dateTimeStr(qint64 dateTimeMs);
     QnStoragePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
     DeviceFileCatalogPtr getFileCatalog(const QString& mac);
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);

@@ -37,7 +37,7 @@ QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *paren
 
 QnVideoServerConnection::~QnVideoServerConnection() {}
 
-QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail)
+QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QRegion& motionRegion) 
 {
     QnRequestParamList result;
 
@@ -46,23 +46,32 @@ QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResou
     result << QnRequestParam("startTime", QString::number(startTimeUSec));
     result << QnRequestParam("endTime", QString::number(endTimeUSec));
     result << QnRequestParam("detail", QString::number(detail));
+    for (int i = 0; i < motionRegion.rects().size(); ++i)
+    {
+        QRect r = motionRegion.rects().at(i);
+        QString rectStr;
+        QTextStream str(&rectStr);
+        str << r.left() << ',' << r.top() << ',' << r.width() << ',' << r.height();
+        str.flush();
+        result << QnRequestParam("motionRect", rectStr);
+    }
 
     return result;
 }
 
-QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail)
+QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QRegion& motionRegion)
 {
     QnTimePeriodList result;
     QnApiRecordedTimePeriodsResponsePtr timePeriodList;
-    if (m_sessionManager->recordedTimePeriods(createParamList(list, startTimeUSec, endTimeUSec, detail), timePeriodList) == 0)
+    if (m_sessionManager->recordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), timePeriodList) == 0)
         result = parseRecordedTimePeriods(timePeriodList);
 
     return result;
 }
 
-void QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, QObject *target, const char *slot) {
+void QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot) {
     detail::QnVideoServerConnectionReplyProcessor *processor = new detail::QnVideoServerConnectionReplyProcessor();
     connect(processor, SIGNAL(finished(const QnTimePeriodList &)), target, slot);
 
-    m_sessionManager->asyncRecordedTimePeriods(createParamList(list, startTimeUSec, endTimeUSec, detail), processor, SLOT(at_replyReceived(int, const QnApiRecordedTimePeriodsResponsePtr &)));
+    m_sessionManager->asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnApiRecordedTimePeriodsResponsePtr &)));
 }

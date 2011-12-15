@@ -9,17 +9,17 @@
 
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
 {
-    return first.startTimeUSec < other.startTimeUSec; 
+    return first.startTimeMs < other.startTimeMs;
 }
 
 bool operator < (qint64 first, const QnTimePeriod& other) 
 { 
-    return first < other.startTimeUSec; 
+    return first < other.startTimeMs; 
 }
 
 bool operator < (const QnTimePeriod& other, qint64 first) 
 { 
-    return other.startTimeUSec < first; 
+    return other.startTimeMs < first;
 }
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
@@ -62,7 +62,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     QString prefix = closeDirPath(storage->getUrl()) + m_macAddress + QString('/');
 
 
-    QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTime/1000);
+    QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
     int currentParts[4];
     currentParts[0] = fileDate.date().year();
     currentParts[1] = fileDate.date().month();
@@ -112,7 +112,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     return true;
 }
 
-qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime)
+qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs)
 {
     cl_log.log("recreate broken file ", fileName, cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
@@ -125,7 +125,7 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     reader->setArchiveDelegate(avi);
     QnStreamRecorder recorder(res);
     recorder.setFileName(fileName + ".new");
-    recorder.setStartOffset(startTime);
+    recorder.setStartOffset(startTimeMs*1000);
 
     QnAbstractMediaDataPtr packet;
     while (packet = avi->getNextData())
@@ -133,7 +133,7 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
         packet->dataProvider = reader;
         recorder.processData(packet);
     }
-    qint64 rez = recorder.duration();
+    qint64 rez = recorder.duration()/1000;
     recorder.close();
     delete reader;
 
@@ -156,14 +156,18 @@ void DeviceFileCatalog::deserializeTitleFile()
         QList<QByteArray> fields = line.split(';');
         if (fields.size() < 3)
             continue;
-        qint64 startTime = fields[0].toLongLong();
-        int duration = fields[3].trimmed().toInt();
+        int coeff = 1; // compabiliy with previous version (convert usec to ms)
+        if (fields[0].length() >= 16)
+            coeff = 1000;
+        qint64 startTime = fields[0].toLongLong()/coeff;
+        QString durationStr = fields[3].trimmed();
+        int duration = fields[3].trimmed().toInt()/coeff;
         Chunk chunk(startTime, fields[1].toInt(), fields[2].toInt(), duration);
         if (fields[3].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             needRewriteFile = true;
-            chunk.duration = recreateFile(fullFileName(chunk), chunk.startTime);
+            chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs);
         }
         if (fileExists(chunk)) 
         {
@@ -187,7 +191,7 @@ void DeviceFileCatalog::deserializeTitleFile()
         str << "start; storage; index; duration\n"; // write CSV header
 
         foreach(Chunk chunk, m_chunks)
-            str << chunk.startTime  << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';' << chunk.duration << '\n';
+            str << chunk.startTimeMs  << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';' << chunk.durationMs << '\n';
         str.flush();
 
         m_file.close();
@@ -203,22 +207,22 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
     QMutexLocker lock(&m_mutex);
 
-    ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTime);
+    ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     m_chunks.insert(itr, chunk);
     QTextStream str(&m_file);
 
-    str << chunk.startTime << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
-    if (chunk.duration >= 0)
-        str << chunk.duration  << '\n';
+    str << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
+    if (chunk.durationMs >= 0)
+        str << chunk.durationMs  << '\n';
     str.flush();
 }
 
-void DeviceFileCatalog::updateDuration(int duration)
+void DeviceFileCatalog::updateDuration(int durationMs)
 {
     QMutexLocker lock(&m_mutex);
-    m_chunks.last().duration = duration;
+    m_chunks.last().durationMs = durationMs;
     QTextStream str(&m_file);
-    str << duration  << '\n';
+    str << durationMs << '\n';
     str.flush();
 }
 
@@ -249,7 +253,7 @@ bool DeviceFileCatalog::deleteFirstRecord()
     return true;
 }
 
-int DeviceFileCatalog::findFileIndex(qint64 startTime, FindMethod method) const
+int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const
 {
 /*
     QString msg;
@@ -264,11 +268,11 @@ int DeviceFileCatalog::findFileIndex(qint64 startTime, FindMethod method) const
     if (m_chunks.isEmpty())
         return -1;
 
-    ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTime);
+    ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTimeMs);
     if (itr > m_chunks.begin())
     {
         --itr;
-         if (method == OnRecordHole_NextChunk && itr->startTime + itr->duration < startTime && itr < m_chunks.end()-1)
+         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs < startTimeMs && itr < m_chunks.end()-1)
              ++itr;
     }
     return itr - m_chunks.begin();
@@ -282,7 +286,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
         return QString();
     return closeDirPath(storage->getUrl()) + 
                 m_macAddress + QString('/') +
-                QnStorageManager::dateTimeStr(chunk.startTime) + 
+                QnStorageManager::dateTimeStr(chunk.startTimeMs) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
                 QString(".mkv");
 }
@@ -293,7 +297,7 @@ qint64 DeviceFileCatalog::minTime() const
     if (m_chunks.isEmpty() || m_firstDeleteCount >= m_chunks.size())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[m_firstDeleteCount].startTime;
+        return m_chunks[m_firstDeleteCount].startTimeMs;
 }
 
 qint64 DeviceFileCatalog::maxTime() const
@@ -302,7 +306,7 @@ qint64 DeviceFileCatalog::maxTime() const
     if (m_chunks.isEmpty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks.last().startTime + qMax(0, m_chunks.last().duration);
+        return m_chunks.last().startTimeMs + qMax(0, m_chunks.last().durationMs);
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
@@ -320,7 +324,7 @@ qint64 DeviceFileCatalog::firstTime() const
     if (m_firstDeleteCount >= m_chunks.size())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[m_firstDeleteCount].startTime;
+        return m_chunks[m_firstDeleteCount].startTimeMs;
 }
 
 QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
@@ -332,18 +336,18 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         return result;
 
     int firstIndex = itr - m_chunks.begin();
-    result << QnTimePeriod(m_chunks[firstIndex].startTime, m_chunks[firstIndex].duration);
+    result << QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs);
 
-    for (int i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTime < endTime; ++i)
+    for (int i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
         QnTimePeriod& last = result.last();
-        qint64 ggC = m_chunks[i].startTime;
-        if (qAbs(last.startTimeUSec + last.durationUSec - m_chunks[i].startTime) <= detailLevel && m_chunks[i].duration != -1)
-            last.durationUSec = m_chunks[i].startTime - last.startTimeUSec + m_chunks[i].duration;
+        qint64 ggC = m_chunks[i].startTimeMs;
+        if (qAbs(last.startTimeMs + last.durationMs - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
+            last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {
-            if (last.durationUSec < detailLevel)
+            if (last.durationMs < detailLevel)
                 result.pop_back();
-            result << QnTimePeriod(m_chunks[i].startTime, m_chunks[i].duration);
+            result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
         }
     }
     return result;
@@ -351,17 +355,17 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
 
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
 { 
-    return first < other.startTime; 
+    return first < other.startTimeMs;
 }
 
 bool operator < (const DeviceFileCatalog::Chunk& first, qint64 other)
 { 
-    return first.startTime < other; 
+    return first.startTimeMs < other;
 }
 
 bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other) 
 { 
-    return first.startTime < other.startTime; 
+    return first.startTimeMs < other.startTimeMs;
 }
 
 QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> periods)
@@ -373,9 +377,9 @@ QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> period
         qint64 minStartTime = 0x7fffffffffffffffll;
         minIndex = -1;
         for (int i = 0; i < periods.size(); ++i) {
-            if (!periods[i].isEmpty() && periods[i][0].startTimeUSec < minStartTime) {
+            if (!periods[i].isEmpty() && periods[i][0].startTimeMs < minStartTime) {
                 minIndex = i;
-                minStartTime = periods[i][0].startTimeUSec;
+                minStartTime = periods[i][0].startTimeMs;
             }
         }
 
@@ -387,11 +391,11 @@ QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> period
             }
             else {
                 QnTimePeriod& last = result.last();
-                if (last.startTimeUSec <= minStartTime && last.startTimeUSec+last.durationUSec > minStartTime)
-                    last.durationUSec = qMax(last.durationUSec, minStartTime + periods[minIndex][0].durationUSec - last.startTimeUSec);
+                if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs > minStartTime)
+                    last.durationMs = qMax(last.durationMs, minStartTime + periods[minIndex][0].durationMs - last.startTimeMs);
                 else {
                     result << periods[minIndex][0];
-                    if (periods[minIndex][0].durationUSec == -1)
+                    if (periods[minIndex][0].durationMs == -1)
                         break;
                 }
             } 

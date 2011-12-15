@@ -1,6 +1,7 @@
 #ifndef __RECORDED_CHUNKS_H__
 #define __RECORDED_CHUNKS_H__
 
+#include <QRect>
 #include "rest/server/request_handler.h"
 
 class QnRestXsdHelpHandler: public QnRestRequestHandler
@@ -16,6 +17,7 @@ class QnRecordedChunkListHandler: public QnRestXsdHelpHandler
     virtual QString description(TCPSocket* tcpSocket) const;
 private:
     qint64 parseDateTime(const QString& dateTime);
+    QRect deserializeMotionRect(const QString& rectStr);
 };
 
 class QnXsdHelperHandler: public QnRestRequestHandler

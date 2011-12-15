@@ -121,6 +121,9 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     void addMotion(const quint8* data, qint64 timestamp);
     void addMotion(QnMetaDataV1Ptr data);
 
+    // remove part of motion info by motion mask
+    void removeMotion(const quint8* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
+
     // ti check if we've got motion at 
     bool isMotionAt(int x, int y) const;
 

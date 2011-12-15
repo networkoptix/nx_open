@@ -213,7 +213,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
     QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
-    
+
     connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
 
@@ -262,14 +262,7 @@ void QnWorkbenchController::drop(const QString &file, const QPoint &gridPos, boo
 }
 
 void QnWorkbenchController::drop(const QList<QString> &files, const QPoint &gridPos, bool findAccepted) {
-    QList<QString> validFiles;
-    if(!findAccepted) {
-        validFiles = files;
-    } else {
-        foreach(const QString &file, files)
-            QnFileProcessor::findAcceptedFiles(file, &validFiles);
-    }
-
+    const QList<QString> validFiles = !findAccepted ? files : QnFileProcessor::findAcceptedFiles(files);
     if(validFiles.empty())
         return;
 

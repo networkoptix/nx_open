@@ -17,11 +17,14 @@ public:
     static QnMotionHelper* instance();
     virtual ~QnMotionHelper();
 
+    // remove part of motion by mask
+    void maskMotion(QnMetaDataV1Ptr data);
+
     // write motion data to file
     void saveToArchive(QnMetaDataV1Ptr data);
 
-    QnTimePeriodList mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime);
-    QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime);
+    QnTimePeriodList mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
+    QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res);
 
     QnMotionHelper();

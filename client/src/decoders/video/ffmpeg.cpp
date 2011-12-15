@@ -391,6 +391,8 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
             outFrame->metadata = m_motionMap[motionIndex].second;
             m_motionMap.remove(motionIndex);
         }
+        else
+            outFrame->metadata.clear();
 
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height || 

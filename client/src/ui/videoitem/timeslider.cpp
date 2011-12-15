@@ -185,14 +185,14 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         // TODO: use lower_bound here and draw only what is actually needed.
         foreach(const QnTimePeriod &period, m_parent->timePeriodList())
         {
-            qreal left = x + static_cast<qreal>(period.startTimeUSec / 1000 - pos) / range * w;
+            qreal left = x + static_cast<qreal>(period.startTimeMs - pos) / range * w;
             left = qMax(left, contentsRect.left());
 
             qreal right;
-            if(period.durationUSec == -1) {
+            if(period.durationMs == -1) {
                 right = contentsRect.right();
             } else {
-                right = x + static_cast<qreal>((period.startTimeUSec + period.durationUSec) / 1000 - pos) / range * w;
+                right = x + static_cast<qreal>((period.startTimeMs + period.durationMs) - pos) / range * w;
                 right = qMin(right, contentsRect.right());
             }
 

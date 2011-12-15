@@ -1,25 +1,23 @@
 #ifndef QN_FILE_PROCESSOR_H
 #define QN_FILE_PROCESSOR_H
 
-#include <QUrl>
+#include <QtCore/QList>
+#include <QtCore/QUrl>
+
 #include <core/resource/resource.h>
 
-class QnFileProcessor {
+class QnFileProcessor
+{
 public:
-    /**
-     * \param path                      Mask that is used for file search.
-     * \param[out] list                 List that found files will be appended to.
-     */
-    static void findAcceptedFiles(const QString &path, QList<QString> *list);
-
-    static QStringList findAcceptedFiles(const QString &path);
-
-    static void findAcceptedFiles(const QList<QUrl> &urls, QList<QString> *list);
+    static QStringList findAcceptedFiles(const QStringList &files);
+    static inline QStringList findAcceptedFiles(const QString &path)
+    { return QnFileProcessor::findAcceptedFiles(QStringList() << path); }
 
     static QStringList findAcceptedFiles(const QList<QUrl> &urls);
+    static inline QStringList findAcceptedFiles(const QUrl &url)
+    { return QnFileProcessor::findAcceptedFiles(QStringList() << url.toLocalFile()); }
 
     static QnResourcePtr createResourcesForFile(const QString &file);
-
     static QnResourceList createResourcesForFiles(const QList<QString> &files);
 };
 

@@ -102,13 +102,29 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 // ----------------------- QnMotionArchive ------------------
 
 QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource): 
-m_resource(resource),
-m_lastDetailedData(new QnMetaDataV1())
+    m_resource(resource),
+    m_lastDetailedData(new QnMetaDataV1())
 {
+    m_camResource = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
     m_firstTime = 0;
+    if (m_camResource) {
+        connect(m_camResource.data(), SIGNAL(motionMaskChanged(QRegion)), this, SLOT(updateMotionMask(QRegion)), Qt::DirectConnection);
+        updateMotionMask(m_camResource->getMotionMask());
+    }
 }
 
+void QnMotionArchive::maskMotion(QnMetaDataV1Ptr data)
+{
+    data->removeMotion((const quint8*) m_motionMask, m_motionMaskStart, m_motionMaskEnd);
+}
+
+
+void QnMotionArchive::updateMotionMask(QRegion maskedRegion)
+{
+    QMutexLocker lock(&m_maskMutex);
+    createMask(maskedRegion, m_motionMask, m_motionMaskStart, m_motionMaskEnd);
+}
 
 QString QnMotionArchive::getFilePrefix(const QDateTime& datetime)
 {
@@ -165,12 +181,10 @@ bool QnMotionArchive::mathImage(const __m128i* data, const __m128i* mask, int ma
     return false;
 }
 
-QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime)
+QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QnTimePeriodList rez;
     QFile motionFile, indexFile;
-    //qint64 msStartTime = startTime/1000; // convert from usec to ms
-    //qint64 msEndTime = endTime/1000; // convert from usec to ms
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
     __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
@@ -186,22 +200,6 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
             qFreeAligned(buffer);
             return rez;
         }
-
-        /*
-        QDateTime qmsStartTime = QDateTime::fromMSecsSinceEpoch(msStartTime);
-        fillFileNames(qmsStartTime, &motionFile, &indexFile);
-        if (!motionFile.open(QFile::ReadOnly) || !indexFile.open(QFile::ReadOnly)) {
-            qFreeAligned(buffer);
-            return rez;
-        }
-
-        qint64 indexSize = (indexFile.size()-MOTION_INDEX_HEADER_SIZE);
-        if (indexSize == 0)
-            return rez;
-        index.resize(indexSize/MOTION_INDEX_RECORD_SIZE);
-        indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
-        indexFile.read((char*) &index[0], indexSize);
-        */
 
         qint64 minTime, maxTime;
         dateBounds(msStartTime, minTime, maxTime);
@@ -237,8 +235,9 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
                         totalSteps = 0;
                         break;
                     }
-                    if (!rez.isEmpty() && fullStartTime <= rez.last().startTimeUSec + rez.last().durationUSec)
-                        rez.last().durationUSec = qMax(rez.last().durationUSec, i->duration + fullStartTime - rez.last().startTimeUSec);
+
+                    if (!rez.isEmpty() && fullStartTime < rez.last().startTimeMs + rez.last().durationMs + (detailLevel-1))
+                        rez.last().durationMs = qMax(rez.last().durationMs, i->duration + fullStartTime - rez.last().startTimeMs);
                     else
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
                 }

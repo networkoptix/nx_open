@@ -1,6 +1,5 @@
 #include "navigationtreewidget.h"
 
-#include <QtCore/QEvent>
 #include <QtGui/QAction>
 #include <QtGui/QBoxLayout>
 #include <QtGui/QItemSelectionModel>
@@ -77,7 +76,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_resourcesTreeView->setSortingEnabled(false); // ###
     m_resourcesTreeView->setUniformRowHeights(true);
     m_resourcesTreeView->setWordWrap(false);
-    m_resourcesTreeView->setDragDropMode(QAbstractItemView::DragOnly);
+    m_resourcesTreeView->setDragDropMode(QAbstractItemView::DragDrop);
 
     connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
@@ -89,7 +88,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_searchTreeView->setSortingEnabled(false); // ###
     m_searchTreeView->setUniformRowHeights(true);
     m_searchTreeView->setWordWrap(false);
-    m_searchTreeView->setDragDropMode(QAbstractItemView::DragOnly);
+    m_searchTreeView->setDragDropMode(QAbstractItemView::DragOnly); // ###
 
     connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
@@ -239,4 +238,3 @@ void NavigationTreeWidget::open()
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         itemActivated(index);
 }
-

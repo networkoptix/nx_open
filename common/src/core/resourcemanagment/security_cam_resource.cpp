@@ -72,3 +72,18 @@ void QnSequrityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFact
 {
     m_dpFactory = dpFactory;
 }
+
+QRegion QnSequrityCamResource::getMotionMask() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_motionMask;
+}
+
+void QnSequrityCamResource::setMotionMask(const QRegion& mask)
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_motionMask == mask)
+        return;
+    m_motionMask = mask;
+    emit motionMaskChanged(mask);
+}

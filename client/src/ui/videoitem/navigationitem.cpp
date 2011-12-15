@@ -53,9 +53,10 @@ void detail::QnTimePeriodUpdater::at_replyReceived(const QnTimePeriodList &timeP
 
 void detail::QnTimePeriodUpdater::sendRequest()
 {
+    QRegion motionRegion; // math only motion by specified region
     m_updateNeeded = false;
     m_updatePending = true;
-    m_connection->asyncRecordedTimePeriods(m_networkResources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1, this, SLOT(at_replyReceived(const QnTimePeriodList &)));
+    m_connection->asyncRecordedTimePeriods(m_networkResources, m_timePeriod.startTimeMs, m_timePeriod.startTimeMs + m_timePeriod.durationMs, 1, motionRegion, this, SLOT(at_replyReceived(const QnTimePeriodList &)));
 }
 
 
@@ -536,12 +537,12 @@ void NavigationItem::updateSlider()
 
 void NavigationItem::updatePeriodList(bool force)
 {
-    qint64 w = m_timeSlider->sliderRange() * 1000;
-    qint64 t = m_timeSlider->viewPortPos() * 1000;
+    qint64 w = m_timeSlider->sliderRange();
+    qint64 t = m_timeSlider->viewPortPos();
     if(t < 0)
         return; /* TODO: why? */
 
-    if(!force && m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
+    if(!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
         return;
 
     QnNetworkResourceList resources;
@@ -568,15 +569,15 @@ void NavigationItem::updatePeriodList(bool force)
     }
 
     /* Request interval no shorter than 1 hour. */
-    const qint64 oneHour = 60ll * 60ll * 1000ll * 1000ll;
+    const qint64 oneHour = 60ll * 60ll * 1000ll;
     if(w < oneHour)
         w = oneHour;
 
     /* It is important to update the stored interval BEFORE sending request to
      * the server. Request is blocking and starts an event loop, so we may get
      * into this method again. */
-    m_timePeriod.startTimeUSec = t - w;
-    m_timePeriod.durationUSec = w * 3;
+    m_timePeriod.startTimeMs = t - w;
+    m_timePeriod.durationMs = w * 3;
 
     if(!connection.isNull()) {
         m_timePeriodUpdater->update(connection, resources, m_timePeriod);

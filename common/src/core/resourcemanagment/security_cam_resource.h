@@ -1,7 +1,7 @@
 #ifndef sequrity_cam_resource_h_1239
 #define sequrity_cam_resource_h_1239
 
-#include <QtCore/QRect>
+#include <QRegion>
 #include "../resource/media_resource.h"
 
 class QnDataProviderFactory
@@ -12,6 +12,7 @@ public:
 
 class QnSequrityCamResource : virtual public QnMediaResource
 {
+    Q_OBJECT
 public:
     QnSequrityCamResource();
     virtual ~QnSequrityCamResource();
@@ -32,6 +33,12 @@ public:
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
+    void setMotionMask(const QRegion& mask);
+    QRegion getMotionMask() const;
+
+signals:
+    void motionMaskChanged(QRegion region);
+
 protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
 
@@ -39,6 +46,7 @@ protected:
     virtual void setCropingPhysical(QRect croping) = 0;
 private:
     QnDataProviderFactory* m_dpFactory;
+    QRegion m_motionMask;
 };
 
 typedef QSharedPointer<QnSequrityCamResource> QnSequrityCamResourcePtr;

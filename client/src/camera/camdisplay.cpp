@@ -556,8 +556,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     if (vd)
     {
         m_ignoringVideo = vd->ignore;
-        if (m_lastMetadata && m_lastMetadata->timestamp <= vd->timestamp && m_lastMetadata->timestamp+m_lastMetadata->m_duration >= vd->timestamp)
+        if (m_lastMetadata && m_lastMetadata->containTime(vd->timestamp))
             vd->motion = m_lastMetadata;
+        else {
+            int gg = 4;
+        }
     }
     else if (ad)
     {
