@@ -28,7 +28,7 @@
 #include <ui/graphics/instruments/forwardinginstrument.h>
 #include <ui/graphics/instruments/transformlistenerinstrument.h>
 #include <ui/graphics/instruments/selectionfixupinstrument.h>
-#include <ui/graphics/instruments/archivedropinstrument.h>
+#include <ui/graphics/instruments/dropinstrument.h>
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
 #include <ui/graphics/instruments/resizehoverinstrument.h>
@@ -85,12 +85,13 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
+    m_archiveDropInstrument = new DropInstrument(this, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     m_dragInstrument = new DragInstrument(this);
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SignalingInstrument *itemContextMenuInstrument = new SignalingInstrument(Instrument::ITEM, Instrument::makeSet(QEvent::GraphicsSceneContextMenu), this);
+    SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -99,8 +100,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
     m_manager->installInstrument(m_resizingInstrument->resizeHoverInstrument());
-    m_manager->installInstrument(new SelectionFixupInstrument(this));
+    m_manager->installInstrument(selectionFixupInstrument);
     m_manager->installInstrument(itemMouseForwardingInstrument);
+    m_manager->installInstrument(selectionFixupInstrument->preForwardingInstrument());
     m_manager->installInstrument(itemClickInstrument);
     m_manager->installInstrument(itemContextMenuInstrument);
 
@@ -208,7 +210,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *preferencesAction          = newAction(tr("Preferences"),          tr("Ctrl+P"),       this);
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
-    QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
+    //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
     QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
     
@@ -218,8 +220,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_contextMenu = new QMenu();
     m_contextMenu->addAction(showMotionAction);
     m_contextMenu->addAction(hideMotionAction);
-    m_contextMenu->addSeparator();
-    m_contextMenu->addAction(exitAction);
+    //m_contextMenu->addSeparator();
+    //m_contextMenu->addAction(exitAction);
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -336,6 +338,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     }
 
     m_display->synchronize(widget->item());
+    m_display->fitInView();
 }
 
 void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
@@ -432,10 +435,12 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
     foreach(QnWorkbenchItem *model, workbenchItems)
         m_display->synchronize(model);
 
+#if 0
     /* Deselect items that were dragged. */
     if(!delta.isNull())
         foreach(QnResourceWidget *widget, widgets)
             widget->setSelected(false);
+#endif
 }
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QnResourceWidget *widget) {
@@ -586,3 +591,4 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
         widget->setMotionGridDisplayed(display);
     }
 }
+

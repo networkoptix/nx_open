@@ -1,6 +1,11 @@
 #ifndef resource_pool_h_1537
 #define resource_pool_h_1537
 
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QObject>
+
 #include "core/resource/resource.h"
 #include "core/resourcemanagment/resource_criteria.h"
 #include "core/resource/network_resource.h"
@@ -29,6 +34,8 @@ public:
 
 public:
     static QnResourcePool *instance();
+
+    void clear();
 
     void addResources(const QnResourceList &resources);
     inline void addResource(QnResourcePtr resource)

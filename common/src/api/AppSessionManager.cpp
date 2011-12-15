@@ -1,15 +1,15 @@
-#include <QDebug>
-#include <QNetworkReply>
-#include <QDomDocument>
-#include <QXmlInputSource>
-#include <QSharedPointer>
-
-#include "QStdIStream.h"
-
 #include "AppSessionManager.h"
 
-AppSessionManager::AppSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth)
-    : SessionManager(host, port, auth)
+#include <QtNetwork/QNetworkReply>
+
+#include <QtXml/QDomDocument>
+#include <QtXml/QXmlInputSource>
+
+#include "utils/network/synchttp.h"
+#include "QStdIStream.h"
+
+AppSessionManager::AppSessionManager(const QUrl &url)
+    : SessionManager(url)
 {
 }
 
@@ -23,7 +23,7 @@ int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnAp
 
     QByteArray reply;
 
-    int status = addObject("server", os.str().c_str(), reply);
+    int status = addObject(QLatin1String("server"), os.str().c_str(), reply);
     if (status == 0)
     {
         try
@@ -34,7 +34,8 @@ int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnAp
             serversPtr = QnApiServerResponsePtr(xsd::api::servers::servers (is, XSD_FLAGS).release());
 
             return 0;
-        } catch (const xml_schema::exception& e)
+        }
+        catch (const xml_schema::exception& e)
         {
             m_lastError = e.what();
 
@@ -56,7 +57,7 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
 
     QByteArray reply;
 
-    int status = addObject("camera", os.str().c_str(), reply);
+    int status = addObject(QLatin1String("camera"), os.str().c_str(), reply);
     if (status == 0)
     {
         try
@@ -67,7 +68,8 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
             camerasPtr = QnApiCameraResponsePtr(xsd::api::cameras::cameras (is, XSD_FLAGS).release());
 
             return 0;
-        } catch (const xml_schema::exception& e)
+        }
+        catch (const xml_schema::exception& e)
         {
             m_lastError = e.what();
 
@@ -89,20 +91,18 @@ int AppSessionManager::addStorage(const ::xsd::api::storages::Storage& storage)
 
     QByteArray reply;
 
-    return addObject("storage", os.str().c_str(), reply);
+    return addObject(QLatin1String("storage"), os.str().c_str(), reply);
 }
 
 int AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
 {
     QTextStream stream(&reply);
 
-    int status = m_httpClient.syncPost(QString("api/%1/").arg(objectName), body, stream.device());
+    int status = m_httpClient->syncPost(createApiUrl(objectName + QLatin1Char('/')), body, stream.device());
     stream.readAll();
 
     if (status != 0)
-    {
         m_lastError = formatNetworkError(status) + reply;
-    }
 
     return status;
 }
@@ -111,8 +111,8 @@ int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTy
 {
     QByteArray reply;
 
-    int status = sendGetRequest("resourceType", reply);
-    if(status == 0)
+    int status = sendGetRequest(QLatin1String("resourceType"), reply);
+    if (status == 0)
     {
         try
         {
@@ -122,7 +122,8 @@ int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTy
             resourceTypes = QnApiResourceTypeResponsePtr(xsd::api::resourceTypes::resourceTypes (is, XSD_FLAGS).release());
 
             return 0;
-        } catch (const xml_schema::exception& e)
+        }
+        catch (const xml_schema::exception& e)
         {
             m_lastError = e.what();
 
@@ -138,7 +139,7 @@ int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
 {
     QByteArray reply;
 
-    int status = sendGetRequest("storage", reply);
+    int status = sendGetRequest(QLatin1String("storage"), reply);
     if (status == 0)
     {
         try
@@ -149,7 +150,8 @@ int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
             storages = QnApiStorageResponsePtr(xsd::api::storages::storages (is, XSD_FLAGS).release());
 
             return 0;
-        } catch (const xml_schema::exception& e)
+        }
+        catch (const xml_schema::exception& e)
         {
             m_lastError = e.what();
 
@@ -165,7 +167,7 @@ int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
 {
     QByteArray reply;
 
-    int status = sendGetRequest("resourceEx", reply);
+    int status = sendGetRequest(QLatin1String("resourceEx"), reply);
     if (status == 0)
     {
         try
@@ -176,7 +178,8 @@ int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
             resources = QnApiResourceResponsePtr(xsd::api::resourcesEx::resourcesEx (is, XSD_FLAGS).release());
 
             return 0;
-        } catch (const xml_schema::exception& e)
+        }
+        catch (const xml_schema::exception& e)
         {
             m_lastError = e.what();
 

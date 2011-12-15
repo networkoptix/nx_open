@@ -47,7 +47,7 @@ public:
         /** By default, drag processor will compress consecutive drag operations 
          * if scene and view mouse coordinates didn't change between them. 
          * This flag disables the compression. */
-        DONT_COMPRESS = 0x1 
+        DONT_COMPRESS = 0x1,
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 
@@ -89,6 +89,19 @@ public:
      * Resets this drag processor, moving it into <tt>WAITING</tt> state. 
      */
     void reset();
+
+    /* Set of widget-level event handler functions that are to be used from user code
+     * in case drag processor is used outside the graphics view framework. */
+
+    void widgetEvent(QWidget *widget, QEvent *event);
+
+    void widgetMousePressEvent(QWidget *widget, QMouseEvent *event);
+
+    void widgetMouseMoveEvent(QWidget *widget, QMouseEvent *event);
+
+    void widgetMouseReleaseEvent(QWidget *widget, QMouseEvent *event);
+
+    void widgetPaintEvent(QWidget *widget, QPaintEvent *event);
 
 
     /* Set of view-level event handler functions that are to be used from user code. */
@@ -135,6 +148,8 @@ private:
 
     void transition(QEvent *event, State state);
 
+    void transition(QEvent *event, QWidget *widget, State state);
+
     void transition(QEvent *event, QGraphicsView *view, State state);
 
     void transition(QEvent *event, QGraphicsScene *scene, State state);
@@ -143,11 +158,15 @@ private:
     
     void drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos);
 
-    QPoint screenPos(QGraphicsView *view, QMouseEvent *event);
+    QPoint screenPos(QWidget *widget, QMouseEvent *event);
+
     template<class T>
     QPoint screenPos(T *object, QGraphicsSceneMouseEvent *event);
 
+    QPointF scenePos(QWidget *widget, QMouseEvent *event);
+
     QPointF scenePos(QGraphicsView *view, QMouseEvent *event);
+
     template<class T>
     QPointF scenePos(T *object, QGraphicsSceneMouseEvent *event);
 
@@ -187,6 +206,9 @@ private:
 
     /** Identifier of a timer used to track mouse press time. */
     int m_dragTimerId;
+
+    /** Whether the first drag notification was sent. */
+    bool m_firstDragSent;
 
     /** Drag information. */
     DragInfo m_info;

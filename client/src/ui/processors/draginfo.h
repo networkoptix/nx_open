@@ -77,8 +77,18 @@ public:
     Qt::KeyboardModifiers modifiers() const;
 
     /**
+     * Note that this function returns NULL if current widget is 
+     * being destroyed or if non-widget set of event handler functions is used.
+     *
+     * \returns                         Current graphics view. 
+     */
+    QWidget *widget() const {
+        return m_widget;
+    }
+
+    /**
      * Note that this function returns NULL if current graphics view is 
-     * being destroyed or if non-view set of event handler function is used.
+     * being destroyed or if non-view set of event handler functions is used.
      *
      * \returns                         Current graphics view. 
      */
@@ -88,7 +98,7 @@ public:
 
     /**
      * Note that this function returns NULL if current graphics scene is 
-     * being destroyed or if non-scene set of event handler function is used.
+     * being destroyed or if non-scene set of event handler functions is used.
      * 
      * \returns                         Current graphics scene.
      */
@@ -98,7 +108,7 @@ public:
 
     /**
      * Note that this function returns NULL if current graphics item is 
-     * being destroyed or if non-item set of event handler function is used.
+     * being destroyed or if non-item set of event handler functions is used.
      * 
      * \returns                         Current graphics item.
      */
@@ -114,6 +124,9 @@ private:
 
     /** Button that triggered the current drag operation. Releasing this button will finish current drag operation. */
     Qt::MouseButton m_triggerButton;
+
+    /** Current widget. */
+    QWidget *m_widget;
 
     /** Current graphics view. */
     QGraphicsView *m_view;

@@ -44,7 +44,7 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     } else {
         m_itemToSelect = NULL;
     }
-
+    
     dragProcessor()->mousePressEvent(viewport, event);
 
     event->accept();

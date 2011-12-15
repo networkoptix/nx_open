@@ -1,34 +1,45 @@
 #include "mainwnd.h"
 
-#include <core/resource/directory_browser.h>
-#include <core/resourcemanagment/resource_pool.h>
-
-#include <ui/layout_navigator.h>
-#include <ui/video_cam_layout/layout_manager.h>
-#include <ui/video_cam_layout/start_screen_content.h>
-#include <QtGui/QDockWidget>
+#include <QtGui/QSplitter>
 #include <QtGui/QTabWidget>
 #include <QtGui/QToolBar>
+
+#include <QtNetwork/QNetworkReply>
+
+#include <api/AppServerConnection.h>
+#include <api/SessionManager.h>
+
+#include <core/resource/directory_browser.h>
+#include <core/resourcemanagment/asynch_seacher.h>
+#include <core/resourcemanagment/resource_pool.h>
+
+#include "ui/layout_navigator.h"
+#include "ui/video_cam_layout/layout_manager.h"
+#include "ui/video_cam_layout/start_screen_content.h"
 
 #include "ui/context_menu_helper.h"
 #include "ui/navigationtreewidget.h"
 
+#include "ui/dialogs/logindialog.h"
 #include "ui/preferences/preferences_wnd.h"
 
-#include <ui/mixins/sync_play_mixin.h>
-#include <ui/mixins/render_watch_mixin.h>
+#include "ui/mixins/sync_play_mixin.h"
+#include "ui/mixins/render_watch_mixin.h"
 
-#include <ui/graphics/view/graphics_view.h>
-#include <ui/graphics/view/blue_background_painter.h>
-#include <ui/graphics/instruments/archivedropinstrument.h>
+#include "ui/graphics/view/graphics_view.h"
+#include "ui/graphics/view/blue_background_painter.h"
 
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_controller.h>
-#include <ui/workbench/workbench_grid_mapper.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_display.h>
+#include "ui/workbench/workbench.h"
+#include "ui/workbench/workbench_controller.h"
+#include "ui/workbench/workbench_grid_mapper.h"
+#include "ui/workbench/workbench_layout.h"
+#include "ui/workbench/workbench_display.h"
+
+#include "ui/skin.h"
+
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
+
 #include "file_processor.h"
 #include "settings.h"
 #include "version.h"
@@ -40,7 +51,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
       m_normalView(NULL),
       m_controller(NULL)
 {
-    if(s_instance != NULL)
+    if (s_instance)
         qnWarning("Several instances of main window created, expect problems.");
     else
         s_instance = this;
@@ -48,7 +59,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     /* Set up QWidget. */
     setWindowTitle(APPLICATION_NAME);
     setAttribute(Qt::WA_QuitOnClose);
-    setAutoFillBackground(false);
     setAcceptDrops(true);
 
     QPalette pal = palette();
@@ -87,13 +97,24 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
 
     /* Prepare UI. */
+    NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(this);
+    connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
+
     QTabWidget *tabWidget = new QTabWidget(this);
-    tabWidget->addTab(view, QIcon(), tr("Scene"));
-    tabWidget->addTab(new QWidget(tabWidget), QIcon(), tr("Grid/Properies"));
-    setCentralWidget(tabWidget);
+    tabWidget->addTab(view, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
+    //tabWidget->addTab(new QWidget(tabWidget), QIcon(), tr("Grid/Properies"));
+
+    m_splitter = new QSplitter(Qt::Horizontal, this);
+    m_splitter->setChildrenCollapsible(false);
+    m_splitter->addWidget(navigationWidget);
+    m_splitter->setStretchFactor(0, 1);
+    m_splitter->setCollapsible(0, true);
+    m_splitter->addWidget(tabWidget);
+    m_splitter->setStretchFactor(1, 99);
+    setCentralWidget(m_splitter);
 
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
-    // Looks like QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
+    // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
 #ifdef Q_OS_WIN
     setContentsMargins(0, 1, 0, 0);
 #else
@@ -101,20 +122,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 #endif
 
 
-    // dock widgets
-    NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(tabWidget);
-
-    connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
-
-    QDockWidget *navigationDock = new QDockWidget(tr("Navigation"), this);
-    navigationDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    navigationDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    navigationDock->setWidget(navigationWidget);
-    addDockWidget(Qt::LeftDockWidgetArea, navigationDock);
-
-
     // toolbars
     QToolBar *toolBar = new QToolBar(this);
+    toolBar->setAllowedAreas(Qt::TopToolBarArea);
     toolBar->addAction(&cm_exit);
     toolBar->addAction(&cm_toggle_fullscreen);
     toolBar->addAction(&cm_preferences);
@@ -132,12 +142,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     addAction(&cm_preferences);
 
 
-#if 0
-    if (!files.isEmpty())
-        show();
-    else
-#endif
-        showFullScreen();
+    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
+
+    QAction *reconnectAction = new QAction(/*Skin::icon(QLatin1String("reconnnect.png")), */tr("Reconnect"), this);
+    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    toolBar->addAction(reconnectAction);
+
+
+    showFullScreen();
 }
 
 MainWnd::~MainWnd()
@@ -255,4 +267,49 @@ void MainWnd::editPreferences()
 {
     PreferencesWindow dialog(this);
     dialog.exec();
+}
+
+void MainWnd::appServerError(int error)
+{
+    switch (error) {
+    case QNetworkReply::ConnectionRefusedError:
+    case QNetworkReply::HostNotFoundError:
+    case QNetworkReply::TimeoutError: // ### remove ?
+    case QNetworkReply::ContentAccessDenied:
+    case QNetworkReply::AuthenticationRequiredError:
+    case QNetworkReply::UnknownNetworkError:
+        appServerAuthenticationRequired();
+        break;
+
+    default:
+        break;
+    }
+}
+
+void MainWnd::appServerAuthenticationRequired()
+{
+    static LoginDialog *dialog = 0;
+    if (dialog)
+        return;
+
+    const QUrl lastUsedUrl = Settings::lastUsedConnection().url;
+    if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
+        return;
+
+    dialog = new LoginDialog(this);
+    if (dialog->exec()) {
+        const Settings::ConnectionData connection = Settings::lastUsedConnection();
+        if (connection.url.isValid()) {
+            QnAppServerConnectionFactory::setDefaultUrl(connection.url);
+
+            // repopulate the resource pool
+            QnResource::stopCommandProc();
+            QnResourceDiscoveryManager::instance().stop();
+            qnResPool->clear(); // ### don't remove local resources
+            QnResourceDiscoveryManager::instance().start();
+            QnResource::startCommandProc();
+        }
+    }
+    delete dialog;
+    dialog = 0;
 }

@@ -1,8 +1,10 @@
 #include "resourcemodel.h"
+#include <QMimeData>
 
 #include "core/resourcemanagment/resource_pool.h"
 
 #include "ui/skin.h"
+#include "ui/view_drag_and_drop.h"
 
 ResourceModel::ResourceModel(QObject *parent)
     : QStandardItemModel(parent)
@@ -74,4 +76,27 @@ void ResourceModel::removeResource(QnResourcePtr resource)
         foreach (QStandardItem *item, takeRow(child->row()))
             delete item;
     }
+}
+
+QMimeData *ResourceModel::mimeData(const QModelIndexList &indexes) const {
+    QMimeData *result = new QMimeData();
+
+    QnResourceList resources;
+    foreach(const QModelIndex &index, indexes) {
+        QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+        if(!resource.isNull())
+            resources.push_back(resource);
+    }
+
+    result->setData(resourcesMime(), serializeResources(resources));
+    
+    return result;
+}
+
+QStringList ResourceModel::mimeTypes() const {
+    QStringList result;
+
+    result.push_back(resourcesMime());
+
+    return result;
 }

@@ -157,6 +157,8 @@ signals:
      */
     void itemRemoved(QnWorkbenchItem *item);
 
+    void boundingRectChanged();
+
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);

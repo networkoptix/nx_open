@@ -129,6 +129,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeSceneBoundsExtension()));
+    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(fitInView()));
     connect(m_curtainActivityInstrument,   SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
     connect(m_curtainActivityInstrument,   SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
@@ -142,8 +143,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
 
     /* Create viewport animator. */
     m_viewportAnimator = new QnViewportAnimator(this);
-    m_viewportAnimator->setMovementSpeed(4.0);
-    m_viewportAnimator->setScalingSpeed(32.0);
+    m_viewportAnimator->setMovementSpeed(1.0);
+    m_viewportAnimator->setScalingSpeed(16.0);
     connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 this,                   SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 m_boundingInstrument,   SLOT(recursiveDisable()));
     connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                this,                   SIGNAL(viewportUngrabbed()));
@@ -251,6 +252,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(m_workbench,            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
     connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
+    connect(m_workbench,            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
 
     /* Create items. */
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
@@ -393,6 +395,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(CLAbstractRenderer *renderer) const
     return m_widgetByRenderer[renderer];
 }
 
+QnResourceWidget *QnWorkbenchDisplay::widget(const QnResourcePtr &resource) const {
+    return m_widgetByResource[resource];
+}
+
 QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbench::ItemRole role) const {
     return widget(m_itemByRole[role]);
 }
@@ -507,6 +513,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     m_widgetByItem.insert(item, widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
+    m_widgetByResource.insert(widget->resource(), widget);
     
     synchronize(widget, false);
     bringToFront(widget);
@@ -532,6 +539,7 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgetByItem.remove(item);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.remove(widget->renderer());
+    m_widgetByResource.remove(widget->resource());
 
     disconnect(widget, NULL, this, NULL);
 
@@ -729,10 +737,18 @@ void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget) {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBounds() {
+    QRectF sizeRect, moveRect;
+
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
-    QRectF rect = zoomedItem != NULL ? itemGeometry(zoomedItem) : layoutBoundingGeometry();
-    m_boundingInstrument->setPositionBounds(m_view, rect);
-    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, rect.size(), Qt::KeepAspectRatioByExpanding);
+    if(zoomedItem != NULL) {
+        sizeRect = moveRect = itemGeometry(zoomedItem);
+    } else {
+        moveRect = sizeRect = layoutBoundingGeometry();
+        //sizeRect = fitInViewGeometry();
+    }
+
+    m_boundingInstrument->setPositionBounds(m_view, moveRect);
+    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {

@@ -1,5 +1,7 @@
 #include "resource_pool.h"
 
+#include "core/resource/video_server.h"
+
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
 QnResourcePool::QnResourcePool() : QObject(),
@@ -7,6 +9,8 @@ QnResourcePool::QnResourcePool() : QObject(),
 {
     qRegisterMetaType<QnResourcePtr>("QnResourcePtr");
     qRegisterMetaType<QnResource::Status>("QnResource::Status");
+
+    clear();
 }
 
 QnResourcePool::~QnResourcePool()
@@ -16,6 +20,19 @@ QnResourcePool::~QnResourcePool()
 QnResourcePool *QnResourcePool::instance()
 {
     return globalResourcePool();
+}
+
+void QnResourcePool::clear()
+{
+    QnResourceList resourcesToRemove;
+    {
+        QMutexLocker locker(&m_resourcesMtx);
+        resourcesToRemove = m_resources.values();
+    }
+    removeResources(resourcesToRemove);
+
+    // ### local (aka "dummy") video server resource
+    addResource(QnResourcePtr(new QnLocalVideoServer));
 }
 
 void QnResourcePool::addResources(const QnResourceList &resources)

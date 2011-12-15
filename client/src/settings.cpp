@@ -1,5 +1,6 @@
 #include "settings.h"
 
+#include <QtCore/QMutex>
 #include <QtCore/QSettings>
 
 #include "license.h"
@@ -209,6 +210,8 @@ void Settings::addAuxMediaRoot(const QString& root)
     m_data.auxMediaRoots.append(fromNativePath(root));
 }
 
+Q_GLOBAL_STATIC_WITH_ARGS(QMutex, globalSettingsMutex, (QMutex::Recursive))
+
 static inline Settings::ConnectionData readConnectionData(QSettings *settings)
 {
     Settings::ConnectionData connection;
@@ -226,6 +229,8 @@ static inline void writeConnectionData(QSettings *settings, const Settings::Conn
 
 Settings::ConnectionData Settings::lastUsedConnection()
 {
+//    QMutexLocker locker(globalSettingsMutex());
+
     ConnectionData connection;
 
     QSettings settings;
@@ -240,6 +245,8 @@ Settings::ConnectionData Settings::lastUsedConnection()
 
 void Settings::setLastUsedConnection(const Settings::ConnectionData &connection)
 {
+//    QMutexLocker locker(globalSettingsMutex());
+
     QSettings settings;
     settings.beginGroup(QLatin1String("AppServerConnections"));
     settings.beginGroup(QLatin1String("lastUsed"));
@@ -250,6 +257,8 @@ void Settings::setLastUsedConnection(const Settings::ConnectionData &connection)
 
 QList<Settings::ConnectionData> Settings::connections()
 {
+//    QMutexLocker locker(globalSettingsMutex());
+
     QList<ConnectionData> connections;
 
     QSettings settings;
@@ -267,6 +276,8 @@ QList<Settings::ConnectionData> Settings::connections()
 
 void Settings::setConnections(const QList<Settings::ConnectionData> &connections)
 {
+//    QMutexLocker locker(globalSettingsMutex());
+
     ConnectionData lastUsed = lastUsedConnection();
 
     QSettings settings;

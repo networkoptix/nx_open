@@ -1,19 +1,67 @@
 #include "selectionfixupinstrument.h"
+#include <limits>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 
 namespace {
-    struct ItemIsSelectable: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *item) const {
-            return item->flags() & QGraphicsItem::ItemIsSelectable;
+    class SelectionPreFixupInstrument: public Instrument {
+    public:
+        SelectionPreFixupInstrument(QObject *parent):
+            Instrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
+        {
+            m_nan = std::numeric_limits<qreal>::quiet_NaN();
+            m_intMin = std::numeric_limits<int>::min();
         }
+
+    protected:
+        virtual bool mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
+            fixButtonDownPositions(event);
+            
+            return false;
+        }
+
+        virtual bool mouseMoveEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
+            fixButtonDownPositions(event);
+
+            return false;
+        }
+
+        virtual bool mouseReleaseEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
+            fixButtonDownPositions(event);
+
+            return false;
+        }
+
+    private:
+        void fixButtonDownPositions(QGraphicsSceneMouseEvent *event) {
+            for (int i = 0x1; i <= 0x10; i <<= 1) {
+                if(event->buttons() & i)
+                    continue;
+
+                /* Qt is totally inconsistent in setting the button down positions for
+                 * mouse events. So we invalidate positions for buttons that are not pressed. 
+                 * This fixes some really surprising quirks in how selection is handled in
+                 * graphics items. */
+                Qt::MouseButton button = static_cast<Qt::MouseButton>(i);
+                event->setButtonDownPos(button, QPointF(m_nan, m_nan));
+                event->setButtonDownScenePos(button, QPointF(m_nan, m_nan));
+                event->setButtonDownScreenPos(button, QPoint(m_intMin, m_intMin));
+            }
+        }
+
+    private:
+        qreal m_nan;
+        int m_intMin;
     };
 
 } // anonymous namespace
 
+
 SelectionFixupInstrument::SelectionFixupInstrument(QObject *parent):
     DragProcessingInstrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
-{}
+{
+    m_preForwardingInstrument = new SelectionPreFixupInstrument(this);
+}
 
 bool SelectionFixupInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     if(!(item->flags() & QGraphicsItem::ItemIsSelectable))

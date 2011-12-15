@@ -7,7 +7,7 @@
 #include <ui/common/margins.h>
 #include "instrument.h"
 
-class BoundingInstrument: public Instrument, protected AnimationTimerListener {
+class BoundingInstrument: public Instrument {
     Q_OBJECT;
 public:
     /**
@@ -99,8 +99,6 @@ protected:
     virtual void unregisteredNotify(QGraphicsView *view) override;
 
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
-
-    virtual void tick(int deltaTime) override;
 
 private:
     class ViewData;

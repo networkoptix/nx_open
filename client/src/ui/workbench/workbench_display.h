@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QHash>
+#include <core/resource/resource.h>
 #include <ui/animation/animation_timer.h>
 #include <ui/common/scene_utility.h>
 #include <utils/common/rect_set.h>
@@ -156,6 +157,8 @@ public:
      */
     QnResourceWidget *widget(CLAbstractRenderer *renderer) const;
 
+    QnResourceWidget *widget(const QnResourcePtr &resource) const;
+
     QnResourceWidget *widget(QnWorkbench::ItemRole role) const;
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
@@ -203,8 +206,6 @@ public:
      */
     void setViewportMargins(const QMargins &margins);
 
-    void fitInView();
-
     void ensureVisible(QnWorkbenchItem *item);
 
 
@@ -233,6 +234,8 @@ public:
     QPoint mapGlobalToGrid(const QPoint &globalPoint) const;
 
 
+public slots:
+    void fitInView();
 
 signals:
     void viewportGrabbed();
@@ -308,6 +311,9 @@ private:
 
 
     /* Internal state. */
+
+    /** Resource to widget mapping. */
+    QHash<QnResourcePtr, QnResourceWidget *> m_widgetByResource;
 
     /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;

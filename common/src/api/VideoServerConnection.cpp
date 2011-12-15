@@ -16,23 +16,23 @@ namespace {
 
 } // anonymous namespace
 
-void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status, const QnApiRecordedTimePeriodsResponsePtr &reply) 
+void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status, const QnApiRecordedTimePeriodsResponsePtr &reply)
 {
     QnTimePeriodList result;
     if(status == 0)
         result = parseRecordedTimePeriods(reply);
 
     emit finished(result);
-    
+
     deleteLater();
 }
 
 
-QnVideoServerConnection::QnVideoServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QObject *parent):
+QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *parent):
     QObject(parent),
-    m_sessionManager(new VideoServerSessionManager(host, port, auth))
+    m_sessionManager(new VideoServerSessionManager(url))
 {
-    m_sessionManager->setAddEndShash(false);
+    m_sessionManager->setAddEndSlash(false);
 }
 
 QnVideoServerConnection::~QnVideoServerConnection() {}

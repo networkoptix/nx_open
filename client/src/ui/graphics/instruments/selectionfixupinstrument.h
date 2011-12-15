@@ -4,9 +4,13 @@
 #include "dragprocessinginstrument.h"
 
 /**
- * Selection of graphics widgets works differently than selection of normal items.
+ * Clicks on graphics widget's frame is treated differently compared to a click
+ * on the surface, which results in surprises with selection handling.
  * 
- * This instrument fixes this problem.
+ * In graphics items right click is treated the same as left click, which
+ * is not the desired behavior.
+ * 
+ * This instrument fixes these problems.
  * 
  * It is to be installed at item level after a forwarding instrument, 
  * but before an instrument that stops event processing.
@@ -15,6 +19,10 @@ class SelectionFixupInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
     SelectionFixupInstrument(QObject *parent = NULL);
+
+    Instrument *preForwardingInstrument() {
+        return m_preForwardingInstrument;
+    }
 
 protected:
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
@@ -26,7 +34,8 @@ protected:
 
 private:
     bool m_isClick;
+    Instrument *m_preForwardingInstrument;
 };
 
 
-#endif QN_SELECTION_FIXUP_INSTRUMENT_H
+#endif // QN_SELECTION_FIXUP_INSTRUMENT_H

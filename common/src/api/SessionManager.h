@@ -1,51 +1,70 @@
 #ifndef __SESSION_MANAGER_H__
 #define __SESSION_MANAGER_H__
 
-#include <QObject>
-#include "utils/network/synchttp.h"
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
+
 #include "utils/common/base.h"
 
 class QNetworkReply;
 
+class SyncHTTP;
+
 namespace detail {
-    class SessionManagerReplyProcessor: public QObject {
-        Q_OBJECT;
+    class SessionManagerReplyProcessor : public QObject
+    {
+        Q_OBJECT
+
     public:
-        SessionManagerReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        SessionManagerReplyProcessor(QObject *parent = 0) : QObject(parent) {}
 
-    private slots:
-        void at_replyReceived(QNetworkReply *reply);
-
-    signals:
+    Q_SIGNALS:
         void finished(int status, const QByteArray &result);
+
+    private Q_SLOTS:
+        void at_replyReceived(QNetworkReply *reply);
     };
 }
 
-class SessionManager: public QObject {
-    Q_OBJECT;
+
+class SessionManager : public QObject
+{
+    Q_OBJECT
+
 public:
-    SessionManager(const QHostAddress& host, quint16 port, const QAuthenticator& auth, QObject *parent = NULL);
+    SessionManager(const QUrl &url, QObject *parent = 0);
     virtual ~SessionManager();
 
-    QByteArray getLastError();
+    static SessionManager *instance();
 
-    void setAddEndShash(bool value);
+    QByteArray lastError() const;
+
+    void setAddEndSlash(bool value);
+
+Q_SIGNALS:
+    void error(int error);
+
+protected Q_SLOTS:
+    void setupErrorHandler();
 
 protected:
     int sendGetRequest(const QString &objectName, QByteArray &reply);
     int sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray &reply);
 
-    void sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
     void sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot);
+    void sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
 
-    QByteArray formatNetworkError(int error);
+    static QByteArray formatNetworkError(int error);
 
-    QUrl createApiUrl(const QString &objectName, const QnRequestParamList &params);
+    QUrl createApiUrl(const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
 
 protected:
-    SyncHTTP m_httpClient;
+    SyncHTTP *m_httpClient;
     QByteArray m_lastError;
-    bool m_addEndShash;
+    bool m_addEndSlash;
+
+private:
+    Q_DISABLE_COPY(SessionManager)
 };
 
 #endif // __SESSION_MANAGER_H__

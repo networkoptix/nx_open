@@ -13,6 +13,10 @@ public:
     explicit ResourceModel(QObject *parent = 0);
     ~ResourceModel();
 
+    virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
+
+    virtual QStringList mimeTypes() const override;
+
 private Q_SLOTS:
     void addResource(QnResourcePtr resource);
     void removeResource(QnResourcePtr resource);
