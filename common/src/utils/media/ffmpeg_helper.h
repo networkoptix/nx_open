@@ -17,6 +17,7 @@ public:
     AVCodecContext* getContext() const { return m_context; }
     CodecID getCodec() const { return m_context->codec_id; }
 private:
+
     FrameType getH264FrameType(const quint8* data, int size);
     FrameType getMpegVideoFrameType(const quint8* data, int size);
     FrameType getWMVFrameType(const quint8* data, int size);
@@ -33,6 +34,9 @@ private:
 
 class QnFfmpegHelper
 {
+private:
+    enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INTER_MATRIX, Field_OVERRIDE };
+    static void appendCtxField(QByteArray *dst, CodecCtxField field, const char* data, int size);
 public:
     static void serializeCodecContext(const AVCodecContext *ctx, QByteArray *data);
     static AVCodecContext *deserializeCodecContext(const char *data, int dataLen);
