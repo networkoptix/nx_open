@@ -67,6 +67,14 @@ QStandardItem *ResourceModel::itemFromResourceId(uint id) const
 
 void ResourceModel::addResource(QnResourcePtr resource)
 {
+    if (!qnResPool->getResourceById(resource->getId())) {
+        qnResPool->addResource(resource); // emits resourceAdded; thus return
+        return;
+    }
+
+    if (itemFromResource(resource))
+        return; // avoid duplicates
+
     uint parentId = -1;
     if (resource->checkFlag(QnResource::local))
         parentId = 0;
@@ -92,7 +100,7 @@ void ResourceModel::addResource(QnResourcePtr resource)
 
 void ResourceModel::removeResource(QnResourcePtr resource)
 {
-    if (QStandardItem *child = itemFromResourceId(resource->getId().hash())) {
+    if (QStandardItem *child = itemFromResource(resource)) {
         foreach (QStandardItem *item, takeRow(child->row()))
             delete item;
     }
