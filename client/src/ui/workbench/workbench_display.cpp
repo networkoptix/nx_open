@@ -743,8 +743,8 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
     if(zoomedItem != NULL) {
         sizeRect = moveRect = itemGeometry(zoomedItem);
     } else {
-        moveRect = sizeRect = layoutBoundingGeometry();
-        //sizeRect = fitInViewGeometry();
+        moveRect = layoutBoundingGeometry();
+        sizeRect = fitInViewGeometry();
     }
 
     m_boundingInstrument->setPositionBounds(m_view, moveRect);
@@ -760,7 +760,6 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     QSizeF sizeExtension = sizeDelta(positionExtension);
     sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
     
-    m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
     m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
 }
 
