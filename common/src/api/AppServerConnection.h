@@ -19,6 +19,8 @@ class QN_EXPORT QnAppServerConnection
 public:
     ~QnAppServerConnection();
 
+    bool isConnected() const;
+
     int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes);
 
     int getResources(QList<QnResourcePtr>& resources);
@@ -31,15 +33,13 @@ public:
     int getStorages(QnResourceList& storages);
     int getScheduleTasks(QnScheduleTaskList& scheduleTasks);
 
-    bool isConnected() const;
-
     QString lastError() const;
 
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 
 private:
-    QSharedPointer<AppSessionManager> m_sessionManager;
+    QScopedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
     QnVideoServerFactory m_serverFactory;
 

@@ -99,6 +99,12 @@ bool QnResource::checkFlag(unsigned long flag) const
     return (m_flags & flag) == flag;
 }
 
+void QnResource::setFlags(unsigned long flags)
+{
+    QMutexLocker locker(&m_mutex);
+    m_flags = flags;
+}
+
 void QnResource::addFlag(unsigned long flag)
 {
     QMutexLocker locker(&m_mutex);

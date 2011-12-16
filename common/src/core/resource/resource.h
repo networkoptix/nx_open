@@ -37,6 +37,8 @@ typedef QMap<QString, QString> QnResourceParameters;
 class QN_EXPORT QnResource : public QObject //: public CLRefCounter
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ getName WRITE setName USER false) // do not show at GUI
+    Q_PROPERTY(QString url READ getUrl WRITE setUrl)
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
@@ -59,8 +61,8 @@ public:
         server = 0x400,   // server resource
         remote = 0x800,   // remote (server) resource
 
-        live_cam = live | video | media | streamprovider,
-        local_live_cam = live_cam | local |  network,
+        live_cam = live | video | media | streamprovider, // don't set w/o `local` or `remote` flag
+        local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote , // | NETWORK,
         server_archive = remote | video | media | audio | streamprovider,
         ARCHIVE = url | local | video | media | audio | streamprovider,     // local media file
@@ -95,6 +97,7 @@ public:
     // flags like network media and so on
     unsigned long flags() const;
     bool checkFlag(unsigned long flag) const;
+    void setFlags(unsigned long flags);
     void addFlag(unsigned long flag);
     void removeFlag(unsigned long flag);
 
@@ -171,9 +174,6 @@ public:
     void removeConsumer(QnResourceConsumer* consumer);
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
-
-    Q_PROPERTY (QString url READ getUrl WRITE setUrl)
-    Q_PROPERTY (QString name READ getName WRITE setName USER false) // do not show at GUI
 
 Q_SIGNALS:
     void onParameterChanged(const QString &paramname, const QString &value);

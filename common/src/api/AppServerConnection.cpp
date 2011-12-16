@@ -20,13 +20,13 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory&
 {
 }
 
+QnAppServerConnection::~QnAppServerConnection()
+{
+}
+
 bool QnAppServerConnection::isConnected() const
 {
     return true;
-}
-
-QnAppServerConnection::~QnAppServerConnection()
-{
 }
 
 int QnAppServerConnection::getResourceTypes(QList<QnResourceTypePtr>& resourceTypes)
