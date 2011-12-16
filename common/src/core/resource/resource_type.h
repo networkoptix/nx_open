@@ -1,9 +1,16 @@
 #ifndef __RESOURCE_TYPE_H
 #define __RESOURCE_TYPE_H
 
-#include <QList>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
+
 #include "param.h"
 #include "utils/common/qnid.h"
+
+class QnResourceType;
+typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
 
 class QN_EXPORT QnResourceType
 {
@@ -32,6 +39,7 @@ public:
     void addParamType(QnParamTypePtr param);
 
     const QList<QnParamTypePtr>& paramTypeList() const;
+
 private:
     QnId m_id;
     QnId m_parentId;
@@ -49,12 +57,11 @@ private:
     mutable bool m_isCameraSet;
 };
 
-typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
 
 class QN_EXPORT QnResourceTypePool
 {
 public:
-    static QnResourceTypePool* instance();
+    static QnResourceTypePool *instance();
 
     QnResourceTypePtr getResourceType(const QnId& id) const;
     void addResourceType(QnResourceTypePtr resourceType);

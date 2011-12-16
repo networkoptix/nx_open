@@ -1,7 +1,21 @@
 #include "resource_type.h"
+
 #include "utils/common/log.h"
 
-Q_GLOBAL_STATIC(QnResourceTypePool, inst)
+QnResourceType::QnResourceType()
+    : m_isCameraSet(false)
+{
+}
+
+/*
+QnResourceType::QnResourceType(const QString& name): m_name(name)
+{
+}
+*/
+
+QnResourceType::~QnResourceType()
+{
+}
 
 bool QnResourceType::isCamera() const
 {
@@ -37,12 +51,14 @@ bool QnResourceType::isCamera() const
     return m_isCamera;
 }
 
-void QnResourceType::addAdditionalParent(const QnId& parent) 
+void QnResourceType::addAdditionalParent(const QnId& parent)
 {
     if (parent != m_parentId)
-        m_additionalParentList << parent; 
+        m_additionalParentList << parent;
 }
-QList<QnId> QnResourceType::allParentList() const {
+
+QList<QnId> QnResourceType::allParentList() const
+{
     QList<QnId> result;
     result << m_parentId;
     result << m_additionalParentList;
@@ -97,9 +113,11 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
 
 // =============================== QnResourceTypePool ========================
 
-QnResourceTypePool* QnResourceTypePool::instance()
+Q_GLOBAL_STATIC(QnResourceTypePool, theResourceTypePool)
+
+QnResourceTypePool *QnResourceTypePool::instance()
 {
-    return inst();
+    return theResourceTypePool();
 }
 
 QnResourceTypePtr QnResourceTypePool::getResourceType(const QnId& id) const
