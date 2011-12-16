@@ -9,6 +9,7 @@
 #include "core/resource/network_resource.h"
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
+#include "core/misc/scheduleTask.h"
 
 class AppSessionManager;
 class QnAppServerConnectionFactory;
@@ -17,6 +18,8 @@ class QN_EXPORT QnAppServerConnection
 {
 public:
     ~QnAppServerConnection();
+
+    bool isConnected() const;
 
     int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes);
 
@@ -28,8 +31,7 @@ public:
 
     int getServers(QnResourceList& servers);
     int getStorages(QnResourceList& storages);
-
-    bool isConnected() const;
+    int getScheduleTasks(QnScheduleTaskList& scheduleTasks);
 
     QString lastError() const;
 
@@ -37,7 +39,7 @@ private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 
 private:
-    QSharedPointer<AppSessionManager> m_sessionManager;
+    QScopedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
     QnVideoServerFactory m_serverFactory;
 

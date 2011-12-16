@@ -1,8 +1,8 @@
 #ifndef __VIDEO_CAMERA_H__
 #define __VIDEO_CAMERA_H__
 
-#include "core/resource/resource.h"
-#include "core/resource/resource_consumer.h"
+#include <core/dataconsumer/dataconsumer.h>
+#include <core/resource/resource_consumer.h>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -17,9 +17,10 @@ public:
     void copyLastGop(CLDataQueue& dstQueue);
 
     // QnAbstractDataConsumer
-    virtual bool canAcceptData() const; 
+    virtual bool canAcceptData() const;
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool processData(QnAbstractDataPacketPtr data);
+
 private:
     QnAbstractMediaStreamDataProvider* m_reader;
     QMutex m_queueMtx;

@@ -136,8 +136,9 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     setLayout(mainLayout);
 #endif
 
-    setMinimumWidth(200);
+    setMinimumWidth(180);
     setMaximumWidth(350);
+
     setAcceptDrops(true);
 
     filterChanged(QString());

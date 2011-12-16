@@ -1,35 +1,18 @@
-#include "resource_command_consumer.h"
-#include "resource_consumer.h"
-#include "file_resource.h"
+#include "resource.h"
+
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resourcemanagment/resource_pool.h"
 
-// Temporary until real ResourceFactory is implemented
+#include "file_resource.h"
+#include "resource_command_consumer.h"
+#include "resource_consumer.h"
 
-
-QnResourceCommandProcessor QnResource::m_commanproc;
-
-QnResourceType::QnResourceType()
-    : m_isCameraSet(false)
-{
-}
-
-/*
-QnResourceType::QnResourceType(const QString& name): m_name(name)
-{
-}
-*/
-
-QnResourceType::~QnResourceType()
-{
-
-}
-
-QnResource::QnResource():
-m_flags(0),
-m_avalable(true),
-m_mutex(QMutex::Recursive),
-m_status(Offline)
+QnResource::QnResource()
+    : QObject(),
+      m_flags(0),
+      m_avalable(true),
+      m_mutex(QMutex::Recursive),
+      m_status(Offline)
 {
 }
 
@@ -46,20 +29,20 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
     const char* NAME = "name";
     const char* URL = "url";
 
-    if (parameters.contains(ID))
-        setId(parameters[ID]);
+    if (parameters.contains(QLatin1String(ID)))
+        setId(parameters[QLatin1String(ID)]);
 
-    if (parameters.contains(TYPE_ID))
-        setTypeId(parameters[TYPE_ID]);
+    if (parameters.contains(QLatin1String(TYPE_ID)))
+        setTypeId(parameters[QLatin1String(TYPE_ID)]);
 
-    if (parameters.contains(PARENT_ID))
-        setParentId(parameters[PARENT_ID]);
+    if (parameters.contains(QLatin1String(PARENT_ID)))
+        setParentId(parameters[QLatin1String(PARENT_ID)]);
 
-    if (parameters.contains(NAME))
-        setName(parameters[NAME]);
+    if (parameters.contains(QLatin1String(NAME)))
+        setName(parameters[QLatin1String(NAME)]);
 
-    if (parameters.contains(URL))
-        setUrl(parameters[URL]);
+    if (parameters.contains(QLatin1String(URL)))
+        setUrl(parameters[QLatin1String(URL)]);
 }
 
 QnId QnResource::getParentId() const
@@ -97,6 +80,12 @@ bool QnResource::checkFlag(unsigned long flag) const
 {
     QMutexLocker locker(&m_mutex);
     return (m_flags & flag) == flag;
+}
+
+void QnResource::setFlags(unsigned long flags)
+{
+    QMutexLocker locker(&m_mutex);
+    m_flags = flags;
 }
 
 void QnResource::addFlag(unsigned long flag)
@@ -489,4 +478,33 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
     if (dataProvider)
         addConsumer(dataProvider);
     return dataProvider;
+}
+
+// -----------------------------------------------------------------------------
+// Temporary until real ResourceFactory is implemented
+Q_GLOBAL_STATIC(QnResourceCommandProcessor, commandProcessor)
+
+void QnResource::startCommandProc()
+{
+    commandProcessor()->start();
+}
+
+void QnResource::stopCommandProc()
+{
+    commandProcessor()->stop();
+}
+
+void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
+{
+    commandProcessor()->putData(data);
+}
+
+int QnResource::commandProcQueSize()
+{
+    return commandProcessor()->queueSize();
+}
+
+bool QnResource::commandProchasSuchDeviceInQueue(QnResourcePtr res)
+{
+    return commandProcessor()->hasSuchResourceInQueue(res);
 }

@@ -122,6 +122,28 @@ void QnMetaDataV1::setMotionAt(int x, int y)
     *b |= (128 >> (shift&7));
 }
 
+
+void QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
+{
+    QRect motioRect = imageRect.intersected(mRect);
+
+    //int localZoneWidth = imageRect.width() / MD_WIDTH;
+    //int localZoneHight = imageRect.height() / MD_HEIGHT;
+
+    int leftZone = motioRect.left() * MD_WIDTH / imageRect.width();
+    int topZone = motioRect.top() * MD_HEIGHT / imageRect.height();
+
+    int rightZone = motioRect.right() * MD_WIDTH / imageRect.width();
+    int bottomZone = motioRect.bottom() * MD_HEIGHT / imageRect.height();
+
+    for (int x = leftZone; x <= rightZone; ++x)
+        for (int y = topZone; y <= bottomZone; ++y)
+        {
+            setMotionAt(x, y);
+        }
+
+}
+
 bool QnMetaDataV1::containTime(const qint64 timeUsec) const
 {
     if (m_duration == 0)

@@ -1,9 +1,9 @@
 #ifndef cl_divice_param_h_1020
 #define cl_divice_param_h_1020
 
-#include <QSharedPointer>
-#include "utils/common/associativearray.h"
+#include <QtCore/QSharedPointer>
 
+#include "utils/common/associativearray.h"
 
 struct QN_EXPORT QnParamType
 {

@@ -1,33 +1,35 @@
 #ifndef recorder_display_h_1347
 #define recorder_display_h_1347
 
+#include <core/resource/resource.h>
+
+#include <utils/common/longrunnable.h>
+
 #include "videodisplay/complicated_item.h"
 
-
-class QnResource;
 class CLRecorderItem;
 
 class CLRecorderDisplay : public CLLongRunnable, public CLAbstractComplicatedItem
 {
 public:
-	CLRecorderDisplay(QnResourcePtr dev, CLRecorderItem* recitem);
-	~CLRecorderDisplay();
+    CLRecorderDisplay(QnResourcePtr dev, CLRecorderItem* recitem);
+    ~CLRecorderDisplay();
 
-	QnResourcePtr getDevice() const;
+    QnResourcePtr getDevice() const;
 
-	virtual void startDisplay();
-	virtual void beforeStopDisplay();
-	virtual void stopDisplay();
+    virtual void startDisplay();
+    virtual void beforeStopDisplay();
+    virtual void stopDisplay();
 
-	virtual CLAbstractSceneItem* getSceneItem() const;
+    virtual CLAbstractSceneItem* getSceneItem() const;
 
-	CLRecorderItem* getRecorderItem() const;
+    CLRecorderItem* getRecorderItem() const;
 
 protected:
-	void run();
+    void run();
 private:
-	QnResourcePtr mDev;
-	CLRecorderItem* mRecitem;
+    QnResourcePtr mDev;
+    CLRecorderItem* mRecitem;
 };
 
-#endif //recorder_display_h_1347
+#endif // recorder_display_h_1347

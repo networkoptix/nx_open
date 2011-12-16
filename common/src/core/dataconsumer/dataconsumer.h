@@ -1,43 +1,37 @@
 #ifndef abstract_data_processor_h_2111
 #define abstract_data_processor_h_2111
 
-struct QnAbstractDataPacket;
-
-
-
+#include "core/datapacket/datapacket.h"
 #include "utils/common/longrunnable.h"
-#include "../datapacket/datapacket.h"
 
 class QN_EXPORT QnAbstractDataConsumer : public CLLongRunnable
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
-	QnAbstractDataConsumer(int maxQueueSize);
-	virtual ~QnAbstractDataConsumer(){}
+    QnAbstractDataConsumer(int maxQueueSize);
+    virtual ~QnAbstractDataConsumer(){}
 
     /**
       * @return true is there is any space in the queue, false otherwise
       */
-	virtual bool canAcceptData() const; 
-	virtual void putData(QnAbstractDataPacketPtr data);
-	virtual void clearUnprocessedData();
-	int queueSize() const;
+    virtual bool canAcceptData() const;
+    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void clearUnprocessedData();
+    int queueSize() const;
     virtual void setSingleShotMode(bool /*single*/) {}
 
     virtual void setSpeed(float /*value*/) {}
     virtual qint64 getCurrentTime() const { return 0; }
     virtual bool isRealTimeSource() const { return false; }
 
-public slots:
-
-
 protected:
-	void run();
+    void run();
     virtual bool processData(QnAbstractDataPacketPtr /*data*/)=0;
-	virtual void endOfRun();
+    virtual void endOfRun();
 
 protected:
-	CLDataQueue m_dataQueue;
+    CLDataQueue m_dataQueue;
 };
 
-#endif //abstract_data_processor_h_2111
+#endif // abstract_data_processor_h_2111

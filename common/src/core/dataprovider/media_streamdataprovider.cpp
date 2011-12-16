@@ -28,19 +28,19 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 
 void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 {
-	QMutexLocker mtx(&m_mutex);
-	m_qulity = q;
-	updateStreamParamsBasedOnQuality();
-	//setNeedKeyData();
+    QMutexLocker mtx(&m_mutex);
+    m_qulity = q;
+    updateStreamParamsBasedOnQuality();
+    //setNeedKeyData();
 }
 
 QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 {
-	QMutexLocker mtx(&m_mutex);
-	return m_qulity;
+    QMutexLocker mtx(&m_mutex);
+    return m_qulity;
 }
 
-// for live providers only 
+// for live providers only
 void QnAbstractMediaStreamDataProvider::setFps(float f)
 {
     QMutexLocker mtx(&m_mutex);
@@ -62,27 +62,27 @@ bool QnAbstractMediaStreamDataProvider::isMaxFps() const
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
-	QMutexLocker mtx(&m_mutex);
+    QMutexLocker mtx(&m_mutex);
     int channel_num = m_mediaResource->getVideoLayout(this)->numberOfChannels();
-	for (unsigned i = 0; i < channel_num; ++i)
-		m_gotKeyFrame[i] = 0;
+    for (int i = 0; i < channel_num; ++i)
+        m_gotKeyFrame[i] = 0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 {
-	QMutexLocker mtx(&m_mutex);
-	return m_gotKeyFrame[channel]==0;
+    QMutexLocker mtx(&m_mutex);
+    return m_gotKeyFrame[channel]==0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
-	QMutexLocker mtx(&m_mutex);
+    QMutexLocker mtx(&m_mutex);
     int channel_num = m_mediaResource->getVideoLayout(this)->numberOfChannels();
-	for (unsigned i = 0; i < channel_num; ++i)
-		if (m_gotKeyFrame[i]==0)
-			return true;
+    for (int i = 0; i < channel_num; ++i)
+        if (m_gotKeyFrame[i]==0)
+            return true;
 
-	return false;
+    return false;
 }
 
 
@@ -91,7 +91,7 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
     setNeedKeyData();
     mFramesLost = 0;
 
-    m_framesSinceLastMetaData = 0; 
+    m_framesSinceLastMetaData = 0;
     m_timeSinceLastMetaData.restart();
 
 }
@@ -170,6 +170,6 @@ const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel
 
 bool QnAbstractMediaStreamDataProvider::needMetaData() const
 {
-    return (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) && 
-        m_framesSinceLastMetaData > 0; // got at least one frame 
+    return (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
+        m_framesSinceLastMetaData > 0; // got at least one frame
 }

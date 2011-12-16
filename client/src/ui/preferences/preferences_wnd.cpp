@@ -39,14 +39,17 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
 
     //setWindowOpacity(.90);
 
-    QString label = creditsLabel->text().replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR)).replace(QLatin1String("FFMPEG_VERSION"), QLatin1String(FFMPEG_VERSION));
+    QString label = creditsLabel->text();
+    label = label.replace(QLatin1String("ORGANIZATION_NAME"), QLatin1String(ORGANIZATION_NAME) + QLatin1String("(tm)"));
+    label = label.replace(QLatin1String("APPLICATION_NAME"), QLatin1String(APPLICATION_NAME));
+    label = label.replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR));
+    label = label.replace(QLatin1String("FFMPEG_VERSION"), QLatin1String(FFMPEG_VERSION));
 #ifndef Q_OS_DARWIN
-    label = label.replace(QLatin1String("BESPIN_STRING"), QLatin1String("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Bespin style</span><span style=\" font-size:8pt;\"> </span><span style=\" font-size:8pt; font-weight:600;\">latest svn version</span><span style=\" font-size:8pt;\"> - Copyright (C) 2007-2010 Thomas Luebking</span></p>"));
-#else
-    label = label.replace(QLatin1String("BESPIN_STRING"), QLatin1String(""));
+    //if (QApplication::style()->objectName() == QLatin1String("Bespin"))
+    label += QLatin1String("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Bespin style</span><span style=\" font-size:8pt;\"> </span><span style=\" font-size:8pt; font-weight:600;\">latest svn version</span><span style=\" font-size:8pt;\"> - Copyright (C) 2007-2010 Thomas Luebking</span></p>");
 #endif
     creditsLabel->setText(label);
-    Settings::instance().fillData(m_settingsData);
+
 
 #ifdef Q_OS_WIN
     videoRecorderWidget = new RecordingSettingsWidget(this);
@@ -63,6 +66,8 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
 
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     tabWidget->insertTab(2, connectionsSettingsWidget, tr("Connections"));
+
+    Settings::instance().fillData(m_settingsData);
 
     updateView();
     updateCameras();

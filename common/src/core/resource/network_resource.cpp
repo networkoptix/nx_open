@@ -3,18 +3,17 @@
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
 
-
-QnNetworkResource::QnNetworkResource():
-m_networkStatus(0),
-m_networkTimeout(2000),
-m_authenticated(true)
+QnNetworkResource::QnNetworkResource()
+    : QnResource(),
+      m_networkStatus(0),
+      m_networkTimeout(2000),
+      m_authenticated(true)
 {
     addFlag(QnResource::network);
 }
 
 QnNetworkResource::~QnNetworkResource()
 {
-
 }
 
 void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
@@ -26,11 +25,11 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
     const char* LOGIN = "login";
     const char* PASSWORD = "password";
 
-    if (parameters.contains(MAC))
-        setMAC(parameters[MAC]);
+    if (parameters.contains(QLatin1String(MAC)))
+        setMAC(parameters[QLatin1String(MAC)]);
 
-    if (parameters.contains(LOGIN) && parameters.contains(PASSWORD))
-        setAuth(parameters[LOGIN], parameters[PASSWORD]);
+    if (parameters.contains(QLatin1String(LOGIN)) && parameters.contains(QLatin1String(PASSWORD)))
+        setAuth(parameters[QLatin1String(LOGIN)], parameters[QLatin1String(PASSWORD)]);
 }
 
 QString QnNetworkResource::getUniqueId() const
@@ -38,10 +37,9 @@ QString QnNetworkResource::getUniqueId() const
     return getMAC().toString();
 }
 
-bool QnNetworkResource::equalsTo(const  QnResourcePtr other) const
+bool QnNetworkResource::equalsTo(const QnResourcePtr other) const
 {
     QnNetworkResourcePtr nr = other.dynamicCast<QnNetworkResource>();
-
     if (!nr)
         return false;
 
@@ -69,7 +67,7 @@ QnMacAddress QnNetworkResource::getMAC() const
     return m_macAddress;
 }
 
-void  QnNetworkResource::setMAC(QnMacAddress mac) 
+void  QnNetworkResource::setMAC(QnMacAddress mac)
 {
     QMutexLocker mutex(&m_mutex);
     m_macAddress = mac;
@@ -164,7 +162,6 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
 
 bool QnNetworkResource::conflicting()
 {
-
     if (checkNetworkStatus(QnNetworkResource::BadHostAddr))
         return false;
 
@@ -189,13 +186,13 @@ bool QnNetworkResource::conflicting()
     QnSleep::msleep(10);
 
     CLPing ping;
-    if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record 
+    if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
     {
         addNetworkStatus(QnNetworkResource::BadHostAddr);
         return true;
     }
 
-    mac = getMacByIP(getHostAddress(), false); // just in case if ARP response from some else have delayed 
+    mac = getMacByIP(getHostAddress(), false); // just in case if ARP response from some else have delayed
 
 
 
@@ -226,7 +223,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 
     QList<QnResourcePtr> local_list;
-    foreach(QnResourcePtr res, lst.values()) 
+    foreach (QnResourcePtr res, lst.values())
     {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
         if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))

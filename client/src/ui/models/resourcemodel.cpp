@@ -13,18 +13,19 @@ ResourceModel::ResourceModel(QObject *parent)
     : QStandardItemModel(parent)
 {
     foreach (QnResourcePtr server, qnResPool->getResourcesWithFlag(QnResource::server)) {
-        QStandardItem *root = new QStandardItem(QIcon(), server->getName());
+        QStandardItem *root = new QStandardItem(server->getName());
         root->setData(server->getId().hash(), Qt::UserRole + 1);
         root->setData(server->toSearchString(), Qt::UserRole + 2);
+        //root->setIcon(Skin::icon(QLatin1String("server.png")));
         root->setEditable(false);
         root->setSelectable(false);
         foreach (QnResourcePtr resource, qnResPool->getResourcesWithParentId(server->getId())) {
             if (!resource->checkFlag(QnResource::server)) {
-                QStandardItem *child = new QStandardItem(QIcon(), resource->getName());
+                QStandardItem *child = new QStandardItem(resource->getName());
                 child->setData(resource->getId().hash(), Qt::UserRole + 1);
                 child->setData(resource->toSearchString(), Qt::UserRole + 2);
-                child->setEditable(false);
                 child->setIcon(resource->checkFlag(QnResource::live_cam) ? Skin::icon(QLatin1String("webcam.png")) : Skin::icon(QLatin1String("layout.png")));
+                child->setEditable(false);
                 root->appendRow(child);
             }
         }
@@ -67,7 +68,7 @@ QStandardItem *ResourceModel::itemFromResourceId(uint id) const
 
 void ResourceModel::addResource(QnResourcePtr resource)
 {
-    if (!qnResPool->getResourceById(resource->getId())) {
+    if (sender() != qnResPool && !qnResPool->getResourceById(resource->getId())) {
         qnResPool->addResource(resource); // emits resourceAdded; thus return
         return;
     }
@@ -75,34 +76,37 @@ void ResourceModel::addResource(QnResourcePtr resource)
     if (itemFromResource(resource))
         return; // avoid duplicates
 
-    uint parentId = -1;
-    if (resource->checkFlag(QnResource::local))
-        parentId = 0;
-    else if (resource->checkFlag(QnResource::remote))
-        parentId = resource->getParentId().hash();
-
     if (resource->checkFlag(QnResource::server)) {
-        QStandardItem *root = new QStandardItem(QIcon(), resource->getName());
+        QStandardItem *root = new QStandardItem(resource->getName());
         root->setData(resource->getId().hash(), Qt::UserRole + 1);
         root->setData(resource->toSearchString(), Qt::UserRole + 2);
+        //root->setIcon(Skin::icon(QLatin1String("server.png")));
         root->setEditable(false);
         root->setSelectable(false);
         appendRow(root);
-    } else if (QStandardItem *root = itemFromResourceId(parentId)) {
-        QStandardItem *child = new QStandardItem(QIcon(), resource->getName());
+    } else if (QStandardItem *root = itemFromResourceId(resource->getParentId().hash())) {
+        QStandardItem *child = new QStandardItem(resource->getName());
         child->setData(resource->getId().hash(), Qt::UserRole + 1);
         child->setData(resource->toSearchString(), Qt::UserRole + 2);
-        child->setEditable(false);
         child->setIcon(resource->checkFlag(QnResource::live_cam) ? Skin::icon(QLatin1String("webcam.png")) : Skin::icon(QLatin1String("layout.png")));
+        child->setEditable(false);
         root->appendRow(child);
+    } else {
+        qWarning("ResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
+                 resource->getParentId().hash(), resource->getId().hash());
     }
 }
 
 void ResourceModel::removeResource(QnResourcePtr resource)
 {
-    if (QStandardItem *child = itemFromResource(resource)) {
-        foreach (QStandardItem *item, takeRow(child->row()))
-            delete item;
+    if (sender() != qnResPool && qnResPool->getResourceById(resource->getId())) {
+        qnResPool->removeResource(resource); // emits resourceRemoved; thus return
+        return;
+    }
+
+    if (QStandardItem *item = itemFromResource(resource)) {
+        foreach (QStandardItem *rowItem, takeRow(item->row()))
+            delete rowItem;
     }
 }
 
@@ -163,7 +167,7 @@ bool ResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction actio
     if (mimeData->hasUrls())
         resources += QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
     foreach (const QnResourcePtr &resource, resources) {
-        if (!resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::server))
+        if (resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::server))
             addResource(resource);
     }
 

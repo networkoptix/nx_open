@@ -12,11 +12,8 @@
 #include "resource_type.h"
 #include "utils/common/qnid.h"
 #include "../datapacket/datapacket.h"
-#include "resource_command_consumer.h"
 
-class QnResourceCommand;
 class QnAbstractStreamDataProvider;
-class QnVideoResourceLayout;
 class QnResourceConsumer;
 
 // this class and inherited must be very light to create
@@ -37,6 +34,8 @@ typedef QMap<QString, QString> QnResourceParameters;
 class QN_EXPORT QnResource : public QObject //: public CLRefCounter
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ getName WRITE setName USER false) // do not show at GUI
+    Q_PROPERTY(QString url READ getUrl WRITE setUrl)
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
@@ -49,7 +48,7 @@ public:
         url = 0x02,  // has url, like file name
         streamprovider = 0x04,
         media = 0x08,
-        playback = 0x10, // something playable ( not real time and not a single shot)
+        playback = 0x10, // something playable (not real time and not a single shot)
         video = 0x20,
         audio = 0x40,
         live = 0x80,
@@ -57,13 +56,13 @@ public:
 
         local = 0x200,    // local client resource
         server = 0x400,   // server resource
-        remote = 0x800,   // remote (server) resource
+        remote = 0x800,   // remote (on-server) resource
 
-        live_cam = live | video | media | streamprovider,
-        local_live_cam = live_cam | local |  network,
-        server_live_cam = live_cam | remote , // | NETWORK,
-        server_archive = remote | video | media | audio | streamprovider,
-        ARCHIVE = url | local | video | media | audio | streamprovider,     // local media file
+        live_cam = live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
+        local_live_cam = live_cam | local | network,
+        server_live_cam = live_cam | remote,// | network,
+        server_archive = remote | media | video | audio | streamprovider,
+        ARCHIVE = url | local | media | video | audio | streamprovider,     // local media file
         SINGLE_SHOT = url | local | media | still_image | streamprovider    // local still image file
     };
 
@@ -95,6 +94,7 @@ public:
     // flags like network media and so on
     unsigned long flags() const;
     bool checkFlag(unsigned long flag) const;
+    void setFlags(unsigned long flags);
     void addFlag(unsigned long flag);
     void removeFlag(unsigned long flag);
 
@@ -172,24 +172,17 @@ public:
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
 
-    Q_PROPERTY (QString url READ getUrl WRITE setUrl)
-    Q_PROPERTY (QString name READ getName WRITE setName USER false) // do not show at GUI
-
 Q_SIGNALS:
     void onParameterChanged(const QString &paramname, const QString &value);
     void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
 public:
-    // will extend the first one and remove all elements from the second one
-    //static void mergeLists(QnResourceMap& first, QnResourceMap& second);
-
-    //static void addReferences(QnResourceList& lst);
-
-    static void startCommandProc() {m_commanproc.start();};
-    static void stopCommandProc() {m_commanproc.stop();};
-    static void addCommandToProc(QnAbstractDataPacketPtr data) {m_commanproc.putData(data);};
-    static int commandProcQueSize() {return m_commanproc.queueSize();}
-    static bool commandProchasSuchDeviceInQueue(QnResourcePtr res) {return m_commanproc.hasSuchResourceInQueue(res);}
+    // this is thread to process commands like setparam
+    static void startCommandProc();
+    static void stopCommandProc();
+    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static int commandProcQueSize();
+    static bool commandProchasSuchDeviceInQueue(QnResourcePtr res);
 
 protected:
     // should change value in memory domain
@@ -204,10 +197,6 @@ protected:
 protected:
     //typedef QMap<QnId, QnParamList > QnParamLists; // key - resource type ID
     //static QnParamLists staticResourcesParamLists; // list of all supported resources params list
-
-    // this is thread to process commands like setparam
-
-    static QnResourceCommandProcessor m_commanproc;
 
 protected:
     mutable QMutex m_mutex;

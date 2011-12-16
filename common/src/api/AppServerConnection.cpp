@@ -9,6 +9,7 @@
 #include "api/parsers/parse_servers.h"
 #include "api/parsers/parse_resource_types.h"
 #include "api/parsers/parse_storages.h"
+#include "api/parsers/parse_schedule_tasks.h"
 
 #include "api/Types.h"
 #include "api/AppSessionManager.h"
@@ -19,13 +20,13 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory&
 {
 }
 
+QnAppServerConnection::~QnAppServerConnection()
+{
+}
+
 bool QnAppServerConnection::isConnected() const
 {
     return true;
-}
-
-QnAppServerConnection::~QnAppServerConnection()
-{
 }
 
 int QnAppServerConnection::getResourceTypes(QList<QnResourceTypePtr>& resourceTypes)
@@ -128,6 +129,20 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
     if (!xsdStorages.isNull())
     {
         parseStorages(storages, xsdStorages->storage(), m_resourceFactory);
+    }
+
+    return status;
+}
+
+int QnAppServerConnection::getScheduleTasks(QnScheduleTaskList& scheduleTasks)
+{
+    QnApiScheduleTaskResponsePtr xsdScheduleTasks;
+
+    int status = m_sessionManager->getScheduleTasks(xsdScheduleTasks);
+
+    if (!xsdScheduleTasks.isNull())
+    {
+        parseScheduleTasks(scheduleTasks, xsdScheduleTasks->scheduleTask(), m_resourceFactory);
     }
 
     return status;
