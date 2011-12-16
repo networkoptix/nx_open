@@ -28,6 +28,7 @@
 #include "core/resource/file_resource.h"
 
 #define TEST_RTSP_SERVER
+//#define STANDALONE_MODE
 
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"

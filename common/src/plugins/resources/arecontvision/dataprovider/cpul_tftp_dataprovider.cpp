@@ -379,63 +379,59 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
-#if 1
-    // for debug purpose only
-    int secs = QDateTime::currentDateTime().time().second();
-    int x = 0, y = 0;
-    if (secs < 15) {
+    //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
 
-    }
-    else if (secs < 30) {
-        x += MD_WIDTH/2;
-    }
-    else if (secs < 45) {
-        y += MD_HEIGHT/2;
-    }
-    else {
-        x += MD_WIDTH/2;
-        y += MD_HEIGHT/2;
-    }
-    for (int x1 = 0; x1 < MD_WIDTH/2; x1++)
+    QnValue mdresult;
+    if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
+        return QnMetaDataV1Ptr(0);
+
+    if (QString(mdresult) == "no motion")
+        return motion; // no motion detected 
+    
+
+    QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
+    int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
+
+    QStringList md = QString(mdresult).split(" ", QString::SkipEmptyParts);
+    if (md.size() < zones*zones)
+        return QnMetaDataV1Ptr(0);
+
+
+    QnValue zone_size;
+    if (!getResource()->getParam("Zone size", zone_size, QnDomainMemory))
+        return QnMetaDataV1Ptr(0);
+
+    int pixelZoneSize = (int)zone_size*32;
+
+    
+    QnValue maxSensorWidth;
+    QnValue maxSensorHight;
+    getResource()->getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
+    getResource()->getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
+    
+
+    QRect imageRect(0,0, maxSensorWidth, maxSensorHight);
+    QRect zeroZoneRect(0,0,pixelZoneSize, pixelZoneSize);
+
+    for (int x = 0; x < zones; ++x)
     {
-        for (int y1 = 0; y1 < MD_HEIGHT/2; y1++)
+        for (int y = 0; y < zones; ++y)
         {
-            motion->setMotionAt(x1+x, y1+y);
+            int index = y*zones + x;
+            QString m = md.at(index) ;
+
+            if (m == "00" || m == "0")
+                continue;
+            
+            QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
+
+            motion->mapMotion(imageRect, currZoneRect);
+
         }
     }
-    motion->m_duration = 1000 * 1000ll * 10;
+
+    motion->m_duration = META_DATA_DURATION_MS *1000 * 10 ;
+
     return motion;
-#endif
-
-        //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
-
-        QnValue mdresult;
-        if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
-            return QnMetaDataV1Ptr(0);
-
-        if (QString(mdresult) == "no motion")
-            return motion; // no motion detected 
         
-
-        //QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
-        //int total_zones = avRes->totalMdZones();
-
-        QnValue zone_size;
-        //avRes->getParam("Zone size", zone_size, QnDomainMemory);
-
-        int pixelZoneSize = (int)zone_size*32;
-
-        /*
-        QnValue maxSensorWidth;
-        QnValue maxSensorHight;
-        getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
-        getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
-        /**/
-
-
-
-
-        
-
-        
-}
+} 

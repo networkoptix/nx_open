@@ -3,6 +3,7 @@
 
 #include <QVector>
 #include <QAudioFormat>
+#include <QRect>
 #include "libavcodec/avcodec.h"
 #include "datapacket.h"
 #include "utils/common/bytearray.h"
@@ -128,6 +129,8 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     bool isMotionAt(int x, int y) const;
 
     void setMotionAt(int x, int y);
+
+    void mapMotion(const QRect& imageRect, const QRect& mRect);
 
     bool isInput(int index) const
     {
