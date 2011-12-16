@@ -639,6 +639,11 @@ QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
     return cwiseMul(gridPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT))));
 }
 
-void QnResourceWidget::addMotionGridRect(const QRect &gridRect) {
+void QnResourceWidget::addToMotionSelection(const QRect &gridRect) {
     m_channelState[0].motionSelection += gridRect.intersected(QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
 }
+
+void QnResourceWidget::clearMotionSelection() {
+    m_channelState[0].motionSelection = QRegion();
+}
+

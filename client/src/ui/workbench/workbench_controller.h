@@ -74,7 +74,9 @@ protected slots:
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
+    void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
     void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
@@ -88,8 +90,6 @@ protected slots:
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
     void at_navigationItem_geometryChanged();
-
-    void at_item_contextMenuRequested(QGraphicsItem *item, QEvent *event);
 
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();

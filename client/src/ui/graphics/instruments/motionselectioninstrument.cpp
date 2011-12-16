@@ -171,7 +171,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
         /* Qt handles QRect borders in totally inhuman way, so we have to do everything by hand. */
         QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
         QPoint c = target()->mapToMotionGrid(selectionItem()->corner());
-        target()->addMotionGridRect(QRect(
+        target()->addToMotionSelection(QRect(
             QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
             QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
         ));

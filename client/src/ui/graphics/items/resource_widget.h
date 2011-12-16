@@ -187,11 +187,31 @@ public:
         return m_displayMotionGrid;
     }
 
+    /**
+     * \param itemPos                   Point in item coordinates to map to grid coordinates.
+     * \returns                         Coordinates of the closest motion grid joint. 
+     *                                  Note that motion grid is finite, so even if the
+     *                                  passed coordinate lies outside the item boundary,
+     *                                  returned joint will lie inside it.
+     */
     QPoint mapToMotionGrid(const QPointF &itemPos);
 
+    /**
+     * \param gridPos                   Coordinate of the motion grid cell.
+     * \returns                         Position in scene coordinates of the top left corner of the grid cell.
+     */
     QPointF mapFromMotionGrid(const QPoint &gridPos);
 
-    void addMotionGridRect(const QRect &gridRect);
+    /**
+     * \param gridRect                  Rectangle in grid coordinates to add to
+     *                                  selected motion region of this widget.
+     */ 
+    void addToMotionSelection(const QRect &gridRect);
+
+    /**
+     * Clears this widget's motion selection region.
+     */
+    void clearMotionSelection();
 
     using base_type::mapRectToScene;
 
