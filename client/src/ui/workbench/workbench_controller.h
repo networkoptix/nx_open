@@ -79,7 +79,9 @@ protected slots:
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
+    void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
+    void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
     void at_viewportGrabbed();
@@ -132,7 +134,8 @@ private:
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
 
-    QMenu *m_contextMenu;
+    QMenu *m_itemContextMenu;
+    QMenu *m_sceneContextMenu;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

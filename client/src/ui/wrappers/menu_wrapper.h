@@ -1,5 +1,5 @@
-#ifndef QN_MENU_CONTROLLER_H
-#define QN_MENU_CONTROLLER_H
+#ifndef QN_MENU_WRAPPER_H
+#define QN_MENU_WRAPPER_H
 
 #include <QObject>
 #include <QHash>
@@ -10,12 +10,12 @@ namespace detail {
     class ActionFactory;
 }
 
-class QnMenuController: public QObject {
+class QnMenuWrapper: public QObject {
     Q_OBJECT;
 public:
-    QnMenuController(QObject *parent = NULL);
+    QnMenuWrapper(QObject *parent = NULL);
 
-    virtual ~QnMenuController();
+    virtual ~QnMenuWrapper();
 
     /**
      * Enum of all menu actions.
@@ -275,6 +275,6 @@ private:
     QHash<ActionId, ActionData> m_infoByAction;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnMenuController::ActionFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnMenuWrapper::ActionFlags);
 
-#endif // QN_MENU_CONTROLLER_H
+#endif // QN_MENU_WRAPPER_H

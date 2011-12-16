@@ -5,11 +5,11 @@
 namespace detail {
     class ActionFactory {
     public:
-        ActionFactory(QnMenuController *controller): m_controller(controller) {
-            m_parentStack.push_back(QnMenuController::INVALID_ACTION);
+        ActionFactory(QnMenuWrapper *controller): m_controller(controller) {
+            m_parentStack.push_back(QnMenuWrapper::INVALID_ACTION);
         }
 
-        void pushParent(QnMenuController::ActionId parentId) {
+        void pushParent(QnMenuWrapper::ActionId parentId) {
             m_parentStack.push_back(parentId);
         }
 
@@ -17,8 +17,8 @@ namespace detail {
             m_parentStack.pop_back();
         }
 
-        void operator()(QnMenuController::ActionId id, const QString &text, const QString &shortcut, QnMenuController::ActionFlags flags) {
-            QnMenuController::ActionData data;
+        void operator()(QnMenuWrapper::ActionId id, const QString &text, const QString &shortcut, QnMenuWrapper::ActionFlags flags) {
+            QnMenuWrapper::ActionData data;
             data.id = id;
             data.flags = flags;
             data.parentId = m_parentStack.back();
@@ -28,14 +28,14 @@ namespace detail {
         }
 
     private:
-        QnMenuController *m_controller;
-        QVector<QnMenuController::ActionId> m_parentStack;
+        QnMenuWrapper *m_controller;
+        QVector<QnMenuWrapper::ActionId> m_parentStack;
     };
 
 } // namespace detail
 
 
-QnMenuController::QnMenuController(QObject *parent): 
+QnMenuWrapper::QnMenuWrapper(QObject *parent): 
     QObject(parent)
 {
     detail::ActionFactory factory(this);
@@ -94,6 +94,6 @@ QnMenuController::QnMenuController(QObject *parent):
     assert(m_infoByAction.size() == ACTION_COUNT);
 }
 
-QnMenuController::~QnMenuController() {
+QnMenuWrapper::~QnMenuWrapper() {
     return;
 }
