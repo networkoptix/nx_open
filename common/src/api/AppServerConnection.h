@@ -9,6 +9,7 @@
 #include "core/resource/network_resource.h"
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
+#include "core/misc/scheduleTask.h"
 
 class AppSessionManager;
 class QnAppServerConnectionFactory;
@@ -30,6 +31,7 @@ public:
 
     int getServers(QnResourceList& servers);
     int getStorages(QnResourceList& storages);
+    int getScheduleTasks(QnScheduleTaskList& scheduleTasks);
 
     QString lastError() const;
 
