@@ -42,13 +42,13 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     foreach (QnResourcePtr resource, resources)
     {
         if (!resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::remote))
-            qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local, neither remote");
+            qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local, neither remote)");
 
         if (!resource->getId().isValid())
         if (!resource->checkFlag(QnResource::server | QnResource::local)) // ### hack - the LocalServer is a fake (invalid) resource
         {
             resource->setId(QnId::generateSpecialId());
-            resource->addFlag(QnResource::local); 
+            resource->addFlag(QnResource::local);
         }
     }
 
