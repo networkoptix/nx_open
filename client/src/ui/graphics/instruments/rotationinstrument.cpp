@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QGraphicsObject>
 #include <ui/graphics/items/resource_widget.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 namespace {
     const QColor defaultColor(255, 0, 0, 96);
@@ -139,12 +140,10 @@ public:
         shape.closeSubpath();
 
         /* Draw! */
-        painter->save();
-        painter->resetTransform();
+        QnScopedPainterTransformRollback transformRollback(painter, QTransform());
         painter->translate(viewportOrigin);
         painter->rotate(atan2(viewportHead - viewportOrigin) / M_PI * 180.0);
         painter->fillPath(shape, defaultColor);
-        painter->restore();
     }
 
     /**
@@ -232,8 +231,7 @@ void RotationInstrument::setRotationItemZValue(qreal rotationItemZValue) {
 }
 
 void RotationInstrument::installedNotify() {
-    if(rotationItem() != NULL)
-        delete rotationItem();
+    assert(rotationItem() == NULL);
 
     m_rotationItem = new RotationItem();
     rotationItem()->setParent(this); /* Just to feel totally safe. */
@@ -246,9 +244,6 @@ void RotationInstrument::installedNotify() {
 
 void RotationInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
-
-    if (scene() != NULL) 
-        disconnect(scene(), NULL, this, NULL);
 
     if(rotationItem() != NULL)
         delete rotationItem();

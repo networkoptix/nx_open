@@ -3,67 +3,72 @@
 
 #include <QtGlobal>
 
-namespace detail {
-    template<class T>
-    struct QnScopedValueRollbackInit {
-        T *variable;
-        T value;
-    };
+template<class T, class Object, class Setter, class Getter>
+class QnGenericScopedValueRollback {
+public:
+    QnGenericScopedValueRollback(Object *object, const Setter &setter, const Getter &getter):
+        m_object(object),
+        m_setter(setter),
+        m_rollbackValue(getter(object)),
+        m_committed(false)
+    {}
 
-    template<class T>
-    QnScopedValueRollbackInit<T> scopedValueRollbackInit(T &variable, const T &newValue) {
-        QnScopedValueRollbackInit<T> result;
-        result.variable = &variable;
-        result.value = variable;
-        variable = newValue;
-        return result;
+    QnGenericScopedValueRollback(Object *object, const Setter &setter, const Getter &getter, const T &newValue):
+        m_object(object),
+        m_setter(setter),
+        m_rollbackValue(getter(object)),
+        m_committed(false)
+    {
+        m_setter(m_object, newValue);
     }
 
-} // namespace detail
-
-
-template<class T>
-class QnScopedValueRollback {
-public:
-    QnScopedValueRollback(T &variable):
-        m_variable(variable),
-        m_value(variable),
-        m_committed(false)
-    {}
-
-    QnScopedValueRollback(const detail::QnScopedValueRollbackInit<T> &init):
-        m_variable(*init.variable),
-        m_value(init.value),
-        m_committed(false)
-    {}
-
-    ~QnScopedValueRollback() {
+    ~QnGenericScopedValueRollback() {
         if(!m_committed)
-            m_variable = m_value;
+            m_setter(m_object, m_rollbackValue);
     }
 
     void commit() {
         m_committed = true;
     }
 
-    /**
-     * This operator is here to make it possible to define scoped rollbacks in
-     * if statement conditions.
-     */
-    operator bool() const {
-        return false;
-    }
-
 private:
-    Q_DISABLE_COPY(QnScopedValueRollback);
+    Q_DISABLE_COPY(QnGenericScopedValueRollback);
 
-    T &m_variable;
-    T m_value;
+    Object *m_object;
+    Setter m_setter;
+    T m_rollbackValue;
     bool m_committed;
 };
 
 
-#define QN_SCOPED_VALUE_ROLLBACK_INITIALIZER(VARIABLE, NEW_VALUE)               \
-    ::detail::scopedValueRollbackInit(VARIABLE, NEW_VALUE)
+namespace detail {
+    struct VariableSetterGetter {
+        template<class T>
+        void operator()(T *variable, const T &value) const {
+            *variable = value;
+        }
+
+        template<class T>
+        T operator()(const T *variable) const {
+            return *variable;
+        }
+    };
+
+} // namespace detail
+
+template<class T>
+class QnScopedValueRollback: public QnGenericScopedValueRollback<T, T, detail::VariableSetterGetter, detail::VariableSetterGetter> {
+    typedef detail::VariableSetterGetter sg_type;
+    typedef QnGenericScopedValueRollback<T, T, sg_type, sg_type> base_type;
+
+public:
+    QnScopedValueRollback(T *variable):
+        base_type(variable, sg_type(), sg_type())
+    {}
+
+    QnScopedValueRollback(T *variable, const T &newValue):
+        base_type(variable, sg_type(), sg_type(), newValue)
+    {}
+};
 
 #endif // QN_SCOPED_VALUE_ROLLBACK_H

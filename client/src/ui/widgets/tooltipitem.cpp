@@ -1,6 +1,8 @@
 #include "tooltipitem.h"
 
 #include <QtGui/QFontMetrics>
+#include <QtGui/QPainter>
+#include <QtGui/QGraphicsSceneWheelEvent>
 
 ToolTipItem::ToolTipItem(QGraphicsItem *parent):
     QGraphicsItem(parent),

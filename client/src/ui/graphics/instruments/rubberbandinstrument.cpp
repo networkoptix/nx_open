@@ -10,6 +10,7 @@
 #include <QRubberBand>
 #include <QWidget>
 #include <QCursor>
+#include <utils/common/scoped_painter_rollback.h>
 #include "instrumentmanager.h"
 
 namespace {
@@ -73,13 +74,10 @@ public:
             painter->setClipRegion(mask.region, Qt::IntersectClip);
         }
 
-        QTransform oldTransform = painter->transform();
-        painter->resetTransform();
-
+        QnScopedPainterTransformRollback transformRollback(painter, QTransform());
         widget->style()->drawControl(QStyle::CE_RubberBand, &rubberBandOption, painter, widget);
 
         /* Restore painter state. */
-        painter->setTransform(oldTransform);
         if (!oldClipRegion.isEmpty())
             painter->setClipRegion(oldClipRegion);
     }

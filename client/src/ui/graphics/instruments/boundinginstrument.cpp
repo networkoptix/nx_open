@@ -97,7 +97,8 @@ namespace {
     QPointF calculateFixedPoint(const QTransform &t, bool *exists) {
         /* Check that it actually is a non-perspective transform. */
 #ifdef _DEBUG
-
+        if(!qFuzzyIsNull(t.m13()) || !qFuzzyIsNull(t.m23()) || !qFuzzyCompare(t.m33(), 1.0))
+            qnWarning("Perspective transformation supplied, expect invalid results.");
 #endif
 
         /* Fill in row-major order. */
@@ -114,6 +115,7 @@ namespace {
         if(qFuzzyIsNull(m(1, 1))) m(1, 1) = 0.0;
         if(qFuzzyIsNull(m(0, 1))) m(0, 1) = 0.0;
 
+        /* Solve linear system. */
         bool invertible;
         QVector4D v = m.inverted(&invertible) * QVector4D(
             -t.m31(),

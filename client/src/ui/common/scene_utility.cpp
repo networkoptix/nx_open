@@ -135,6 +135,13 @@ qreal QnSceneUtility::scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMod
     }
 }
 
+QPoint QnSceneUtility::bounded(const QPoint &pos, const QRect &bounds) {
+    return QPoint(
+        qBound(bounds.left(), pos.x(), bounds.right()),
+        qBound(bounds.top(), pos.y(), bounds.bottom())
+    );
+}
+
 QSizeF QnSceneUtility::bounded(const QSizeF &size, const QSizeF &maxSize, Qt::AspectRatioMode mode) {
     if(mode == Qt::IgnoreAspectRatio)
         return size.boundedTo(maxSize);

@@ -149,6 +149,8 @@ public:
      */
     static qreal scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mode);
 
+    static QPoint bounded(const QPoint &pos, const QRect &bounds);
+
     /**
      * Bounds the given size, so that a rectangle of size maxSize would include
      * a rectangle of bounded size.

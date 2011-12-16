@@ -187,6 +187,12 @@ public:
         return m_displayMotionGrid;
     }
 
+    QPoint mapToMotionGrid(const QPointF &itemPos);
+
+    QPointF mapFromMotionGrid(const QPoint &gridPos);
+
+    void addMotionGridRect(const QRect &gridRect);
+
     using base_type::mapRectToScene;
 
 signals:
@@ -236,19 +242,31 @@ private:
     struct ChannelState {
         ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {}
 
+        /** Current overlay icon. */
         OverlayIcon icon;
+
+        /** Time when the last icon change has occurred, in milliseconds since epoch. */
         qint64 iconChangeTimeMSec;
+        
+        /** Whether the icon should fade in on change. */
         bool iconFadeInNeeded;
+
+        /** Last time when new frame was rendered, in milliseconds since epoch. */
         qint64 lastNewFrameTimeMSec;
+
+        /** Selected region for search-by-motion, in parrots. */
+        QRegion motionSelection;
     };
 
     void setOverlayIcon(int channel, OverlayIcon icon);
 
     void drawOverlayIcon(int channel, const QRectF &rect);
 
-    void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
+    void drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time);
 
-    void drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion);
+    void drawMotionGrid(QPainter *painter, const QRectF &rect, QnMetaDataV1Ptr motion);
+
+    void drawMotionSelection(QPainter *painter, const QRectF &rect, const QRegion &selection);
 
 private:
     /** Layout item. */

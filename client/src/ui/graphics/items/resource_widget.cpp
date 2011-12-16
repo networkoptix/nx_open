@@ -10,6 +10,7 @@
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <settings.h>
 #include "resource_widget_renderer.h"
 #include "polygonal_shadow_item.h"
@@ -316,32 +317,23 @@ void QnResourceWidget::hideActivityDecorations() {
     m_activityDecorationsVisible = false;
 }
 
-void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion)
-{
+void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion) {
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
+    
+    painter->setPen(QPen(QColor(255, 255, 255, 16)));
     for (int x = 0; x < MD_WIDTH; ++x)
         painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
-    {
-    }
     for (int y = 0; y < MD_HEIGHT; ++y)
-    {
         painter->drawLine(QPointF(0.0, y*yStep), QPointF(rect.width(), y*yStep));
-    }
     if (!motion)
         return;
-    painter->setPen(QPen(0x00ff0080));
-    for (int y = 0; y < MD_HEIGHT; ++y)
-    {
-        for (int x = 0; x < MD_WIDTH; ++x)
-        {
-            if (motion->isMotionAt(x,y))
-            {
-                painter->drawRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
-            }
-        }
-    }
 
+    painter->setPen(QPen(QColor(255, 0, 0, 48)));
+    for (int y = 0; y < MD_HEIGHT; ++y)
+        for (int x = 0; x < MD_WIDTH; ++x)
+            if(motion->isMotionAt(x, y))
+                painter->drawRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
 }
 
 void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time)
@@ -356,15 +348,35 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qi
         QFontMetrics metric(font);
         QSize size = metric.size(Qt::TextSingleLine, text);
         painter->setFont(font);
+        painter->setPen(QPen(QColor(255, 255, 255, 128), 0));
+        painter->setBrush(QColor(255, 255, 255, 64));
         painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+2, text);
     }
 }
 
+void QnResourceWidget::drawMotionSelection(QPainter *painter, const QRectF &rect, const QRegion &selection) {
+    QPainterPath path;
+    path.addRegion(selection);
+    path = path.simplified(); // TODO: this is slow.
+
+    QnScopedPainterTransformRollback transformRollback(painter);
+    painter->translate(rect.topLeft());
+    painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
+
+    painter->setBrush(QColor(0, 255, 0, 16));
+    painter->setPen(QPen(QColor(0, 255, 0, 32), 0));
+    painter->drawPath(path);
+}
+
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
-    if (painter->paintEngine()->type() != QPaintEngine::OpenGL && painter->paintEngine()->type() != QPaintEngine::OpenGL2) {
+    if (painter->paintEngine()->type() != QPaintEngine::OpenGL2 && painter->paintEngine()->type() != QPaintEngine::OpenGL) {
         qnWarning("Painting with the paint engine of type %1 is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
     }
+
+    QnScopedPainterPenRollback penRollback(painter);
+    QnScopedPainterBrushRollback brushRollback(painter);
+    QnScopedPainterFontRollback fontRollback(painter);
 
     /* Update screen size of a single channel. */
     QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
@@ -375,7 +387,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
-
     painter->beginNativePainting();
     for(int i = 0; i < m_channelCount; i++) {
         /* Draw content. */
@@ -410,14 +421,20 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     /* Draw decorations */
     for(int i = 0; i < m_channelCount; i++) {
-        /* Current time. */
-        qint64 time = m_renderer->lastDisplayedTime(i);
-        if (time > 1000000ll * 3600*24)
-            drawCurrentTime(painter, channelRect(i), time); // do not show time for regular media files
+        QRectF rect = channelRect(i);
 
         /* Motion grid. */
         if (m_displayMotionGrid)
-            drawMotionGrid(painter, channelRect(i), m_renderer->lastFrameMetadata(i));
+            drawMotionGrid(painter, rect, m_renderer->lastFrameMetadata(i));
+
+        /* Selection. */
+        if(!m_channelState[i].motionSelection.isEmpty())
+            drawMotionSelection(painter, rect, m_channelState[i].motionSelection);
+
+        /* Current time. */
+        qint64 time = m_renderer->lastDisplayedTime(i);
+        if (time > 1000000ll * 3600*24)
+            drawCurrentTime(painter, rect, time); // do not show time for regular media files
     }
 }
 
@@ -478,7 +495,7 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     glPopAttrib();
 }
 
-void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)  {
+void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     QSizeF size = this->size();
     qreal w = size.width();
     qreal h = size.height();
@@ -492,7 +509,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
         color.setBlue ((color.blue()  + selectedFrameColorMixIn.blue())  / 2);
     }
 
-    painter->setRenderHint(QPainter::Antialiasing, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
     painter->fillRect(QRectF(-fw,     -fw,     w + fw * 2,  fw), color);
     painter->fillRect(QRectF(-fw,     h,       w + fw * 2,  fw), color);
     painter->fillRect(QRectF(-fw,     0,       fw,          h),  color);
@@ -612,4 +629,16 @@ void QnResourceWidget::setMotionGridDisplayed(bool displayed) {
     m_displayMotionGrid = displayed;
 
     m_display->archiveReader()->setSendMotion(displayed);
+}
+
+QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
+    return bounded(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))).toPoint(), QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
+}
+
+QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
+    return cwiseMul(gridPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT))));
+}
+
+void QnResourceWidget::addMotionGridRect(const QRect &gridRect) {
+    m_channelState[0].motionSelection += gridRect.intersected(QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
 }

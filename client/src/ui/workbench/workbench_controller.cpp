@@ -33,6 +33,7 @@
 #include <ui/graphics/instruments/uielementsinstrument.h>
 #include <ui/graphics/instruments/resizehoverinstrument.h>
 #include <ui/graphics/instruments/signalinginstrument.h>
+#include <ui/graphics/instruments/motionselectioninstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 
@@ -92,6 +93,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SignalingInstrument *itemContextMenuInstrument = new SignalingInstrument(Instrument::ITEM, Instrument::makeSet(QEvent::GraphicsSceneContextMenu), this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
+    MotionSelectionInstrument *motionSelectionInstrument = new MotionSelectionInstrument(this);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -125,6 +127,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_archiveDropInstrument);
+    m_manager->installInstrument(motionSelectionInstrument);
 
     connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemClickInstrument,        SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)), this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -156,6 +159,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                             itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                          itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                         itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),       itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),      itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),         m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),        m_dragInstrument,               SLOT(recursiveEnable()));
@@ -168,6 +173,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),       m_rubberBandInstrument,         SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),       m_resizingInstrument,           SLOT(recursiveEnable()));
+
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),       m_dragInstrument,               SLOT(recursiveDisable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),      m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),       m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),      m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
