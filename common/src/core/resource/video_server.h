@@ -12,11 +12,15 @@ public:
     virtual ~QnLocalVideoServer();
 
     virtual QString getUniqueId() const;
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role);
 };
+
 
 class QnVideoServer : public QnResource
 {
+    Q_OBJECT
+    Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
+
 public:
     QnVideoServer();
     virtual ~QnVideoServer();
@@ -32,12 +36,12 @@ public:
     void setGuid(const QString& guid);
     QString getGuid() const;
 
-    Q_PROPERTY (QString apiUrl READ getApiUrl WRITE setApiUrl)
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
     QString m_guid;
 };
+
 
 class QnVideoServerFactory : public QnResourceFactory
 {
@@ -48,4 +52,4 @@ public:
 typedef QSharedPointer<QnVideoServer> QnVideoServerPtr;
 typedef QList<QnVideoServerPtr> QnVideoServerList;
 
-#endif
+#endif // __VIDEO_SERVER_H
