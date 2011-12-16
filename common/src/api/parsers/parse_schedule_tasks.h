@@ -20,7 +20,7 @@ void parseScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnApiScheduleTa
                                            i->startTime(),
                                            i->endTime(),
                                            i->doRecordAudio(),
-                                           i->recordType().c_str(),
+                                           i->recordType(),
                                            i->dayOfWeek(),
                                            i->beforeThreshold(),
                                            i->afterThreshold()

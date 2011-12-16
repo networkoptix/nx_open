@@ -163,11 +163,11 @@ int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
     return status;
 }
 
-int AppSessionManager::getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks)
+int AppSessionManager::getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks, const QnId& mediaServerId)
 {
     QByteArray reply;
 
-    int status = sendGetRequest(QLatin1String("scheduleTask"), reply);
+    int status = sendGetRequest(QString("scheduleTask/%1").arg(mediaServerId.toString()), reply);
     if (status == 0)
     {
         try

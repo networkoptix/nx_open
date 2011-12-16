@@ -134,11 +134,11 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
     return status;
 }
 
-int QnAppServerConnection::getScheduleTasks(QnScheduleTaskList& scheduleTasks)
+int QnAppServerConnection::getScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnId& mediaServerId)
 {
     QnApiScheduleTaskResponsePtr xsdScheduleTasks;
 
-    int status = m_sessionManager->getScheduleTasks(xsdScheduleTasks);
+    int status = m_sessionManager->getScheduleTasks(xsdScheduleTasks, mediaServerId);
 
     if (!xsdScheduleTasks.isNull())
     {
