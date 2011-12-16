@@ -2,7 +2,7 @@
 #define view_drag_and_drop_helper_h_1835
 
 #include <QList>
-#include "core\resource\resource.h"
+#include "core/resource/resource.h"
 
 class QGraphicsItem;
 class QByteArray;

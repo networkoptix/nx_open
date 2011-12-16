@@ -12,7 +12,7 @@ public:
     QnScheduleTask() {}
 
     QnScheduleTask(QnId id, QnId sourceId, int startTime, int endTime,
-                   bool doRecordAudio, QString recordType, int dayOfWeek, int beforeThreshold, int afterThreshold)
+                   bool doRecordAudio, int recordType, int dayOfWeek, int beforeThreshold, int afterThreshold)
       : m_id(id),
         m_sourceId(sourceId),
         m_startTime(startTime),
@@ -33,7 +33,7 @@ public:
     int m_startTime;
     int m_endTime;
     bool m_doRecordAudio;
-    QString m_recordType;
+    int m_recordType;
     int m_dayOfWeek;
     int m_beforeThreshold;
     int m_afterThreshold;

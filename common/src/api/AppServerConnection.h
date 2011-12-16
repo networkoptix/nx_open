@@ -31,7 +31,7 @@ public:
 
     int getServers(QnResourceList& servers);
     int getStorages(QnResourceList& storages);
-    int getScheduleTasks(QnScheduleTaskList& scheduleTasks);
+    int getScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnId& mediaServerId);
 
     QString lastError() const;
 

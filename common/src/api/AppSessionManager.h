@@ -5,6 +5,8 @@
 
 #include "api/Types.h"
 #include "utils/network/simple_http_client.h"
+#include "utils/common/qnid.h"
+
 #include "SessionManager.h"
 
 class AppSessionManager : public SessionManager
@@ -18,7 +20,7 @@ public:
     int getResources(QnApiResourceResponsePtr& resources);
 
     int getStorages(QnApiStorageResponsePtr& resources);
-    int getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks);
+    int getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks, const QnId& mediaServerId);
 
     int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers);
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);

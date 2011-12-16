@@ -14,7 +14,7 @@
             <xs:element name="startTime" type="xs:int"/>
             <xs:element name="endTime" type="xs:int"/>
             <xs:element name="doRecordAudio" type="xs:boolean"/>
-            <xs:element name="recordType" type="xs:string"/>
+            <xs:element name="recordType" type="xs:int"/>
             <xs:element name="dayOfWeek" type="xs:int"/>
             <xs:element name="beforeThreshold" type="xs:int"/>
             <xs:element name="afterThreshold" type="xs:int"/>
