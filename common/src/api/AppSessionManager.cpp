@@ -98,7 +98,7 @@ int AppSessionManager::addObject(const QString& objectName, const QByteArray& bo
 {
     QTextStream stream(&reply);
 
-    int status = m_httpClient->syncPost(createApiUrl(objectName + QLatin1Char('/')), body, stream.device());
+    int status = m_httpClient->syncPost(createApiUrl(objectName), body, stream.device());
     stream.readAll();
 
     if (status != 0)
@@ -148,6 +148,34 @@ int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
             QStdIStream is(stream.device());
 
             storages = QnApiStorageResponsePtr(xsd::api::storages::storages (is, XSD_FLAGS).release());
+
+            return 0;
+        }
+        catch (const xml_schema::exception& e)
+        {
+            m_lastError = e.what();
+
+            qDebug(e.what());
+            return -1;
+        }
+    }
+
+    return status;
+}
+
+int AppSessionManager::getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks)
+{
+    QByteArray reply;
+
+    int status = sendGetRequest(QLatin1String("scheduleTask"), reply);
+    if (status == 0)
+    {
+        try
+        {
+            QTextStream stream(reply);
+            QStdIStream is(stream.device());
+
+            scheduleTasks = QnApiScheduleTaskResponsePtr(xsd::api::scheduleTasks::scheduleTasks (is, XSD_FLAGS).release());
 
             return 0;
         }

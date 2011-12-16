@@ -98,6 +98,7 @@ XSD_FILES = $$PWD/api/xsd/cameras.xsd \
             $$PWD/api/xsd/resourcesEx.xsd \
             $$PWD/api/xsd/servers.xsd \
             $$PWD/api/xsd/storages.xsd \
+            $$PWD/api/xsd/scheduleTasks.xsd \
             $$PWD/api/xsd/events.xsd \
             $$PWD/api/xsd/videoserver/recordedTimePeriods.xsd
 
