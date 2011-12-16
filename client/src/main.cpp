@@ -96,7 +96,7 @@ void addTestData()
     /*
     QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
     resource->removeFlag(QnResource::local); // to initialize access to resource throught RTSP server
-    resource->addFlag(QnResource::remove); // to initialize access to resource throught RTSP server
+    resource->addFlag(QnResource::remote); // to initialize access to resource throught RTSP server
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
@@ -121,7 +121,7 @@ void addTestData()
     /*
     QnAviResourcePtr resource2(new QnAviResource("C:/Users/physic/Videos/HighDef_-_Audio_-_Japan.avi"));
     resource2->removeFlag(QnResource::local); // to initialize access to resource throught RTSP server
-    resource2->addFlag(QnResource::remove); // to initialize access to resource throught RTSP server
+    resource2->addFlag(QnResource::remote); // to initialize access to resource throught RTSP server
     resource2->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource2));
     */

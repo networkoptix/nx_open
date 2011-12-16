@@ -76,12 +76,6 @@ void ResourceModel::addResource(QnResourcePtr resource)
     if (itemFromResource(resource))
         return; // avoid duplicates
 
-    uint parentId = -1;
-    if (resource->checkFlag(QnResource::local))
-        parentId = 0;
-    else if (resource->checkFlag(QnResource::remote))
-        parentId = resource->getParentId().hash();
-
     if (resource->checkFlag(QnResource::server)) {
         QStandardItem *root = new QStandardItem(resource->getName());
         root->setData(resource->getId().hash(), Qt::UserRole + 1);
@@ -90,13 +84,16 @@ void ResourceModel::addResource(QnResourcePtr resource)
         root->setEditable(false);
         root->setSelectable(false);
         appendRow(root);
-    } else if (QStandardItem *root = itemFromResourceId(parentId)) {
+    } else if (QStandardItem *root = itemFromResourceId(resource->getParentId().hash())) {
         QStandardItem *child = new QStandardItem(resource->getName());
         child->setData(resource->getId().hash(), Qt::UserRole + 1);
         child->setData(resource->toSearchString(), Qt::UserRole + 2);
         child->setIcon(resource->checkFlag(QnResource::live_cam) ? Skin::icon(QLatin1String("webcam.png")) : Skin::icon(QLatin1String("layout.png")));
         child->setEditable(false);
         root->appendRow(child);
+    } else {
+        qWarning("ResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
+                 resource->getParentId().hash(), resource->getId().hash());
     }
 }
 
@@ -107,9 +104,9 @@ void ResourceModel::removeResource(QnResourcePtr resource)
         return;
     }
 
-    if (QStandardItem *child = itemFromResource(resource)) {
-        foreach (QStandardItem *item, takeRow(child->row()))
-            delete item;
+    if (QStandardItem *item = itemFromResource(resource)) {
+        foreach (QStandardItem *rowItem, takeRow(item->row()))
+            delete rowItem;
     }
 }
 
