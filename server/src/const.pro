@@ -1,7 +1,5 @@
 INCLUDEPATH += ../../common/src
 
-include(../contrib/qtservice/src/qtservice.pri)
-
 win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
 }
@@ -19,6 +17,8 @@ FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
 TARGET = mediaserver
+
+include(../contrib/qtservice/src/qtservice.pri)
 
 win32: RC_FILE = server.rc
 
