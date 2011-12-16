@@ -7,7 +7,7 @@
  * Clicks on graphics widget's frame is treated differently compared to a click
  * on the surface, which results in surprises with selection handling.
  * 
- * In graphics items right click is treated the same as left click, which
+ * Also in graphics items right click is treated the same as left click, which
  * is not the desired behavior.
  * 
  * This instrument fixes these problems.

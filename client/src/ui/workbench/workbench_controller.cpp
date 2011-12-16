@@ -476,7 +476,18 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     workbench()->setItem(QnWorkbench::FOCUSED, workbenchItem);
 }
 
-void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &info) {
+void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    if(widget == NULL)
+        return;
+    
+    /* Right click does not select items. 
+     * However, we need to select the item under mouse for the menu to work as expected. */
+    if(!widget->isSelected()) {
+        widget->scene()->clearSelection();
+        widget->setSelected(true);
+    }
+
     m_contextMenu->exec(info.screenPos());
 }
 
