@@ -35,7 +35,7 @@ namespace {
     private:
         void fixButtonDownPositions(QGraphicsSceneMouseEvent *event) {
             for (int i = 0x1; i <= 0x10; i <<= 1) {
-                if(event->buttons() & i)
+                if((event->buttons() & i) || event->button() == i)
                     continue;
 
                 /* Qt is totally inconsistent in setting the button down positions for
