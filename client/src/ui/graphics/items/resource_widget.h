@@ -128,10 +128,9 @@ public:
     }
 
     /**
-     * Every widget is considered inscribed into an enclosing rectangle with a 
-     * fixed aspect ratio. When aspect ratio of a widget changes, actual geometry
-     * of its enclosing rectangle is recalculated, and this widget is re-inscribed
-     * into it.
+     * Every widget is considered to be inscribed into an enclosing rectangle with a 
+     * fixed aspect ratio. When aspect ratio of the widget itself changes, it is 
+     * re-inscribed into its enclosed rectangle.
      *
      * \returns                         Aspect ratio of the enclosing rectangle for this widget. 
      */

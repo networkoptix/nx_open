@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QMatrix4x4>
 #include <utils/common/warnings.h>
+#include <utils/common/util.h>
 #include <ui/animation/animation_event.h>
 #include "instrumentmanager.h"
 
@@ -85,11 +86,20 @@ namespace {
         }
     }
 
-    bool qFuzzyInside(qreal value, qreal lo, qreal hi) {
-        return (value >= lo && value <= hi) || qFuzzyCompare(value, lo) || qFuzzyCompare(value, hi);
-    }
-
+    /**
+     * Calculates fixed point of an affine transformation. Perspective 
+     * transformations are not handled.
+     * 
+     * \param t                         Transformation to calculate fixed point of.
+     * \param[out] exists               Whether the fixed point exists.
+     * \returns                         Fixed point, or (0, 0) if it doesn't exist.
+     */
     QPointF calculateFixedPoint(const QTransform &t, bool *exists) {
+        /* Check that it actually is a non-perspective transform. */
+#ifdef _DEBUG
+
+#endif
+
         /* Fill in row-major order. */
         QMatrix4x4 m(
             t.m11() - 1.0,  t.m21(),       0.0,   0.0,
@@ -98,6 +108,7 @@ namespace {
             0.0,            0.0,           0.0,   1.0
         );
 
+        /* We deal with stability issues the brute way. */
         if(qFuzzyIsNull(m(0, 0))) m(0, 0) = 0.0;
         if(qFuzzyIsNull(m(1, 0))) m(1, 0) = 0.0;
         if(qFuzzyIsNull(m(1, 1))) m(1, 1) = 0.0;
@@ -114,7 +125,11 @@ namespace {
         if(exists != NULL)
             *exists = invertible;
 
-        return QPointF(v.x(), v.y());
+        if(invertible) {
+            return QPointF(v.x(), v.y());
+        } else {
+            return QPointF();
+        }
     }
 
 } // anonymous namespace
@@ -249,7 +264,7 @@ public:
             /* Apply zoom correction. */
             qreal logScale, powFactor;
             calculateRelativeScale(&logScale, &powFactor);
-            if(!qFuzzyInside(logScale, -1.0, 1.0) && !qFuzzyCompare(logScale, logOldScale)) {
+            if(!qnFuzzyBetween(logScale, -1.0, 1.0) && !qFuzzyCompare(logScale, logOldScale)) {
                 qreal logFactor = calculateCorrection(logOldScale, logScale, -1.0, 1.0);
 
                 QnSceneUtility::scaleViewport(m_view, std::exp(logFactor * powFactor));
