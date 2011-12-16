@@ -41,6 +41,9 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (QnResourcePtr resource, resources)
     {
+        if (!resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::remote))
+            qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local, neither remote");
+
         if (!resource->getId().isValid())
         if (!resource->checkFlag(QnResource::server | QnResource::local)) // ### hack - the LocalServer is a fake (invalid) resource
         {
@@ -53,7 +56,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         QMutexLocker locker(&m_resourcesMtx);
         foreach (QnResourcePtr resource, resources)
         {
-            const QnId resId = resource->getId();
+            const QnId &resId = resource->getId();
             if (!m_resources.contains(resId))
             {
                 m_resources.insert(resId, resource);
@@ -85,10 +88,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
 QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const
 {
-    QMutexLocker locker(&m_resourcesMtx);
-    ResourceMap::const_iterator it = m_resources.constFind(id);
-    if (it != m_resources.constEnd())
-        return it.value();
+    if (id.isValid())
+    {
+        QMutexLocker locker(&m_resourcesMtx);
+        ResourceMap::const_iterator it = m_resources.constFind(id);
+        if (it != m_resources.constEnd())
+            return it.value();
+    }
 
     return QnResourcePtr(0);
 }
@@ -166,11 +172,14 @@ QnResourceList QnResourcePool::getResourcesWithParentId(const QnId &id) const
 {
     QnResourceList result;
 
-    QMutexLocker locker(&m_resourcesMtx);
-    foreach (QnResourcePtr resource, m_resources)
+    if (id.isValid())
     {
-        if (resource->getParentId() == id)
-            result.append(resource);
+        QMutexLocker locker(&m_resourcesMtx);
+        foreach (QnResourcePtr resource, m_resources)
+        {
+            if (resource->getParentId() == id)
+                result.append(resource);
+        }
     }
 
     return result;

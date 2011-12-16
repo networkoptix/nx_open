@@ -1,13 +1,14 @@
 #ifndef resource_commendprocessor_h_2221
 #define resource_commendprocessor_h_2221
 
-#include "../datapacket/datapacket.h"
+#include "core/dataconsumer/dataconsumer.h"
+#include "core/datapacket/datapacket.h"
+
+#include "resource.h"
 #include "resource_consumer.h"
-#include "../dataconsumer/dataconsumer.h"
-#include "utils/common/qnid.h"
 
-
-
+class QnResourceCommand;
+typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
 
 class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {
@@ -18,26 +19,25 @@ public:
     virtual void beforeDisconnectFromResource();
 };
 
-typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
 
 class QN_EXPORT QnResourceCommandProcessor : public QnAbstractDataConsumer
 {
 public:
-	QnResourceCommandProcessor();
-	~QnResourceCommandProcessor();
+    QnResourceCommandProcessor();
+    ~QnResourceCommandProcessor();
 
-	virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(QnAbstractDataPacketPtr data);
 
-	virtual void clearUnprocessedData();
+    virtual void clearUnprocessedData();
 
-	bool hasSuchResourceInQueue(QnResourcePtr res) const;
+    bool hasSuchResourceInQueue(QnResourcePtr res) const;
 
 protected:
-	virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(QnAbstractDataPacketPtr data);
+
 private:
     mutable QMutex m_cs;
-	QMap<QnId, unsigned int> mResourceQueue;
-	
+    QMap<QnId, unsigned int> mResourceQueue;
 };
 
 #endif //resource_commendprocessor_h_2221
