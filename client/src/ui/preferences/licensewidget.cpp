@@ -97,7 +97,7 @@ void LicenseWidget::licenseDetailsButtonClicked()
                          "Locked to Hardware ID: %3<br />\n"
                          "<br />\n"
                          "<b>Features:</b><br />\n"
-                         "Cameras Allowed: %4")
+                         "Archive Streams Allowed: %4")
                       .arg(license.name())
                       .arg(license.serialKey())
                       .arg(license.hardwareId())
