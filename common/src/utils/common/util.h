@@ -109,7 +109,7 @@ bool qnBetween(const T &value, const T &min, const T &max) {
  * \param max                           Interval's right border.
  * \returns                             Whether the given value lies in [min, max] interval, 
  */
-bool qnFuzzyBetween(double value, double min, double max, double precision = 0.000000000001) {
+inline bool qnFuzzyBetween(double value, double min, double max, double precision = 0.000000000001) {
     return min * (1.0 - precision) <= value && value <= max * (1.0 + precision);
 }
 
