@@ -9,10 +9,11 @@
 class QnFileDeletor
 {
 public:
+    void init(const QString& tmpRoot);
     static QnFileDeletor* instance();
     void deleteFile(const QString& fileName);
     
-    QnFileDeletor(const QString& tmpRoot);
+    QnFileDeletor();
 private:
     void processPostponedFiles();
     void postponeFile(const QString& fileName);

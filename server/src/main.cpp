@@ -256,7 +256,7 @@ int serverMain(int argc, char *argv[])
 
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    QnFileDeletor fileDeletor(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
     return 0;
 }

@@ -2,20 +2,22 @@
 #include "utils/common/log.h"
 #include "utils/common/util.h"
 
-QnFileDeletor* fileDeletor = 0;
+Q_GLOBAL_STATIC (QnFileDeletor, inst);
+
 QnFileDeletor* QnFileDeletor::instance()
 {
-    return fileDeletor;
+    return inst();
 }
 
-QnFileDeletor::QnFileDeletor(const QString& tmpRoot)
+QnFileDeletor::QnFileDeletor()
 {
-    Q_ASSERT( fileDeletor == 0);
-    fileDeletor = this;
+}
+
+void QnFileDeletor::init(const QString& tmpRoot)
+{
     m_firstTime = true;
     m_mediaRoot = closeDirPath(tmpRoot);
     m_deleteCatalog.setFileName(m_mediaRoot +  "delete_latter.csv");
-
 }
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
@@ -61,6 +63,7 @@ void QnFileDeletor::postponeFile(const QString& fileName)
 
 void QnFileDeletor::processPostponedFiles()
 {
+
     QMutexLocker lock(&m_mutex);
     if (m_firstTime)
     {
