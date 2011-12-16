@@ -21,9 +21,6 @@ public:
 
     SelectionBehavior selectionBehaviorOnRemove() const;
     void setSelectionBehaviorOnRemove(SelectionBehavior behavior);
-
-public Q_SLOTS:
-    void closeTab(int index);
 };
 
 #endif // TABWIDGET_H

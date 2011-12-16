@@ -5,7 +5,6 @@
 TabWidget::TabWidget(QWidget *parent)
     : QTabWidget(parent)
 {
-    connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 }
 
 TabWidget::SelectionBehavior TabWidget::selectionBehaviorOnRemove() const
@@ -16,10 +15,4 @@ TabWidget::SelectionBehavior TabWidget::selectionBehaviorOnRemove() const
 void TabWidget::setSelectionBehaviorOnRemove(TabWidget::SelectionBehavior behavior)
 {
     tabBar()->setSelectionBehaviorOnRemove(static_cast<QTabBar::SelectionBehavior>(behavior));
-}
-
-void TabWidget::closeTab(int index)
-{
-    if (widget(index)->close())
-        removeTab(index);
 }

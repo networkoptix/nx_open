@@ -2,6 +2,7 @@
 
 #include <QtGui/QSplitter>
 #include <QtGui/QToolBar>
+#include <QtGui/QToolButton>
 
 #include <QtNetwork/QNetworkReply>
 
@@ -101,19 +102,28 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(this);
     connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
 
-    TabWidget *tabWidget = new TabWidget(this);
-    tabWidget->setMovable(true);
-    tabWidget->setTabsClosable(true);
-    tabWidget->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
-    tabWidget->addTab(view, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
-    //tabWidget->addTab(new QWidget(tabWidget), QIcon(), tr("Grid/Properies"));
+    m_tabWidget = new TabWidget(this);
+    m_tabWidget->setMovable(true);
+    m_tabWidget->setTabsClosable(true);
+    m_tabWidget->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
+    m_tabWidget->addTab(view, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
+    //m_tabWidget->addTab(new QWidget(m_tabWidget), QIcon(), tr("Grid/Properies"));
+    connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+
+    QToolButton *newTabButton = new QToolButton(m_tabWidget);
+    newTabButton->setToolTip(tr("New Tab"));
+    newTabButton->setShortcut(QKeySequence::New);
+    newTabButton->setIcon(Skin::icon(QLatin1String("plus.png")));
+    newTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
+    m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
 
     m_splitter = new QSplitter(Qt::Horizontal, this);
     m_splitter->setChildrenCollapsible(false);
     m_splitter->addWidget(navigationWidget);
     m_splitter->setStretchFactor(0, 1);
     m_splitter->setCollapsible(0, true);
-    m_splitter->addWidget(tabWidget);
+    m_splitter->addWidget(m_tabWidget);
     m_splitter->setStretchFactor(1, 99);
     setCentralWidget(m_splitter);
 
@@ -161,6 +171,22 @@ MainWnd::~MainWnd()
     s_instance = 0;
 
     destroyNavigator(m_normalView);
+}
+
+void MainWnd::addTab()
+{
+    m_tabWidget->addTab(new QWidget(m_tabWidget), QIcon(), tr("New Tab"));
+}
+
+void MainWnd::closeTab(int index)
+{
+    if (m_tabWidget->count() == 1)
+        return; // don't close last tab
+
+    if (QWidget *widget = m_tabWidget->widget(index)) {
+        if (widget->close())
+            m_tabWidget->removeTab(index);
+    }
 }
 
 void MainWnd::itemActivated(uint resourceId)

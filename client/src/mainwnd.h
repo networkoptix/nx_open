@@ -5,6 +5,8 @@
 
 class QSplitter;
 
+class TabWidget;
+
 class CLLayoutNavigator;
 class LayoutContent;
 
@@ -31,6 +33,9 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private Q_SLOTS:
+    void addTab();
+    void closeTab(int index);
+
     void itemActivated(uint resourceId);
     void handleMessage(const QString &message);
 
@@ -49,6 +54,7 @@ private:
     QnWorkbenchController *m_controller;
     CLLayoutNavigator *m_normalView;
     QSplitter *m_splitter;
+    TabWidget *m_tabWidget;
 
     static MainWnd *s_instance;
 };
