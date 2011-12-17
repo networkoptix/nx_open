@@ -33,6 +33,9 @@ public:
     //if pleaseStop is called search will be interrupted
     void pleaseStop();
 
+    bool isLocal() const;
+    void setLocal(bool l);
+
 protected:
 
     bool shouldStop() const;
@@ -40,6 +43,9 @@ protected:
 protected:
     bool m_sholudbeUsed;
     volatile bool m_shouldStop;
+
+private:
+    bool m_localResources;
 };
 
 //=====================================================================

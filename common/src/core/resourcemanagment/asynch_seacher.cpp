@@ -146,7 +146,16 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
         if (searcher->shouldBeUsed() && !needToStop())
-            resources.append(searcher->findResources());
+        {
+            QnResourceList lst = searcher->findResources();
+            if (searcher->isLocal())
+            {
+                foreach(QnResourcePtr r, lst)
+                    r->addFlag(QnResource::local);
+            }
+
+            resources.append(lst);
+        }
     }
 
     //excluding already existing resources

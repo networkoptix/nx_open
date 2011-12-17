@@ -28,7 +28,7 @@
 #include "core/resource/file_resource.h"
 
 #define TEST_RTSP_SERVER
-//#define STANDALONE_MODE
+#define STANDALONE_MODE
 
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
@@ -245,6 +245,7 @@ int main(int argc, char *argv[])
 
     //============================
 #ifdef STANDALONE_MODE
+    QnPlArecontResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
 #endif
 

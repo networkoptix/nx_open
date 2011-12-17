@@ -430,7 +430,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
         }
     }
 
-    motion->m_duration = META_DATA_DURATION_MS *1000 * 10 ;
+    motion->m_duration = META_DATA_DURATION_MS * 1000 ;
 
     return motion;
         
