@@ -7,48 +7,58 @@ template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
-/*
+/**
  * Remove directory recursively.
+ * 
+ * \param dirName                       Name of the directory to remove.
+ * \returns                             Whether the operation completer successfully.
  */
 QN_EXPORT bool removeDir(const QString &dirName);
 
-/*
- * Convert path from native to inner.
+/**
+ * Convert path from native to universal.
+ * 
+ * \param path                          Path to convert.
+ * \returns                             Converted path.
  */
 QN_EXPORT QString fromNativePath(QString path);
 
-/*
- * Get user data directory. Directory should be available for writing.
+/**
+ * \returns                             User data directory. Directory should be available for writing.
  */
 QN_EXPORT QString getDataDirectory();
 
-/*
- * Get user movies directory.
+/**
+ * \returns                             User movies directory.
  */
 QN_EXPORT QString getMoviesDirectory();
 
-/*
- * Get number of digits in decimal representaion of an integer.
+/**
+ * \param num                           Number.
+ * \returns                             Number of digits in decimal representation of the given number.
  */
 QN_EXPORT int digitsInNumber(unsigned num);
 
-/*
- * Format duration like HH:MM:SS/HH:MM:SS
+/**
+ * Formats position in a time interval using the "HH:MM:SS/HH:MM:SS" format.
+ * Hours part is omitted when it is not relevant.
  *
- * @param duration duration in seconds
- * @param total duration in seconds
+ * \param position                      Current position in seconds.
+ * \param total                         Total duration in seconds. 
+ *                                      Pass zero to convert position only.
  */
-QN_EXPORT QString formatDuration(unsigned duration, unsigned total = 0);
+QN_EXPORT QString formatDuration(unsigned position, unsigned total = 0);
 
-/*
+/**
  * Gets param from string;   for example str= {param1="param_val" sdhksjh}
  * function return param_val
  */
 QN_EXPORT QString getParamFromString(const QString& str, const QString& param);
 
-/*
- * Round value up with step. step must be power of 2
- * function return rounded value
+/**
+ * \param value                         Value to round up.
+ * \param step                          Rounding step, must be power of 2.
+ * \returns                             Rounded value.
  */
 inline unsigned int roundUp(unsigned int value, int step) {
     return ((value-1) & ~(step-1)) + step;

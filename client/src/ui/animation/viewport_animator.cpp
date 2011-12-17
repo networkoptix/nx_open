@@ -11,7 +11,7 @@ namespace {
     class ViewportPositionSetter {
     public:
         void operator()(QObject *view, const QVariant &value) const {
-            QnSceneUtility::moveViewportSceneTo(checked_cast<QGraphicsView *>(view), value.toPointF());
+            SceneUtility::moveViewportSceneTo(checked_cast<QGraphicsView *>(view), value.toPointF());
         }
     };
 
@@ -20,7 +20,7 @@ namespace {
         ViewportScaleSetter(Qt::AspectRatioMode mode): m_mode(mode) {}
 
         void operator()(QObject *view, const QVariant &value) const {
-            QnSceneUtility::scaleViewportTo(checked_cast<QGraphicsView *>(view), value.toSizeF(), m_mode);
+            SceneUtility::scaleViewportTo(checked_cast<QGraphicsView *>(view), value.toSizeF(), m_mode);
         }
 
     private:

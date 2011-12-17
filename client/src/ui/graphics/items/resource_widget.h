@@ -20,7 +20,7 @@ class QnWorkbenchItem;
 class QnResourceDisplay;
 class QnPolygonalShadowItem;
 
-class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected QnSceneUtility {
+class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);

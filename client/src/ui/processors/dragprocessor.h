@@ -34,7 +34,7 @@ class DragProcessHandler;
  * function was called, then <tt>finishDrag()</tt> will also be called even
  * if this drag processor or target surface is destroyed.
  */
-class DragProcessor: public QObject, protected QnSceneUtility {
+class DragProcessor: public QObject, protected SceneUtility {
     Q_OBJECT;
 public:
     enum State {
@@ -179,7 +179,7 @@ private:
     template<class T, class Event>
     void mouseReleaseEventInternal(T *object, Event *event);
 
-    using QnSceneUtility::view;
+    using SceneUtility::view;
 
 private:
     /** Flags. */

@@ -3,7 +3,7 @@
 
 #include <QtGui/QWidget>
 
-#include "ui/videorecordersettings.h"
+#include "ui/screen_recording/video_recorder_settings.h"
 
 namespace Ui {
     class RecordingSettings;

@@ -7,13 +7,23 @@
 #include <QGraphicsLinearLayout>
 #include <QAction>
 #include <QMenu>
+#include <QMessageBox>
+#include <QLabel>
+#include <QPropertyAnimation>
+#include <QFileInfo>
+#include <QSettings>
+#include <QFileDialog>
 
 #include <core/resourcemanagment/security_cam_resource.h>
+#include <core/resource/directory_browser.h>
+#include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 
 #include <ui/animation/viewport_animator.h>
+
+#include <ui/screen_recording/screen_recorder.h>
 
 #include <ui/graphics/instruments/instrumentmanager.h>
 #include <ui/graphics/instruments/handscrollinstrument.h>
@@ -55,6 +65,30 @@ namespace {
         return result;
     }
 
+    QRegion createRoundRegion(int rSmall, int rLarge, const QRect &rect) {
+        QRegion region;
+
+        int circleX = rLarge;
+
+        int circleY = rSmall-1;
+        for (int y = 0; y < qMin(rect.height(), rSmall); ++y)
+        {
+            // calculate circle Point
+            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
+            region += QRect(x,y, rect.width()-x*2,1);
+        }
+        for (int y = qMin(rect.height(), rSmall); y < rect.height() - rSmall; ++y)
+            region += QRect(0,y, rect.width(),1);
+
+        circleY = rect.height() - rSmall;
+        for (int y = rect.height() - rSmall; y < rect.height(); ++y)
+        {
+            // calculate circle Point
+            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
+            region += QRect(x,y, rect.width()-x*2,1);
+        }
+        return region;
+    }
 
 } // anonymous namespace
 
@@ -183,11 +217,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
     verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     controlsWidget->setLayout(verticalLayout);
-
+    
     m_navigationItem = new NavigationItem(controlsWidget);
-
+   
     verticalLayout->addStretch(0x1000);
-
     verticalLayout->addItem(m_navigationItem);
 
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
@@ -199,8 +232,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
-#if 0
     /* Set up context menu. */
+#if 0
     QAction *addFilesAction             = newAction(tr("Add file(s)"),          tr("Ins"),          this);
     QAction *addFolderAction            = newAction(tr("Add folder"),           tr("Shift+Ins"),    this);
     QAction *addCameraAction            = newAction(tr("Add camera"),           tr("Ctrl+Ins"),     this);
@@ -220,17 +253,24 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
     QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
-    QAction *startStopScreenRecording   = newAction(tr("Start/stop screen recording"), tr(""),      this);
+    QAction *toggleScreenRecordingAction= newAction(tr("Toggle screen recording"), tr(""),          this);
 
     connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(toggleScreenRecordingAction,SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
 
     m_itemContextMenu = new QMenu();
     m_itemContextMenu->addAction(showMotionAction);
     m_itemContextMenu->addAction(hideMotionAction);
     
     m_sceneContextMenu = new QMenu();
-    m_sceneContextMenu->addAction(startStopScreenRecording);
+    m_sceneContextMenu->addAction(toggleScreenRecordingAction);
+
+    /* Init screen recorder. */
+    m_screenRecorder = new QnScreenRecorder(this);
+    connect(m_screenRecorder,           SIGNAL(recordingStarted()),                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
+    connect(m_screenRecorder,           SIGNAL(recordingFinished(const QString &)),                                 this,                           SLOT(at_screenRecorder_recordingFinished(const QString &)));
+    connect(m_screenRecorder,           SIGNAL(error(const QString &)),                                             this,                           SLOT(at_screenRecorder_error(const QString &)));
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -619,5 +659,112 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
 
         widget->setMotionGridDisplayed(display);
     }
+}
+
+void QnWorkbenchController::at_toggleRecordingAction_triggered() {
+    if(m_screenRecorder->isRecording()) {
+        at_stopRecordingAction_triggered(); 
+    } else {
+        at_startRecordingAction_triggered();
+    }
+}
+
+void QnWorkbenchController::at_startRecordingAction_triggered() {
+    if(m_screenRecorder->isRecording())
+        return;
+
+    if(!m_screenRecorder->isSupported())
+        return;
+
+    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
+    if(widget == NULL) {
+        qnWarning("Viewport was expected to be a QGLWidget.");
+        return;
+    }
+
+    m_screenRecorder->startRecording(widget);
+}
+
+void QnWorkbenchController::at_stopRecordingAction_triggered() {
+    if(!m_screenRecorder->isRecording())
+        return;
+
+    if(!m_screenRecorder->isSupported())
+        return;
+
+    m_screenRecorder->stopRecording();
+}
+
+void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
+    QMessageBox::warning(display()->view()->viewport(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
+}
+
+void QnWorkbenchController::at_screenRecorder_recordingStarted() {
+    QWidget *viewport = display()->view()->viewport();
+
+    QLabel *label = new QLabel(viewport);
+    label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    label->resize(200, 200);
+    label->move(toPoint(viewport->size() - label->size()) / 2);
+    label->setMask(createRoundRegion(18, 18, label->rect()));
+    label->setText(tr("Recording started"));
+    label->setAlignment(Qt::AlignCenter);
+    label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
+    label->setFocusPolicy(Qt::NoFocus);
+    label->show();
+
+    QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
+    animation->setEasingCurve(QEasingCurve::OutCubic);
+    animation->setDuration(3000);
+    animation->setStartValue(1.0);
+    animation->setEndValue(0.0);
+    animation->start();
+
+    connect(animation, SIGNAL(finished()), label, SLOT(deleteLater()));
+}
+
+void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
+    QString suggetion = QFileInfo(recordedFileName).fileName();
+    if (suggetion.isEmpty())
+        suggetion = tr("recorded_video");
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("videoRecording"));
+
+    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString selectedFilter;
+    while (1) {
+        QString filePath = QFileDialog::getSaveFileName(
+            display()->view()->viewport(), 
+            tr("Save Recording As..."),
+            previousDir + QLatin1Char('/') + suggetion,
+            tr("Transport Stream (*.ts)"),
+            &selectedFilter,
+            QFileDialog::DontUseNativeDialog
+        );
+
+        if (!filePath.isEmpty()) {
+            if (!filePath.endsWith(QLatin1String(".ts"), Qt::CaseInsensitive))
+                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
+            
+            QFile::remove(filePath);
+            if (!QFile::rename(recordedFileName, filePath)) {
+                QString message = QObject::tr("Can't overwrite file '%1'. Please try another name.").arg(filePath);
+                CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
+                QMessageBox::warning(display()->view()->viewport(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                continue;
+            }
+
+            QnResourcePtr res = QnResourceDirectoryBrowser::instance().checkFile(filePath);
+            if (res)
+                qnResPool->addResource(res);
+
+            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+        } else {
+            QFile::remove(recordedFileName);
+        }
+        break;
+    }
+    settings.endGroup();
 }
 

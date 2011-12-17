@@ -38,10 +38,10 @@ namespace {
 
     QPointF calculateOrigin(QGraphicsView *view, QnResourceWidget *widget) {
         QRect viewportRect = view->viewport()->rect();
-        qreal viewportDiameter = QnSceneUtility::length(view->mapToScene(viewportRect.bottomRight()) - view->mapToScene(viewportRect.topLeft()));
+        qreal viewportDiameter = SceneUtility::length(view->mapToScene(viewportRect.bottomRight()) - view->mapToScene(viewportRect.topLeft()));
 
         QRectF widgetRect = widget->rect();
-        qreal widgetDiameter = QnSceneUtility::length(widget->mapToScene(widgetRect.bottomRight()) - widget->mapToScene(widgetRect.topLeft()));
+        qreal widgetDiameter = SceneUtility::length(widget->mapToScene(widgetRect.bottomRight()) - widget->mapToScene(widgetRect.topLeft()));
 
         QPointF widgetCenter = widget->mapToScene(widget->transformOriginPoint());
 
@@ -53,7 +53,7 @@ namespace {
 
             /* Perform calculations in the dimension of the line connecting viewport and widget centers,
              * zero at viewport center. */
-            qreal distance = QnSceneUtility::length(viewportCenter - widgetCenter);
+            qreal distance = SceneUtility::length(viewportCenter - widgetCenter);
             qreal lo = qMax(-viewportDiameter / 2, distance - widgetDiameter / 2);
             qreal hi = qMin(viewportDiameter / 2, distance + widgetDiameter / 2);
             qreal pos = (lo + hi) / 2;
@@ -72,7 +72,7 @@ namespace {
     }
 
     qreal calculateItemAngle(QnResourceWidget *, const QPointF &itemPoint, const QPointF &itemOrigin) {
-        return QnSceneUtility::atan2(itemPoint - itemOrigin);
+        return SceneUtility::atan2(itemPoint - itemOrigin);
     }
 
     qreal calculateSceneAngle(QnResourceWidget *widget, const QPointF &scenePoint, const QPointF &sceneOrigin) {
@@ -82,7 +82,7 @@ namespace {
 
 } // anonymous namespace
 
-class RotationItem: public QGraphicsObject, protected QnSceneUtility {
+class RotationItem: public QGraphicsObject, protected SceneUtility {
 public:
     RotationItem(QGraphicsItem *parent = NULL): 
         QGraphicsObject(parent),
@@ -110,7 +110,7 @@ public:
             return; /* Target may get suddenly deleted. */
 
         /* Accessing viewport is safe here as it equals the passed widget. */
-        QGraphicsView *view = QnSceneUtility::view(m_viewport);
+        QGraphicsView *view = SceneUtility::view(m_viewport);
         QTransform sceneToViewport = view->viewportTransform();
 
         /* Map head & origin to viewport. */

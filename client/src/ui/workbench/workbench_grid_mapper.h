@@ -7,7 +7,7 @@
 #include <QPoint>
 #include <ui/common/scene_utility.h>
 
-class QnWorkbenchGridMapper: public QObject, protected QnSceneUtility {
+class QnWorkbenchGridMapper: public QObject, protected SceneUtility {
     Q_OBJECT;
 public:
     QnWorkbenchGridMapper(QObject *parent = NULL);

@@ -9,7 +9,7 @@ class QGraphicsWidget;
 class QPropertyAnimation;
 class QParallelAnimationGroup;
 
-class QnWidgetAnimator: public QObject, protected QnSceneUtility {
+class QnWidgetAnimator: public QObject, protected SceneUtility {
     Q_OBJECT;
 public:
     /**

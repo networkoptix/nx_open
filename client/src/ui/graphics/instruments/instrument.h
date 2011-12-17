@@ -117,7 +117,7 @@ namespace detail {
  * inside derived class's destructor if it reimplements either 
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public QObject, protected QnSceneUtility {
+class Instrument: public QObject, protected SceneUtility {
     Q_OBJECT;
 
 public:

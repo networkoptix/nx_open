@@ -48,11 +48,11 @@ QString getMoviesDirectory()
     return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
 }
 
-QString formatDuration(unsigned duration, unsigned total)
+QString formatDuration(unsigned position, unsigned total)
 {
-    unsigned hours = duration / 3600;
-    unsigned minutes = (duration % 3600) / 60;
-    unsigned seconds = duration % 60;
+    unsigned hours = position / 3600;
+    unsigned minutes = (position % 3600) / 60;
+    unsigned seconds = position % 60;
 
     if (total == 0)
     {

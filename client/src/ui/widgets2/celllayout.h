@@ -13,7 +13,7 @@
 
 class CellLayoutPrivate;
 
-class CellLayout: public QGraphicsLayout, protected QnSceneUtility
+class CellLayout: public QGraphicsLayout, protected SceneUtility
 {
 public:
     /**

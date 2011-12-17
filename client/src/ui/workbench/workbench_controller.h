@@ -31,6 +31,7 @@ class QnWorkbench;
 class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
+class QnScreenRecorder;
 
 
 /**
@@ -38,7 +39,7 @@ class QnWorkbenchGridMapper;
  * 
  * It also presents some functions for high-level scene content manipulation.
  */
-class QnWorkbenchController: public QObject, protected QnSceneUtility {
+class QnWorkbenchController: public QObject, protected SceneUtility {
     Q_OBJECT;
 public:
     QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent = NULL);
@@ -96,6 +97,14 @@ protected slots:
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
 
+    void at_startRecordingAction_triggered();
+    void at_stopRecordingAction_triggered();
+    void at_toggleRecordingAction_triggered();
+
+    void at_screenRecorder_error(const QString &errorMessage);
+    void at_screenRecorder_recordingStarted();
+    void at_screenRecorder_recordingFinished(const QString &recordedFileName);
+
 private:
     /** Display synchronizer. */
     QnWorkbenchDisplay *m_display;
@@ -133,6 +142,9 @@ private:
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
+
+    
+    QnScreenRecorder *m_screenRecorder;
 
     QMenu *m_itemContextMenu;
     QMenu *m_sceneContextMenu;

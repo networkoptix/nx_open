@@ -38,7 +38,7 @@ class CLCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
+class QnWorkbenchDisplay: public QObject, protected AnimationTimerListener, protected SceneUtility {
     Q_OBJECT;
 public:
     /**

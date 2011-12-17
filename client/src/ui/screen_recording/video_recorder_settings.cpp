@@ -1,4 +1,4 @@
-#include "videorecordersettings.h"
+#include "video_recorder_settings.h"
 
 #include <QtCore/QSettings>
 #include <QtGui/QApplication>

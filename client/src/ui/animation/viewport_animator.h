@@ -11,7 +11,7 @@ class QGraphicsView;
 
 class QnAccessorAnimation;
 
-class QnViewportAnimator: public QObject, protected QnSceneUtility {
+class QnViewportAnimator: public QObject, protected SceneUtility {
     Q_OBJECT;
 public:
     /**

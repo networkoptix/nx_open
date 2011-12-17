@@ -31,7 +31,7 @@
 #include "ui/preferences/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
 #include "youtube/youtubeuploaddialog.h"
-#include "videorecordersettings.h"
+#include "ui/screen_recording/video_recorder_settings.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resourcemanagment/security_cam_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"

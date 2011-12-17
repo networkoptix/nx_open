@@ -269,11 +269,11 @@ public:
             if(!qnFuzzyBetween(logScale, -1.0, 1.0) && !qFuzzyCompare(logScale, logOldScale)) {
                 qreal logFactor = calculateCorrection(logOldScale, logScale, -1.0, 1.0);
 
-                QnSceneUtility::scaleViewport(m_view, std::exp(logFactor * powFactor));
+                SceneUtility::scaleViewport(m_view, std::exp(logFactor * powFactor));
 
                 /* Calculate relative correction and move viewport. */
                 qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
-                QnSceneUtility::moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
+                SceneUtility::moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
 
                 updateParameters();
             }
@@ -283,7 +283,7 @@ public:
             if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyCompare(m_sceneViewportCenter, oldCenter)) {
                 QPointF correction = calculateCorrection(oldCenter, m_sceneViewportCenter, centerPositionBounds);
 
-                QnSceneUtility::moveViewportScene(m_view, correction);
+                SceneUtility::moveViewportScene(m_view, correction);
 
                 updateParameters();
             }
@@ -300,7 +300,7 @@ public:
                 if(std::abs(logDelta) > std::abs(logDirection))
                     logDelta = logDirection;
 
-                QnSceneUtility::scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
+                SceneUtility::scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
 
                 updateParameters();
             }
@@ -317,7 +317,7 @@ public:
                     if(deltaLength > directionLength)
                         deltaLength = directionLength;
 
-                    QnSceneUtility::moveViewportScene(m_view, direction / directionLength * deltaLength);
+                    SceneUtility::moveViewportScene(m_view, direction / directionLength * deltaLength);
                 }
             }
 
@@ -370,7 +370,7 @@ protected:
         sceneRect.adjust(-dx, -dy, dx, dy);
             
         /* Expand. */
-        sceneRect = QnSceneUtility::dilated(sceneRect, sceneRect.size() * 3);
+        sceneRect = SceneUtility::dilated(sceneRect, sceneRect.size() * 3);
 
         /* Expand to include current scene rect. */
         sceneRect = sceneRect.united(m_view->sceneRect());
