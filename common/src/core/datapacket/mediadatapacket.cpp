@@ -127,6 +127,9 @@ void QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
 {
     QRect motioRect = imageRect.intersected(mRect);
 
+    if (motioRect.isNull())
+        return;
+
     //int localZoneWidth = imageRect.width() / MD_WIDTH;
     //int localZoneHight = imageRect.height() / MD_HEIGHT;
 

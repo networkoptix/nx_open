@@ -46,10 +46,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
         if (!resource->getId().isValid())
         if (!resource->checkFlag(QnResource::server | QnResource::local)) // ### hack - the LocalServer is a fake (invalid) resource
-        {
             resource->setId(QnId::generateSpecialId());
-            resource->addFlag(QnResource::local);
-        }
     }
 
     {

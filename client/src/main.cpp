@@ -245,6 +245,7 @@ int main(int argc, char *argv[])
 
     //============================
 #ifdef STANDALONE_MODE
+    QnPlArecontResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
 #endif
 

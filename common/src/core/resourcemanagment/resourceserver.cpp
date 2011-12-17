@@ -4,7 +4,8 @@
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
 m_shouldStop(false),
-m_sholudbeUsed(true)
+m_sholudbeUsed(true),
+m_localResources(false)
 {
 
 }
@@ -36,6 +37,16 @@ void QnAbstractResourceSearcher::pleaseStop()
 bool QnAbstractResourceSearcher::shouldStop() const
 {
     return m_shouldStop;
+}
+
+bool QnAbstractResourceSearcher::isLocal() const
+{
+    return m_localResources;
+}
+
+void QnAbstractResourceSearcher::setLocal(bool l)
+{
+    m_localResources = l;
 }
 
 
