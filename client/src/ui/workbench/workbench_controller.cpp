@@ -700,12 +700,12 @@ void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage)
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
-    QWidget *viewport = display()->view()->viewport();
+    QWidget *view = display()->view();
 
-    QLabel *label = new QLabel(viewport);
+    QLabel *label = new QLabel(view);
     label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
     label->resize(200, 200);
-    label->move(toPoint(viewport->size() - label->size()) / 2);
+    label->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - label->size()) / 2);
     label->setMask(createRoundRegion(18, 18, label->rect()));
     label->setText(tr("Recording started"));
     label->setAlignment(Qt::AlignCenter);
