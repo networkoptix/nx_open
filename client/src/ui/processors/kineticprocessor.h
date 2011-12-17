@@ -18,10 +18,10 @@
  * Kinetic processor presents several functions that are to be used from user
  * code. The most important functions are:
  * <ul>
- * <li><tt>reset()</tt>, which is to be used when a motion starts, or when
- *    there is a need to stop kinetic process prematurely. </li>
+ * <li><tt>reset()</tt>, which is to be used when a user-controlled motion starts, 
+ *    or when there is a need to stop kinetic process prematurely. </li>
  * <li><tt>shift()</tt>, which is be to used to feed position delta
- *    values to kinetic processor while motion is in progress.</tt>
+ *    values to kinetic processor while user-controller motion is in progress.</tt>
  * <li><tt>start()</tt>, which starts kinetic motion.</tt>
  * </ul>
  * 

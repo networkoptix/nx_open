@@ -22,7 +22,7 @@ namespace {
     
     const qreal defaultArrowOverlap = 5;
 
-    const qreal snapTo90IntervalSize = 20.0;
+    const qreal snapTo90IntervalSize = 10.0;
 
     inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &frontUnit, const QPointF &sideUnit) {
         shape->lineTo(base - defaultArrowSize.width() / 2 * sideUnit - defaultArrowOverlap * frontUnit);
