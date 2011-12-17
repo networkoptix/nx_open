@@ -628,7 +628,7 @@ QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
 }
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
-    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-0.1, -0.1, 0.1, 0.1));
+    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-0.05, -0.05, 0.05, 0.05));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -759,7 +759,7 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     if(zoomedItem != NULL) {
         m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
     } else {
-        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.25, 0.25, 0.25, 0.25));
+        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.5, 0.5, 0.5, 0.5));
     }
 
     QSizeF sizeExtension = sizeDelta(positionExtension);
