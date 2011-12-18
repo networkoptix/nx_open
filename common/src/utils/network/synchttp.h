@@ -11,7 +11,6 @@
 #include <QtNetwork/QNetworkReply>
 
 class QAuthenticator;
-class QNetworkAccessManager;
 class QNetworkProxy;
 
 /**
@@ -82,7 +81,6 @@ private Q_SLOTS:
 private:
     QUrl m_url;
     QByteArray m_credentials;
-    QNetworkAccessManager *m_accessManager;
 };
 
 #endif
