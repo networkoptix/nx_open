@@ -1,18 +1,19 @@
 #ifndef QN_WORKBENCH_ITEM_H
 #define QN_WORKBENCH_ITEM_H
 
-#include <QObject>
-#include <QScopedPointer>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 class QnWorkbenchLayout;
-class QnResourceDisplay;
 
 /**
  * Layout item model. Video, image, folder, or anything else.
  */
-class QnWorkbenchItem: public QObject {
-    Q_OBJECT;
-    Q_FLAGS(ItemFlag ItemFlags);
+class QnWorkbenchItem : public QObject
+{
+    Q_OBJECT
+    Q_FLAGS(ItemFlag ItemFlags)
+
 public:
     enum ItemFlag {
         Pinned = 0x1  /**< Item is pinned to the grid. Items are pinned by default. */
@@ -21,9 +22,9 @@ public:
 
     /**
      * Constructor.
-     * 
+     *
      * \param resourceUniqueId          Unique identifier of a resource.
-     * \param parent                    Parent of this object.                
+     * \param parent                    Parent of this object.
      */
     QnWorkbenchItem(const QString &resourceUniqueId, QObject *parent = NULL);
 
@@ -40,7 +41,7 @@ public:
     }
 
     /**
-     * \returns                         Unique identifier of a resource associated with this item. 
+     * \returns                         Unique identifier of a resource associated with this item.
      */
     const QString &resourceUniqueId() const {
         return m_resourceUniqueId;
@@ -60,7 +61,7 @@ public:
      * <li>This item is pinned.</li>
      * <li>Given geometry is already occupied by some other item.</li>
      * </ul>
-     * 
+     *
      * If you want to have more control on how items are moved, use the
      * function provided by the layout.
      *
@@ -107,7 +108,7 @@ public:
     }
 
     /**
-     * Note that this function will fail when trying to pin an item into a 
+     * Note that this function will fail when trying to pin an item into a
      * position that is already occupied.
      *
      * \param flag                      Flag to set.
@@ -128,14 +129,6 @@ public:
      */
     void setRotation(qreal rotation);
 
-    /**
-     * Creates a display for this item. Caller is responsible for deleting it.
-     * 
-     * \returns                         Newly created display, or NULL if display cannot be created.
-     */
-    QnResourceDisplay *createDisplay(QObject *parent = NULL); // TODO: move out?
-
-
 signals:
     void geometryChanged();
     void geometryDeltaChanged();
@@ -149,7 +142,7 @@ protected:
     void ensureRemoved();
 
     void setGeometryInternal(const QRect &geometry);
-    
+
     void setFlagInternal(ItemFlag flag, bool value);
 
 private:
@@ -174,6 +167,6 @@ private:
     qreal m_rotation;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchItem::ItemFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchItem::ItemFlags)
 
 #endif // QN_WORKBENCH_ITEM_H

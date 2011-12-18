@@ -6,14 +6,16 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
+#include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <settings.h>
-#include "resource_widget_renderer.h"
+
 #include "polygonal_shadow_item.h"
+#include "resource_widget_renderer.h"
+#include "settings.h"
 
 namespace {
     /** Default frame width. */
@@ -26,8 +28,8 @@ namespace {
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
-     * 
-     * Frame events are processed not only when hovering over the frame itself, 
+     *
+     * Frame events are processed not only when hovering over the frame itself,
      * but also over its extension. */
     const qreal frameExtensionMultiplier = 1.0;
 
@@ -88,10 +90,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setLayout(layout);
 
     /* Set up video rendering. */
-    m_display = item->createDisplay(this);
+
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
+
+    m_display = new QnResourceDisplay(resource, this);
+    Q_ASSERT(m_display);
     m_videoLayout = m_display->videoLayout();
+    Q_ASSERT(m_videoLayout);
     m_channelCount = m_videoLayout->numberOfChannels();
-    
+
     m_renderer = new QnResourceWidgetRenderer(m_channelCount);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
@@ -106,7 +113,7 @@ QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 
     delete m_display;
-    
+
     if(!m_shadow.isNull()) {
         m_shadow.data()->setShapeProvider(NULL);
         delete m_shadow.data();
@@ -119,7 +126,7 @@ const QnResourcePtr &QnResourceWidget::resource() const {
 
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     prepareGeometryChange();
-    
+
     m_frameWidth = frameWidth;
     qreal extendedFrameWidth = m_frameWidth * (1.0 + frameExtensionMultiplier);
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
@@ -184,7 +191,7 @@ void QnResourceWidget::updateShadowPos() {
 void QnResourceWidget::setGeometry(const QRectF &geometry) {
     /* Unfortunately, widgets with constant aspect ratio cannot be implemented
      * using size hints. So here is one of the workarounds. */
-    
+
 #if 0
     if(!hasAspectRatio()) {
         base_type::setGeometry(geometry);
@@ -266,7 +273,7 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
     case ItemTransformHasChanged:
     case ItemRotationHasChanged:
     case ItemScaleHasChanged:
-    case ItemTransformOriginPointHasChanged: 
+    case ItemTransformOriginPointHasChanged:
         invalidateShadowShape();
         updateShadowPos();
         break;
@@ -294,7 +301,7 @@ void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    if (m_channelCount == 1) 
+    if (m_channelCount == 1)
         return QRectF(QPointF(0.0, 0.0), size());
 
     QSizeF size = this->size();
@@ -302,9 +309,9 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     qreal h = size.height() / m_videoLayout->height();
 
     return QRectF(
-        w * m_videoLayout->h_position(channel), 
-        h * m_videoLayout->v_position(channel), 
-        w, 
+        w * m_videoLayout->h_position(channel),
+        h * m_videoLayout->v_position(channel),
+        w,
         h
     );
 }
@@ -320,7 +327,7 @@ void QnResourceWidget::hideActivityDecorations() {
 void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion) {
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
-    
+
     painter->setPen(QPen(QColor(255, 255, 255, 16)));
     for (int x = 0; x < MD_WIDTH; ++x)
         painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
@@ -457,8 +464,8 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     qreal fadeMultiplier = state.iconFadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.iconChangeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0;
 
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND); 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glColor4f(0.0, 0.0, 0.0, 0.5 * fadeMultiplier);
     glBegin(GL_QUADS);
@@ -466,21 +473,21 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     glEnd();
 
     QRectF iconRect = expanded(
-        1.0, 
+        1.0,
         QRectF(
             rect.center() - toPoint(rect.size()) / 8,
             rect.size() / 4
         ),
         Qt::KeepAspectRatio
     );
-    
+
     glPushMatrix();
     glTranslatef(iconRect.center().x(), iconRect.center().y(), 1.0);
     glScalef(iconRect.width() / 2, iconRect.height() / 2, 1.0);
     switch(state.icon) {
-    case LOADING: 
+    case LOADING:
         progressPainter()->paint(
-            static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec, 
+            static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
             fadeMultiplier
         );
         break;
@@ -594,8 +601,8 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
     if(event->type() == QEvent::GraphicsSceneHoverMove) {
         QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
 
-        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame. 
-         * 
+        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
+         *
          * As this widget may not have a frame section associated with some parts of
          * its frame, cursor must be unset manually. */
         Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
