@@ -107,6 +107,7 @@ protected slots:
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
     void onPrepareRecording(QVariant value);
+    void onStartRecording();
 private:
     /** Display synchronizer. */
     QnWorkbenchDisplay *m_display;
@@ -152,6 +153,9 @@ private:
     QAction *m_startRecordingAction;
     QAction *m_stopRecordingAction;
     QAction *m_recordingSettingsActions;
+    bool m_recordingNeedCountdown;
+    QLabel* m_recordingLabel;
+    QPropertyAnimation *m_recordingAnimation;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

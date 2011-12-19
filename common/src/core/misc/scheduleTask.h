@@ -37,19 +37,19 @@ public:
     /*
     * Duration at ms
     */
-    int durationMs() const { return m_endTime - m_startTime; }
+    int durationMs() const;
 
     /*
     * Schedule relative start time inside a week at ms.
     */
-    int startTimeMs() const { return m_startTime; }
+    int startTimeMs() const;
 
     /*
     * Schedule relative start time inside a week at ms.
     */
-    bool containTime(int weekTimeMs) const { return m_startTime <= weekTimeMs && weekTimeMs <= m_endTime; }
+    bool containTime(int weekTimeMs) const;
 
-    bool operator<(const QnScheduleTask &other) const { return m_startTime < other.m_startTime; }
+    bool operator<(const QnScheduleTask &other) const;
 
     // Add getters and settings here
 
@@ -65,8 +65,8 @@ public:
     int m_afterThreshold;
 };
 
-inline bool operator<(qint64 first, const QnScheduleTask &other) { return first < other.m_startTime; }
-inline bool operator<(const QnScheduleTask &other, qint64 first) { return other.m_startTime < first; }
+inline bool operator<(qint64 first, const QnScheduleTask &other);
+inline bool operator<(const QnScheduleTask &other, qint64 first);
 
 //typedef QSharedPointer<QnScheduleTask> QnScheduleTaskPtr;
 typedef QList<QnScheduleTask> QnScheduleTaskList;
