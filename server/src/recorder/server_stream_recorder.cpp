@@ -5,6 +5,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     QnStreamRecorder(dev)
 {
     m_skipDataToTime = AV_NOPTS_VALUE;
+    m_lastMotionTimeUsec = AV_NOPTS_VALUE;
+    m_lastMotionContainData = false;
 }
 
 bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
@@ -22,8 +24,12 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 
     QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (metaData) {
-        m_lastMotionTimeUsec = metaData->timestamp;
-        setPrebufferingUsec(0); // flush prebuffer
+        bool motionContainData = !metaData->isEmpty();
+        if (motionContainData || m_lastMotionContainData) {
+            m_lastMotionTimeUsec = metaData->timestamp;
+            setPrebufferingUsec(0); // flush prebuffer
+        }
+        m_lastMotionContainData = motionContainData;
         return;
     }
     if (m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp >= m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll)
@@ -38,9 +44,13 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
     if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Run)
         return true;
+    else if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Never)
+        return false;
+
     // if prebuffering mode and all buffer is full - drop data
 
-    bool rez = getPrebufferingUsec() == 0;
+    bool rez = m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll;
+    //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll))/1000000.0;
     if (!rez)
         close();
     return rez;
@@ -49,7 +59,7 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleTask)
 {
     m_currentScheduleTask = scheduleTask;
-    m_lastMotionTimeUsec = AV_NOPTS_VALUE;
+    //m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
         setPrebufferingUsec(scheduleTask.getBeforeThreshold()*1000000ll);
     else

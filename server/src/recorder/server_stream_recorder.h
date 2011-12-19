@@ -26,6 +26,7 @@ private:
     QnScheduleTask m_currentScheduleTask;
     qint64 m_skipDataToTime;
     qint64 m_lastMotionTimeUsec;
+    bool m_lastMotionContainData;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

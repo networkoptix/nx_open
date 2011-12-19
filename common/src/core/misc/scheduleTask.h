@@ -9,7 +9,7 @@
 class QnScheduleTask
 {
 public:
-    enum RecordingType { RecordingType_Run, RecordingType_MotionOnly };
+    enum RecordingType { RecordingType_Run, RecordingType_MotionOnly, RecordingType_Never };
 
     QnScheduleTask()
         : m_startTime(0), m_endTime(0),
