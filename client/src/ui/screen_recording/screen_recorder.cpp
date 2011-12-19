@@ -133,8 +133,8 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     QString logoName = QLatin1String("logo_1920_1080.png");
     logo = Skin::pixmap(logoName); // hint: comment this line to remove logo
 #endif
-    
-    m_encoder.reset(new DesktopFileEncoder(
+    delete m_encoder;
+    m_encoder = new DesktopFileEncoder(
         filePath,
         screen,
         audioDevice.isNull() ? 0 : &audioDevice,
@@ -145,7 +145,7 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
         encodingQuality,
         appWidget,
         logo
-    ));
+    );
 
     if (!m_encoder->start()) {
         cl_log.log(m_encoder->lastErrorStr(), cl_logERROR);
@@ -153,7 +153,8 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
         emit error(m_encoder->lastErrorStr());
 
 
-        m_encoder.reset();
+        m_encoder->deleteLater();
+        m_encoder = 0;
         return;
     }
 
@@ -171,12 +172,13 @@ void QnScreenRecorder::stopRecording() {
     if(!m_recording)
         return; /* Stopping when nothing is being recorded is OK. */
 
-    assert(!m_encoder.isNull());
+    assert(m_encoder);
 
     QString recordedFileName = m_encoder->fileName();
     m_encoder->stop();
 
     m_recording = false;
-    m_encoder.reset();
     emit recordingFinished(recordedFileName);
+    m_encoder->deleteLater();
+    m_encoder = 0;
 }

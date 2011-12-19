@@ -51,7 +51,7 @@ signals:
 
 private:
     bool m_recording;
-    QScopedPointer<DesktopFileEncoder> m_encoder;
+    DesktopFileEncoder* m_encoder;
 };
 
 #endif // QN_SCREEN_RECORDER_H
