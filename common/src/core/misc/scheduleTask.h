@@ -65,8 +65,8 @@ public:
     int m_afterThreshold;
 };
 
-inline bool operator<(qint64 first, const QnScheduleTask &other);
-inline bool operator<(const QnScheduleTask &other, qint64 first);
+bool operator<(qint64 first, const QnScheduleTask &other);
+bool operator<(const QnScheduleTask &other, qint64 first);
 
 //typedef QSharedPointer<QnScheduleTask> QnScheduleTaskPtr;
 typedef QList<QnScheduleTask> QnScheduleTaskList;
