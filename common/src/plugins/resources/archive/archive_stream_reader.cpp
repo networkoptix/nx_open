@@ -730,7 +730,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
     if (maskedDelegate) {
         maskedDelegate->setSendMotion(value);
-        if (!mFirstTime)
+        if (!mFirstTime && !m_delegate->isRealTimeSource())
             jumpToPreviousFrame(determineDisplayTime());
         return true;
     }
