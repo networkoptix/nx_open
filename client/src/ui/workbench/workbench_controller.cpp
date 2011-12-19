@@ -476,8 +476,13 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
             updateGeometryDelta(widget);
 
     /* Re-sync everything. */
-    foreach(QnWorkbenchItem *model, workbenchItems)
-        m_display->synchronize(model);
+    foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
+        m_display->synchronize(workbenchItem);
+
+    /* Un-raise the raised item if it was among the dragged ones. */
+    QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+    if(raisedItem != NULL && workbenchItems.contains(raisedItem))
+        workbench()->setItem(QnWorkbench::RAISED, NULL);
 
 #if 0
     /* Deselect items that were dragged. */
