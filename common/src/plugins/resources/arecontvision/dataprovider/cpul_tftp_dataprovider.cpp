@@ -5,6 +5,7 @@
 #include "../tools/AVJpegHeader.h"
 #include <QMutex>
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "utils/common/util.h"
 
 //======================================================
 
@@ -430,8 +431,8 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
         }
     }
 
-    motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-
+    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
+    motion->m_duration = INT64_MAX;
     return motion;
         
 } 
