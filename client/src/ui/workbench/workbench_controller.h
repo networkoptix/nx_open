@@ -107,7 +107,7 @@ protected slots:
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
     void onPrepareRecording(QVariant value);
-    void onStartRecording();
+    void onRecordingCountdownFinished();
 private:
     /** Display synchronizer. */
     QnWorkbenchDisplay *m_display;
@@ -153,7 +153,7 @@ private:
     QAction *m_startRecordingAction;
     QAction *m_stopRecordingAction;
     QAction *m_recordingSettingsActions;
-    bool m_recordingNeedCountdown;
+    bool m_countdownCanceled;
     QLabel* m_recordingLabel;
     QPropertyAnimation *m_recordingAnimation;
 };

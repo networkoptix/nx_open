@@ -278,7 +278,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_screenRecorder,           SIGNAL(recordingFinished(const QString &)),                                 this,                           SLOT(at_screenRecorder_recordingFinished(const QString &)));
     connect(m_screenRecorder,           SIGNAL(error(const QString &)),                                             this,                           SLOT(at_screenRecorder_error(const QString &)));
 
-    m_recordingNeedCountdown = false;
+    m_countdownCanceled = false;
     m_recordingLabel = 0;
     m_recordingAnimation = 0;
 }
@@ -588,7 +588,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
     QScopedPointer<QMenu> menu(new QMenu(display()->view()));
-    if(m_screenRecorder->isRecording()) {
+    if(m_screenRecorder->isRecording() || m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running) {
         menu->addAction(m_stopRecordingAction);
     } else {
         menu->addAction(m_startRecordingAction);
@@ -699,12 +699,9 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
     if(!m_screenRecorder->isSupported())
         return;
 
-    m_recordingNeedCountdown = !m_recordingNeedCountdown;
+    m_countdownCanceled = false;
 
     //m_startRecordingAction->setDis              = newAction(tr("Start screen recording")
-
-    if (!m_recordingNeedCountdown)
-        return;
 
     QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
     if(widget == NULL) {
@@ -736,22 +733,23 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
     m_recordingAnimation->setEndValue(0.6);
 
     m_recordingAnimation->disconnect();
-    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(onStartRecording()));
+    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(onRecordingCountdownFinished()));
     connect(m_recordingAnimation,SIGNAL(valueChanged(QVariant)), this, SLOT(onPrepareRecording(QVariant)));
     m_recordingLabel->setText(tr("Ready"));
     m_recordingAnimation->start();
 }
 
-void QnWorkbenchController::onStartRecording()
+void QnWorkbenchController::onRecordingCountdownFinished()
 {
     m_recordingLabel->hide();
-    if (m_recordingNeedCountdown)
+    if (!m_countdownCanceled)
     {
-        m_recordingNeedCountdown = false;
+        //m_countdownStarted = false;
         QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
         if(widget)
             m_screenRecorder->startRecording(widget);
     }
+    m_countdownCanceled = false;
 };
 
 void QnWorkbenchController::onPrepareRecording(QVariant value)
@@ -770,7 +768,7 @@ void QnWorkbenchController::onPrepareRecording(QVariant value)
         return;
 
     //DesktopFileEncoder *desktopEncoder = qobject_cast<DesktopFileEncoder *>(cm_start_video_recording.property("encoder").value<QObject *>());
-    if (!m_recordingNeedCountdown) {
+    if (m_countdownCanceled) {
         label->setText(tr("Cancelled"));
         return;
     }
@@ -784,8 +782,10 @@ void QnWorkbenchController::onPrepareRecording(QVariant value)
 }
 
 void QnWorkbenchController::at_stopRecordingAction_triggered() {
-    if(!m_screenRecorder->isRecording())
+    if(!m_screenRecorder->isRecording()) {
+        m_countdownCanceled = true;
         return;
+    }
 
     if(!m_screenRecorder->isSupported())
         return;
