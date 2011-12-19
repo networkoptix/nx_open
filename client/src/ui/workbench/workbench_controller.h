@@ -168,7 +168,7 @@ private:
     /** Screen recording countdown label. */
     QLabel* m_recordingLabel;
 
-    /** Animation for screen recording coutdown. */
+    /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
 };
 

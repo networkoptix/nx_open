@@ -257,20 +257,25 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
     QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
-    m_startRecordingAction              = newAction(tr("Start screen recording"), tr("Alt+R"),           this);
-    m_stopRecordingAction               = newAction(tr("Stop screen recording"), tr("Alt+R"),            this);
-
+    m_startRecordingAction              = newAction(tr("Start screen recording"), tr(""),           this);
+    m_stopRecordingAction               = newAction(tr("Stop screen recording"), tr(""),            this);
+    QAction *toggleRecordingAction      = newAction(tr("Start/stop screen recording"), tr("Alt+R"), this);
     m_recordingSettingsActions          = newAction(tr("Screen recording settings"), tr(""),        this);
 
     connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(m_startRecordingAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_startRecordingAction_triggered()));
     connect(m_stopRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_stopRecordingAction_triggered()));
+    connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
+
+    m_display->view()->addAction(toggleRecordingAction);
 
     m_itemContextMenu = new QMenu();
     m_itemContextMenu->addAction(showMotionAction);
     m_itemContextMenu->addAction(hideMotionAction);
+
+
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -589,7 +594,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
     QScopedPointer<QMenu> menu(new QMenu(display()->view()));
-    if(m_screenRecorder->isRecording() || m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running) {
+    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
         menu->addAction(m_stopRecordingAction);
     } else {
         menu->addAction(m_startRecordingAction);
@@ -686,7 +691,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
 }
 
 void QnWorkbenchController::at_toggleRecordingAction_triggered() {
-    if(m_screenRecorder->isRecording()) {
+    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
         at_stopRecordingAction_triggered(); 
     } else {
         at_startRecordingAction_triggered();
@@ -701,8 +706,6 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
         return;
 
     m_countdownCanceled = false;
-
-    //m_startRecordingAction->setDis              = newAction(tr("Start screen recording")
 
     QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
     if(widget == NULL) {
