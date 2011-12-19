@@ -855,7 +855,9 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
         m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
         // if click on void => go to all flders layout
+#if 0
         (static_cast<MainWnd*>(mMainWnd))->goToNewLayoutContent(CLSceneLayoutManager::instance().getAllLayoutsContent());
+#endif
         return;
     }
 
@@ -3624,7 +3626,9 @@ void GraphicsView::onOpenFile()
         //QString selectedFilter = m_openMediaDialog.selectedFilter();
         QStringList srcFiles = m_openMediaDialog.selectedFiles();
         QStringList dstFiles = QnFileProcessor::findAcceptedFiles(srcFiles);
+#if 0
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
+#endif
     }
 }
 

@@ -1,5 +1,6 @@
 #include "mainwnd.h"
 
+#include <QtGui/QBoxLayout>
 #include <QtGui/QSplitter>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
@@ -50,7 +51,6 @@ MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
-      m_normalView(NULL),
       m_controller(NULL)
 {
     if (s_instance)
@@ -73,22 +73,22 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
-    QnGraphicsView *view = new QnGraphicsView(scene, this);
+    m_view = new QnGraphicsView(scene, this);
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
-    view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
 
     const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
-    QnWorkbench *workbench = new QnWorkbench(this);
-    workbench->mapper()->setCellSize(defaultCellSize);
-    workbench->mapper()->setSpacing(defaultSpacing);
+    m_workbench = new QnWorkbench(this);
+    m_workbench->mapper()->setCellSize(defaultCellSize);
+    m_workbench->mapper()->setSpacing(defaultSpacing);
 
-    QnWorkbenchDisplay *display = new QnWorkbenchDisplay(workbench, this);
+    QnWorkbenchDisplay *display = new QnWorkbenchDisplay(m_workbench, this);
     display->setScene(scene);
-    display->setView(view);
+    display->setView(m_view);
 
     m_controller = new QnWorkbenchController(display, this);
 
@@ -106,8 +106,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_tabWidget->setMovable(true);
     m_tabWidget->setTabsClosable(true);
     m_tabWidget->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
-    m_tabWidget->addTab(view, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
-    //m_tabWidget->addTab(new QWidget(m_tabWidget), QIcon(), tr("Grid/Properies"));
+
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
     connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 
     QToolButton *newTabButton = new QToolButton(m_tabWidget);
@@ -163,19 +163,46 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     toolBar->addAction(reconnectAction);
 
 
+    addTab();
+
     showFullScreen();
 }
 
 MainWnd::~MainWnd()
 {
     s_instance = 0;
-
-    destroyNavigator(m_normalView);
 }
 
 void MainWnd::addTab()
 {
-    m_tabWidget->addTab(new QWidget(m_tabWidget), QIcon(), tr("New Tab"));
+    QWidget *widget = new QWidget(m_tabWidget);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    widget->setProperty("SceneState", QVariant::fromValue(new QnWorkbenchLayout(widget))); // ###
+
+    int index = m_tabWidget->addTab(widget, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
+    m_tabWidget->setCurrentIndex(index);
+}
+
+Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
+
+void MainWnd::currentTabChanged(int index)
+{
+    if (QWidget *widget = m_view->parentWidget()) {
+        if (m_tabWidget->indexOf(widget) != -1) {
+            if (QLayout *layout = widget->layout())
+                layout->removeWidget(m_view);
+        }
+    }
+
+    m_workbench->setLayout(0);
+
+    if (QWidget *widget = m_tabWidget->widget(index)) {
+        if (QLayout *layout = widget->layout())
+            layout->addWidget(m_view);
+
+        m_workbench->setLayout(widget->property("SceneState").value<QnWorkbenchLayout *>()); // ###
+    }
 }
 
 void MainWnd::closeTab(int index)
@@ -195,13 +222,13 @@ void MainWnd::itemActivated(uint resourceId)
     QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId)));
 
     QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-    if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).empty()) {
+    if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).isEmpty()) {
         QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
-
         m_controller->drop(resource, gridPos);
     }
 }
 
+#if 0
 void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
 {
     if (files.isEmpty())
@@ -244,25 +271,6 @@ void MainWnd::goToNewLayoutContent(LayoutContent* newl)
     m_normalView->goToNewLayoutContent(newl);
 }
 
-void MainWnd::handleMessage(const QString &message)
-{
-    const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-    addFilesToCurrentOrNewLayout(files);
-    activate();
-}
-
-void MainWnd::closeEvent(QCloseEvent *event)
-{
-    QMainWindow::closeEvent(event);
-
-    if (event->isAccepted())
-    {
-        destroyNavigator(m_normalView);
-
-        Q_EMIT mainWindowClosed();
-    }
-}
-
 void MainWnd::destroyNavigator(CLLayoutNavigator *&nav)
 {
     if (nav)
@@ -271,6 +279,24 @@ void MainWnd::destroyNavigator(CLLayoutNavigator *&nav)
         delete nav;
         nav = 0;
     }
+}
+#endif
+
+void MainWnd::handleMessage(const QString &message)
+{
+    const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
+#if 0
+    addFilesToCurrentOrNewLayout(files);
+#endif
+    activate();
+}
+
+void MainWnd::closeEvent(QCloseEvent *event)
+{
+    QMainWindow::closeEvent(event);
+
+    if (event->isAccepted())
+        Q_EMIT mainWindowClosed();
 }
 
 void MainWnd::activate()

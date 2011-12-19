@@ -1,13 +1,11 @@
 #include "workbench_item.h"
-#include <cassert>
+
 #include <ui/common/scene_utility.h>
-#include <core/resource/resource.h>
-#include <core/resourcemanagment/resource_pool.h>
-#include <camera/resource_display.h>
+
 #include "workbench_layout.h"
 
-QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUniqueId, QObject *parent): 
-    QObject(parent), 
+QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUniqueId, QObject *parent):
+    QObject(parent),
     m_resourceUniqueId(resourceUniqueId),
     m_layout(NULL),
     m_flags(Pinned),
@@ -64,7 +62,7 @@ bool QnWorkbenchItem::setFlag(ItemFlag flag, bool value) {
         if(flag == Pinned && !value)
             return m_layout->unpinItem(this);
     }
-    
+
     setFlagInternal(flag, value);
     return true;
 }
@@ -88,11 +86,4 @@ void QnWorkbenchItem::setRotation(qreal rotation) {
     m_rotation = rotation;
 
     emit rotationChanged();
-}
-
-QnResourceDisplay *QnWorkbenchItem::createDisplay(QObject *parent) {
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(m_resourceUniqueId);
-    if(resource.isNull())
-        return NULL;
-    return new QnResourceDisplay(resource, parent);
 }

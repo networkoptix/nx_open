@@ -40,6 +40,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
         return;
 
     QRect oldBoundingRect;
+    QRect newBoundingRect;
 
     /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
@@ -60,8 +61,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
     }
     emit layoutChanged();
 
-    /* Set up new layout.
-     * It may be NULL only when this function is called from destructor. */
+    /* Set up new layout. */
     if(m_layout != NULL) {
         connect(m_layout, SIGNAL(itemAdded(QnWorkbenchItem *)),             this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
         connect(m_layout, SIGNAL(itemRemoved(QnWorkbenchItem *)),           this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
@@ -71,9 +71,11 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
         foreach(QnWorkbenchItem *item, m_layout->items())
             at_layout_itemAdded(item);
 
-        if(m_layout->boundingRect() != oldBoundingRect)
-            emit boundingRectChanged();
+        newBoundingRect = m_layout->boundingRect();
     }
+
+    if (newBoundingRect != oldBoundingRect)
+        emit boundingRectChanged();
 }
 
 void QnWorkbench::setMode(Mode mode) {

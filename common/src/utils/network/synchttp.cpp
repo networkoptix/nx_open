@@ -60,13 +60,18 @@ int SyncHTTP::syncPost(const QUrl &url, const QByteArray &data, QIODevice *to)
     return syncPost(url, &buffer, to);
 }
 
+Q_DECLARE_METATYPE(QNetworkReply::NetworkError)
+Q_DECLARE_TYPEINFO(QNetworkReply::NetworkError, Q_PRIMITIVE_TYPE);
+
 QNetworkReply *SyncHTTP::asyncRequest(Operation op, const QUrl &url, QIODevice *data, QObject *target, const char *slot)
 {
+    qRegisterMetaType<QNetworkReply::NetworkError>();
+
     QNetworkRequest request(url.isValid() && !url.isRelative() ? url : m_url.resolved(url));
     if (!m_credentials.isEmpty())
         request.setRawHeader("Authorization", m_credentials);
 
-    QNetworkAccessManager *accessManager = new QNetworkAccessManager(this); // ###
+    QNetworkAccessManager *accessManager = new QNetworkAccessManager; // ###
     connect(accessManager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
     connect(accessManager, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)),
@@ -90,6 +95,8 @@ QNetworkReply *SyncHTTP::asyncRequest(Operation op, const QUrl &url, QIODevice *
     if (reply) {
         connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onError(QNetworkReply::NetworkError)));
         connect(reply, SIGNAL(destroyed()), accessManager, SLOT(deleteLater()));
+    } else {
+        accessManager->deleteLater();
     }
 
     return reply;
