@@ -8,6 +8,7 @@
 #include <camera/camera.h>
 #include <camera/abstractrenderer.h>
 #include <utils/common/warnings.h>
+#include <utils/common/counter.h>
 
 detail::QnRendererGuard::~QnRendererGuard() {
     delete m_renderer;
@@ -43,8 +44,11 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
         if(m_mediaProvider != NULL) {
             m_camera = new CLVideoCamera(m_mediaResource, NULL, false, m_mediaProvider);
             
-            connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_camera,       SLOT(deleteLater()));
-            /* Data provider will be destroyed by the camDisplay. */
+            QnCounter *counter = new QnCounter(2);
+            connect(m_camera->getCamCamDisplay(),   SIGNAL(finished()),         counter,        SLOT(increment()));
+            connect(m_mediaProvider,                SIGNAL(finished()),         counter,        SLOT(increment()));
+            connect(counter,                        SIGNAL(targetReached()),    counter,        SLOT(deleteLater()));
+            connect(counter,                        SIGNAL(targetReached()),    m_camera,       SLOT(deleteLater()));
         } else {
             m_camera = NULL;
 
@@ -87,8 +91,6 @@ void QnResourceDisplay::beforeDisconnectFromResource() {
 void QnResourceDisplay::disconnectFromResource() {
     if(m_dataProvider == NULL)
         return; 
-
-    static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
 
     if(m_mediaProvider != NULL)
         m_mediaProvider->removeDataProcessor(m_camera->getCamCamDisplay());

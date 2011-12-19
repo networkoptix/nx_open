@@ -22,7 +22,7 @@ namespace detail {
             m_renderer(renderer) 
         {}
 
-        ~QnRendererGuard();
+        virtual ~QnRendererGuard();
 
         CLAbstractRenderer *renderer() const {
             return m_renderer;
@@ -31,6 +31,7 @@ namespace detail {
     private:
         CLAbstractRenderer *m_renderer;
     };
+
 } // namespace detail
 
 

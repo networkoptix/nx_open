@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Connect to Applicetion Server Instance</string>
+   <string>Connect to Application Server Instance</string>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -33,7 +33,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Connect to Applicetion Server Instance</string>
+      <string>Connect to Application Server Instance</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout1">
       <item>
