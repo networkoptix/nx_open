@@ -7,6 +7,7 @@
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
+#include "core/misc/scheduleTask.h"
 #include "server_stream_recorder.h"
 
 static const int TRUNCATE_INTERVAL = 60; // seconds
@@ -28,9 +29,9 @@ void QnRecordingManager::start()
 
 void QnRecordingManager::stop()
 {
-    foreach(QnStreamRecorder* recorder, m_recordMap.values())
+    foreach(QnServerStreamRecorder* recorder, m_recordMap.values())
         recorder->pleaseStop();
-    foreach(QnStreamRecorder* recorder, m_recordMap.values()) {
+    foreach(QnServerStreamRecorder* recorder, m_recordMap.values()) {
         recorder->stop();
         delete recorder;
     }
@@ -45,20 +46,58 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
         QnSequrityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSequrityCamResource>(res);
         cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
         QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader();
-        QnStreamRecorder* recorder = new QnServerStreamRecorder(res);
+        QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res);
         recorder->setTruncateInterval(TRUNCATE_INTERVAL);
         connect(recorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(recordingFailed(QString)));
         reader->addDataProcessor(recorder);
         reader->setNeedKeyData();
         recorder->start();
         m_recordMap.insert(res, recorder);
+
+        QMutexLocker lock(&m_mutex);
+        QMap<QnId, QnScheduleTaskList>::iterator scheduleItr = m_scheduleByCamera.find(res->getId());
+        if (scheduleItr != m_scheduleByCamera.end())
+            recorder->updateSchedule(scheduleItr.value());
+    }
+}
+
+void QnRecordingManager::updateSchedule(QnScheduleTaskList scheduleTasks)
+{
+    qSort(scheduleTasks);
+    QMap<QnId, QnScheduleTaskList> newSchedule;
+    QnScheduleTaskList cameraSchedule;
+    QnId lastCameraId;
+    foreach (const QnScheduleTask& task, scheduleTasks)
+    {
+        if (task.getSourceId() != lastCameraId && !cameraSchedule.isEmpty())
+        {
+            newSchedule.insert(lastCameraId, cameraSchedule);
+            cameraSchedule.clear();
+        }
+        lastCameraId = task.getSourceId();
+        cameraSchedule << task;
+    }
+    if (!cameraSchedule.isEmpty())
+        newSchedule.insert(lastCameraId, cameraSchedule);
+    QMutexLocker lock(&m_mutex);
+    m_scheduleByCamera = newSchedule;
+    //foreach (const QnScheduleTaskList& taskList, newSchedule) 
+    for (QMap<QnId, QnScheduleTaskList>::iterator itr = m_scheduleByCamera.begin(); itr != m_scheduleByCamera.end(); ++itr)
+    {
+        QnResourcePtr res = qnResPool->getResourceById(itr.key());
+        QMap<QnResourcePtr, QnServerStreamRecorder*>::iterator itrRec = m_recordMap.find(res);
+        if (itrRec != m_recordMap.end())
+        {
+            QnServerStreamRecorder* recorder = itrRec.value();
+            recorder->updateSchedule(itr.value());
+        }
     }
 }
 
 void QnRecordingManager::recordingFailed(QString errMessage)
 {
-    QnStreamRecorder* recorder = static_cast<QnStreamRecorder*>(sender());
-    for (QMap<QnResourcePtr, QnStreamRecorder*>::iterator itr = m_recordMap.begin(); itr != m_recordMap.end(); ++itr)
+    QnServerStreamRecorder* recorder = static_cast<QnServerStreamRecorder*>(sender());
+    for (QMap<QnResourcePtr, QnServerStreamRecorder*>::iterator itr = m_recordMap.begin(); itr != m_recordMap.end(); ++itr)
     {
         if (itr.value() == recorder) 
         {
@@ -72,12 +111,12 @@ void QnRecordingManager::recordingFailed(QString errMessage)
 
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 {
-    QMap<QnResourcePtr, QnStreamRecorder*>::iterator itr = m_recordMap.find(res);
+    QMap<QnResourcePtr, QnServerStreamRecorder*>::iterator itr = m_recordMap.find(res);
     if (itr == m_recordMap.end())
         return;
     
     qnCameraPool->removeVideoCamera(itr.key());
-    QnStreamRecorder* recorder = static_cast<QnStreamRecorder*>(itr.value());
+    QnServerStreamRecorder* recorder = static_cast<QnServerStreamRecorder*>(itr.value());
     m_recordMap.erase(itr);
     delete recorder;
 }

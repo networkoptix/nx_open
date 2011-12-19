@@ -34,6 +34,15 @@ protected:
     virtual void endOfRun();
     bool initFfmpegContainer(QnCompressedVideoDataPtr mediaData);
 
+    void setPrebufferingUsec(int value);
+    int getPrebufferingUsec() const;
+    virtual bool needSaveData(QnAbstractMediaDataPtr media);
+    virtual void beforeProcessData(QnAbstractMediaDataPtr media);
+
+    virtual bool saveMotion(QnAbstractMediaDataPtr media);
+    bool saveData(QnAbstractMediaDataPtr md);
+private:
+    void markNeedKeyData();
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
@@ -54,6 +63,8 @@ private:
     QString m_fixedFileName;
     qint64 m_lastPacketTime;
     qint64 m_startOffset;
+    int m_prebufferingUsec;
+    QQueue<QnAbstractMediaDataPtr> m_prebuffer;
 };
 
 #endif // _STREAM_RECORDER_H__
