@@ -163,6 +163,15 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
 #endif
 }
 
+void QnScreenRecorder::cancelRecording() {
+    if (m_encoder) {
+        m_encoder->stop();
+        m_encoder->deleteLater();
+        m_encoder = 0;
+        m_recording = false;
+    }
+}
+
 void QnScreenRecorder::stopRecording() {
     if(!isSupported()) {
         qnWarning("Screen recording is not supported on this platform.");
