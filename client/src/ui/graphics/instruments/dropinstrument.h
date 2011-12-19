@@ -23,7 +23,7 @@ private:
 private:
     QStringList m_files;
     QnResourceList m_resources;
-    QnWorkbenchController *m_controller;
+    QnWorkbenchController *const m_controller;
 };
 
 #endif // QN_DROP_INSTRUMENT_H
