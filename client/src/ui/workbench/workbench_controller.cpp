@@ -700,7 +700,63 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
         return;
     }
 
-    m_screenRecorder->startRecording(widget);
+    QWidget *view = display()->view();
+
+    QLabel *label = new QLabel(view);
+    label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    label->resize(200, 200);
+    label->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - label->size()) / 2);
+
+    label->setMask(createRoundRegion(18, 18, label->rect()));
+    label->setText(tr("Recording started"));
+    label->setAlignment(Qt::AlignCenter);
+    label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
+    label->setFocusPolicy(Qt::NoFocus);
+    label->show();
+
+    QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
+    animation->setEasingCurve(QEasingCurve::OutCubic);
+    animation->setDuration(3000);
+    animation->setStartValue(1.0);
+    animation->setEndValue(0.0);
+    animation->start();
+
+    connect(animation, SIGNAL(finished()), animation, SLOT(deleteLater()));
+    connect(animation, SIGNAL(finished()), label, SLOT(deleteLater()));
+    connect(animation, SIGNAL(finished()), m_screenRecorder, SLOT(startRecording(QGLWidget)));
+
+    connect(animation,SIGNAL(valueChanged(QVariant)), this, SLOT(onPrepareRecording(QVariant)));
+}
+
+void QnWorkbenchController::onPrepareRecording(QVariant value)
+{
+#if 0
+#ifdef Q_OS_WIN
+    static double TICKS = 3;
+
+    QPropertyAnimation* animation = dynamic_cast<QPropertyAnimation*> (sender());
+    if (!animation)
+        return;
+
+    double normValue = 1.0 - (double) animation->currentTime() / animation->duration();
+
+    QLabel* label = dynamic_cast<QLabel*> (animation->targetObject());
+    if (!label)
+        return;
+
+    DesktopFileEncoder *desktopEncoder = qobject_cast<DesktopFileEncoder *>(cm_start_video_recording.property("encoder").value<QObject *>());
+    if (!desktopEncoder) {
+        label->setText(tr("Cancelled"));
+        return;
+    }
+
+    double d = normValue * (TICKS+1);
+    if (d >= TICKS)
+        return;
+    int n = int (d) + 1;
+    label->setText(QString::number(n));
+#endif
+#endif
 }
 
 void QnWorkbenchController::at_stopRecordingAction_triggered() {
@@ -724,27 +780,6 @@ void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage)
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
-    QWidget *view = display()->view();
-
-    QLabel *label = new QLabel(view);
-    label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-    label->resize(200, 200);
-    label->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - label->size()) / 2);
-    label->setMask(createRoundRegion(18, 18, label->rect()));
-    label->setText(tr("Recording started"));
-    label->setAlignment(Qt::AlignCenter);
-    label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
-    label->setFocusPolicy(Qt::NoFocus);
-    label->show();
-
-    QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
-    animation->setEasingCurve(QEasingCurve::OutCubic);
-    animation->setDuration(3000);
-    animation->setStartValue(1.0);
-    animation->setEndValue(0.0);
-    animation->start();
-
-    connect(animation, SIGNAL(finished()), label, SLOT(deleteLater()));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {

@@ -144,6 +144,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     unsigned char i_mask;
     quint8 m_input;
     qint64 m_duration;
+private:
     qint64 m_firstTimestamp;
 
 };

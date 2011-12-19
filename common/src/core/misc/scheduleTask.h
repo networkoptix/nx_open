@@ -9,21 +9,47 @@
 class QnScheduleTask
 {
 public:
-    QnScheduleTask() {}
+    enum RecordingType { RecordingType_Run, RecordingType_MotionOnly };
 
+    QnScheduleTask()
+        : m_startTime(0), m_endTime(0),
+          m_doRecordAudio(false),
+          m_recordType(RecordingType_Run),
+          m_dayOfWeek(1),
+          m_beforeThreshold(0), m_afterThreshold(0)
+    {}
     QnScheduleTask(QnId id, QnId sourceId, int startTime, int endTime,
-                   bool doRecordAudio, int recordType, int dayOfWeek, int beforeThreshold, int afterThreshold)
-      : m_id(id),
-        m_sourceId(sourceId),
-        m_startTime(startTime),
-        m_endTime(endTime),
-        m_doRecordAudio(doRecordAudio),
-        m_recordType(recordType),
-        m_dayOfWeek(dayOfWeek),
-        m_beforeThreshold(beforeThreshold),
-        m_afterThreshold(afterThreshold)
-    {
-    }
+                   bool doRecordAudio, RecordingType recordType, int dayOfWeek, int beforeThreshold, int afterThreshold)
+        : m_id(id), m_sourceId(sourceId),
+          m_startTime(startTime), m_endTime(endTime),
+          m_doRecordAudio(doRecordAudio),
+          m_recordType(recordType),
+          m_dayOfWeek(dayOfWeek),
+          m_beforeThreshold(beforeThreshold), m_afterThreshold(afterThreshold)
+    {}
+
+    QnId getId() const { return m_id; }
+    QnId getSourceId() const { return m_sourceId; }
+    RecordingType getRecordingType() const { return m_recordType; }
+    int getBeforeThreshold() const { return m_beforeThreshold; }
+    int getAfterThreshold() const { return m_afterThreshold; }
+
+    /*
+    * Duration at ms
+    */
+    int durationMs() const { return m_endTime - m_startTime; }
+
+    /*
+    * Schedule relative start time inside a week at ms.
+    */
+    int startTimeMs() const { return m_startTime; }
+
+    /*
+    * Schedule relative start time inside a week at ms.
+    */
+    bool containTime(int weekTimeMs) const { return m_startTime <= weekTimeMs && weekTimeMs <= m_endTime; }
+
+    bool operator<(const QnScheduleTask &other) const { return m_startTime < other.m_startTime; }
 
     // Add getters and settings here
 
@@ -33,13 +59,16 @@ public:
     int m_startTime;
     int m_endTime;
     bool m_doRecordAudio;
-    int m_recordType;
+    RecordingType m_recordType;
     int m_dayOfWeek;
     int m_beforeThreshold;
     int m_afterThreshold;
 };
 
-typedef QSharedPointer<QnScheduleTask> QnScheduleTaskPtr;
-typedef QList<QnScheduleTaskPtr> QnScheduleTaskList;
+inline bool operator<(qint64 first, const QnScheduleTask &other) { return first < other.m_startTime; }
+inline bool operator<(const QnScheduleTask &other, qint64 first) { return other.m_startTime < first; }
+
+//typedef QSharedPointer<QnScheduleTask> QnScheduleTaskPtr;
+typedef QList<QnScheduleTask> QnScheduleTaskList;
 
 #endif // _vms_schedule_task_h

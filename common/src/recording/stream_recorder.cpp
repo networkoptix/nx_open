@@ -26,7 +26,8 @@ m_startDateTime(-1),
 m_endDateTime(-1),
 m_lastPacketTime(0),
 m_startOffset(0),
-m_forceDefaultCtx(true)
+m_forceDefaultCtx(true),
+m_prebufferingUsec(0)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -62,11 +63,15 @@ void QnStreamRecorder::close()
     m_packetWrited = false;
     m_firstTimestamp = -1;
 
-	for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-		m_gotKeyFrame[i] = false;
+    markNeedKeyData();
 	m_firstTime = true;
 }
 
+void QnStreamRecorder::markNeedKeyData()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_gotKeyFrame[i] = false;
+}
 
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 {
@@ -74,7 +79,25 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     if (!md)
         return true; // skip unknown data
 
+    beforeProcessData(md);
+    m_prebuffer << md;
+    while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.first()->timestamp >= m_prebufferingUsec)
+    {
+        QnAbstractMediaDataPtr d = m_prebuffer.dequeue();
+        if (needSaveData(d))
+            saveData(d);
+        else
+            markNeedKeyData();
+    }
+    return true;
+}
+
+bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
+{
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
+
+    if (md->dataType == QnAbstractMediaData::META_V1)
+        return saveMotion(md);
 
     if (m_firstTime)
     {
@@ -114,11 +137,12 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
             close();
             m_startDateTime = m_endDateTime;
 
-            return processData(md);
+            return saveData(md);
         }
     }
     else if (vd && !m_gotKeyFrame[channel]) // did not got key frame so far
         return true;
+
 
     AVPacket avPkt;
     av_init_packet(&avPkt);
@@ -139,7 +163,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         m_packetWrited = true;
 
     return true;
-}
+};
 
 void QnStreamRecorder::endOfRun()
 {
@@ -294,4 +318,30 @@ void QnStreamRecorder::setFileName(const QString& fileName)
 void QnStreamRecorder::setStartOffset(qint64 value)
 {
     m_startOffset = value;
+}
+
+void QnStreamRecorder::setPrebufferingUsec(int value)
+{
+    m_prebufferingUsec = value;
+}
+
+int QnStreamRecorder::getPrebufferingUsec() const
+{
+    return m_prebufferingUsec;
+}
+
+
+bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
+{
+    return true;
+}
+
+void QnStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
+{
+
+}
+
+bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
+{
+    return true;
 }

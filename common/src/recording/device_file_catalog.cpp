@@ -368,6 +368,12 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
     return first.startTimeMs < other.startTimeMs;
 }
 
+bool QnTimePeriod::containTime(qint64 timeMs) const
+{
+    return qnBetween(timeMs, startTimeMs, startTimeMs+durationMs);
+}
+
+
 QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> periods)
 {
     QnTimePeriodList result;

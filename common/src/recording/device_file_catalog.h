@@ -19,6 +19,8 @@ struct QnTimePeriod
 
     static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
 
+    bool containTime(qint64 timeMs) const;
+
     /** Start time in milliseconds. */
     qint64 startTimeMs;
 

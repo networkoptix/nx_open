@@ -33,16 +33,16 @@ public:
     bool isRecording() const;
 
     /**
+     * Stops screen recording.
+     */
+    void stopRecording();
+public slots:
+    /**
      * Starts screen recording.
      *
      * \param appWidget                 Widget to use for recording in windowed mode.
      */
     void startRecording(QGLWidget *appWidget);
-
-    /**
-     * Stops screen recording.
-     */
-    void stopRecording();
 
 signals:
     void recordingStarted();

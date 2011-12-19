@@ -27,7 +27,7 @@
 #include "core/resource/video_server.h"
 #include <signal.h>
 #include <xercesc/util/PlatformUtils.hpp>
-
+#include "core/misc/scheduleTask.h"
 #include "qtservice.h"
 
 #include <fstream>
@@ -309,7 +309,6 @@ public:
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnResourceDiscoveryManager::instance());
 
         // The following is demo only. Remove it.
-
         QList<QnResourceTypePtr> resourceTypeList;
 
         for(;;)
@@ -334,29 +333,26 @@ public:
         QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverHost));
         if (videoServer.isNull())
             return;
-
-        ////////////////
-#include "core/misc/scheduleTask.h"
         QnScheduleTaskList scheduleTasks;
         appServerConnection->getScheduleTasks(scheduleTasks, videoServer->getId());
 
-        foreach (QnScheduleTaskPtr scheduleTask, scheduleTasks)
+        QnRecordingManager::instance()->updateSchedule(scheduleTasks);
+        foreach (QnScheduleTask scheduleTask, scheduleTasks)
         {
             QString str;
             QTextStream stream(&str);
 
-            stream << "ScheduleTask " << scheduleTask->m_id.toString() <<
-                                              scheduleTask->m_afterThreshold <<
-                                              scheduleTask->m_beforeThreshold <<
-                                              scheduleTask->m_dayOfWeek <<
-                                              scheduleTask->m_doRecordAudio <<
-                                              scheduleTask->m_startTime <<
-                                              scheduleTask->m_endTime <<
-                                              scheduleTask->m_recordType <<
-                                              scheduleTask->m_sourceId.toString();
+            stream << "ScheduleTask " << scheduleTask.m_id.toString() <<
+                                              scheduleTask.m_afterThreshold <<
+                                              scheduleTask.m_beforeThreshold <<
+                                              scheduleTask.m_dayOfWeek <<
+                                              scheduleTask.m_doRecordAudio <<
+                                              scheduleTask.m_startTime <<
+                                              scheduleTask.m_endTime <<
+                                              scheduleTask.m_recordType <<
+                                              scheduleTask.m_sourceId.toString();
             cl_log.log(str, cl_logALWAYS);
         }
-        ////////////////////
 
         m_processor = new QnAppserverResourceProcessor(videoServer->getId(), QnResourceDiscoveryManager::instance());
 

@@ -111,8 +111,8 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         {
             qint64 start = htonll(period.startTimeMs);
             qint64 duration = htonll(period.durationMs);
-            result.append((const char*) &start, 8);
-            result.append((const char*) &duration, 4);
+            result.append(((const char*) &start)+2, 6);
+            result.append(((const char*) &duration)+2, 6);
         }
     }
     else {

@@ -5,8 +5,9 @@
 #include <QMap>
 #include "core/resource/resource.h"
 #include "core/resourcemanagment/security_cam_resource.h"
+#include "core/misc/scheduleTask.h"
 
-class QnStreamRecorder;
+class QnServerStreamRecorder;
 class QnRecordingManager: public QObject
 {
     Q_OBJECT
@@ -18,12 +19,17 @@ public:
     void start();
     void stop();
     bool isCameraRecoring(QnResourcePtr camera);
+
+    void updateSchedule(QnScheduleTaskList scheduleTasks);
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
     void recordingFailed(QString errMessage);
 private:
-    QMap<QnResourcePtr, QnStreamRecorder*> m_recordMap;
+    QMutex m_mutex;
+
+    QMap<QnResourcePtr, QnServerStreamRecorder*> m_recordMap;
+    QMap<QnId, QnScheduleTaskList> m_scheduleByCamera;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory
