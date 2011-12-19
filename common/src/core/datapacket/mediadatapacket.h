@@ -130,7 +130,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     void setMotionAt(int x, int y);
 
-    void mapMotion(const QRect& imageRect, const QRect& mRect);
+    bool mapMotion(const QRect& imageRect, const QRect& mRect);
 
     bool isInput(int index) const
     {
@@ -140,6 +140,9 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     }
 
     bool containTime(const qint64 timeUsec) const;
+
+    /** returns true if no motion detected */
+    bool isEmpty() const;
 
     unsigned char i_mask;
     quint8 m_input;

@@ -84,6 +84,20 @@ void QnMetaDataV1::removeMotion(const quint8* image, int startIndex, int endInde
     }
 }
 
+bool QnMetaDataV1::isEmpty() const
+{
+    static const __m128i ff_mask = _mm_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff);
+    __m128i* src = (__m128i*) data.data();
+    
+    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    {
+        if (_mm_testz_si128(src[i], ff_mask) == 0)
+            return false;
+    }
+    
+    return true;
+}
+
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
     if (m_firstTimestamp == AV_NOPTS_VALUE)
@@ -123,12 +137,12 @@ void QnMetaDataV1::setMotionAt(int x, int y)
 }
 
 
-void QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
+bool QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
 {
     QRect motioRect = imageRect.intersected(mRect);
 
     if (motioRect.isNull())
-        return;
+        return false;
 
     //int localZoneWidth = imageRect.width() / MD_WIDTH;
     //int localZoneHight = imageRect.height() / MD_HEIGHT;
@@ -139,12 +153,13 @@ void QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
     int rightZone = motioRect.right() * MD_WIDTH / imageRect.width();
     int bottomZone = motioRect.bottom() * MD_HEIGHT / imageRect.height();
 
-    for (int x = leftZone; x <= rightZone; ++x)
+    for (int x = leftZone; x <= rightZone; ++x) {
         for (int y = topZone; y <= bottomZone; ++y)
         {
             setMotionAt(x, y);
         }
-
+    }
+    return true;
 }
 
 bool QnMetaDataV1::containTime(const qint64 timeUsec) const

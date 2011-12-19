@@ -347,7 +347,8 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
     else {
         // save to disk
         m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
-        rez = saveToArchiveInternal(m_lastDetailedData);
+        if (!m_lastDetailedData->isEmpty())
+            rez = saveToArchiveInternal(m_lastDetailedData);
         m_lastDetailedData = data;
         //qDebug() << "start new Motion" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz");
     }
