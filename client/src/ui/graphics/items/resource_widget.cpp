@@ -328,7 +328,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnM
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
 
-    painter->setPen(QPen(QColor(255, 255, 255, 16)));
+    painter->setPen(QPen(QColor(255, 255, 255, 32)));
     for (int x = 0; x < MD_WIDTH; ++x)
         painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
     for (int y = 0; y < MD_HEIGHT; ++y)
@@ -336,7 +336,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnM
     if (!motion)
         return;
 
-    painter->setPen(QPen(QColor(255, 0, 0, 48)));
+    painter->setPen(QPen(QColor(255, 0, 0, 80)));
     for (int y = 0; y < MD_HEIGHT; ++y)
         for (int x = 0; x < MD_WIDTH; ++x)
             if(motion->isMotionAt(x, y))
