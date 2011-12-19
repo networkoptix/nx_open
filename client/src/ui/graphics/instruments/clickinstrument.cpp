@@ -1,22 +1,106 @@
 #include "clickinstrument.h"
 #include <QGraphicsSceneMouseEvent>
+#include <QWeakPointer>
 #include <QApplication>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/warnings.h>
+
+namespace {
+    void copyEvent(const QGraphicsSceneMouseEvent *src, QGraphicsSceneMouseEvent *dst) {
+        /* Copy only what is accessible through ClickInfo. */
+        dst->setScenePos(src->scenePos());
+        dst->setScreenPos(src->screenPos());
+        dst->setButtons(src->buttons());
+        dst->setButton(src->button());
+        dst->setModifiers(src->modifiers());
+    }
+
+} // anonymous namespace
+
 
 class ClickInfoPrivate: public QGraphicsSceneMouseEvent {};
 
-ClickInstrument::ClickInstrument(Qt::MouseButtons buttons, WatchedType watchedType, QObject *parent): 
+struct ClickInstrument::ClickData {
+    ClickData(): item(NULL) {}
+
+    QGraphicsSceneMouseEvent event;
+    QGraphicsItem *item;
+    QWeakPointer<QGraphicsScene> scene;
+    QWeakPointer<QGraphicsView> view;
+};
+
+ClickInstrument::ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent): 
     DragProcessingInstrument(
         watchedType,
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick),
         parent
     ),
     m_buttons(buttons),
+    m_clickDelayMSec(clickDelayMSec),
+    m_clickTimer(0),
+    m_clickData(new ClickData()),
     m_isClick(false),
-    m_isDoubleClick(false)
-{}
+    m_isDoubleClick(false),
+    m_nextDoubleClickIsClick(false)
+{
+    if(clickDelayMSec < 0) {
+        qnWarning("Invalid click delay '%1'.", clickDelayMSec);
+        m_clickDelayMSec = 0;
+    }
+}
 
 ClickInstrument::~ClickInstrument() {
     ensureUninstalled();
+}
+
+void ClickInstrument::aboutToBeDisabledNotify() {
+    killClickTimer();
+    
+    base_type::aboutToBeDisabledNotify();
+}
+
+void ClickInstrument::timerEvent(QTimerEvent *) {
+    QnScopedValueRollback<bool> clickRollback(&m_isClick, true);
+    if(m_isDoubleClick) {
+        m_isDoubleClick = false;
+    } else {
+        m_nextDoubleClickIsClick = true;
+    }
+    killClickTimer();
+
+    if(watches(ITEM)) {
+        emitSignals(m_clickData->view.data(), m_clickData->item, &m_clickData->event);
+    } else {
+        emitSignals(m_clickData->view.data(), m_clickData->scene.data(), &m_clickData->event);
+    }
+}
+
+void ClickInstrument::storeClickData(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    copyEvent(event, &m_clickData->event);
+    m_clickData->item = item;
+    m_clickData->scene.clear();
+    m_clickData->view = view;
+}
+
+void ClickInstrument::storeClickData(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    copyEvent(event, &m_clickData->event);
+    m_clickData->item = NULL;
+    m_clickData->scene = scene;
+    m_clickData->view = view;
+}
+
+void ClickInstrument::killClickTimer() {
+    if(m_clickTimer == 0)
+        return;
+
+    killTimer(m_clickTimer);
+    m_clickTimer = 0;
+}
+
+void ClickInstrument::restartClickTimer() {
+    killClickTimer();
+
+    m_clickTimer = startTimer(m_clickDelayMSec);
 }
 
 template<class T>
@@ -26,6 +110,7 @@ bool ClickInstrument::mousePressEventInternal(T *object, QGraphicsSceneMouseEven
 
     m_isClick = true;
     m_isDoubleClick = false;
+    m_nextDoubleClickIsClick = false;
 
     dragProcessor()->mousePressEvent(object, event);
     return false;
@@ -37,7 +122,8 @@ bool ClickInstrument::mouseDoubleClickEventInternal(T *object, QGraphicsSceneMou
         return false;
 
     m_isClick = true;
-    m_isDoubleClick = true;
+    m_isDoubleClick = !m_nextDoubleClickIsClick;
+    m_nextDoubleClickIsClick = false;
 
     dragProcessor()->mousePressEvent(object, event);
     return false;
@@ -65,7 +151,17 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
     QGraphicsView *view = NULL;
     if(event->widget() != NULL)
         view = qobject_cast<QGraphicsView *>(event->widget()->parent()); 
-    emitSignals(view, object, event);
+    if(m_clickDelayMSec != 0) {
+        if(m_isDoubleClick) {
+            killClickTimer();
+            emitSignals(view, object, event);
+        } else {
+            storeClickData(view, object, event);
+            restartClickTimer();
+        }
+    } else {
+        emitSignals(view, object, event);
+    }
 
     m_isClick = false;
     m_isDoubleClick = false;
@@ -78,8 +174,10 @@ void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsItem *item, QGra
     ClickInfo info(static_cast<ClickInfoPrivate *>(event));
 
     if(m_isDoubleClick) {
+        qDebug() << "DOUBLE CLICK";
         emit doubleClicked(view, item, info);
     } else {
+        qDebug() << "CLICK";
         emit clicked(view, item, info);
     }
 }

@@ -31,14 +31,22 @@ private:
  */
 class ClickInstrument: public DragProcessingInstrument {
     Q_OBJECT;
+
+    typedef DragProcessingInstrument base_type;
+
 public:
     /**
      * \param buttons                   Mouse buttons to handle.
+     * \param clickDelayMSec            Delay in milliseconds to wait for the
+     *                                  double click before emitting the click signal.
+     *                                  If the double click arrives before the
+     *                                  delay times out, click signal won't be 
+     *                                  emitted at all.
      * \param watchedType               Type of click events that this instrument will watch.
      *                                  Note that only SCENE and ITEM types are supported.
      * \param parent                    Parent object for this instrument.
      */
-    ClickInstrument(Qt::MouseButtons buttons, WatchedType watchedType, QObject *parent = NULL);
+    ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent = NULL);
     virtual ~ClickInstrument();
 
 signals:
@@ -49,6 +57,10 @@ signals:
     void doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
 protected:
+    virtual void timerEvent(QTimerEvent *event) override;
+
+    virtual void aboutToBeDisabledNotify() override;
+
     virtual bool mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseDoubleClickEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
@@ -65,6 +77,11 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private:
+    void storeClickData(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
+    void storeClickData(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
+    void killClickTimer();
+    void restartClickTimer();
+
     template<class T>
     bool mousePressEventInternal(T *object, QGraphicsSceneMouseEvent *event);
 
@@ -81,9 +98,15 @@ private:
     void emitSignals(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
 
 private:
+    struct ClickData;
+
     Qt::MouseButtons m_buttons;
+    int m_clickDelayMSec;
+    int m_clickTimer;
+    QScopedPointer<ClickData> m_clickData;
     bool m_isClick;
     bool m_isDoubleClick;
+    bool m_nextDoubleClickIsClick;
 };
 
 #endif // QN_CLICK_INSTRUMENT_H
