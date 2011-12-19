@@ -21,9 +21,10 @@
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 
-#include <ui/animation/viewport_animator.h>
-
 #include <ui/screen_recording/screen_recorder.h>
+#include <ui/preferences/preferences_wnd.h>
+
+#include <ui/animation/viewport_animator.h>
 
 #include <ui/graphics/instruments/instrumentmanager.h>
 #include <ui/graphics/instruments/handscrollinstrument.h>
@@ -253,18 +254,19 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
     QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
-    QAction *toggleScreenRecordingAction= newAction(tr("Toggle screen recording"), tr(""),          this);
+    m_startRecordingAction              = newAction(tr("Start screen recording"), tr(""),           this);
+    m_stopRecordingAction               = newAction(tr("Stop screen recording"), tr(""),            this);
+    m_recordingSettingsActions          = newAction(tr("Screen recording settings"), tr(""),        this);
 
     connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
-    connect(toggleScreenRecordingAction,SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
+    connect(m_startRecordingAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_startRecordingAction_triggered()));
+    connect(m_stopRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_stopRecordingAction_triggered()));
+    connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
 
     m_itemContextMenu = new QMenu();
     m_itemContextMenu->addAction(showMotionAction);
     m_itemContextMenu->addAction(hideMotionAction);
-    
-    m_sceneContextMenu = new QMenu();
-    m_sceneContextMenu->addAction(toggleScreenRecordingAction);
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -572,7 +574,15 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 }
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
-    m_sceneContextMenu->exec(info.screenPos());
+    QScopedPointer<QMenu> menu(new QMenu(display()->view()));
+    if(m_screenRecorder->isRecording()) {
+        menu->addAction(m_stopRecordingAction);
+    } else {
+        menu->addAction(m_startRecordingAction);
+    }
+    menu->addAction(m_recordingSettingsActions);
+
+    menu->exec(info.screenPos());
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
@@ -695,8 +705,14 @@ void QnWorkbenchController::at_stopRecordingAction_triggered() {
     m_screenRecorder->stopRecording();
 }
 
+void QnWorkbenchController::at_recordingSettingsActions_triggered() {
+    QScopedPointer<PreferencesWindow> dialog(new PreferencesWindow(display()->view()));
+    dialog->setCurrentTab(4);
+    dialog->exec();
+}
+
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    QMessageBox::warning(display()->view()->viewport(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
+    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
@@ -735,7 +751,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     QString selectedFilter;
     while (1) {
         QString filePath = QFileDialog::getSaveFileName(
-            display()->view()->viewport(), 
+            display()->view(), 
             tr("Save Recording As..."),
             previousDir + QLatin1Char('/') + suggetion,
             tr("Transport Stream (*.ts)"),
@@ -751,7 +767,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = QObject::tr("Can't overwrite file '%1'. Please try another name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view()->viewport(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
             }
 

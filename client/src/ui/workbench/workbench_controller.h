@@ -100,6 +100,7 @@ protected slots:
     void at_startRecordingAction_triggered();
     void at_stopRecordingAction_triggered();
     void at_toggleRecordingAction_triggered();
+    void at_recordingSettingsActions_triggered();
 
     void at_screenRecorder_error(const QString &errorMessage);
     void at_screenRecorder_recordingStarted();
@@ -147,7 +148,9 @@ private:
     QnScreenRecorder *m_screenRecorder;
 
     QMenu *m_itemContextMenu;
-    QMenu *m_sceneContextMenu;
+    QAction *m_startRecordingAction;
+    QAction *m_stopRecordingAction;
+    QAction *m_recordingSettingsActions;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H
