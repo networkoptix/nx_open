@@ -1,7 +1,7 @@
 #include "scheduleTask.h"
 #include "utils/common/util.h"
 
-bool QnScheduleTask::containTime(int weekTimeMs) const
+bool QnScheduleTask::containTimeMs(int weekTimeMs) const
 {
     return qnBetween(weekTimeMs, startTimeMs(), startTimeMs()+durationMs());
 }

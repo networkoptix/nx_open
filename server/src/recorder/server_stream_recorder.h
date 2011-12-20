@@ -24,7 +24,7 @@ private:
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
     QnScheduleTask m_currentScheduleTask;
-    qint64 m_skipDataToTime;
+    //qint64 m_skipDataToTime;
     qint64 m_lastMotionTimeUsec;
     bool m_lastMotionContainData;
 };

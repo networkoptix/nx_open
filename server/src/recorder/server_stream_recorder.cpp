@@ -4,7 +4,7 @@
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     QnStreamRecorder(dev)
 {
-    m_skipDataToTime = AV_NOPTS_VALUE;
+    //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     m_lastMotionContainData = false;
 }
@@ -19,8 +19,9 @@ bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 {
-    if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Run)
+    if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly) {
         return;
+    }
 
     QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (metaData) {
@@ -38,7 +39,6 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         setPrebufferingUsec(m_currentScheduleTask.getBeforeThreshold()*1000000ll);
     }
 }
-
 
 bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
@@ -58,12 +58,15 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 
 void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleTask)
 {
-    m_currentScheduleTask = scheduleTask;
-    //m_lastMotionTimeUsec = AV_NOPTS_VALUE;
-    if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
-        setPrebufferingUsec(scheduleTask.getBeforeThreshold()*1000000ll);
-    else
+    if (scheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly)
+    {
+        flushPrebuffer();
         setPrebufferingUsec(0);
+    }
+    else {
+        setPrebufferingUsec(scheduleTask.getBeforeThreshold()*1000000ll);
+    }
+    m_currentScheduleTask = scheduleTask;
 }
 
 bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
@@ -79,35 +82,41 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
         {
             qint64 timeMs = media->timestamp/1000;
 
-            if (m_skipDataToTime != AV_NOPTS_VALUE && timeMs < m_skipDataToTime)
-                return true; // no recording period. skipData
-
+            //bool isEmptyPeriod = m_skipDataToTime != AV_NOPTS_VALUE && timeMs < m_skipDataToTime;
             if (!m_lastSchedulePeriod.containTime(timeMs))
             {
                 // find new schedule
-                QDateTime dataDate = QDateTime::fromMSecsSinceEpoch(timeMs);
-                int scheduleTime = (dataDate.date().dayOfWeek()-1)*3600*24 + dataDate.time().hour()*3600 + dataDate.time().second();
+                QDateTime packetDateTime = QDateTime::fromMSecsSinceEpoch(timeMs);
+                QDateTime weekStartDateTime = QDateTime(packetDateTime.addDays(1 - packetDateTime.date().dayOfWeek()).date());
+                int scheduleTimeMs = weekStartDateTime.msecsTo(packetDateTime);
 
-                QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTime);
+                QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs/1000);
                 if (itr > m_schedule.begin())
                     --itr;
 
                 // truncate current date to a start of week
-                dataDate = QDateTime(dataDate.addDays(1 - dataDate.date().dayOfWeek()).date());
-                qint64 absoluteScheduleTime = dataDate.toMSecsSinceEpoch() + itr->startTimeMs();
+                qint64 absoluteScheduleTime = weekStartDateTime.toMSecsSinceEpoch() + itr->startTimeMs();
 
-                if (itr->containTime(scheduleTime)) {
+                if (itr->containTimeMs(scheduleTimeMs)) {
                     m_lastSchedulePeriod = QnTimePeriod(absoluteScheduleTime, itr->durationMs()); 
                     updateRecordingType(*itr);
-                    m_skipDataToTime = AV_NOPTS_VALUE;
+                    //m_skipDataToTime = AV_NOPTS_VALUE;
                 }
                 else {
-                    m_skipDataToTime = absoluteScheduleTime;
-                    close();
+                    if (timeMs > absoluteScheduleTime)
+                        absoluteScheduleTime = weekStartDateTime.addDays(7).toMSecsSinceEpoch() + itr->startTimeMs();
+                    //m_skipDataToTime = absoluteScheduleTime;
+                    QnScheduleTask noRecordTask(QnId::generateSpecialId(), m_device->getId(), 0, 0, false, QnScheduleTask::RecordingType_Never, 1, 0, 0);
+                    qint64 curTime = packetDateTime.toMSecsSinceEpoch();
+                    m_lastSchedulePeriod = QnTimePeriod(curTime, absoluteScheduleTime - curTime);
+                    updateRecordingType(noRecordTask);
+                    //close();
                 }
             }
         }
     }
+
+    beforeProcessData(media);
 
     return QnStreamRecorder::processData(data);
 }

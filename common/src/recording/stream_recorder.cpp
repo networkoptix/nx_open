@@ -74,13 +74,24 @@ void QnStreamRecorder::markNeedKeyData()
         m_gotKeyFrame[i] = false;
 }
 
+void QnStreamRecorder::flushPrebuffer()
+{
+    while (!m_prebuffer.isEmpty())
+    {
+        QnAbstractMediaDataPtr d = m_prebuffer.dequeue();
+        if (needSaveData(d))
+            saveData(d);
+        else
+            markNeedKeyData();
+    }
+}
+
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr md = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!md)
         return true; // skip unknown data
 
-    beforeProcessData(md);
     m_prebuffer << md;
     while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.first()->timestamp >= m_prebufferingUsec)
     {
@@ -333,11 +344,6 @@ int QnStreamRecorder::getPrebufferingUsec() const
 bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
     return true;
-}
-
-void QnStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
-{
-
 }
 
 bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
