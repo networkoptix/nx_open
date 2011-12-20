@@ -116,6 +116,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Install and configure instruments. */
     ClickInstrument *itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
     ClickInstrument *itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
+    ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::ITEM, this);
     ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
@@ -142,6 +143,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(selectionFixupInstrument->preForwardingInstrument());
     m_manager->installInstrument(itemLeftClickInstrument);
     m_manager->installInstrument(itemRightClickInstrument);
+    m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
@@ -167,6 +169,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)), this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),               this,                           SLOT(at_dragStarted(QGraphicsView *, QList<QGraphicsItem *>)));
@@ -518,10 +521,18 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidge
 }
 
 void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
-    if(info.button() == Qt::LeftButton) {
+    switch(info.button()) {
+    case Qt::LeftButton:
         at_item_leftClicked(view, item, info);
-    } else {
+        break;
+    case Qt::RightButton:
         at_item_rightClicked(view, item, info);
+        break;
+    case Qt::MiddleButton:
+        at_item_middleClicked(view, item, info);
+        break;
+    default:
+        break;
     }
 }
 
@@ -552,6 +563,14 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
     }
 
     m_itemContextMenu->exec(info.screenPos());
+}
+
+void QnWorkbenchController::at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    if(widget == NULL)
+        return;
+
+    widget->item()->setRotation(0);
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
