@@ -38,7 +38,7 @@
 
 #include "ui/widgets3/tabwidget.h"
 
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>

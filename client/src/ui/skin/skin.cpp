@@ -4,6 +4,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QPixmapCache>
 
+#include "proxystyle_p.h"
+
 #ifdef CL_DEFAULT_SKIN_PREFIX
 #  define CL_SKIN_PREFIX QLatin1String(CL_DEFAULT_SKIN_PREFIX)
 #else
@@ -52,4 +54,19 @@ QIcon Skin::icon(const QString &name)
 QPixmap Skin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
 {
     return cachedPixmap(path(name), size, aspectMode, mode);
+}
+
+QStyle *Skin::style()
+{
+    QString baseStyle;
+#ifndef Q_OS_DARWIN
+#ifdef CL_CUSTOMIZATION_PRESET
+    qputenv("BESPIN_PRESET", QLatin1String(CL_CUSTOMIZATION_PRESET));
+#endif
+    baseStyle = QLatin1String("Bespin");
+#else
+    baseStyle = QLatin1String("cleanlooks");
+#endif
+
+    return new ProxyStyle(baseStyle);
 }

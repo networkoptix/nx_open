@@ -4,6 +4,8 @@
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
 
+class QStyle;
+
 class Skin
 {
 public:
@@ -12,6 +14,8 @@ public:
     static QPixmap pixmap(const QString &name, const QSize &size = QSize(),
                           Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
                           Qt::TransformationMode mode = Qt::FastTransformation);
+
+    static QStyle *style();
 };
 
 #endif // SKIN_H
