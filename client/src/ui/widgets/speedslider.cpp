@@ -2,34 +2,26 @@
 
 #include <QtCore/QPropertyAnimation>
 
-#include <QtGui/QApplication>
-#include <QtGui/QProxyStyle>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleFactory>
+#include "ui/proxystyle.h"
 
 #include "tooltipitem.h"
 
-class SpeedSliderProxyStyle : public QProxyStyle
+class SpeedSliderProxyStyle : public ProxyStyle
 {
 public:
-    SpeedSliderProxyStyle(QStyle *baseStyle = 0) : QProxyStyle(baseStyle)
-    {
-        if (!baseStyle)
-            setBaseStyle(qApp->style());
-    }
+    SpeedSliderProxyStyle(QObject *parent = 0) : ProxyStyle(0, parent) {}
 
     int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
     {
         if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
             return Qt::LeftButton;
-        return QProxyStyle::styleHint(hint, option, widget, returnData);
+        return ProxyStyle::styleHint(hint, option, widget, returnData);
     }
 
     QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
     {
-        QRect r = QProxyStyle::subControlRect(cc, opt, sc, widget);
-        if (cc == CC_Slider && sc == SC_SliderHandle)
-        {
+        QRect r = ProxyStyle::subControlRect(cc, opt, sc, widget);
+        if (cc == CC_Slider && sc == SC_SliderHandle) {
             int side = qMin(r.width(), r.height());
             if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
                 r.setWidth(side);
@@ -39,8 +31,6 @@ public:
         return r;
     }
 };
-
-Q_GLOBAL_STATIC_WITH_ARGS(SpeedSliderProxyStyle, speedSliderProxyStyle, (QStyleFactory::create(qApp->style()->objectName())))
 
 
 static const struct Preset {
@@ -65,7 +55,7 @@ SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     m_toolTip = new StyledToolTipItem(this);
     m_toolTip->setVisible(false);
 
-    setStyle(speedSliderProxyStyle());
+    setStyle(new SpeedSliderProxyStyle(this));
 
     setSingleStep(5);
     setPageStep(10);

@@ -4,12 +4,14 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QPixmapCache>
 
-#include "proxystyle_p.h"
+#include "ui/proxystyle.h"
 
-#ifdef CL_DEFAULT_SKIN_PREFIX
-#  define CL_SKIN_PREFIX QLatin1String(CL_DEFAULT_SKIN_PREFIX)
-#else
-#  define CL_SKIN_PREFIX QLatin1Char(':')
+#ifndef CL_SKIN_PATH
+#  ifdef CL_CUSTOMIZATION_PRESET
+#    define CL_SKIN_PATH QLatin1String(":/") + QLatin1String(CL_CUSTOMIZATION_PRESET)
+#  else
+#    define CL_SKIN_PATH QLatin1Char(':')
+#  endif
 #endif
 
 static inline QPixmap cachedPixmap(const QString &name_, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
@@ -43,7 +45,7 @@ static inline QPixmap cachedPixmap(const QString &name_, const QSize &size, Qt::
 
 QString Skin::path(const QString &name)
 {
-    return CL_SKIN_PREFIX + QLatin1String("/skin/") + name;
+    return CL_SKIN_PATH + QLatin1String("/skin/") + name;
 }
 
 QIcon Skin::icon(const QString &name)

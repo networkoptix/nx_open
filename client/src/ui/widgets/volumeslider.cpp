@@ -1,35 +1,27 @@
 #include "volumeslider.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QProxyStyle>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleFactory>
+#include "ui/proxystyle.h"
 
 #include "tooltipitem.h"
 
 #include "openal/qtvaudiodevice.h"
 
-class VolumeSliderProxyStyle : public QProxyStyle
+class VolumeSliderProxyStyle : public ProxyStyle
 {
 public:
-    VolumeSliderProxyStyle(QStyle *baseStyle = 0) : QProxyStyle(baseStyle)
-    {
-        if (!baseStyle)
-            setBaseStyle(qApp->style());
-    }
+    VolumeSliderProxyStyle(QObject *parent = 0) : ProxyStyle(0, parent) {}
 
     int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
     {
         if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
             return Qt::LeftButton;
-        return QProxyStyle::styleHint(hint, option, widget, returnData);
+        return ProxyStyle::styleHint(hint, option, widget, returnData);
     }
 
     QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
     {
-        QRect r = QProxyStyle::subControlRect(cc, opt, sc, widget);
-        if (cc == CC_Slider && sc == SC_SliderHandle)
-        {
+        QRect r = ProxyStyle::subControlRect(cc, opt, sc, widget);
+        if (cc == CC_Slider && sc == SC_SliderHandle) {
             if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
                 r.setWidth(3);
             else
@@ -39,8 +31,6 @@ public:
     }
 };
 
-//Q_GLOBAL_STATIC_WITH_ARGS(VolumeSliderProxyStyle, volumeSliderProxyStyle, (QStyleFactory::create(qApp->style()->objectName())))
-
 
 VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
@@ -49,7 +39,7 @@ VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     m_toolTip = new StyledToolTipItem(this);
     m_toolTip->setVisible(false);
 
-    //setStyle(volumeSliderProxyStyle());
+    setStyle(new VolumeSliderProxyStyle(this));
 
     setRange(0, 100);
     setSliderPosition(QtvAudioDevice::instance().volume() * 100);
