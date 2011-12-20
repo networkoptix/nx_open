@@ -289,8 +289,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
-    m_screenRecorder->cancelRecording();
-    return;
+    disconnect(m_screenRecorder, NULL, this, NULL);
+    m_screenRecorder->stopRecording();
 }
 
 QnWorkbenchDisplay *QnWorkbenchController::display() const {

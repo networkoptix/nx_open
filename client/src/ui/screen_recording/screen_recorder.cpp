@@ -89,7 +89,7 @@ QnScreenRecorder::QnScreenRecorder(QObject *parent):
 {}
 
 QnScreenRecorder::~QnScreenRecorder() {
-    return;
+    stopRecording();
 }
 
 bool QnScreenRecorder::isSupported() const {
@@ -161,15 +161,6 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     m_recording = true;
     emit recordingStarted();
 #endif
-}
-
-void QnScreenRecorder::cancelRecording() {
-    if (m_encoder) {
-        m_encoder->stop();
-        m_encoder->deleteLater();
-        m_encoder = 0;
-        m_recording = false;
-    }
 }
 
 void QnScreenRecorder::stopRecording() {
