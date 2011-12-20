@@ -1,6 +1,6 @@
 #include "start_screen_content.h"
 
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 
 QString start_screen = QLatin1String("start screen");
 
@@ -12,15 +12,15 @@ extern QString button_system;
 
 LayoutContent& startscreen_content()
 {
-	static LayoutContent instance;
-	static bool frist_time = true;
+    static LayoutContent instance;
+    static bool frist_time = true;
 
-	if (frist_time)
-	{
+    if (frist_time)
+    {
 
-		frist_time = false;
+        frist_time = false;
 
-		instance.setName(start_screen);
+        instance.setName(start_screen);
 
         int eveLogoWidth = 720*0.5;
         int eveLogoHeight = 475*0.5;
@@ -68,32 +68,32 @@ LayoutContent& startscreen_content()
 
         CLRectAdjustment adj;
 
-		adj.x1 = 1800 + 460;
-		adj.y1 = 1800;
-		adj.x2 = -1800 + 460;
-		adj.y2 = -1800;
-		/**/
-		instance.setRectAdjustment(adj);
+        adj.x1 = 1800 + 460;
+        adj.y1 = 1800;
+        adj.x2 = -1800 + 460;
+        adj.y2 = -1800;
+        /**/
+        instance.setRectAdjustment(adj);
 
-		instance.setDeviceCriteria(cr);
-		instance.removeIntereactionFlag(
-			LayoutContent::Zoomable |
-			LayoutContent::SceneMovable |
-			LayoutContent::ShowAvalable |
-			LayoutContent::ItemMovable |
-			LayoutContent::GridEnable |
-			LayoutContent::ItemRotatable |
-			LayoutContent::ItemSelectable );
+        instance.setDeviceCriteria(cr);
+        instance.removeIntereactionFlag(
+            LayoutContent::Zoomable |
+            LayoutContent::SceneMovable |
+            LayoutContent::ShowAvalable |
+            LayoutContent::ItemMovable |
+            LayoutContent::GridEnable |
+            LayoutContent::ItemRotatable |
+            LayoutContent::ItemSelectable );
 
 
-		instance.addDecorationFlag(
-            LayoutContent::BackGroundLogo | 
-            LayoutContent::ExitButton | 
-            LayoutContent::ToggleFullScreenButton | 
+        instance.addDecorationFlag(
+            LayoutContent::BackGroundLogo |
+            LayoutContent::ExitButton |
+            LayoutContent::ToggleFullScreenButton |
             LayoutContent::SettingButton);
-	}
+    }
 
 
-	return instance;
+    return instance;
 }
 

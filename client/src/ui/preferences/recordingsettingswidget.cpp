@@ -1,12 +1,15 @@
 #include "recordingsettingswidget.h"
 #include "ui_recordingsettingswidget.h"
-#include "ui/skin.h"
 
 #include <QtCore/QSettings>
+
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
-#include "QtMultimedia/QAudioDeviceInfo"
+
+#include <QtMultimedia/QAudioDeviceInfo>
+
+#include "ui/skin/skin.h"
 
 #ifdef Q_OS_WIN32
 #include "device_plugins/desktop/win_audio_helper.h"

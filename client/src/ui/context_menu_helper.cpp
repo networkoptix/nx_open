@@ -3,7 +3,7 @@
 #include <QtGui/QKeySequence>
 #include <QtGui/QMenu>
 
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 
 QAction cm_new_item(QObject::tr("New Item"), 0);
 QAction cm_exit(QObject::tr("Exit"), 0);
