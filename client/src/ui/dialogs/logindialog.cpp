@@ -6,7 +6,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "ui/preferences/preferences_wnd.h"
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 
 #include "settings.h"
 

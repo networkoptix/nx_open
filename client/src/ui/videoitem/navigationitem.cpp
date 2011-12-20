@@ -9,17 +9,20 @@
 
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/video_server.h>
-#include "timeslider.h"
+#include <plugins/resources/archive/abstract_archive_stream_reader.h>
+#include <utils/common/util.h>
+#include <utils/common/warnings.h>
+
 #include "camera/camera.h"
+
+#include "ui/skin/skin.h"
 #include "ui/videoitem/video_wnd_item.h"
 #include "ui/widgets/imagebutton.h"
 #include "ui/widgets/speedslider.h"
 #include "ui/widgets/volumeslider.h"
 #include "ui/widgets/tooltipitem.h"
-#include "ui/skin.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "utils/common/util.h"
-#include "utils/common/warnings.h"
+
+#include "timeslider.h"
 
 void detail::QnTimePeriodUpdater::update(const QnVideoServerConnectionPtr &connection, const QnNetworkResourceList &networkResources, const QnTimePeriod &timePeriod)
 {

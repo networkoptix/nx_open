@@ -77,12 +77,12 @@ void CLLayoutNavigator::destroy()
     //delete m_videoView; // TODO
 }
 
-void CLLayoutNavigator::setMode(ViewMode mode)
+void CLLayoutNavigator::setMode(CLLayoutNavigator::ViewMode mode)
 {
     m_mode = mode;
 }
 
-ViewMode CLLayoutNavigator::getMode() const
+CLLayoutNavigator::ViewMode CLLayoutNavigator::getMode() const
 {
     return m_mode;
 }
