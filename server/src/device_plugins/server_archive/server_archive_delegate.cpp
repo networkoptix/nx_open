@@ -93,7 +93,7 @@ void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
     }
 }
 
-qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
+qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSearch)
 {
     qint64 timeMs = time/1000;
 
@@ -116,7 +116,7 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
             //qDebug() << "found period:" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz") << "duration=" << itr->durationMs/1000.0;
         }
         else {
-            if (!m_reverseMode)
+            if (!useReverseSearch)
             {
                 ++itr;
                 if (itr != m_playbackMask.end())
@@ -132,7 +132,8 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
             }
             else {
                 m_lastTimePeriod = *itr;
-                timeMs = itr->startTimeMs + itr->durationMs;
+                timeMs = qMax(itr->startTimeMs, itr->startTimeMs + itr->durationMs - BACKWARD_SEEK_STEP);
+                //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh:mm:ss.zzz");
             }
         }
     }
@@ -202,7 +203,7 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
     m_eof = false;
     if (!m_motionRegion.isEmpty()) 
     {
-        time = correctTimeByMask(time);
+        time = correctTimeByMask(time, m_reverseMode);
         m_eof = time == AV_NOPTS_VALUE;
         if (m_eof)
             return -1; 
@@ -252,7 +253,7 @@ begin_label:
             bool afterSeekIgnore = m_lastSeekTime != AV_NOPTS_VALUE && data->timestamp < m_lastSeekTime;
             if (!afterSeekIgnore)
             {
-                qint64 newTime = correctTimeByMask(data->timestamp);
+                qint64 newTime = correctTimeByMask(data->timestamp, false);
                 if (newTime == AV_NOPTS_VALUE)
                 {
                     // eof reached
