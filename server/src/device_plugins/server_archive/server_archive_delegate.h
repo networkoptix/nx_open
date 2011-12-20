@@ -58,6 +58,7 @@ private:
     QnMotionArchiveConnectionPtr m_motionConnection;
     QnAbstractMediaDataPtr m_tmpData;
     bool m_sendMotion;
+    bool m_eof;
 };
 
 #endif // _SERVER_ARCHIVE_DELEGATE_H__
