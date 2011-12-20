@@ -724,9 +724,11 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 
 bool QnArchiveStreamReader::setSendMotion(bool value)
 {
+    /*
     if (m_navDelegate) {
         return m_navDelegate->setSendMotion(value);
     }
+    */
     QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
     if (maskedDelegate) {
         maskedDelegate->setSendMotion(value);
@@ -741,13 +743,15 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
 
 bool QnArchiveStreamReader::setMotionRegion(const QRegion& region)
 {
+    /*
     if (m_navDelegate) {
         return m_navDelegate->setMotionRegion(region);
     }
+    */
     QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
     if (maskedDelegate) {
         maskedDelegate->setMotionRegion(region);
-        if (!mFirstTime)
+        if (!mFirstTime && !m_delegate->isRealTimeSource())
             jumpToPreviousFrame(determineDisplayTime());
         return true;
     }
