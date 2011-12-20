@@ -4,11 +4,9 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QTimer>
 
-#include "ui/ui_common.h"
-
 CLPictureImageItem::CLPictureImageItem(GraphicsView* view, int max_width, int max_height,
-				   QString path,
-				   QString name):
+                   QString path,
+                   QString name):
 CLImageItem(view, max_width,max_height,name),
 m_CurrentImg(0),
 m_CurrentIndex(0),
@@ -18,7 +16,7 @@ m_forwardDirection(true)
     if (path.endsWith(QLatin1String(".png")))
     {
         // single image
-        m_Images.append(cached(path));
+        m_Images.append(QPixmap(path));
     }
     else
     {
@@ -26,7 +24,7 @@ m_forwardDirection(true)
         QDir dir(path);
         const QStringList filter = QStringList() << QLatin1String("*.png");
         foreach (const QFileInfo &fi, dir.entryInfoList(filter, QDir::Files, QDir::Name))
-            m_Images.append(cached(fi.absoluteFilePath()));
+            m_Images.append(QPixmap(fi.absoluteFilePath()));
 
         if (m_Images.isEmpty())
             m_Images.append(QPixmap());
@@ -58,11 +56,11 @@ void CLPictureImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     if (!m_CurrentImg)
         return;
 
-	painter->setRenderHint(QPainter::SmoothPixmapTransform);
-	painter->setRenderHint(QPainter::Antialiasing);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform);
+    painter->setRenderHint(QPainter::Antialiasing);
 
-	painter->drawPixmap(boundingRect(), *m_CurrentImg, m_CurrentImg->rect());
-	drawStuff(painter);
+    painter->drawPixmap(boundingRect(), *m_CurrentImg, m_CurrentImg->rect());
+    drawStuff(painter);
 }
 
 void CLPictureImageItem::onTimer()
