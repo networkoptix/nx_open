@@ -13,8 +13,9 @@
 #include <QtGui/QStyle>
 #include <QtGui/QStyleFactory>
 
-#include "ui/skin.h"
-#include "utils/common/util.h"
+#include <utils/common/util.h>
+
+#include "ui/skin/skin.h"
 
 #include "ui/widgets2/graphicsframe.h"
 #include "ui/widgets2/graphicsslider.h"
@@ -213,8 +214,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->fillRect(r, linearGrad);
 
     ensureHandleRect();
-    // ### use Skin::cached(const QString &name, const QSizeF &size, Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation)
-    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
 

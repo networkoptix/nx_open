@@ -4,11 +4,11 @@
 #include <QtGui/QStringListModel>
 #include <QtGui/QToolButton>
 
+#include <core/resourcemanagment/resource_pool.h>
+
+#include "ui/skin/skin.h"
 #include "ui/video_cam_layout/layout_content.h"
 #include "ui/graphicsview.h"
-#include "ui/skin.h"
-#include "core/resourcemanagment/resource_pool.h"
-
 
 CLSearchEditCompleter::CLSearchEditCompleter(QObject *parent)
     : QCompleter(parent)

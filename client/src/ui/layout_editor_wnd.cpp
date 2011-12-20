@@ -45,13 +45,13 @@ m_editedView(0)
     connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
     connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 
-    m_topView->setMode(LAYOUTEDITOR_ViewMode);
+    m_topView->setMode(CLLayoutNavigator::LAYOUTEDITOR_ViewMode);
     m_topView->getView().setViewMode(GraphicsView::ItemsDonor);
 
-    m_bottomView->setMode(LAYOUTEDITOR_ViewMode);
+    m_bottomView->setMode(CLLayoutNavigator::LAYOUTEDITOR_ViewMode);
     m_bottomView->getView().setViewMode(GraphicsView::ItemsDonor);
 
-    m_editedView->setMode(LAYOUTEDITOR_ViewMode);
+    m_editedView->setMode(CLLayoutNavigator::LAYOUTEDITOR_ViewMode);
     m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
 
     QLayout* ml = new QHBoxLayout();
