@@ -647,7 +647,10 @@ QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
 }
 
 void QnResourceWidget::addToMotionSelection(const QRect &gridRect) {
+    QRegion motionSelection = m_channelState[0].motionSelection;
     m_channelState[0].motionSelection += gridRect.intersected(QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
+    if(motionSelection != m_channelState[0].motionSelection)
+        display()->archiveReader()->setMotionRegion(motionSelection);
 }
 
 void QnResourceWidget::clearMotionSelection() {
