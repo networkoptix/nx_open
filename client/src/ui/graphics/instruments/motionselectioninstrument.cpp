@@ -25,7 +25,7 @@ public:
             return; /* Draw it on source viewport only. */
 
         QnScopedPainterPenRollback penRollback(painter, QPen(QColor(0, 255, 0, 32), 0));
-        QnScopedPainterBrushRollback brushRollback(painter, QColor(0, 255, 0, 16));
+        QnScopedPainterBrushRollback brushRollback(painter, QColor(0, 255, 0, 64));
         painter->drawRect(boundingRect());
     }
 
