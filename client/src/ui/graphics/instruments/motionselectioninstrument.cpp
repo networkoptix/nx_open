@@ -88,10 +88,7 @@ MotionSelectionInstrument::~MotionSelectionInstrument() {
 void MotionSelectionInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
-    m_selectionItem = new MotionSelectionItem();
-    selectionItem()->setParent(this); /* Just to feel totally safe. */
-    selectionItem()->setVisible(false);
-    scene()->addItem(selectionItem());
+    ensureSelectionItem();
 
     base_type::installedNotify();
 }
@@ -101,6 +98,16 @@ void MotionSelectionInstrument::aboutToBeUninstalledNotify() {
 
     if(selectionItem() != NULL)
         delete selectionItem();
+}
+
+void MotionSelectionInstrument::ensureSelectionItem() {
+    if(selectionItem() != NULL)
+        return;
+
+    m_selectionItem = new MotionSelectionItem();
+    selectionItem()->setVisible(false);
+    if(scene() != NULL)
+        scene()->addItem(selectionItem());
 }
 
 bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
@@ -145,6 +152,7 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
         return;
     }
 
+    ensureSelectionItem();
     selectionItem()->setParentItem(target());
     selectionItem()->setOrigin(target()->mapFromMotionGrid(target()->mapToMotionGrid(target()->mapFromScene(info->mousePressScenePos()))));
     selectionItem()->setViewport(info->view()->viewport());
@@ -160,6 +168,7 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
         return;
     }
 
+    ensureSelectionItem();
     selectionItem()->setCorner(target()->mapFromMotionGrid(target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()))));
 }
 
@@ -167,6 +176,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
     if(!m_selectionStartedEmitted)
         emit selectionFinished(info->view(), target());
     
+    ensureSelectionItem();
     if(target() != NULL) {
         /* Qt handles QRect borders in totally inhuman way, so we have to do everything by hand. */
         QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
@@ -178,6 +188,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
     }
 
     selectionItem()->setVisible(false);
+    selectionItem()->setParentItem(NULL);
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {

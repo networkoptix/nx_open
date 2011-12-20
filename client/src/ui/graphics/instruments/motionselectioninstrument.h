@@ -44,6 +44,8 @@ protected:
         return m_target.data();
     }
 
+    void ensureSelectionItem();
+
 private:
     QWeakPointer<MotionSelectionItem> m_selectionItem;
     QWeakPointer<QnResourceWidget> m_target;
