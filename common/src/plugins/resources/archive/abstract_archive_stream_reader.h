@@ -18,10 +18,10 @@ public:
     virtual bool isMediaPaused() const = 0;
 
     // playback filter by motion detection mask
-    virtual bool setMotionRegion(const QRegion& region) = 0;
+    //virtual bool setMotionRegion(const QRegion& region) = 0;
 
     // delivery motion data to a client
-    virtual bool setSendMotion(bool value) = 0;
+    //virtual bool setSendMotion(bool value) = 0;
 };
 
 class QnAbstractArchiveReader : public QnClientPullMediaStreamProvider, public QnAbstractNavigator
@@ -69,6 +69,8 @@ public:
     qint64 endTime() const;
     bool isRealTimeSource() const;
 
+    virtual bool setMotionRegion(const QRegion& region) = 0;
+    virtual bool setSendMotion(bool value) = 0;
 
 Q_SIGNALS:
     void beforeJump(qint64 mksec);
