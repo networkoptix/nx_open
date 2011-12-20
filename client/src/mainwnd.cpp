@@ -344,8 +344,6 @@ void MainWnd::appServerError(int error)
 
 void MainWnd::appServerAuthenticationRequired()
 {
-    return;
-
     static LoginDialog *dialog = 0;
     if (dialog)
         return;

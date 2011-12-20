@@ -78,6 +78,7 @@ protected slots:
     void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
     void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
@@ -168,7 +169,7 @@ private:
     /** Screen recording countdown label. */
     QLabel* m_recordingLabel;
 
-    /** Animation for screen recording coutdown. */
+    /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
 };
 

@@ -37,11 +37,6 @@ public:
      */
     void stopRecording();
 
-    /**
-     * Cancel screen recording. Used on application stop
-     */
-    void QnScreenRecorder::cancelRecording();
-
 public slots:
     /**
      * Starts screen recording.
