@@ -174,8 +174,7 @@ GraphicsFrame::~GraphicsFrame()
 */
 int GraphicsFrame::frameStyle() const
 {
-    Q_D(const GraphicsFrame);
-    return d->frameStyle;
+    return d_func()->frameStyle;
 }
 
 /*!
@@ -264,8 +263,7 @@ void GraphicsFrame::setFrameShadow(GraphicsFrame::Shadow shadow)
 */
 int GraphicsFrame::frameWidth() const
 {
-    Q_D(const GraphicsFrame);
-    return d->frameWidth;
+    return d_func()->frameWidth;
 }
 
 /*!
@@ -281,8 +279,7 @@ int GraphicsFrame::frameWidth() const
 */
 int GraphicsFrame::lineWidth() const
 {
-    Q_D(const GraphicsFrame);
-    return d->lineWidth;
+    return d_func()->lineWidth;
 }
 
 void GraphicsFrame::setLineWidth(int width)
@@ -304,8 +301,7 @@ void GraphicsFrame::setLineWidth(int width)
 */
 int GraphicsFrame::midLineWidth() const
 {
-    Q_D(const GraphicsFrame);
-    return d->midLineWidth;
+    return d_func()->midLineWidth;
 }
 
 void GraphicsFrame::setMidLineWidth(int width)

@@ -38,6 +38,7 @@ public:
 
 protected:
     virtual void initStyleOption(QStyleOption *option) const override;
+
     virtual bool event(QEvent *event) override;
 
 protected:

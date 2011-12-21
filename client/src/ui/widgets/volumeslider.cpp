@@ -22,10 +22,11 @@ public:
     {
         QRect r = ProxyStyle::subControlRect(cc, opt, sc, widget);
         if (cc == CC_Slider && sc == SC_SliderHandle) {
+            int side = qMin(r.width(), r.height());//3;
             if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
-                r.setWidth(3);
+                r.setWidth(side);
             else
-                r.setHeight(3);
+                r.setHeight(side);
         }
         return r;
     }

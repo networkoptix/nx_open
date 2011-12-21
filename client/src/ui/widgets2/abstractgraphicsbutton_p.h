@@ -14,6 +14,10 @@ class AbstractGraphicsButtonPrivate : public GraphicsWidgetPrivate
 public:
     AbstractGraphicsButtonPrivate(QSizePolicy::ControlType type = QSizePolicy::DefaultType);
 
+    void init();
+    void click();
+    void refresh();
+
     QString text;
     QIcon icon;
     QSize iconSize;
@@ -21,13 +25,13 @@ public:
     QKeySequence shortcut;
     int shortcutId;
 #endif
-    uint checkable : 1;
-    uint checked : 1;
-    uint autoRepeat : 1;
+    uint checkable     : 1;
+    uint checked       : 1;
+    uint autoRepeat    : 1;
     uint autoExclusive : 1;
-    uint down : 1;
-    uint blockRefresh : 1;
-    uint pressed : 1;
+    uint down          : 1;
+    uint blockRefresh  : 1;
+    uint pressed       : 1;
 
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
     GraphicsButtonGroup *group;
@@ -38,11 +42,7 @@ public:
     int autoRepeatDelay, autoRepeatInterval;
 
     QSizePolicy::ControlType controlType;
-    mutable QSize sizeHint;
-
-    void init();
-    void click();
-    void refresh();
+    mutable QSizeF sizeHint;
 
     QList<AbstractGraphicsButton *> queryButtonList() const;
     AbstractGraphicsButton *queryCheckedButton() const;
