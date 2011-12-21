@@ -627,7 +627,11 @@ QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
 }
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
-    return m_workbench->mapper()->mapFromGrid(QRectF(m_workbench->layout()->boundingRect()).adjusted(-0.05, -0.05, 0.05, 0.05));
+    QRect layoutBoundingRect = m_workbench->layout()->boundingRect();
+    if(layoutBoundingRect.isNull())
+        layoutBoundingRect = QRect(0, 0, 1, 1);
+
+    return m_workbench->mapper()->mapFromGrid(QRectF(layoutBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
