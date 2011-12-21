@@ -1,6 +1,7 @@
 #include "server_stream_recorder.h"
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
+#include "core/dataprovider/media_streamdataprovider.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     QnStreamRecorder(dev)
@@ -8,6 +9,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     m_lastMotionContainData = false;
+    m_needUpdateStreamParams = false;
 }
 
 bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
@@ -20,6 +22,16 @@ bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 {
+    if (m_needUpdateStreamParams)
+    {
+        QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (media->dataProvider);
+        if (mediaProvider) 
+        {
+            mediaProvider->setFps(m_currentScheduleTask.getFps());
+            mediaProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+            m_needUpdateStreamParams = false;
+        }
+    }
     if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly) {
         return;
     }
@@ -101,6 +113,7 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
                 if (itr->containTimeMs(scheduleTimeMs)) {
                     m_lastSchedulePeriod = QnTimePeriod(absoluteScheduleTime, itr->durationMs()); 
                     updateRecordingType(*itr);
+                    m_needUpdateStreamParams = true;
                     //m_skipDataToTime = AV_NOPTS_VALUE;
                 }
                 else {

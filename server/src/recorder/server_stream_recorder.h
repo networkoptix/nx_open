@@ -32,6 +32,7 @@ private:
     //qint64 m_skipDataToTime;
     qint64 m_lastMotionTimeUsec;
     bool m_lastMotionContainData;
+    bool m_needUpdateStreamParams;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

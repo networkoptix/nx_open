@@ -40,6 +40,9 @@ public:
     RecordingType getRecordingType() const { return m_recordType; }
     int getBeforeThreshold() const { return m_beforeThreshold; }
     int getAfterThreshold() const { return m_afterThreshold; }
+    int getFps() const { return m_fps; }
+    QnStreamQuality getStreamQuality() const { return m_streamQuality; }
+
 
     /*
     * Duration at ms
