@@ -5,6 +5,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "storage_manager.h"
+#include "utils/common/util.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -24,7 +25,7 @@ m_truncateInterval(0),
 m_currentChunkLen(0),
 m_startDateTime(AV_NOPTS_VALUE),
 m_endDateTime(-1),
-m_lastPacketTime(0),
+m_lastPacketTime(AV_NOPTS_VALUE),
 m_startOffset(0),
 m_forceDefaultCtx(true),
 m_prebufferingUsec(0)
@@ -60,6 +61,7 @@ void QnStreamRecorder::close()
             avio_close(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
         m_formatCtx = 0;
+        m_lastPacketTime = AV_NOPTS_VALUE;
     }
     m_packetWrited = false;
     m_firstTimestamp = -1;
@@ -107,6 +109,14 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
+
+    if (m_lastPacketTime != AV_NOPTS_VALUE)
+    {
+        if (md->timestamp - m_lastPacketTime > MAX_FRAME_DURATION*1000ll) {
+            close();
+            m_lastPacketTime = md->timestamp;
+        }
+    }
 
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md);
@@ -159,8 +169,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     AVStream* stream = m_formatCtx->streams[channel];
     AVRational srcRate = {1, 1000000};
     Q_ASSERT(stream->time_base.num && stream->time_base.den);
-    m_lastPacketTime = md->timestamp-m_firstTimestamp;
-    avPkt.pts = av_rescale_q(m_lastPacketTime, srcRate, stream->time_base);
+    m_lastPacketTime = md->timestamp;
+    avPkt.pts = av_rescale_q(m_lastPacketTime-m_firstTimestamp, srcRate, stream->time_base);
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
     avPkt.stream_index= channel;

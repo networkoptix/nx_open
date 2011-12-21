@@ -21,7 +21,9 @@ public:
 
     void setFileName(const QString& fileName);
     void close();
-    qint64 duration() const { return m_lastPacketTime; }
+    
+    qint64 duration() const  { return m_lastPacketTime - m_firstTimestamp; }
+    
     virtual bool processData(QnAbstractDataPacketPtr data);
 
     void setStartOffset(qint64 value);
