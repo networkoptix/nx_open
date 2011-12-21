@@ -23,7 +23,7 @@ public:
     {}
     QnScheduleTask(QnId id, QnId sourceId, int startTime, int endTime,
                    bool doRecordAudio, RecordingType recordType, int dayOfWeek, int beforeThreshold, int afterThreshold,
-                   QnStreamQuality streamQuality, int fps)
+                   QnStreamQuality streamQuality = QnQualityHighest, int fps = 10)
         : m_id(id), m_sourceId(sourceId),
           m_startTime(startTime), m_endTime(endTime),
           m_doRecordAudio(doRecordAudio),
