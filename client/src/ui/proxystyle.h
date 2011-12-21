@@ -74,7 +74,7 @@ protected Q_SLOTS:
 private:
     Q_DISABLE_COPY(ProxyStyle)
 
-    mutable QPointer<QStyle> m_style;
+    QPointer<QStyle> m_style;
 };
 
 #endif // PROXYSTYLE_H
