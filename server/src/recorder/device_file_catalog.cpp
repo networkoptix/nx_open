@@ -1,26 +1,14 @@
+#include <QDir>
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
-#include "file_deletor.h"
+#include "recording/file_deletor.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
-#include "stream_recorder.h"
+#include "recording/stream_recorder.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-
-bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
-{
-    return first.startTimeMs < other.startTimeMs;
-}
-
-bool operator < (qint64 first, const QnTimePeriod& other) 
-{ 
-    return first < other.startTimeMs; 
-}
-
-bool operator < (const QnTimePeriod& other, qint64 first) 
-{ 
-    return other.startTimeMs < first;
-}
+#include "motion/motion_helper.h"
+#include <QDebug>
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
     m_firstDeleteCount(0),
@@ -143,6 +131,24 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     return rez;
 }
 
+QList<QDate> DeviceFileCatalog::recordedMonthList()
+{
+    QVector<DeviceFileCatalog::Chunk>::iterator curItr = m_chunks.begin();
+    QDate monthStart(1970, 1, 1);
+    QList<QDate> rez;
+
+    curItr = qLowerBound(curItr, m_chunks.end(), QDateTime(monthStart).toMSecsSinceEpoch());
+    while (curItr != m_chunks.end())
+    {
+        monthStart = QDateTime::fromMSecsSinceEpoch(curItr->startTimeMs).date();
+        monthStart = monthStart.addDays(1 - monthStart.day());
+        rez << monthStart;
+        monthStart = monthStart.addMonths(1);
+        curItr = qLowerBound(curItr, m_chunks.end(), QDateTime(monthStart).toMSecsSinceEpoch());
+    }
+    return rez;
+}
+
 void DeviceFileCatalog::deserializeTitleFile()
 {
     QMutexLocker lock(&m_mutex);
@@ -196,6 +202,9 @@ void DeviceFileCatalog::deserializeTitleFile()
 
         m_file.close();
         newFile.close();
+
+        QnMotionHelper::instance()->deleteUnusedFiles(recordedMonthList(), m_macAddress);
+
         if (m_file.remove())
             newFile.rename(m_file.fileName());
         m_file.open(QFile::ReadWrite);
@@ -238,6 +247,17 @@ bool DeviceFileCatalog::deleteFirstRecord()
     {
         QString delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
         qnFileDeletor->deleteFile(delFileName);
+        bool isLastChunkOfMonth = true;
+        QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
+        if (m_firstDeleteCount < m_chunks.size()-1)
+        {
+            QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
+            isLastChunkOfMonth = curDate.year() != nextDate.year() || curDate.month() != nextDate.month();
+        }
+        if (isLastChunkOfMonth) {
+            QString motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
+            qnFileDeletor->deleteDir(motionDirName);
+        }
         m_firstDeleteCount++;
     }
     else {

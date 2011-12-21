@@ -8,33 +8,7 @@
 #include <QSharedPointer>
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
-
-struct QnTimePeriod;
-typedef QVector<QnTimePeriod> QnTimePeriodList;
-
-struct QnTimePeriod
-{
-    QnTimePeriod(): startTimeMs(0), durationMs(0) {}
-    QnTimePeriod(qint64 _startTimeMs, int _durationMs): startTimeMs(_startTimeMs), durationMs(_durationMs) {}
-
-    static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
-
-    bool containTime(qint64 timeMs) const;
-
-    /** Start time in milliseconds. */
-    qint64 startTimeMs;
-
-    /** Duration in milliseconds. 
-     * 
-     * -1 if duration is infinite or unknown. It may be the case if this time period 
-     * represents a video chunk that is being recorded at the moment. */
-    qint64 durationMs;
-
-};
-bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
-bool operator < (qint64 first, const QnTimePeriod& other);
-bool operator < (const QnTimePeriod& other, qint64 first);
-
+#include "recording/time_period.h"
 
 class DeviceFileCatalog: public QObject
 {
@@ -49,9 +23,10 @@ public:
             startTimeMs(_startTime), storageIndex(_storageIndex), fileIndex(_fileIndex), durationMs(_duration) {}
 
         qint64 startTimeMs; // chunk startTime at ms
+        int durationMs; // chunk duration at ms
+
         quint16 storageIndex;
         quint16 fileIndex;
-        int durationMs; // chunk duration at ms
     };
 
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
@@ -77,6 +52,7 @@ public:
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs);
+    QList<QDate> recordedMonthList();
 private:
     mutable QMutex m_mutex;
     QFile m_file;

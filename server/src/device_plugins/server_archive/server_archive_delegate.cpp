@@ -104,6 +104,9 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSe
     if (timeMs >= m_lastTimePeriod.startTimeMs && timeMs < m_lastTimePeriod.startTimeMs + m_lastTimePeriod.durationMs)
         return time;
 
+    if (m_playbackMask.isEmpty())
+        return AV_NOPTS_VALUE;
+
     //qDebug() << "inputTime=" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
 
     QnTimePeriodList::iterator itr = qUpperBound(m_playbackMask.begin(), m_playbackMask.end(), timeMs);

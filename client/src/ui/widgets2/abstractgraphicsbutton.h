@@ -93,8 +93,6 @@ protected:
     virtual void checkStateSet();
     virtual void nextCheckState();
 
-    void initStyleOption(QStyleOption *option) const;
-
     bool event(QEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);

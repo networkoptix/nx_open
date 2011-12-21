@@ -340,8 +340,8 @@ void AbstractGraphicsButtonPrivate::moveFocus(int key)
 
     for (int i = 0; i < buttonList.count(); ++i) {
         AbstractGraphicsButton *button = buttonList.at(i);
-        if (button != f && button->window() == f->window() && button->isEnabled() && button->isVisible() &&
-            (autoExclusive || (button->focusPolicy() & focus_flag) == focus_flag)) {
+        if (button != f && button->window() == f->window() && button->isEnabled() && button->isVisible()
+            && (autoExclusive || (button->focusPolicy() & focus_flag) == focus_flag)) {
             QRectF buttonRect = button->rect().translated(button->mapToScene(QPoint(0,0)));
             QPointF p = buttonRect.center();
 
@@ -436,6 +436,7 @@ void AbstractGraphicsButtonPrivate::init()
 {
     Q_Q(AbstractGraphicsButton);
 
+    q->setAcceptHoverEvents(true);
     q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy)));
     q->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed, controlType));
 //    q->setForegroundRole(QPalette::ButtonText);
@@ -587,10 +588,10 @@ void AbstractGraphicsButton::setText(const QString &text)
     Q_D(AbstractGraphicsButton);
     if (d->text == text)
         return;
+
     d->text = text;
 #ifndef QT_NO_SHORTCUT
-    QKeySequence newMnemonic = QKeySequence::mnemonic(text);
-    setShortcut(newMnemonic);
+    setShortcut(QKeySequence::mnemonic(text));
 #endif
     d->sizeHint = QSizeF();
     update();
@@ -616,6 +617,34 @@ void AbstractGraphicsButton::setIcon(const QIcon &icon)
 {
     Q_D(AbstractGraphicsButton);
     d->icon = icon;
+    d->sizeHint = QSizeF();
+    update();
+    updateGeometry();
+}
+
+/*!
+    \property AbstractGraphicsButton::iconSize
+    \brief the icon size used for this button.
+
+    The default size is defined by the GUI style. This is a maximum
+    size for the icons. Smaller icons will not be scaled up.
+*/
+QSize AbstractGraphicsButton::iconSize() const
+{
+    Q_D(const AbstractGraphicsButton);
+    if (d->iconSize.isValid())
+        return d->iconSize;
+    const int e = style()->pixelMetric(QStyle::PM_ButtonIconSize, 0, 0);
+    return QSize(e, e);
+}
+
+void AbstractGraphicsButton::setIconSize(const QSize &size)
+{
+    Q_D(AbstractGraphicsButton);
+    if (d->iconSize == size)
+        return;
+
+    d->iconSize = size;
     d->sizeHint = QSizeF();
     update();
     updateGeometry();
@@ -687,7 +716,7 @@ void AbstractGraphicsButton::setChecked(bool checked)
     }
 
     if (!checked && d->queryCheckedButton() == this) {
-        // the checked button of an exclusive or autoexclusive group cannot be  unchecked
+        // the checked button of an exclusive or autoexclusive group cannot be unchecked
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
         if (d->group ? d->group->d_func()->exclusive : d->autoExclusive)
             return;
@@ -730,6 +759,7 @@ void AbstractGraphicsButton::setDown(bool down)
     Q_D(AbstractGraphicsButton);
     if (d->down == down)
         return;
+
     d->down = down;
     d->refresh();
     if (d->autoRepeat && d->down)
@@ -919,6 +949,18 @@ void AbstractGraphicsButton::toggle()
     setChecked(!d_func()->checked);
 }
 
+/*!
+    Returns true if \a pos is inside the clickable button rectangle;
+    otherwise returns false.
+
+    By default, the clickable area is the entire widget. Subclasses
+    may reimplement this function to provide support for clickable
+    areas of different shapes and sizes.
+*/
+bool AbstractGraphicsButton::hitButton(const QPointF &pos) const
+{
+    return rect().contains(pos);
+}
 
 /*!
     This virtual handler is called when setChecked() was called,
@@ -934,7 +976,7 @@ void AbstractGraphicsButton::checkStateSet()
 /*!
     This virtual handler is called when a button is clicked. The
     default implementation calls setChecked(!isChecked()) if the button
-    isCheckable().  It allows subclasses to implement intermediate button states.
+    isCheckable(). It allows subclasses to implement intermediate button states.
 
     \sa checkStateSet()
 */
@@ -942,36 +984,6 @@ void AbstractGraphicsButton::nextCheckState()
 {
     if (isCheckable())
         setChecked(!isChecked());
-}
-
-/*!
-    Returns true if \a pos is inside the clickable button rectangle;
-    otherwise returns false.
-
-    By default, the clickable area is the entire widget. Subclasses
-    may reimplement this function to provide support for clickable
-    areas of different shapes and sizes.
-*/
-bool AbstractGraphicsButton::hitButton(const QPointF &pos) const
-{
-    return rect().contains(pos);
-}
-
-/*!
-    \reimp
-*/
-void AbstractGraphicsButton::initStyleOption(QStyleOption *option) const
-{
-    Q_D(const AbstractGraphicsButton);
-
-    GraphicsWidget::initStyleOption(option);
-
-    if (d->down)
-        option->state |= QStyle::State_Sunken;
-    if (d->checked)
-        option->state |= QStyle::State_On;
-    if (!d->checked && !d->down)
-        option->state |= QStyle::State_Raised;
 }
 
 /*!
@@ -1009,6 +1021,7 @@ bool AbstractGraphicsButton::event(QEvent *event)
         QShortcutEvent *se = static_cast<QShortcutEvent *>(event);
         if (d->shortcutId != se->shortcutId())
             return false;
+
         if (!se->isAmbiguous()) {
             if (!d->animateTimer.isActive())
                 animateClick();
@@ -1030,11 +1043,7 @@ bool AbstractGraphicsButton::event(QEvent *event)
 void AbstractGraphicsButton::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
     Q_D(AbstractGraphicsButton);
-    if (e->button() != Qt::LeftButton) {
-        e->ignore();
-        return;
-    }
-    if (hitButton(e->pos())) {
+    if (e->button() == Qt::LeftButton && hitButton(e->pos())) {
         setDown(true);
         d->pressed = true;
         update(); //flush paint event before invoking potentially expensive operation
@@ -1054,12 +1063,7 @@ void AbstractGraphicsButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
     Q_D(AbstractGraphicsButton);
     d->pressed = false;
 
-    if (e->button() != Qt::LeftButton) {
-        e->ignore();
-        return;
-    }
-
-    if (!d->down) {
+    if (e->button() != Qt::LeftButton || !d->down) {
         e->ignore();
         return;
     }
@@ -1223,6 +1227,7 @@ void AbstractGraphicsButton::focusInEvent(QFocusEvent *e)
     if (!QApplication::keypadNavigationEnabled())
 #endif
     d_func()->fixFocusPolicy();
+
     GraphicsWidget::focusInEvent(e);
 }
 
@@ -1233,6 +1238,7 @@ void AbstractGraphicsButton::focusOutEvent(QFocusEvent *e)
 {
     if (e->reason() != Qt::PopupFocusReason)
         d_func()->down = false;
+
     GraphicsWidget::focusOutEvent(e);
 }
 
@@ -1308,32 +1314,3 @@ void AbstractGraphicsButton::changeEvent(QEvent *e)
 
     \sa checked, clicked()
 */
-
-/*!
-    \property AbstractGraphicsButton::iconSize
-    \brief the icon size used for this button.
-
-    The default size is defined by the GUI style. This is a maximum
-    size for the icons. Smaller icons will not be scaled up.
-*/
-QSize AbstractGraphicsButton::iconSize() const
-{
-    Q_D(const AbstractGraphicsButton);
-    if (d->iconSize.isValid())
-        return d->iconSize;
-    const int e = style()->pixelMetric(QStyle::PM_ButtonIconSize, 0, 0);
-    return QSize(e, e);
-}
-
-void AbstractGraphicsButton::setIconSize(const QSize &size)
-{
-    Q_D(AbstractGraphicsButton);
-    if (d->iconSize == size)
-        return;
-
-    d->iconSize = size;
-    d->sizeHint = QSizeF();
-    updateGeometry();
-    if (isVisible())
-        update();
-}

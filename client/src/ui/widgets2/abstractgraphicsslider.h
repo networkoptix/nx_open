@@ -102,12 +102,12 @@ protected:
 
     void initStyleOption(QStyleOption *option) const;
 
-    bool event(QEvent *e);
-    void changeEvent(QEvent *e);
-    void keyPressEvent(QKeyEvent *ev);
-    void timerEvent(QTimerEvent *);
+    bool event(QEvent *event);
+    void changeEvent(QEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void timerEvent(QTimerEvent *event);
 #ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QGraphicsSceneWheelEvent *e);
+    void wheelEvent(QGraphicsSceneWheelEvent *event);
 #endif
 
 protected:

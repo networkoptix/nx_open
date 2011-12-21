@@ -2,6 +2,7 @@
 #include <QDateTime>
 #include <QDir>
 #include "utils/common/util.h"
+#include "motion_helper.h"
 
 static const char version = 1;
 static const quint16 DETAILED_AGGREGATE_INTERVAL = 5; // at seconds
@@ -126,15 +127,15 @@ void QnMotionArchive::updateMotionMask(QRegion maskedRegion)
     createMask(maskedRegion, m_motionMask, m_motionMaskStart, m_motionMaskEnd);
 }
 
-QString QnMotionArchive::getFilePrefix(const QDateTime& datetime)
+QString QnMotionArchive::getFilePrefix(const QDate& datetime)
 {
-    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + m_resource->getMAC().toString() + QString("/") + datetime.toString("yyyy/MM/");
+    return QnMotionHelper::instance()->getMotionDir(datetime, m_resource->getMAC().toString());
 }
 
 void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile)
 {
     QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
-    QString fileName = getFilePrefix(datetime);
+    QString fileName = getFilePrefix(datetime.date());
     if (motionFile)
         motionFile->setFileName(fileName+"motion_detailed_data.bin");
     if (indexFile)

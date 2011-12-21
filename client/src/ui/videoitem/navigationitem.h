@@ -5,7 +5,7 @@
 
 #include <QtGui/QGraphicsWidget>
 
-#include <recording/device_file_catalog.h> /* For QnTimePeriod. */
+#include "recording/time_period.h"
 #include <api/VideoServerConnection.h>
 
 namespace detail {

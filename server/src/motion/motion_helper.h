@@ -7,8 +7,9 @@
 #include "utils/media/sse_helper.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/network_resource.h"
-#include "recording/device_file_catalog.h"
+#include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
+#include "recording/time_period.h"
 
 class QnMotionHelper
 {
@@ -27,8 +28,13 @@ public:
     QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res);
 
+    static QString getMotionDir(const QDate& date, const QString& macAddress);
+    static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& macAddress);
+
     QnMotionHelper();
 private:
+    static QString getBaseDir(const QString& macAddress);
+
     // create Find mask by region
     void createMask(const QRegion& region);
 
@@ -41,5 +47,6 @@ private:
     MotionWriters m_writers;
     QMutex m_mutex;
 };
+
 
 #endif // __MOTION_HELPER_H__
