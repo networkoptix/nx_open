@@ -20,7 +20,7 @@ public:
         orientation(Qt::Horizontal),
         minimum(0), maximum(99), pageStep(10), value(0), position(0), pressValue(-1),
         singleStep(1), offset_accumulated(0), tracking(true),
-        blocktracking(false), pressed(false),
+        blockTracking(false), pressed(false),
         invertedAppearance(false), invertedControls(false),
         acceleratedWheeling(false),
         repeatAction(AbstractGraphicsSlider::SliderNoAction)
@@ -44,11 +44,11 @@ public:
     int singleStep;
 
     float offset_accumulated;
-    uint tracking : 1;
-    uint blocktracking :1;
-    uint pressed : 1;
-    uint invertedAppearance : 1;
-    uint invertedControls : 1;
+    uint tracking            : 1;
+    uint blockTracking       : 1;
+    uint pressed             : 1;
+    uint invertedAppearance  : 1;
+    uint invertedControls    : 1;
     uint acceleratedWheeling : 1;
 
     QBasicTimer repeatActionTimer;

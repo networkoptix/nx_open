@@ -52,8 +52,8 @@ void GraphicsSliderPrivate::updateHoverControl(const QPoint &pos)
 {
     Q_Q(GraphicsSlider);
 
-    QRect lastHoverRect = hoverRect;
-    QStyle::SubControl lastHoverControl = hoverControl;
+    const QRect lastHoverRect = hoverRect;
+    const QStyle::SubControl lastHoverControl = hoverControl;
     if (lastHoverControl != newHoverControl(pos)) {
         q->update(lastHoverRect);
         q->update(hoverRect);
@@ -67,23 +67,11 @@ QStyle::SubControl GraphicsSliderPrivate::newHoverControl(const QPoint &pos)
     QStyleOptionSlider opt;
     q->initStyleOption(&opt);
     opt.subControls = QStyle::SC_All;
-    QRect handleRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-    QRect grooveRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove);
-    QRect tickmarksRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderTickmarks);
-
-    if (handleRect.contains(pos)) {
-        hoverRect = handleRect;
-        hoverControl = QStyle::SC_SliderHandle;
-    } else if (grooveRect.contains(pos)) {
-        hoverRect = grooveRect;
-        hoverControl = QStyle::SC_SliderGroove;
-    } else if (tickmarksRect.contains(pos)) {
-        hoverRect = tickmarksRect;
-        hoverControl = QStyle::SC_SliderTickmarks;
-    } else {
+    hoverControl = q->style()->hitTestComplexControl(QStyle::CC_Slider, &opt, pos);
+    if (hoverControl != QStyle::SC_None)
+        hoverRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, hoverControl);
+    else
         hoverRect = QRect();
-        hoverControl = QStyle::SC_None;
-    }
 
     return hoverControl;
 }

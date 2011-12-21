@@ -205,8 +205,7 @@ AbstractGraphicsSlider::~AbstractGraphicsSlider()
 */
 Qt::Orientation AbstractGraphicsSlider::orientation() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->orientation;
+    return d_func()->orientation;
 }
 
 void AbstractGraphicsSlider::setOrientation(Qt::Orientation orientation)
@@ -235,14 +234,12 @@ void AbstractGraphicsSlider::setOrientation(Qt::Orientation orientation)
 */
 int AbstractGraphicsSlider::minimum() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->minimum;
+    return d_func()->minimum;
 }
 
 void AbstractGraphicsSlider::setMinimum(int min)
 {
-    Q_D(AbstractGraphicsSlider);
-    setRange(min, qMax(d->maximum, min));
+    setRange(min, qMax(d_func()->maximum, min));
 }
 
 /*!
@@ -255,14 +252,12 @@ void AbstractGraphicsSlider::setMinimum(int min)
 */
 int AbstractGraphicsSlider::maximum() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->maximum;
+    return d_func()->maximum;
 }
 
 void AbstractGraphicsSlider::setMaximum(int max)
 {
-    Q_D(AbstractGraphicsSlider);
-    setRange(qMin(d->minimum, max), max);
+    setRange(qMin(d_func()->minimum, max), max);
 }
 
 /*!
@@ -301,8 +296,7 @@ void AbstractGraphicsSlider::setRange(int min, int max)
 */
 int AbstractGraphicsSlider::singleStep() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->singleStep;
+    return d_func()->singleStep;
 }
 
 void AbstractGraphicsSlider::setSingleStep(int step)
@@ -323,8 +317,7 @@ void AbstractGraphicsSlider::setSingleStep(int step)
 */
 int AbstractGraphicsSlider::pageStep() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->pageStep;
+    return d_func()->pageStep;
 }
 
 void AbstractGraphicsSlider::setPageStep(int step)
@@ -347,14 +340,12 @@ void AbstractGraphicsSlider::setPageStep(int step)
 */
 bool AbstractGraphicsSlider::hasTracking() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->tracking;
+    return d_func()->tracking;
 }
 
 void AbstractGraphicsSlider::setTracking(bool enable)
 {
-    Q_D(AbstractGraphicsSlider);
-    d->tracking = enable;
+    d_func()->tracking = enable;
 }
 
 /*!
@@ -369,8 +360,7 @@ void AbstractGraphicsSlider::setTracking(bool enable)
 */
 bool AbstractGraphicsSlider::isSliderDown() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->pressed;
+    return d_func()->pressed;
 }
 
 void AbstractGraphicsSlider::setSliderDown(bool down)
@@ -399,8 +389,7 @@ void AbstractGraphicsSlider::setSliderDown(bool down)
 */
 int AbstractGraphicsSlider::sliderPosition() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->position;
+    return d_func()->position;
 }
 
 void AbstractGraphicsSlider::setSliderPosition(int position)
@@ -414,7 +403,7 @@ void AbstractGraphicsSlider::setSliderPosition(int position)
         update();
     if (d->pressed)
         Q_EMIT sliderMoved(position);
-    if (d->tracking && !d->blocktracking)
+    if (d->tracking && !d->blockTracking)
         triggerAction(SliderMove);
 }
 
@@ -429,8 +418,7 @@ void AbstractGraphicsSlider::setSliderPosition(int position)
 */
 int AbstractGraphicsSlider::value() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->value;
+    return d_func()->value;
 }
 
 void AbstractGraphicsSlider::setValue(int value)
@@ -467,14 +455,12 @@ void AbstractGraphicsSlider::setValue(int value)
 */
 bool AbstractGraphicsSlider::invertedAppearance() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->invertedAppearance;
+    return d_func()->invertedAppearance;
 }
 
 void AbstractGraphicsSlider::setInvertedAppearance(bool invert)
 {
-    Q_D(AbstractGraphicsSlider);
-    d->invertedAppearance = invert;
+    d_func()->invertedAppearance = invert;
     update();
 }
 
@@ -488,14 +474,12 @@ void AbstractGraphicsSlider::setInvertedAppearance(bool invert)
 */
 bool AbstractGraphicsSlider::invertedControls() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->invertedControls;
+    return d_func()->invertedControls;
 }
 
 void AbstractGraphicsSlider::setInvertedControls(bool invert)
 {
-    Q_D(AbstractGraphicsSlider);
-    d->invertedControls = invert;
+    d_func()->invertedControls = invert;
 }
 
 /*!
@@ -508,14 +492,12 @@ void AbstractGraphicsSlider::setInvertedControls(bool invert)
 */
 bool AbstractGraphicsSlider::isWheelingAccelerated() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->acceleratedWheeling;
+    return d_func()->acceleratedWheeling;
 }
 
 void AbstractGraphicsSlider::setWheelingAccelerated(bool enable)
 {
-    Q_D(AbstractGraphicsSlider);
-    d->acceleratedWheeling = enable;
+    d_func()->acceleratedWheeling = enable;
 }
 
 /*!
@@ -526,7 +508,7 @@ void AbstractGraphicsSlider::setWheelingAccelerated(bool enable)
 void AbstractGraphicsSlider::triggerAction(SliderAction action)
 {
     Q_D(AbstractGraphicsSlider);
-    d->blocktracking = true;
+    d->blockTracking = true;
     switch (action) {
     case SliderSingleStepAdd:
         setSliderPosition(d->overflowSafeAdd(d->effectiveSingleStep()));
@@ -551,7 +533,7 @@ void AbstractGraphicsSlider::triggerAction(SliderAction action)
         break;
     };
     Q_EMIT actionTriggered(action);
-    d->blocktracking = false;
+    d->blockTracking = false;
     setValue(d->position);
 }
 
@@ -562,8 +544,7 @@ void AbstractGraphicsSlider::triggerAction(SliderAction action)
 */
 AbstractGraphicsSlider::SliderAction AbstractGraphicsSlider::repeatAction() const
 {
-    Q_D(const AbstractGraphicsSlider);
-    return d->repeatAction;
+    return d_func()->repeatAction;
 }
 
 /*!
@@ -651,13 +632,13 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
 /*!
     \reimp
 */
-void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
+void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
 {
     Q_D(AbstractGraphicsSlider);
 
     SliderAction action = SliderNoAction;
 #ifdef QT_KEYPAD_NAVIGATION
-    if (ev->isAutoRepeat()) {
+    if (event->isAutoRepeat()) {
         if (!d->firstRepeat.isValid())
             d->firstRepeat.start();
         else if (1 == d->repeatMultiplier) {
@@ -681,20 +662,20 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
     }
 #endif
 
-    switch (ev->key()) {
+    switch (event->key()) {
 #ifdef QT_KEYPAD_NAVIGATION
         case Qt::Key_Select:
             if (QApplication::keypadNavigationEnabled())
                 setEditFocus(!hasEditFocus());
             else
-                ev->ignore();
+                event->ignore();
             break;
         case Qt::Key_Back:
             if (QApplication::keypadNavigationEnabled() && hasEditFocus()) {
                 setValue(d->origValue);
                 setEditFocus(false);
             } else
-                ev->ignore();
+                event->ignore();
             break;
 #endif
 
@@ -709,7 +690,7 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
                     || d->orientation == Qt::Vertical
                     || !hasEditFocus()
                     && (QWidgetPrivate::canKeypadNavigate(Qt::Horizontal) || QWidgetPrivate::inTabWidget(this)))) {
-                ev->ignore();
+                event->ignore();
                 return;
             }
             if (QApplication::keypadNavigationEnabled() && d->orientation == Qt::Vertical)
@@ -729,7 +710,7 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
                     || d->orientation == Qt::Vertical
                     || !hasEditFocus()
                     && (QWidgetPrivate::canKeypadNavigate(Qt::Horizontal) || QWidgetPrivate::inTabWidget(this)))) {
-                ev->ignore();
+                event->ignore();
                 return;
             }
             if (QApplication::keypadNavigationEnabled() && d->orientation == Qt::Vertical)
@@ -749,7 +730,7 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
                     && (QApplication::navigationMode() == Qt::NavigationModeKeypadTabOrder
                     || d->orientation == Qt::Horizontal
                     || !hasEditFocus() && QWidgetPrivate::canKeypadNavigate(Qt::Vertical))) {
-                ev->ignore();
+                event->ignore();
                 break;
             }
 #endif
@@ -762,7 +743,7 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
                     && (QApplication::navigationMode() == Qt::NavigationModeKeypadTabOrder
                     || d->orientation == Qt::Horizontal
                     || !hasEditFocus() && QWidgetPrivate::canKeypadNavigate(Qt::Vertical))) {
-                ev->ignore();
+                event->ignore();
                 break;
             }
 #endif
@@ -781,7 +762,7 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
             action = SliderToMaximum;
             break;
         default:
-            ev->ignore();
+            event->ignore();
             break;
     }
     if (action)
@@ -820,28 +801,27 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const
 /*!
     \reimp
 */
-bool AbstractGraphicsSlider::event(QEvent *e)
+bool AbstractGraphicsSlider::event(QEvent *event)
 {
 #ifdef QT_KEYPAD_NAVIGATION
-    if (e->type() == QEvent::FocusIn) {
+    if (event->type() == QEvent::FocusIn) {
         Q_D(AbstractGraphicsSlider);
         d->origValue = d->value;
     }
 #endif
 
-    return GraphicsWidget::event(e);
+    return GraphicsWidget::event(event);
 }
 
 /*!
     \reimp
 */
-void AbstractGraphicsSlider::changeEvent(QEvent *ev)
+void AbstractGraphicsSlider::changeEvent(QEvent *event)
 {
-    Q_D(AbstractGraphicsSlider);
-    switch (ev->type()) {
+    switch (event->type()) {
     case QEvent::EnabledChange:
         if (!isEnabled()) {
-            d->repeatActionTimer.stop();
+            d_func()->repeatActionTimer.stop();
             setSliderDown(false);
         }
     // fall through
@@ -849,16 +829,16 @@ void AbstractGraphicsSlider::changeEvent(QEvent *ev)
         break;
     }
 
-    GraphicsWidget::changeEvent(ev);
+    GraphicsWidget::changeEvent(event);
 }
 
 /*!
     \reimp
 */
-void AbstractGraphicsSlider::timerEvent(QTimerEvent *e)
+void AbstractGraphicsSlider::timerEvent(QTimerEvent *event)
 {
     Q_D(AbstractGraphicsSlider);
-    if (e->timerId() == d->repeatActionTimer.timerId()) {
+    if (event->timerId() == d->repeatActionTimer.timerId()) {
         if (d->repeatActionTime) { // was threshold time, use repeat time next time
             d->repeatActionTimer.start(d->repeatActionTime, this);
             d->repeatActionTime = 0;
@@ -876,10 +856,9 @@ void AbstractGraphicsSlider::timerEvent(QTimerEvent *e)
 /*!
     \reimp
 */
-void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
+void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
-    Q_D(AbstractGraphicsSlider);
-    e->accept();
-    d->scrollByDelta(e->orientation(), e->modifiers(), e->delta());
+    event->accept();
+    d_func()->scrollByDelta(event->orientation(), event->modifiers(), event->delta());
 }
 #endif
