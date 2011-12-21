@@ -11,6 +11,7 @@
 #include "ui/device_settings/plugins/arecontvision/arecont_dlg.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
+#include "ui/skin/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
@@ -274,9 +275,7 @@ int main(int argc, char *argv[])
 
     //=========================================================
 
-#ifndef Q_OS_DARWIN
-    qApp->setStyle(QLatin1String("Bespin"));
-#endif
+    qApp->setStyle(Skin::style());
 
     qApp->setStyleSheet(QLatin1String(
             "QMenu {\n"

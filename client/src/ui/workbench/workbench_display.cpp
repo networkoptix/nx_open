@@ -7,6 +7,9 @@
 
 #include <QtAlgorithms>
 
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+
 #include <camera/resource_display.h>
 #include <camera/camera.h>
 
@@ -28,11 +31,7 @@
 #include <ui/graphics/items/curtain_item.h>
 #include <ui/graphics/items/image_button_widget.h>
 
-#include <ui/ui_common.h>
-#include <ui/skin.h>
-
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
+#include "ui/skin/skin.h"
 
 #include "workbench_layout.h"
 #include "workbench_item.h"
@@ -106,7 +105,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
 
     /* Create and configure instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
-    
+
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
     AnimationInstrument *animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
@@ -114,7 +113,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_widgetActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
-    
+
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
@@ -182,15 +181,15 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
 
     if(m_scene != NULL && m_workbench != NULL)
         deinitSceneWorkbench();
-    
-    /* Prepare new scene. */ 
+
+    /* Prepare new scene. */
     m_scene = scene;
     if(m_scene == NULL && m_dummyScene != NULL) {
         m_dummyScene->clear();
         m_scene = m_dummyScene;
     }
 
-    /* Set up new scene. 
+    /* Set up new scene.
      * It may be NULL only when this function is called from destructor. */
     if(m_scene != NULL && m_workbench != NULL)
         initSceneWorkbench();
@@ -236,7 +235,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
 
     connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
 
-    /* Scene indexing will only slow everything down. */ 
+    /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     /* Set up curtain. */
@@ -274,7 +273,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
 
     if(m_view != NULL) {
         m_instrumentManager->unregisterView(m_view);
-        
+
         disconnect(m_view, NULL, this, NULL);
 
         m_viewportAnimator->setView(NULL);
@@ -309,7 +308,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         m_view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
 
         /* All our items save and restore painter state. */
-        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */ 
+        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 
         /* Don't even try to uncomment this one, it slows everything down. */
@@ -376,8 +375,8 @@ QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     if(animator != NULL)
         return animator;
 
-    /* Create if it's not there. 
-     * 
+    /* Create if it's not there.
+     *
      * Note that widget is set as animator's parent. */
     animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget);
     animator->setMovementSpeed(4.0);
@@ -481,12 +480,12 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setPixmap(cached(Skin::path(QLatin1String("close3.png"))));
+    closeButton->setPixmap(Skin::pixmap(QLatin1String("close3.png")));
     closeButton->setMinimumSize(QSizeF(10.0, 10.0));
     closeButton->setMaximumSize(QSizeF(10.0, 10.0));
     connect(closeButton, SIGNAL(clicked()), item, SLOT(deleteLater()));
     widget->addButton(closeButton);
-    
+
     m_scene->addItem(widget);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
@@ -498,9 +497,9 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     widget->setWindowFlags(Qt::Window);
 
     /* Unsetting this flag is VERY important. If it is set, graphics scene
-     * will mess with widget's z value and bring it to front every time 
+     * will mess with widget's z value and bring it to front every time
      * it is clicked. This will wreak havoc in our layered system.
-     * 
+     *
      * Note that this flag must be unset after Qt::Window window flag is set
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
@@ -514,7 +513,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
     m_widgetByResource.insert(widget->resource(), widget);
-    
+
     synchronize(widget, false);
     bringToFront(widget);
 
@@ -568,7 +567,7 @@ qreal QnWorkbenchDisplay::layerZValue(Layer layer) const {
 
 QnWorkbenchDisplay::Layer QnWorkbenchDisplay::synchronizedLayer(QnWorkbenchItem *item) const {
     assert(item != NULL);
-    
+
     if(item == m_itemByRole[QnWorkbench::ZOOMED]) {
         return ZOOMED_LAYER;
     } else if(item->isPinned()) {
@@ -645,7 +644,7 @@ QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const 
 
     return m_workbench->mapper()->mapToGrid(m_view->mapToScene(viewportPoint));
 }
-    
+
 QPoint QnWorkbenchDisplay::mapGlobalToGrid(const QPoint &globalPoint) const {
     if(m_view == NULL)
         return QPoint();
@@ -713,7 +712,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Update Z value. */
     if(item == raisedItem || item == zoomedItem)
         bringToFront(widget);
-    
+
     /* Update enclosing aspect ratio. */
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
 
@@ -764,7 +763,7 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
 
     QSizeF sizeExtension = sizeDelta(positionExtension);
     sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
-    
+
     m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
 }
 

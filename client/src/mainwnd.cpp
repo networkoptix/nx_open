@@ -38,7 +38,7 @@
 
 #include "ui/widgets3/tabwidget.h"
 
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -79,7 +79,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-
     const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
     m_workbench = new QnWorkbench(this);
@@ -155,12 +154,11 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-
-    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
-
     QAction *reconnectAction = new QAction(/*Skin::icon(QLatin1String("reconnnect.png")), */tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
     toolBar->addAction(reconnectAction);
+
+    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
 
     addTab();

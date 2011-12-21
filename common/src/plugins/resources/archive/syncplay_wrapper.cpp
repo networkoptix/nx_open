@@ -85,6 +85,7 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
     }
 }
 
+/*
 bool QnArchiveSyncPlayWrapper::setSendMotion(bool value)
 {
     Q_D(const QnArchiveSyncPlayWrapper);
@@ -97,7 +98,9 @@ bool QnArchiveSyncPlayWrapper::setSendMotion(bool value)
     }
     return rez;
 }
+*/
 
+/*
 bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
 {
     Q_D(const QnArchiveSyncPlayWrapper);
@@ -110,6 +113,7 @@ bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
     }
     return rez;
 }
+*/
 
 bool QnArchiveSyncPlayWrapper::isMediaPaused() const
 {

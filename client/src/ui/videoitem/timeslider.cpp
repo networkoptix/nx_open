@@ -9,12 +9,11 @@
 #include <QtGui/QGraphicsLinearLayout>
 #include <QtGui/QMenu>
 #include <QtGui/QPainter>
-#include <QtGui/QProxyStyle>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleFactory>
 
-#include "ui/skin.h"
-#include "utils/common/util.h"
+#include <utils/common/util.h>
+
+#include "ui/skin/skin.h"
+#include "ui/proxystyle.h"
 
 #include "ui/widgets2/graphicsframe.h"
 #include "ui/widgets2/graphicsslider.h"
@@ -42,27 +41,22 @@ static const int MAX_LABEL_WIDTH = 64;
 // -------------------------------------------------------------------------- //
 // SliderProxyStyle
 // -------------------------------------------------------------------------- //
-class SliderProxyStyle : public QProxyStyle
+class SliderProxyStyle : public ProxyStyle
 {
 public:
-    SliderProxyStyle(QStyle *baseStyle = 0) : QProxyStyle(baseStyle)
-    {
-        if (!baseStyle)
-            setBaseStyle(qApp->style());
-    }
+    SliderProxyStyle(QObject *parent = 0) : ProxyStyle(0, parent) {}
 
     int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
     {
         if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
             return Qt::LeftButton;
-        return QProxyStyle::styleHint(hint, option, widget, returnData);
+        return ProxyStyle::styleHint(hint, option, widget, returnData);
     }
 
     QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
     {
-        QRect r = QProxyStyle::subControlRect(cc, opt, sc, widget);
-        if (cc == CC_Slider && sc == SC_SliderHandle)
-        {
+        QRect r = ProxyStyle::subControlRect(cc, opt, sc, widget);
+        if (cc == CC_Slider && sc == SC_SliderHandle) {
             int side = qMin(r.width(), r.height());
             if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
                 r.setWidth(side);
@@ -72,8 +66,6 @@ public:
         return r;
     }
 };
-
-Q_GLOBAL_STATIC_WITH_ARGS(SliderProxyStyle, sliderProxyStyle, (QStyleFactory::create(qApp->style()->objectName())))
 
 
 // -------------------------------------------------------------------------- //
@@ -213,8 +205,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->fillRect(r, linearGrad);
 
     ensureHandleRect();
-    // ### use Skin::cached(const QString &name, const QSizeF &size, Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation)
-    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
 
@@ -829,7 +820,7 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_slider->setMaximum(10000);
     m_slider->installEventFilter(this);
 
-    m_slider->setStyle(sliderProxyStyle());
+    m_slider->setStyle(new SliderProxyStyle(m_slider));
 
     m_timeLine = new TimeLine(this);
     m_timeLine->setLineWidth(0);

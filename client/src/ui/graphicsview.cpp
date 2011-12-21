@@ -25,7 +25,7 @@
 #include "utils/common/util.h"
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/ui_common.h"
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 #include "ui/animation/property_animation.h"
 #include "ui/preferences/preferences_wnd.h"
 #include "ui/preferences/recordingsettingswidget.h"
@@ -1071,7 +1071,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
             QDrag *drag = new QDrag(this);
             drag->setMimeData(mimeData);
-            drag->setPixmap(cached(Skin::path(QLatin1String("camera_dd_icon.png"))));
+            drag->setPixmap(Skin::path(QLatin1String("camera_dd_icon.png")));
 
             drag->exec(Qt::CopyAction);
             scene()->clearSelection();

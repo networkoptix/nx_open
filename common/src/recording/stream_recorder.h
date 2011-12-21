@@ -35,9 +35,9 @@ protected:
     bool initFfmpegContainer(QnCompressedVideoDataPtr mediaData);
 
     void setPrebufferingUsec(int value);
+    void flushPrebuffer();
     int getPrebufferingUsec() const;
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
-    virtual void beforeProcessData(QnAbstractMediaDataPtr media);
 
     virtual bool saveMotion(QnAbstractMediaDataPtr media);
     bool saveData(QnAbstractMediaDataPtr md);

@@ -54,7 +54,7 @@ public:
     /*
     * Schedule relative start time inside a week at ms.
     */
-    bool containTime(int weekTimeMs) const;
+    bool containTimeMs(int weekTimeMs) const;
 
     bool operator<(const QnScheduleTask &other) const;
 

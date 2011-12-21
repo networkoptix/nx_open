@@ -22,7 +22,7 @@ m_firstTimestamp(-1),
 m_formatCtx(0),
 m_truncateInterval(0),
 m_currentChunkLen(0),
-m_startDateTime(-1),
+m_startDateTime(AV_NOPTS_VALUE),
 m_endDateTime(-1),
 m_lastPacketTime(0),
 m_startOffset(0),
@@ -41,12 +41,13 @@ void QnStreamRecorder::close()
 {
     if (m_formatCtx) 
     {
-        if (m_startDateTime != -1)
+        if (m_startDateTime != AV_NOPTS_VALUE)
         {
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+m_startDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_startOffset+m_endDateTime/1000).toAscii().data(), 0);
             if (m_truncateInterval != 0)
                 qnStorageMan->fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
+            m_startDateTime = AV_NOPTS_VALUE;
         }
 
         if (m_packetWrited)
@@ -73,13 +74,24 @@ void QnStreamRecorder::markNeedKeyData()
         m_gotKeyFrame[i] = false;
 }
 
+void QnStreamRecorder::flushPrebuffer()
+{
+    while (!m_prebuffer.isEmpty())
+    {
+        QnAbstractMediaDataPtr d = m_prebuffer.dequeue();
+        if (needSaveData(d))
+            saveData(d);
+        else
+            markNeedKeyData();
+    }
+}
+
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr md = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!md)
         return true; // skip unknown data
 
-    beforeProcessData(md);
     m_prebuffer << md;
     while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.first()->timestamp >= m_prebufferingUsec)
     {
@@ -132,8 +144,6 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
             while (m_currentChunkLen <= 0)
                 m_currentChunkLen += m_truncateInterval;
             //cl_log.log("chunkLen=" , m_currentChunkLen/1000000.0, cl_logALWAYS);
-            //m_startDateTime = m_endDateTime;
-            //m_endDateTime = md->timestamp;
             close();
             m_startDateTime = m_endDateTime;
 
@@ -172,7 +182,7 @@ void QnStreamRecorder::endOfRun()
 
 bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 {
-    if (m_startDateTime == -1)
+    if (m_startDateTime == AV_NOPTS_VALUE)
         m_startDateTime = mediaData->timestamp;
     //QnResourcePtr resource = mediaData->dataProvider->getResource();
     // allocate container
@@ -334,11 +344,6 @@ int QnStreamRecorder::getPrebufferingUsec() const
 bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
     return true;
-}
-
-void QnStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
-{
-
 }
 
 bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)

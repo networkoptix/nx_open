@@ -33,7 +33,7 @@ public:
     virtual void onReverseMode(qint64 displayTime, bool value);
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk);
-    qint64 correctTimeByMask(qint64 time);
+    qint64 correctTimeByMask(qint64 time, bool useReverseSearch);
     qint64 seekInternal(qint64 time);
     void loadPlaybackMask(qint64 msTime);
 private:
@@ -58,6 +58,7 @@ private:
     QnMotionArchiveConnectionPtr m_motionConnection;
     QnAbstractMediaDataPtr m_tmpData;
     bool m_sendMotion;
+    bool m_eof;
 };
 
 #endif // _SERVER_ARCHIVE_DELEGATE_H__

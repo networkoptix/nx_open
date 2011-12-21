@@ -1,11 +1,15 @@
 #include "screen_recorder.h"
-#include <cassert>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QGLWidget>
-#include <client_util.h>
+
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
+
+#include <QtOpenGL/QGLWidget>
+
 #include <utils/common/warnings.h>
-#include <ui/skin.h>
+#include <client_util.h>
+
+#include "ui/skin/skin.h"
+
 #include "video_recorder_settings.h"
 
 #ifdef Q_OS_WIN
@@ -174,7 +178,7 @@ void QnScreenRecorder::stopRecording() {
     if(!m_recording)
         return; /* Stopping when nothing is being recorded is OK. */
 
-    assert(m_encoder);
+    Q_ASSERT(m_encoder);
 
     QString recordedFileName = m_encoder->fileName();
     m_encoder->stop();

@@ -18,7 +18,8 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_playbackMaskEnd(AV_NOPTS_VALUE),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
-    m_sendMotion(false)
+    m_sendMotion(false),
+    m_eof(false)
 {
     m_aviDelegate = new QnAviArchiveDelegate();
 }
@@ -92,7 +93,7 @@ void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
     }
 }
 
-qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
+qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSearch)
 {
     qint64 timeMs = time/1000;
 
@@ -103,7 +104,7 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
     if (timeMs >= m_lastTimePeriod.startTimeMs && timeMs < m_lastTimePeriod.startTimeMs + m_lastTimePeriod.durationMs)
         return time;
 
-    qDebug() << "inputTime=" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
+    //qDebug() << "inputTime=" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
 
     QnTimePeriodList::iterator itr = qUpperBound(m_playbackMask.begin(), m_playbackMask.end(), timeMs);
     if (itr != m_playbackMask.begin())
@@ -115,16 +116,24 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time)
             //qDebug() << "found period:" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz") << "duration=" << itr->durationMs/1000.0;
         }
         else {
-            if (!m_reverseMode)
+            if (!useReverseSearch)
             {
                 ++itr;
-                m_lastTimePeriod = *itr;
-                timeMs = itr->startTimeMs;
-                //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
+                if (itr != m_playbackMask.end())
+                {
+                    m_lastTimePeriod = *itr;
+                    timeMs = itr->startTimeMs;
+                    //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
+                }
+                else {
+                    //qDebug() << "End of motion filter reached" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
+                    return AV_NOPTS_VALUE;
+                }
             }
             else {
                 m_lastTimePeriod = *itr;
-                timeMs = itr->startTimeMs + itr->durationMs;
+                timeMs = qMax(itr->startTimeMs, itr->startTimeMs + itr->durationMs - BACKWARD_SEEK_STEP);
+                //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh:mm:ss.zzz");
             }
         }
     }
@@ -191,13 +200,22 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
     m_tmpData.clear();
     // change time by playback mask
-    if (!m_motionRegion.isEmpty())
-        time = correctTimeByMask(time);
+    m_eof = false;
+    if (!m_motionRegion.isEmpty()) 
+    {
+        time = correctTimeByMask(time, m_reverseMode);
+        m_eof = time == AV_NOPTS_VALUE;
+        if (m_eof)
+            return -1; 
+    }
     return seekInternal(time);
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
 {
+    if (m_eof)
+        return QnAbstractMediaDataPtr();
+
     if (m_tmpData)
     {
         QnAbstractMediaDataPtr rez = m_tmpData;
@@ -235,7 +253,19 @@ begin_label:
             bool afterSeekIgnore = m_lastSeekTime != AV_NOPTS_VALUE && data->timestamp < m_lastSeekTime;
             if (!afterSeekIgnore)
             {
-                qint64 newTime = correctTimeByMask(data->timestamp);
+                qint64 newTime = correctTimeByMask(data->timestamp, false);
+                if (newTime == AV_NOPTS_VALUE)
+                {
+                    // eof reached
+                    if (m_reverseMode) {
+                        data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+                        data->timestamp = INT64_MAX; // EOF reached
+                    }
+                    else {
+                        data.clear();
+                    }
+                    return data;
+                }
                 if (newTime != data->timestamp) 
                 {
                     if (waitMotionCnt > 1)

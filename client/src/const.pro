@@ -149,7 +149,9 @@ FORMS += ui/preferences/connectionssettingswidget.ui ui/preferences/licensewidge
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
-#DEFINES += CL_DEFAULT_SKIN_PREFIX=\\\"./trinity\\\"
+#DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"
+# or
+#DEFINES += CL_SKIN_PATH=\\\"./trinity\\\"
 
 
 # Define override specifier.

@@ -4,7 +4,7 @@
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QStandardItemModel>
 
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 
 ConnectionsSettingsWidget::ConnectionsSettingsWidget(QWidget *parent) :
     QWidget(parent),

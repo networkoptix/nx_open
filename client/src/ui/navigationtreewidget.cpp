@@ -17,7 +17,7 @@
 #include "ui/context_menu_helper.h"
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/models/resourcemodel.h"
-#include "ui/skin.h"
+#include "ui/skin/skin.h"
 
 class NavigationTreeSortFilterProxyModel : public QSortFilterProxyModel
 {
