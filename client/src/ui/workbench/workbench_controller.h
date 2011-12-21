@@ -22,6 +22,7 @@ class DropInstrument;
 class UiElementsInstrument;
 class RotationInstrument;
 class ClickInfo;
+class ResizingInfo;
 
 class NavigationItem;
 
@@ -68,8 +69,8 @@ protected:
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
 
 protected slots:
-    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
-    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget);
+    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
     void at_dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);

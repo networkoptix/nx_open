@@ -7,6 +7,19 @@
 class ConstrainedResizable;
 class ResizeHoverInstrument;
 
+class ResizingInfo {
+public:
+    Qt::WindowFrameSection frameSection() const;
+
+protected:
+    friend class ResizingInstrument;
+
+    ResizingInfo(ResizingInstrument *instrument): m_instrument(instrument) {}
+
+private:
+    ResizingInstrument *m_instrument;
+};
+
 /**
  * This instrument implements resizing of QGraphicsWidget. 
  * Unlike default resizing algorithm, it allows resizing to non-integer sizes.
@@ -56,10 +69,10 @@ public:
     }
 
 signals:
-    void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget);
-    void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
-    void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget);
-    void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget);
+    void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
 protected:
     virtual void enabledNotify() override;
@@ -75,6 +88,8 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private:
+    friend class ResizingInfo;
+
     ResizeHoverInstrument *m_resizeHoverInstrument;
     int m_effectiveDistance;
     bool m_effective;

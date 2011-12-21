@@ -7,6 +7,9 @@
 #include <QPoint>
 #include <ui/common/scene_utility.h>
 
+/**
+ * Convenience class that stores grid parameters.
+ */
 class QnWorkbenchGridMapper: public QObject, protected SceneUtility {
     Q_OBJECT;
 public:
@@ -104,6 +107,20 @@ public:
     QPoint mapToGrid(const QPointF &pos) const;
 
     /**
+     * \param pos                       Position in scene coordinates to map to grid coordinates.
+     * \returns                         Corresponding position in grid coordinates.
+     */
+    QPointF mapToGridF(const QPointF &pos) const;
+
+    /**
+     * \param size                      Size in scene coordinates.
+     * \returns                         Smallest size in grid cells that fits the given size.
+     */
+    QSize mapToGrid(const QSizeF &size) const;
+
+    QSizeF mapToGridF(const QSizeF &size) const;
+
+    /**
      * \param gridPos                   Coordinate of the grid cell.
      * \returns                         Position in scene coordinates of the top left corner of the grid cell.
      */
@@ -113,13 +130,7 @@ public:
      * \param gridPos                   Coordinate of a point on a grid.
      * \return                          Position in scene coordinates of the given point.
      */
-    QPointF mapFromGrid(const QPointF &gridPos) const;
-
-    /**
-     * \param size                      Size in scene coordinates.
-     * \returns                         Smallest size in grid cells that fits the given size.
-     */
-    QSize mapToGrid(const QSizeF &size) const;
+    QPointF mapFromGridF(const QPointF &gridPos) const;
 
     /**
      * \param gridSize                  Size in grid cells.
@@ -131,13 +142,19 @@ public:
      * \param gridSize                  Size in grid cells.
      * \returns                         Corresponding size in scene coordinates.
      */
-    QSizeF mapFromGrid(const QSizeF &gridSize) const;
+    QSizeF mapFromGridF(const QSizeF &gridSize) const;
 
     /**
      * \param rect                      Rectangle in scene coordinates to map to grid coordinates.
      * \returns                         Smallest grid rectangle that fits the given rectangle.
      */
     QRect mapToGrid(const QRectF &rect) const;
+
+    /**
+     * \param rect                      Rectangle in scene coordinates to map to grid coordinates.
+     * \returns                         Corresponding grid rectangle in grid coordinates.
+     */
+    QRectF mapToGridF(const QRectF &rect) const;
 
     /**
      * \param gridRect                  Rectangle in grid cells.
@@ -149,7 +166,7 @@ public:
      * \param gridRect                  Rectangle in grid cells.
      * \returns                         Corresponding rectangle in scene coordinates.
      */
-    QRectF mapFromGrid(const QRectF &gridRect) const;
+    QRectF mapFromGridF(const QRectF &gridRect) const;
 
 signals:
     void originChanged(const QPointF &oldOrigin, const QPointF &newOrigin);
