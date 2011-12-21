@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 #include <QList>
 
+#include "core/resource/media_resource.h"
 #include "utils/common/qnid.h"
 
 class QnScheduleTask
@@ -16,16 +17,22 @@ public:
           m_doRecordAudio(false),
           m_recordType(RecordingType_Run),
           m_dayOfWeek(1),
-          m_beforeThreshold(0), m_afterThreshold(0)
+          m_beforeThreshold(0), m_afterThreshold(0),
+          m_streamQuality(QnQualityHighest),
+          m_fps(10)
     {}
     QnScheduleTask(QnId id, QnId sourceId, int startTime, int endTime,
-                   bool doRecordAudio, RecordingType recordType, int dayOfWeek, int beforeThreshold, int afterThreshold)
+                   bool doRecordAudio, RecordingType recordType, int dayOfWeek, int beforeThreshold, int afterThreshold,
+                   QnStreamQuality streamQuality, int fps)
         : m_id(id), m_sourceId(sourceId),
           m_startTime(startTime), m_endTime(endTime),
           m_doRecordAudio(doRecordAudio),
           m_recordType(recordType),
           m_dayOfWeek(dayOfWeek),
-          m_beforeThreshold(beforeThreshold), m_afterThreshold(afterThreshold)
+          m_beforeThreshold(beforeThreshold),
+          m_afterThreshold(afterThreshold),
+          m_streamQuality(streamQuality),
+          m_fps(fps)
     {}
 
     QnId getId() const { return m_id; }
@@ -63,6 +70,8 @@ public:
     int m_dayOfWeek;
     int m_beforeThreshold;
     int m_afterThreshold;
+    QnStreamQuality m_streamQuality;
+    int m_fps;
 };
 
 bool operator<(qint64 first, const QnScheduleTask &other);
