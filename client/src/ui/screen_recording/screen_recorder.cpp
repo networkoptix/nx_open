@@ -69,6 +69,7 @@ namespace {
         }
     }
 
+#ifdef Q_OS_WIN
     CLScreenGrabber::CaptureMode settingsToGrabberCaptureMode(VideoRecorderSettings::CaptureMode captureMode) {
         switch(captureMode) {
         case VideoRecorderSettings::WindowMode:             return CLScreenGrabber::CaptureMode_Application;
@@ -79,6 +80,7 @@ namespace {
             return CLScreenGrabber::CaptureMode_Application;
         }
     }
+#endif
 
 } // anonymous namespace
 
