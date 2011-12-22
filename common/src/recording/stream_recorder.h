@@ -44,8 +44,8 @@ protected:
     virtual bool saveMotion(QnAbstractMediaDataPtr media);
     bool saveData(QnAbstractMediaDataPtr md);
 
-    virtual void fileFinished(qint64 durationMs, const QString& fileName) {}
-    virtual void fileStarted(qint64 startTimeMs, const QString& fileName) {}
+    virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/) {}
+    virtual void fileStarted(qint64 /*startTimeMs*/, const QString& /*fileName*/) {}
     virtual QString fillFileName();
 private:
     void markNeedKeyData();

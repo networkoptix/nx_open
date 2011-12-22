@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <QVariant>
+#include <QEasingCurve>
 #include "abstract_animator.h"
 #include "accessor.h"
 #include "converter.h"
@@ -42,6 +43,12 @@ public:
     }
 
     void setConverter(QnAbstractConverter *converter);
+
+    const QEasingCurve &easingCurve() const {
+        return m_easingCurve;
+    }
+
+    void setEasingCurve(const QEasingCurve &easingCurve);
 
     QObject *targetObject() const {
         return m_target;
@@ -91,6 +98,7 @@ private:
 private:
     QScopedPointer<QnAbstractAccessor> m_accessor;
     QScopedPointer<QnAbstractConverter> m_converter;
+    QEasingCurve m_easingCurve;
     int m_type;
     QVariant m_startValue;
     QVariant m_targetValue;

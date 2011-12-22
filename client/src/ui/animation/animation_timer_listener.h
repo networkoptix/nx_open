@@ -14,6 +14,8 @@ public:
 
     virtual ~AnimationTimerListener();
 
+    void setTimer(AnimationTimer *timer);
+
 protected:
     /**
      * Note that there is a reason for passing delta time instead of absolute time.

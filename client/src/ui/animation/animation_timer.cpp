@@ -32,6 +32,9 @@ void AnimationTimerListener::stopListening() {
         m_timer->listenerStoppedListening(this);
 }
 
+void AnimationTimerListener::setTimer(AnimationTimer *timer) {
+    timer->addListener(this);
+}
 
 
 AnimationTimer::AnimationTimer():
