@@ -71,6 +71,10 @@ public:
 
     // remove part of motion by mask
     void maskMotion(QnMetaDataV1Ptr data);
+
+    qint64 minTime() const;
+    qint64 maxTime() const;
+
 public slots:
     void updateMotionMask(QRegion maskedRegion);
 private:
@@ -81,7 +85,11 @@ private:
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile);
     bool saveToArchiveInternal(QnMetaDataV1Ptr data);
 
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time);
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time);
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime);
+
+    void loadRecordedRange();
 
     friend class QnMotionArchiveConnection;
 private:
@@ -100,6 +108,9 @@ private:
     __m128i m_motionMask[MD_WIDTH * MD_HEIGHT / 128];
     int m_motionMaskStart;
     int m_motionMaskEnd;
+
+    qint64 m_minMotionTime;
+    qint64 m_maxMotionTime;
 };
 
 #endif // __MOTION_WRITER_H__

@@ -95,8 +95,9 @@ QString QnMotionHelper::getMotionDir(const QDate& date, const QString& macAddres
     return getBaseDir(macAddress) + date.toString("yyyy/MM/");
 }
 
-void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& macAddress)
+QList<QDate> QnMotionHelper::recordedMonth(const QString& macAddress)
 {
+    QList<QDate> rez;
     QDir baseDir(getBaseDir(macAddress));
     QList<QFileInfo> yearList = baseDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
     foreach(const QFileInfo& fiYear, yearList)
@@ -105,10 +106,17 @@ void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QStr
         QList<QFileInfo> monthDirs = yearDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
         foreach(const QFileInfo& fiMonth, monthDirs)
         {
-            QDate monthDate(fiYear.baseName().toInt(), fiMonth.baseName().toInt(), 1);
-            qDebug() << monthDate;
-            if (!monthList.contains(monthDate))
-                qnFileDeletor->deleteDir(fiMonth.absoluteFilePath());
+            rez << QDate(fiYear.baseName().toInt(), fiMonth.baseName().toInt(), 1);
         }
+    }
+    return rez;
+}
+
+void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& macAddress)
+{
+    QList<QDate> existsData = recordedMonth(macAddress);
+    foreach(const QDate& date, existsData) {
+        if (!monthList.contains(date))
+            qnFileDeletor->deleteDir(getMotionDir(date, macAddress));
     }
 }
