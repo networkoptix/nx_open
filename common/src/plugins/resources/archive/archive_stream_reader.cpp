@@ -203,6 +203,9 @@ bool QnArchiveStreamReader::getNextVideoPacket()
         if (!m_nextData)
             return false;
 
+        if (m_nextData->dataType == QnAbstractMediaData::META_V1)
+            m_skippedMetadata << m_nextData;
+
         QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(m_nextData);
         if (video && video->channelNumber == 0)
             return true; // packet with primary video channel
@@ -211,6 +214,9 @@ bool QnArchiveStreamReader::getNextVideoPacket()
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
+    while (!m_skippedMetadata.isEmpty())
+        return m_skippedMetadata.dequeue();
+
     //=================
     {
         QMutexLocker mutex(&m_jumpMtx);
@@ -252,7 +258,6 @@ begin_label:
         m_skipFramesToTime = m_tmpSkipFramesToTime;
         m_tmpSkipFramesToTime = 0;
         m_requiredJumpTime = AV_NOPTS_VALUE;
-        m_nextData.clear();
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
@@ -275,7 +280,6 @@ begin_label:
         if (!delegateForNegativeSpeed) {
             m_lastGopSeekTime = -1;
             intChanneljumpTo(displayTime, 0);
-            m_nextData.clear();
             if (reverseMode) {
                 if (displayTime != DATETIME_NOW)
                     m_topIFrameTime = displayTime;
@@ -294,7 +298,7 @@ begin_label:
 	// If there is no nextPacket - read it from file, otherwise use saved packet
     if (m_nextData) {
         m_currentData = m_nextData;
-        m_nextData = QnAbstractMediaDataPtr();
+        m_nextData.clear();
     }
     else {
         m_currentData = getNextPacket();
@@ -468,46 +472,20 @@ begin_label:
                 {
                     // Some error or end of file. Stop reading frames.
                     setSkipFramesToTime(0);
-
-                    m_nextData = QnAbstractMediaDataPtr();
+                    m_nextData.clear();
                 }
 			}
 
 			if (m_nextData)
 			{
 				if (!reverseMode && m_nextData->timestamp < m_skipFramesToTime)
-                {
-				/*
-                    QString msg;
-                    QTextStream str(&msg);
-                    str << " ignore data. curTime=" << QDateTime::fromMSecsSinceEpoch(m_nextData->timestamp/1000).toString() 
-                        << " borderTime=" << QDateTime::fromMSecsSinceEpoch(skipFramesToTime()/1000).toString();
-                    str.flush();
-                    cl_log.log(msg, cl_logWARNING);
-                    str.flush();
-				*/
 					videoData->ignore = true;
-                }
                 else if (reverseMode && m_nextData->timestamp > m_skipFramesToTime)
                     videoData->ignore = true;
-                else {
-                    /*
-                    if (m_skipFramesToTime != 0) 
-                    {
-                        QString msg;
-                        QTextStream str(&msg);
-                        str << "no more ignore. curTime=" << QDateTime::fromMSecsSinceEpoch(m_nextData->timestamp/1000).toString() 
-                            << " borderTime=" << QDateTime::fromMSecsSinceEpoch(m_skipFramesToTime/1000).toString();
-                        str.flush();
-                        cl_log.log(msg, cl_logWARNING);
-                        str.flush();
-                    }
-                    */
+                else 
 					setSkipFramesToTime(0);
-                }
 			}
 		}
-
 	}
 
 	if (m_currentData && m_eof)
@@ -544,6 +522,8 @@ begin_label:
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
 {
+    m_skippedMetadata.clear();
+    m_nextData.clear();
     qint64 seekRez = 0;
     if (mksec > 0) {
         seekRez = m_delegate->seek(mksec);
@@ -576,6 +556,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
                 if (m_lengthMksec < 1000 * 1000 * 5)
                     msleep(200); // prevent to fast file walk for very short files.
                 m_delegate->close();
+                m_skippedMetadata.clear();
                 m_eof = true;
 
                 if (!init())
