@@ -113,6 +113,26 @@ QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource):
         connect(m_camResource.data(), SIGNAL(motionMaskChanged(QRegion)), this, SLOT(updateMotionMask(QRegion)), Qt::DirectConnection);
         updateMotionMask(m_camResource->getMotionMask());
     }
+    loadRecordedRange();
+}
+
+void QnMotionArchive::loadRecordedRange()
+{
+    m_minMotionTime = AV_NOPTS_VALUE;
+    m_maxMotionTime = AV_NOPTS_VALUE;
+    QList<QDate> existsRecords = QnMotionHelper::instance()->recordedMonth(m_resource->getMAC().toString());
+    if (existsRecords.isEmpty())
+        return;
+
+    QVector<IndexRecord> index;
+    IndexHeader indexHeader;
+    loadIndexFile(index, indexHeader, existsRecords.first());
+    if (!index.isEmpty())
+        m_minMotionTime = index.first().start + indexHeader.startTime;
+    if (existsRecords.size() > 1)
+        loadIndexFile(index, indexHeader, existsRecords.last());
+    if (!index.isEmpty())
+        m_maxMotionTime = index.last().start + indexHeader.startTime;
 }
 
 void QnMotionArchive::maskMotion(QnMetaDataV1Ptr data)
@@ -254,6 +274,16 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     return rez;
 }
 
+bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time)
+{
+    return loadIndexFile(index, indexHeader, time.toMSecsSinceEpoch());
+}
+
+bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time)
+{
+    return loadIndexFile(index, indexHeader, QDateTime(time).toMSecsSinceEpoch());
+}
+
 bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime)
 {
     QFile indexFile;
@@ -330,6 +360,10 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
 
     m_detailedIndexFile.flush();
     m_detailedMotionFile.flush();
+
+    m_maxMotionTime = data->timestamp;
+    if (m_minMotionTime == AV_NOPTS_VALUE)
+        m_minMotionTime = m_maxMotionTime;
     return true;
 }
 
@@ -359,4 +393,14 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
 QnMotionArchiveConnectionPtr QnMotionArchive::createConnection()
 {
     return QnMotionArchiveConnectionPtr(new QnMotionArchiveConnection(this));
+}
+
+qint64 QnMotionArchive::minTime() const
+{
+    return m_minMotionTime;
+}
+
+qint64 QnMotionArchive::maxTime() const
+{
+    return m_maxMotionTime;
 }
