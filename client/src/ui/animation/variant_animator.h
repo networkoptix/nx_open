@@ -71,6 +71,14 @@ public:
     void setTargetValue(const QVariant &targetValue);
 
 protected:
+    MagnitudeCalculator *magnitudeCalculator() const {
+        return m_magnitudeCalculator;
+    }
+
+    LinearCombinator *linearCombinator() const {
+        return m_linearCombinator;
+    }
+
     virtual int estimatedDuration() const override;
 
     virtual void updateCurrentTime(int currentTime) override;

@@ -198,11 +198,11 @@ QPointF SceneUtility::pointCentroid(const QPolygonF &polygon) {
     return result / size;
 }
 
-QRectF SceneUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {
+QRectF SceneUtility::mapRectToScene(const QGraphicsView *view, const QRect &rect) {
     return view->viewportTransform().inverted().mapRect(QRectF(rect));
 }
 
-QRect SceneUtility::mapRectFromScene(QGraphicsView *view, const QRectF &rect) {
+QRect SceneUtility::mapRectFromScene(const QGraphicsView *view, const QRectF &rect) {
     return view->viewportTransform().mapRect(rect).toRect();
 }
 
