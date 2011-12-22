@@ -9,7 +9,6 @@
 #include <client_util.h>
 
 #include "ui/skin/skin.h"
-
 #include "video_recorder_settings.h"
 
 #ifdef Q_OS_WIN
@@ -174,12 +173,13 @@ void QnScreenRecorder::stopRecording() {
         qnWarning("Screen recording is not supported on this platform.");
         return;
     }
-    
+
     if(!m_recording)
         return; /* Stopping when nothing is being recorded is OK. */
 
-    Q_ASSERT(m_encoder);
+    Q_ASSERT(m_encoder != NULL);
 
+#ifdef Q_OS_WIN
     QString recordedFileName = m_encoder->fileName();
     m_encoder->stop();
 
@@ -187,4 +187,5 @@ void QnScreenRecorder::stopRecording() {
     emit recordingFinished(recordedFileName);
     m_encoder->deleteLater();
     m_encoder = 0;
+#endif
 }
