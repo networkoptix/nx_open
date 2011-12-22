@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 
 /**
- * This is a thread-safe container for head-allocated items that takes ownership
+ * This is a thread-safe container for heap-allocated items that takes ownership
  * of the items inside it.
  */
 template<class T>
