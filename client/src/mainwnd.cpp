@@ -201,6 +201,9 @@ void MainWnd::currentTabChanged(int index)
 
         m_workbench->setLayout(widget->property("SceneState").value<QnWorkbenchLayout *>()); // ###
         m_display->fitInView(false);
+
+        /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
+        m_view->setTransformationAnchor(QGraphicsView::NoAnchor); 
     }
 }
 
