@@ -9,33 +9,33 @@ void GraphicsLabelPrivate::init()
     updateTextBrush();
     updateTextFont();
 
-    q->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred,
-        QSizePolicy::Label));
+    q->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred, QSizePolicy::Label));
 }
 
-void GraphicsLabelPrivate::updateTextFont() 
+void GraphicsLabelPrivate::updateTextFont()
 {
     Q_Q(GraphicsLabel);
 
     textItem->setFont(q->font());
 }
 
-void GraphicsLabelPrivate::updateTextBrush() 
+void GraphicsLabelPrivate::updateTextBrush()
 {
     Q_Q(GraphicsLabel);
-    
+
     textItem->setBrush(q->palette().color(q->isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::WindowText));
 }
 
+
 GraphicsLabel::GraphicsLabel(QGraphicsItem *parent, Qt::WindowFlags f)
-    : GraphicsFrame(*new GraphicsLabelPrivate(), parent, f)
+    : GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
 {
     Q_D(GraphicsLabel);
     d->init();
 }
 
 GraphicsLabel::GraphicsLabel(const QString &text, QGraphicsItem *parent, Qt::WindowFlags f)
-    : GraphicsFrame(*new GraphicsLabelPrivate(), parent, f)
+    : GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
 {
     Q_D(GraphicsLabel);
     d->init();
@@ -44,6 +44,13 @@ GraphicsLabel::GraphicsLabel(const QString &text, QGraphicsItem *parent, Qt::Win
 
 GraphicsLabel::~GraphicsLabel()
 {
+}
+
+QString GraphicsLabel::text() const
+{
+    Q_D(const GraphicsLabel);
+
+    return d->textItem->text();
 }
 
 void GraphicsLabel::setText(const QString &text)
@@ -57,40 +64,16 @@ void GraphicsLabel::setText(const QString &text)
     updateGeometry();
 }
 
-QString GraphicsLabel::text() const
-{
-    Q_D(const GraphicsLabel);
-    
-    return d->textItem->text();
-}
-
 void GraphicsLabel::clear()
 {
     setText(QString());
 }
 
-void GraphicsLabel::setNum(int num)
-{
-    QString str;
-    str.setNum(num);
-    setText(str);
-}
-
-void GraphicsLabel::setNum(double num)
-{
-    QString str;
-    str.setNum(num);
-    setText(str);
-}
-
 QSizeF GraphicsLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
-    Q_D(const GraphicsLabel);
+    if(which == Qt::MinimumSize)
+        return d_func()->textItem->boundingRect().size();
 
-    if(which == Qt::MinimumSize) {
-        return d->textItem->boundingRect().size();
-    } else {
-        return base_type::sizeHint(which, constraint);
-    }
+    return base_type::sizeHint(which, constraint);
 }
 
 void GraphicsLabel::changeEvent(QEvent *event) {
@@ -110,4 +93,3 @@ void GraphicsLabel::changeEvent(QEvent *event) {
 
     base_type::changeEvent(event);
 }
-

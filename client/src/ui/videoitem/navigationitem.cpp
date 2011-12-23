@@ -4,7 +4,6 @@
 
 #include <QtGui/QAction>
 #include <QtGui/QGraphicsLinearLayout>
-#include <QtGui/QLabel>
 
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/video_server.h>
@@ -27,15 +26,6 @@
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
-
-// ### hack to avoid scene move up and down
-class QLabelKillsWheelEvent : public QLabel
-{
-protected:
-    void wheelEvent(QWheelEvent *) {}
-};
-// ###
-
 
 class SliderToolTipItem : public StyledToolTipItem
 {
@@ -213,7 +203,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_timeSlider = new TimeSlider(this);
     m_timeSlider->setObjectName("TimeSlider");
-    m_timeSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_timeSlider->setToolTipItem(new TimeSliderToolTipItem(m_timeSlider));
     m_timeSlider->toolTipItem()->setVisible(false);
     m_timeSlider->setEndSize(SLIDER_NOW_AREA_WIDTH);
@@ -253,7 +242,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
-    m_volumeSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
 
     connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
@@ -261,12 +249,13 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_timeLabel = new GraphicsLabel();
     m_timeLabel->setObjectName("TimeLabel");
-    m_timeLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    
-    QPalette timeLabelPalette = m_timeLabel->palette();
-    timeLabelPalette.setColor(QPalette::WindowText, QColor(63, 159, 216));
-    timeLabelPalette.setColor(QPalette::Window, QColor(0, 0, 0, 0));
-    m_timeLabel->setPalette(timeLabelPalette);
+    m_timeLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed, QSizePolicy::Label);
+    {
+        QPalette pal = m_timeLabel->palette();
+        pal.setColor(QPalette::Window, QColor(0, 0, 0, 0));
+        pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
+        m_timeLabel->setPalette(pal);
+    }
 
     QGraphicsLinearLayout *rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutH->setContentsMargins(0, 0, 0, 0);
@@ -299,6 +288,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     mainLayout->addItem(rightLayoutV);
     mainLayout->setAlignment(rightLayoutV, Qt::AlignRight | Qt::AlignVCenter);
     setLayout(mainLayout);
+
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
@@ -828,24 +819,7 @@ void NavigationItem::onSpeedChanged(float newSpeed)
             else
                 pause();
 
-            if (CLVideoWindowItem *vwi = m_camera->getVideoWindow())
-            {
-                if (restoreInfoTextData)
-                {
-                    restoreInfoTextData->timer.stop();
-                }
-                else
-                {
-                    restoreInfoTextData = new RestoreInfoTextData;
-                    restoreInfoTextData->extraInfoText = vwi->extraInfoText();
-                    restoreInfoTextData->timer.setSingleShot(true);
-                    connect(&restoreInfoTextData->timer, SIGNAL(timeout()), this, SLOT(restoreInfoText()));
-                }
-
-                vwi->setExtraInfoText(!qFuzzyIsNull(newSpeed) ? tr("[ Speed: %1 ]").arg(tr("%1x").arg(newSpeed)) : tr("Paused"));
-
-                restoreInfoTextData->timer.start(3000);
-            }
+            setInfoText(!qFuzzyIsNull(newSpeed) ? tr("[ Speed: %1 ]").arg(tr("%1x").arg(newSpeed)) : tr("Paused"));
         }
         else
         {
@@ -856,27 +830,25 @@ void NavigationItem::onSpeedChanged(float newSpeed)
 
 void NavigationItem::onVolumeLevelChanged(int newVolumeLevel)
 {
-    m_muteButton->setChecked(m_volumeSlider->isMute());
+    setMute(m_volumeSlider->isMute());
 
-    if (m_camera && m_camera->getVideoWindow())
-    {
-        CLVideoWindowItem *vwi = m_camera->getVideoWindow();
+    setInfoText(tr("[ Volume: %1 ]").arg(!m_volumeSlider->isMute() ? tr("%1%").arg(newVolumeLevel) : tr("Muted")));
+}
 
-        if (restoreInfoTextData)
-        {
+void NavigationItem::setInfoText(const QString &infoText)
+{
+    if (CLVideoWindowItem *vwi = m_camera ? m_camera->getVideoWindow() : 0) {
+        if (restoreInfoTextData) {
             restoreInfoTextData->timer.stop();
-        }
-        else
-        {
+        } else {
             restoreInfoTextData = new RestoreInfoTextData;
             restoreInfoTextData->extraInfoText = vwi->extraInfoText();
             restoreInfoTextData->timer.setSingleShot(true);
             connect(&restoreInfoTextData->timer, SIGNAL(timeout()), this, SLOT(restoreInfoText()));
         }
-
-        vwi->setExtraInfoText(tr("[ Volume: %1 ]").arg(!m_volumeSlider->isMute() ? tr("%1%").arg(newVolumeLevel) : tr("Muted")));
-
         restoreInfoTextData->timer.start(3000);
+
+        vwi->setExtraInfoText(infoText);
     }
 }
 
@@ -885,15 +857,18 @@ void NavigationItem::restoreInfoText()
     if (!restoreInfoTextData)
         return;
 
-    if (m_camera && m_camera->getVideoWindow())
-    {
-        CLVideoWindowItem *vwi = m_camera->getVideoWindow();
-
+    if (CLVideoWindowItem *vwi = m_camera ? m_camera->getVideoWindow() : 0) {
+        restoreInfoTextData->timer.stop();
         vwi->setExtraInfoText(restoreInfoTextData->extraInfoText);
     }
 
     delete restoreInfoTextData;
     restoreInfoTextData = 0;
+}
+
+void NavigationItem::setMute(bool mute)
+{
+    m_muteButton->setChecked(mute);
 }
 
 void NavigationItem::setPlaying(bool playing)

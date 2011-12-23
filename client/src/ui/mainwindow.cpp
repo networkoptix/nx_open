@@ -37,7 +37,7 @@
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_display.h"
 
-#include "ui/widgets3/tabwidget.h"
+#include "ui/widgets3/tabbar.h"
 
 #include "ui/skin/skin.h"
 
@@ -49,7 +49,7 @@
 #include "version.h"
 
 MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags flags)
-    : FancyMainWindow(parent, flags),
+    : FancyMainWindow(parent, flags | Qt::WindowShadeButtonHint),
       m_controller(0)
 {
     setWindowTitle(APPLICATION_NAME);
@@ -63,6 +63,27 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     const int min_width = 800;
     setMinimumWidth(min_width);
     setMinimumHeight(min_width * 3 / 4);
+
+
+    // set up actions
+    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
+    addAction(&cm_exit);
+
+    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+    addAction(&cm_toggle_fullscreen);
+
+    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
+    addAction(&cm_preferences);
+
+    QAction *reconnectAction = new QAction(style()->standardIcon(QStyle::SP_BrowserReload), tr("Reconnect"), this);
+    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+
+    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
+
+    QAction *newTabAction = new QAction(Skin::icon(QLatin1String("plus.png")), tr("New Tab"), this);
+    newTabAction->setShortcut(QKeySequence::New);
+    newTabAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(newTabAction, SIGNAL(triggered()), this, SLOT(addTab()));
 
 
     // Set up scene & view
@@ -79,40 +100,51 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     m_workbench->mapper()->setCellSize(defaultCellSize);
     m_workbench->mapper()->setSpacing(defaultSpacing);
 
-    QnWorkbenchDisplay *display = new QnWorkbenchDisplay(m_workbench, this);
-    display->setScene(scene);
-    display->setView(m_view);
+    m_display = new QnWorkbenchDisplay(m_workbench, this);
+    m_display->setScene(scene);
+    m_display->setView(m_view);
 
-    m_controller = new QnWorkbenchController(display, this);
+    m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(display, this);
+    new QnSyncPlayMixin(m_display, this);
 
     // Prepare UI
     NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(this);
     connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
 
-    m_tabWidget = new TabWidget(this);
-    m_tabWidget->setMovable(true);
-    m_tabWidget->setTabsClosable(true);
-    m_tabWidget->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
+    m_tabBar = new TabBar(this);
+    m_tabBar->setDocumentMode(true);
+    m_tabBar->setExpanding(false);
+    m_tabBar->setMovable(true);
+    m_tabBar->setTabsClosable(true);
+    m_tabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
 
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
-    connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+    connect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
+    connect(m_tabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 
-    QToolButton *newTabButton = new QToolButton(m_tabWidget);
-    newTabButton->setToolTip(tr("New Tab"));
-    newTabButton->setShortcut(QKeySequence::New);
-    newTabButton->setIcon(Skin::icon(QLatin1String("plus.png")));
-    newTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
-    m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
+    {
+        QToolBar *toolBar = new QToolBar(this);
+        toolBar->setAllowedAreas(Qt::NoToolBarArea);
+        toolBar->addAction(reconnectAction);
+        toolBar->addAction(&cm_preferences);
+        toolBar->addAction(newTabAction);
+
+        QVBoxLayout *mainLayout = qobject_cast<QVBoxLayout *>(layout());
+        Q_ASSERT(mainLayout);
+        QHBoxLayout *tabBarLayout = new QHBoxLayout;
+        tabBarLayout->setContentsMargins(0, 0, 0, 0);
+        tabBarLayout->setSpacing(2);
+        tabBarLayout->addWidget(toolBar);
+        tabBarLayout->addWidget(m_tabBar, 255);
+        mainLayout->insertLayout(1, tabBarLayout);
+    }
 
     m_splitter = new QSplitter(Qt::Horizontal, this);
     m_splitter->setChildrenCollapsible(false);
     m_splitter->addWidget(navigationWidget);
     m_splitter->setStretchFactor(0, 1);
     m_splitter->setCollapsible(0, true);
-    m_splitter->addWidget(m_tabWidget);
+    m_splitter->addWidget(m_view);
     m_splitter->setStretchFactor(1, 99);
     setCentralWidget(m_splitter);
 
@@ -125,87 +157,48 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 #endif
 
 
-    // toolbars
-    QToolBar *toolBar = new QToolBar(this);
-    toolBar->setAllowedAreas(Qt::TopToolBarArea);
-    toolBar->addAction(&cm_toggle_fullscreen);
-    toolBar->addAction(&cm_preferences);
-    //addToolBar(Qt::TopToolBarArea, toolBar);
-m_tabWidget->setCornerWidget(toolBar, Qt::TopRightCorner);
-
-
-    // actions
-    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
-    addAction(&cm_exit);
-
-    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
-    addAction(&cm_toggle_fullscreen);
-
-    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
-    addAction(&cm_preferences);
-
-    QAction *reconnectAction = new QAction(style()->standardIcon(QStyle::SP_BrowserReload), tr("Reconnect"), this);
-    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
-    toolBar->addAction(reconnectAction);
-
-    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
-
-
     addTab();
-
-    showNormal();
 
     // Process input files
     const QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
     for (int i = 1; i < argc; ++i)
         m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), gridPos);
+
+    showNormal();
 }
 
 MainWindow::~MainWindow()
 {
 }
 
+Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
+
 void MainWindow::addTab()
 {
-    QWidget *widget = new QWidget(m_tabWidget);
-    (void)new QVBoxLayout(widget); // ensure widget's layout
-
-    widget->setProperty("SceneState", QVariant::fromValue(new QnWorkbenchLayout(widget))); // ###
-
-    int index = m_tabWidget->addTab(widget, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
-    m_tabWidget->setCurrentIndex(index);
+    const int index = m_tabBar->addTab(Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
+    m_tabBar->setTabData(index, QVariant::fromValue(new QnWorkbenchLayout(m_view))); // ###
+    m_tabBar->setCurrentIndex(index);
 }
-
-Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
 
 void MainWindow::currentTabChanged(int index)
 {
-    if (QWidget *widget = m_view->parentWidget()) {
-        if (m_tabWidget->indexOf(widget) != -1) {
-            if (QLayout *layout = widget->layout())
-                layout->removeWidget(m_view);
-        }
-    }
-
-    m_workbench->setLayout(0);
-
-    if (QWidget *widget = m_tabWidget->widget(index)) {
-        if (QLayout *layout = widget->layout())
-            layout->addWidget(m_view);
-
-        m_workbench->setLayout(widget->property("SceneState").value<QnWorkbenchLayout *>()); // ###
-    }
+    QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>(); // ###
+    m_workbench->setLayout(layout);
+    m_display->fitInView(false);
 }
 
 void MainWindow::closeTab(int index)
 {
-    if (m_tabWidget->count() == 1)
+    if (m_tabBar->count() == 1)
         return; // don't close last tab
 
-    if (QWidget *widget = m_tabWidget->widget(index)) {
-        if (widget->close())
-            m_tabWidget->removeTab(index);
-    }
+    if (m_tabBar->currentIndex() == index)
+        m_workbench->setLayout(0);
+
+    QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>(); // ###
+    delete layout;
+
+    m_tabBar->removeTab(index);
 }
 
 void MainWindow::itemActivated(uint resourceId)

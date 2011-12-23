@@ -9,7 +9,6 @@
 #include "camera/time_period_reader_helper.h"
 
 
-class QLabel;
 class QTimerEvent;
 
 class CLVideoCamera;
@@ -37,7 +36,7 @@ public:
 
     inline bool isPlaying() const { return m_playing; }
 
-    static const int DEFAULT_HEIGHT = 60;
+    static const int DEFAULT_HEIGHT = 60; // ### remove
 
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
     // isUnderMouse() replacement;
@@ -55,6 +54,7 @@ public Q_SLOTS:
 #endif
 
 public Q_SLOTS:
+    void setMute(bool mute);
     void setPlaying(bool playing);
     void loadMotionPeriods(QnResourcePtr resource, QRegion region);
 
@@ -90,6 +90,7 @@ private Q_SLOTS:
 
     void onVolumeLevelChanged(int);
 
+    void setInfoText(const QString &infoText);
     void restoreInfoText();
 
     void onTimePeriodLoaded(const QnTimePeriodList &timePeriods, int handle);
