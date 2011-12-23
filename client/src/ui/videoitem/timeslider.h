@@ -50,8 +50,10 @@ public:
     inline void resetSelectionRange()
     { setSelectionRange(0, 0); }
 
-    const QnTimePeriodList &timePeriodList() const { return m_timePeriodList; }
-    void setTimePeriodList(const QnTimePeriodList &timePeriodList) { m_timePeriodList = timePeriodList; }
+    const QnTimePeriodList &recTimePeriodList() const { return m_recTimePeriodList; }
+    const QnTimePeriodList &motionTimePeriodList() const { return m_motionTimePeriodList; }
+    void setRecTimePeriodList(const QnTimePeriodList &timePeriodList) { m_recTimePeriodList = timePeriodList; }
+    void setMotionTimePeriodList(const QnTimePeriodList &timePeriodList) { m_motionTimePeriodList = timePeriodList; }
 
     bool isAtEnd();
     void setEndSize(qreal size);
@@ -115,7 +117,8 @@ private:
     QPropertyAnimation *m_animation;
     bool m_centralise;
 
-    QnTimePeriodList m_timePeriodList;
+    QnTimePeriodList m_recTimePeriodList;
+    QnTimePeriodList m_motionTimePeriodList;
 
     qreal m_endSize;
 

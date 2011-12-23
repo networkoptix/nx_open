@@ -16,14 +16,12 @@ namespace {
 
 } // anonymous namespace
 
-void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status, const QnApiRecordedTimePeriodsResponsePtr &reply)
+void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status, const QnApiRecordedTimePeriodsResponsePtr &reply, int handle)
 {
     QnTimePeriodList result;
-    if(status == 0)
+    if(status == 0) 
         result = parseRecordedTimePeriods(reply);
-
-    emit finished(result);
-
+    emit finished(status, result, handle);
     deleteLater();
 }
 
@@ -69,9 +67,9 @@ QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkRes
     return result;
 }
 
-void QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot) {
+long QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot) {
     detail::QnVideoServerConnectionReplyProcessor *processor = new detail::QnVideoServerConnectionReplyProcessor();
-    connect(processor, SIGNAL(finished(const QnTimePeriodList &)), target, slot);
+    connect(processor, SIGNAL(finished(int, const QnTimePeriodList &, int)), target, slot);
 
-    m_sessionManager->asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnApiRecordedTimePeriodsResponsePtr &)));
+    return m_sessionManager->asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnApiRecordedTimePeriodsResponsePtr &, int)));
 }

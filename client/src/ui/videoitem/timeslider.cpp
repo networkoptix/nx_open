@@ -97,7 +97,7 @@ protected:
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
-
+    void drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color);
 private:
     TimeSlider *m_parent;
     ToolTipItem *m_toolTip;
@@ -142,6 +142,36 @@ void MySlider::setToolTipItem(ToolTipItem *toolTip)
         m_toolTip->setParentItem(this);
 }
 
+void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color)
+{
+    const qint64 range = m_parent->sliderRange();
+    const qint64 pos = m_parent->viewPortPos() /*+ timezoneOffset*/;
+
+    QRectF contentsRect = this->contentsRect();
+    qreal x = contentsRect.left() + m_handleRect.width() / 2;
+    qreal w = contentsRect.width() - m_handleRect.width();
+
+    // TODO: use lower_bound here and draw only what is actually needed.
+    foreach(const QnTimePeriod &period, timePeriods)
+    {
+        qreal left = x + static_cast<qreal>(period.startTimeMs - pos) / range * w;
+        left = qMax(left, contentsRect.left());
+
+        qreal right;
+        if(period.durationMs == -1) {
+            right = contentsRect.right();
+        } else {
+            right = x + static_cast<qreal>((period.startTimeMs + period.durationMs) - pos) / range * w;
+            right = qMin(right, contentsRect.right());
+        }
+
+        if(left > right)
+            continue;
+
+        painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), color);
+    }
+}
+
 void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
@@ -165,35 +195,10 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->fillRect(r, linearGrad);
 
     // Draw time periods
-    if (!m_parent->timePeriodList().empty())
-    {
-        const qint64 range = m_parent->sliderRange();
-        const qint64 pos = m_parent->viewPortPos() /*+ timezoneOffset*/;
-
-        QRectF contentsRect = this->contentsRect();
-        qreal x = contentsRect.left() + m_handleRect.width() / 2;
-        qreal w = contentsRect.width() - m_handleRect.width();
-
-        // TODO: use lower_bound here and draw only what is actually needed.
-        foreach(const QnTimePeriod &period, m_parent->timePeriodList())
-        {
-            qreal left = x + static_cast<qreal>(period.startTimeMs - pos) / range * w;
-            left = qMax(left, contentsRect.left());
-
-            qreal right;
-            if(period.durationMs == -1) {
-                right = contentsRect.right();
-            } else {
-                right = x + static_cast<qreal>((period.startTimeMs + period.durationMs) - pos) / range * w;
-                right = qMin(right, contentsRect.right());
-            }
-
-            if(left > right)
-                continue;
-
-            painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), QColor(255, 0, 0, 96));
-        }
-    }
+    if (!m_parent->recTimePeriodList().empty())
+        drawTimePeriods(painter, m_parent->recTimePeriodList(), QColor(255, 0, 0, 96));
+    if (!m_parent->motionTimePeriodList().empty())
+        drawTimePeriods(painter, m_parent->motionTimePeriodList(), QColor(0, 255, 0, 96));
 
     r = contentsRect();
     qreal l = r.left() + QStyle::sliderPositionFromValue(minimum(), maximum(), maximum() - m_endSize, r.width());

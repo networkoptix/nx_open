@@ -25,46 +25,8 @@
 
 #include "timeslider.h"
 
-void detail::QnTimePeriodUpdater::update(const QnVideoServerConnectionPtr &connection, const QnNetworkResourceList &networkResources, const QnTimePeriod &timePeriod)
-{
-    m_connection = connection;
-    m_networkResources = networkResources;
-    m_timePeriod = timePeriod;
-
-    if(m_updatePending) {
-        m_updateNeeded = true;
-        return;
-    }
-
-    if(m_networkResources.empty()) {
-        at_replyReceived(QnTimePeriodList());
-    } else {
-        sendRequest();
-    }
-}
-
-void detail::QnTimePeriodUpdater::at_replyReceived(const QnTimePeriodList &timePeriods)
-{
-    if(m_updateNeeded) {
-        /* The data we got has already expired... resend the request. */
-        sendRequest();
-        return;
-    }
-
-    m_updatePending = false;
-    emit ready(timePeriods);
-}
-
-void detail::QnTimePeriodUpdater::sendRequest()
-{
-    QRegion motionRegion; // math only motion by specified region
-    m_updateNeeded = false;
-    m_updatePending = true;
-    m_connection->asyncRecordedTimePeriods(m_networkResources, m_timePeriod.startTimeMs, m_timePeriod.startTimeMs + m_timePeriod.durationMs, 1, motionRegion, this, SLOT(at_replyReceived(const QnTimePeriodList &)));
-}
-
-
 static const int SLIDER_NOW_AREA_WIDTH = 30;
+static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
 
 // ### hack to avoid scene move up and down
 class QLabelKillsWheelEvent : public QLabel
@@ -177,8 +139,9 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
         setPalette(pal);
     }
 
-    m_timePeriodUpdater = new detail::QnTimePeriodUpdater(this);
-    connect(m_timePeriodUpdater, SIGNAL(ready(const QnTimePeriodList &)), this, SLOT(onTimePeriodUpdaterReady(const QnTimePeriodList &)));
+    
+    connect(QnTimePeriodReaderHelper::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
+    connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
     m_backwardButton = new ImageButton(this);
     m_backwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_backward_grey.png")), ImageButton::Active, ImageButton::Background);
@@ -346,6 +309,9 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
 
     setVideoCamera(0);
+    m_fullTimePeriodHandle = 0;
+    m_timePeriodUpdateTime = 0;
+    m_forceTimePeriodLoading = false;
 }
 
 NavigationItem::~NavigationItem()
@@ -431,7 +397,7 @@ void NavigationItem::addReserveCamera(CLVideoCamera *camera)
     m_reserveCameras.insert(camera);
 
     updateActualCamera();
-    updatePeriodList(true);
+    m_forceTimePeriodLoading = !updateRecPeriodList(true);
 }
 
 void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
@@ -439,7 +405,11 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
     m_reserveCameras.remove(camera);
 
     updateActualCamera();
-    updatePeriodList(true);
+    m_forceTimePeriodLoading = !updateRecPeriodList(true);
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
+    if (netRes)
+        m_motionPeriodLoader.remove(netRes);
+    repaintMotionPeriods();
 }
 
 void NavigationItem::updateActualCamera()
@@ -535,41 +505,60 @@ void NavigationItem::updateSlider()
         }
         m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
 
-        updatePeriodList(false);
+        m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 }
 
-void NavigationItem::updatePeriodList(bool force)
+void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
 {
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!netRes)
+        return;
     qint64 w = m_timeSlider->sliderRange();
     qint64 t = m_timeSlider->viewPortPos();
-    if(t < 0)
-        return; /* TODO: why? */
+    if(t <= 0)
+        return;  // slider range still not initialized yet
+
+    if (!m_motionPeriodLoader.contains(netRes)) {
+        MotionPeriodLoader p;
+        p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(netRes);
+        if (!p.loader) {
+            qWarning() << "Connection to a video server lost. Can't load motion info";
+            return;
+        }
+        connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
+        connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
+        m_motionPeriodLoader.insert(netRes, p);
+    }
+    QnTimePeriod loadingPeriod(t - w, w * 3);
+    MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
+    p.loadingHandle = p.loader->load(loadingPeriod, region);
+}
+
+bool NavigationItem::updateRecPeriodList(bool force)
+{
+    qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    if (!force && currentTime - m_timePeriodUpdateTime < TIME_PERIOD_UPDATE_INTERVAL)
+        return true;
+
+    qint64 w = m_timeSlider->sliderRange();
+    qint64 t = m_timeSlider->viewPortPos();
+    if(t <= 0) 
+        return false;  // slider range does not initialized now
+
+    m_timePeriodUpdateTime = currentTime;
 
     if(!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
-        return;
+        return true;
+
+    if (!m_camera)
+        return false;
 
     QnNetworkResourceList resources;
-    QnVideoServerConnectionPtr connection;
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
-        if(networkResource.isNull())
-            continue;
-
-        resources.push_back(networkResource);
-
-        if(!connection.isNull())
-            continue;
-
-        QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(qnResPool->getResourceById(networkResource->getParentId()));
-        if(serverResource.isNull())
-            continue;
-
-        QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
-        if(serverConnection.isNull())
-            continue;
-
-        connection = serverConnection;
+        if(networkResource) 
+            resources.push_back(networkResource);
     }
 
     /* Request interval no shorter than 1 hour. */
@@ -580,20 +569,58 @@ void NavigationItem::updatePeriodList(bool force)
     /* It is important to update the stored interval BEFORE sending request to
      * the server. Request is blocking and starts an event loop, so we may get
      * into this method again. */
-    m_timePeriod.startTimeMs = t - w;
-    m_timePeriod.durationMs = w * 3;
-
-    if(!connection.isNull()) {
-        m_timePeriodUpdater->update(connection, resources, m_timePeriod);
-    } else if(resources.empty()) {
-        onTimePeriodUpdaterReady(QnTimePeriodList());
-    }
+    QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
+    m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
+    m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
+    if (!resources.isEmpty())
+        m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
+    return true;
 }
 
-void NavigationItem::onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods)
+void NavigationItem::onMotionPeriodLoadFailed(int status, int handle)
 {
-    m_timeSlider->setTimePeriodList(timePeriods);
+
 }
+
+void NavigationItem::onTimePeriodLoadFailed(int status, int handle)
+{
+
+}
+
+void NavigationItem::onTimePeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
+{
+    if (handle == m_fullTimePeriodHandle)
+        m_timeSlider->setRecTimePeriodList(timePeriods);
+}
+
+void NavigationItem::repaintMotionPeriods()
+{
+    QVector<QnTimePeriodList> allPeriods;
+    foreach(const MotionPeriodLoader& info, m_motionPeriodLoader.values()) {
+        if (!info.periods.isEmpty())
+            allPeriods << info.periods;
+    }
+    m_timeSlider->setMotionTimePeriodList(QnTimePeriod::mergeTimePeriods(allPeriods));
+}
+
+void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
+{
+    bool needUpdate = false;
+    for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
+    {
+        MotionPeriodLoader& info = itr.value();
+        if (info.loadingHandle == handle)
+        {
+            info.periods = timePeriods;
+            info.loadingHandle = 0;
+            needUpdate = true;
+        }
+    }
+    if (needUpdate)
+        repaintMotionPeriods();
+}
+
 
 void NavigationItem::onValueChanged(qint64 time)
 {
@@ -612,7 +639,7 @@ void NavigationItem::onValueChanged(qint64 time)
 
     smartSeek(time);
 
-    updatePeriodList(false);
+    updateRecPeriodList(false);
 }
 
 void NavigationItem::smartSeek(qint64 timeMSec)

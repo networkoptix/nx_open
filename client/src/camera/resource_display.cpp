@@ -32,13 +32,6 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     if(m_dataProvider != NULL) {
         m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
-#if 0
-        // motion detection test
-        QRegion region;
-        region += QRect(0,0, 5,4);
-        m_archiveReader->setMotionRegion(region);
-#endif
-
 
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
         if(m_mediaProvider != NULL) {
