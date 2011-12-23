@@ -1,6 +1,6 @@
 #include <QFileInfo>
 #include "recorded_chunks.h"
-#include "recording/storage_manager.h"
+#include "recorder/storage_manager.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
 #include "core/resourcemanagment/resource_pool.h"

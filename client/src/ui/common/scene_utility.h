@@ -28,6 +28,9 @@ public:
     static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
 
+    static QRectF resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection resizeGrip);
+    static QRect resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSection resizeGrip);
+
     /**
      * \param margins                   Margins.
      * \returns                         Amount by which the size of some rectangle 
@@ -126,14 +129,14 @@ public:
      * \param rect                      Rectangle to map to scene.
      * \returns                         Bounding rectangle of the mapped polygon.
      */
-    static QRectF mapRectToScene(QGraphicsView *view, const QRect &rect);
+    static QRectF mapRectToScene(const QGraphicsView *view, const QRect &rect);
 
     /**
      * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map from scene.
      * \returns                         Bounding rectangle of the mapped polygon.
      */
-    static QRect mapRectFromScene(QGraphicsView *view, const QRectF &rect);
+    static QRect mapRectFromScene(const QGraphicsView *view, const QRectF &rect);
 
     /**
      * Calculates the factor by which the given size must be scaled to fit into

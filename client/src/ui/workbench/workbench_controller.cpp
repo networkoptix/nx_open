@@ -166,56 +166,56 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_archiveDropInstrument);
     m_manager->installInstrument(motionSelectionInstrument);
 
-    connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)), this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
-    connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
-    connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),               this,                           SLOT(at_dragStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),              this,                           SLOT(at_dragFinished(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *)),                this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *)));
-    connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),               this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
-    connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
-    connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
+    connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
+    connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
+    connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_dragStarted(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_dragFinished(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
+    connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
+    connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),                               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
+    connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),                              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
 
-    connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
-    connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
+    connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
+    connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
 
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                m_handScrollInstrument,         SLOT(recursiveEnable()));
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                  m_wheelZoomInstrument,          SLOT(recursiveDisable()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                m_wheelZoomInstrument,          SLOT(recursiveEnable()));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                m_handScrollInstrument,         SLOT(recursiveEnable()));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  m_wheelZoomInstrument,          SLOT(recursiveDisable()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                m_wheelZoomInstrument,          SLOT(recursiveEnable()));
 
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),         itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),        itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessFinished(QGraphicsView *)),                               itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),        itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),       itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_handScrollInstrument,     SIGNAL(scrollProcessStarted(QGraphicsView *)),                              itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                             itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                          itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                         itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),       itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),      itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                                itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_dragInstrument,           SIGNAL(dragProcessFinished(QGraphicsView *)),                                               itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_handScrollInstrument,     SIGNAL(scrollProcessStarted(QGraphicsView *)),                                              itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                                             itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                                          itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                                         itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),         m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),        m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),         m_rubberBandInstrument,         SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),        m_rubberBandInstrument,         SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_dragInstrument,               SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_rubberBandInstrument,         SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_rubberBandInstrument,         SLOT(recursiveEnable()));
 
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),        m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),       m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),        m_rubberBandInstrument,         SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),       m_rubberBandInstrument,         SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),        m_resizingInstrument,           SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),       m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_dragInstrument,               SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_rubberBandInstrument,         SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_rubberBandInstrument,         SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveEnable()));
 
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),       m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),      m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),       m_resizingInstrument,           SLOT(recursiveDisable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),      m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_dragInstrument,               SLOT(recursiveDisable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
@@ -230,14 +230,14 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     verticalLayout->addStretch(0x1000);
     verticalLayout->addItem(m_navigationItem);
 
-    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
+    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
 
     /* Connect to display. */
-    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                  this,                           SLOT(at_viewportGrabbed()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                this,                           SLOT(at_viewportUngrabbed()));
-    connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(at_viewportGrabbed()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(at_viewportUngrabbed()));
+    connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
     /* Set up context menu. */
 #if 0
@@ -272,32 +272,27 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
 
-    m_display->view()->addAction(toggleRecordingAction);
-
     m_itemContextMenu = new QMenu();
     m_itemContextMenu->addAction(showMotionAction);
     m_itemContextMenu->addAction(hideMotionAction);
 
-
-
-#ifdef Q_OS_WIN
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
-    connect(m_screenRecorder,           SIGNAL(recordingStarted()),                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
-    connect(m_screenRecorder,           SIGNAL(recordingFinished(const QString &)),                                 this,                           SLOT(at_screenRecorder_recordingFinished(const QString &)));
-    connect(m_screenRecorder,           SIGNAL(error(const QString &)),                                             this,                           SLOT(at_screenRecorder_error(const QString &)));
-#endif
+    if(m_screenRecorder->isSupported()) {
+        connect(m_screenRecorder,           SIGNAL(recordingStarted()),                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
+        connect(m_screenRecorder,           SIGNAL(recordingFinished(const QString &)),                                 this,                           SLOT(at_screenRecorder_recordingFinished(const QString &)));
+        connect(m_screenRecorder,           SIGNAL(error(const QString &)),                                             this,                           SLOT(at_screenRecorder_error(const QString &)));
 
+        m_display->view()->addAction(toggleRecordingAction);
+    }
     m_countdownCanceled = false;
     m_recordingLabel = 0;
     m_recordingAnimation = 0;
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
-#ifdef Q_OS_WIN
     disconnect(m_screenRecorder, NULL, this, NULL);
     m_screenRecorder->stopRecording();
-#endif
 }
 
 QnWorkbenchDisplay *QnWorkbenchController::display() const {
@@ -381,20 +376,64 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
+void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING STARTED");
 
     m_display->bringToFront(item);
 }
 
-void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
+namespace {
+    QSize sizeForBound(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
+        QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
+        if(boundOrientation == Qt::Horizontal) {
+            sceneSize.setHeight(sceneSize.width() / aspectRatio);
+        } else {
+            sceneSize.setWidth(sceneSize.height() * aspectRatio);
+        }
+
+        QSize gridSize0 = mapper->mapToGrid(sceneSize);
+        QSize gridSize1 = gridSize0;
+        if(boundOrientation == Qt::Horizontal) {
+            gridSize1.setHeight(qMax(gridSize1.height() - 1, 1));
+        } else {
+            gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
+        }
+
+        qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
+        qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
+        return distance0 < distance1 ? gridSize0 : gridSize1;
+    }
+
+} // anonymous namespace
+
+
+
+void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
     qDebug("RESIZING FINISHED");
 
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
 
-    QRect newRect = mapper()->mapToGrid(widget->geometry());
+    QRectF newSceneGeometry = widget->geometry();
+
+    /* Calculate new size in grid coordinates. */
+    QSizeF gridSizeF = mapper()->mapToGridF(newSceneGeometry.size());
+    QSize gridSize = QSize(
+        qMax(1, qRound(gridSizeF.width())), 
+        qMax(1, qRound(gridSizeF.height()))
+    );
+
+    if(widget->hasAspectRatio()) {
+        if(widget->aspectRatio() > 1.0) {
+            gridSize = sizeForBound(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
+        } else {
+            gridSize = sizeForBound(mapper(), gridSize.height(), Qt::Vertical, widget->aspectRatio());
+        }
+    }
+
+    /* Calculate new grid rect based on the dragged frame section. */
+    QRect newRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
     QSet<QnWorkbenchItem *> entities = layout()->items(newRect);
     entities.remove(widget->item());
     if (entities.empty()) {
@@ -569,7 +608,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
     m_itemContextMenu->exec(info.screenPos());
 }
 
-void QnWorkbenchController::at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
+void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
@@ -617,14 +656,14 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
     QScopedPointer<QMenu> menu(new QMenu(display()->view()));
-#ifdef Q_OS_WIN
-    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
-        menu->addAction(m_stopRecordingAction);
-    } else {
-        menu->addAction(m_startRecordingAction);
+    if(m_screenRecorder->isSupported()) {
+        if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
+            menu->addAction(m_stopRecordingAction);
+        } else {
+            menu->addAction(m_startRecordingAction);
+        }
     }
     menu->addAction(m_recordingSettingsActions);
-#endif
 
     menu->exec(info.screenPos());
 }
@@ -716,17 +755,14 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
 }
 
 void QnWorkbenchController::at_toggleRecordingAction_triggered() {
-#ifdef Q_OS_WIN
     if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
         at_stopRecordingAction_triggered(); 
     } else {
         at_startRecordingAction_triggered();
     }
-#endif
 }
 
 void QnWorkbenchController::at_startRecordingAction_triggered() {
-#ifdef Q_OS_WIN
     if(m_screenRecorder->isRecording())
         return;
 
@@ -766,30 +802,25 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
 
     m_recordingAnimation->disconnect();
     connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(onRecordingCountdownFinished()));
-    connect(m_recordingAnimation,SIGNAL(valueChanged(QVariant)), this, SLOT(onPrepareRecording(QVariant)));
+    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(onPrepareRecording(QVariant)));
     m_recordingLabel->setText(tr("Ready"));
     m_recordingAnimation->start();
-#endif
 }
 
 void QnWorkbenchController::onRecordingCountdownFinished()
 {
-#ifdef Q_OS_WIN
     m_recordingLabel->hide();
     if (!m_countdownCanceled)
     {
-        //m_countdownStarted = false;
         QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
         if(widget)
             m_screenRecorder->startRecording(widget);
     }
     m_countdownCanceled = false;
-#endif
 };
 
 void QnWorkbenchController::onPrepareRecording(QVariant value)
 {
-#ifdef Q_OS_WIN
     static double TICKS = 3;
 
     QPropertyAnimation* animation = dynamic_cast<QPropertyAnimation*> (sender());
@@ -802,7 +833,6 @@ void QnWorkbenchController::onPrepareRecording(QVariant value)
     if (!label)
         return;
 
-    //DesktopFileEncoder *desktopEncoder = qobject_cast<DesktopFileEncoder *>(cm_start_video_recording.property("encoder").value<QObject *>());
     if (m_countdownCanceled) {
         label->setText(tr("Cancelled"));
         return;
@@ -813,11 +843,9 @@ void QnWorkbenchController::onPrepareRecording(QVariant value)
         return;
     int n = int (d) + 1;
     label->setText(QString::number(n));
-#endif
 }
 
 void QnWorkbenchController::at_stopRecordingAction_triggered() {
-#ifdef Q_OS_WIN
     if(!m_screenRecorder->isRecording()) {
         m_countdownCanceled = true;
         return;
@@ -827,7 +855,6 @@ void QnWorkbenchController::at_stopRecordingAction_triggered() {
         return;
 
     m_screenRecorder->stopRecording();
-#endif
 }
 
 void QnWorkbenchController::at_recordingSettingsActions_triggered() {

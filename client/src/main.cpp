@@ -1,7 +1,7 @@
 //#include <vld.h>
 #include "eve_app.h"
 
-#define CL_CUSOM_MAINWINDOW
+//#define CL_CUSOM_MAINWINDOW
 #ifdef CL_CUSOM_MAINWINDOW
 #include "ui/mainwindow.h"
 #endif
@@ -24,7 +24,6 @@
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "recording/storage_manager.h"
 #include "client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/AppServerConnection.h"
@@ -271,13 +270,13 @@ int main(int argc, char *argv[])
     CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
 
     //============================
-
+    /*
     QnStoragePtr storage0(new QnStorage());
     storage0->setUrl(getRecordingDir());
     storage0->setIndex(0);
     qnResPool->addResource(storage0);
     qnStorageMan->addStorage(storage0);
-
+    */
     //=========================================================
 
     qApp->setStyle(Skin::style());

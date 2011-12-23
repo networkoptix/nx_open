@@ -17,6 +17,7 @@ class BoundingInstrument;
 class TransformListenerInstrument;
 class ActivityListenerInstrument;
 class ForwardingInstrument;
+class AnimationInstrument;
 
 class CLAbstractRenderer;
 
@@ -353,6 +354,8 @@ private:
     /** Paint forwarding instrument. */
     ForwardingInstrument *m_paintForwardingInstrument;
 
+    /** Instrument that provides animation timer. */
+    AnimationInstrument *m_animationInstrument;
 
     /* Animation-related stuff. */
 

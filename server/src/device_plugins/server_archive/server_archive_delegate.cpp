@@ -65,7 +65,7 @@ void QnServerArchiveDelegate::close()
     m_afterSeek = false;
 }
 
-void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
+void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime, bool useReverseSearch)
 {
     if (msTime >= m_playbackMaskStart && msTime < m_playbackMaskEnd)
         return;
@@ -82,27 +82,62 @@ void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime)
             return;
     }
 
-    QnTimePeriodList newMask = QnMotionHelper::instance()->mathImage(m_motionRegion, m_resource, loadMin, loadMax, 1);
-    QVector<QnTimePeriodList> periods;
-    periods << m_playbackMask << newMask;
-    m_playbackMask = QnTimePeriod::mergeTimePeriods(periods);
+    bool dataFound = false;
+    QnMotionArchive* archive = QnMotionHelper::instance()->getArchive(m_resource);
+    while (!dataFound)
+    {
+        QnTimePeriodList newMask = archive->mathPeriod(m_motionRegion, loadMin, loadMax, 1);
+        if (!newMask.isEmpty())
+        {
+            QVector<QnTimePeriodList> periods;
+            periods << m_playbackMask << newMask;
+            m_playbackMask = QnTimePeriod::mergeTimePeriods(periods);
+            dataFound = true;
+        }
+        if (m_playbackMaskStart != AV_NOPTS_VALUE) {
+            m_playbackMaskStart = qMin(loadMin, m_playbackMaskStart);
+            m_playbackMaskEnd = qMin(archive->maxTime(), qMax(loadMax, m_playbackMaskEnd));
+        }
+        else {
+            m_playbackMaskStart = loadMin;
+            m_playbackMaskEnd = qMin(archive->maxTime(), loadMax);
+        }
 
+        if (!useReverseSearch) {
+            loadMin = loadMax;
+            loadMax += MOTION_LOAD_STEP;
+            if (loadMin >= archive->maxTime())
+                break;
+        }
+        else {
+            loadMax = loadMin;
+            loadMin -= MOTION_LOAD_STEP;
+            if (loadMax <= archive->minTime())
+                break;
+        }
+    }
+
+    /*
     if (!m_playbackMask.isEmpty()) {
         m_playbackMaskStart = qMin(loadMin, m_playbackMask.first().startTimeMs);
         m_playbackMaskEnd = qMin(QDateTime::currentDateTime().toMSecsSinceEpoch(), qMax(loadMax, m_playbackMask.last().startTimeMs + m_playbackMask.last().durationMs));
     }
+    */
 }
 
 qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSearch)
 {
     qint64 timeMs = time/1000;
 
-    loadPlaybackMask(timeMs);
+    loadPlaybackMask(timeMs, useReverseSearch);
 
 
 
     if (timeMs >= m_lastTimePeriod.startTimeMs && timeMs < m_lastTimePeriod.startTimeMs + m_lastTimePeriod.durationMs)
         return time;
+
+    if (m_playbackMask.isEmpty())
+        return AV_NOPTS_VALUE;
 
     //qDebug() << "inputTime=" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
 

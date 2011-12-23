@@ -106,6 +106,7 @@ private:
     QWaitCondition m_singleShowWaitCond;
     QnAbstractMediaDataPtr m_currentData;
     QnAbstractMediaDataPtr m_nextData;
+    QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
 
     qint64 determineDisplayTime();
     void intChanneljumpTo(qint64 mksec, int channel);

@@ -86,7 +86,7 @@ static const int MAX_RTSP_DATA_LEN = 65535 - 16;
 static const qint64 BACKWARD_SEEK_STEP =  1000 * 1000; 
 static const qint64 MAX_FIRST_GOP_DURATION = 1000 * 1000 * 10;
 
-static const qint64 MAX_FRAME_DURATION = 10 * 1000;
+static const qint64 MAX_FRAME_DURATION = 5 * 1000;
 
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
 #define htonll(x) \

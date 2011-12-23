@@ -35,6 +35,14 @@ bool QnFileDeletor::internalDeleteFile(const QString& fileName)
     return true;
 }
 
+void QnFileDeletor::deleteDir(const QString& dirName)
+{
+    QDir dir(dirName);
+    QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    foreach(const QFileInfo& fi, list)
+        deleteFile(fi.absoluteFilePath());
+}
+
 void QnFileDeletor::deleteFile(const QString& fileName)
 {
     processPostponedFiles();

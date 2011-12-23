@@ -5,6 +5,8 @@
 #include <QVariant>
 
 class QPointF;
+class QSizeF;
+class QRectF;
 class QVector2D;
 class QVector3D;
 class QVector4D;
@@ -14,6 +16,8 @@ int linearCombine(qreal a, int x, qreal b, int y);
 float linearCombine(qreal a, float x, qreal b, float y);
 double linearCombine(qreal a, double x, qreal b, double y);
 QPointF linearCombine(qreal a, const QPointF &x, qreal b, const QPointF &y);
+QSizeF linearCombine(qreal a, const QSizeF &x, qreal b, const QSizeF &y);
+QRectF linearCombine(qreal a, const QRectF &x, qreal b, const QRectF &y);
 QVector2D linearCombine(qreal a, const QVector2D &x, qreal b, const QVector2D &y);
 QVector3D linearCombine(qreal a, const QVector3D &x, qreal b, const QVector3D &y);
 QVector4D linearCombine(qreal a, const QVector4D &x, qreal b, const QVector4D &y);

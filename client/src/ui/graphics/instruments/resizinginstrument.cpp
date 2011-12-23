@@ -34,6 +34,10 @@ namespace {
 
 } // anonymous namespace
 
+Qt::WindowFrameSection ResizingInfo::frameSection() const {
+    return m_instrument->m_section;
+}
+
 ResizingInstrument::ResizingInstrument(QObject *parent):
     base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
@@ -110,7 +114,7 @@ bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
 }
 
 void ResizingInstrument::startDragProcess(DragInfo *info) {
-    emit resizingProcessStarted(info->view(), m_widget.data());
+    emit resizingProcessStarted(info->view(), m_widget.data(), ResizingInfo(this));
 }
 
 void ResizingInstrument::startDrag(DragInfo *info) {
@@ -122,7 +126,7 @@ void ResizingInstrument::startDrag(DragInfo *info) {
         return;
     }
 
-    emit resizingStarted(info->view(), m_widget.data());
+    emit resizingStarted(info->view(), m_widget.data(), ResizingInfo(this));
     m_resizingStartedEmitted = true;
 }
 
@@ -212,68 +216,18 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     if(m_resizable != NULL)
         size = m_resizable->constrainedSize(size);
 
-    switch (m_section) {
-    case Qt::LeftSection:
-        newGeometry = QRectF(
-            startGeometry.right() - size.width(), 
-            startGeometry.top(),
-            size.width(),
-            startGeometry.height()
-        );
-        break;
-    case Qt::TopLeftSection:
-        newGeometry = QRectF(
-            startGeometry.right() - size.width(), 
-            startGeometry.bottom() - size.height(),
-            size.width(), 
-            size.height()
-        );
-        break;
-    case Qt::TopSection:
-        newGeometry = QRectF(
-            startGeometry.left(), 
-            startGeometry.bottom() - size.height(),
-            startGeometry.width(), 
-            size.height()
-        );
-        break;
-    case Qt::TopRightSection:
-        newGeometry.setTop(startGeometry.bottom() - size.height());
-        newGeometry.setWidth(size.width());
-        break;
-    case Qt::RightSection:
-        newGeometry.setWidth(size.width());
-        break;
-    case Qt::BottomRightSection:
-        newGeometry.setWidth(size.width());
-        newGeometry.setHeight(size.height());
-        break;
-    case Qt::BottomSection:
-        newGeometry.setHeight(size.height());
-        break;
-    case Qt::BottomLeftSection:
-        newGeometry = QRectF(
-            startGeometry.right() - size.width(), 
-            startGeometry.top(),
-            size.width(), 
-            size.height()
-        );
-        break;
-    default:
-        break;
-    }
-
+    newGeometry = resizeRect(startGeometry, size, m_section);
     widget->setGeometry(newGeometry);
 }
 
 void ResizingInstrument::finishDrag(DragInfo *info) {
     if(m_resizingStartedEmitted)
-        emit resizingFinished(info->view(), m_widget.data());
+        emit resizingFinished(info->view(), m_widget.data(), ResizingInfo(this));
 
     m_widget.clear();
     m_resizable = NULL;
 }
 
 void ResizingInstrument::finishDragProcess(DragInfo *info) {
-    emit resizingProcessFinished(info->view(), m_widget.data());
+    emit resizingProcessFinished(info->view(), m_widget.data(), ResizingInfo(this));
 }

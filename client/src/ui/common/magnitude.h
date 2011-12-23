@@ -4,6 +4,8 @@
 #include <utils/common/warnings.h>
 
 class QPointF;
+class QSizeF;
+class QRectF;
 class QVector2D;
 class QVector3D;
 class QVector4D;
@@ -14,10 +16,12 @@ qreal calculateMagnitude(int value);
 qreal calculateMagnitude(float value);
 qreal calculateMagnitude(double value);
 qreal calculateMagnitude(const QPointF &value);
+qreal calculateMagnitude(const QSizeF &value);
 qreal calculateMagnitude(const QVector2D &value);
 qreal calculateMagnitude(const QVector3D &value);
 qreal calculateMagnitude(const QVector4D &value);
 qreal calculateMagnitude(const QColor &value);
+qreal calculateMagnitude(const QRectF &value); /* QRectF is treated as a 4D vector here. */
 
 template<class T>
 qreal calculateMagnitude(const T &value, ...) {

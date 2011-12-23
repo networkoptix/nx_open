@@ -18,7 +18,7 @@
 #include "rtsp/rtsp_listener.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "recorder/recording_manager.h"
-#include "recording/storage_manager.h"
+#include "recorder/storage_manager.h"
 #include "api/AppServerConnection.h"
 #include "appserver/processor.h"
 #include "recording/file_deletor.h"

@@ -7,7 +7,7 @@
 #include "core/resource/network_resource.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/sse_helper.h"
-#include "recording/device_file_catalog.h"
+#include "recorder/device_file_catalog.h"
 #include "core/resourcemanagment/security_cam_resource.h"
 
 static const int MOTION_INDEX_HEADER_SIZE = 16;
@@ -71,17 +71,25 @@ public:
 
     // remove part of motion by mask
     void maskMotion(QnMetaDataV1Ptr data);
+
+    qint64 minTime() const;
+    qint64 maxTime() const;
+
 public slots:
     void updateMotionMask(QRegion maskedRegion);
 private:
     static void createMask(const QRegion& region,  __m128i* mask, int& msMaskStart, int& msMaskEnd);
-    QString getFilePrefix(const QDateTime& datetime);
+    QString getFilePrefix(const QDate& datetime);
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
     bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile);
     bool saveToArchiveInternal(QnMetaDataV1Ptr data);
 
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time);
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time);
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime);
+
+    void loadRecordedRange();
 
     friend class QnMotionArchiveConnection;
 private:
@@ -100,6 +108,9 @@ private:
     __m128i m_motionMask[MD_WIDTH * MD_HEIGHT / 128];
     int m_motionMaskStart;
     int m_motionMaskEnd;
+
+    qint64 m_minMotionTime;
+    qint64 m_maxMotionTime;
 };
 
 #endif // __MOTION_WRITER_H__

@@ -1,6 +1,10 @@
 #include "motion_helper.h"
 #include "motion_archive.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+#include "utils/common/util.h"
+#include <QFileInfo>
+#include <QDir>
+#include "recording/file_deletor.h"
 
 QnMotionHelper::QnMotionHelper()
 {
@@ -79,4 +83,40 @@ Q_GLOBAL_STATIC(QnMotionHelper, inst);
 QnMotionHelper* QnMotionHelper::instance()
 {
     return inst();
+}
+
+QString QnMotionHelper::getBaseDir(const QString& macAddress)
+{
+    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + macAddress + QString("/");
+}
+
+QString QnMotionHelper::getMotionDir(const QDate& date, const QString& macAddress)
+{
+    return getBaseDir(macAddress) + date.toString("yyyy/MM/");
+}
+
+QList<QDate> QnMotionHelper::recordedMonth(const QString& macAddress)
+{
+    QList<QDate> rez;
+    QDir baseDir(getBaseDir(macAddress));
+    QList<QFileInfo> yearList = baseDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
+    foreach(const QFileInfo& fiYear, yearList)
+    {
+        QDir yearDir(fiYear.absoluteFilePath());
+        QList<QFileInfo> monthDirs = yearDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
+        foreach(const QFileInfo& fiMonth, monthDirs)
+        {
+            rez << QDate(fiYear.baseName().toInt(), fiMonth.baseName().toInt(), 1);
+        }
+    }
+    return rez;
+}
+
+void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& macAddress)
+{
+    QList<QDate> existsData = recordedMonth(macAddress);
+    foreach(const QDate& date, existsData) {
+        if (!monthList.contains(date))
+            qnFileDeletor->deleteDir(getMotionDir(date, macAddress));
+    }
 }

@@ -6,8 +6,8 @@
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
-#include "recording/device_file_catalog.h"
-#include "recording/storage_manager.h"
+#include "recorder/device_file_catalog.h"
+#include "recorder/storage_manager.h"
 #include "utils/media/sse_helper.h"
 #include "motion/motion_archive.h"
 
@@ -35,7 +35,7 @@ private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk);
     qint64 correctTimeByMask(qint64 time, bool useReverseSearch);
     qint64 seekInternal(qint64 time);
-    void loadPlaybackMask(qint64 msTime);
+    void loadPlaybackMask(qint64 msTime, bool useReverseSearch);
 private:
     bool m_opened;
     QnResourcePtr m_resource;

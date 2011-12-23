@@ -5,7 +5,7 @@
 
 #include <QtGui/QGraphicsWidget>
 
-#include <recording/device_file_catalog.h> /* For QnTimePeriod. */
+#include "recording/time_period.h"
 #include <api/VideoServerConnection.h>
 
 namespace detail {
@@ -46,6 +46,7 @@ class ImageButton;
 class SpeedSlider;
 class TimeSlider;
 class VolumeSlider;
+class GraphicsLabel;
 
 #define EMULATE_CLUnMovedInteractiveOpacityItem
 
@@ -141,7 +142,7 @@ private:
     SpeedSlider *m_speedSlider;
     ImageButton *m_muteButton;
     VolumeSlider *m_volumeSlider;
-    QLabel *m_timeLabel;
+    GraphicsLabel *m_timeLabel;
 
     CLVideoCamera *m_camera;
     CLVideoCamera *m_forcedCamera;

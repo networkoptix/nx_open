@@ -50,26 +50,33 @@ void QnWorkbenchGridMapper::setHorizontalSpacing(qreal spacing) {
     setSpacing(QSizeF(spacing, m_spacing.height()));
 }
 
-QPoint QnWorkbenchGridMapper::mapToGrid(const QPointF &pos) const {
-    /* Compute origin and a unit vectors in the cell-based coordinate system. */
-    QPointF origin = mapFromGrid(QPoint(0, 0)) - toPoint(m_spacing) / 2;
-    QPointF unit = toPoint(m_cellSize + m_spacing);
+QPointF QnWorkbenchGridMapper::mapToGridF(const QPointF &pos) const {
+    return cwiseDiv(pos - m_origin, toPoint(m_cellSize + m_spacing));
+}
 
-    /* Perform coordinate transformation. */
-    QPointF gridPos = cwiseDiv(pos - origin, unit);
+QPointF QnWorkbenchGridMapper::mapFromGridF(const QPointF &gridPos) const {
+    return m_origin + cwiseMul(gridPos, toPoint(m_cellSize + m_spacing));
+}
+
+QPoint QnWorkbenchGridMapper::mapToGrid(const QPointF &pos) const {
+    QPointF gridPos = mapToGridF(pos);
     return QPoint(std::floor(gridPos.x()), std::floor(gridPos.y()));
 }
 
 QPointF QnWorkbenchGridMapper::mapFromGrid(const QPoint &gridPos) const {
-    return mapFromGrid(QPointF(gridPos));
+    return mapFromGridF(gridPos);
 }
 
-QPointF QnWorkbenchGridMapper::mapFromGrid(const QPointF &gridPos) const {
-    return m_origin + cwiseMul(toPoint(m_cellSize + m_spacing), gridPos);
+QSizeF QnWorkbenchGridMapper::mapToGridF(const QSizeF &size) const {
+    return cwiseDiv(size + m_spacing, m_cellSize + m_spacing);
+}
+
+QSizeF QnWorkbenchGridMapper::mapFromGridF(const QSizeF &gridSize) const {
+    return cwiseMul(gridSize, m_cellSize + m_spacing) - m_spacing;
 }
 
 QSize QnWorkbenchGridMapper::mapToGrid(const QSizeF &size) const {
-    QSizeF gridSize = cwiseDiv(size + m_spacing, m_cellSize + m_spacing);
+    QSizeF gridSize = mapToGridF(size);
     QSizeF ceilGridSize = QSize(std::ceil(gridSize.width()), std::ceil(gridSize.height()));
 
     /* It may have been rounded up as a result of floating-point precision issues.
@@ -83,11 +90,21 @@ QSize QnWorkbenchGridMapper::mapToGrid(const QSizeF &size) const {
 }
 
 QSizeF QnWorkbenchGridMapper::mapFromGrid(const QSize &gridSize) const {
-    return mapFromGrid(QSizeF(gridSize));
+    return mapFromGridF(gridSize);
 }
 
-QSizeF QnWorkbenchGridMapper::mapFromGrid(const QSizeF &gridSize) const {
-    return cwiseMul(m_cellSize, gridSize) + (cwiseMul(m_spacing, gridSize - QSizeF(1, 1))).expandedTo(QSizeF(0, 0));
+QRectF QnWorkbenchGridMapper::mapToGridF(const QRectF &rect) const {
+    return QRectF(
+        mapToGridF(rect.topLeft()),
+        mapToGridF(rect.size())
+    );
+}
+
+QRectF QnWorkbenchGridMapper::mapFromGridF(const QRectF &gridRect) const {
+    return QRectF(
+        mapFromGridF(gridRect.topLeft()),
+        mapFromGridF(gridRect.size())
+    );
 }
 
 QRect QnWorkbenchGridMapper::mapToGrid(const QRectF &rect) const {
@@ -100,13 +117,6 @@ QRect QnWorkbenchGridMapper::mapToGrid(const QRectF &rect) const {
     return QRect(gridTopLeft, gridSize);
 }
 
-QRectF QnWorkbenchGridMapper::mapFromGrid(const QRectF &gridRect) const {
-    return QRectF(
-        mapFromGrid(gridRect.topLeft()),
-        mapFromGrid(gridRect.size())
-    );
-}
-
 QRectF QnWorkbenchGridMapper::mapFromGrid(const QRect &gridRect) const {
-    return mapFromGrid(QRectF(gridRect));
+    return mapFromGridF(QRectF(gridRect));
 }

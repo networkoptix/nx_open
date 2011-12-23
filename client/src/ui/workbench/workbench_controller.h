@@ -11,6 +11,8 @@ class QGraphicsScene;
 class QGraphicsView;
 class QGraphicsItem;
 class QMenu;
+class QLabel;
+class QPropertyAnimation;
 
 class InstrumentManager;
 class HandScrollInstrument;
@@ -22,6 +24,7 @@ class DropInstrument;
 class UiElementsInstrument;
 class RotationInstrument;
 class ClickInfo;
+class ResizingInfo;
 
 class NavigationItem;
 
@@ -32,9 +35,7 @@ class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 
-#ifdef Q_OS_WIN
 class QnScreenRecorder;
-#endif
 
 /**
  * This class implements default scene manipulation logic.
@@ -69,8 +70,8 @@ protected:
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
 
 protected Q_SLOTS:
-    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
-    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget);
+    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
     void at_dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
@@ -150,10 +151,8 @@ private:
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
-#ifdef Q_OS_WIN
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;
-#endif
 
     /** Layout item context menu. */
     QMenu *m_itemContextMenu;
@@ -171,7 +170,7 @@ private:
     bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
-    QLabel* m_recordingLabel;
+    QLabel *m_recordingLabel;
 
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;

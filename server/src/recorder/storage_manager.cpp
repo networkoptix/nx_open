@@ -1,3 +1,4 @@
+#include <QDir>
 #include "storage_manager.h"
 #include "utils/common/util.h"
 #include "core/resourcemanagment/resource_pool.h"

@@ -4,7 +4,7 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "storage_manager.h"
+#include "utils/common/util.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -24,7 +24,7 @@ m_truncateInterval(0),
 m_currentChunkLen(0),
 m_startDateTime(AV_NOPTS_VALUE),
 m_endDateTime(-1),
-m_lastPacketTime(0),
+m_lastPacketTime(AV_NOPTS_VALUE),
 m_startOffset(0),
 m_forceDefaultCtx(true),
 m_prebufferingUsec(0)
@@ -45,8 +45,7 @@ void QnStreamRecorder::close()
         {
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+m_startDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_startOffset+m_endDateTime/1000).toAscii().data(), 0);
-            if (m_truncateInterval != 0)
-                qnStorageMan->fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
+            fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
             m_startDateTime = AV_NOPTS_VALUE;
         }
 
@@ -60,6 +59,7 @@ void QnStreamRecorder::close()
             avio_close(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
         m_formatCtx = 0;
+        m_lastPacketTime = AV_NOPTS_VALUE;
     }
     m_packetWrited = false;
     m_firstTimestamp = -1;
@@ -107,6 +107,14 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
+
+    if (m_lastPacketTime != AV_NOPTS_VALUE)
+    {
+        if (md->timestamp - m_lastPacketTime > MAX_FRAME_DURATION*1000ll) {
+            close();
+            m_lastPacketTime = md->timestamp;
+        }
+    }
 
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md);
@@ -159,8 +167,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     AVStream* stream = m_formatCtx->streams[channel];
     AVRational srcRate = {1, 1000000};
     Q_ASSERT(stream->time_base.num && stream->time_base.den);
-    m_lastPacketTime = md->timestamp-m_firstTimestamp;
-    avPkt.pts = av_rescale_q(m_lastPacketTime, srcRate, stream->time_base);
+    m_lastPacketTime = md->timestamp;
+    avPkt.pts = av_rescale_q(m_lastPacketTime-m_firstTimestamp, srcRate, stream->time_base);
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
     avPkt.stream_index= channel;
@@ -196,16 +204,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
     QString fileExt = QString(outputCtx->extensions).split(',')[0];
 
-    //QFileInfo fi(m_device->getUniqueId());
-    if (m_fixedFileName.isEmpty()) 
-    {
-        QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
-        Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        m_fileName = qnStorageMan->getFileName(m_startDateTime/1000, netResource);
-    }
-    else {
-        m_fileName = m_fixedFileName;
-    }
+    m_fileName = fillFileName();
     m_fileName += QString(".") + fileExt;
     QString url = QString("ufile:") + m_fileName;
 
@@ -218,9 +217,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
-    if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(m_startDateTime/1000, m_fileName);
-    }
+    fileStarted(m_startDateTime/1000, m_fileName);
 
     outputCtx->video_codec = mediaData->compressionType;
     
@@ -349,4 +346,9 @@ bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 {
     return true;
+}
+
+QString QnStreamRecorder::fillFileName()
+{
+    return m_fixedFileName;
 }
