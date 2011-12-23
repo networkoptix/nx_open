@@ -10,6 +10,7 @@
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
 #include "core/misc/scheduleTask.h"
+#include "core/resourcemanagment/security_cam_resource.h"
 
 class AppSessionManager;
 class QnAppServerConnectionFactory;
@@ -29,7 +30,7 @@ public:
     int addCamera(const QnNetworkResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
     int addStorage(const QnStorage&);
 
-    int getServers(QnResourceList& servers);
+    int getCameras(QnSequrityCamResourceList& cameras, const QnId& mediaServerId);
     int getStorages(QnResourceList& storages);
     int getScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnId& mediaServerId);
 

@@ -87,3 +87,13 @@ void QnSequrityCamResource::setMotionMask(const QRegion& mask)
     m_motionMask = mask;
     emit motionMaskChanged(mask);
 }
+
+void QnSequrityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks)
+{
+    m_scheduleTasks = scheduleTasks;
+}
+
+const QnScheduleTaskList QnSequrityCamResource::getScheduleTasks() const
+{
+    return m_scheduleTasks;
+}

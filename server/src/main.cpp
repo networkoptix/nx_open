@@ -333,8 +333,11 @@ public:
         QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverHost));
         if (videoServer.isNull())
             return;
-        QnScheduleTaskList scheduleTasks;
-        appServerConnection->getScheduleTasks(scheduleTasks, videoServer->getId());
+
+        QnScheduleTaskList scheduleTasks;        
+
+        QnSequrityCamResourceList cameras;
+        appServerConnection->getCameras(cameras, videoServer->getId());
 
         QnRecordingManager::instance()->updateSchedule(scheduleTasks);
         foreach (QnScheduleTask scheduleTask, scheduleTasks)
