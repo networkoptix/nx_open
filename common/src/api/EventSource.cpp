@@ -1,9 +1,10 @@
 #include <QtNetwork>
-
+#include <iostream>
 #include "EventSource.h"
 
 bool QnEvent::parse(const QByteArray& rawData)
-{
+{   
+    std::cerr << "entering parse" << std::endl;
     QJson::Parser parser;
     bool ok;
     QVariant parsed = parser.parse(rawData, &ok);
@@ -78,18 +79,23 @@ void QnEventSource::httpFinished()
 {
     QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
     if (reply->error()) {
+        std::cerr << "error" << std::endl;
         QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
         emit connectionClosed(reply->errorString());
     } else if (!redirectionTarget.isNull()) {
+        std::cerr << "redirecting" << std::endl;
         m_url = m_url.resolved(redirectionTarget.toUrl());
         reply->deleteLater();
         startRequest();
         return;
     } else {
+        std::cerr << "clono" << std::endl;
         // Connection closed normally by the server. Reconnect immediately.
         QTimer::singleShot(0, this, SLOT(startRequest()));
         emit connectionClosed("OK");
     }
+
+    std::cerr << "delela" << std::endl;
 
     reply->deleteLater();
     reply = 0;
