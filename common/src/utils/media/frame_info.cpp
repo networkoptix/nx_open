@@ -23,7 +23,7 @@ extern "C" {
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);
 
-void downscalePlate_factor2_sse_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+void downscalePlate_factor2_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                 const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
 {
     Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/2,16) <= dst_stride);
@@ -76,7 +76,7 @@ void downscalePlate_factor2_sse_intr(unsigned char * dst, const unsigned int dst
     }
 }
 
-void downscalePlate_factor4_sse_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+void downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                      const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
     Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/4,8) <= dst_stride);
@@ -123,7 +123,7 @@ void downscalePlate_factor4_sse_intr(unsigned char * dst, const unsigned int dst
     }
 }
 
-void downscalePlate_factor8_sse_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                      const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
     Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/8,4) <= dst_stride);
@@ -139,7 +139,7 @@ void downscalePlate_factor8_sse_intr(unsigned char * dst, const unsigned int dst
         const __m128i *src2 = (const __m128i*) src_line2;
         quint8* dstCur = dst;
 
-
+        
         for (int x = xSteps/2; x > 0; --x)
         {
             _mm_prefetch((const char*) (src1+2), _MM_HINT_NTA);
@@ -358,7 +358,7 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		volatile int g = 0;
 		for (int i = 0; i < 10000; ++i)
 		{
-            downscalePlate_factor8_sse_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0);
+            downscalePlate_factor8_sse41_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0);
 			//downscalePlate_factor2_sse(dst->data[0], src_width/2,   src->data[0], src_width, src->linesize[0], src_height);
 			//downscalePlate_factor2_sse(dst->data[1], src_width/chroma_h_factor/2, src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
 			//downscalePlate_factor2_sse(dst->data[2], src_width/chroma_h_factor/2, src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
@@ -382,9 +382,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		cl_log.log("-------------------------",  g, cl_logALWAYS);
 		*/
         if (useSSE3()) {
-            downscalePlate_factor2_sse_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);
-		    downscalePlate_factor2_sse_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-		    downscalePlate_factor2_sse_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
+            downscalePlate_factor2_ssse3_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);
+		    downscalePlate_factor2_ssse3_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
+		    downscalePlate_factor2_ssse3_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
         }
         else {
             downscalePlate_factor2(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);
@@ -395,9 +395,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     else if(factor == factor_4)
     {
         if (useSSSE3()) {
-            downscalePlate_factor4_sse_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
-            downscalePlate_factor4_sse_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-            downscalePlate_factor4_sse_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
+            downscalePlate_factor4_ssse3_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
+            downscalePlate_factor4_ssse3_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
+            downscalePlate_factor4_ssse3_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
         }
         else {
             downscalePlate_factor4(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
@@ -407,10 +407,10 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     }
     else if(factor == factor_8)
     {
-        if (useSSSE3()) {
-            downscalePlate_factor8_sse_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
-            downscalePlate_factor8_sse_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-            downscalePlate_factor8_sse_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
+        if (useSSE41()) {
+            downscalePlate_factor8_sse41_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
+            downscalePlate_factor8_sse41_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
+            downscalePlate_factor8_sse41_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
         }
         else {
             downscalePlate_factor8(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
