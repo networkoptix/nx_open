@@ -131,16 +131,20 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
             start = start.left(start.size() - 1);
             end = QChar('-') + end;
         }
-
-        double val = start.toDouble();
-        m_startTime = val < 1000000 ? val * 1000000.0 : val;
+        if (start == "now") {
+            m_startTime= DATETIME_NOW;
+        }
+        else {
+            double val = start.toDouble();
+            m_startTime = val < 1000000 ? val * 1000000.0 : val;
+        }
         if (index > 0) 
         {
             if (end == "now") {
                 m_endTime = DATETIME_NOW;
             }
             else {
-                val = end.toDouble();
+                double val = end.toDouble();
                 m_endTime = val < 1000000 ? val * 1000000.0 : val;
             }
         }

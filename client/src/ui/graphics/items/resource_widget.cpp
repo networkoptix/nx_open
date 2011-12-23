@@ -91,9 +91,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
 
     /* Set up video rendering. */
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
+    m_resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
 
-    m_display = new QnResourceDisplay(resource, this);
+    m_display = new QnResourceDisplay(m_resource, this);
     Q_ASSERT(m_display);
     m_videoLayout = m_display->videoLayout();
     Q_ASSERT(m_videoLayout);
@@ -649,8 +649,10 @@ QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
 void QnResourceWidget::addToMotionSelection(const QRect &gridRect) {
     QRegion prevSelection = m_channelState[0].motionSelection;
     m_channelState[0].motionSelection += gridRect.intersected(QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
-    if(prevSelection != m_channelState[0].motionSelection)
+    if(prevSelection != m_channelState[0].motionSelection) {
         display()->archiveReader()->setMotionRegion(m_channelState[0].motionSelection);
+        emit motionRegionSelected(m_resource, m_channelState[0].motionSelection);
+    }
 }
 
 void QnResourceWidget::clearMotionSelection() {

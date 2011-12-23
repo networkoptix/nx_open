@@ -223,14 +223,6 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnId& resourceTy
     return result;
 }
 
-bool QnPlArecontResourceSearcher::isResourceTypeSupported(const QnId& resourceTypeId) const
-{
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    if (resourceType.isNull())
-        return false;
-
-    return resourceType->getManufacture() == manufacture();
-}
 
 QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
 {

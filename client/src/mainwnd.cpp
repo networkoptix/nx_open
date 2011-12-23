@@ -85,13 +85,13 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_workbench->mapper()->setCellSize(defaultCellSize);
     m_workbench->mapper()->setSpacing(defaultSpacing);
 
-    QnWorkbenchDisplay *display = new QnWorkbenchDisplay(m_workbench, this);
-    display->setScene(scene);
-    display->setView(m_view);
+    m_display = new QnWorkbenchDisplay(m_workbench, this);
+    m_display->setScene(scene);
+    m_display->setView(m_view);
 
-    m_controller = new QnWorkbenchController(display, this);
+    m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(display, this);
+    new QnSyncPlayMixin(m_display, this);
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -171,18 +171,18 @@ MainWnd::~MainWnd()
     s_instance = 0;
 }
 
+Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
+
 void MainWnd::addTab()
 {
     QWidget *widget = new QWidget(m_tabWidget);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    (void)new QVBoxLayout(widget); // ensure widget's layout
 
     widget->setProperty("SceneState", QVariant::fromValue(new QnWorkbenchLayout(widget))); // ###
 
     int index = m_tabWidget->addTab(widget, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
     m_tabWidget->setCurrentIndex(index);
 }
-
-Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
 
 void MainWnd::currentTabChanged(int index)
 {
@@ -200,6 +200,7 @@ void MainWnd::currentTabChanged(int index)
             layout->addWidget(m_view);
 
         m_workbench->setLayout(widget->property("SceneState").value<QnWorkbenchLayout *>()); // ###
+        m_display->fitInView(false);
     }
 }
 
@@ -209,8 +210,15 @@ void MainWnd::closeTab(int index)
         return; // don't close last tab
 
     if (QWidget *widget = m_tabWidget->widget(index)) {
-        if (widget->close())
+        QnWorkbenchLayout *layout = widget->property("SceneState").value<QnWorkbenchLayout *>(); // ###
+        if (widget->close()) {
+            if (m_tabWidget->currentIndex() == index)
+                m_workbench->setLayout(0);
+
+            delete layout;
+
             m_tabWidget->removeTab(index);
+        }
     }
 }
 
@@ -285,7 +293,11 @@ void MainWnd::handleMessage(const QString &message)
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
 #if 0
     addFilesToCurrentOrNewLayout(files);
+#else
+    const QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+    m_controller->drop(files, gridPos);
 #endif
+
     activate();
 }
 

@@ -1,5 +1,5 @@
-#ifndef QN_GRAPHICS_LABEL_H
-#define QN_GRAPHICS_LABEL_H
+#ifndef GRAPHICSLABEL_H
+#define GRAPHICSLABEL_H
 
 #include "graphicsframe.h"
 
@@ -18,11 +18,11 @@ public:
     ~GraphicsLabel();
 
     QString text() const;
-    
+
 public Q_SLOTS:
-    void setText(const QString &);
-    void setNum(int);
-    void setNum(double);
+    void setText(const QString &text);
+    inline void setNum(int num) { setText(QString::number(num)); }
+    inline void setNum(double num) { setText(QString::number(num)); }
     void clear();
 
 protected:
@@ -35,5 +35,4 @@ private:
     Q_DECLARE_PRIVATE(GraphicsLabel)
 };
 
-
-#endif // QN_GRAPHICS_LABEL_H
+#endif // GRAPHICSLABEL_H

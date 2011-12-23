@@ -6,9 +6,13 @@
 
 #include "utils/network/synchttp.h"
 
+QAtomicInt SessionManager::m_handle(1);
+
+
 void detail::SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
 {
-    emit finished(reply->error(), reply->readAll());
+    int handle = reply->property("handle").toInt();
+    emit finished(reply->error(), reply->readAll(), handle);
 
     reply->deleteLater();
     deleteLater();
@@ -76,18 +80,20 @@ int SessionManager::sendGetRequest(const QString &objectName, const QnRequestPar
     return status;
 }
 
-void SessionManager::sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot)
+int SessionManager::sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot)
 {
-    sendAsyncGetRequest(objectName, QnRequestParamList(), target, slot);
+    return sendAsyncGetRequest(objectName, QnRequestParamList(), target, slot);
 }
 
-void SessionManager::sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
+int SessionManager::sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
 {
     /* We set parent to 'this' so that destroying session manager would stop all requests. */
     detail::SessionManagerReplyProcessor *processor = new detail::SessionManagerReplyProcessor();
-    connect(processor, SIGNAL(finished(int, const QByteArray &)), target, slot);
-
-    m_httpClient->asyncGet(createApiUrl(objectName, params), processor, SLOT(at_replyReceived(QNetworkReply *)));
+    connect(processor, SIGNAL(finished(int, const QByteArray &, int)), target, slot);
+    QNetworkReply* reply = m_httpClient->asyncGet(createApiUrl(objectName, params), processor, SLOT(at_replyReceived(QNetworkReply *)));
+    int handle = m_handle.fetchAndAddAcquire(1);
+    reply->setProperty("handle", handle);
+    return handle;
 }
 
 void SessionManager::setAddEndSlash(bool value)

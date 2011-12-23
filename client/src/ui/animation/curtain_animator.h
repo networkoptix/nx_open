@@ -3,23 +3,21 @@
 
 #include <QObject>
 #include <QWeakPointer>
-
-class AnimationTimer;
+#include "animator_group.h"
 
 class QnCurtainItem;
 class QnResourceWidget;
 class QnVariantAnimator;
-class QnAnimatorGroup;
 
-class QnCurtainAnimator: public QObject {
+class QnCurtainAnimator: public QnAnimatorGroup {
     Q_OBJECT;
 
 public:
-    QnCurtainAnimator(int durationMSec, AnimationTimer *timer, QObject *parent = NULL);
+    QnCurtainAnimator(QObject *parent = NULL);
 
-    QnCurtainItem *curtainItem() const {
-        return m_curtain;
-    }
+    virtual ~QnCurtainAnimator();
+
+    QnCurtainItem *curtainItem() const;
 
     void setCurtainItem(QnCurtainItem *curtain);
 
@@ -27,12 +25,13 @@ public:
 
     void uncurtain();
 
+    void setSpeed(qreal speed);
+
 signals:
     void curtained();
     void uncurtained();
 
 private slots:
-    void at_curtain_destroyed();
     void at_animation_finished();
 
 private:
@@ -41,11 +40,9 @@ private:
     void setCurtained(bool curtained);
 
 private:
-    QnCurtainItem *m_curtain;
     QColor m_curtainColor;
     QColor m_frameColor;
     bool m_curtained;
-    QnAnimatorGroup *m_animatorGroup;
     QnVariantAnimator *m_curtainColorAnimator;
     QnVariantAnimator *m_frameColorAnimator;
 };

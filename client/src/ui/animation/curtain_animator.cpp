@@ -5,9 +5,8 @@
 #include <ui/graphics/items/curtain_item.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <utils/common/warnings.h>
-#include <ui/animation/variant_animator.h>
-#include <ui/animation/animator_group.h>
-#include <ui/animation/animation_timer.h>
+#include <utils/common/checked_cast.h>
+#include "variant_animator.h"
 
 namespace {
     QColor translucent(const QColor &color) {
@@ -17,75 +16,69 @@ namespace {
     }
 }
 
-QnCurtainAnimator::QnCurtainAnimator(int durationMSec, AnimationTimer *timer, QObject *parent):
-    QObject(parent),
-    m_curtain(NULL),
+QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
+    QnAnimatorGroup(parent),
     m_curtained(false),
-    m_animatorGroup(NULL),
+    m_curtainColorAnimator(NULL),
     m_frameColorAnimator(NULL)
 {
-    if(durationMSec < 0) {
-        qnWarning("Invalid animation duration '%1'", durationMSec);
-        durationMSec = 1; /* Instant color change. */
-    }
-
-    qreal speed = 1.0 / (durationMSec / 1000.0);
-
     m_curtainColorAnimator = new QnVariantAnimator(this);
     m_curtainColorAnimator->setAccessor(new QnPropertyAccessor("color"));
     m_curtainColorAnimator->setConverter(new QnVectorToColorConverter());
     m_curtainColorAnimator->setTargetObject(NULL);
-    m_curtainColorAnimator->setSpeed(speed);
 
     m_frameColorAnimator = new QnVariantAnimator(this);
     m_frameColorAnimator->setAccessor(new QnPropertyAccessor("frameColor"));
     m_frameColorAnimator->setConverter(new QnVectorToColorConverter());
     m_frameColorAnimator->setTargetObject(NULL);
-    m_frameColorAnimator->setSpeed(speed);
 
-    m_animatorGroup = new QnAnimatorGroup(this);
-    m_animatorGroup->addAnimator(m_curtainColorAnimator);
-    m_animatorGroup->addAnimator(m_frameColorAnimator);
-    timer->addListener(m_animatorGroup);
+    addAnimator(m_curtainColorAnimator);
+    addAnimator(m_frameColorAnimator);
 
-    connect(m_animatorGroup, SIGNAL(finished()), this, SLOT(at_animation_finished()));
+    connect(this, SIGNAL(finished()), this, SLOT(at_animation_finished()));
+}
+
+QnCurtainAnimator::~QnCurtainAnimator() {
+    stop();
 }
 
 void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain) {
-    if(m_curtain != NULL) {
-        m_animatorGroup->stop();
-
-        disconnect(m_curtain, NULL, this, NULL);
+    if(curtainItem() != NULL) {
+        stop();
 
         m_curtainColorAnimator->setTargetObject(NULL);
     }
 
-    m_curtain = curtain;
-
-    if(m_curtain != NULL) {
-        m_curtainColorAnimator->setTargetObject(m_curtain);
-
-        connect(m_curtain, SIGNAL(destroyed()), this, SLOT(at_curtain_destroyed()));
+    if(curtain != NULL) {
+        m_curtainColorAnimator->setTargetObject(curtain);
 
         m_curtainColor = curtain->color();
-        m_curtain->setColor(translucent(m_curtainColor));
-        m_curtain->hide();
+        curtain->setColor(translucent(m_curtainColor));
+        curtain->hide();
     }
 }
 
-void QnCurtainAnimator::at_curtain_destroyed() {
-    setCurtainItem(NULL);
+QnCurtainItem *QnCurtainAnimator::curtainItem() const {
+    return checked_cast<QnCurtainItem *>(m_curtainColorAnimator->targetObject());
+}
+
+void QnCurtainAnimator::setSpeed(qreal speed) {
+    m_curtainColorAnimator->setSpeed(speed);
+    m_frameColorAnimator->setSpeed(speed);
 }
 
 void QnCurtainAnimator::at_animation_finished() {
-    setCurtained(m_curtain != NULL && m_curtain->color().alpha() != 0);
+    QnCurtainItem *curtain = curtainItem();
+
+    setCurtained(curtain != NULL && curtain->color().alpha() != 0);
 }
 
 void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget) {
-    if(m_curtain == NULL)
+    QnCurtainItem *curtain = curtainItem();
+    if(curtain == NULL)
         return; 
 
-    m_animatorGroup->pause();
+    pause();
 
     restoreFrameColor();
     m_frameColor = frontWidget->frameColor();
@@ -93,19 +86,20 @@ void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget) {
     m_frameColorAnimator->setTargetValue(translucent(m_frameColor));
 
     m_curtainColorAnimator->setTargetValue(m_curtainColor);
-    m_curtain->show();
+    curtain->show();
 
-    m_animatorGroup->start();
+    start();
 }
 
 void QnCurtainAnimator::uncurtain() {
-    if(m_curtain == NULL)
+    QnCurtainItem *curtain = curtainItem();
+    if(curtain == NULL)
         return; 
 
-    m_animatorGroup->stop();
+    stop();
     restoreFrameColor();
-    m_curtain->setColor(translucent(m_curtainColor));
-    m_curtain->hide();
+    curtain->setColor(translucent(m_curtainColor));
+    curtain->hide();
     setCurtained(false);
 }
 
@@ -129,3 +123,4 @@ void QnCurtainAnimator::setCurtained(bool curtained) {
         emit this->uncurtained();
     }
 }
+

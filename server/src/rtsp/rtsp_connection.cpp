@@ -194,7 +194,10 @@ int QnRtspConnectionProcessor::composeDescribe()
     if (d->archiveDP) {
         QString range = "npt=";
         d->archiveDP->open();
-        range += QString::number(d->archiveDP->startTime());
+        if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+            range += "now";
+        else
+            range += QString::number(d->archiveDP->startTime());
         range += "-";
         if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
             range += "now";

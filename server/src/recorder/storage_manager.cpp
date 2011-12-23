@@ -140,7 +140,8 @@ void QnStorageManager::clearSpace(QnStoragePtr storage)
 
 
     QString dir = storage->getUrl();
-    while (getDiskFreeSpace(dir) < storage->getSpaceLimit())
+    qint64 freeSpace = getDiskFreeSpace(dir);
+    while (freeSpace != -1 && freeSpace < storage->getSpaceLimit())
     {
         qint64 minTime = 0x7fffffffffffffffll;
         QString mac;
@@ -163,6 +164,7 @@ void QnStorageManager::clearSpace(QnStoragePtr storage)
             catalog->deleteFirstRecord();
         else
             break; // nothing to delete
+        freeSpace = getDiskFreeSpace(dir);
     }
 }
 

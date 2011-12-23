@@ -17,6 +17,7 @@ class BoundingInstrument;
 class TransformListenerInstrument;
 class ActivityListenerInstrument;
 class ForwardingInstrument;
+class AnimationInstrument;
 
 class CLAbstractRenderer;
 
@@ -235,7 +236,7 @@ public:
 
 
 public slots:
-    void fitInView();
+    void fitInView(bool animate = true);
 
 signals:
     void viewportGrabbed();
@@ -277,7 +278,7 @@ protected slots:
 
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
-    
+
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_modeChanged();
     void at_workbench_itemChanged(QnWorkbench::ItemRole role);
@@ -353,6 +354,8 @@ private:
     /** Paint forwarding instrument. */
     ForwardingInstrument *m_paintForwardingInstrument;
 
+    /** Instrument that provides animation timer. */
+    AnimationInstrument *m_animationInstrument;
 
     /* Animation-related stuff. */
 

@@ -349,6 +349,8 @@ qint64 DeviceFileCatalog::firstTime() const
 
 QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
+    qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
+
     QMutexLocker lock(&m_mutex);
     QnTimePeriodList result;
     ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTime);
@@ -370,6 +372,9 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
             result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
         }
     }
+    if (!result.isEmpty())
+        qDebug() << "lastFoundPeriod start " << QDateTime::fromMSecsSinceEpoch(result.last().startTimeMs).toString("hh:mm:ss.zzz") << "dur=" << result.last().durationMs;
+
     return result;
 }
 
@@ -388,45 +393,3 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
     return first.startTimeMs < other.startTimeMs;
 }
 
-bool QnTimePeriod::containTime(qint64 timeMs) const
-{
-    return qnBetween(timeMs, startTimeMs, startTimeMs+durationMs);
-}
-
-
-QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> periods)
-{
-    QnTimePeriodList result;
-    int minIndex = 0;
-    while (minIndex != -1)
-    {
-        qint64 minStartTime = 0x7fffffffffffffffll;
-        minIndex = -1;
-        for (int i = 0; i < periods.size(); ++i) {
-            if (!periods[i].isEmpty() && periods[i][0].startTimeMs < minStartTime) {
-                minIndex = i;
-                minStartTime = periods[i][0].startTimeMs;
-            }
-        }
-
-        if (minIndex >= 0)
-        {
-            // add chunk to merged data
-            if (result.isEmpty()) {
-                result << periods[minIndex][0];
-            }
-            else {
-                QnTimePeriod& last = result.last();
-                if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs > minStartTime)
-                    last.durationMs = qMax(last.durationMs, minStartTime + periods[minIndex][0].durationMs - last.startTimeMs);
-                else {
-                    result << periods[minIndex][0];
-                    if (periods[minIndex][0].durationMs == -1)
-                        break;
-                }
-            } 
-            periods[minIndex].pop_front();
-        }
-    }
-    return result;
-}
