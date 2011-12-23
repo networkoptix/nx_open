@@ -29,8 +29,12 @@ namespace {
         {
             qint64 startTimeMs = 0;
             qint64 durationMs = 0;
-            buffer.read(((char*) &startTimeMs) + 2, 6);
-            buffer.read(((char*) &durationMs) + 2, 6);
+            buffer.read(((char*) &startTimeMs), 6);
+            buffer.read(((char*) &durationMs), 6);
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+            startTimeMs <<= 16;
+            durationMs <<= 16;
+#endif
             result << QnTimePeriod(ntohll(startTimeMs), ntohll(durationMs));
         }
 
