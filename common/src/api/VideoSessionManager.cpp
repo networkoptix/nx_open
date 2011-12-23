@@ -34,6 +34,9 @@ namespace {
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
             startTimeMs <<= 16;
             durationMs <<= 16;
+#else
+            startTimeMs >>= 16;
+            durationMs >>= 16;
 #endif
             result << QnTimePeriod(ntohll(startTimeMs), ntohll(durationMs));
         }
