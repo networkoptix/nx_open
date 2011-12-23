@@ -117,7 +117,7 @@ void QnAbstractAnimator::updateState(State newState) {
         break;
     case PAUSED:
         if(oldState == STOPPED) { /* STOPPED -> PAUSED. */
-            /* Nothing to do here. */            
+            emit started();
         } else { /* RUNNING -> PAUSED. */
             m_currentTime = 0;
             stopListening();
@@ -126,7 +126,6 @@ void QnAbstractAnimator::updateState(State newState) {
     case RUNNING: /* PAUSED -> RUNNING. */
         m_currentTime = 0;
         startListening();
-        emit started();
         if(duration() < minimalDurationMSec)
             tick(duration());
         break;

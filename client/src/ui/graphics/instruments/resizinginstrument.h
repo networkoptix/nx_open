@@ -6,6 +6,7 @@
 
 class ConstrainedResizable;
 class ResizeHoverInstrument;
+class ResizingInstrument;
 
 class ResizingInfo {
 public:

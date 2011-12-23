@@ -2,6 +2,8 @@
 #include <cassert>
 #include <cmath> /* For std::abs & std::sqrt. */
 #include <QPointF>
+#include <QSizeF>
+#include <QRectF>
 #include <QVector2D>
 #include <QVector3D>
 #include <QVector4D>
@@ -40,6 +42,8 @@ namespace {
             add(new StandardMagnitudeCalculator<float>());
             add(new StandardMagnitudeCalculator<double>());
             add(new StandardMagnitudeCalculator<QPointF>());
+            add(new StandardMagnitudeCalculator<QSizeF>());
+            add(new StandardMagnitudeCalculator<QRectF>());
             add(new StandardMagnitudeCalculator<QVector2D>());
             add(new StandardMagnitudeCalculator<QVector3D>());
             add(new StandardMagnitudeCalculator<QVector4D>());
@@ -91,6 +95,10 @@ qreal calculateMagnitude(const QPointF &value) {
     return std::sqrt(value.x() * value.x() + value.y() * value.y());
 }
 
+qreal calculateMagnitude(const QSizeF &value) {
+    return std::sqrt(value.width() * value.width() + value.height() * value.height());
+}
+
 qreal calculateMagnitude(const QVector2D &value) {
     return value.length();
 }
@@ -105,4 +113,8 @@ qreal calculateMagnitude(const QVector4D &value) {
 
 qreal calculateMagnitude(const QColor &value) {
     return calculateMagnitude(QVector4D(value.redF(), value.greenF(), value.blueF(), value.alphaF()));
+}
+
+qreal calculateMagnitude(const QRectF &value) {
+    return calculateMagnitude(QVector4D(value.top(), value.left(), value.width(), value.height()));
 }

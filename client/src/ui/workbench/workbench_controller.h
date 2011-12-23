@@ -11,6 +11,8 @@ class QGraphicsScene;
 class QGraphicsView;
 class QGraphicsItem;
 class QMenu;
+class QLabel;
+class QPropertyAnimation;
 
 class InstrumentManager;
 class HandScrollInstrument;
@@ -33,9 +35,7 @@ class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 
-#ifdef Q_OS_WIN
 class QnScreenRecorder;
-#endif
 
 /**
  * This class implements default scene manipulation logic. 
@@ -151,10 +151,8 @@ private:
 
 
     
-    #ifdef Q_OS_WIN
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;
-    #endif
 
     /** Layout item context menu. */
     QMenu *m_itemContextMenu;
@@ -172,7 +170,7 @@ private:
     bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
-    QLabel* m_recordingLabel;
+    QLabel *m_recordingLabel;
 
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;

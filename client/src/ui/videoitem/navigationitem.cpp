@@ -4,7 +4,6 @@
 
 #include <QtGui/QAction>
 #include <QtGui/QGraphicsLinearLayout>
-#include <QtGui/QGraphicsProxyWidget>
 #include <QtGui/QLabel>
 
 #include <core/resourcemanagment/resource_pool.h>
@@ -21,6 +20,8 @@
 #include "ui/widgets/speedslider.h"
 #include "ui/widgets/volumeslider.h"
 #include "ui/widgets/tooltipitem.h"
+
+#include "ui/widgets2/graphicslabel.h"
 
 #include "timeslider.h"
 
@@ -295,20 +296,20 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
     connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
 
-    m_timeLabel = new QLabelKillsWheelEvent;
+    m_timeLabel = new GraphicsLabel();
     m_timeLabel->setObjectName("TimeLabel");
     m_timeLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    m_timeLabel->setStyleSheet("QLabel { background: transparent; color: rgb(63, 159, 216); }");
-
-    QGraphicsProxyWidget *timeLabelProxyWidget = new QGraphicsProxyWidget(this);
-    timeLabelProxyWidget->setWidget(m_timeLabel);
-
+    
+    QPalette timeLabelPalette = m_timeLabel->palette();
+    timeLabelPalette.setColor(QPalette::WindowText, QColor(63, 159, 216));
+    timeLabelPalette.setColor(QPalette::Window, QColor(0, 0, 0, 0));
+    m_timeLabel->setPalette(timeLabelPalette);
 
     QGraphicsLinearLayout *rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutH->setContentsMargins(0, 0, 0, 0);
     rightLayoutH->setSpacing(3);
-    rightLayoutH->addItem(timeLabelProxyWidget);
-    rightLayoutH->setAlignment(timeLabelProxyWidget, Qt::AlignLeft | Qt::AlignVCenter);
+    rightLayoutH->addItem(m_timeLabel);
+    rightLayoutH->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
     rightLayoutH->addItem(m_liveButton);
     rightLayoutH->setAlignment(m_liveButton, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);

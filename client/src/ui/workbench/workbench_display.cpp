@@ -72,8 +72,8 @@ namespace {
     /** Viewport lower size boundary, in scene coordinates. */
     const QSizeF viewportLowerSizeBound = QSizeF(8.0, 8.0);
 
-    const int widgetAnimationDurationMsec = 250;
-    const int zoomAnimationDurationMsec = 250;
+    const int widgetAnimationDurationMsec = 500;
+    const int zoomAnimationDurationMsec = 500;
 
     /** The amount of z-space that one layer occupies. */
     const qreal layerZSize = 10000000.0;
@@ -107,7 +107,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
 
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
-    AnimationInstrument *animationInstrument = new AnimationInstrument(this);
+    m_animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
@@ -121,7 +121,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_instrumentManager->installInstrument(m_boundingInstrument);
     m_instrumentManager->installInstrument(m_curtainActivityInstrument);
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
-    m_instrumentManager->installInstrument(animationInstrument);
+    m_instrumentManager->installInstrument(m_animationInstrument);
 
     m_curtainActivityInstrument->recursiveDisable();
 
@@ -133,22 +133,25 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_curtainActivityInstrument,   SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
-    (new QAnimationTimer(this))->addListener(this);
+    setTimer(new QAnimationTimer(this));
 
     /* Create curtain animator. */
-    m_curtainAnimator = new QnCurtainAnimator(1000, animationInstrument->animationTimer(), this);
+    m_curtainAnimator = new QnCurtainAnimator(this);
+    m_curtainAnimator->setSpeed(1.0); /* (255, 0, 0) -> (0, 0, 0) in 1 second. */
+    m_curtainAnimator->setTimer(m_animationInstrument->animationTimer());
     connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(at_curtained()));
     connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
 
     /* Create viewport animator. */
     m_viewportAnimator = new QnViewportAnimator(this);
-    m_viewportAnimator->setMovementSpeed(1.0);
-    m_viewportAnimator->setScalingSpeed(16.0);
-    connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 this,                   SIGNAL(viewportGrabbed()));
-    connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 m_boundingInstrument,   SLOT(recursiveDisable()));
-    connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                this,                   SIGNAL(viewportUngrabbed()));
-    connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                m_boundingInstrument,   SLOT(recursiveEnable()));
-    connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                this,                   SLOT(at_viewport_animationFinished()));
+    m_viewportAnimator->setRelativeSpeed(1.5);
+    m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);
+    m_viewportAnimator->setTimer(m_animationInstrument->animationTimer());
+    connect(m_viewportAnimator,             SIGNAL(started()),                                          this,                   SIGNAL(viewportGrabbed()));
+    connect(m_viewportAnimator,             SIGNAL(started()),                                          m_boundingInstrument,   SLOT(recursiveDisable()));
+    connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SIGNAL(viewportUngrabbed()));
+    connect(m_viewportAnimator,             SIGNAL(finished()),                                         m_boundingInstrument,   SLOT(recursiveEnable()));
+    connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SLOT(at_viewport_animationFinished()));
 
     /* Set up defaults. */
     initWorkbench(workbench);
@@ -379,9 +382,10 @@ QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
      *
      * Note that widget is set as animator's parent. */
     animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget);
-    animator->setMovementSpeed(4.0);
-    animator->setScalingSpeed(32.0);
+    animator->setTranslationSpeed(length(workbench()->mapper()->step()));  // TODO
     animator->setRotationSpeed(720.0);
+    animator->setTimer(m_animationInstrument->animationTimer());
+    animator->setTimeLimit(widgetAnimationDurationMsec);
     widget->setData(ITEM_ANIMATOR, QVariant::fromValue<QnWidgetAnimator *>(animator));
     return animator;
 }
@@ -433,17 +437,17 @@ CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
 void QnWorkbenchDisplay::fitInView() {
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
     if(zoomedItem != NULL) {
-        m_viewportAnimator->moveTo(itemGeometry(zoomedItem), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(itemGeometry(zoomedItem));
     } else {
-        m_viewportAnimator->moveTo(fitInViewGeometry(), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(fitInViewGeometry());
     }
 }
 
 void QnWorkbenchDisplay::ensureVisible(QnWorkbenchItem *item) {
-    QRectF targetGeometry = m_viewportAnimator->isAnimating() ? m_viewportAnimator->targetRect() : viewportGeometry();
+    QRectF targetGeometry = m_viewportAnimator->isRunning() ? m_viewportAnimator->targetRect() : viewportGeometry();
     targetGeometry = targetGeometry.united(itemGeometry(item));
 
-    m_viewportAnimator->moveTo(targetGeometry, zoomAnimationDurationMsec);
+    m_viewportAnimator->moveTo(targetGeometry);
 }
 
 void QnWorkbenchDisplay::bringToFront(const QList<QGraphicsItem *> &items) {
@@ -723,9 +727,9 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Move! */
     QnWidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        animator->moveTo(enclosingGeometry, item->rotation(), widgetAnimationDurationMsec);
+        animator->moveTo(enclosingGeometry, item->rotation());
     } else {
-        animator->stopAnimation();
+        animator->stop();
         widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
@@ -777,7 +781,7 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
         return;
 
     QnResourceWidget *widget = this->widget(raisedItem);
-    synchronizeGeometry(widget, animator(widget)->isAnimating());
+    synchronizeGeometry(widget, animator(widget)->isRunning());
 }
 
 
@@ -856,9 +860,9 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
 
             m_curtainActivityInstrument->recursiveEnable();
 
-            m_viewportAnimator->moveTo(itemGeometry(item), zoomAnimationDurationMsec);
+            m_viewportAnimator->moveTo(itemGeometry(item));
         } else {
-            m_viewportAnimator->moveTo(fitInViewGeometry(), zoomAnimationDurationMsec);
+            m_viewportAnimator->moveTo(fitInViewGeometry());
         }
 
         synchronizeSceneBounds();

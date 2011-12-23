@@ -1,6 +1,8 @@
 #include "linear_combination.h"
 #include <cassert>
 #include <QPointF>
+#include <QSizeF>
+#include <QRectF>
 #include <QVector2D>
 #include <QVector3D>
 #include <QVector4D>
@@ -42,6 +44,8 @@ namespace {
             add(new StandardLinearCombinator<float>());
             add(new StandardLinearCombinator<double>());
             add(new StandardLinearCombinator<QPointF>());
+            add(new StandardLinearCombinator<QSizeF>());
+            add(new StandardLinearCombinator<QRectF>());
             add(new StandardLinearCombinator<QVector2D>());
             add(new StandardLinearCombinator<QVector3D>());
             add(new StandardLinearCombinator<QVector4D>());
@@ -114,6 +118,10 @@ QPointF linearCombine(qreal a, const QPointF &x, qreal b, const QPointF &y) {
     return linearCombineInternal(a, x, b, y);
 }
 
+QSizeF linearCombine(qreal a, const QSizeF &x, qreal b, const QSizeF &y) {
+    return linearCombineInternal(a, x, b, y);
+}
+
 QVector2D linearCombine(qreal a, const QVector2D &x, qreal b, const QVector2D &y) {
     return linearCombineInternal(a, x, b, y);
 }
@@ -134,3 +142,11 @@ QColor linearCombine(qreal a, const QColor &x, qreal b, const QColor &y) {
         qBound(0, linearCombine(a, x.alpha(), b, y.alpha()), 255)
     );
 }
+
+QRectF linearCombine(qreal a, const QRectF &x, qreal b, const QRectF &y) {
+    return QRectF(
+        linearCombine(a, x.topLeft(),   b, y.topLeft()),
+        linearCombine(a, x.size(),      b, y.size())
+    );
+}
+

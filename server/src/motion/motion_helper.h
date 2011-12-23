@@ -28,8 +28,11 @@ public:
     QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res);
 
+    QnMotionArchive* getArchive(QnResourcePtr res);
+
     static QString getMotionDir(const QDate& date, const QString& macAddress);
     static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& macAddress);
+    static QList<QDate> recordedMonth(const QString& macAddress);
 
     QnMotionHelper();
 private:
@@ -41,7 +44,6 @@ private:
     // mach one motion image by mask
     bool mathImage(const __m128i* data);
 
-    QnMotionArchive* getArchive(QnResourcePtr res);
 private:
     typedef QMap<QnNetworkResourcePtr, QnMotionArchive*> MotionWriters;
     MotionWriters m_writers;

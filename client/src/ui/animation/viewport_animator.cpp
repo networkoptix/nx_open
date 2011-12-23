@@ -1,191 +1,115 @@
 #include "viewport_animator.h"
 #include <cmath> /* For std::log, std::exp. */
 #include <limits>
-#include <QParallelAnimationGroup>
+#include <QGraphicsView>
+#include <QMargins>
 #include <ui/common/scene_utility.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <ui/common/linear_combination.h>
+#include <ui/common/magnitude.h>
 #include "setter_animation.h"
+#include "accessor.h"
 
-namespace {
-    class ViewportPositionSetter {
-    public:
-        void operator()(QObject *view, const QVariant &value) const {
-            SceneUtility::moveViewportSceneTo(checked_cast<QGraphicsView *>(view), value.toPointF());
-        }
-    };
+class QnViewportRectAccessor: public QnAbstractAccessor {
+public:
+    virtual QVariant get(const QObject *object) const override {
+        const QGraphicsView *view = checked_cast<const QGraphicsView *>(object);
 
-    class ViewportScaleSetter {
-    public:
-        ViewportScaleSetter(Qt::AspectRatioMode mode): m_mode(mode) {}
+        return SceneUtility::mapRectToScene(view, SceneUtility::eroded(view->viewport()->rect(), m_margins));
+    }
 
-        void operator()(QObject *view, const QVariant &value) const {
-            SceneUtility::scaleViewportTo(checked_cast<QGraphicsView *>(view), value.toSizeF(), m_mode);
-        }
+    virtual void set(QObject *object, const QVariant &value) const override {
+        QGraphicsView *view = checked_cast<QGraphicsView *>(object);
+        QRectF sceneRect = value.toRectF();
 
-    private:
-        Qt::AspectRatioMode m_mode;
-    };
+        /* Extend to match aspect ratio. */
+        sceneRect = aspectRatioAdjusted(view, sceneRect);
 
-    class EmptyGetter {
-    public:
-        QVariant operator()(const QObject *) const {
-            return QVariant();
-        }
-    };
+        /* Adjust for margins. */
+        MarginsF extension = SceneUtility::cwiseDiv(m_margins, QSizeF(view->viewport()->size()));
+        extension = SceneUtility::cwiseMul(SceneUtility::cwiseDiv(extension, MarginsF(1.0, 1.0, 1.0, 1.0) - extension), sceneRect.size());
+        sceneRect = SceneUtility::dilated(sceneRect, extension);
 
-} // anonymous namespace
+        /* Set! */
+        SceneUtility::moveViewportSceneTo(view, sceneRect.center());
+        SceneUtility::scaleViewportTo(view, sceneRect.size(), Qt::KeepAspectRatioByExpanding);
+    }
 
+    const QMargins &margins() const {
+        return m_margins;
+    }
 
-//void ViewportRectAccessor: public  {
+    void setMargins(const QMargins &margins) {
+        m_margins = margins;
+    }
 
-//};
+    QRectF aspectRatioAdjusted(QGraphicsView *view, const QRectF &sceneRect) const {
+        return SceneUtility::expanded(
+            SceneUtility::aspectRatio(SceneUtility::eroded(view->viewport()->size(), m_margins)), 
+            sceneRect, 
+            Qt::KeepAspectRatioByExpanding, 
+            Qt::AlignCenter
+        );
+    }
 
+private:
+    QMargins m_margins;
+};
 
 QnViewportAnimator::QnViewportAnimator(QObject *parent):
-    QObject(parent),
-    m_view(NULL),
-    m_movementSpeed(1.0),
-    m_logScalingSpeed(std::log(2.0)),
-    m_animationGroup(NULL),
-    m_scaleAnimation(NULL),
-    m_positionAnimation(NULL)
+    QnVariantAnimator(parent),
+    m_accessor(new QnViewportRectAccessor()),
+    m_relativeSpeed(0.0)
 {
-    m_animationGroup = new QParallelAnimationGroup(this);
-    connect(m_animationGroup, SIGNAL(stateChanged(QAbstractAnimation::State, QAbstractAnimation::State)), this, SLOT(at_animationGroup_stateChanged(QAbstractAnimation::State, QAbstractAnimation::State)));
+    setAccessor(m_accessor);
 }
 
 void QnViewportAnimator::setView(QGraphicsView *view) {
-    if(m_view != NULL) {
-        m_animationGroup->stop();
+    stop();
 
-        delete m_scaleAnimation;
-        m_scaleAnimation = NULL;
+    setTargetObject(view);
+}
 
-        delete m_positionAnimation;
-        m_positionAnimation = NULL;
+QGraphicsView *QnViewportAnimator::view() const {
+    return checked_cast<QGraphicsView *>(targetObject());
+}
+
+void QnViewportAnimator::moveTo(const QRectF &rect) {
+    pause();
+    
+    setTargetValue(rect);
+
+    start();
+}
+
+const QMargins &QnViewportAnimator::viewportMargins() const {
+    return m_accessor->margins();
+}
+
+void QnViewportAnimator::setViewportMargins(const QMargins &margins) {
+    m_accessor->setMargins(margins);
+}
+
+void QnViewportAnimator::setRelativeSpeed(qreal relativeSpeed) {
+    m_relativeSpeed = relativeSpeed;
+}
+
+int QnViewportAnimator::estimatedDuration() const {
+    QGraphicsView *view = this->view();
+    QRectF startRect = m_accessor->aspectRatioAdjusted(view, startValue().toRectF());
+    QRectF targetRect = m_accessor->aspectRatioAdjusted(view, targetValue().toRectF());
+
+    qreal speed;
+    if(qFuzzyIsNull(m_relativeSpeed)) {
+        speed = this->speed(); 
+    } else {
+        speed = m_relativeSpeed * (SceneUtility::length(startRect.size()) + SceneUtility::length(targetRect.size())) / 2;
     }
 
-    m_view = view;
-
-    if(m_view != NULL) {
-        if(m_view->thread() != thread()) {
-            qnWarning("Cannot create an animator for a graphics view in another thread.");
-            return;
-        }
-
-        connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
-
-        m_scaleAnimation = new QnAccessorAnimation(this);
-        m_scaleAnimation->setAccessor(newAccessor(EmptyGetter(), ViewportScaleSetter(Qt::KeepAspectRatioByExpanding)));
-        m_scaleAnimation->setTargetObject(view);
-
-        m_positionAnimation = new QnAccessorAnimation(this);
-        m_positionAnimation->setAccessor(newAccessor(EmptyGetter(), ViewportPositionSetter()));
-        m_positionAnimation->setTargetObject(view);
-
-        m_animationGroup->addAnimation(m_scaleAnimation);
-        m_animationGroup->addAnimation(m_positionAnimation);
-    }
+    return magnitudeCalculator()->calculate(linearCombinator()->combine(1.0, startRect, -1.0, targetRect)) / speed * 1000;
 }
 
-void QnViewportAnimator::at_view_destroyed() {
-    setView(NULL);
-}
-
-void QnViewportAnimator::at_animationGroup_stateChanged(QAbstractAnimation::State newState, QAbstractAnimation::State oldState) {
-    if(newState == QAbstractAnimation::Stopped) {
-        emit animationFinished();
-    } else if(oldState == QAbstractAnimation::Stopped) {
-        emit animationStarted();
-    }
-}
-
-void QnViewportAnimator::moveTo(const QRectF &rect, int timeLimitMsecs) {
-    if(m_view == NULL)
-        return;
-
-    if(timeLimitMsecs == -1)
-        timeLimitMsecs = std::numeric_limits<int>::max();
-
-    QSizeF viewportSize = m_view->viewport()->size();
-    QRectF actualRect = rect;
-
-    /* Extend to match aspect ratio. */
-    actualRect = expanded(aspectRatio(eroded(viewportSize, m_viewportMargins)), rect, Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
-
-    /* Adjust for margins. */
-    MarginsF extension = cwiseDiv(m_viewportMargins, viewportSize);
-    extension = cwiseMul(cwiseDiv(extension, MarginsF(1.0, 1.0, 1.0, 1.0) - extension), actualRect.size());
-    actualRect = dilated(actualRect, extension);
-
-    QRectF viewportRect = mapRectToScene(m_view, m_view->viewport()->rect());
-    if(qFuzzyCompare(viewportRect, actualRect)) {
-        m_animationGroup->stop();
-        return;
-    }
-
-    qreal timeLimit = timeLimitMsecs / 1000.0;
-    qreal movementTime = length(actualRect.center() - viewportRect.center()) / (m_movementSpeed * length(viewportRect.size() + actualRect.size()) / 2);
-    qreal scalingTime = std::abs(std::log(scaleFactor(viewportRect.size(), actualRect.size(), Qt::KeepAspectRatioByExpanding)) / m_logScalingSpeed);
-
-    int durationMsecs = 1000 * qMin(timeLimit, qMax(movementTime, scalingTime));
-    if(durationMsecs == 0) {
-        m_animationGroup->stop();
-        return;
-    }
-
-    m_targetRect = actualRect;
-
-    bool alreadyAnimating = isAnimating();
-    bool signalsBlocked = blockSignals(true); /* Don't emit animationFinished() now. */
-
-    m_scaleAnimation->setStartValue(viewportRect.size());
-    m_scaleAnimation->setEndValue(actualRect.size());
-    m_scaleAnimation->setDuration(durationMsecs);
-
-    m_positionAnimation->setStartValue(viewportRect.center());
-    m_positionAnimation->setEndValue(actualRect.center());
-    m_positionAnimation->setDuration(durationMsecs);
-
-    m_animationGroup->setCurrentTime(0);
-    m_animationGroup->setDirection(QAbstractAnimation::Forward);
-
-    m_animationGroup->start();
-    blockSignals(signalsBlocked);
-    if(!alreadyAnimating)
-        emit animationStarted();
-}
-
-bool QnViewportAnimator::isAnimating() const {
-    return m_animationGroup->state() == QAbstractAnimation::Running;
-}
-
-#if 0
-void QnViewportAnimator::reverse() {
-    if(!isAnimating())
-        return;
-
-    m_animationGroup->setDirection(m_animationGroup->direction() == QAbstractAnimation::Forward ? QAbstractAnimation::Backward : QAbstractAnimation::Forward);
-}
-#endif
-
-qreal QnViewportAnimator::movementSpeed() const {
-    return m_movementSpeed;
-}
-
-qreal QnViewportAnimator::scalingSpeed() const {
-    return std::exp(m_logScalingSpeed);
-}
-
-void QnViewportAnimator::setMovementSpeed(qreal multiplier) {
-    m_movementSpeed = multiplier;
-}
-
-void QnViewportAnimator::setScalingSpeed(qreal multiplier) {
-    m_logScalingSpeed = std::log(multiplier);
-}
-
-const QRectF &QnViewportAnimator::targetRect() const {
-    return m_targetRect;
+QRectF QnViewportAnimator::targetRect() const {
+    return targetValue().toRectF();
 }
