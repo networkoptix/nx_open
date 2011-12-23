@@ -92,15 +92,21 @@ void QnAbstractAnimator::setState(State newState) {
 }
 
 void QnAbstractAnimator::tick(int deltaTime) {
+    setCurrentTime(m_currentTime + deltaTime);
+}
+
+void QnAbstractAnimator::setCurrentTime(int currentTime) {
+    if(m_currentTime == currentTime)
+        return;
+
     ensureDuration();
+    if(currentTime > m_duration)
+        currentTime = m_duration;
 
-    m_currentTime += deltaTime;
-    if(m_currentTime > m_duration)
-        m_currentTime = m_duration;
-
+    m_currentTime = currentTime;
     updateCurrentTime(m_currentTime);
 
-    if(m_currentTime == m_duration)
+    if(m_currentTime >= m_duration)
         stop();
 }
 

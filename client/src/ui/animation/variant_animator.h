@@ -144,13 +144,9 @@ protected:
 
     QVariant toExternal(const QVariant &internal) const;
 
-    const QVariant &internalTargetValue() const {
-        return m_internalTargetValue;
-    }
+    QVariant internalTargetValue() const;
 
-    const QVariant &internalStartValue() const {
-        return m_internalStartValue;
-    }
+    QVariant internalStartValue() const;
 
     virtual int estimatedDuration() const override;
 
@@ -176,10 +172,15 @@ private:
 
     void setInternalTypeInternal(int newInternalType);
 
+    qreal easingCurveProgress(int currentTime) const;
+
+    qreal easingCurveValue(qreal progress) const;
+
 private:
     QScopedPointer<QnAbstractAccessor> m_accessor;
     QScopedPointer<QnAbstractConverter> m_converter;
     QEasingCurve m_easingCurve;
+    qreal m_easingCurveCorrection;
     int m_internalType;
     QVariant m_internalStartValue;
     QVariant m_internalTargetValue;

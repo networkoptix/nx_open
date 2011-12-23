@@ -34,7 +34,7 @@ protected:
 
     virtual void updateState(State newState) override;
 
-    virtual void updateCurrentTime(int deltaTime) override;
+    virtual void updateCurrentTime(int currentTime) override;
 
     virtual int estimatedDuration() const override;
 

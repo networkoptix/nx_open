@@ -36,7 +36,7 @@ QnWidgetAnimator::~QnWidgetAnimator() {
     stop();
 }
 
-void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
+void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasingCurve &curve) {
     if(widget() == NULL) {
         qnWarning("Cannot move a NULL widget.");
         return;
@@ -47,9 +47,16 @@ void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
     pause();
 
     m_geometryAnimator->setTargetValue(geometry);
+    m_geometryAnimator->setEasingCurve(curve);
+
     m_rotationAnimator->setTargetValue(rotation);
+    m_rotationAnimator->setEasingCurve(curve);
 
     start();
+}
+
+void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
+    moveTo(geometry, rotation, QEasingCurve::InOutBack);
 }
 
 QGraphicsWidget *QnWidgetAnimator::widget() const {

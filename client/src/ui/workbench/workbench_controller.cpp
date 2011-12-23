@@ -434,6 +434,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 
     /* Calculate new grid rect based on the dragged frame section. */
     QRect newRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
+    if(widget->item()->geometry() == newRect)
+        return;
+
     QSet<QnWorkbenchItem *> entities = layout()->items(newRect);
     entities.remove(widget->item());
     if (entities.empty()) {

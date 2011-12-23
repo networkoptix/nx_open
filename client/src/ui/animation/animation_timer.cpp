@@ -84,18 +84,32 @@ void AnimationTimer::updateCurrentTime(qint64 time) {
 
     if(isActive()) {
         int deltaTime = static_cast<int>(time - m_lastTickTime);
-        if(deltaTime > 0)
-            foreach(AnimationTimerListener *listener, m_listeners)
-                if(listener->isListening())
-                    listener->tick(deltaTime);
+        if(deltaTime > 0) {
+            bool hasNullListeners = false;
+
+            /* Listeners may be added/removed in the process, 
+             * this is why we have to iterate by index. */
+            for(int i = 0; i < m_listeners.size(); i++) {
+                AnimationTimerListener *listener = m_listeners[i];
+                if(listener == NULL) {
+                    hasNullListeners = true;
+                } else if(m_listeners[i]->isListening()) {
+                    m_listeners[i]->tick(deltaTime);
+                }
+            }
+
+            if(hasNullListeners)
+                m_listeners.removeAll(NULL);
+        }
     }
 
     m_lastTickTime = time;
 }
 
 void AnimationTimer::clearListeners() {
-    while(!m_listeners.empty())
-        removeListener(m_listeners[0]);
+    for(int i = 0; i < m_listeners.size(); i++)
+        if(m_listeners[i] != NULL)
+            removeListener(m_listeners[i]);
 }
 
 void AnimationTimer::addListener(AnimationTimerListener *listener) {
@@ -124,7 +138,7 @@ void AnimationTimer::removeListener(AnimationTimerListener *listener) {
 
     if(listener->isListening())
         listenerStoppedListening(listener);
-    m_listeners.removeOne(listener);
+    m_listeners[m_listeners.indexOf(listener)] = NULL;
     listener->m_timer = NULL;
 }
 

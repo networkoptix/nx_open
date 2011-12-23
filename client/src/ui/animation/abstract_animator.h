@@ -167,6 +167,8 @@ protected:
      */
     void setDurationOverride(int durationOverride);
 
+    void setCurrentTime(int currentTime);
+
     /**
      * Marks stored duration as invalid. It will be recalculated on request.
      */

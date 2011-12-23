@@ -7,6 +7,8 @@
 #include "animator_group.h"
 
 class QGraphicsWidget;
+class QEasingCurve;
+
 class QnVariantAnimator;
 
 class QnWidgetAnimator: public QnAnimatorGroup {
@@ -32,7 +34,10 @@ public:
      * 
      * \param geometry                  Rectangle to move widget to, in scene coordinates.
      * \param rotation                  Rotation value for the widget.
+     * \param curve                     Easing curve to use.
      */
+    void moveTo(const QRectF &geometry, qreal rotation, const QEasingCurve &curve);
+
     void moveTo(const QRectF &geometry, qreal rotation);
 
     /**

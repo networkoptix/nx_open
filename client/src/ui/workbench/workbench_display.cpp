@@ -726,6 +726,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         calculateExpansionValues(enclosingGeometry.top(),  enclosingGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
 
         enclosingGeometry = enclosingGeometry.adjusted(xp1, yp1, xp2, yp2);
+
     }
 
     /* Update Z value. */
@@ -738,7 +739,19 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Move! */
     QnWidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        animator->moveTo(enclosingGeometry, item->rotation());
+        QEasingCurve easingCurve;
+
+        QSizeF currentSize = widget->enclosingGeometry().size();
+        QSizeF targetSize = enclosingGeometry.size();
+        if(qFuzzyCompare(currentSize, targetSize)) {
+            easingCurve = QEasingCurve::InOutBack;
+        } else if(contains(targetSize, currentSize)) {
+            easingCurve = QEasingCurve::InBack;
+        } else {
+            easingCurve = QEasingCurve::OutBack;
+        }
+
+        animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
     } else {
         animator->stop();
         widget->setEnclosingGeometry(enclosingGeometry);

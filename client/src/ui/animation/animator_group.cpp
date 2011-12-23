@@ -43,6 +43,8 @@ void QnAnimatorGroup::insertAnimator(int index, QnAbstractAnimator *animator) {
     m_animators.insert(index, animator);
     animator->m_group = this;
     animator->setParent(this); /* This will make sure that ChildAdded event is sent to 'this'. */
+
+    invalidateDuration();
 }
 
 void QnAnimatorGroup::removeAnimator(QnAbstractAnimator *animator) {
@@ -76,6 +78,8 @@ QnAbstractAnimator *QnAnimatorGroup::takeAnimator(int index) {
     if (m_animators.isEmpty())
         stop();
 
+    invalidateDuration();
+
     return animator;
 }
 
@@ -87,7 +91,7 @@ bool QnAnimatorGroup::event(QEvent *event) {
     if (event->type() == QEvent::ChildAdded) {
         QnAbstractAnimator *animator = qobject_cast<QnAbstractAnimator *>(static_cast<QChildEvent *>(event)->child());
         if (animator != NULL && animator->group() != this)
-                addAnimator(animator);
+            addAnimator(animator);
     } else if (event->type() == QEvent::ChildRemoved) {
         /* We can only rely on the child being a QObject because in the QEvent::ChildRemoved case it might be called from the destructor. */
         QnAbstractAnimator *animator = static_cast<QnAbstractAnimator *>(static_cast<QChildEvent *>(event)->child());
@@ -100,9 +104,12 @@ bool QnAnimatorGroup::event(QEvent *event) {
 }
 
 void QnAnimatorGroup::updateState(State newState) {
-    if(newState == RUNNING)
+    if(newState == RUNNING) {
+        invalidateDuration();
+
         foreach(QnAbstractAnimator *animator, m_animators)
             animator->setDurationOverride(duration());
+    }
 
     foreach(QnAbstractAnimator *animator, m_animators)
         animator->setState(newState);
@@ -110,9 +117,9 @@ void QnAnimatorGroup::updateState(State newState) {
     base_type::updateState(newState);
 }
 
-void QnAnimatorGroup::updateCurrentTime(int deltaTime) {
+void QnAnimatorGroup::updateCurrentTime(int currentTime) {
     foreach(QnAbstractAnimator *animator, m_animators)
-        animator->updateCurrentTime(deltaTime);
+        animator->setCurrentTime(currentTime);
 }
 
 int QnAnimatorGroup::estimatedDuration() const {

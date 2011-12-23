@@ -7,6 +7,7 @@
 
 QnVariantAnimator::QnVariantAnimator(QObject *parent):
     QnAbstractAnimator(parent),
+    m_easingCurveCorrection(0.0),
     m_internalType(QMetaType::Void),
     m_target(NULL),
     m_speed(1.0),
@@ -144,14 +145,28 @@ void QnVariantAnimator::setInternalTypeInternal(int newInternalType) {
 }
 
 int QnVariantAnimator::estimatedDuration() const {
-    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, m_internalStartValue, -1.0, m_internalTargetValue)) / m_speed * 1000;
+    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, internalStartValue(), -1.0, internalTargetValue())) / m_speed * 1000;
+}
+
+qreal QnVariantAnimator::easingCurveProgress(int currentTime) const {
+    return m_easingCurveCorrection + (1.0 - m_easingCurveCorrection) * static_cast<qreal>(currentTime) / duration();
+}
+
+qreal QnVariantAnimator::easingCurveValue(qreal progress) const {
+    //if()
+    qreal correctionValue = m_easingCurve.valueForProgress(m_easingCurveCorrection);
+
+    return (m_easingCurve.valueForProgress(progress) - correctionValue) / (1.0 - correctionValue);
 }
 
 void QnVariantAnimator::updateCurrentTime(int currentTime) {
+
+    qDebug() << "updateCurrentTime" << currentTime;
+
     updateCurrentValue(interpolated(
-        m_internalStartValue, 
-        m_internalTargetValue, 
-        m_easingCurve.valueForProgress(static_cast<qreal>(currentTime) / duration())
+        internalStartValue(), 
+        internalTargetValue(), 
+        easingCurveValue(easingCurveProgress(currentTime))
     ));
 }
 
@@ -170,6 +185,8 @@ void QnVariantAnimator::updateCurrentValue(const QVariant &value) const {
     if(accessor() == NULL || targetObject() == NULL)
         return;
 
+    qDebug() << "updateCurrentValue" << value;
+
     accessor()->set(m_target, toExternal(value));
 }
 
@@ -184,11 +201,15 @@ void QnVariantAnimator::updateState(State newState) {
 
         if(targetObject() == NULL)
             return; /* This is a normal use case, don't emit warnings. */
+    } if(oldState == RUNNING) {
+        m_easingCurveCorrection = this->easingCurveProgress(currentTime());
     }
 
     if(newState == RUNNING) {
         m_internalStartValue = currentValue();
         invalidateDuration();
+    } else if(newState == STOPPED) {
+        m_easingCurveCorrection = 0.0;
     }
 
     base_type::updateState(newState);
@@ -230,12 +251,23 @@ void QnVariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
 }
 
 QVariant QnVariantAnimator::targetValue() const {
-    return toExternal(m_internalTargetValue);
+    return toExternal(internalTargetValue());
 }
 
 QVariant QnVariantAnimator::startValue() const {
-    return toExternal(m_internalStartValue);
+    return toExternal(internalStartValue());
 }
 
+QVariant QnVariantAnimator::internalTargetValue() const {
+    return m_internalTargetValue;
+}
+
+QVariant QnVariantAnimator::internalStartValue() const {
+    if(state() == RUNNING) {
+        return m_internalStartValue;
+    } else {
+        return currentValue();
+    }
+}
 
 
