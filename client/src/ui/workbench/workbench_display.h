@@ -236,7 +236,7 @@ public:
 
 
 public slots:
-    void fitInView();
+    void fitInView(bool animate = true);
 
 signals:
     void viewportGrabbed();
@@ -278,7 +278,7 @@ protected slots:
 
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
-    
+
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_modeChanged();
     void at_workbench_itemChanged(QnWorkbench::ItemRole role);

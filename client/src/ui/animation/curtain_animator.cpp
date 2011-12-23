@@ -38,6 +38,10 @@ QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
     connect(this, SIGNAL(finished()), this, SLOT(at_animation_finished()));
 }
 
+QnCurtainAnimator::~QnCurtainAnimator() {
+    stop();
+}
+
 void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain) {
     if(curtainItem() != NULL) {
         stop();

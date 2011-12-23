@@ -32,6 +32,10 @@ QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &ge
     addAnimator(m_rotationAnimator);
 }
 
+QnWidgetAnimator::~QnWidgetAnimator() {
+    stop();
+}
+
 void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
     if(widget() == NULL) {
         qnWarning("Cannot move a NULL widget.");

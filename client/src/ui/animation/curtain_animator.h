@@ -15,6 +15,8 @@ class QnCurtainAnimator: public QnAnimatorGroup {
 public:
     QnCurtainAnimator(QObject *parent = NULL);
 
+    virtual ~QnCurtainAnimator();
+
     QnCurtainItem *curtainItem() const;
 
     void setCurtainItem(QnCurtainItem *curtain);

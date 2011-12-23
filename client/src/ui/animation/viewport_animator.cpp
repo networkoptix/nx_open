@@ -65,6 +65,10 @@ QnViewportAnimator::QnViewportAnimator(QObject *parent):
     setAccessor(m_accessor);
 }
 
+QnViewportAnimator::~QnViewportAnimator() {
+    stop();
+}
+
 void QnViewportAnimator::setView(QGraphicsView *view) {
     stop();
 

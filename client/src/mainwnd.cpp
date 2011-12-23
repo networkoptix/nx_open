@@ -85,13 +85,13 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_workbench->mapper()->setCellSize(defaultCellSize);
     m_workbench->mapper()->setSpacing(defaultSpacing);
 
-    QnWorkbenchDisplay *display = new QnWorkbenchDisplay(m_workbench, this);
-    display->setScene(scene);
-    display->setView(m_view);
+    m_display = new QnWorkbenchDisplay(m_workbench, this);
+    m_display->setScene(scene);
+    m_display->setView(m_view);
 
-    m_controller = new QnWorkbenchController(display, this);
+    m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(display, this);
+    new QnSyncPlayMixin(m_display, this);
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -200,6 +200,7 @@ void MainWnd::currentTabChanged(int index)
             layout->addWidget(m_view);
 
         m_workbench->setLayout(widget->property("SceneState").value<QnWorkbenchLayout *>()); // ###
+        m_display->fitInView(false);
     }
 }
 
