@@ -11,7 +11,6 @@ public:
     virtual ~QnResourceDirectoryBrowser();
 
     QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
-    bool isResourceTypeSupported(const QnId& resourceTypeId) const;
 
     static QnResourceDirectoryBrowser &instance();
 

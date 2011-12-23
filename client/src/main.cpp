@@ -34,6 +34,7 @@
 #include "core/resource/qnstorage.h"
 
 #include <xercesc/util/PlatformUtils.hpp>
+#include "plugins/resources/axis/axis_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -247,6 +248,9 @@ int main(int argc, char *argv[])
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+
+    QnPlAxisResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
 #endif
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
