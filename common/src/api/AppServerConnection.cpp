@@ -114,10 +114,18 @@ int QnAppServerConnection::addStorage(const QnStorage& storageIn)
     return m_sessionManager->addStorage(storage);
 }
 
-int QnAppServerConnection::getServers(QnResourceList& /*servers*/)
+int QnAppServerConnection::getCameras(QnSequrityCamResourceList& cameras, const QnId& mediaServerId)
 {
-    // todo: implement me
-    return 0;
+    QnApiCameraResponsePtr xsdCameras;
+
+    int status = m_sessionManager->getCameras(xsdCameras, mediaServerId);
+
+    if (!xsdCameras.isNull())
+    {
+        parseCameras(cameras, xsdCameras->camera(), m_resourceFactory);
+    }
+
+    return status;
 }
 
 int QnAppServerConnection::getStorages(QnResourceList& storages)

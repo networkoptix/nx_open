@@ -1,5 +1,5 @@
-#ifndef QN_GRAPHICS_LABEL_P_H
-#define QN_GRAPHICS_LABEL_P_H
+#ifndef GRAPHICSLABEL_P_H
+#define GRAPHICSLABEL_P_H
 
 #include "graphicsframe_p.h"
 
@@ -8,9 +8,8 @@ class QGraphicsSimpleTextItem;
 class GraphicsLabelPrivate : public GraphicsFramePrivate
 {
     Q_DECLARE_PUBLIC(GraphicsLabel)
-public:
-    GraphicsLabelPrivate() {}
 
+public:
     void init();
 
     void updateTextBrush();
@@ -19,4 +18,4 @@ public:
     QGraphicsSimpleTextItem *textItem;
 };
 
-#endif // QN_GRAPHICS_LABEL_P_H
+#endif // GRAPHICSLABEL_P_H

@@ -29,6 +29,7 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #include "core/misc/scheduleTask.h"
 #include "qtservice.h"
+#include "eventmanager.h"
 
 #include <fstream>
 
@@ -275,6 +276,24 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
 }
 
+void initAppServerEventConnection(const QSettings &settings)
+{
+    QUrl appServerEventsUrl;
+
+    // ### remove
+    appServerEventsUrl.setScheme(QLatin1String("http"));
+    appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+    appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
+    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+    appServerEventsUrl.setPath("/events");
+
+    static const int EVENT_RECONNECT_TIMEOUT = 3000;
+
+    QnEventManager* eventManager = QnEventManager::instance();
+    eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+}
+
 class QnMain : public QThread
 {
 public:
@@ -305,6 +324,8 @@ public:
         QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
         initAppServerConnection(settings);
+        initAppServerEventConnection(settings);
+        QnEventManager* eventManager = QnEventManager::instance();
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnResourceDiscoveryManager::instance());
 
@@ -333,10 +354,19 @@ public:
         QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverHost));
         if (videoServer.isNull())
             return;
-        QnScheduleTaskList scheduleTasks;
-        appServerConnection->getScheduleTasks(scheduleTasks, videoServer->getId());
 
-        QnRecordingManager::instance()->updateSchedule(scheduleTasks);
+        eventManager->run();
+
+        QnScheduleTaskList scheduleTasks;
+
+        QnSequrityCamResourceList cameras;
+        appServerConnection->getCameras(cameras, videoServer->getId());
+
+        foreach(QnSequrityCamResourcePtr camera, cameras)
+        {
+            QnRecordingManager::instance()->updateSchedule(camera);
+        }
+
         foreach (QnScheduleTask scheduleTask, scheduleTasks)
         {
             QString str;

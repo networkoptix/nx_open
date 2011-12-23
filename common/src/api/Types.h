@@ -1,6 +1,8 @@
 #ifndef _EVE_TYPES_H
 #define _EVE_TYPES_H
 
+#include <QSharedPointer>
+
 #include "xsd_resourceTypes.h"
 #include "xsd_resources.h"
 #include "xsd_resourcesEx.h"

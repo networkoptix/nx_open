@@ -19,7 +19,7 @@ namespace detail {
         SessionManagerReplyProcessor(QObject *parent = 0) : QObject(parent) {}
 
     Q_SIGNALS:
-        void finished(int status, const QByteArray &result);
+        void finished(int status, const QByteArray &result, int handle);
 
     private Q_SLOTS:
         void at_replyReceived(QNetworkReply *reply);
@@ -51,8 +51,8 @@ protected:
     int sendGetRequest(const QString &objectName, QByteArray &reply);
     int sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray &reply);
 
-    void sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot);
-    void sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
+    int sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot);
+    int sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
 
     static QByteArray formatNetworkError(int error);
 
@@ -62,7 +62,7 @@ protected:
     SyncHTTP *m_httpClient;
     QByteArray m_lastError;
     bool m_addEndSlash;
-
+    static QAtomicInt m_handle;
 private:
     Q_DISABLE_COPY(SessionManager)
 };

@@ -5,12 +5,13 @@
 
 class QSplitter;
 
-class TabWidget;
+class TabBar;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchController;
+class QnWorkbenchDisplay;
 
 class MainWindow : public FancyMainWindow
 {
@@ -44,11 +45,12 @@ private Q_SLOTS:
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
+    QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
     QSplitter *m_splitter;
-    TabWidget *m_tabWidget;
+    TabBar *m_tabBar;
 };
 
 #endif // MAINWINDOW_H

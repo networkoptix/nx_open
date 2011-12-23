@@ -171,6 +171,8 @@ MainWnd::~MainWnd()
     s_instance = 0;
 }
 
+Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
+
 void MainWnd::addTab()
 {
     QWidget *widget = new QWidget(m_tabWidget);
@@ -181,8 +183,6 @@ void MainWnd::addTab()
     int index = m_tabWidget->addTab(widget, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
     m_tabWidget->setCurrentIndex(index);
 }
-
-Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
 
 void MainWnd::currentTabChanged(int index)
 {
@@ -210,8 +210,15 @@ void MainWnd::closeTab(int index)
         return; // don't close last tab
 
     if (QWidget *widget = m_tabWidget->widget(index)) {
-        if (widget->close())
+        QnWorkbenchLayout *layout = widget->property("SceneState").value<QnWorkbenchLayout *>(); // ###
+        if (widget->close()) {
+            if (m_tabWidget->currentIndex() == index)
+                m_workbench->setLayout(0);
+
+            delete layout;
+
             m_tabWidget->removeTab(index);
+        }
     }
 }
 

@@ -218,7 +218,7 @@ public:
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
-
+    void motionRegionSelected(QnResourcePtr resource, QRegion region);
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
@@ -339,6 +339,8 @@ private:
 
     /** Whether motion detection grid should be displayed. */
     bool m_displayMotionGrid;
+
+    QnResourcePtr m_resource;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

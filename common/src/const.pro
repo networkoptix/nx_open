@@ -30,18 +30,19 @@ INCLUDEPATH += $$PWD/common $$PWD/common/core $$PWD/common/utils $$PWD/common/pl
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -lqjsond
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -lqjson
 }
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
+INCLUDEPATH += ../contrib/qjson/include
 win32 {
-  INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
-  LIBS += -lws2_32 -lIphlpapi -lOle32
+  INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32 
+  LIBS += -lws2_32 -lIphlpapi -lOle32 -L../contrib/qjson/lib/win32
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
 
@@ -67,7 +68,7 @@ win32 {
 
 mac {
   LIBS += -framework IOKit
-  LIBS += -lz -lbz2
+  LIBS += -lz -lbz2 -L../contrib/qjson/lib/mac -lqjson
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse4.1
 }

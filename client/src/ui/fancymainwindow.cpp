@@ -321,8 +321,8 @@ void TitleBar::systemMenuButtonClicked()
 }
 
 
-FancyMainWindow::FancyMainWindow(QWidget *parent, Qt::WFlags flags)
-    : QFrame(parent, flags | Qt::FramelessWindowHint),
+FancyMainWindow::FancyMainWindow(QWidget *parent, Qt::WindowFlags flags)
+    : QFrame(parent, flags | Qt::Window | Qt::FramelessWindowHint),
       m_centralWidget(0)
 {
     setFrameShape(WinPanel);

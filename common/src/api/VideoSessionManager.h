@@ -3,6 +3,7 @@
 
 #include "SessionManager.h"
 #include "Types.h"
+#include "recording/time_period.h"
 
 namespace detail {
     class VideoServerSessionManagerReplyProcessor: public QObject
@@ -12,10 +13,10 @@ namespace detail {
         VideoServerSessionManagerReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply);
+        void at_replyReceived(int status, const QByteArray &reply, int handle);
 
     signals:
-        void finished(int status, const QnApiRecordedTimePeriodsResponsePtr &timePeriods);
+        void finished(int status, const QnTimePeriodList& timePeriods, int handle);
     };
 }
 
@@ -26,9 +27,10 @@ class VideoServerSessionManager: public SessionManager
 public:
     VideoServerSessionManager(const QUrl &url, QObject *parent = 0);
 
-    int recordedTimePeriods(const QnRequestParamList& params, QnApiRecordedTimePeriodsResponsePtr& timePeriodList);
+    int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList);
 
-    void asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot);
+    /** Returns handle if a request */
+    int asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot);
 };
 
 #endif // __VIDEO_SERVER_SESSION_MANAGER_H__

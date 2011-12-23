@@ -1,5 +1,7 @@
 INCLUDEPATH += ../../common/src
 
+INCLUDEPATH += ../../common/contrib/qjson/include
+
 win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
 }
@@ -40,18 +42,18 @@ CONFIG(release, debug|release) {
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release
 }
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
 
 win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
-    LIBS += -lxerces-c_3
+    LIBS += -lxerces-c_3 -lqjson
 
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }

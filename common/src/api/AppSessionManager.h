@@ -19,6 +19,7 @@ public:
     int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes);
     int getResources(QnApiResourceResponsePtr& resources);
 
+    int getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId);
     int getStorages(QnApiStorageResponsePtr& resources);
     int getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks, const QnId& mediaServerId);
 

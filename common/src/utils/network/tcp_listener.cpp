@@ -84,6 +84,8 @@ void QnTcpListener::removeDisconnectedConnections()
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
+    if (!d->serverSocket)
+        m_needStop = true;
     while (!m_needStop)
     {
         TCPSocket* clientSocket = d->serverSocket->accept();

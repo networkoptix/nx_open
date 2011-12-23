@@ -10,8 +10,8 @@ class TabWidget;
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
 class QnWorkbench;
-class QnWorkbenchDisplay;
 class QnWorkbenchController;
+class QnWorkbenchDisplay;
 
 class MainWnd : public QMainWindow
 {

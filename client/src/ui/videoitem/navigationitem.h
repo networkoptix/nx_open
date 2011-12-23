@@ -6,40 +6,10 @@
 #include <QtGui/QGraphicsWidget>
 
 #include "recording/time_period.h"
-#include <api/VideoServerConnection.h>
-
-namespace detail {
-    class QnTimePeriodUpdater: public QObject {
-        Q_OBJECT;
-    public:
-        QnTimePeriodUpdater(QObject *parent = NULL): QObject(parent), m_updatePending(false), m_updateNeeded(false) {}
-
-        void update(const QnVideoServerConnectionPtr &connection, const QnNetworkResourceList &networkResources, const QnTimePeriod &timePeriod);
-
-    signals:
-        void ready(const QnTimePeriodList &timePeriods);
-
-    private slots:
-        void at_replyReceived(const QnTimePeriodList &timePeriods);
-
-    private:
-        void sendRequest();
-
-    private:
-        QnVideoServerConnectionPtr m_connection;
-        QnNetworkResourceList m_networkResources;
-        QnTimePeriod m_timePeriod;
-        bool m_updatePending;
-        bool m_updateNeeded;
-    };
-
-}
+#include "camera/time_period_reader_helper.h"
 
 
-class QLabel;
 class QTimerEvent;
-
-class QnVideoServerConnection;
 
 class CLVideoCamera;
 class ImageButton;
@@ -66,7 +36,7 @@ public:
 
     inline bool isPlaying() const { return m_playing; }
 
-    static const int DEFAULT_HEIGHT = 60;
+    static const int DEFAULT_HEIGHT = 60; // ### remove
 
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
     // isUnderMouse() replacement;
@@ -84,7 +54,9 @@ public Q_SLOTS:
 #endif
 
 public Q_SLOTS:
+    void setMute(bool mute);
     void setPlaying(bool playing);
+    void loadMotionPeriods(QnResourcePtr resource, QRegion region);
 
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
@@ -92,14 +64,12 @@ Q_SIGNALS:
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
-    void updatePeriodList(bool force);
+    bool updateRecPeriodList(bool force);
 
     void smartSeek(qint64 timeMSec);
     void setActualCamera(CLVideoCamera *camera);
     void updateActualCamera();
-
-    void updateTimePeriods(const QnVideoServerConnection *connection, const QnNetworkResourceList &resources);
-
+    void repaintMotionPeriods();
 private Q_SLOTS:
     void onLiveModeChanged(bool value);
     void pause();
@@ -120,9 +90,14 @@ private Q_SLOTS:
 
     void onVolumeLevelChanged(int);
 
+    void setInfoText(const QString &infoText);
     void restoreInfoText();
 
-    void onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods);
+    void onTimePeriodLoaded(const QnTimePeriodList &timePeriods, int handle);
+    void onTimePeriodLoadFailed(int status, int handle);
+
+    void onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle);
+    void onMotionPeriodLoadFailed(int status, int handle);
 
 protected:
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
@@ -132,6 +107,13 @@ protected:
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
 private:
+    struct MotionPeriodLoader {
+        MotionPeriodLoader(): loadingHandle(0) {}
+        QnTimePeriodUpdaterPtr loader;
+        int loadingHandle;
+        QnTimePeriodList periods;
+    };
+
     TimeSlider *m_timeSlider;
     ImageButton *m_backwardButton;
     ImageButton *m_stepBackwardButton;
@@ -150,10 +132,16 @@ private:
     int m_timerId;
     qint64 m_currentTime;
     bool m_playing;
+    int m_fullTimePeriodHandle;
+    qint64 m_timePeriodUpdateTime;
+    bool m_forceTimePeriodLoading;
+
+    typedef QMap<QnNetworkResourcePtr, MotionPeriodLoader> MotionPeriods;
+    MotionPeriods m_motionPeriodLoader;
 
     QnTimePeriod m_timePeriod;
 
-    detail::QnTimePeriodUpdater *m_timePeriodUpdater;
+    //QnTimePeriodUpdater *m_fullTimePeriodUpdater;
 
     struct RestoreInfoTextData {
         QString extraInfoText;
