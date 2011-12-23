@@ -326,6 +326,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     mainLayout->setAlignment(rightLayoutV, Qt::AlignRight | Qt::AlignVCenter);
     setLayout(mainLayout);
 
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
 
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
     playAction->setShortcut(tr("Space"));

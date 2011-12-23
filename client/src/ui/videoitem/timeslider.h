@@ -78,8 +78,6 @@ Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
 
 protected:
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
-
     virtual bool eventFilter(QObject *target, QEvent *event) override;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 

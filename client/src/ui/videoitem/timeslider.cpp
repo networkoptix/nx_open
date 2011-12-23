@@ -73,8 +73,6 @@ public:
 // -------------------------------------------------------------------------- //
 class MySlider : public GraphicsSlider
 {
-    friend class TimeSlider; // ### for sizeHint()
-
 public:
     MySlider(TimeSlider *parent);
 
@@ -808,9 +806,11 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_centralise(true),
     m_endSize(0.0)
 {
+    qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
+
     setAcceptHoverEvents(true);
 
-    qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Slider);
 
     m_animation = new QPropertyAnimation(this, "viewPortPos", this);
 
@@ -834,8 +834,6 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     layout->addItem(m_slider);
     layout->addItem(m_timeLine);
     setLayout(layout);
-
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Slider);
 
     connect(m_slider, SIGNAL(sliderPressed()), this, SIGNAL(sliderPressed()));
     connect(m_slider, SIGNAL(sliderReleased()), this, SIGNAL(sliderReleased()));
@@ -971,11 +969,6 @@ void TimeSlider::setScalingFactor(double factor)
         m_scalingFactor = oldfactor;
     //setViewPortPos(currentValue() - m_slider->value()*delta());
     setViewPortPos(currentValue() - sliderRange()/2);
-}
-
-QSizeF TimeSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
-{
-    return m_slider->sizeHint(which, constraint) + QSizeF(0, 40);
 }
 
 bool TimeSlider::isMoving() const
