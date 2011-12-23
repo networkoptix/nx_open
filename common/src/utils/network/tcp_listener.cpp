@@ -86,6 +86,12 @@ void QnTcpListener::run()
     Q_D(QnTcpListener);
     while (!m_needStop)
     {
+        if (d->serverSocket == 0)
+        {
+            msleep(1000);
+            continue;
+        }
+
         TCPSocket* clientSocket = d->serverSocket->accept();
         if (clientSocket) {
             qDebug() << "New client connection from " << clientSocket->getPeerAddress();
