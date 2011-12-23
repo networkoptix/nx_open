@@ -20,7 +20,7 @@ public:
     void stop();
     bool isCameraRecoring(QnResourcePtr camera);
 
-    void updateSchedule(QnScheduleTaskList scheduleTasks);
+    void updateSchedule(QnSequrityCamResourcePtr camera);
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);

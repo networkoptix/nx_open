@@ -10,6 +10,8 @@
 #include <QVariant>
 #include <qjson/parser.h>
 
+#include "utils/common/qnid.h"
+
 static const char* QN_EVENT_RES_CHANGE = "RC";
 static const char* QN_EVENT_RES_DELETE = "RD";
 static const char* QN_EVENT_RES_SETPARAM = "RSP";
@@ -18,7 +20,7 @@ struct QnEvent
 {
     QString eventType;
     QString objectName;
-    QString resourceId;
+    QnId resourceId;
 
     // for RSP event
     QString paramName;

@@ -61,36 +61,15 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
     }
 }
 
-void QnRecordingManager::updateSchedule(QnScheduleTaskList scheduleTasks)
+void QnRecordingManager::updateSchedule(QnSequrityCamResourcePtr camera)
 {
-    qSort(scheduleTasks);
-    QMap<QnId, QnScheduleTaskList> newSchedule;
-    QnScheduleTaskList cameraSchedule;
-    QnId lastCameraId;
-    foreach (const QnScheduleTask& task, scheduleTasks)
-    {
-        if (task.getSourceId() != lastCameraId && !cameraSchedule.isEmpty())
-        {
-            newSchedule.insert(lastCameraId, cameraSchedule);
-            cameraSchedule.clear();
-        }
-        lastCameraId = task.getSourceId();
-        cameraSchedule << task;
-    }
-    if (!cameraSchedule.isEmpty())
-        newSchedule.insert(lastCameraId, cameraSchedule);
     QMutexLocker lock(&m_mutex);
-    m_scheduleByCamera = newSchedule;
-    //foreach (const QnScheduleTaskList& taskList, newSchedule) 
-    for (QMap<QnId, QnScheduleTaskList>::iterator itr = m_scheduleByCamera.begin(); itr != m_scheduleByCamera.end(); ++itr)
+
+    QMap<QnResourcePtr, QnServerStreamRecorder*>::iterator itrRec = m_recordMap.find(camera);
+    if (itrRec != m_recordMap.end())
     {
-        QnResourcePtr res = qnResPool->getResourceById(itr.key());
-        QMap<QnResourcePtr, QnServerStreamRecorder*>::iterator itrRec = m_recordMap.find(res);
-        if (itrRec != m_recordMap.end())
-        {
-            QnServerStreamRecorder* recorder = itrRec.value();
-            recorder->updateSchedule(itr.value());
-        }
+        QnServerStreamRecorder* recorder = itrRec.value();
+        recorder->updateSchedule(camera->getScheduleTasks());
     }
 }
 

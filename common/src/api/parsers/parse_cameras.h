@@ -60,7 +60,7 @@ void parseCameras(QList<ResourcePtr>& cameras, const QnApiCameras& xsdCameras, Q
         if (cameraBase.isNull())
             continue;
 
-        QnSequrityCamResourcePtr camera = camera.dynamicCast<QnSequrityCamResource>();
+        QnSequrityCamResourcePtr camera = cameraBase.dynamicCast<QnSequrityCamResource>();
         if (camera.isNull())
             continue;
 
