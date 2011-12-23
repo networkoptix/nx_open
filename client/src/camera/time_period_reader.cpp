@@ -13,8 +13,10 @@ QnTimePeriodReader::QnTimePeriodReader(const QnVideoServerConnectionPtr &connect
 int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& region)
 {
     QMutexLocker lock(&m_mutex);
-    if (region != m_region)
+    if (region != m_region) {
         m_loadedPeriods.clear();
+        m_loadedData.clear();
+    }
     m_region = region;
 
     foreach(const QnTimePeriod& loadedPeriod, m_loadedPeriods) 
