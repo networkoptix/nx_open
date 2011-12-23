@@ -39,4 +39,22 @@ static inline bool useSSSE3()
 #endif
 }
 
+static inline bool useSSE41()
+{
+#ifdef Q_OS_MAC
+    return true;
+#else
+    return qDetectCPUFeatures() & SSE4_1;
+#endif
+}
+
+static inline bool useSSE42()
+{
+#ifdef Q_OS_MAC
+    return true;
+#else
+    return qDetectCPUFeatures() & SSE4_2;
+#endif
+}
+
 #endif // __SSE_HELPER_H__
