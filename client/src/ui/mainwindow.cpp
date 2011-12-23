@@ -100,13 +100,13 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     m_workbench->mapper()->setCellSize(defaultCellSize);
     m_workbench->mapper()->setSpacing(defaultSpacing);
 
-    QnWorkbenchDisplay *display = new QnWorkbenchDisplay(m_workbench, this);
-    display->setScene(scene);
-    display->setView(m_view);
+    m_display = new QnWorkbenchDisplay(m_workbench, this);
+    m_display->setScene(scene);
+    m_display->setView(m_view);
 
-    m_controller = new QnWorkbenchController(display, this);
+    m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(display, this);
+    new QnSyncPlayMixin(m_display, this);
 
     // Prepare UI
     NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(this);
@@ -184,6 +184,7 @@ void MainWindow::currentTabChanged(int index)
 {
     QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>(); // ###
     m_workbench->setLayout(layout);
+    m_display->fitInView(false);
 }
 
 void MainWindow::closeTab(int index)

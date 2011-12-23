@@ -11,6 +11,7 @@ class QnBlueBackgroundPainter;
 class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchController;
+class QnWorkbenchDisplay;
 
 class MainWindow : public FancyMainWindow
 {
@@ -44,6 +45,7 @@ private Q_SLOTS:
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
+    QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
