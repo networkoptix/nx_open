@@ -37,12 +37,13 @@ class QnScreenRecorder;
 #endif
 
 /**
- * This class implements default scene manipulation logic. 
- * 
+ * This class implements default scene manipulation logic.
+ *
  * It also presents some functions for high-level scene content manipulation.
  */
 class QnWorkbenchController: public QObject, protected SceneUtility {
     Q_OBJECT;
+
 public:
     QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent = NULL);
 
@@ -67,7 +68,7 @@ protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
 
-protected slots:
+protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
@@ -111,11 +112,12 @@ protected slots:
 
     void onPrepareRecording(QVariant value);
     void onRecordingCountdownFinished();
+
 private:
     /** Display synchronizer. */
     QnWorkbenchDisplay *m_display;
 
-    /** Instrument manager for the scene. */ 
+    /** Instrument manager for the scene. */
     InstrumentManager *m_manager;
 
     /** Hand scroll instrument. */
@@ -148,12 +150,10 @@ private:
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
-
-    
-    #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;
-    #endif
+#endif
 
     /** Layout item context menu. */
     QMenu *m_itemContextMenu;
@@ -166,7 +166,7 @@ private:
 
     /** Open recording setting dialog. */
     QAction *m_recordingSettingsActions;
-    
+
     /** Mark recorder countdown is canceled. */
     bool m_countdownCanceled;
 

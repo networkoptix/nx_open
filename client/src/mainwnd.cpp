@@ -174,7 +174,7 @@ MainWnd::~MainWnd()
 void MainWnd::addTab()
 {
     QWidget *widget = new QWidget(m_tabWidget);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    (void)new QVBoxLayout(widget); // ensure widget's layout
 
     widget->setProperty("SceneState", QVariant::fromValue(new QnWorkbenchLayout(widget))); // ###
 
@@ -285,7 +285,11 @@ void MainWnd::handleMessage(const QString &message)
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
 #if 0
     addFilesToCurrentOrNewLayout(files);
+#else
+    const QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+    m_controller->drop(files, gridPos);
 #endif
+
     activate();
 }
 

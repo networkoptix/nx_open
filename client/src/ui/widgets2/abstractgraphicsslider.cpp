@@ -824,7 +824,7 @@ void AbstractGraphicsSlider::changeEvent(QEvent *event)
             d_func()->repeatActionTimer.stop();
             setSliderDown(false);
         }
-    // fall through
+        // fall through
     default:
         break;
     }
