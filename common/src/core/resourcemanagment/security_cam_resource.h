@@ -3,6 +3,7 @@
 
 #include <QRegion>
 #include "../resource/media_resource.h"
+#include "core/misc/scheduleTask.h"
 
 class QnDataProviderFactory
 {
@@ -36,6 +37,9 @@ public:
     void setMotionMask(const QRegion& mask);
     QRegion getMotionMask() const;
 
+    void setScheduleTasks(const QnScheduleTaskList& scheduleTasks);
+    const QnScheduleTaskList getScheduleTasks() const;
+
 signals:
     void motionMaskChanged(QRegion region);
 
@@ -47,8 +51,10 @@ protected:
 private:
     QnDataProviderFactory* m_dpFactory;
     QRegion m_motionMask;
+    QnScheduleTaskList m_scheduleTasks;
 };
 
 typedef QSharedPointer<QnSequrityCamResource> QnSequrityCamResourcePtr;
+typedef QList<QnSequrityCamResourcePtr> QnSequrityCamResourceList;
 
 #endif //sequrity_cam_resource_h_1239

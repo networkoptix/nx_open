@@ -13,7 +13,7 @@ from string import Template
 
 sys.path.insert(0, '../common')
 
-from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB, setup_tools
+from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, instantiate_pro, copy_files, BUILDLIB, setup_tools
 from convert import convert as convert_common
 
 FFMPEG_VERSION = '2011-08-29'
@@ -57,6 +57,7 @@ if len(sys.argv) == 2 and sys.argv[1] == '-parents':
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 tools_path = setup_tools()
+qjson_path = setup_qjson()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -86,6 +87,8 @@ copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 
 copy_files(tools_path + '/bin/*.dll', 'bin/release')
 copy_files(tools_path + '/bin/*.dll', 'bin/debug')
+copy_files(qjson_path + '/*.dll', 'bin/release')
+copy_files(qjson_path + '/*.dll', 'bin/debug')
 
 gen_version_h()
 

@@ -77,6 +77,11 @@ def gen_filetypes_h():
     print >> filetypes_h, 'static const char* IMAGE_FILETYPES[] = {%s};' % string.join(['"' + x[0] + '"' for x in image_filetypes], ', ')
     print >> filetypes_h, '#endif // UNICLIENT_FILETYPES_H_'
 
+def setup_qjson():
+    qjson_path = '../common/contrib/qjson'
+
+    return qjson_path + '/lib/' + sys.platform
+
 def setup_tools():
     tools_path = os.getenv('EVE_TOOLS')
 

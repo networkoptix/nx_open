@@ -39,9 +39,10 @@ CONFIG(release, debug|release) {
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
+INCLUDEPATH += ../contrib/qjson/include
 win32 {
-  INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
-  LIBS += -lws2_32 -lIphlpapi -lOle32
+  INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32 
+  LIBS += -lws2_32 -lIphlpapi -lOle32 -L../contrib/qjson/lib/win32 -lqjson
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
 
@@ -67,7 +68,7 @@ win32 {
 
 mac {
   LIBS += -framework IOKit
-  LIBS += -lz -lbz2
+  LIBS += -lz -lbz2 -L../contrib/qjson/lib/mac -lqjson
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse4.1
 }

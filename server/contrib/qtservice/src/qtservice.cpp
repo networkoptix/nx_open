@@ -402,6 +402,22 @@ bool QtServiceController::start()
     \sa QtServiceBase::processCommand()
 */
 
+class QtServiceStarter : public QObject
+{
+    Q_OBJECT
+public:
+    QtServiceStarter(QtServiceBasePrivate *service)
+        : QObject(), d_ptr(service) {}
+public slots:
+    void slotStart()
+    {
+        d_ptr->startService();
+    }
+private:
+    QtServiceBasePrivate *d_ptr;
+};
+#include "qtservice.moc"
+
 QtServiceBase *QtServiceBasePrivate::instance = 0;
 
 QtServiceBasePrivate::QtServiceBasePrivate(const QString &name)
@@ -554,7 +570,7 @@ int QtServiceBasePrivate::run(bool asService, const QStringList &argList)
     \row \i -p \i -pause \i Pause the service.
     \row \i -r \i -resume \i Resume a paused service.
     \row \i -c \e{cmd} \i -command \e{cmd}
-     \i Send the user defined command code \e{cmd} to the service application.
+	 \i Send the user defined command code \e{cmd} to the service application.
     \row \i -v \i -version \i Display version and status information.
     \endtable
 
@@ -617,12 +633,12 @@ QtServiceBase::QtServiceBase(int argc, char **argv, const QString &name)
 
     QString nm(name);
     if (nm.length() > 255) {
-    qWarning("QtService: 'name' is longer than 255 characters.");
-    nm.truncate(255);
+	qWarning("QtService: 'name' is longer than 255 characters.");
+	nm.truncate(255);
     }
     if (nm.contains('\\')) {
-    qWarning("QtService: 'name' contains backslashes '\\'.");
-    nm.replace((QChar)'\\', (QChar)'\0');
+	qWarning("QtService: 'name' contains backslashes '\\'.");
+	nm.replace((QChar)'\\', (QChar)'\0');
     }
 
     d_ptr = new QtServiceBasePrivate(nm);
