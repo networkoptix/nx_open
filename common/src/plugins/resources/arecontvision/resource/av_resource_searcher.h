@@ -12,8 +12,6 @@ public:
 
 	static QnPlArecontResourceSearcher& instance();
 	
-    bool isResourceTypeSupported(const QnId& resourceTypeId) const;
-
     QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
 	// return the manufacture of the server 
 	virtual QString manufacture() const;
