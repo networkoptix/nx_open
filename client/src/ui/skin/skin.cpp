@@ -68,6 +68,13 @@ QStyle *Skin::style()
 }
 
 
+int AppStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
+{
+    if (hint == QStyle::SH_ToolTipLabel_Opacity)
+        return 255;
+    return ProxyStyle::styleHint(hint, option, widget, returnData);
+}
+
 QIcon AppStyle::standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const
 {
     QIcon icon;
