@@ -144,8 +144,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
 
     /* Create viewport animator. */
     m_viewportAnimator = new QnViewportAnimator(this);
-    m_viewportAnimator->setRelativeSpeed(1.5);
-    m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);
+    m_viewportAnimator->setRelativeSpeed(1.5);//anim view port movement
+    m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);//anim
     m_viewportAnimator->setTimer(m_animationInstrument->animationTimer());
     connect(m_viewportAnimator,             SIGNAL(started()),                                          this,                   SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator,             SIGNAL(started()),                                          m_boundingInstrument,   SLOT(recursiveDisable()));
@@ -385,7 +385,7 @@ QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     animator->setTranslationSpeed(length(workbench()->mapper()->step()));  // TODO
     animator->setRotationSpeed(720.0);
     animator->setTimer(m_animationInstrument->animationTimer());
-    animator->setTimeLimit(widgetAnimationDurationMsec);
+    animator->setTimeLimit(widgetAnimationDurationMsec); //anim rotation & move & size change of item 
     widget->setData(ITEM_ANIMATOR, QVariant::fromValue<QnWidgetAnimator *>(animator));
     return animator;
 }
@@ -744,11 +744,11 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
         if(qFuzzyCompare(currentSize, targetSize)) {
-            easingCurve = QEasingCurve::InOutBack;
+            easingCurve = QEasingCurve::InOutBack; //anim move widget without resizing 
         } else if(contains(targetSize, currentSize)) {
-            easingCurve = QEasingCurve::InBack;
+            easingCurve = QEasingCurve::InBack; //anim  if resize up
         } else {
-            easingCurve = QEasingCurve::OutBack;
+            easingCurve = QEasingCurve::OutBack; //anim if resize down
         }
 
         animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
