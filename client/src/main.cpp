@@ -1,6 +1,11 @@
 //#include <vld.h>
 #include "eve_app.h"
 
+//#define CL_CUSOM_MAINWINDOW
+#ifdef CL_CUSOM_MAINWINDOW
+#include "ui/mainwindow.h"
+#endif
+
 #include "version.h"
 #include "mainwnd.h"
 #include "settings.h"
@@ -327,7 +332,11 @@ int main(int argc, char *argv[])
 
     initContextMenu();
 
+#ifdef CL_CUSOM_MAINWINDOW
+    MainWindow mainWindow(argc, argv);
+#else
     MainWnd mainWindow(argc, argv);
+#endif
     mainWindow.show();
 
 #ifdef TEST_RTSP_SERVER

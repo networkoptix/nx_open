@@ -1,7 +1,8 @@
-#include "mainwnd.h"
+#include "mainwindow.h"
 
 #include <QtGui/QBoxLayout>
 #include <QtGui/QSplitter>
+#include <QtGui/QStyle>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
 
@@ -47,18 +48,10 @@
 #include "settings.h"
 #include "version.h"
 
-MainWnd *MainWnd::s_instance = 0;
-
-MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
-    : QMainWindow(parent, flags),
-      m_controller(NULL)
+MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags flags)
+    : FancyMainWindow(parent, flags),
+      m_controller(0)
 {
-    if (s_instance)
-        qnWarning("Several instances of main window created, expect problems.");
-    else
-        s_instance = this;
-
-    /* Set up QWidget. */
     setWindowTitle(APPLICATION_NAME);
     setAttribute(Qt::WA_QuitOnClose);
     setAcceptDrops(true);
@@ -71,14 +64,15 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     setMinimumWidth(min_width);
     setMinimumHeight(min_width * 3 / 4);
 
-    /* Set up scene & view. */
+
+    // Set up scene & view
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene, this);
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
-    /* Set up model & control machinery. */
+    // Set up model & control machinery
     const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
     m_workbench = new QnWorkbench(this);
@@ -93,11 +87,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     new QnSyncPlayMixin(display, this);
 
-    /* Process input files. */
-    for (int i = 1; i < argc; ++i)
-        m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
-
-    /* Prepare UI. */
+    // Prepare UI
     NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(this);
     connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
 
@@ -138,10 +128,10 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     // toolbars
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setAllowedAreas(Qt::TopToolBarArea);
-    toolBar->addAction(&cm_exit);
     toolBar->addAction(&cm_toggle_fullscreen);
     toolBar->addAction(&cm_preferences);
-    addToolBar(Qt::TopToolBarArea, toolBar);
+    //addToolBar(Qt::TopToolBarArea, toolBar);
+m_tabWidget->setCornerWidget(toolBar, Qt::TopRightCorner);
 
 
     // actions
@@ -154,7 +144,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-    QAction *reconnectAction = new QAction(/*Skin::icon(QLatin1String("reconnnect.png")), */tr("Reconnect"), this);
+    QAction *reconnectAction = new QAction(style()->standardIcon(QStyle::SP_BrowserReload), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
     toolBar->addAction(reconnectAction);
 
@@ -163,15 +153,19 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     addTab();
 
-    showFullScreen();
+    showNormal();
+
+    // Process input files
+    const QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+    for (int i = 1; i < argc; ++i)
+        m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), gridPos);
 }
 
-MainWnd::~MainWnd()
+MainWindow::~MainWindow()
 {
-    s_instance = 0;
 }
 
-void MainWnd::addTab()
+void MainWindow::addTab()
 {
     QWidget *widget = new QWidget(m_tabWidget);
     (void)new QVBoxLayout(widget); // ensure widget's layout
@@ -184,7 +178,7 @@ void MainWnd::addTab()
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
 
-void MainWnd::currentTabChanged(int index)
+void MainWindow::currentTabChanged(int index)
 {
     if (QWidget *widget = m_view->parentWidget()) {
         if (m_tabWidget->indexOf(widget) != -1) {
@@ -203,7 +197,7 @@ void MainWnd::currentTabChanged(int index)
     }
 }
 
-void MainWnd::closeTab(int index)
+void MainWindow::closeTab(int index)
 {
     if (m_tabWidget->count() == 1)
         return; // don't close last tab
@@ -214,94 +208,36 @@ void MainWnd::closeTab(int index)
     }
 }
 
-void MainWnd::itemActivated(uint resourceId)
+void MainWindow::itemActivated(uint resourceId)
 {
     // ### rewrite from scratch ;)
     QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId)));
 
     QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-    if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).isEmpty()) {
+    if (mediaResource && m_controller->layout()->items(mediaResource->getUniqueId()).isEmpty()) {
         QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
         m_controller->drop(resource, gridPos);
     }
 }
 
-#if 0
-void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
-{
-    if (files.isEmpty())
-        return;
-
-    cl_log.log(QLatin1String("Entering addFilesToCurrentOrNewLayout"), cl_logALWAYS);
-
-    QnResourceList rlst = QnResourceDirectoryBrowser::instance().checkFiles(files);
-    qnResPool->addResources(rlst);
-
-    // If current content created by opening files or DND, use it. Otherwise create new one.
-    LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
-
-    if (!forceNewLayout && content != CLSceneLayoutManager::instance().getSearchLayout()
-        && content != CLSceneLayoutManager::instance().startScreenLayoutContent())
-    {
-        cl_log.log(QLatin1String("Using old layout, content ") + content->getName(), cl_logALWAYS);
-        foreach (const QString &file, files)
-        {
-            m_normalView->getView().getCamLayOut().addDevice(file, true);
-            content->addDevice(file);
-        }
-
-        m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
-    }
-    else
-    {
-        cl_log.log(QLatin1String("Creating new layout, content ") + content->getName(), cl_logALWAYS);
-        content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
-
-        foreach (const QString &file, files)
-            content->addDevice(file);
-
-        m_normalView->goToNewLayoutContent(content);
-    }
-}
-
-void MainWnd::goToNewLayoutContent(LayoutContent* newl)
-{
-    m_normalView->goToNewLayoutContent(newl);
-}
-
-void MainWnd::destroyNavigator(CLLayoutNavigator *&nav)
-{
-    if (nav)
-    {
-        nav->destroy();
-        delete nav;
-        nav = 0;
-    }
-}
-#endif
-
-void MainWnd::handleMessage(const QString &message)
+void MainWindow::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-#if 0
-    addFilesToCurrentOrNewLayout(files);
-#else
     const QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
     m_controller->drop(files, gridPos);
-#endif
 
     activate();
 }
 
-void MainWnd::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent *event)
 {
-    QMainWindow::closeEvent(event);
+    FancyMainWindow::closeEvent(event);
 
     if (event->isAccepted())
         Q_EMIT mainWindowClosed();
 }
 
-void MainWnd::activate()
+void MainWindow::activate()
 {
     if (isFullScreen())
         showFullScreen();
@@ -311,7 +247,7 @@ void MainWnd::activate()
     activateWindow();
 }
 
-void MainWnd::toggleFullScreen()
+void MainWindow::toggleFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
@@ -321,13 +257,13 @@ void MainWnd::toggleFullScreen()
     }
 }
 
-void MainWnd::editPreferences()
+void MainWindow::editPreferences()
 {
     PreferencesWindow dialog(this);
     dialog.exec();
 }
 
-void MainWnd::appServerError(int error)
+void MainWindow::appServerError(int error)
 {
     switch (error) {
     case QNetworkReply::ConnectionRefusedError:
@@ -344,7 +280,7 @@ void MainWnd::appServerError(int error)
     }
 }
 
-void MainWnd::appServerAuthenticationRequired()
+void MainWindow::appServerAuthenticationRequired()
 {
     static LoginDialog *dialog = 0;
     if (dialog)
