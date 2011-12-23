@@ -36,7 +36,6 @@ namespace detail {
 }
 
 
-class QLabel;
 class QTimerEvent;
 
 class QnVideoServerConnection;
@@ -66,7 +65,7 @@ public:
 
     inline bool isPlaying() const { return m_playing; }
 
-    static const int DEFAULT_HEIGHT = 60;
+    static const int DEFAULT_HEIGHT = 60; // ### remove
 
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
     // isUnderMouse() replacement;

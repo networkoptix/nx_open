@@ -835,6 +835,8 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     layout->addItem(m_timeLine);
     setLayout(layout);
 
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Slider);
+
     connect(m_slider, SIGNAL(sliderPressed()), this, SIGNAL(sliderPressed()));
     connect(m_slider, SIGNAL(sliderReleased()), this, SIGNAL(sliderReleased()));
     connect(m_slider, SIGNAL(sliderReleased()), this, SLOT(centraliseSlider()), Qt::QueuedConnection);
