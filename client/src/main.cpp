@@ -1,6 +1,11 @@
 //#include <vld.h>
 #include "eve_app.h"
 
+//#define CL_CUSOM_MAINWINDOW
+#ifdef CL_CUSOM_MAINWINDOW
+#include "ui/mainwindow.h"
+#endif
+
 #include "version.h"
 #include "mainwnd.h"
 #include "settings.h"
@@ -34,6 +39,7 @@
 #include "core/resource/qnstorage.h"
 
 #include <xercesc/util/PlatformUtils.hpp>
+#include "plugins/resources/axis/axis_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -247,6 +253,9 @@ int main(int argc, char *argv[])
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+
+    QnPlAxisResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
 #endif
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
@@ -323,7 +332,11 @@ int main(int argc, char *argv[])
 
     initContextMenu();
 
+#ifdef CL_CUSOM_MAINWINDOW
+    MainWindow mainWindow(argc, argv);
+#else
     MainWnd mainWindow(argc, argv);
+#endif
     mainWindow.show();
 
 #ifdef TEST_RTSP_SERVER

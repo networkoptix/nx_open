@@ -19,7 +19,7 @@ public:
 
 protected:
 	bool m_deleteAfterFinished;
-
+    
 };
 
 #endif //abstract_animation_h_2000

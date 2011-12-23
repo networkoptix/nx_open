@@ -129,14 +129,14 @@ public:
      * \param rect                      Rectangle to map to scene.
      * \returns                         Bounding rectangle of the mapped polygon.
      */
-    static QRectF mapRectToScene(QGraphicsView *view, const QRect &rect);
+    static QRectF mapRectToScene(const QGraphicsView *view, const QRect &rect);
 
     /**
      * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map from scene.
      * \returns                         Bounding rectangle of the mapped polygon.
      */
-    static QRect mapRectFromScene(QGraphicsView *view, const QRectF &rect);
+    static QRect mapRectFromScene(const QGraphicsView *view, const QRectF &rect);
 
     /**
      * Calculates the factor by which the given size must be scaled to fit into

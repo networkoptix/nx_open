@@ -59,9 +59,23 @@ void QnVariantAnimator::setConverter(QnAbstractConverter *converter) {
     setType(currentValue().userType());
 }
 
+void QnVariantAnimator::setEasingCurve(const QEasingCurve &easingCurve) {
+    if(isRunning()) {
+        qnWarning("Cannot change easing curve of a running animator.");
+        return;
+    }
+
+    m_easingCurve = easingCurve;
+}
+
 void QnVariantAnimator::setTargetObject(QObject *target) {
     if(isRunning()) {
         qnWarning("Cannot change target object of a running animator.");
+        return;
+    }
+
+    if(target != NULL && target->thread() != thread()) {
+        qnWarning("Cannot animate an object from another thread.");
         return;
     }
 
@@ -106,7 +120,11 @@ int QnVariantAnimator::estimatedDuration() const {
 }
 
 void QnVariantAnimator::updateCurrentTime(int currentTime) {
-    updateCurrentValue(interpolated(startValue(), targetValue(), static_cast<qreal>(currentTime) / duration()));
+    updateCurrentValue(interpolated(
+        startValue(), 
+        targetValue(), 
+        m_easingCurve.valueForProgress(static_cast<qreal>(currentTime) / duration())
+    ));
 }
 
 QVariant QnVariantAnimator::interpolated(const QVariant &from, const QVariant &to, qreal progress) const {

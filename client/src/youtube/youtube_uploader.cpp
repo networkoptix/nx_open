@@ -182,7 +182,7 @@ void YouTubeUploader::nextStep()
                 upload();
                 break;
             }
-        // fall through
+            // fall through
         case State_Finished:
             emit uploadFinished();
             break;
@@ -194,9 +194,9 @@ void YouTubeUploader::nextStep()
 
 YouTubeUploader::YouTubeUploader(QObject *parent)
     : QObject(parent),
-    m_state(State_Unauthorized),
-    m_errorCode(0),
-    m_categoryReply(0)
+      m_state(State_Unauthorized),
+      m_errorCode(0),
+      m_categoryReply(0)
 {
     m_manager = new QNetworkAccessManager(this);
     connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
@@ -337,10 +337,8 @@ void YouTubeUploader::replyFinished(QNetworkReply* reply)
     /*
     qDebug((QString("Code = ") + statusCode);
     if (reply->error() == QNetworkReply::NoError) {
-        foreach(const QByteArray &header, reply->rawHeaderList())
-        {
+        foreach (const QByteArray &header, reply->rawHeaderList())
             qDebug(header + " = " + reply->rawHeader(header));
-        }
     }
     */
 
@@ -401,7 +399,7 @@ void YouTubeUploader::slotSslErrors(QList<QSslError> list)
 {
     QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
     if (reply) {
-        foreach(QSslError error, list) 
+        foreach (const QSslError &error, list)
         {
             if (error.error() == QSslError::NoError)
                 reply->ignoreSslErrors();

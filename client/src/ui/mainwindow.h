@@ -1,7 +1,7 @@
-#ifndef MAINWND_H
-#define MAINWND_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include "fancymainwindow.h"
 
 class QSplitter;
 
@@ -10,18 +10,15 @@ class TabWidget;
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
 class QnWorkbench;
-class QnWorkbenchDisplay;
 class QnWorkbenchController;
 
-class MainWnd : public QMainWindow
+class MainWindow : public FancyMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
-    virtual ~MainWnd();
-
-    static MainWnd* instance() { return s_instance; }
+    MainWindow(int argc, char *argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
+    virtual ~MainWindow();
 
 Q_SIGNALS:
     void mainWindowClosed();
@@ -44,28 +41,14 @@ private Q_SLOTS:
     void appServerError(int error);
     void appServerAuthenticationRequired();
 
-#if 0
-public:
-    void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
-    void goToNewLayoutContent(LayoutContent* newl);
-
-private:
-    void destroyNavigator(CLLayoutNavigator *&nav);
-
-    CLLayoutNavigator *m_normalView;
-#endif
-
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
-    QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
     QSplitter *m_splitter;
     TabWidget *m_tabWidget;
-
-    static MainWnd *s_instance;
 };
 
-#endif // MAINWND_H
+#endif // MAINWINDOW_H
