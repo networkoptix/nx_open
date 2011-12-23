@@ -12,10 +12,10 @@ namespace detail {
         VideoServerSessionManagerReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply);
+        void at_replyReceived(int status, const QByteArray &reply, int handle);
 
     signals:
-        void finished(int status, const QnApiRecordedTimePeriodsResponsePtr &timePeriods);
+        void finished(int status, const QnApiRecordedTimePeriodsResponsePtr &timePeriods, int handle);
     };
 }
 
@@ -28,7 +28,8 @@ public:
 
     int recordedTimePeriods(const QnRequestParamList& params, QnApiRecordedTimePeriodsResponsePtr& timePeriodList);
 
-    void asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot);
+    /** Returns handle if a request */
+    int asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot);
 };
 
 #endif // __VIDEO_SERVER_SESSION_MANAGER_H__

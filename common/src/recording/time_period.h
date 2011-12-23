@@ -14,6 +14,9 @@ struct QnTimePeriod
     static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
 
     bool containTime(qint64 timeMs) const;
+    bool containPeriod(const QnTimePeriod& timePeriod) const;
+    void addPeriod(const QnTimePeriod& timePeriod);
+    void clear();
 
     /** Start time in milliseconds. */
     qint64 startTimeMs;

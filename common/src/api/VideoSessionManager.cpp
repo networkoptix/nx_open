@@ -34,13 +34,13 @@ namespace {
 } // anonymous namespace
 
 
-void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply)
+void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, int handle)
 {
     QnApiRecordedTimePeriodsResponsePtr result;
     if(status == 0)
         status = parseRecordedTimePeriods(reply, &result);
 
-    emit finished(status, result);
+    emit finished(status, result, handle);
 
     deleteLater();
 }
@@ -59,11 +59,10 @@ int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& par
     return parseRecordedTimePeriods(reply, &timePeriodList);
 }
 
-void VideoServerSessionManager::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot)
+int VideoServerSessionManager::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot)
 {
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
-    connect(processor, SIGNAL(finished(int, const QnApiRecordedTimePeriodsResponsePtr &)), target, slot);
-
-    sendAsyncGetRequest("api/RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &)));
+    connect(processor, SIGNAL(finished(int, const QnApiRecordedTimePeriodsResponsePtr &, int)), target, slot);
+    return sendAsyncGetRequest("api/RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &, int)));
 }
 

@@ -6,7 +6,9 @@ QnAnimatorGroup::QnAnimatorGroup(QObject *parent):
     QnAbstractAnimator(parent)
 {}
 
-QnAnimatorGroup::~QnAnimatorGroup() {}
+QnAnimatorGroup::~QnAnimatorGroup() {
+    stop();
+}
 
 QnAbstractAnimator *QnAnimatorGroup::animatorAt(int index) const {
     if (index < 0 || index >= m_animators.size()) {

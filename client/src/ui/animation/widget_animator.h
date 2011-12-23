@@ -23,6 +23,11 @@ public:
     QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent = NULL);
 
     /**
+     * Virtual destructor.
+     */
+    virtual ~QnWidgetAnimator();
+
+    /**
      * Starts animated move of a widget to the given position.
      * 
      * \param geometry                  Rectangle to move widget to, in scene coordinates.

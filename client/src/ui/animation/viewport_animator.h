@@ -24,6 +24,8 @@ public:
      */
     QnViewportAnimator(QObject *parent = NULL);
 
+    virtual ~QnViewportAnimator();
+
     /**
      * \returns                         View that this viewport animator is assigned to.
      */

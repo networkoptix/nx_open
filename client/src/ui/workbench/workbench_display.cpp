@@ -434,12 +434,23 @@ CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: mutators
 // -------------------------------------------------------------------------- //
-void QnWorkbenchDisplay::fitInView() {
+void QnWorkbenchDisplay::fitInView(bool animate) {
+    QRectF targetGeometry; 
+
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
     if(zoomedItem != NULL) {
-        m_viewportAnimator->moveTo(itemGeometry(zoomedItem));
+        targetGeometry = itemGeometry(zoomedItem);
     } else {
-        m_viewportAnimator->moveTo(fitInViewGeometry());
+        targetGeometry = fitInViewGeometry();
+    }
+
+    if(animate) {
+        m_viewportAnimator->moveTo(targetGeometry);
+    } else {
+        m_viewportAnimator->stop();
+        m_boundingInstrument->recursiveDisable();
+        m_viewportAnimator->accessor()->set(m_viewportAnimator->targetObject(), targetGeometry);
+        m_boundingInstrument->recursiveEnable(); /* So that caches are updated. */
     }
 }
 
@@ -829,25 +840,41 @@ void QnWorkbenchDisplay::at_workbench_modeChanged() {
     }
 }
 
+namespace {
+    QnWorkbenchItem *audioItem(QnWorkbenchItem *(&itemByRole)[QnWorkbench::ITEM_ROLE_COUNT]) {
+        if(itemByRole[QnWorkbench::ZOOMED] != NULL) {
+            return itemByRole[QnWorkbench::ZOOMED];
+        } else if(itemByRole[QnWorkbench::RAISED] != NULL) {
+            return itemByRole[QnWorkbench::RAISED];
+        } else {
+            return NULL;
+        }
+    }
+
+}
+
 void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item) {
     if(item == m_itemByRole[role])
         return;
 
+    QnWorkbenchItem *oldAudioItem = audioItem(m_itemByRole);
     QnWorkbenchItem *oldItem = m_itemByRole[role];
     m_itemByRole[role] = item;
+    QnWorkbenchItem *newAudioItem = audioItem(m_itemByRole);
 
-    switch(role) {
-    case QnWorkbench::RAISED: {
-        /* Stop audio on previously raised item. */
-        CLCamDisplay *oldCamDisplay = camDisplay(oldItem);
+    /* Update audio playback. */
+    if(oldAudioItem != newAudioItem) {
+        CLCamDisplay *oldCamDisplay = camDisplay(oldAudioItem);
         if(oldCamDisplay != NULL)
             oldCamDisplay->playAudio(false);
 
-        /* Play audio on newly raised item. */
-        CLCamDisplay *newCamDisplay = camDisplay(item);
+        CLCamDisplay *newCamDisplay = camDisplay(newAudioItem);
         if(newCamDisplay != NULL)
             newCamDisplay->playAudio(true);
+    }
 
+    switch(role) {
+    case QnWorkbench::RAISED: {
         /* Sync new & old items. */
         if(oldItem != NULL)
             synchronize(oldItem);

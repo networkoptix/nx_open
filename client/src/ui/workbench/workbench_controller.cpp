@@ -714,8 +714,11 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
         return;
 
     QnSequrityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSequrityCamResource>();
-    if(cameraResource != NULL)
+    if(cameraResource != NULL) 
+    {
+        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QRegion)), m_navigationItem, SLOT(loadMotionPeriods(QnResourcePtr, QRegion)));
         m_navigationItem->addReserveCamera(widget->display()->camera());
+    }
 }
 
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
