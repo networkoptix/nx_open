@@ -13,7 +13,7 @@ namespace detail {
         QnVideoServerConnectionReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QnApiRecordedTimePeriodsResponsePtr &reply, int handle);
+        void at_replyReceived(int status, const QnTimePeriodList &result, int handle);
 
     signals:
         void finished(int, const QnTimePeriodList &timePeriods, int handle);

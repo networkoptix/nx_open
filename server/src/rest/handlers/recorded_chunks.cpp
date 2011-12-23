@@ -107,6 +107,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     else
         periods = QnMotionHelper::instance()->mathImage(motionRegion, resList, startTime, endTime, detailLevel);
     if (useBinary) {
+        result.append("BIN");
         foreach(QnTimePeriod period, periods)
         {
             qint64 start = htonll(period.startTimeMs);

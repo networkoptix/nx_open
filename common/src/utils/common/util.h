@@ -89,17 +89,23 @@ static const qint64 MAX_FIRST_GOP_DURATION = 1000 * 1000 * 10;
 static const qint64 MAX_FRAME_DURATION = 5 * 1000;
 
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-#define htonll(x) \
-    ((((x) & 0xff00000000000000LL) >> 56) | \
-    (((x) & 0x00ff000000000000LL) >> 40) | \
-    (((x) & 0x0000ff0000000000LL) >> 24) | \
-    (((x) & 0x000000ff00000000LL) >> 8) | \
-    (((x) & 0x00000000ff000000LL) << 8) | \
-    (((x) & 0x0000000000ff0000LL) << 24) | \
-    (((x) & 0x000000000000ff00LL) << 40) | \
-    (((x) & 0x00000000000000ffLL) << 56))
+inline static quint64 htonll(quint64 x)
+{
+    return
+    ((((x) & 0xff00000000000000ULL) >> 56) | 
+    (((x) & 0x00ff000000000000ULL) >> 40) | 
+    (((x) & 0x0000ff0000000000ULL) >> 24) | 
+    (((x) & 0x000000ff00000000ULL) >> 8) | 
+    (((x) & 0x00000000ff000000ULL) << 8) | 
+    (((x) & 0x0000000000ff0000ULL) << 24) | 
+    (((x) & 0x000000000000ff00ULL) << 40) | 
+    (((x) & 0x00000000000000ffULL) << 56));
+}
+inline static quint64 ntohll(quint64 x) { return htonll(x); }
+
 #else
-#define htonll(x) 
+inline static quint64 htonll(quint64 x) { return x;}
+inline static quint64 ntohll(quint64 x)  { return x;}
 #endif
 
 /**
