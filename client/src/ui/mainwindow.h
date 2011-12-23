@@ -5,7 +5,7 @@
 
 class QSplitter;
 
-class TabWidget;
+class TabBar;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
@@ -48,7 +48,7 @@ private:
     QnGraphicsView *m_view;
 
     QSplitter *m_splitter;
-    TabWidget *m_tabWidget;
+    TabBar *m_tabBar;
 };
 
 #endif // MAINWINDOW_H
