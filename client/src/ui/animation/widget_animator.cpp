@@ -42,8 +42,6 @@ void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEas
         return;
     }
 
-    qDebug() << "MOVETO" << geometry << "CURRENT TARGET" << m_geometryAnimator->targetValue().toRectF();
-
     pause();
 
     m_geometryAnimator->setTargetValue(geometry);

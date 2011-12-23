@@ -153,16 +153,12 @@ qreal QnVariantAnimator::easingCurveProgress(int currentTime) const {
 }
 
 qreal QnVariantAnimator::easingCurveValue(qreal progress) const {
-    //if()
     qreal correctionValue = m_easingCurve.valueForProgress(m_easingCurveCorrection);
 
     return (m_easingCurve.valueForProgress(progress) - correctionValue) / (1.0 - correctionValue);
 }
 
 void QnVariantAnimator::updateCurrentTime(int currentTime) {
-
-    qDebug() << "updateCurrentTime" << currentTime;
-
     updateCurrentValue(interpolated(
         internalStartValue(), 
         internalTargetValue(), 
@@ -184,8 +180,6 @@ QVariant QnVariantAnimator::currentValue() const {
 void QnVariantAnimator::updateCurrentValue(const QVariant &value) const {
     if(accessor() == NULL || targetObject() == NULL)
         return;
-
-    qDebug() << "updateCurrentValue" << value;
 
     accessor()->set(m_target, toExternal(value));
 }
