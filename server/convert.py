@@ -87,8 +87,8 @@ copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 
 copy_files(tools_path + '/bin/*.dll', 'bin/release')
 copy_files(tools_path + '/bin/*.dll', 'bin/debug')
-copy_files(qjson_path + '/*.dll', 'bin/release')
-copy_files(qjson_path + '/*.dll', 'bin/debug')
+copy_files(qjson_path + '/qjson.dll', 'bin/release')
+copy_files(qjson_path + '/qjsond.dll', 'bin/debug')
 
 gen_version_h()
 
