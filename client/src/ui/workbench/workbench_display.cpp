@@ -838,6 +838,17 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
 
     switch(role) {
     case QnWorkbench::RAISED: {
+        /* Stop audio on previously raised item. */
+        CLCamDisplay *oldCamDisplay = camDisplay(oldItem);
+        if(oldCamDisplay != NULL)
+            oldCamDisplay->playAudio(false);
+
+        /* Play audio on newly raised item. */
+        CLCamDisplay *newCamDisplay = camDisplay(item);
+        if(newCamDisplay != NULL)
+            newCamDisplay->playAudio(true);
+
+        /* Sync new & old items. */
         if(oldItem != NULL)
             synchronize(oldItem);
         if(item != NULL) {
@@ -869,19 +880,8 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         synchronizeSceneBoundsExtension();
         break;
     }
-    case QnWorkbench::FOCUSED: {
-        /* Stop audio on previously focused item. */
-        CLCamDisplay *oldCamDisplay = camDisplay(oldItem);
-        if(oldCamDisplay != NULL)
-            oldCamDisplay->playAudio(false);
-
-        /* Play audio on newly focused item. */
-        CLCamDisplay *newCamDisplay = camDisplay(item);
-        if(newCamDisplay != NULL)
-            newCamDisplay->playAudio(true);
-
+    case QnWorkbench::FOCUSED:
         break;
-    }
     default:
         qnWarning("Unreachable code executed.");
         return;
