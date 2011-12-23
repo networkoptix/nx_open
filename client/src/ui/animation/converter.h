@@ -8,22 +8,47 @@ class QVariant;
  */
 class QnAbstractConverter {
 public:
+    QnAbstractConverter(int sourceType, int targetType):
+        m_sourceType(sourceType),
+        m_targetType(targetType)
+    {}
+
+    int sourceType() const {
+        return m_sourceType;
+    }
+
+    int targetType() const {
+        return m_targetType;
+    }
+
+    QVariant convertSourceToTarget(const QVariant &source) const;
+
+    QVariant convertTargetToSource(const QVariant &target) const;
+
     virtual ~QnAbstractConverter() {}
 
-    virtual QVariant convertTo(const QVariant &source) const = 0;
+protected:
+    virtual QVariant doConvertSourceToTarget(const QVariant &source) const = 0;
 
-    virtual QVariant convertFrom(const QVariant &source) const = 0;
+    virtual QVariant doConvertTargetToSource(const QVariant &target) const = 0;
+
+private:
+    int m_sourceType;
+    int m_targetType;
 };
 
 
 /**
  * QVector4D->QColor converter. 
  */
-class QnVectorToColorConverter: public QnAbstractConverter {
+class QnColorToVectorConverter: public QnAbstractConverter {
 public:
-    virtual QVariant convertTo(const QVariant &source) const override;
+    QnColorToVectorConverter();
 
-    virtual QVariant convertFrom(const QVariant &source) const override;
+protected:
+    virtual QVariant doConvertSourceToTarget(const QVariant &source) const override;
+
+    virtual QVariant doConvertTargetToSource(const QVariant &target) const override;
 };
 
 #endif // QN_CONVERTER_H

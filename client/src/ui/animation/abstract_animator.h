@@ -167,12 +167,15 @@ protected:
      */
     void setDurationOverride(int durationOverride);
 
-    void ensureDuration() const;
-
+    /**
+     * Marks stored duration as invalid. It will be recalculated on request.
+     */
     void invalidateDuration();
 
 private:
     virtual void tick(int deltaTime) override;
+
+    void ensureDuration() const;
 
 private:
     friend class QnAnimatorGroup;

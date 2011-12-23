@@ -7,13 +7,13 @@
 
 QnVariantAnimator::QnVariantAnimator(QObject *parent):
     QnAbstractAnimator(parent),
-    m_type(QMetaType::Void),
+    m_internalType(QMetaType::Void),
     m_target(NULL),
     m_speed(1.0),
     m_magnitudeCalculator(NULL),
     m_linearCombinator(NULL)
 {
-    updateType(type());
+    updateInternalType(internalType());
 }
 
 QnVariantAnimator::~QnVariantAnimator() {
@@ -44,7 +44,7 @@ void QnVariantAnimator::setAccessor(QnAbstractAccessor *accessor) {
     m_accessor.reset(accessor);
 
     invalidateDuration();
-    setType(currentValue().userType());
+    setInternalTypeInternal(currentValue().userType());
 }
 
 void QnVariantAnimator::setConverter(QnAbstractConverter *converter) {
@@ -56,7 +56,7 @@ void QnVariantAnimator::setConverter(QnAbstractConverter *converter) {
     m_converter.reset(converter);
 
     invalidateDuration();
-    setType(currentValue().userType());
+    setInternalTypeInternal(currentValue().userType());
 }
 
 void QnVariantAnimator::setEasingCurve(const QEasingCurve &easingCurve) {
@@ -99,30 +99,58 @@ void QnVariantAnimator::setTargetObjectInternal(QObject *target) {
     }
 
     invalidateDuration();
-    setType(currentValue().userType());
+    setInternalTypeInternal(currentValue().userType());
+}
+
+int QnVariantAnimator::internalType() const {
+    if(converter() == NULL)
+        return m_internalType;
+
+    return converter()->targetType();
+}
+
+int QnVariantAnimator::externalType() const {
+    if(converter() == NULL)
+        return m_internalType;
+
+    return converter()->sourceType();
+}
+
+QVariant QnVariantAnimator::toInternal(const QVariant &external) const {
+    if(converter() == NULL)
+        return external;
+
+    return converter()->convertSourceToTarget(external);
+}
+
+QVariant QnVariantAnimator::toExternal(const QVariant &internal) const {
+    if(converter() == NULL)
+        return internal;
+
+    return converter()->convertTargetToSource(internal);
 }
 
 void QnVariantAnimator::setTargetValue(const QVariant &targetValue) {
-    updateTargetValue(targetValue);
+    updateTargetValue(toInternal(targetValue));
 }
 
-void QnVariantAnimator::setType(int newType) {
-    assert(newType >= 0);
+void QnVariantAnimator::setInternalTypeInternal(int newInternalType) {
+    assert(newInternalType >= 0);
 
-    if(m_type == newType)
+    if(m_internalType == newInternalType)
         return;
 
-    updateType(newType);
+    updateInternalType(newInternalType);
 }
 
 int QnVariantAnimator::estimatedDuration() const {
-    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, m_startValue, -1.0, m_targetValue)) / m_speed * 1000;
+    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, m_internalStartValue, -1.0, m_internalTargetValue)) / m_speed * 1000;
 }
 
 void QnVariantAnimator::updateCurrentTime(int currentTime) {
     updateCurrentValue(interpolated(
-        startValue(), 
-        targetValue(), 
+        m_internalStartValue, 
+        m_internalTargetValue, 
         m_easingCurve.valueForProgress(static_cast<qreal>(currentTime) / duration())
     ));
 }
@@ -133,19 +161,16 @@ QVariant QnVariantAnimator::interpolated(const QVariant &from, const QVariant &t
 
 QVariant QnVariantAnimator::currentValue() const {
     if(accessor() == NULL || targetObject() == NULL)
-        return QVariant(type(), static_cast<void *>(NULL));
+        return QVariant(internalType(), static_cast<void *>(NULL));
 
-    QVariant result = accessor()->get(targetObject());
-    if(converter() != NULL)
-        result = converter()->convertFrom(result);
-    return result;
+    return toInternal(accessor()->get(targetObject()));
 }
 
 void QnVariantAnimator::updateCurrentValue(const QVariant &value) const {
     if(accessor() == NULL || targetObject() == NULL)
         return;
 
-    accessor()->set(m_target, converter() == NULL ? value : converter()->convertTo(value));
+    accessor()->set(m_target, toExternal(value));
 }
 
 void QnVariantAnimator::updateState(State newState) {
@@ -162,27 +187,27 @@ void QnVariantAnimator::updateState(State newState) {
     }
 
     if(newState == RUNNING) {
-        m_startValue = currentValue();
+        m_internalStartValue = currentValue();
         invalidateDuration();
     }
 
     base_type::updateState(newState);
 }
 
-void QnVariantAnimator::updateType(int newType) {
-    m_type = newType;
-    m_startValue = QVariant(newType, static_cast<void *>(NULL));
-    m_targetValue = QVariant(newType, static_cast<void *>(NULL));
+void QnVariantAnimator::updateInternalType(int newInternalType) {
+    m_internalType = newInternalType;
+    m_internalStartValue = QVariant(newInternalType, static_cast<void *>(NULL));
+    m_internalTargetValue = QVariant(newInternalType, static_cast<void *>(NULL));
 
-    m_linearCombinator = LinearCombinator::forType(type());
+    m_linearCombinator = LinearCombinator::forType(internalType());
     if(m_linearCombinator == NULL) {
-        qnWarning("No linear combinator registered for type '%1'", QMetaType::typeName(type()));
+        qnWarning("No linear combinator registered for type '%1'.", QMetaType::typeName(internalType()));
         m_linearCombinator = LinearCombinator::forType(0);
     }
 
-    m_magnitudeCalculator = MagnitudeCalculator::forType(type());
+    m_magnitudeCalculator = MagnitudeCalculator::forType(internalType());
     if(m_linearCombinator == NULL) {
-        qnWarning("No magnitude calculator registered for type '%1'", QMetaType::typeName(type()));
+        qnWarning("No magnitude calculator registered for type '%1'.", QMetaType::typeName(internalType()));
         m_magnitudeCalculator = MagnitudeCalculator::forType(0);
     }
 
@@ -190,8 +215,8 @@ void QnVariantAnimator::updateType(int newType) {
 }
 
 void QnVariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
-    if(newTargetValue.userType() != m_type) {
-        qnWarning("Value of invalid type was provided - expected '%1', got '%2'.", QMetaType::typeName(m_type), QMetaType::typeName(newTargetValue.userType()));
+    if(newTargetValue.userType() != internalType()) {
+        qnWarning("Value of invalid type was provided - expected '%1', got '%2'.", QMetaType::typeName(internalType()), QMetaType::typeName(newTargetValue.userType()));
         return;
     }
 
@@ -200,10 +225,17 @@ void QnVariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
         return;
     }
 
-    m_targetValue = newTargetValue;
+    m_internalTargetValue = newTargetValue;
     invalidateDuration();
 }
 
+QVariant QnVariantAnimator::targetValue() const {
+    return toExternal(m_internalTargetValue);
+}
+
+QVariant QnVariantAnimator::startValue() const {
+    return toExternal(m_internalStartValue);
+}
 
 
 

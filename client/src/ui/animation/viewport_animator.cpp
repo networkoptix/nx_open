@@ -101,8 +101,8 @@ void QnViewportAnimator::setRelativeSpeed(qreal relativeSpeed) {
 
 int QnViewportAnimator::estimatedDuration() const {
     QGraphicsView *view = this->view();
-    QRectF startRect = m_accessor->aspectRatioAdjusted(view, startValue().toRectF());
-    QRectF targetRect = m_accessor->aspectRatioAdjusted(view, targetValue().toRectF());
+    QRectF startRect = m_accessor->aspectRatioAdjusted(view, internalStartValue().toRectF());
+    QRectF targetRect = m_accessor->aspectRatioAdjusted(view, internalTargetValue().toRectF());
 
     qreal speed;
     if(qFuzzyIsNull(m_relativeSpeed)) {
@@ -117,3 +117,4 @@ int QnViewportAnimator::estimatedDuration() const {
 QRectF QnViewportAnimator::targetRect() const {
     return targetValue().toRectF();
 }
+
