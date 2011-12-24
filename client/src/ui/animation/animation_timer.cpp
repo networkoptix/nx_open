@@ -44,8 +44,7 @@ AnimationTimer::AnimationTimer():
 {}
 
 AnimationTimer::~AnimationTimer() {
-    while(!m_listeners.empty())
-        removeListener(m_listeners[0]);
+    clearListeners();
 }
 
 void AnimationTimer::deactivate() {
