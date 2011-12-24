@@ -285,11 +285,11 @@ int main(int argc, char *argv[])
 
     qApp->setStyle(Skin::style());
 
-    qApp->setStyleSheet(QLatin1String(
+    /*qApp->setStyleSheet(QLatin1String(
             "QMenu {\n"
             "font-family: Bodoni MT;\n"
             "font-size: 18px;\n"
-            "}"));
+            "}"));*/
 
     /*qApp->setStyleSheet(QLatin1String(
         "QMenu {\n"

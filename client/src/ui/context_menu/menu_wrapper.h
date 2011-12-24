@@ -5,6 +5,7 @@
 #include <QHash>
 
 class QAction;
+class QMenu;
 
 namespace detail {
     class ActionFactory;
@@ -16,6 +17,10 @@ public:
     QnMenuWrapper(QObject *parent = NULL);
 
     virtual ~QnMenuWrapper();
+
+    static QnMenuWrapper *instance();
+
+    QMenu *newMenu(QWidget *parent = NULL);
 
     /**
      * Enum of all menu actions.
@@ -273,6 +278,8 @@ protected:
 
 private:
     QHash<ActionId, ActionData> m_infoByAction;
+
+    QFont m_menuFont;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMenuWrapper::ActionFlags);

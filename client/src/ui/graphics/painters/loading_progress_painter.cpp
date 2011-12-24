@@ -1,16 +1,8 @@
 #include "loading_progress_painter.h"
-#include <cmath> /* For std::fmod, std::sin and std::cos. */
+#include <cmath> /* For std::fmod. */
 #include <utils/common/qt_opengl.h>
 #include <ui/common/linear_combination.h>
 #include "color_shader_program.h"
-
-namespace {
-    void glVertexPolar(qreal alpha, qreal r) {
-        glVertex(r * std::cos(alpha), r * std::sin(alpha));
-    }
-
-} // anonymous namespace
-
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
     m_sectorCount(sectorCount),

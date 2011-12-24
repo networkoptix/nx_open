@@ -18,6 +18,7 @@
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/models/resourcemodel.h"
 #include "ui/skin/skin.h"
+#include "ui/context_menu/menu_wrapper.h"
 
 class NavigationTreeSortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -156,33 +157,33 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         resources.append(qnResPool->getResourceById(QnId(QString::number(index.data(Qt::UserRole + 1).toUInt()))));
 
-    QMenu menu;
+    QScopedPointer<QMenu> menu(QnMenuWrapper::instance()->newMenu());
 
-    QAction *openAction = new QAction(tr("Open"), &menu);
+    QAction *openAction = new QAction(tr("Open"), menu.data());
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
-    menu.addAction(openAction);
-    menu.addSeparator();
+    menu->addAction(openAction);
+    menu->addSeparator();
     if (resources.size() == 1)
     {
         const QnResourcePtr resource = resources.first();
         if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT))
         {
-            menu.addAction(&cm_editTags);
+            menu->addAction(&cm_editTags);
 
             if (resource->associatedWithFile())
-                menu.addAction(&cm_remove_from_disk);
+                menu->addAction(&cm_remove_from_disk);
 
             if (resource->checkFlag(QnResource::ARCHIVE))
-                menu.addAction(&cm_upload_youtube);
+                menu->addAction(&cm_upload_youtube);
 
             if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::SINGLE_SHOT))
-                menu.addAction(&cm_open_containing_folder);
+                menu->addAction(&cm_open_containing_folder);
         }
         else if (resource->checkFlag(QnResource::live_cam))
         {
             // ### Start/Stop recording (Ctrl+R)
             // ### Delete(if no connection)(Shift+Del)
-            menu.addAction(&cm_editTags);
+            menu->addAction(&cm_editTags);
             // ### Export selected... (Ctrl+E)
         }
         else if (resource->checkFlag(QnResource::server))
@@ -192,7 +193,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
         // ### handle layouts
 
         if (CLDeviceSettingsDlgFactory::canCreateDlg(resource))
-            menu.addAction(&cm_settings);
+            menu->addAction(&cm_settings);
     }
     else if (resources.size() > 1)
     {
@@ -200,17 +201,17 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
     }
     else
     {
-        menu.addAction(&cm_open_file);
-        menu.addAction(&cm_new_item);
+        menu->addAction(&cm_open_file);
+        menu->addAction(&cm_new_item);
     }
-    menu.addSeparator();
-    menu.addAction(&cm_toggle_fullscreen);
-    menu.addAction(&cm_screen_recording);
-    menu.addAction(&cm_preferences);
-    menu.addSeparator();
-    menu.addAction(&cm_exit);
+    menu->addSeparator();
+    menu->addAction(&cm_toggle_fullscreen);
+    menu->addAction(&cm_screen_recording);
+    menu->addAction(&cm_preferences);
+    menu->addSeparator();
+    menu->addAction(&cm_exit);
 
-    /*QAction *action = */menu.exec(event->globalPos());
+    /*QAction *action = */menu->exec(event->globalPos());
 }
 
 void NavigationTreeWidget::filterChanged(const QString &filter)

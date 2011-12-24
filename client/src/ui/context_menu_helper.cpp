@@ -5,6 +5,8 @@
 
 #include "ui/skin/skin.h"
 
+#include "ui/context_menu/menu_wrapper.h"
+
 QAction cm_new_item(QObject::tr("New Item"), 0);
 QAction cm_exit(QObject::tr("Exit"), 0);
 QAction cm_fitinview(QObject::tr("Fit in View"), 0);
@@ -70,7 +72,8 @@ void initContextMenu()
     cm_editTags.setShortcut(QObject::tr("Alt+T"));
     cm_editTags.setShortcutContext(Qt::ApplicationShortcut);
 
-    QMenu *newItemMenu = new QMenu(QObject::tr("New Item"));
+    QMenu *newItemMenu = QnMenuWrapper::instance()->newMenu();
+    newItemMenu->setTitle(QObject::tr("New Item"));
     newItemMenu->addAction(new QAction(QObject::tr("Camera"), &cm_new_item));
     newItemMenu->addAction(new QAction(QObject::tr("Media Folder"), &cm_new_item));
     newItemMenu->addAction(new QAction(QObject::tr("Layout"), &cm_new_item));
@@ -81,7 +84,8 @@ void initContextMenu()
     cm_start_video_recording.setShortcuts(QList<QKeySequence>() << QObject::tr("Alt+R") << Qt::Key_MediaRecord);
     cm_start_video_recording.setShortcutContext(Qt::ApplicationShortcut);
 
-    QMenu *screenRecordingMenu = new QMenu(QObject::tr("Screen Recording"));
+    QMenu *screenRecordingMenu = QnMenuWrapper::instance()->newMenu();
+    screenRecordingMenu->setTitle(QObject::tr("Screen Recording"));
     screenRecordingMenu->addAction(&cm_start_video_recording);
     screenRecordingMenu->addAction(&cm_recording_settings);
     cm_screen_recording.setMenu(screenRecordingMenu);
@@ -97,7 +101,8 @@ void initContextMenu()
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
     cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/togglefullscreen.png")));
 
-    QMenu *itemDistanceMenu = new QMenu(QObject::tr("Item distance"));
+    QMenu *itemDistanceMenu = QnMenuWrapper::instance()->newMenu();
+    itemDistanceMenu->setTitle(QObject::tr("Item distance"));
     for (int i = 5; i < 40; i += 5)
     {
         QAction *action = new QAction(QString("%1%").arg(i), &cm_distance);
@@ -107,7 +112,8 @@ void initContextMenu()
     cm_distance.setMenu(itemDistanceMenu);
     cm_distance.setToolTip(QObject::tr("Item distance"));
 
-    QMenu *rotationMenu = new QMenu(QObject::tr("Rotation"));
+    QMenu *rotationMenu = QnMenuWrapper::instance()->newMenu();
+    rotationMenu->setTitle(QObject::tr("Rotation"));
     {
         QAction *action = new QAction(QObject::tr("0"), &cm_rotate);
         action->setData(0);

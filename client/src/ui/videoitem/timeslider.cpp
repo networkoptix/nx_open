@@ -19,6 +19,8 @@
 #include "ui/widgets2/graphicsslider.h"
 #include "ui/widgets/tooltipitem.h"
 
+#include "ui/context_menu/menu_wrapper.h"
+
 #include <qmath.h>
 
 //#define TIMESLIDER_ANIMATED_DRAG
@@ -653,15 +655,15 @@ void TimeLine::setSelectionRange(const QPair<qint64, qint64> &range)
 
 void TimeLine::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    QMenu menu;
-    QAction *selectRangeAction = menu.addAction(tr("Select Range"));
-    menu.addSeparator();
-    QAction *clearRangeAction = menu.addAction(tr("Clear Range"));
+    QScopedPointer<QMenu> menu(QnMenuWrapper::instance()->newMenu());
+    QAction *selectRangeAction = menu->addAction(tr("Select Range"));
+    menu->addSeparator();
+    QAction *clearRangeAction = menu->addAction(tr("Clear Range"));
     clearRangeAction->setEnabled(m_rangeSelectionState == RangeSelected);
-    QAction *exportRangeAction = menu.addAction(tr("Export Selected Range..."));
+    QAction *exportRangeAction = menu->addAction(tr("Export Selected Range..."));
     exportRangeAction->setEnabled(m_rangeSelectionState == RangeSelected);
 
-    QAction *selectedAction = menu.exec(event->screenPos());
+    QAction *selectedAction = menu->exec(event->screenPos());
 
     if (selectedAction == selectRangeAction) {
         resetSelectionRange();

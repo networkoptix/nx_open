@@ -50,6 +50,8 @@
 
 #include <ui/videoitem/navigationitem.h>
 
+#include <ui/context_menu/menu_wrapper.h>
+
 #include <file_processor.h>
 
 #include "grid_walker.h"
@@ -272,7 +274,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
 
-    m_itemContextMenu = new QMenu();
+    m_itemContextMenu = QnMenuWrapper::instance()->newMenu();
     m_itemContextMenu->addAction(showMotionAction);
     m_itemContextMenu->addAction(hideMotionAction);
 
@@ -657,7 +659,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 }
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
-    QScopedPointer<QMenu> menu(new QMenu(display()->view()));
+    QScopedPointer<QMenu> menu(QnMenuWrapper::instance()->newMenu(display()->view()));
     if(m_screenRecorder->isSupported()) {
         if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
             menu->addAction(m_stopRecordingAction);

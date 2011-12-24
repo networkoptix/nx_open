@@ -2,7 +2,10 @@
 #define QN_BLUE_BACKROUND_PAINTER_H
 
 #include <QElapsedTimer>
+#include <QScopedPointer>
 #include "graphics_view.h" /* For QnLayerPainter. */
+
+#define QN_BACKGROUND_PAINTER_NO_OPENGL
 
 class QnBlueBackgroundPainter : public QnLayerPainter
 {
@@ -10,9 +13,11 @@ public:
     /**
      * \param cycleIntervalSecs         Background animation cycle, in seconds.
      */
-	QnBlueBackgroundPainter(qreal cycleIntervalSecs);
+    QnBlueBackgroundPainter(qreal cycleIntervalSecs);
 
-	virtual void drawLayer(QPainter *painter, const QRectF &rect) override;
+    virtual ~QnBlueBackgroundPainter();
+
+    virtual void drawLayer(QPainter *painter, const QRectF &rect) override;
 
 protected:
     virtual void installedNotify() override;

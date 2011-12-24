@@ -1,13 +1,20 @@
 #include <cmath> /* For std::fmod. */
 #include <QRect>
 #include <QRadialGradient>
+#include <ui/graphics/painters/radial_gradient_painter.h>
+#include <utils/common/qt_opengl.h>
 #include "blue_background_painter.h"
+#include "../painters/paused_painter.h"
+
+Q_GLOBAL_STATIC_WITH_ARGS(QnRadialGradientPainter, radialGradientPainter, (32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0)));
 
 QnBlueBackgroundPainter::QnBlueBackgroundPainter(qreal cycleIntervalSecs):
     m_cycleIntervalSecs(cycleIntervalSecs)
 {
     m_timer.start();
 }
+
+QnBlueBackgroundPainter::~QnBlueBackgroundPainter() {}
 
 qreal QnBlueBackgroundPainter::position()
 {
@@ -36,25 +43,54 @@ void QnBlueBackgroundPainter::installedNotify() {
 
 void QnBlueBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
 {
-	qreal pos = position();
+    qreal pos = position();
 
-	QColor color(10, 10, 110 + 50 * pos, 255); // NO
-	//QColor color(0, 100 + 50 * rpos, 160, 255); // trinity
+    QColor color(10, 10, 110 + 50 * pos, 255); // NO
+    //QColor color(0, 100 + 50 * rpos, 160, 255); // trinity
 
-	QPointF center1(rect.center().x() - pos * rect.width() / 2, rect.center().y());
-	QPointF center2(rect.center().x() + pos * rect.width() / 2, rect.center().y());
+    QPointF center1(rect.center().x() - pos * rect.width() / 2, rect.center().y());
+    QPointF center2(rect.center().x() + pos * rect.width() / 2, rect.center().y());
 
+    qreal radius = qMin(rect.width(), rect.height()) / 1.4142;
+
+#ifdef QN_BACKGROUND_PAINTER_NO_OPENGL
 	{
-		QRadialGradient radialGrad(center1, qMin(rect.width(), rect.height()) / 1.5);
+		QRadialGradient radialGrad(center1, radius);
 		radialGrad.setColorAt(0, color);
 		radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
 		painter->fillRect(rect, radialGrad);
 	}
 
 	{
-		QRadialGradient radialGrad(center2, qMin(rect.width(), rect.height()) / 1.5);
+		QRadialGradient radialGrad(center2, radius);
 		radialGrad.setColorAt(0, color);
 		radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
 		painter->fillRect(rect, radialGrad);
 	}
+#else
+    painter->beginNativePainting();
+    {
+        QnRadialGradientPainter *gradientPainter = radialGradientPainter();
+
+        glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+        glTranslate(center1);
+        glScale(radius, radius);
+        gradientPainter->paint(color);
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslate(center2);
+        glScale(radius, radius);
+        gradientPainter->paint(color);
+        glPopMatrix();
+
+
+        glPopAttrib();
+    }
+    painter->endNativePainting();
+#endif
 }

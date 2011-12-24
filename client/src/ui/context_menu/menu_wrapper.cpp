@@ -1,5 +1,6 @@
 #include "menu_wrapper.h"
 #include <QAction>
+#include <QMenu>
 #include <cassert>
 
 namespace detail {
@@ -38,6 +39,7 @@ namespace detail {
 QnMenuWrapper::QnMenuWrapper(QObject *parent): 
     QObject(parent)
 {
+#if 0
     detail::ActionFactory factory(this);
 
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);
@@ -92,8 +94,26 @@ QnMenuWrapper::QnMenuWrapper(QObject *parent):
     factory(APP_EXIT,                       tr("Exit"),                         tr("Alt+F4"),           GLOBAL_SCOPE);
 
     assert(m_infoByAction.size() == ACTION_COUNT);
+#endif
+
+    m_menuFont = QFont(QLatin1String("Bodoni MT"));
+    m_menuFont.setPixelSize(18);
 }
 
 QnMenuWrapper::~QnMenuWrapper() {
     return;
+}
+
+Q_GLOBAL_STATIC(QnMenuWrapper, menuWrapperInstance);
+
+QnMenuWrapper *QnMenuWrapper::instance() {
+    return menuWrapperInstance();
+}
+
+QMenu *QnMenuWrapper::newMenu(QWidget *parent) {
+    QMenu *result = new QMenu(parent);
+
+    result->setFont(m_menuFont);
+
+    return result;
 }
