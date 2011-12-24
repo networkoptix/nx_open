@@ -185,6 +185,7 @@ void MainWindow::currentTabChanged(int index)
     QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>(); // ###
     m_workbench->setLayout(layout);
     m_display->fitInView(false);
+    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
 }
 
 void MainWindow::closeTab(int index)
