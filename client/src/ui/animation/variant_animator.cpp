@@ -196,7 +196,8 @@ void QnVariantAnimator::updateState(State newState) {
         if(targetObject() == NULL)
             return; /* This is a normal use case, don't emit warnings. */
     } if(oldState == RUNNING) {
-        m_easingCurveCorrection = this->easingCurveProgress(currentTime());
+        if(currentTime() < duration())
+            m_easingCurveCorrection = this->easingCurveProgress(currentTime());
     }
 
     if(newState == RUNNING) {
