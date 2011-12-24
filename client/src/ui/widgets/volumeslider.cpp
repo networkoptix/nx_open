@@ -162,7 +162,7 @@ void VolumeSlider::onValueChanged(int value)
     if (m_toolTip) {
         QStyleOptionSlider opt;
         initStyleOption(&opt);
-        const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+        const QRectF sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
         m_toolTip->setPos(sliderRect.center().x(), sliderRect.top());
         m_toolTip->setText(!QtvAudioDevice::instance().isMute() ? tr("%1%").arg(value) : tr("Muted"));
         m_toolTip->setVisible(true);

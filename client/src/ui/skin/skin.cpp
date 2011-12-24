@@ -2,7 +2,10 @@
 
 #include <QtGui/QImage>
 #include <QtGui/QPixmapCache>
+#include <QtGui/QPainter>
 
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/warnings.h>
 #include "appstyle_p.h"
 
 #ifndef CL_SKIN_PATH
@@ -67,6 +70,9 @@ QStyle *Skin::style()
     return new AppStyle(baseStyle);
 }
 
+AppStyle::AppStyle(const QString &baseStyle, QObject *parent): 
+    ProxyStyle(baseStyle, parent) 
+{}
 
 int AppStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
 {
@@ -148,4 +154,39 @@ QIcon AppStyle::standardIconImplementation(StandardPixmap standardIcon, const QS
     }
 
     return icon;
+}
+
+void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
+    if(control == CC_Slider) {
+        drawSliderControl(static_cast<const QStyleOptionSlider *>(option), painter, widget);
+    } else {
+        ProxyStyle::drawComplexControl(control, option, painter, widget);
+    }
+}
+
+void AppStyle::drawSliderControl(const QStyleOptionSlider *option, QPainter *painter, const QWidget *widget) const {
+    QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
+    QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
+
+    /* bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle); */
+
+    if(option->orientation != Qt::Horizontal)
+        qnWarning("Non-horizontal sliders are not implemented. Expect display artifacts.");
+
+    QPixmap grooveBorderPic = Skin::pixmap(QLatin1String("slider_groove_lborder.png"), grooveRect.size(),       Qt::KeepAspectRatio,   Qt::SmoothTransformation);
+    QPixmap grooveBodyPic   = Skin::pixmap(QLatin1String("slider_groove_body.png"),    grooveRect.size(),       Qt::KeepAspectRatio,   Qt::SmoothTransformation);
+    QPixmap handlePic       = Skin::pixmap(QLatin1String("slider_handle.png"),         2 * handleRect.size(),   Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    /* Draw groove. */
+    painter->drawPixmap(grooveRect.topLeft(), grooveBorderPic);
+    {
+        QnScopedPainterTransformRollback transformRollback(painter);
+        painter->translate(grooveRect.left() + grooveRect.width(), grooveRect.top());
+        painter->scale(-1.0, 1.0);
+        painter->drawPixmap(0, 0, grooveBorderPic);
+    }
+    painter->drawTiledPixmap(grooveRect.adjusted(grooveBorderPic.width(), 0, -grooveBorderPic.width(), 0), grooveBodyPic);
+
+    /* Draw handle. */
+    painter->drawPixmap(handleRect.topLeft() - QPointF(handleRect.width(), handleRect.height()) / 2, handlePic);
 }
