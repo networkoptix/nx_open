@@ -40,6 +40,7 @@
 
 #include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"
+#include "eventmanager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -171,6 +172,25 @@ void initAppServerConnection()
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
 }
 
+void initAppServerEventConnection()
+{
+    QUrl appServerEventsUrl;
+
+    // ### remove
+    QSettings settings;
+    appServerEventsUrl.setScheme(QLatin1String("http"));
+    appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+    appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
+    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+    appServerEventsUrl.setPath("/events");
+
+    static const int EVENT_RECONNECT_TIMEOUT = 3000;
+
+    QnEventManager* eventManager = QnEventManager::instance();
+    eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+}
+
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
@@ -200,6 +220,7 @@ int main(int argc, char *argv[])
     }
 
     initAppServerConnection();
+    initAppServerEventConnection();
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 

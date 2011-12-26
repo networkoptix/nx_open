@@ -16,6 +16,8 @@ public:
     virtual void beforeDisconnectFromResource() = 0;
     virtual void disconnectFromResource();
 
+    virtual void beforeUpdate() {}
+    virtual void afterUpdate() {}
 protected:
     QnResourcePtr m_resource;
 };
