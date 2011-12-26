@@ -1,4 +1,5 @@
 INCLUDEPATH += ../../common/src
+INCLUDEPATH += ../../common/contrib/qjson/include
 
 win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
@@ -75,7 +76,7 @@ win32 {
 }
 
 mac {
-    LIBS += -lxerces-c-3.1
+    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1
     DEFINES += QN_EXPORT=
 }
 
@@ -83,14 +84,14 @@ LIBS += -L$$EVETOOLS_DIR/lib
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release
 }
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
 
 win32 {
   win32-msvc* {

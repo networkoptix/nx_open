@@ -103,7 +103,7 @@ void serializeField(QByteArray& stream, qint64 field)
     else if (field < 0x4000000000ll-1)
         saveField(stream, field, 3, 5);
     else {
-        saveField(stream, 0xffffffffff, 3, 5);
+        saveField(stream, 0xffffffffffll, 3, 5);
         qint64 data = htonll(field << 16);
         stream.append(((const char*) &data), 6);
     }
