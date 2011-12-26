@@ -224,7 +224,6 @@ signals:
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -247,7 +246,7 @@ protected:
 
 private slots:
     void at_sourceSizeChanged(const QSize &size);
-
+    void onResourceUpdated();
 private:
     /**
      * \param channel                   Channel number.

@@ -261,23 +261,23 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
-    QAction *showMotionAction           = newAction(tr("Open motion view/search grid"),          tr(""),             this);
-    QAction *hideMotionAction           = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
+    m_showMotionAction                  = newAction(tr("Open motion view/search grid"),          tr(""),             this);
+    m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
     m_startRecordingAction              = newAction(tr("Start screen recording"), tr(""),           this);
     m_stopRecordingAction               = newAction(tr("Stop screen recording"), tr(""),            this);
     QAction *toggleRecordingAction      = newAction(tr("Start/stop screen recording"), tr("Alt+R"), this);
     m_recordingSettingsActions          = newAction(tr("Screen recording settings"), tr(""),        this);
 
-    connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
-    connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(m_showMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(m_hideMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(m_startRecordingAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_startRecordingAction_triggered()));
     connect(m_stopRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_stopRecordingAction_triggered()));
     connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
 
     m_itemContextMenu = new QMenu(display->view());
-    m_itemContextMenu->addAction(showMotionAction);
-    m_itemContextMenu->addAction(hideMotionAction);
+    m_itemContextMenu->addAction(m_showMotionAction);
+    m_itemContextMenu->addAction(m_hideMotionAction);
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);

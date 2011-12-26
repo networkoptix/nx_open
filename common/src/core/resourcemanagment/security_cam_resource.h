@@ -40,7 +40,7 @@ public:
     void setScheduleTasks(const QnScheduleTaskList& scheduleTasks);
     const QnScheduleTaskList getScheduleTasks() const;
 
-    QnSequrityCamResource& operator=(const QnSequrityCamResource& other);
+    QnSequrityCamResource& operator=(const QnResource& other) override;
 
 signals:
     void motionMaskChanged(QRegion region);

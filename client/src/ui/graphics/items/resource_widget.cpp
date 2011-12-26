@@ -96,6 +96,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
 
     m_display = new QnResourceDisplay(m_resource, this);
+
+    connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(onResourceUpdated()));
+
     Q_ASSERT(m_display);
     m_videoLayout = m_display->videoLayout();
     Q_ASSERT(m_videoLayout);
@@ -361,6 +364,12 @@ void QnResourceWidget::prepareMotionMask()
     m_motionMaskReady = true;
 };
 
+void QnResourceWidget::onResourceUpdated()
+{
+    m_motionMaskReady = false;
+}
+
+
 void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion) {
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
@@ -376,7 +385,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnM
             painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
         }
         else {
-            QRegion lineRect(x, 0, 1, MD_HEIGHT);
+            QRegion lineRect(x, 0, 1, MD_HEIGHT+1);
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
@@ -389,7 +398,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnM
             painter->drawLine(QPointF(0.0, y*yStep), QPointF(rect.width(), y*yStep));
         }
         else {
-            QRegion lineRect(0, y, MD_WIDTH, 1);
+            QRegion lineRect(0, y, MD_WIDTH+1, 1);
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {

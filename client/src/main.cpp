@@ -367,6 +367,8 @@ int main(int argc, char *argv[])
     QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
         &mainWindow, SLOT(handleMessage(const QString&)));
 
+    QnEventManager::instance()->run();
+
     int result = application.exec();
 
     QnResource::stopCommandProc();

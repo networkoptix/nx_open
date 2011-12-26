@@ -71,7 +71,7 @@ public:
     QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
 
-    QnResource& operator=(const QnResource& other);
+    virtual QnResource& operator=(const QnResource& other);
 
     virtual void deserialize(const QnResourceParameters& parameters);
 

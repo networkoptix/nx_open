@@ -46,6 +46,8 @@ QnResource& QnResource::operator=(const QnResource& other)
 
     foreach (QnResourceConsumer* consumer, m_consumers)
         consumer->afterUpdate();
+    
+    return *this;
 }
 
 void QnResource::deserialize(const QnResourceParameters& parameters)

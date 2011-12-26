@@ -178,6 +178,9 @@ private:
     QPropertyAnimation *m_recordingAnimation;
 
     MotionSelectionInstrument *m_motionSelectionInstrument;
+
+    QAction *m_showMotionAction;
+    QAction *m_hideMotionAction;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H
