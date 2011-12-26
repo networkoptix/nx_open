@@ -71,7 +71,7 @@ void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
     addMotion((const quint8*) data->data.data(), data->timestamp);
 }
 
-void QnMetaDataV1::removeMotion(const quint8* image, int startIndex, int endIndex)
+void QnMetaDataV1::removeMotion(const __m128i* image, int startIndex, int endIndex)
 {
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
@@ -169,3 +169,35 @@ bool QnMetaDataV1::containTime(const qint64 timeUsec) const
     else
         return timestamp <= timeUsec && timestamp + m_duration > timeUsec;
 }
+
+inline void setBit(quint8* data, int x, int y)
+{
+    int offset = (x * MD_HEIGHT + y) / 8;
+    data[offset] |= 0x80 >> (y&7);
+}
+
+
+void QnMetaDataV1::createMask(const QRegion& region,  __m128i* mask, int* maskStart, int* maskEnd)
+{
+    if (maskStart)
+        *maskStart = 0;
+    if (maskEnd)
+        *maskEnd = 0;
+    memset(mask, 0, MD_WIDTH * MD_HEIGHT / 8);
+
+    for (int i = 0; i < region.rectCount(); ++i)
+    {
+        const QRect& rect = region.rects().at(i);
+        if (maskStart)
+            *maskStart = qMin((rect.left() * MD_HEIGHT + rect.top()) / 128, *maskStart);
+        if (maskEnd)
+            *maskEnd = qMax((rect.right() * MD_HEIGHT + rect.bottom()) / 128, *maskEnd);
+        for (int x = rect.left(); x <= rect.right(); ++x)
+        {
+            for (int y = rect.top(); y <= rect.bottom(); ++y)
+                setBit((quint8*) mask, x,y);
+        }
+    }
+
+}
+

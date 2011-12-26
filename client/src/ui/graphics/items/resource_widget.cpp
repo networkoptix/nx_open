@@ -16,6 +16,7 @@
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "settings.h"
+#include "core/resourcemanagment/security_cam_resource.h"
 
 namespace {
     /** Default frame width. */
@@ -63,7 +64,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_frameWidth(0.0),
     m_aboutToBeDestroyedEmitted(false),
     m_activityDecorationsVisible(false),
-    m_displayMotionGrid(false)
+    m_displayMotionGrid(false),
+    m_motionMaskReady(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -107,6 +109,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_channelState.resize(m_channelCount);
 
     m_display->start();
+
+    m_motionMaskBinData = (__m128i*) qMallocAligned(MD_WIDTH*MD_HEIGHT,32);
 }
 
 QnResourceWidget::~QnResourceWidget() {
@@ -118,6 +122,7 @@ QnResourceWidget::~QnResourceWidget() {
         m_shadow.data()->setShapeProvider(NULL);
         delete m_shadow.data();
     }
+    qFreeAligned(m_motionMaskBinData);
 }
 
 const QnResourcePtr &QnResourceWidget::resource() const {
@@ -324,17 +329,78 @@ void QnResourceWidget::hideActivityDecorations() {
     m_activityDecorationsVisible = false;
 }
 
+void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF& rect) 
+{
+    QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
+    if (!camera)
+        return;
+    drawFilledRegion(painter, rect, camera->getMotionMask(), QColor(255, 255, 255, 26));
+}
+
+void QnResourceWidget::prepareMotionMask()
+{
+    QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
+    if (camera) 
+    {
+        m_motionMask = camera->getMotionMask();
+        QnMetaDataV1::createMask(m_motionMask, m_motionMaskBinData);
+
+        if (!m_motionMask.rects().isEmpty())
+        {
+            QVector<QRect> rects = m_motionMask.rects();
+            for (int i = 0; i < rects.size(); ++i) {
+                if (rects[i].x())
+                    rects[i].setX(rects[i].x()+1);
+                if (rects[i].y())
+                    rects[i].setY(rects[i].y()+1);
+            }
+            m_motionMask.setRects(&rects[0], rects.size());
+        }
+
+    }
+    m_motionMaskReady = true;
+};
+
 void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion) {
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
 
+    if (!m_motionMaskReady)
+        prepareMotionMask();
+
     painter->setPen(QPen(QColor(255, 255, 255, 40)));
-    for (int x = 0; x < MD_WIDTH; ++x)
-        painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
-    for (int y = 0; y < MD_HEIGHT; ++y)
-        painter->drawLine(QPointF(0.0, y*yStep), QPointF(rect.width(), y*yStep));
+    for (int x = 0; x < MD_WIDTH; ++x) 
+    {
+        if (m_motionMask.isEmpty())
+        {
+            painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
+        }
+        else {
+            QRegion lineRect(x, 0, 1, MD_HEIGHT);
+            QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
+            foreach(const QRect& r, drawRegion.rects())
+            {
+                painter->drawLine(QPointF(x*xStep, r.top()*yStep), QPointF(x*xStep, r.bottom()*yStep));
+            }
+        }
+    }
+    for (int y = 0; y < MD_HEIGHT; ++y) {
+        if (m_motionMask.isEmpty()) {
+            painter->drawLine(QPointF(0.0, y*yStep), QPointF(rect.width(), y*yStep));
+        }
+        else {
+            QRegion lineRect(0, y, MD_WIDTH, 1);
+            QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
+            foreach(const QRect& r, drawRegion.rects())
+            {
+                painter->drawLine(QPointF(r.left()*xStep, y*yStep), QPointF(r.right()*xStep, y*yStep));
+            }
+        }
+    }
     if (!motion)
         return;
+
+    motion->removeMotion(m_motionMaskBinData);
 
     painter->setPen(QPen(QColor(255, 0, 0, 80)));
     for (int y = 0; y < MD_HEIGHT; ++y)
@@ -361,7 +427,8 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qi
     }
 }
 
-void QnResourceWidget::drawMotionSelection(QPainter *painter, const QRectF &rect, const QRegion &selection) {
+void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color) {
+    qDebug() << selection;
     QPainterPath path;
     path.addRegion(selection);
     path = path.simplified(); // TODO: this is slow.
@@ -370,8 +437,8 @@ void QnResourceWidget::drawMotionSelection(QPainter *painter, const QRectF &rect
     painter->translate(rect.topLeft());
     painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
 
-    painter->setBrush(QColor(0, 255, 0, 40));
-    painter->setPen(QPen(QColor(0, 255, 0, 40), 0));
+    painter->setBrush(color);
+    painter->setPen(QPen(color));
     painter->drawPath(path);
 }
 
@@ -435,9 +502,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         {
             drawMotionGrid(painter, rect, m_renderer->lastFrameMetadata(i));
 
+            drawMotionMask(painter, rect);
+
             /* Selection. */
             if(!m_channelState[i].motionSelection.isEmpty())
-                drawMotionSelection(painter, rect, m_channelState[i].motionSelection);
+                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, QColor(0, 255, 0, 40));
         }
 
         /* Current time. */

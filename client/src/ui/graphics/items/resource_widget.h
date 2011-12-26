@@ -12,6 +12,8 @@
 #include "polygonal_shadow_item.h"
 #include "core/datapacket/mediadatapacket.h"
 
+
+
 class QGraphicsLinearLayout;
 
 class QnResourceWidgetRenderer;
@@ -286,7 +288,10 @@ private:
 
     void drawMotionGrid(QPainter *painter, const QRectF &rect, QnMetaDataV1Ptr motion);
 
-    void drawMotionSelection(QPainter *painter, const QRectF &rect, const QRegion &selection);
+    void prepareMotionMask();
+    void drawMotionMask(QPainter *painter, const QRectF& rect);
+
+    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
 
 private:
     /** Layout item. */
@@ -341,6 +346,9 @@ private:
     bool m_displayMotionGrid;
 
     QnResourcePtr m_resource;
+    QRegion m_motionMask;
+    bool m_motionMaskReady;
+    __m128i* m_motionMaskBinData;
 };
 
 #endif // QN_RESOURCE_WIDGET_H
