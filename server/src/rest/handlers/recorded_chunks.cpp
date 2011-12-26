@@ -108,13 +108,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         periods = QnMotionHelper::instance()->mathImage(motionRegion, resList, startTime, endTime, detailLevel);
     if (useBinary) {
         result.append("BIN");
-        foreach(QnTimePeriod period, periods)
-        {
-            qint64 start = htonll(period.startTimeMs << 16);
-            qint64 duration = htonll(period.durationMs << 16);
-            result.append(((const char*) &start), 6);
-            result.append(((const char*) &duration), 6);
-        }
+        QnTimePeriod::encode(result,periods);
     }
     else {
         result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");

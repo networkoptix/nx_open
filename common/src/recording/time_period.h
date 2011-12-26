@@ -6,12 +6,23 @@
 struct QnTimePeriod;
 typedef QVector<QnTimePeriod> QnTimePeriodList;
 
-struct QnTimePeriod
+struct QN_EXPORT QnTimePeriod
 {
     QnTimePeriod(): startTimeMs(0), durationMs(0) {}
-    QnTimePeriod(qint64 _startTimeMs, int _durationMs): startTimeMs(_startTimeMs), durationMs(_durationMs) {}
+    QnTimePeriod(qint64 _startTimeMs, qint64 _durationMs): startTimeMs(_startTimeMs), durationMs(_durationMs) {}
+
+    bool operator==(const QnTimePeriod& other) const;
 
     static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
+    
+    /** Encode(compress) data to a byteArray. 
+    * TimePeriods must be arranged by time and does not intersects. If condition is not meet, function returns false
+    * Average compressed QnTimePeriod size near 6 bytes */
+    static bool encode(QByteArray& stream, const QnTimePeriodList& periods);
+    
+    /** Decode(decompress) data from a byteArray. */
+    static bool decode(QByteArray& stream, QnTimePeriodList& periods);
+    static bool decode(const quint8* data, int dataSize, QnTimePeriodList& periods);
 
     bool containTime(qint64 timeMs) const;
     bool containPeriod(const QnTimePeriod& timePeriod) const;
