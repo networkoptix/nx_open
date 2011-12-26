@@ -24,7 +24,7 @@ public:
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(0, 255, 0, 32), 0));
+        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(16, 128+16, 16, 255), 0));
         QnScopedPainterBrushRollback brushRollback(painter, QColor(0, 255, 0, 64));
         painter->drawRect(boundingRect());
     }
@@ -154,7 +154,9 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
 
     ensureSelectionItem();
     selectionItem()->setParentItem(target());
-    selectionItem()->setOrigin(target()->mapFromMotionGrid(target()->mapToMotionGrid(target()->mapFromScene(info->mousePressScenePos()))));
+    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
+    QPoint gridPos = target()->mapToMotionGrid(itemPos);
+    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridPos));
     selectionItem()->setViewport(info->view()->viewport());
     selectionItem()->setVisible(true);
 
@@ -169,7 +171,22 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
     }
 
     ensureSelectionItem();
-    selectionItem()->setCorner(target()->mapFromMotionGrid(target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()))));
+    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
+    QPoint gridOrigin = target()->mapToMotionGrid(itemPos);
+    QPoint gridCorner = target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()));
+    
+    
+    if (gridCorner.x() >= gridOrigin.x())
+        gridCorner += QPoint(1,0);
+    else 
+        gridOrigin += QPoint(1,0);
+    if (gridCorner.y() >= gridOrigin.y())
+        gridCorner += QPoint(0,1);
+    else 
+        gridOrigin += QPoint(0,1);
+    
+    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridOrigin));
+    selectionItem()->setCorner(target()->mapFromMotionGrid(gridCorner));
 }
 
 void MotionSelectionInstrument::finishDrag(DragInfo *info) {

@@ -23,6 +23,7 @@ class ResizingInstrument;
 class DropInstrument;
 class UiElementsInstrument;
 class RotationInstrument;
+class MotionSelectionInstrument;
 class ClickInfo;
 class ResizingInfo;
 
@@ -36,6 +37,7 @@ class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 
 class QnScreenRecorder;
+
 
 /**
  * This class implements default scene manipulation logic.
@@ -174,6 +176,8 @@ private:
 
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
+
+    MotionSelectionInstrument *m_motionSelectionInstrument;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

@@ -431,12 +431,14 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         QRectF rect = channelRect(i);
 
         /* Motion grid. */
-        if (m_displayMotionGrid)
+        if (m_displayMotionGrid) 
+        {
             drawMotionGrid(painter, rect, m_renderer->lastFrameMetadata(i));
 
-        /* Selection. */
-        if(!m_channelState[i].motionSelection.isEmpty())
-            drawMotionSelection(painter, rect, m_channelState[i].motionSelection);
+            /* Selection. */
+            if(!m_channelState[i].motionSelection.isEmpty())
+                drawMotionSelection(painter, rect, m_channelState[i].motionSelection);
+        }
 
         /* Current time. */
         qint64 time = m_renderer->lastDisplayedTime(i);
@@ -638,8 +640,11 @@ void QnResourceWidget::setMotionGridDisplayed(bool displayed) {
     m_display->archiveReader()->setSendMotion(displayed);
 }
 
-QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
-    return bounded(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))).toPoint(), QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
+QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos) 
+{
+    QPointF pointf(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))));
+    QPoint p((int) (pointf.x()), (int) (pointf.y()));
+    return bounded(p, QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
 }
 
 QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
