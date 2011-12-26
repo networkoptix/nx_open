@@ -20,9 +20,6 @@ public:
 
 protected Q_SLOTS:
     QIcon standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const;
-
-private:
-    void drawSliderControl(const QStyleOptionSlider *option, QPainter *painter, const QWidget *widget) const;
 };
 
 #endif // APPSTYLE_P_H
