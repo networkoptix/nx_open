@@ -69,7 +69,7 @@ void ClickInstrument::timerEvent(QTimerEvent *) {
     killClickTimer();
 
     if(watches(ITEM)) {
-        emitSignals(m_clickData->view.data(), m_clickData->item, &m_clickData->event);
+        emitSignals(m_clickData->view.data(), m_clickData->item, &m_clickData->event); // TODO: item may get destroyed. Check for this, it is real.
     } else {
         emitSignals(m_clickData->view.data(), m_clickData->scene.data(), &m_clickData->event);
     }

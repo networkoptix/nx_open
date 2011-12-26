@@ -58,7 +58,7 @@ private:
 };
 
 QnViewportAnimator::QnViewportAnimator(QObject *parent):
-    QnVariantAnimator(parent),
+    base_type(parent),
     m_accessor(new QnViewportRectAccessor()),
     m_relativeSpeed(0.0)
 {
@@ -95,23 +95,12 @@ void QnViewportAnimator::setViewportMargins(const QMargins &margins) {
     m_accessor->setMargins(margins);
 }
 
-void QnViewportAnimator::setRelativeSpeed(qreal relativeSpeed) {
-    m_relativeSpeed = relativeSpeed;
-}
-
-int QnViewportAnimator::estimatedDuration() const {
+int QnViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
     QGraphicsView *view = this->view();
-    QRectF startRect = m_accessor->aspectRatioAdjusted(view, internalStartValue().toRectF());
-    QRectF targetRect = m_accessor->aspectRatioAdjusted(view, internalTargetValue().toRectF());
+    QRectF startRect = m_accessor->aspectRatioAdjusted(view, from.toRectF());
+    QRectF targetRect = m_accessor->aspectRatioAdjusted(view, to.toRectF());
 
-    qreal speed;
-    if(qFuzzyIsNull(m_relativeSpeed)) {
-        speed = this->speed(); 
-    } else {
-        speed = m_relativeSpeed * (SceneUtility::length(startRect.size()) + SceneUtility::length(targetRect.size())) / 2;
-    }
-
-    return magnitudeCalculator()->calculate(linearCombinator()->combine(1.0, startRect, -1.0, targetRect)) / speed * 1000;
+    return base_type::estimatedDuration(startRect, targetRect);
 }
 
 QRectF QnViewportAnimator::targetRect() const {

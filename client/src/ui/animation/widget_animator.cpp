@@ -7,6 +7,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include "variant_animator.h"
+#include "rect_animator.h"
 
 QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent):
     QnAnimatorGroup(parent),
@@ -18,7 +19,7 @@ QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &ge
         return;
     }
 
-    m_geometryAnimator = new QnVariantAnimator(this);
+    m_geometryAnimator = new QnRectAnimator(this);
     m_geometryAnimator->setTargetObject(widget);
     m_geometryAnimator->setAccessor(new QnPropertyAccessor(geometryPropertyName));
     m_geometryAnimator->setEasingCurve(QEasingCurve::InOutBack);
@@ -61,16 +62,32 @@ QGraphicsWidget *QnWidgetAnimator::widget() const {
     return checked_cast<QGraphicsWidget *>(m_geometryAnimator->targetObject());
 }
 
-qreal QnWidgetAnimator::translationSpeed() const {
-    return m_geometryAnimator->speed();
+qreal QnWidgetAnimator::scalingSpeed() const {
+    return m_geometryAnimator->scalingSpeed();
+}
+
+qreal QnWidgetAnimator::relativeMovementSpeed() const {
+    return m_geometryAnimator->relativeMovementSpeed();
+}
+
+qreal QnWidgetAnimator::absoluteMovementSpeed() const {
+    return m_geometryAnimator->absoluteMovementSpeed();
 }
 
 qreal QnWidgetAnimator::rotationSpeed() const {
     return m_rotationAnimator->speed();
 }
 
-void QnWidgetAnimator::setTranslationSpeed(qreal points) {
-    m_geometryAnimator->setSpeed(points);
+void QnWidgetAnimator::setScalingSpeed(qreal scalingSpeed) {
+    m_geometryAnimator->setScalingSpeed(scalingSpeed);
+}
+
+void QnWidgetAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
+    m_geometryAnimator->setRelativeMovementSpeed(relativeMovementSpeed);
+}
+
+void QnWidgetAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
+    m_geometryAnimator->setAbsoluteMovementSpeed(absoluteMovementSpeed);
 }
 
 void QnWidgetAnimator::setRotationSpeed(qreal degrees) {

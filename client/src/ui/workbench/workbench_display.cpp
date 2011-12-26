@@ -143,9 +143,11 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
 
     /* Create viewport animator. */
-    m_viewportAnimator = new QnViewportAnimator(this);
-    m_viewportAnimator->setRelativeSpeed(1.5);//anim view port movement
-    m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);//anim
+    m_viewportAnimator = new QnViewportAnimator(this); // ANIMATION: viewport.
+    m_viewportAnimator->setAbsoluteMovementSpeed(0.0); /* Viewport movement speed in scene coordinates. */
+    m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
+    m_viewportAnimator->setScalingSpeed(4.0); /* Viewport scaling speed, scale factor per second. */
+    m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);
     m_viewportAnimator->setTimer(m_animationInstrument->animationTimer());
     connect(m_viewportAnimator,             SIGNAL(started()),                                          this,                   SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator,             SIGNAL(started()),                                          m_boundingInstrument,   SLOT(recursiveDisable()));
@@ -381,11 +383,13 @@ QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     /* Create if it's not there.
      *
      * Note that widget is set as animator's parent. */
-    animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget);
-    animator->setTranslationSpeed(length(workbench()->mapper()->step()));  // TODO
+    animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
+    animator->setAbsoluteMovementSpeed(0.0);
+    animator->setRelativeMovementSpeed(1.0);
+    animator->setScalingSpeed(4.0);
     animator->setRotationSpeed(720.0);
     animator->setTimer(m_animationInstrument->animationTimer());
-    animator->setTimeLimit(widgetAnimationDurationMsec); //anim rotation & move & size change of item 
+    animator->setTimeLimit(widgetAnimationDurationMsec);
     widget->setData(ITEM_ANIMATOR, QVariant::fromValue<QnWidgetAnimator *>(animator));
     return animator;
 }
@@ -738,17 +742,20 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Move! */
     QnWidgetAnimator *animator = this->animator(widget);
-    if(animate) {
+    if(animate) { // ANIMATION: easing curves for items.
         QEasingCurve easingCurve;
 
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
         if(qFuzzyCompare(currentSize, targetSize)) {
-            easingCurve = QEasingCurve::InOutBack; //anim move widget without resizing 
+            /* Item was moved without resizing. */
+            easingCurve = QEasingCurve::InOutBack;
         } else if(contains(targetSize, currentSize)) {
-            easingCurve = QEasingCurve::InBack; //anim  if resize up
+            /* Item was resized up. */
+            easingCurve = QEasingCurve::InBack;
         } else {
-            easingCurve = QEasingCurve::OutBack; //anim if resize down
+            /* Item was resized down. */
+            easingCurve = QEasingCurve::OutBack;
         }
 
         animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
