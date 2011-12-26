@@ -70,7 +70,7 @@ public:
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
-
+    int isMotionGridDisplayed();
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
