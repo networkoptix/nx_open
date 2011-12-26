@@ -274,7 +274,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
 
-    m_itemContextMenu = QnMenuWrapper::instance()->newMenu();
+    m_itemContextMenu = new QMenu(display->view());
     m_itemContextMenu->addAction(showMotionAction);
     m_itemContextMenu->addAction(hideMotionAction);
 
@@ -659,7 +659,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 }
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
-    QScopedPointer<QMenu> menu(QnMenuWrapper::instance()->newMenu(display()->view()));
+    QScopedPointer<QMenu> menu(new QMenu(display()->view()));
     if(m_screenRecorder->isSupported()) {
         if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
             menu->addAction(m_stopRecordingAction);

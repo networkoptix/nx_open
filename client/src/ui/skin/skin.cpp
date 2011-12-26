@@ -189,11 +189,12 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
         const QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
         const QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
-        //bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
+        bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
 
         QPixmap grooveBorderPic = Skin::pixmap(QLatin1String("slider_groove_lborder.png"), grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmap grooveBodyPic = Skin::pixmap(QLatin1String("slider_groove_body.png"), grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        QPixmap handlePic = Skin::pixmap(QLatin1String("slider_handle.png"), 2 * handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        QPixmap handlePic = Skin::pixmap(QLatin1String(hovered ? "slider_handle_active.png" : "slider_handle.png"), 2 * handleRect.size(),   Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
 
         painter->drawTiledPixmap(grooveRect.adjusted(grooveBorderPic.width(), 0, -grooveBorderPic.width(), 0), grooveBodyPic);
         painter->drawPixmap(grooveRect.topLeft(), grooveBorderPic);
@@ -211,4 +212,15 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
     }
 
     ProxyStyle::drawComplexControl(control, option, painter, widget);
+}
+
+void AppStyle::polish(QApplication *application) {
+    QFont menuFont;
+    menuFont.setFamily(QLatin1String("Bodoni MT"));
+    menuFont.setPixelSize(18);
+    application->setFont(menuFont, "QMenu");
+}
+
+void AppStyle::unpolish(QApplication *application) {
+    application->setFont(QFont(), "QMenu");
 }

@@ -95,9 +95,6 @@ QnMenuWrapper::QnMenuWrapper(QObject *parent):
 
     assert(m_infoByAction.size() == ACTION_COUNT);
 #endif
-
-    m_menuFont = QFont(QLatin1String("Bodoni MT"));
-    m_menuFont.setPixelSize(18);
 }
 
 QnMenuWrapper::~QnMenuWrapper() {
