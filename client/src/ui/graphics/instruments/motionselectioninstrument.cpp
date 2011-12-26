@@ -24,7 +24,7 @@ public:
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(0, 255, 0, 32), 0));
+        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(16, 128+16, 16, 255), 0));
         QnScopedPainterBrushRollback brushRollback(painter, QColor(0, 255, 0, 64));
         painter->drawRect(boundingRect());
     }
@@ -78,7 +78,8 @@ private:
 };
 
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
-    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
+    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    m_emptyDrag(false)
 {}
 
 MotionSelectionInstrument::~MotionSelectionInstrument() {
@@ -140,10 +141,13 @@ bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event
 }
 
 void MotionSelectionInstrument::startDragProcess(DragInfo *info) {
+    m_emptyDrag = true;
     emit selectionProcessStarted(info->view(), target());
 }
 
-void MotionSelectionInstrument::startDrag(DragInfo *info) {
+void MotionSelectionInstrument::startDrag(DragInfo *info) 
+{
+    m_emptyDrag = false;
     m_selectionStartedEmitted = false;
 
     if(target() == NULL) {
@@ -152,9 +156,15 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
         return;
     }
 
+    if (!(info->modifiers() & Qt::ControlModifier))
+        target()->clearMotionSelection();
+
+
     ensureSelectionItem();
     selectionItem()->setParentItem(target());
-    selectionItem()->setOrigin(target()->mapFromMotionGrid(target()->mapToMotionGrid(target()->mapFromScene(info->mousePressScenePos()))));
+    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
+    QPoint gridPos = target()->mapToMotionGrid(itemPos);
+    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridPos));
     selectionItem()->setViewport(info->view()->viewport());
     selectionItem()->setVisible(true);
 
@@ -167,9 +177,26 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
-
+    
     ensureSelectionItem();
-    selectionItem()->setCorner(target()->mapFromMotionGrid(target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()))));
+    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
+    QPoint gridOrigin = target()->mapToMotionGrid(itemPos);
+    QPoint gridCorner = target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()));
+    
+    if ((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() >= QApplication::startDragDistance())
+    {
+        if (gridCorner.x() >= gridOrigin.x())
+            gridCorner += QPoint(1,0);
+        else 
+            gridOrigin += QPoint(1,0);
+        if (gridCorner.y() >= gridOrigin.y())
+            gridCorner += QPoint(0,1);
+        else 
+            gridOrigin += QPoint(0,1);
+    }
+
+    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridOrigin));
+    selectionItem()->setCorner(target()->mapFromMotionGrid(gridCorner));
 }
 
 void MotionSelectionInstrument::finishDrag(DragInfo *info) {
@@ -181,10 +208,11 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
         /* Qt handles QRect borders in totally inhuman way, so we have to do everything by hand. */
         QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
         QPoint c = target()->mapToMotionGrid(selectionItem()->corner());
+
         target()->addToMotionSelection(QRect(
             QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
             QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
-        ));
+            ));
     }
 
     selectionItem()->setVisible(false);
@@ -192,10 +220,11 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
+    if (m_emptyDrag && (info->modifiers() & Qt::ShiftModifier) && !(info->modifiers() & Qt::ControlModifier))
+    {
+        target()->clearMotionSelection();
+        m_emptyDrag = false;
+    }
     emit selectionProcessFinished(info->view(), target());
+
 }
-
-
-
-
-

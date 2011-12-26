@@ -50,6 +50,7 @@ private:
     QWeakPointer<MotionSelectionItem> m_selectionItem;
     QWeakPointer<QnResourceWidget> m_target;
     bool m_selectionStartedEmitted;
+    bool m_emptyDrag;
 };
 
 

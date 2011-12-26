@@ -137,14 +137,14 @@ void QnMotionArchive::loadRecordedRange()
 
 void QnMotionArchive::maskMotion(QnMetaDataV1Ptr data)
 {
-    data->removeMotion((const quint8*) m_motionMask, m_motionMaskStart, m_motionMaskEnd);
+    data->removeMotion(m_motionMask, m_motionMaskStart, m_motionMaskEnd);
 }
 
 
 void QnMotionArchive::updateMotionMask(QRegion maskedRegion)
 {
     QMutexLocker lock(&m_maskMutex);
-    createMask(maskedRegion, m_motionMask, m_motionMaskStart, m_motionMaskEnd);
+    QnMetaDataV1::createMask(maskedRegion, m_motionMask, &m_motionMaskStart, &m_motionMaskEnd);
 }
 
 QString QnMotionArchive::getFilePrefix(const QDate& datetime)
@@ -165,33 +165,6 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
     dir.mkpath(fileName);
 }
 
-inline void setBit(quint8* data, int x, int y)
-{
-    int offset = (x * MD_HEIGHT + y) / 8;
-    data[offset] |= 0x80 >> (y&7);
-}
-
-void QnMotionArchive::createMask(const QRegion& region,  __m128i* mask, int& maskStart, int& maskEnd)
-{
-
-    maskStart = 0;
-    maskEnd = 0;
-    memset(mask, 0, MD_WIDTH * MD_HEIGHT / 8);
-
-    for (int i = 0; i < region.rectCount(); ++i)
-    {
-        const QRect& rect = region.rects().at(i);
-        maskStart = qMin((rect.left() * MD_HEIGHT + rect.top()) / 128, maskStart);
-        maskEnd = qMax((rect.right() * MD_HEIGHT + rect.bottom()) / 128, maskEnd);
-        for (int x = rect.left(); x <= rect.right(); ++x)
-        {
-            for (int y = rect.top(); y <= rect.bottom(); ++y)
-                setBit((quint8*) mask, x,y);
-        }
-    }
-
-}
-
 bool QnMotionArchive::mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {
     for (int i = maskStart; i <= maskEnd; ++i)
@@ -209,7 +182,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
     __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
-    createMask(region, mask, maskStart, maskEnd);
+    QnMetaDataV1::createMask(region, mask, &maskStart, &maskEnd);
     bool isFirstStep = true;
 
     while (msStartTime < msEndTime)

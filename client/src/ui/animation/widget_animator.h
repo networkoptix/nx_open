@@ -10,6 +10,7 @@ class QGraphicsWidget;
 class QEasingCurve;
 
 class QnVariantAnimator;
+class QnRectAnimator;
 
 class QnWidgetAnimator: public QnAnimatorGroup {
     Q_OBJECT;
@@ -46,19 +47,32 @@ public:
     QGraphicsWidget *widget() const;
 
     /**
-     * \returns                         Widget geometry change speed, in scene coordinates.
+     * \returns                         Widget scaling speed, scale factor per second.
      */
-    qreal translationSpeed() const;
+    qreal scalingSpeed() const;
+
+    /**
+     * \returns                         Relative part of the widget's movement speed, 
+     *                                  in widgets per second.
+     */
+    qreal relativeMovementSpeed() const;
+
+    /**
+     * \returns                         Absolute part of the widget's movement speed,
+     *                                  in scene coordinates.
+     */
+    qreal absoluteMovementSpeed() const;
 
     /**
      * \returns                         Widget rotation speed, in degrees per second.
      */
     qreal rotationSpeed() const;
 
-    /**
-     * \param multiplier                Widget geometry change speed, in scene coordinates.
-     */
-    void setTranslationSpeed(qreal points);
+    void setScalingSpeed(qreal scalingSpeed);
+
+    void setRelativeMovementSpeed(qreal relativeMovementSpeed);
+
+    void setAbsoluteMovementSpeed(qreal absoluteMovementSpeed);
 
     /**
      * \param multiplier                Widget rotation speed, in degrees per second.
@@ -67,7 +81,7 @@ public:
 
 private:
     /** Widget geometry animation. */
-    QnVariantAnimator *m_geometryAnimator;
+    QnRectAnimator *m_geometryAnimator;
 
     /** Widget rotation animation. */
     QnVariantAnimator *m_rotationAnimator;
