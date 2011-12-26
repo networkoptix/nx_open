@@ -145,7 +145,11 @@ void QnVariantAnimator::setInternalTypeInternal(int newInternalType) {
 }
 
 int QnVariantAnimator::estimatedDuration() const {
-    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, internalStartValue(), -1.0, internalTargetValue())) / m_speed * 1000;
+    return estimatedDuration(internalStartValue(), internalTargetValue());
+}
+
+int QnVariantAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
+    return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, from, -1.0, to)) / m_speed * 1000;
 }
 
 qreal QnVariantAnimator::easingCurveProgress(int currentTime) const {
