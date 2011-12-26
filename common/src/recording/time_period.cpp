@@ -127,7 +127,7 @@ bool QnTimePeriod::encode(QByteArray& stream, const QnTimePeriodList& periods)
             return false;
         if (i > 0)
             serializeField(stream, timeDelta);
-        serializeField(stream, periods[i].durationMs);
+        serializeField(stream, periods[i].durationMs+1);
         timePos += timeDelta + periods[i].durationMs;
     }
     return true;
@@ -178,6 +178,7 @@ bool QnTimePeriod::decode(const quint8* data, int dataSize, QnTimePeriodList& pe
         qint64 duration = decodeValue(curPtr, end);
         if (duration == -1) 
             return false;
+        duration--;
         fullStartTime += relStartTime;
         periods << QnTimePeriod(fullStartTime, duration);
         fullStartTime += duration;
