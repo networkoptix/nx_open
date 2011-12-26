@@ -655,7 +655,7 @@ void TimeLine::setSelectionRange(const QPair<qint64, qint64> &range)
 
 void TimeLine::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    QScopedPointer<QMenu> menu(QnMenuWrapper::instance()->newMenu());
+    QScopedPointer<QMenu> menu(new QMenu(event->widget()));
     QAction *selectRangeAction = menu->addAction(tr("Select Range"));
     menu->addSeparator();
     QAction *clearRangeAction = menu->addAction(tr("Clear Range"));

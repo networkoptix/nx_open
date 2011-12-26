@@ -158,24 +158,26 @@ QIcon AppStyle::standardIconImplementation(StandardPixmap standardIcon, const QS
 
 void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     if(control == CC_Slider) {
-        drawSliderControl(static_cast<const QStyleOptionSlider *>(option), painter, widget);
+        drawSliderControl(qstyleoption_cast<const QStyleOptionSlider *>(option), painter, widget);
     } else {
         ProxyStyle::drawComplexControl(control, option, painter, widget);
     }
 }
 
 void AppStyle::drawSliderControl(const QStyleOptionSlider *option, QPainter *painter, const QWidget *widget) const {
-    QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
-    QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
-
-    /* bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle); */
+    if(option == NULL)
+        return;
 
     if(option->orientation != Qt::Horizontal)
         qnWarning("Non-horizontal sliders are not implemented. Expect display artifacts.");
 
-    QPixmap grooveBorderPic = Skin::pixmap(QLatin1String("slider_groove_lborder.png"), grooveRect.size(),       Qt::KeepAspectRatio,   Qt::SmoothTransformation);
-    QPixmap grooveBodyPic   = Skin::pixmap(QLatin1String("slider_groove_body.png"),    grooveRect.size(),       Qt::KeepAspectRatio,   Qt::SmoothTransformation);
-    QPixmap handlePic       = Skin::pixmap(QLatin1String("slider_handle.png"),         2 * handleRect.size(),   Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
+    QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
+
+    bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
+    QPixmap grooveBorderPic = Skin::pixmap(QLatin1String("slider_groove_lborder.png"),                                grooveRect.size(),       Qt::KeepAspectRatio,   Qt::SmoothTransformation);
+    QPixmap grooveBodyPic   = Skin::pixmap(QLatin1String("slider_groove_body.png"),                                   grooveRect.size(),       Qt::KeepAspectRatio,   Qt::SmoothTransformation);
+    QPixmap handlePic       = Skin::pixmap(QLatin1String(hovered ? "slider_handle_active.png" : "slider_handle.png"), 2 * handleRect.size(),   Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     /* Draw groove. */
     painter->drawPixmap(grooveRect.topLeft(), grooveBorderPic);
@@ -189,4 +191,15 @@ void AppStyle::drawSliderControl(const QStyleOptionSlider *option, QPainter *pai
 
     /* Draw handle. */
     painter->drawPixmap(handleRect.topLeft() - QPointF(handleRect.width(), handleRect.height()) / 2, handlePic);
+}
+
+void AppStyle::polish(QApplication *application) {
+    QFont menuFont;
+    menuFont.setFamily(QLatin1String("Bodoni MT"));
+    menuFont.setPixelSize(18);
+    application->setFont(menuFont, "QMenu");
+}
+
+void AppStyle::unpolish(QApplication *application) {
+    application->setFont(QFont(), "QMenu");
 }

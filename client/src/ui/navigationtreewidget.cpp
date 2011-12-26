@@ -157,7 +157,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         resources.append(qnResPool->getResourceById(QnId(QString::number(index.data(Qt::UserRole + 1).toUInt()))));
 
-    QScopedPointer<QMenu> menu(QnMenuWrapper::instance()->newMenu());
+    QScopedPointer<QMenu> menu(new QMenu(this));
 
     QAction *openAction = new QAction(tr("Open"), menu.data());
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
