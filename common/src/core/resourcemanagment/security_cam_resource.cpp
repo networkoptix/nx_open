@@ -12,6 +12,17 @@ QnSequrityCamResource::~QnSequrityCamResource()
 
 }
 
+QnSequrityCamResource& QnSequrityCamResource::operator=(const QnSequrityCamResource& other)
+{
+    QWriteLocker writeLocker(&m_rwLock);
+    QReadLocker readLocker(&other.m_rwLock);
+
+    QnResource::operator =(other);
+
+    m_motionMask = other.m_motionMask;
+    m_scheduleTasks = other.m_scheduleTasks;
+}
+
 QString QnSequrityCamResource::oemName() const
 {
     return manufacture();
