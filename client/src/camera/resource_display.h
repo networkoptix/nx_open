@@ -134,6 +134,10 @@ public:
      */
     void addRenderer(CLAbstractRenderer *renderer);
 
+    virtual void afterUpdate();
+
+signals:
+    void resourceUpdated();
 protected:
     virtual void beforeDisconnectFromResource() override;
 

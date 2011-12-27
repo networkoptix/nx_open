@@ -9,7 +9,26 @@ QnSequrityCamResource::QnSequrityCamResource()
 
 QnSequrityCamResource::~QnSequrityCamResource()
 {
+}
 
+QnSequrityCamResource& QnSequrityCamResource::operator=(const QnResource& other)
+{
+    const QnSequrityCamResource* other_casted = dynamic_cast<const QnSequrityCamResource*>(&other);
+
+    if (other_casted)
+    {
+        QReadLocker readLocker(&other_casted->m_rwLock);
+        QWriteLocker writeLocker(&m_rwLock);
+        QnResource::operator =(other);
+
+        m_motionMask = other_casted->m_motionMask;
+        m_scheduleTasks = other_casted->m_scheduleTasks;
+    } else
+    {
+        QnResource::operator =(other);
+    }
+
+    return *this;
 }
 
 QString QnSequrityCamResource::oemName() const
@@ -75,13 +94,13 @@ void QnSequrityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFact
 
 QRegion QnSequrityCamResource::getMotionMask() const
 {
-    QMutexLocker lock(&m_mutex);
+    QReadLocker readLocker(&m_rwLock);
     return m_motionMask;
 }
 
 void QnSequrityCamResource::setMotionMask(const QRegion& mask)
 {
-    QMutexLocker lock(&m_mutex);
+    QWriteLocker writeLocker(&m_rwLock);
     if (m_motionMask == mask)
         return;
     m_motionMask = mask;

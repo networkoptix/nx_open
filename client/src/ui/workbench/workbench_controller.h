@@ -70,7 +70,7 @@ public:
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
-
+    int isMotionGridDisplayed();
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -178,6 +178,9 @@ private:
     QPropertyAnimation *m_recordingAnimation;
 
     MotionSelectionInstrument *m_motionSelectionInstrument;
+
+    QAction *m_showMotionAction;
+    QAction *m_hideMotionAction;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

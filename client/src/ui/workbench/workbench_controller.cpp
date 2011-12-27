@@ -261,23 +261,21 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
-    QAction *showMotionAction           = newAction(tr("Open motion view/search grid"),          tr(""),             this);
-    QAction *hideMotionAction           = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
+    m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
+    m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
     m_startRecordingAction              = newAction(tr("Start screen recording"), tr(""),           this);
     m_stopRecordingAction               = newAction(tr("Stop screen recording"), tr(""),            this);
     QAction *toggleRecordingAction      = newAction(tr("Start/stop screen recording"), tr("Alt+R"), this);
     m_recordingSettingsActions          = newAction(tr("Screen recording settings"), tr(""),        this);
 
-    connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
-    connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(m_showMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(m_hideMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(m_startRecordingAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_startRecordingAction_triggered()));
     connect(m_stopRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_stopRecordingAction_triggered()));
     connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
 
     m_itemContextMenu = new QMenu(display->view());
-    m_itemContextMenu->addAction(showMotionAction);
-    m_itemContextMenu->addAction(hideMotionAction);
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -610,6 +608,20 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         widget->setSelected(true);
     }
 
+    m_itemContextMenu->removeAction(m_hideMotionAction);
+    m_itemContextMenu->removeAction(m_showMotionAction);
+
+    int gridnowDisplayed = isMotionGridDisplayed();
+    if (gridnowDisplayed == 1)
+        m_itemContextMenu->addAction(m_hideMotionAction);
+    else if (gridnowDisplayed == 0)
+        m_itemContextMenu->addAction(m_showMotionAction);
+    else {
+        m_itemContextMenu->addAction(m_hideMotionAction);
+        m_itemContextMenu->addAction(m_showMotionAction);
+    }
+
+
     m_itemContextMenu->exec(info.screenPos());
 }
 
@@ -753,6 +765,26 @@ void QnWorkbenchController::at_showMotionAction_triggered()
 void QnWorkbenchController::at_hideMotionAction_triggered() {
     displayMotionGrid(display()->scene()->selectedItems(), false);
     m_motionSelectionInstrument->recursiveDisable();
+}
+
+int QnWorkbenchController::isMotionGridDisplayed() 
+{
+    bool allDisplayed = true;
+    bool allNonDisplayed = true;
+    foreach(QGraphicsItem *item, display()->scene()->selectedItems()) 
+    {
+        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        if(widget == NULL)
+            continue;
+        allDisplayed &= widget->isMotionGridDisplayed();
+        allNonDisplayed &= !widget->isMotionGridDisplayed();
+    }
+    if (allDisplayed)
+        return 1;
+    else if (allNonDisplayed)
+        return 0;
+    else
+        return -1;
 }
 
 void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
