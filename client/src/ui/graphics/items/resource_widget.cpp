@@ -452,6 +452,13 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
 }
 
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
+    const QPaintEngine* paintEngine = painter->paintEngine();
+    if (!paintEngine)
+    {
+        qnWarning("No OpenGL compatible paint engine is found.");
+        return;
+    }
+
     if (painter->paintEngine()->type() != QPaintEngine::OpenGL2 && painter->paintEngine()->type() != QPaintEngine::OpenGL) {
         qnWarning("Painting with the paint engine of type %1 is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
