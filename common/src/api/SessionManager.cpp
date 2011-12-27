@@ -32,6 +32,7 @@ SessionManager::SessionManager(const QUrl &url, QObject *parent)
 
 SessionManager::~SessionManager()
 {
+    m_httpClient->deleteLater();
 }
 
 SessionManager *SessionManager::instance()
