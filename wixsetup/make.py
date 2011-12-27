@@ -11,10 +11,11 @@ from fixasfiles import fixasfiles
 
 from common.convert import rmtree
 
-rmtree('bin')
-rmtree('obj')
-rmtree('EveAssocCA/Release')
-rmtree('PropsCA/Release')
+if os.path.exists('bin'):
+    rmtree('bin')
+
+if os.path.exists('obj'):
+    rmtree('obj')
 
 def gen_strings():
     xin = open('CustomStrings.wxl.template', 'r').read()
