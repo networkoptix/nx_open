@@ -19,6 +19,11 @@ class QnGridWalker;
 class QnWorkbenchLayout: public QObject {
     Q_OBJECT;
 public:
+    struct Disposition {
+        QList<QPoint> free;
+        QList<QPoint> occupied;
+    };
+
     /**
      * Constructor.
      * 
@@ -50,17 +55,35 @@ public:
      * \param item                      Item to remove
      */
     void removeItem(QnWorkbenchItem *item);
-    
+
+    /**
+     * \param item                      Item to check.
+     * \param geometry                  New position.
+     * \param[out] disposition          Disposition of free and occupied cells in the target region.
+     * \returns                         Whether the item can be moved.
+     */
+    bool canMoveItem(QnWorkbenchItem *item, const QRect &geometry, Disposition *disposition = NULL);
+
     /**
      * \param item                      Item to move to a new position.
      * \param geometry                  New position.
+     * \param[out] disposition          Disposition of free and occupied cells in the target region.
      * \returns                         Whether the item was moved.
      */
     bool moveItem(QnWorkbenchItem *item, const QRect &geometry);
 
     /**
+     * \param items                     Items to check.
+     * \param geometries                New positions.
+     * \param[out] disposition          Disposition of free and occupied cells in the target region.
+     * \returns                         Whether the items can be moved.
+     */
+    bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition = NULL);
+
+    /**
      * \param items                     Items to move to new positions.
      * \param geometries                New positions.
+     * \param[out] disposition          Disposition of free and occupied cells in the target region.
      * \returns                         Whether the items were moved.
      */
     bool moveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries);
@@ -68,6 +91,7 @@ public:
     /**
      * \param item                      Item to pin.
      * \param geometry                  Position to pin to.
+     * \param[out] disposition          Disposition of free and occupied cells in the target region.
      * \returns                         Whether the item was pinned.
      */
     bool pinItem(QnWorkbenchItem *item, const QRect &geometry);
@@ -165,6 +189,10 @@ signals:
      * This signal is emitted whenever bounding rectangle of this layout changes. 
      */
     void boundingRectChanged();
+
+protected:
+    template<bool returnEarly>
+    bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition);
 
 private:
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
