@@ -47,6 +47,7 @@
 #include <ui/graphics/instruments/motionselectioninstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/grid_item.h>
 
 #include <ui/videoitem/navigationitem.h>
 
@@ -380,7 +381,14 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING STARTED");
 
-    m_display->bringToFront(item);
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    if(widget == NULL)
+        return;
+
+    m_display->bringToFront(widget);
+
+    /* Show grid. */
+    m_display->gridItem()->fadeIn();
 }
 
 namespace {
@@ -415,6 +423,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
+
+    /* Hide grid. */
+    m_display->gridItem()->fadeOut();
 
     QRectF newSceneGeometry = widget->geometry();
 
@@ -451,6 +462,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING STARTED");
 
+    /* Show grid. */
+    m_display->gridItem()->fadeIn();
+
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
     m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
@@ -463,6 +477,9 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
 
 void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING FINISHED");
+
+    /* Hide grid. */
+    m_display->gridItem()->fadeOut();
 
     /* Get workbench items and drag delta. */
     QList<QnResourceWidget *> widgets;

@@ -30,6 +30,7 @@ class QnViewportAnimator;
 class QnWidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
+class QnGridItem;
 
 class CLVideoCamera;
 class CLCamDisplay;
@@ -145,6 +146,11 @@ public:
      * \param view                      New view for this workbench manager.
      */
     void setView(QGraphicsView *view);
+
+    /**
+     * \returns                         Grid item. 
+     */
+    QnGridItem *gridItem();
 
     /**
      * \param item                      Item to get widget for.
@@ -334,6 +340,10 @@ private:
     /** Viewport margins. */
     QMargins m_viewportMargins;
 
+    /** Grid item. */
+    QWeakPointer<QnGridItem> m_gridItem;
+
+
     /* Instruments. */
 
     /** Instrument manager owned by this workbench manager. */
@@ -356,6 +366,7 @@ private:
 
     /** Instrument that provides animation timer. */
     AnimationInstrument *m_animationInstrument;
+
 
     /* Animation-related stuff. */
 

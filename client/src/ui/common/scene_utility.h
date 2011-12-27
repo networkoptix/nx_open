@@ -28,6 +28,8 @@ public:
     static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
 
+    static QColor translucent(const QColor &color);
+
     static QRectF resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection resizeGrip);
     static QRect resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSection resizeGrip);
 

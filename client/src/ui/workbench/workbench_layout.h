@@ -20,8 +20,8 @@ class QnWorkbenchLayout: public QObject {
     Q_OBJECT;
 public:
     struct Disposition {
-        QList<QPoint> free;
-        QList<QPoint> occupied;
+        QSet<QPoint> free;
+        QSet<QPoint> occupied;
     };
 
     /**
