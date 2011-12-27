@@ -59,11 +59,6 @@ public:
 
     void setAnimationTimer(AnimationTimer *timer);
 
-    // animates visibility changing
-    //void setVisibleAnimated(bool visible, int time_ms = 1000);
-    //inline void showAnimated(int time_ms = 1000) { setVisibleAnimated(true, time_ms); }
-    //inline void hideAnimated(int time_ms = 1000) { setVisibleAnimated(false, time_ms); }
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
