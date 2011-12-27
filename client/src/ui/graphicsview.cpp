@@ -20,7 +20,7 @@
 #include "videoitem/search/search_filter_item.h"
 #include "videoitem/web_item.h"
 #include "animation/group_animation.h"
-#include "videoitem/grid_item.h"
+#include "videoitem/grid_item_old.h"
 #include "client_util.h"
 #include "utils/common/util.h"
 #include "videoitem/unmoved/multipage/page_selector.h"

@@ -212,8 +212,8 @@ bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, cons
     } else {
         goodPointSet.subtract(badPointSet);
 
-        disposition->free = goodPointSet.toList();
-        disposition->occupied = badPointSet.toList();
+        disposition->free = goodPointSet;
+        disposition->occupied = badPointSet;
         
         return badPointSet.empty();
     }
