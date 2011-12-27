@@ -4,6 +4,8 @@
 #include <QGraphicsObject>
 #include <QWeakPointer>
 
+class AnimationTimer;
+
 class QnWorkbenchGridMapper;
 class QnVariantAnimator;
 
@@ -55,6 +57,8 @@ public:
 
     void setFadingSpeed(qreal speed);
 
+    void setAnimationTimer(AnimationTimer *timer);
+
     // animates visibility changing
     //void setVisibleAnimated(bool visible, int time_ms = 1000);
     //inline void showAnimated(int time_ms = 1000) { setVisibleAnimated(true, time_ms); }
@@ -69,7 +73,6 @@ private:
     QColor m_color;
     QColor m_defaultColor;
     qreal m_lineWidth;
-
     QnVariantAnimator *m_colorAnimator;
 };
 

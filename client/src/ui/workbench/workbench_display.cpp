@@ -216,6 +216,10 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     }
     m_curtainAnimator->setCurtainItem(NULL);
 
+    /* Clear grid. */
+    if(!m_gridItem.isNull())
+        delete m_gridItem.data();
+
     /* Deinit workbench. */
     disconnect(m_workbench, NULL, this, NULL);
 
@@ -256,7 +260,8 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_scene->addItem(m_gridItem.data());
     setLayer(m_gridItem.data(), BACK_LAYER);
     m_gridItem.data()->setDefaultColor(QColor(0, 240, 240, 128));
-    m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
+    m_gridItem.data()->setMapper(m_workbench->mapper());
+    m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
     /* Init workbench. */
     connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_workbench_aboutToBeDestroyed()));

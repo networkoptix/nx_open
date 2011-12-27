@@ -7,19 +7,25 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/animation/variant_animator.h>
 
-//QColor color(0, 240, 240);
-
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
+    m_color(QColor(0, 0, 0, 0)),
+    m_defaultColor(QColor(0, 0, 0, 0)),
     m_lineWidth(1.0),
     m_colorAnimator(new QnVariantAnimator(this))
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
 
+    m_colorAnimator->setTargetObject(this);
     m_colorAnimator->setAccessor(new QnPropertyAccessor("color"));
     m_colorAnimator->setConverter(new QnColorToVectorConverter());
     m_colorAnimator->setSpeed(1.0);
+
+    setAcceptedMouseButtons(0);
+    
+    /* Don't disable this item here. When disabled, it starts accepting wheel events 
+     * (and probably other events too). Looks like a Qt bug. */
 }
 
 QnGridItem::~QnGridItem() {
@@ -30,11 +36,24 @@ void QnGridItem::setMapper(QnWorkbenchGridMapper *mapper) {
     m_mapper = mapper;
 }
 
+void QnGridItem::setAnimationTimer(AnimationTimer *timer) {
+    m_colorAnimator->setTimer(timer);
+}
+
 void QnGridItem::setFadingSpeed(qreal speed) {
-    m_colorAnimator->setSpeed(speed);
+    if(m_colorAnimator->isRunning()) {
+        m_colorAnimator->pause();
+        m_colorAnimator->setSpeed(speed);
+        m_colorAnimator->start();
+    } else {
+        m_colorAnimator->setSpeed(speed);
+    }
 }
 
 void QnGridItem::fadeIn() {
+    if(m_color.alpha() == 0)
+        m_color = SceneUtility::translucent(m_defaultColor);
+
     m_colorAnimator->pause();
     m_colorAnimator->setTargetValue(m_defaultColor);
     m_colorAnimator->start();
@@ -73,7 +92,8 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 
     /* Draw! */
     QnScopedPainterPenRollback penRollback(painter, QPen(m_color, m_lineWidth));
-    QPointF topLeft = mapper()->mapToGrid(QPoint(gridRect.left(), gridRect.top())) - SceneUtility::toPoint(mapper()->spacing()) / 2;
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+    QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - SceneUtility::toPoint(mapper()->spacing()) / 2;
     QPointF delta = SceneUtility::toPoint(mapper()->step());
 
     /* Vertical lines. */
