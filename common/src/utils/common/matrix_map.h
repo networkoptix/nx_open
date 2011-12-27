@@ -7,6 +7,8 @@
 #include <QHash>
 #include <QSet>
 #include <QPair>
+#include <utils/common/warnings.h>
+#include <utils/common/range.h>
 
 inline uint qHash(const QPoint &value) {
     using ::qHash;
@@ -113,25 +115,90 @@ public:
     /**
      * \param region                    Region to examine.
      * \param value                     Value to check.
-     * \param emptyAllowed              Whether unoccupied positions are allowed.
-     * \returns                         Whether the given region is occupied by given value only.
+     * \param[out] conforming           List to add conforming coordinates to.
+     * \param[out] nonconforming        List to add non-conforming coordinates to.
+     * \returns                         Whether the given region is occupied by given value only. Note that empty space is allowed.
      */
-    bool isOccupiedBy(const QRect &region, const T &value, bool emptyAllowed) const {
+    bool isOccupiedBy(const QRect &region, const T &value, QList<QPoint> *conforming = NULL, QList<QPoint> *nonconforming = NULL) const {
+        return isOccupiedBy(region, SingleValueConformanceChecker(value), conforming, nonconforming);
+    }
+
+    bool isOccupiedBy(const QRect &region, const T &value, QSet<QPoint> *conforming = NULL, QSet<QPoint> *nonconforming = NULL) const {
+        return isOccupiedBy(region, SingleValueConformanceChecker(value), conforming, nonconforming);
+    }
+
+    bool isOccupiedBy(const QRect &region, const QSet<T> &values, QList<QPoint> *conforming = NULL, QList<QPoint> *nonconforming = NULL) const {
+        return isOccupiedBy(region, ValueSetConformanceChecker(values), conforming, nonconforming);
+    }
+
+    bool isOccupiedBy(const QRect &region, const QSet<T> &values, QSet<QPoint> *conforming = NULL, QSet<QPoint> *nonconforming = NULL) const {
+        return isOccupiedBy(region, ValueSetConformanceChecker(values), conforming, nonconforming);
+    }
+
+protected:
+    struct SingleValueConformanceChecker {
+    public:
+        SingleValueConformanceChecker(const T &value): m_value(value) {}
+
+        bool operator()(const T &value) const {
+            return value == m_value;
+        }
+
+    private:
+        const T &m_value;
+    };
+
+    struct ValueSetConformanceChecker {
+    public:
+        ValueSetConformanceChecker(const QSet<T> &values): m_values(values) {}
+
+        bool operator()(const T &value) const {
+            return m_values.contains(value);
+        }
+
+    private:
+        const QSet<T> &m_values;
+    };
+
+    template<class ConformanceChecker, class PointContainer>
+    bool isOccupiedBy(const QRect &region, const ConformanceChecker &checker, PointContainer *conforming = NULL, PointContainer *nonconforming = NULL) const {
+        if(conforming == NULL && nonconforming == NULL) {
+            return isOccupiedBy<true, PointContainer>(region, checker, NULL, NULL);
+        } else if(conforming != NULL && nonconforming != NULL) {
+            return isOccupiedBy<false, PointContainer>(region, checker, conforming, nonconforming);
+        } else {
+            qnWarning("'conforming' and 'nonconforming' parameters must either be both NULL or both non-NULL.");
+            return isOccupiedBy<true, PointContainer>(region, checker, NULL, NULL);
+        }
+    }
+
+    template<bool returnEarly, class PointContainer, class ConformanceChecker>
+    bool isOccupiedBy(const QRect &region, const ConformanceChecker &checker, PointContainer *conforming, PointContainer *nonconforming) const {
         for (int r = region.top(); r <= region.bottom(); r++) {
             for (int c = region.left(); c <= region.right(); c++) {
+                bool conforms = true;
+
                 typename QHash<QPoint, T>::const_iterator pos = m_itemByPosition.find(QPoint(c, r));
-                if(pos == m_itemByPosition.end()) {
-                    if(!emptyAllowed)
+                if(pos != m_itemByPosition.end())
+                    conforms = checker(*pos);
+
+                if(returnEarly) {
+                    if(!conforms)
                         return false;
                 } else {
-                    if(*pos != value)
-                        return false;
+                    if(conforms) {
+                        qnInsert(*conforming, conforming->end(), QPoint(c, r));
+                    } else {
+                        qnInsert(*nonconforming, nonconforming->end(), QPoint(c, r));
+                    }
                 }
             }
         }
 
         return true;
     }
+
+
 
 private:
     QHash<QPoint, T> m_itemByPosition;
