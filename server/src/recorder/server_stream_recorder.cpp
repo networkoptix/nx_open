@@ -139,6 +139,7 @@ void QnServerStreamRecorder::updateSchedule(const QnScheduleTaskList& schedule)
 {
     QMutexLocker lock(&m_scheduleMutex);
     m_schedule = schedule;
+    m_lastSchedulePeriod.clear();
 }
 
 QString QnServerStreamRecorder::fillFileName()
