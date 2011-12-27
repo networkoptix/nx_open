@@ -60,6 +60,10 @@ def rmtree(path):
 
             time.sleep(1)
 
+        if os.listdir(path):
+            print >> sys.stderr, "Couldn't remove", path
+            sys.exit(1)
+
         func(path)
 
     if os.path.isdir(path):

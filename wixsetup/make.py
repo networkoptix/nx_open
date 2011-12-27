@@ -9,6 +9,13 @@ from version import *
 from string import Template
 from fixasfiles import fixasfiles
 
+from common.convert import rmtree
+
+rmtree('bin')
+rmtree('obj')
+rmtree('EveAssocCA/Release')
+rmtree('PropsCA/Release')
+
 def gen_strings():
     xin = open('CustomStrings.wxl.template', 'r').read()
     xout = open('CustomStrings.wxl', 'w')
