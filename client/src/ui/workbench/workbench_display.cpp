@@ -30,6 +30,7 @@
 #include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/curtain_item.h>
 #include <ui/graphics/items/image_button_widget.h>
+#include <ui/graphics/items/grid_item.h>
 
 #include "ui/skin/skin.h"
 
@@ -250,6 +251,13 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
+    /* Set up grid. */
+    m_gridItem = new QnGridItem();
+    m_scene->addItem(m_gridItem.data());
+    setLayer(m_gridItem.data(), BACK_LAYER);
+    m_gridItem.data()->setDefaultColor(QColor(0, 240, 240, 128));
+    m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
+
     /* Init workbench. */
     connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_workbench_aboutToBeDestroyed()));
     connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
@@ -348,6 +356,9 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
     m_boundingInstrument->setMovementSpeed(m_view, 4.0);
 }
 
+QnGridItem *QnWorkbenchDisplay::gridItem() {
+    return m_gridItem.data();
+}
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties

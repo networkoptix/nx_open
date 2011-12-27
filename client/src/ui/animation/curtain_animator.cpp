@@ -8,14 +8,6 @@
 #include <utils/common/checked_cast.h>
 #include "variant_animator.h"
 
-namespace {
-    QColor translucent(const QColor &color) {
-        QColor result = color;
-        result.setAlpha(0);
-        return result;
-    }
-}
-
 QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
     QnAnimatorGroup(parent),
     m_curtained(false),
@@ -53,7 +45,7 @@ void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain) {
         m_curtainColorAnimator->setTargetObject(curtain);
 
         m_curtainColor = curtain->color();
-        curtain->setColor(translucent(m_curtainColor));
+        curtain->setColor(SceneUtility::translucent(m_curtainColor));
         curtain->hide();
     }
 }
@@ -83,7 +75,7 @@ void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget) {
     restoreFrameColor();
     m_frameColor = frontWidget->frameColor();
     m_frameColorAnimator->setTargetObject(frontWidget);
-    m_frameColorAnimator->setTargetValue(translucent(m_frameColor));
+    m_frameColorAnimator->setTargetValue(SceneUtility::translucent(m_frameColor));
 
     m_curtainColorAnimator->setTargetValue(m_curtainColor);
     curtain->show();
@@ -98,7 +90,7 @@ void QnCurtainAnimator::uncurtain() {
 
     stop();
     restoreFrameColor();
-    curtain->setColor(translucent(m_curtainColor));
+    curtain->setColor(SceneUtility::translucent(m_curtainColor));
     curtain->hide();
     setCurtained(false);
 }
