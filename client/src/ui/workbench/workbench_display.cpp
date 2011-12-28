@@ -515,7 +515,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setPixmap(Skin::pixmap(QLatin1String("close3.png")));
+    closeButton->setPixmap(Skin::pixmap(QLatin1String("close.png")));
     closeButton->setMinimumSize(QSizeF(10.0, 10.0));
     closeButton->setMaximumSize(QSizeF(10.0, 10.0));
     connect(closeButton, SIGNAL(clicked()), item, SLOT(deleteLater()));

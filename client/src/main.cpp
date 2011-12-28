@@ -224,6 +224,7 @@ int main(int argc, char *argv[])
 
     EveApplication application(argc, argv);
     application.setQuitOnLastWindowClosed(true);
+    application.setWindowIcon(Skin::icon(QLatin1String("appicon.png")));
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
