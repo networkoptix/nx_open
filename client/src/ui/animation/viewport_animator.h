@@ -3,17 +3,17 @@
 
 #include <QObject>
 #include <ui/common/scene_utility.h>
-#include "variant_animator.h"
+#include "rect_animator.h"
 
 class QGraphicsView;
 class QMargins;
 
 class QnViewportRectAccessor;
 
-class QnViewportAnimator: public QnVariantAnimator {
+class QnViewportAnimator: public QnRectAnimator {
     Q_OBJECT;
 
-    typedef QnVariantAnimator base_type;
+    typedef QnRectAnimator base_type;
 
 public:
     /**
@@ -48,16 +48,10 @@ public:
      */
     void moveTo(const QRectF &rect);
 
-    void setRelativeSpeed(qreal relativeSpeed);
-
-    qreal relativeSpeed() const {
-        return m_relativeSpeed;
-    }
-
     QRectF targetRect() const;
 
 protected:
-    virtual int estimatedDuration() const override;
+    virtual int estimatedDuration(const QVariant &from, const QVariant &to) const override;
 
 private:
     /** Accessor for viewport rect. */

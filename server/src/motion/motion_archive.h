@@ -19,8 +19,8 @@ class QnMotionArchive;
 #pragma pack(push, 1)
 struct IndexRecord
 {
-    int start;    // at ms since epoch + start offset from a file header
-    int duration; // at ms
+    quint32 start;    // at ms since epoch + start offset from a file header
+    quint32 duration; // at ms
 };
 
 struct IndexHeader
@@ -78,7 +78,6 @@ public:
 public slots:
     void updateMotionMask(QRegion maskedRegion);
 private:
-    static void createMask(const QRegion& region,  __m128i* mask, int& msMaskStart, int& msMaskEnd);
     QString getFilePrefix(const QDate& datetime);
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
     bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);

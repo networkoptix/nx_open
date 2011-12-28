@@ -83,7 +83,7 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
     {
         if (reply.startsWith("BIN"))
         {
-            result = parseBinaryTimePeriods(reply);
+            QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
         }
         else {
             QnApiRecordedTimePeriodsResponsePtr xmlResponse;

@@ -1,7 +1,21 @@
 #include "workbench_layout.h"
 #include <utils/common/warnings.h>
+#include <utils/common/range.h>
 #include "workbench_item.h"
 #include "grid_walker.h"
+
+namespace {
+    template<class PointContainer>
+    void pointize(const QRect &region, PointContainer *points) {
+        if(points == NULL)
+            return;
+
+        for (int r = region.top(); r <= region.bottom(); r++) 
+            for (int c = region.left(); c <= region.right(); c++) 
+                qnInsert(*points, points->end(), QPoint(c, r));
+    }
+
+} // anonymous namespace
 
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
     QObject(parent)
@@ -77,13 +91,27 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     emit itemRemoved(item);
 }
 
-bool QnWorkbenchLayout::moveItem(QnWorkbenchItem *item, const QRect &geometry) {
+bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem *item, const QRect &geometry, Disposition *disposition) {
     if(item->layout() != this) {
         qnWarning("Cannot move an item that does not belong to this layout.");
         return false;
     }
 
-    if (item->isPinned() && !m_itemMap.isOccupiedBy(geometry, item, true))
+    if(item->isPinned()) {
+        return m_itemMap.isOccupiedBy(
+            geometry, 
+            item, 
+            disposition == NULL ? NULL : &disposition->free, 
+            disposition == NULL ? NULL : &disposition->occupied
+        );
+    } else {
+        pointize(geometry, disposition == NULL ? NULL : &disposition->free);
+        return true;
+    }
+}
+
+bool QnWorkbenchLayout::moveItem(QnWorkbenchItem *item, const QRect &geometry) {
+    if(!canMoveItem(item, geometry))
         return false;
 
     if(item->isPinned()) {
@@ -105,7 +133,16 @@ void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem *item, const QRect &geo
     item->setGeometryInternal(geometry);
 }
 
-bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries) {
+bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) {
+    if(disposition == NULL) {
+        return canMoveItems<true>(items, geometries, NULL);
+    } else {
+        return canMoveItems<false>(items, geometries, disposition);
+    }
+}
+
+template<bool returnEarly>
+bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) {
     if (items.size() != geometries.size()) {
         qnWarning("Sizes of the given containers do not match.");
         return false;
@@ -122,10 +159,14 @@ bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem *> &items, const Q
         }
     }
 
+    /* Good points are those where items can be moved. 
+     * Bad points are those where they cannot be moved. */
+    QSet<QPoint> goodPointSet, badPointSet;
+
     /* Check whether new positions do not intersect each other. */
-    QSet<QPoint> pointSet;
     for(int i = 0; i < items.size(); i++) {
-        if(!items[i]->isPinned())
+        QnWorkbenchItem *item = items[i];
+        if(!item->isPinned())
             continue;
 
         const QRect &geometry = geometries[i];
@@ -133,25 +174,53 @@ bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem *> &items, const Q
             for (int c = geometry.left(); c <= geometry.right(); c++) {
                 QPoint point(c, r);
 
-                if (pointSet.contains(point))
-                    return false;
-
-                pointSet.insert(point);
+                bool conforms = !goodPointSet.contains(point);
+                if(conforms) {
+                    goodPointSet.insert(point);
+                } else {
+                    if(returnEarly)
+                        return false;
+                    badPointSet.insert(point);
+                }
             }
         }
     }
 
     /* Check validity of new positions relative to existing items. */
-    QSet<QnWorkbenchItem *> replacedItems;
+    QSet<QnWorkbenchItem *> itemSet = items.toSet();
     for(int i = 0; i < items.size(); i++) {
-        if(!items[i]->isPinned())
+        QnWorkbenchItem *item = items[i];
+        if(!item->isPinned()) {
+            pointize(geometries[i], &goodPointSet);
             continue;
+        }
 
-        m_itemMap.values(geometries[i], &replacedItems);
+        bool conforms = m_itemMap.isOccupiedBy(
+            geometries[i], 
+            itemSet,
+            returnEarly ? NULL : &goodPointSet, 
+            returnEarly ? NULL : &badPointSet
+        );
+
+        Q_UNUSED(conforms); /* It is not used if we're not returning early. */
+        if(returnEarly && !conforms)
+            return false;
     }
-    foreach (QnWorkbenchItem *item, items)
-        replacedItems.remove(item);
-    if (!replacedItems.empty())
+
+    if(returnEarly) {
+        return true; /* If we got here with early return on, then it means that everything is OK. */
+    } else {
+        goodPointSet.subtract(badPointSet);
+
+        disposition->free = goodPointSet;
+        disposition->occupied = badPointSet;
+        
+        return badPointSet.empty();
+    }
+}
+
+bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries) {
+    if(!canMoveItems(items, geometries, NULL))
         return false;
 
     /* Move. */

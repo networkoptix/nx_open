@@ -23,6 +23,7 @@ class ResizingInstrument;
 class DropInstrument;
 class UiElementsInstrument;
 class RotationInstrument;
+class MotionSelectionInstrument;
 class ClickInfo;
 class ResizingInfo;
 
@@ -36,6 +37,7 @@ class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 
 class QnScreenRecorder;
+
 
 /**
  * This class implements default scene manipulation logic.
@@ -68,7 +70,7 @@ public:
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
-
+    int isMotionGridDisplayed();
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -174,6 +176,11 @@ private:
 
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
+
+    MotionSelectionInstrument *m_motionSelectionInstrument;
+
+    QAction *m_showMotionAction;
+    QAction *m_hideMotionAction;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

@@ -8,6 +8,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QStringList>
 
+#include <QReadWriteLock>
 #include "param.h"
 #include "resource_type.h"
 #include "utils/common/qnid.h"
@@ -69,6 +70,8 @@ public:
     QnResource();
     QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
+
+    virtual QnResource& operator=(const QnResource& other);
 
     virtual void deserialize(const QnResourceParameters& parameters);
 
@@ -199,7 +202,7 @@ protected:
     //static QnParamLists staticResourcesParamLists; // list of all supported resources params list
 
 protected:
-    mutable QMutex m_mutex;
+    mutable QReadWriteLock m_rwLock;
     unsigned long m_flags;
     QString m_name;
 

@@ -7,6 +7,7 @@
 #include "libavcodec/avcodec.h"
 #include "datapacket.h"
 #include "utils/common/bytearray.h"
+#include "utils/media/sse_helper.h"
 
 struct AVCodecContext;
 
@@ -123,7 +124,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     void addMotion(QnMetaDataV1Ptr data);
 
     // remove part of motion info by motion mask
-    void removeMotion(const quint8* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
+    void removeMotion(const __m128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
 
     // ti check if we've got motion at 
     bool isMotionAt(int x, int y) const;
@@ -143,6 +144,9 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     /** returns true if no motion detected */
     bool isEmpty() const;
+
+
+    static void createMask(const QRegion& region,  __m128i* mask, int* maskStart = 0, int* maskEnd = 0);
 
     unsigned char i_mask;
     quint8 m_input;

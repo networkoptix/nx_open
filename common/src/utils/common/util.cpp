@@ -1,6 +1,6 @@
 #include "utils/common/util.h"
 
-#ifdef Q_OS_MAC
+#ifndef Q_OS_WIN
 #include <sys/statvfs.h>
 #endif
 

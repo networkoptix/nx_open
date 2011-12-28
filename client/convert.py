@@ -17,7 +17,7 @@ import re
 # os.path = posixpath
 sys.path.insert(0, os.path.join('..', 'common'))
 
-from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB, qt_path, copy_files, setup_tools
+from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB, qt_path, copy_files, setup_tools, setup_qjson
 from convert import convert as convert_common
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
@@ -119,6 +119,7 @@ if len(sys.argv) == 2 and sys.argv[1] == '-parents':
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 openal_path = setup_openal()
 tools_path = setup_tools()
+qjson_path = setup_qjson()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -150,6 +151,9 @@ copy_files(openal_path + '/*.dll', 'bin/release-test')
 copy_files(openal_path + '/*.dll', 'bin/debug-test')
 copy_files(openal_path + '/*.dll', 'bin/release')
 copy_files(openal_path + '/*.dll', 'bin/debug')
+
+copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
+copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
 
 copy_files(tools_path + '/bin/*.dll', 'bin/release')
 copy_files(tools_path + '/bin/*.dll', 'bin/debug')

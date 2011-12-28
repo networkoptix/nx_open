@@ -152,6 +152,8 @@ protected:
 
     virtual void updateCurrentTime(int currentTime) override;
 
+    virtual int estimatedDuration(const QVariant &from, const QVariant &to) const;
+
     virtual QVariant currentValue() const;
 
     virtual void updateCurrentValue(const QVariant &value) const;

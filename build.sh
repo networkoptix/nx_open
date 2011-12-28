@@ -1,4 +1,4 @@
-for i in common server client appserver
+for i in common server appserver
 do
   pushd $i
   python convert.py
@@ -16,7 +16,7 @@ sed -i "" "s%^..\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/bu
 sed -i "" "s%^..\/build\/\(debug\/generated\/qtservice.moc\)%\1%" server/build/Makefile.release
 sed -i "" "s%^..\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/build/Makefile.release
 
-for i in common server client
+for i in common server 
 do
   pushd $i/build
   make -f Makefile.debug -j9

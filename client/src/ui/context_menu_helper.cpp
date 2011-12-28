@@ -72,7 +72,7 @@ void initContextMenu()
     cm_editTags.setShortcut(QObject::tr("Alt+T"));
     cm_editTags.setShortcutContext(Qt::ApplicationShortcut);
 
-    QMenu *newItemMenu = QnMenuWrapper::instance()->newMenu();
+    QMenu *newItemMenu = new QMenu();
     newItemMenu->setTitle(QObject::tr("New Item"));
     newItemMenu->addAction(new QAction(QObject::tr("Camera"), &cm_new_item));
     newItemMenu->addAction(new QAction(QObject::tr("Media Folder"), &cm_new_item));
@@ -84,7 +84,7 @@ void initContextMenu()
     cm_start_video_recording.setShortcuts(QList<QKeySequence>() << QObject::tr("Alt+R") << Qt::Key_MediaRecord);
     cm_start_video_recording.setShortcutContext(Qt::ApplicationShortcut);
 
-    QMenu *screenRecordingMenu = QnMenuWrapper::instance()->newMenu();
+    QMenu *screenRecordingMenu = new QMenu();
     screenRecordingMenu->setTitle(QObject::tr("Screen Recording"));
     screenRecordingMenu->addAction(&cm_start_video_recording);
     screenRecordingMenu->addAction(&cm_recording_settings);
@@ -101,7 +101,7 @@ void initContextMenu()
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
     cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/togglefullscreen.png")));
 
-    QMenu *itemDistanceMenu = QnMenuWrapper::instance()->newMenu();
+    QMenu *itemDistanceMenu = new QMenu();
     itemDistanceMenu->setTitle(QObject::tr("Item distance"));
     for (int i = 5; i < 40; i += 5)
     {
@@ -112,7 +112,7 @@ void initContextMenu()
     cm_distance.setMenu(itemDistanceMenu);
     cm_distance.setToolTip(QObject::tr("Item distance"));
 
-    QMenu *rotationMenu = QnMenuWrapper::instance()->newMenu();
+    QMenu *rotationMenu = new QMenu();
     rotationMenu->setTitle(QObject::tr("Rotation"));
     {
         QAction *action = new QAction(QObject::tr("0"), &cm_rotate);

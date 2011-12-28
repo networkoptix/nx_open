@@ -47,6 +47,7 @@
 #include <ui/graphics/instruments/motionselectioninstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/grid_item.h>
 
 #include <ui/videoitem/navigationitem.h>
 
@@ -93,6 +94,46 @@ namespace {
         return region;
     }
 
+    QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
+        QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
+        if(boundOrientation == Qt::Horizontal) {
+            sceneSize.setHeight(sceneSize.width() / aspectRatio);
+        } else {
+            sceneSize.setWidth(sceneSize.height() * aspectRatio);
+        }
+
+        QSize gridSize0 = mapper->mapToGrid(sceneSize);
+        QSize gridSize1 = gridSize0;
+        if(boundOrientation == Qt::Horizontal) {
+            gridSize1.setHeight(qMax(gridSize1.height() - 1, 1));
+        } else {
+            gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
+        }
+
+        qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
+        qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
+        return distance0 < distance1 ? gridSize0 : gridSize1;
+    }
+
+    QSize bestDoubleBoundedSize(QnWorkbenchGridMapper *mapper, const QSize &bound, qreal aspectRatio) {
+        qreal boundAspectRatio = SceneUtility::aspectRatio(mapper->mapFromGrid(bound));
+
+        if(aspectRatio < boundAspectRatio) {
+            return bestSingleBoundedSize(mapper, bound.height(), Qt::Vertical, aspectRatio);
+        } else {
+            return bestSingleBoundedSize(mapper, bound.width(), Qt::Horizontal, aspectRatio);
+        }
+    }
+
+    QRect bestDoubleBoundedGeometry(QnWorkbenchGridMapper *mapper, const QRect &bound, qreal aspectRatio) {
+        QSize size = bestDoubleBoundedSize(mapper, bound.size(), aspectRatio);
+
+        return QRect(
+            bound.topLeft() + SceneUtility::toPoint(bound.size() - size) / 2,
+            size
+        );
+    }
+
 } // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
@@ -131,7 +172,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_dragInstrument = new DragInstrument(this);
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
-    MotionSelectionInstrument *motionSelectionInstrument = new MotionSelectionInstrument(this);
+    m_motionSelectionInstrument = new MotionSelectionInstrument(this);
+    m_motionSelectionInstrument->recursiveDisable();
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -166,7 +208,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_archiveDropInstrument);
-    m_manager->installInstrument(motionSelectionInstrument);
+    m_manager->installInstrument(m_motionSelectionInstrument);
 
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -199,8 +241,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                                             itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                                          itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                                         itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_dragInstrument,               SLOT(recursiveEnable()));
@@ -214,10 +256,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveEnable()));
 
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveDisable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_dragInstrument,               SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
@@ -260,23 +302,21 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
-    QAction *showMotionAction           = newAction(tr("Show motion"),          tr(""),             this);
-    QAction *hideMotionAction           = newAction(tr("Hide motion"),          tr(""),             this);
+    m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
+    m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
     m_startRecordingAction              = newAction(tr("Start screen recording"), tr(""),           this);
     m_stopRecordingAction               = newAction(tr("Stop screen recording"), tr(""),            this);
     QAction *toggleRecordingAction      = newAction(tr("Start/stop screen recording"), tr("Alt+R"), this);
     m_recordingSettingsActions          = newAction(tr("Screen recording settings"), tr(""),        this);
 
-    connect(showMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
-    connect(hideMotionAction,           SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(m_showMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(m_hideMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(m_startRecordingAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_startRecordingAction_triggered()));
     connect(m_stopRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_stopRecordingAction_triggered()));
     connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
 
-    m_itemContextMenu = QnMenuWrapper::instance()->newMenu();
-    m_itemContextMenu->addAction(showMotionAction);
-    m_itemContextMenu->addAction(hideMotionAction);
+    m_itemContextMenu = new QMenu(display->view());
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -347,9 +387,31 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gr
     QRect geometry(gridPos, QSize(1, 1));
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
     item->setGeometry(geometry);
+    item->setFlag(QnWorkbenchItem::Pinned, false);
 
     layout()->addItem(item);
-    if(!item->isPinned()) {
+    QnResourceWidget *widget = display()->widget(item);
+
+    /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
+    const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
+    qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
+    QSize gridSize;
+    if(estimatedAspectRatio > 1.0) {
+        gridSize = bestSingleBoundedSize(mapper(), 1, Qt::Vertical, estimatedAspectRatio);
+    } else {
+        gridSize = bestSingleBoundedSize(mapper(), 1, Qt::Horizontal, estimatedAspectRatio);
+    }
+
+    /* Adjust item's geometry for the new size. */
+    if(gridSize != item->geometry().size()) {
+        geometry = item->geometry();
+        geometry.moveTopLeft(geometry.topLeft() - toPoint(gridSize - geometry.size()) / 2);
+        geometry.setSize(gridSize);
+        item->setGeometry(geometry);
+    }
+
+    /* Try to pin the item. */
+    if(!item->setFlag(QnWorkbenchItem::Pinned, true)) {
         /* Place already taken, pick closest one. Use AR-based metric. */
         QnAspectRatioGridWalker walker(aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
         QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size(), &walker);
@@ -381,34 +443,15 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING STARTED");
 
-    m_display->bringToFront(item);
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    if(widget == NULL)
+        return;
+
+    m_display->bringToFront(widget);
+
+    /* Show grid. */
+    m_display->gridItem()->fadeIn();
 }
-
-namespace {
-    QSize sizeForBound(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
-        QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
-        if(boundOrientation == Qt::Horizontal) {
-            sceneSize.setHeight(sceneSize.width() / aspectRatio);
-        } else {
-            sceneSize.setWidth(sceneSize.height() * aspectRatio);
-        }
-
-        QSize gridSize0 = mapper->mapToGrid(sceneSize);
-        QSize gridSize1 = gridSize0;
-        if(boundOrientation == Qt::Horizontal) {
-            gridSize1.setHeight(qMax(gridSize1.height() - 1, 1));
-        } else {
-            gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
-        }
-
-        qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
-        qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
-        return distance0 < distance1 ? gridSize0 : gridSize1;
-    }
-
-} // anonymous namespace
-
-
 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
     qDebug("RESIZING FINISHED");
@@ -416,6 +459,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
+
+    /* Hide grid. */
+    m_display->gridItem()->fadeOut();
 
     QRectF newSceneGeometry = widget->geometry();
 
@@ -428,9 +474,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 
     if(widget->hasAspectRatio()) {
         if(widget->aspectRatio() > 1.0) {
-            gridSize = sizeForBound(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
+            gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
         } else {
-            gridSize = sizeForBound(mapper(), gridSize.height(), Qt::Vertical, widget->aspectRatio());
+            gridSize = bestSingleBoundedSize(mapper(), gridSize.height(), Qt::Vertical, widget->aspectRatio());
         }
     }
 
@@ -452,6 +498,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING STARTED");
 
+    /* Show grid. */
+    m_display->gridItem()->fadeIn();
+
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
     m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
@@ -464,6 +513,9 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
 
 void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING FINISHED");
+
+    /* Hide grid. */
+    m_display->gridItem()->fadeOut();
 
     /* Get workbench items and drag delta. */
     QList<QnResourceWidget *> widgets;
@@ -492,20 +544,34 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
 
         /* Handle single widget case. */
         if(workbenchItems.size() == 1) {
-            QnWorkbenchItem *draggedModel = workbenchItems[0];
+            QnWorkbenchItem *draggedWorkbenchItem = workbenchItems[0];
 
             /* Find item that dragged item was dropped on. */
             QPoint cursorPos = QCursor::pos();
-            QnWorkbenchItem *replacedModel = layout()->item(mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
+            QnWorkbenchItem *replacedWorkbenchItem = layout()->item(mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
 
             /* Switch places if dropping smaller one on a bigger one. */
-            if(replacedModel != NULL && replacedModel != draggedModel && draggedModel->isPinned()) {
-                QSizeF draggedSize = draggedModel->geometry().size();
-                QSizeF replacedSize = replacedModel->geometry().size();
-                if(replacedSize.width() >= draggedSize.width() && replacedSize.height() >= draggedSize.height()) {
-                    workbenchItems.push_back(replacedModel);
-                    geometries.push_back(replacedModel->geometry());
-                    geometries.push_back(draggedModel->geometry());
+            if(replacedWorkbenchItem != NULL && replacedWorkbenchItem != draggedWorkbenchItem && draggedWorkbenchItem->isPinned()) {
+                QSizeF draggedSize = draggedWorkbenchItem->geometry().size();
+                QSizeF replacedSize = replacedWorkbenchItem->geometry().size();
+                if(replacedSize.width() > draggedSize.width() && replacedSize.height() > draggedSize.height()) {
+                    QnResourceWidget *draggedWidget = display()->widget(draggedWorkbenchItem);
+                    QnResourceWidget *replacedWidget = display()->widget(replacedWorkbenchItem);
+
+                    workbenchItems.push_back(replacedWorkbenchItem);
+
+                    if(draggedWidget->hasAspectRatio()) {
+                        geometries.push_back(bestDoubleBoundedGeometry(mapper(), replacedWorkbenchItem->geometry(), draggedWidget->aspectRatio()));
+                    } else {
+                        geometries.push_back(replacedWorkbenchItem->geometry());
+                    }
+
+                    if(replacedWidget->hasAspectRatio()) {
+                        geometries.push_back(bestDoubleBoundedGeometry(mapper(), draggedWorkbenchItem->geometry(), replacedWidget->aspectRatio()));
+                    } else {
+                        geometries.push_back(draggedWorkbenchItem->geometry());
+                    }
+
                     finished = true;
                 }
             }
@@ -609,6 +675,20 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         widget->setSelected(true);
     }
 
+    m_itemContextMenu->removeAction(m_hideMotionAction);
+    m_itemContextMenu->removeAction(m_showMotionAction);
+
+    int gridnowDisplayed = isMotionGridDisplayed();
+    if (gridnowDisplayed == 1)
+        m_itemContextMenu->addAction(m_hideMotionAction);
+    else if (gridnowDisplayed == 0)
+        m_itemContextMenu->addAction(m_showMotionAction);
+    else {
+        m_itemContextMenu->addAction(m_hideMotionAction);
+        m_itemContextMenu->addAction(m_showMotionAction);
+    }
+
+
     m_itemContextMenu->exec(info.screenPos());
 }
 
@@ -659,7 +739,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 }
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
-    QScopedPointer<QMenu> menu(QnMenuWrapper::instance()->newMenu(display()->view()));
+    QScopedPointer<QMenu> menu(new QMenu(display()->view()));
     if(m_screenRecorder->isSupported()) {
         if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
             menu->addAction(m_stopRecordingAction);
@@ -743,12 +823,35 @@ void QnWorkbenchController::at_navigationItem_geometryChanged() {
     ));
 }
 
-void QnWorkbenchController::at_showMotionAction_triggered() {
+void QnWorkbenchController::at_showMotionAction_triggered() 
+{
     displayMotionGrid(display()->scene()->selectedItems(), true);
+    m_motionSelectionInstrument->recursiveEnable();
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
     displayMotionGrid(display()->scene()->selectedItems(), false);
+    m_motionSelectionInstrument->recursiveDisable();
+}
+
+int QnWorkbenchController::isMotionGridDisplayed() 
+{
+    bool allDisplayed = true;
+    bool allNonDisplayed = true;
+    foreach(QGraphicsItem *item, display()->scene()->selectedItems()) 
+    {
+        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        if(widget == NULL)
+            continue;
+        allDisplayed &= widget->isMotionGridDisplayed();
+        allNonDisplayed &= !widget->isMotionGridDisplayed();
+    }
+    if (allDisplayed)
+        return 1;
+    else if (allNonDisplayed)
+        return 0;
+    else
+        return -1;
 }
 
 void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {

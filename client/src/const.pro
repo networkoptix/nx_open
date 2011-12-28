@@ -1,4 +1,5 @@
 INCLUDEPATH += ../../common/src
+INCLUDEPATH += ../../common/contrib/qjson/include
 
 win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
@@ -75,7 +76,7 @@ win32 {
 }
 
 mac {
-    LIBS += -lxerces-c-3.1
+    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1
     DEFINES += QN_EXPORT=
 }
 
@@ -83,14 +84,14 @@ LIBS += -L$$EVETOOLS_DIR/lib
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release
 }
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
 
 win32 {
   win32-msvc* {
@@ -146,7 +147,8 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 RESOURCES += ../build/skin.qrc
 FORMS += ui/preferences/connectionssettingswidget.ui ui/preferences/licensewidget.ui ui/preferences/preferences.ui ui/preferences/recordingsettingswidget.ui \
          ui/dialogs/logindialog.ui ui/dialogs/tagseditdialog.ui \
-         youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
+         youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui \
+         ui/device_settings/camera_schedule.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"
