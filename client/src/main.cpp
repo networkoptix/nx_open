@@ -153,7 +153,7 @@ void initAppServerConnection()
 
     QUrl appServerUrl;
 
-    const Settings::ConnectionData lastUsedConnection = Settings::lastUsedConnection();
+    Settings::ConnectionData lastUsedConnection = Settings::lastUsedConnection();
     
     bool hasDefaultConnection = false;
     QList<Settings::ConnectionData> connections = Settings::connections();
@@ -188,8 +188,10 @@ void initAppServerConnection()
 
         connections.append(connection);
         Settings::setConnections(connections);
-        
-        Settings::setLastUsedConnection(connection);
+
+        lastUsedConnection.url = appServerUrl;
+
+        Settings::setLastUsedConnection(lastUsedConnection);
     }
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
