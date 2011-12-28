@@ -104,19 +104,19 @@ public:
 
     /**
      * \param position                  Position to get item at.
-     * \returns                         Item at the given position, or NULL if the given position is empty.
+     * \returns                         Pinned item at the given position, or NULL if the given position is empty.
      */
     QnWorkbenchItem *item(const QPoint &position) const;
 
     /**
-     * \param region                    Region to get items at.
-     * \returns                         Set of items at the given region.
+     * \param region                    Region to get pinned items at.
+     * \returns                         Set of pinned items at the given region.
      */
     QSet<QnWorkbenchItem *> items(const QRect &region) const;
 
     /**
-     * \param regions                   Regions to get items at.
-     * \returns                         Set of items at the given regions.
+     * \param regions                   Regions to get pinned items at.
+     * \returns                         Set of pinned items at the given regions.
      */
     QSet<QnWorkbenchItem *> items(const QList<QRect> &regions) const;
 
