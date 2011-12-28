@@ -5,6 +5,7 @@
 
 class QSplitter;
 
+class NavigationTreeWidget;
 class TabWidget;
 
 class QnBlueBackgroundPainter;
@@ -63,6 +64,7 @@ private:
     QnGraphicsView *m_view;
 
     QSplitter *m_splitter;
+    NavigationTreeWidget *m_navigationWidget;
     TabWidget *m_tabWidget;
 
     static MainWnd *s_instance;

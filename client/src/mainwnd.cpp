@@ -98,8 +98,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
 
     /* Prepare UI. */
-    NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(this);
-    connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
+    m_navigationWidget = new NavigationTreeWidget(this);
+    connect(m_navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
 
     m_tabWidget = new TabWidget(this);
     m_tabWidget->setMovable(true);
@@ -119,7 +119,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_splitter = new QSplitter(Qt::Horizontal, this);
     m_splitter->setChildrenCollapsible(false);
-    m_splitter->addWidget(navigationWidget);
+    m_splitter->addWidget(m_navigationWidget);
     m_splitter->setStretchFactor(0, 1);
     m_splitter->setCollapsible(0, true);
     m_splitter->addWidget(m_tabWidget);
@@ -203,7 +203,7 @@ void MainWnd::currentTabChanged(int index)
         m_display->fitInView(false);
 
         /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
-        m_view->setTransformationAnchor(QGraphicsView::NoAnchor); 
+        m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
     }
 }
 
@@ -376,7 +376,12 @@ void MainWnd::appServerAuthenticationRequired()
             // repopulate the resource pool
             QnResource::stopCommandProc();
             QnResourceDiscoveryManager::instance().stop();
-            qnResPool->clear(); // ### don't remove local resources
+
+            // don't remove local resources
+            const QnResourceList localResources = qnResPool->getResourcesWithFlag(QnResource::local);
+            qnResPool->clear();
+            qnResPool->addResources(localResources);
+
             QnResourceDiscoveryManager::instance().start();
             QnResource::startCommandProc();
         }
