@@ -385,7 +385,7 @@ QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     animator->setTranslationSpeed(length(workbench()->mapper()->step()));  // TODO
     animator->setRotationSpeed(720.0);
     animator->setTimer(m_animationInstrument->animationTimer());
-    animator->setTimeLimit(widgetAnimationDurationMsec); //anim rotation & move & size change of item 
+    animator->setTimeLimit(widgetAnimationDurationMsec); //anim rotation & move & size change of item
     widget->setData(ITEM_ANIMATOR, QVariant::fromValue<QnWidgetAnimator *>(animator));
     return animator;
 }
@@ -435,7 +435,7 @@ CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
 // QnWorkbenchDisplay :: mutators
 // -------------------------------------------------------------------------- //
 void QnWorkbenchDisplay::fitInView(bool animate) {
-    QRectF targetGeometry; 
+    QRectF targetGeometry;
 
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
     if(zoomedItem != NULL) {
@@ -495,7 +495,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setPixmap(Skin::pixmap(QLatin1String("close3.png")));
+    closeButton->setPixmap(Skin::pixmap(QLatin1String("close.png")));
     closeButton->setMinimumSize(QSizeF(10.0, 10.0));
     closeButton->setMaximumSize(QSizeF(10.0, 10.0));
     connect(closeButton, SIGNAL(clicked()), item, SLOT(deleteLater()));
@@ -744,7 +744,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
         if(qFuzzyCompare(currentSize, targetSize)) {
-            easingCurve = QEasingCurve::InOutBack; //anim move widget without resizing 
+            easingCurve = QEasingCurve::InOutBack; //anim move widget without resizing
         } else if(contains(targetSize, currentSize)) {
             easingCurve = QEasingCurve::InBack; //anim  if resize up
         } else {
