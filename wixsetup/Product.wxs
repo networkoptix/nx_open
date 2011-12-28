@@ -66,7 +66,7 @@
         <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="" />
         
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
-              Value="&quot;[#dbconfigexe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
+              Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
               Execute="deferred" Return="check" Impersonate="no" />
         
@@ -120,14 +120,10 @@
                         <Directory Id="VmsAppServerDir" Name="AppServer">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
                                 <File Id="appserverexe" Name="appserver.exe" Source="../appserver/build/exe.win32-2.7/appserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="VMS Application Server" Scope="any" IgnoreFailure="yes"/>
-                                    
-                                    <Shortcut Id="StartmenuStartAppServer" Directory="ProgramMenuAppServerDir" Name="Start $(env.APPLICATION_NAME) Application Server"
-                                              WorkingDirectory='VmsAppServerDir' Advertise="no" Icon="icon_menu.exe"/>
-                                    <Shortcut Id="StartmenuStopAppServer" Directory="ProgramMenuAppServerDir" Name="Stop $(env.APPLICATION_NAME) Application Server"
-                                              WorkingDirectory='VmsAppServerDir' Advertise="no" Icon="icon_menu.exe" Arguments="-t"/>
+                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="VMS Application Server" Scope="any" IgnoreFailure="yes"/>                                                                        
                                 </File>
-                                <File Id="dbconfigexe" Name="dbconfig.exe" Source="../appserver/build/exe.win32-2.7/dbconfig.exe"/>
+                                
+<!--                                <File Id="dbconfigexe" Name="dbconfig.exe" Source="../appserver/build/exe.win32-2.7/dbconfig.exe"/>
                                 <File Id="bz2pyd" Name="bz2.pyd" Source="../appserver/build/exe.win32-2.7/bz2.pyd"/>
                                 <File Id="cx_Freezeutilpyd" Name="cx_Freeze.util.pyd" Source="../appserver/build/exe.win32-2.7/cx_Freeze.util.pyd"/>
                                 <File Id="cx_Logging" Name="cx_Logging.pyd" Source="../appserver/build/exe.win32-2.7/cx_Logging.pyd"/>
@@ -156,6 +152,7 @@
                                 <File Id="_sslpyd" Name="_ssl.pyd" Source="../appserver/build/exe.win32-2.7/_ssl.pyd"/>
                                 <File Id="win32comshellshellpyd" Name="win32com.shell.shell.pyd" Source="../appserver/build/exe.win32-2.7/win32com.shell.shell.pyd"/>
                                 
+-->
                                 <ServiceInstall Id="VmsAppServerService"
                                                 Name="VmsAppServer"
                                                 DisplayName="Network Optix VMS Application Server"
@@ -184,11 +181,11 @@
                                 <File Id="serverconf" Name="server.conf" Source="../appserver/build/exe.win32-2.7/server.conf"/>
                             </Component> -->
                             
-                            <Directory Id="AppServerDatabaseDir" Name="db">
+                            <!-- <Directory Id="AppServerDatabaseDir" Name="db">
                                 <Component Id="AppServerDatabase" Guid="{C3C3F0CE-F976-40ef-AC81-FDED1B4C94DE}">
                                     <File Id="appserver.db" Name="appserver.db" Source="../appserver/build/exe.win32-2.7/db/appserver.db"/>
                                 </Component>
-                            </Directory>
+                            </Directory> -->
                             
                             <Directory Id="AppServerResourcesDir" Name="resources">
                                 <Component Id="AppServerResources" Guid="{C9BCF856-4075-4e46-BEC0-FB4107F3C257}">
@@ -207,12 +204,7 @@
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../server/bin/release/mediaserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="VMS Media Server" Scope="any" IgnoreFailure="yes"/>
-                                    
-                                    <Shortcut Id="StartmenuStartMediaServer" Directory="ProgramMenuMediaServerDir" Name="Start $(env.APPLICATION_NAME) Media Server"
-                                              WorkingDirectory='VmsMediaServerDir' Advertise="no" Icon="icon_menu.exe" />
-                                    <Shortcut Id="StartmenuStopMediaServer" Directory="ProgramMenuMediaServerDir" Name="Stop $(env.APPLICATION_NAME) Media Server"
-                                              WorkingDirectory='VmsMediaServerDir' Advertise="no" Icon="icon_menu.exe" Arguments="-t"/>
+                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="VMS Media Server" Scope="any" IgnoreFailure="yes"/>                                    
                                 </File>
                                 
                                 <ServiceInstall Id="VmsMediaServerService"
@@ -265,6 +257,10 @@
                             
                             <Component Id="ServerXerces" Guid="{B81B02A6-9CC1-4b16-9E03-A4AD91624B5E}">
                                 <File Id="ServerXercescDll" Name="xerces-c_3_1.dll" Source="../server/bin/release/xerces-c_3_1.dll"/>
+                            </Component>
+
+                            <Component Id="ServerQjson" Guid="{809F73F7-A313-4190-8DF5-389D6B57064B}">
+                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="../server/bin/release/qjson.dll"/>
                             </Component>
                         </Directory>
                         
@@ -333,6 +329,10 @@
                                 <File Id="ClientXercescDll" Name="xerces-c_3_1.dll" Source="../client/bin/release/xerces-c_3_1.dll"/>
                             </Component>
                             
+                            <Component Id="ClientQjson" Guid="{E22DFDE7-0917-4feb-971D-74457D2DAD71}">
+                                <File Id="ClientQjsonDll" Name="qjson.dll" Source="../client/bin/release/qjson.dll"/>
+                            </Component>
+
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
                                     <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\release\styles\bespin.dll"/>
@@ -387,10 +387,11 @@
         
         <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Application Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+            <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="AppServerConfiguration" />
             
-            <ComponentRef Id="AppServerDatabase" />
+            <!-- <ComponentRef Id="AppServerDatabase" /> -->
             <ComponentRef Id="AppServerResources" />
             <ComponentRef Id="AppServerTemplates" />
             
@@ -406,6 +407,7 @@
             <ComponentRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerXerces"/>
+            <ComponentRef Id="ServerQjson"/>
             
             <ComponentRef Id='ProgramMenuMediaServerDir' />
         </Feature>
@@ -422,6 +424,7 @@
             <ComponentRef Id="ClientOpenAL" />
             <ComponentRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientXerces"/>
+            <ComponentRef Id="ClientQjson"/>
             <ComponentRef Id="bespin" />
             <ComponentRef Id='arecontvision'/>
             

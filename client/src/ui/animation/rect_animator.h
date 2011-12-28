@@ -5,7 +5,7 @@
 
 /**
  * When animating <tt>QRectF</tt> properties, single speed value has little
- * sense. This class introduces additional speed values that can be
+ * sense. This class introduces new speed values that can be
  * adjusted to change transition times.
  */
 class QnRectAnimator: public QnVariantAnimator {
@@ -36,7 +36,7 @@ public:
      *                                  in rectangle's space coordinates per second.
      */
     qreal absoluteMovementSpeed() const {
-        return speed();
+        return m_absoluteMovementSpeed;
     }
 
     /**
@@ -54,9 +54,7 @@ public:
      * \param absoluteMovementSpeed     New absolute part of the movement speed, 
      *                                  in rectangle's space coordinates per second.
      */
-    void setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
-        setSpeed(absoluteMovementSpeed);
-    }
+    void setAbsoluteMovementSpeed(qreal absoluteMovementSpeed);
 
 protected:
     virtual void updateInternalType(int newType) override;
@@ -66,6 +64,7 @@ protected:
 private:
     qreal m_logScalingSpeed;
     qreal m_relativeMovementSpeed;
+    qreal m_absoluteMovementSpeed;
 };
 
 #endif // QN_RECT_ANIMATOR_H

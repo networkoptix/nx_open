@@ -418,7 +418,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnM
                 painter->drawRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
 }
 
-void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time)
+void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time)
 {
     QString text = QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
     if (!text.isEmpty())
@@ -429,9 +429,9 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qi
         font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
         QFontMetrics metric(font);
         QSize size = metric.size(Qt::TextSingleLine, text);
-        painter->setFont(font);
-        painter->setPen(QPen(QColor(255, 255, 255, 128), 0));
-        painter->setBrush(QColor(255, 255, 255, 64));
+        
+        QnScopedPainterFontRollback fontRollback(painter, font);
+        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
         painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+2, text);
     }
 }
@@ -452,6 +452,13 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
 }
 
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
+    const QPaintEngine* paintEngine = painter->paintEngine();
+    if (!paintEngine)
+    {
+        qnWarning("No OpenGL compatible paint engine is found.");
+        return;
+    }
+
     if (painter->paintEngine()->type() != QPaintEngine::OpenGL2 && painter->paintEngine()->type() != QPaintEngine::OpenGL) {
         qnWarning("Painting with the paint engine of type %1 is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
@@ -502,13 +509,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
     painter->endNativePainting();
 
-    /* Draw decorations */
-    for(int i = 0; i < m_channelCount; i++) {
-        QRectF rect = channelRect(i);
+    /* Draw motion grid. */
+    if (m_displayMotionGrid) {
+        for(int i = 0; i < m_channelCount; i++) {
+            QRectF rect = channelRect(i);
 
-        /* Motion grid. */
-        if (m_displayMotionGrid) 
-        {
             drawMotionGrid(painter, rect, m_renderer->lastFrameMetadata(i));
 
             drawMotionMask(painter, rect);
@@ -517,12 +522,12 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             if(!m_channelState[i].motionSelection.isEmpty())
                 drawFilledRegion(painter, rect, m_channelState[i].motionSelection, QColor(0, 255, 0, 40));
         }
-
-        /* Current time. */
-        qint64 time = m_renderer->lastDisplayedTime(i);
-        if (time > 1000000ll * 3600*24)
-            drawCurrentTime(painter, rect, time); // do not show time for regular media files
     }
+
+    /* Draw current time. */
+    qint64 time = m_renderer->lastDisplayedTime(0);
+    if (time > 1000000ll * 3600 * 24)
+        drawCurrentTime(painter, rect(), time); /* Do not show time for regular media files. */
 }
 
 void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {

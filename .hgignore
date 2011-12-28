@@ -27,7 +27,7 @@ appserver/db/appserver.db
 appserver/db/appserver_debug.db
 appserver/protocol/*.py
 appserver/test/executions
-appserver/static/admin
+appserver/static
 
 bin
 build
@@ -58,5 +58,6 @@ server/src/server.mak*
 winbuild/msvc2010/setup.bat
 
 wixsetup/CustomStrings.wxl
+wixsetup/AppServerFiles.wxs
 
 My Amplifier XE Results*

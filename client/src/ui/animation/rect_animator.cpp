@@ -7,10 +7,9 @@
 QnRectAnimator::QnRectAnimator(QObject *parent):
     base_type(parent),
     m_logScalingSpeed(std::log(2.0)),
-    m_relativeMovementSpeed(1.0)
-{
-    setAbsoluteMovementSpeed(0.0);
-}
+    m_relativeMovementSpeed(1.0),
+    m_absoluteMovementSpeed(0.0)
+{}
 
 QnRectAnimator::~QnRectAnimator() {}
 
@@ -59,8 +58,8 @@ qreal QnRectAnimator::scalingSpeed() const {
 }
 
 void QnRectAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
-    if(relativeMovementSpeed <= 0.0) {
-        qnWarning("Invalid non-positive movement speed %1.", relativeMovementSpeed);
+    if(relativeMovementSpeed < 0.0) {
+        qnWarning("Invalid negative movement speed %1.", relativeMovementSpeed);
         return;
     }
 
@@ -73,3 +72,17 @@ void QnRectAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
     invalidateDuration();
 }
 
+void QnRectAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
+    if(absoluteMovementSpeed < 0.0) {
+        qnWarning("Invalid negative absolute movement speed %1.", absoluteMovementSpeed);
+        return;
+    }
+
+    if(isRunning()) {
+        qnWarning("Cannot change movement speed of a running animator.");
+        return;
+    }
+
+    m_absoluteMovementSpeed = absoluteMovementSpeed;
+    invalidateDuration();
+}

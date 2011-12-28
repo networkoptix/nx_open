@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AppServerDlg.wxs" />
+    <Compile Include="AppServerFiles.wxs" />
     <Compile Include="ClientDlg.wxs" />
     <Compile Include="DowngradeWarningDlg.wxs" />
     <Compile Include="FileAssociations.wxs" />

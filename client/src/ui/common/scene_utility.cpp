@@ -59,6 +59,12 @@ MarginsF SceneUtility::cwiseDiv(const MarginsF &l, const MarginsF &r) {
     );
 }
 
+QColor SceneUtility::translucent(const QColor &color) {
+    QColor result = color;
+    result.setAlpha(0);
+    return result;
+}
+
 namespace {
     template<class Rect, class Size>
     Rect resizeRectInternal(const Rect &rect, const Size &size, Qt::WindowFrameSection resizeGrip) {

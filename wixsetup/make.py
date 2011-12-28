@@ -7,6 +7,15 @@ sys.path.append('..')
 from version import *
 # from genassoc import gen_assoc, gen_file_exts
 from string import Template
+from fixasfiles import fixasfiles
+
+from common.convert import rmtree
+
+if os.path.exists('bin'):
+    rmtree('bin')
+
+if os.path.exists('obj'):
+    rmtree('obj')
 
 def gen_strings():
     xin = open('CustomStrings.wxl.template', 'r').read()
@@ -28,7 +37,11 @@ os.putenv('APPLICATION_VERSION', APPLICATION_VERSION)
 # Generate CustomStrings.wxl
 gen_strings()
 
-os.system(r'candle -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll *.wxs' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION))
+WXS_FILES = "MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs  ClientDlg.wxs  Product.wxs AppServerFiles.wxs AppServerDlg.wxs FileAssociations.wxs"
+os.system(r'heat dir ..\appserver\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
+fixasfiles()
+
+os.system(r'candle -dAppServerSourceDir="../appserver/build/exe.win32-2.7" -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION, WXS_FILES))
 
 output_file = 'bin/VMS-%s.msi' % APPLICATION_VERSION
 try:
