@@ -147,7 +147,8 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 RESOURCES += ../build/skin.qrc
 FORMS += ui/preferences/connectionssettingswidget.ui ui/preferences/licensewidget.ui ui/preferences/preferences.ui ui/preferences/recordingsettingswidget.ui \
          ui/dialogs/logindialog.ui ui/dialogs/tagseditdialog.ui \
-         youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
+         youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui \
+         ui/device_settings/camera_schedule.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"

@@ -68,6 +68,7 @@ QNetworkReply *SyncHTTP::asyncRequest(Operation op, const QUrl &url, QIODevice *
     qRegisterMetaType<QNetworkReply::NetworkError>();
 
     QNetworkRequest request(url.isValid() && !url.isRelative() ? url : m_url.resolved(url));
+    request.setRawHeader("Connection", "close");
     if (!m_credentials.isEmpty())
         request.setRawHeader("Authorization", m_credentials);
 
