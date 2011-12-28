@@ -24,6 +24,11 @@ QnAppServerConnection::~QnAppServerConnection()
 {
 }
 
+void QnAppServerConnection::testConnectionAsync(QObject* target, const char* slot)
+{
+    return m_sessionManager->testConnectionAsync(target, slot);
+}
+
 bool QnAppServerConnection::isConnected() const
 {
     return true;
@@ -185,11 +190,14 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
     }
 }
 
-QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory &resourceFactory)
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QUrl url, QnResourceFactory &resourceFactory)
 {
-    QUrl url = defaultUrl();
-
     cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
 
     return QnAppServerConnectionPtr(new QnAppServerConnection(url, resourceFactory));
+}
+
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory &resourceFactory)
+{
+    return createConnection(defaultUrl(), resourceFactory);
 }

@@ -96,10 +96,8 @@ void PreferencesWindow::accept()
 
     if (connectionsSettingsWidget) {
         QList<Settings::ConnectionData> connections;
-        foreach (const ConnectionsSettingsWidget::ConnectionData &conn, connectionsSettingsWidget->connections()) {
-            Settings::ConnectionData connection;
-            connection.name = conn.name;
-            connection.url = conn.url;
+        foreach (const Settings::ConnectionData &conn, connectionsSettingsWidget->connections()) {
+            Settings::ConnectionData connection = conn;
 
             if (!connection.name.isEmpty() && connection.url.isValid())
                 connections.append(connection);
@@ -152,11 +150,9 @@ void PreferencesWindow::updateView()
 
 void PreferencesWindow::updateStoredConnections()
 {
-    QList<ConnectionsSettingsWidget::ConnectionData> connections;
+    QList<Settings::ConnectionData> connections;
     foreach (const Settings::ConnectionData &conn, Settings::connections()) {
-        ConnectionsSettingsWidget::ConnectionData connection;
-        connection.name = conn.name;
-        connection.url = conn.url;
+        Settings::ConnectionData connection = conn;
 
         if (!connection.name.trimmed().isEmpty()) // the last used one
             connections.append(connection);

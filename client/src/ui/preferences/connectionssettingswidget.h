@@ -6,6 +6,8 @@
 
 #include <QtGui/QWidget>
 
+#include "settings.h"
+
 class QDataWidgetMapper;
 class QModelIndex;
 class QStandardItem;
@@ -23,19 +25,10 @@ public:
     explicit ConnectionsSettingsWidget(QWidget *parent = 0);
     ~ConnectionsSettingsWidget();
 
-    struct ConnectionData {
-        inline bool operator==(const ConnectionData &other) const
-        { return name == other.name && url == other.url; }
-
-        QString name;
-        QUrl url;
-        // ### QString advancedParameters;
-    };
-
-    QList<ConnectionData> connections() const;
-    void setConnections(const QList<ConnectionData> &connections);
-    void addConnection(const ConnectionData &connection);
-    void removeConnection(const ConnectionData &connection);
+    QList<Settings::ConnectionData> connections() const;
+    void setConnections(const QList<Settings::ConnectionData> &connections);
+    void addConnection(const Settings::ConnectionData &connection);
+    void removeConnection(const Settings::ConnectionData &connection);
 
 protected:
     void changeEvent(QEvent *event);
@@ -46,11 +39,15 @@ private Q_SLOTS:
     void currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     void savePasswordToggled(bool save);
     void newConnection();
+    void testConnection();
+    void testResults(int status, const QByteArray &data, int requstHandle);
     void duplicateConnection();
     void deleteConnection();
 
 private:
     Q_DISABLE_COPY(ConnectionsSettingsWidget)
+
+    QUrl currentUrl();
 
     QScopedPointer<Ui::ConnectionsSettingsWidget> ui;
 

@@ -40,6 +40,11 @@ SessionManager *SessionManager::instance()
     return globalSessionManager();
 }
 
+void SessionManager::testConnectionAsync(QObject* receiver, const char *slot)
+{
+    sendAsyncGetRequest("ping", receiver, slot);
+}
+
 void SessionManager::setupErrorHandler()
 {
     disconnect(m_httpClient, 0, SessionManager::instance(), 0);
