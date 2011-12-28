@@ -4,9 +4,11 @@
 #ifdef Q_OS_WIN
 #define QT_HAVE_SSSE3 // Intel core and above
 #include <QtCore/private/qsimd_p.h>
+#else
+#include "qsimd_p.h"
 #endif
 
-#ifdef Q_OS_MAC
+#ifndef Q_OS_WIN
 #include <xmmintrin.h>
 #include <emmintrin.h>
 #include <smmintrin.h>

@@ -1,6 +1,6 @@
 #include "VideoServerConnection.h"
 #include "VideoServerConnection_p.h"
-#include "xsd_RecordedTimePeriods.h"
+#include "xsd_recordedTimePeriods.h"
 #include "VideoSessionManager.h"
 
 void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status, const QnTimePeriodList &result, int handle)

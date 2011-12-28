@@ -219,7 +219,7 @@ struct CLAVIPlaylistStreamReaderPriv
         return reader->readPacket(buf, size);
     }
 
-    static qint64 seek(void* opaque, qint64 offset, qint32 whence)
+    static int64_t seek(void* opaque, int64_t offset, qint32 whence)
     {
         QnAVIPlaylistArchiveDelegate* reader = reinterpret_cast<QnAVIPlaylistArchiveDelegate*> (opaque);
         return reader->seek(offset, whence);

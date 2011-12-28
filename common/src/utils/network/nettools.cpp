@@ -238,7 +238,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
 
 //{ windows
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 
 void removeARPrecord(const QHostAddress& ip)
 {
@@ -333,7 +333,7 @@ QString getMacByIP(const QHostAddress& ip, bool net)
     return res;
 }
 
-#else
+#elseif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
@@ -407,5 +407,13 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     return QString();
 }
+#else // Linux
+void removeARPrecord(const QHostAddress& /*ip*/) {}
+
+QString getMacByIP(const QHostAddress& ip, bool /*net*/)
+{
+    return "";
+}
+
 #endif
 

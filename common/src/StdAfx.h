@@ -28,6 +28,8 @@ extern "C" {
 	#include <libavutil/avstring.h>
 }
 
+#include "qsimd_p.h"
+
 #if defined __cplusplus
 // stl headers
 #include <algorithm>
@@ -57,13 +59,12 @@ extern "C" {
 #include <QFileInfo>
 #include <QFileInfoList>
 #include <QFont>
-#include <QFontmetrics>
+#include <QFontMetrics>
 #include <QGraphicsItem>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
-#include <QGraphicsitem>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHostAddress>
@@ -122,7 +123,7 @@ extern "C" {
 #include <QWaitCondition>
 #include <QWheelEvent>
 #include <QWidget>
-#include <QtConcurrentmap>
+#include <QtConcurrentMap>
 #include <QtCore/qmath.h>
 #include <QtDebug>
 #include <QtGui/QApplication>

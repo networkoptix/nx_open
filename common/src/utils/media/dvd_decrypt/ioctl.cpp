@@ -38,6 +38,11 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>
 
+#ifdef Q_OS_LINUX
+#define HAVE_LINUX_DVD_STRUCT
+#define DVD_STRUCT_IN_LINUX_CDROM_H
+#endif
+
 #if defined( WIN32 )
 #   include <windows.h>
 #   include <winioctl.h>

@@ -1,7 +1,7 @@
 #include <QSet>
 #include <QTextStream>
 #include <QHttpRequestHeader>
-#include <qDebug>
+#include <QDebug>
 #include <QRegion>
 #include <QBuffer>
 
