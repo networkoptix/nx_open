@@ -216,7 +216,8 @@ static inline Settings::ConnectionData readConnectionData(QSettings *settings)
 {
     Settings::ConnectionData connection;
     connection.name = settings->value(QLatin1String("name")).toString();
-    connection.url = settings->value(QLatin1String("url")).toUrl();
+    connection.url = settings->value(QLatin1String("url")).toString();
+    connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == "true");
 
     return connection;
 }
@@ -224,7 +225,8 @@ static inline Settings::ConnectionData readConnectionData(QSettings *settings)
 static inline void writeConnectionData(QSettings *settings, const Settings::ConnectionData &connection)
 {
     settings->setValue(QLatin1String("name"), connection.name);
-    settings->setValue(QLatin1String("url"), connection.url);
+    settings->setValue(QLatin1String("url"), connection.url.toString());
+    settings->setValue(QLatin1String("readOnly"), connection.readOnly);
 }
 
 Settings::ConnectionData Settings::lastUsedConnection()

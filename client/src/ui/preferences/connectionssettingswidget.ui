@@ -62,12 +62,6 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <layout class="QFormLayout" name="formLayout">
-           <property name="fieldGrowthPolicy">
-            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-           </property>
-           <property name="labelAlignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="connectionNameLabel">
              <property name="text">
@@ -111,11 +105,51 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="hostnameLineEdit">
-             <property name="maxLength">
-              <number>500</number>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLineEdit" name="hostnameLineEdit">
+               <property name="maxLength">
+                <number>500</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QLabel" name="portLabel">
+                 <property name="text">
+                  <string>&amp;Port:</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::AutoText</enum>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="openExternalLinks">
+                  <bool>false</bool>
+                 </property>
+                 <property name="buddy">
+                  <cstring>hostnameLineEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="portLineEdit">
+                 <property name="maximumSize">
+                  <size>
+                   <width>70</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="maxLength">
+                  <number>500</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="usernameLabel">
@@ -223,6 +257,13 @@
         <widget class="QPushButton" name="newConnectionButton">
          <property name="text">
           <string>New Connection</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="testConnectionButton">
+         <property name="text">
+          <string>Test Connection</string>
          </property>
         </widget>
        </item>

@@ -347,7 +347,9 @@ void MainWnd::appServerError(int error)
     case QNetworkReply::ContentAccessDenied:
     case QNetworkReply::AuthenticationRequiredError:
     case QNetworkReply::UnknownNetworkError:
-        appServerAuthenticationRequired();
+        // Do not show popup box! It's annoying!
+        // Show something like color label in the main window.
+        // appServerAuthenticationRequired();
         break;
 
     default:

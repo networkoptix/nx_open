@@ -37,6 +37,8 @@ public:
 
     static SessionManager *instance();
 
+    void testConnectionAsync(QObject* receiver, const char *slot);
+
     QByteArray lastError() const;
 
     void setAddEndSlash(bool value);

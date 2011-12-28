@@ -26,12 +26,16 @@ protected:
     void changeEvent(QEvent *event);
 
 private Q_SLOTS:
+    void testSettings();
     void updateStoredConnections();
     void currentIndexChanged(int index);
     void configureStoredConnections();
+    void testResults(int status, const QByteArray &data, int requstHandle);
 
 private:
     Q_DISABLE_COPY(LoginDialog)
+
+    QUrl currentUrl();
 
     QScopedPointer<Ui::LoginDialog> ui;
 

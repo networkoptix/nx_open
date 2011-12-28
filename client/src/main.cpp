@@ -149,40 +149,58 @@ void addTestData()
 
 void initAppServerConnection()
 {
+    static const char* DEFAULT_CONNECTION_NAME = "default";
+
     QUrl appServerUrl;
 
-    // ### remove
-    QSettings settings;
-    appServerUrl.setScheme(QLatin1String("http"));
-    appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-    appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
-    appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
-    { // ### uncomment to convert/save it
-//        Settings::ConnectionData connection;
-//        connection.url = appServerUrl;
-//        Settings::setLastUsedConnection(connection);
+    Settings::ConnectionData lastUsedConnection = Settings::lastUsedConnection();
+    
+    bool hasDefaultConnection = false;
+    QList<Settings::ConnectionData> connections = Settings::connections();
+    foreach(const Settings::ConnectionData& connection, connections)
+    {
+        if (connection.name == DEFAULT_CONNECTION_NAME)
+        {
+            hasDefaultConnection = true;
+            break;
+        }
     }
-    // ###
 
-    const Settings::ConnectionData connection = Settings::lastUsedConnection();
-    if (connection.url.isValid())
-        appServerUrl = connection.url;
+    // If there is default connection, use lastUsedConnection even it's invalid
+    if (hasDefaultConnection)
+    {
+        appServerUrl = lastUsedConnection.url;
+    }
+    // otherwise load default connection, add it as default and store it as last used
+    else
+    {
+        QSettings settings;
+        appServerUrl.setScheme(QLatin1String("http"));
+        appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+        appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
+        appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+        appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+
+        Settings::ConnectionData connection;
+        connection.name = DEFAULT_CONNECTION_NAME;
+        connection.url = appServerUrl;
+        connection.readOnly = true;
+
+        connections.append(connection);
+        Settings::setConnections(connections);
+
+        lastUsedConnection.url = appServerUrl;
+
+        Settings::setLastUsedConnection(lastUsedConnection);
+    }
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
 }
 
 void initAppServerEventConnection()
 {
-    QUrl appServerEventsUrl;
+    QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
 
-    // ### remove
-    QSettings settings;
-    appServerEventsUrl.setScheme(QLatin1String("http"));
-    appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-    appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
-    appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
