@@ -8,11 +8,9 @@
 #include "qsimd_p.h"
 #endif
 
-#ifndef Q_OS_WIN
 #include <xmmintrin.h>
 #include <emmintrin.h>
 #include <smmintrin.h>
-#endif
 
 static inline bool useSSE2()
 {
