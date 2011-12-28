@@ -94,6 +94,27 @@ namespace {
         return region;
     }
 
+    QSize sizeForBound(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
+        QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
+        if(boundOrientation == Qt::Horizontal) {
+            sceneSize.setHeight(sceneSize.width() / aspectRatio);
+        } else {
+            sceneSize.setWidth(sceneSize.height() * aspectRatio);
+        }
+
+        QSize gridSize0 = mapper->mapToGrid(sceneSize);
+        QSize gridSize1 = gridSize0;
+        if(boundOrientation == Qt::Horizontal) {
+            gridSize1.setHeight(qMax(gridSize1.height() - 1, 1));
+        } else {
+            gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
+        }
+
+        qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
+        qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
+        return distance0 < distance1 ? gridSize0 : gridSize1;
+    }
+
 } // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
@@ -347,9 +368,31 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gr
     QRect geometry(gridPos, QSize(1, 1));
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
     item->setGeometry(geometry);
+    item->setFlag(QnWorkbenchItem::Pinned, false);
 
     layout()->addItem(item);
-    if(!item->isPinned()) {
+    QnResourceWidget *widget = display()->widget(item);
+
+    /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
+    const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
+    qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
+    QSize gridSize;
+    if(estimatedAspectRatio > 1.0) {
+        gridSize = sizeForBound(mapper(), 1, Qt::Vertical, estimatedAspectRatio);
+    } else {
+        gridSize = sizeForBound(mapper(), 1, Qt::Horizontal, estimatedAspectRatio);
+    }
+
+    /* Adjust item's geometry for the new size. */
+    if(gridSize != item->geometry().size()) {
+        geometry = item->geometry();
+        geometry.moveTopLeft(geometry.topLeft() - toPoint(gridSize - geometry.size()) / 2);
+        geometry.setSize(gridSize);
+        item->setGeometry(geometry);
+    }
+
+    /* Try to pin the item. */
+    if(!item->setFlag(QnWorkbenchItem::Pinned, true)) {
         /* Place already taken, pick closest one. Use AR-based metric. */
         QnAspectRatioGridWalker walker(aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
         QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size(), &walker);
@@ -390,32 +433,6 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     /* Show grid. */
     m_display->gridItem()->fadeIn();
 }
-
-namespace {
-    QSize sizeForBound(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
-        QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
-        if(boundOrientation == Qt::Horizontal) {
-            sceneSize.setHeight(sceneSize.width() / aspectRatio);
-        } else {
-            sceneSize.setWidth(sceneSize.height() * aspectRatio);
-        }
-
-        QSize gridSize0 = mapper->mapToGrid(sceneSize);
-        QSize gridSize1 = gridSize0;
-        if(boundOrientation == Qt::Horizontal) {
-            gridSize1.setHeight(qMax(gridSize1.height() - 1, 1));
-        } else {
-            gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
-        }
-
-        qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
-        qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
-        return distance0 < distance1 ? gridSize0 : gridSize1;
-    }
-
-} // anonymous namespace
-
-
 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
     qDebug("RESIZING FINISHED");
