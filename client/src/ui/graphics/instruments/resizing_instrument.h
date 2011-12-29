@@ -2,7 +2,7 @@
 #define QN_RESIZING_INSTRUMENT_H
 
 #include <QWeakPointer>
-#include "dragprocessinginstrument.h"
+#include "drag_processing_instrument.h"
 
 class ConstrainedResizable;
 class ResizeHoverInstrument;

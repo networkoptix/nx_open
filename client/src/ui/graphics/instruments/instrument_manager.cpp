@@ -1,13 +1,13 @@
-#include "instrumentmanager.h"
-#include "instrumentmanager_p.h"
+#include "instrument_manager.h"
+#include "instrument_manager_p.h"
 #include <cassert>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <utils/common/warnings.h>
 #include <ui/animation/animation_event.h>
 #include "instrument.h"
-#include "instrumenteventdispatcher.h"
-#include "instrumentpaintsyncer.h"
+#include "instrument_event_dispatcher.h"
+#include "instrument_paint_syncer.h"
 
 namespace {
     /** Name of the property to store a list of scene's instrument managers. */

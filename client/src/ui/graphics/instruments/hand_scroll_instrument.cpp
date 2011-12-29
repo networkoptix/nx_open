@@ -1,10 +1,10 @@
-#include "handscrollinstrument.h"
+#include "hand_scroll_instrument.h"
 #include <QMouseEvent>
 #include <QWidget>
 #include <QScrollBar>
 #include <QGraphicsView>
 #include <QApplication>
-#include <ui/processors/kineticcuttingprocessor.h>
+#include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>
 
 HandScrollInstrument::HandScrollInstrument(QObject *parent):

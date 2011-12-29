@@ -5,7 +5,7 @@
 #include <QSet>
 #include <QList>
 #include "instrument.h"
-#include "installationmode.h"
+#include "installation_mode.h"
 
 class QGraphicsItem;
 class QGraphicsScene;

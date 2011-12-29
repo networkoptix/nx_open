@@ -1,4 +1,4 @@
-#include "clickinstrument.h"
+#include "click_instrument.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QWeakPointer>
 #include <QApplication>

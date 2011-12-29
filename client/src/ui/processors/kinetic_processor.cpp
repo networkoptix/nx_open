@@ -1,4 +1,4 @@
-#include "kineticprocessor.h"
+#include "kinetic_processor.h"
 
 KineticProcessor::KineticProcessor(int type, QObject *parent):
     QObject(parent),

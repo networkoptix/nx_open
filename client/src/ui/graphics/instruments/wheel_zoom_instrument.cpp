@@ -1,10 +1,10 @@
-#include "wheelzoominstrument.h"
+#include "wheel_zoom_instrument.h"
 #include <cmath> /* For std::pow. */
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
 #include <QCursor>
 #include <QDateTime>
-#include <ui/processors/kineticcuttingprocessor.h>
+#include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>
 
 namespace {

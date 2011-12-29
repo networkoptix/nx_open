@@ -1,4 +1,4 @@
-#include "dragprocessor.h"
+#include "drag_processor.h"
 #include <cassert>
 #include <QApplication>
 #include <QMouseEvent>
@@ -8,7 +8,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <utils/common/warnings.h>
-#include "dragprocesshandler.h"
+#include "drag_process_handler.h"
 
 DragProcessor::DragProcessor(QObject *parent):
     QObject(parent),

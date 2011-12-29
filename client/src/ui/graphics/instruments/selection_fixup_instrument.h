@@ -1,7 +1,7 @@
 #ifndef QN_SELECTION_FIXUP_INSTRUMENT_H
 #define QN_SELECTION_FIXUP_INSTRUMENT_H
 
-#include "dragprocessinginstrument.h"
+#include "drag_processing_instrument.h"
 
 /**
  * Clicks on graphics widget's frame is treated differently compared to a click

@@ -3,7 +3,7 @@
 
 #include "instrument.h"
 #include <QWeakPointer>
-#include <ui/processors/kineticprocessor.h>
+#include <ui/processors/kinetic_processor.h>
 
 /**
  * Wheel zoom instrument implements scene zooming with a mouse wheel.

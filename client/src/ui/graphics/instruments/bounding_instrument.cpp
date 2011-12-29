@@ -1,4 +1,4 @@
-#include "boundinginstrument.h"
+#include "bounding_instrument.h"
 #include <cassert>
 #include <cmath> /* For std::log, std::exp, std::abs. */
 #include <limits>
@@ -8,7 +8,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <ui/animation/animation_event.h>
-#include "instrumentmanager.h"
 
 namespace {
 

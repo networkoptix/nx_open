@@ -1,4 +1,4 @@
-#include "dropinstrument.h"
+#include "drop_instrument.h"
 
 #include <QtGui/QtEvents>
 

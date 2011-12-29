@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 #include <ui/common/magnitude.h>
 #include <ui/common/linear_combination.h>
-#include "kineticprocesshandler.h"
+#include "kinetic_process_handler.h"
 
 /**
  * Kinetic processor implements logic that is common to components that make

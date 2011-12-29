@@ -1,7 +1,7 @@
 #ifndef QN_ROTATION_INSTRUMENT_H
 #define QN_ROTATION_INSTRUMENT_H
 
-#include "dragprocessinginstrument.h"
+#include "drag_processing_instrument.h"
 #include <QWeakPointer>
 
 class QnResourceWidget;

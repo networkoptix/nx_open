@@ -1,7 +1,7 @@
 #ifndef QN_KINETIC_ZOOM_PROCESSOR_H
 #define QN_KINETIC_ZOOM_PROCESSOR_H
 
-#include "kineticprocessor.h"
+#include "kinetic_processor.h"
 #include <limits>
 #include <cmath>
 

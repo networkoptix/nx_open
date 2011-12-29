@@ -32,7 +32,7 @@
 #include <ui/animation/animation_timer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include "instrumentmanager.h"
+#include "instrument_manager.h"
 
 
 Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):

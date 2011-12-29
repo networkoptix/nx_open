@@ -1,4 +1,4 @@
-#include "redirectinginstrument.h"
+#include "redirecting_instrument.h"
 #include <utils/common/warnings.h>
 
 void RedirectingInstrument::init(Instrument *target) {

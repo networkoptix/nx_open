@@ -2,7 +2,7 @@
 #define QN_DRAG_INSTRUMENT_H
 
 #include <QPoint>
-#include "dragprocessinginstrument.h"
+#include "drag_processing_instrument.h"
 
 class DragInstrument: public DragProcessingInstrument {
     Q_OBJECT;

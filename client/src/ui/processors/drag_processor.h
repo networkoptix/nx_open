@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QWeakPointer>
 #include <ui/common/scene_utility.h>
-#include "draginfo.h"
-#include "dragprocesshandler.h"
+#include "drag_info.h"
+#include "drag_process_handler.h"
 
 class QWidget;
 class QMouseEvent;

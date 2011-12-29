@@ -1,4 +1,4 @@
-#include "resizehoverinstrument.h"
+#include "resize_hover_instrument.h"
 #include <QGraphicsItem>
 #include <QGraphicsWidget>
 #include <QGraphicsSceneHoverEvent>

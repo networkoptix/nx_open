@@ -1,4 +1,4 @@
-#include "rubberbandinstrument.h"
+#include "rubber_band_instrument.h"
 #include <cassert>
 #include <limits>
 #include <QGraphicsView>
@@ -11,7 +11,6 @@
 #include <QWidget>
 #include <QCursor>
 #include <utils/common/scoped_painter_rollback.h>
-#include "instrumentmanager.h"
 
 namespace {
     struct ItemIsMouseInteractive: public std::unary_function<QGraphicsItem *, bool> {

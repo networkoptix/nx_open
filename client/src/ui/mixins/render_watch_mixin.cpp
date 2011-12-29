@@ -2,9 +2,9 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/instruments/signalinginstrument.h>
-#include <ui/graphics/instruments/instrumentmanager.h>
-#include <ui/graphics/instruments/forwardinginstrument.h>
+#include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/instruments/forwarding_instrument.h>
 #include <camera/abstractrenderer.h>
 #include <utils/common/warnings.h>
 

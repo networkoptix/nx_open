@@ -1,4 +1,4 @@
-#include "uielementsinstrument.h"
+#include "ui_elements_instrument.h"
 #include <QGraphicsWidget>
 
 class DestructionGuardItem: public QGraphicsObject {

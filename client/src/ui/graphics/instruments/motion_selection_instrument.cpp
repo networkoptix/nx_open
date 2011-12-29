@@ -1,4 +1,4 @@
-#include "motionselectioninstrument.h"
+#include "motion_selection_instrument.h"
 #include <cassert>
 #include <QGraphicsObject>
 #include <QMouseEvent>

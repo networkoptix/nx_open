@@ -2,7 +2,7 @@
 #define QN_CLICK_INSTRUMENT_H
 
 #include <QPoint>
-#include "dragprocessinginstrument.h"
+#include "drag_processing_instrument.h"
 
 class ClickInfoPrivate;
 

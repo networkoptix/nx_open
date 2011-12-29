@@ -1,4 +1,4 @@
-#include "selectionfixupinstrument.h"
+#include "selection_fixup_instrument.h"
 #include <limits>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>

@@ -1,8 +1,8 @@
-#include "resizinginstrument.h"
+#include "resizing_instrument.h"
 #include <QGraphicsWidget>
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/frame_section_queryable.h>
-#include "resizehoverinstrument.h"
+#include "resize_hover_instrument.h"
 
 namespace {
     struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem *, bool> {

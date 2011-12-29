@@ -1,4 +1,4 @@
-#include "rotationinstrument.h"
+#include "rotation_instrument.h"
 #include <cassert>
 #include <cmath> /* For std::fmod, std::floor, std::sin and std::cos. */
 #include <limits>

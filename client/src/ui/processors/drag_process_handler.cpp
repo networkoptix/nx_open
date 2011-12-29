@@ -1,5 +1,5 @@
-#include "dragprocesshandler.h"
-#include "dragprocessor.h"
+#include "drag_process_handler.h"
+#include "drag_processor.h"
 
 DragProcessHandler::DragProcessHandler():
     m_processor(NULL) 

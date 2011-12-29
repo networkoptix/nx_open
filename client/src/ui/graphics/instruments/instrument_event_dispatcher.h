@@ -8,8 +8,8 @@
 #include <QEvent> /* For QEvent::Type. */
 #include <QPair>
 #include "instrument.h"
-#include "sceneeventfilter.h"
-#include "installationmode.h"
+#include "scene_event_filter.h"
+#include "installation_mode.h"
 
 template<class T>
 class InstrumentEventDispatcherBase: public QObject {

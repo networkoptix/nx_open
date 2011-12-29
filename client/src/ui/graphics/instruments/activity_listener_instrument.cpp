@@ -1,4 +1,4 @@
-#include "activitylistenerinstrument.h"
+#include "activity_listener_instrument.h"
 #include <utils/common/warnings.h>
 
 ActivityListenerInstrument::ActivityListenerInstrument(int activityTimeoutMSec, QObject *parent):

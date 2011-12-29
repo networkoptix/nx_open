@@ -1,4 +1,4 @@
-#include "draginstrument.h"
+#include "drag_instrument.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QMouseEvent>

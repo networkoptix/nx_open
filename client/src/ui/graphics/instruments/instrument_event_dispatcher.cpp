@@ -1,4 +1,4 @@
-#include "instrumenteventdispatcher.h"
+#include "instrument_event_dispatcher.h"
 #include <cassert>
 #include <QMetaObject>
 #include <utils/common/warnings.h>

@@ -1,4 +1,4 @@
-#include "forwardinginstrument.h"
+#include "forwarding_instrument.h"
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 

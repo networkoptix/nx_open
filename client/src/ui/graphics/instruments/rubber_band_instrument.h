@@ -5,7 +5,7 @@
 #include <QPoint>
 #include <QRect>
 #include <QSet>
-#include "dragprocessinginstrument.h"
+#include "drag_processing_instrument.h"
 
 class QGraphicsItem;
 

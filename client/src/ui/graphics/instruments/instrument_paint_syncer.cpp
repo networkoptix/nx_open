@@ -1,4 +1,4 @@
-#include "instrumentpaintsyncer.h"
+#include "instrument_paint_syncer.h"
 #include <QEvent>
 #include <QDateTime>
 #include <QGLWidget>
