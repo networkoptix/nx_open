@@ -9,10 +9,8 @@
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>
 #include <core/resource/resource_consumer.h>
+#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "polygonal_shadow_item.h"
-#include "core/datapacket/mediadatapacket.h"
-
-
 
 class QGraphicsLinearLayout;
 
@@ -246,7 +244,8 @@ protected:
 
 private slots:
     void at_sourceSizeChanged(const QSize &size);
-    void onResourceUpdated();
+    void at_display_resourceUpdated();
+
 private:
     /**
      * \param channel                   Channel number.
@@ -285,9 +284,10 @@ private:
 
     void drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time);
 
-    void drawMotionGrid(QPainter *painter, const QRectF &rect, QnMetaDataV1Ptr motion);
+    void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion);
 
     void prepareMotionMask();
+
     void drawMotionMask(QPainter *painter, const QRectF& rect);
 
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);

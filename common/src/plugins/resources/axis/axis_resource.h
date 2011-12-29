@@ -8,7 +8,7 @@
 #include "core/datapacket/mediadatapacket.h"
 
 
-class QnPlAxisResource : public QnNetworkResource, public QnSequrityCamResource
+class QnPlAxisResource : public QnNetworkResource, public QnSecurityCamResource
 {
 public:
 

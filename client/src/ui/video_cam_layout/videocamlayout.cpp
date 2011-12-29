@@ -127,7 +127,7 @@ bool SceneLayout::hasLiveCameras() const {
         if(resource == NULL)
             continue;
 
-        if(dynamic_cast<QnSequrityCamResource *>(resource))
+        if(dynamic_cast<QnSecurityCamResource *>(resource))
             return true;
     }
 
@@ -446,7 +446,7 @@ void SceneLayout::addDeviceNavigation(CLAbstractSceneItem* item) {
     if(videoItem == NULL)
         return;
 
-    if(!dynamic_cast<QnSequrityCamResource *>(videoItem->getComplicatedItem()->getDevice().data()))
+    if(!dynamic_cast<QnSecurityCamResource *>(videoItem->getComplicatedItem()->getDevice().data()))
         return;
 
     //m_navigationItem->show(500);
@@ -463,7 +463,7 @@ void SceneLayout::removeDeviceNavigation(CLAbstractSceneItem* item) {
     if(videoItem == NULL)
         return;
 
-    if(!dynamic_cast<QnSequrityCamResource *>(videoItem->getComplicatedItem()->getDevice().data()))
+    if(!dynamic_cast<QnSecurityCamResource *>(videoItem->getComplicatedItem()->getDevice().data()))
         return;
 
     m_view->getNavigationItem()->removeReserveCamera(videoItem->getVideoCam());

@@ -1,19 +1,19 @@
 #include "security_cam_resource.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
-QnSequrityCamResource::QnSequrityCamResource()
+QnSecurityCamResource::QnSecurityCamResource()
 {
     m_dpFactory = 0;
     addFlag(QnResource::live_cam);
 }
 
-QnSequrityCamResource::~QnSequrityCamResource()
+QnSecurityCamResource::~QnSecurityCamResource()
 {
 }
 
-QnSequrityCamResource& QnSequrityCamResource::operator=(const QnResource& other)
+QnSecurityCamResource& QnSecurityCamResource::operator=(const QnResource& other)
 {
-    const QnSequrityCamResource* other_casted = dynamic_cast<const QnSequrityCamResource*>(&other);
+    const QnSecurityCamResource* other_casted = dynamic_cast<const QnSecurityCamResource*>(&other);
 
     if (other_casted)
     {
@@ -31,13 +31,13 @@ QnSequrityCamResource& QnSequrityCamResource::operator=(const QnResource& other)
     return *this;
 }
 
-QString QnSequrityCamResource::oemName() const
+QString QnSecurityCamResource::oemName() const
 {
     return manufacture();
 }
 
 
-int QnSequrityCamResource::getMaxFps()
+int QnSecurityCamResource::getMaxFps()
 {
     if (hasSuchParam("MaxFPS"))
     {
@@ -50,7 +50,7 @@ int QnSequrityCamResource::getMaxFps()
     return val;
 }
 
-QSize QnSequrityCamResource::getMaxSensorSize()
+QSize QnSecurityCamResource::getMaxSensorSize()
 {
 
     if (!hasSuchParam("MaxSensorWidth") || !hasSuchParam("MaxSensorHeight"))
@@ -67,17 +67,17 @@ QSize QnSequrityCamResource::getMaxSensorSize()
 
 }
 
-QRect QnSequrityCamResource::getCroping(QnDomain /*domain*/)
+QRect QnSecurityCamResource::getCroping(QnDomain /*domain*/)
 {
     return QRect(0, 0, 100, 100);
 }
 
-void QnSequrityCamResource::setCroping(QRect croping, QnDomain /*domain*/)
+void QnSecurityCamResource::setCroping(QRect croping, QnDomain /*domain*/)
 {
     setCropingPhysical(croping);
 }
 
-QnAbstractStreamDataProvider* QnSequrityCamResource::createDataProviderInternal(QnResource::ConnectionRole role)
+QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role)
 {
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default)
         return createLiveDataProvider();
@@ -87,18 +87,18 @@ QnAbstractStreamDataProvider* QnSequrityCamResource::createDataProviderInternal(
         return 0;
 }
 
-void QnSequrityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
+void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
 {
     m_dpFactory = dpFactory;
 }
 
-QRegion QnSequrityCamResource::getMotionMask() const
+QRegion QnSecurityCamResource::getMotionMask() const
 {
     QReadLocker readLocker(&m_rwLock);
     return m_motionMask;
 }
 
-void QnSequrityCamResource::setMotionMask(const QRegion& mask)
+void QnSecurityCamResource::setMotionMask(const QRegion& mask)
 {
     QWriteLocker writeLocker(&m_rwLock);
     if (m_motionMask == mask)
@@ -107,12 +107,12 @@ void QnSequrityCamResource::setMotionMask(const QRegion& mask)
     emit motionMaskChanged(mask);
 }
 
-void QnSequrityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks)
+void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks)
 {
     m_scheduleTasks = scheduleTasks;
 }
 
-const QnScheduleTaskList QnSequrityCamResource::getScheduleTasks() const
+const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
 {
     return m_scheduleTasks;
 }

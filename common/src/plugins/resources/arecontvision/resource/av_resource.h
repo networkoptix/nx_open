@@ -13,7 +13,7 @@ class QDomElement;
 
 
 // this class and inherited must be very light to create 
-class QnPlAreconVisionResource : public QnNetworkResource, public QnSequrityCamResource
+class QnPlAreconVisionResource : public QnNetworkResource, public QnSecurityCamResource
 {
 public:
     static const char* MANUFACTURE;

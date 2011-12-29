@@ -11,12 +11,12 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
 };
 
-class QnSequrityCamResource : virtual public QnMediaResource
+class QnSecurityCamResource : virtual public QnMediaResource
 {
     Q_OBJECT
 public:
-    QnSequrityCamResource();
-    virtual ~QnSequrityCamResource();
+    QnSecurityCamResource();
+    virtual ~QnSecurityCamResource();
 
     // like arecont or iqinvision
     virtual QString manufacture() const = 0;
@@ -40,7 +40,7 @@ public:
     void setScheduleTasks(const QnScheduleTaskList& scheduleTasks);
     const QnScheduleTaskList getScheduleTasks() const;
 
-    QnSequrityCamResource& operator=(const QnResource& other) override;
+    QnSecurityCamResource& operator=(const QnResource& other) override;
 
 signals:
     void motionMaskChanged(QRegion region);
@@ -56,7 +56,7 @@ private:
     QnScheduleTaskList m_scheduleTasks;
 };
 
-typedef QSharedPointer<QnSequrityCamResource> QnSequrityCamResourcePtr;
-typedef QList<QnSequrityCamResourcePtr> QnSequrityCamResourceList;
+typedef QSharedPointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
+typedef QList<QnSecurityCamResourcePtr> QnSecurityCamResourceList;
 
 #endif //sequrity_cam_resource_h_1239

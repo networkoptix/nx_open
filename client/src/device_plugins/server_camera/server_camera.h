@@ -10,7 +10,7 @@ public:
     void processResources(const QnResourceList &resources);
 };
 
-class QnServerCamera: public QnNetworkResource, public QnSequrityCamResource
+class QnServerCamera: public QnNetworkResource, public QnSecurityCamResource
 {
 public:
     QnServerCamera();

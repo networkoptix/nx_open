@@ -11,8 +11,8 @@ void parseScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnApiScheduleTa
 
     for (ScheduleTasks::scheduleTask_const_iterator i (xsdScheduleTasks.begin()); i != xsdScheduleTasks.end(); ++i)
     {
-        QnScheduleTask scheduleTask(       i->id().c_str(),
-                                           i->sourceId().c_str(),
+        QnScheduleTask scheduleTask(       i->id().present() ? (*(i->id())).c_str() : "",
+                                           i->sourceId().present() ? (*(i->sourceId())).c_str() : "",
                                            i->startTime(),
                                            i->endTime(),
                                            i->doRecordAudio(),
