@@ -10,16 +10,16 @@ class QnException: virtual public std::exception {
 public:
     QnException(const QString &message = QString()): m_message(message) {}
 
-    virtual ~Exception() noexcept {}
+    virtual ~QnException() noexcept {}
 
     virtual QString message() const noexcept {
         return m_message;
     }
 
     virtual const char *what() const noexcept override {
-        if(mCachedWhat.isNull())
-            mCachedWhat = message().toLocal8Bit();
-        return mCachedWhat.data();
+        if(m_cachedWhat.isNull())
+            m_cachedWhat = message().toLocal8Bit();
+        return m_cachedWhat.data();
     }
 
 private:

@@ -41,7 +41,9 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "eventmanager.h"
-#include "auto_tester.h"
+
+#include "tests/auto_tester.h"
+#include "tests/auto_test_result.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -372,7 +374,17 @@ int main(int argc, char *argv[])
 
     QnEventManager::instance()->run();
 
-    int result = application.exec();
+    autoTester.start();
+
+    int result;
+    try {
+        result = application.exec();
+    } catch (const QnAutoTestResult &testResult) {
+        QTextStream out(stdout);
+
+        out << testResult.message();
+        result = testResult.succeeded() ? 0 : 0xDEADBEEF;
+    }
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
