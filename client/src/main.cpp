@@ -42,6 +42,8 @@
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "eventmanager.h"
 
+#include "tests/auto_tester.h"
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -206,6 +208,8 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
+    QnAutoTester autoTester(argc, argv);
+
     EveApplication application(argc, argv);
     application.setQuitOnLastWindowClosed(true);
 
@@ -369,7 +373,18 @@ int main(int argc, char *argv[])
 
     QnEventManager::instance()->run();
 
+    QObject::connect(&autoTester, SIGNAL(finished()), &application, SLOT(quit()));
+    autoTester.start();
+
     int result = application.exec();
+
+    if(autoTester.state() == QnAutoTester::FINISHED) {
+        if(!autoTester.succeeded())
+            result = 0xDEADBEEF;
+
+        QTextStream out(stdout);
+        out << autoTester.message();
+    }
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
