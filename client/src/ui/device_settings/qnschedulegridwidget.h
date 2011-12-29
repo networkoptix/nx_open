@@ -25,10 +25,11 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent * event);
     virtual void leaveEvent(QEvent * event );
     virtual void paintEvent(QPaintEvent * event);
+    virtual void resizeEvent(QResizeEvent * event);
 private:
     qreal getCellSize();
     QPoint getCell(const QPoint& p, bool doTruncate);
-    void initMetrics(const QFont& f);
+    void initMetrics();
     void updateCellValue(const QPoint& cell);
 private:
     typedef QVariant CellParams[ParamNum_Dummy];
@@ -43,8 +44,11 @@ private:
     int m_gridTopOffset;
     QPoint m_mousePressPos;
     QPoint m_mouseMovePos;
+    QPoint m_mouseMoveCell;
     QRect m_selectedRect;
     bool m_mousePressed;
+    QFont m_labelsFont;
+    QFont m_gridFont;
 };
 
 #endif // __SCHEDULE_GRID_WIDGET_H_
