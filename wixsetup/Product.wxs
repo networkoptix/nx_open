@@ -38,19 +38,19 @@
         <Property Id="APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         
         <!-- MediaServer properties-->
-        <Property Id="SERVER_HOST" Secure="yes" />
-        <Property Id="SERVER_PORT" Secure="yes" />
-        <Property Id="SERVER_LOGIN" Secure="yes" />
-        <Property Id="SERVER_PASSWORD" Secure="yes" />
+        <Property Id="SERVER_HOST" Secure="yes" Value="localhost"/>
+        <Property Id="SERVER_PORT" Secure="yes" Value="8000"/>
+        <Property Id="SERVER_LOGIN" Secure="yes" Value="appserver"/>
+        <Property Id="SERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="SERVER_RTSP_PORT" Secure="yes" Value="8001"/>
         <Property Id="SERVER_API_PORT" Secure="yes" Value="8002"/>
         <Property Id="SERVER_DIRECTORY" Secure="yes"/>
         
         <!-- Client properties-->
-        <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" />
-        <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" />
-        <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes"/>
-        <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes" />
+        <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
+        <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="8000"/>
+        <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="appserver"/>
+        <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
         
         <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
@@ -103,7 +103,7 @@
             <Directory Id="SERVER_DIRECTORY" Name="Server Media">
                 <Component Id="ServerDirectoryComponent" Guid="{C259A76D-4CAA-489f-A18F-28AED0232853}" Permanent="yes">
                     <CreateFolder Directory="SERVER_DIRECTORY"/>
-                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\[ProductName] Server' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\[ProductName] Media Server' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
             
@@ -360,7 +360,7 @@
                     <Directory Id="ProgramMenuMediaServerDir" Name="VMS Media Server">
                         <Component Id="ProgramMenuMediaServerDir" Guid="{AAF5310E-3711-4980-95E9-A34CC7E137B6}">
                             <RemoveFolder Id='ProgramMenuMediaServerDir' On='uninstall' />
-                            <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName] Media Server' Type='string' Value='' KeyPath='yes' />
+                            <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\[ProductName] Media Server' Type='string' Value='' KeyPath='yes' />
                         </Component>
                     </Directory>
                     <Directory Id="ProgramMenuAppServerDir" Name="VMS Application Server">
