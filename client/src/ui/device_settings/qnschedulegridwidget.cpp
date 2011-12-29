@@ -14,8 +14,8 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
         for (int y = 0; y < ROW_COUNT; ++y)
         {
             m_gridParams[x][y][ParamType_Color] = QColor(COLOR_LIGHT,0,0).rgba();
-            m_gridParams[x][y][ParamType_First] = 25;
-            m_gridParams[x][y][ParamType_Second] = "Hi";
+            m_gridParams[x][y][ParamType_First] = 1;
+            m_gridParams[x][y][ParamType_Second] = "Lo";
         }
     }
     QDate date(2010,1,1);
