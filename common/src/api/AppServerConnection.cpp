@@ -93,6 +93,28 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
                                      cameraIn.getAuth().user().toStdString(),
                                      cameraIn.getAuth().password().toStdString());
 
+    const QnSecurityCamResource* securityCamera = dynamic_cast<const QnSecurityCamResource*>(&cameraIn);
+    if (securityCamera)
+    {
+        xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
+        foreach(const QnScheduleTask& scheduleTaskIn, securityCamera->getScheduleTasks())
+        {
+            xsd::api::scheduleTasks::ScheduleTask scheduleTask(
+                                                    scheduleTaskIn.startTimeMs(),
+                                                    scheduleTaskIn.startTimeMs() + scheduleTaskIn.durationMs(),
+                                                    scheduleTaskIn.getDoRecordAudio(),
+                                                    scheduleTaskIn.getRecordingType(),
+                                                    scheduleTaskIn.getDayOfWeek(),
+                                                    scheduleTaskIn.getBeforeThreshold(),
+                                                    scheduleTaskIn.getAfterThreshold(),
+                                                    scheduleTaskIn.getStreamQuality(),
+                                                    scheduleTaskIn.getFps());
+
+            scheduleTasks.scheduleTask().push_back(scheduleTask);
+        }
+        camera.scheduleTasks(scheduleTasks);
+    }
+
     camera.parentID(serverIdIn.toString().toStdString());
 
     QnApiCameraResponsePtr xsdCameras;
@@ -119,7 +141,7 @@ int QnAppServerConnection::addStorage(const QnStorage& storageIn)
     return m_sessionManager->addStorage(storage);
 }
 
-int QnAppServerConnection::getCameras(QnSequrityCamResourceList& cameras, const QnId& mediaServerId)
+int QnAppServerConnection::getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId)
 {
     QnApiCameraResponsePtr xsdCameras;
 

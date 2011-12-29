@@ -6,7 +6,7 @@
 #include "core/resourcemanagment/security_cam_resource.h"
 #include "api/parsers/parse_schedule_tasks.h"
 
-// void parseCameras(QnSequrityCamResourceList& cameras, const QnApiCameras& xsdCameras, QnResourceFactory& resourceFactory);
+// void parseCameras(QnSecurityCamResourceList& cameras, const QnApiCameras& xsdCameras, QnResourceFactory& resourceFactory);
 
 namespace
 {
@@ -60,7 +60,7 @@ void parseCameras(QList<ResourcePtr>& cameras, const QnApiCameras& xsdCameras, Q
         if (cameraBase.isNull())
             continue;
 
-        QnSequrityCamResourcePtr camera = cameraBase.dynamicCast<QnSequrityCamResource>();
+        QnSecurityCamResourcePtr camera = cameraBase.dynamicCast<QnSecurityCamResource>();
         if (camera.isNull())
             continue;
 

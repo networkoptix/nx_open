@@ -359,10 +359,10 @@ public:
 
         QnScheduleTaskList scheduleTasks;
 
-        QnSequrityCamResourceList cameras;
+        QnSecurityCamResourceList cameras;
         appServerConnection->getCameras(cameras, videoServer->getId());
 
-        foreach(QnSequrityCamResourcePtr camera, cameras)
+        foreach(QnSecurityCamResourcePtr camera, cameras)
         {
             QnRecordingManager::instance()->updateSchedule(camera);
         }

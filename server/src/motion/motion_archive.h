@@ -93,7 +93,7 @@ private:
     friend class QnMotionArchiveConnection;
 private:
     QnNetworkResourcePtr m_resource;
-    QnSequrityCamResourcePtr m_camResource;
+    QnSecurityCamResourcePtr m_camResource;
     qint64 m_lastDateForCurrentFile;
     
     QFile m_detailedMotionFile;

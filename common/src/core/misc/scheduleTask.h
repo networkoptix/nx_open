@@ -42,6 +42,8 @@ public:
     int getAfterThreshold() const { return m_afterThreshold; }
     int getFps() const { return m_fps; }
     QnStreamQuality getStreamQuality() const { return m_streamQuality; }
+    bool getDoRecordAudio() const { return m_doRecordAudio; }
+    int getDayOfWeek() const { return m_dayOfWeek; }
 
 
     /*

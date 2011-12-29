@@ -106,7 +106,7 @@ QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource):
     m_resource(resource),
     m_lastDetailedData(new QnMetaDataV1())
 {
-    m_camResource = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
+    m_camResource = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
     m_firstTime = 0;
     if (m_camResource) {

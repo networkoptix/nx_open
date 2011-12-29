@@ -43,7 +43,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
     if (camera) 
     {
-        QnSequrityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSequrityCamResource>(res);
+        QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
         cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
         QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader();
         QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res);
@@ -61,7 +61,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
     }
 }
 
-void QnRecordingManager::updateSchedule(QnSequrityCamResourcePtr camera)
+void QnRecordingManager::updateSchedule(QnSecurityCamResourcePtr camera)
 {
     QMutexLocker lock(&m_mutex);
 

@@ -334,7 +334,7 @@ void QnResourceWidget::hideActivityDecorations() {
 
 void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF& rect) 
 {
-    QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     if (!camera)
         return;
     drawFilledRegion(painter, rect, camera->getMotionMask(), QColor(255, 255, 255, 26));
@@ -342,7 +342,7 @@ void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF& rect)
 
 void QnResourceWidget::prepareMotionMask()
 {
-    QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     if (camera) 
     {
         m_motionMask = camera->getMotionMask();
