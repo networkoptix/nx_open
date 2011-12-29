@@ -3,6 +3,7 @@
 
 #include <QtGui/QMainWindow>
 
+class QPropertyAnimation;
 class QSplitter;
 
 class NavigationTreeWidget;
@@ -28,12 +29,16 @@ Q_SIGNALS:
     void mainWindowClosed();
 
 protected:
+    bool eventFilter(QObject *watched, QEvent *event);
     void closeEvent(QCloseEvent *event);
 
 private Q_SLOTS:
     void addTab();
     void currentTabChanged(int index);
     void closeTab(int index);
+
+    void toggleShowNavTree();
+    void navTreeAnimationFinished();
 
     void itemActivated(uint resourceId);
     void handleMessage(const QString &message);
@@ -66,6 +71,10 @@ private:
     QSplitter *m_splitter;
     NavigationTreeWidget *m_navigationWidget;
     TabWidget *m_tabWidget;
+
+    QPropertyAnimation *m_navigationWidgetAnimation;
+
+    QPoint m_splitterClickedPos;
 
     static MainWnd *s_instance;
 };
