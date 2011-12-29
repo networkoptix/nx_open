@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>CameraSchedule</class>
+ <widget class="QWidget" name="CameraSchedule">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>780</width>
-    <height>599</height>
+    <width>1085</width>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Camera schedule editor</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_7">
    <item>
@@ -27,7 +27,13 @@
        <property name="title">
         <string>Schedule grid</string>
        </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <property name="spacing">
@@ -36,7 +42,7 @@
           <item>
            <widget class="QCheckBox" name="checkBox_2">
             <property name="text">
-             <string>Display quality on a grid</string>
+             <string>Display quality on grid</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -62,7 +68,7 @@
           <item>
            <widget class="QCheckBox" name="checkBox">
             <property name="text">
-             <string>Display fps on a grid</string>
+             <string>Display fps on grid</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -124,7 +130,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QWidget" name="widget" native="true">
+         <widget class="QnScheduleGridWidget" name="widget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -374,6 +380,9 @@
      <property name="title">
       <string>Motion recording settings</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
        <layout class="QGridLayout" name="gridLayout">
@@ -458,6 +467,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnScheduleGridWidget</class>
+   <extends>QWidget</extends>
+   <header>qnschedulegridwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

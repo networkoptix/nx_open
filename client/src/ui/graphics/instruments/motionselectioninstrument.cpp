@@ -24,8 +24,8 @@ public:
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(16, 128+16, 16, 255), 0));
-        QnScopedPainterBrushRollback brushRollback(painter, QColor(0, 255, 0, 64));
+        QnScopedPainterPenRollback penRollback(painter, QPen(SELECT_ARIA_PEN_COLOR));
+        QnScopedPainterBrushRollback brushRollback(painter, QColor(SELECT_ARIA_BRUSH_COLOR));
         painter->drawRect(boundingRect());
     }
 

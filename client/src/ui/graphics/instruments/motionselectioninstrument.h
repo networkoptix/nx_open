@@ -4,6 +4,10 @@
 #include "dragprocessinginstrument.h"
 #include <QWeakPointer>
 
+static const QColor SELECT_ARIA_PEN_COLOR(16, 128+16, 16, 255);
+static const QColor SELECT_ARIA_BRUSH_COLOR(0, 255, 0, 64);
+
+
 class QnResourceWidget;
 class MotionSelectionItem;
 
