@@ -158,9 +158,10 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
 {
     static FileTypeSupport m_fileTypeSupport;
 
-    if (m_fileTypeSupport.isImageFileExt(xfile))
-        return QnResourcePtr(new QnLocalFileResource(xfile));
-    else if (CLAviDvdDevice::isAcceptedUrl(xfile))
+    //if (m_fileTypeSupport.isImageFileExt(xfile))
+    //    return QnResourcePtr(new QnLocalFileResource(xfile));
+    //else 
+    if (CLAviDvdDevice::isAcceptedUrl(xfile))
         return QnResourcePtr(new CLAviDvdDevice(xfile));
     else if (CLAviBluRayDevice::isAcceptedUrl(xfile))
         return QnResourcePtr(new CLAviBluRayDevice(xfile));

@@ -125,6 +125,7 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
     if (!rt.isValid())
         return QnNetworkResourcePtr(0);
 
+    resource->setTypeId(rt);
     resource->setName(name);
     resource->setMAC(smac);
 
