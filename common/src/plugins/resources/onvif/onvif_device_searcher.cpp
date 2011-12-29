@@ -3,7 +3,7 @@
 #include "utils/network/mdns.h"
 #include "utils/common/sleep.h"
 
-#ifdef Q_OS_MAC
+#ifndef Q_OS_WIN
 #include <netinet/in.h>
 #include <sys/socket.h>
 #endif

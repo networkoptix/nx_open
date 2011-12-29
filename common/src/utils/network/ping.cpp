@@ -134,7 +134,15 @@ unsigned short checksum(const struct icmp& packet)
 
 bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
 {
-    unsigned short id  = (unsigned short) (arc4random() >> 15);
+    long rnd;
+
+#ifdef Q_OS_MAC
+    rnd = arc4random();
+#else
+    rnd = random();
+#endif
+
+    unsigned short id  = (unsigned short) (rnd >> 15);
 
     int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
     if (fd == -1)
@@ -168,7 +176,10 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
     saddr.sin_family = AF_INET;
     saddr.sin_port = 0;
     saddr.sin_addr.s_addr = addr;
+
+#ifdef Q_OS_MAC
     saddr.sin_len = sizeof(struct sockaddr_in);
+#endif
 
     if (sendto(fd, (void*)&packet.icmp, sizeof (packet.icmp), 0, (sockaddr*)&saddr, sizeof(saddr)) == -1)
     {

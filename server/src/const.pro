@@ -65,6 +65,10 @@ mac {
     DEFINES += QN_EXPORT=
 }
 
+unix:!mac {
+    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c
+}
+
 LIBS += -L$$EVETOOLS_DIR/lib
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
@@ -97,16 +101,18 @@ win32 {
   # Define QN_EXPORT only if common build is not static
   isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
   !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
+}
 
-  DEFINES += __STDC_CONSTANT_MACROS
+DEFINES += __STDC_CONSTANT_MACROS
+
+unix {
+  LIBS += -lz
+  QMAKE_CXXFLAGS += -msse4.1
+  DEFINES += QN_EXPORT=
 }
 
 mac {
-  LIBS += -framework IOKit -framework CoreServices
-  LIBS += -lz -lbz2
-
-  QMAKE_CXXFLAGS += -msse4.1
-  DEFINES += QN_EXPORT=
+  LIBS += -lbz2 -framework IOKit -framework CoreServices
 }
 
 INCLUDEPATH += $$PWD

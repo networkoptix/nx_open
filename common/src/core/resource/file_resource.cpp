@@ -3,6 +3,10 @@
 #include "file_resource.h"
 #include "core/dataprovider/single_shot_file_dataprovider.h"
 
+#include <plugins/resources/archive/archive_stream_reader.h>
+#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
+
+
 
 QnLocalFileResource::QnLocalFileResource(const QString &filename)
 {

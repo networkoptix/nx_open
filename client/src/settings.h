@@ -53,11 +53,16 @@ public:
 
     // ### separate out ?
     struct ConnectionData {
+        ConnectionData()
+            : readOnly(false)
+        {}
+
         inline bool operator==(const ConnectionData &other) const
         { return name == other.name && url == other.url; }
 
         QString name;
         QUrl url;
+        bool readOnly;
     };
     static ConnectionData lastUsedConnection();
     static void setLastUsedConnection(const ConnectionData &connection);

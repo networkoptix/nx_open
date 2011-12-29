@@ -42,7 +42,7 @@ bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
     switch(type)
     {
     case CloseSubItem:
-        item = new CLImgSubItem(this, Skin::path(QLatin1String("close3.png")), type, global_decoration_opacity, global_decoration_max_opacity, 300, 300);
+        item = new CLImgSubItem(this, Skin::path(QLatin1String("close.png")), type, global_decoration_opacity, global_decoration_max_opacity, 300, 300);
         break;
 
     case MakeScreenshotSubItem:

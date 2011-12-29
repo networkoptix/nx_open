@@ -7,6 +7,7 @@
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <core/resourcemanagment/resource_pool.h>
+#include <core/resourcemanagment/security_cam_resource.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/warnings.h>
@@ -16,11 +17,10 @@
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "settings.h"
-#include "core/resourcemanagment/security_cam_resource.h"
 
 namespace {
     /** Default frame width. */
-    const qreal defaultFrameWidth = 1.0;
+    const qreal defaultFrameWidth = 0.5;
 
     /** Default frame color. */
     const QColor defaultFrameColor = QColor(128, 128, 128, 196);
@@ -92,12 +92,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setLayout(layout);
 
     /* Set up video rendering. */
-
     m_resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
-
     m_display = new QnResourceDisplay(m_resource, this);
-
-    connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(onResourceUpdated()));
+    connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(at_display_resourceUpdated()));
 
     Q_ASSERT(m_display);
     m_videoLayout = m_display->videoLayout();
@@ -334,7 +331,7 @@ void QnResourceWidget::hideActivityDecorations() {
 
 void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF& rect) 
 {
-    QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     if (!camera)
         return;
     drawFilledRegion(painter, rect, camera->getMotionMask(), QColor(255, 255, 255, 26));
@@ -342,7 +339,7 @@ void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF& rect)
 
 void QnResourceWidget::prepareMotionMask()
 {
-    QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(m_resource);
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     if (camera) 
     {
         m_motionMask = camera->getMotionMask();
@@ -364,13 +361,13 @@ void QnResourceWidget::prepareMotionMask()
     m_motionMaskReady = true;
 };
 
-void QnResourceWidget::onResourceUpdated()
+void QnResourceWidget::at_display_resourceUpdated()
 {
     m_motionMaskReady = false;
 }
 
 
-void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion) {
+void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, const QnMetaDataV1Ptr &motion) {
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
 
@@ -418,7 +415,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnM
                 painter->drawRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
 }
 
-void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time)
+void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time)
 {
     QString text = QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
     if (!text.isEmpty())
@@ -429,9 +426,9 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qi
         font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
         QFontMetrics metric(font);
         QSize size = metric.size(Qt::TextSingleLine, text);
-        painter->setFont(font);
-        painter->setPen(QPen(QColor(255, 255, 255, 128), 0));
-        painter->setBrush(QColor(255, 255, 255, 64));
+        
+        QnScopedPainterFontRollback fontRollback(painter, font);
+        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
         painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+2, text);
     }
 }
@@ -492,16 +489,16 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             setOverlayIcon(i, PAUSED);
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
             setOverlayIcon(i, LOADING);
-
-            /* Draw black rectangle if there is nothing to draw. */
-            if(status != QnRenderStatus::RENDERED_OLD_FRAME) {
-                glBegin(GL_QUADS);
-                glColor4f(0.0, 0.0, 0.0, 1.0);
-                glVertices(rect);
-                glEnd();
-            }
         } else {
             setOverlayIcon(i, NO_ICON);
+        }
+
+        /* Draw black rectangle if there is nothing to draw. */
+        if(status != QnRenderStatus::RENDERED_OLD_FRAME && status != QnRenderStatus::RENDERED_NEW_FRAME) {
+            glBegin(GL_QUADS);
+            glColor4f(0.0, 0.0, 0.0, 1.0);
+            glVertices(rect);
+            glEnd();
         }
 
         /* Draw overlay icon. */
@@ -509,13 +506,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
     painter->endNativePainting();
 
-    /* Draw decorations */
-    for(int i = 0; i < m_channelCount; i++) {
-        QRectF rect = channelRect(i);
+    /* Draw motion grid. */
+    if (m_displayMotionGrid) {
+        for(int i = 0; i < m_channelCount; i++) {
+            QRectF rect = channelRect(i);
 
-        /* Motion grid. */
-        if (m_displayMotionGrid) 
-        {
             drawMotionGrid(painter, rect, m_renderer->lastFrameMetadata(i));
 
             drawMotionMask(painter, rect);
@@ -524,12 +519,12 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             if(!m_channelState[i].motionSelection.isEmpty())
                 drawFilledRegion(painter, rect, m_channelState[i].motionSelection, QColor(0, 255, 0, 40));
         }
-
-        /* Current time. */
-        qint64 time = m_renderer->lastDisplayedTime(i);
-        if (time > 1000000ll * 3600*24)
-            drawCurrentTime(painter, rect, time); // do not show time for regular media files
     }
+
+    /* Draw current time. */
+    qint64 time = m_renderer->lastDisplayedTime(0);
+    if (time > 1000000ll * 3600 * 24)
+        drawCurrentTime(painter, rect(), time); /* Do not show time for regular media files. */
 }
 
 void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {

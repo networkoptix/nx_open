@@ -24,6 +24,11 @@ QnAppServerConnection::~QnAppServerConnection()
 {
 }
 
+void QnAppServerConnection::testConnectionAsync(QObject* target, const char* slot)
+{
+    return m_sessionManager->testConnectionAsync(target, slot);
+}
+
 bool QnAppServerConnection::isConnected() const
 {
     return true;
@@ -88,6 +93,28 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
                                      cameraIn.getAuth().user().toStdString(),
                                      cameraIn.getAuth().password().toStdString());
 
+    const QnSecurityCamResource* securityCamera = dynamic_cast<const QnSecurityCamResource*>(&cameraIn);
+    if (securityCamera)
+    {
+        xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
+        foreach(const QnScheduleTask& scheduleTaskIn, securityCamera->getScheduleTasks())
+        {
+            xsd::api::scheduleTasks::ScheduleTask scheduleTask(
+                                                    scheduleTaskIn.getStartTime(),
+                                                    scheduleTaskIn.getEndTime(),
+                                                    scheduleTaskIn.getDoRecordAudio(),
+                                                    scheduleTaskIn.getRecordingType(),
+                                                    scheduleTaskIn.getDayOfWeek(),
+                                                    scheduleTaskIn.getBeforeThreshold(),
+                                                    scheduleTaskIn.getAfterThreshold(),
+                                                    scheduleTaskIn.getStreamQuality(),
+                                                    scheduleTaskIn.getFps());
+
+            scheduleTasks.scheduleTask().push_back(scheduleTask);
+        }
+        camera.scheduleTasks(scheduleTasks);
+    }
+
     camera.parentID(serverIdIn.toString().toStdString());
 
     QnApiCameraResponsePtr xsdCameras;
@@ -114,7 +141,7 @@ int QnAppServerConnection::addStorage(const QnStorage& storageIn)
     return m_sessionManager->addStorage(storage);
 }
 
-int QnAppServerConnection::getCameras(QnSequrityCamResourceList& cameras, const QnId& mediaServerId)
+int QnAppServerConnection::getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId)
 {
     QnApiCameraResponsePtr xsdCameras;
 
@@ -185,11 +212,14 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
     }
 }
 
-QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory &resourceFactory)
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QUrl url, QnResourceFactory &resourceFactory)
 {
-    QUrl url = defaultUrl();
-
     cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
 
     return QnAppServerConnectionPtr(new QnAppServerConnection(url, resourceFactory));
+}
+
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QnResourceFactory &resourceFactory)
+{
+    return createConnection(defaultUrl(), resourceFactory);
 }

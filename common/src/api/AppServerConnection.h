@@ -20,6 +20,8 @@ class QN_EXPORT QnAppServerConnection
 public:
     ~QnAppServerConnection();
 
+    void testConnectionAsync(QObject* target, const char* slot);
+
     bool isConnected() const;
 
     int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes);
@@ -30,7 +32,7 @@ public:
     int addCamera(const QnNetworkResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
     int addStorage(const QnStorage&);
 
-    int getCameras(QnSequrityCamResourceList& cameras, const QnId& mediaServerId);
+    int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId);
     int getStorages(QnResourceList& storages);
     int getScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnId& mediaServerId);
 
@@ -56,6 +58,7 @@ public:
     static void setDefaultUrl(const QUrl &url);
 
     static QnAppServerConnectionPtr createConnection(QnResourceFactory &resourceFactory);
+    static QnAppServerConnectionPtr createConnection(QUrl url, QnResourceFactory &resourceFactory);
 
 private:
     QMutex m_mutex;

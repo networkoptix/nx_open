@@ -61,7 +61,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_clearFilterButton->setText(QLatin1String("X"));
     m_clearFilterButton->setToolTip(tr("Reset Filter"));
     m_clearFilterButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    m_clearFilterButton->setIcon(Skin::icon(QLatin1String("close2.png")));
+    m_clearFilterButton->setIcon(Skin::icon(QLatin1String("clear.png")));
     m_clearFilterButton->setIconSize(QSize(16, 16));
 
     connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
@@ -104,7 +104,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     m_resourcesTreeView->setModel(m_resourcesModel);
     m_searchTreeView->setModel(m_searchProxyModel);
-    QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
+    //QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
 
 
     QHBoxLayout *topLayout = new QHBoxLayout;

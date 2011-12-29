@@ -32,11 +32,17 @@ SessionManager::SessionManager(const QUrl &url, QObject *parent)
 
 SessionManager::~SessionManager()
 {
+    m_httpClient->deleteLater();
 }
 
 SessionManager *SessionManager::instance()
 {
     return globalSessionManager();
+}
+
+void SessionManager::testConnectionAsync(QObject* receiver, const char *slot)
+{
+    sendAsyncGetRequest("ping", receiver, slot);
 }
 
 void SessionManager::setupErrorHandler()

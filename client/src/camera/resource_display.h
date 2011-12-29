@@ -138,6 +138,7 @@ public:
 
 signals:
     void resourceUpdated();
+
 protected:
     virtual void beforeDisconnectFromResource() override;
 

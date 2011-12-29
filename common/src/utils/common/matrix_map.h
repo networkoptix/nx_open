@@ -9,12 +9,7 @@
 #include <QPair>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
-
-inline uint qHash(const QPoint &value) {
-    using ::qHash;
-
-    return qHash(qMakePair(value.x(), value.y()));
-}
+#include <utils/common/hash.h>
 
 /**
  * Matrix map is an abstraction of an infinite two-dimensional sparse array.

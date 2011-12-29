@@ -27,7 +27,7 @@ QnVideoCameraPool* QnVideoCameraPool::instance()
 
 QnVideoCamera* QnVideoCameraPool::getVideoCamera(QnResourcePtr res)
 {
-    QnSequrityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSequrityCamResource>(res);
+    QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (!cameraRes)
         return 0;
 

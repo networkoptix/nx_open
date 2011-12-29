@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <qDebug>
+#include <QDebug>
 
 #ifndef WIN32
 #   include <sys/param.h>

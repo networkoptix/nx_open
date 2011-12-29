@@ -11,6 +11,9 @@ from filetypes import all_filetypes, video_filetypes, image_filetypes
 
 FFMPEG_VERSION = '2011-08-29'
 
+if sys.platform == 'linux2':
+    FFMPEG_VERSION = '2011-12-27'
+
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 
@@ -21,6 +24,14 @@ BUILDLIB = 'staticlib'
 # Temporary hack for development. There are some problems on mac with debugging static libs.
 if sys.platform == 'darwin':
     BUILDLIB = ''
+
+def platform():
+    if sys.platform == 'win32':
+        return 'win32'
+    elif sys.platform == 'darwin':
+        return 'mac'
+    elif sys.platform == 'linux2':
+        return 'linux'
 
 def link_or_copy(src, dst):
     try:
@@ -39,7 +50,7 @@ def qt_path(path):
         return path
 
     qtpath = path.replace('\\', '/')
-    if sys.platform == 'win32':
+    if platform() == 'win32':
         qtpath = qtpath.lstrip('/')
     return qtpath
 
@@ -59,6 +70,10 @@ def rmtree(path):
                 break
 
             time.sleep(1)
+
+        if os.listdir(path):
+            print >> sys.stderr, "Couldn't remove", path
+            sys.exit(1)
 
         func(path)
 
@@ -80,9 +95,12 @@ def gen_filetypes_h():
 def setup_qjson():
     qjson_path = '../common/contrib/qjson'
 
-    return qjson_path + '/lib/' + sys.platform
+    return qjson_path + '/lib/' + platform()
 
 def setup_tools():
+    if platform() == 'linux':
+        return '/usr'
+
     tools_path = os.getenv('EVE_TOOLS')
 
     if not tools_path or not os.path.isdir(tools_path):
@@ -93,12 +111,7 @@ def setup_tools():
         print 'Please clone ssh://hg@noptix.dyndns.biz/evetools to ../.. or to directory referenced by EVE_TOOLS env variable'
         sys.exit(1)
 
-    if sys.platform == 'darwin':
-        platform = 'mac'
-    else:
-        platform = 'win32'
-
-    return qt_path(os.path.join(tools_path, platform))
+    return qt_path(os.path.join(tools_path, platform()))
 
 
 def setup_ffmpeg():
@@ -113,10 +126,12 @@ def setup_ffmpeg():
         sys.exit(1)
 
     ffmpeg = 'ffmpeg-git-' + FFMPEG_VERSION
-    if sys.platform == 'win32':
+    if platform() == 'win32':
         ffmpeg += '-mingw'
-    else:
+    elif platform() == 'mac':
         ffmpeg += '-macos'
+    elif platform() == 'linux':
+        ffmpeg += '-linux'
 
 
     ffmpeg_path = qt_path(os.path.join(ffmpeg_path, ffmpeg))
@@ -237,12 +252,15 @@ def convert():
         index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
         instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 
-        if sys.platform == 'win32':
+        if platform() == 'win32':
             os.system('qmake -tp vc -o src/common.vcproj src/common.pro')
 
-        elif sys.platform == 'darwin':
+        elif platform() == 'mac':
             os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/common.pro')
             os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/common.pro')
+        elif platform() == 'linux':
+            os.system('qmake -spec linux-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/common.pro')
+            os.system('qmake -spec linux-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/common.pro')
     finally:
         os.chdir(oldpwd)
     

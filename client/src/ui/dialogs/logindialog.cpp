@@ -5,8 +5,12 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
+#include "core/resource/resource.h"
 #include "ui/preferences/preferences_wnd.h"
 #include "ui/skin/skin.h"
+#include "connectionTestingDialog.h"
+
+#include "api/AppServerConnection.h"
 
 #include "settings.h"
 
@@ -33,8 +37,9 @@ LoginDialog::LoginDialog(QWidget *parent) :
     m_dataWidgetMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
     m_dataWidgetMapper->setOrientation(Qt::Horizontal);
     m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
-    m_dataWidgetMapper->addMapping(ui->usernameLineEdit, 2);
-    m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 3);
+    m_dataWidgetMapper->addMapping(ui->portLineEdit, 2);
+    m_dataWidgetMapper->addMapping(ui->usernameLineEdit, 3);
+    m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
 
     connect(ui->configureStoredConnectionsButton, SIGNAL(clicked()), this, SLOT(configureStoredConnections()));
 
@@ -50,25 +55,44 @@ LoginDialog::~LoginDialog()
 {
 }
 
-void LoginDialog::accept()
+void LoginDialog::testSettings()
+{
+    QUrl url = currentUrl();
+    
+    if (!url.isValid())
+    {
+        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
+        return;
+    }
+
+    ConnectionTestingDialog dialog(this, url);
+    dialog.setModal(true);
+    dialog.exec();
+}
+
+QUrl LoginDialog::currentUrl()
 {
     const int row = ui->storedConnectionsComboBox->currentIndex();
 
+    QUrl url;
+    
+    QString host = m_connectionsModel->item(row, 1)->text();
+    int port = m_connectionsModel->item(row, 2)->text().toInt();
+
+    url.setScheme("http");
+    url.setHost(host);
+    url.setPort(port);
+    url.setUserName(m_connectionsModel->item(row, 3)->text());
+    url.setPassword(m_connectionsModel->item(row, 4)->text());
+
+    return url;
+}
+
+void LoginDialog::accept()
+{
     Settings::ConnectionData connection;
-    // connection.name = m_connectionsModel->item(row, 0)->text();
-    QString str = m_connectionsModel->item(row, 1)->text();
-    if (!str.isEmpty()) {
-        const int idx = str.indexOf(QLatin1String("://"));
-        if (idx == -1)
-            str.prepend(QLatin1String("http://"));
-        else if (str.left(idx) != QLatin1String("http"))
-            str.replace(0, idx, QLatin1String("http"));
-        connection.url.setUrl(str, QUrl::StrictMode);
-        if (connection.url.isValid()) {
-            connection.url.setUserName(m_connectionsModel->item(row, 2)->text());
-            connection.url.setPassword(m_connectionsModel->item(row, 3)->text());
-        }
-    }
+
+    connection.url = currentUrl();
 
     if (!connection.url.isValid()) {
         QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
@@ -83,6 +107,7 @@ void LoginDialog::accept()
 void LoginDialog::reset()
 {
     ui->hostnameLineEdit->clear();
+    ui->portLineEdit->clear();
     ui->usernameLineEdit->clear();
     ui->passwordLineEdit->clear();
 
@@ -115,7 +140,8 @@ void LoginDialog::updateStoredConnections()
 
         QList<QStandardItem *> row;
         row << new QStandardItem(connection.name)
-            << new QStandardItem(connection.url.toString(QUrl::RemoveUserInfo))
+            << new QStandardItem(connection.url.host())
+            << new QStandardItem(QString::number(connection.url.port()))
             << new QStandardItem(connection.url.userName())
             << new QStandardItem(connection.url.password());
         m_connectionsModel->appendRow(row);
@@ -134,7 +160,8 @@ void LoginDialog::updateStoredConnections()
         }
         QList<QStandardItem *> row;
         row << new QStandardItem(connection.name)
-            << new QStandardItem(connection.url.toString(QUrl::RemoveUserInfo))
+            << new QStandardItem(connection.url.host())
+            << new QStandardItem(QString::number(connection.url.port()))
             << new QStandardItem(connection.url.userName())
             << new QStandardItem(connection.url.password());
         m_connectionsModel->insertRow(0, row);

@@ -73,6 +73,8 @@ void DragInstrument::dragMove(DragInfo *info) {
     /* Drag selected items. */
     foreach (QGraphicsItem *item, scene()->selectedItems())
         item->setPos(item->pos() + delta);
+
+    emit drag(info->view(), scene()->selectedItems());
 }
 
 void DragInstrument::finishDrag(DragInfo *info) {

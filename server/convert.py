@@ -13,7 +13,7 @@ from string import Template
 
 sys.path.insert(0, '../common')
 
-from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, instantiate_pro, copy_files, BUILDLIB, setup_tools
+from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
 from convert import convert as convert_common
 
 FFMPEG_VERSION = '2011-08-29'
@@ -87,18 +87,22 @@ copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 
 copy_files(tools_path + '/bin/*.dll', 'bin/release')
 copy_files(tools_path + '/bin/*.dll', 'bin/debug')
-copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
-copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
+
+if platform() == 'win32':
+    copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
+    copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
+elif platform() == 'linux':
+    copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
+    copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
 
 gen_version_h()
 
 index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 
-if sys.platform == 'win32':
+if platform() == 'win32':
     os.system('qmake -tp vc -o src/server.vcproj src/server.pro')
-
-elif sys.platform == 'darwin':
+elif platform() == 'mac':
     if os.path.exists('src/Makefile.debug'):
         os.unlink('src/Makefile.debug')
 
@@ -107,3 +111,12 @@ elif sys.platform == 'darwin':
 
     os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/server.pro')
     os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/server.pro')
+elif platform() == 'linux':
+    if os.path.exists('src/Makefile.debug'):
+        os.unlink('src/Makefile.debug')
+
+    if os.path.exists('src/Makefile.release'):
+        os.unlink('src/Makefile.release')
+
+    os.system('qmake -spec linux-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/server.pro')
+    os.system('qmake -spec linux-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/server.pro')

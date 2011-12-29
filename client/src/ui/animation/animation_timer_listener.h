@@ -16,6 +16,10 @@ public:
 
     void setTimer(AnimationTimer *timer);
 
+    AnimationTimer *timer() const {
+        return m_timer;
+    }
+
 protected:
     /**
      * Note that there is a reason for passing delta time instead of absolute time.
@@ -27,10 +31,6 @@ protected:
      *                                  in milliseconds.
      */
     virtual void tick(int deltaTime) = 0;
-
-    AnimationTimer *timer() const {
-        return m_timer;
-    }
 
     /**
      * Activates the link between this listener and its associated timer so 

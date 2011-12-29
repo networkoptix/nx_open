@@ -5,6 +5,10 @@
 #include <limits.h>
 #include <stdexcept>
 
+#ifndef Q_OS_WIN
+#include <arpa/inet.h>
+#endif
+
 const static unsigned INT_BIT = CHAR_BIT * sizeof(unsigned);
 
 class BitStreamException: public std::exception {

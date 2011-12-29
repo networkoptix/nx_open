@@ -2,25 +2,36 @@
 #include <limits>
 #include <cmath>
 #include <QPainter>
+#include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/checked_cast.h>
 #include <ui/common/scene_utility.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/animation/variant_animator.h>
+#include "grid_highlight_item.h"
+
+namespace {
+    const char *pointPropertyName = "_qn_itemPoint";
+    const char *animatorPropertyName = "_qn_itemAnimator";
+}
+
+Q_DECLARE_METATYPE(QnVariantAnimator *);
 
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_color(QColor(0, 0, 0, 0)),
-    m_defaultColor(QColor(0, 0, 0, 0)),
     m_lineWidth(1.0),
-    m_colorAnimator(new QnVariantAnimator(this))
+    m_opacityAnimator(new QnVariantAnimator(this))
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
 
-    m_colorAnimator->setTargetObject(this);
-    m_colorAnimator->setAccessor(new QnPropertyAccessor("color"));
-    m_colorAnimator->setConverter(new QnColorToVectorConverter());
-    m_colorAnimator->setSpeed(1.0);
+    setStateColor(ALLOWED, QColor(0, 255, 0, 64));
+    setStateColor(DISALLOWED, QColor(255, 0, 0, 64));
+
+    m_opacityAnimator->setTargetObject(this);
+    m_opacityAnimator->setAccessor(new QnPropertyAccessor("opacity"));
+    m_opacityAnimator->setSpeed(1.0);
 
     setAcceptedMouseButtons(0);
     
@@ -37,32 +48,39 @@ void QnGridItem::setMapper(QnWorkbenchGridMapper *mapper) {
 }
 
 void QnGridItem::setAnimationTimer(AnimationTimer *timer) {
-    m_colorAnimator->setTimer(timer);
+    m_opacityAnimator->setTimer(timer);
 }
 
-void QnGridItem::setFadingSpeed(qreal speed) {
-    if(m_colorAnimator->isRunning()) {
-        m_colorAnimator->pause();
-        m_colorAnimator->setSpeed(speed);
-        m_colorAnimator->start();
+void QnGridItem::setAnimationSpeed(qreal speed) {
+    if(m_opacityAnimator->isRunning()) {
+        m_opacityAnimator->pause();
+        m_opacityAnimator->setSpeed(speed);
+        m_opacityAnimator->start();
     } else {
-        m_colorAnimator->setSpeed(speed);
+        m_opacityAnimator->setSpeed(speed);
     }
 }
 
-void QnGridItem::fadeIn() {
-    if(m_color.alpha() == 0)
-        m_color = SceneUtility::translucent(m_defaultColor);
-
-    m_colorAnimator->pause();
-    m_colorAnimator->setTargetValue(m_defaultColor);
-    m_colorAnimator->start();
+void QnGridItem::setAnimationTimeLimit(int timeLimitMSec) {
+    if(m_opacityAnimator->isRunning()) {
+        m_opacityAnimator->pause();
+        m_opacityAnimator->setTimeLimit(timeLimitMSec);
+        m_opacityAnimator->start();
+    } else {
+        m_opacityAnimator->setTimeLimit(timeLimitMSec);
+    }
 }
 
-void QnGridItem::fadeOut() {
-    m_colorAnimator->pause();
-    m_colorAnimator->setTargetValue(SceneUtility::translucent(m_defaultColor));
-    m_colorAnimator->start();
+void QnGridItem::animatedShow() {
+    m_opacityAnimator->pause();
+    m_opacityAnimator->setTargetValue(1.0);
+    m_opacityAnimator->start();
+}
+
+void QnGridItem::animatedHide() {
+    m_opacityAnimator->pause();
+    m_opacityAnimator->setTargetValue(0.0);
+    m_opacityAnimator->start();
 }
 
 QRectF QnGridItem::boundingRect() const {
@@ -73,7 +91,7 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     if(mapper() == NULL)
         return;
 
-    if(m_color.alpha() == 0)
+    if(qFuzzyIsNull(painter->opacity()))
         return;
 
     /* Calculate the extends that would cover entire viewport. */
@@ -113,3 +131,112 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     }
 }
 
+QColor QnGridItem::stateColor(int cellState) const {
+    return m_colorByState.value(cellState, QColor(0, 0, 0, 0));
+}
+
+void QnGridItem::setStateColor(int cellState, const QColor &color) {
+    if(cellState == INITIAL) {
+        qnWarning("Cannot change color for initial cell state.");
+        return;
+    }
+
+    m_colorByState[cellState] = color;
+}
+
+QnGridHighlightItem *QnGridItem::newHighlightItem() {
+    if(!m_freeItems.empty())
+        return m_freeItems.takeLast();
+
+    return new QnGridHighlightItem(this);
+}
+
+QPoint QnGridItem::itemCell(QnGridHighlightItem *item) const {
+    return item->property(pointPropertyName).toPoint();
+}
+
+void QnGridItem::setItemCell(QnGridHighlightItem *item, const QPoint &cell) const {
+    item->setProperty(pointPropertyName, cell);
+}
+
+QnVariantAnimator *QnGridItem::itemAnimator(QnGridHighlightItem *item) {
+    QnVariantAnimator *animator = item->property(animatorPropertyName).value<QnVariantAnimator *>();
+
+    if(animator == NULL) {
+        animator = new QnVariantAnimator(item);
+        animator->setTargetObject(item);
+        animator->setTimer(m_opacityAnimator->timer());
+        animator->setAccessor(new QnPropertyAccessor("color"));
+        animator->setConverter(new QnColorToVectorConverter());
+        animator->setSpeed(m_opacityAnimator->speed());
+        connect(animator, SIGNAL(finished()), this, SLOT(at_itemAnimator_finished()));
+        item->setProperty(animatorPropertyName, QVariant::fromValue<QnVariantAnimator *>(animator));
+    }
+
+    return animator;
+}
+
+void QnGridItem::at_itemAnimator_finished() {
+    QnVariantAnimator *animator = checked_cast<QnVariantAnimator *>(sender());
+    QnGridHighlightItem *item = checked_cast<QnGridHighlightItem *>(animator->targetObject());
+
+    QPoint cell = itemCell(item);
+    PointData &data = m_dataByCell[cell];
+    if(data.state == INITIAL) {
+        data.item = NULL;
+        m_freeItems.push_back(item);
+        setItemCell(item, QPoint(0, 0));
+    }
+}
+
+int QnGridItem::cellState(const QPoint &cell) const {
+    QHash<QPoint, PointData>::const_iterator pos = m_dataByCell.find(cell);
+    if(pos == m_dataByCell.end())
+        return INITIAL;
+
+    return pos->state;
+}
+
+void QnGridItem::setCellState(const QPoint &cell, int cellState) {
+    if(mapper() == NULL)
+        return;
+    
+    PointData &data = m_dataByCell[cell];
+    if(data.state == cellState)
+        return;
+    data.state = cellState;
+
+    if(data.item == NULL) {
+        data.item = newHighlightItem();
+
+        qreal d =  m_lineWidth / 2; 
+        data.item->setRect(SceneUtility::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
+        setItemCell(data.item, cell);
+    }
+
+    QnVariantAnimator *animator = itemAnimator(data.item);
+    animator->pause();
+    
+    QColor targetColor = stateColor(cellState);
+    if(data.item->color().alpha() == 0)
+        data.item->setColor(SceneUtility::translucent(targetColor));
+    animator->setTargetValue(targetColor);
+    
+    animator->start();
+}
+
+void QnGridItem::setCellState(const QSet<QPoint> &cells, int cellState) {
+    foreach(const QPoint &cell, cells)
+        setCellState(cell, cellState);
+}
+
+void QnGridItem::setCellState(const QRect &cells, int cellState) {
+    for (int r = cells.top(); r <= cells.bottom(); r++) 
+        for (int c = cells.left(); c <= cells.right(); c++) 
+            setCellState(QPoint(c, r), cellState);
+}
+
+void QnGridItem::setCellState(const QList<QRect> &cells, int cellState) {
+    foreach(const QRect &rect, cells)
+        setCellState(rect, cellState);
+}

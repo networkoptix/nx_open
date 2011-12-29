@@ -72,6 +72,7 @@ public:
 signals:
     void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 

@@ -13,7 +13,7 @@
 #include "xsd_events.h"
 #include "xsd_storages.h"
 #include "xsd_scheduleTasks.h"
-#include "xsd_RecordedTimePeriods.h"
+#include "xsd_recordedTimePeriods.h"
 
 // for appServer methods
 

@@ -259,7 +259,10 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
     setLayer(m_gridItem.data(), BACK_LAYER);
-    m_gridItem.data()->setDefaultColor(QColor(0, 240, 240, 128));
+    m_gridItem.data()->setAnimationSpeed(2.0);
+    m_gridItem.data()->setAnimationTimeLimit(300);
+    m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
+    m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setMapper(m_workbench->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
@@ -515,7 +518,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setPixmap(Skin::pixmap(QLatin1String("close3.png")));
+    closeButton->setPixmap(Skin::pixmap(QLatin1String("close.png")));
     closeButton->setMinimumSize(QSizeF(10.0, 10.0));
     closeButton->setMaximumSize(QSizeF(10.0, 10.0));
     connect(closeButton, SIGNAL(clicked()), item, SLOT(deleteLater()));

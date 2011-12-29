@@ -72,11 +72,19 @@ win32 {
   }
 }
 
-mac {
-  LIBS += -framework IOKit
-  LIBS += -lz -lbz2 -L../contrib/qjson/lib/mac
+unix {
+  LIBS += -lz -lbz2
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse4.1
+}
+
+mac {
+  LIBS += -framework IOKit
+  LIBS += -L../contrib/qjson/lib/mac
+}
+
+unix:!mac {
+  LIBS += -L../contrib/qjson/lib/linux
 }
 
 DEFINES += __STDC_CONSTANT_MACROS
@@ -93,6 +101,9 @@ mac {
     LIBS += -lxerces-c-3.1
 }
 
+uniq:!mac {
+    LIBS += -lxerces-c
+}
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include 
 LIBS += -L$$EVETOOLS_DIR/lib
