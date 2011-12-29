@@ -41,6 +41,7 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "eventmanager.h"
+#include "core/resource/directory_browser.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -290,6 +291,13 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().addResourceProcessor(&serverCameraProcessor);
 
     //============================
+    //QnResourceDirectoryBrowser
+    QnResourceDirectoryBrowser::instance().setLocal(true);
+    QStringList dirs;
+    dirs << Settings::instance().mediaRoot();
+    QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
