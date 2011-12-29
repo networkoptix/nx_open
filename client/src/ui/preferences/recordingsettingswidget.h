@@ -1,7 +1,7 @@
 #ifndef VIDEORECORDINGDIALOG_H
 #define VIDEORECORDINGDIALOG_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ui/screen_recording/video_recorder_settings.h"
 
