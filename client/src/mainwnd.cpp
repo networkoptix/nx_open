@@ -1,5 +1,7 @@
 #include "mainwnd.h"
 
+#include <QtCore/QPropertyAnimation>
+
 #include <QtGui/QBoxLayout>
 #include <QtGui/QSplitter>
 #include <QtGui/QToolBar>
@@ -51,7 +53,8 @@ MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
-      m_controller(NULL)
+      m_controller(0),
+      m_navigationWidgetAnimation(0)
 {
     if (s_instance)
         qnWarning("Several instances of main window created, expect problems.");
@@ -126,6 +129,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_splitter->setStretchFactor(1, 99);
     setCentralWidget(m_splitter);
 
+    m_splitter->handle(1)->installEventFilter(this);
+
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
 #ifdef Q_OS_WIN
@@ -160,6 +165,12 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
+    // ###
+    QAction *showNavTreeAction = new QAction(tr("<=|=>"), this);
+    showNavTreeAction->setToolTip(tr("Toggle navigation tree show/hide"));
+    connect(showNavTreeAction, SIGNAL(triggered()), this, SLOT(toggleShowNavTree()));
+    toolBar->addAction(showNavTreeAction);
+    //
 
     addTab();
 
@@ -221,6 +232,71 @@ void MainWnd::closeTab(int index)
             delete layout;
 
             m_tabWidget->removeTab(index);
+        }
+    }
+}
+
+void MainWnd::toggleShowNavTree()
+{
+    if (!m_navigationWidgetAnimation) {
+        Q_ASSERT(m_splitter->indexOf(m_navigationWidget) == 0); // must be inserted already
+
+        m_navigationWidgetAnimation = new QPropertyAnimation(m_navigationWidget, "geometry", m_navigationWidget);
+        m_navigationWidgetAnimation->setDuration(250);
+
+        connect(m_navigationWidgetAnimation, SIGNAL(finished()), this, SLOT(navTreeAnimationFinished()));
+    }
+
+    m_navigationWidgetAnimation->stop();
+
+    if (m_splitter->indexOf(m_navigationWidget) != -1) {
+        QRect geom = m_navigationWidget->rect();
+        geom.moveTopLeft(m_navigationWidget->mapTo(this, geom.topLeft()));
+
+        m_navigationWidget->setParent(this);
+        m_splitter->stackUnder(m_navigationWidget);
+        m_navigationWidget->setGeometry(geom);
+        m_navigationWidget->show();
+
+        QWidget *tmpWidget = new QWidget(m_splitter);
+        tmpWidget->setFixedWidth(1);
+        m_splitter->insertWidget(0, tmpWidget);
+
+        m_splitter->handle(1)->removeEventFilter(this);
+        m_splitter->handle(1)->installEventFilter(this);
+
+        m_navigationWidgetAnimation->setDirection(QAbstractAnimation::Forward);
+        m_navigationWidgetAnimation->setStartValue(geom);
+        geom.moveLeft(-geom.width());
+        m_navigationWidgetAnimation->setEndValue(geom);
+    } else {
+        delete m_splitter->widget(0);
+
+        m_navigationWidget->show();
+
+        m_navigationWidgetAnimation->setDirection(QAbstractAnimation::Backward);
+        QRect geom = m_navigationWidgetAnimation->startValue().toRect();
+        geom.setTop(m_splitter->y());
+        geom.setHeight(m_splitter->height());
+        m_navigationWidgetAnimation->setStartValue(geom);
+        geom = m_navigationWidgetAnimation->endValue().toRect();
+        geom.setTop(m_splitter->y());
+        geom.setHeight(m_splitter->height());
+        m_navigationWidgetAnimation->setEndValue(geom);
+    }
+
+    m_navigationWidgetAnimation->start();
+}
+
+void MainWnd::navTreeAnimationFinished()
+{
+    if (QPropertyAnimation *animation = qobject_cast<QPropertyAnimation *>(sender())) {
+        if (animation->direction() == QAbstractAnimation::Backward) {
+            m_splitter->insertWidget(0, m_navigationWidget);
+            m_splitter->setStretchFactor(0, 1);
+            m_splitter->setCollapsible(0, true);
+        } else {
+            m_navigationWidget->hide();
         }
     }
 }
@@ -302,6 +378,32 @@ void MainWnd::handleMessage(const QString &message)
 #endif
 
     activate();
+}
+
+bool MainWnd::eventFilter(QObject *watched, QEvent *event)
+{
+    if (qobject_cast<QSplitterHandle *>(watched)) {
+        if (event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if (mouseEvent->button() == Qt::LeftButton)
+                m_splitterClickedPos = mouseEvent->globalPos();
+        } else if (event->type() == QEvent::MouseMove) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if (mouseEvent->buttons() & Qt::LeftButton) {
+                if (QPoint(mouseEvent->globalPos() - m_splitterClickedPos).manhattanLength() >= QApplication::startDragDistance())
+                    m_splitterClickedPos = QPoint();
+            }
+        } else if (event->type() == QEvent::MouseButtonRelease) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if (mouseEvent->button() == Qt::LeftButton) {
+                if (!m_splitterClickedPos.isNull())
+                    toggleShowNavTree();
+                m_splitterClickedPos = QPoint();
+            }
+        }
+    }
+
+    return QMainWindow::eventFilter(watched, event);
 }
 
 void MainWnd::closeEvent(QCloseEvent *event)
