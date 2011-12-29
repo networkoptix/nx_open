@@ -19,16 +19,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (networkResource.isNull())
             continue;
 
-        QnSecurityCamResourcePtr securityCamResource = resource.dynamicCast<QnSecurityCamResource>();
-
-        if (!securityCamResource.isNull())
-        {
-            QnScheduleTaskList taskList;
-            taskList.append(QnScheduleTask("", "", 11, 12,true, QnScheduleTask::RecordingType_MotionOnly, 1, 2, 3, QnQualityHighest, 7));
-            taskList.append(QnScheduleTask("", "", 21, 22,true, QnScheduleTask::RecordingType_Never, 5, 6, 7, QnQualityLow, 5));
-            securityCamResource->setScheduleTasks(taskList);
-        }
-
         m_appServer->addCamera(*networkResource, m_serverId, cameras);
     }
 

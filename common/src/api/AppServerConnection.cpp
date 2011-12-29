@@ -100,8 +100,8 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
         foreach(const QnScheduleTask& scheduleTaskIn, securityCamera->getScheduleTasks())
         {
             xsd::api::scheduleTasks::ScheduleTask scheduleTask(
-                                                    scheduleTaskIn.startTimeMs(),
-                                                    scheduleTaskIn.startTimeMs() + scheduleTaskIn.durationMs(),
+                                                    scheduleTaskIn.getStartTime(),
+                                                    scheduleTaskIn.getEndTime(),
                                                     scheduleTaskIn.getDoRecordAudio(),
                                                     scheduleTaskIn.getRecordingType(),
                                                     scheduleTaskIn.getDayOfWeek(),
