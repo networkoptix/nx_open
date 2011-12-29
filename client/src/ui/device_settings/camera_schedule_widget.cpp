@@ -111,6 +111,7 @@ void CameraScheduleWidget::onNeedReadCellParams(QPoint cell)
         ui->comboBoxQuality->setCurrentIndex(qualityTextToIndex(getLongText(shortQuality)));
     }
     m_disableUpdateGridParams = false;
+    updateGridParams();
 }
 
 void CameraScheduleWidget::onDisplayQualityChanged(int state)
