@@ -43,7 +43,6 @@
 #include "eventmanager.h"
 
 #include "tests/auto_tester.h"
-#include "tests/auto_test_result.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -374,16 +373,17 @@ int main(int argc, char *argv[])
 
     QnEventManager::instance()->run();
 
+    QObject::connect(&autoTester, SIGNAL(finished()), &application, SLOT(quit()));
     autoTester.start();
 
-    int result;
-    try {
-        result = application.exec();
-    } catch (const QnAutoTestResult &testResult) {
-        QTextStream out(stdout);
+    int result = application.exec();
 
-        out << testResult.message();
-        result = testResult.succeeded() ? 0 : 0xDEADBEEF;
+    if(autoTester.state() == QnAutoTester::FINISHED) {
+        if(!autoTester.succeeded())
+            result = 0xDEADBEEF;
+
+        QTextStream out(stdout);
+        out << autoTester.message();
     }
 
     QnResource::stopCommandProc();

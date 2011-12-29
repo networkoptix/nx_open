@@ -58,6 +58,8 @@ public:
 
     void addParameter(const QnCommandLineParameter &parameter);
 
+    void print(QTextStream &stream) const;
+
     QVariant value(const QString &name, const QVariant &defaultValue = QVariant());
 
     QVariant value(const char *name, const QVariant &defaultValue = QVariant());

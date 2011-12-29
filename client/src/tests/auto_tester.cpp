@@ -4,7 +4,6 @@
 #include <QTimer>
 #include <core/resourcemanagment/resource_pool.h>
 #include "command_line_parser.h"
-#include "auto_test_result.h"
 
 namespace {
     qint64 defaultAutoTesterTimeout = 20 * 1000; 
@@ -12,29 +11,40 @@ namespace {
 
 QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     QObject(parent),
+    m_state(INITIAL),
     m_startTime(0),
     m_timeout(defaultAutoTesterTimeout),
-    m_valid(true),
-    m_started(false),
     m_successfulTests(0),
-    m_allTests(0)
+    m_allTests(0),
+    m_timer(NULL)
 {
     QnCommandLineParser parser;
-    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::INTEGER, "--test-timeout", NULL, tr("Time to wait before finishing the test, in milliseconds.")));
-    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::STRING, "--test-resource-substring", NULL, tr("Substring the must be present in one of the resources.")));
+    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::INTEGER, "--test-timeout", NULL, tr("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout)));
+    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::STRING, "--test-resource-substring", NULL, tr("Substring that must be present in one of the resources.")));
+    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::FLAG, "--test-help", NULL, tr("Show this help screen.")));
 
-    m_valid = parser.parse(argc, argv);
-    if(m_valid) {
+    bool valid = parser.parse(argc, argv);
+    bool showHelp = false;
+    if(valid) {
         m_timeout = parser.value("--test-timeout", m_timeout).toLongLong();
-        
+
+        showHelp = parser.value("--test-help", false).toBool();
+
         m_resourceSearchString = parser.value("--test-resource-substring", m_resourceSearchString).toString();
         if(!m_resourceSearchString.isEmpty())
             m_allTests |= RESOURCE_SUBSTRING;
+    } else {
+        m_state = INVALID;
+        showHelp = true;
     }
 
-    m_timer = new QTimer(this);
-    m_timer->setInterval(1000);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
+    if(showHelp) {
+        QTextStream out(stdout);
+        out << endl;
+        out << "TESTS USAGE:" << endl;
+        parser.print(out);
+        out << endl;
+    }
 }
     
 QnAutoTester::~QnAutoTester() {
@@ -42,18 +52,21 @@ QnAutoTester::~QnAutoTester() {
 }
 
 void QnAutoTester::start() {
-    if(!m_valid)
+    if(m_state != INITIAL)
         return;
 
-    if(m_started)
+    if(m_allTests == 0)
         return;
 
-    m_started = true;
+    m_state = STARTED;
+
+    m_timer = new QTimer(this);
+    m_timer->setInterval(1000);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
 
     m_startTime = QDateTime::currentMSecsSinceEpoch();
 
-    if(m_allTests != 0)
-        m_timer->start();
+    m_timer->start();
 }
 
 bool QnAutoTester::needsTesting(Test test) {
@@ -62,17 +75,20 @@ bool QnAutoTester::needsTesting(Test test) {
 
 void QnAutoTester::at_timer_timeout() {
     if(QDateTime::currentMSecsSinceEpoch() - m_startTime > m_timeout) {
-        bool success = m_successfulTests == m_allTests;
+        m_succeeded = m_successfulTests == m_allTests;
 
         QString message;
-        if(success) {
-            message = tr("All tests completed successfully.\n");
+        if(m_succeeded) {
+            m_message = tr("All tests completed successfully.\n");
         } else {
             if(needsTesting(RESOURCE_SUBSTRING))
-                message += tr("Test for resource substring '%1' failed.\n").arg(m_resourceSearchString);
+                m_message += tr("Test for resource substring '%1' failed.\n").arg(m_resourceSearchString);
         }
 
-        throw QnAutoTestResult(success, message);
+        m_state = FINISHED;
+        m_timer->stop();
+        emit finished();
+        return;
     }
 
     if(needsTesting(RESOURCE_SUBSTRING))

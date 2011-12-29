@@ -13,10 +13,33 @@ public:
     };
     Q_DECLARE_FLAGS(Tests, Test);
 
+    enum State {
+        INITIAL,
+        INVALID,
+        STARTED,
+        FINISHED
+    };
+
     QnAutoTester(int &argc, char **argv, QObject *parent = NULL);
 
     virtual ~QnAutoTester();
 
+    State state() const {
+        return m_state;
+    }
+
+    const QString &message() const {
+        return m_message;
+    }
+
+    bool succeeded() const {
+        return m_succeeded;
+    }
+
+signals:
+    void finished();
+
+public slots:
     void start();
 
 protected slots:
@@ -28,14 +51,13 @@ protected:
     void testResourceSubstring();
 
 private:
-    /** Whether the command line was OK. */
-    bool m_valid;
+    /** Current tester state. */
+    State m_state;
 
-    /** Whether the tester was started. */
-    bool m_started;
-
+    /** All tests that have to be performed. */
     Tests m_allTests;
 
+    /** Tests that succeeded. */
     Tests m_successfulTests;
 
     /** Time when the auto tester has started, in milliseconds since epoch. */
@@ -49,6 +71,10 @@ private:
 
     /** Timer. */
     QTimer *m_timer;
+
+    bool m_succeeded;
+
+    QString m_message;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnAutoTester::Tests);

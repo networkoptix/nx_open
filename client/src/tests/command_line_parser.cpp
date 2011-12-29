@@ -30,6 +30,34 @@ void QnCommandLineParser::clear() {
     m_indexByName.clear();
 }
 
+void QnCommandLineParser::print(QTextStream &stream) const {
+    /* The dirty way, for now. */
+
+    int shortNameWidth = 0;
+    int longNameWidth = 0;
+    foreach(const QnCommandLineParameter &parameter, m_parameters) {
+        shortNameWidth = qMax(shortNameWidth, parameter.shortName().size());
+        longNameWidth = qMax(longNameWidth, parameter.name().size());
+    }
+    if(longNameWidth > 0)
+        longNameWidth++; /* So that there is a single space between long & short names. */
+
+    foreach(const QnCommandLineParameter &parameter, m_parameters) {
+        stream.setFieldAlignment(QTextStream::AlignRight);
+        
+        stream.setFieldWidth(shortNameWidth);
+        stream << parameter.shortName();
+        
+        stream.setFieldWidth(longNameWidth);
+        stream << parameter.name();
+
+        stream.setFieldWidth(0);
+        stream << " " << parameter.description();
+
+        stream << endl;
+    }
+}
+
 bool QnCommandLineParser::parse(int &argc, char **argv) {
     int pos = 0, skipped = 0;
 
@@ -53,8 +81,8 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
         QString stringValue;
         if(parameter.hasValue()) {
             pos++;
-            if(pos > argc) {
-                err << tr("No value provided for the '%1' parameter.").arg(name);
+            if(pos >= argc) {
+                err << tr("No value provided for the '%1' parameter.").arg(name) << endl;
                 return false;
             } else {
                 stringValue = QLatin1String(argv[pos]);
@@ -71,7 +99,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
             bool ok;
             qint64 intValue = stringValue.toLongLong(&ok);
             if(!ok) {
-                err << tr("Invalid value for '%1' parameter - expected integer, provided '%2'.").arg(name).arg(stringValue);
+                err << tr("Invalid value for '%1' parameter - expected integer, provided '%2'.").arg(name).arg(stringValue) << endl;
                 return false;
             } else {
                 value = intValue;
