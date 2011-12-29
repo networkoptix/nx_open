@@ -470,6 +470,7 @@ void MainWnd::appServerAuthenticationRequired()
         return;
 
     dialog = new LoginDialog(this);
+    dialog->setModal(true);
     if (dialog->exec()) {
         const Settings::ConnectionData connection = Settings::lastUsedConnection();
         if (connection.url.isValid()) {

@@ -266,7 +266,9 @@ void MainWindow::appServerError(int error)
     case QNetworkReply::ContentAccessDenied:
     case QNetworkReply::AuthenticationRequiredError:
     case QNetworkReply::UnknownNetworkError:
-        appServerAuthenticationRequired();
+        // ### Do not show popup box! It's annoying!
+        // ### Show something like color label in the main window.
+        //appServerAuthenticationRequired();
         break;
 
     default:
@@ -285,6 +287,7 @@ void MainWindow::appServerAuthenticationRequired()
         return;
 
     dialog = new LoginDialog(this);
+    dialog->setModal(true);
     if (dialog->exec()) {
         const Settings::ConnectionData connection = Settings::lastUsedConnection();
         if (connection.url.isValid()) {
@@ -293,7 +296,12 @@ void MainWindow::appServerAuthenticationRequired()
             // repopulate the resource pool
             QnResource::stopCommandProc();
             QnResourceDiscoveryManager::instance().stop();
-            qnResPool->clear(); // ### don't remove local resources
+
+            // don't remove local resources
+            const QnResourceList localResources = qnResPool->getResourcesWithFlag(QnResource::local);
+            qnResPool->clear();
+            qnResPool->addResources(localResources);
+
             QnResourceDiscoveryManager::instance().start();
             QnResource::startCommandProc();
         }

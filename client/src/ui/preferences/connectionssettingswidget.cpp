@@ -7,6 +7,7 @@
 #include "api/AppServerConnection.h"
 
 #include "ui/skin/skin.h"
+#include "ui/dialogs/connectionTestingDialog.h"
 
 ConnectionsSettingsWidget::ConnectionsSettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -158,6 +159,7 @@ void ConnectionsSettingsWidget::currentRowChanged(const QModelIndex &current, co
     ui->defaultConnectionCheckBox->setEnabled(!disable);
 
     ui->duplicateConnectionButton->setEnabled(!isOnRootItem);
+    ui->testConnectionButton->setEnabled(!isOnRootItem);
     ui->deleteConnectionButton->setEnabled(!disable);
 
     if (previous != m_connectionsRootItem->index()) {
@@ -170,18 +172,18 @@ void ConnectionsSettingsWidget::currentRowChanged(const QModelIndex &current, co
 
 QUrl ConnectionsSettingsWidget::currentUrl()
 {
-    int row = ui->connectionsTreeView->currentIndex().row();
+    const QModelIndex current = ui->connectionsTreeView->currentIndex();
 
     QUrl url;
     
-    QString host = m_connectionsModel->item(row, 1)->text();
-    int port = m_connectionsModel->item(row, 2)->text().toInt();
+    QString host = m_connectionsModel->itemFromIndex(current.sibling(current.row(), 1))->text();
+    int port = m_connectionsModel->itemFromIndex(current.sibling(current.row(), 2))->text().toInt();
 
     url.setScheme("http");
     url.setHost(host);
     url.setPort(port);
-    url.setUserName(m_connectionsModel->item(row, 3)->text());
-    url.setPassword(m_connectionsModel->item(row, 4)->text());
+    url.setUserName(m_connectionsModel->itemFromIndex(current.sibling(current.row(), 3))->text());
+    url.setPassword(m_connectionsModel->itemFromIndex(current.sibling(current.row(), 4))->text());
 
     return url;
 }
@@ -195,22 +197,21 @@ void ConnectionsSettingsWidget::savePasswordToggled(bool save)
 
 void ConnectionsSettingsWidget::testConnection()
 {
+    const QModelIndex current = ui->connectionsTreeView->currentIndex();
+    if (current == m_connectionsRootItem->index())
+        return;
+
     QUrl url = currentUrl();
-
-    QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url, QnDummyResourceFactory());
-
-    connection->testConnectionAsync(this, SLOT(testResults(int, const QByteArray&, int)));
-}
-
-void ConnectionsSettingsWidget::testResults(int status, const QByteArray &data, int requstHandle)
-{
-    if (status != 200)
+    
+    if (!url.isValid())
     {
-        QMessageBox::warning(this, tr("Invalid settings"), tr("The settings you have entered is not valid."));
-    } else
-    {
-        QMessageBox::information(this, tr("Settings are valid"), tr("The settings you have entered is valid."));
+        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
+        return;
     }
+
+    ConnectionTestingDialog dialog(this, url);
+    dialog.setModal(true);
+    dialog.exec();
 }
 
 void ConnectionsSettingsWidget::newConnection()
@@ -218,7 +219,7 @@ void ConnectionsSettingsWidget::newConnection()
     QList<QStandardItem *> row;
     row << new QStandardItem(tr("Unnamed"))
         << new QStandardItem()
-        << new QStandardItem()
+        << new QStandardItem("8000")
         << new QStandardItem()
         << new QStandardItem()
         << new QStandardItem();
