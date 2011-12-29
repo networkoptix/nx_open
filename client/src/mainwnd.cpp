@@ -187,7 +187,8 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
 void MainWnd::addTab()
 {
     QWidget *widget = new QWidget(m_tabWidget);
-    (void)new QVBoxLayout(widget); // ensure widget's layout
+    QVBoxLayout *layout = new QVBoxLayout(widget); // ensure widget's layout
+    layout->setContentsMargins(0, 0, 0, 0);
 
     widget->setProperty("SceneState", QVariant::fromValue(new QnWorkbenchLayout(widget))); // ###
 
