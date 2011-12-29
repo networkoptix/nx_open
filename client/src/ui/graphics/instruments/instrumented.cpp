@@ -1,5 +1,5 @@
 #include "instrumented.h"
-#include "instrumentmanager.h"
+#include "instrument_manager.h"
 
 detail::InstrumentedBase::InstrumentedBase(): m_scene(NULL) {}
 

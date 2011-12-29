@@ -17,14 +17,14 @@
 #include <ui/animation/widget_animator.h>
 #include <ui/animation/curtain_animator.h>
 
-#include <ui/graphics/instruments/instrumentmanager.h>
-#include <ui/graphics/instruments/boundinginstrument.h>
-#include <ui/graphics/instruments/transformlistenerinstrument.h>
-#include <ui/graphics/instruments/activitylistenerinstrument.h>
-#include <ui/graphics/instruments/forwardinginstrument.h>
-#include <ui/graphics/instruments/stopinstrument.h>
-#include <ui/graphics/instruments/signalinginstrument.h>
-#include <ui/graphics/instruments/animationinstrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/instruments/bounding_instrument.h>
+#include <ui/graphics/instruments/transform_listener_instrument.h>
+#include <ui/graphics/instruments/activity_listener_instrument.h>
+#include <ui/graphics/instruments/forwarding_instrument.h>
+#include <ui/graphics/instruments/stop_instrument.h>
+#include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/graphics/instruments/animation_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>

@@ -26,25 +26,25 @@
 
 #include <ui/animation/viewport_animator.h>
 
-#include <ui/graphics/instruments/instrumentmanager.h>
-#include <ui/graphics/instruments/handscrollinstrument.h>
-#include <ui/graphics/instruments/wheelzoominstrument.h>
-#include <ui/graphics/instruments/rubberbandinstrument.h>
-#include <ui/graphics/instruments/draginstrument.h>
-#include <ui/graphics/instruments/rotationinstrument.h>
-#include <ui/graphics/instruments/clickinstrument.h>
-#include <ui/graphics/instruments/boundinginstrument.h>
-#include <ui/graphics/instruments/stopinstrument.h>
-#include <ui/graphics/instruments/stopacceptedinstrument.h>
-#include <ui/graphics/instruments/forwardinginstrument.h>
-#include <ui/graphics/instruments/transformlistenerinstrument.h>
-#include <ui/graphics/instruments/selectionfixupinstrument.h>
-#include <ui/graphics/instruments/dropinstrument.h>
-#include <ui/graphics/instruments/resizinginstrument.h>
-#include <ui/graphics/instruments/uielementsinstrument.h>
-#include <ui/graphics/instruments/resizehoverinstrument.h>
-#include <ui/graphics/instruments/signalinginstrument.h>
-#include <ui/graphics/instruments/motionselectioninstrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/wheel_zoom_instrument.h>
+#include <ui/graphics/instruments/rubber_band_instrument.h>
+#include <ui/graphics/instruments/drag_instrument.h>
+#include <ui/graphics/instruments/rotation_instrument.h>
+#include <ui/graphics/instruments/click_instrument.h>
+#include <ui/graphics/instruments/bounding_instrument.h>
+#include <ui/graphics/instruments/stop_instrument.h>
+#include <ui/graphics/instruments/stop_accepted_instrument.h>
+#include <ui/graphics/instruments/forwarding_instrument.h>
+#include <ui/graphics/instruments/transform_listener_instrument.h>
+#include <ui/graphics/instruments/selection_fixup_instrument.h>
+#include <ui/graphics/instruments/drop_instrument.h>
+#include <ui/graphics/instruments/resizing_instrument.h>
+#include <ui/graphics/instruments/ui_elements_instrument.h>
+#include <ui/graphics/instruments/resize_hover_instrument.h>
+#include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
