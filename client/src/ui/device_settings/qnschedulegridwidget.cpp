@@ -1,5 +1,5 @@
 #include "qnschedulegridwidget.h"
-#include "ui/graphics/instruments/motionselectioninstrument.h"
+#include "ui/graphics/instruments/motion_selection_instrument.h"
 
 static const int TEXT_SPACING = 4;
 static const QColor NORMAL_LABEL_COLOR(255,255,255);
@@ -83,7 +83,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
     qreal cellSize = getCellSize();
 
     p.setFont(m_labelsFont);
-    for (int y = 0; y < ROW_COUNT; ++y) 
+    for (int y = 0; y < ROW_COUNT; ++y)
     {
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
             p.setPen(SELECTED_LABEL_COLOR);
@@ -112,8 +112,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
         {
             QColor color(m_gridParams[x][y][ParamType_Color].toUInt());
             if (!m_mousePressed) {
-                if (y == m_mouseMoveCell.y() && x == m_mouseMoveCell.x() || 
-                    m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x() || 
+                if (y == m_mouseMoveCell.y() && x == m_mouseMoveCell.x() ||
+                    m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x() ||
                     m_mouseMoveCell.x() == -1 && y == m_mouseMoveCell.y() ||
                     m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == -1)
                 {
@@ -198,7 +198,7 @@ QPoint QnScheduleGridWidget::getCell(const QPoint& p, bool doTruncate)
     qreal cellSize = getCellSize();
     int cellX = (p.x() - m_gridLeftOffset)/cellSize;
     int cellY = (p.y() - m_gridTopOffset)/cellSize;
-    
+
     if (doTruncate)
         return QPoint(qBound(0, COL_COUNT-1, cellX), qBound(0, ROW_COUNT-1, cellY));
 
@@ -222,10 +222,10 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent * event )
             emit needReadCellParams(cell);
         return;
     }
-    
+
     m_mousePressPos = event->pos();
     m_mousePressed = true;
-    if (cell.x() == -1 && cell.y() == -1) 
+    if (cell.x() == -1 && cell.y() == -1)
     {
         for (int y = 0; y < ROW_COUNT; ++y)
             for (int x = 0; x < COL_COUNT; ++x)
