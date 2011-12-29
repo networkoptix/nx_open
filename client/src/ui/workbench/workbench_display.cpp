@@ -257,11 +257,12 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
 
     /* Set up grid. */
     m_gridItem = new QnGridItem();
-    m_gridItem.data()->setAnimationSpeed(2.0);
-    m_gridItem.data()->setAnimationTimeLimit(300);
     m_scene->addItem(m_gridItem.data());
     setLayer(m_gridItem.data(), BACK_LAYER);
-    m_gridItem.data()->setDefaultColor(QColor(0, 240, 240, 128));
+    m_gridItem.data()->setAnimationSpeed(2.0);
+    m_gridItem.data()->setAnimationTimeLimit(300);
+    m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
+    m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setMapper(m_workbench->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
