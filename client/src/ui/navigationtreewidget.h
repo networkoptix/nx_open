@@ -9,6 +9,7 @@ class QSortFilterProxyModel;
 class QTabWidget;
 class QToolButton;
 class QTreeView;
+class QModelIndex;
 
 class NavigationTreeWidget : public QWidget
 {
