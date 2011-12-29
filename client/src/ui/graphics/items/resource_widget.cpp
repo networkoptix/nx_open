@@ -489,16 +489,16 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             setOverlayIcon(i, PAUSED);
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
             setOverlayIcon(i, LOADING);
-
-            /* Draw black rectangle if there is nothing to draw. */
-            if(status != QnRenderStatus::RENDERED_OLD_FRAME) {
-                glBegin(GL_QUADS);
-                glColor4f(0.0, 0.0, 0.0, 1.0);
-                glVertices(rect);
-                glEnd();
-            }
         } else {
             setOverlayIcon(i, NO_ICON);
+        }
+
+        /* Draw black rectangle if there is nothing to draw. */
+        if(status != QnRenderStatus::RENDERED_OLD_FRAME && status != QnRenderStatus::RENDERED_NEW_FRAME) {
+            glBegin(GL_QUADS);
+            glColor4f(0.0, 0.0, 0.0, 1.0);
+            glVertices(rect);
+            glEnd();
         }
 
         /* Draw overlay icon. */
