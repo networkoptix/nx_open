@@ -3,11 +3,13 @@
 
 #include <QGraphicsObject>
 #include <QWeakPointer>
+#include <utils/common/hash.h> /* For qHash(QPoint). */
 
 class AnimationTimer;
 
 class QnWorkbenchGridMapper;
 class QnVariantAnimator;
+class QnGridHighlightItem;
 
 class QnGridItem : public QGraphicsObject {
     Q_OBJECT;
@@ -15,6 +17,13 @@ class QnGridItem : public QGraphicsObject {
     Q_PROPERTY(QColor defaultColor READ defaultColor WRITE setDefaultColor);
 
 public:
+    enum CellState {
+        INITIAL,
+        ALLOWED,
+        DISALLOWED,
+        CUSTOM
+    };
+
     QnGridItem(QGraphicsItem *parent = NULL);
     
     virtual ~QnGridItem();
@@ -51,24 +60,61 @@ public:
         m_lineWidth = lineWidth;
     }
 
-    void fadeIn();
+    void animatedShow();
 
-    void fadeOut();
+    void animatedHide();
 
-    void setFadingSpeed(qreal speed);
+    void setAnimationSpeed(qreal speed);
+
+    void setAnimationTimeLimit(int timeLimitMSec);
 
     void setAnimationTimer(AnimationTimer *timer);
+
+
+    QColor stateColor(int cellState) const;
+
+    void setStateColor(int cellState, const QColor &color);
+
+
+    int cellState(const QPoint &cell) const;
+
+    void setCellState(const QPoint &cell, int cellState);
+
+    void setCellState(const QSet<QPoint> &cells, int cellState);
+
+    void setCellState(const QRect &cells, int cellState);
+
+    void setCellState(const QList<QRect> &cells, int cellState);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    QnGridHighlightItem *newHighlightItem();
+
+    QPoint itemCell(QnGridHighlightItem *item) const;
+    void setItemCell(QnGridHighlightItem *item, const QPoint &cell) const;
+    QnVariantAnimator *itemAnimator(QnGridHighlightItem *item);
+
+protected slots:
+    void at_itemAnimator_finished();
+
 private:
+    struct PointData {
+        PointData(): state(INITIAL), item(NULL) {}
+
+        int state;
+        QnGridHighlightItem *item;
+    };
+
     QRectF m_boundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     QColor m_color;
     QColor m_defaultColor;
     qreal m_lineWidth;
     QnVariantAnimator *m_colorAnimator;
+    QHash<int, QColor> m_colorByState;
+    QHash<QPoint, PointData> m_dataByCell;
+    QList<QnGridHighlightItem *> m_freeItems;
 };
 
 

@@ -71,11 +71,14 @@ protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();
+
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
+    void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
     void at_dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_drag(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
 
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
@@ -117,11 +120,22 @@ protected Q_SLOTS:
     void onRecordingCountdownFinished();
 
 private:
+    /* Global state. */
+
     /** Display synchronizer. */
     QnWorkbenchDisplay *m_display;
 
     /** Instrument manager for the scene. */
     InstrumentManager *m_manager;
+
+    /** Navigation item. */
+    NavigationItem *m_navigationItem;
+
+    /** Widgets by role. */
+    QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
+
+
+    /* Instruments. */
 
     /** Hand scroll instrument. */
     HandScrollInstrument *m_handScrollInstrument;
@@ -147,11 +161,33 @@ private:
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;
 
-    /** Navigation item. */
-    NavigationItem *m_navigationItem;
 
-    /** Widgets by role. */
-    QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
+    /* Resizing-related state. */
+
+    /** Widget that is being resized. */
+    QnResourceWidget *m_resizedWidget;
+
+    /** Current grid rect of the widget being resized. */
+    QRect m_resizedWidgetRect;
+
+
+    /* Dragging-related state. */
+    
+    /** Items that are being dragged. */
+    QList<QGraphicsItem *> m_draggedItems;
+
+    /** Workbench items that are being dragged. */
+    QList<QnWorkbenchItem *> m_draggedWorkbenchItems;
+
+    /** Workbench items that will be replaced as a result of a drag. */
+    QList<QnWorkbenchItem *> m_replacedWorkbenchItems;
+
+    /** Current drag distance. */
+    QPoint m_dragDelta;
+
+    /** Target geometries for concatenation of dragged and replaced item lists. */
+    QList<QRect> m_dragGeometries;
+
 
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;

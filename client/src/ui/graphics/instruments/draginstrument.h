@@ -21,6 +21,7 @@ public:
 signals:
     void dragProcessStarted(QGraphicsView *view);
     void dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void drag(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void dragProcessFinished(QGraphicsView *view);
 

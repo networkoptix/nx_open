@@ -134,12 +134,18 @@ namespace {
         );
     }
 
+    QPoint invalidDragDelta() {
+        return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+    }
+
 } // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
     m_display(display),
-    m_manager(display->instrumentManager())
+    m_manager(display->instrumentManager()),
+    m_resizedWidget(NULL),
+    m_dragDelta(invalidDragDelta())
 {
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -217,8 +223,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_dragStarted(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_dragInstrument,           SIGNAL(drag(QGraphicsView *, QList<QGraphicsItem *>)),                                      this,                           SLOT(at_drag(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_dragFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
+    connect(m_resizingInstrument,       SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),                 this,                           SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),                               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),                              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
@@ -443,25 +451,21 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING STARTED");
 
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
-    if(widget == NULL)
+    m_resizedWidget = dynamic_cast<QnResourceWidget *>(item);
+    if(m_resizedWidget == NULL)
         return;
 
-    m_display->bringToFront(widget);
+    m_display->bringToFront(m_resizedWidget);
 
     /* Show grid. */
-    m_display->gridItem()->fadeIn();
+    m_display->gridItem()->animatedShow();
 }
 
-void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
-    qDebug("RESIZING FINISHED");
-
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
-    if(widget == NULL)
+void QnWorkbenchController::at_resizing(QGraphicsView *view, QGraphicsWidget *item, const ResizingInfo &info) {
+    if(m_resizedWidget != item)
         return;
 
-    /* Hide grid. */
-    m_display->gridItem()->fadeOut();
+    QnResourceWidget *widget = m_resizedWidget;
 
     QRectF newSceneGeometry = widget->geometry();
 
@@ -472,6 +476,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
         qMax(1, qRound(gridSizeF.height()))
     );
 
+    /* Adjust for aspect ratio. */
     if(widget->hasAspectRatio()) {
         if(widget->aspectRatio() > 1.0) {
             gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
@@ -481,29 +486,65 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     }
 
     /* Calculate new grid rect based on the dragged frame section. */
-    QRect newRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
-    QSet<QnWorkbenchItem *> entities = layout()->items(newRect);
+    QRect newResizingWidgetRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
+    if(newResizingWidgetRect != m_resizedWidgetRect) {
+        QnWorkbenchLayout::Disposition disposition;
+        workbench()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
+
+        m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
+        m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
+        m_display->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
+
+        m_resizedWidgetRect = newResizingWidgetRect;
+    }
+}
+
+void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
+    qDebug("RESIZING FINISHED");
+
+    if(m_resizedWidget != item)
+        return;
+
+    QnResourceWidget *widget = m_resizedWidget;
+
+    /* Hide grid. */
+    m_display->gridItem()->animatedHide();
+
+    /* Resize if possible. */
+    QSet<QnWorkbenchItem *> entities = layout()->items(m_resizedWidgetRect);
     entities.remove(widget->item());
     if (entities.empty()) {
-        widget->item()->setGeometry(newRect);
+        widget->item()->setGeometry(m_resizedWidgetRect);
         updateGeometryDelta(widget);
     }
 
     m_display->synchronize(widget->item());
 
-    if(widget->item()->geometry() != newRect)
-        m_display->fitInView();
+    /* Clean up resizing state. */
+    m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
+    m_resizedWidgetRect = QRect();
+    m_resizedWidget = NULL;
 }
 
 void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING STARTED");
 
-    /* Show grid. */
-    m_display->gridItem()->fadeIn();
-
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
     m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
+
+    /* Show grid. */
+    m_display->gridItem()->animatedShow();
+
+    /* Build item lists. */
+    m_draggedItems = items;
+    foreach (QGraphicsItem *item, m_draggedItems) {
+        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        if(widget == NULL)
+            continue;
+
+        m_draggedWorkbenchItems.push_back(widget->item());
+    }
 
     /* Un-raise if raised is among the dragged. */
     //QnResourceWidget *raisedWidget = display()->widget(workbench()->raisedItem());
@@ -511,40 +552,22 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
     //    workbench()->setRaisedItem(NULL);
 }
 
-void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
-    qDebug("DRAGGING FINISHED");
-
-    /* Hide grid. */
-    m_display->gridItem()->fadeOut();
-
-    /* Get workbench items and drag delta. */
-    QList<QnResourceWidget *> widgets;
-    QList<QnWorkbenchItem *> workbenchItems;
-    QPoint delta;
-    foreach (QGraphicsItem *item, items) {
-        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
-        if(widget == NULL)
-            continue;
-
-        if(workbenchItems.empty())
-            delta = mapper()->mapToGrid(widget->geometry()).topLeft() - widget->item()->geometry().topLeft();
-
-        widgets.push_back(widget);
-        workbenchItems.push_back(widget->item());
-    }
-    if(workbenchItems.empty())
+void QnWorkbenchController::at_drag(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
+    if(m_draggedWorkbenchItems.empty())
         return;
 
-    bool success = false;
-    if(delta.isNull()) {
-        success = true;
-    } else {
-        QList<QRect> geometries;
-        bool finished = false;
+    QPoint newDragDelta = mapper()->mapToGrid(display()->widget(m_draggedWorkbenchItems[0])->geometry()).topLeft() - m_draggedWorkbenchItems[0]->geometry().topLeft();
+    if(newDragDelta != m_dragDelta) {
+        m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
+
+        m_dragDelta = newDragDelta;
+        m_replacedWorkbenchItems.clear();
+        m_dragGeometries.clear();
 
         /* Handle single widget case. */
-        if(workbenchItems.size() == 1) {
-            QnWorkbenchItem *draggedWorkbenchItem = workbenchItems[0];
+        bool finished = false;
+        if(m_draggedWorkbenchItems.size() == 1) {
+            QnWorkbenchItem *draggedWorkbenchItem = m_draggedWorkbenchItems[0];
 
             /* Find item that dragged item was dropped on. */
             QPoint cursorPos = QCursor::pos();
@@ -558,18 +581,18 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
                     QnResourceWidget *draggedWidget = display()->widget(draggedWorkbenchItem);
                     QnResourceWidget *replacedWidget = display()->widget(replacedWorkbenchItem);
 
-                    workbenchItems.push_back(replacedWorkbenchItem);
+                    m_replacedWorkbenchItems.push_back(replacedWorkbenchItem);
 
                     if(draggedWidget->hasAspectRatio()) {
-                        geometries.push_back(bestDoubleBoundedGeometry(mapper(), replacedWorkbenchItem->geometry(), draggedWidget->aspectRatio()));
+                        m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), replacedWorkbenchItem->geometry(), draggedWidget->aspectRatio()));
                     } else {
-                        geometries.push_back(replacedWorkbenchItem->geometry());
+                        m_dragGeometries.push_back(replacedWorkbenchItem->geometry());
                     }
 
                     if(replacedWidget->hasAspectRatio()) {
-                        geometries.push_back(bestDoubleBoundedGeometry(mapper(), draggedWorkbenchItem->geometry(), replacedWidget->aspectRatio()));
+                        m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), draggedWorkbenchItem->geometry(), replacedWidget->aspectRatio()));
                     } else {
-                        geometries.push_back(draggedWorkbenchItem->geometry());
+                        m_dragGeometries.push_back(draggedWorkbenchItem->geometry());
                     }
 
                     finished = true;
@@ -580,30 +603,48 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
         /* Handle all other cases. */
         if(!finished) {
             QList<QRect> replacedGeometries;
-            foreach (QnWorkbenchItem *model, workbenchItems) {
-                QRect geometry = model->geometry().adjusted(delta.x(), delta.y(), delta.x(), delta.y());
-                geometries.push_back(geometry);
-                if(model->isPinned())
+            foreach (QnWorkbenchItem *workbenchItem, m_draggedWorkbenchItems) {
+                QRect geometry = workbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y());
+                m_dragGeometries.push_back(geometry);
+                if(workbenchItem->isPinned())
                     replacedGeometries.push_back(geometry);
             }
 
-            QList<QnWorkbenchItem *> replacedModels = layout()->items(replacedGeometries).subtract(workbenchItems.toSet()).toList();
+            m_replacedWorkbenchItems = layout()->items(replacedGeometries).subtract(m_draggedWorkbenchItems.toSet()).toList();
+            
             replacedGeometries.clear();
-            foreach (QnWorkbenchItem *model, replacedModels)
-                replacedGeometries.push_back(model->geometry().adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
+            foreach (QnWorkbenchItem *workbenchItem, m_replacedWorkbenchItems)
+                replacedGeometries.push_back(workbenchItem->geometry().adjusted(-m_dragDelta.x(), -m_dragDelta.y(), -m_dragDelta.x(), -m_dragDelta.y()));
 
-            workbenchItems.append(replacedModels);
-            geometries.append(replacedGeometries);
+            m_dragGeometries.append(replacedGeometries);
             finished = true;
         }
 
-        success = layout()->moveItems(workbenchItems, geometries);
+        QnWorkbenchLayout::Disposition disposition;
+        layout()->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
+
+        m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
+        m_display->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
     }
+}
+
+void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
+    qDebug("DRAGGING FINISHED");
+
+    if(m_draggedWorkbenchItems.empty())
+        return;
+
+    /* Hide grid. */
+    m_display->gridItem()->animatedHide();
+
+    /* Do drag. */
+    QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
+    bool success = layout()->moveItems(workbenchItems, m_dragGeometries);
 
     /* Adjust geometry deltas if everything went fine. */
     if(success)
-        foreach(QnResourceWidget *widget, widgets)
-            updateGeometryDelta(widget);
+        foreach(QnWorkbenchItem *item, workbenchItems)
+            updateGeometryDelta(display()->widget(item));
 
     /* Re-sync everything. */
     foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
@@ -614,12 +655,13 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
     if(raisedItem != NULL && workbenchItems.contains(raisedItem))
         workbench()->setItem(QnWorkbench::RAISED, NULL);
 
-#if 0
-    /* Deselect items that were dragged. */
-    if(!delta.isNull())
-        foreach(QnResourceWidget *widget, widgets)
-            widget->setSelected(false);
-#endif
+    /* Clean up dragging state. */
+    m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
+    m_dragDelta = invalidDragDelta();
+    m_draggedItems.clear();
+    m_draggedWorkbenchItems.clear();
+    m_replacedWorkbenchItems.clear();
+    m_dragGeometries.clear();
 }
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QnResourceWidget *widget) {
@@ -716,7 +758,7 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
             workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
         } else {
             workbench()->setItem(QnWorkbench::ZOOMED, NULL);
-            workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(QnWorkbench::RAISED, workbenchItem);
         }
     } else {
         workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);

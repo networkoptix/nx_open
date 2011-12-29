@@ -218,6 +218,8 @@ void ResizingInstrument::dragMove(DragInfo *info) {
 
     newGeometry = resizeRect(startGeometry, size, m_section);
     widget->setGeometry(newGeometry);
+
+    emit resizing(info->view(), widget, ResizingInfo(this));
 }
 
 void ResizingInstrument::finishDrag(DragInfo *info) {
