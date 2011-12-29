@@ -41,6 +41,7 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "eventmanager.h"
+#include "auto_tester.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -205,6 +206,8 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
+
+    QnAutoTester autoTester(argc, argv);
 
     EveApplication application(argc, argv);
     application.setQuitOnLastWindowClosed(true);

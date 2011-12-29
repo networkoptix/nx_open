@@ -155,7 +155,7 @@ namespace {
 
 }
 
-QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent = NULL):
+QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     QObject(parent),
     m_startTime(0),
     m_timeout(defaultAutoTesterTimeout),
@@ -171,8 +171,8 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent = NULL):
     m_valid = parser.parse(argc, argv);
     if(m_valid) {
         m_timeout = parser.value(QLatin1String("--test-timeout"), m_timeout).toLongLong();
+        
         m_resourceSearchString = parser.value(QLatin1String("--test-resource-substring"), m_resourceSearchString).toString();
-
         if(!m_resourceSearchString.isEmpty())
             m_allTests |= RESOURCE_SUBSTRING;
     }
@@ -183,7 +183,7 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent = NULL):
 }
     
 QnAutoTester::~QnAutoTester() {
-
+    return;
 }
 
 void QnAutoTester::start() {
@@ -197,7 +197,8 @@ void QnAutoTester::start() {
 
     m_startTime = QDateTime::currentMSecsSinceEpoch();
 
-    m_timer->start();
+    if(m_allTests != 0)
+        m_timer->start();
 }
 
 bool QnAutoTester::needsTesting(Test test) {
@@ -206,11 +207,18 @@ bool QnAutoTester::needsTesting(Test test) {
 
 void QnAutoTester::at_timer_timeout() {
     if(QDateTime::currentMSecsSinceEpoch() - m_startTime > m_timeout)
+        //throw std::exception("Tests failed.");
 
     if(needsTesting(RESOURCE_SUBSTRING))
         testResourceSubstring();
 }
 
 void QnAutoTester::testResourceSubstring() {
-    QnResourceList resources = qnResPool->getResources();
+    foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
+        if(resource->toString().contains(m_resourceSearchString)) {
+            m_successfulTests |= RESOURCE_SUBSTRING;
+            return;
+        }
+    }
 }
+
