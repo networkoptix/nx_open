@@ -2,8 +2,8 @@
 #include "ui/graphics/instruments/motionselectioninstrument.h"
 
 static const int TEXT_SPACING = 4;
-static const int SEL_CELL_CLR_DELTA = 40;
 static const QColor NORMAL_LABEL_COLOR(255,255,255);
+static const QColor WEEKEND_LABEL_COLOR(255,128,128);
 static const QColor SELECTED_LABEL_COLOR(64,128, 192);
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
@@ -13,7 +13,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     {
         for (int y = 0; y < ROW_COUNT; ++y)
         {
-            m_gridParams[x][y][ParamType_Color] = QColor(100,0,0).rgba();
+            m_gridParams[x][y][ParamType_Color] = QColor(COLOR_LIGHT,0,0).rgba();
             m_gridParams[x][y][ParamType_First] = 25;
             m_gridParams[x][y][ParamType_Second] = "Hi";
         }
@@ -30,11 +30,12 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     m_mousePressed = false;
     setMouseTracking(true);
 
-    m_defaultParams[ParamType_Color] = QColor(0, 100,0).rgba();
+    m_defaultParams[ParamType_Color] = QColor(0, COLOR_LIGHT,0).rgba();
     m_defaultParams[ParamType_First] = 3;
     m_defaultParams[ParamType_Second] = "Lo";
     m_showFirstParam = true;
     m_showSecondParam = true;
+
 }
 
 qreal QnScheduleGridWidget::getCellSize()
@@ -71,7 +72,7 @@ void QnScheduleGridWidget::initMetrics()
     while (1)
     {
         QFontMetrics metrics(m_gridFont);
-        if (metrics.width("30") > cellSize/2.2)
+        if (metrics.width("Md") > cellSize/2.2)
             break;
         m_gridFont.setPointSizeF(m_gridFont.pointSizeF()+0.5);
     }
@@ -89,8 +90,10 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
     {
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
             p.setPen(SELECTED_LABEL_COLOR);
-        else
+        else if (y < 5)
             p.setPen(NORMAL_LABEL_COLOR);
+        else
+            p.setPen(WEEKEND_LABEL_COLOR);
         p.drawText(QRect(0, cellSize*y+m_gridTopOffset, m_gridLeftOffset-TEXT_SPACING, cellSize), Qt::AlignRight | Qt::AlignVCenter, m_weekDays[y]);
     }
     for (int x = 0; x < COL_COUNT; ++x) {
@@ -211,19 +214,6 @@ QPoint QnScheduleGridWidget::getCell(const QPoint& p, bool doTruncate)
         return QPoint(cellX, cellY);
     else
         return QPoint(-2, -2);
-
-    /*
-    if (p.x() >= m_gridLeftOffset && p.y() >= m_gridTopOffset)
-    {
-        if (cellX < COL_COUNT && cellY < ROW_COUNT)
-            return QPoint(cellX, cellY);
-        else
-            return QPoint(-1, -1);
-    }
-    
-    else
-        return QPoint(-1, -1);
-    */
 }
 
 void QnScheduleGridWidget::mousePressEvent(QMouseEvent * event )
@@ -285,11 +275,13 @@ void QnScheduleGridWidget::setDefaultParam(ParamType number, const QVariant& val
 void QnScheduleGridWidget::setShowFirstParam(bool value)
 {
     m_showFirstParam = value;
+    update();
 }
 
 void QnScheduleGridWidget::setShowSecondParam(bool value)
 {
     m_showSecondParam = value;
+    update();
 }
 
 void QnScheduleGridWidget::resizeEvent(QResizeEvent * event)

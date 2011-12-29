@@ -6,4 +6,67 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget *parent) :
     ui(new Ui::CameraSchedule)
 {
     ui->setupUi(this);
+    connect(ui->chkBoxDisplayQuality, SIGNAL(stateChanged(int)), this, SLOT(onDisplayQualityChanged(int)));
+    connect(ui->chkBoxDisplayFPS, SIGNAL(stateChanged(int)), this, SLOT(onDisplayFPSChanged(int)));
+
+    // init buttons
+    ui->btnRecordAlways->setColor(QColor(COLOR_LIGHT,0,0));
+    ui->btnRecordAlways->setCheckedColor(QColor(COLOR_LIGHT+SEL_CELL_CLR_DELTA,0,0));
+    ui->btnRecordMotion->setColor(QColor(0, COLOR_LIGHT, 0));
+    ui->btnRecordMotion->setCheckedColor(QColor(0, COLOR_LIGHT+SEL_CELL_CLR_DELTA, 0));
+    int noRecClr = COLOR_LIGHT - 24;
+    ui->btnNoRecord->setColor(QColor(noRecClr, noRecClr, noRecClr));
+    ui->btnNoRecord->setCheckedColor(QColor(noRecClr+SEL_CELL_CLR_DELTA, noRecClr+SEL_CELL_CLR_DELTA, noRecClr+SEL_CELL_CLR_DELTA));
+
+    connect(ui->btnRecordAlways, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
+    connect(ui->btnRecordMotion, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
+    connect(ui->btnNoRecord, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
+    connect(ui->comboBoxQuality, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGridParams()));
+    connect(ui->fpsSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateGridParams()));
+}
+
+QString getShortText(const QString& text)
+{
+    if (text == "Low")
+        return "Lo";
+    else if (text == "Medium")
+        return "Md";
+    else if (text == "High")
+        return "Hi";
+    else if (text == "Best")
+        return "Bst";
+    else 
+        return "-";
+}
+
+void CameraScheduleWidget::updateGridParams()
+{
+    QColor color;
+    if (ui->btnRecordAlways->isChecked())
+        color = ui->btnRecordAlways->color();
+    else if (ui->btnRecordMotion->isChecked())
+        color = ui->btnRecordMotion->color();
+    else if (ui->btnNoRecord->isChecked()) 
+        color = ui->btnNoRecord->color();
+
+    ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Color, color.rgba());
+    if (ui->btnNoRecord->isChecked()) {
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QString("-"));
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, QString("-"));
+    }
+    else 
+    {
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QString::number(ui->fpsSpinBox->value()));
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, getShortText(ui->comboBoxQuality->currentText()));
+    }
+}
+
+void CameraScheduleWidget::onDisplayQualityChanged(int state)
+{
+    ui->gridWidget->setShowSecondParam(state);
+}
+
+void CameraScheduleWidget::onDisplayFPSChanged(int state)
+{
+    ui->gridWidget->setShowFirstParam(state);
 }

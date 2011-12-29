@@ -5,7 +5,8 @@
 
 static const int COL_COUNT = 24;
 static const int ROW_COUNT = 7;
-
+static const int SEL_CELL_CLR_DELTA = 40;
+static const int COLOR_LIGHT = 100;
 
 class QnScheduleGridWidget: public QWidget
 {
