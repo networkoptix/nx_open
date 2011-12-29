@@ -763,16 +763,18 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
+        /*
         if(qFuzzyCompare(currentSize, targetSize)) {
-            /* Item was moved without resizing. */
+            // Item was moved without resizing. 
             easingCurve = QEasingCurve::InOutBack;
         } else if(contains(targetSize, currentSize)) {
-            /* Item was resized up. */
+            //Item was resized up. 
             easingCurve = QEasingCurve::InBack;
         } else {
-            /* Item was resized down. */
+            // Item was resized down.
             easingCurve = QEasingCurve::OutBack;
         }
+        /**/
 
         animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
     } else {

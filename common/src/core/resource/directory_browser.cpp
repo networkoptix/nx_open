@@ -123,7 +123,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
         return result;
 
     //foreach (const QFileInfo &fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
-    QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files);
+    QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
     foreach (const QFileInfo &fi, flist)
     {
         if (shouldStop())
@@ -142,7 +142,10 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
         {
             QnResourcePtr res = createArchiveResource(fi.absoluteFilePath());
             if (res!=0)
+            {
+                cl_log.log("created local resource: ", fi.absoluteFilePath() , cl_logALWAYS);
                 result.append(res);
+            }
         }
 
 
