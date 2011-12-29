@@ -104,7 +104,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     m_resourcesTreeView->setModel(m_resourcesModel);
     m_searchTreeView->setModel(m_searchProxyModel);
-    QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
+    //QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
 
 
     QHBoxLayout *topLayout = new QHBoxLayout;
