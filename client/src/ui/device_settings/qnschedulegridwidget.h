@@ -19,6 +19,10 @@ public:
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFirstParam(bool value);
     void setShowSecondParam(bool value);
+
+    QVariant getCellParam(const QPoint& cell, ParamType paramType);
+signals:
+    void needReadCellParams(QPoint cell);
 protected:
 
     virtual void mouseMoveEvent(QMouseEvent * event );

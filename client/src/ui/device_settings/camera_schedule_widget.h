@@ -16,8 +16,12 @@ private slots:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
     void updateGridParams();
+    void onNeedReadCellParams(QPoint cell);
+private:
+    int qualityTextToIndex(const QString& text);
 private:
     Ui::CameraSchedule *ui;
+    bool m_disableUpdateGridParams;
 };
 
 

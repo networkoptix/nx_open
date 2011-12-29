@@ -9,14 +9,14 @@ static const QColor SELECTED_LABEL_COLOR(64,128, 192);
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     QWidget(parent)
 {
+    m_defaultParams[ParamType_Color] = QColor(COLOR_LIGHT,0, 0).rgba();
+    m_defaultParams[ParamType_First] = 1;
+    m_defaultParams[ParamType_Second] = "Lo";
+
     for (int x = 0; x < COL_COUNT; ++x)
     {
         for (int y = 0; y < ROW_COUNT; ++y)
-        {
-            m_gridParams[x][y][ParamType_Color] = QColor(COLOR_LIGHT,0,0).rgba();
-            m_gridParams[x][y][ParamType_First] = 1;
-            m_gridParams[x][y][ParamType_Second] = "Lo";
-        }
+            qCopy(m_defaultParams, &m_defaultParams[ParamNum_Dummy], m_gridParams[x][y]);
     }
     QDate date(2010,1,1);
     date = date.addDays(1 - date.dayOfWeek());
@@ -30,9 +30,6 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     m_mousePressed = false;
     setMouseTracking(true);
 
-    m_defaultParams[ParamType_Color] = QColor(0, COLOR_LIGHT,0).rgba();
-    m_defaultParams[ParamType_First] = 3;
-    m_defaultParams[ParamType_Second] = "Lo";
     m_showFirstParam = true;
     m_showSecondParam = true;
 
@@ -218,10 +215,16 @@ QPoint QnScheduleGridWidget::getCell(const QPoint& p, bool doTruncate)
 
 void QnScheduleGridWidget::mousePressEvent(QMouseEvent * event )
 {
+    QPoint cell = getCell(event->pos(), false);
+    if (event->modifiers() & Qt::AltModifier)
+    {
+        if (cell.x() >= 0 && cell.y() >= 0)
+            emit needReadCellParams(cell);
+        return;
+    }
+    
     m_mousePressPos = event->pos();
     m_mousePressed = true;
-    QPoint cell = getCell(event->pos(), false);
-    
     if (cell.x() == -1 && cell.y() == -1) 
     {
         for (int y = 0; y < ROW_COUNT; ++y)
@@ -253,15 +256,17 @@ void QnScheduleGridWidget::updateCellValue(const QPoint& cell)
 
 void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent * event)
 {
-    QPoint cell1 = getCell(m_mousePressPos, true);
-    QPoint cell2 = getCell(event->pos(), true);
-    QRect r = QRect(cell1, cell2).normalized();
-    for (int x = r.left(); x <= r.right(); ++x)
+    if (m_mousePressed)
     {
-        for (int y = r.top(); y <= r.bottom(); ++y)
-            updateCellValue(QPoint(x,y));
+        QPoint cell1 = getCell(m_mousePressPos, true);
+        QPoint cell2 = getCell(event->pos(), true);
+        QRect r = QRect(cell1, cell2).normalized();
+        for (int x = r.left(); x <= r.right(); ++x)
+        {
+            for (int y = r.top(); y <= r.bottom(); ++y)
+                updateCellValue(QPoint(x,y));
+        }
     }
-
     m_mousePressed = false;
     m_selectedRect = QRect();
     update();
@@ -287,4 +292,9 @@ void QnScheduleGridWidget::setShowSecondParam(bool value)
 void QnScheduleGridWidget::resizeEvent(QResizeEvent * event)
 {
     initMetrics();
+}
+
+QVariant QnScheduleGridWidget::getCellParam(const QPoint& cell, ParamType paramType)
+{
+    return m_gridParams[cell.x()][cell.y()][paramType];
 }

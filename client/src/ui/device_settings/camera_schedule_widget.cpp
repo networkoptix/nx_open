@@ -23,6 +23,10 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget *parent) :
     connect(ui->btnNoRecord, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
     connect(ui->comboBoxQuality, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGridParams()));
     connect(ui->fpsSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateGridParams()));
+
+    connect(ui->gridWidget, SIGNAL(needReadCellParams(QPoint)), this, SLOT(onNeedReadCellParams(QPoint)));
+
+    m_disableUpdateGridParams = false;
 }
 
 QString getShortText(const QString& text)
@@ -39,8 +43,35 @@ QString getShortText(const QString& text)
         return "-";
 }
 
+QString getLongText(const QString& text)
+{
+    if (text == "Lo")
+        return "Low";
+    else if (text == "Md")
+        return "Medium";
+    else if (text == "Hi")
+        return "High";
+    else if (text == "Bst")
+        return "Best";
+    else 
+        return "-";
+}
+
+int CameraScheduleWidget::qualityTextToIndex(const QString& text)
+{
+    for (int i = 0; i < ui->comboBoxQuality->count(); ++i)
+    {
+        if (ui->comboBoxQuality->itemText(i) == text)
+            return i;
+    }
+    return 0;
+}
+
 void CameraScheduleWidget::updateGridParams()
 {
+    if (m_disableUpdateGridParams)
+        return;
+
     QColor color;
     if (ui->btnRecordAlways->isChecked())
         color = ui->btnRecordAlways->color();
@@ -59,6 +90,27 @@ void CameraScheduleWidget::updateGridParams()
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QString::number(ui->fpsSpinBox->value()));
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, getShortText(ui->comboBoxQuality->currentText()));
     }
+}
+
+void CameraScheduleWidget::onNeedReadCellParams(QPoint cell)
+{
+    m_disableUpdateGridParams = true;
+    QColor color(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ParamType_Color).toUInt());
+    double fps(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ParamType_First).toDouble());
+    QString shortQuality(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ParamType_Second).toString());
+
+    if (color == ui->btnRecordAlways->color())
+        ui->btnRecordAlways->setChecked(true);
+    else if (color == ui->btnRecordMotion->color())
+        ui->btnRecordMotion->setChecked(true);
+    else if (color == ui->btnNoRecord->color())
+        ui->btnNoRecord->setChecked(true);
+    if (color != ui->btnNoRecord->color()) 
+    {
+        ui->fpsSpinBox->setValue(fps);
+        ui->comboBoxQuality->setCurrentIndex(qualityTextToIndex(getLongText(shortQuality)));
+    }
+    m_disableUpdateGridParams = false;
 }
 
 void CameraScheduleWidget::onDisplayQualityChanged(int state)
