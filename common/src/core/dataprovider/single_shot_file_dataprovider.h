@@ -25,6 +25,4 @@ private:
 
 };
 
-/**/
-
 #endif //single_shot_file_reader_h_215

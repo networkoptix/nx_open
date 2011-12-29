@@ -7,6 +7,7 @@
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <core/resourcemanagment/resource_pool.h>
+#include <core/resourcemanagment/security_cam_resource.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/warnings.h>
@@ -16,11 +17,10 @@
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "settings.h"
-#include "core/resourcemanagment/security_cam_resource.h"
 
 namespace {
     /** Default frame width. */
-    const qreal defaultFrameWidth = 1.0;
+    const qreal defaultFrameWidth = 0.5;
 
     /** Default frame color. */
     const QColor defaultFrameColor = QColor(128, 128, 128, 196);
@@ -92,12 +92,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setLayout(layout);
 
     /* Set up video rendering. */
-
     m_resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
-
     m_display = new QnResourceDisplay(m_resource, this);
-
-    connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(onResourceUpdated()));
+    connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(at_display_resourceUpdated()));
 
     Q_ASSERT(m_display);
     m_videoLayout = m_display->videoLayout();
@@ -364,13 +361,13 @@ void QnResourceWidget::prepareMotionMask()
     m_motionMaskReady = true;
 };
 
-void QnResourceWidget::onResourceUpdated()
+void QnResourceWidget::at_display_resourceUpdated()
 {
     m_motionMaskReady = false;
 }
 
 
-void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, QnMetaDataV1Ptr motion) {
+void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, const QnMetaDataV1Ptr &motion) {
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
 

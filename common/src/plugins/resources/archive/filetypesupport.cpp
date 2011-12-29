@@ -7,8 +7,11 @@ FileTypeSupport::FileTypeSupport()
 {
     for (unsigned i = 0; i < arraysize(IMAGE_FILETYPES); i++)
     {
-        m_imageFileExtensions << QLatin1String(".") + QString::fromLatin1(IMAGE_FILETYPES[i]);
-        m_imageFileFilter << QLatin1String("*.") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        // TODO
+        // m_imageFileExtensions << QLatin1String(".") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        // m_imageFileFilter << QLatin1String("*.") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        m_movieFileExtensions << QLatin1String(".") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        m_movieFileFilter << QLatin1String("*.") + QString::fromLatin1(IMAGE_FILETYPES[i]);
     }
 
     for (unsigned i = 0; i < arraysize(VIDEO_FILETYPES); i++)
