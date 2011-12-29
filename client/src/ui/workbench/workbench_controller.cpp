@@ -571,31 +571,34 @@ void QnWorkbenchController::at_drag(QGraphicsView *view, const QList<QGraphicsIt
 
             /* Find item that dragged item was dropped on. */
             QPoint cursorPos = QCursor::pos();
-            QnWorkbenchItem *replacedWorkbenchItem = layout()->item(mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
+            QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout()->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
+            if(replacedWorkbenchItems.size() == 1) {
+                QnWorkbenchItem *replacedWorkbenchItem = *replacedWorkbenchItems.begin();
 
-            /* Switch places if dropping smaller one on a bigger one. */
-            if(replacedWorkbenchItem != NULL && replacedWorkbenchItem != draggedWorkbenchItem && draggedWorkbenchItem->isPinned()) {
-                QSizeF draggedSize = draggedWorkbenchItem->geometry().size();
-                QSizeF replacedSize = replacedWorkbenchItem->geometry().size();
-                if(replacedSize.width() > draggedSize.width() && replacedSize.height() > draggedSize.height()) {
-                    QnResourceWidget *draggedWidget = display()->widget(draggedWorkbenchItem);
-                    QnResourceWidget *replacedWidget = display()->widget(replacedWorkbenchItem);
+                /* Switch places if dropping smaller one on a bigger one. */
+                if(replacedWorkbenchItem != NULL && replacedWorkbenchItem != draggedWorkbenchItem && draggedWorkbenchItem->isPinned()) {
+                    QSizeF draggedSize = draggedWorkbenchItem->geometry().size();
+                    QSizeF replacedSize = replacedWorkbenchItem->geometry().size();
+                    if(replacedSize.width() > draggedSize.width() && replacedSize.height() > draggedSize.height()) {
+                        QnResourceWidget *draggedWidget = display()->widget(draggedWorkbenchItem);
+                        QnResourceWidget *replacedWidget = display()->widget(replacedWorkbenchItem);
 
-                    m_replacedWorkbenchItems.push_back(replacedWorkbenchItem);
+                        m_replacedWorkbenchItems.push_back(replacedWorkbenchItem);
 
-                    if(draggedWidget->hasAspectRatio()) {
-                        m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), replacedWorkbenchItem->geometry(), draggedWidget->aspectRatio()));
-                    } else {
-                        m_dragGeometries.push_back(replacedWorkbenchItem->geometry());
+                        if(draggedWidget->hasAspectRatio()) {
+                            m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), replacedWorkbenchItem->geometry(), draggedWidget->aspectRatio()));
+                        } else {
+                            m_dragGeometries.push_back(replacedWorkbenchItem->geometry());
+                        }
+
+                        if(replacedWidget->hasAspectRatio()) {
+                            m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), draggedWorkbenchItem->geometry(), replacedWidget->aspectRatio()));
+                        } else {
+                            m_dragGeometries.push_back(draggedWorkbenchItem->geometry());
+                        }
+
+                        finished = true;
                     }
-
-                    if(replacedWidget->hasAspectRatio()) {
-                        m_dragGeometries.push_back(bestDoubleBoundedGeometry(mapper(), draggedWorkbenchItem->geometry(), replacedWidget->aspectRatio()));
-                    } else {
-                        m_dragGeometries.push_back(draggedWorkbenchItem->geometry());
-                    }
-
-                    finished = true;
                 }
             }
         }

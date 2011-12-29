@@ -20,9 +20,8 @@ Q_DECLARE_METATYPE(QnVariantAnimator *);
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_color(QColor(0, 0, 0, 0)),
-    m_defaultColor(QColor(0, 0, 0, 0)),
     m_lineWidth(1.0),
-    m_colorAnimator(new QnVariantAnimator(this))
+    m_opacityAnimator(new QnVariantAnimator(this))
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
@@ -30,10 +29,9 @@ QnGridItem::QnGridItem(QGraphicsItem *parent):
     setStateColor(ALLOWED, QColor(0, 255, 0, 64));
     setStateColor(DISALLOWED, QColor(255, 0, 0, 64));
 
-    m_colorAnimator->setTargetObject(this);
-    m_colorAnimator->setAccessor(new QnPropertyAccessor("color"));
-    m_colorAnimator->setConverter(new QnColorToVectorConverter());
-    m_colorAnimator->setSpeed(1.0);
+    m_opacityAnimator->setTargetObject(this);
+    m_opacityAnimator->setAccessor(new QnPropertyAccessor("opacity"));
+    m_opacityAnimator->setSpeed(1.0);
 
     setAcceptedMouseButtons(0);
     
@@ -50,42 +48,39 @@ void QnGridItem::setMapper(QnWorkbenchGridMapper *mapper) {
 }
 
 void QnGridItem::setAnimationTimer(AnimationTimer *timer) {
-    m_colorAnimator->setTimer(timer);
+    m_opacityAnimator->setTimer(timer);
 }
 
 void QnGridItem::setAnimationSpeed(qreal speed) {
-    if(m_colorAnimator->isRunning()) {
-        m_colorAnimator->pause();
-        m_colorAnimator->setSpeed(speed);
-        m_colorAnimator->start();
+    if(m_opacityAnimator->isRunning()) {
+        m_opacityAnimator->pause();
+        m_opacityAnimator->setSpeed(speed);
+        m_opacityAnimator->start();
     } else {
-        m_colorAnimator->setSpeed(speed);
+        m_opacityAnimator->setSpeed(speed);
     }
 }
 
 void QnGridItem::setAnimationTimeLimit(int timeLimitMSec) {
-    if(m_colorAnimator->isRunning()) {
-        m_colorAnimator->pause();
-        m_colorAnimator->setTimeLimit(timeLimitMSec);
-        m_colorAnimator->start();
+    if(m_opacityAnimator->isRunning()) {
+        m_opacityAnimator->pause();
+        m_opacityAnimator->setTimeLimit(timeLimitMSec);
+        m_opacityAnimator->start();
     } else {
-        m_colorAnimator->setTimeLimit(timeLimitMSec);
+        m_opacityAnimator->setTimeLimit(timeLimitMSec);
     }
 }
 
 void QnGridItem::animatedShow() {
-    if(m_color.alpha() == 0)
-        m_color = SceneUtility::translucent(m_defaultColor);
-
-    m_colorAnimator->pause();
-    m_colorAnimator->setTargetValue(m_defaultColor);
-    m_colorAnimator->start();
+    m_opacityAnimator->pause();
+    m_opacityAnimator->setTargetValue(1.0);
+    m_opacityAnimator->start();
 }
 
 void QnGridItem::animatedHide() {
-    m_colorAnimator->pause();
-    m_colorAnimator->setTargetValue(SceneUtility::translucent(m_defaultColor));
-    m_colorAnimator->start();
+    m_opacityAnimator->pause();
+    m_opacityAnimator->setTargetValue(0.0);
+    m_opacityAnimator->start();
 }
 
 QRectF QnGridItem::boundingRect() const {
@@ -96,7 +91,7 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     if(mapper() == NULL)
         return;
 
-    if(m_color.alpha() == 0)
+    if(qFuzzyIsNull(painter->opacity()))
         return;
 
     /* Calculate the extends that would cover entire viewport. */
@@ -170,10 +165,10 @@ QnVariantAnimator *QnGridItem::itemAnimator(QnGridHighlightItem *item) {
     if(animator == NULL) {
         animator = new QnVariantAnimator(item);
         animator->setTargetObject(item);
-        animator->setTimer(m_colorAnimator->timer());
+        animator->setTimer(m_opacityAnimator->timer());
         animator->setAccessor(new QnPropertyAccessor("color"));
         animator->setConverter(new QnColorToVectorConverter());
-        animator->setSpeed(m_colorAnimator->speed());
+        animator->setSpeed(m_opacityAnimator->speed());
         connect(animator, SIGNAL(finished()), this, SLOT(at_itemAnimator_finished()));
         item->setProperty(animatorPropertyName, QVariant::fromValue<QnVariantAnimator *>(animator));
     }

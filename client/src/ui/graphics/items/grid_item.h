@@ -14,7 +14,6 @@ class QnGridHighlightItem;
 class QnGridItem : public QGraphicsObject {
     Q_OBJECT;
     Q_PROPERTY(QColor color READ color WRITE setColor);
-    Q_PROPERTY(QColor defaultColor READ defaultColor WRITE setDefaultColor);
 
 public:
     enum CellState {
@@ -42,14 +41,6 @@ public:
 
     void setColor(const QColor &color) {
         m_color = color;
-    }
-
-    const QColor &defaultColor() const {
-        return m_defaultColor;
-    }
-
-    void setDefaultColor(const QColor &defaultColor) {
-        m_defaultColor = defaultColor;
     }
 
     qreal lineWidth() const {
@@ -109,9 +100,8 @@ private:
     QRectF m_boundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     QColor m_color;
-    QColor m_defaultColor;
     qreal m_lineWidth;
-    QnVariantAnimator *m_colorAnimator;
+    QnVariantAnimator *m_opacityAnimator;
     QHash<int, QColor> m_colorByState;
     QHash<QPoint, PointData> m_dataByCell;
     QList<QnGridHighlightItem *> m_freeItems;
