@@ -8,6 +8,7 @@
 #include "core/resource/resource.h"
 #include "ui/preferences/preferences_wnd.h"
 #include "ui/skin/skin.h"
+#include "connectionTestingDialog.h"
 
 #include "api/AppServerConnection.h"
 
@@ -54,24 +55,19 @@ LoginDialog::~LoginDialog()
 {
 }
 
-void LoginDialog::testResults(int status, const QByteArray &data, int requstHandle)
-{
-    if (status)
-    {
-        QMessageBox::warning(this, tr("Invalid settings"), tr("The settings you have entered is not valid."));
-    } else
-    {
-        QMessageBox::information(this, tr("Settings are valid"), tr("The settings you have entered is valid."));
-    }
-}
-
 void LoginDialog::testSettings()
 {
     QUrl url = currentUrl();
+    
+    if (!url.isValid())
+    {
+        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
+        return;
+    }
 
-    QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url, QnDummyResourceFactory());
-
-    connection->testConnectionAsync(this, SLOT(testResults(int, const QByteArray&, int)));
+    ConnectionTestingDialog dialog(this, url);
+    dialog.setModal(true);
+    dialog.exec();
 }
 
 QUrl LoginDialog::currentUrl()

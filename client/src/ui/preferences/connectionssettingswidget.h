@@ -40,7 +40,6 @@ private Q_SLOTS:
     void savePasswordToggled(bool save);
     void newConnection();
     void testConnection();
-    void testResults(int status, const QByteArray &data, int requstHandle);
     void duplicateConnection();
     void deleteConnection();
 
