@@ -3135,12 +3135,12 @@ void GraphicsView::mouseSpeed_helper(qreal& mouse_speed, int& dx, int&dy, int mi
     }
 }
 
-void GraphicsView::show_device_settings_helper(QnResourcePtr dev)
+void GraphicsView::show_device_settings_helper(QnResourcePtr resource)
 {
     bool open = false;
     QPoint p;
 
-    if (mDeviceDlg && mDeviceDlg->getDevice()!=dev) // need to delete only if exists and not for this device
+    if (mDeviceDlg && mDeviceDlg->resource() != resource) // need to delete only if exists and not for this device
     {
         // already opened ( may be for another device )
         p = mDeviceDlg->pos();
@@ -3157,7 +3157,7 @@ void GraphicsView::show_device_settings_helper(QnResourcePtr dev)
 
     if (!mDeviceDlg)
     {
-        mDeviceDlg = CLDeviceSettingsDlgFactory::createDlg(dev);
+        mDeviceDlg = CLDeviceSettingsDlgFactory::createDlg(resource);
         if (!mDeviceDlg)
             return;
 

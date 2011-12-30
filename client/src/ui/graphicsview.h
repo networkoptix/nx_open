@@ -125,7 +125,7 @@ protected:
     void onArrange_helper();
     void onCircle_helper(bool show=false);
 
-    void show_device_settings_helper(QnResourcePtr dev);
+    void show_device_settings_helper(QnResourcePtr resource);
 
     CLAbstractSceneItem* getLastSelectedItem();
     void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);

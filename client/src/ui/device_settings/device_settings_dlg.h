@@ -1,52 +1,56 @@
 #ifndef abstract_device_settings_dlg_h_1652
 #define abstract_device_settings_dlg_h_1652
 
+#include <QtCore/QList>
+
+#include <QtGui/QDialog>
+
 #include "core/resource/resource.h"
 
-
-class QnResource;
-class QTabWidget;
 class QDialogButtonBox;
-class CLAbstractSettingsWidget;
 class QGroupBox;
+class QTabWidget;
+
+class CLAbstractSettingsWidget;
 class CLDeviceSettingsTab;
 
 class CLAbstractDeviceSettingsDlg : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
+    CLAbstractDeviceSettingsDlg(QnResourcePtr resource);
+    virtual ~CLAbstractDeviceSettingsDlg();
 
-	CLAbstractDeviceSettingsDlg(QnResourcePtr dev);
+    QnResourcePtr resource() const;
 
-	virtual ~CLAbstractDeviceSettingsDlg();
+    void putWidget(CLAbstractSettingsWidget *wgt);
+    void putGroup(QGroupBox *group);
 
-	QnResourcePtr getDevice() const;
-	void putWidget(CLAbstractSettingsWidget* wgt);
-	void putGroup(QGroupBox* group);
-
-public slots:
-	virtual void setParam(const QString& name, const QVariant& val);
-	virtual void onClose();
-	virtual void onSuggestions();
+public Q_SLOTS:
+    virtual void setParam(const QString &name, const QVariant &val);
+    virtual void onClose();
+    virtual void onSuggestions();
 
     virtual void onNewtab(int index);
 
 protected:
-    void addTabWidget(CLDeviceSettingsTab* tab);
-	CLAbstractSettingsWidget* getWidgetByName(QString name) const;
-	QGroupBox* getGroupByName(QString name) const;
-	CLDeviceSettingsTab* tabByName(QString name) const;
+    void addTabWidget(CLDeviceSettingsTab *tab);
+    CLAbstractSettingsWidget *getWidgetByName(const QString &name) const;
+    QGroupBox *getGroupByName(const QString &name) const;
+    CLDeviceSettingsTab *tabByName(const QString &name) const;
 
-    QList<CLAbstractSettingsWidget*> getWidgetsBygroup(QString group) const;
+    QList<CLAbstractSettingsWidget *> getWidgetsBygroup(const QString &group) const;
+
 protected:
-	QnResourcePtr mDevice;
+    QnResourcePtr m_resource;
 
-	QTabWidget* mTabWidget;
-	QDialogButtonBox* mButtonBox;
+    QTabWidget *m_tabWidget;
+    QDialogButtonBox *m_buttonBox;
 
-	QList<CLAbstractSettingsWidget*> mWgtsLst;
-	QList<QGroupBox*> mGroups;
-	QList<CLDeviceSettingsTab*> mTabs;
+    QList<CLAbstractSettingsWidget *> mWgtsLst;
+    QList<QGroupBox *> m_groups;
+    QList<CLDeviceSettingsTab *> m_tabs;
 };
 
 #endif //abstract_device_settings_dlg_h_1652

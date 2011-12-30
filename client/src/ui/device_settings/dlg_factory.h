@@ -3,19 +3,18 @@
 
 #include "core/resource/resource.h"
 
-
 class QnResource;
 class CLAbstractDeviceSettingsDlg;
 
 /**
- * Interface for creating device-specific settings dialogs. 
+ * Interface for creating device-specific settings dialogs.
  */
 class CLAbstractDlgManufacture
 {
 public:
     /**
      * \param dev                       Resource to create settings dialog for.
-     * \returns                         Newly created settings dialog, 
+     * \returns                         Newly created settings dialog,
      *                                  or NULL if it could not be created.
      */
     virtual CLAbstractDeviceSettingsDlg *createDlg(QnResourcePtr dev) = 0;
@@ -43,7 +42,7 @@ class CLDeviceSettingsDlgFactory
 public:
     /**
      * \param dev                       Resource to check.
-     * \returns                         Whether this factory can create a 
+     * \returns                         Whether this factory can create a
      *                                  settings dialog for the given resource.
      */
     static bool canCreateDlg(QnResourcePtr dev);
@@ -58,7 +57,7 @@ public:
 
     /**
      * Registers a dialog manufacture with this factory.
-     * 
+     *
      * \param manufacture               Manufacture to register.
      */
     static void registerDlgManufacture(CLAbstractDlgManufacture *manufacture);

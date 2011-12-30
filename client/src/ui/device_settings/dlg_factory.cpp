@@ -5,33 +5,32 @@
 #include <utils/common/warnings.h>
 #include "device_settings_dlg.h"
 
-
 typedef QList<CLAbstractDlgManufacture *> Manufactures;
 Q_GLOBAL_STATIC(Manufactures, manufactures)
 
-bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr dev)
+bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
 {
-    if (!dev)
+    if (!resource)
         return false;
 
     foreach (CLAbstractDlgManufacture *man, *manufactures())
     {
-        if (man->canProduceDlg(dev))
+        if (man->canProduceDlg(resource))
             return true;
     }
 
     return false;
 }
 
-CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr dev)
+CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource)
 {
-    if (!dev)
+    if (!resource)
         return 0;
 
     foreach (CLAbstractDlgManufacture *man, *manufactures())
     {
-        if (man->canProduceDlg(dev))
-            return man->createDlg(dev);
+        if (man->canProduceDlg(resource))
+            return man->createDlg(resource);
     }
 
     return 0;
@@ -39,7 +38,7 @@ CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr
 
 void CLDeviceSettingsDlgFactory::registerDlgManufacture(CLAbstractDlgManufacture *manufacture)
 {
-    if(manufacture == NULL) {
+    if (!manufacture) {
         qnNullWarning(manufacture);
         return;
     }
