@@ -67,7 +67,6 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
         mPossibleNames.push_back(ai);
         mPossibleNames.push_back(ir);
     }
-
 }
 
 CLAbstractDeviceSettingsDlg *AreconVisionDlgManufacture::createDlg(QnResourcePtr resource)
@@ -80,7 +79,7 @@ bool AreconVisionDlgManufacture::canProduceDlg(QnResourcePtr resource) const
     return mPossibleNames.contains(resource->getName());
 }
 
-//=======================================================================================
+
 AVSettingsDlg::AVSettingsDlg(QnResourcePtr resource, QWidget *parent)
     : CLAbstractDeviceSettingsDlg(resource, parent)
 {
@@ -280,7 +279,6 @@ void AVSettingsDlg::onSuggestions()
 {
     QString text = tr("To reduce the bandwidth try to set Light Mode on Exposure tab to HightSpeed and set Short Exposure to 30ms.");
     QMessageBox mbox(QMessageBox::Information, tr("Suggestion"), text, QMessageBox::Ok, this, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    //mbox.setWindowOpacity(global_dlg_opacity);
     mbox.exec();
 }
 

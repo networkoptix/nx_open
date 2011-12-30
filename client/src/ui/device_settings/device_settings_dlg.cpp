@@ -13,19 +13,14 @@
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource, QWidget *parent)
     : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint |
                       Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint),
-        m_resource(resource)
+      m_resource(resource)
 {
     setWindowTitle(tr("Camera settings: %1").arg(m_resource->toString()));
-    //setWindowOpacity(global_dlg_opacity);
 
     int width = 610;
     int height = 490;
 
     resize(width, height);
-
-    //QPalette pal = palette();
-    //pal.setColor(backgroundRole(), Qt::black);
-    //setPalette(pal);
 
     m_tabWidget = new QTabWidget(this);
 
@@ -75,8 +70,7 @@ void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
 
 CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name) const
 {
-    foreach (CLDeviceSettingsTab *tab, m_tabs)
-    {
+    foreach (CLDeviceSettingsTab *tab, m_tabs) {
         if (name == tab->name())
             return tab;
     }
@@ -91,8 +85,7 @@ void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget *wgt)
 
 CLAbstractSettingsWidget *CLAbstractDeviceSettingsDlg::getWidgetByName(const QString &name) const
 {
-    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst)
-    {
+    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst) {
         if (name == wgt->param().name())
             return wgt;
     }
@@ -107,8 +100,7 @@ void CLAbstractDeviceSettingsDlg::putGroup(QGroupBox *group)
 
 QGroupBox *CLAbstractDeviceSettingsDlg::getGroupByName(const QString &name) const
 {
-    foreach (QGroupBox *groupBox, m_groups)
-    {
+    foreach (QGroupBox *groupBox, m_groups) {
         if (name == groupBox->title())
             return groupBox;
     }
@@ -120,8 +112,7 @@ QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::getWidgetsBygroup
 {
     QList<CLAbstractSettingsWidget *> result;
 
-    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst)
-    {
+    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst) {
         if (wgt->group() == group)
             result.append(wgt);
     }
@@ -141,8 +132,7 @@ void CLAbstractDeviceSettingsDlg::onSuggestions()
 void CLAbstractDeviceSettingsDlg::onNewtab(int index)
 {
     const QString group = static_cast<CLDeviceSettingsTab *>(m_tabWidget->widget(index))->name();
-    foreach (CLAbstractSettingsWidget *wgt, getWidgetsBygroup(group))
-    {
+    foreach (CLAbstractSettingsWidget *wgt, getWidgetsBygroup(group)) {
         QnDeviceGetParamCommandPtr command(new QnDeviceGetParamCommand(wgt));
         QnResource::addCommandToProc(command);
     }

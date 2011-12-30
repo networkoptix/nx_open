@@ -1,9 +1,8 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule.h"
 
-CameraScheduleWidget::CameraScheduleWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CameraSchedule)
+CameraScheduleWidget::CameraScheduleWidget(QWidget *parent)
+    : QWidget(parent), ui(new Ui::CameraSchedule)
 {
     ui->setupUi(this);
     connect(ui->chkBoxDisplayQuality, SIGNAL(stateChanged(int)), this, SLOT(onDisplayQualityChanged(int)));
@@ -31,30 +30,28 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget *parent) :
 
 QString getShortText(const QString& text)
 {
-    if (text == "Low")
-        return "Lo";
-    else if (text == "Medium")
-        return "Md";
-    else if (text == "High")
-        return "Hi";
-    else if (text == "Best")
-        return "Bst";
-    else 
-        return "-";
+    if (text == QLatin1String("Low"))
+        return QLatin1String("Lo");
+    if (text == QLatin1String("Medium"))
+        return QLatin1String("Md");
+    if (text == QLatin1String("High"))
+        return QLatin1String("Hi");
+    if (text == QLatin1String("Best"))
+        return QLatin1String("Bst");
+    return QLatin1String("-");
 }
 
 QString getLongText(const QString& text)
 {
-    if (text == "Lo")
-        return "Low";
-    else if (text == "Md")
-        return "Medium";
-    else if (text == "Hi")
-        return "High";
-    else if (text == "Bst")
-        return "Best";
-    else 
-        return "-";
+    if (text == QLatin1String("Lo"))
+        return QLatin1String("Low");
+    if (text == QLatin1String("Md"))
+        return QLatin1String("Medium");
+    if (text == QLatin1String("Hi"))
+        return QLatin1String("High");
+    if (text == QLatin1String("Bst"))
+        return QLatin1String("Best");
+    return QLatin1String("-");
 }
 
 int CameraScheduleWidget::qualityTextToIndex(const QString& text)
@@ -77,15 +74,16 @@ void CameraScheduleWidget::updateGridParams()
         color = ui->btnRecordAlways->color();
     else if (ui->btnRecordMotion->isChecked())
         color = ui->btnRecordMotion->color();
-    else if (ui->btnNoRecord->isChecked()) 
+    else if (ui->btnNoRecord->isChecked())
         color = ui->btnNoRecord->color();
 
     ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Color, color.rgba());
-    if (ui->btnNoRecord->isChecked()) {
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QString("-"));
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, QString("-"));
+    if (ui->btnNoRecord->isChecked())
+    {
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QLatin1String("-"));
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, QLatin1String("-"));
     }
-    else 
+    else
     {
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QString::number(ui->fpsSpinBox->value()));
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, getShortText(ui->comboBoxQuality->currentText()));
@@ -105,7 +103,7 @@ void CameraScheduleWidget::onNeedReadCellParams(QPoint cell)
         ui->btnRecordMotion->setChecked(true);
     else if (color == ui->btnNoRecord->color())
         ui->btnNoRecord->setChecked(true);
-    if (color != ui->btnNoRecord->color()) 
+    if (color != ui->btnNoRecord->color())
     {
         ui->fpsSpinBox->setValue(fps);
         ui->comboBoxQuality->setCurrentIndex(qualityTextToIndex(getLongText(shortQuality)));

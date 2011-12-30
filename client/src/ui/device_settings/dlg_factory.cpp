@@ -1,6 +1,5 @@
 #include "dlg_factory.h"
 
-#include <utils/common/warnings.h>
 #include "device_settings_dlg.h"
 
 Q_GLOBAL_STATIC(CLDeviceSettingsDlgFactory, factory)
@@ -20,8 +19,7 @@ bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
     if (!resource)
         return false;
 
-    foreach (CLAbstractDlgManufacture *manufacture, factory()->manufactures)
-    {
+    foreach (CLAbstractDlgManufacture *manufacture, factory()->manufactures) {
         if (manufacture->canProduceDlg(resource))
             return true;
     }
@@ -34,8 +32,7 @@ CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr
     if (!resource)
         return 0;
 
-    foreach (CLAbstractDlgManufacture *manufacture, factory()->manufactures)
-    {
+    foreach (CLAbstractDlgManufacture *manufacture, factory()->manufactures) {
         if (manufacture->canProduceDlg(resource))
             return manufacture->createDlg(resource);
     }
@@ -45,10 +42,6 @@ CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr
 
 void CLDeviceSettingsDlgFactory::registerDlgManufacture(CLAbstractDlgManufacture *manufacture)
 {
-    if (!manufacture) {
-        qnNullWarning(manufacture);
-        return;
-    }
-
-    factory()->manufactures.append(manufacture);
+    if (manufacture)
+        factory()->manufactures.append(manufacture);
 }

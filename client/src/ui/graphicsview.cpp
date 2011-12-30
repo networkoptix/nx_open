@@ -1418,7 +1418,6 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
 
     //===== final menu=====
     QMenu menu;
-    //menu.setWindowOpacity(global_menu_opacity);
 
     if (aitem && scene()->selectedItems().isEmpty()) // single selection
     {
