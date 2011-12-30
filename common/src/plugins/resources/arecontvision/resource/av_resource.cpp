@@ -157,9 +157,10 @@ QString QnPlAreconVisionResource::toSearchString() const
 {
     QString result;
 
-    QString firmware = getResourceParamList().get("Firmware version").value().toString();
-    QString hardware = getResourceParamList().get("Image engine").value().toString();
-    QString net = getResourceParamList().get("Net version").value().toString();
+    const QnParamList params = getResourceParamList();
+    const QString firmware = params.value("Firmware version").value().toString();
+    const QString hardware = params.value("Image engine").value().toString();
+    const QString net = params.value("Net version").value().toString();
 
     result += QnNetworkResource::toSearchString() + QLatin1String(" live fw=") + firmware + QLatin1String(" hw=") + hardware + QLatin1String(" net=") + net;
     if (!m_description.isEmpty())
@@ -315,7 +316,7 @@ int QnPlAreconVisionResource::totalMdZones() const
 bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QVariant& val)
 {
     //================================================
-    QnParam& param = getResourceParamList().get(name);
+    QnParam param = getResourceParamList().value(name);
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper
     {
         //cl_log.log("cannot find http command for such param!", cl_logWARNING);
@@ -356,7 +357,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QVariant& v
 
 bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QVariant& val )
 {
-    QnParam& param = getResourceParamList().get(name);
+    QnParam param = getResourceParamList().value(name);
 
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;

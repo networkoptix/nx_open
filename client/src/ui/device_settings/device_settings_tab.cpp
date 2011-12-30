@@ -9,96 +9,93 @@ mGroup(group),
 mHandler(handler),
 mDlg(dlg)
 {
-	setAutoFillBackground(true);
+    setAutoFillBackground(true);
 
     QPalette pal = palette();
     pal.setColor(backgroundRole(), Qt::black);
     //setPalette(pal);
 
-	//QVBoxLayout *mainLayout = new QVBoxLayout;
+    //QVBoxLayout *mainLayout = new QVBoxLayout;
 
-	QList<QString> sub_groups = mDevice->getResourceParamList().subGroupList(mGroup);
+    QList<QString> sub_groups = mDevice->getResourceParamList().subGroupList(mGroup);
 
-	int size = 175;
+    int size = 175;
 
-	QRect parent_rect = rect();
+    QRect parent_rect = rect();
 
-	int x = 0;
-	for (int i = 0 ; i < sub_groups.count(); ++i)
-	{
-		QString sub_group = sub_groups.at(i);
+    int x = 0;
+    for (int i = 0 ; i < sub_groups.count(); ++i)
+    {
+        QString sub_group = sub_groups.at(i);
 
-		QWidget* parent = this;
+        QWidget* parent = this;
 
-		if (!sub_group.isEmpty())
-		{
-			QGroupBox *subgroupBox = new QGroupBox(this);
-			subgroupBox->setFixedWidth(size);
-			subgroupBox->setFixedHeight(420);
-			subgroupBox->setTitle(sub_group);
-			subgroupBox->setObjectName(group+sub_group);
-			subgroupBox->move(10+x, 10);
-			subgroupBox->setFont(settings_font);
+        if (!sub_group.isEmpty())
+        {
+            QGroupBox *subgroupBox = new QGroupBox(this);
+            subgroupBox->setFixedWidth(size);
+            subgroupBox->setFixedHeight(420);
+            subgroupBox->setTitle(sub_group);
+            subgroupBox->setObjectName(group+sub_group);
+            subgroupBox->move(10+x, 10);
+            subgroupBox->setFont(settings_font);
 
-			mDlg->putGroup(subgroupBox);
+            mDlg->putGroup(subgroupBox);
 
-			parent = subgroupBox;
+            parent = subgroupBox;
 
-			x+=(size+15);
-		}
+            x+=(size+15);
+        }
 
-		QnParamList::QnParamMap paramLst = mDevice->getResourceParamList().paramList(group, sub_group).list();
+        int y = 0;
+        foreach (const QnParam &param, mDevice->getResourceParamList().paramList(group, sub_group).list())
+        {
+            if (!param.isUiParam())
+                continue;
 
-		int y = 0;
-		foreach (QnParam param, paramLst)
-		{
-			if (!param.isUiParam())
-				continue;
+            CLAbstractSettingsWidget* awidget = 0;
 
-			CLAbstractSettingsWidget* awidget = 0;
+            switch(param.type())
+            {
+            case QnParamType::OnOff:
+                awidget =  new SettingsOnOffWidget(handler, dev, group, sub_group, param.name());
+                break;
 
-			switch(param.type())
-			{
-			case QnParamType::OnOff:
-				awidget =  new SettingsOnOffWidget(handler, dev, group, sub_group, param.name());
-				break;
+            case QnParamType::MinMaxStep:
+                awidget =  new SettingsMinMaxStepWidget(handler, dev, group, sub_group, param.name());
+                break;
 
-			case QnParamType::MinMaxStep:
-				awidget =  new SettingsMinMaxStepWidget(handler, dev, group, sub_group, param.name());
-				break;
+            case QnParamType::Enumeration:
+                awidget =  new SettingsEnumerationWidget(handler, dev, group, sub_group, param.name());
+                break;
 
-			case QnParamType::Enumeration:
-				awidget =  new SettingsEnumerationWidget(handler, dev, group, sub_group, param.name());
-				break;
+            case QnParamType::Button:
+                awidget =  new SettingsButtonWidget(handler, dev, group, sub_group, param.name());
+                break;
 
-			case QnParamType::Button:
-				awidget =  new SettingsButtonWidget(handler, dev, group, sub_group, param.name());
-				break;
+            }
 
-			}
+            if (awidget==0)
+                continue;
 
-			if (awidget==0)
-				continue;
+            QWidget* widget = awidget->toWidget();
+            widget->setFont(settings_font);
 
-			QWidget* widget = awidget->toWidget();
-			widget->setFont(settings_font);
+            if (!param.description().isEmpty())
+                widget->setToolTip(param.description());
 
-			if (!param.description().isEmpty())
-				widget->setToolTip(param.description());
+            widget->setParent(parent);
+            widget->move(10, 20 + y);
+            y+=80;
 
-			widget->setParent(parent);
-			widget->move(10, 20 + y);
-			y+=80;
+            mDlg->putWidget(awidget);
+        }
 
-			mDlg->putWidget(awidget);
+        //mainLayout->addWidget(subgroupBox);
 
-		}
+    }
 
-		//mainLayout->addWidget(subgroupBox);
-
-	}
-
-	//setLayout(mainLayout);
+    //setLayout(mainLayout);
 }
 
 CLDeviceSettingsTab::~CLDeviceSettingsTab()
@@ -108,5 +105,5 @@ CLDeviceSettingsTab::~CLDeviceSettingsTab()
 
 QString CLDeviceSettingsTab::name() const
 {
-	return mGroup;
+    return mGroup;
 }

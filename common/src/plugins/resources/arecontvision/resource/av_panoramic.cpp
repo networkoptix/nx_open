@@ -137,7 +137,7 @@ QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider
 
 bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QVariant& val )
 {
-    QnParam& param = getResourceParamList().get(name);
+    QnParam param = getResourceParamList().value(name);
 
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;

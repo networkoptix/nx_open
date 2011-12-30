@@ -54,33 +54,34 @@ void QnParamList::inheritedFrom(const QnParamList& other)
 
 }
 
-bool QnParamList::exists(const QString& name) const
+bool QnParamList::contains(const QString& name) const
 {
-    QnParamMap::const_iterator it = m_params.find(name);
-    if (it == m_params.end())
-        return false;
-
-    return true;
+    return m_params.contains(name);
 }
 
-QnParam& QnParamList::get(const QString& name)
+QnParam& QnParamList::value(const QString& name)
 {
     return m_params[name];
 }
 
-const QnParam QnParamList::get(const QString& name) const
+const QnParam QnParamList::value(const QString& name) const
 {
-    return m_params[name];
+    return m_params.value(name);
 }
 
 void QnParamList::put(const QnParam& param)
 {
-    m_params[param.name()] = param;
+    m_params.insert(param.name(), param);
 }
 
-bool QnParamList::empty() const
+bool QnParamList::isEmpty() const
 {
-    return m_params.empty();
+    return m_params.isEmpty();
+}
+
+QList<QnParam> QnParamList::list() const
+{
+    return m_params.values();
 }
 
 QList<QString> QnParamList::groupList() const
@@ -89,13 +90,9 @@ QList<QString> QnParamList::groupList() const
 
     foreach (const QnParam& param, m_params)
     {
-        QString group = param.group();
-
-        if (group=="")
-            continue;
-
-        if (!result.contains(group))
-            result.push_back(group);
+        const QString group = param.group();
+        if (!group.isEmpty() && !result.contains(group))
+            result.append(group);
     }
 
     return result;
@@ -107,16 +104,12 @@ QList<QString> QnParamList::subGroupList(const QString &group) const
 
     foreach (const QnParam& param, m_params)
     {
-        QString lgroup = param.group();
-        if (lgroup==group)
+        const QString lgroup = param.group();
+        if (lgroup == group)
         {
-            QString subgroup = param.subgroup();
-
-            //if (subgroup=="")
-            //	continue;
-
-            if (!result.contains(subgroup))
-                result.push_back(subgroup);
+            const QString subgroup = param.subgroup();
+            if (/*!subgroup.isEmpty() && */!result.contains(subgroup))
+                result.append(subgroup);
         }
     }
 
@@ -129,20 +122,13 @@ QnParamList QnParamList::paramList(const QString &group, const QString &subgroup
 
     foreach (const QnParam& param, m_params)
     {
-        QString lgroup = param.group();
-        QString lsubgroup = param.subgroup();
-
+        const QString lgroup = param.group();
+        const QString lsubgroup = param.subgroup();
         if (lgroup == group && lsubgroup == subgroup)
             result.put(param);
     }
 
     return result;
-
-}
-
-QnParamList::QnParamMap& QnParamList::list()
-{
-    return m_params;
 }
 
 // ===========================================

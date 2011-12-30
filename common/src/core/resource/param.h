@@ -75,17 +75,16 @@ private:
 
 class QN_EXPORT QnParamList
 {
-
 public:
     typedef QMap<QString, QnParam> QnParamMap;
 
     void inheritedFrom(const QnParamList& other);
-    bool exists(const QString& name) const;
-    QnParam& get(const QString& name);
-    const QnParam get(const QString& name) const;
+    bool contains(const QString& name) const;
+    QnParam& value(const QString& name);
+    const QnParam value(const QString& name) const;
     void put(const QnParam& param);
-    bool empty() const;
-    QnParamMap& list();
+    bool isEmpty() const;
+    QList<QnParam> list() const;
 
     QList<QString> groupList() const;
     QList<QString> subGroupList(const QString &group) const;

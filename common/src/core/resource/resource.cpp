@@ -148,7 +148,7 @@ QString QnResource::toSearchString() const
 
 bool QnResource::hasSuchParam(const QString& name) const
 {
-    return getResourceParamList().exists(name);
+    return getResourceParamList().contains(name);
 }
 
 bool QnResource::getParamPhysical(const QString& /*name*/, QVariant& /*val*/)
@@ -176,7 +176,7 @@ bool QnResource::getParam(const QString& name, QVariant& val, QnDomain domain )
     }
 
 
-    QnParam& param = getResourceParamList().get(name);
+    QnParam& param = getResourceParamList().value(name);
     if (domain == QnDomainMemory)
     {
         QReadLocker readLocker(&m_rwLock);
@@ -219,7 +219,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
     }
 
 
-    QnParam& param = getResourceParamList().get(name);
+    QnParam& param = getResourceParamList().value(name);
 
     /*
     if (param.isReadOnly())
@@ -313,7 +313,7 @@ QnParamList& QnResource::getResourceParamList() const
     QnId restypeid;
     {
         QReadLocker readLocker(&m_rwLock);
-        if (!m_resourceParamList.empty())
+        if (!m_resourceParamList.isEmpty())
             return m_resourceParamList;
         restypeid = m_typeId;
     }
@@ -350,7 +350,7 @@ QnParamList& QnResource::getResourceParamList() const
     }
 
     QWriteLocker writeLocker(&m_rwLock);
-    if (m_resourceParamList.empty())
+    if (m_resourceParamList.isEmpty())
         m_resourceParamList = resourceParamList;
 
     return m_resourceParamList;
