@@ -32,12 +32,12 @@ class CLAbstractSettingsWidget : public QObject
     Q_OBJECT
 
 public:
-    CLAbstractSettingsWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    CLAbstractSettingsWidget(QObject* handler, QnResourcePtr resource, QString group, QString sub_group, QString paramname);
     virtual ~CLAbstractSettingsWidget();
 
-    virtual QWidget* toWidget();
+    QWidget *widget() const;
 
-    QnResourcePtr getDevice() const;
+    QnResourcePtr resource() const;
     const QnParam& param() const;
 
     QString group() const;
@@ -92,8 +92,8 @@ public Q_SLOTS:
     void updateParam(QString val);
 
 private Q_SLOTS:
-    void onValChanged();
-    void onValChanged(int val);
+    void onValueChanged();
+    void onValueChanged(int val);
 
 private:
     SettingsSlider* m_slider;

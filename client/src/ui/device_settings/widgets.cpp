@@ -3,6 +3,7 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QCheckBox>
 #include <QtGui/QGroupBox>
+#include <QtGui/QPushButton>
 #include <QtGui/QRadioButton>
 
 #include "settings.h"
@@ -20,9 +21,9 @@ void SettingsSlider::keyReleaseEvent(QKeyEvent *event)
 }
 //==============================================
 
-CLAbstractSettingsWidget::CLAbstractSettingsWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname)
+CLAbstractSettingsWidget::CLAbstractSettingsWidget(QObject* handler, QnResourcePtr resource, QString group, QString sub_group, QString paramname)
     : QObject(),
-      mDevice(dev),
+      mDevice(resource),
       mHandler(handler),
       m_group(group),
       m_sub_group(sub_group),
@@ -35,7 +36,7 @@ CLAbstractSettingsWidget::~CLAbstractSettingsWidget()
 {
 }
 
-QnResourcePtr CLAbstractSettingsWidget::getDevice() const
+QnResourcePtr CLAbstractSettingsWidget::resource() const
 {
     return mDevice;
 }
@@ -45,15 +46,16 @@ const QnParam& CLAbstractSettingsWidget::param() const
     return mParam;
 }
 
-QWidget* CLAbstractSettingsWidget::toWidget()
+QWidget *CLAbstractSettingsWidget::widget() const
 {
+    Q_ASSERT(mWidget);
     return mWidget;
 }
 
-void CLAbstractSettingsWidget::setParam_helper(const QString& /*name*/, const QVariant& val)
+void CLAbstractSettingsWidget::setParam_helper(const QString &name, const QVariant &val)
 {
     mParam.setValue(val);
-    emit setParam(mParam.name(),val);
+    Q_EMIT setParam(name, val);
 }
 
 QString CLAbstractSettingsWidget::group() const
@@ -67,16 +69,15 @@ QString CLAbstractSettingsWidget::subGroup() const
 }
 
 //==============================================
+
 SettingsOnOffWidget::SettingsOnOffWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname)
     : CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
     m_checkBox = new QCheckBox(mParam.name());
-    if (mParam.value() == mParam.possibleValues().front())
+    if (!mParam.possibleValues().isEmpty() && mParam.value() == mParam.possibleValues().front())
         m_checkBox->setCheckState(Qt::Checked);
 
     connect(m_checkBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
-
-    //QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
 
     mWidget = m_checkBox;
 }
@@ -94,7 +95,7 @@ void SettingsOnOffWidget::stateChanged(int state)
     }
 
     QString val = state == Qt::Checked ? mParam.possibleValues().front().toString() : mParam.possibleValues().back().toString();
-    setParam_helper(mParam.name(),val);
+    setParam_helper(mParam.name(), val);
 }
 
 void SettingsOnOffWidget::updateParam(QString val)
@@ -107,39 +108,35 @@ SettingsMinMaxStepWidget::SettingsMinMaxStepWidget(QObject* handler, QnResourceP
     : CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
     groupBox = new QGroupBox();
+    groupBox->setTitle(mParam.name());
+    //groupBox->setFont(QFont("Courier New", 11));
 
     m_slider = new SettingsSlider(Qt::Horizontal, groupBox);
     m_slider->setMinimumWidth(130);
     m_slider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
-    groupBox->setTitle(mParam.name());
-
-    //QFont font("Courier New", 11);
-    //groupBox->setFont(font);
-
     m_slider->setRange(mParam.minValue(), mParam.maxValue());
     m_slider->setValue(mParam.value().toInt());
+
+    connect(m_slider, SIGNAL(sliderReleased()), this, SLOT(onValueChanged()));
+    connect(m_slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
+    connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
 
     QVBoxLayout *layout = new QVBoxLayout(groupBox);
     layout->addWidget(m_slider);
 
-    connect(m_slider, SIGNAL(sliderReleased()), this, SLOT(onValChanged()));
-    connect(m_slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
-    connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValChanged(int)));
-
     mWidget = groupBox;
 
-    onValChanged(mParam.value().toInt());
+    onValueChanged(mParam.value().toInt());
 }
 
-void SettingsMinMaxStepWidget::onValChanged(int val)
+void SettingsMinMaxStepWidget::onValueChanged(int val)
 {
     groupBox->setTitle(mParam.name() + QLatin1Char('(') + QString::number(val) + QLatin1Char(')'));
 }
 
-void SettingsMinMaxStepWidget::onValChanged()
+void SettingsMinMaxStepWidget::onValueChanged()
 {
-    setParam_helper(mParam.name(),m_slider->value());
+    setParam_helper(mParam.name(), m_slider->value());
 }
 
 void SettingsMinMaxStepWidget::updateParam(QString val)
@@ -152,34 +149,33 @@ SettingsEnumerationWidget::SettingsEnumerationWidget(QObject* handler, QnResourc
 CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
     QGroupBox* groupBox  = new QGroupBox();
-    mWidget = groupBox;
     groupBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     groupBox->setTitle(mParam.name());
     groupBox->setMinimumWidth(140);
 
     QVBoxLayout *layout = new QVBoxLayout(groupBox);
-
-    for (int i = 0; i < mParam.uiPossibleValues().count();++i)
+    foreach (const QVariant &val, mParam.uiPossibleValues())
     {
-        QRadioButton *btn = new QRadioButton(mParam.uiPossibleValues().at(i).toString(), groupBox);
-        layout->addWidget(btn);
+        const QString name = val.toString();
 
-        QString val = mParam.possibleValues().at(i).toString();
-        if (val == mParam.value().toString())
-            btn->setChecked(true);
-
-        btn->setObjectName(val);
+        QRadioButton *btn = new QRadioButton(name, groupBox);
+        btn->setObjectName(name);
         btn->setFont(settings_font);
-
-        m_radioBtns.push_back(btn);
+        btn->setChecked(name == mParam.value().toString());
 
         connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
+
+        layout->addWidget(btn);
+
+        m_radioBtns.append(btn);
     }
+
+    mWidget = groupBox;
 }
 
 void SettingsEnumerationWidget::onClicked()
 {
-    QString val = QObject::sender()->objectName();
+    QString val = sender()->objectName();
 
     setParam_helper(mParam.name(), val);
 }
@@ -194,7 +190,7 @@ QRadioButton* SettingsEnumerationWidget::getBtnByname(const QString& name)
 {
     foreach (QRadioButton *btn, m_radioBtns)
     {
-        if (btn->objectName()==name)
+        if (btn->objectName() == name)
             return btn;
     }
 
@@ -206,10 +202,9 @@ SettingsButtonWidget::SettingsButtonWidget(QObject* handler, QnResourcePtr dev, 
     : CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
     QPushButton* btn = new QPushButton(mParam.name());
+    btn->setFocusPolicy(Qt::NoFocus);
 
     connect(btn, SIGNAL(released()), this, SLOT(onClicked()));
-
-    btn->setFocusPolicy(Qt::NoFocus);
 
     mWidget = btn;
 }

@@ -72,7 +72,7 @@ void CLAbstractDeviceSettingsDlg::setParam(const QString &name, const QVariant &
     m_resource->setParamAsynch(name, val, QnDomainPhysical);
 }
 
-void CLAbstractDeviceSettingsDlg::addTabWidget(CLDeviceSettingsTab *tab)
+void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
 {
     m_tabWidget->addTab(tab, tab->name());
 }

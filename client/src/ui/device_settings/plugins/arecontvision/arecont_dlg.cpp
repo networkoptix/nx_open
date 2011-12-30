@@ -108,28 +108,28 @@ void AVSettingsDlg::initTabsOrder()
     CLDeviceSettingsTab* tab = 0;
 
     if ( (tab = tabByName(tr("Image quality"))) )
-        addTabWidget(tab);
+        addTab(tab);
 
     if ( (tab = tabByName(tr("Exposure"))) )
-        addTabWidget(tab);
+        addTab(tab);
 
     if ( (tab = tabByName(tr("AutoIris"))) )
-        addTabWidget(tab);
+        addTab(tab);
 
     if ( (tab = tabByName(tr("Day/Night"))) )
-        addTabWidget(tab);
+        addTab(tab);
 
     if ( (tab=tabByName(tr("Binning"))) )
-        addTabWidget(tab);
+        addTab(tab);
 
     if ( (tab = tabByName(tr("Motion detection"))) )
-        addTabWidget(tab);
+        addTab(tab);
 
     if ( (tab = tabByName(tr("Network"))) )
-        addTabWidget(tab);
+        addTab(tab);
 
     if ( (tab = tabByName(tr("Administration/Info"))) )
-        addTabWidget(tab);
+        addTab(tab);
 }
 
 void AVSettingsDlg::initImageQuality()
@@ -148,24 +148,22 @@ void AVSettingsDlg::initImageQuality()
         if ( (wgt = getWidgetByName(QLatin1String("Quality"))) )
         {
             if (h264)
-                wgt->toWidget()->move(10,35);
+                wgt->widget()->move(10,35);
             else
             {
-                wgt->toWidget()->move(10,73);
-                wgt->toWidget()->setFixedWidth(330);
+                wgt->widget()->move(10,73);
+                wgt->widget()->setFixedWidth(330);
             }
-
         }
 
         if ( (wgt = getWidgetByName(QLatin1String("Codec"))) )
-            wgt->toWidget()->move(200,25);
+            wgt->widget()->move(200,25);
 
         if ( (wgt = getWidgetByName(QLatin1String("Bitrate"))) )
         {
-            wgt->toWidget()->move(10,125);
-            wgt->toWidget()->setFixedWidth(330);
+            wgt->widget()->move(10,125);
+            wgt->widget()->setFixedWidth(330);
         }
-
     }
 
     if ( (group = getGroupByName(QLatin1String("Color"))) )
@@ -175,11 +173,10 @@ void AVSettingsDlg::initImageQuality()
         group->setFixedHeight(205);
 
         if ( (wgt = getWidgetByName(QLatin1String("Red"))) )
-            wgt->toWidget()->move(10,30);
+            wgt->widget()->move(10,30);
 
         if ( (wgt = getWidgetByName(QLatin1String("Blue"))) )
-            wgt->toWidget()->move(10,120);
-
+            wgt->widget()->move(10,120);
     }
 
     if ( (group = getGroupByName(QLatin1String("Adjustment"))) )
@@ -189,35 +186,31 @@ void AVSettingsDlg::initImageQuality()
         group->setFixedHeight(110);
 
         if ( (wgt = getWidgetByName(QLatin1String("Brightness"))) )
-            wgt->toWidget()->move(10,30);
+            wgt->widget()->move(10,30);
 
         if ( (wgt = getWidgetByName(QLatin1String("Sharpness"))) )
-            wgt->toWidget()->move(200,30);
+            wgt->widget()->move(200,30);
 
         if ( (wgt = getWidgetByName(QLatin1String("Saturation"))) )
-            wgt->toWidget()->move(380,30);
-
+            wgt->widget()->move(380,30);
     }
 
     if ( (wgt = getWidgetByName(QLatin1String("Equalize Brightness"))) )
     {
-        wgt->toWidget()->move(135,360);
+        wgt->widget()->move(135,360);
 
         if ( (wgt = getWidgetByName(QLatin1String("Equalize Color"))) )
-            wgt->toWidget()->move(340,360);
+            wgt->widget()->move(340,360);
 
         if ( (wgt = getWidgetByName(QLatin1String("Rotate 180"))) )
-            wgt->toWidget()->hide(); // for now
-
+            wgt->widget()->hide(); // for now
     }
     else
     {
         if ( (wgt = getWidgetByName(QLatin1String("Rotate 180"))) )
-            wgt->toWidget()->move(255,360);
+            wgt->widget()->move(255,360);
     }
-
     //
-
 }
 
 void AVSettingsDlg::initExposure()
@@ -226,10 +219,10 @@ void AVSettingsDlg::initExposure()
     CLAbstractSettingsWidget* wgt;
 
     if ( (wgt = getWidgetByName(QLatin1String("Illumination"))) )
-        wgt->toWidget()->move(420,60);
+        wgt->widget()->move(420,60);
 
     if ( (wgt = getWidgetByName(QLatin1String("Lighting"))) )
-        wgt->toWidget()->move(420,210);
+        wgt->widget()->move(420,210);
 
     if ( (group = getGroupByName(QLatin1String("Low Light Mode"))) )
     {
@@ -238,13 +231,13 @@ void AVSettingsDlg::initExposure()
         group->setFixedHeight(240);
 
         if ( (wgt = getWidgetByName(QLatin1String("Light Mode"))) )
-            wgt->toWidget()->move(30,30);
+            wgt->widget()->move(30,30);
 
         if ( (wgt = getWidgetByName(QLatin1String("Short Exposure"))) )
-            wgt->toWidget()->move(200,75);
+            wgt->widget()->move(200,75);
 
         if ( (wgt = getWidgetByName(QLatin1String("Auto exposure On/Off"))) )
-            wgt->toWidget()->move(30,200);
+            wgt->widget()->move(30,200);
     }
 }
 
@@ -254,7 +247,7 @@ void AVSettingsDlg::initAI()
     CLAbstractSettingsWidget* wgt;
 
     if ( (wgt = getWidgetByName(QLatin1String("AutoIris enable"))) )
-        wgt->toWidget()->move(200,180);
+        wgt->widget()->move(200,180);
 }
 
 void AVSettingsDlg::initDN()
@@ -263,7 +256,7 @@ void AVSettingsDlg::initDN()
     CLAbstractSettingsWidget* wgt;
 
     if ( (wgt = getWidgetByName(QLatin1String("Day/Night Mode"))) )
-        wgt->toWidget()->move(215,130);
+        wgt->widget()->move(215,130);
 }
 
 void AVSettingsDlg::initMD()
@@ -278,19 +271,19 @@ void AVSettingsDlg::initMD()
     //Md detail
 
     if ( (wgt = getWidgetByName(QLatin1String("Enable motion detection"))) )
-        wgt->toWidget()->move(175,30);
+        wgt->widget()->move(175,30);
 
     if ( (wgt = getWidgetByName(QLatin1String("Zone size"))) )
-        wgt->toWidget()->move(80,80);
+        wgt->widget()->move(80,80);
 
     if ( (wgt = getWidgetByName(QLatin1String("Threshold"))) )
-        wgt->toWidget()->move(320,80);
+        wgt->widget()->move(320,80);
 
     if ( (wgt = getWidgetByName(QLatin1String("Sensitivity"))) )
-        wgt->toWidget()->move(80,210);
+        wgt->widget()->move(80,210);
 
     if ( (wgt = getWidgetByName(QLatin1String("Md detail"))) )
-        wgt->toWidget()->move(320,210);
+        wgt->widget()->move(320,210);
 }
 
 void AVSettingsDlg::initAdmin()
@@ -299,7 +292,7 @@ void AVSettingsDlg::initAdmin()
     CLAbstractSettingsWidget* wgt;
 
     if ( (wgt = getWidgetByName(QLatin1String("Factory defaults"))) )
-        wgt->toWidget()->move(230,150);
+        wgt->widget()->move(230,150);
 }
 
 //=========================================================================
@@ -332,7 +325,7 @@ void AVSettingsDlg::correctWgtsState()
     {
         val = wgt->param().value().toString();
         if (wgt = getWidgetByName(QLatin1String("Short Exposure")))
-            wgt->toWidget()->setVisible(val == QLatin1String("highspeed"));
+            wgt->widget()->setVisible(val == QLatin1String("highspeed"));
     }
 
     //=================================================
@@ -340,6 +333,6 @@ void AVSettingsDlg::correctWgtsState()
     {
         val = wgt->param().value().toString();
         if (wgt = getWidgetByName(QLatin1String("Bitrate")))
-            wgt->toWidget()->setVisible(val == QLatin1String("H.264"));
+            wgt->widget()->setVisible(val == QLatin1String("H.264"));
     }
 }

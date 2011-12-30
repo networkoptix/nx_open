@@ -1,11 +1,12 @@
 #include "settings_getter.h"
+
 #include "widgets.h"
 
-QnDeviceGetParamCommand::QnDeviceGetParamCommand(CLAbstractSettingsWidget* wgt):
-QnResourceCommand(wgt->getDevice()),
-m_wgt(wgt)
+QnDeviceGetParamCommand::QnDeviceGetParamCommand(CLAbstractSettingsWidget *wgt)
+    : QnResourceCommand(wgt->resource()),
+      m_wgt(wgt)
 {
-    connect(this, SIGNAL(ongetvalue(QString)), m_wgt, SLOT(updateParam(QString)));// , Qt::BlockingQueuedConnection );
+    connect(this, SIGNAL(ongetvalue(QString)), m_wgt, SLOT(updateParam(QString)));// , Qt::BlockingQueuedConnection);
 }
 
 void QnDeviceGetParamCommand::execute()
@@ -15,5 +16,5 @@ void QnDeviceGetParamCommand::execute()
 
     QVariant val;
     if (m_resource->getParam(m_wgt->param().name(), val, QnDomainPhysical))
-        emit ongetvalue(val.toString());
+        Q_EMIT ongetvalue(val.toString());
 }

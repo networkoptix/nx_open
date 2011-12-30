@@ -35,7 +35,7 @@ public Q_SLOTS:
     virtual void onNewtab(int index);
 
 protected:
-    void addTabWidget(CLDeviceSettingsTab *tab);
+    void addTab(CLDeviceSettingsTab *tab);
     CLAbstractSettingsWidget *getWidgetByName(const QString &name) const;
     QGroupBox *getGroupByName(const QString &name) const;
     CLDeviceSettingsTab *tabByName(const QString &name) const;

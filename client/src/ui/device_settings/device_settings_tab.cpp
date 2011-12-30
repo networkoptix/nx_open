@@ -78,7 +78,7 @@ mDlg(dlg)
             if (awidget==0)
                 continue;
 
-            QWidget* widget = awidget->toWidget();
+            QWidget* widget = awidget->widget();
             widget->setFont(settings_font);
 
             if (!param.description().isEmpty())
