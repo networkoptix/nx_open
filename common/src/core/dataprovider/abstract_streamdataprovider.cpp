@@ -1,6 +1,6 @@
 #include "abstract_streamdataprovider.h"
-#include "../resource/resource.h"
 
+#include "../resource/resource.h"
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resource):
     QnResourceConsumer(resource),
@@ -11,7 +11,7 @@ QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resourc
 
 QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
 {
-	stop();
+    stop();
 }
 
 bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
@@ -30,11 +30,11 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 {
-	QMutexLocker mutex(&m_mutex);
+    QMutexLocker mutex(&m_mutex);
 
-	if (!m_dataprocessors.contains(dp))
+    if (!m_dataprocessors.contains(dp))
     {
-		m_dataprocessors.push_back(dp);
+        m_dataprocessors.push_back(dp);
         connect(this, SIGNAL(realTimeStreamHint(bool)), dp, SLOT(onRealTimeStreamHint(bool)), Qt::DirectConnection);
         connect(this, SIGNAL(slowSourceHint()), dp, SLOT(onSlowSourceHint()), Qt::DirectConnection);
 
@@ -49,8 +49,8 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 
 void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* dp)
 {
-	QMutexLocker mutex(&m_mutex);
-	m_dataprocessors.removeOne(dp);
+    QMutexLocker mutex(&m_mutex);
+    m_dataprocessors.removeOne(dp);
 }
 
 double QnAbstractStreamDataProvider::getSpeed() const
@@ -77,12 +77,12 @@ void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
     if (!data)
         return;
 
-	QMutexLocker mutex(&m_mutex);
-	for (int i = 0; i < m_dataprocessors.size(); ++i)
-	{
-		QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
-		dp->putData(data);
-	}
+    QMutexLocker mutex(&m_mutex);
+    for (int i = 0; i < m_dataprocessors.size(); ++i)
+    {
+        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        dp->putData(data);
+    }
 }
 
 bool QnAbstractStreamDataProvider::isConnectedToTheResource() const
@@ -93,7 +93,7 @@ bool QnAbstractStreamDataProvider::isConnectedToTheResource() const
 void QnAbstractStreamDataProvider::disconnectFromResource()
 {
     stop();
-    
+
     QnResourceConsumer::disconnectFromResource();
 }
 
