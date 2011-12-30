@@ -19,7 +19,7 @@ class CLAbstractDeviceSettingsDlg : public QDialog
     Q_OBJECT
 
 public:
-    CLAbstractDeviceSettingsDlg(QnResourcePtr resource);
+    CLAbstractDeviceSettingsDlg(QnResourcePtr resource, QWidget *parent = 0);
     virtual ~CLAbstractDeviceSettingsDlg();
 
     QnResourcePtr resource() const;

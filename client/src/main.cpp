@@ -156,7 +156,7 @@ void initAppServerConnection()
     QUrl appServerUrl;
 
     Settings::ConnectionData lastUsedConnection = Settings::lastUsedConnection();
-    
+
     bool hasDefaultConnection = false;
     QList<Settings::ConnectionData> connections = Settings::connections();
     foreach(const Settings::ConnectionData& connection, connections)
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
 
     QnResourceDiscoveryManager::instance().start();
 
-    CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
+    CLDeviceSettingsDlgFactory::registerDlgManufacture(new AreconVisionDlgManufacture);
 
     //============================
     /*

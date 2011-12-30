@@ -24,10 +24,11 @@ void SettingsSlider::keyReleaseEvent(QKeyEvent *event)
 CLAbstractSettingsWidget::CLAbstractSettingsWidget(QObject* handler, QnResourcePtr resource, QString group, QString sub_group, QString paramname)
     : QObject(),
       mDevice(resource),
+      mParam(mDevice->getResourceParamList().value(paramname)),
       mHandler(handler),
+      mWidget(0),
       m_group(group),
-      m_sub_group(sub_group),
-      mParam(mDevice->getResourceParamList().value(paramname))
+      m_sub_group(sub_group)
 {
     connect(this, SIGNAL(setParam(QString,QVariant)), handler, SLOT(setParam(QString,QVariant)));
 }

@@ -10,12 +10,12 @@
 #include "settings_getter.h"
 #include "widgets.h"
 
-CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource)
-    : QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint |
-                 Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint),
+CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource, QWidget *parent)
+    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint |
+                      Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint),
         m_resource(resource)
 {
-    setWindowTitle(tr("Camera settings: ") + m_resource->toString());
+    setWindowTitle(tr("Camera settings: %1").arg(m_resource->toString()));
     //setWindowOpacity(global_dlg_opacity);
 
     int width = 610;
@@ -29,30 +29,26 @@ CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource)
 
     m_tabWidget = new QTabWidget(this);
 
-    QList<QString> groups = m_resource->getResourceParamList().groupList();
-
     foreach (const QString &group, m_resource->getResourceParamList().groupList())
         m_tabs.append(new CLDeviceSettingsTab(this, this, m_resource, group));
 
     m_buttonBox = new QDialogButtonBox(this);
     m_buttonBox->setFocusPolicy(Qt::NoFocus);
 
-    QPushButton* suggestionsBtn = new QPushButton(tr("Suggestions..."));
+    QPushButton *suggestionsBtn = new QPushButton(tr("Suggestions..."), this);
+    suggestionsBtn->setFocusPolicy(Qt::NoFocus);
     connect(suggestionsBtn, SIGNAL(released()), this, SLOT(onSuggestions()));
     m_buttonBox->addButton(suggestionsBtn, QDialogButtonBox::ActionRole);
-    suggestionsBtn->setFocusPolicy(Qt::NoFocus);
 
-    QPushButton* closeBtn = new QPushButton(tr("Close"));
+    QPushButton *closeBtn = new QPushButton(tr("Close"), this);
+    closeBtn->setFocusPolicy(Qt::NoFocus);
     connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
     m_buttonBox->addButton(closeBtn, QDialogButtonBox::RejectRole);
-    closeBtn->setFocusPolicy(Qt::NoFocus);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_tabWidget);
     mainLayout->addWidget(m_buttonBox);
     setLayout(mainLayout);
-
-    //suggestionsBtn->move(30,30);
 
     connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onNewtab(int)));
 }
@@ -144,7 +140,7 @@ void CLAbstractDeviceSettingsDlg::onSuggestions()
 
 void CLAbstractDeviceSettingsDlg::onNewtab(int index)
 {
-    QString group = static_cast<CLDeviceSettingsTab *>(m_tabWidget->widget(index))->name();
+    const QString group = static_cast<CLDeviceSettingsTab *>(m_tabWidget->widget(index))->name();
     foreach (CLAbstractSettingsWidget *wgt, getWidgetsBygroup(group))
     {
         QnDeviceGetParamCommandPtr command(new QnDeviceGetParamCommand(wgt));

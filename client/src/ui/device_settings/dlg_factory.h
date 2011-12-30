@@ -1,9 +1,10 @@
 #ifndef dlg_factory__h_1712
 #define dlg_factory__h_1712
 
+#include <QtCore/QList>
+
 #include "core/resource/resource.h"
 
-class QnResource;
 class CLAbstractDeviceSettingsDlg;
 
 /**
@@ -12,6 +13,8 @@ class CLAbstractDeviceSettingsDlg;
 class CLAbstractDlgManufacture
 {
 public:
+    virtual ~CLAbstractDlgManufacture() {}
+
     /**
      * \param dev                       Resource to create settings dialog for.
      * \returns                         Newly created settings dialog,
@@ -25,12 +28,6 @@ public:
      *                                  settings dialog for the given resource.
      */
     virtual bool canProduceDlg(QnResourcePtr dev) const = 0;
-
-protected:
-    /**
-     * Virtual destructor.
-     */
-    virtual ~CLAbstractDlgManufacture() {}
 };
 
 
@@ -40,6 +37,10 @@ protected:
 class CLDeviceSettingsDlgFactory
 {
 public:
+    ~CLDeviceSettingsDlgFactory();
+
+    static CLDeviceSettingsDlgFactory *instance();
+
     /**
      * \param dev                       Resource to check.
      * \returns                         Whether this factory can create a
@@ -61,6 +62,9 @@ public:
      * \param manufacture               Manufacture to register.
      */
     static void registerDlgManufacture(CLAbstractDlgManufacture *manufacture);
+
+private:
+    QList<CLAbstractDlgManufacture *> manufactures;
 };
 
 #endif //dlg_factory__h_1712

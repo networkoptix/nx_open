@@ -3,7 +3,7 @@
 
 #include <QtGui/QSlider>
 
-#include "core/resource/resource.h"
+#include <core/resource/resource.h>
 
 class QCheckBox;
 class QGroupBox;
@@ -54,9 +54,9 @@ protected:
 
 protected:
     QnResourcePtr mDevice;
-    QnParam& mParam;
-    QObject* mHandler;
-    QWidget* mWidget;
+    QnParam mParam;
+    QObject *const mHandler;
+    QWidget *mWidget;
     QString m_group;
     QString m_sub_group;
 };
