@@ -46,7 +46,7 @@ QnResource& QnResource::operator=(const QnResource& other)
 
     foreach (QnResourceConsumer* consumer, m_consumers)
         consumer->afterUpdate();
-    
+
     return *this;
 }
 
@@ -193,7 +193,7 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
         if (!getParamPhysical(name, val))
             return false;
 
-        emit onParameterChanged(name, QString(val));
+        emit onParameterChanged(name, val.toString());
         return true;
     }
     else if (domain == QnDomainDatabase)
@@ -248,9 +248,9 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
             return false;
         }
         if (param.isStatic())
-            setProperty(param.name().toUtf8(), (QString) val);
+            setProperty(param.name().toUtf8(), val);
     }
-    emit onParameterChanged(name, QString(val));
+    emit onParameterChanged(name, val.toString());
 
     return true;
 }

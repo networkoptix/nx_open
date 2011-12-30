@@ -1,108 +1,122 @@
 #ifndef settings_widgets_h_1820
 #define settings_widgets_h_1820
 
+#include <QtGui/QSlider>
+
 #include "core/resource/resource.h"
 
-
-
+class QCheckBox;
+class QGroupBox;
+class QRadioButton;
 
 class QnResource;
-class QGroupBox;
 
 class SettingsSlider : public QSlider
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	SettingsSlider( Qt::Orientation orientation, QWidget * parent = 0 );
+    SettingsSlider( Qt::Orientation orientation, QWidget * parent = 0 );
 
 Q_SIGNALS:
     void onKeyReleased();
 
 protected:
-	void keyReleaseEvent ( QKeyEvent * event );
+    void keyReleaseEvent ( QKeyEvent * event );
 };
 
 //==============================================
 
 class CLAbstractSettingsWidget : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	CLAbstractSettingsWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
-	virtual ~CLAbstractSettingsWidget();
+    CLAbstractSettingsWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    virtual ~CLAbstractSettingsWidget();
 
-	virtual QWidget* toWidget();
+    virtual QWidget* toWidget();
 
-	QnResourcePtr getDevice() const;
-	const QnParam& param() const;
+    QnResourcePtr getDevice() const;
+    const QnParam& param() const;
 
     QString group() const;
     QString subGroup() const;
 
-signals:
-	void setParam(const QString& name, const QnValue& val);
+Q_SIGNALS:
+    void setParam(const QString& name, const QnValue& val);
 
-public slots:
+public Q_SLOTS:
     virtual void updateParam(QString val) = 0;
 
 protected:
-	virtual void setParam_helper(const QString& name, const QnValue& val);
+    virtual void setParam_helper(const QString& name, const QnValue& val);
+
 protected:
-	QnResourcePtr mDevice;
-	QnParam& mParam;
-	QObject* mHandler;
-	QWidget* mWidget;
+    QnResourcePtr mDevice;
+    QnParam& mParam;
+    QObject* mHandler;
+    QWidget* mWidget;
     QString m_group;
     QString m_sub_group;
 };
 //==============================================
+
 class SettingsOnOffWidget : public CLAbstractSettingsWidget
 {
-	Q_OBJECT
-public:
-	SettingsOnOffWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
-	~SettingsOnOffWidget();
+    Q_OBJECT
 
-public slots:
+public:
+    SettingsOnOffWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    ~SettingsOnOffWidget();
+
+public Q_SLOTS:
      void updateParam(QString val);
 
-private slots:
-	void stateChanged (int state);
+private Q_SLOTS:
+    void stateChanged (int state);
+
 private:
-    QCheckBox * m_checkBox;
+    QCheckBox *m_checkBox;
 };
 //==============================================
+
 class SettingsMinMaxStepWidget : public CLAbstractSettingsWidget
 {
-	Q_OBJECT
-public:
-	SettingsMinMaxStepWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    Q_OBJECT
 
-public slots:
+public:
+    SettingsMinMaxStepWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+
+public Q_SLOTS:
     void updateParam(QString val);
 
-private slots:
-	void onValChanged();
-	void onValChanged(int val);
+private Q_SLOTS:
+    void onValChanged();
+    void onValChanged(int val);
 
 private:
-	SettingsSlider* m_slider;
-	QGroupBox* groupBox;
+    SettingsSlider* m_slider;
+    QGroupBox* groupBox;
 };
 //==============================================
+
 class SettingsEnumerationWidget : public CLAbstractSettingsWidget
 {
-	Q_OBJECT
-public:
-	SettingsEnumerationWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    Q_OBJECT
 
-public slots:
+public:
+    SettingsEnumerationWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+
+public Q_SLOTS:
     void updateParam(QString val);
 
-private slots:
-	void onClicked();
+private Q_SLOTS:
+    void onClicked();
+
 private:
     QRadioButton* getBtnByname(const QString& name);
+
 private:
     QList<QRadioButton*> m_radioBtns;
 };
@@ -110,16 +124,16 @@ private:
 //==============================================
 class SettingsButtonWidget : public CLAbstractSettingsWidget
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	SettingsButtonWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    SettingsButtonWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
 
-public slots:
-     void updateParam(QString val);
+public Q_SLOTS:
+    void updateParam(QString val);
 
-private slots:
-		void onClicked();
-
+private Q_SLOTS:
+    void onClicked();
 };
 
 #endif //settings_widgets_h_1820

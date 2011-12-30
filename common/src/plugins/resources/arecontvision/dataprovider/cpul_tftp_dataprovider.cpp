@@ -385,14 +385,14 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
     if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
         return QnMetaDataV1Ptr(0);
 
-    if (QString(mdresult) == "no motion")
+    if (mdresult.toString() == QLatin1String("no motion"))
         return motion; // no motion detected
 
 
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
     int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
 
-    QStringList md = QString(mdresult).split(" ", QString::SkipEmptyParts);
+    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
     if (md.size() < zones*zones)
         return QnMetaDataV1Ptr(0);
 
@@ -401,7 +401,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
     if (!getResource()->getParam("Zone size", zone_size, QnDomainMemory))
         return QnMetaDataV1Ptr(0);
 
-    int pixelZoneSize = (int)zone_size*32;
+    int pixelZoneSize = zone_size.toInt() * 32;
 
 
     QnValue maxSensorWidth;
@@ -410,8 +410,8 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
     getResource()->getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
 
 
-    QRect imageRect(0,0, maxSensorWidth, maxSensorHight);
-    QRect zeroZoneRect(0,0,pixelZoneSize, pixelZoneSize);
+    QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
+    QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
 
     for (int x = 0; x < zones; ++x)
     {
@@ -433,5 +433,4 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = INT64_MAX;
     return motion;
-
 }

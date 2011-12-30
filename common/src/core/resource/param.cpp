@@ -10,30 +10,31 @@ QnParamType::QnParamType(const QString& name, QnValue val)
 */
 
 QnParamType::QnParamType()
+    : type(None),
+      min_val(0.0), max_val(0.0), step(0.0),
+      ui(false), isReadOnly(false), isStatic(false)
 {
-    type = None;
-    readonly = false;
-    ui = false;
-    isStatic = false;
 }
 
-bool QnParamType::setDefVal(QnValue val) // safe way to set value
+bool QnParamType::setDefVal(const QnValue &val) // safe way to set value
 {
-    switch(type)
+    switch (type)
     {
-    case MinMaxStep:
-        if (val>max_val) return false;
-        if (val<min_val) return false;
-        break;
-
     case None:
         return false;
+
+    case MinMaxStep:
+        if (val.toDouble() < min_val || val.toDouble() > max_val)
+            return false;
+        break;
 
     case Enumeration:
         if (!possible_values.contains(val))
             return false;
         break;
 
+    default:
+        break;
     }
 
     default_value = val;
@@ -59,17 +60,17 @@ bool QnParamList::exists(const QString& name) const
     return true;
 }
 
-QnParam& QnParamList::get(const QString& name) 
+QnParam& QnParamList::get(const QString& name)
 {
     return m_params[name];
 }
 
-const QnParam QnParamList::get(const QString& name) const 
+const QnParam QnParamList::get(const QString& name) const
 {
     return m_params[name];
 }
 
-void QnParamList::put(const QnParam& param) 
+void QnParamList::put(const QnParam& param)
 {
     m_params[param.name()] = param;
 }
@@ -97,7 +98,7 @@ QList<QString> QnParamList::groupList() const
     return result;
 }
 
-QList<QString> QnParamList::subGroupList(QString group) const
+QList<QString> QnParamList::subGroupList(const QString &group) const
 {
     QList<QString> result;
 
@@ -119,7 +120,7 @@ QList<QString> QnParamList::subGroupList(QString group) const
     return result;
 }
 
-QnParamList QnParamList::paramList(QString group, QString subgroup) const
+QnParamList QnParamList::paramList(const QString &group, const QString &subgroup) const
 {
     QnParamList result;
 
@@ -145,23 +146,25 @@ QnParamList::QnParamMap& QnParamList::list()
 // QnParam
 // ===========================================
 
-bool QnParam::setValue(QnValue val) // safe way to set value
+bool QnParam::setValue(const QnValue &val) // safe way to set value
 {
     switch(m_paramType->type)
     {
-    case QnParamType::MinMaxStep:
-        if (val > m_paramType->max_val) return false;
-        if (val < m_paramType->min_val) return false;
-        break;
-
     case QnParamType::None:
         return true;
+
+    case QnParamType::MinMaxStep:
+        if (val.toDouble() < m_paramType->min_val || val.toDouble() > m_paramType->max_val)
+            return false;
+        break;
 
     case QnParamType::Enumeration:
         if (!m_paramType->possible_values.contains(val))
             return false;
         break;
 
+    default:
+        break;
     }
 
     m_value = val;

@@ -16,12 +16,12 @@ public:
     }
 
 
-    virtual unsigned int width() const 
+    virtual unsigned int width() const
     {
         return 4;
     }
 
-    virtual unsigned int height() const 
+    virtual unsigned int height() const
     {
         return 1;
     }
@@ -70,12 +70,12 @@ public:
         return 1;
     }
 
-    virtual unsigned int width() const 
+    virtual unsigned int width() const
     {
         return 4;
     }
 
-    virtual unsigned int height() const 
+    virtual unsigned int height() const
     {
         return 1;
     }
@@ -124,14 +124,14 @@ CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
 
 bool CLArecontPanoramicResource::getDescription()
 {
-	m_description = "";
-	return true;
+    m_description = "";
+    return true;
 }
 
 QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider()
 {
-	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
-	return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
+    cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
+    return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
 
@@ -142,88 +142,75 @@ bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QnV
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
 
-	if (param.type()==QnParamType::None || param.type()==QnParamType::Button) 
-	{
-		CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-		QString request;
+    if (param.type()==QnParamType::None || param.type()==QnParamType::Button)
+    {
+        CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
-		QTextStream str(&request);
-		str << "set?" << param.netHelper();
+        QString request = QLatin1String("set?") + param.netHelper();
 
         if (connection.doGET(request)!=CL_HTTP_SUCCESS)
             if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
-				return false;
-	}
-	else
-	{
-		for (int i = 1; i <=4 ; ++i)
-		{
-			CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-			QString request;
+                return false;
+    }
+    else
+    {
+        for (int i = 1; i <=4 ; ++i)
+        {
+            CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
-			QTextStream str(&request);
-			str << "set" << i << "?" << param.netHelper();
-			str << "=" << (QString)val;
+            QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + param.netHelper() + QLatin1Char('=') + val.toString();
 
             if (connection.doGET(request)!=CL_HTTP_SUCCESS)
                 if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
-					return false;
-		}
+                    return false;
+        }
+    }
 
-	}
-
-	return true;
-
+    return true;
 }
 
 bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
 {
+    if (QnPlAreconVisionResource::setSpecialParam(name, val, domain))
+        return true;
 
-	if (QnPlAreconVisionResource::setSpecialParam(name, val, domain))
-		return true;
+    if (name == QLatin1String("resolution"))
+    {
+        if (val.toString() == QLatin1String("half"))
+            return setResolution(false);
+        if (val.toString() == QLatin1String("full"))
+            return setResolution(true);
+    }
+    else if (name == QLatin1String("Quality"))
+    {
+        int q = val.toInt();
+        if (q >= 1 && q <= 21)
+            return setCamQulity(q);
+    }
 
-	if (name=="resolution")
-	{
-		if (val==(QString)("half"))
-			return setResolution(false);
-		else if (val==(QString)("full"))
-			return setResolution(true);
-
-		return false;
-	}
-	else if (name=="Quality")
-	{
-		int q = val;
-		if (q<1 || q>21)
-			return false;
-
-		return setCamQulity(q);
-
-	}
-
-	return false;
+    return false;
 }
 
 //=======================================================================
 bool CLArecontPanoramicResource::setResolution(bool full)
 {
-	int value = full ? 15 : 0; // all sensors to full/half resolution
+    int value = full ? 15 : 0; // all sensors to full/half resolution
 
-	if (CL_HTTP_SUCCESS!=setRegister(3, 0xD1, value)) // FULL RES QULITY
-		return false;
+    if (CL_HTTP_SUCCESS!=setRegister(3, 0xD1, value)) // FULL RES QULITY
+        return false;
 
-	return true;
+    return true;
 }
 
 bool CLArecontPanoramicResource::setCamQulity(int q)
 {
-	if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
-		return false;
+    if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
+        return false;
 
-	if (CL_HTTP_SUCCESS!=setRegister(3, 0xEE, q)) // HALF RES QULITY
-		return false;
+    if (CL_HTTP_SUCCESS!=setRegister(3, 0xEE, q)) // HALF RES QULITY
+        return false;
 
-	return false;
+    return false;
 
 }
 

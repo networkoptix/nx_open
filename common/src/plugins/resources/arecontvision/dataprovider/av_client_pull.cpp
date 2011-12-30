@@ -109,7 +109,7 @@ int QnPlAVClinetPullStreamReader::getBitrate() const
 
     QnValue val;
     getResource()->getParam("Bitrate", val, QnDomainMemory);
-    return val;
+    return val.toInt();
 }
 
 bool QnPlAVClinetPullStreamReader::isH264() const

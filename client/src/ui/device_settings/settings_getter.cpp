@@ -13,11 +13,7 @@ void QnDeviceGetParamCommand::execute()
     if (!isConnectedToTheResource())
         return;
 
-    QString name = m_wgt->param().name();
-    QnValue val;  
-    if (m_resource->getParam(name, val, QnDomainPhysical))
-    {
-        emit ongetvalue(QString(val));
-    }
-   
+    QnValue val;
+    if (m_resource->getParam(m_wgt->param().name(), val, QnDomainPhysical))
+        emit ongetvalue(val.toString());
 }

@@ -1,4 +1,7 @@
 #include "arecont_dlg.h"
+
+#include <QtGui/QMessageBox>
+
 #include "../../widgets.h"
 #include "settings.h"
 
@@ -325,37 +328,18 @@ void AVSettingsDlg::correctWgtsState()
     CLAbstractSettingsWidget* wgt;
     QString val;
 
-    if ( (wgt = getWidgetByName(QLatin1String("Light Mode"))) )
+    if (wgt = getWidgetByName(QLatin1String("Light Mode")))
     {
-        val = (QString)wgt->param().value();
-
-        if (val == QLatin1String("highspeed"))
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Short Exposure"))) )
-                wgt->toWidget()->show();
-        }
-        else
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Short Exposure"))) )
-                wgt->toWidget()->hide();
-        }
+        val = wgt->param().value().toString();
+        if (wgt = getWidgetByName(QLatin1String("Short Exposure")))
+            wgt->toWidget()->setVisible(val == QLatin1String("highspeed"));
     }
 
     //=================================================
-    if ( (wgt = getWidgetByName(QLatin1String("Codec"))) )
+    if (wgt = getWidgetByName(QLatin1String("Codec")))
     {
-        val = (QString)wgt->param().value();
-
-        if (val == QLatin1String("H.264"))
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Bitrate"))) )
-                wgt->toWidget()->show();
-        }
-        else
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Bitrate"))) )
-                wgt->toWidget()->hide();
-        }
+        val = wgt->param().value().toString();
+        if (wgt = getWidgetByName(QLatin1String("Bitrate")))
+            wgt->toWidget()->setVisible(val == QLatin1String("H.264"));
     }
-
 }

@@ -37,32 +37,32 @@ bool QnPlAreconVisionResource::isDualSensor() const
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 {
-	QString req;
-	QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
+    QString req;
+    QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
-	CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
 
     CLHttpStatus result = http.doGET(req);
 
-	if (result!=CL_HTTP_SUCCESS)
-		return result;
+    if (result!=CL_HTTP_SUCCESS)
+        return result;
 
-	char c_response[200];
-	int result_size =  http.read(c_response,sizeof(c_response));
+    char c_response[200];
+    int result_size =  http.read(c_response,sizeof(c_response));
 
-	if (result_size <0)
-		return CL_TRANSPORT_ERROR;
+    if (result_size <0)
+        return CL_TRANSPORT_ERROR;
 
-	QByteArray arr = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
+    QByteArray arr = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
 
-	int index = arr.indexOf('=');
-	if (index==-1)
-		return CL_TRANSPORT_ERROR;
+    int index = arr.indexOf('=');
+    if (index==-1)
+        return CL_TRANSPORT_ERROR;
 
-	QByteArray cnum = arr.mid(index+1);
-	val = cnum.toInt();
+    QByteArray cnum = arr.mid(index+1);
+    val = cnum.toInt();
 
-	return CL_HTTP_SUCCESS;
+    return CL_HTTP_SUCCESS;
 
 }
 
@@ -153,64 +153,58 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
     return QnNetworkResource::setHostAddress(ip, domain);
 }
 
-
 QString QnPlAreconVisionResource::toSearchString() const
 {
     QString result;
 
-    QString firmware = getResourceParamList().get("Firmware version").value();
-    QString hardware = getResourceParamList().get("Image engine").value();
-    QString net = getResourceParamList().get("Net version").value();
+    QString firmware = getResourceParamList().get("Firmware version").value().toString();
+    QString hardware = getResourceParamList().get("Image engine").value().toString();
+    QString net = getResourceParamList().get("Net version").value().toString();
 
-    QTextStream t(&result);
-    t<< QnNetworkResource::toSearchString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
+    result += QnNetworkResource::toSearchString() + QLatin1String(" live fw=") + firmware + QLatin1String(" hw=") + hardware + QLatin1String(" net=") + net;
+    if (!m_description.isEmpty())
+        result += QLatin1String(" dsc=") + m_description;
 
-    if (m_description.isEmpty())
-        t <<  " dsc=" << m_description;
     return result;
-
 }
-
 
 QnResourcePtr QnPlAreconVisionResource::updateResource()
 {
-	QnValue model;
-	QnValue model_relase;
+    QnValue model;
+    QnValue model_relase;
 
-	if (!getParam("Model", model, QnDomainPhysical))
-		return QnNetworkResourcePtr(0);
+    if (!getParam("Model", model, QnDomainPhysical))
+        return QnNetworkResourcePtr(0);
 
-	if (!getParam("ModelRelease", model_relase, QnDomainPhysical))
-		return QnNetworkResourcePtr(0);
+    if (!getParam("ModelRelease", model_relase, QnDomainPhysical))
+        return QnNetworkResourcePtr(0);
 
-	if (model_relase!=model)
-	{
-		//this camera supports release name
-		model = model_relase;
-	}
-	else
-	{
-		//old camera; does not support relase name; but must support fullname
-		if (getParam("ModelFull", model_relase, QnDomainPhysical))
-			model = model_relase;
-	}
+    if (model_relase!=model)
+    {
+        //this camera supports release name
+        model = model_relase;
+    }
+    else
+    {
+        //old camera; does not support relase name; but must support fullname
+        if (getParam("ModelFull", model_relase, QnDomainPhysical))
+            model = model_relase;
+    }
 
-	QnNetworkResourcePtr result ( createResourceByName(model) );
+    QnNetworkResourcePtr result(createResourceByName(model.toString()));
+    if (result)
+    {
+        result->setName(model.toString());
+        result->setHostAddress(getHostAddress(), QnDomainMemory);
+        result->setMAC(getMAC());
+        result->setId(getId());
+    }
+    else
+    {
+        cl_log.log("Found unknown resource! ", model.toString(), cl_logWARNING);
+    }
 
-	if (!result)
-	{
-		cl_log.log("Found unknown resource! ", QString(model), cl_logWARNING);
-		return QnNetworkResourcePtr(0);
-	}
-
-	result->setName(model);
-	result->setHostAddress(getHostAddress(), QnDomainMemory);
-	result->setMAC(getMAC());
-	result->setId(getId());
-	
-
-
-	return result;
+    return result;
 }
 
 void QnPlAreconVisionResource::beforeUse()
@@ -234,14 +228,15 @@ void QnPlAreconVisionResource::beforeUse()
     setRegister(3, 21, 20); // sets I frame frequency to 1/20
 
 
-    if (!setParam("Enable motion detection", "on", QnDomainPhysical)) // enables motion detection; 
+    if (!setParam("Enable motion detection", "on", QnDomainPhysical)) // enables motion detection;
         return;
 
     // check if we've got 1024 zones
-    setParam("TotalZones", 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it 
+    setParam("TotalZones", 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it
     if (!getParam("TotalZones", val, QnDomainPhysical))
         return;
-    if (val == 1024)
+
+    if (val.toInt() == 1024)
         m_totalMdZones = 1024;
 
     // lets set zone size
@@ -250,8 +245,8 @@ void QnPlAreconVisionResource::beforeUse()
 
     //one zone - 32x32 pixels; zone sizes are 1-15
 
-    int optimal_zone_size_pixels = (int)maxSensorWidth / (m_totalMdZones == 64 ? 8 : 32);
-    
+    int optimal_zone_size_pixels = maxSensorWidth.toInt() / (m_totalMdZones == 64 ? 8 : 32);
+
     int zone_size = (optimal_zone_size_pixels%32) ? (optimal_zone_size_pixels/32 + 1) : optimal_zone_size_pixels/32;
 
     if (zone_size>15)
@@ -261,8 +256,6 @@ void QnPlAreconVisionResource::beforeUse()
         zone_size = 1;
 
     setParam("Zone size", zone_size, QnDomainPhysical);
-
-
 }
 
 QString QnPlAreconVisionResource::manufacture() const
@@ -281,7 +274,7 @@ bool QnPlAreconVisionResource::updateMACAddress()
     if (!getParam("MACAddress", val, QnDomainPhysical))
         return false;
 
-    setMAC(QnMacAddress(val));
+    setMAC(QnMacAddress(val.toString()));
 
     return true;
 }
@@ -296,11 +289,8 @@ QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, 
     return QImage();
 }
 
-
-
 void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-
 }
 
 void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
@@ -324,7 +314,6 @@ int QnPlAreconVisionResource::totalMdZones() const
 //===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)
 {
-
     //================================================
     QnParam& param = getResourceParamList().get(name);
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper
@@ -361,8 +350,8 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& va
     param.setValue(QString(rarray.data()));
 
     val = param.value();
-    return true;
 
+    return true;
 }
 
 bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnValue& val )
@@ -374,17 +363,13 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
 
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
-    QString request;
-
-    QTextStream str(&request);
-    str << "set?" << param.netHelper();
-    if (param.type()!=QnParamType::None && param.type()!=QnParamType::Button)
-        str << "=" << (QString)val;
+    QString request = QLatin1String("set?") + param.netHelper();
+    if (param.type() != QnParamType::None && param.type() != QnParamType::Button)
+        request += QLatin1Char('=') + val.toString();
 
     if (connection.doGET(request)!=CL_HTTP_SUCCESS)
         if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
             return false;
-
 
     return true;
 }
@@ -394,10 +379,10 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString
 {
     QnId rt = qnResTypePool->getResourceTypeId(MANUFACTURE, name);
     if (!rt.isValid())
-	{
-		cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
-		return 0;
-	}
+    {
+        cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
+        return 0;
+    }
 
     return createResourceByTypeId(rt);
 }
@@ -442,8 +427,8 @@ bool QnPlAreconVisionResource::isPanoramic(QString name)
     return false;
 }
 
-QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider() 
-{ 
+QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
+{
     Q_ASSERT_X(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract.");
     return 0;
 }

@@ -5,7 +5,7 @@
 
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
-QnMediaResource::QnMediaResource(): 
+QnMediaResource::QnMediaResource():
     QnResource()
 {
     addFlag(QnResource::media);
@@ -25,11 +25,10 @@ QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQ
 static QnDefaultDeviceVideoLayout defaultVideoLayout;
 const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
-    QString layoutStr;
     QnValue val;
     getParam("VideoLayout", val, QnDomainMemory);
-    QString strVal = val;
-    if (strVal.isEmpty()) 
+    QString strVal = val.toString();
+    if (strVal.isEmpty())
     {
         const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*>(dataProvider);
         if (archive == 0)
