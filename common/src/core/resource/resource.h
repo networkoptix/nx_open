@@ -122,19 +122,19 @@ public:
     bool hasSuchParam(const QString& name) const;
 
     // return true if no error
-    virtual bool getParam(const QString& name, QnValue& val, QnDomain domain);
+    virtual bool getParam(const QString& name, QVariant& val, QnDomain domain);
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed onParameterChanged signal is emitted
-    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain);
+    void getParamAsynch(const QString& name, QVariant& val, QnDomain domain);
 
 
     // return true if no error
-    virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain);
+    virtual bool setParam(const QString& name, const QVariant& val, QnDomain domain);
 
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
-    void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain );
+    void setParamAsynch(const QString& name, const QVariant& val, QnDomain domain );
 
     // ==============================================================================
 
@@ -189,11 +189,11 @@ public:
 
 protected:
     // should change value in memory domain
-    virtual bool getParamPhysical(const QString& name, QnValue& val);
+    virtual bool getParamPhysical(const QString& name, QVariant& val);
 
     // should just do physical job( network or so ) do not care about memory domain
-    virtual bool setParamPhysical(const QString& name, const QnValue& val);
-    virtual bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
+    virtual bool setParamPhysical(const QString& name, const QVariant& val);
+    virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role) = 0;
 

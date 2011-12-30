@@ -25,7 +25,7 @@ public:
 	void putGroup(QGroupBox* group);
 
 public slots:
-	virtual void setParam(const QString& name, const QnValue& val);
+	virtual void setParam(const QString& name, const QVariant& val);
 	virtual void onClose();
 	virtual void onSuggestions();
 

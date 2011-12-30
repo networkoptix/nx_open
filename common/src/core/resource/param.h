@@ -1,30 +1,29 @@
 #ifndef QN_PARAM_H
 #define QN_PARAM_H
 
+#include <QtCore/QList>
+#include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>
-
-typedef QVariant QnValue;
 
 struct QN_EXPORT QnParamType
 {
     enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
     QnParamType();
-    //QnParamType(const QString& name, QnValue val);
-
-    QString name;
+    //QnParamType(const QString& name, const QVariant &val);
 
     DataType type;
+
+    QString name;
+    QVariant default_value;
 
     double min_val;
     double max_val;
     double step;
 
-    QList<QnValue> possible_values;
-    QList<QnValue> ui_possible_values;
-
-    QnValue default_value;
+    QList<QVariant> possible_values;
+    QList<QVariant> ui_possible_values;
 
     QString paramNetHelper;
     QString group;
@@ -35,7 +34,7 @@ struct QN_EXPORT QnParamType
     bool isReadOnly;
     bool isStatic;
 
-    bool setDefVal(const QnValue &val); // safe way to set value
+    bool setDefVal(const QVariant &val); // safe way to set value
 };
 
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
@@ -44,19 +43,19 @@ typedef QSharedPointer<QnParamType> QnParamTypePtr;
 struct QN_EXPORT QnParam
 {
     QnParam() {}
-    QnParam(const QnValue &val) { m_value = val; }
+    QnParam(const QVariant &val) { m_value = val; }
     QnParam(QnParamTypePtr paramType) { m_paramType = paramType;}
 
-    bool setValue(const QnValue &val); // safe way to set value
-    const QnValue& value() const { return m_value; }
+    bool setValue(const QVariant &val); // safe way to set value
+    const QVariant& value() const { return m_value; }
     const QString& name() const { return m_paramType->name; }
     const QString& group() const { return m_paramType->group; }
     const QString& subgroup() const { return m_paramType->subgroup; }
     double minValue() const { return m_paramType->min_val; }
     double maxValue() const { return m_paramType->max_val; }
     QnParamType::DataType type() const { return m_paramType->type;}
-    const QList<QnValue>& uiPossibleValues() const { return m_paramType->ui_possible_values; }
-    const QList<QnValue>& possibleValues() const { return m_paramType->possible_values; }
+    const QList<QVariant>& uiPossibleValues() const { return m_paramType->ui_possible_values; }
+    const QList<QVariant>& possibleValues() const { return m_paramType->possible_values; }
     const QString& description() const { return m_paramType->description; }
     bool isUiParam() const { return m_paramType->ui; }
     bool isStatic() const { return m_paramType->isStatic; }
@@ -70,7 +69,7 @@ struct QN_EXPORT QnParam
 
 private:
     QnParamTypePtr m_paramType;
-    QnValue m_value;
+    QVariant m_value;
 };
 
 

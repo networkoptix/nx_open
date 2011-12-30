@@ -28,8 +28,8 @@ m_group(group),
 m_sub_group(sub_group),
 mParam(mDevice->getResourceParamList().get(paramname))
 {
-    QObject::connect(this, SIGNAL( setParam(const QString&, const QnValue&) ),
-                    handler, SLOT( setParam(const QString&, const QnValue&) )  );
+    QObject::connect(this, SIGNAL( setParam(const QString&, const QVariant&) ),
+                    handler, SLOT( setParam(const QString&, const QVariant&) )  );
 }
 
 CLAbstractSettingsWidget::~CLAbstractSettingsWidget()
@@ -51,7 +51,7 @@ QWidget* CLAbstractSettingsWidget::toWidget()
     return mWidget;
 }
 
-void CLAbstractSettingsWidget::setParam_helper(const QString& /*name*/, const QnValue& val)
+void CLAbstractSettingsWidget::setParam_helper(const QString& /*name*/, const QVariant& val)
 {
     mParam.setValue(val);
     emit setParam(mParam.name(),val);

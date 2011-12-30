@@ -135,7 +135,7 @@ QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider
 }
 
 
-bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QnValue& val )
+bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QVariant& val )
 {
     QnParam& param = getResourceParamList().get(name);
 
@@ -169,7 +169,7 @@ bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QnV
     return true;
 }
 
-bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
+bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
 {
     if (QnPlAreconVisionResource::setSpecialParam(name, val, domain))
         return true;

@@ -73,7 +73,7 @@ QnResourcePtr CLAbstractDeviceSettingsDlg::getDevice() const
 	return mDevice;
 }
 
-void CLAbstractDeviceSettingsDlg::setParam(const QString& name, const QnValue& val)
+void CLAbstractDeviceSettingsDlg::setParam(const QString& name, const QVariant& val)
 {
 	mDevice->setParamAsynch(name,val, QnDomainPhysical);
 }

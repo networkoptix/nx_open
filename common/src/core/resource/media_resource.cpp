@@ -25,7 +25,7 @@ QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQ
 static QnDefaultDeviceVideoLayout defaultVideoLayout;
 const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
-    QnValue val;
+    QVariant val;
     getParam("VideoLayout", val, QnDomainMemory);
     QString strVal = val.toString();
     if (strVal.isEmpty())

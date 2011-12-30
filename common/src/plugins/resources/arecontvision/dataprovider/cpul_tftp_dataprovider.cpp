@@ -381,7 +381,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
 
-    QnValue mdresult;
+    QVariant mdresult;
     if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
         return QnMetaDataV1Ptr(0);
 
@@ -397,15 +397,15 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
         return QnMetaDataV1Ptr(0);
 
 
-    QnValue zone_size;
+    QVariant zone_size;
     if (!getResource()->getParam("Zone size", zone_size, QnDomainMemory))
         return QnMetaDataV1Ptr(0);
 
     int pixelZoneSize = zone_size.toInt() * 32;
 
 
-    QnValue maxSensorWidth;
-    QnValue maxSensorHight;
+    QVariant maxSensorWidth;
+    QVariant maxSensorHight;
     getResource()->getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
     getResource()->getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
 

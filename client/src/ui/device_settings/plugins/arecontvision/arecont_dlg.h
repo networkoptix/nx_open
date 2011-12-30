@@ -25,7 +25,7 @@ public:
 	AVSettingsDlg(QnResourcePtr dev);
 protected slots:
 	virtual void onSuggestions();
-	virtual void setParam(const QString& name, const QnValue& val);
+	virtual void setParam(const QString& name, const QVariant& val);
     virtual void onClose();
 private:
 

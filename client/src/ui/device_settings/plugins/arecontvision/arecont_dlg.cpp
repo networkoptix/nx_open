@@ -303,7 +303,7 @@ void AVSettingsDlg::initAdmin()
 }
 
 //=========================================================================
-void AVSettingsDlg::setParam(const QString& name, const QnValue& val)
+void AVSettingsDlg::setParam(const QString& name, const QVariant& val)
 {
     CLAbstractDeviceSettingsDlg::setParam(name, val);
     correctWgtsState();

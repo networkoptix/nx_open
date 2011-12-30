@@ -170,8 +170,8 @@ QString QnPlAreconVisionResource::toSearchString() const
 
 QnResourcePtr QnPlAreconVisionResource::updateResource()
 {
-    QnValue model;
-    QnValue model_relase;
+    QVariant model;
+    QVariant model_relase;
 
     if (!getParam("Model", model, QnDomainPhysical))
         return QnNetworkResourcePtr(0);
@@ -212,7 +212,7 @@ void QnPlAreconVisionResource::beforeUse()
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
 
-    QnValue val;
+    QVariant val;
     if (!getParam("Firmware version", val, QnDomainPhysical))
         return;
 
@@ -240,7 +240,7 @@ void QnPlAreconVisionResource::beforeUse()
         m_totalMdZones = 1024;
 
     // lets set zone size
-    QnValue maxSensorWidth;
+    QVariant maxSensorWidth;
     getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
 
     //one zone - 32x32 pixels; zone sizes are 1-15
@@ -270,7 +270,7 @@ bool QnPlAreconVisionResource::isResourceAccessible()
 
 bool QnPlAreconVisionResource::updateMACAddress()
 {
-    QnValue val;
+    QVariant val;
     if (!getParam("MACAddress", val, QnDomainPhysical))
         return false;
 
@@ -295,8 +295,8 @@ void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
 {
-    QnValue maxSensorWidth;
-    QnValue maxSensorHight;
+    QVariant maxSensorWidth;
+    QVariant maxSensorHight;
     getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
     getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
 
@@ -312,7 +312,7 @@ int QnPlAreconVisionResource::totalMdZones() const
 }
 
 //===============================================================================================================================
-bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)
+bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QVariant& val)
 {
     //================================================
     QnParam& param = getResourceParamList().get(name);
@@ -354,7 +354,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& va
     return true;
 }
 
-bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnValue& val )
+bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QVariant& val )
 {
     QnParam& param = getResourceParamList().get(name);
 

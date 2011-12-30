@@ -44,13 +44,13 @@ public:
     QString subGroup() const;
 
 Q_SIGNALS:
-    void setParam(const QString& name, const QnValue& val);
+    void setParam(const QString& name, const QVariant& val);
 
 public Q_SLOTS:
     virtual void updateParam(QString val) = 0;
 
 protected:
-    virtual void setParam_helper(const QString& name, const QnValue& val);
+    virtual void setParam_helper(const QString& name, const QVariant& val);
 
 protected:
     QnResourcePtr mDevice;

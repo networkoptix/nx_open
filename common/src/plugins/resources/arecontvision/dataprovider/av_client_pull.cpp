@@ -107,7 +107,7 @@ int QnPlAVClinetPullStreamReader::getBitrate() const
     if (!getResource()->hasSuchParam("Bitrate"))
         return 0;
 
-    QnValue val;
+    QVariant val;
     getResource()->getParam("Bitrate", val, QnDomainMemory);
     return val.toInt();
 }
@@ -117,7 +117,7 @@ bool QnPlAVClinetPullStreamReader::isH264() const
     if (!getResource()->hasSuchParam("Codec"))
         return false;
 
-    QnValue val;
+    QVariant val;
     getResource()->getParam("Codec", val, QnDomainMemory);
     return val==QLatin1String("H.264");
 }

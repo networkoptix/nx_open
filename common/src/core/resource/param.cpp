@@ -1,7 +1,10 @@
 #include "param.h"
 
 /*
-QnParamType::QnParamType(const QString& name, QnValue val)
+QnParamType::QnParamType(const QString& name, const QVariant &val)
+    : type(Value), name(name), default_value(val),
+      min_val(0.0), max_val(0.0), step(0.0),
+      ui(false), isReadOnly(false), isStatic(false)
 {
     type = Value;
     this->name = name;
@@ -16,7 +19,7 @@ QnParamType::QnParamType()
 {
 }
 
-bool QnParamType::setDefVal(const QnValue &val) // safe way to set value
+bool QnParamType::setDefVal(const QVariant &val) // safe way to set value
 {
     switch (type)
     {
@@ -146,7 +149,7 @@ QnParamList::QnParamMap& QnParamList::list()
 // QnParam
 // ===========================================
 
-bool QnParam::setValue(const QnValue &val) // safe way to set value
+bool QnParam::setValue(const QVariant &val) // safe way to set value
 {
     switch(m_paramType->type)
     {

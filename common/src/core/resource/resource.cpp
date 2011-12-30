@@ -151,22 +151,22 @@ bool QnResource::hasSuchParam(const QString& name) const
     return getResourceParamList().exists(name);
 }
 
-bool QnResource::getParamPhysical(const QString& /*name*/, QnValue& /*val*/)
+bool QnResource::getParamPhysical(const QString& /*name*/, QVariant& /*val*/)
 {
     return false;
 }
 
-bool QnResource::setParamPhysical(const QString& /*name*/, const QnValue& /*val*/)
+bool QnResource::setParamPhysical(const QString& /*name*/, const QVariant& /*val*/)
 {
     return false;
 }
 
-bool QnResource::setSpecialParam(const QString& /*name*/, const QnValue& /*val*/, QnDomain /*domain*/)
+bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*/, QnDomain /*domain*/)
 {
     return false;
 }
 
-bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
+bool QnResource::getParam(const QString& name, QVariant& val, QnDomain domain )
 {
 
     if (!hasSuchParam(name))
@@ -205,12 +205,12 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
     return true;
 }
 
-void QnResource::getParamAsynch(const QString &/*name*/, QnValue &/*val*/, QnDomain /*domain*/)
+void QnResource::getParamAsynch(const QString &/*name*/, QVariant &/*val*/, QnDomain /*domain*/)
 {
 
 }
 
-bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain domain)
+bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain domain)
 {
     if (!hasSuchParam(name))
     {
@@ -258,7 +258,7 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
 class QnResourceSetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QnValue& val, QnDomain domain):
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val, QnDomain domain):
       QnResourceCommand(res),
           m_name(name),
           m_val(val),
@@ -275,13 +275,13 @@ public:
 
 private:
     QString m_name;
-    QnValue m_val;
+    QVariant m_val;
     QnDomain m_domain;
 };
 
 typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
-void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomain domain)
+void QnResource::setParamAsynch(const QString& name, const QVariant& val, QnDomain domain)
 {
     QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(toSharedPointer(), name, val, domain) );
     addCommandToProc(command);
