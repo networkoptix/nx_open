@@ -31,8 +31,10 @@ class QnWorkbench;
 class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
-class QnScreenRecorder;
 
+#ifdef Q_OS_WIN
+class QnScreenRecorder;
+#endif
 
 /**
  * This class implements default scene manipulation logic. 
@@ -148,8 +150,10 @@ private:
 
 
     
+    #ifdef Q_OS_WIN
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;
+    #endif
 
     /** Layout item context menu. */
     QMenu *m_itemContextMenu;

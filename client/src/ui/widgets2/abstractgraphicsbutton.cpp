@@ -4,7 +4,6 @@
 #include <QtCore/QEvent>
 #include <QtCore/QPointer>
 
-#include <QtGui/QAbstractButton>
 #include <QtGui/QAbstractItemView>
 #ifndef QT_NO_ACCESSIBILITY
 #  include <QtGui/QAccessible>
@@ -12,13 +11,10 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsSceneEvent>
-#include <QtGui/QPainter>
 #include <QtGui/QStyle>
 
 #define AUTO_REPEAT_DELAY  300
 #define AUTO_REPEAT_INTERVAL 100
-
-Q_GUI_EXPORT extern bool qt_tab_all_widgets;
 
 /*!
     \class AbstractGraphicsButton
@@ -142,12 +138,13 @@ class GraphicsButtonGroupPrivate : public QObjectPrivate
 
 public:
     GraphicsButtonGroupPrivate() : exclusive(true) {}
+
     QList<AbstractGraphicsButton *> buttonList;
     QPointer<AbstractGraphicsButton> checkedButton;
     void detectCheckedButton();
     void notifyChecked(AbstractGraphicsButton *button);
     bool exclusive;
-    QMap<AbstractGraphicsButton*, int> mapping;
+    QHash<AbstractGraphicsButton*, int> mapping;
 };
 
 GraphicsButtonGroup::GraphicsButtonGroup(QObject *parent)
@@ -162,17 +159,14 @@ GraphicsButtonGroup::~GraphicsButtonGroup()
         d->buttonList.at(i)->d_func()->group = 0;
 }
 
-
 bool GraphicsButtonGroup::exclusive() const
 {
-    Q_D(const GraphicsButtonGroup);
-    return d->exclusive;
+    return d_func()->exclusive;
 }
 
 void GraphicsButtonGroup::setExclusive(bool exclusive)
 {
-    Q_D(GraphicsButtonGroup);
-    d->exclusive = exclusive;
+    d_func()->exclusive = exclusive;
 }
 
 void GraphicsButtonGroup::addButton(AbstractGraphicsButton *button)
@@ -206,9 +200,8 @@ void GraphicsButtonGroup::addButton(AbstractGraphicsButton *button, int id)
 void GraphicsButtonGroup::removeButton(AbstractGraphicsButton *button)
 {
     Q_D(GraphicsButtonGroup);
-    if (d->checkedButton == button) {
+    if (d->checkedButton == button)
         d->detectCheckedButton();
-    }
     if (button->d_func()->group == this) {
         button->d_func()->group = 0;
         d->buttonList.removeAll(button);
@@ -218,33 +211,28 @@ void GraphicsButtonGroup::removeButton(AbstractGraphicsButton *button)
 
 QList<AbstractGraphicsButton*> GraphicsButtonGroup::buttons() const
 {
-    Q_D(const GraphicsButtonGroup);
-    return d->buttonList;
+    return d_func()->buttonList;
 }
 
 AbstractGraphicsButton *GraphicsButtonGroup::checkedButton() const
 {
-    Q_D(const GraphicsButtonGroup);
-    return d->checkedButton;
+    return d_func()->checkedButton;
 }
 
 AbstractGraphicsButton *GraphicsButtonGroup::button(int id) const
 {
-    Q_D(const GraphicsButtonGroup);
-    return d->mapping.key(id);
-}
-
-void GraphicsButtonGroup::setId(AbstractGraphicsButton *button, int id)
-{
-    Q_D(GraphicsButtonGroup);
-    if (button && id != -1)
-        d->mapping[button] = id;
+    return d_func()->mapping.key(id);
 }
 
 int GraphicsButtonGroup::id(AbstractGraphicsButton *button) const
 {
-    Q_D(const GraphicsButtonGroup);
-    return d->mapping.value(button, -1);
+    return d_func()->mapping.value(button, -1);
+}
+
+void GraphicsButtonGroup::setId(AbstractGraphicsButton *button, int id)
+{
+    if (button && id != -1)
+        d_func()->mapping[button] = id;
 }
 
 int GraphicsButtonGroup::checkedId() const
@@ -346,12 +334,14 @@ void AbstractGraphicsButtonPrivate::moveFocus(int key)
     int bestScore = -1;
     QRectF target = f->rect().translated(f->mapToScene(QPoint(0,0)));
     QPointF goal = target.center();
+
+    Q_GUI_EXPORT extern bool qt_tab_all_widgets;
     uint focus_flag = qt_tab_all_widgets ? Qt::TabFocus : Qt::StrongFocus;
 
     for (int i = 0; i < buttonList.count(); ++i) {
         AbstractGraphicsButton *button = buttonList.at(i);
-        if (button != f && button->window() == f->window() && button->isEnabled() && button->isVisible() &&
-            (autoExclusive || (button->focusPolicy() & focus_flag) == focus_flag)) {
+        if (button != f && button->window() == f->window() && button->isEnabled() && button->isVisible()
+            && (autoExclusive || (button->focusPolicy() & focus_flag) == focus_flag)) {
             QRectF buttonRect = button->rect().translated(button->mapToScene(QPoint(0,0)));
             QPointF p = buttonRect.center();
 
@@ -423,6 +413,7 @@ void AbstractGraphicsButtonPrivate::moveFocus(int key)
 void AbstractGraphicsButtonPrivate::fixFocusPolicy()
 {
     Q_Q(AbstractGraphicsButton);
+
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
     if (!group && !autoExclusive)
 #else
@@ -445,6 +436,7 @@ void AbstractGraphicsButtonPrivate::init()
 {
     Q_Q(AbstractGraphicsButton);
 
+    q->setAcceptHoverEvents(true);
     q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy)));
     q->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed, controlType));
 //    q->setForegroundRole(QPalette::ButtonText);
@@ -500,12 +492,12 @@ void AbstractGraphicsButtonPrivate::emitClicked()
 {
     Q_Q(AbstractGraphicsButton);
     QPointer<AbstractGraphicsButton> guard(q);
-    emit q->clicked(checked);
+    Q_EMIT q->clicked(checked);
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
     if (guard && group) {
-        emit group->buttonClicked(group->id(q));
+        Q_EMIT group->buttonClicked(group->id(q));
         if (guard && group)
-            emit group->buttonClicked(q);
+            Q_EMIT group->buttonClicked(q);
     }
 #endif
 }
@@ -514,12 +506,12 @@ void AbstractGraphicsButtonPrivate::emitPressed()
 {
     Q_Q(AbstractGraphicsButton);
     QPointer<AbstractGraphicsButton> guard(q);
-    emit q->pressed();
+    Q_EMIT q->pressed();
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
     if (guard && group) {
-        emit group->buttonPressed(group->id(q));
+        Q_EMIT group->buttonPressed(group->id(q));
         if (guard && group)
-            emit group->buttonPressed(q);
+            Q_EMIT group->buttonPressed(q);
     }
 #endif
 }
@@ -528,12 +520,12 @@ void AbstractGraphicsButtonPrivate::emitReleased()
 {
     Q_Q(AbstractGraphicsButton);
     QPointer<AbstractGraphicsButton> guard(q);
-    emit q->released();
+    Q_EMIT q->released();
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
     if (guard && group) {
-        emit group->buttonReleased(group->id(q));
+        Q_EMIT group->buttonReleased(group->id(q));
         if (guard && group)
-            emit group->buttonReleased(q);
+            Q_EMIT group->buttonReleased(q);
     }
 #endif
 }
@@ -588,8 +580,7 @@ AbstractGraphicsButton::~AbstractGraphicsButton()
 */
 QString AbstractGraphicsButton::text() const
 {
-    Q_D(const AbstractGraphicsButton);
-    return d->text;
+    return d_func()->text;
 }
 
 void AbstractGraphicsButton::setText(const QString &text)
@@ -597,12 +588,12 @@ void AbstractGraphicsButton::setText(const QString &text)
     Q_D(AbstractGraphicsButton);
     if (d->text == text)
         return;
+
     d->text = text;
 #ifndef QT_NO_SHORTCUT
-    QKeySequence newMnemonic = QKeySequence::mnemonic(text);
-    setShortcut(newMnemonic);
+    setShortcut(QKeySequence::mnemonic(text));
 #endif
-    d->sizeHint = QSize();
+    d->sizeHint = QSizeF();
     update();
     updateGeometry();
 #ifndef QT_NO_ACCESSIBILITY
@@ -617,19 +608,46 @@ void AbstractGraphicsButton::setText(const QString &text)
     The icon's default size is defined by the GUI style, but can be
     adjusted by setting the \l iconSize property.
 */
+QIcon AbstractGraphicsButton::icon() const
+{
+    return d_func()->icon;
+}
+
 void AbstractGraphicsButton::setIcon(const QIcon &icon)
 {
     Q_D(AbstractGraphicsButton);
     d->icon = icon;
-    d->sizeHint = QSize();
+    d->sizeHint = QSizeF();
     update();
     updateGeometry();
 }
 
-QIcon AbstractGraphicsButton::icon() const
+/*!
+    \property AbstractGraphicsButton::iconSize
+    \brief the icon size used for this button.
+
+    The default size is defined by the GUI style. This is a maximum
+    size for the icons. Smaller icons will not be scaled up.
+*/
+QSize AbstractGraphicsButton::iconSize() const
 {
     Q_D(const AbstractGraphicsButton);
-    return d->icon;
+    if (d->iconSize.isValid())
+        return d->iconSize;
+    const int e = style()->pixelMetric(QStyle::PM_ButtonIconSize, 0, 0);
+    return QSize(e, e);
+}
+
+void AbstractGraphicsButton::setIconSize(const QSize &size)
+{
+    Q_D(AbstractGraphicsButton);
+    if (d->iconSize == size)
+        return;
+
+    d->iconSize = size;
+    d->sizeHint = QSizeF();
+    update();
+    updateGeometry();
 }
 
 #ifndef QT_NO_SHORTCUT
@@ -637,6 +655,11 @@ QIcon AbstractGraphicsButton::icon() const
     \property AbstractGraphicsButton::shortcut
     \brief the mnemonic associated with the button
 */
+QKeySequence AbstractGraphicsButton::shortcut() const
+{
+    return d_func()->shortcut;
+}
+
 void AbstractGraphicsButton::setShortcut(const QKeySequence &key)
 {
     Q_D(AbstractGraphicsButton);
@@ -644,12 +667,6 @@ void AbstractGraphicsButton::setShortcut(const QKeySequence &key)
         releaseShortcut(d->shortcutId);
     d->shortcut = key;
     d->shortcutId = grabShortcut(key);
-}
-
-QKeySequence AbstractGraphicsButton::shortcut() const
-{
-    Q_D(const AbstractGraphicsButton);
-    return d->shortcut;
 }
 #endif // QT_NO_SHORTCUT
 
@@ -661,6 +678,11 @@ QKeySequence AbstractGraphicsButton::shortcut() const
 
     \sa checked
 */
+bool AbstractGraphicsButton::isCheckable() const
+{
+    return d_func()->checkable;
+}
+
 void AbstractGraphicsButton::setCheckable(bool checkable)
 {
     Q_D(AbstractGraphicsButton);
@@ -671,12 +693,6 @@ void AbstractGraphicsButton::setCheckable(bool checkable)
     d->checked = false;
 }
 
-bool AbstractGraphicsButton::isCheckable() const
-{
-    Q_D(const AbstractGraphicsButton);
-    return d->checkable;
-}
-
 /*!
     \property AbstractGraphicsButton::checked
     \brief whether the button is checked
@@ -685,6 +701,11 @@ bool AbstractGraphicsButton::isCheckable() const
 
     \sa checkable
 */
+bool AbstractGraphicsButton::isChecked() const
+{
+    return d_func()->checked;
+}
+
 void AbstractGraphicsButton::setChecked(bool checked)
 {
     Q_D(AbstractGraphicsButton);
@@ -695,7 +716,7 @@ void AbstractGraphicsButton::setChecked(bool checked)
     }
 
     if (!checked && d->queryCheckedButton() == this) {
-        // the checked button of an exclusive or autoexclusive group cannot be  unchecked
+        // the checked button of an exclusive or autoexclusive group cannot be unchecked
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
         if (d->group ? d->group->d_func()->exclusive : d->autoExclusive)
             return;
@@ -717,13 +738,7 @@ void AbstractGraphicsButton::setChecked(bool checked)
     if (guard && checked)
         d->notifyChecked();
     if (guard)
-        emit toggled(checked);
-}
-
-bool AbstractGraphicsButton::isChecked() const
-{
-    Q_D(const AbstractGraphicsButton);
-    return d->checked;
+        Q_EMIT toggled(checked);
 }
 
 /*!
@@ -734,23 +749,23 @@ bool AbstractGraphicsButton::isChecked() const
     pressed() and clicked() are not emitted if you set this property
     to true. The default is false.
 */
+bool AbstractGraphicsButton::isDown() const
+{
+    return d_func()->down;
+}
+
 void AbstractGraphicsButton::setDown(bool down)
 {
     Q_D(AbstractGraphicsButton);
     if (d->down == down)
         return;
+
     d->down = down;
     d->refresh();
     if (d->autoRepeat && d->down)
         d->repeatTimer.start(d->autoRepeatDelay, this);
     else
         d->repeatTimer.stop();
-}
-
-bool AbstractGraphicsButton::isDown() const
-{
-    Q_D(const AbstractGraphicsButton);
-    return d->down;
 }
 
 /*!
@@ -766,6 +781,11 @@ bool AbstractGraphicsButton::isDown() const
     system and not by this class. The pressed(), released(), and clicked() signals will be emitted
     like in the normal case.
 */
+bool AbstractGraphicsButton::autoRepeat() const
+{
+    return d_func()->autoRepeat;
+}
+
 void AbstractGraphicsButton::setAutoRepeat(bool autoRepeat)
 {
     Q_D(AbstractGraphicsButton);
@@ -778,12 +798,6 @@ void AbstractGraphicsButton::setAutoRepeat(bool autoRepeat)
         d->repeatTimer.stop();
 }
 
-bool AbstractGraphicsButton::autoRepeat() const
-{
-    Q_D(const AbstractGraphicsButton);
-    return d->autoRepeat;
-}
-
 /*!
     \property AbstractGraphicsButton::autoRepeatDelay
     \brief the initial delay of auto-repetition
@@ -794,16 +808,15 @@ bool AbstractGraphicsButton::autoRepeat() const
 
     \sa autoRepeat, autoRepeatInterval
 */
+int AbstractGraphicsButton::autoRepeatDelay() const
+{
+    return d_func()->autoRepeatDelay;
+}
+
 void AbstractGraphicsButton::setAutoRepeatDelay(int autoRepeatDelay)
 {
     Q_D(AbstractGraphicsButton);
     d->autoRepeatDelay = autoRepeatDelay;
-}
-
-int AbstractGraphicsButton::autoRepeatDelay() const
-{
-    Q_D(const AbstractGraphicsButton);
-    return d->autoRepeatDelay;
 }
 
 /*!
@@ -816,16 +829,15 @@ int AbstractGraphicsButton::autoRepeatDelay() const
 
     \sa autoRepeat, autoRepeatDelay
 */
+int AbstractGraphicsButton::autoRepeatInterval() const
+{
+    return d_func()->autoRepeatInterval;
+}
+
 void AbstractGraphicsButton::setAutoRepeatInterval(int autoRepeatInterval)
 {
     Q_D(AbstractGraphicsButton);
     d->autoRepeatInterval = autoRepeatInterval;
-}
-
-int AbstractGraphicsButton::autoRepeatInterval() const
-{
-    Q_D(const AbstractGraphicsButton);
-    return d->autoRepeatInterval;
 }
 
 /*!
@@ -845,16 +857,14 @@ int AbstractGraphicsButton::autoRepeatInterval() const
 
     \sa QRadioButton
 */
-void AbstractGraphicsButton::setAutoExclusive(bool autoExclusive)
-{
-    Q_D(AbstractGraphicsButton);
-    d->autoExclusive = autoExclusive;
-}
-
 bool AbstractGraphicsButton::autoExclusive() const
 {
-    Q_D(const AbstractGraphicsButton);
-    return d->autoExclusive;
+    return d_func()->autoExclusive;
+}
+
+void AbstractGraphicsButton::setAutoExclusive(bool autoExclusive)
+{
+    d_func()->autoExclusive = autoExclusive;
 }
 
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
@@ -868,8 +878,7 @@ bool AbstractGraphicsButton::autoExclusive() const
 */
 GraphicsButtonGroup *AbstractGraphicsButton::group() const
 {
-    Q_D(const AbstractGraphicsButton);
-    return d->group;
+    return d_func()->group;
 }
 #endif // QT_NO_GRAPHICSBUTTONGROUP
 
@@ -937,33 +946,7 @@ void AbstractGraphicsButton::click()
 */
 void AbstractGraphicsButton::toggle()
 {
-    Q_D(AbstractGraphicsButton);
-    setChecked(!d->checked);
-}
-
-
-/*!
-    This virtual handler is called when setChecked() was called,
-    unless it was called from within nextCheckState(). It allows
-    subclasses to reset their intermediate button states.
-
-    \sa nextCheckState()
- */
-void AbstractGraphicsButton::checkStateSet()
-{
-}
-
-/*!
-    This virtual handler is called when a button is clicked. The
-    default implementation calls setChecked(!isChecked()) if the button
-    isCheckable().  It allows subclasses to implement intermediate button states.
-
-    \sa checkStateSet()
-*/
-void AbstractGraphicsButton::nextCheckState()
-{
-    if (isCheckable())
-        setChecked(!isChecked());
+    setChecked(!d_func()->checked);
 }
 
 /*!
@@ -980,14 +963,38 @@ bool AbstractGraphicsButton::hitButton(const QPointF &pos) const
 }
 
 /*!
+    This virtual handler is called when setChecked() was called,
+    unless it was called from within nextCheckState(). It allows
+    subclasses to reset their intermediate button states.
+
+    \sa nextCheckState()
+ */
+void AbstractGraphicsButton::checkStateSet()
+{
+}
+
+/*!
+    This virtual handler is called when a button is clicked. The
+    default implementation calls setChecked(!isChecked()) if the button
+    isCheckable(). It allows subclasses to implement intermediate button states.
+
+    \sa checkStateSet()
+*/
+void AbstractGraphicsButton::nextCheckState()
+{
+    if (isCheckable())
+        setChecked(!isChecked());
+}
+
+/*!
     \reimp
 */
-bool AbstractGraphicsButton::event(QEvent *e)
+bool AbstractGraphicsButton::event(QEvent *event)
 {
     // as opposed to other widgets, disabled buttons accept mouse
     // events. This avoids surprising click-through scenarios
     if (!isEnabled()) {
-        switch(e->type()) {
+        switch(event->type()) {
         case QEvent::TabletPress:
         case QEvent::TabletRelease:
         case QEvent::TabletMove:
@@ -1009,11 +1016,12 @@ bool AbstractGraphicsButton::event(QEvent *e)
     }
 
 #ifndef QT_NO_SHORTCUT
-    if (e->type() == QEvent::Shortcut) {
+    if (event->type() == QEvent::Shortcut) {
         Q_D(AbstractGraphicsButton);
-        QShortcutEvent *se = static_cast<QShortcutEvent *>(e);
+        QShortcutEvent *se = static_cast<QShortcutEvent *>(event);
         if (d->shortcutId != se->shortcutId())
             return false;
+
         if (!se->isAmbiguous()) {
             if (!d->animateTimer.isActive())
                 animateClick();
@@ -1026,20 +1034,16 @@ bool AbstractGraphicsButton::event(QEvent *e)
     }
 #endif
 
-    return GraphicsWidget::event(e);
+    return GraphicsWidget::event(event);
 }
 
 /*!
     \reimp
 */
-void AbstractGraphicsButton::mousePressEvent(QGraphicsSceneMouseEvent * e)
+void AbstractGraphicsButton::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
     Q_D(AbstractGraphicsButton);
-    if (e->button() != Qt::LeftButton) {
-        e->ignore();
-        return;
-    }
-    if (hitButton(e->pos())) {
+    if (e->button() == Qt::LeftButton && hitButton(e->pos())) {
         setDown(true);
         d->pressed = true;
         update(); //flush paint event before invoking potentially expensive operation
@@ -1059,12 +1063,7 @@ void AbstractGraphicsButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
     Q_D(AbstractGraphicsButton);
     d->pressed = false;
 
-    if (e->button() != Qt::LeftButton) {
-        e->ignore();
-        return;
-    }
-
-    if (!d->down) {
+    if (e->button() != Qt::LeftButton || !d->down) {
         e->ignore();
         return;
     }
@@ -1228,6 +1227,7 @@ void AbstractGraphicsButton::focusInEvent(QFocusEvent *e)
     if (!QApplication::keypadNavigationEnabled())
 #endif
     d_func()->fixFocusPolicy();
+
     GraphicsWidget::focusInEvent(e);
 }
 
@@ -1238,6 +1238,7 @@ void AbstractGraphicsButton::focusOutEvent(QFocusEvent *e)
 {
     if (e->reason() != Qt::PopupFocusReason)
         d_func()->down = false;
+
     GraphicsWidget::focusOutEvent(e);
 }
 
@@ -1250,8 +1251,9 @@ void AbstractGraphicsButton::changeEvent(QEvent *e)
         if (!isEnabled())
             setDown(false);
     } else {
-        d_func()->sizeHint = QSize();
+        d_func()->sizeHint = QSizeF();
     }
+
     GraphicsWidget::changeEvent(e);
 }
 
@@ -1312,32 +1314,3 @@ void AbstractGraphicsButton::changeEvent(QEvent *e)
 
     \sa checked, clicked()
 */
-
-/*!
-    \property AbstractGraphicsButton::iconSize
-    \brief the icon size used for this button.
-
-    The default size is defined by the GUI style. This is a maximum
-    size for the icons. Smaller icons will not be scaled up.
-*/
-QSize AbstractGraphicsButton::iconSize() const
-{
-    Q_D(const AbstractGraphicsButton);
-    if (d->iconSize.isValid())
-        return d->iconSize;
-    const int e = style()->pixelMetric(QStyle::PM_ButtonIconSize, 0, 0);
-    return QSize(e, e);
-}
-
-void AbstractGraphicsButton::setIconSize(const QSize &size)
-{
-    Q_D(AbstractGraphicsButton);
-    if (d->iconSize == size)
-        return;
-
-    d->iconSize = size;
-    d->sizeHint = QSize();
-    updateGeometry();
-    if (isVisible())
-        update();
-}

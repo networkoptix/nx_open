@@ -4,6 +4,7 @@
 #include "api/Types.h"
 #include "core/resource/resource.h"
 #include "core/misc/scheduleTask.h"
+#include "core/resource/media_resource.h"
 
 void parseScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnApiScheduleTasks& xsdScheduleTasks, QnResourceFactory& /*resourceFactory*/)
 {
@@ -22,7 +23,9 @@ void parseScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnApiScheduleTa
                                            (QnScheduleTask::RecordingType) i->recordType(),
                                            i->dayOfWeek(),
                                            i->beforeThreshold(),
-                                           i->afterThreshold()
+                                           i->afterThreshold(),
+                                           (QnStreamQuality)i->streamQuality(),
+                                           i->fps()
                                         );
 
         scheduleTasks.append(scheduleTask);

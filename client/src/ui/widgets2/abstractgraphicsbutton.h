@@ -36,38 +36,40 @@ public:
     explicit AbstractGraphicsButton(QGraphicsItem *parent = 0);
     ~AbstractGraphicsButton();
 
-    void setText(const QString &text);
     QString text() const;
+    void setText(const QString &text);
 
-    void setIcon(const QIcon &icon);
     QIcon icon() const;
+    void setIcon(const QIcon &icon);
 
     QSize iconSize() const;
+    inline void setIconSize(int w, int h)
+    { setIconSize(QSize(w, h)); }
 
 #ifndef QT_NO_SHORTCUT
-    void setShortcut(const QKeySequence &key);
     QKeySequence shortcut() const;
+    void setShortcut(const QKeySequence &key);
 #endif
 
-    void setCheckable(bool);
     bool isCheckable() const;
+    void setCheckable(bool);
 
     bool isChecked() const;
 
-    void setDown(bool);
     bool isDown() const;
+    void setDown(bool);
 
-    void setAutoRepeat(bool);
     bool autoRepeat() const;
+    void setAutoRepeat(bool);
 
-    void setAutoRepeatDelay(int);
     int autoRepeatDelay() const;
+    void setAutoRepeatDelay(int);
 
-    void setAutoRepeatInterval(int);
     int autoRepeatInterval() const;
+    void setAutoRepeatInterval(int);
 
-    void setAutoExclusive(bool);
     bool autoExclusive() const;
+    void setAutoExclusive(bool);
 
 #ifndef QT_NO_GRAPHICSBUTTONGROUP
     GraphicsButtonGroup *group() const;
@@ -94,7 +96,7 @@ protected:
     bool event(QEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
-    void mousePressEvent(QGraphicsSceneMouseEvent * event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *e);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *e);
     void focusInEvent(QFocusEvent *e);
@@ -103,7 +105,7 @@ protected:
     void timerEvent(QTimerEvent *e);
 
 protected:
-    AbstractGraphicsButton(AbstractGraphicsButtonPrivate &dd, QGraphicsItem *parent = 0);
+    AbstractGraphicsButton(AbstractGraphicsButtonPrivate &dd, QGraphicsItem *parent);
 
 private:
     Q_DISABLE_COPY(AbstractGraphicsButton)

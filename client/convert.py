@@ -16,7 +16,7 @@ import re
 
 # os.path = posixpath
 sys.path.insert(0, os.path.join('..', 'common'))
-  
+
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB, qt_path, copy_files, setup_tools
 from convert import convert as convert_common
 
@@ -30,7 +30,7 @@ if sys.platform == 'win32':
     EXCLUDE_FILES += ('_mac',)
 elif sys.platform == 'darwin':
     EXCLUDE_DIRS += ('desktop',)
-    EXCLUDE_FILES += ('_win',)
+    EXCLUDE_FILES += ('_win', 'screen_recorder.cpp', 'screen_recorder.h',)
 
 def is_exclude_file(f):
     for exclude_file in EXCLUDE_FILES:
