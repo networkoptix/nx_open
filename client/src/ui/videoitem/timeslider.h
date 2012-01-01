@@ -2,7 +2,7 @@
 #define TIMESLIDER_H
 
 #include "ui/widgets2/graphicswidget.h"
-#include <recording/device_file_catalog.h> /* For QnTimePeriodList. */
+#include "recording/time_period.h"
 
 class QPropertyAnimation;
 

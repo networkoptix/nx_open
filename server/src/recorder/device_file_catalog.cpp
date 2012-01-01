@@ -1,28 +1,14 @@
+#include <QDir>
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
-#include "file_deletor.h"
+#include "recording/file_deletor.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
-#include "stream_recorder.h"
+#include "recording/stream_recorder.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "../../server/src/motion/motion_helper.h"
+#include "motion/motion_helper.h"
 #include <QDebug>
-
-bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
-{
-    return first.startTimeMs < other.startTimeMs;
-}
-
-bool operator < (qint64 first, const QnTimePeriod& other) 
-{ 
-    return first < other.startTimeMs; 
-}
-
-bool operator < (const QnTimePeriod& other, qint64 first) 
-{ 
-    return other.startTimeMs < first;
-}
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
     m_firstDeleteCount(0),

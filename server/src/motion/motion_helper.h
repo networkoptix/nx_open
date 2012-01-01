@@ -7,8 +7,9 @@
 #include "utils/media/sse_helper.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/network_resource.h"
-#include "recording/device_file_catalog.h"
+#include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
+#include "recording/time_period.h"
 
 class QnMotionHelper
 {

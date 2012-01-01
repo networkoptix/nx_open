@@ -5,9 +5,9 @@
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QAuthenticator>
-#include "recording/device_file_catalog.h"
 #include "core/resource/network_resource.h"
 #include "utils/common/util.h"
+#include "recording/time_period.h"
 
 class VideoServerSessionManager;
 

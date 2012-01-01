@@ -3,7 +3,8 @@
 
 #include "recording/stream_recorder.h"
 #include "core/misc/scheduleTask.h"
-#include "recording/device_file_catalog.h"
+#include "recorder/device_file_catalog.h"
+#include "recording/time_period.h"
 
 class QnServerStreamRecorder: public QnStreamRecorder
 {
@@ -17,6 +18,10 @@ protected:
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
     void beforeProcessData(QnAbstractMediaDataPtr media);
     bool saveMotion(QnAbstractMediaDataPtr media);
+
+    virtual void fileStarted(qint64 startTimeMs, const QString& fileName);
+    virtual void fileFinished(qint64 durationMs, const QString& fileName);
+    virtual QString fillFileName();
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
 private:

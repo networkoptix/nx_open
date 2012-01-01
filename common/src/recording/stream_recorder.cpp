@@ -4,7 +4,6 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "storage_manager.h"
 #include "utils/common/util.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
@@ -46,8 +45,7 @@ void QnStreamRecorder::close()
         {
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+m_startDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_startOffset+m_endDateTime/1000).toAscii().data(), 0);
-            if (m_truncateInterval != 0)
-                qnStorageMan->fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
+            fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
             m_startDateTime = AV_NOPTS_VALUE;
         }
 
@@ -206,16 +204,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
     QString fileExt = QString(outputCtx->extensions).split(',')[0];
 
-    //QFileInfo fi(m_device->getUniqueId());
-    if (m_fixedFileName.isEmpty()) 
-    {
-        QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
-        Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        m_fileName = qnStorageMan->getFileName(m_startDateTime/1000, netResource);
-    }
-    else {
-        m_fileName = m_fixedFileName;
-    }
+    m_fileName = fillFileName();
     m_fileName += QString(".") + fileExt;
     QString url = QString("ufile:") + m_fileName;
 
@@ -228,9 +217,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
-    if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(m_startDateTime/1000, m_fileName);
-    }
+    fileStarted(m_startDateTime/1000, m_fileName);
 
     outputCtx->video_codec = mediaData->compressionType;
     
@@ -359,4 +346,9 @@ bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 {
     return true;
+}
+
+QString QnStreamRecorder::fillFileName()
+{
+    return m_fixedFileName;
 }

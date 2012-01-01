@@ -1,5 +1,6 @@
 #include "server_stream_recorder.h"
 #include "motion/motion_helper.h"
+#include "storage_manager.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     QnStreamRecorder(dev)
@@ -125,4 +126,30 @@ void QnServerStreamRecorder::updateSchedule(const QnScheduleTaskList& schedule)
 {
     QMutexLocker lock(&m_scheduleMutex);
     m_schedule = schedule;
+}
+
+QString QnServerStreamRecorder::fillFileName()
+{
+    if (m_fixedFileName.isEmpty()) 
+    {
+        QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
+        Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
+        return qnStorageMan->getFileName(m_startDateTime/1000, netResource);
+    }
+    else {
+        return m_fixedFileName;
+    }
+}
+
+void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName)
+{
+    if (m_truncateInterval != 0)
+        qnStorageMan->fileFinished(durationMs, fileName);
+};
+
+void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, const QString& fileName)
+{
+    if (m_truncateInterval > 0) {
+        qnStorageMan->fileStarted(startTimeMs, fileName);
+    }
 }

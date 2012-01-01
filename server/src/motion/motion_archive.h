@@ -7,7 +7,7 @@
 #include "core/resource/network_resource.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/sse_helper.h"
-#include "recording/device_file_catalog.h"
+#include "recorder/device_file_catalog.h"
 #include "core/resourcemanagment/security_cam_resource.h"
 
 static const int MOTION_INDEX_HEADER_SIZE = 16;
