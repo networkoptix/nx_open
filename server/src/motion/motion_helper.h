@@ -27,8 +27,13 @@ public:
     QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res);
 
+    static QString getMotionDir(const QDate& date, const QString& macAddress);
+    static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& macAddress);
+
     QnMotionHelper();
 private:
+    static QString getBaseDir(const QString& macAddress);
+
     // create Find mask by region
     void createMask(const QRegion& region);
 
@@ -41,5 +46,6 @@ private:
     MotionWriters m_writers;
     QMutex m_mutex;
 };
+
 
 #endif // __MOTION_HELPER_H__

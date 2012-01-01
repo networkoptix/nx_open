@@ -12,6 +12,7 @@ public:
     void init(const QString& tmpRoot);
     static QnFileDeletor* instance();
     void deleteFile(const QString& fileName);
+    void deleteDir(const QString& dirName);
     
     QnFileDeletor();
 private:

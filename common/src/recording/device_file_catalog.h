@@ -49,9 +49,10 @@ public:
             startTimeMs(_startTime), storageIndex(_storageIndex), fileIndex(_fileIndex), durationMs(_duration) {}
 
         qint64 startTimeMs; // chunk startTime at ms
+        int durationMs; // chunk duration at ms
+
         quint16 storageIndex;
         quint16 fileIndex;
-        int durationMs; // chunk duration at ms
     };
 
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
@@ -77,6 +78,7 @@ public:
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs);
+    QList<QDate> recordedMonthList();
 private:
     mutable QMutex m_mutex;
     QFile m_file;
