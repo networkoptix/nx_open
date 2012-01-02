@@ -89,6 +89,7 @@ protected Q_SLOTS:
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
     void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);

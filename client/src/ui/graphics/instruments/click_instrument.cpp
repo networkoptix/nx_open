@@ -112,6 +112,13 @@ bool ClickInstrument::mousePressEventInternal(T *object, QGraphicsSceneMouseEven
     m_isDoubleClick = false;
     m_nextDoubleClickIsClick = false;
 
+    /* Note that qobject_cast is for a reason here. There are no guarantees
+     * regarding the widget stored in the supplied event. */
+    QGraphicsView *view = NULL;
+    if(event->widget() != NULL)
+        view = qobject_cast<QGraphicsView *>(event->widget()->parent()); 
+    emitInitialSignal(view, object, event);
+
     dragProcessor()->mousePressEvent(object, event);
     return false;
 }
@@ -174,10 +181,8 @@ void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsItem *item, QGra
     ClickInfo info(static_cast<ClickInfoPrivate *>(event));
 
     if(m_isDoubleClick) {
-        qDebug() << "DOUBLE CLICK";
         emit doubleClicked(view, item, info);
     } else {
-        qDebug() << "CLICK";
         emit clicked(view, item, info);
     }
 }
@@ -190,6 +195,14 @@ void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsScene *, QGraphi
     } else {
         emit clicked(view, info);
     }
+}
+
+void ClickInstrument::emitInitialSignal(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    emit pressed(view, item, ClickInfo(static_cast<ClickInfoPrivate *>(event)));
+}
+
+void ClickInstrument::emitInitialSignal(QGraphicsView *view, QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
+    emit pressed(view, ClickInfo(static_cast<ClickInfoPrivate *>(event)));
 }
 
 void ClickInstrument::startDrag(DragInfo *) {

@@ -201,7 +201,7 @@ public:
      * \param flag                      Affected flag.
      * \param value                     New value for the affected flag.
      */
-    void setDisplayFlag(DisplayFlag flag, bool value) {
+    void setDisplayFlag(DisplayFlag flag, bool value = true) {
         setDisplayFlags(value ? m_displayFlags | flag : m_displayFlags & ~flag);
     }
 

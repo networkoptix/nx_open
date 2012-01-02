@@ -224,6 +224,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_archiveDropInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
+    connect(itemLeftClickInstrument,    SIGNAL(pressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftPressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -477,6 +478,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
+    m_resizedWidget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY);
     m_display->bringToFront(m_resizedWidget);
     m_display->gridItem()->animatedShow();
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
@@ -567,6 +569,7 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
         m_draggedWorkbenchItems.push_back(widget->item());
 
         opacityAnimator(widget)->animateTo(widgetManipulationOpacity);
+        widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY);
     }
 
     /* Un-raise if raised is among the dragged. */
@@ -721,6 +724,20 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *
     default:
         break;
     }
+}
+
+void QnWorkbenchController::at_item_leftPressed(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+    if(info.modifiers() != 0)
+        return;
+
+    if(item->isSelected())
+        return;
+
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    if(widget == NULL)
+        return;
+
+    widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY, false);
 }
 
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
