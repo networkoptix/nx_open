@@ -33,7 +33,7 @@ public:
     VariantAnimator(QObject *parent = NULL);
 
     /**
-     * Virutual destructor.
+     * Virtual destructor.
      */
     virtual ~VariantAnimator();
 
