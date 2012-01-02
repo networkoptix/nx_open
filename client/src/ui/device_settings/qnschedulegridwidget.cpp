@@ -1,5 +1,5 @@
 #include "qnschedulegridwidget.h"
-#include "ui/graphics/instruments/motion_selection_instrument.h"
+#include "settings.h"
 
 static const int TEXT_SPACING = 4;
 static const QColor NORMAL_LABEL_COLOR(255,255,255);
@@ -163,8 +163,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
 
 
     // draw selection
-    p.setPen(SELECT_ARIA_PEN_COLOR);
-    p.setBrush(SELECT_ARIA_BRUSH_COLOR);
+    p.setPen(global_motion_selection_rubber_band_border_color);
+    p.setBrush(global_motion_selection_rubber_band_color);
     if (!m_selectedRect.isEmpty())
         p.drawRect(m_selectedRect);
 }

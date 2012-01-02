@@ -320,9 +320,16 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
 
 QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos) 
 {
-    QPointF pointf(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))));
-    QPoint p((int) (pointf.x()), (int) (pointf.y()));
-    return bounded(p, QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
+    QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))));
+    QPoint gridPos(std::floor(gridPosF.x()), std::floor(gridPosF.y()));
+
+    /* Deal with rounding issues. */
+    if(qFuzzyCompare(gridPosF.x() - gridPos.x(), 1.0))
+        gridPos.rx()++;
+    if(qFuzzyCompare(gridPosF.y() - gridPos.y(), 1.0))
+        gridPos.ry()++;
+
+    return bounded(gridPos, QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
 }
 
 QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
@@ -546,7 +553,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
             /* Selection. */
             if(!m_channelState[i].motionSelection.isEmpty())
-                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, QColor(0, 255, 0, 40));
+                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, global_motion_selection_color);
         }
     }
 

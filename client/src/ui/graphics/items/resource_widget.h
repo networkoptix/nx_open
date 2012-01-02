@@ -220,7 +220,7 @@ public:
 
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
-     * \returns                         Coordinates of the motion cell position.
+     * \returns                         Coordinates of the motion cell that the given point belongs to.
      *                                  Note that motion grid is finite, so even if the
      *                                  passed coordinate lies outside the item boundary,
      *                                  returned joint will lie inside it.

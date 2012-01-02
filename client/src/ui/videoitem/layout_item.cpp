@@ -106,6 +106,6 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
     if (option->state & QStyle::State_Selected)
     {
-        painter->fillRect(boundingRect(), m_can_be_droped ? global_can_be_droped_color :  global_selection_color );
+        painter->fillRect(boundingRect(), m_can_be_droped ? global_can_be_dropped_color :  global_selection_color );
     }
 }
