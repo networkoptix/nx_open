@@ -66,9 +66,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_enclosingAspectRatio(1.0),
     m_frameWidth(0.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_activityDecorationsVisible(false),
-    m_displayMotionGrid(false),
-    m_motionMaskValid(false)
+    m_displayFlags(DISPLAY_SELECTION_OVERLAY)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -244,11 +242,11 @@ QRectF QnResourceWidget::channelRect(int channel) const {
 }
 
 void QnResourceWidget::showActivityDecorations() {
-    m_activityDecorationsVisible = true;
+    setDisplayFlag(DISPLAY_ACTIVITY_OVERLAY, true);
 }
 
 void QnResourceWidget::hideActivityDecorations() {
-    m_activityDecorationsVisible = false;
+    setDisplayFlag(DISPLAY_ACTIVITY_OVERLAY, false);
 }
 
 void QnResourceWidget::invalidateMotionMask() {
@@ -322,15 +320,6 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
     emit aboutToBeDestroyed();
 }
 
-void QnResourceWidget::setMotionGridDisplayed(bool displayed) {
-    if(m_displayMotionGrid == displayed)
-        return;
-
-    m_displayMotionGrid = displayed;
-
-    m_display->archiveReader()->setSendMotion(displayed);
-}
-
 QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos) 
 {
     QPointF pointf(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))));
@@ -353,6 +342,14 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect) {
 
 void QnResourceWidget::clearMotionSelection() {
     m_channelState[0].motionSelection = QRegion();
+}
+
+void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
+    DisplayFlags changedFlags = m_displayFlags ^ flags;
+    m_displayFlags = flags;
+
+    if(changedFlags & DISPLAY_MOTION_GRID)
+        m_display->archiveReader()->setSendMotion(flags & DISPLAY_MOTION_GRID);
 }
 
 // -------------------------------------------------------------------------- //
@@ -511,12 +508,15 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         QRectF rect = channelRect(i);
         QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect, effectiveOpacity());
 
+        /* Draw selected / not selected overlay. */
+        drawSelection(rect);
+
         /* Update channel state. */
         if(status == QnRenderStatus::RENDERED_NEW_FRAME)
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
 
         /* Set overlay icon. */
-        if(m_display->isPaused() && m_activityDecorationsVisible) {
+        if(m_display->isPaused() && (m_displayFlags & DISPLAY_ACTIVITY_OVERLAY)) {
             setOverlayIcon(i, PAUSED);
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
             setOverlayIcon(i, LOADING);
@@ -538,7 +538,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->endNativePainting();
 
     /* Draw motion grid. */
-    if (m_displayMotionGrid) {
+    if (m_displayFlags & DISPLAY_MOTION_GRID) {
         for(int i = 0; i < m_channelCount; i++) {
             QRectF rect = channelRect(i);
 
@@ -577,6 +577,27 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     painter->fillRect(QRectF(-fw,     h,       w + fw * 2,  fw), color);
     painter->fillRect(QRectF(-fw,     0,       fw,          h),  color);
     painter->fillRect(QRectF(w,       0,       fw,          h),  color);
+}
+
+void QnResourceWidget::drawSelection(const QRectF &rect) {
+    if(!isSelected())
+        return;
+
+    if(!(m_displayFlags & DISPLAY_SELECTION_OVERLAY))
+        return;
+
+    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    QColor color = global_selection_color;
+    color.setAlpha(color.alpha() * effectiveOpacity());
+    glColor(color);
+    glBegin(GL_QUADS);
+    glVertices(rect);
+    glEnd();
+
+    glPopAttrib();
 }
 
 void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {

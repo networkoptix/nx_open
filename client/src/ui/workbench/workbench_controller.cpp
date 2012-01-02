@@ -482,7 +482,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
-void QnWorkbenchController::at_resizing(QGraphicsView *view, QGraphicsWidget *item, const ResizingInfo &info) {
+void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
     if(m_resizedWidget != item)
         return;
 
@@ -520,7 +520,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *view, QGraphicsWidget *it
     }
 }
 
-void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
+void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING FINISHED");
 
     if(m_resizedWidget != item)
@@ -575,7 +575,7 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
     //    workbench()->setRaisedItem(NULL);
 }
 
-void QnWorkbenchController::at_drag(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
+void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *> &) {
     if(m_draggedWorkbenchItems.empty())
         return;
 
@@ -654,7 +654,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *view, const QList<QGraphicsIt
     }
 }
 
-void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
+void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
     qDebug("DRAGGING FINISHED");
 
     if(m_draggedWorkbenchItems.empty())
@@ -934,7 +934,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
         if(widget == NULL)
             continue;
 
-        widget->setMotionGridDisplayed(display);
+        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
     }
 }
 

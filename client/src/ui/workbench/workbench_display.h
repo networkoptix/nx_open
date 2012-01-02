@@ -282,12 +282,17 @@ protected:
     void initBoundingInstrument();
 
     void changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
+    void updateSelectionDisplay(QnWorkbenchItem *item);
+    void updateSelectionDisplay(QnResourceWidget *widget);
 
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
 
-    void at_viewport_animationFinished();
+    void at_scene_selectionChanged();
+    void at_scene_destroyed();
+
+    void at_viewportAnimator_finished();
 
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
@@ -308,7 +313,7 @@ protected slots:
     void at_uncurtained();
 
     void at_widget_aboutToBeDestroyed();
-    void at_scene_destroyed();
+
     void at_view_destroyed();
 
 private:
