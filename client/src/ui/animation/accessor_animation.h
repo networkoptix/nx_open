@@ -1,5 +1,5 @@
-#ifndef QN_SETTER_ANIMATION_H
-#define QN_SETTER_ANIMATION_H
+#ifndef QN_ACCESSOR_ANIMATION_H
+#define QN_ACCESSOR_ANIMATION_H
 
 #include <QVariantAnimation>
 #include <QScopedPointer>
@@ -49,4 +49,4 @@ private:
     QWeakPointer<QObject> m_target;
 };
 
-#endif // QN_SETTER_ANIMATION_H
+#endif // QN_ACCESSOR_ANIMATION_H

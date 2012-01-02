@@ -23,6 +23,7 @@ public:
     void updateView();
     
     bool isSkipViewUpdate() const;
+
 signals:
 	void finished();
     

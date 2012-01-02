@@ -7,6 +7,8 @@
 #include <QHash>
 #include <QList>
 
+class QTextStream;
+
 class QnCommandLineParameter {
 public:
     enum Type {
