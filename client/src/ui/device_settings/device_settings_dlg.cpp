@@ -25,7 +25,7 @@ CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource,
     m_tabWidget = new QTabWidget(this);
 
     foreach (const QString &group, m_resource->getResourceParamList().groupList())
-        m_tabs.append(new CLDeviceSettingsTab(this, this, m_resource, group));
+        m_tabs.append(new CLDeviceSettingsTab(this, m_resource, group));
 
     m_buttonBox = new QDialogButtonBox(this);
     m_buttonBox->setFocusPolicy(Qt::NoFocus);

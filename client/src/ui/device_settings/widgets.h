@@ -16,13 +16,13 @@ class SettingsSlider : public QSlider
     Q_OBJECT
 
 public:
-    SettingsSlider( Qt::Orientation orientation, QWidget * parent = 0 );
+    explicit SettingsSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
 Q_SIGNALS:
     void onKeyReleased();
 
 protected:
-    void keyReleaseEvent ( QKeyEvent * event );
+    void keyReleaseEvent(QKeyEvent *event);
 };
 
 //==============================================
@@ -32,33 +32,33 @@ class CLAbstractSettingsWidget : public QObject
     Q_OBJECT
 
 public:
-    CLAbstractSettingsWidget(QObject* handler, QnResourcePtr resource, QString group, QString sub_group, QString paramname);
+    CLAbstractSettingsWidget(QnResourcePtr resource, const QnParam &param);
     virtual ~CLAbstractSettingsWidget();
 
-    QWidget *widget() const;
-
     QnResourcePtr resource() const;
-    const QnParam& param() const;
+    const QnParam &param() const;
 
     QString group() const;
     QString subGroup() const;
 
+    QWidget *widget() const;
+
 Q_SIGNALS:
-    void setParam(const QString& name, const QVariant& val);
-
-public Q_SLOTS:
-    virtual void updateParam(QString val) = 0;
+    void setParam(const QString &name, const QVariant &value);
 
 protected:
-    virtual void setParam_helper(const QString& name, const QVariant& val);
+    void setParamValue(const QVariant &value);
 
-protected:
-    QnResourcePtr mDevice;
-    QnParam mParam;
-    QObject *const mHandler;
-    QWidget *mWidget;
-    QString m_group;
-    QString m_sub_group;
+    virtual QWidget *createWidget() = 0;
+
+    virtual void updateParam(const QVariant &value) = 0;
+
+private:
+    Q_DISABLE_COPY(CLAbstractSettingsWidget)
+
+    const QnResourcePtr m_resource;
+    QnParam m_param;
+    mutable QWidget *m_widget;
 };
 //==============================================
 
@@ -67,14 +67,15 @@ class SettingsOnOffWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsOnOffWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
-    ~SettingsOnOffWidget();
+    SettingsOnOffWidget(QnResourcePtr dev, const QnParam &param);
 
-public Q_SLOTS:
-     void updateParam(QString val);
+protected:
+    QWidget *createWidget();
+
+    void updateParam(const QVariant &value);
 
 private Q_SLOTS:
-    void stateChanged (int state);
+    void toggled(bool checked);
 
 private:
     QCheckBox *m_checkBox;
@@ -86,18 +87,20 @@ class SettingsMinMaxStepWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsMinMaxStepWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    SettingsMinMaxStepWidget(QnResourcePtr dev, const QnParam &param);
 
-public Q_SLOTS:
-    void updateParam(QString val);
+protected:
+    QWidget *createWidget();
+
+    void updateParam(const QVariant &value);
 
 private Q_SLOTS:
     void onValueChanged();
-    void onValueChanged(int val);
+    void onValueChanged(int value);
 
 private:
-    SettingsSlider* m_slider;
-    QGroupBox* groupBox;
+    SettingsSlider *m_slider;
+    QGroupBox *m_groupBox;
 };
 //==============================================
 
@@ -106,19 +109,20 @@ class SettingsEnumerationWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsEnumerationWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    SettingsEnumerationWidget(QnResourcePtr dev, const QnParam &param);
 
-public Q_SLOTS:
-    void updateParam(QString val);
+protected:
+    QWidget *createWidget();
+
+    void updateParam(const QVariant &value);
 
 private Q_SLOTS:
     void onClicked();
 
 private:
-    QRadioButton* getBtnByname(const QString& name);
+    QRadioButton *getButtonByname(const QString &name) const;
 
-private:
-    QList<QRadioButton*> m_radioBtns;
+    QList<QRadioButton *> m_radioButtons;
 };
 
 //==============================================
@@ -127,10 +131,12 @@ class SettingsButtonWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsButtonWidget(QObject* handler, QnResourcePtr dev, QString group, QString sub_group, QString paramname);
+    SettingsButtonWidget(QnResourcePtr dev, const QnParam &param);
 
-public Q_SLOTS:
-    void updateParam(QString val);
+protected:
+    QWidget *createWidget();
+
+    void updateParam(const QVariant &value);
 
 private Q_SLOTS:
     void onClicked();

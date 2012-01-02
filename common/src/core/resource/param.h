@@ -37,6 +37,8 @@ struct QN_EXPORT QnParamType
     bool setDefVal(const QVariant &val); // safe way to set value
 };
 
+Q_DECLARE_TYPEINFO(QnParamType, Q_COMPLEX_TYPE);
+
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 
@@ -62,15 +64,12 @@ struct QN_EXPORT QnParam
     const bool isReadOnly() const { return m_paramType->isReadOnly; }
     const QString netHelper() const { return m_paramType->paramNetHelper; }
 
-    QString toDebugString() const
-    {
-        return name() + QLatin1Char(' ') + m_paramType->default_value.toString();
-    }
-
 private:
     QnParamTypePtr m_paramType;
     QVariant m_value;
 };
+
+Q_DECLARE_TYPEINFO(QnParam, Q_COMPLEX_TYPE);
 
 
 class QN_EXPORT QnParamList

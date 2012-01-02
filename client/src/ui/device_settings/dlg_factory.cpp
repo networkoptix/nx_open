@@ -1,25 +1,24 @@
 #include "dlg_factory.h"
 
+#include <QtCore/QList>
+
 #include "device_settings_dlg.h"
 
-Q_GLOBAL_STATIC(CLDeviceSettingsDlgFactory, factory)
-
-CLDeviceSettingsDlgFactory::~CLDeviceSettingsDlgFactory()
+class Manufactures : public QList<CLAbstractDlgManufacture *>
 {
-    qDeleteAll(manufactures);
-}
+public:
+    ~Manufactures() { qDeleteAll(*this); }
+};
 
-CLDeviceSettingsDlgFactory *CLDeviceSettingsDlgFactory::instance()
-{
-    return factory();
-}
+Q_GLOBAL_STATIC(Manufactures, manufactures)
+
 
 bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
 {
     if (!resource)
         return false;
 
-    foreach (CLAbstractDlgManufacture *manufacture, factory()->manufactures) {
+    foreach (CLAbstractDlgManufacture *manufacture, *manufactures()) {
         if (manufacture->canProduceDlg(resource))
             return true;
     }
@@ -32,7 +31,7 @@ CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr
     if (!resource)
         return 0;
 
-    foreach (CLAbstractDlgManufacture *manufacture, factory()->manufactures) {
+    foreach (CLAbstractDlgManufacture *manufacture, *manufactures()) {
         if (manufacture->canProduceDlg(resource))
             return manufacture->createDlg(resource);
     }
@@ -43,5 +42,5 @@ CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr
 void CLDeviceSettingsDlgFactory::registerDlgManufacture(CLAbstractDlgManufacture *manufacture)
 {
     if (manufacture)
-        factory()->manufactures.append(manufacture);
+        manufactures()->append(manufacture);
 }

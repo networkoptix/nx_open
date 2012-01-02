@@ -10,16 +10,15 @@ class CLDeviceSettingsTab : public QWidget
     Q_OBJECT
 
 public:
-    CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dlg, QObject *handler, QnResourcePtr dev, QString group);
+    CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, QnResourcePtr resource, const QString &group);
     ~CLDeviceSettingsTab();
 
     QString name() const;
 
 protected:
-    CLAbstractDeviceSettingsDlg *const mDlg;
-    QObject *const mHandler;
-    const QnResourcePtr mDevice;
-    QString mGroup;
+    CLAbstractDeviceSettingsDlg *const m_dialog;
+    const QnResourcePtr m_resource;
+    const QString m_group;
 };
 
 #endif //abstract_device_settings_tab_h_2004
