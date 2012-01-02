@@ -734,7 +734,6 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     QnWorkbenchItem *workbenchItem = widget->item();
 
     workbench()->setItem(QnWorkbench::RAISED, workbench()->item(QnWorkbench::RAISED) == workbenchItem ? NULL : workbenchItem);
-    workbench()->setItem(QnWorkbench::FOCUSED, workbenchItem);
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -850,11 +849,13 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
 
     m_widgetByRole[role] = widget;
 
+    /* Update navigation item's target. */
+    QnResourceWidget *navigatedWidget = m_widgetByRole[QnWorkbench::ZOOMED];
+    if(navigatedWidget == NULL)
+        navigatedWidget = m_widgetByRole[QnWorkbench::RAISED];
+    m_navigationItem->setVideoCamera(widget == NULL ? NULL : navigatedWidget->display()->camera());
+
     switch(role) {
-    case QnWorkbench::FOCUSED:
-        /* Update navigation item's target. */
-        m_navigationItem->setVideoCamera(widget == NULL ? NULL : widget->display()->camera());
-        break;
     case QnWorkbench::ZOOMED: {
         bool effective = widget == NULL;
         m_resizingInstrument->setEffective(effective);
@@ -985,13 +986,13 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
     m_recordingAnimation->setEndValue(0.6);
 
     m_recordingAnimation->disconnect();
-    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(onRecordingCountdownFinished()));
-    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(onPrepareRecording(QVariant)));
+    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
+    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
     m_recordingLabel->setText(tr("Ready"));
     m_recordingAnimation->start();
 }
 
-void QnWorkbenchController::onRecordingCountdownFinished()
+void QnWorkbenchController::at_recordingAnimation_finished()
 {
     m_recordingLabel->hide();
     if (!m_countdownCanceled)
@@ -1003,7 +1004,7 @@ void QnWorkbenchController::onRecordingCountdownFinished()
     m_countdownCanceled = false;
 };
 
-void QnWorkbenchController::onPrepareRecording(QVariant value)
+void QnWorkbenchController::at_recordingAnimation_valueChanged(QVariant value)
 {
     static double TICKS = 3;
 

@@ -981,8 +981,6 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         synchronizeSceneBoundsExtension();
         break;
     }
-    case QnWorkbench::FOCUSED:
-        break;
     default:
         qnWarning("Unreachable code executed.");
         return;

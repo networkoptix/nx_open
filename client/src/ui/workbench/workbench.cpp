@@ -12,7 +12,7 @@ QnWorkbench::QnWorkbench(QObject *parent):
 {
     qRegisterMetaType<QnWorkbench::ItemRole>("QnWorkbench::ItemRole");
 
-    m_itemByRole[RAISED] = m_itemByRole[ZOOMED] = m_itemByRole[FOCUSED] = 0;
+    m_itemByRole[RAISED] = m_itemByRole[ZOOMED] = 0;
 
     m_mapper = new QnWorkbenchGridMapper(this);
 

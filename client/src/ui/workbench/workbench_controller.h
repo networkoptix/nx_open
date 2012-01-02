@@ -120,8 +120,8 @@ protected Q_SLOTS:
     void at_screenRecorder_recordingStarted();
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
-    void onPrepareRecording(QVariant value);
-    void onRecordingCountdownFinished();
+    void at_recordingAnimation_valueChanged(QVariant value);
+    void at_recordingAnimation_finished();
 
 private:
     /* Global state. */
@@ -164,6 +164,9 @@ private:
 
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;
+
+    /** Motion selection instrument. */
+    MotionSelectionInstrument *m_motionSelectionInstrument;
 
 
     /* Resizing-related state. */
@@ -216,8 +219,6 @@ private:
 
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
-
-    MotionSelectionInstrument *m_motionSelectionInstrument;
 
     QAction *m_showMotionAction;
     QAction *m_hideMotionAction;
