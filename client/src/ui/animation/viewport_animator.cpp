@@ -8,7 +8,6 @@
 #include <utils/common/checked_cast.h>
 #include <ui/common/linear_combination.h>
 #include <ui/common/magnitude.h>
-#include "setter_animation.h"
 #include "accessor.h"
 
 class ViewportRectAccessor: public AbstractAccessor {
