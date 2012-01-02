@@ -19,7 +19,7 @@ class ActivityListenerInstrument;
 class ForwardingInstrument;
 class AnimationInstrument;
 
-class CLAbstractRenderer;
+class QnAbstractRenderer;
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -169,7 +169,7 @@ public:
      * \param renderer                  Renderer to get widget for.
      * \returns                         Widget for the given renderer.
      */
-    QnResourceWidget *widget(CLAbstractRenderer *renderer) const;
+    QnResourceWidget *widget(QnAbstractRenderer *renderer) const;
 
     QnResourceWidget *widget(const QnResourcePtr &resource) const;
 
@@ -333,7 +333,7 @@ private:
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
 
     /** Renderer to widget mapping. */
-    QHash<CLAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer;
+    QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer;
 
     /** Current front z displacement value. */
     qreal m_frontZ;

@@ -37,7 +37,7 @@ QnRenderWatchMixin::QnRenderWatchMixin(QObject *parent):
     QObject(parent)
 {}
 
-void QnRenderWatchMixin::registerRenderer(CLAbstractRenderer *renderer, QObject *lifetime) {
+void QnRenderWatchMixin::registerRenderer(QnAbstractRenderer *renderer, QObject *lifetime) {
     if(renderer == NULL) {
         qnNullWarning(renderer);
         return;
@@ -59,7 +59,7 @@ void QnRenderWatchMixin::registerRenderer(CLAbstractRenderer *renderer, QObject 
     connect(lifetime, SIGNAL(destroyed()), this, SLOT(at_lifetime_destroyed()));
 }
 
-void QnRenderWatchMixin::unregisterRenderer(CLAbstractRenderer *renderer) {
+void QnRenderWatchMixin::unregisterRenderer(QnAbstractRenderer *renderer) {
     if(renderer == NULL) {
         qnNullWarning(renderer);
         return;
@@ -80,12 +80,12 @@ void QnRenderWatchMixin::at_lifetime_destroyed() {
 }
 
 void QnRenderWatchMixin::startDisplay() {
-    for(QHash<CLAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++)
+    for(QHash<QnAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++)
         pos->displayCounter = pos.key()->displayCounter();
 }
 
 void QnRenderWatchMixin::finishDisplay() {
-    for(QHash<CLAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++) {
+    for(QHash<QnAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++) {
         bool displayed = pos->displayCounter != pos.key()->displayCounter();
 
         if(displayed && !pos->displaying) {

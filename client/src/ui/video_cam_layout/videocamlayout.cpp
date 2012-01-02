@@ -71,7 +71,7 @@ m_renderWatcher(new QnRenderWatchMixin(this))
 
 	m_grid.setSettings(settings);
     m_syncPlay = new QnArchiveSyncPlayWrapper();
-    connect(renderWatcher(), SIGNAL(displayingStateChanged(CLAbstractRenderer*, bool)), this, SLOT(onDisplayingStateChanged(CLAbstractRenderer*, bool)));
+    connect(renderWatcher(), SIGNAL(displayingStateChanged(QnAbstractRenderer*, bool)), this, SLOT(onDisplayingStateChanged(QnAbstractRenderer*, bool)));
     connect(this, SIGNAL(consumerBlocksReader(QnAbstractStreamDataProvider*, bool)), m_syncPlay, SLOT(onConsumerBlocksReader(QnAbstractStreamDataProvider*, bool)));
 }
 
@@ -339,7 +339,7 @@ void SceneLayout::onTimer()
 				added = true;
 
 			if (m_deviceitems.count()==0)
-				CLGLRenderer::clearGarbage();
+				QnGLRenderer::clearGarbage();
 	}
 
 	foreach(QnResourcePtr dev, all_devs)
@@ -425,7 +425,7 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect, CLBasicLay
 	return addDevice(dev, update_scene_rect, itemSettings);
 }
 
-void SceneLayout::onDisplayingStateChanged(CLAbstractRenderer* renderer, bool value)
+void SceneLayout::onDisplayingStateChanged(QnAbstractRenderer* renderer, bool value)
 {
     foreach(CLAbstractComplicatedItem* item, m_deviceitems)
     {
@@ -657,7 +657,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
 
 	connect(item, SIGNAL(onMakeScreenshot(CLAbstractSubItemContainer*)), this, SLOT(onItemMakeScreenshot(CLAbstractSubItemContainer*)));
 
-    CLAbstractRenderer *renderer = dynamic_cast<CLAbstractRenderer *>(item);
+    QnAbstractRenderer *renderer = dynamic_cast<QnAbstractRenderer *>(item);
     if(renderer != NULL)
         m_renderWatcher->registerRenderer(renderer, item);
 

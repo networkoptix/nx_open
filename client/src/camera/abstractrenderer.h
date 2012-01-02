@@ -12,12 +12,12 @@ struct CLVideoDecoderOutput;
  * 
  * Note that it is owned by the rendering thread.
  */
-class CLAbstractRenderer
+class QnAbstractRenderer
 {
 public:
-    CLAbstractRenderer(): m_displayCounter(0) {}
+    QnAbstractRenderer(): m_displayCounter(0) {}
 
-    virtual ~CLAbstractRenderer() {}
+    virtual ~QnAbstractRenderer() {}
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
@@ -30,8 +30,6 @@ public:
     /**
      * This function is supposed to be called from <i>rendering</i> thread.
      * It notifies the <i>decoding</i> thread that the current frame was rendered.
-     * 
-     * 
      */
     void frameDisplayed() {
         m_displayCounter++;

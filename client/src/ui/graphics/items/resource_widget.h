@@ -255,6 +255,10 @@ private:
      * \returns                         Rectangle in local coordinates where given channel is to be drawn.
      */
     QRectF channelRect(int channel) const;
+    
+    void ensureMotionMask();
+
+    void invalidateMotionMask();
 
     enum OverlayIcon {
         NO_ICON,
@@ -289,8 +293,6 @@ private:
 
     void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion);
 
-    void prepareMotionMask();
-
     void drawMotionMask(QPainter *painter, const QRectF& rect);
 
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
@@ -298,6 +300,9 @@ private:
 private:
     /** Layout item. */
     QnWorkbenchItem *m_item;
+
+    /** Resource associated with this widget. */
+    QnResourcePtr m_resource;
 
     /** Display. */
     QnResourceDisplay *m_display;
@@ -347,10 +352,14 @@ private:
     /** Whether motion detection grid should be displayed. */
     bool m_displayMotionGrid;
 
-    QnResourcePtr m_resource;
+    /** Image region where motion is currently present, in parrots. */
     QRegion m_motionMask;
-    bool m_motionMaskReady;
-    __m128i* m_motionMaskBinData;
+
+    /** Binary mask for the current motion region. */
+    __m128i *m_motionMaskBinData;
+
+    /** Whether the motion mask is valid. */
+    bool m_motionMaskValid;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

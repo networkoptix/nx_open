@@ -14,9 +14,9 @@ class RectAnimator: public VariantAnimator {
     typedef VariantAnimator base_type;
 
 public:
-    QnRectAnimator(QObject *parent = NULL);
+    RectAnimator(QObject *parent = NULL);
 
-    virtual ~QnRectAnimator();
+    virtual ~RectAnimator();
 
     /**
      * \returns                         Scaling speed, scaling factor per second.

@@ -68,7 +68,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_aboutToBeDestroyedEmitted(false),
     m_activityDecorationsVisible(false),
     m_displayMotionGrid(false),
-    m_motionMaskReady(false)
+    m_motionMaskValid(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -94,6 +94,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     layout->addStretch(0x1000);
     setLayout(layout);
 
+    /* Set up motion-related stuff. */
+    m_motionMaskBinData = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
+
     /* Set up video rendering. */
     m_resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
     m_display = new QnResourceDisplay(m_resource, this);
@@ -111,9 +114,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     /* Set up overlay icons. */
     m_channelState.resize(m_channelCount);
 
+    /* Start displaying. This must be the last line in the constructor. */
     m_display->start();
-
-    m_motionMaskBinData = (__m128i*) qMallocAligned(MD_WIDTH*MD_HEIGHT,32);
 }
 
 QnResourceWidget::~QnResourceWidget() {
@@ -125,6 +127,7 @@ QnResourceWidget::~QnResourceWidget() {
         m_shadow.data()->setShapeProvider(NULL);
         delete m_shadow.data();
     }
+
     qFreeAligned(m_motionMaskBinData);
 }
 
@@ -144,12 +147,6 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
         m_shadow.data()->setSoftWidth(m_frameWidth);
 }
 
-void QnResourceWidget::setShadowDisplacement(const QPointF &displacement) {
-    m_shadowDisplacement = displacement;
-
-    updateShadowPos();
-}
-
 void QnResourceWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
     m_enclosingAspectRatio = enclosingAspectRatio;
 }
@@ -166,39 +163,6 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
     } else {
         setGeometry(enclosingGeometry);
     }
-}
-
-QPolygonF QnResourceWidget::provideShape() {
-    QTransform transform = sceneTransform();
-    QPointF zero = transform.map(QPointF());
-    transform = transform * QTransform::fromTranslate(-zero.x(), -zero.y());
-
-    qreal fw2 = m_frameWidth / 2;
-    return transform.map(QPolygonF(QRectF(QPointF(0, 0), size()).adjusted(-fw2, -fw2, fw2, fw2)));
-}
-
-void QnResourceWidget::invalidateShadowShape() {
-    if(m_shadow.isNull())
-        return;
-
-    m_shadow.data()->invalidateShape();
-}
-
-void QnResourceWidget::updateShadowZ() {
-    if(!m_shadow.isNull()) {
-        m_shadow.data()->setZValue(zValue());
-        m_shadow.data()->stackBefore(this);
-    }
-}
-
-void QnResourceWidget::updateShadowPos() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setPos(mapToScene(0.0, 0.0) + m_shadowDisplacement);
-}
-
-void QnResourceWidget::updateShadowOpacity() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setOpacity(opacity());
 }
 
 void QnResourceWidget::setGeometry(const QRectF &geometry) {
@@ -263,44 +227,6 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
     return result;
 }
 
-QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
-    switch(change) {
-    case ItemPositionHasChanged:
-        updateShadowPos();
-        break;
-    case ItemTransformHasChanged:
-    case ItemRotationHasChanged:
-    case ItemScaleHasChanged:
-    case ItemTransformOriginPointHasChanged:
-        invalidateShadowShape();
-        updateShadowPos();
-        break;
-    case ItemSceneHasChanged:
-        if(scene() != NULL && !m_shadow.isNull()) {
-            scene()->addItem(m_shadow.data());
-            updateShadowZ();
-            updateShadowPos();
-        }
-        break;
-    case ItemOpacityHasChanged:
-        updateShadowOpacity();
-        break;
-    case ItemZValueHasChanged:
-        updateShadowZ();
-        break;
-    default:
-        break;
-    }
-
-    return base_type::itemChange(change, value);
-}
-
-void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    invalidateShadowShape();
-
-    base_type::resizeEvent(event);
-}
-
 QRectF QnResourceWidget::channelRect(int channel) const {
     if (m_channelCount == 1)
         return QRectF(QPointF(0.0, 0.0), size());
@@ -325,16 +251,15 @@ void QnResourceWidget::hideActivityDecorations() {
     m_activityDecorationsVisible = false;
 }
 
-void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF& rect) 
-{
-    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
-    if (!camera)
-        return;
-    drawFilledRegion(painter, rect, camera->getMotionMask(), QColor(255, 255, 255, 26));
+void QnResourceWidget::invalidateMotionMask() {
+    m_motionMaskValid = false;
 }
 
-void QnResourceWidget::prepareMotionMask()
+void QnResourceWidget::ensureMotionMask()
 {
+    if(m_motionMaskValid)
+        return;
+
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     if (camera) 
     {
@@ -354,7 +279,7 @@ void QnResourceWidget::prepareMotionMask()
         }
 
     }
-    m_motionMaskReady = true;
+    m_motionMaskValid = true;
 };
 
 void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
@@ -377,24 +302,6 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
     /* This widget has no side frame sections in case aspect ratio is set. */
     if(hasAspectRatio())
         result = result & ~(Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection);
-
-    return result;
-}
-
-bool QnResourceWidget::windowFrameEvent(QEvent *event) {
-    bool result = base_type::windowFrameEvent(event);
-
-    if(event->type() == QEvent::GraphicsSceneHoverMove) {
-        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
-
-        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
-         *
-         * As this widget may not have a frame section associated with some parts of
-         * its frame, cursor must be unset manually. */
-        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
-        if(section == Qt::NoSection)
-            unsetCursor();
-    }
 
     return result;
 }
@@ -448,10 +355,108 @@ void QnResourceWidget::clearMotionSelection() {
     m_channelState[0].motionSelection = QRegion();
 }
 
+// -------------------------------------------------------------------------- //
+// Shadow
+// -------------------------------------------------------------------------- //
+void QnResourceWidget::setShadowDisplacement(const QPointF &displacement) {
+    m_shadowDisplacement = displacement;
+
+    updateShadowPos();
+}
+
+QPolygonF QnResourceWidget::provideShape() {
+    QTransform transform = sceneTransform();
+    QPointF zero = transform.map(QPointF());
+    transform = transform * QTransform::fromTranslate(-zero.x(), -zero.y());
+
+    qreal fw2 = m_frameWidth / 2;
+    return transform.map(QPolygonF(QRectF(QPointF(0, 0), size()).adjusted(-fw2, -fw2, fw2, fw2)));
+}
+
+void QnResourceWidget::invalidateShadowShape() {
+    if(m_shadow.isNull())
+        return;
+
+    m_shadow.data()->invalidateShape();
+}
+
+void QnResourceWidget::updateShadowZ() {
+    if(!m_shadow.isNull()) {
+        m_shadow.data()->setZValue(zValue());
+        m_shadow.data()->stackBefore(this);
+    }
+}
+
+void QnResourceWidget::updateShadowPos() {
+    if(!m_shadow.isNull())
+        m_shadow.data()->setPos(mapToScene(0.0, 0.0) + m_shadowDisplacement);
+}
+
+void QnResourceWidget::updateShadowOpacity() {
+    if(!m_shadow.isNull())
+        m_shadow.data()->setOpacity(opacity());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
+    switch(change) {
+    case ItemPositionHasChanged:
+        updateShadowPos();
+        break;
+    case ItemTransformHasChanged:
+    case ItemRotationHasChanged:
+    case ItemScaleHasChanged:
+    case ItemTransformOriginPointHasChanged:
+        invalidateShadowShape();
+        updateShadowPos();
+        break;
+    case ItemSceneHasChanged:
+        if(scene() != NULL && !m_shadow.isNull()) {
+            scene()->addItem(m_shadow.data());
+            updateShadowZ();
+            updateShadowPos();
+        }
+        break;
+    case ItemOpacityHasChanged:
+        updateShadowOpacity();
+        break;
+    case ItemZValueHasChanged:
+        updateShadowZ();
+        break;
+    default:
+        break;
+    }
+
+    return base_type::itemChange(change, value);
+}
+
+void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
+    invalidateShadowShape();
+
+    base_type::resizeEvent(event);
+}
+
+bool QnResourceWidget::windowFrameEvent(QEvent *event) {
+    bool result = base_type::windowFrameEvent(event);
+
+    if(event->type() == QEvent::GraphicsSceneHoverMove) {
+        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
+
+        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
+         *
+         * As this widget may not have a frame section associated with some parts of
+         * its frame, cursor must be unset manually. */
+        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
+        if(section == Qt::NoSection)
+            unsetCursor();
+    }
+
+    return result;
+}
+
 void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
     qreal oldAspectRatio = m_aspectRatio;
     qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
@@ -468,7 +473,7 @@ void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
 }
 
 void QnResourceWidget::at_display_resourceUpdated() {
-    m_motionMaskReady = false;
+    invalidateMotionMask();
 }
 
 
@@ -625,8 +630,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     double xStep = rect.width() / (double) MD_WIDTH;
     double yStep = rect.height() / (double) MD_HEIGHT;
 
-    if (!m_motionMaskReady)
-        prepareMotionMask();
+    ensureMotionMask();
 
     painter->setPen(QPen(QColor(255, 255, 255, 40)));
     for (int x = 0; x < MD_WIDTH; ++x) 
@@ -687,7 +691,7 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qi
     }
 }
 
-void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color) {
+void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color) {
     qDebug() << selection;
     QPainterPath path;
     path.addRegion(selection);
@@ -700,4 +704,12 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
     painter->setBrush(color);
     painter->setPen(QPen(color));
     painter->drawPath(path);
+}
+
+void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect) 
+{
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
+    if (!camera)
+        return;
+    drawFilledRegion(painter, rect, camera->getMotionMask(), QColor(255, 255, 255, 26));
 }

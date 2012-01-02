@@ -72,7 +72,7 @@ void CLLayoutNavigator::destroy()
     m_videoView->closeAllDlg();
 
     //if (m_mode==NORMAL_ViewMode)
-        CLGLRenderer::clearGarbage();
+        QnGLRenderer::clearGarbage();
 
     //delete m_videoView; // TODO
 }
@@ -189,7 +189,7 @@ void CLLayoutNavigator::onIntroScreenEscape()
 void CLLayoutNavigator::onLayOutStoped(LayoutContent* /*l*/)
 {
     if (m_mode==NORMAL_ViewMode)
-        CLGLRenderer::clearGarbage();
+        QnGLRenderer::clearGarbage();
 
     m_videoView->getCamLayOut().setContent(mNewContent);
     m_videoView->getCamLayOut().start();

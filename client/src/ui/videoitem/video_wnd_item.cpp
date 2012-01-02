@@ -35,7 +35,7 @@ CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const QnVideoResourceLa
     //setFlag(QGraphicsItem::ItemIsMovable);
 
     for (unsigned i = 0; i  < m_videonum; ++i)
-        m_gldraw[i] = new CLGLRenderer(this);
+        m_gldraw[i] = new QnGLRenderer(this);
 
     connect( this, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onResize()));
 }
@@ -241,7 +241,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     for (unsigned i = 0; i  < m_videonum; ++i)
     {
         m_gldraw[i]->setOpacity(drawSelection ? 0.7 : 1.0);
-        if (m_gldraw[i]->paintEvent(getSubChannelRect(i)) == CLGLRenderer::CANNOT_RENDER) 
+        if (m_gldraw[i]->paintEvent(getSubChannelRect(i)) == QnGLRenderer::CANNOT_RENDER) 
         {
             drawGLfailaure(painter);
         } 
@@ -344,7 +344,7 @@ void CLVideoWindowItem::drawGLfailaure(QPainter* painter)
     painter->setFont(m_FPS_Font);
 
     QString text;
-    QTextStream(&text) << tr("Image size is bigger than MAXGlTextureSize(") << CLGLRenderer::getMaxTextureSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
+    QTextStream(&text) << tr("Image size is bigger than MAXGlTextureSize(") << QnGLRenderer::getMaxTextureSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
 
     QFontMetrics metrics = QFontMetrics(m_FPS_Font);
     int border = qMax(4, metrics.leading());
@@ -445,7 +445,7 @@ QImage CLVideoWindowItem::getScreenshot()
     return rez;
 }
 
-bool CLVideoWindowItem::contains(CLAbstractRenderer* renderer)  const
+bool CLVideoWindowItem::contains(QnAbstractRenderer* renderer)  const
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {

@@ -113,7 +113,7 @@ protected slots:
 	void onItemMakeScreenshot(CLAbstractSubItemContainer* item);
 
 	void stop_helper(bool emt = true);
-    void onDisplayingStateChanged(CLAbstractRenderer* renderer, bool value);
+    void onDisplayingStateChanged(QnAbstractRenderer* renderer, bool value);
 private:
 	// remove item from lay out
 	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);

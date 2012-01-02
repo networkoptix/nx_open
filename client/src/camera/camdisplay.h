@@ -10,7 +10,7 @@
 #include "utils/common/adaptivesleep.h"
 #include "utils/media/externaltimesource.h"
 
-class CLAbstractRenderer;
+class QnAbstractRenderer;
 class CLVideoStreamDisplay;
 class CLAudioStreamDisplay;
 struct QnCompressedVideoData;
@@ -25,7 +25,7 @@ public:
 	CLCamDisplay(bool generateEndOfStreamSignal);
 	~CLCamDisplay();
 
-	void addVideoChannel(int index, CLAbstractRenderer* vw, bool can_downsacle);
+	void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
 	virtual bool processData(QnAbstractDataPacketPtr data);
 
 	void pause();

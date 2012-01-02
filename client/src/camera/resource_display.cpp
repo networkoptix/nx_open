@@ -172,7 +172,7 @@ bool QnResourceDisplay::isPaused() {
     return m_archiveReader->isMediaPaused();
 }
 
-void QnResourceDisplay::addRenderer(CLAbstractRenderer *renderer) {
+void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
     if(m_camera == NULL) {
         delete renderer;
         return;

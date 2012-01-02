@@ -28,7 +28,7 @@ QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QObject *parent):
 
     /* Prepare render watcher. */
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(display, this);
-    connect(renderWatcher, SIGNAL(displayingStateChanged(CLAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(CLAbstractRenderer *, bool)));
+    connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
 }
 
 void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -54,7 +54,7 @@ void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget
     m_syncPlay->removeArchiveReader(widget->display()->archiveReader());
 }
 
-void QnSyncPlayMixin::at_renderWatcher_displayingStateChanged(CLAbstractRenderer *renderer, bool displaying) {
+void QnSyncPlayMixin::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
     if(m_display.isNull())
         return;
 

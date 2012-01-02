@@ -417,7 +417,7 @@ QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const {
     return m_widgetByItem[item];
 }
 
-QnResourceWidget *QnWorkbenchDisplay::widget(CLAbstractRenderer *renderer) const {
+QnResourceWidget *QnWorkbenchDisplay::widget(QnAbstractRenderer *renderer) const {
     return m_widgetByRenderer[renderer];
 }
 

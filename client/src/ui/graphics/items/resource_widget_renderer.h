@@ -8,9 +8,9 @@
 
 class QThread;
 
-class CLGLRenderer;
+class QnGLRenderer;
 
-class QnResourceWidgetRenderer: public QObject, public CLAbstractRenderer, public QnRenderStatus {
+class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer, public QnRenderStatus {
     Q_OBJECT;
 public:
     QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL);
@@ -45,7 +45,7 @@ signals:
 
 private:
     /** Renderers that are used to render the channels. */
-    QList<CLGLRenderer *> m_channelRenderers;
+    QList<QnGLRenderer *> m_channelRenderers;
 
     /** Current source size, in square pixels. */
     QSize m_sourceSize;
