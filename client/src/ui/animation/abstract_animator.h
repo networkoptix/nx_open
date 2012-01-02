@@ -5,12 +5,12 @@
 #include <QVariant>
 #include "animation_timer_listener.h"
 
-class QnAnimatorGroup;
+class AnimatorGroup;
 
 /**
  * Base class for animators. 
  */
-class QnAbstractAnimator: public QObject, public AnimationTimerListener {
+class AbstractAnimator: public QObject, public AnimationTimerListener {
     Q_OBJECT;
 public:
     /**
@@ -18,12 +18,12 @@ public:
      * 
      * \param parent                    Parent object.
      */
-    QnAbstractAnimator(QObject *parent = NULL);
+    AbstractAnimator(QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnAbstractAnimator();
+    virtual ~AbstractAnimator();
 
     /**
      * Animator state.
@@ -97,7 +97,7 @@ public:
     /**
      * \returns                         Group that this animator belongs to.
      */
-    QnAnimatorGroup *group() {
+    AnimatorGroup *group() {
         return m_group;
     }
 
@@ -180,11 +180,11 @@ private:
     void ensureDuration() const;
 
 private:
-    friend class QnAnimatorGroup;
+    friend class AnimatorGroup;
 
     /* 'Stable' state. */
 
-    QnAnimatorGroup *m_group;
+    AnimatorGroup *m_group;
     State m_state;
     int m_timeLimitMSec;
     int m_durationOverride;

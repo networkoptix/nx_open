@@ -31,11 +31,12 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
     return m_channelRenderers[channel]->lastFrameMetadata();
 }
 
-
-QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect) {
+QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect, qreal opacity) {
     frameDisplayed();
 
-    return m_channelRenderers[channel]->paintEvent(rect);
+    CLGLRenderer *renderer = m_channelRenderers[channel];
+    renderer->setOpacity(opacity);
+    return renderer->paintEvent(rect);
 }
 
 void QnResourceWidgetRenderer::draw(CLVideoDecoderOutput *image) {

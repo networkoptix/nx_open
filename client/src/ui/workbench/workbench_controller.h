@@ -35,6 +35,7 @@ class QnWorkbench;
 class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
+class VariantAnimator;
 
 class QnScreenRecorder;
 
@@ -71,6 +72,9 @@ protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();
+
+    VariantAnimator *opacityAnimator(QnResourceWidget *widget);
+
 
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);

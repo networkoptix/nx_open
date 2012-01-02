@@ -144,7 +144,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
 
     /* Create viewport animator. */
-    m_viewportAnimator = new QnViewportAnimator(this); // ANIMATION: viewport.
+    m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
     m_viewportAnimator->setAbsoluteMovementSpeed(0.0); /* Viewport movement speed in scene coordinates. */
     m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
     m_viewportAnimator->setScalingSpeed(4.0); /* Viewport scaling speed, scale factor per second. */
@@ -394,22 +394,22 @@ void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Layer lay
         setLayer(item, layer);
 }
 
-QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
-    QnWidgetAnimator *animator = widget->data(ITEM_ANIMATOR).value<QnWidgetAnimator *>();
+WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
+    WidgetAnimator *animator = widget->data(ITEM_ANIMATOR).value<WidgetAnimator *>();
     if(animator != NULL)
         return animator;
 
     /* Create if it's not there.
      *
      * Note that widget is set as animator's parent. */
-    animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
+    animator = new WidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
     animator->setAbsoluteMovementSpeed(0.0);
     animator->setRelativeMovementSpeed(1.0);
     animator->setScalingSpeed(4.0);
     animator->setRotationSpeed(720.0);
     animator->setTimer(m_animationInstrument->animationTimer());
     animator->setTimeLimit(widgetAnimationDurationMsec);
-    widget->setData(ITEM_ANIMATOR, QVariant::fromValue<QnWidgetAnimator *>(animator));
+    widget->setData(ITEM_ANIMATOR, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
 }
 
@@ -760,7 +760,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
 
     /* Move! */
-    QnWidgetAnimator *animator = this->animator(widget);
+    WidgetAnimator *animator = this->animator(widget);
     if(animate) { // ANIMATION: easing curves for items.
         QEasingCurve easingCurve;
 

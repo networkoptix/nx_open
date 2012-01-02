@@ -8,12 +8,12 @@
 class QGraphicsView;
 class QMargins;
 
-class QnViewportRectAccessor;
+class ViewportRectAccessor;
 
-class QnViewportAnimator: public QnRectAnimator {
+class ViewportAnimator: public RectAnimator {
     Q_OBJECT;
 
-    typedef QnRectAnimator base_type;
+    typedef RectAnimator base_type;
 
 public:
     /**
@@ -22,9 +22,9 @@ public:
      * \param view                      View that this viewport animator will be assigned to.
      * \param parent                    Parent object.
      */
-    QnViewportAnimator(QObject *parent = NULL);
+    ViewportAnimator(QObject *parent = NULL);
 
-    virtual ~QnViewportAnimator();
+    virtual ~ViewportAnimator();
 
     /**
      * \returns                         View that this viewport animator is assigned to.
@@ -55,7 +55,7 @@ protected:
 
 private:
     /** Accessor for viewport rect. */
-    QnViewportRectAccessor *m_accessor;
+    ViewportRectAccessor *m_accessor;
 
     qreal m_relativeSpeed;
 };

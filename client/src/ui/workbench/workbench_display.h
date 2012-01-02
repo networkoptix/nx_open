@@ -26,8 +26,8 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnResourceWidget;
 class QnResourceDisplay;
-class QnViewportAnimator;
-class QnWidgetAnimator;
+class ViewportAnimator;
+class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
@@ -62,8 +62,8 @@ public:
     /**
      * Constructor.
      * 
-     * \param workbench                 Workbench to manage.
-     * \param parent                    Parent object for this workbench manager.
+     * \param workbench                 Workbench to display.
+     * \param parent                    Parent object for this workbench display.
      */
     QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent = NULL);
 
@@ -73,44 +73,51 @@ public:
     virtual ~QnWorkbenchDisplay();
 
     /**
-     * \returns                         Instrument manager owned by this workbench manager. 
+     * \returns                         Instrument manager owned by this workbench display. 
      */
     InstrumentManager *instrumentManager() const {
         return m_instrumentManager;
     }
 
     /**
-     * \returns                         Bounding instrument used by this workbench manager.
+     * \returns                         Bounding instrument used by this workbench display.
      */
     BoundingInstrument *boundingInstrument() const {
         return m_boundingInstrument;
     }
 
     /**
-     * \returns                         Transformation listener instrument used by this workbench manager.
+     * \returns                         Transformation listener instrument used by this workbench display.
      */
     TransformListenerInstrument *transformationListenerInstrument() const {
         return m_transformListenerInstrument;
     }
 
     /**
-     * \returns                         Activity listener instrument used by this workbench manager.
+     * \returns                         Activity listener instrument used by this workbench display.
      */
     ActivityListenerInstrument *activityListenerInstrument() const {
         return m_curtainActivityInstrument;
     }
 
     /**
-     * \returns                         Paint forwarding instrument used by this workbench manager.
+     * \returns                         Paint forwarding instrument used by this workbench display.
      */
     ForwardingInstrument *paintForwardingInstrument() const {
         return m_paintForwardingInstrument;
     }
 
     /**
+     * \returns                         Animation instrument used by this workbench display.
+     */
+    AnimationInstrument *animationInstrument() const {
+        return m_animationInstrument;
+    }
+
+    /**
      * Note that this function never returns NULL.
      * 
-     * \returns                         Current workbench of this workbench manager. 
+     * \returns                         Current workbench of this workbench display. 
      */
     QnWorkbench *workbench() const {
         return m_workbench;
@@ -119,7 +126,7 @@ public:
     /**
      * Note that this function never returns NULL.
      *
-     * \returns                         Current scene of this workbench manager.
+     * \returns                         Current scene of this workbench display.
      */
     QGraphicsScene *scene() const {
         return m_scene;
@@ -128,14 +135,14 @@ public:
     /**
      * Note that workbench manager does not take ownership of the supplied scene.
      *
-     * \param scene                     New scene for this workbench manager.
+     * \param scene                     New scene for this workbench display.
      *                                  If NULL is supplied, an empty scene
-     *                                  owned by this workbench manager is used.
+     *                                  owned by this workbench display is used.
      */
     void setScene(QGraphicsScene *scene);
 
     /**
-     * \returns                         Current graphics view of this workbench manager. 
+     * \returns                         Current graphics view of this workbench display. 
      *                                  May be NULL.
      */
     QGraphicsView *view() const {
@@ -143,7 +150,7 @@ public:
     }
 
     /**
-     * \param view                      New view for this workbench manager.
+     * \param view                      New view for this workbench display.
      */
     void setView(QGraphicsView *view);
 
@@ -255,7 +262,7 @@ signals:
 protected:
     virtual void tick(int deltaTime) override;
     
-    QnWidgetAnimator *animator(QnResourceWidget *widget);
+    WidgetAnimator *animator(QnResourceWidget *widget);
 
     void synchronizeGeometry(QnWorkbenchItem *item, bool animate);
     void synchronizeGeometry(QnResourceWidget *widget, bool animate);
@@ -371,7 +378,7 @@ private:
     /* Animation-related stuff. */
 
     /** Viewport animator. */
-    QnViewportAnimator *m_viewportAnimator;
+    ViewportAnimator *m_viewportAnimator;
 
     /** Curtain item. */
     QWeakPointer<QnCurtainItem> m_curtainItem;

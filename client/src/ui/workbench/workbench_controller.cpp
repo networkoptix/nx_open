@@ -1,6 +1,7 @@
 #include "workbench_controller.h"
 #include <cassert>
 #include <cmath> /* For std::floor. */
+#include <limits>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGLWidget>
@@ -45,6 +46,7 @@
 #include <ui/graphics/instruments/resize_hover_instrument.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/instruments/animation_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
@@ -61,6 +63,8 @@
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
 #include "workbench_display.h"
+
+Q_DECLARE_METATYPE(VariantAnimator *);
 
 namespace {
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
@@ -137,6 +141,10 @@ namespace {
     QPoint invalidDragDelta() {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
+
+    const char *opacityAnimatorPropertyName = "_qn_itemOpacityAnimator";
+
+    const qreal widgetManipulationOpacity = 0.3;
 
 } // anonymous namespace
 
@@ -361,6 +369,20 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
 }
 
+VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget) {
+    VariantAnimator *animator = widget->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
+    if(animator != NULL)
+        return animator;
+
+    animator = new VariantAnimator(widget);
+    animator->setTargetObject(widget);
+    animator->setTimer(display()->animationInstrument()->animationTimer());
+    animator->setAccessor(new QnPropertyAccessor("opacity"));
+    animator->setSpeed(1.0);
+    widget->setProperty(opacityAnimatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
+    return animator;
+}
+
 void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool findAccepted) {
     drop(url.toLocalFile(), gridPos, findAccepted);
 }
@@ -456,9 +478,8 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
         return;
 
     m_display->bringToFront(m_resizedWidget);
-
-    /* Show grid. */
     m_display->gridItem()->animatedShow();
+    opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
 void QnWorkbenchController::at_resizing(QGraphicsView *view, QGraphicsWidget *item, const ResizingInfo &info) {
@@ -507,8 +528,8 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 
     QnResourceWidget *widget = m_resizedWidget;
 
-    /* Hide grid. */
     m_display->gridItem()->animatedHide();
+    opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     /* Resize if possible. */
     QSet<QnWorkbenchItem *> entities = layout()->items(m_resizedWidgetRect);
@@ -544,6 +565,8 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
             continue;
 
         m_draggedWorkbenchItems.push_back(widget->item());
+
+        opacityAnimator(widget)->animateTo(widgetManipulationOpacity);
     }
 
     /* Un-raise if raised is among the dragged. */
@@ -644,10 +667,16 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
     QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
     bool success = layout()->moveItems(workbenchItems, m_dragGeometries);
 
-    /* Adjust geometry deltas if everything went fine. */
-    if(success)
-        foreach(QnWorkbenchItem *item, workbenchItems)
-            updateGeometryDelta(display()->widget(item));
+    foreach(QnWorkbenchItem *item, workbenchItems) {
+        QnResourceWidget *widget = display()->widget(item);
+
+        /* Adjust geometry deltas if everything went fine. */
+        if(success)
+            updateGeometryDelta(widget);
+
+        /* Animate opacity back. */
+        opacityAnimator(widget)->animateTo(1.0);
+    }
 
     /* Re-sync everything. */
     foreach(QnWorkbenchItem *workbenchItem, workbenchItems)

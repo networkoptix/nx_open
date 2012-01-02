@@ -9,8 +9,8 @@
 #include "variant_animator.h"
 #include "rect_animator.h"
 
-QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent):
-    QnAnimatorGroup(parent),
+WidgetAnimator::WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent):
+    AnimatorGroup(parent),
     m_geometryAnimator(NULL),
     m_rotationAnimator(NULL)
 {
@@ -19,12 +19,12 @@ QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &ge
         return;
     }
 
-    m_geometryAnimator = new QnRectAnimator(this);
+    m_geometryAnimator = new RectAnimator(this);
     m_geometryAnimator->setTargetObject(widget);
     m_geometryAnimator->setAccessor(new QnPropertyAccessor(geometryPropertyName));
     m_geometryAnimator->setEasingCurve(QEasingCurve::InOutBack);
 
-    m_rotationAnimator = new QnVariantAnimator(this);
+    m_rotationAnimator = new VariantAnimator(this);
     m_rotationAnimator->setTargetObject(widget);
     m_rotationAnimator->setAccessor(new QnPropertyAccessor(rotationPropertyName));
     m_rotationAnimator->setEasingCurve(QEasingCurve::InOutBack);
@@ -33,11 +33,11 @@ QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &ge
     addAnimator(m_rotationAnimator);
 }
 
-QnWidgetAnimator::~QnWidgetAnimator() {
+WidgetAnimator::~WidgetAnimator() {
     stop();
 }
 
-void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasingCurve &curve) {
+void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasingCurve &curve) {
     if(widget() == NULL) {
         qnWarning("Cannot move a NULL widget.");
         return;
@@ -54,43 +54,43 @@ void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEas
     start();
 }
 
-void QnWidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
+void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
     moveTo(geometry, rotation, QEasingCurve::InOutBack);
 }
 
-QGraphicsWidget *QnWidgetAnimator::widget() const {
+QGraphicsWidget *WidgetAnimator::widget() const {
     return checked_cast<QGraphicsWidget *>(m_geometryAnimator->targetObject());
 }
 
-qreal QnWidgetAnimator::scalingSpeed() const {
+qreal WidgetAnimator::scalingSpeed() const {
     return m_geometryAnimator->scalingSpeed();
 }
 
-qreal QnWidgetAnimator::relativeMovementSpeed() const {
+qreal WidgetAnimator::relativeMovementSpeed() const {
     return m_geometryAnimator->relativeMovementSpeed();
 }
 
-qreal QnWidgetAnimator::absoluteMovementSpeed() const {
+qreal WidgetAnimator::absoluteMovementSpeed() const {
     return m_geometryAnimator->absoluteMovementSpeed();
 }
 
-qreal QnWidgetAnimator::rotationSpeed() const {
+qreal WidgetAnimator::rotationSpeed() const {
     return m_rotationAnimator->speed();
 }
 
-void QnWidgetAnimator::setScalingSpeed(qreal scalingSpeed) {
+void WidgetAnimator::setScalingSpeed(qreal scalingSpeed) {
     m_geometryAnimator->setScalingSpeed(scalingSpeed);
 }
 
-void QnWidgetAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
+void WidgetAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
     m_geometryAnimator->setRelativeMovementSpeed(relativeMovementSpeed);
 }
 
-void QnWidgetAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
+void WidgetAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
     m_geometryAnimator->setAbsoluteMovementSpeed(absoluteMovementSpeed);
 }
 
-void QnWidgetAnimator::setRotationSpeed(qreal degrees) {
+void WidgetAnimator::setRotationSpeed(qreal degrees) {
     m_rotationAnimator->setSpeed(degrees);
 }
 

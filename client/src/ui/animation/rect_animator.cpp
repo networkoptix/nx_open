@@ -4,23 +4,23 @@
 #include <utils/common/warnings.h>
 #include <ui/common/scene_utility.h>
 
-QnRectAnimator::QnRectAnimator(QObject *parent):
+RectAnimator::RectAnimator(QObject *parent):
     base_type(parent),
     m_logScalingSpeed(std::log(2.0)),
     m_relativeMovementSpeed(1.0),
     m_absoluteMovementSpeed(0.0)
 {}
 
-QnRectAnimator::~QnRectAnimator() {}
+RectAnimator::~RectAnimator() {}
 
-void QnRectAnimator::updateInternalType(int newType) {
+void RectAnimator::updateInternalType(int newType) {
     if(newType != QMetaType::Void && newType != QMetaType::QRectF)
         qnWarning("Type '%1' is not supported by this animator.", QMetaType::typeName(newType));
 
     base_type::updateInternalType(newType);
 }
 
-int QnRectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
+int RectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
     if(internalType() != QMetaType::QRectF)
         return base_type::estimatedDuration(from, to);
 
@@ -38,7 +38,7 @@ int QnRectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) 
     return qMax(scalingTime, movementTime) * 1000;
 }
 
-void QnRectAnimator::setScalingSpeed(qreal scalingSpeed) {
+void RectAnimator::setScalingSpeed(qreal scalingSpeed) {
     if(scalingSpeed <= 1.0) {
         qnWarning("Invalid non-positive scaling speed %1.", scalingSpeed);
         return;
@@ -53,11 +53,11 @@ void QnRectAnimator::setScalingSpeed(qreal scalingSpeed) {
     invalidateDuration();
 }
 
-qreal QnRectAnimator::scalingSpeed() const {
+qreal RectAnimator::scalingSpeed() const {
     return std::exp(m_logScalingSpeed);
 }
 
-void QnRectAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
+void RectAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
     if(relativeMovementSpeed < 0.0) {
         qnWarning("Invalid negative movement speed %1.", relativeMovementSpeed);
         return;
@@ -72,7 +72,7 @@ void QnRectAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
     invalidateDuration();
 }
 
-void QnRectAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
+void RectAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
     if(absoluteMovementSpeed < 0.0) {
         qnWarning("Invalid negative absolute movement speed %1.", absoluteMovementSpeed);
         return;

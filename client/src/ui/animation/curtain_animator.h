@@ -7,9 +7,9 @@
 
 class QnCurtainItem;
 class QnResourceWidget;
-class QnVariantAnimator;
+class VariantAnimator;
 
-class QnCurtainAnimator: public QnAnimatorGroup {
+class QnCurtainAnimator: public AnimatorGroup {
     Q_OBJECT;
 
 public:
@@ -43,8 +43,8 @@ private:
     QColor m_curtainColor;
     QColor m_frameColor;
     bool m_curtained;
-    QnVariantAnimator *m_curtainColorAnimator;
-    QnVariantAnimator *m_frameColorAnimator;
+    VariantAnimator *m_curtainColorAnimator;
+    VariantAnimator *m_frameColorAnimator;
 };
 
 

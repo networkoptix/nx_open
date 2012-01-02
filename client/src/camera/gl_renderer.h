@@ -3,6 +3,7 @@
 
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
+#include <QtGui/QColor>
 
 #include <QtOpenGL/qgl.h>
 

@@ -219,9 +219,11 @@ signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
     void motionRegionSelected(QnResourcePtr resource, QRegion region);
+
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -238,6 +240,7 @@ protected:
 
     void updateShadowZ();
     void updateShadowPos();
+    void updateShadowOpacity();
     void invalidateShadowShape();
 
     void ensureAboutToBeDestroyedEmitted();

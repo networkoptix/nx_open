@@ -29,10 +29,12 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
-    RenderStatus paint(int channel, const QRectF &rect);
+    RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
 
     qint64 lastDisplayedTime(int channel) const;
+
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const;
+
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.

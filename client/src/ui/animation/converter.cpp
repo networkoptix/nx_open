@@ -6,7 +6,7 @@
 #include <QColor>
 #include <utils/common/warnings.h>
 
-QVariant QnAbstractConverter::convertSourceToTarget(const QVariant &source) const {
+QVariant AbstractConverter::convertSourceToTarget(const QVariant &source) const {
     if(source.userType() != sourceType()) {
         qnWarning("Source of invalid type: expected '%1', got '%2'.", QMetaType::typeName(sourceType()), QMetaType::typeName(source.userType()));
 
@@ -16,7 +16,7 @@ QVariant QnAbstractConverter::convertSourceToTarget(const QVariant &source) cons
     return doConvertSourceToTarget(source);
 }
 
-QVariant QnAbstractConverter::convertTargetToSource(const QVariant &target) const {
+QVariant AbstractConverter::convertTargetToSource(const QVariant &target) const {
     if(target.userType() != targetType()) {
         qnWarning("Target of invalid type: expected '%1', got '%2'.", QMetaType::typeName(targetType()), QMetaType::typeName(target.userType()));
 
@@ -27,7 +27,7 @@ QVariant QnAbstractConverter::convertTargetToSource(const QVariant &target) cons
 }
 
 QnColorToVectorConverter::QnColorToVectorConverter():
-    QnAbstractConverter(QMetaType::QColor, QMetaType::QVector4D)
+    AbstractConverter(QMetaType::QColor, QMetaType::QVector4D)
 {}
 
 QVariant QnColorToVectorConverter::doConvertSourceToTarget(const QVariant &source) const {

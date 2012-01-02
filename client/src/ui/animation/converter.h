@@ -6,9 +6,9 @@ class QVariant;
 /**
  * Abstract converter class. 
  */
-class QnAbstractConverter {
+class AbstractConverter {
 public:
-    QnAbstractConverter(int sourceType, int targetType):
+    AbstractConverter(int sourceType, int targetType):
         m_sourceType(sourceType),
         m_targetType(targetType)
     {}
@@ -25,7 +25,7 @@ public:
 
     QVariant convertTargetToSource(const QVariant &target) const;
 
-    virtual ~QnAbstractConverter() {}
+    virtual ~AbstractConverter() {}
 
 protected:
     virtual QVariant doConvertSourceToTarget(const QVariant &source) const = 0;
@@ -41,7 +41,7 @@ private:
 /**
  * QVector4D->QColor converter. 
  */
-class QnColorToVectorConverter: public QnAbstractConverter {
+class QnColorToVectorConverter: public AbstractConverter {
 public:
     QnColorToVectorConverter();
 
