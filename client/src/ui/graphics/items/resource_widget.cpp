@@ -25,8 +25,6 @@ namespace {
     /** Default frame color. */
     const QColor defaultFrameColor = QColor(128, 128, 128, 196);
 
-    const QColor selectedFrameColorMixIn = QColor(255, 255, 255, 0);
-
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
      *
@@ -563,14 +561,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-
-    /* Prepare color. */
     QColor color = m_frameColor;
-    if(isSelected()) {
-        color.setRed  ((color.red()   + selectedFrameColorMixIn.red())   / 2);
-        color.setGreen((color.green() + selectedFrameColorMixIn.green()) / 2);
-        color.setBlue ((color.blue()  + selectedFrameColorMixIn.blue())  / 2);
-    }
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
     painter->fillRect(QRectF(-fw,     -fw,     w + fw * 2,  fw), color);
