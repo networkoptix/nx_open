@@ -3,6 +3,8 @@
 
 #include "drag_processing_instrument.h"
 
+class SelectionPreFixupInstrument;
+
 /**
  * Clicks on graphics widget's frame is treated differently compared to a click
  * on the surface, which results in surprises with selection handling.
@@ -20,9 +22,7 @@ class SelectionFixupInstrument: public DragProcessingInstrument {
 public:
     SelectionFixupInstrument(QObject *parent = NULL);
 
-    Instrument *preForwardingInstrument() {
-        return m_preForwardingInstrument;
-    }
+    Instrument *preForwardingInstrument() const;
 
 protected:
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
@@ -34,7 +34,7 @@ protected:
 
 private:
     bool m_isClick;
-    Instrument *m_preForwardingInstrument;
+    SelectionPreFixupInstrument *m_preForwardingInstrument;
 };
 
 
