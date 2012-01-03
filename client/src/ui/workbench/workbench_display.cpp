@@ -25,6 +25,7 @@
 #include <ui/graphics/instruments/stop_instrument.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
+#include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
@@ -114,6 +115,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_widgetActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+    m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
@@ -123,6 +125,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_instrumentManager->installInstrument(m_curtainActivityInstrument);
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(m_animationInstrument);
+    m_instrumentManager->installInstrument(m_selectionOverlayHackInstrument);
 
     m_curtainActivityInstrument->recursiveDisable();
 
@@ -244,7 +247,6 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     }
 
     connect(m_scene, SIGNAL(destroyed()),           this, SLOT(at_scene_destroyed()));
-    connect(m_scene, SIGNAL(selectionChanged()),    this, SLOT(at_scene_selectionChanged()));
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -882,30 +884,6 @@ void QnWorkbenchDisplay::at_workbench_modeChanged() {
     }
 }
 
-void QnWorkbenchDisplay::updateSelectionDisplay(QnWorkbenchItem *item) {
-    updateSelectionDisplay(widget(item));
-}
-
-void QnWorkbenchDisplay::updateSelectionDisplay(QnResourceWidget *widget) {
-    bool result;
-
-    if(widget->item() == m_itemByRole[QnWorkbench::ZOOMED]) {
-        result = false;
-    } else if(widget->item() == m_itemByRole[QnWorkbench::RAISED] && scene()->selectedItems().size() == 1) {
-        result = false;
-    } else {
-        result = true;
-    }
-
-    widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY, result);
-}
-
-void QnWorkbenchDisplay::at_scene_selectionChanged() {
-    QnWorkbenchItem *raisedItem = m_itemByRole[QnWorkbench::RAISED];
-    if(raisedItem != NULL)
-        updateSelectionDisplay(raisedItem);
-}
-
 namespace {
     QnWorkbenchItem *audioItem(QnWorkbenchItem *(&itemByRole)[QnWorkbench::ITEM_ROLE_COUNT]) {
         if(itemByRole[QnWorkbench::ZOOMED] != NULL) {
@@ -944,15 +922,11 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         /* Sync new & old items. */
         if(oldItem != NULL) {
             synchronize(oldItem);
-
-            updateSelectionDisplay(oldItem);
         }
         
         if(item != NULL) {
             bringToFront(item);
             synchronize(item, true);
-
-            updateSelectionDisplay(item);
         }
 
         break;
@@ -962,8 +936,6 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
             synchronize(oldItem, true);
 
             m_curtainActivityInstrument->recursiveDisable();
-
-            updateSelectionDisplay(oldItem);
         }
 
         if(item != NULL) {
@@ -973,8 +945,6 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
             m_curtainActivityInstrument->recursiveEnable();
 
             m_viewportAnimator->moveTo(itemGeometry(item));
-
-            updateSelectionDisplay(item);
         } else {
             m_viewportAnimator->moveTo(fitInViewGeometry());
         }
