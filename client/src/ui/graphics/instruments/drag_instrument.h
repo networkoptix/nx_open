@@ -8,8 +8,16 @@ class DragInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
     DragInstrument(QObject *parent);
+
     virtual ~DragInstrument();
 
+    /**
+     * Whether the instrument is effective.
+     * 
+     * When dragging instrument is not effective it never starts the actual
+     * drag. However, drag process is still handled and <tt>dragProcessStarted</tt>
+     * signal is emitted.
+     */
     bool isEffective() const {
         return m_effective;
     }

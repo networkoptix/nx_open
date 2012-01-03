@@ -260,8 +260,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                                             itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                                          itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                                         itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_dragInstrument,               SLOT(recursiveEnable()));
@@ -275,10 +275,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveEnable()));
 
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                      m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     m_dragInstrument,               SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
@@ -746,6 +746,9 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(info.modifiers() != 0)
         return;
 
+    if(workbench()->item(QnWorkbench::ZOOMED) != NULL)
+        return; /* Don't change currently raised item if we're zoomed. It is surprising for the user. */
+
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
@@ -808,7 +811,6 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
             workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
         } else {
             workbench()->setItem(QnWorkbench::ZOOMED, NULL);
-            workbench()->setItem(QnWorkbench::RAISED, workbenchItem);
         }
     } else {
         workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);

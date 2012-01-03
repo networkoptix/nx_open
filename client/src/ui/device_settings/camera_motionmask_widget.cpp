@@ -8,12 +8,15 @@ QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QString& unicId, QWidge
 {
     m_widget = new QnResourceWidget(new QnWorkbenchItem(unicId), 0);
     m_widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
+
     m_widget->setEnclosingGeometry(geometry());
     m_widget->setFrameWidth(0);
 
     m_scene.addItem(m_widget);
     
     m_view = new QGraphicsView(&m_scene);
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     QGLFormat glFormat;
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
     glFormat.setSwapInterval(1); /* Turn vsync on. */
