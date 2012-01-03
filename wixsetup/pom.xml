@@ -28,6 +28,17 @@
 				<version>1.1</version>
 				<executions>
 					<execution>
+						<id>initialize</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>qtvars.bat</executable>
+							<workingDirectory>${baseDir}</workingDirectory>
+						</configuration>					
+					</execution>				
+					<execution>
 						<id>package-PropsCA-with-msbuild</id>
 						<phase>package</phase>
 						<goals>
