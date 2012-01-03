@@ -746,6 +746,9 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(info.modifiers() != 0)
         return;
 
+    if(workbench()->item(QnWorkbench::ZOOMED) != NULL)
+        return; /* Don't change currently raised item if we're zoomed. It is surprising for the user. */
+
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
@@ -808,7 +811,6 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
             workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
         } else {
             workbench()->setItem(QnWorkbench::ZOOMED, NULL);
-            workbench()->setItem(QnWorkbench::RAISED, workbenchItem);
         }
     } else {
         workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
