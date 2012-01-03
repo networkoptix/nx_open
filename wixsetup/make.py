@@ -53,3 +53,7 @@ os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtensi
 
 os.system(r'cscript FixExitDialog.js %s' % output_file)
 
+
+if not os.path.exists(output_file):
+    print >> sys.stderr, 'Output file is not created. Build failed'
+    sys.exit(1)
