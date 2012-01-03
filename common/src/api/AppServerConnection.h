@@ -34,7 +34,6 @@ public:
 
     int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId);
     int getStorages(QnResourceList& storages);
-    int getScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnId& mediaServerId);
 
     QString lastError() const;
 

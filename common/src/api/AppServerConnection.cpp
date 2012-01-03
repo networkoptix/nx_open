@@ -169,20 +169,6 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
     return status;
 }
 
-int QnAppServerConnection::getScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnId& mediaServerId)
-{
-    QnApiScheduleTaskResponsePtr xsdScheduleTasks;
-
-    int status = m_sessionManager->getScheduleTasks(xsdScheduleTasks, mediaServerId);
-
-    if (!xsdScheduleTasks.isNull())
-    {
-        parseScheduleTasks(scheduleTasks, xsdScheduleTasks->scheduleTask(), m_resourceFactory);
-    }
-
-    return status;
-}
-
 QString QnAppServerConnection::lastError() const
 {
     return m_sessionManager->lastError();

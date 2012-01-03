@@ -191,34 +191,6 @@ int AppSessionManager::getCameras(QnApiCameraResponsePtr& scheduleTasks, const Q
     return status;
 }
 
-int AppSessionManager::getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks, const QnId& mediaServerId)
-{
-    QByteArray reply;
-
-    int status = sendGetRequest(QString("scheduleTask/%1").arg(mediaServerId.toString()), reply);
-    if (status == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            scheduleTasks = QnApiScheduleTaskResponsePtr(xsd::api::scheduleTasks::scheduleTasks (is, XSD_FLAGS).release());
-
-            return 0;
-        }
-        catch (const xml_schema::exception& e)
-        {
-            m_lastError = e.what();
-
-            qDebug(e.what());
-            return -1;
-        }
-    }
-
-    return status;
-}
-
 int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
 {
     QByteArray reply;
