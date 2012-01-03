@@ -196,9 +196,9 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     // Draw time periods
     if (!m_parent->recTimePeriodList().empty())
-        drawTimePeriods(painter, m_parent->recTimePeriodList(), QColor(255, 0, 0, 96));
+        drawTimePeriods(painter, m_parent->recTimePeriodList(), QColor(255, 0, 0, 192));
     if (!m_parent->motionTimePeriodList().empty())
-        drawTimePeriods(painter, m_parent->motionTimePeriodList(), QColor(0, 255, 0, 96));
+        drawTimePeriods(painter, m_parent->motionTimePeriodList(), QColor(0, 255, 0, 192));
 
     r = contentsRect();
     qreal l = r.left() + QStyle::sliderPositionFromValue(minimum(), maximum(), maximum() - m_endSize, r.width());
