@@ -61,8 +61,6 @@ win* {
 
 mac {
     LIBS += -framework OpenAL
-
-    LIBS += -lcrypto
 }
 
 win32 {
@@ -75,20 +73,31 @@ win32 {
     !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
 }
 
+unix {
+  LIBS += -lcrypto -lz
+  QMAKE_CXXFLAGS += -msse4.1
+  DEFINES += QN_EXPORT=
+}
+
 mac {
     LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1
-    DEFINES += QN_EXPORT=
 }
+
+unix:!mac {
+    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c -lopenal
+}
+
+DEFINES += __STDC_CONSTANT_MACROS
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug
+  LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug $$LIBS
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release
+  LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release $$LIBS
 }
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
@@ -125,9 +134,8 @@ win32 {
 
 mac {
   LIBS += -framework IOKit -framework CoreServices
-  LIBS += -lz -lbz2
+  LIBS += -lbz2
 
-  QMAKE_CXXFLAGS += -msse4.1
   PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
   PRIVATE_FRAMEWORKS.path = Contents/MacOS
   QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
@@ -148,7 +156,7 @@ RESOURCES += ../build/skin.qrc
 FORMS += ui/preferences/connectionssettingswidget.ui ui/preferences/licensewidget.ui ui/preferences/preferences.ui ui/preferences/recordingsettingswidget.ui \
          ui/dialogs/logindialog.ui ui/dialogs/tagseditdialog.ui \
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui \
-         ui/device_settings/camera_schedule.ui ui/dialogs/connectionTestingDialog.ui
+         ui/device_settings/camera_schedule.ui ui/dialogs/connectiontestingdialog.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"

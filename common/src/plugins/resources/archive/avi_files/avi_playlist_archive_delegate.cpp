@@ -161,9 +161,16 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec)
     int rez;
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
+    {
+        // Testing on linux with newer ffmpeg. Need to fix it later.
+#ifndef Q_OS_LINUX
         ff_read_frame_flush(m_formatContext);
-    else
+#endif
+    } else
+    {
         rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+    }
+
     m_inSeek = false;
     return mksec;
 }

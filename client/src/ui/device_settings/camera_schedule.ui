@@ -472,13 +472,13 @@
   <customwidget>
    <class>QnScheduleGridWidget</class>
    <extends>QWidget</extends>
-   <header>qnschedulegridwidget.h</header>
+   <header>ui/device_settings/qnschedulegridwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnCheckedButton</class>
    <extends>QToolButton</extends>
-   <header>qncheckedbutton.h</header>
+   <header>ui/device_settings/qncheckedbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

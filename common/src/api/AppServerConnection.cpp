@@ -169,20 +169,6 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
     return status;
 }
 
-int QnAppServerConnection::getScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnId& mediaServerId)
-{
-    QnApiScheduleTaskResponsePtr xsdScheduleTasks;
-
-    int status = m_sessionManager->getScheduleTasks(xsdScheduleTasks, mediaServerId);
-
-    if (!xsdScheduleTasks.isNull())
-    {
-        parseScheduleTasks(scheduleTasks, xsdScheduleTasks->scheduleTask(), m_resourceFactory);
-    }
-
-    return status;
-}
-
 QString QnAppServerConnection::lastError() const
 {
     return m_sessionManager->lastError();
@@ -212,7 +198,7 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
     }
 }
 
-QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QUrl url, QnResourceFactory &resourceFactory)
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QUrl& url, QnResourceFactory &resourceFactory)
 {
     cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
 

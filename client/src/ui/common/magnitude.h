@@ -1,6 +1,7 @@
 #ifndef QN_MAGNITUDE_H
 #define QN_MAGNITUDE_H
 
+#include <typeinfo>
 #include <utils/common/warnings.h>
 
 class QPointF;
