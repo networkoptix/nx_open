@@ -61,6 +61,8 @@
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
 #include "workbench_display.h"
+#include "ui/device_settings/camera_schedule_widget.h"
+#include "ui/device_settings/camera_motionmask_widget.h"
 
 namespace {
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
@@ -872,6 +874,17 @@ void QnWorkbenchController::at_showMotionAction_triggered()
 {
     displayMotionGrid(display()->scene()->selectedItems(), true);
     m_motionSelectionInstrument->recursiveEnable();
+
+#if 0
+    
+    CameraScheduleWidget* test1 = new CameraScheduleWidget(0);
+    test1->show();
+#endif
+#if 0
+    QnResourceWidget* widget = dynamic_cast<QnResourceWidget*> (display()->scene()->selectedItems()[0]);
+    QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource()->getUniqueId());
+    test2->show();
+#endif
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
