@@ -75,6 +75,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_lastSleepInterval(0),
       //m_previousVideoDisplayedTime(0),
       m_afterJump(false),
+      m_bofReceived(false),
       m_displayLasts(0),
       m_ignoringVideo(false),
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
@@ -390,6 +391,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
 
     QMutexLocker lock(&m_timeMutex);
     m_afterJump = true;
+    m_bofReceived = false;
     m_buffering = true;
     m_lastDisplayedVideoTime = AV_NOPTS_VALUE;
     //clearUnprocessedData();
@@ -585,7 +587,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     if( m_afterJump)
     {
-        if (!(media->flags & QnAbstractMediaData::MediaFlags_BOF)) // jump finished, but old data received)
+        //if (!(media->flags & QnAbstractMediaData::MediaFlags_BOF)) // jump finished, but old data received)
+        //    return true; // jump finished, but old data received
+        if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
+            m_bofReceived = true;
+        if (!m_bofReceived)
             return true; // jump finished, but old data received
 
         qint64 ts = vd? vd->timestamp : ad->timestamp;
@@ -593,9 +599,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (ad && ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
             return true; // skip packet
         // clear everything we can
+        m_bofReceived = false;
         afterJump(media);
         QMutexLocker lock(&m_timeMutex);
-        if (m_executingJump == 0)
+        if (m_executingJump == 0) 
             m_afterJump = false;
         //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
