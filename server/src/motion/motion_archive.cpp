@@ -264,12 +264,25 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
     if (!indexFile.open(QFile::ReadOnly)) 
         return false;
 
-    qint64 indexSize = (indexFile.size()-MOTION_INDEX_HEADER_SIZE);
-    if (indexSize == 0)
-        return false;
-    index.resize(indexSize/MOTION_INDEX_RECORD_SIZE);
+    //qint64 indexSize = (indexFile.size()-MOTION_INDEX_HEADER_SIZE);
+    //if (indexSize == 0)
+    //    return false;
+    //index.resize(indexSize/MOTION_INDEX_RECORD_SIZE);
     indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
-    indexFile.read((char*) &index[0], indexSize);
+    //indexFile.read((char*) &index[0], indexSize);
+
+    quint8 tmpBuffer[1024*128];
+    while(1)
+    {
+        int readed = indexFile.read((char*) tmpBuffer, sizeof(tmpBuffer));
+        if (readed < 1)
+            break;
+        int records = readed / MOTION_INDEX_RECORD_SIZE;
+        int oldVectorSize = index.size();
+        index.resize(oldVectorSize + records);
+        memcpy(&index[oldVectorSize], tmpBuffer, records * MOTION_INDEX_RECORD_SIZE);
+    }
+
     return true;
 }
 
@@ -326,10 +339,19 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     }
     quint32 relTime = quint32(timestamp - m_firstTime);
     quint32 duration = int(data->m_duration/1000);
-    m_detailedIndexFile.write((const char*) &relTime, 4);
-    m_detailedIndexFile.write((const char*) &duration, 4);
+    if (m_detailedIndexFile.write((const char*) &relTime, 4) != 4)
+    {
+        qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
+    }
+    if (m_detailedIndexFile.write((const char*) &duration, 4) != 4)
+    {
+        qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
+    }
 
-    m_detailedMotionFile.write(data->data.constData(), data->data.capacity());
+    if (m_detailedMotionFile.write(data->data.constData(), data->data.capacity()) != data->data.capacity())
+    {
+        qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
+    }
 
     m_detailedIndexFile.flush();
     m_detailedMotionFile.flush();
