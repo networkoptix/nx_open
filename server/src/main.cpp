@@ -32,6 +32,7 @@
 #include "eventmanager.h"
 
 #include <fstream>
+#include "plugins/resources/axis/axis_resource_searcher.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -440,6 +441,7 @@ public:
         //============================
         QnResourceDiscoveryManager::instance().addResourceProcessor(m_processor);
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().start();
         //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
         //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
