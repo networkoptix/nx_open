@@ -56,6 +56,9 @@ void DragInstrument::startDragProcess(DragInfo *info) {
 }
 
 void DragInstrument::startDrag(DragInfo *info) {
+    if(!m_effective)
+        return;
+
     if(m_itemToSelect != NULL) {
         m_itemToSelect->setSelected(true);
         m_itemToSelect = NULL;
@@ -78,6 +81,9 @@ void DragInstrument::dragMove(DragInfo *info) {
 }
 
 void DragInstrument::finishDrag(DragInfo *info) {
+    if(!m_effective)
+        return;
+
     emit dragFinished(info->view(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
 }
 
