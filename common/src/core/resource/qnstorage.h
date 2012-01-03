@@ -3,8 +3,12 @@
 
 #include "resource.h"
 
-class QnStorage: public QnResource
+class QnStorage : public QnResource
 {
+    Q_OBJECT
+    Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
+    Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
+
 public:
     QnStorage();
     virtual ~QnStorage();
@@ -23,8 +27,6 @@ public:
      */
     void setIndex(quint16 value);
     quint16 getIndex() const;
-
-    Q_PROPERTY (qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
 
 protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);

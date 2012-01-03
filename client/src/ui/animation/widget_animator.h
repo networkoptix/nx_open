@@ -9,10 +9,10 @@
 class QGraphicsWidget;
 class QEasingCurve;
 
-class QnVariantAnimator;
-class QnRectAnimator;
+class VariantAnimator;
+class RectAnimator;
 
-class QnWidgetAnimator: public QnAnimatorGroup {
+class WidgetAnimator: public AnimatorGroup {
     Q_OBJECT;
 public:
     /**
@@ -23,12 +23,12 @@ public:
      * \param rotationPropertyName      Property name for changing widget's rotation.
      * \param parent                    Parent object.
      */
-    QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent = NULL);
+    WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnWidgetAnimator();
+    virtual ~WidgetAnimator();
 
     /**
      * Starts animated move of a widget to the given position.
@@ -81,12 +81,12 @@ public:
 
 private:
     /** Widget geometry animation. */
-    QnRectAnimator *m_geometryAnimator;
+    RectAnimator *m_geometryAnimator;
 
     /** Widget rotation animation. */
-    QnVariantAnimator *m_rotationAnimator;
+    VariantAnimator *m_rotationAnimator;
 };
 
-Q_DECLARE_METATYPE(QnWidgetAnimator *);
+Q_DECLARE_METATYPE(WidgetAnimator *);
 
 #endif // QN_WIDGET_ANIMATOR_H

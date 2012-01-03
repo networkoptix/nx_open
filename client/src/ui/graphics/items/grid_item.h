@@ -8,7 +8,7 @@
 class AnimationTimer;
 
 class QnWorkbenchGridMapper;
-class QnVariantAnimator;
+class VariantAnimator;
 class QnGridHighlightItem;
 
 class QnGridItem : public QGraphicsObject {
@@ -84,7 +84,7 @@ protected:
 
     QPoint itemCell(QnGridHighlightItem *item) const;
     void setItemCell(QnGridHighlightItem *item, const QPoint &cell) const;
-    QnVariantAnimator *itemAnimator(QnGridHighlightItem *item);
+    VariantAnimator *itemAnimator(QnGridHighlightItem *item);
 
 protected slots:
     void at_itemAnimator_finished();
@@ -101,7 +101,7 @@ private:
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     QColor m_color;
     qreal m_lineWidth;
-    QnVariantAnimator *m_opacityAnimator;
+    VariantAnimator *m_opacityAnimator;
     QHash<int, QColor> m_colorByState;
     QHash<QPoint, PointData> m_dataByCell;
     QList<QnGridHighlightItem *> m_freeItems;

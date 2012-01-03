@@ -8,10 +8,9 @@
 #include <utils/common/checked_cast.h>
 #include <ui/common/linear_combination.h>
 #include <ui/common/magnitude.h>
-#include "setter_animation.h"
 #include "accessor.h"
 
-class QnViewportRectAccessor: public QnAbstractAccessor {
+class ViewportRectAccessor: public AbstractAccessor {
 public:
     virtual QVariant get(const QObject *object) const override {
         const QGraphicsView *view = checked_cast<const QGraphicsView *>(object);
@@ -57,29 +56,29 @@ private:
     QMargins m_margins;
 };
 
-QnViewportAnimator::QnViewportAnimator(QObject *parent):
+ViewportAnimator::ViewportAnimator(QObject *parent):
     base_type(parent),
-    m_accessor(new QnViewportRectAccessor()),
+    m_accessor(new ViewportRectAccessor()),
     m_relativeSpeed(0.0)
 {
     setAccessor(m_accessor);
 }
 
-QnViewportAnimator::~QnViewportAnimator() {
+ViewportAnimator::~ViewportAnimator() {
     stop();
 }
 
-void QnViewportAnimator::setView(QGraphicsView *view) {
+void ViewportAnimator::setView(QGraphicsView *view) {
     stop();
 
     setTargetObject(view);
 }
 
-QGraphicsView *QnViewportAnimator::view() const {
+QGraphicsView *ViewportAnimator::view() const {
     return checked_cast<QGraphicsView *>(targetObject());
 }
 
-void QnViewportAnimator::moveTo(const QRectF &rect) {
+void ViewportAnimator::moveTo(const QRectF &rect) {
     pause();
     
     setTargetValue(rect);
@@ -87,15 +86,15 @@ void QnViewportAnimator::moveTo(const QRectF &rect) {
     start();
 }
 
-const QMargins &QnViewportAnimator::viewportMargins() const {
+const QMargins &ViewportAnimator::viewportMargins() const {
     return m_accessor->margins();
 }
 
-void QnViewportAnimator::setViewportMargins(const QMargins &margins) {
+void ViewportAnimator::setViewportMargins(const QMargins &margins) {
     m_accessor->setMargins(margins);
 }
 
-int QnViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
+int ViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
     QGraphicsView *view = this->view();
     QRectF startRect = m_accessor->aspectRatioAdjusted(view, from.toRectF());
     QRectF targetRect = m_accessor->aspectRatioAdjusted(view, to.toRectF());
@@ -103,7 +102,7 @@ int QnViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &
     return base_type::estimatedDuration(startRect, targetRect);
 }
 
-QRectF QnViewportAnimator::targetRect() const {
+QRectF ViewportAnimator::targetRect() const {
     return targetValue().toRectF();
 }
 

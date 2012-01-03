@@ -2,7 +2,6 @@
 
 #include <QtGui/QBoxLayout>
 #include <QtGui/QSplitter>
-#include <QtGui/QStyle>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
 
@@ -75,7 +74,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-    QAction *reconnectAction = new QAction(style()->standardIcon(QStyle::SP_BrowserReload), tr("Reconnect"), this);
+    QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));

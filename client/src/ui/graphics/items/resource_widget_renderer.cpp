@@ -7,16 +7,16 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(int channelCount, QObject *pa
     QObject(parent)
 {
     for(int i = 0; i < channelCount; i++)
-        m_channelRenderers.push_back(new CLGLRenderer());
+        m_channelRenderers.push_back(new QnGLRenderer());
 }
 
 void QnResourceWidgetRenderer::beforeDestroy() {
-    foreach(CLGLRenderer *renderer, m_channelRenderers)
+    foreach(QnGLRenderer *renderer, m_channelRenderers)
         renderer->beforeDestroy();
 }
 
 QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
-    foreach(CLGLRenderer *renderer, m_channelRenderers)
+    foreach(QnGLRenderer *renderer, m_channelRenderers)
         delete renderer;
 
     m_channelRenderers.clear();
@@ -31,11 +31,12 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
     return m_channelRenderers[channel]->lastFrameMetadata();
 }
 
-
-QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect) {
+QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect, qreal opacity) {
     frameDisplayed();
 
-    return m_channelRenderers[channel]->paintEvent(rect);
+    QnGLRenderer *renderer = m_channelRenderers[channel];
+    renderer->setOpacity(opacity);
+    return renderer->paintEvent(rect);
 }
 
 void QnResourceWidgetRenderer::draw(CLVideoDecoderOutput *image) {

@@ -91,7 +91,7 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiReso
                     param->ui = *propertyTypesIter->ui();
 
                 if (propertyTypesIter->readonly().present())
-                    param->readonly = *propertyTypesIter->readonly();
+                    param->isReadOnly = *propertyTypesIter->readonly();
 
                 resourceType->addParamType(param);
             }

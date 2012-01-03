@@ -14,7 +14,7 @@ static const int MAX_QUEUE_TIME = 1000 * 200;
 class BufferedFrameDisplayer: public CLLongRunnable 
 {
 public:
-    BufferedFrameDisplayer(CLAbstractRenderer* drawer): m_queue(MAX_FRAME_QUEUE_SIZE-1), m_drawer(drawer)
+    BufferedFrameDisplayer(QnAbstractRenderer* drawer): m_queue(MAX_FRAME_QUEUE_SIZE-1), m_drawer(drawer)
     {
         m_currentTime = AV_NOPTS_VALUE;
         m_expectedTime = AV_NOPTS_VALUE;
@@ -165,7 +165,7 @@ private:
     qint64 m_expectedTime;
     QTime m_timer;
     QTime m_alignedTimer;
-    CLAbstractRenderer* m_drawer;
+    QnAbstractRenderer* m_drawer;
     qint64 m_currentTime;
     QMutex m_sync;
     qint64 m_lastDisplayedTime;
@@ -221,7 +221,7 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
     delete m_prevFrameToDelete;
 }
 
-void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
+void CLVideoStreamDisplay::setDrawer(QnAbstractRenderer* draw)
 {
     m_drawer = draw;
 }
@@ -291,7 +291,7 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
     int newWidth = srcWidth / rez;
     int newHeight = srcHeight / rez;
-    int maxTextureSize = CLGLRenderer::getMaxTextureSize();
+    int maxTextureSize = QnGLRenderer::getMaxTextureSize();
     while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
     {
         rez = CLVideoDecoderOutput::downscale_factor ((int)rez * 2);
@@ -467,7 +467,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
 
     CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
-    bool useTmpFrame =  !CLGLRenderer::isPixelFormatSupported(pixFmt) ||
+    bool useTmpFrame =  !QnGLRenderer::isPixelFormatSupported(pixFmt) ||
         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
         scaleFactor > CLVideoDecoderOutput::factor_1;
 
@@ -555,7 +555,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
 
     if (useTmpFrame)
     {
-        if (CLGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= CLVideoDecoderOutput::factor_8)
+        if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= CLVideoDecoderOutput::factor_8)
             CLVideoDecoderOutput::downscale(&m_tmpFrame, outFrame, scaleFactor); // fast scaler
         else {
             if (!rescaleFrame(m_tmpFrame, *outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor)) // universal scaler

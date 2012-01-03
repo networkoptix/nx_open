@@ -1,8 +1,8 @@
 #ifndef QN_FRAME_SECTION_QUERYABLE_H
 #define QN_FRAME_SECTION_QUERYABLE_H
 
-#include <QtGlobal>
-#include <utils/common/warnings.h>
+#include <Qt>
+#include <QRectF>
 
 namespace Qn {
     /**
@@ -25,66 +25,13 @@ namespace Qn {
 
     Q_DECLARE_FLAGS(WindowFrameSections, WindowFrameSection);
 
-    inline Qn::WindowFrameSection toQnFrameSection(Qt::WindowFrameSection section) {
-        return static_cast<Qn::WindowFrameSection>(1 << (section - 1));
-    }
+    Qn::WindowFrameSection toQnFrameSection(Qt::WindowFrameSection section);
 
-    inline Qt::WindowFrameSection toQtFrameSection(Qn::WindowFrameSection section) {
-        switch(section) {
-        case NoSection:             return Qt::NoSection;
-        case LeftSection:           return Qt::LeftSection;
-        case TopLeftSection:        return Qt::TopLeftSection;
-        case TopSection:            return Qt::TopSection;
-        case TopRightSection:       return Qt::TopRightSection;
-        case RightSection:          return Qt::RightSection;
-        case BottomRightSection:    return Qt::BottomRightSection;
-        case BottomSection:         return Qt::BottomSection;
-        case BottomLeftSection:     return Qt::BottomLeftSection;
-        case TitleBarArea:          return Qt::TitleBarArea;
-        default:
-            qnWarning("Invalid Qn::WindowFrameSection '%1'.", static_cast<int>(section));
-            return Qt::NoSection;
-        }
-    }
+    Qt::WindowFrameSection toQtFrameSection(Qn::WindowFrameSection section);
 
-    inline Qt::WindowFrameSection toNaturalQtFrameSection(Qn::WindowFrameSections sections) {
-        if(sections == 0) { /* Filter out the most common case first. */
-            return Qt::NoSection;
-        } else if(sections & (Qn::TopLeftSection | Qn::BottomRightSection | Qn::TopRightSection | Qn::BottomLeftSection)) {
-            if(sections & (Qn::TopLeftSection | Qn::BottomRightSection)) {
-                if(sections & Qn::BottomRightSection) {
-                    return Qt::BottomRightSection;
-                } else {
-                    return Qt::TopLeftSection;
-                }
-            } else {
-                if(sections & Qn::TopRightSection) {
-                    return Qt::TopRightSection;
-                } else {
-                    return Qt::BottomLeftSection;
-                }
-            }
-        } else if(sections & (Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection)) {
-            if(sections & (Qn::LeftSection | Qn::RightSection)) {
-                if(sections & Qn::RightSection) {
-                    return Qt::RightSection;
-                } else {
-                    return Qt::LeftSection;
-                }
-            } else {
-                if(sections & Qn::BottomSection) {
-                    return Qt::BottomSection;
-                } else {
-                    return Qt::TopSection;
-                }
-            }
-        } else if(sections & Qn::TitleBarArea) {
-            return Qt::TitleBarArea;
-        } else {
-            qnWarning("Invalid Qn::WindowFrameSections '%1'.", static_cast<int>(sections));
-            return Qt::NoSection;
-        }
-    }
+    Qt::WindowFrameSection toNaturalQtFrameSection(Qn::WindowFrameSections sections);
+
+    Qn::WindowFrameSections calculateRectangularFrameSections(const QRectF &frameRect, const QRectF &rect, const QRectF &query);
 
 } // namespace Qn
 
@@ -120,6 +67,7 @@ public:
     Qt::WindowFrameSection windowFrameSectionAt(const QRectF &region) const {
         return toNaturalQtFrameSection(windowFrameSectionsAt(region));
     }
+
 };
 
 #endif // QN_FRAME_SECTION_QUERYABLE_H

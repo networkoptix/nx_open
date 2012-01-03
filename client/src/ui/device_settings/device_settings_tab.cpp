@@ -1,112 +1,105 @@
 #include "device_settings_tab.h"
+
+#include <QtGui/QItemEditorFactory>
+
 #include "widgets.h"
 #include "device_settings_dlg.h"
 #include "settings.h"
 
-CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg* dlg, QObject* handler, QnResourcePtr dev, QString group):
-mDevice(dev),
-mGroup(group),
-mHandler(handler),
-mDlg(dlg)
+CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, QnResourcePtr resource, const QString &group)
+    : QWidget(dialog),
+      m_dialog(dialog),
+      m_resource(resource),
+      m_group(group)
 {
-	setAutoFillBackground(true);
+    setAutoFillBackground(true);
+    {
+        QPalette pal = palette();
+        pal.setColor(backgroundRole(), Qt::black);
+        //setPalette(pal);
+    }
 
-    QPalette pal = palette();
-    pal.setColor(backgroundRole(), Qt::black);
-    //setPalette(pal);
+    //QVBoxLayout *mainLayout = new QVBoxLayout;
 
-	//QVBoxLayout *mainLayout = new QVBoxLayout;
+    int size = 175;
 
-	QList<QString> sub_groups = mDevice->getResourceParamList().subGroupList(mGroup);
+    int x = 0;
+    foreach (const QString &sub_group, m_resource->getResourceParamList().subGroupList(m_group))
+    {
+        QWidget *parent = this;
 
-	int size = 175;
+        if (!sub_group.isEmpty())
+        {
+            QGroupBox *subgroupBox = new QGroupBox(this);
+            subgroupBox->setObjectName(group + sub_group);
+            subgroupBox->setTitle(sub_group);
+            subgroupBox->setFont(settings_font);
+            subgroupBox->setFixedSize(size, 420);
+            subgroupBox->move(10+x, 10);
 
-	QRect parent_rect = rect();
+            m_dialog->putGroup(subgroupBox);
 
-	int x = 0;
-	for (int i = 0 ; i < sub_groups.count(); ++i)
-	{
-		QString sub_group = sub_groups.at(i);
+            parent = subgroupBox;
 
-		QWidget* parent = this;
+            x += size + 15;
+        }
 
-		if (!sub_group.isEmpty())
-		{
-			QGroupBox *subgroupBox = new QGroupBox(this);
-			subgroupBox->setFixedWidth(size);
-			subgroupBox->setFixedHeight(420);
-			subgroupBox->setTitle(sub_group);
-			subgroupBox->setObjectName(group+sub_group);
-			subgroupBox->move(10+x, 10);
-			subgroupBox->setFont(settings_font);
+        int y = 0;
+        foreach (const QnParam &param, m_resource->getResourceParamList().paramList(group, sub_group).list())
+        {
+            if (!param.isUiParam())
+                continue;
 
-			mDlg->putGroup(subgroupBox);
+            CLAbstractSettingsWidget *awidget = 0;
+            switch (param.type())
+            {
+            case QnParamType::OnOff:
+                awidget = new SettingsOnOffWidget(m_resource, param);
+                break;
 
-			parent = subgroupBox;
+            case QnParamType::MinMaxStep:
+                awidget = new SettingsMinMaxStepWidget(m_resource, param);
+                break;
 
-			x+=(size+15);
-		}
+            case QnParamType::Enumeration:
+                awidget = new SettingsEnumerationWidget(m_resource, param);
+                break;
 
-		QnParamList::QnParamMap paramLst = mDevice->getResourceParamList().paramList(group, sub_group).list();
+            case QnParamType::Button:
+                awidget = new SettingsButtonWidget(m_resource, param);
+                break;
 
-		int y = 0;
-		foreach (QnParam param, paramLst)
-		{
-			if (!param.isUiParam())
-				continue;
+            default:
+                //awidget = QItemEditorFactory::defaultFactory()->createEditor(param.defaultValue().userType(), parent); // ###
+                break;
+            }
+            if (awidget) {
+                connect(awidget, SIGNAL(setParam(QString,QVariant)), m_dialog, SLOT(setParam(QString,QVariant)));
 
-			CLAbstractSettingsWidget* awidget = 0;
+                QWidget *widget = awidget->widget();
+                widget->setParent(parent);
+                widget->setFont(settings_font);
 
-			switch(param.type())
-			{
-			case QnParamType::OnOff:
-				awidget =  new SettingsOnOffWidget(handler, dev, group, sub_group, param.name());
-				break;
+                if (!param.description().isEmpty())
+                    widget->setToolTip(param.description());
 
-			case QnParamType::MinMaxStep:
-				awidget =  new SettingsMinMaxStepWidget(handler, dev, group, sub_group, param.name());
-				break;
+                widget->move(10, 20 + y);
+                y += 80;
 
-			case QnParamType::Enumeration:
-				awidget =  new SettingsEnumerationWidget(handler, dev, group, sub_group, param.name());
-				break;
+                m_dialog->putWidget(awidget);
+            }
+        }
+        //mainLayout->addWidget(subgroupBox);
+    }
 
-			case QnParamType::Button:
-				awidget =  new SettingsButtonWidget(handler, dev, group, sub_group, param.name());
-				break;
-
-			}
-
-			if (awidget==0)
-				continue;
-
-			QWidget* widget = awidget->toWidget();
-			widget->setFont(settings_font);
-
-			if (!param.description().isEmpty())
-				widget->setToolTip(param.description());
-
-			widget->setParent(parent);
-			widget->move(10, 20 + y);
-			y+=80;
-
-			mDlg->putWidget(awidget);
-
-		}
-
-		//mainLayout->addWidget(subgroupBox);
-
-	}
-
-	//setLayout(mainLayout);
+    //setLayout(mainLayout);
 }
 
 CLDeviceSettingsTab::~CLDeviceSettingsTab()
 {
-
 }
 
 QString CLDeviceSettingsTab::name() const
 {
-	return mGroup;
+    return m_group;
 }

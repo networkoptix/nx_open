@@ -10,7 +10,7 @@ namespace {
     int minimalDurationMSec = 17;
 }
 
-QnAbstractAnimator::QnAbstractAnimator(QObject *parent):
+AbstractAnimator::AbstractAnimator(QObject *parent):
     QObject(parent),
     m_group(NULL),
     m_state(STOPPED),
@@ -21,11 +21,11 @@ QnAbstractAnimator::QnAbstractAnimator(QObject *parent):
     m_currentTime(0)
 {}
 
-QnAbstractAnimator::~QnAbstractAnimator() {
+AbstractAnimator::~AbstractAnimator() {
     assert(isStopped()); /* Derived class must be sure to stop the animation in its destructor. */
 }
 
-void QnAbstractAnimator::setTimeLimit(int timeLimitMSec) {
+void AbstractAnimator::setTimeLimit(int timeLimitMSec) {
     if(isRunning()) {
         qnWarning("Cannot change time limit of a running animation.");
         return;
@@ -34,7 +34,7 @@ void QnAbstractAnimator::setTimeLimit(int timeLimitMSec) {
     m_timeLimitMSec = timeLimitMSec;
 }
 
-void QnAbstractAnimator::ensureDuration() const {
+void AbstractAnimator::ensureDuration() const {
     if(m_durationValid)
         return;
 
@@ -48,38 +48,38 @@ void QnAbstractAnimator::ensureDuration() const {
     m_durationValid = true;
 }
 
-void QnAbstractAnimator::invalidateDuration() {
+void AbstractAnimator::invalidateDuration() {
     assert(!isRunning()); /* Cannot invalidate duration of a running animation. */
 
     m_durationValid = false;
 }
 
 
-int QnAbstractAnimator::duration() const {
+int AbstractAnimator::duration() const {
     ensureDuration();
 
     return m_duration;
 }
 
-void QnAbstractAnimator::start() {
+void AbstractAnimator::start() {
     setState(RUNNING);
 }
 
-void QnAbstractAnimator::pause() {
+void AbstractAnimator::pause() {
     setState(PAUSED);
 }
 
-void QnAbstractAnimator::stop() {
+void AbstractAnimator::stop() {
     setState(STOPPED);
 }
 
-void QnAbstractAnimator::setDurationOverride(int durationOverride) {
+void AbstractAnimator::setDurationOverride(int durationOverride) {
     assert(!isRunning()); /* Cannot override duration of a running animation. */
 
     m_durationOverride = durationOverride;
 }
 
-void QnAbstractAnimator::setState(State newState) {
+void AbstractAnimator::setState(State newState) {
     assert(newState == STOPPED || newState == PAUSED || newState == RUNNING);
 
     int d = newState > m_state ? 1 : -1;
@@ -91,11 +91,11 @@ void QnAbstractAnimator::setState(State newState) {
     }
 }
 
-void QnAbstractAnimator::tick(int deltaTime) {
+void AbstractAnimator::tick(int deltaTime) {
     setCurrentTime(m_currentTime + deltaTime);
 }
 
-void QnAbstractAnimator::setCurrentTime(int currentTime) {
+void AbstractAnimator::setCurrentTime(int currentTime) {
     if(m_currentTime == currentTime)
         return;
 
@@ -110,7 +110,7 @@ void QnAbstractAnimator::setCurrentTime(int currentTime) {
         stop();
 }
 
-void QnAbstractAnimator::updateState(State newState) {
+void AbstractAnimator::updateState(State newState) {
     State oldState = m_state;
     m_state = newState;
 

@@ -1,11 +1,13 @@
 #include "skin.h"
 
+#include <QtGui/QApplication>
 #include <QtGui/QImage>
 #include <QtGui/QPixmapCache>
 #include <QtGui/QPainter>
 #include <QtGui/QStyleOption>
 
 #include "appstyle_p.h"
+#include "settings.h"
 
 #ifndef CL_SKIN_PATH
 #  ifdef CL_CUSTOMIZATION_PRESET
@@ -68,6 +70,10 @@ QStyle *Skin::style()
 
     return new AppStyle(baseStyle);
 }
+
+
+static const float global_dialog_opacity = 0.9;
+static const float global_menu_opacity = 0.8;
 
 AppStyle::AppStyle(const QString &baseStyle, QObject *parent)
     : ProxyStyle(baseStyle, parent)
@@ -420,4 +426,24 @@ void AppStyle::unpolish(QApplication *application)
     application->setFont(QFont(), "QMenu");
 
     ProxyStyle::unpolish(application);
+}
+
+void AppStyle::polish(QWidget *widget)
+{
+    ProxyStyle::polish(widget);
+
+/*    if (widget->inherits("QDialog"))
+        widget->setWindowOpacity(global_dialog_opacity);
+    else if (widget->inherits("QMenu"))
+        widget->setWindowOpacity(global_menu_opacity);*/
+}
+
+void AppStyle::unpolish(QWidget *widget)
+{
+/*    if (widget->inherits("QDialog"))
+        widget->setWindowOpacity(1.0);
+    else if (widget->inherits("QMenu"))
+        widget->setWindowOpacity(1.0);*/
+
+    ProxyStyle::unpolish(widget);
 }

@@ -5,8 +5,8 @@
 #include <ui/common/linear_combination.h>
 #include <ui/common/magnitude.h>
 
-QnVariantAnimator::QnVariantAnimator(QObject *parent):
-    QnAbstractAnimator(parent),
+VariantAnimator::VariantAnimator(QObject *parent):
+    AbstractAnimator(parent),
     m_easingCurveCorrection(0.0),
     m_internalType(QMetaType::Void),
     m_target(NULL),
@@ -17,11 +17,11 @@ QnVariantAnimator::QnVariantAnimator(QObject *parent):
     updateInternalType(internalType());
 }
 
-QnVariantAnimator::~QnVariantAnimator() {
+VariantAnimator::~VariantAnimator() {
     stop();
 }
 
-void QnVariantAnimator::setSpeed(qreal speed) {
+void VariantAnimator::setSpeed(qreal speed) {
     if(speed <= 0.0) {
         qnWarning("Invalid non-positive speed %1.", speed);
         return;
@@ -36,7 +36,7 @@ void QnVariantAnimator::setSpeed(qreal speed) {
     invalidateDuration();
 }
 
-void QnVariantAnimator::setAccessor(QnAbstractAccessor *accessor) {
+void VariantAnimator::setAccessor(AbstractAccessor *accessor) {
     if(isRunning()) {
         qnWarning("Cannot change accessor of a running animator.");
         return;
@@ -48,7 +48,7 @@ void QnVariantAnimator::setAccessor(QnAbstractAccessor *accessor) {
     setInternalTypeInternal(currentValue().userType());
 }
 
-void QnVariantAnimator::setConverter(QnAbstractConverter *converter) {
+void VariantAnimator::setConverter(AbstractConverter *converter) {
     if(isRunning()) {
         qnWarning("Cannot change converter of a running animator.");
         return;
@@ -60,7 +60,7 @@ void QnVariantAnimator::setConverter(QnAbstractConverter *converter) {
     setInternalTypeInternal(currentValue().userType());
 }
 
-void QnVariantAnimator::setEasingCurve(const QEasingCurve &easingCurve) {
+void VariantAnimator::setEasingCurve(const QEasingCurve &easingCurve) {
     if(isRunning()) {
         qnWarning("Cannot change easing curve of a running animator.");
         return;
@@ -69,7 +69,7 @@ void QnVariantAnimator::setEasingCurve(const QEasingCurve &easingCurve) {
     m_easingCurve = easingCurve;
 }
 
-void QnVariantAnimator::setTargetObject(QObject *target) {
+void VariantAnimator::setTargetObject(QObject *target) {
     if(isRunning()) {
         qnWarning("Cannot change target object of a running animator.");
         return;
@@ -83,11 +83,11 @@ void QnVariantAnimator::setTargetObject(QObject *target) {
     setTargetObjectInternal(target);
 }
 
-void QnVariantAnimator::at_target_destroyed() {
+void VariantAnimator::at_target_destroyed() {
     setTargetObjectInternal(NULL);
 }
 
-void QnVariantAnimator::setTargetObjectInternal(QObject *target) {
+void VariantAnimator::setTargetObjectInternal(QObject *target) {
     if(m_target != NULL)
         disconnect(m_target, NULL, this, NULL);
 
@@ -103,39 +103,39 @@ void QnVariantAnimator::setTargetObjectInternal(QObject *target) {
     setInternalTypeInternal(currentValue().userType());
 }
 
-int QnVariantAnimator::internalType() const {
+int VariantAnimator::internalType() const {
     if(converter() == NULL)
         return m_internalType;
 
     return converter()->targetType();
 }
 
-int QnVariantAnimator::externalType() const {
+int VariantAnimator::externalType() const {
     if(converter() == NULL)
         return m_internalType;
 
     return converter()->sourceType();
 }
 
-QVariant QnVariantAnimator::toInternal(const QVariant &external) const {
+QVariant VariantAnimator::toInternal(const QVariant &external) const {
     if(converter() == NULL)
         return external;
 
     return converter()->convertSourceToTarget(external);
 }
 
-QVariant QnVariantAnimator::toExternal(const QVariant &internal) const {
+QVariant VariantAnimator::toExternal(const QVariant &internal) const {
     if(converter() == NULL)
         return internal;
 
     return converter()->convertTargetToSource(internal);
 }
 
-void QnVariantAnimator::setTargetValue(const QVariant &targetValue) {
+void VariantAnimator::setTargetValue(const QVariant &targetValue) {
     updateTargetValue(toInternal(targetValue));
 }
 
-void QnVariantAnimator::setInternalTypeInternal(int newInternalType) {
+void VariantAnimator::setInternalTypeInternal(int newInternalType) {
     assert(newInternalType >= 0);
 
     if(m_internalType == newInternalType)
@@ -144,25 +144,25 @@ void QnVariantAnimator::setInternalTypeInternal(int newInternalType) {
     updateInternalType(newInternalType);
 }
 
-int QnVariantAnimator::estimatedDuration() const {
+int VariantAnimator::estimatedDuration() const {
     return estimatedDuration(internalStartValue(), internalTargetValue());
 }
 
-int QnVariantAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
+int VariantAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
     return m_magnitudeCalculator->calculate(m_linearCombinator->combine(1.0, from, -1.0, to)) / m_speed * 1000;
 }
 
-qreal QnVariantAnimator::easingCurveProgress(int currentTime) const {
+qreal VariantAnimator::easingCurveProgress(int currentTime) const {
     return m_easingCurveCorrection + (1.0 - m_easingCurveCorrection) * static_cast<qreal>(currentTime) / duration();
 }
 
-qreal QnVariantAnimator::easingCurveValue(qreal progress) const {
+qreal VariantAnimator::easingCurveValue(qreal progress) const {
     qreal correctionValue = m_easingCurve.valueForProgress(m_easingCurveCorrection);
 
     return (m_easingCurve.valueForProgress(progress) - correctionValue) / (1.0 - correctionValue);
 }
 
-void QnVariantAnimator::updateCurrentTime(int currentTime) {
+void VariantAnimator::updateCurrentTime(int currentTime) {
     updateCurrentValue(interpolated(
         internalStartValue(), 
         internalTargetValue(), 
@@ -170,25 +170,25 @@ void QnVariantAnimator::updateCurrentTime(int currentTime) {
     ));
 }
 
-QVariant QnVariantAnimator::interpolated(const QVariant &from, const QVariant &to, qreal progress) const {
+QVariant VariantAnimator::interpolated(const QVariant &from, const QVariant &to, qreal progress) const {
     return m_linearCombinator->combine(1 - progress, from, progress, to);
 }
 
-QVariant QnVariantAnimator::currentValue() const {
+QVariant VariantAnimator::currentValue() const {
     if(accessor() == NULL || targetObject() == NULL)
         return QVariant(internalType(), static_cast<void *>(NULL));
 
     return toInternal(accessor()->get(targetObject()));
 }
 
-void QnVariantAnimator::updateCurrentValue(const QVariant &value) const {
+void VariantAnimator::updateCurrentValue(const QVariant &value) const {
     if(accessor() == NULL || targetObject() == NULL)
         return;
 
     accessor()->set(m_target, toExternal(value));
 }
 
-void QnVariantAnimator::updateState(State newState) {
+void VariantAnimator::updateState(State newState) {
     State oldState = state();
 
     if(oldState == STOPPED) {
@@ -214,7 +214,7 @@ void QnVariantAnimator::updateState(State newState) {
     base_type::updateState(newState);
 }
 
-void QnVariantAnimator::updateInternalType(int newInternalType) {
+void VariantAnimator::updateInternalType(int newInternalType) {
     m_internalType = newInternalType;
     m_internalStartValue = QVariant(newInternalType, static_cast<void *>(NULL));
     m_internalTargetValue = QVariant(newInternalType, static_cast<void *>(NULL));
@@ -234,7 +234,7 @@ void QnVariantAnimator::updateInternalType(int newInternalType) {
     invalidateDuration();
 }
 
-void QnVariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
+void VariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
     if(newTargetValue.userType() != internalType()) {
         qnWarning("Value of invalid type was provided - expected '%1', got '%2'.", QMetaType::typeName(internalType()), QMetaType::typeName(newTargetValue.userType()));
         return;
@@ -249,19 +249,19 @@ void QnVariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
     invalidateDuration();
 }
 
-QVariant QnVariantAnimator::targetValue() const {
+QVariant VariantAnimator::targetValue() const {
     return toExternal(internalTargetValue());
 }
 
-QVariant QnVariantAnimator::startValue() const {
+QVariant VariantAnimator::startValue() const {
     return toExternal(internalStartValue());
 }
 
-QVariant QnVariantAnimator::internalTargetValue() const {
+QVariant VariantAnimator::internalTargetValue() const {
     return m_internalTargetValue;
 }
 
-QVariant QnVariantAnimator::internalStartValue() const {
+QVariant VariantAnimator::internalStartValue() const {
     if(state() == RUNNING) {
         return m_internalStartValue;
     } else {

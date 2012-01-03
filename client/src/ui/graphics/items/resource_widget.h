@@ -31,8 +31,25 @@ class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, 
     typedef GraphicsWidget base_type;
 
 public:
+    enum DisplayFlag {
+        DISPLAY_ACTIVITY_OVERLAY,  /**< Whether the paused overlay icon should be displayed. */
+        DISPLAY_SELECTION_OVERLAY, /**< Whether selected / not selected state should be displayed. */
+        DISPLAY_MOTION_GRID,       /**< Whether a grid with motion detection is to be displayed. */
+    };
+
+    Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag);
+
+    /**
+     * Constructor.
+     * 
+     * \param item                      Workbench item that this resource widget will represent.
+     * \param parent                    Parent item.
+     */
     QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
 
+    /**
+     * Virtual destructor. 
+     */
     virtual ~QnResourceWidget();
 
     /**
@@ -174,22 +191,36 @@ public:
     void removeButton(QGraphicsLayoutItem *button);
 
     /**
-     * \param displayed                 Whether a grid with motion detection should be 
-     *                                  displayed over a video.
+     * \returns                         Display flags for this widget. 
      */
-    void setMotionGridDisplayed(bool displayed);
+    DisplayFlags displayFlags() const {
+        return m_displayFlags;
+    }
+
+    /**
+     * \param flag                      Affected flag.
+     * \param value                     New value for the affected flag.
+     */
+    void setDisplayFlag(DisplayFlag flag, bool value = true) {
+        setDisplayFlags(value ? m_displayFlags | flag : m_displayFlags & ~flag);
+    }
+
+    /**
+     * \param flags                     New display flags for this widget.
+     */
+    void setDisplayFlags(DisplayFlags flags);
 
     /**
      * \returns                         Whether a grid with motion detection is 
      *                                  displayed over a video. 
      */
     bool isMotionGridDisplayed() const {
-        return m_displayMotionGrid;
+        return m_displayFlags & DISPLAY_MOTION_GRID;
     }
 
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
-     * \returns                         Coordinates of the motion cell position.
+     * \returns                         Coordinates of the motion cell that the given point belongs to.
      *                                  Note that motion grid is finite, so even if the
      *                                  passed coordinate lies outside the item boundary,
      *                                  returned joint will lie inside it.
@@ -219,9 +250,11 @@ signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
     void motionRegionSelected(QnResourcePtr resource, QRegion region);
+
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -238,6 +271,7 @@ protected:
 
     void updateShadowZ();
     void updateShadowPos();
+    void updateShadowOpacity();
     void invalidateShadowShape();
 
     void ensureAboutToBeDestroyedEmitted();
@@ -252,6 +286,10 @@ private:
      * \returns                         Rectangle in local coordinates where given channel is to be drawn.
      */
     QRectF channelRect(int channel) const;
+    
+    void ensureMotionMask();
+
+    void invalidateMotionMask();
 
     enum OverlayIcon {
         NO_ICON,
@@ -280,13 +318,13 @@ private:
 
     void setOverlayIcon(int channel, OverlayIcon icon);
 
+    void drawSelection(const QRectF &rect);
+
     void drawOverlayIcon(int channel, const QRectF &rect);
 
     void drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time);
 
     void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion);
-
-    void prepareMotionMask();
 
     void drawMotionMask(QPainter *painter, const QRectF& rect);
 
@@ -296,8 +334,14 @@ private:
     /** Layout item. */
     QnWorkbenchItem *m_item;
 
+    /** Resource associated with this widget. */
+    QnResourcePtr m_resource;
+
     /** Display. */
     QnResourceDisplay *m_display;
+
+    /* Display flags. */
+    DisplayFlags m_displayFlags;
 
     /** Resource layout of this display widget. */
     const QnVideoResourceLayout *m_videoLayout;
@@ -335,19 +379,19 @@ private:
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
 
-    /** Whether activity decorations are visible. */
-    bool m_activityDecorationsVisible;
-
     /** Additional per-channel state. */
     QVector<ChannelState> m_channelState;
 
-    /** Whether motion detection grid should be displayed. */
-    bool m_displayMotionGrid;
-
-    QnResourcePtr m_resource;
+    /** Image region where motion is currently present, in parrots. */
     QRegion m_motionMask;
-    bool m_motionMaskReady;
-    __m128i* m_motionMaskBinData;
+
+    /** Binary mask for the current motion region. */
+    __m128i *m_motionMaskBinData;
+
+    /** Whether the motion mask is valid. */
+    bool m_motionMaskValid;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
 
 #endif // QN_RESOURCE_WIDGET_H

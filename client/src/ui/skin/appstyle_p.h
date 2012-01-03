@@ -20,8 +20,9 @@ public:
     QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option = 0, const QWidget *widget = 0) const;
 
     void polish(QApplication *application);
-
     void unpolish(QApplication *application);
+    void polish(QWidget *widget);
+    void unpolish(QWidget *widget);
 
 protected Q_SLOTS:
     QIcon standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const;

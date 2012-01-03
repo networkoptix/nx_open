@@ -1,5 +1,5 @@
-#ifndef QN_SETTER_ANIMATION_H
-#define QN_SETTER_ANIMATION_H
+#ifndef QN_ACCESSOR_ANIMATION_H
+#define QN_ACCESSOR_ANIMATION_H
 
 #include <QVariantAnimation>
 #include <QScopedPointer>
@@ -11,11 +11,11 @@ class QnAccessorAnimation: public QVariantAnimation {
 public:
     QnAccessorAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
 
-    QnAbstractAccessor *accessor() const {
+    AbstractAccessor *accessor() const {
         return m_accessor.data();
     }
 
-    void setAccessor(QnAbstractAccessor *accessor) {
+    void setAccessor(AbstractAccessor *accessor) {
         m_accessor.reset(accessor);
     }
 
@@ -45,8 +45,8 @@ protected:
     }
 
 private:
-    QScopedPointer<QnAbstractAccessor> m_accessor;
+    QScopedPointer<AbstractAccessor> m_accessor;
     QWeakPointer<QObject> m_target;
 };
 
-#endif // QN_SETTER_ANIMATION_H
+#endif // QN_ACCESSOR_ANIMATION_H

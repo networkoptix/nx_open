@@ -1,21 +1,16 @@
-#ifdef Q_OS_WIN
-
 #include "desktop_device.h"
-#include "../streamreader/desktop_stream_reader.h"
 
+#ifdef Q_OS_WIN
+#  include "../streamreader/desktop_stream_reader.h"
+#endif
 
 CLDesktopDevice::CLDesktopDevice(int index)
 {
-    m_flags |= local_live_cam;
+    addFlag(local_live_cam);
     QString t = QLatin1String("Desktop") + QString::number(index+1);
 
     setUrl(t);
     setName(t);
-}
-
-CLDesktopDevice::~CLDesktopDevice()
-{
-
 }
 
 QString CLDesktopDevice::toString() const
@@ -25,7 +20,11 @@ QString CLDesktopDevice::toString() const
 
 QnAbstractStreamDataProvider* CLDesktopDevice::createDataProviderInternal(ConnectionRole /*role*/)
 {
+#ifdef Q_OS_WIN
     return new CLDesktopStreamreader(toSharedPointer());
+#else
+    return 0;
+#endif
 }
 
 bool CLDesktopDevice::unknownDevice() const
@@ -33,10 +32,7 @@ bool CLDesktopDevice::unknownDevice() const
     return false;
 }
 
-
 QString CLDesktopDevice::getUniqueId() const
 {
     return getUrl();
 }
-
-#endif // Q_OS_WIN

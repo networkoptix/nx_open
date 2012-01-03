@@ -15,7 +15,7 @@ class NavigationItem;
 class CLVideoCamera;
 struct CLVideoDecoderOutput;
 
-class CLVideoWindowItem : public CLImageItem, public CLAbstractRenderer
+class CLVideoWindowItem : public CLImageItem, public QnAbstractRenderer
 {
     Q_OBJECT
 public:
@@ -51,7 +51,7 @@ public:
 
     virtual void goToSteadyMode(bool steady, bool instant);
     QImage getScreenshot();
-    bool contains(CLAbstractRenderer* renderer) const;
+    bool contains(QnAbstractRenderer* renderer) const;
 protected:
 
     QPointF getBestSubItemPos(CLSubItemType type);
@@ -73,7 +73,7 @@ protected:
     QRect getSubChannelRect(unsigned int channel) const;
 
 protected:
-    CLGLRenderer* m_gldraw[CL_MAX_CHANNELS];
+    QnGLRenderer* m_gldraw[CL_MAX_CHANNELS];
     bool m_first_draw;
     QnStatistics* m_stat[CL_MAX_CHANNELS];
 

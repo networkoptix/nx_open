@@ -3,31 +3,31 @@
 
 #include "abstract_animator.h"
 
-class QnAnimatorGroup: public QnAbstractAnimator {
+class AnimatorGroup: public AbstractAnimator {
     Q_OBJECT;
 
-    typedef QnAbstractAnimator base_type;
+    typedef AbstractAnimator base_type;
 
 public:
-    QnAnimatorGroup(QObject *parent = NULL);
+    AnimatorGroup(QObject *parent = NULL);
 
-    virtual ~QnAnimatorGroup();
+    virtual ~AnimatorGroup();
 
-    void addAnimator(QnAbstractAnimator *animator);
+    void addAnimator(AbstractAnimator *animator);
     
-    QnAbstractAnimator *animatorAt(int index) const;
+    AbstractAnimator *animatorAt(int index) const;
 
     int animatorCount() const;
 
     void clear();
 
-    int indexOfAnimator(QnAbstractAnimator *animator) const;
+    int indexOfAnimator(AbstractAnimator *animator) const;
 
-    void insertAnimator(int index, QnAbstractAnimator *animator);
+    void insertAnimator(int index, AbstractAnimator *animator);
 
-    void removeAnimator(QnAbstractAnimator *animator);
+    void removeAnimator(AbstractAnimator *animator);
 
-    QnAbstractAnimator *takeAnimator(int index);
+    AbstractAnimator *takeAnimator(int index);
 
 protected:
     virtual bool event(QEvent *event) override;
@@ -39,7 +39,7 @@ protected:
     virtual int estimatedDuration() const override;
 
 private:
-    QList<QnAbstractAnimator *> m_animators;
+    QList<AbstractAnimator *> m_animators;
 };
 
 #endif // QN_ANIMATOR_GROUP_H

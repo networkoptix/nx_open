@@ -2,15 +2,15 @@
 #include <QEvent>
 #include <utils/common/warnings.h>
 
-QnAnimatorGroup::QnAnimatorGroup(QObject *parent):
-    QnAbstractAnimator(parent)
+AnimatorGroup::AnimatorGroup(QObject *parent):
+    AbstractAnimator(parent)
 {}
 
-QnAnimatorGroup::~QnAnimatorGroup() {
+AnimatorGroup::~AnimatorGroup() {
     stop();
 }
 
-QnAbstractAnimator *QnAnimatorGroup::animatorAt(int index) const {
+AbstractAnimator *AnimatorGroup::animatorAt(int index) const {
     if (index < 0 || index >= m_animators.size()) {
         qnWarning("Index is out of bounds.");
         return NULL;
@@ -19,25 +19,25 @@ QnAbstractAnimator *QnAnimatorGroup::animatorAt(int index) const {
     return m_animators[index];
 }
 
-int QnAnimatorGroup::animatorCount() const {
+int AnimatorGroup::animatorCount() const {
     return m_animators.size();
 }
 
-int QnAnimatorGroup::indexOfAnimator(QnAbstractAnimator *animator) const {
+int AnimatorGroup::indexOfAnimator(AbstractAnimator *animator) const {
     return m_animators.indexOf(animator);
 }
 
-void QnAnimatorGroup::addAnimator(QnAbstractAnimator *animator) {
+void AnimatorGroup::addAnimator(AbstractAnimator *animator) {
     insertAnimator(m_animators.size(), animator);
 }
 
-void QnAnimatorGroup::insertAnimator(int index, QnAbstractAnimator *animator) {
+void AnimatorGroup::insertAnimator(int index, AbstractAnimator *animator) {
     if (index < 0 || index > m_animators.size()) {
         qnWarning("Index is out of bounds.");
         return;
     }
 
-    if (QnAnimatorGroup *oldGroup = animator->group())
+    if (AnimatorGroup *oldGroup = animator->group())
         oldGroup->removeAnimator(animator);
 
     m_animators.insert(index, animator);
@@ -47,7 +47,7 @@ void QnAnimatorGroup::insertAnimator(int index, QnAbstractAnimator *animator) {
     invalidateDuration();
 }
 
-void QnAnimatorGroup::removeAnimator(QnAbstractAnimator *animator) {
+void AnimatorGroup::removeAnimator(AbstractAnimator *animator) {
     if (animator == NULL) {
         qnNullWarning(animator);
         return;
@@ -62,13 +62,13 @@ void QnAnimatorGroup::removeAnimator(QnAbstractAnimator *animator) {
     takeAnimator(index);
 }
 
-QnAbstractAnimator *QnAnimatorGroup::takeAnimator(int index) {
+AbstractAnimator *AnimatorGroup::takeAnimator(int index) {
     if (index < 0 || index >= m_animators.size()) {
         qnWarning("No animator at index %1.", index);
         return NULL;
     }
 
-    QnAbstractAnimator *animator = m_animators[index];
+    AbstractAnimator *animator = m_animators[index];
     animator->m_group = NULL;
     m_animators.removeAt(index);
     
@@ -83,48 +83,48 @@ QnAbstractAnimator *QnAnimatorGroup::takeAnimator(int index) {
     return animator;
 }
 
-void QnAnimatorGroup::clear() {
+void AnimatorGroup::clear() {
     qDeleteAll(m_animators);
 }
 
-bool QnAnimatorGroup::event(QEvent *event) {
+bool AnimatorGroup::event(QEvent *event) {
     if (event->type() == QEvent::ChildAdded) {
-        QnAbstractAnimator *animator = qobject_cast<QnAbstractAnimator *>(static_cast<QChildEvent *>(event)->child());
+        AbstractAnimator *animator = qobject_cast<AbstractAnimator *>(static_cast<QChildEvent *>(event)->child());
         if (animator != NULL && animator->group() != this)
             addAnimator(animator);
     } else if (event->type() == QEvent::ChildRemoved) {
         /* We can only rely on the child being a QObject because in the QEvent::ChildRemoved case it might be called from the destructor. */
-        QnAbstractAnimator *animator = static_cast<QnAbstractAnimator *>(static_cast<QChildEvent *>(event)->child());
+        AbstractAnimator *animator = static_cast<AbstractAnimator *>(static_cast<QChildEvent *>(event)->child());
         int index = m_animators.indexOf(animator);
         if (index != -1)
             takeAnimator(index);
     }
 
-    return QnAbstractAnimator::event(event);
+    return AbstractAnimator::event(event);
 }
 
-void QnAnimatorGroup::updateState(State newState) {
+void AnimatorGroup::updateState(State newState) {
     if(newState == RUNNING) {
         invalidateDuration();
 
-        foreach(QnAbstractAnimator *animator, m_animators)
+        foreach(AbstractAnimator *animator, m_animators)
             animator->setDurationOverride(duration());
     }
 
-    foreach(QnAbstractAnimator *animator, m_animators)
+    foreach(AbstractAnimator *animator, m_animators)
         animator->setState(newState);
 
     base_type::updateState(newState);
 }
 
-void QnAnimatorGroup::updateCurrentTime(int currentTime) {
-    foreach(QnAbstractAnimator *animator, m_animators)
+void AnimatorGroup::updateCurrentTime(int currentTime) {
+    foreach(AbstractAnimator *animator, m_animators)
         animator->setCurrentTime(currentTime);
 }
 
-int QnAnimatorGroup::estimatedDuration() const {
+int AnimatorGroup::estimatedDuration() const {
     int result = 0;
-    foreach(QnAbstractAnimator *animator, m_animators)
+    foreach(AbstractAnimator *animator, m_animators)
         result = qMax(result, animator->estimatedDuration());
     return result;
 }

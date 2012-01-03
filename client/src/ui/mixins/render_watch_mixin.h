@@ -7,7 +7,7 @@
 class QnWorkbenchDisplay;
 class QnResourceWidget;
 
-class CLAbstractRenderer;
+class QnAbstractRenderer;
 
 class QnRenderWatchMixin: public QObject {
     Q_OBJECT;
@@ -38,14 +38,14 @@ public:
      *                                  for automatic unregistration on
      *                                  renderer destruction.
      */
-    void registerRenderer(CLAbstractRenderer *renderer, QObject *lifetime);
+    void registerRenderer(QnAbstractRenderer *renderer, QObject *lifetime);
 
     /**
      * Unregisters the given renderer.
      * 
      * \param renderer                  Renderer to unregister.
      */
-    void unregisterRenderer(CLAbstractRenderer *renderer);
+    void unregisterRenderer(QnAbstractRenderer *renderer);
 
 public slots:
     /**
@@ -67,7 +67,7 @@ signals:
      * \param renderer                  Renderer.
      * \param displaying                New displaying state of the renderer.
      */
-    void displayingStateChanged(CLAbstractRenderer *renderer, bool displaying);
+    void displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
 
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -85,8 +85,8 @@ private:
         QObject *lifetime;
     };
 
-    QHash<CLAbstractRenderer *, Info> m_infoByRenderer;
-    QHash<QObject *, CLAbstractRenderer *> m_rendererByLifetime;
+    QHash<QnAbstractRenderer *, Info> m_infoByRenderer;
+    QHash<QObject *, QnAbstractRenderer *> m_rendererByLifetime;
 };
 
 #endif // QN_RENDER_WATCH_MIXIN_H

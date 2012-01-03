@@ -144,7 +144,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
 
     /* Create viewport animator. */
-    m_viewportAnimator = new QnViewportAnimator(this); // ANIMATION: viewport.
+    m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
     m_viewportAnimator->setAbsoluteMovementSpeed(0.0); /* Viewport movement speed in scene coordinates. */
     m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
     m_viewportAnimator->setScalingSpeed(4.0); /* Viewport scaling speed, scale factor per second. */
@@ -154,7 +154,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_viewportAnimator,             SIGNAL(started()),                                          m_boundingInstrument,   SLOT(recursiveDisable()));
     connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SIGNAL(viewportUngrabbed()));
     connect(m_viewportAnimator,             SIGNAL(finished()),                                         m_boundingInstrument,   SLOT(recursiveEnable()));
-    connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SLOT(at_viewport_animationFinished()));
+    connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SLOT(at_viewportAnimator_finished()));
 
     /* Set up defaults. */
     initWorkbench(workbench);
@@ -243,7 +243,8 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
         initBoundingInstrument();
     }
 
-    connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
+    connect(m_scene, SIGNAL(destroyed()),           this, SLOT(at_scene_destroyed()));
+    connect(m_scene, SIGNAL(selectionChanged()),    this, SLOT(at_scene_selectionChanged()));
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -266,7 +267,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_gridItem.data()->setMapper(m_workbench->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
-    /* Init workbench. */
+    /* Connect to workbench. */
     connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_workbench_aboutToBeDestroyed()));
     connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
     connect(m_workbench,            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
@@ -394,22 +395,22 @@ void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Layer lay
         setLayer(item, layer);
 }
 
-QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
-    QnWidgetAnimator *animator = widget->data(ITEM_ANIMATOR).value<QnWidgetAnimator *>();
+WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
+    WidgetAnimator *animator = widget->data(ITEM_ANIMATOR).value<WidgetAnimator *>();
     if(animator != NULL)
         return animator;
 
     /* Create if it's not there.
      *
      * Note that widget is set as animator's parent. */
-    animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
+    animator = new WidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
     animator->setAbsoluteMovementSpeed(0.0);
     animator->setRelativeMovementSpeed(1.0);
     animator->setScalingSpeed(4.0);
-    animator->setRotationSpeed(720.0);
+    animator->setRotationSpeed(270.0);
     animator->setTimer(m_animationInstrument->animationTimer());
     animator->setTimeLimit(widgetAnimationDurationMsec);
-    widget->setData(ITEM_ANIMATOR, QVariant::fromValue<QnWidgetAnimator *>(animator));
+    widget->setData(ITEM_ANIMATOR, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
 }
 
@@ -417,7 +418,7 @@ QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const {
     return m_widgetByItem[item];
 }
 
-QnResourceWidget *QnWorkbenchDisplay::widget(CLAbstractRenderer *renderer) const {
+QnResourceWidget *QnWorkbenchDisplay::widget(QnAbstractRenderer *renderer) const {
     return m_widgetByRenderer[renderer];
 }
 
@@ -760,7 +761,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
 
     /* Move! */
-    QnWidgetAnimator *animator = this->animator(widget);
+    WidgetAnimator *animator = this->animator(widget);
     if(animate) { // ANIMATION: easing curves for items.
         QEasingCurve easingCurve;
 
@@ -844,7 +845,7 @@ void QnWorkbenchDisplay::tick(int /*deltaTime*/) {
     m_view->viewport()->update();
 }
 
-void QnWorkbenchDisplay::at_viewport_animationFinished() {
+void QnWorkbenchDisplay::at_viewportAnimator_finished() {
     synchronizeSceneBounds();
 }
 
@@ -877,6 +878,30 @@ void QnWorkbenchDisplay::at_workbench_modeChanged() {
     } else {
         m_boundingInstrument->recursiveEnable();
     }
+}
+
+void QnWorkbenchDisplay::updateSelectionDisplay(QnWorkbenchItem *item) {
+    updateSelectionDisplay(widget(item));
+}
+
+void QnWorkbenchDisplay::updateSelectionDisplay(QnResourceWidget *widget) {
+    bool result;
+
+    if(widget->item() == m_itemByRole[QnWorkbench::ZOOMED]) {
+        result = false;
+    } else if(widget->item() == m_itemByRole[QnWorkbench::RAISED] && scene()->selectedItems().size() == 1) {
+        result = false;
+    } else {
+        result = true;
+    }
+
+    widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY, result);
+}
+
+void QnWorkbenchDisplay::at_scene_selectionChanged() {
+    QnWorkbenchItem *raisedItem = m_itemByRole[QnWorkbench::RAISED];
+    if(raisedItem != NULL)
+        updateSelectionDisplay(raisedItem);
 }
 
 namespace {
@@ -915,11 +940,17 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
     switch(role) {
     case QnWorkbench::RAISED: {
         /* Sync new & old items. */
-        if(oldItem != NULL)
+        if(oldItem != NULL) {
             synchronize(oldItem);
+
+            updateSelectionDisplay(oldItem);
+        }
+        
         if(item != NULL) {
             bringToFront(item);
             synchronize(item, true);
+
+            updateSelectionDisplay(item);
         }
 
         break;
@@ -929,6 +960,8 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
             synchronize(oldItem, true);
 
             m_curtainActivityInstrument->recursiveDisable();
+
+            updateSelectionDisplay(oldItem);
         }
 
         if(item != NULL) {
@@ -938,6 +971,8 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
             m_curtainActivityInstrument->recursiveEnable();
 
             m_viewportAnimator->moveTo(itemGeometry(item));
+
+            updateSelectionDisplay(item);
         } else {
             m_viewportAnimator->moveTo(fitInViewGeometry());
         }
@@ -946,8 +981,6 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         synchronizeSceneBoundsExtension();
         break;
     }
-    case QnWorkbench::FOCUSED:
-        break;
     default:
         qnWarning("Unreachable code executed.");
         return;

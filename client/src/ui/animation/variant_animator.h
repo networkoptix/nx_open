@@ -12,18 +12,17 @@
 class MagnitudeCalculator;
 class LinearCombinator;
 
-class QnAbstractSetter;
-class QnAbstractGetter;
-class QnAbstractConverter;
+class AbstractAccessor;
+class AbstractConverter;
 
 /**
  * Animator that animates QObject's parameters. Parameters do not need to
  * be Qt properties, as they can be set and read using specialized accessor.
  */
-class QnVariantAnimator: public QnAbstractAnimator {
+class VariantAnimator: public AbstractAnimator {
     Q_OBJECT;
 
-    typedef QnAbstractAnimator base_type;
+    typedef AbstractAnimator base_type;
 
 public:
     /**
@@ -31,12 +30,12 @@ public:
      * 
      * \param parent                    Parent object.
      */
-    QnVariantAnimator(QObject *parent = NULL);
+    VariantAnimator(QObject *parent = NULL);
 
     /**
-     * Virutual destructor.
+     * Virtual destructor.
      */
-    virtual ~QnVariantAnimator();
+    virtual ~VariantAnimator();
 
     /**
      * \returns                         Speed of this animator, in the units of a type used for intermediate computations.
@@ -57,19 +56,19 @@ public:
     /**
      * \returns                         Accessor used by this animator, of NULL if none.
      */
-    QnAbstractAccessor *accessor() const {
+    AbstractAccessor *accessor() const {
         return m_accessor.data();
     }
 
     /**
      * \param accessor                  Accessor to use. Animator will take ownership of the given accessor.
      */
-    void setAccessor(QnAbstractAccessor *accessor);
+    void setAccessor(AbstractAccessor *accessor);
 
     /**
      * \returns                         Converter used by this animator, or NULL if none.
      */
-    QnAbstractConverter *converter() const {
+    AbstractConverter *converter() const {
         return m_converter.data();
     }
 
@@ -86,7 +85,7 @@ public:
      * 
      * \param converter                 Converter to use.
      */
-    void setConverter(QnAbstractConverter *converter);
+    void setConverter(AbstractConverter *converter);
 
     /**
      * \returns                         Easing curve used by this animator.
@@ -126,6 +125,18 @@ public:
      * \param targetValue               New target value to animate to.
      */
     void setTargetValue(const QVariant &targetValue);
+
+    /**
+     * Convenience function that pauses the animator, sets its target value,
+     * and resumes it.
+     * 
+     * \param value                     Target value.
+     */
+    void animateTo(const QVariant &value) {
+        pause();
+        setTargetValue(value);
+        start();
+    }
 
 protected:
     MagnitudeCalculator *magnitudeCalculator() const {
@@ -179,8 +190,8 @@ private:
     qreal easingCurveValue(qreal progress) const;
 
 private:
-    QScopedPointer<QnAbstractAccessor> m_accessor;
-    QScopedPointer<QnAbstractConverter> m_converter;
+    QScopedPointer<AbstractAccessor> m_accessor;
+    QScopedPointer<AbstractConverter> m_converter;
     QEasingCurve m_easingCurve;
     qreal m_easingCurveCorrection;
     int m_internalType;

@@ -1,29 +1,29 @@
-#ifndef cl_divice_param_h_1020
-#define cl_divice_param_h_1020
+#ifndef QN_PARAM_H
+#define QN_PARAM_H
 
+#include <QtCore/QList>
+#include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
-
-#include "utils/common/associativearray.h"
+#include <QtCore/QVariant>
 
 struct QN_EXPORT QnParamType
 {
-    enum DataType {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
+    enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
     QnParamType();
-    //QnParamType(const QString& name, QnValue val);
-
-    QString name;
+    //QnParamType(const QString& name, const QVariant &val);
 
     DataType type;
 
-    QnValue min_val;
-    QnValue max_val;
-    QnValue step;
+    QString name;
+    QVariant default_value;
 
-    QList<QnValue> possible_values;
-    QList<QnValue> ui_possible_values;
+    double min_val;
+    double max_val;
+    double step;
 
-    QnValue default_value;
+    QList<QVariant> possible_values;
+    QList<QVariant> ui_possible_values;
 
     QString paramNetHelper;
     QString group;
@@ -31,65 +31,69 @@ struct QN_EXPORT QnParamType
     QString description;
 
     bool ui;
-    bool readonly;
+    bool isReadOnly;
     bool isStatic;
 
-    bool setDefVal(QnValue val); // safe way to set value
+    bool setDefVal(const QVariant &val); // safe way to set value
 };
+
+Q_DECLARE_TYPEINFO(QnParamType, Q_COMPLEX_TYPE);
+
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
+
 
 struct QN_EXPORT QnParam
 {
-    QnParam() {}
-    QnParam(QnValue val){m_value = val;};
-    QnParam(QnParamTypePtr paramType) { m_paramType = paramType;}
+    QnParam() : m_paramType(new QnParamType) {}
+    QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant())
+        : m_paramType(paramType), m_value(value)
+    {}
 
-    bool setValue(QnValue val); // safe way to set value
-    const QnValue& value() const { return m_value; }
-    const QString& name() const  { return m_paramType->name; }
+    bool setValue(const QVariant &val); // safe way to set value
+    const QVariant& value() const { return m_value; }
+    const QVariant &defaultValue() const { return m_paramType->default_value; }
+    const QString& name() const { return m_paramType->name; }
     const QString& group() const { return m_paramType->group; }
     const QString& subgroup() const { return m_paramType->subgroup; }
-    bool  isUiParam() const  { return m_paramType->ui; }
-    bool isStatic() const { return m_paramType->isStatic; }
-    const QnValue& minValue() const { return m_paramType->min_val; }
-    const QnValue& maxValue() const { return m_paramType->max_val; }
+    double minValue() const { return m_paramType->min_val; }
+    double maxValue() const { return m_paramType->max_val; }
     QnParamType::DataType type() const { return m_paramType->type;}
-    const QList<QnValue>& uiPossibleValues() const { return m_paramType->ui_possible_values; }
-    const QList<QnValue>& possibleValues() const { return m_paramType->possible_values; }
+    const QList<QVariant>& uiPossibleValues() const { return m_paramType->ui_possible_values; }
+    const QList<QVariant>& possibleValues() const { return m_paramType->possible_values; }
     const QString& description() const { return m_paramType->description; }
-    const bool isReadOnly() const { return m_paramType->readonly; }
+    bool isUiParam() const { return m_paramType->ui; }
+    bool isStatic() const { return m_paramType->isStatic; }
+    const bool isReadOnly() const { return m_paramType->isReadOnly; }
     const QString netHelper() const { return m_paramType->paramNetHelper; }
-
-    QString toDebugString() const
-    {
-        return name() + QString(" ") + QString(m_paramType->default_value);
-    }
 
 private:
     QnParamTypePtr m_paramType;
-    QnValue m_value;
+    QVariant m_value;
 };
+
+Q_DECLARE_TYPEINFO(QnParam, Q_COMPLEX_TYPE);
+
 
 class QN_EXPORT QnParamList
 {
-
 public:
     typedef QMap<QString, QnParam> QnParamMap;
 
     void inheritedFrom(const QnParamList& other);
-    bool exists(const QString& name) const;
-    QnParam& get(const QString& name);
-    const QnParam get(const QString& name) const;
-    void put(const QnParam& param);
-    bool empty() const;
-    QnParamMap& list();
+    bool contains(const QString& name) const;
+    QnParam& value(const QString& name);
+    const QnParam value(const QString& name) const;
+    void append(const QnParam& param);
+    bool isEmpty() const;
+    QList<QnParam> list() const;
 
     QList<QString> groupList() const;
-    QList<QString> subGroupList(QString group) const;
+    QList<QString> subGroupList(const QString &group) const;
 
-    QnParamList paramList(QString group, QString subgroup) const;
+    QnParamList paramList(const QString &group, const QString &subgroup) const;
+
 private:
     QnParamMap m_params;
 };
 
-#endif //cl_divice_param_h_1020
+#endif // QN_PARAM_H

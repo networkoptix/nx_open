@@ -53,17 +53,16 @@ public:
     virtual QPalette standardPalette() const
     { return baseStyle()->standardPalette(); }
 
-    virtual void polish(QWidget *widget)
-    { baseStyle()->polish(widget); }
-    virtual void polish(QPalette &palette)
-    { baseStyle()->polish(palette); }
     virtual void polish(QApplication *application)
     { baseStyle()->polish(application); }
-
-    virtual void unpolish(QWidget *widget)
-    { baseStyle()->unpolish(widget); }
     virtual void unpolish(QApplication *application)
     { baseStyle()->unpolish(application); }
+    virtual void polish(QWidget *widget)
+    { baseStyle()->polish(widget); }
+    virtual void unpolish(QWidget *widget)
+    { baseStyle()->unpolish(widget); }
+    virtual void polish(QPalette &palette)
+    { baseStyle()->polish(palette); }
 
 protected:
     virtual bool event(QEvent *e)

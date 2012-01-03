@@ -1,5 +1,6 @@
 #include "polygonal_shadow_item.h"
 #include <utils/common/qt_opengl.h>
+#include <ui/common/scene_utility.h>
 
 QnPolygonalShadowItem::QnPolygonalShadowItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
@@ -53,8 +54,12 @@ namespace {
 void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureParameters();
 
-    QColor transparent = m_color;
-    transparent.setAlpha(0);
+    /* Color for drawing the shadow. */
+    QColor color = m_color;
+    color.setAlpha(color.alpha() * effectiveOpacity());
+
+    /* Color for drawing the soft corners. */
+    QColor transparent = SceneUtility::transparent(color);
     
     painter->beginNativePainting();
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
@@ -63,7 +68,7 @@ void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     /* Draw shadowed rect. */
     glBegin(GL_TRIANGLE_FAN);
-    glColor(m_color);
+    glColor(color);
     glVertices(m_shape);
     glEnd();
 

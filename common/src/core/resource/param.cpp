@@ -1,7 +1,10 @@
 #include "param.h"
 
 /*
-QnParamType::QnParamType(const QString& name, QnValue val)
+QnParamType::QnParamType(const QString& name, const QVariant &val)
+    : type(Value), name(name), default_value(val),
+      min_val(0.0), max_val(0.0), step(0.0),
+      ui(false), isReadOnly(false), isStatic(false)
 {
     type = Value;
     this->name = name;
@@ -10,30 +13,31 @@ QnParamType::QnParamType(const QString& name, QnValue val)
 */
 
 QnParamType::QnParamType()
+    : type(None),
+      min_val(0.0), max_val(0.0), step(0.0),
+      ui(false), isReadOnly(false), isStatic(false)
 {
-    type = None;
-    readonly = false;
-    ui = false;
-    isStatic = false;
 }
 
-bool QnParamType::setDefVal(QnValue val) // safe way to set value
+bool QnParamType::setDefVal(const QVariant &val) // safe way to set value
 {
-    switch(type)
+    switch (type)
     {
-    case MinMaxStep:
-        if (val>max_val) return false;
-        if (val<min_val) return false;
-        break;
-
     case None:
         return false;
+
+    case MinMaxStep:
+        if (val.toDouble() < min_val || val.toDouble() > max_val)
+            return false;
+        break;
 
     case Enumeration:
         if (!possible_values.contains(val))
             return false;
         break;
 
+    default:
+        break;
     }
 
     default_value = val;
@@ -50,33 +54,34 @@ void QnParamList::inheritedFrom(const QnParamList& other)
 
 }
 
-bool QnParamList::exists(const QString& name) const
+bool QnParamList::contains(const QString& name) const
 {
-    QnParamMap::const_iterator it = m_params.find(name);
-    if (it == m_params.end())
-        return false;
-
-    return true;
+    return m_params.contains(name);
 }
 
-QnParam& QnParamList::get(const QString& name) 
+QnParam& QnParamList::value(const QString& name)
 {
     return m_params[name];
 }
 
-const QnParam QnParamList::get(const QString& name) const 
+const QnParam QnParamList::value(const QString& name) const
 {
-    return m_params[name];
+    return m_params.value(name);
 }
 
-void QnParamList::put(const QnParam& param) 
+void QnParamList::append(const QnParam& param)
 {
-    m_params[param.name()] = param;
+    m_params.insert(param.name(), param);
 }
 
-bool QnParamList::empty() const
+bool QnParamList::isEmpty() const
 {
-    return m_params.empty();
+    return m_params.isEmpty();
+}
+
+QList<QnParam> QnParamList::list() const
+{
+    return m_params.values();
 }
 
 QList<QString> QnParamList::groupList() const
@@ -85,83 +90,70 @@ QList<QString> QnParamList::groupList() const
 
     foreach (const QnParam& param, m_params)
     {
-        QString group = param.group();
-
-        if (group=="")
-            continue;
-
-        if (!result.contains(group))
-            result.push_back(group);
+        const QString group = param.group();
+        if (!group.isEmpty() && !result.contains(group))
+            result.append(group);
     }
 
     return result;
 }
 
-QList<QString> QnParamList::subGroupList(QString group) const
+QList<QString> QnParamList::subGroupList(const QString &group) const
 {
     QList<QString> result;
 
     foreach (const QnParam& param, m_params)
     {
-        QString lgroup = param.group();
-        if (lgroup==group)
+        const QString lgroup = param.group();
+        if (lgroup == group)
         {
-            QString subgroup = param.subgroup();
-
-            //if (subgroup=="")
-            //	continue;
-
-            if (!result.contains(subgroup))
-                result.push_back(subgroup);
+            const QString subgroup = param.subgroup();
+            if (/*!subgroup.isEmpty() && */!result.contains(subgroup))
+                result.append(subgroup);
         }
     }
 
     return result;
 }
 
-QnParamList QnParamList::paramList(QString group, QString subgroup) const
+QnParamList QnParamList::paramList(const QString &group, const QString &subgroup) const
 {
     QnParamList result;
 
     foreach (const QnParam& param, m_params)
     {
-        QString lgroup = param.group();
-        QString lsubgroup = param.subgroup();
-
+        const QString lgroup = param.group();
+        const QString lsubgroup = param.subgroup();
         if (lgroup == group && lsubgroup == subgroup)
-            result.put(param);
+            result.append(param);
     }
 
     return result;
-
-}
-
-QnParamList::QnParamMap& QnParamList::list()
-{
-    return m_params;
 }
 
 // ===========================================
 // QnParam
 // ===========================================
 
-bool QnParam::setValue(QnValue val) // safe way to set value
+bool QnParam::setValue(const QVariant &val) // safe way to set value
 {
     switch(m_paramType->type)
     {
-    case QnParamType::MinMaxStep:
-        if (val > m_paramType->max_val) return false;
-        if (val < m_paramType->min_val) return false;
-        break;
-
     case QnParamType::None:
         return true;
+
+    case QnParamType::MinMaxStep:
+        if (val.toDouble() < m_paramType->min_val || val.toDouble() > m_paramType->max_val)
+            return false;
+        break;
 
     case QnParamType::Enumeration:
         if (!m_paramType->possible_values.contains(val))
             return false;
         break;
 
+    default:
+        break;
     }
 
     m_value = val;

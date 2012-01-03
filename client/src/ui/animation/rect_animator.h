@@ -8,15 +8,15 @@
  * sense. This class introduces new speed values that can be
  * adjusted to change transition times.
  */
-class QnRectAnimator: public QnVariantAnimator {
+class RectAnimator: public VariantAnimator {
     Q_OBJECT;
 
-    typedef QnVariantAnimator base_type;
+    typedef VariantAnimator base_type;
 
 public:
-    QnRectAnimator(QObject *parent = NULL);
+    RectAnimator(QObject *parent = NULL);
 
-    virtual ~QnRectAnimator();
+    virtual ~RectAnimator();
 
     /**
      * \returns                         Scaling speed, scaling factor per second.

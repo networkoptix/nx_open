@@ -8,9 +8,9 @@
 
 class QThread;
 
-class CLGLRenderer;
+class QnGLRenderer;
 
-class QnResourceWidgetRenderer: public QObject, public CLAbstractRenderer, public QnRenderStatus {
+class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer, public QnRenderStatus {
     Q_OBJECT;
 public:
     QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL);
@@ -29,10 +29,12 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
-    RenderStatus paint(int channel, const QRectF &rect);
+    RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
 
     qint64 lastDisplayedTime(int channel) const;
+
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const;
+
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
@@ -43,7 +45,7 @@ signals:
 
 private:
     /** Renderers that are used to render the channels. */
-    QList<CLGLRenderer *> m_channelRenderers;
+    QList<QnGLRenderer *> m_channelRenderers;
 
     /** Current source size, in square pixels. */
     QSize m_sourceSize;

@@ -1,4 +1,7 @@
 #include "arecont_dlg.h"
+
+#include <QtGui/QMessageBox>
+
 #include "../../widgets.h"
 #include "settings.h"
 
@@ -50,9 +53,9 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
     mPossibleNames.push_back(QLatin1String("20185"));
     mPossibleNames.push_back(QLatin1String("20365"));
 
-    QList<QString> base = mPossibleNames;
+    QList<QString> copy = mPossibleNames;
 
-    foreach (const QString &str, base)
+    foreach (const QString &str, copy)
     {
         QString mini = str + QLatin1String("M");
         QString dn = str + QLatin1String("DN");
@@ -64,28 +67,21 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
         mPossibleNames.push_back(ai);
         mPossibleNames.push_back(ir);
     }
-
 }
 
-AreconVisionDlgManufacture& AreconVisionDlgManufacture::instance()
+CLAbstractDeviceSettingsDlg *AreconVisionDlgManufacture::createDlg(QnResourcePtr resource)
 {
-    static AreconVisionDlgManufacture inst;
-    return inst;
+    return new AVSettingsDlg(resource);
 }
 
-CLAbstractDeviceSettingsDlg* AreconVisionDlgManufacture::createDlg(QnResourcePtr dev)
+bool AreconVisionDlgManufacture::canProduceDlg(QnResourcePtr resource) const
 {
-    return new AVSettingsDlg(dev);
+    return mPossibleNames.contains(resource->getName());
 }
 
-bool AreconVisionDlgManufacture::canProduceDlg(QnResourcePtr dev) const
-{
-    return mPossibleNames.contains(dev->getName());
-}
 
-//=======================================================================================
-AVSettingsDlg::AVSettingsDlg(QnResourcePtr dev):
-CLAbstractDeviceSettingsDlg(dev)
+AVSettingsDlg::AVSettingsDlg(QnResourcePtr resource, QWidget *parent)
+    : CLAbstractDeviceSettingsDlg(resource, parent)
 {
     initTabsOrder();
     initImageQuality();
@@ -100,207 +96,180 @@ CLAbstractDeviceSettingsDlg(dev)
 
 void AVSettingsDlg::initTabsOrder()
 {
-    //return;
-
     CLDeviceSettingsTab* tab = 0;
 
-    if ( (tab = tabByName(tr("Image quality"))) )
-        addTabWidget(tab);
+    if (tab = tabByName(tr("Image quality")))
+        addTab(tab);
 
-    if ( (tab = tabByName(tr("Exposure"))) )
-        addTabWidget(tab);
+    if (tab = tabByName(tr("Exposure")))
+        addTab(tab);
 
-    if ( (tab = tabByName(tr("AutoIris"))) )
-        addTabWidget(tab);
+    if (tab = tabByName(tr("AutoIris")))
+        addTab(tab);
 
-    if ( (tab = tabByName(tr("Day/Night"))) )
-        addTabWidget(tab);
+    if (tab = tabByName(tr("Day/Night")))
+        addTab(tab);
 
-    if ( (tab=tabByName(tr("Binning"))) )
-        addTabWidget(tab);
+    if (tab=tabByName(tr("Binning")))
+        addTab(tab);
 
-    if ( (tab = tabByName(tr("Motion detection"))) )
-        addTabWidget(tab);
+    if (tab = tabByName(tr("Motion detection")))
+        addTab(tab);
 
-    if ( (tab = tabByName(tr("Network"))) )
-        addTabWidget(tab);
+    if (tab = tabByName(tr("Network")))
+        addTab(tab);
 
-    if ( (tab = tabByName(tr("Administration/Info"))) )
-        addTabWidget(tab);
+    if (tab = tabByName(tr("Administration/Info")))
+        addTab(tab);
 }
 
 void AVSettingsDlg::initImageQuality()
 {
-    QGroupBox* group;
-    CLAbstractSettingsWidget* wgt;
-
-    if ( (group = getGroupByName(QLatin1String("Quality"))) )
+    if (QGroupBox *group = getGroupByName(QLatin1String("Quality")))
     {
         group->move(10,10);
         group->setFixedWidth(350);
         group->setFixedHeight(205);
 
-        bool h264 = (getWidgetByName(QLatin1String("Codec")) != 0);
-
-        if ( (wgt = getWidgetByName(QLatin1String("Quality"))) )
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Quality")))
         {
-            if (h264)
-                wgt->toWidget()->move(10,35);
+            if (getWidgetByName(QLatin1String("Codec")) != 0)
+            {
+                wgt->widget()->move(10,35);
+            }
             else
             {
-                wgt->toWidget()->move(10,73);
-                wgt->toWidget()->setFixedWidth(330);
+                wgt->widget()->move(10,73);
+                wgt->widget()->setFixedWidth(330);
             }
-
         }
 
-        if ( (wgt = getWidgetByName(QLatin1String("Codec"))) )
-            wgt->toWidget()->move(200,25);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Codec")))
+            wgt->widget()->move(200,25);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Bitrate"))) )
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Bitrate")))
         {
-            wgt->toWidget()->move(10,125);
-            wgt->toWidget()->setFixedWidth(330);
+            wgt->widget()->move(10,125);
+            wgt->widget()->setFixedWidth(330);
         }
-
     }
 
-    if ( (group = getGroupByName(QLatin1String("Color"))) )
+    if (QGroupBox *group = getGroupByName(QLatin1String("Color")))
     {
         group->move(385,10);
         group->setFixedWidth(180);
         group->setFixedHeight(205);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Red"))) )
-            wgt->toWidget()->move(10,30);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Red")))
+            wgt->widget()->move(10,30);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Blue"))) )
-            wgt->toWidget()->move(10,120);
-
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Blue")))
+            wgt->widget()->move(10,120);
     }
 
-    if ( (group = getGroupByName(QLatin1String("Adjustment"))) )
+    if (QGroupBox *group = getGroupByName(QLatin1String("Adjustment")))
     {
         group->move(10,240);
         group->setFixedWidth(555);
         group->setFixedHeight(110);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Brightness"))) )
-            wgt->toWidget()->move(10,30);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Brightness")))
+            wgt->widget()->move(10,30);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Sharpness"))) )
-            wgt->toWidget()->move(200,30);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Sharpness")))
+            wgt->widget()->move(200,30);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Saturation"))) )
-            wgt->toWidget()->move(380,30);
-
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Saturation")))
+            wgt->widget()->move(380,30);
     }
 
-    if ( (wgt = getWidgetByName(QLatin1String("Equalize Brightness"))) )
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Equalize Brightness")))
     {
-        wgt->toWidget()->move(135,360);
+        wgt->widget()->move(135,360);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Equalize Color"))) )
-            wgt->toWidget()->move(340,360);
+        if (wgt = getWidgetByName(QLatin1String("Equalize Color")))
+            wgt->widget()->move(340,360);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Rotate 180"))) )
-            wgt->toWidget()->hide(); // for now
-
+        if (wgt = getWidgetByName(QLatin1String("Rotate 180")))
+            wgt->widget()->hide(); // for now
     }
     else
     {
-        if ( (wgt = getWidgetByName(QLatin1String("Rotate 180"))) )
-            wgt->toWidget()->move(255,360);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Rotate 180")))
+            wgt->widget()->move(255,360);
     }
-
     //
-
 }
 
 void AVSettingsDlg::initExposure()
 {
-    QGroupBox* group;
-    CLAbstractSettingsWidget* wgt;
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Illumination")))
+        wgt->widget()->move(420,60);
 
-    if ( (wgt = getWidgetByName(QLatin1String("Illumination"))) )
-        wgt->toWidget()->move(420,60);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Lighting")))
+        wgt->widget()->move(420,210);
 
-    if ( (wgt = getWidgetByName(QLatin1String("Lighting"))) )
-        wgt->toWidget()->move(420,210);
-
-    if ( (group = getGroupByName(QLatin1String("Low Light Mode"))) )
+    if (QGroupBox *group = getGroupByName(QLatin1String("Low Light Mode")))
     {
         group->move(10,60);
         group->setFixedWidth(380);
         group->setFixedHeight(240);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Light Mode"))) )
-            wgt->toWidget()->move(30,30);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Light Mode")))
+            wgt->widget()->move(30,30);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Short Exposure"))) )
-            wgt->toWidget()->move(200,75);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Short Exposure")))
+            wgt->widget()->move(200,75);
 
-        if ( (wgt = getWidgetByName(QLatin1String("Auto exposure On/Off"))) )
-            wgt->toWidget()->move(30,200);
+        if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Auto exposure On/Off")))
+            wgt->widget()->move(30,200);
     }
 }
 
 void AVSettingsDlg::initAI()
 {
-//    QGroupBox* group;
-    CLAbstractSettingsWidget* wgt;
-
-    if ( (wgt = getWidgetByName(QLatin1String("AutoIris enable"))) )
-        wgt->toWidget()->move(200,180);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("AutoIris enable")))
+        wgt->widget()->move(200,180);
 }
 
 void AVSettingsDlg::initDN()
 {
-//    QGroupBox* group;
-    CLAbstractSettingsWidget* wgt;
-
-    if ( (wgt = getWidgetByName(QLatin1String("Day/Night Mode"))) )
-        wgt->toWidget()->move(215,130);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Day/Night Mode")))
+        wgt->widget()->move(215,130);
 }
 
 void AVSettingsDlg::initMD()
 {
-//    QGroupBox* group;
-    CLAbstractSettingsWidget* wgt;
-
     //Enable motion detection
     //Zone size
     //Threshold
     //Sensitivity
     //Md detail
 
-    if ( (wgt = getWidgetByName(QLatin1String("Enable motion detection"))) )
-        wgt->toWidget()->move(175,30);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Enable motion detection")))
+        wgt->widget()->move(175,30);
 
-    if ( (wgt = getWidgetByName(QLatin1String("Zone size"))) )
-        wgt->toWidget()->move(80,80);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Zone size")))
+        wgt->widget()->move(80,80);
 
-    if ( (wgt = getWidgetByName(QLatin1String("Threshold"))) )
-        wgt->toWidget()->move(320,80);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Threshold")))
+        wgt->widget()->move(320,80);
 
-    if ( (wgt = getWidgetByName(QLatin1String("Sensitivity"))) )
-        wgt->toWidget()->move(80,210);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Sensitivity")))
+        wgt->widget()->move(80,210);
 
-    if ( (wgt = getWidgetByName(QLatin1String("Md detail"))) )
-        wgt->toWidget()->move(320,210);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Md detail")))
+        wgt->widget()->move(320,210);
 }
 
 void AVSettingsDlg::initAdmin()
 {
-//    QGroupBox* group;
-    CLAbstractSettingsWidget* wgt;
-
-    if ( (wgt = getWidgetByName(QLatin1String("Factory defaults"))) )
-        wgt->toWidget()->move(230,150);
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Factory defaults")))
+        wgt->widget()->move(230,150);
 }
 
 //=========================================================================
-void AVSettingsDlg::setParam(const QString& name, const QnValue& val)
+void AVSettingsDlg::setParam(const QString& name, const QVariant& val)
 {
     CLAbstractDeviceSettingsDlg::setParam(name, val);
     correctWgtsState();
@@ -310,7 +279,6 @@ void AVSettingsDlg::onSuggestions()
 {
     QString text = tr("To reduce the bandwidth try to set Light Mode on Exposure tab to HightSpeed and set Short Exposure to 30ms.");
     QMessageBox mbox(QMessageBox::Information, tr("Suggestion"), text, QMessageBox::Ok, this, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    //mbox.setWindowOpacity(global_dlg_opacity);
     mbox.exec();
 }
 
@@ -322,40 +290,17 @@ void AVSettingsDlg::onClose()
 
 void AVSettingsDlg::correctWgtsState()
 {
-    CLAbstractSettingsWidget* wgt;
-    QString val;
-
-    if ( (wgt = getWidgetByName(QLatin1String("Light Mode"))) )
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Light Mode")))
     {
-        val = (QString)wgt->param().value();
-
-        if (val == QLatin1String("highspeed"))
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Short Exposure"))) )
-                wgt->toWidget()->show();
-        }
-        else
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Short Exposure"))) )
-                wgt->toWidget()->hide();
-        }
+        QString val = wgt->param().value().toString();
+        if (wgt = getWidgetByName(QLatin1String("Short Exposure")))
+            wgt->widget()->setVisible(val == QLatin1String("highspeed"));
     }
 
-    //=================================================
-    if ( (wgt = getWidgetByName(QLatin1String("Codec"))) )
+    if (CLAbstractSettingsWidget *wgt = getWidgetByName(QLatin1String("Codec")))
     {
-        val = (QString)wgt->param().value();
-
-        if (val == QLatin1String("H.264"))
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Bitrate"))) )
-                wgt->toWidget()->show();
-        }
-        else
-        {
-            if ( (wgt = getWidgetByName(QLatin1String("Bitrate"))) )
-                wgt->toWidget()->hide();
-        }
+        QString val = wgt->param().value().toString();
+        if (wgt = getWidgetByName(QLatin1String("Bitrate")))
+            wgt->widget()->setVisible(val == QLatin1String("H.264"));
     }
-
 }

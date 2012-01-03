@@ -2,8 +2,10 @@
 #include <cassert>
 #include <QGraphicsObject>
 #include <QMouseEvent>
+#include <QApplication>
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/graphics/items/resource_widget.h>
+#include <settings.h>
 
 class MotionSelectionItem: public QGraphicsObject {
 public:
@@ -24,8 +26,8 @@ public:
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(SELECT_ARIA_PEN_COLOR));
-        QnScopedPainterBrushRollback brushRollback(painter, QColor(SELECT_ARIA_BRUSH_COLOR));
+        QnScopedPainterPenRollback penRollback(painter, QPen(global_motion_selection_rubber_band_border_color));
+        QnScopedPainterBrushRollback brushRollback(painter, QColor(global_motion_selection_rubber_band_color));
         painter->drawRect(boundingRect());
     }
 
@@ -186,13 +188,13 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
     if ((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() >= QApplication::startDragDistance())
     {
         if (gridCorner.x() >= gridOrigin.x())
-            gridCorner += QPoint(1,0);
+            gridCorner += QPoint(1, 0);
         else 
-            gridOrigin += QPoint(1,0);
+            gridOrigin += QPoint(1, 0);
         if (gridCorner.y() >= gridOrigin.y())
-            gridCorner += QPoint(0,1);
+            gridCorner += QPoint(0, 1);
         else 
-            gridOrigin += QPoint(0,1);
+            gridOrigin += QPoint(0, 1);
     }
 
     selectionItem()->setOrigin(target()->mapFromMotionGrid(gridOrigin));
@@ -212,7 +214,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
         target()->addToMotionSelection(QRect(
             QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
             QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
-            ));
+        ));
     }
 
     selectionItem()->setVisible(false);

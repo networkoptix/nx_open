@@ -40,12 +40,12 @@
 static const unsigned int MAX_SHADER_SIZE = 1024*3;
 static const unsigned int ROUND_COEFF = 8;
 
-QVector<uchar> CLGLRenderer::m_staticYFiller;
-QVector<uchar> CLGLRenderer::m_staticUVFiller;
+QVector<uchar> QnGLRenderer::m_staticYFiller;
+QVector<uchar> QnGLRenderer::m_staticUVFiller;
 
-QMutex CLGLRenderer::m_programMutex;
-bool CLGLRenderer::m_programInited = false;
-GLuint CLGLRenderer::m_program[2];
+QMutex QnGLRenderer::m_programMutex;
+bool QnGLRenderer::m_programInited = false;
+GLuint QnGLRenderer::m_program[2];
 
 
 #define OGL_CHECK_ERROR(str) //if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
@@ -124,23 +124,23 @@ static const char yuy2ToRgb[] =
 "MOV result.color.w, c[1].y;"
 "END";
 
-int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
+int QnGLRenderer::gl_status = QnGLRenderer::CL_GL_NOT_TESTED;
 
 static QList<GLuint *> mGarbage;
 
-CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw):
+QnGLRenderer::QnGLRenderer(CLVideoWindowItem *vw):
     m_videowindow(vw)
 {
     construct();
 }
 
-CLGLRenderer::CLGLRenderer():
+QnGLRenderer::QnGLRenderer():
     m_videowindow(NULL)
 {
     construct();
 }
 
-void CLGLRenderer::construct() {
+void QnGLRenderer::construct() {
     clampConstant = GL_CLAMP;
     isNonPower2 = false;
     isSoftYuv2Rgb = false;
@@ -164,10 +164,10 @@ void CLGLRenderer::construct() {
 
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
-    (void)CLGLRenderer::getMaxTextureSize();
+    (void)QnGLRenderer::getMaxTextureSize();
 }
 
-int CLGLRenderer::checkOpenGLError() const
+int QnGLRenderer::checkOpenGLError() const
 {
     int err = glGetError();
     if (GL_NO_ERROR != err)
@@ -179,7 +179,7 @@ int CLGLRenderer::checkOpenGLError() const
     return err;
 }
 
-CLGLRenderer::~CLGLRenderer()
+QnGLRenderer::~QnGLRenderer()
 {
     if (m_textureUploaded)
     {
@@ -194,7 +194,7 @@ CLGLRenderer::~CLGLRenderer()
     }
 }
 
-void CLGLRenderer::clearGarbage()
+void QnGLRenderer::clearGarbage()
 {
     foreach (GLuint *heap, mGarbage)
     {
@@ -205,7 +205,7 @@ void CLGLRenderer::clearGarbage()
     mGarbage.clear();
 }
 
-void CLGLRenderer::init(bool msgbox)
+void QnGLRenderer::init(bool msgbox)
 {
     if (m_inited)
         return;
@@ -372,7 +372,7 @@ void CLGLRenderer::init(bool msgbox)
 
 Q_GLOBAL_STATIC(QMutex, maxTextureSizeMutex)
 
-int CLGLRenderer::getMaxTextureSize()
+int QnGLRenderer::getMaxTextureSize()
 {
     static GLint maxTextureSize = 0;
     if (!maxTextureSize)
@@ -389,7 +389,7 @@ int CLGLRenderer::getMaxTextureSize()
     return maxTextureSize;
 }
 
-void CLGLRenderer::beforeDestroy()
+void QnGLRenderer::beforeDestroy()
 {
     QMutexLocker lock(&m_displaySync);
     m_needwait = false;
@@ -398,7 +398,7 @@ void CLGLRenderer::beforeDestroy()
     m_waitCon.wakeAll();
 }
 
-void CLGLRenderer::draw(CLVideoDecoderOutput* img)
+void QnGLRenderer::draw(CLVideoDecoderOutput* img)
 {
     QMutexLocker locker(&m_displaySync);
     //m_abort_drawing = false;
@@ -431,7 +431,7 @@ void CLGLRenderer::draw(CLVideoDecoderOutput* img)
     }
 }
 
-void CLGLRenderer::waitForFrameDisplayed(int channel)
+void QnGLRenderer::waitForFrameDisplayed(int channel)
 {
     Q_UNUSED(channel)
 
@@ -442,22 +442,22 @@ void CLGLRenderer::waitForFrameDisplayed(int channel)
     }
 }
 
-void CLGLRenderer::setForceSoftYUV(bool value)
+void QnGLRenderer::setForceSoftYUV(bool value)
 {
     m_forceSoftYUV = value;
 }
 
-qreal CLGLRenderer::opacity() const
+qreal QnGLRenderer::opacity() const
 {
     return m_painterOpacity;
 }
 
-void CLGLRenderer::setOpacity(qreal opacity)
+void QnGLRenderer::setOpacity(qreal opacity)
 {
     m_painterOpacity = opacity;
 }
 
-void CLGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
+void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 {
     // normalize the values
     m_brightness = brightness * 128;
@@ -466,7 +466,7 @@ void CLGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
     m_saturation = saturation + 1.0;
 }
 
-int CLGLRenderer::glRGBFormat() const
+int QnGLRenderer::glRGBFormat() const
 {
     if (!isYuvFormat())
     {
@@ -482,7 +482,7 @@ int CLGLRenderer::glRGBFormat() const
     return GL_RGBA;
 }
 
-bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
+bool QnGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 {
     switch (pixfmt)
     {
@@ -500,12 +500,12 @@ bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
     return false;
 }
 
-bool CLGLRenderer::isYuvFormat() const
+bool QnGLRenderer::isYuvFormat() const
 {
     return m_format == PIX_FMT_YUV422P || m_format == PIX_FMT_YUV420P || m_format == PIX_FMT_YUV444P;
 }
 
-void CLGLRenderer::updateTexture()
+void QnGLRenderer::updateTexture()
 {
     //image.saveToFile("test.yuv");
 
@@ -746,7 +746,7 @@ void CLGLRenderer::updateTexture()
     */
 }
 
-void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array)
+void QnGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array)
 {
     float tx_array[8] = {m_videoCoeffL[0], 0.0f,
                         m_videoCoeffW[0], 0.0f,
@@ -843,7 +843,7 @@ static inline QRect getTextureRect(float textureWidth, float textureHeight,
 }
 #endif
 
-CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
+QnGLRenderer::RenderStatus QnGLRenderer::paintEvent(const QRectF &r)
 {
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -908,7 +908,7 @@ CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
     return result;
 }
 
-QSize CLGLRenderer::sizeOnScreen(unsigned int channel) const
+QSize QnGLRenderer::sizeOnScreen(unsigned int channel) const
 {
     qnWarning("Unreachable code executed.");
 
@@ -918,7 +918,7 @@ QSize CLGLRenderer::sizeOnScreen(unsigned int channel) const
         return QSize();
 }
 
-bool CLGLRenderer::constantDownscaleFactor() const
+bool QnGLRenderer::constantDownscaleFactor() const
 {
     qnWarning("Unreachable code executed.");
 
@@ -928,25 +928,25 @@ bool CLGLRenderer::constantDownscaleFactor() const
         return false;
 }
 
-qint64 CLGLRenderer::lastDisplayedTime() const
+qint64 QnGLRenderer::lastDisplayedTime() const
 {
     QMutexLocker locker(&m_displaySync);
     return m_lastDisplayedTime;
 }
 
-QnMetaDataV1Ptr CLGLRenderer::lastFrameMetadata() const
+QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
 {
     QMutexLocker locker(&m_displaySync);
     return m_lastDisplayedMetadata;
 }
 
-bool CLGLRenderer::isNoVideo() const
+bool QnGLRenderer::isNoVideo() const
 {
     QMutexLocker locker(&m_displaySync);
     return m_noVideo;
 }
 
-void CLGLRenderer::onNoVideo()
+void QnGLRenderer::onNoVideo()
 {
     QMutexLocker locker(&m_displaySync);
     m_noVideo = true;

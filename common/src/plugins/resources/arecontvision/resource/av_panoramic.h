@@ -13,8 +13,8 @@ public:
     virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
 protected:
 
-    virtual bool setParamPhysical(const QString& name, const QnValue& val);
-    virtual bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
+    virtual bool setParamPhysical(const QString& name, const QVariant& val);
+    virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 

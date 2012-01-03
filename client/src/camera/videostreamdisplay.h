@@ -6,7 +6,7 @@
 
 class QnAbstractVideoDecoder;
 struct QnCompressedVideoData;
-class CLAbstractRenderer;
+class QnAbstractRenderer;
 class BufferedFrameDisplayer;
 
 static const int MAX_FRAME_QUEUE_SIZE = 12;
@@ -21,7 +21,7 @@ public:
 
     CLVideoStreamDisplay(bool can_downscale);
     ~CLVideoStreamDisplay();
-    void setDrawer(CLAbstractRenderer* draw);
+    void setDrawer(QnAbstractRenderer* draw);
     FrameDisplayStatus dispay(QnCompressedVideoDataPtr data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
@@ -48,7 +48,7 @@ private:
     mutable QMutex m_timeMutex;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
 
-    CLAbstractRenderer* m_drawer;
+    QnAbstractRenderer* m_drawer;
 
     /**
       * to reduce image size for weak video cards 

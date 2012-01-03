@@ -159,7 +159,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-    QAction *reconnectAction = new QAction(/*Skin::icon(QLatin1String("reconnnect.png")), */tr("Reconnect"), this);
+    QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
     toolBar->addAction(reconnectAction);
 

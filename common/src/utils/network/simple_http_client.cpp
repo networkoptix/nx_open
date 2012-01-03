@@ -34,32 +34,32 @@ CLSimpleHTTPClient::~CLSimpleHTTPClient()
 
 CLHttpStatus CLSimpleHTTPClient::getNextLine()
 {
-	m_line.clear();
-	QTextStream response(&m_line);
-	char prev = 0 , curr = 0;
+    m_line.clear();
+    QTextStream response(&m_line);
+    char prev = 0 , curr = 0;
 
-	int readed = 0;
+    int readed = 0;
 
-	while(1)
-	{
+    while(1)
+    {
         if (m_sock->recv(&curr,1)<0)
             return CL_TRANSPORT_ERROR;
 
-		if (prev=='\r' && curr == '\n')
-			break;
+        if (prev=='\r' && curr == '\n')
+            break;
 
-		if (prev==0 && curr == 0 && readed>1)
-			break;
+        if (prev==0 && curr == 0 && readed>1)
+            break;
 
-		response << curr;
-		prev = curr;
-		++readed;
+        response << curr;
+        prev = curr;
+        ++readed;
 
         if (readed > MAX_LINE_LENGTH)
             break;
-	}
+    }
 
-	return CL_HTTP_SUCCESS;
+    return CL_HTTP_SUCCESS;
 
 }
 
@@ -186,8 +186,8 @@ int CLSimpleHTTPClient::readHeaders()
         {
             QString name = m_line.left(pos).trimmed();
             QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
-            QnAssociativeArray::put(name, val );
-            if (name==QLatin1String("Content-Length"))
+            m_header.insert(name, val );
+            if (name == QLatin1String("Content-Length"))
             {
                 m_contentLen = val.toInt();
                 m_readed = 0;
@@ -206,8 +206,8 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 
 CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recursive)
 {
-	try
-	{
+    try
+    {
         if (!m_connected)
         {
             if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
@@ -216,23 +216,23 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             }
         }
 
-		QString request;
-		QTextStream os(&request);
+        QString request;
+        QTextStream os(&request);
 
         os << "GET /" << requestStr<<" HTTP/1.1\r\n"
-			<< "Host: "<< m_host.toString() << "\r\n";
+            << "Host: "<< m_host.toString() << "\r\n";
 
-		if (m_auth.user().length()>0 && mNonce.isEmpty())
-		{
-			os << basicAuth() << "\r\n";
-		}
-		else if (m_auth.password().length()>0 && !mNonce.isEmpty())
-		{
+        if (m_auth.user().length()>0 && mNonce.isEmpty())
+        {
+            os << basicAuth() << "\r\n";
+        }
+        else if (m_auth.password().length()>0 && !mNonce.isEmpty())
+        {
             os << digestAccess(request);
-		}
+        }
 
-		os<< "\r\n";
-        
+        os<< "\r\n";
+
         if (!m_sock->send(request.toLatin1().data(), request.toLatin1().size()))
         {
             qDebug() << "OpenStream1";
@@ -245,9 +245,9 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             return CL_TRANSPORT_ERROR;
         }
 
-        
-		if (!m_line.contains(QLatin1String("200 OK")))// not ok
-		{
+
+        if (!m_line.contains(QLatin1String("200 OK")))// not ok
+        {
             close();
 
             if (m_line.contains(QLatin1String("401 Unauthorized")))
@@ -261,22 +261,22 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             }
 
             return CL_TRANSPORT_ERROR;
-		}
+        }
 
         if (readHeaders() == CL_TRANSPORT_ERROR)
             return CL_TRANSPORT_ERROR;
 
-				
-		m_connected = true;
 
-		return CL_HTTP_SUCCESS;
+        m_connected = true;
 
-	}
-	catch (...)
-	{
+        return CL_HTTP_SUCCESS;
+
+    }
+    catch (...)
+    {
         close();
         return CL_TRANSPORT_ERROR;
-	}
+    }
 }
 
 void CLSimpleHTTPClient::close()
@@ -300,16 +300,16 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
 
 long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
 {
-	if (!m_connected) return -1;
+    if (!m_connected) return -1;
 
-	int readed = 0;
+    int readed = 0;
     readed = m_sock->recv(data, max_len);
 
 
-	if (readed<=0)
+    if (readed<=0)
         close();
 
-	m_readed+=readed;
+    m_readed+=readed;
 
     if (m_readed == m_contentLen)
         m_connected = false;

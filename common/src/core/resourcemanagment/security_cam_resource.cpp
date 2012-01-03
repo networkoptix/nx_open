@@ -45,9 +45,9 @@ int QnSecurityCamResource::getMaxFps()
         return 15;
     }
 
-    QnValue val;
+    QVariant val;
     getParam("MaxFPS", val, QnDomainMemory);
-    return val;
+    return val.toInt();
 }
 
 QSize QnSecurityCamResource::getMaxSensorSize()
@@ -59,11 +59,11 @@ QSize QnSecurityCamResource::getMaxSensorSize()
         return QSize(0,0);
     }
 
-    QnValue val_w, val_h;
+    QVariant val_w, val_h;
     getParam("MaxSensorWidth", val_w, QnDomainMemory);
     getParam("MaxSensorHeight", val_h, QnDomainMemory);
 
-    return QSize(val_w, val_h);
+    return QSize(val_w.toInt(), val_h.toInt());
 
 }
 

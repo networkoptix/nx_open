@@ -1,9 +1,9 @@
 #ifndef __SIMPLE_HTTP_CLIENT__
 #define __SIMPLE_HTTP_CLIENT__
 
-#include "socket.h"
-#include "../common/associativearray.h"
+#include <QtCore/QHash>
 
+#include "socket.h"
 
 enum CLHttpStatus
 {
@@ -14,12 +14,13 @@ enum CLHttpStatus
     CL_TRANSPORT_ERROR = -1
 };
 
-class CLSimpleHTTPClient : public QnAssociativeArray
+class CLSimpleHTTPClient
 {
-    enum {Basic , Digestaccess };
-public:	
-	CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
-	~CLSimpleHTTPClient();
+    enum { Basic, Digestaccess };
+
+public:
+    CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    ~CLSimpleHTTPClient();
 
     CLHttpStatus doGET(const QString& request, bool recursive = true);
     CLHttpStatus doPOST(const QString& request, const QString& body);
@@ -31,19 +32,24 @@ public:
 
     void readAll(QByteArray& data);
 
-	long read(char* data, unsigned long max_len);
+    long read(char* data, unsigned long max_len);
 
     void close();
 
-	QString getContentType() const 
-	{
-		return m_contentType;
-	}
+    QHash<QString, QString> header() const
+    {
+        return m_header;
+    }
 
-	unsigned int getContentLen() const
-	{
-		return m_contentLen;
-	}
+    QString getContentType() const
+    {
+        return m_contentType;
+    }
+
+    unsigned int getContentLen() const
+    {
+        return m_contentLen;
+    }
 
     QString mRealm;
     QString mNonce;
@@ -64,20 +70,21 @@ private:
 private:
     QString m_line;
 
-	QHostAddress m_host;
-	int m_port;
+    QHostAddress m_host;
+    int m_port;
 
-	QString m_contentType;
-	unsigned int m_contentLen;
+    QHash<QString, QString> m_header;
+    QString m_contentType;
+    unsigned int m_contentLen;
     unsigned int m_readed;
 
     typedef QSharedPointer<TCPSocket> TCPSocketPtr;
 
     TCPSocketPtr m_sock;
-	bool m_connected;
+    bool m_connected;
 
-	unsigned int m_timeout;
-	QAuthenticator m_auth;
+    unsigned int m_timeout;
+    QAuthenticator m_auth;
 };
 
 #endif //__SIMPLE_HTTP_CLIENT__

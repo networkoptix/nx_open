@@ -1,8 +1,7 @@
 #ifndef dlg_settings_getter_h2355
 #define dlg_settings_getter_h2355
+
 #include "core/resource/resource_command_consumer.h"
-
-
 
 class CLAbstractSettingsWidget;
 
@@ -10,12 +9,14 @@ class QnDeviceGetParamCommand : public QObject, public QnResourceCommand
 {
     Q_OBJECT
 public:
-    QnDeviceGetParamCommand(CLAbstractSettingsWidget* wgt);
+    QnDeviceGetParamCommand(CLAbstractSettingsWidget *wgt);
     void execute();
-signals:
+
+Q_SIGNALS:
     void ongetvalue(QString val);
+
 private:
-    CLAbstractSettingsWidget* m_wgt;
+    CLAbstractSettingsWidget *const m_wgt;
 };
 
 typedef QSharedPointer<QnDeviceGetParamCommand> QnDeviceGetParamCommandPtr;

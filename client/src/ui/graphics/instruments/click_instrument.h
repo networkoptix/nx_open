@@ -50,9 +50,20 @@ public:
     virtual ~ClickInstrument();
 
 signals:
+    /** 
+     * This signal is emitted when the mouse is pressed over an item.
+     * After that <tt>clicked</tt>, <tt>doubleClicked</tt> or both may be emitted,
+     * depending on the click delay.
+     * 
+     * \param view                      View where the click originated.
+     * \param item                      Item that was clicked.
+     * \param info                      Additional click information.
+     */
+    void pressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
+    void pressed(QGraphicsView *view, const ClickInfo &info);
     void clicked(QGraphicsView *view, const ClickInfo &info);
     void doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
@@ -96,6 +107,9 @@ private:
 
     void emitSignals(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
     void emitSignals(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
+
+    void emitInitialSignal(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
+    void emitInitialSignal(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
 
 private:
     struct ClickData;

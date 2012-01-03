@@ -11,25 +11,25 @@ class QnAbstractStreamDataProvider;
 class QnVideoResourceLayout;
 class CLCamDisplay;
 class CLLongRunnable;
-class CLAbstractRenderer;
+class QnAbstractRenderer;
 class CLVideoCamera;
 
 namespace detail {
     class QnRendererGuard: public QObject {
         Q_OBJECT;
     public:
-        QnRendererGuard(CLAbstractRenderer *renderer): 
+        QnRendererGuard(QnAbstractRenderer *renderer): 
             m_renderer(renderer) 
         {}
 
         virtual ~QnRendererGuard();
 
-        CLAbstractRenderer *renderer() const {
+        QnAbstractRenderer *renderer() const {
             return m_renderer;
         }
 
     private:
-        CLAbstractRenderer *m_renderer;
+        QnAbstractRenderer *m_renderer;
     };
 
 } // namespace detail
@@ -132,7 +132,7 @@ public:
     /**
      * \param renderer                  Renderer to assign to this display. Ownership of the renderer is transferred to this display. 
      */
-    void addRenderer(CLAbstractRenderer *renderer);
+    void addRenderer(QnAbstractRenderer *renderer);
 
     virtual void afterUpdate();
 

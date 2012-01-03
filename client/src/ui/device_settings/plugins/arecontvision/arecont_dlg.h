@@ -6,39 +6,39 @@
 
 class AreconVisionDlgManufacture : public CLAbstractDlgManufacture
 {
-private:
-	AreconVisionDlgManufacture();
 public:
-	static AreconVisionDlgManufacture& instance();
-public:
-	CLAbstractDeviceSettingsDlg* createDlg(QnResourcePtr dev);
-	bool canProduceDlg(QnResourcePtr dev) const;
-private:
-	QList<QString> mPossibleNames;
+    AreconVisionDlgManufacture();
 
+    CLAbstractDeviceSettingsDlg *createDlg(QnResourcePtr resource);
+    bool canProduceDlg(QnResourcePtr resource) const;
+
+private:
+    QList<QString> mPossibleNames;
 };
+
 
 class AVSettingsDlg : public CLAbstractDeviceSettingsDlg
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	AVSettingsDlg(QnResourcePtr dev);
-protected slots:
-	virtual void onSuggestions();
-	virtual void setParam(const QString& name, const QnValue& val);
+    AVSettingsDlg(QnResourcePtr resource, QWidget *parent = 0);
+
+protected Q_SLOTS:
+    virtual void onSuggestions();
+    virtual void setParam(const QString& name, const QVariant& val);
     virtual void onClose();
+
 private:
-
-	void initTabsOrder();
-	void initImageQuality();
-	void initExposure();
-	void initAI();
-	void initDN();
-	void initMD();
-	void initAdmin();
-	//==========
-	void correctWgtsState();
-
+    void initTabsOrder();
+    void initImageQuality();
+    void initExposure();
+    void initAI();
+    void initDN();
+    void initMD();
+    void initAdmin();
+    //==========
+    void correctWgtsState();
 };
 
 #endif //arecon_dlg_factory_h1733

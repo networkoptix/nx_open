@@ -15,13 +15,13 @@ namespace {
     const char *animatorPropertyName = "_qn_itemAnimator";
 }
 
-Q_DECLARE_METATYPE(QnVariantAnimator *);
+Q_DECLARE_METATYPE(VariantAnimator *);
 
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_color(QColor(0, 0, 0, 0)),
     m_lineWidth(1.0),
-    m_opacityAnimator(new QnVariantAnimator(this))
+    m_opacityAnimator(new VariantAnimator(this))
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
@@ -72,15 +72,11 @@ void QnGridItem::setAnimationTimeLimit(int timeLimitMSec) {
 }
 
 void QnGridItem::animatedShow() {
-    m_opacityAnimator->pause();
-    m_opacityAnimator->setTargetValue(1.0);
-    m_opacityAnimator->start();
+    m_opacityAnimator->animateTo(1.0);
 }
 
 void QnGridItem::animatedHide() {
-    m_opacityAnimator->pause();
-    m_opacityAnimator->setTargetValue(0.0);
-    m_opacityAnimator->start();
+    m_opacityAnimator->animateTo(0.0);
 }
 
 QRectF QnGridItem::boundingRect() const {
@@ -159,25 +155,24 @@ void QnGridItem::setItemCell(QnGridHighlightItem *item, const QPoint &cell) cons
     item->setProperty(pointPropertyName, cell);
 }
 
-QnVariantAnimator *QnGridItem::itemAnimator(QnGridHighlightItem *item) {
-    QnVariantAnimator *animator = item->property(animatorPropertyName).value<QnVariantAnimator *>();
-
-    if(animator == NULL) {
-        animator = new QnVariantAnimator(item);
-        animator->setTargetObject(item);
-        animator->setTimer(m_opacityAnimator->timer());
-        animator->setAccessor(new QnPropertyAccessor("color"));
-        animator->setConverter(new QnColorToVectorConverter());
-        animator->setSpeed(m_opacityAnimator->speed());
-        connect(animator, SIGNAL(finished()), this, SLOT(at_itemAnimator_finished()));
-        item->setProperty(animatorPropertyName, QVariant::fromValue<QnVariantAnimator *>(animator));
-    }
-
+VariantAnimator *QnGridItem::itemAnimator(QnGridHighlightItem *item) {
+    VariantAnimator *animator = item->property(animatorPropertyName).value<VariantAnimator *>();
+    if(animator != NULL)
+        return animator;
+    
+    animator = new VariantAnimator(item);
+    animator->setTargetObject(item);
+    animator->setTimer(m_opacityAnimator->timer());
+    animator->setAccessor(new QnPropertyAccessor("color"));
+    animator->setConverter(new QnColorToVectorConverter());
+    animator->setSpeed(m_opacityAnimator->speed());
+    connect(animator, SIGNAL(finished()), this, SLOT(at_itemAnimator_finished()));
+    item->setProperty(animatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
     return animator;
 }
 
 void QnGridItem::at_itemAnimator_finished() {
-    QnVariantAnimator *animator = checked_cast<QnVariantAnimator *>(sender());
+    VariantAnimator *animator = checked_cast<VariantAnimator *>(sender());
     QnGridHighlightItem *item = checked_cast<QnGridHighlightItem *>(animator->targetObject());
 
     QPoint cell = itemCell(item);
@@ -214,12 +209,12 @@ void QnGridItem::setCellState(const QPoint &cell, int cellState) {
         setItemCell(data.item, cell);
     }
 
-    QnVariantAnimator *animator = itemAnimator(data.item);
+    VariantAnimator *animator = itemAnimator(data.item);
     animator->pause();
     
     QColor targetColor = stateColor(cellState);
     if(data.item->color().alpha() == 0)
-        data.item->setColor(SceneUtility::translucent(targetColor));
+        data.item->setColor(SceneUtility::transparent(targetColor));
     animator->setTargetValue(targetColor);
     
     animator->start();

@@ -9,17 +9,17 @@
 #include "variant_animator.h"
 
 QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
-    QnAnimatorGroup(parent),
+    AnimatorGroup(parent),
     m_curtained(false),
     m_curtainColorAnimator(NULL),
     m_frameColorAnimator(NULL)
 {
-    m_curtainColorAnimator = new QnVariantAnimator(this);
+    m_curtainColorAnimator = new VariantAnimator(this);
     m_curtainColorAnimator->setAccessor(new QnPropertyAccessor("color"));
     m_curtainColorAnimator->setConverter(new QnColorToVectorConverter());
     m_curtainColorAnimator->setTargetObject(NULL);
 
-    m_frameColorAnimator = new QnVariantAnimator(this);
+    m_frameColorAnimator = new VariantAnimator(this);
     m_frameColorAnimator->setAccessor(new QnPropertyAccessor("frameColor"));
     m_frameColorAnimator->setConverter(new QnColorToVectorConverter());
     m_frameColorAnimator->setTargetObject(NULL);
@@ -45,7 +45,7 @@ void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain) {
         m_curtainColorAnimator->setTargetObject(curtain);
 
         m_curtainColor = curtain->color();
-        curtain->setColor(SceneUtility::translucent(m_curtainColor));
+        curtain->setColor(SceneUtility::transparent(m_curtainColor));
         curtain->hide();
     }
 }
@@ -75,7 +75,7 @@ void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget) {
     restoreFrameColor();
     m_frameColor = frontWidget->frameColor();
     m_frameColorAnimator->setTargetObject(frontWidget);
-    m_frameColorAnimator->setTargetValue(SceneUtility::translucent(m_frameColor));
+    m_frameColorAnimator->setTargetValue(SceneUtility::transparent(m_frameColor));
 
     m_curtainColorAnimator->setTargetValue(m_curtainColor);
     curtain->show();
@@ -90,7 +90,7 @@ void QnCurtainAnimator::uncurtain() {
 
     stop();
     restoreFrameColor();
-    curtain->setColor(SceneUtility::translucent(m_curtainColor));
+    curtain->setColor(SceneUtility::transparent(m_curtainColor));
     curtain->hide();
     setCurtained(false);
 }

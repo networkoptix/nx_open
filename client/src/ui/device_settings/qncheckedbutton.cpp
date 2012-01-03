@@ -8,14 +8,17 @@ QnCheckedButton::QnCheckedButton(QWidget* parent): QToolButton(parent)
 void QnCheckedButton::checkStateSet()
 {
     QPixmap image(width(),height());
-    QPainter p (&image);
-    p.setPen(QColor(0,0,0));
-    if (isChecked())
-        p.setBrush(m_checkedColor);
-    else
-        p.setBrush(m_color);
-    int Offs = isChecked() ? 4 : 0;
-    p.drawRect(Offs, Offs, image.width() - Offs*2, image.height() - Offs*2);
+    {
+        QPainter p (&image);
+        p.setPen(QColor(0,0,0));
+        if (isChecked())
+            p.setBrush(m_checkedColor);
+        else
+            p.setBrush(m_color);
+        int Offs = isChecked() ? 4 : 0;
+        p.drawRect(Offs, Offs, image.width() - Offs*2, image.height() - Offs*2);
+    }
+
     QIcon icon;
 
     icon.addPixmap(image, QIcon::Normal, QIcon::Off);

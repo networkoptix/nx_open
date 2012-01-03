@@ -39,7 +39,6 @@ public:
     enum ItemRole {
         RAISED,  /**< The item is raised. */
         ZOOMED,  /**< The item is zoomed. */
-        FOCUSED, /**< The item is focused. */
         ITEM_ROLE_COUNT
     };
 

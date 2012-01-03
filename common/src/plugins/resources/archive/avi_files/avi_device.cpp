@@ -6,38 +6,35 @@
 QnAviResource::QnAviResource(const QString& file)
 {
     setUrl(QDir::cleanPath(file));
-	m_name = QFileInfo(file).fileName();
+    setName(QFileInfo(file).fileName());
+}
+
+QnAviResource::~QnAviResource()
+{
 }
 
 void QnAviResource::deserialize(const QnResourceParameters& parameters)
 {
     QnAbstractArchiveResource::deserialize(parameters);
 
-    const char* FILE = "file";
-
-    if (parameters.contains(FILE))
+    if (parameters.contains(QLatin1String("file")))
     {
-        QString file = parameters[FILE];
+        QString file = parameters[QLatin1String("file")];
         setUrl(QDir::cleanPath(file));
-        m_name = QFileInfo(file).fileName();
+        setName(QFileInfo(file).fileName());
     }
-}
-
-QnAviResource::~QnAviResource()
-{
-
 }
 
 QString QnAviResource::toString() const
 {
-	return m_name;
+    return getName();
 }
 
 QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
-
     result->setArchiveDelegate(new QnAviArchiveDelegate());
+
     return result;
 }
 
@@ -46,8 +43,8 @@ const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMedia
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
         return archiveReader->getDPVideoLayout();
-    else
-        return QnMediaResource::getVideoLayout();
+
+    return QnMediaResource::getVideoLayout();
 }
 
 const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
@@ -55,6 +52,6 @@ const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMedia
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
         return archiveReader->getDPAudioLayout();
-    else
-        return QnMediaResource::getAudioLayout();
+
+    return QnMediaResource::getAudioLayout();
 }

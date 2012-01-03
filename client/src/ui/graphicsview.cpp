@@ -1418,7 +1418,6 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
 
     //===== final menu=====
     QMenu menu;
-    //menu.setWindowOpacity(global_menu_opacity);
 
     if (aitem && scene()->selectedItems().isEmpty()) // single selection
     {
@@ -2361,7 +2360,7 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
     // Initialize maxTextureSize value. It should be somewhere where GL context already initialized, otherwise it will return 0.
     // Probably Medved6 knows better place.
-    CLGLRenderer::getMaxTextureSize();
+    QnGLRenderer::getMaxTextureSize();
 
     if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())// ||
         //m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent() )
@@ -3135,12 +3134,12 @@ void GraphicsView::mouseSpeed_helper(qreal& mouse_speed, int& dx, int&dy, int mi
     }
 }
 
-void GraphicsView::show_device_settings_helper(QnResourcePtr dev)
+void GraphicsView::show_device_settings_helper(QnResourcePtr resource)
 {
     bool open = false;
     QPoint p;
 
-    if (mDeviceDlg && mDeviceDlg->getDevice()!=dev) // need to delete only if exists and not for this device
+    if (mDeviceDlg && mDeviceDlg->resource() != resource) // need to delete only if exists and not for this device
     {
         // already opened ( may be for another device )
         p = mDeviceDlg->pos();
@@ -3157,7 +3156,7 @@ void GraphicsView::show_device_settings_helper(QnResourcePtr dev)
 
     if (!mDeviceDlg)
     {
-        mDeviceDlg = CLDeviceSettingsDlgFactory::createDlg(dev);
+        mDeviceDlg = CLDeviceSettingsDlgFactory::createDlg(resource);
         if (!mDeviceDlg)
             return;
 

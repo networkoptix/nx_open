@@ -1,8 +1,9 @@
-#ifndef clgl_renderer_12_29
-#define clgl_renderer_12_29
+#ifndef QN_GL_RENDERER_H
+#define QN_GL_RENDERER_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
+#include <QtGui/QColor>
 
 #include <QtOpenGL/qgl.h>
 
@@ -11,7 +12,7 @@
 
 class CLVideoWindowItem;
 
-class CLGLRenderer : public CLAbstractRenderer, public QnRenderStatus
+class QnGLRenderer : public QnAbstractRenderer, public QnRenderStatus
 {
 public:
     enum CLGLDrawHardwareStatus
@@ -23,9 +24,9 @@ public:
 
     static void clearGarbage();
 
-    CLGLRenderer(CLVideoWindowItem *vw);
-    CLGLRenderer();
-    ~CLGLRenderer();
+    QnGLRenderer(CLVideoWindowItem *vw);
+    QnGLRenderer();
+    ~QnGLRenderer();
 
     static int getMaxTextureSize();
 
@@ -167,4 +168,4 @@ private:
     bool m_noVideo;
 };
 
-#endif //clgl_renderer_12_29
+#endif //QN_GL_RENDERER_H

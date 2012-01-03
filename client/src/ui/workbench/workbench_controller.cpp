@@ -1,6 +1,7 @@
 #include "workbench_controller.h"
 #include <cassert>
 #include <cmath> /* For std::floor. */
+#include <limits>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGLWidget>
@@ -45,6 +46,7 @@
 #include <ui/graphics/instruments/resize_hover_instrument.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/instruments/animation_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
@@ -63,6 +65,8 @@
 #include "workbench_display.h"
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motionmask_widget.h"
+
+Q_DECLARE_METATYPE(VariantAnimator *);
 
 namespace {
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
@@ -139,6 +143,10 @@ namespace {
     QPoint invalidDragDelta() {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
+
+    const char *opacityAnimatorPropertyName = "_qn_itemOpacityAnimator";
+
+    const qreal widgetManipulationOpacity = 0.3;
 
 } // anonymous namespace
 
@@ -218,6 +226,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_archiveDropInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
+    connect(itemLeftClickInstrument,    SIGNAL(pressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftPressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -363,6 +372,20 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
 }
 
+VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget) {
+    VariantAnimator *animator = widget->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
+    if(animator != NULL)
+        return animator;
+
+    animator = new VariantAnimator(widget);
+    animator->setTargetObject(widget);
+    animator->setTimer(display()->animationInstrument()->animationTimer());
+    animator->setAccessor(new QnPropertyAccessor("opacity"));
+    animator->setSpeed(1.0);
+    widget->setProperty(opacityAnimatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
+    return animator;
+}
+
 void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool findAccepted) {
     drop(url.toLocalFile(), gridPos, findAccepted);
 }
@@ -457,13 +480,13 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
+    m_resizedWidget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY);
     m_display->bringToFront(m_resizedWidget);
-
-    /* Show grid. */
     m_display->gridItem()->animatedShow();
+    opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
-void QnWorkbenchController::at_resizing(QGraphicsView *view, QGraphicsWidget *item, const ResizingInfo &info) {
+void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
     if(m_resizedWidget != item)
         return;
 
@@ -501,7 +524,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *view, QGraphicsWidget *it
     }
 }
 
-void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
+void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING FINISHED");
 
     if(m_resizedWidget != item)
@@ -509,8 +532,8 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 
     QnResourceWidget *widget = m_resizedWidget;
 
-    /* Hide grid. */
     m_display->gridItem()->animatedHide();
+    opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     /* Resize if possible. */
     QSet<QnWorkbenchItem *> entities = layout()->items(m_resizedWidgetRect);
@@ -546,6 +569,9 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
             continue;
 
         m_draggedWorkbenchItems.push_back(widget->item());
+
+        opacityAnimator(widget)->animateTo(widgetManipulationOpacity);
+        widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY);
     }
 
     /* Un-raise if raised is among the dragged. */
@@ -554,7 +580,7 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
     //    workbench()->setRaisedItem(NULL);
 }
 
-void QnWorkbenchController::at_drag(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
+void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *> &) {
     if(m_draggedWorkbenchItems.empty())
         return;
 
@@ -633,7 +659,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *view, const QList<QGraphicsIt
     }
 }
 
-void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
+void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
     qDebug("DRAGGING FINISHED");
 
     if(m_draggedWorkbenchItems.empty())
@@ -646,10 +672,16 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGr
     QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
     bool success = layout()->moveItems(workbenchItems, m_dragGeometries);
 
-    /* Adjust geometry deltas if everything went fine. */
-    if(success)
-        foreach(QnWorkbenchItem *item, workbenchItems)
-            updateGeometryDelta(display()->widget(item));
+    foreach(QnWorkbenchItem *item, workbenchItems) {
+        QnResourceWidget *widget = display()->widget(item);
+
+        /* Adjust geometry deltas if everything went fine. */
+        if(success)
+            updateGeometryDelta(widget);
+
+        /* Animate opacity back. */
+        opacityAnimator(widget)->animateTo(1.0);
+    }
 
     /* Re-sync everything. */
     foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
@@ -696,6 +728,20 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *
     }
 }
 
+void QnWorkbenchController::at_item_leftPressed(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+    if(info.modifiers() != 0)
+        return;
+
+    if(item->isSelected())
+        return;
+
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    if(widget == NULL)
+        return;
+
+    widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY, false);
+}
+
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
     if(info.modifiers() != 0)
         return;
@@ -707,7 +753,6 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     QnWorkbenchItem *workbenchItem = widget->item();
 
     workbench()->setItem(QnWorkbench::RAISED, workbench()->item(QnWorkbench::RAISED) == workbenchItem ? NULL : workbenchItem);
-    workbench()->setItem(QnWorkbench::FOCUSED, workbenchItem);
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -823,11 +868,13 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
 
     m_widgetByRole[role] = widget;
 
+    /* Update navigation item's target. */
+    QnResourceWidget *navigatedWidget = m_widgetByRole[QnWorkbench::ZOOMED];
+    if(navigatedWidget == NULL)
+        navigatedWidget = m_widgetByRole[QnWorkbench::RAISED];
+    m_navigationItem->setVideoCamera(widget == NULL ? NULL : navigatedWidget->display()->camera());
+
     switch(role) {
-    case QnWorkbench::FOCUSED:
-        /* Update navigation item's target. */
-        m_navigationItem->setVideoCamera(widget == NULL ? NULL : widget->display()->camera());
-        break;
     case QnWorkbench::ZOOMED: {
         bool effective = widget == NULL;
         m_resizingInstrument->setEffective(effective);
@@ -918,7 +965,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
         if(widget == NULL)
             continue;
 
-        widget->setMotionGridDisplayed(display);
+        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
     }
 }
 
@@ -969,13 +1016,13 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
     m_recordingAnimation->setEndValue(0.6);
 
     m_recordingAnimation->disconnect();
-    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(onRecordingCountdownFinished()));
-    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(onPrepareRecording(QVariant)));
+    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
+    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
     m_recordingLabel->setText(tr("Ready"));
     m_recordingAnimation->start();
 }
 
-void QnWorkbenchController::onRecordingCountdownFinished()
+void QnWorkbenchController::at_recordingAnimation_finished()
 {
     m_recordingLabel->hide();
     if (!m_countdownCanceled)
@@ -987,7 +1034,7 @@ void QnWorkbenchController::onRecordingCountdownFinished()
     m_countdownCanceled = false;
 };
 
-void QnWorkbenchController::onPrepareRecording(QVariant value)
+void QnWorkbenchController::at_recordingAnimation_valueChanged(QVariant value)
 {
     static double TICKS = 3;
 

@@ -129,7 +129,7 @@ void CLCamDisplay::resume()
     QnAbstractDataConsumer::resume();
 }
 
-void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw, bool canDownscale)
+void CLCamDisplay::addVideoChannel(int index, QnAbstractRenderer* vw, bool canDownscale)
 {
     Q_ASSERT(index < CL_MAX_CHANNELS);
 

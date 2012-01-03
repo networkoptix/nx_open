@@ -1,141 +1,120 @@
 #include "device_settings_dlg.h"
+
+#include <QtGui/QBoxLayout>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QGroupBox>
+#include <QtGui/QTabWidget>
+
 #include "device_settings_tab.h"
-#include "widgets.h"
 #include "settings.h"
 #include "settings_getter.h"
+#include "widgets.h"
 
-CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr dev):
-QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint |
-		Qt::WindowCloseButtonHint| Qt::WindowStaysOnTopHint |
-		Qt::MSWindowsFixedSizeDialogHint),
-        mDevice(dev)
+CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource, QWidget *parent)
+    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint |
+                      Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint),
+      m_resource(resource)
 {
-	setWindowTitle(tr("Camera settings: ") + mDevice->toString());
-	//setWindowOpacity(global_dlg_opacity);
+    setWindowTitle(tr("Camera settings: %1").arg(m_resource->toString()));
 
-	int width = 610;
-	int height = 490;
+    int width = 610;
+    int height = 490;
 
-	resize(width, height);
+    resize(width, height);
 
-    //QPalette pal = palette();
-    //pal.setColor(backgroundRole(), Qt::black);
-    //setPalette(pal);
+    m_tabWidget = new QTabWidget(this);
 
-	QVBoxLayout *mainLayout = new QVBoxLayout;
+    foreach (const QString &group, m_resource->getResourceParamList().groupList())
+        m_tabs.append(new CLDeviceSettingsTab(this, m_resource, group));
 
-	mTabWidget = new QTabWidget;
+    m_buttonBox = new QDialogButtonBox(this);
+    m_buttonBox->setFocusPolicy(Qt::NoFocus);
 
-	QList<QString> groups = mDevice->getResourceParamList().groupList();
+    QPushButton *suggestionsBtn = new QPushButton(tr("Suggestions..."), this);
+    suggestionsBtn->setFocusPolicy(Qt::NoFocus);
+    connect(suggestionsBtn, SIGNAL(released()), this, SLOT(onSuggestions()));
+    m_buttonBox->addButton(suggestionsBtn, QDialogButtonBox::ActionRole);
 
-	for (int i = 0; i < groups.count(); ++i)
-	{
-		QString group = groups.at(i);
-		mTabs.push_back(new CLDeviceSettingsTab(this, this, mDevice, group));
-	}
+    QPushButton *closeBtn = new QPushButton(tr("Close"), this);
+    closeBtn->setFocusPolicy(Qt::NoFocus);
+    connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
+    m_buttonBox->addButton(closeBtn, QDialogButtonBox::RejectRole);
 
-	mButtonBox = new QDialogButtonBox();
-	mButtonBox->setFocusPolicy(Qt::NoFocus);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(m_tabWidget);
+    mainLayout->addWidget(m_buttonBox);
+    setLayout(mainLayout);
 
-	QPushButton* suggestionsBtn = new QPushButton(tr("Suggestions..."));
-	connect(suggestionsBtn, SIGNAL(released()), this, SLOT(onSuggestions()));
-	mButtonBox->addButton(suggestionsBtn, QDialogButtonBox::ActionRole);
-	suggestionsBtn->setFocusPolicy(Qt::NoFocus);
-
-	QPushButton* closeBtn = new QPushButton(tr("Close"));
-	connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
-	mButtonBox->addButton(closeBtn, QDialogButtonBox::RejectRole);
-	closeBtn->setFocusPolicy(Qt::NoFocus);
-
-	//! [4]
-
-	mainLayout->addWidget(mTabWidget);
-	mainLayout->addWidget(mButtonBox);
-	setLayout(mainLayout);
-
-	//suggestionsBtn->move(30,30);
-
-	connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(onNewtab(int)) );
-
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onNewtab(int)));
 }
 
 CLAbstractDeviceSettingsDlg::~CLAbstractDeviceSettingsDlg()
 {
-	for (int i = 0; i < mWgtsLst.count(); ++i)
-	{
-		CLAbstractSettingsWidget* wgt = mWgtsLst.at(i);
-		delete wgt;
-	}
+    qDeleteAll(mWgtsLst);
 }
 
-QnResourcePtr CLAbstractDeviceSettingsDlg::getDevice() const
+QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
 {
-	return mDevice;
+    return m_resource;
 }
 
-void CLAbstractDeviceSettingsDlg::setParam(const QString& name, const QnValue& val)
+void CLAbstractDeviceSettingsDlg::setParam(const QString &name, const QVariant &val)
 {
-	mDevice->setParamAsynch(name,val, QnDomainPhysical);
+    m_resource->setParamAsynch(name, val, QnDomainPhysical);
 }
 
-void CLAbstractDeviceSettingsDlg::addTabWidget(CLDeviceSettingsTab* tab)
+void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
 {
-	mTabWidget->addTab(tab, tab->name());
+    m_tabWidget->addTab(tab, tab->name());
 }
 
-CLDeviceSettingsTab* CLAbstractDeviceSettingsDlg::tabByName(QString name) const
+CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name) const
 {
-	for (int i = 0; i < mTabs.count(); ++i)
-	{
-		CLDeviceSettingsTab* tab = mTabs.at(i);
-		if (name == tab->name())
-			return tab;
-	}
+    foreach (CLDeviceSettingsTab *tab, m_tabs) {
+        if (name == tab->name())
+            return tab;
+    }
 
-	return 0;
+    return 0;
 }
 
-void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget* wgt)
+void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget *wgt)
 {
-	mWgtsLst.push_back(wgt);
+    mWgtsLst.append(wgt);
 }
 
-CLAbstractSettingsWidget* CLAbstractDeviceSettingsDlg::getWidgetByName(QString name) const
+CLAbstractSettingsWidget *CLAbstractDeviceSettingsDlg::getWidgetByName(const QString &name) const
 {
-	for (int i = 0; i < mWgtsLst.count(); ++i)
-	{
-		CLAbstractSettingsWidget* wgt = mWgtsLst.at(i);
-		if (name == wgt->param().name())
-			return wgt;
-	}
+    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst) {
+        if (name == wgt->param().name())
+            return wgt;
+    }
 
-	return 0;
+    return 0;
 }
 
-void CLAbstractDeviceSettingsDlg::putGroup(QGroupBox* group)
+void CLAbstractDeviceSettingsDlg::putGroup(QGroupBox *group)
 {
-	mGroups.push_back(group);
+    m_groups.append(group);
 }
 
-QGroupBox* CLAbstractDeviceSettingsDlg::getGroupByName(QString name) const
+QGroupBox *CLAbstractDeviceSettingsDlg::getGroupByName(const QString &name) const
 {
-	for (int i = 0; i < mGroups.count(); ++i)
-	{
-		QGroupBox* wgt = mGroups.at(i);
-		if (name == wgt->title())
-			return wgt;
-	}
-	return 0;
+    foreach (QGroupBox *groupBox, m_groups) {
+        if (name == groupBox->title())
+            return groupBox;
+    }
+
+    return 0;
 }
 
-QList<CLAbstractSettingsWidget*> CLAbstractDeviceSettingsDlg::getWidgetsBygroup(QString group) const
+QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::getWidgetsBygroup(const QString &group) const
 {
-    QList<CLAbstractSettingsWidget*> result;
+    QList<CLAbstractSettingsWidget *> result;
 
-    foreach(CLAbstractSettingsWidget* wgt, mWgtsLst)
-    {
-        if (wgt->group()==group)
-            result.push_back(wgt);
+    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst) {
+        if (wgt->group() == group)
+            result.append(wgt);
     }
 
     return result;
@@ -148,16 +127,12 @@ void CLAbstractDeviceSettingsDlg::onClose()
 
 void CLAbstractDeviceSettingsDlg::onSuggestions()
 {
-
 }
 
-void CLAbstractDeviceSettingsDlg::onNewtab(int /*index*/)
+void CLAbstractDeviceSettingsDlg::onNewtab(int index)
 {
-    QString group = static_cast<CLDeviceSettingsTab*>(mTabWidget->currentWidget())->name();
-    QList<CLAbstractSettingsWidget*> wgt_to_update = getWidgetsBygroup(group);
-
-    foreach(CLAbstractSettingsWidget* wgt, wgt_to_update)
-    {
+    const QString group = static_cast<CLDeviceSettingsTab *>(m_tabWidget->widget(index))->name();
+    foreach (CLAbstractSettingsWidget *wgt, getWidgetsBygroup(group)) {
         QnDeviceGetParamCommandPtr command(new QnDeviceGetParamCommand(wgt));
         QnResource::addCommandToProc(command);
     }
