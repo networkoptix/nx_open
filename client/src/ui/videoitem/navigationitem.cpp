@@ -505,6 +505,14 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return;
+
+    if (region.isEmpty())
+    {
+        m_motionPeriodLoader.remove(netRes);
+        repaintMotionPeriods();
+        return;
+    }
+
     qint64 w = m_timeSlider->sliderRange();
     qint64 t = m_timeSlider->viewPortPos();
     if(t <= 0)
