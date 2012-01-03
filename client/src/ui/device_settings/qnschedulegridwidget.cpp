@@ -1,5 +1,5 @@
 #include "qnschedulegridwidget.h"
-#include "settings.h"
+#include "ui/graphics/instruments/motionselectioninstrument.h"
 
 static const int TEXT_SPACING = 4;
 static const QColor NORMAL_LABEL_COLOR(255,255,255);
