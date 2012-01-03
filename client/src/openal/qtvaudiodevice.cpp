@@ -7,8 +7,13 @@
 
 #include "qtvsound.h"
 
+#ifndef Q_OS_LINUX
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#else
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
 
 //#define OPENAL_STATIC
 

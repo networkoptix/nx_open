@@ -1,7 +1,12 @@
 #include "qtvsound.h"
 
+#ifndef Q_OS_LINUX
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#else
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
 
 #include "utils/common/sleep.h"
 #include "qtvaudiodevice.h"

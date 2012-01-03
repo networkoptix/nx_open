@@ -17,7 +17,8 @@ import re
 # os.path = posixpath
 sys.path.insert(0, os.path.join('..', 'common'))
 
-from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB, qt_path, copy_files, setup_tools, setup_qjson
+from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB
+from convert import qt_path, copy_files, setup_tools, setup_qjson, platform
 from convert import convert as convert_common
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
@@ -25,10 +26,10 @@ from filetypes import all_filetypes, video_filetypes, image_filetypes
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 
-if sys.platform == 'win32':
+if platform() == 'win32':
     EXCLUDE_DIRS += ()
     EXCLUDE_FILES += ('_mac',)
-elif sys.platform == 'darwin':
+else:
     EXCLUDE_DIRS += ('desktop',)
     EXCLUDE_FILES += ('_win',)
 
@@ -79,7 +80,11 @@ def generate_info_plist():
 def gen_version_h():
     revision = os.popen('hg id -i').read().strip()
 
-    ffmpeg_version = re.search(r'(N-[^\s]*)', os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()).groups()[0]
+    if platform() == 'linux':
+        os.putenv('LD_LIBRARY_PATH', os.path.join(ffmpeg_path_release, 'lib'))
+    ffmpeg_output = os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()
+    print ffmpeg_output
+    ffmpeg_version = re.search(r'(N-[^\s]*)', ffmpeg_output).groups()[0]
 
     version_h = open('src/version.h', 'w')
     print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
@@ -172,17 +177,18 @@ index_dirs(('src',), 'src/const.pro', 'src/client.pro', exclude_dirs=EXCLUDE_DIR
 instantiate_pro('src/client.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 # index_dirs(('src', 'test'), 'test/const.pro', 'test/client_tests.pro', True, exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 
-if sys.platform == 'win32':
+if platform() == 'win32':
     os.system('qmake -tp vc -o src/client.vcproj src/client.pro')
-#    os.system('qmake -tp vc -o test/client_tests.vcproj test/client_tests.pro')
-
-elif sys.platform == 'darwin':
+elif platform() == 'darwin':
     generate_info_plist()
 
     os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/client.pro')
     os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/client.pro')
+elif platform() == 'linux':
+    os.system('qmake -spec linux-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/client.pro')
+    os.system('qmake -spec linux-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/client.pro')
 
-if sys.platform == 'win32':
+if platform() == 'win32':
     # Bespin. By now only for windows.
     bespin_path = 'contrib/bespin/bin/'
     ### add x86/x64 selector

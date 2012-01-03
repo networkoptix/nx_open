@@ -8,7 +8,7 @@
 #include "core/resource/resource.h"
 #include "ui/preferences/preferences_wnd.h"
 #include "ui/skin/skin.h"
-#include "connectionTestingDialog.h"
+#include "connectiontestingdialog.h"
 
 #include "api/AppServerConnection.h"
 

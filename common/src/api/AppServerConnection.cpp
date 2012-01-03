@@ -198,7 +198,7 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
     }
 }
 
-QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(QUrl url, QnResourceFactory &resourceFactory)
+QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QUrl& url, QnResourceFactory &resourceFactory)
 {
     cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logALWAYS);
 

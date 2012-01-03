@@ -8,7 +8,7 @@
 #include "core/resource/resource.h"
 #include "ui/preferences/preferences_wnd.h"
 #include "ui/skin/skin.h"
-#include "connectionTestingDialog.h"
+#include "connectiontestingdialog.h"
 
 #include "settings.h"
 
@@ -72,7 +72,7 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, in
 
 void ConnectionTestingDialog::testSettings()
 {
-    connection = QnAppServerConnectionFactory::createConnection(m_url, QnDummyResourceFactory());
+    connection = QnAppServerConnectionFactory::createConnection(m_url, QnDummyResourceFactory::instance());
 
     connection->testConnectionAsync(this, SLOT(testResults(int, const QByteArray&, int)));
 }

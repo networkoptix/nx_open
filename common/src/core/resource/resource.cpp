@@ -9,6 +9,8 @@
 
 #include <limits.h>
 
+QnDummyResourceFactory* QnDummyResourceFactory::m_instance = 0;
+
 QnResource::QnResource()
     : QObject(),
       m_rwLock(QReadWriteLock::Recursive),

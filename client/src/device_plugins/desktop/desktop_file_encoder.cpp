@@ -1,5 +1,8 @@
 #include <QAudioInput>
+
+#ifndef Q_OS_LINUX
 #include <intrin.h>
+#endif
 
 #include "desktop_file_encoder.h"
 //#include "dsp_effects/denoiser.h"

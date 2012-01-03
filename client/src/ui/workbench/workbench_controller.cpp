@@ -157,7 +157,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta())
 {
-    std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
+    ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,

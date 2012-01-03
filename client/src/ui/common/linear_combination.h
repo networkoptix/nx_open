@@ -1,6 +1,7 @@
 #ifndef QN_LINEAR_COMBINATION_H
 #define QN_LINEAR_COMBINATION_H
 
+#include <typeinfo>
 #include <utils/common/warnings.h>
 #include <QVariant>
 
