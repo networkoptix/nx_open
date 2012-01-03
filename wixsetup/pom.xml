@@ -75,6 +75,20 @@
 							</arguments>							
 						</configuration>					
 					</execution>
+					<execution>
+						<id>integration-test</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>test.bat</executable>
+							<workingDirectory>${baseDir}</workingDirectory>
+							<!--<arguments>
+								<argument></argument>
+							</arguments> -->							
+						</configuration>					
+					</execution>					
 				</executions>
 			</plugin>
 			<!--<plugin>
