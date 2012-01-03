@@ -30,14 +30,14 @@ INCLUDEPATH += $$PWD/common $$PWD/common/core $$PWD/common/utils $$PWD/common/pl
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib
+  LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib $$LIBS
   win32 {
     LIBS+=-L../contrib/qjson/lib/win32/debug
   }
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib
+  LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib $$LIBS
   win32 {
     LIBS+=-L../contrib/qjson/lib/win32/release
   }

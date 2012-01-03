@@ -249,6 +249,7 @@ int main(int argc, char *argv[])
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     const QString dataLocation = getDataDirectory();
+    qDebug() << "Loc: " << dataLocation;
     if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
         return 0;
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))

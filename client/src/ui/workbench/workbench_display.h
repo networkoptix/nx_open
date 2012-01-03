@@ -18,6 +18,7 @@ class TransformListenerInstrument;
 class ActivityListenerInstrument;
 class ForwardingInstrument;
 class AnimationInstrument;
+class SelectionOverlayHackInstrument;
 
 class QnAbstractRenderer;
 
@@ -112,6 +113,10 @@ public:
      */
     AnimationInstrument *animationInstrument() const {
         return m_animationInstrument;
+    }
+
+    SelectionOverlayHackInstrument *selectionOverlayHackInstrument() const {
+        return m_selectionOverlayHackInstrument;
     }
 
     /**
@@ -282,14 +287,11 @@ protected:
     void initBoundingInstrument();
 
     void changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
-    void updateSelectionDisplay(QnWorkbenchItem *item);
-    void updateSelectionDisplay(QnResourceWidget *widget);
 
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
 
-    void at_scene_selectionChanged();
     void at_scene_destroyed();
 
     void at_viewportAnimator_finished();
@@ -379,6 +381,8 @@ private:
     /** Instrument that provides animation timer. */
     AnimationInstrument *m_animationInstrument;
 
+    /** Selection overlay hack instrument. */
+    SelectionOverlayHackInstrument *m_selectionOverlayHackInstrument;
 
     /* Animation-related stuff. */
 

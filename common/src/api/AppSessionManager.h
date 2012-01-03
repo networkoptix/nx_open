@@ -21,7 +21,6 @@ public:
 
     int getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId);
     int getStorages(QnApiStorageResponsePtr& resources);
-    int getScheduleTasks(QnApiScheduleTaskResponsePtr& scheduleTasks, const QnId& mediaServerId);
 
     int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers);
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);

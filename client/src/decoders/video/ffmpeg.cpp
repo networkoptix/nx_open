@@ -12,7 +12,7 @@ static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
-static const quint32 LONG_NAL_PREFIX = htonl(1);
+static const quint32 LONG_NAL_PREFIX = 16777216; // htonl(1);
 
 //================================================
 

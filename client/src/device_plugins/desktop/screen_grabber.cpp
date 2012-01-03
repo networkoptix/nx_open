@@ -156,7 +156,7 @@ HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
 
     if (m_mode != CaptureMode_Application)
     {
-        if(FAILED(m_pD3D->CreateDevice(m_displayNumber, D3DDEVTYPE_HAL,hWnd,D3DCREATE_SOFTWARE_VERTEXPROCESSING ,&d3dpp,&m_pd3dDevice)))
+        if(FAILED(m_pD3D->CreateDevice(m_displayNumber, D3DDEVTYPE_HAL,hWnd,D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3dpp,&m_pd3dDevice)))
         {
             qWarning() << "Unable to Create Device";
             return E_FAIL;
@@ -289,8 +289,6 @@ CLScreenGrabber::CaptureInfo CLScreenGrabber::captureFrame()
 
 void bgra_to_yv12_sse_intr(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
-	return;
-
     static const __m128i sse_2000         = _mm_setr_epi16( 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 );
     static const __m128i sse_00a0         = _mm_setr_epi16( 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 );
     static const __m128i sse_mask_color   = _mm_setr_epi32( 0x00003fc0, 0x00003fc0, 0x00003fc0, 0x00003fc0);

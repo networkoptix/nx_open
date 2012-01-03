@@ -44,6 +44,10 @@
 
 #include <qglobal.h>
 
+
+QT_BEGIN_HEADER
+
+
 #if defined(QT_NO_MAC_XARCH) || (defined(Q_OS_DARWIN) && (defined(__ppc__) || defined(__ppc64__)))
 // Disable MMX and SSE on Mac/PPC builds, or if the compiler
 // does not support -Xarch argument passing
@@ -133,6 +137,10 @@
 #include <mm3dnow.h>
 #endif
 
+QT_BEGIN_NAMESPACE
+
+QT_MODULE(Core)
+
 enum CPUFeatures {
     None        = 0,
     MMX         = 0x1,
@@ -156,5 +164,9 @@ Q_CORE_EXPORT uint qDetectCPUFeatures();
 
 #define ALIGNMENT_PROLOGUE_16BYTES(ptr, i, length) \
     for (; i < static_cast<int>(qMin(static_cast<quintptr>(length), ((4 - ((reinterpret_cast<quintptr>(ptr) >> 2) & 0x3)) & 0x3))); ++i)
+
+QT_END_NAMESPACE
+
+QT_END_HEADER
 
 #endif // QSIMD_P_H

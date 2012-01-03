@@ -47,6 +47,7 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
+#include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
@@ -157,7 +158,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta())
 {
-    std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
+    ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
@@ -185,6 +186,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_archiveDropInstrument = new DropInstrument(this, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
+    SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_dragInstrument = new DragInstrument(this);
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
@@ -262,6 +264,13 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                                         itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+
+    connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               selectionOverlayHackInstrument, SLOT(recursiveDisable()));
+    connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              selectionOverlayHackInstrument, SLOT(recursiveEnable()));
+    connect(m_rubberBandInstrument,     SIGNAL(rubberBandStarted(QGraphicsView *)),                                                 selectionOverlayHackInstrument, SLOT(recursiveDisable()));
+    connect(m_rubberBandInstrument,     SIGNAL(rubberBandFinished(QGraphicsView *)),                                                selectionOverlayHackInstrument, SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          selectionOverlayHackInstrument, SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         selectionOverlayHackInstrument, SLOT(recursiveEnable()));
 
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_dragInstrument,               SLOT(recursiveEnable()));
@@ -480,7 +489,6 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
-    m_resizedWidget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY);
     m_display->bringToFront(m_resizedWidget);
     m_display->gridItem()->animatedShow();
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
@@ -571,7 +579,6 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
         m_draggedWorkbenchItems.push_back(widget->item());
 
         opacityAnimator(widget)->animateTo(widgetManipulationOpacity);
-        widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY);
     }
 
     /* Un-raise if raised is among the dragged. */
@@ -728,6 +735,7 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *
     }
 }
 
+// TODO: remove function
 void QnWorkbenchController::at_item_leftPressed(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
     if(info.modifiers() != 0)
         return;
@@ -738,8 +746,6 @@ void QnWorkbenchController::at_item_leftPressed(QGraphicsView *, QGraphicsItem *
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
-
-    widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY, false);
 }
 
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -799,6 +805,9 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
+
+    m_display->scene()->clearSelection();
+    widget->setSelected(true);
 
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(QnWorkbench::ZOOMED);
