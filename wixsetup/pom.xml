@@ -62,7 +62,7 @@
 						</configuration>
 					</execution>					
 
-					<execution>
+<!--					<execution>
 						<id>initialize-qt</id>
 						<phase>package</phase>
 						<goals>
@@ -72,7 +72,7 @@
 							<executable>qtvars.bat</executable>
 							<workingDirectory>${baseDir}</workingDirectory>
 						</configuration>					
-					</execution>
+					</execution>-->
 					
 					<execution>
 						<id>wix</id>
