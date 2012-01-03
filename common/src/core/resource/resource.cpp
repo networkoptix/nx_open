@@ -142,7 +142,9 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::toSharedPointer() const
 {
-    return QnResourcePtr(const_cast<QnResource *>(this));
+    QnResourcePtr res = qnResPool->getResourceById(getId());
+    Q_ASSERT_X(res != 0, Q_FUNC_INFO, "Resource not found");
+    return res;
 }
 
 QnParamList &QnResource::getResourceParamList() const

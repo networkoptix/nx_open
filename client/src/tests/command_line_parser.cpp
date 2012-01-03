@@ -61,7 +61,7 @@ void QnCommandLineParser::print(QTextStream &stream) const {
 bool QnCommandLineParser::parse(int &argc, char **argv) {
     int pos = 0, skipped = 0;
 
-    QTextStream err(stderr);
+    QTextStream err(stderr); 
 
     while(pos < argc) {
         /* Extract name. */
