@@ -28,6 +28,17 @@
 				<version>1.1</version>
 				<executions>
 					<execution>
+						<id>initialize</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>qtvars.bat</executable>
+							<workingDirectory>${baseDir}</workingDirectory>
+						</configuration>					
+					</execution>				
+					<execution>
 						<id>package-PropsCA-with-msbuild</id>
 						<phase>package</phase>
 						<goals>
@@ -75,6 +86,20 @@
 							</arguments>							
 						</configuration>					
 					</execution>
+					<execution>
+						<id>integration-test</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>test.bat</executable>
+							<workingDirectory>${baseDir}</workingDirectory>
+							<!--<arguments>
+								<argument></argument>
+							</arguments> -->							
+						</configuration>					
+					</execution>					
 				</executions>
 			</plugin>
 			<!--<plugin>

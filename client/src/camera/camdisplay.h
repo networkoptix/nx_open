@@ -153,6 +153,7 @@ private:
     int skipPrevJumpSignal;
     int m_processedPackets;
     QnMetaDataV1Ptr m_lastMetadata;
+    bool m_bofReceived;
 };
 
 #endif //clcam_display_h_1211

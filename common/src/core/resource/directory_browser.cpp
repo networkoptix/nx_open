@@ -51,6 +51,8 @@ QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance()
 QnResourceList QnResourceDirectoryBrowser::findResources()
 {
 
+    setShouldBeUsed(false);
+
     QThread::Priority old_priority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
@@ -120,16 +122,33 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
     if (!dir.exists())
         return result;
 
-    foreach (const QFileInfo &fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
+    //foreach (const QFileInfo &fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
+    QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
+    foreach (const QFileInfo &fi, flist)
     {
         if (shouldStop())
-
             return result;
 
-        QnResourcePtr res = createArchiveResource(fi.absoluteFilePath());
+        QString t = fi.absoluteFilePath();
 
-        if (res!=0)
-            result.append(res);
+        if (fi.isDir())
+        {
+            if (fi.absoluteFilePath() == directory)
+                continue;
+
+            result.append(findResources(fi.absoluteFilePath()));
+        }
+        else
+        {
+            QnResourcePtr res = createArchiveResource(fi.absoluteFilePath());
+            if (res!=0)
+            {
+                cl_log.log("created local resource: ", fi.absoluteFilePath() , cl_logALWAYS);
+                result.append(res);
+            }
+        }
+
+
     }
 
     return result;
@@ -139,9 +158,10 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
 {
     static FileTypeSupport m_fileTypeSupport;
 
-    if (m_fileTypeSupport.isImageFileExt(xfile))
-        return QnResourcePtr(new QnLocalFileResource(xfile));
-    else if (CLAviDvdDevice::isAcceptedUrl(xfile))
+    //if (m_fileTypeSupport.isImageFileExt(xfile))
+    //    return QnResourcePtr(new QnLocalFileResource(xfile));
+    //else 
+    if (CLAviDvdDevice::isAcceptedUrl(xfile))
         return QnResourcePtr(new CLAviDvdDevice(xfile));
     else if (CLAviBluRayDevice::isAcceptedUrl(xfile))
         return QnResourcePtr(new CLAviBluRayDevice(xfile));

@@ -69,7 +69,7 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
     if (iqpos<0)
         return QnNetworkResourcePtr(0);
 
-    int macpos = responseData.indexOf('-', iqpos);
+    int macpos = responseData.indexOf("00", iqpos);
     if (macpos < 0)
         return QnNetworkResourcePtr(0);
 
@@ -79,13 +79,14 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
     }
 
     name.replace(QString(" "), QString()); // remove spaces
+    name.replace(QString("-"), QString()); // remove spaces
     name.replace(QString("\t"), QString()); // remove tabs
 
     if (macpos+12 > responseData.size())
         return QnNetworkResourcePtr(0);
 
 
-    macpos++; // -
+    //macpos++; // -
 
     while(responseData.at(macpos)==' ')
         ++macpos;
@@ -124,6 +125,7 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
     if (!rt.isValid())
         return QnNetworkResourcePtr(0);
 
+    resource->setTypeId(rt);
     resource->setName(name);
     resource->setMAC(smac);
 

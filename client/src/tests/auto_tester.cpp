@@ -16,7 +16,8 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     m_timeout(defaultAutoTesterTimeout),
     m_successfulTests(0),
     m_allTests(0),
-    m_timer(NULL)
+    m_timer(NULL),
+    m_succeeded(false)
 {
     QnCommandLineParser parser;
     parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::INTEGER, "--test-timeout", NULL, tr("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout)));
@@ -97,7 +98,7 @@ void QnAutoTester::at_timer_timeout() {
 
 void QnAutoTester::testResourceSubstring() {
     foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
-        if(resource->toString().contains(m_resourceSearchString)) {
+        if(resource->getName().contains(m_resourceSearchString)) {
             m_successfulTests |= RESOURCE_SUBSTRING;
             return;
         }

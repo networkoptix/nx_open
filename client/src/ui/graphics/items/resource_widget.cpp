@@ -346,7 +346,11 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect) {
 }
 
 void QnResourceWidget::clearMotionSelection() {
+    if (m_channelState[0].motionSelection.isEmpty())
+        return;
     m_channelState[0].motionSelection = QRegion();
+    display()->archiveReader()->setMotionRegion(QRegion());
+    emit motionRegionSelected(m_resource, QRegion());
 }
 
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
