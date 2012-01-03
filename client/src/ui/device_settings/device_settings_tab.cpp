@@ -1,4 +1,7 @@
 #include "device_settings_tab.h"
+
+#include <QtGui/QItemEditorFactory>
+
 #include "widgets.h"
 #include "device_settings_dlg.h"
 #include "settings.h"
@@ -47,7 +50,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
             if (!param.isUiParam())
                 continue;
 
-            CLAbstractSettingsWidget *awidget;
+            CLAbstractSettingsWidget *awidget = 0;
             switch (param.type())
             {
             case QnParamType::OnOff:
@@ -67,7 +70,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
                 break;
 
             default:
-                awidget = 0;
+                //awidget = QItemEditorFactory::defaultFactory()->createEditor(param.defaultValue().userType(), parent); // ###
                 break;
             }
             if (awidget) {

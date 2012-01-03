@@ -35,7 +35,7 @@ typedef QMap<QString, QString> QnResourceParameters;
 class QN_EXPORT QnResource : public QObject //: public CLRefCounter
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ getName WRITE setName USER false) // do not show at GUI
+    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show at GUI
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
 
 public:
@@ -115,18 +115,21 @@ public:
     virtual QString toString() const;
     virtual QString toSearchString() const;
 
+
+    QnResourcePtr toSharedPointer() const;
+
     // ==================================================
 
-    QnParamList& getResourceParamList() const;// returns params that can be changed on device level
+    QnParamList &getResourceParamList() const;// returns params that can be changed on device level
 
-    bool hasSuchParam(const QString& name) const;
+    bool hasSuchParam(const QString &name) const;
 
     // return true if no error
-    virtual bool getParam(const QString& name, QVariant& val, QnDomain domain);
+    bool getParam(const QString &name, QVariant &val, QnDomain domain);
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed onParameterChanged signal is emitted
-    void getParamAsynch(const QString& name, QVariant& val, QnDomain domain);
+    void getParamAsynch(const QString &name, QnDomain domain);
 
 
     // return true if no error
@@ -169,14 +172,13 @@ public:
     bool hasTag(const QString& tag) const;
     QStringList tagList() const;
 
-    QnResourcePtr toSharedPointer() const;
     void addConsumer(QnResourceConsumer* consumer);
     void removeConsumer(QnResourceConsumer* consumer);
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
 
 Q_SIGNALS:
-    void onParameterChanged(const QString &paramname, const QString &value);
+    void onParameterChanged(const QString &name, const QVariant &value);
     void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
 public:
@@ -203,16 +205,15 @@ protected:
 
 protected:
     mutable QReadWriteLock m_rwLock;
-    unsigned long m_flags;
-    QString m_name;
-
-    mutable QnParamList m_resourceParamList;
 
 private:
     QnId m_id;
     QnId m_parentId;
 
     QnId m_typeId;
+
+    unsigned long m_flags;
+    QString m_name;
 
     QDateTime m_lastDiscoveredTime;
 
@@ -223,6 +224,8 @@ private:
     QString m_url; //-
 
     Status m_status;
+
+    mutable QnParamList m_resourceParamList;
 
 
     mutable QnParamList m_streamParamList; //-

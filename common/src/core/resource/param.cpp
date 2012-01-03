@@ -69,7 +69,7 @@ const QnParam QnParamList::value(const QString& name) const
     return m_params.value(name);
 }
 
-void QnParamList::put(const QnParam& param)
+void QnParamList::append(const QnParam& param)
 {
     m_params.insert(param.name(), param);
 }
@@ -125,7 +125,7 @@ QnParamList QnParamList::paramList(const QString &group, const QString &subgroup
         const QString lgroup = param.group();
         const QString lsubgroup = param.subgroup();
         if (lgroup == group && lsubgroup == subgroup)
-            result.put(param);
+            result.append(param);
     }
 
     return result;

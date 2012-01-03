@@ -44,12 +44,14 @@ typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 struct QN_EXPORT QnParam
 {
-    QnParam() {}
-    QnParam(const QVariant &val) { m_value = val; }
-    QnParam(QnParamTypePtr paramType) { m_paramType = paramType;}
+    QnParam() : m_paramType(new QnParamType) {}
+    QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant())
+        : m_paramType(paramType), m_value(value)
+    {}
 
     bool setValue(const QVariant &val); // safe way to set value
     const QVariant& value() const { return m_value; }
+    const QVariant &defaultValue() const { return m_paramType->default_value; }
     const QString& name() const { return m_paramType->name; }
     const QString& group() const { return m_paramType->group; }
     const QString& subgroup() const { return m_paramType->subgroup; }
@@ -81,7 +83,7 @@ public:
     bool contains(const QString& name) const;
     QnParam& value(const QString& name);
     const QnParam value(const QString& name) const;
-    void put(const QnParam& param);
+    void append(const QnParam& param);
     bool isEmpty() const;
     QList<QnParam> list() const;
 

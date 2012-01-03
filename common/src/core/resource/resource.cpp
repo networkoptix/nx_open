@@ -7,10 +7,12 @@
 #include "resource_command_consumer.h"
 #include "resource_consumer.h"
 
+#include <limits.h>
+
 QnResource::QnResource()
     : QObject(),
-      m_flags(0),
       m_rwLock(QReadWriteLock::Recursive),
+      m_flags(0),
       m_avalable(true),
       m_status(Offline)
 {
@@ -52,26 +54,20 @@ QnResource& QnResource::operator=(const QnResource& other)
 
 void QnResource::deserialize(const QnResourceParameters& parameters)
 {
-    const char* ID = "id";
-    const char* PARENT_ID = "parentId";
-    const char* TYPE_ID = "typeId";
-    const char* NAME = "name";
-    const char* URL = "url";
+    if (parameters.contains(QLatin1String("id")))
+        setId(parameters[QLatin1String("id")]);
 
-    if (parameters.contains(QLatin1String(ID)))
-        setId(parameters[QLatin1String(ID)]);
+    if (parameters.contains(QLatin1String("typeId")))
+        setTypeId(parameters[QLatin1String("typeId")]);
 
-    if (parameters.contains(QLatin1String(TYPE_ID)))
-        setTypeId(parameters[QLatin1String(TYPE_ID)]);
+    if (parameters.contains(QLatin1String("parentId")))
+        setParentId(parameters[QLatin1String("parentId")]);
 
-    if (parameters.contains(QLatin1String(PARENT_ID)))
-        setParentId(parameters[QLatin1String(PARENT_ID)]);
+    if (parameters.contains(QLatin1String("name")))
+        setName(parameters[QLatin1String("name")]);
 
-    if (parameters.contains(QLatin1String(NAME)))
-        setName(parameters[QLatin1String(NAME)]);
-
-    if (parameters.contains(QLatin1String(URL)))
-        setUrl(parameters[QLatin1String(URL)]);
+    if (parameters.contains(QLatin1String("url")))
+        setUrl(parameters[QLatin1String("url")]);
 }
 
 QnId QnResource::getParentId() const
@@ -131,8 +127,7 @@ void QnResource::removeFlag(unsigned long flag)
 
 bool QnResource::associatedWithFile() const
 {
-    QReadLocker readLocker(&m_rwLock);
-    return checkFlag(QnResource::ARCHIVE) || checkFlag(QnResource::SINGLE_SHOT);
+    return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0;
 }
 
 QString QnResource::toString() const
@@ -145,8 +140,83 @@ QString QnResource::toSearchString() const
     return toString();
 }
 
+QnResourcePtr QnResource::toSharedPointer() const
+{
+    return QnResourcePtr(const_cast<QnResource *>(this));
+}
 
-bool QnResource::hasSuchParam(const QString& name) const
+QnParamList &QnResource::getResourceParamList() const
+{
+    QnId restypeid;
+    {
+        QReadLocker readLocker(&m_rwLock);
+        if (!m_resourceParamList.isEmpty())
+            return m_resourceParamList;
+        restypeid = m_typeId;
+    }
+
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(restypeid);
+    if (!resType)
+        return m_resourceParamList;
+
+    QnParamList resourceParamList;
+
+    // 1. read Q_PROPERTY params
+    const QMetaObject *mObject = metaObject();
+    for (int i = 0; i < mObject->propertyCount(); ++i) {
+        const QMetaProperty mProperty = mObject->property(i);
+        QnParamTypePtr paramType(new QnParamType());
+        switch (mProperty.userType()) {
+        case QVariant::Bool:
+            paramType->type = QnParamType::Boolen;
+            break;
+        case QVariant::UInt:
+            paramType->type = QnParamType::MinMaxStep;
+            paramType->min_val = 0;
+            paramType->max_val = UINT_MAX;
+            break;
+        case QVariant::Int:
+            paramType->type = QnParamType::MinMaxStep;
+            paramType->min_val = INT_MIN;
+            paramType->max_val = INT_MAX;
+            break;
+        case QVariant::ULongLong:
+            paramType->type = QnParamType::MinMaxStep;
+            paramType->min_val = 0;
+            paramType->max_val = ULLONG_MAX;
+            break;
+        case QVariant::LongLong:
+            paramType->type = QnParamType::MinMaxStep;
+            paramType->min_val = LLONG_MIN;
+            paramType->max_val = LLONG_MAX;
+            break;
+        default:
+            paramType->type = QnParamType::Value;
+            break;
+        }
+        paramType->name = mProperty.name();
+        paramType->ui = mProperty.isDesignable();
+        paramType->isStatic = true;
+        //resType->addParamType(paramType);
+        QnParam newParam(paramType);
+        resourceParamList.append(newParam);
+    }
+
+    // 2. read AppServer params
+    foreach (QnParamTypePtr paramType, resType->paramTypeList()) {
+        QnParam newParam(paramType);
+        newParam.setValue(paramType->default_value);
+        resourceParamList.append(newParam);
+    }
+
+    QWriteLocker writeLocker(&m_rwLock);
+    if (m_resourceParamList.isEmpty())
+        m_resourceParamList = resourceParamList;
+
+    return m_resourceParamList;
+}
+
+bool QnResource::hasSuchParam(const QString &name) const
 {
     return getResourceParamList().contains(name);
 }
@@ -166,48 +236,37 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
     return false;
 }
 
-bool QnResource::getParam(const QString& name, QVariant& val, QnDomain domain )
+bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 {
-
     if (!hasSuchParam(name))
     {
         cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
         return false;
     }
 
-
-    QnParam& param = getResourceParamList().value(name);
+    const QnParam &param = getResourceParamList().value(name);
     if (domain == QnDomainMemory)
     {
         QReadLocker readLocker(&m_rwLock);
         val = param.value();
         if (param.isStatic())
-            val = this->property(name.toUtf8()).toString();
+            val = this->property(param.name().toUtf8()).toString();
         return true;
     }
     else if (domain == QnDomainPhysical)
     {
-        if (param.isStatic())
-            return false;
-
-        if (!getParamPhysical(name, val))
-            return false;
-
-        emit onParameterChanged(name, val.toString());
-        return true;
+        if (!param.isStatic() && getParamPhysical(param.name(), val)) {
+            emit onParameterChanged(param.name(), val);
+            return true;
+        }
     }
     else if (domain == QnDomainDatabase)
     {
-        if (param.isStatic())
-            return false;
+        if (!param.isStatic())
+            return true;
     }
 
-    return true;
-}
-
-void QnResource::getParamAsynch(const QString &/*name*/, QVariant &/*val*/, QnDomain /*domain*/)
-{
-
+    return false;
 }
 
 bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain domain)
@@ -218,41 +277,69 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
         return false;
     }
 
-
-    QnParam& param = getResourceParamList().value(name);
-
+    QnParam &param = getResourceParamList().value(name);
     /*
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         return false;
     }
-    /**/
+    */
 
-
-    if (domain == QnDomainPhysical)
-    {
-        if (param.isStatic())
-            return false;
-
-        if (!setParamPhysical(name, val))
-            return false;
-    }
-
-    // QnDomainMemory
+    if (domain == QnDomainMemory)
     {
         QReadLocker readLocker(&m_rwLock);
-        if (!param.setValue(val))
-        {
-            cl_log.log("cannot set such param!", cl_logWARNING);
-            return false;
+        if (param.setValue(val)) {
+            if (param.isStatic())
+                setProperty(param.name().toUtf8(), val);
+            emit onParameterChanged(param.name(), val);
+            return true;
         }
-        if (param.isStatic())
-            setProperty(param.name().toUtf8(), val);
     }
-    emit onParameterChanged(name, val.toString());
+    else if (domain == QnDomainPhysical)
+    {
+        if (!param.isStatic() && setParamPhysical(param.name(), val)) {
+            emit onParameterChanged(param.name(), val);
+            return true;
+        }
+    }
 
-    return true;
+    return false;
+}
+
+class QnResourceGetParamCommand : public QnResourceCommand
+{
+public:
+    QnResourceGetParamCommand(QnResourcePtr res, const QString& name, QnDomain domain):
+      QnResourceCommand(res),
+          m_name(name),
+          m_domain(domain)
+      {}
+
+      virtual void beforeDisconnectFromResource(){}
+
+      void execute()
+      {
+            if (isConnectedToTheResource()) {
+                QVariant val;
+                if (m_resource->getParam(m_name, val, m_domain)) {
+                    if (m_domain != QnDomainPhysical)
+                        QMetaObject::invokeMethod(m_resource.data(), "onParameterChanged", Qt::QueuedConnection, Q_ARG(QString, m_name), Q_ARG(QVariant, val));
+                }
+            }
+      }
+
+private:
+    QString m_name;
+    QnDomain m_domain;
+};
+
+typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
+
+void QnResource::getParamAsynch(const QString &name, QnDomain domain)
+{
+    QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(), name, domain));
+    addCommandToProc(command);
 }
 
 class QnResourceSetParamCommand : public QnResourceCommand
@@ -283,77 +370,13 @@ typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 void QnResource::setParamAsynch(const QString& name, const QVariant& val, QnDomain domain)
 {
-    QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(toSharedPointer(), name, val, domain) );
+    QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(), name, val, domain));
     addCommandToProc(command);
 }
 
 bool QnResource::unknownResource() const
 {
     return getName().isEmpty();
-}
-
-QnParamType::DataType variantTypeToPropType(QVariant::Type type)
-{
-    switch (type)
-    {
-        case QVariant::Bool:
-            return QnParamType::Boolen;
-        case QVariant::UInt:
-        case QVariant::Int:
-        case QVariant::ULongLong:
-        case QVariant::LongLong:
-            return QnParamType::MinMaxStep;
-        default:
-            return QnParamType::Value;
-    }
-}
-
-QnParamList& QnResource::getResourceParamList() const
-{
-    QnId restypeid;
-    {
-        QReadLocker readLocker(&m_rwLock);
-        if (!m_resourceParamList.isEmpty())
-            return m_resourceParamList;
-        restypeid = m_typeId;
-    }
-
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(restypeid);
-    if (!resType)
-        return m_resourceParamList;
-
-    QnParamList resourceParamList;
-
-    // 1. read Q_PROPERTY params
-    for (int i = 0; i < metaObject()->propertyCount(); ++i)
-    {
-        QMetaProperty prop =  metaObject()->property(i);
-        QnParamTypePtr paramType(new QnParamType());
-        paramType->type = variantTypeToPropType(prop.type());
-        paramType->name = prop.name();
-        paramType->ui = prop.isUser();
-        paramType->isStatic = true;
-        //paramType = resType->addParamType(paramType);
-        QnParam newParam(paramType);
-        resourceParamList.put(newParam);
-    }
-
-    // 2. read AppServer params
-
-    const QList<QnParamTypePtr>& paramTypes = resType->paramTypeList();
-    foreach(QnParamTypePtr paramType, paramTypes)
-    {
-        QnParam newParam(paramType);
-        newParam.setValue(paramType->default_value);
-        //cl_log.log(newParam.toDebugString(), cl_logALWAYS); // debug
-        resourceParamList.put(newParam);
-    }
-
-    QWriteLocker writeLocker(&m_rwLock);
-    if (m_resourceParamList.isEmpty())
-        m_resourceParamList = resourceParamList;
-
-    return m_resourceParamList;
 }
 
 QnId QnResource::getTypeId() const
@@ -457,13 +480,6 @@ QStringList QnResource::tagList() const
 {
     QReadLocker readLocker(&m_rwLock);
     return m_tags;
-}
-
-QnResourcePtr QnResource::toSharedPointer() const
-{
-    QnResourcePtr res = qnResPool->getResourceById(getId());
-    Q_ASSERT_X(res != 0, Q_FUNC_INFO, "Resource not found");
-    return res;
 }
 
 void QnResource::addConsumer(QnResourceConsumer* consumer)
