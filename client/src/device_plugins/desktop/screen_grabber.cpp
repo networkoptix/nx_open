@@ -156,7 +156,7 @@ HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
 
     if (m_mode != CaptureMode_Application)
     {
-        if(FAILED(m_pD3D->CreateDevice(m_displayNumber, D3DDEVTYPE_HAL,hWnd,D3DCREATE_SOFTWARE_VERTEXPROCESSING ,&d3dpp,&m_pd3dDevice)))
+        if(FAILED(m_pD3D->CreateDevice(m_displayNumber, D3DDEVTYPE_HAL,hWnd,D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3dpp,&m_pd3dDevice)))
         {
             qWarning() << "Unable to Create Device";
             return E_FAIL;
