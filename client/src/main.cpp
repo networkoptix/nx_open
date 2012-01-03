@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
 
     if(autoTester.state() == QnAutoTester::FINISHED) {
         if(!autoTester.succeeded())
-            result = 0xDEADBEEF;
+            result = 1;
 
         QTextStream out(stdout);
         out << autoTester.message();
