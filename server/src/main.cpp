@@ -421,7 +421,7 @@ public:
             storage->setParentId(videoServer->getId());
             storage->setName("Initial");
             storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
-            storage->setSpaceLimit(100ll * 1000 * 1024);
+            storage->setSpaceLimit(5ll * 1024 * 1024 * 1024);
 
             if (appServerConnection->addStorage(*storage))
                 qDebug() << "Couldn't add storage: " << appServerConnection->lastError();
