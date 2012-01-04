@@ -3,12 +3,12 @@
 
 
 #include "core/resourcemanagment/security_cam_resource.h"
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 
 
-class QnPlAxisResource : public QnNetworkResource, public QnSecurityCamResource
+class QnPlAxisResource : public QnCameraResource
 {
 public:
 

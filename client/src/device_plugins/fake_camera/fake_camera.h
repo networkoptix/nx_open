@@ -1,13 +1,13 @@
 #ifndef _FAKE_CAMERA_H__
 #define _FAKE_CAMERA_H__
 
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 #include "core/resource/media_resource.h"
 
 
 
 
-class QnFakeCamera: virtual public QnNetworkResource, virtual public QnMediaResource
+class QnFakeCamera: public QnCameraResource
 {
 public:
     QnFakeCamera();
