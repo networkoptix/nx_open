@@ -9,7 +9,7 @@ class AreconVisionDlgManufacture : public CLAbstractDlgManufacture
 public:
     AreconVisionDlgManufacture();
 
-    CLAbstractDeviceSettingsDlg *createDlg(QnResourcePtr resource);
+    QDialog *createDlg(QnResourcePtr resource);
     bool canProduceDlg(QnResourcePtr resource) const;
 
 private:

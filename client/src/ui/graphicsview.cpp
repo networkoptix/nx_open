@@ -3139,7 +3139,7 @@ void GraphicsView::show_device_settings_helper(QnResourcePtr resource)
     bool open = false;
     QPoint p;
 
-    if (mDeviceDlg && mDeviceDlg->resource() != resource) // need to delete only if exists and not for this device
+    if (mDeviceDlg && qobject_cast<CLAbstractDeviceSettingsDlg *>(mDeviceDlg)->resource() != resource) // need to delete only if exists and not for this device
     {
         // already opened ( may be for another device )
         p = mDeviceDlg->pos();

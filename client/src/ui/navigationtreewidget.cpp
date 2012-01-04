@@ -211,7 +211,19 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
     menu->addSeparator();
     menu->addAction(&cm_exit);
 
-    /*QAction *action = */menu->exec(event->globalPos());
+    QAction *action = menu->exec(event->globalPos());
+
+    if (resources.size() == 1)
+    {
+        const QnResourcePtr resource = resources.first();
+        if (action == &cm_settings) { // ###
+            if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource)) {
+                dialog->setParent(this);
+                dialog->exec();
+                delete dialog;
+            }
+        }
+    }
 }
 
 void NavigationTreeWidget::filterChanged(const QString &filter)
