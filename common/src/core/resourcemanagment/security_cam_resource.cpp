@@ -11,24 +11,16 @@ QnSecurityCamResource::~QnSecurityCamResource()
 {
 }
 
-QnSecurityCamResource& QnSecurityCamResource::operator=(const QnResource& other)
+void QnSecurityCamResource::updateInner(const QnResource& other)
 {
-    const QnSecurityCamResource* other_casted = dynamic_cast<const QnSecurityCamResource*>(&other);
+    QnMediaResource::updateInner(other);
 
+    const QnSecurityCamResource* other_casted = dynamic_cast<const QnSecurityCamResource*>(&other);
     if (other_casted)
     {
-        QReadLocker readLocker(&other_casted->m_rwLock);
-        QWriteLocker writeLocker(&m_rwLock);
-        QnResource::operator =(other);
-
         m_motionMask = other_casted->m_motionMask;
         m_scheduleTasks = other_casted->m_scheduleTasks;
-    } else
-    {
-        QnResource::operator =(other);
     }
-
-    return *this;
 }
 
 QString QnSecurityCamResource::oemName() const

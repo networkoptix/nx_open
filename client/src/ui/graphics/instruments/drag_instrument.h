@@ -3,6 +3,7 @@
 
 #include <QPoint>
 #include "drag_processing_instrument.h"
+#include <ui/common/weak_graphics_item_pointer.h>
 
 class DragInstrument: public DragProcessingInstrument {
     Q_OBJECT;
@@ -44,7 +45,7 @@ protected:
 
 private:
     bool m_effective;
-    QGraphicsItem *m_itemToSelect;
+    WeakGraphicsItemPointer m_itemToSelect;
 };
 
 #endif // QN_DRAG_INSTRUMENT_H

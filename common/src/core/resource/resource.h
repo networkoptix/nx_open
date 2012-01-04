@@ -71,8 +71,6 @@ public:
     QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
 
-    virtual QnResource& operator=(const QnResource& other);
-
     virtual void deserialize(const QnResourceParameters& parameters);
 
     QnId getId() const;
@@ -189,7 +187,10 @@ public:
     static int commandProcQueSize();
     static bool commandProchasSuchDeviceInQueue(QnResourcePtr res);
 
+    void update(const QnResource& other);
 protected:
+    virtual void updateInner(const QnResource& other);
+
     // should change value in memory domain
     virtual bool getParamPhysical(const QString& name, QVariant& val);
 

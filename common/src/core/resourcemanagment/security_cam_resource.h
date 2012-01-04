@@ -40,12 +40,13 @@ public:
     void setScheduleTasks(const QnScheduleTaskList& scheduleTasks);
     const QnScheduleTaskList getScheduleTasks() const;
 
-    QnSecurityCamResource& operator=(const QnResource& other) override;
 
 signals:
     void motionMaskChanged(QRegion region);
 
 protected:
+    void updateInner(const QnResource& other) override;
+
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;

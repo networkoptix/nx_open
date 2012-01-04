@@ -83,7 +83,7 @@ int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServe
     return 1;
 }
 
-int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const QnId& serverIdIn, QList<QnResourcePtr>& cameras)
+int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, QList<QnResourcePtr>& cameras)
 {
     xsd::api::cameras::Camera camera(cameraIn.getId().toString().toStdString(),
                                      cameraIn.getName().toStdString(),
@@ -93,29 +93,25 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
                                      cameraIn.getAuth().user().toStdString(),
                                      cameraIn.getAuth().password().toStdString());
 
-    const QnSecurityCamResource* securityCamera = dynamic_cast<const QnSecurityCamResource*>(&cameraIn);
-    if (securityCamera)
+    xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
+    foreach(const QnScheduleTask& scheduleTaskIn, cameraIn.getScheduleTasks())
     {
-        xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
-        foreach(const QnScheduleTask& scheduleTaskIn, securityCamera->getScheduleTasks())
-        {
-            xsd::api::scheduleTasks::ScheduleTask scheduleTask(
-                                                    scheduleTaskIn.getStartTime(),
-                                                    scheduleTaskIn.getEndTime(),
-                                                    scheduleTaskIn.getDoRecordAudio(),
-                                                    scheduleTaskIn.getRecordingType(),
-                                                    scheduleTaskIn.getDayOfWeek(),
-                                                    scheduleTaskIn.getBeforeThreshold(),
-                                                    scheduleTaskIn.getAfterThreshold(),
-                                                    scheduleTaskIn.getStreamQuality(),
-                                                    scheduleTaskIn.getFps());
+        xsd::api::scheduleTasks::ScheduleTask scheduleTask(
+                                                scheduleTaskIn.getStartTime(),
+                                                scheduleTaskIn.getEndTime(),
+                                                scheduleTaskIn.getDoRecordAudio(),
+                                                scheduleTaskIn.getRecordingType(),
+                                                scheduleTaskIn.getDayOfWeek(),
+                                                scheduleTaskIn.getBeforeThreshold(),
+                                                scheduleTaskIn.getAfterThreshold(),
+                                                scheduleTaskIn.getStreamQuality(),
+                                                scheduleTaskIn.getFps());
 
-            scheduleTasks.scheduleTask().push_back(scheduleTask);
-        }
-        camera.scheduleTasks(scheduleTasks);
+        scheduleTasks.scheduleTask().push_back(scheduleTask);
     }
+    camera.scheduleTasks(scheduleTasks);
 
-    camera.parentID(serverIdIn.toString().toStdString());
+    camera.parentID(cameraIn.getParentId().toString().toStdString());
 
     QnApiCameraResponsePtr xsdCameras;
 

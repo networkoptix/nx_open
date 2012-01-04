@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
+#include <ui/common/weak_graphics_item_pointer.h>
 
 namespace {
     void copyEvent(const QGraphicsSceneMouseEvent *src, QGraphicsSceneMouseEvent *dst) {
@@ -24,7 +25,7 @@ struct ClickInstrument::ClickData {
     ClickData(): item(NULL) {}
 
     QGraphicsSceneMouseEvent event;
-    QGraphicsItem *item;
+    WeakGraphicsItemPointer item;
     QWeakPointer<QGraphicsScene> scene;
     QWeakPointer<QGraphicsView> view;
 };
@@ -69,7 +70,7 @@ void ClickInstrument::timerEvent(QTimerEvent *) {
     killClickTimer();
 
     if(watches(ITEM)) {
-        emitSignals(m_clickData->view.data(), m_clickData->item, &m_clickData->event); // TODO: item may get destroyed. Check for this, it is real.
+        emitSignals(m_clickData->view.data(), m_clickData->item.data(), &m_clickData->event);
     } else {
         emitSignals(m_clickData->view.data(), m_clickData->scene.data(), &m_clickData->event);
     }
@@ -178,6 +179,9 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
 }
 
 void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    if(view == NULL || item == NULL)
+        return; /* May have been destroyed. */
+
     ClickInfo info(static_cast<ClickInfoPrivate *>(event));
 
     if(m_isDoubleClick) {
@@ -187,7 +191,10 @@ void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsItem *item, QGra
     }
 }
 
-void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
+void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    if(view == NULL || scene == NULL)
+        return; /* May have been destroyed. */
+
     ClickInfo info(static_cast<ClickInfoPrivate *>(event));
 
     if(m_isDoubleClick) {

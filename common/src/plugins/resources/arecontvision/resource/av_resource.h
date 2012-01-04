@@ -2,7 +2,7 @@
 #define QnPlAreconVisionResource_h_1252
 
 #include "core/resourcemanagment/security_cam_resource.h"
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 
@@ -13,7 +13,7 @@ class QDomElement;
 
 
 // this class and inherited must be very light to create 
-class QnPlAreconVisionResource : public QnNetworkResource, public QnSecurityCamResource
+class QnPlAreconVisionResource : public QnCameraResource
 {
 public:
     static const char* MANUFACTURE;
