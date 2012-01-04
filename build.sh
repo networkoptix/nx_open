@@ -1,4 +1,4 @@
-for i in common server appserver
+for i in common server client appserver
 do
   pushd $i
   python convert.py
@@ -6,17 +6,25 @@ do
 done
 
 # Workaround buggy qtservice
-sed -i "" "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" server/build/Makefile.debug
-sed -i "" "1,/debug\/generated\/qtservice_unix.moc\ \\\\/{/debug\/generated\/qtservice_unix.moc\\ \\\\/d;}" server/build/Makefile.debug
-sed -i "" "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" server/build/Makefile.release
-sed -i "" "1,/debug\/generated\/qtservice_unix.moc\ \\\\/{/debug\/generated\/qtservice_unix.moc\\ \\\\/d;}" server/build/Makefile.release
+if [ `uname -s` == 'Darwin' ]
+then
+    SED_ARGS='-i ""'
+else
+    # Assume GNU sed
+    SED_ARGS='-i""'
+fi
 
-sed -i "" "s%^..\/build\/\(debug\/generated\/qtservice.moc\)%\1%" server/build/Makefile.debug
-sed -i "" "s%^..\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/build/Makefile.debug
-sed -i "" "s%^..\/build\/\(debug\/generated\/qtservice.moc\)%\1%" server/build/Makefile.release
-sed -i "" "s%^..\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/build/Makefile.release
+sed $SED_ARGS "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" server/build/Makefile.debug
+sed $SED_ARGS "1,/debug\/generated\/qtservice_unix.moc\ \\\\/{/debug\/generated\/qtservice_unix.moc\\ \\\\/d;}" server/build/Makefile.debug
+sed $SED_ARGS "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" server/build/Makefile.release
+sed $SED_ARGS "1,/debug\/generated\/qtservice_unix.moc\ \\\\/{/debug\/generated\/qtservice_unix.moc\\ \\\\/d;}" server/build/Makefile.release
 
-for i in common server 
+sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice.moc\)%\1%" server/build/Makefile.debug
+sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/build/Makefile.debug
+sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice.moc\)%\1%" server/build/Makefile.release
+sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/build/Makefile.release
+
+for i in common server client
 do
   pushd $i/build
   make -f Makefile.debug -j9

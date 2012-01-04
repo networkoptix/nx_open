@@ -14,12 +14,12 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
     foreach (QnResourcePtr resource, resources)
     {
-        QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>();
+        QnCameraResourcePtr cameraResource = resource.dynamicCast<QnCameraResource>();
 
-        if (networkResource.isNull())
+        if (cameraResource.isNull())
             continue;
 
-        m_appServer->addCamera(*networkResource, m_serverId, cameras);
+        m_appServer->addCamera(*cameraResource, m_serverId, cameras);
     }
 
     QnResourcePool::instance()->addResources(cameras);
