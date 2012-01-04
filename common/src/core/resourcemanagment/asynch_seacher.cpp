@@ -175,6 +175,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     QMap<quint32, int> ipsList;
     foreach (QnResourcePtr res, QnResourcePool::instance()->getResourcesWithFlag(QnResource::network))
     {
+        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+            continue;
+
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
         if (netRes)
         {
@@ -192,6 +195,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         if (QnResourcePool::instance()->hasSuchResouce(res->getUniqueId()))
             continue; // this ip is already taken into account
 
+        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+            continue;
+
+
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
         if (netRes)
         {
@@ -207,6 +214,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     // in pool could not be 2 resources with same ip
     foreach (QnResourcePtr res, resources)
     {
+        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+            continue;
+
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
         if (netRes)
         {
@@ -347,6 +357,9 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
 
     foreach(QnResourcePtr res, justfoundList)
     {
+        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+            continue;
+
         QnNetworkResourcePtr nr = res.dynamicCast<QnNetworkResource>();
 
         if (!nr)
