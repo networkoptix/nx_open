@@ -42,7 +42,7 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
         m_itemToSelect = draggedItem;
     } else {
-        m_itemToSelect = NULL;
+        m_itemToSelect.clear();
     }
     
     dragProcessor()->mousePressEvent(viewport, event);
@@ -59,9 +59,9 @@ void DragInstrument::startDrag(DragInfo *info) {
     if(!m_effective)
         return;
 
-    if(m_itemToSelect != NULL) {
-        m_itemToSelect->setSelected(true);
-        m_itemToSelect = NULL;
+    if(!m_itemToSelect.isNull()) {
+        m_itemToSelect.data()->setSelected(true);
+        m_itemToSelect.clear();
     }
 
     emit dragStarted(info->view(), scene()->selectedItems());

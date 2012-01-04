@@ -225,6 +225,8 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     
+    if (getDisplayedTime() != DATETIME_NOW)
+        reader->jumpToPreviousFrame(getCurrentTime());
 
     reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
     reader->setCycleMode(false);
