@@ -19,7 +19,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
-        m_appServer->addCamera(*cameraResource, m_serverId, cameras);
+        cameraResource->setParentId(m_serverId);
+        m_appServer->addCamera(*cameraResource, cameras);
     }
 
     QnResourcePool::instance()->addResources(cameras);

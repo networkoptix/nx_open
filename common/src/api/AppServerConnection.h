@@ -29,7 +29,7 @@ public:
     int getResources(QList<QnResourcePtr>& resources);
 
     int addServer(const QnVideoServer&, QnVideoServerList& servers);
-    int addCamera(const QnCameraResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
+    int addCamera(const QnCameraResource&, QList<QnResourcePtr>& cameras);
     int addStorage(const QnStorage&);
 
     int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId);

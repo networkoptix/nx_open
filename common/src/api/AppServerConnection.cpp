@@ -83,7 +83,7 @@ int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServe
     return 1;
 }
 
-int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, const QnId& serverIdIn, QList<QnResourcePtr>& cameras)
+int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, QList<QnResourcePtr>& cameras)
 {
     xsd::api::cameras::Camera camera(cameraIn.getId().toString().toStdString(),
                                      cameraIn.getName().toStdString(),
@@ -111,7 +111,7 @@ int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, const QnI
     }
     camera.scheduleTasks(scheduleTasks);
 
-    camera.parentID(serverIdIn.toString().toStdString());
+    camera.parentID(cameraIn.getParentId().toString().toStdString());
 
     QnApiCameraResponsePtr xsdCameras;
 

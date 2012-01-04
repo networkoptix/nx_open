@@ -19,7 +19,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_waitBOF(false),
     m_lastPacketFlags(-1),
     m_closing(false),
-    m_singleShotMode(false)
+    m_singleShotMode(false),
+    m_lastReceivedTime(AV_NOPTS_VALUE)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -202,6 +203,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         reopen();
     if (result)
         m_lastPacketFlags = result->flags;
+    m_lastReceivedTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
     return result;
 }
 
@@ -428,4 +430,12 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
         m_rtspSession.setAdditionAttribute("x-motion-region", s);
     }
     //m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+}
+
+void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
+{
+    if (m_position == DATETIME_NOW && qAbs(m_lastReceivedTime - QDateTime::currentDateTime().toMSecsSinceEpoch()) > 250)
+    {
+        m_rtspSession.stop();
+    }
 }

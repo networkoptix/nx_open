@@ -694,6 +694,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         if (m_requiredJumpTime != AV_NOPTS_VALUE)
             emit jumpCanceled(m_requiredJumpTime);
         emit beforeJump(mksec);
+        m_delegate->beforeSeek(mksec);
         channeljumpToUnsync(mksec, 0, skipTime);
     }
     m_lastJumpTime = mksec;

@@ -358,32 +358,6 @@ public:
 
         eventManager->run();
 
-        QnScheduleTaskList scheduleTasks;
-
-        QnSecurityCamResourceList cameras;
-        appServerConnection->getCameras(cameras, videoServer->getId());
-
-        foreach(QnSecurityCamResourcePtr camera, cameras)
-        {
-            QnRecordingManager::instance()->updateSchedule(camera);
-        }
-
-        foreach (QnScheduleTask scheduleTask, scheduleTasks)
-        {
-            QString str;
-            QTextStream stream(&str);
-
-            stream << "ScheduleTask " << scheduleTask.m_id.toString() <<
-                                              scheduleTask.m_afterThreshold <<
-                                              scheduleTask.m_beforeThreshold <<
-                                              scheduleTask.m_dayOfWeek <<
-                                              scheduleTask.m_doRecordAudio <<
-                                              scheduleTask.m_startTime <<
-                                              scheduleTask.m_endTime <<
-                                              scheduleTask.m_recordType <<
-                                              scheduleTask.m_sourceId.toString();
-            cl_log.log(str, cl_logALWAYS);
-        }
 
         m_processor = new QnAppserverResourceProcessor(videoServer->getId(), QnResourceDiscoveryManager::instance());
 
@@ -421,7 +395,7 @@ public:
             storage->setParentId(videoServer->getId());
             storage->setName("Initial");
             storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
-            storage->setSpaceLimit(100ll * 1000 * 1024);
+            storage->setSpaceLimit(5ll * 1024 * 1024 * 1024);
 
             if (appServerConnection->addStorage(*storage))
                 qDebug() << "Couldn't add storage: " << appServerConnection->lastError();
@@ -442,9 +416,39 @@ public:
         QnResourceDiscoveryManager::instance().addResourceProcessor(m_processor);
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().start();
         //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
         //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
+
+        QnScheduleTaskList scheduleTasks;
+
+        QnSecurityCamResourceList cameras;
+        appServerConnection->getCameras(cameras, videoServer->getId());
+
+        foreach(QnSecurityCamResourcePtr camera, cameras)
+        {
+            qnResPool->addResource(camera);
+
+            QnRecordingManager::instance()->updateSchedule(camera);
+        }
+
+        foreach (QnScheduleTask scheduleTask, scheduleTasks)
+        {
+            QString str;
+            QTextStream stream(&str);
+
+            stream << "ScheduleTask " << scheduleTask.m_id.toString() <<
+                scheduleTask.m_afterThreshold <<
+                scheduleTask.m_beforeThreshold <<
+                scheduleTask.m_dayOfWeek <<
+                scheduleTask.m_doRecordAudio <<
+                scheduleTask.m_startTime <<
+                scheduleTask.m_endTime <<
+                scheduleTask.m_recordType <<
+                scheduleTask.m_sourceId.toString();
+            cl_log.log(str, cl_logALWAYS);
+        }
+
+        QnResourceDiscoveryManager::instance().start();
 
         exec();
     }

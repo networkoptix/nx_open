@@ -31,6 +31,7 @@ public:
 
     virtual void setMotionRegion(const QRegion& region);
     virtual void setSendMotion(bool value);
+    virtual void beforeSeek(qint64 time);
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);
