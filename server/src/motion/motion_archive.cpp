@@ -213,6 +213,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
         motionFile.seek((startItr-index.begin()) * MOTION_DATA_RECORD_SIZE);
 
         // math file (one month)
+        QVector<IndexRecord>::const_iterator i = startItr;
         while (totalSteps > 0)
         {
             int readed = motionFile.read((char*) buffer, MOTION_DATA_RECORD_SIZE * qMin(totalSteps,1024));
@@ -220,7 +221,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
                 break;
             quint8* dataEnd = buffer + readed;
             quint8* curData = buffer;
-            for (QVector<IndexRecord>::const_iterator i = startItr; i < endItr && curData < dataEnd; ++i)
+            while (i < endItr && curData < dataEnd)
             {
                 if (mathImage((__m128i*) curData, mask, maskStart, maskEnd))
                 {
@@ -236,6 +237,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
                 }
                 curData += MOTION_DATA_RECORD_SIZE;
+                ++i;
             }
             totalSteps -= readed/MOTION_DATA_RECORD_SIZE;
         }
@@ -268,6 +270,7 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
     //if (indexSize == 0)
     //    return false;
     //index.resize(indexSize/MOTION_INDEX_RECORD_SIZE);
+    index.clear();
     indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
     //indexFile.read((char*) &index[0], indexSize);
 
