@@ -65,6 +65,9 @@ protected:
 
     int mFramesLost;
     QnMediaResourcePtr m_mediaResource;
+
+private:
+    mutable int m_numberOfchannels;
 };
 
 
