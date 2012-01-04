@@ -868,7 +868,7 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
     }
     menu->addAction(m_recordingSettingsActions);
 
-    menu->addAction(m_randomGridAction);
+    //menu->addAction(m_randomGridAction);
 
     menu->exec(info.screenPos());
 }
