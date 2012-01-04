@@ -1,8 +1,10 @@
 #ifndef QN_WORKBENCH_ITEM_H
 #define QN_WORKBENCH_ITEM_H
 
-#include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
+#include <QObject>
+#include <QScopedPointer>
+#include <QRectF>
+#include <QRect>
 
 class QnWorkbenchLayout;
 
@@ -84,6 +86,18 @@ public:
      * \returns                         Whether the geometry delta was successfully changed.
      */
     bool setGeometryDelta(const QRectF &geometryDelta);
+
+    /**
+     * \param combinedGeometry          New combined geometry for this item. 
+     *                                  New geometry and geometry delta will be calculated based on this value.
+     * \returns                         Whether the combined geometry was successfully changed.
+     */
+    bool setCombinedGeometry(const QRectF &combinedGeometry);
+
+    /**
+     * \returns                         Combined geometry of this item.
+     */
+    QRectF combinedGeometry() const;
 
     /**
      * \returns                         Flags of this item.

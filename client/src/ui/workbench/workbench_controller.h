@@ -61,12 +61,12 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    void drop(const QUrl &url, const QPoint &gridPos, bool findAccepted = true);
-    void drop(const QList<QUrl> &urls, const QPoint &gridPos, bool findAccepted = true);
-    void drop(const QString &file, const QPoint &gridPos, bool findAccepted = true);
-    void drop(const QList<QString> &files, const QPoint &gridPos, bool findAccepted = true);
-    void drop(const QnResourcePtr &resource, const QPoint &gridPos);
-    void drop(const QnResourceList &resources, const QPoint &gridPos);
+    void drop(const QUrl &url, const QPointF &gridPos, bool findAccepted = true);
+    void drop(const QList<QUrl> &urls, const QPointF &gridPos, bool findAccepted = true);
+    void drop(const QString &file, const QPointF &gridPos, bool findAccepted = true);
+    void drop(const QList<QString> &files, const QPointF &gridPos, bool findAccepted = true);
+    void drop(const QnResourcePtr &resource, const QPointF &gridPos);
+    void drop(const QnResourceList &resources, const QPointF &gridPos);
 
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
@@ -123,6 +123,8 @@ protected Q_SLOTS:
 
     void at_recordingAnimation_valueChanged(QVariant value);
     void at_recordingAnimation_finished();
+
+    void at_randomGridAction_triggered();
 
 private:
     /* Global state. */
@@ -223,6 +225,7 @@ private:
 
     QAction *m_showMotionAction;
     QAction *m_hideMotionAction;
+    QAction *m_randomGridAction;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H
