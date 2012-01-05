@@ -8,6 +8,7 @@
 #include <ui/common/scene_utility.h>
 #include <utils/common/rect_set.h>
 #include "workbench.h"
+#include "recording/time_period.h"
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -267,7 +268,7 @@ signals:
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(QnWorkbench::ItemRole role);
-
+    void playbackMaskChanged(const QnTimePeriodList&);
 protected:
     virtual void tick(int deltaTime) override;
     

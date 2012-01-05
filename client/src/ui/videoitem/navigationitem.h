@@ -60,6 +60,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
+    void playbackMaskChanged(const QnTimePeriodList& playbackMask);
 
 protected:
     void timerEvent(QTimerEvent* event);
@@ -140,6 +141,7 @@ private:
     MotionPeriods m_motionPeriodLoader;
 
     QnTimePeriod m_timePeriod;
+    QnTimePeriodList m_mergedMotionPeriods;
 
     //QnTimePeriodUpdater *m_fullTimePeriodUpdater;
 

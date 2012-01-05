@@ -481,7 +481,7 @@ void NavigationItem::updateSlider()
     qint64 endTime = reader->endTime();
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
-        m_timeSlider->setMinimumValue(startTime / 1000);
+		m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentDateTime().toMSecsSinceEpoch()-10000); // if  nothing is recorded set minvalue to live-10sec
         m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
         if (m_timeSlider->minimumValue() == 0)
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
@@ -600,7 +600,10 @@ void NavigationItem::repaintMotionPeriods()
         if (!info.periods.isEmpty())
             allPeriods << info.periods;
     }
-    m_timeSlider->setMotionTimePeriodList(QnTimePeriod::mergeTimePeriods(allPeriods));
+    m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
+    m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
+
+    emit playbackMaskChanged(m_mergedMotionPeriods);
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
