@@ -8,7 +8,8 @@
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
 
-QnResourceDiscoveryManager::QnResourceDiscoveryManager()
+QnResourceDiscoveryManager::QnResourceDiscoveryManager():
+m_server(false)
 {
 }
 
@@ -22,6 +23,11 @@ QnResourceDiscoveryManager& QnResourceDiscoveryManager::instance()
     static QnResourceDiscoveryManager instance;
 
     return instance;
+}
+
+void QnResourceDiscoveryManager::setServer(bool serv)
+{
+    m_server = serv;
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
@@ -211,8 +217,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     // from just found
     foreach (QnResourcePtr res, resources)
     {
-        if (QnResourcePool::instance()->hasSuchResouce(res->getUniqueId()))
-            continue; // this ip is already taken into account
+        //if (QnResourcePool::instance()->hasSuchResouce(res->getUniqueId()))
+        //    continue; // this ip is already taken into account
 
         if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
@@ -240,7 +246,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         if (netRes)
         {
             quint32 ips = netRes->getHostAddress().toIPv4Address();
-            if (ipsList.count(ips) > 1)
+            if (ipsList.count(ips) > 0 && ipsList[ips] > 1)
                 netRes->setNetworkStatus(QnNetworkResource::BadHostAddr);
         }
     }
@@ -349,12 +355,19 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 if (rpNetRes)
                 {
                     // if such network resource is in pool and has diff IP => should keep it 
-                    //rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnResource::);
+                    rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomain::QnDomainMemory);
                     it = resources.erase(it);
 
-                    //if (server)
+                    if (m_server)
                     {
-                        //m_appServer = QnAppServerConnectionFactory::createConnection(resourceFactory);
+                        QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
+                        if (cameraResource)
+                        {
+                            QnResourceList cameras;
+                            QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
+                            connect->addCamera(*cameraResource, cameras);
+                        }
+
                     }
 
                     continue;

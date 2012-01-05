@@ -24,6 +24,8 @@ public:
 
     static QnResourceDiscoveryManager& instance();
 
+    void setServer(bool serv);
+
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
@@ -59,6 +61,8 @@ private:
     ResourceProcessorList m_resourceProcessors;
 
     CLNetState m_netState;
+
+    bool m_server;
 };
 
 #endif //cl_asynch_device_sarcher_h_423
