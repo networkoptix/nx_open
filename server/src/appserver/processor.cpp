@@ -2,10 +2,10 @@
 
 #include "core/resourcemanagment/resource_pool.h"
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId, QnResourceFactory& resourceFactory)
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId)
     : m_serverId(serverId)
 {
-    m_appServer = QnAppServerConnectionFactory::createConnection(resourceFactory);
+    m_appServer = QnAppServerConnectionFactory::createConnection();
 }
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)

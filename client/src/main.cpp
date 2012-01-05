@@ -197,6 +197,7 @@ void initAppServerConnection()
     }
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
+    QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
 
 void initAppServerEventConnection()
