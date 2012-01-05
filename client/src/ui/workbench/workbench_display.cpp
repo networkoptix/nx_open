@@ -277,6 +277,12 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(m_workbench,            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
 
+    /* Connect to grid mapper. */
+    QnWorkbenchGridMapper *mapper = m_workbench->mapper();
+    connect(mapper,                 SIGNAL(originChanged()),                        this,                   SLOT(at_mapper_originChanged()));
+    connect(mapper,                 SIGNAL(cellSizeChanged()),                      this,                   SLOT(at_mapper_cellSizeChanged()));
+    connect(mapper,                 SIGNAL(spacingChanged()),                       this,                   SLOT(at_mapper_spacingChanged()));
+
     /* Create items. */
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
         addItemInternal(item);
@@ -697,6 +703,22 @@ QPoint QnWorkbenchDisplay::mapGlobalToGrid(const QPoint &globalPoint) const {
     return mapViewportToGrid(m_view->mapFromGlobal(globalPoint));
 }
 
+QPointF QnWorkbenchDisplay::mapViewportToGridF(const QPoint &viewportPoint) const {
+    if(m_view == NULL)
+        return QPointF();
+
+    return m_workbench->mapper()->mapToGridF(m_view->mapToScene(viewportPoint));
+
+}
+
+QPointF QnWorkbenchDisplay::mapGlobalToGridF(const QPoint &globalPoint) const {
+    if(m_view == NULL)
+        return QPoint();
+
+    return mapViewportToGridF(m_view->mapFromGlobal(globalPoint));
+}
+
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: synchronizers
@@ -788,6 +810,11 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
+}
+
+void QnWorkbenchDisplay::synchronizeAllGeometries(bool animate) {
+    foreach(QnResourceWidget *widget, m_widgetByItem)
+        synchronizeGeometry(widget, animate);
 }
 
 void QnWorkbenchDisplay::synchronizeLayer(QnWorkbenchItem *item) {
@@ -1025,3 +1052,14 @@ void QnWorkbenchDisplay::at_view_destroyed() {
     setView(NULL);
 }
 
+void QnWorkbenchDisplay::at_mapper_originChanged() {
+    synchronizeAllGeometries(true);
+}
+
+void QnWorkbenchDisplay::at_mapper_cellSizeChanged() {
+    synchronizeAllGeometries(true);
+}
+
+void QnWorkbenchDisplay::at_mapper_spacingChanged() {
+    synchronizeAllGeometries(true);
+}

@@ -329,6 +329,10 @@ inline bool qFuzzyIsNull(const QPointF &p) {
     return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
 }
 
+inline bool qFuzzyIsNull(const QSizeF &s) {
+    return ::qFuzzyIsNull(s.width()) && ::qFuzzyIsNull(s.height());
+}
+
 inline bool qFuzzyCompare(const QPointF &l, const QPointF &r) {
     return ::qFuzzyCompare(l.x(), r.x()) && ::qFuzzyCompare(l.y(), r.y());
 }
@@ -344,6 +348,14 @@ inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
         ::qFuzzyCompare(l.width(), r.width()) &&
         ::qFuzzyCompare(l.height(), r.height());
 }
+
+float qFuzzyFloor(float value);
+
+double qFuzzyFloor(double value);
+
+float qFuzzyCeil(float value);
+
+double qFuzzyCeil(double value);
 
 
 #endif // QN_SCENE_UTILITY_H
