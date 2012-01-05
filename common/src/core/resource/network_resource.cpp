@@ -188,8 +188,10 @@ bool QnNetworkResource::conflicting()
     CLPing ping;
     if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
     {
-        addNetworkStatus(QnNetworkResource::BadHostAddr);
-        return true;
+        //addNetworkStatus(QnNetworkResource::BadHostAddr);
+        //return true;
+
+        // some times ping does not work but cam is still is not conflicting 
     }
 
     mac = getMacByIP(getHostAddress(), false); // just in case if ARP response from some else have delayed

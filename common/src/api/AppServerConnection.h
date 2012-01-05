@@ -56,12 +56,15 @@ public:
     static QUrl defaultUrl();
     static void setDefaultUrl(const QUrl &url);
 
-    static QnAppServerConnectionPtr createConnection(QnResourceFactory &resourceFactory);
-    static QnAppServerConnectionPtr createConnection(const QUrl& url, QnResourceFactory &resourceFactory);
+    static void setDefaultFactory(QnResourceFactory*);
+
+    static QnAppServerConnectionPtr createConnection();
+    static QnAppServerConnectionPtr createConnection(const QUrl& url);
 
 private:
     QMutex m_mutex;
     QUrl m_url;
+    QnResourceFactory* m_resourceFactory;
 };
 
 #endif // APPSERVERCONNECTIONIMPL_H

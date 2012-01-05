@@ -36,7 +36,7 @@ void QnEventManager::eventReceived(QnEvent event)
 {
     if (event.eventType == QN_EVENT_RES_CHANGE)
     {
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnServerCameraFactory::instance());
+        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
         QnResourceList resources;
         appServerConnection->getResources(resources);
