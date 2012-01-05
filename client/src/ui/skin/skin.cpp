@@ -15,6 +15,8 @@
 
 QString Skin::path(const QString &name)
 {
+    if (name.isEmpty())
+        return name;
     return CL_SKIN_PATH + QLatin1String("/skin/") + name;
 }
 

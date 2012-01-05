@@ -264,8 +264,10 @@ QPixmap AppProxyStyle::standardPixmap(StandardPixmap standardPixmap, const QStyl
         pm = Skin::pixmap(QLatin1String("decorations/restore.png"));
         break;
     case SP_TitleBarShadeButton:
+        pm = Skin::pixmap(QLatin1String("decorations/fullscreen.png"));
+        break;
     case SP_TitleBarUnshadeButton:
-        pm = Skin::pixmap(QLatin1String("decorations/togglefullscreen.png"));
+        pm = Skin::pixmap(QLatin1String("decorations/unfullscreen.png"));
         break;
 //    case SP_TitleBarContextHelpButton: // ###
 //        pm = Skin::pixmap(QLatin1String("decorations/help.png"));
@@ -342,8 +344,10 @@ QIcon AppProxyStyle::standardIconImplementation(StandardPixmap standardIcon, con
         icon.addPixmap(Skin::pixmap(QLatin1String("decorations/restore.png"), QSize(16, 16), Qt::KeepAspectRatio));
         break;
     case SP_TitleBarShadeButton:
+        icon.addPixmap(Skin::pixmap(QLatin1String("decorations/fullscreen.png"), QSize(16, 16), Qt::KeepAspectRatio));
+        break;
     case SP_TitleBarUnshadeButton:
-        icon.addPixmap(Skin::pixmap(QLatin1String("decorations/togglefullscreen.png"), QSize(16, 16), Qt::KeepAspectRatio));
+        icon.addPixmap(Skin::pixmap(QLatin1String("decorations/unfullscreen.png"), QSize(16, 16), Qt::KeepAspectRatio));
         break;
 //    case SP_TitleBarContextHelpButton: // ###
 //        icon.addPixmap(Skin::pixmap(QLatin1String("decorations/help.png"), QSize(16, 16), Qt::KeepAspectRatio));

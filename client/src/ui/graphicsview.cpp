@@ -608,7 +608,7 @@ void GraphicsView::initDecoration()
 
     if (toggleFullscreen)
     {
-        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/togglefullscreen.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/fullscreen.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
