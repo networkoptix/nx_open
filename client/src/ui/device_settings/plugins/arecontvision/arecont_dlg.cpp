@@ -69,7 +69,7 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
     }
 }
 
-CLAbstractDeviceSettingsDlg *AreconVisionDlgManufacture::createDlg(QnResourcePtr resource)
+QDialog *AreconVisionDlgManufacture::createDlg(QnResourcePtr resource)
 {
     return new AVSettingsDlg(resource);
 }

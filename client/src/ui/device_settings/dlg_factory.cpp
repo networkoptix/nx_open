@@ -26,7 +26,7 @@ bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
     return false;
 }
 
-CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource)
+QDialog *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource)
 {
     if (!resource)
         return 0;

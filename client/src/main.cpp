@@ -1,4 +1,3 @@
-//#include <vld.h>
 #include "eve_app.h"
 
 //#define CL_CUSOM_MAINWINDOW
@@ -391,7 +390,7 @@ int main(int argc, char *argv[])
     MainWnd mainWindow(argc, argv);
 #endif
     mainWindow.show();
-    
+
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif
@@ -401,15 +400,15 @@ int main(int argc, char *argv[])
 
     QnEventManager::instance()->run();
 
-    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
+    if (autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
         QObject::connect(&autoTester, SIGNAL(finished()), &application, SLOT(quit()));
         autoTester.start();
     }
 
     int result = application.exec();
 
-    if(autoTester.state() == QnAutoTester::FINISHED) {
-        if(!autoTester.succeeded())
+    if (autoTester.state() == QnAutoTester::FINISHED) {
+        if (!autoTester.succeeded())
             result = 1;
 
         QTextStream out(stdout);

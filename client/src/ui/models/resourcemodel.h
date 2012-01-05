@@ -23,9 +23,12 @@ protected:
     QStandardItem *itemFromResource(QnResourcePtr resource) const;
     QStandardItem *itemFromResourceId(uint id) const;
 
-private Q_SLOTS:
     void addResource(QnResourcePtr resource);
     void removeResource(QnResourcePtr resource);
+
+private Q_SLOTS:
+    void _q_addResource(QnResourcePtr resource);
+    void _q_removeResource(QnResourcePtr resource);
 };
 
 #endif // RESOURCEMODEL_H

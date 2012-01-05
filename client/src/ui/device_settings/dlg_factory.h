@@ -3,7 +3,7 @@
 
 #include "core/resource/resource.h"
 
-class CLAbstractDeviceSettingsDlg;
+class QDialog;
 
 /**
  * Interface for creating device-specific settings dialogs.
@@ -18,7 +18,7 @@ public:
      * \returns                         Newly created settings dialog,
      *                                  or NULL if it could not be created.
      */
-    virtual CLAbstractDeviceSettingsDlg *createDlg(QnResourcePtr resource) = 0;
+    virtual QDialog *createDlg(QnResourcePtr resource) = 0;
 
     /**
      * \param dev                       Resource to check.
@@ -48,7 +48,7 @@ public:
      *                                  given resource, or NULL if the dialog
      *                                  could not be created.
      */
-    static CLAbstractDeviceSettingsDlg *createDlg(QnResourcePtr resource);
+    static QDialog *createDlg(QnResourcePtr resource);
 
     /**
      * Registers a dialog manufacture with this factory.

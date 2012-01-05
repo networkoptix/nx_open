@@ -158,14 +158,14 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
         left = qMax(left, contentsRect.left());
 
         qreal right;
-        if(period.durationMs == -1) {
+        if (period.durationMs == -1) {
             right = contentsRect.right();
         } else {
             right = x + static_cast<qreal>((period.startTimeMs + period.durationMs) - pos) / range * w;
             right = qMin(right, contentsRect.right());
         }
 
-        if(left > right)
+        if (left > right)
             continue;
 
         painter->fillRect(left, contentsRect.top(), qMax(1.0,right - left), contentsRect.height(), color);

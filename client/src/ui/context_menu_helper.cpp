@@ -99,7 +99,7 @@ void initContextMenu()
 #endif
     cm_toggle_fullscreen.setShortcuts(shortcuts);
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
-    cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/togglefullscreen.png")));
+    cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/fullscreen.png")));
 
     QMenu *itemDistanceMenu = new QMenu();
     itemDistanceMenu->setTitle(QObject::tr("Item distance"));
