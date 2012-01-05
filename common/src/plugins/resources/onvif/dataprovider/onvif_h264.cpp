@@ -43,7 +43,7 @@ void RTPH264Streamreader::openStream()
 
     if (m_RtpSession.open(url))
     {
-        m_rtpIo = m_RtpSession.play();
+        m_rtpIo = m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
         if (m_rtpIo)
         {
             m_streamParser = new CLH264RtpParser(m_rtpIo);

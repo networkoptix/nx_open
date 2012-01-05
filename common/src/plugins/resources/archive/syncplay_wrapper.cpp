@@ -266,7 +266,10 @@ void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
         if (info.reader != sender())
             info.reader->setSpeed(value);
     }
-    reinitTime(getDisplayedTimeInternal());
+    qint64 displayedTime = getDisplayedTimeInternal();
+    if (d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW)
+        displayedTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+    reinitTime(displayedTime);
     d->speed = value;
 
     d->blockSetSpeedSignal = false;
@@ -316,6 +319,8 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     {
         if (info.enabled) {
             qint64 time = info.cam->getCurrentTime();
+            if (time == DATETIME_NOW)
+                time = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
             if (displayTime == AV_NOPTS_VALUE)
                 displayTime = time;
             else if (time != AV_NOPTS_VALUE)

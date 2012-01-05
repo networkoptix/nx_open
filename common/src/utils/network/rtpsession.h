@@ -55,7 +55,7 @@ public:
     bool open(const QString& url);
 
     // position at mksec
-    RTPIODevice* play(qint64 position = 0, double scale = 1.0);
+    RTPIODevice* play(qint64 positionStart, qint64 positionEnd, double scale);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -79,6 +79,7 @@ public:
     qint64 startTime() const;
     qint64 endTime() const;
     float getScale() const;
+    void setScale(float value);
 
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();

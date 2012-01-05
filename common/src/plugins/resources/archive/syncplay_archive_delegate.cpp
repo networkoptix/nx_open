@@ -117,3 +117,8 @@ void QnSyncPlayArchiveDelegate::beforeSeek(qint64 time)
 {
     m_ownerDelegate->beforeSeek(time);
 }
+
+void QnSyncPlayArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
+{
+    m_ownerDelegate->beforeChangeReverseMode(reverseMode);
+}
