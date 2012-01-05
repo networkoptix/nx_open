@@ -317,7 +317,11 @@ QSizeF SceneUtility::eroded(const QSizeF &size, const MarginsF &amount) {
 }
 
 bool SceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
-    return size.width() > otherSize.width() && size.height() > otherSize.height();
+    return size.width() >= otherSize.width() && size.height() >= otherSize.height();
+}
+
+bool SceneUtility::contains(const QSize &size, const QSize &otherSize) {
+    return size.width() >= otherSize.width() && size.height() >= otherSize.height();
 }
 
 void SceneUtility::moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta) {
