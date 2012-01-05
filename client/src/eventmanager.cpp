@@ -34,32 +34,38 @@ void QnEventManager::run()
 
 void QnEventManager::eventReceived(QnEvent event)
 {
+    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
+
     if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnServerCameraFactory::instance());
 
+        QByteArray errorString;
         QnResourceList resources;
-        appServerConnection->getResources(resources);
-
-        QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
-
-        foreach(const QnResourcePtr& resource, resources)
+        if (appServerConnection->getResources(resources, errorString) == 0)
         {
-            if (resource->getId() == event.resourceId)
+            QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
+
+            foreach(const QnResourcePtr& resource, resources)
             {
-                if (ownResource.isNull())
-                    qnResPool->addResource(resource);
-                else
-                    ownResource->update(*resource);
+                if (resource->getId() == event.resourceId)
+                {
+                    if (ownResource.isNull())
+                        qnResPool->addResource(resource);
+                    else
+                        ownResource->update(*resource);
+                }
             }
+        } else
+        {
+            qDebug()  << "QnEventManager::eventReceived(): Can't get resource from appserver. Reason: "
+                      << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
         }
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
         qnResPool->removeResource(ownResource);
     }
-
-    qDebug() << event.eventType << " " << event.objectName << " " << event.resourceId;
 }
 
 void QnEventManager::connectionClosed(QString errorString)

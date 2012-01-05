@@ -43,6 +43,8 @@ public:
 
     void setAddEndSlash(bool value);
 
+    static QByteArray formatNetworkError(int error);
+
 Q_SIGNALS:
     void error(int error);
 
@@ -50,19 +52,19 @@ protected Q_SLOTS:
     void setupErrorHandler();
 
 protected:
-    int sendGetRequest(const QString &objectName, QByteArray &reply);
-    int sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray &reply);
+    int sendGetRequest(const QString &objectName, QByteArray &reply, QByteArray& errorString);
+    int sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray &reply, QByteArray& errorString);
 
     int sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot);
     int sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
 
-    static QByteArray formatNetworkError(int error);
+    int sendAsyncPostRequest(const QString &objectName, const QByteArray& data, QObject *target, const char *slot);
+    int sendAsyncPostRequest(const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
 
     QUrl createApiUrl(const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
 
 protected:
     SyncHTTP *m_httpClient;
-    QByteArray m_lastError;
     bool m_addEndSlash;
     static QAtomicInt m_handle;
 private:

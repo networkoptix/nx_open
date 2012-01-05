@@ -103,10 +103,10 @@ VideoServerSessionManager::VideoServerSessionManager(const QUrl &url, QObject *p
 {
 }
 
-int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& result)
+int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& result, QByteArray& errorString)
 {
     QByteArray reply;
-    if(sendGetRequest("api/RecordedTimePeriods", params, reply) != 0)
+    if(sendGetRequest("api/RecordedTimePeriods", params, reply, errorString) != 0)
         return 1;
     QnApiRecordedTimePeriodsResponsePtr timePeriodList;
     int status = parseRecordedTimePeriods(reply, &timePeriodList);
