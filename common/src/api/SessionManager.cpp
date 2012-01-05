@@ -67,21 +67,22 @@ QUrl SessionManager::createApiUrl(const QString &objectName, const QnRequestPara
     return url;
 }
 
-int SessionManager::sendGetRequest(const QString &objectName, QByteArray& reply)
+int SessionManager::sendGetRequest(const QString &objectName, QByteArray& reply, QByteArray& errorString)
 {
-    return sendGetRequest(objectName, QnRequestParamList(), reply);
+    return sendGetRequest(objectName, QnRequestParamList(), reply, errorString);
 }
 
-int SessionManager::sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray& reply)
+int SessionManager::sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray& reply, QByteArray& errorString)
 {
-    m_lastError.clear();
-
     QBuffer buffer(&reply);
     buffer.open(QIODevice::WriteOnly);
 
     int status = m_httpClient->syncGet(createApiUrl(objectName, params), &buffer);
     if (status != 0)
-        m_lastError = formatNetworkError(status) + reply;
+    {
+        errorString += "\nSessionManager::sendGetRequest(): ";
+        errorString += formatNetworkError(status) + reply;
+    }
 
     return status;
 }
@@ -102,14 +103,25 @@ int SessionManager::sendAsyncGetRequest(const QString &objectName, const QnReque
     return handle;
 }
 
+int SessionManager::sendAsyncPostRequest(const QString &objectName, const QByteArray& data, QObject *target, const char *slot)
+{
+    return sendAsyncPostRequest(objectName, QnRequestParamList(), data, target, slot);
+}
+
+int SessionManager::sendAsyncPostRequest(const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
+{
+    /* We set parent to 'this' so that destroying session manager would stop all requests. */
+    detail::SessionManagerReplyProcessor *processor = new detail::SessionManagerReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QByteArray &, int)), target, slot);
+    QNetworkReply* reply = m_httpClient->asyncPost(createApiUrl(objectName, params), data, processor, SLOT(at_replyReceived(QNetworkReply *)));
+    int handle = m_handle.fetchAndAddAcquire(1);
+    reply->setProperty("handle", handle);
+    return handle;
+}
+
 void SessionManager::setAddEndSlash(bool value)
 {
     m_addEndSlash = value;
-}
-
-QByteArray SessionManager::lastError() const
-{
-    return m_lastError;
 }
 
 QByteArray SessionManager::formatNetworkError(int error)

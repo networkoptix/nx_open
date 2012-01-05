@@ -34,34 +34,41 @@ void QnEventManager::run()
 
 void QnEventManager::eventReceived(QnEvent event)
 {
+    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
+
     if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnResourceDiscoveryManager::instance());
 
+        QByteArray errorString;
+
         QnResourceList resources;
-        appServerConnection->getResources(resources);
-
-        foreach(const QnResourcePtr& resource, resources)
+        if (appServerConnection->getResources(resources, errorString) == 0)
         {
-            if (resource->getId() == event.resourceId)
+            foreach(const QnResourcePtr& resource, resources)
             {
-                qnResPool->addResource(resource);
-
-                QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
-
-                QnSecurityCamResourcePtr securityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
-                if (!securityCamera.isNull())
+                if (resource->getId() == event.resourceId)
                 {
-                    QnRecordingManager::instance()->updateSchedule(securityCamera);
+                    qnResPool->addResource(resource);
+
+                    QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+
+                    QnSecurityCamResourcePtr securityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
+                    if (!securityCamera.isNull())
+                    {
+                        QnRecordingManager::instance()->updateSchedule(securityCamera);
+                    }
                 }
             }
+        } else
+        {
+            qDebug()  << "QnEventManager::eventReceived(): Can't get resource from appserver. Reason: "
+                      << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
         }
     }
-
-    qDebug() << event.eventType << " " << event.objectName << " " << event.resourceId;
 }
 
 void QnEventManager::connectionClosed(QString errorString)
 {
-    qDebug() << "Connection aborted:" << errorString;
+    qDebug() << "QnEventManager::connectionClosed(): Connection aborted:" << errorString;
 }

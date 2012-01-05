@@ -71,8 +71,10 @@ bool QnResourceDiscoveryManager::getResourceTypes()
     QnDummyResourceFactory dummyFactory;
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(dummyFactory);
 
+    QByteArray errorString;
+
     QList<QnResourceTypePtr> resourceTypeList;
-    if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
+    if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
     {
         qnResTypePool->addResourceTypeList(resourceTypeList);
         qDebug() << "Got " << resourceTypeList.size() << " resource types";
@@ -80,7 +82,7 @@ bool QnResourceDiscoveryManager::getResourceTypes()
         return true;
     }
 
-    qDebug() << "Can't get resource types from Application server";
+    qDebug() << "Can't get resource types from Application server: " << errorString;
     return false;
 }
 
