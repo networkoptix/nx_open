@@ -9,8 +9,8 @@ class AreconVisionDlgManufacture : public CLAbstractDlgManufacture
 public:
     AreconVisionDlgManufacture();
 
-    QDialog *createDlg(QnResourcePtr resource);
     bool canProduceDlg(QnResourcePtr resource) const;
+    QDialog *createDlg(QnResourcePtr resource);
 
 private:
     QList<QString> mPossibleNames;
