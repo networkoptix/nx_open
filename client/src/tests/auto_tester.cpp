@@ -3,10 +3,14 @@
 #include <QTextStream>
 #include <QTimer>
 #include <core/resourcemanagment/resource_pool.h>
+#include <utils/common/warnings.h>
 #include "command_line_parser.h"
 
 namespace {
     qint64 defaultAutoTesterTimeout = 20 * 1000; 
+
+    /** Run tests every second. */
+    int defaultTestPeriod = 1000;
 }
 
 QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
@@ -53,16 +57,15 @@ QnAutoTester::~QnAutoTester() {
 }
 
 void QnAutoTester::start() {
-    if(m_state != INITIAL)
+    if(m_state != INITIAL) {
+        qnWarning("Cannot start auto tester that is not in its initial state.");
         return;
+    }
 
-    if(m_allTests == 0)
-        return;
-
-    m_state = STARTED;
+    m_state = RUNNING;
 
     m_timer = new QTimer(this);
-    m_timer->setInterval(1000);
+    m_timer->setInterval(defaultTestPeriod);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
 
     m_startTime = QDateTime::currentMSecsSinceEpoch();
@@ -75,10 +78,12 @@ bool QnAutoTester::needsTesting(Test test) {
 }
 
 void QnAutoTester::at_timer_timeout() {
-    if(QDateTime::currentMSecsSinceEpoch() - m_startTime > m_timeout) {
-        m_succeeded = m_successfulTests == m_allTests;
+    if(needsTesting(RESOURCE_SUBSTRING))
+        testResourceSubstring();
 
-        QString message;
+    m_succeeded = m_successfulTests == m_allTests;
+
+    if(m_succeeded || QDateTime::currentMSecsSinceEpoch() - m_startTime > m_timeout) {
         if(m_succeeded) {
             m_message = tr("All tests completed successfully.\n");
         } else {
@@ -89,11 +94,7 @@ void QnAutoTester::at_timer_timeout() {
         m_state = FINISHED;
         m_timer->stop();
         emit finished();
-        return;
     }
-
-    if(needsTesting(RESOURCE_SUBSTRING))
-        testResourceSubstring();
 }
 
 void QnAutoTester::testResourceSubstring() {

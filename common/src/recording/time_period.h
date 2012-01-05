@@ -4,7 +4,8 @@
 #include <QVector>
 
 struct QnTimePeriod;
-typedef QVector<QnTimePeriod> QnTimePeriodList;
+class QnTimePeriodList;
+//typedef QVector<QnTimePeriod> QnTimePeriodList;
 
 struct QN_EXPORT QnTimePeriod
 {
@@ -39,6 +40,28 @@ struct QN_EXPORT QnTimePeriod
     qint64 durationMs;
 
 };
+
+class QnTimePeriodList: public QVector<QnTimePeriod>
+{
+public:
+    QnTimePeriodList(): QVector<QnTimePeriod>() 
+    {
+
+    }
+
+    QnTimePeriodList::const_iterator findNearestPeriod(qint64 timeMs, bool searchForward) const
+    {
+        if (isEmpty())
+            return end();
+        QnTimePeriodList::const_iterator itr = qUpperBound(begin(), end(), timeMs);
+        if (itr != begin())
+            --itr;
+        if (searchForward && !itr->containTime(timeMs))
+            ++itr;
+        return itr;
+    }
+};
+
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
 bool operator < (qint64 first, const QnTimePeriod& other);
 bool operator < (const QnTimePeriod& other, qint64 first);

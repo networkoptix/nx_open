@@ -600,7 +600,10 @@ void NavigationItem::repaintMotionPeriods()
         if (!info.periods.isEmpty())
             allPeriods << info.periods;
     }
-    m_timeSlider->setMotionTimePeriodList(QnTimePeriod::mergeTimePeriods(allPeriods));
+    m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
+    m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
+
+    emit playbackMaskChanged(m_mergedMotionPeriods);
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)

@@ -23,8 +23,10 @@ QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QObject *parent):
     m_syncPlay->setParent(this);
 
     /* Connect to display. */
-    connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),              this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),   this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display,    SIGNAL(playbackMaskChanged(const QnTimePeriodList&)), this,   SLOT(at_playback_mask_changed(const QnTimePeriodList&)));
+    
 
     /* Prepare render watcher. */
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(display, this);
@@ -67,4 +69,9 @@ void QnSyncPlayMixin::at_renderWatcher_displayingStateChanged(QnAbstractRenderer
         return;
 
     m_syncPlay->onConsumerBlocksReader(widget->display()->dataProvider(), !displaying);
+}
+
+void QnSyncPlayMixin::at_playback_mask_changed(const QnTimePeriodList& playbackMask)
+{
+    m_syncPlay->setPlaybackMask(playbackMask);
 }

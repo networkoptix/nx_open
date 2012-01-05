@@ -82,7 +82,9 @@ void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &ti
                 m_loadedData = QnTimePeriod::mergeTimePeriods(periods); // union data
 
                 periods.clear();
-                periods << m_loadedPeriods << (QnTimePeriodList() << m_loading[i].period);
+                QnTimePeriodList tmp;
+                tmp << m_loading[i].period;
+                periods << m_loadedPeriods << tmp;
                 m_loadedPeriods = QnTimePeriod::mergeTimePeriods(periods); // union loaded time range info 
 
                 // reduce right edge of loaded period info if last period under writing now
