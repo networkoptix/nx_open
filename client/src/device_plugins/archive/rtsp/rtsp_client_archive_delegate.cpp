@@ -414,8 +414,11 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
         m_position = displayTime;
         open(m_resource);
     }
-    else
+    else {
         m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
+    }
+    m_sendedCSec = m_rtspSession.lastSendedCSeq();
+
 
     if (fromLive) 
         m_position = AV_NOPTS_VALUE;
