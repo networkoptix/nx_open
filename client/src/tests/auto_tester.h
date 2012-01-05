@@ -9,37 +9,60 @@ class QnAutoTester: public QObject {
     Q_OBJECT;
 public:
     enum Test {
-        RESOURCE_SUBSTRING = 0x1
+        RESOURCE_SUBSTRING = 0x1 /**< Test for the presence of a substring in resource names. */
     };
     Q_DECLARE_FLAGS(Tests, Test);
 
     enum State {
-        INITIAL,
-        INVALID,
-        STARTED,
-        FINISHED
+        INITIAL,    /**< Ready for testing. */
+        INVALID,    /**< There was an error in command line arguments. Error description was printed to STDERR. */
+        RUNNING,    /**< Testing. */
+        FINISHED    /**< Testing finished, results available. */
     };
 
     QnAutoTester(int &argc, char **argv, QObject *parent = NULL);
 
     virtual ~QnAutoTester();
 
+    /**
+     * \returns                         Current state of the auto tester.
+     */
     State state() const {
         return m_state;
     }
 
+    /**
+     * \returns                         All tests that this auto tester has to perform.
+     */
+    Tests tests() const {
+        return m_allTests;
+    }
+
+    /**
+     * \returns                         Textual description of the testing results.
+     */
     const QString &message() const {
         return m_message;
     }
 
+    /**
+     * \returns                         Whether all tests were successful. 
+     */
     bool succeeded() const {
         return m_succeeded;
     }
 
 signals:
+    /**
+     * This signal is emitted when testing is finished.
+     */
     void finished();
 
 public slots:
+    /**
+     * Starts testing. Note that if there are no tests to perform, testing will
+     * be finished immediately.
+     */
     void start();
 
 protected slots:
@@ -60,7 +83,7 @@ private:
     /** Tests that succeeded. */
     Tests m_successfulTests;
 
-    /** Time when the auto tester has started, in milliseconds since epoch. */
+    /** Time when the auto tester was started, in milliseconds since epoch. */
     qint64 m_startTime;
 
     /** Auto tester timeout, in milliseconds. */
@@ -69,11 +92,13 @@ private:
     /** String that must be present in resources. */
     QString m_resourceSearchString;
 
-    /** Timer. */
+    /** Timer used for testing. */
     QTimer *m_timer;
 
+    /** Whether all tests succeeded. */
     bool m_succeeded;
 
+    /** Textual description of the testing results. */
     QString m_message;
 };
 
