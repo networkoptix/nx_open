@@ -71,7 +71,9 @@ protected:
     void setActualCamera(CLVideoCamera *camera);
     void updateActualCamera();
     void repaintMotionPeriods();
+
 private Q_SLOTS:
+    void setLiveMode(bool value);
     void onLiveModeChanged(bool value);
     void pause();
     void play();
@@ -100,6 +102,8 @@ private Q_SLOTS:
     void onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle);
     void onMotionPeriodLoadFailed(int status, int handle);
 
+    void onMrsButtonClicked();
+
 protected:
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
@@ -122,6 +126,7 @@ private:
     ImageButton *m_stepForwardButton;
     ImageButton *m_forwardButton;
     ImageButton *m_liveButton;
+    ImageButton *m_mrsButton;
     SpeedSlider *m_speedSlider;
     ImageButton *m_muteButton;
     VolumeSlider *m_volumeSlider;
