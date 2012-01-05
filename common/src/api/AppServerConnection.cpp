@@ -15,14 +15,14 @@
 #include "api/AppSessionManager.h"
 
 
-void conn_detail::ReplyProcessor::at_replyReceived(int handle, int status, const QByteArray &reply)
+void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, int handle)
 {
     if (m_objectName == "server")
     {
         QnResourceList servers;
         QnApiServerResponsePtr xsdServers;
 
-        QTextStream stream(reply);
+        QTextStream stream(result);
 
         QByteArray errorString;
         AppSessionManager::loadObjects(stream.device(), xsdServers, ::xsd::api::servers::servers, errorString);
@@ -40,7 +40,7 @@ void conn_detail::ReplyProcessor::at_replyReceived(int handle, int status, const
         QnResourceList cameras;
         QnApiCameraResponsePtr xsdCameras;
 
-        QTextStream stream(reply);
+        QTextStream stream(result);
 
         QByteArray errorString;
         AppSessionManager::loadObjects(stream.device(), xsdCameras, ::xsd::api::cameras::cameras, errorString);
@@ -142,7 +142,7 @@ int QnAppServerConnection::saveAsync(const QnVideoServer& serverIn, QObject* tar
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, "server");
     QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
 
-    m_sessionManager->addServerAsync(*server, processor, SLOT(at_replyReceived(int handle, int status, const QByteArray &reply)));
+    m_sessionManager->addServerAsync(*server, processor, SLOT(finished(int, const QByteArray&, int)));
 
     return 0;
 }
@@ -154,7 +154,7 @@ int QnAppServerConnection::saveAsync(const QnCameraResource& cameraIn, QObject* 
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, "camera");
     QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
 
-    m_sessionManager->addCameraAsync(*camera, processor, SLOT());
+    m_sessionManager->addCameraAsync(*camera, processor, SLOT(finished(int, const QByteArray&, int)));
 
     return 0;
 }

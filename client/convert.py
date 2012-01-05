@@ -179,7 +179,7 @@ instantiate_pro('src/client.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path
 
 if platform() == 'win32':
     os.system('qmake -tp vc -o src/client.vcproj src/client.pro')
-elif platform() == 'darwin':
+elif platform() == 'mac':
     generate_info_plist()
 
     os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/client.pro')

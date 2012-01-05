@@ -21,11 +21,20 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         QByteArray errorString;
         cameraResource->setParentId(m_serverId);
-        if (m_appServer->addCamera(*cameraResource, cameras, errorString) != 0)
+        m_appServer->saveAsync(*cameraResource, this, SLOT(finished(int, int, const QByteArray&, const QnResourceList&)));
+
+/*        if (m_appServer->addCamera(*cameraResource, cameras, errorString) != 0)
         {
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
-        }
+        } */
     }
 
-    QnResourcePool::instance()->addResources(cameras);
+
+}
+
+void QnAppserverResourceProcessor::finished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources)
+{
+    qDebug() << "QnAppserverResourceProcessor::finished, h = " << handle << ", status = " << status << ", e = " << errorString << ", r = " << resources.size();
+
+    QnResourcePool::instance()->addResources(resources);
 }

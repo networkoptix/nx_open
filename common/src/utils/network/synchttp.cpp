@@ -78,7 +78,7 @@ QNetworkReply *SyncHTTP::asyncRequest(Operation op, const QUrl &url, QIODevice *
     connect(accessManager, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)),
             this, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)));
     if (target && slot)
-        connect(accessManager, SIGNAL(finished(QNetworkReply*)), target, slot, Qt::UniqueConnection);
+        connect(accessManager, SIGNAL(finished(QNetworkReply*)), target, slot); //, Qt::UniqueConnection);
 
     QNetworkReply *reply = 0;
     switch (op) {

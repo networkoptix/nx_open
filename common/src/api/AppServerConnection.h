@@ -29,7 +29,7 @@ namespace conn_detail
         }
 
     public slots:
-        void at_replyReceived(int handle, int status, const QByteArray &reply);
+        void finished(int status, const QByteArray &result, int handle);
 
     signals:
         void finished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources);

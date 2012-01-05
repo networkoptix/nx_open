@@ -7,16 +7,7 @@
 
 typedef QSharedPointer<xsd::api::servers::Server> QnApiServerPtr;
 
-QnApiServerPtr unparseServer(const QnVideoServer& serverIn)
-{
-    return QnApiServerPtr(new xsd::api::servers::Server(serverIn.getId().toString().toStdString(),
-                                                                                   serverIn.getName().toStdString(),
-                                                                                   serverIn.getTypeId().toString().toStdString(),
-                                                                                   serverIn.getUrl().toStdString(),
-                                                                                   serverIn.getGuid().toStdString(),
-                                                                                   serverIn.getApiUrl().toStdString()));
-}
-
+QnApiServerPtr unparseServer(const QnVideoServer& serverIn);
 
 template <class ResourcePtr>
 void parseServers(QList<ResourcePtr> &servers, const QnApiServers &xsdServers, QnResourceFactory &/*resourceFactory*/)
