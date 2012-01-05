@@ -1,5 +1,7 @@
 #include "resource_pool.h"
 
+#include <QtCore/QMetaObject>
+
 #include "core/resource/video_server.h"
 
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
@@ -39,6 +41,8 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 {
     ResourceMap newResources; // sort by id
 
+    QMutexLocker locker(&m_resourcesMtx);
+
     foreach (QnResourcePtr resource, resources)
     {
         if (!resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::remote))
@@ -49,38 +53,34 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             resource->setId(QnId::generateSpecialId());
     }
 
+    foreach (QnResourcePtr resource, resources)
     {
-        QMutexLocker locker(&m_resourcesMtx);
-        foreach (QnResourcePtr resource, resources)
+        const QnId &resId = resource->getId();
+        if (!m_resources.contains(resId))
         {
-            const QnId &resId = resource->getId();
-            if (!m_resources.contains(resId))
-            {
-                m_resources.insert(resId, resource);
-                newResources.insert(resId, resource);
-            }
+            m_resources.insert(resId, resource);
+            newResources.insert(resId, resource);
         }
     }
 
     foreach (QnResourcePtr resource, newResources.values())
-        Q_EMIT resourceAdded(resource);
+        QMetaObject::invokeMethod(this, "resourceAdded", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
 }
 
 void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
+    QMutexLocker locker(&m_resourcesMtx);
+
+    foreach (QnResourcePtr resource, resources)
     {
-        QMutexLocker locker(&m_resourcesMtx);
-        foreach (QnResourcePtr resource, resources)
-        {
-            if (m_resources.remove(resource->getId()) != 0)
-                removedResources.append(resource);
-        }
+        if (m_resources.remove(resource->getId()) != 0)
+            removedResources.append(resource);
     }
 
     foreach (QnResourcePtr resource, removedResources)
-        Q_EMIT resourceRemoved(resource);
+        QMetaObject::invokeMethod(this, "resourceRemoved", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
 }
 
 QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const
