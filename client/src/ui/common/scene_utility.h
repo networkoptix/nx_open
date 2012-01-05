@@ -258,6 +258,13 @@ public:
     static bool contains(const QSizeF &size, const QSizeF &otherSize);
 
     /**
+     * \param size                      Size to check for containment.
+     * \param otherSize                 Reference size.
+     * \returns                         Whether the reference size contains the given size.
+     */
+    static bool contains(const QSize &size, const QSize &otherSize);
+
+    /**
      * Moves the given viewport.
      * 
      * \param view                      Graphics view to move viewport of.

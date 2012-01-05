@@ -66,6 +66,10 @@
 
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motionmask_widget.h"
+#include "ui/navigationtreewidget.h"
+
+//#include <QGraphicsProxyWidget>
+//#include "ui/graphics/items/caching_proxy_widget.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *);
 
@@ -316,6 +320,22 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     
     m_navigationItem = new NavigationItem(controlsWidget);
    
+
+
+    //NavigationTreeWidget *w = new NavigationTreeWidget();
+    //CachingProxyWidget *pw = new CachingProxyWidget();
+    //pw->setWidget(w);
+
+    //QGraphicsLinearLayout *hl = new QGraphicsLinearLayout(Qt::Horizontal);
+    //hl->addItem(pw);
+    //hl->addStretch(0x1000);
+
+    //verticalLayout->addItem(hl);
+    //verticalLayout->setStretchFactor(hl, 0x1000);
+
+
+
+
     verticalLayout->addStretch(0x1000);
     verticalLayout->addItem(m_navigationItem);
 
