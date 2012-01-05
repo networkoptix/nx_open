@@ -69,14 +69,14 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
     }
 }
 
-QDialog *AreconVisionDlgManufacture::createDlg(QnResourcePtr resource)
-{
-    return new AVSettingsDlg(resource);
-}
-
 bool AreconVisionDlgManufacture::canProduceDlg(QnResourcePtr resource) const
 {
     return mPossibleNames.contains(resource->getName());
+}
+
+QDialog *AreconVisionDlgManufacture::createDlg(QnResourcePtr resource)
+{
+    return new AVSettingsDlg(resource);
 }
 
 

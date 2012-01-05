@@ -709,7 +709,6 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qi
 }
 
 void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color) {
-    qDebug() << selection;
     QPainterPath path;
     path.addRegion(selection);
     path = path.simplified(); // TODO: this is slow.

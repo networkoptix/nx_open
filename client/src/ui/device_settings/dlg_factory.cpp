@@ -4,11 +4,7 @@
 
 #include "device_settings_dlg.h"
 
-class Manufactures : public QList<CLAbstractDlgManufacture *>
-{
-public:
-    ~Manufactures() { qDeleteAll(*this); }
-};
+typedef QList<CLAbstractDlgManufacture *> Manufactures;
 
 Q_GLOBAL_STATIC(Manufactures, manufactures)
 
