@@ -58,18 +58,39 @@
 
 #include <file_processor.h>
 
-#include "grid_walker.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
 #include "workbench_display.h"
+
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motionmask_widget.h"
+#include "ui/navigationtreewidget.h"
+
+//#include <QGraphicsProxyWidget>
+//#include "ui/graphics/items/caching_proxy_widget.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *);
 
 namespace {
+    class AspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPointF> {
+    public:
+        AspectRatioMagnitudeCalculator(qreal aspectRatio):
+            m_aspectRatio(aspectRatio)
+        {}
+
+    protected:
+        virtual qreal calculateInternal(const void *value) const override {
+            const QPointF &p = *static_cast<const QPointF *>(value);
+
+            return qMax(qAbs(p.x() / m_aspectRatio), qAbs(p.y()));
+        }
+
+    private:
+        qreal m_aspectRatio;
+    };
+
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
         QAction *result = new QAction(text, parent);
         result->setShortcut(shortcut);
@@ -299,10 +320,28 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     
     m_navigationItem = new NavigationItem(controlsWidget);
    
+
+
+    //NavigationTreeWidget *w = new NavigationTreeWidget();
+    //CachingProxyWidget *pw = new CachingProxyWidget();
+    //pw->setWidget(w);
+
+    //QGraphicsLinearLayout *hl = new QGraphicsLinearLayout(Qt::Horizontal);
+    //hl->addItem(pw);
+    //hl->addStretch(0x1000);
+
+    //verticalLayout->addItem(hl);
+    //verticalLayout->setStretchFactor(hl, 0x1000);
+
+
+
+
     verticalLayout->addStretch(0x1000);
     verticalLayout->addItem(m_navigationItem);
 
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
+    connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
+
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -329,6 +368,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *preferencesAction          = newAction(tr("Preferences"),          tr("Ctrl+P"),       this);
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
+    m_randomGridAction                  = newAction(tr("Randomize grid"), tr(""),                   this);
     //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
     m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
@@ -343,6 +383,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_stopRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_stopRecordingAction_triggered()));
     connect(toggleRecordingAction,      SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
     connect(m_recordingSettingsActions, SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsActions_triggered()));
+
+    connect(m_randomGridAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_randomGridAction_triggered()));
 
     m_itemContextMenu = new QMenu(display->view());
 
@@ -395,24 +437,24 @@ VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget
     return animator;
 }
 
-void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool findAccepted) {
+void QnWorkbenchController::drop(const QUrl &url, const QPointF &gridPos, bool findAccepted) {
     drop(url.toLocalFile(), gridPos, findAccepted);
 }
 
-void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPoint &gridPos, bool findAccepted) {
+void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPointF &gridPos, bool findAccepted) {
     QList<QString> files;
     foreach(const QUrl &url, urls)
         files.push_back(url.toLocalFile());
     drop(files, gridPos, findAccepted);
 }
 
-void QnWorkbenchController::drop(const QString &file, const QPoint &gridPos, bool findAccepted) {
+void QnWorkbenchController::drop(const QString &file, const QPointF &gridPos, bool findAccepted) {
     QList<QString> files;
     files.push_back(file);
     drop(files, gridPos, findAccepted);
 }
 
-void QnWorkbenchController::drop(const QList<QString> &files, const QPoint &gridPos, bool findAccepted) {
+void QnWorkbenchController::drop(const QList<QString> &files, const QPointF &gridPos, bool findAccepted) {
     const QList<QString> validFiles = !findAccepted ? files : QnFileProcessor::findAcceptedFiles(files);
     if(validFiles.empty())
         return;
@@ -420,45 +462,41 @@ void QnWorkbenchController::drop(const QList<QString> &files, const QPoint &grid
     drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
 }
 
-void QnWorkbenchController::drop(const QnResourceList &resources, const QPoint &gridPos) {
+void QnWorkbenchController::drop(const QnResourceList &resources, const QPointF &gridPos) {
     foreach(const QnResourcePtr &resource, resources)
         drop(resource, gridPos);
 }
 
-void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gridPos) {
-    QRect geometry(gridPos, QSize(1, 1));
+void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &gridPos) {
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
-    item->setGeometry(geometry);
     item->setFlag(QnWorkbenchItem::Pinned, false);
-
+    item->setCombinedGeometry(QRectF(gridPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
     layout()->addItem(item);
+
     QnResourceWidget *widget = display()->widget(item);
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
     qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
-    QSize gridSize;
+    QSize size(1, 1);
     if(estimatedAspectRatio > 1.0) {
-        gridSize = bestSingleBoundedSize(mapper(), 1, Qt::Vertical, estimatedAspectRatio);
+        size = bestSingleBoundedSize(mapper(), 1, Qt::Vertical, estimatedAspectRatio);
     } else {
-        gridSize = bestSingleBoundedSize(mapper(), 1, Qt::Horizontal, estimatedAspectRatio);
+        size = bestSingleBoundedSize(mapper(), 1, Qt::Horizontal, estimatedAspectRatio);
     }
 
     /* Adjust item's geometry for the new size. */
-    if(gridSize != item->geometry().size()) {
-        geometry = item->geometry();
-        geometry.moveTopLeft(geometry.topLeft() - toPoint(gridSize - geometry.size()) / 2);
-        geometry.setSize(gridSize);
-        item->setGeometry(geometry);
+    if(size != item->geometry().size()) {
+        QRectF combinedGeometry = item->combinedGeometry();
+        combinedGeometry.moveTopLeft(combinedGeometry.topLeft() - toPoint(size - combinedGeometry.size()) / 2.0);
+        combinedGeometry.setSize(size);
+        item->setCombinedGeometry(combinedGeometry);
     }
 
-    /* Try to pin the item. */
-    if(!item->setFlag(QnWorkbenchItem::Pinned, true)) {
-        /* Place already taken, pick closest one. Use AR-based metric. */
-        QnAspectRatioGridWalker walker(aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
-        QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size(), &walker);
-        layout()->pinItem(item, newGeometry);
-    }
+    /* Pin the item. */
+    AspectRatioMagnitudeCalculator metric(aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
+    QRect geometry = layout()->closestFreeSlot(gridPos, size, &metric);
+    layout()->pinItem(item, geometry);
 
     display()->fitInView();
 }
@@ -852,6 +890,8 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
     }
     menu->addAction(m_recordingSettingsActions);
 
+    //menu->addAction(m_randomGridAction);
+
     menu->exec(info.screenPos());
 }
 
@@ -1141,3 +1181,8 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     settings.endGroup();
 }
 
+
+void QnWorkbenchController::at_randomGridAction_triggered() {
+    display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
+    display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
+}

@@ -159,7 +159,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     addTab();
 
     // Process input files
-    const QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+    const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
     for (int i = 1; i < argc; ++i)
         m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), gridPos);
 
@@ -208,7 +208,7 @@ void MainWindow::itemActivated(uint resourceId)
 
     QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
     if (mediaResource && m_controller->layout()->items(mediaResource->getUniqueId()).isEmpty()) {
-        QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+        const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
         m_controller->drop(resource, gridPos);
     }
 }
@@ -216,7 +216,7 @@ void MainWindow::itemActivated(uint resourceId)
 void MainWindow::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-    const QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+    const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
     m_controller->drop(files, gridPos);
 
     activate();

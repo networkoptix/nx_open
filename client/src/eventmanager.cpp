@@ -47,7 +47,10 @@ void QnEventManager::eventReceived(QnEvent event)
         {
             if (resource->getId() == event.resourceId)
             {
-                *ownResource = *resource;
+                if (ownResource.isNull())
+                    qnResPool->addResource(resource);
+                else
+                    ownResource->update(*resource);
             }
         }
     } else if (event.eventType == QN_EVENT_RES_DELETE)

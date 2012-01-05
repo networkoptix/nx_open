@@ -19,7 +19,9 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_waitBOF(false),
     m_lastPacketFlags(-1),
     m_closing(false),
-    m_singleShotMode(false)
+    m_singleShotMode(false),
+    m_lastReceivedTime(AV_NOPTS_VALUE),
+    m_blockReopening(false)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -52,7 +54,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 
     if (m_rtspSession.open(url)) 
     {
-        m_rtpData = m_rtspSession.play(m_position);
+        m_rtpData = m_rtspSession.play(m_position, m_position, m_rtspSession.getScale());
         if (!m_rtpData)
             m_rtspSession.stop();
     }
@@ -106,6 +108,9 @@ qint64 QnRtspClientArchiveDelegate::endTime()
 void QnRtspClientArchiveDelegate::reopen()
 {
     close();
+
+    if (m_blockReopening)
+        return;
 
     for (int i = 0; i < 50 && !m_closing; ++i)
         QnSleep::msleep(10);
@@ -202,16 +207,25 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         reopen();
     if (result)
         m_lastPacketFlags = result->flags;
+    m_lastReceivedTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
     return result;
 }
 
 qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
 {
+    m_blockReopening = false;
+
     if (time == m_position)
         return time;
+
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
-    m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
+
+    if (!m_opened && m_resource) {
+        open(m_resource);
+    }
+    else
+        m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
     m_waitBOF = true;
 	/*
@@ -391,10 +405,23 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 
 void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
+    m_blockReopening = false;
     int sign = value ? -1 : 1;
-    if (value && m_position == DATETIME_NOW)
+    bool fromLive = value && m_position == DATETIME_NOW;
+
+    if (!m_opened && m_resource) {
+        m_rtspSession.setScale(qAbs(m_rtspSession.getScale()) * sign);
+        m_position = displayTime;
+        open(m_resource);
+    }
+    else {
+        m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
+    }
+    m_sendedCSec = m_rtspSession.lastSendedCSeq();
+
+
+    if (fromLive) 
         m_position = AV_NOPTS_VALUE;
-    m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
 }
 
 bool QnRtspClientArchiveDelegate::isRealTimeSource() const 
@@ -428,4 +455,19 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
         m_rtspSession.setAdditionAttribute("x-motion-region", s);
     }
     //m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+}
+
+void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
+{
+    if ((m_position == DATETIME_NOW || time == DATETIME_NOW) && 
+        qAbs(m_lastReceivedTime - QDateTime::currentDateTime().toMSecsSinceEpoch()) > 250)
+    {
+        m_blockReopening = true;
+        close();
+    }
+}
+
+void QnRtspClientArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
+{
+    beforeSeek(AV_NOPTS_VALUE);
 }

@@ -1,8 +1,7 @@
 #ifndef __SERVER_CAMERA_H__
 #define __SERVER_CAMERA_H__
 
-#include "core/resourcemanagment/security_cam_resource.h"
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 
 class QnServerCameraProcessor : public QnResourceProcessor
 {
@@ -10,7 +9,7 @@ public:
     void processResources(const QnResourceList &resources);
 };
 
-class QnServerCamera: public QnNetworkResource, public QnSecurityCamResource
+class QnServerCamera: public QnCameraResource
 {
 public:
     QnServerCamera();

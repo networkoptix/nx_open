@@ -129,7 +129,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
         setPalette(pal);
     }
 
-    
+
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
@@ -423,7 +423,7 @@ void NavigationItem::updateActualCamera()
 
 void NavigationItem::setActualCamera(CLVideoCamera *camera)
 {
-    if(m_camera == camera)
+    if (m_camera == camera)
         return;
 
     m_speedSlider->resetSpeed();
@@ -481,7 +481,7 @@ void NavigationItem::updateSlider()
     qint64 endTime = reader->endTime();
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
-        m_timeSlider->setMinimumValue(startTime / 1000);
+        m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentDateTime().toMSecsSinceEpoch() - 10000); // if  nothing is recorded set minvalue to live-10sec
         m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
         if (m_timeSlider->minimumValue() == 0)
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
@@ -515,7 +515,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
 
     qint64 w = m_timeSlider->sliderRange();
     qint64 t = m_timeSlider->viewPortPos();
-    if(t <= 0)
+    if (t <= 0)
         return;  // slider range still not initialized yet
 
     if (!m_motionPeriodLoader.contains(netRes)) {
@@ -542,12 +542,12 @@ bool NavigationItem::updateRecPeriodList(bool force)
 
     qint64 w = m_timeSlider->sliderRange();
     qint64 t = m_timeSlider->viewPortPos();
-    if(t <= 0) 
+    if (t <= 0)
         return false;  // slider range does not initialized now
 
     m_timePeriodUpdateTime = currentTime;
 
-    if(!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
+    if (!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
         return true;
 
     if (!m_camera)
@@ -556,13 +556,13 @@ bool NavigationItem::updateRecPeriodList(bool force)
     QnNetworkResourceList resources;
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
-        if(networkResource) 
+        if (networkResource)
             resources.push_back(networkResource);
     }
 
     /* Request interval no shorter than 1 hour. */
     const qint64 oneHour = 60ll * 60ll * 1000ll;
-    if(w < oneHour)
+    if (w < oneHour)
         w = oneHour;
 
     /* It is important to update the stored interval BEFORE sending request to
@@ -600,7 +600,10 @@ void NavigationItem::repaintMotionPeriods()
         if (!info.periods.isEmpty())
             allPeriods << info.periods;
     }
-    m_timeSlider->setMotionTimePeriodList(QnTimePeriod::mergeTimePeriods(allPeriods));
+    m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
+    m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
+
+    emit playbackMaskChanged(m_mergedMotionPeriods);
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
@@ -643,11 +646,11 @@ void NavigationItem::onValueChanged(qint64 time)
 
 void NavigationItem::smartSeek(qint64 timeMSec)
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    if(m_timeSlider->isAtEnd()) {
+    if (m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW);
 
         m_liveButton->show();
@@ -664,7 +667,7 @@ void NavigationItem::smartSeek(qint64 timeMSec)
 
 void NavigationItem::pause()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -681,7 +684,7 @@ void NavigationItem::pause()
 
 void NavigationItem::play()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -705,7 +708,7 @@ void NavigationItem::play()
 
 void NavigationItem::rewindBackward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -718,7 +721,7 @@ void NavigationItem::rewindBackward()
 
 void NavigationItem::rewindForward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -740,7 +743,7 @@ void NavigationItem::rewindForward()
 
 void NavigationItem::stepBackward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -769,7 +772,7 @@ void NavigationItem::stepBackward()
 
 void NavigationItem::stepForward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -789,7 +792,7 @@ void NavigationItem::stepForward()
 
 void NavigationItem::onSliderPressed()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -800,7 +803,7 @@ void NavigationItem::onSliderPressed()
 
 void NavigationItem::onSliderReleased()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);

@@ -1,3 +1,6 @@
+#ifndef _Q_STD_STREAM_H
+#define _Q_STD_STREAM_H
+
 #include <QIODevice>
 #include <ios>
 
@@ -30,4 +33,4 @@ private:
     QStdStreamBuf * m_buf;
 };
 
-
+#endif // _Q_STD_STREAM_H

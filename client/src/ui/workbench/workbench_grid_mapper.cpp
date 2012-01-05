@@ -16,30 +16,27 @@ void QnWorkbenchGridMapper::setOrigin(const QPointF &origin) {
     if(qFuzzyCompare(origin, m_origin))
         return;
 
-    QPointF oldOrigin = m_origin;
     m_origin = origin;
 
-    emit originChanged(oldOrigin, m_origin);
+    emit originChanged();
 }
 
 void QnWorkbenchGridMapper::setCellSize(const QSizeF &cellSize) {
     if(qFuzzyCompare(cellSize, m_cellSize))
         return;
 
-    QSizeF oldCellSize = m_cellSize;
     m_cellSize = cellSize;
 
-    emit cellSizeChanged(oldCellSize, m_cellSize);
+    emit cellSizeChanged();
 }
 
 void QnWorkbenchGridMapper::setSpacing(const QSizeF &spacing) {
     if(qFuzzyCompare(spacing, m_spacing))
         return;
 
-    QSizeF oldSpacing = m_spacing;
     m_spacing = spacing;
 
-    emit spacingChanged(oldSpacing, m_spacing);
+    emit spacingChanged();
 }
 
 void QnWorkbenchGridMapper::setVerticalSpacing(qreal spacing) {
@@ -77,14 +74,7 @@ QSizeF QnWorkbenchGridMapper::mapFromGridF(const QSizeF &gridSize) const {
 
 QSize QnWorkbenchGridMapper::mapToGrid(const QSizeF &size) const {
     QSizeF gridSize = mapToGridF(size);
-    QSizeF ceilGridSize = QSize(std::ceil(gridSize.width()), std::ceil(gridSize.height()));
-
-    /* It may have been rounded up as a result of floating-point precision issues.
-     * Check and fix that. */
-    if (qFuzzyCompare(ceilGridSize.width() - gridSize.width(), 1.0))
-        ceilGridSize.setWidth(ceilGridSize.width() - 1);
-    if (qFuzzyCompare(ceilGridSize.height() - gridSize.height(), 1.0))
-        ceilGridSize.setHeight(ceilGridSize.height() - 1);
+    QSizeF ceilGridSize = QSize(qFuzzyCeil(gridSize.width()), qFuzzyCeil(gridSize.height()));
 
     return QSize(ceilGridSize.width(), ceilGridSize.height());
 }

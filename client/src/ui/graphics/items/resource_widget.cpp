@@ -321,13 +321,7 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
 QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos) 
 {
     QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))));
-    QPoint gridPos(std::floor(gridPosF.x()), std::floor(gridPosF.y()));
-
-    /* Deal with rounding issues. */
-    if(qFuzzyCompare(gridPosF.x() - gridPos.x(), 1.0))
-        gridPos.rx()++;
-    if(qFuzzyCompare(gridPosF.y() - gridPos.y(), 1.0))
-        gridPos.ry()++;
+    QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
 
     return bounded(gridPos, QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
 }
@@ -340,7 +334,7 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect) {
     QRegion prevSelection = m_channelState[0].motionSelection;
     m_channelState[0].motionSelection += gridRect.intersected(QRect(0, 0, MD_WIDTH + 1, MD_HEIGHT + 1));
     if(prevSelection != m_channelState[0].motionSelection) {
-        display()->archiveReader()->setMotionRegion(m_channelState[0].motionSelection);
+        //display()->archiveReader()->setMotionRegion(m_channelState[0].motionSelection);
         emit motionRegionSelected(m_resource, m_channelState[0].motionSelection);
     }
 }

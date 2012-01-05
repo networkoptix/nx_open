@@ -601,9 +601,11 @@ bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
 
 void QnArchiveStreamReader::setReverseMode(bool value)
 {
-    if (value != m_reverseMode)
+    if (value != m_reverseMode) {
         m_lastJumpTime = AV_NOPTS_VALUE;
-    m_reverseMode = value;
+        m_reverseMode = value;
+        m_delegate->beforeChangeReverseMode(m_reverseMode);
+    }
 }
 
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
@@ -694,6 +696,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         if (m_requiredJumpTime != AV_NOPTS_VALUE)
             emit jumpCanceled(m_requiredJumpTime);
         emit beforeJump(mksec);
+        m_delegate->beforeSeek(mksec);
         channeljumpToUnsync(mksec, 0, skipTime);
     }
     m_lastJumpTime = mksec;

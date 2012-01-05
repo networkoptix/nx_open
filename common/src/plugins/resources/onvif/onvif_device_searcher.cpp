@@ -67,7 +67,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     QnResourceList result;
 
     QList<QHostAddress> localAddresses = getAllIPv4Addresses();
-
+#if 0
     CL_LOG(cl_logDEBUG1)
     {
         QString log;
@@ -81,7 +81,7 @@ QnResourceList OnvifResourceSearcher::findResources()
             cl_log.log(slog, cl_logDEBUG1);
         }
     }
-
+#endif
 
 
     foreach(QHostAddress localAddress, localAddresses)

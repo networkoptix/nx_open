@@ -195,7 +195,7 @@ bool RTPSession::open(const QString& url)
     return true;
 }
 
-RTPIODevice* RTPSession::play(qint64 position, double scale)
+RTPIODevice* RTPSession::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
     RTPIODevice* ioDevice = sendSetup();
 
@@ -203,7 +203,7 @@ RTPIODevice* RTPSession::play(qint64 position, double scale)
         return 0;
 
 
-    if (!sendPlay(position, AV_NOPTS_VALUE, scale))
+    if (!sendPlay(positionStart, positionEnd, scale))
         return 0;
 
 
@@ -812,6 +812,11 @@ qint64 RTPSession::endTime() const
 float RTPSession::getScale() const
 {
     return m_scale;
+}
+
+void RTPSession::setScale(float value)
+{
+    m_scale = value;
 }
 
 void RTPSession::setAdditionAttribute(const QByteArray& name, const QByteArray& value)

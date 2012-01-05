@@ -36,6 +36,7 @@ public:
         lastJumpTime = DATETIME_NOW;
         inJumpCount = 0;
         speed = 1.0;
+        processingJump = false;
     }
 
 
@@ -53,8 +54,10 @@ public:
     int inJumpCount;
     QTime timer;
     double speed;
-    //QMap<QnlTimeSource*,qint64> maxAllowedDate;
-    //QMap<QnlTimeSource*,qint64> minAllowedDate;
+    
+    QnTimePeriodList playbackMask;
+    QnTimePeriod m_curPlaybackPeriod;
+    bool processingJump;
 };
 
 // ------------------- QnArchiveSyncPlayWrapper ----------------------------
@@ -153,6 +156,13 @@ void QnArchiveSyncPlayWrapper::setSingleShotMode(bool value)
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
+    qint64 newTime = findTimeAtPlaybackMask(mksec);
+    skipTime += newTime - mksec;
+    return jumpToInternal(newTime, skipTime);
+}
+
+bool QnArchiveSyncPlayWrapper::jumpToInternal(qint64 mksec,  qint64 skipTime)
+{
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->lastJumpTime = skipTime ? skipTime : mksec;
@@ -167,6 +177,7 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
             info.reader->setNavDelegate(this);
         }
     }
+    d->processingJump = rez;
     return rez;
 }
 
@@ -225,7 +236,6 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     
-
     reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
     reader->setCycleMode(false);
 
@@ -234,6 +244,9 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     connect(reader, SIGNAL(jumpCanceled(qint64)), this, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
 
     connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
+
+    if (getDisplayedTime() != DATETIME_NOW)
+        reader->jumpToPreviousFrame(getCurrentTime());
 
     //connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
     //connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
@@ -253,7 +266,10 @@ void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
         if (info.reader != sender())
             info.reader->setSpeed(value);
     }
-    reinitTime(getDisplayedTimeInternal());
+    qint64 displayedTime = getDisplayedTimeInternal();
+    if (d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW)
+        displayedTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+    reinitTime(displayedTime);
     d->speed = value;
 
     d->blockSetSpeedSignal = false;
@@ -287,7 +303,10 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
     if (d->lastJumpTime == DATETIME_NOW)
         return DATETIME_NOW;
 
-    return getDisplayedTimeInternal();
+    qint64 rez = getDisplayedTimeInternal();
+    if (rez != DATETIME_NOW)
+        const_cast<QnArchiveSyncPlayWrapper*>(this)->ensurePosAtPlaybackMask(rez);
+    return rez;
 }
 
 qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
@@ -300,6 +319,8 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     {
         if (info.enabled) {
             qint64 time = info.cam->getCurrentTime();
+            if (time == DATETIME_NOW)
+                time = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
             if (displayTime == AV_NOPTS_VALUE)
                 displayTime = time;
             else if (time != AV_NOPTS_VALUE)
@@ -340,6 +361,11 @@ void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->inJumpCount--;
+    Q_ASSERT(d->inJumpCount >= 0);
+    if (d->inJumpCount == 0) 
+    {
+        d->processingJump = false;
+    }
 }
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 /*mksec*/)
@@ -348,8 +374,12 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 /*mksec*/)
 
     QMutexLocker lock(&d->timeMutex);
     d->inJumpCount--;
-    if (d->inJumpCount == 0)
+    Q_ASSERT(d->inJumpCount >= 0);
+    if (d->inJumpCount == 0) 
+    {
+        d->processingJump = false;
         d->timer.restart();
+    }
 }
 
 qint64 QnArchiveSyncPlayWrapper::minTime() const
@@ -530,4 +560,53 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
             break;
         }
     }
+}
+
+void QnArchiveSyncPlayWrapper::setPlaybackMask(const QnTimePeriodList& playbackMask)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    d->playbackMask = playbackMask;
+    d->m_curPlaybackPeriod.clear();
+}
+
+void QnArchiveSyncPlayWrapper::ensurePosAtPlaybackMask(qint64 timeUsec)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    qint64 newTime = findTimeAtPlaybackMask(timeUsec);
+    if (newTime != timeUsec)
+    {
+        jumpToInternal(newTime, newTime);
+    }
+    /*
+    if (d->playbackMask.isEmpty() || d->m_curPlaybackPeriod.containTime(timeMs) || d->processingJump)
+        return;
+    QnTimePeriodList::const_iterator itr = d->playbackMask.findNearestPeriod(timeMs, d->speed >= 0);
+    if (itr == d->playbackMask.end())
+        jumpTo(DATETIME_NOW, DATETIME_NOW);
+    d->m_curPlaybackPeriod = *itr;
+    if (!d->m_curPlaybackPeriod.containTime(timeMs))
+    {
+        qint64 seekTime = d->speed >= 0 ? d->m_curPlaybackPeriod.startTimeMs : d->m_curPlaybackPeriod.startTimeMs + d->m_curPlaybackPeriod.durationMs - BACKWARD_SEEK_STEP;
+        jumpTo(seekTime*1000, seekTime*1000);
+    }
+    */
+}
+
+qint64 QnArchiveSyncPlayWrapper::findTimeAtPlaybackMask(qint64 timeUsec)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    qint64 timeMs = timeUsec/1000;
+    if (d->playbackMask.isEmpty() || d->m_curPlaybackPeriod.containTime(timeMs) || d->processingJump)
+        return timeUsec;
+    QnTimePeriodList::const_iterator itr = d->playbackMask.findNearestPeriod(timeMs, d->speed >= 0);
+    if (itr == d->playbackMask.end()) {
+        d->playbackMask.findNearestPeriod(timeMs, d->speed >= 0);
+        return DATETIME_NOW;
+    }
+    d->m_curPlaybackPeriod = *itr;
+    if (!d->m_curPlaybackPeriod.containTime(timeMs))
+        return d->speed >= 0 ? d->m_curPlaybackPeriod.startTimeMs*1000 : (d->m_curPlaybackPeriod.startTimeMs + d->m_curPlaybackPeriod.durationMs)*1000 - BACKWARD_SEEK_STEP;
+    else
+        return timeUsec;
 }

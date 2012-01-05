@@ -169,9 +169,9 @@ public:
     QRectF mapFromGridF(const QRectF &gridRect) const;
 
 signals:
-    void originChanged(const QPointF &oldOrigin, const QPointF &newOrigin);
-    void cellSizeChanged(const QSizeF &oldSize, const QSizeF &newSize);
-    void spacingChanged(const QSizeF &oldSpacing, const QSizeF &newSpacing);
+    void originChanged();
+    void cellSizeChanged();
+    void spacingChanged();
     
 private:
     QPointF m_origin;

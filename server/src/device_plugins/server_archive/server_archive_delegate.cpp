@@ -32,7 +32,9 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 
 qint64 QnServerArchiveDelegate::startTime()
 {
-    return m_catalog ? m_catalog->minTime()*1000 : 0;
+	if (!m_catalog || m_catalog->minTime() == AV_NOPTS_VALUE)
+		return AV_NOPTS_VALUE;
+    return m_catalog->minTime()*1000;
 }
 
 qint64 QnServerArchiveDelegate::endTime()

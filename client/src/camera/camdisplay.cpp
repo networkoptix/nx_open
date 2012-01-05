@@ -528,6 +528,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;
+    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+    if (!vd && !ad)
+        return true;
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
     if (metadata) {
@@ -553,8 +557,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         return true; // skip data
 
 
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
     if (vd)
     {
         m_ignoringVideo = vd->ignore;

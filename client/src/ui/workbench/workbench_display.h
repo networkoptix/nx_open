@@ -8,6 +8,7 @@
 #include <ui/common/scene_utility.h>
 #include <utils/common/rect_set.h>
 #include "workbench.h"
+#include "recording/time_period.h"
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -252,6 +253,10 @@ public:
     
     QPoint mapGlobalToGrid(const QPoint &globalPoint) const;
 
+    QPointF mapViewportToGridF(const QPoint &viewportPoint) const;
+
+    QPointF mapGlobalToGridF(const QPoint &globalPoint) const;
+
 
 public slots:
     void fitInView(bool animate = true);
@@ -263,7 +268,7 @@ signals:
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(QnWorkbench::ItemRole role);
-
+    void playbackMaskChanged(const QnTimePeriodList&);
 protected:
     virtual void tick(int deltaTime) override;
     
@@ -271,6 +276,7 @@ protected:
 
     void synchronizeGeometry(QnWorkbenchItem *item, bool animate);
     void synchronizeGeometry(QnResourceWidget *widget, bool animate);
+    void synchronizeAllGeometries(bool animate);
     void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnResourceWidget *widget);
     void synchronizeSceneBounds();
@@ -317,6 +323,10 @@ protected slots:
     void at_widget_aboutToBeDestroyed();
 
     void at_view_destroyed();
+
+    void at_mapper_originChanged();
+    void at_mapper_cellSizeChanged();
+    void at_mapper_spacingChanged();
 
 private:
     /* Directly visible state */

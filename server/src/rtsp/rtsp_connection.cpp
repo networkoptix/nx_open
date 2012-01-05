@@ -394,7 +394,7 @@ int QnRtspConnectionProcessor::composePlay()
             QnTimePeriodList motionPeriods;
             QRegion region;
             QString motionRegion = d->requestHeaders.value("x-motion-region").toUtf8();
-            if (!motionRegion.isNull())
+            if (motionRegion.size() > 0)
             {
                 QBuffer buffer;
                 buffer.open(QIODevice::ReadWrite);

@@ -5,8 +5,9 @@
 #include <QtXml/QDomDocument>
 #include <QtXml/QXmlInputSource>
 
+#include <algorithm>
+
 #include "utils/network/synchttp.h"
-#include "QStdIStream.h"
 
 AppSessionManager::AppSessionManager(const QUrl &url)
     : SessionManager(url)
@@ -15,70 +16,18 @@ AppSessionManager::AppSessionManager(const QUrl &url)
 
 int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr)
 {
-    std::ostringstream os;
-
     ::xsd::api::servers::Servers servers;
     servers.server().push_back(server);
-    ::xsd::api::servers::servers(os, servers, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
 
-    QByteArray reply;
-
-    int status = addObject(QLatin1String("server"), os.str().c_str(), reply);
-    if (status == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            serversPtr = QnApiServerResponsePtr(xsd::api::servers::servers (is, XSD_FLAGS).release());
-
-            return 0;
-        }
-        catch (const xml_schema::exception& e)
-        {
-            m_lastError = e.what();
-
-            qDebug(e.what());
-            return -1;
-        }
-    }
-
-    return status;
+    return addObjects("server", servers, serversPtr, ::xsd::api::servers::servers, ::xsd::api::servers::servers);
 }
 
 int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnApiCameraResponsePtr& camerasPtr)
 {
-    std::ostringstream os;
-
     ::xsd::api::cameras::Cameras cameras;
     cameras.camera().push_back(camera);
-    ::xsd::api::cameras::cameras(os, cameras, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
 
-    QByteArray reply;
-
-    int status = addObject(QLatin1String("camera"), os.str().c_str(), reply);
-    if (status == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            camerasPtr = QnApiCameraResponsePtr(xsd::api::cameras::cameras (is, XSD_FLAGS).release());
-
-            return 0;
-        }
-        catch (const xml_schema::exception& e)
-        {
-            m_lastError = e.what();
-
-            qDebug(e.what());
-            return -1;
-        }
-    }
-
-    return status;
+    return addObjects("camera", cameras, camerasPtr, ::xsd::api::cameras::cameras, ::xsd::api::cameras::cameras);
 }
 
 int AppSessionManager::addStorage(const ::xsd::api::storages::Storage& storage)
@@ -109,112 +58,20 @@ int AppSessionManager::addObject(const QString& objectName, const QByteArray& bo
 
 int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes)
 {
-    QByteArray reply;
-
-    int status = sendGetRequest(QLatin1String("resourceType"), reply);
-    if (status == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            resourceTypes = QnApiResourceTypeResponsePtr(xsd::api::resourceTypes::resourceTypes (is, XSD_FLAGS).release());
-
-            return 0;
-        }
-        catch (const xml_schema::exception& e)
-        {
-            m_lastError = e.what();
-
-            qDebug(e.what());
-            return -1;
-        }
-    }
-
-    return status;
+    return getObjects<xsd::api::resourceTypes::ResourceTypes>("resourceType", "", resourceTypes, xsd::api::resourceTypes::resourceTypes);
 }
 
-int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
+int AppSessionManager::getStorages(QnApiStorageResponsePtr& xstorages)
 {
-    QByteArray reply;
-
-    int status = sendGetRequest(QLatin1String("storage"), reply);
-    if (status == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            storages = QnApiStorageResponsePtr(xsd::api::storages::storages (is, XSD_FLAGS).release());
-
-            return 0;
-        }
-        catch (const xml_schema::exception& e)
-        {
-            m_lastError = e.what();
-
-            qDebug(e.what());
-            return -1;
-        }
-    }
-
-    return status;
+    return getObjects<xsd::api::storages::Storages>("storage", "", xstorages, xsd::api::storages::storages);
 }
 
-int AppSessionManager::getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId)
+int AppSessionManager::getCameras(QnApiCameraResponsePtr& cameras, const QnId& mediaServerId)
 {
-    QByteArray reply;
-
-    int status = sendGetRequest(QString("camera/%1").arg(mediaServerId.toString()), reply);
-    if (status == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            scheduleTasks = QnApiCameraResponsePtr(xsd::api::cameras::cameras (is, XSD_FLAGS).release());
-
-            return 0;
-        }
-        catch (const xml_schema::exception& e)
-        {
-            m_lastError = e.what();
-
-            qDebug(e.what());
-            return -1;
-        }
-    }
-
-    return status;
+    return getObjects<xsd::api::cameras::Cameras>("camera", mediaServerId.toString(), cameras, xsd::api::cameras::cameras);
 }
 
 int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
 {
-    QByteArray reply;
-
-    int status = sendGetRequest(QLatin1String("resourceEx"), reply);
-    if (status == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            resources = QnApiResourceResponsePtr(xsd::api::resourcesEx::resourcesEx (is, XSD_FLAGS).release());
-
-            return 0;
-        }
-        catch (const xml_schema::exception& e)
-        {
-            m_lastError = e.what();
-
-            qDebug(e.what());
-            return -1;
-        }
-    }
-
-    return status;
+    return getObjects<xsd::api::resourcesEx::Resources>("resourceEx", "", resources, xsd::api::resourcesEx::resourcesEx);
 }
