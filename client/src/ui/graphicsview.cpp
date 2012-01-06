@@ -608,7 +608,7 @@ void GraphicsView::initDecoration()
 
     if (toggleFullscreen)
     {
-        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/togglefullscreen.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/fullscreen.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
@@ -2661,7 +2661,7 @@ void GraphicsView::onCircle_helper(bool show)
 
     foreach (CLAbstractSceneItem* item, wndlst)
     {
-        QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "rotation");
+        QPropertyAnimation *anim = AnimationManager::addAnimation(item, "rotation");
 
         anim->setStartValue(item->getRotation());
         anim->setEndValue(cl_get_random_val(0, 30));
@@ -2674,7 +2674,7 @@ void GraphicsView::onCircle_helper(bool show)
 
         //=========================
 
-        QPropertyAnimation *anim2 = AnimationManager::instance().addAnimation(item, "pos");
+        QPropertyAnimation *anim2 = AnimationManager::addAnimation(item, "pos");
 
         anim2->setStartValue(item->pos());
 
@@ -2724,7 +2724,7 @@ void GraphicsView::onArrange_helper()
     {
         item->stop_animation();
 
-        QPropertyAnimation *anim1 = AnimationManager::instance().addAnimation(item, "rotation");
+        QPropertyAnimation *anim1 = AnimationManager::addAnimation(item, "rotation");
 
         anim1->setStartValue(item->getRotation());
         anim1->setEndValue(0);
@@ -2744,7 +2744,7 @@ void GraphicsView::onArrange_helper()
     {
         CLAbstractSceneItem* item = ipos.item;
 
-        QPropertyAnimation *anim2 = AnimationManager::instance().addAnimation(item, "pos");
+        QPropertyAnimation *anim2 = AnimationManager::addAnimation(item, "pos");
 
         anim2->setStartValue(item->pos());
 
@@ -3139,7 +3139,7 @@ void GraphicsView::show_device_settings_helper(QnResourcePtr resource)
     bool open = false;
     QPoint p;
 
-    if (mDeviceDlg && mDeviceDlg->resource() != resource) // need to delete only if exists and not for this device
+    if (mDeviceDlg && qobject_cast<CLAbstractDeviceSettingsDlg *>(mDeviceDlg)->resource() != resource) // need to delete only if exists and not for this device
     {
         // already opened ( may be for another device )
         p = mDeviceDlg->pos();
@@ -3542,7 +3542,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             ge.slotFromPos(item_to_swap_with->scenePos().toPoint(), new_slot_x, new_slot_y);
             QPointF item_newPos = ge.adjustedPosForSlot(item, new_slot_x, new_slot_y);
 
-            QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
+            QPropertyAnimation *anim = AnimationManager::addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(item_newPos);
             duration = 1000 + cl_get_random_val(0, 300);
@@ -3553,7 +3553,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             m_ignoreMouse.ignoreNextMs(duration, true);
 
             item_to_swap_with->setZValue(global_base_scene_z_level + 1); // this item
-            anim = AnimationManager::instance().addAnimation(item_to_swap_with, "pos");
+            anim = AnimationManager::addAnimation(item_to_swap_with, "pos");
             anim->setStartValue(item_to_swap_with->pos());
             anim->setEndValue(item_to_swap_with_newPos);
             duration = 1000 + cl_get_random_val(0, 300);
@@ -3565,7 +3565,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
         }
         else if (ge.canBeDropedHere(item)) // just adjust the item
         {
-            QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
+            QPropertyAnimation *anim = AnimationManager::addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(ge.adjustedPosForItem(item));
             duration = 1000 + cl_get_random_val(0, 300);
@@ -3580,7 +3580,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             int original_slot_x, original_slot_y;
             ge.slotFromPos(item->getOriginalPos().toPoint(), original_slot_x, original_slot_y);
 
-            QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
+            QPropertyAnimation *anim = AnimationManager::addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(ge.adjustedPosForSlot(item, original_slot_x, original_slot_y));
             duration = 1000 + cl_get_random_val(0, 300);

@@ -9,6 +9,7 @@ public:
     virtual qint64 getCurrentTime() const = 0;
     virtual qint64 getDisplayedTime() const = 0;
     virtual qint64 getNextTime() const = 0;
+    virtual qint64 getExternalTime() const = 0;
 
     virtual qint64 expectedTime() const { return getCurrentTime(); }
 

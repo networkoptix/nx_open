@@ -6,9 +6,9 @@
 #include <QHash>
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
+#include <ui/common/magnitude.h>
 
 class QnWorkbenchItem;
-class QnGridWalker;
 
 /**
  * Layout of a workbench. 
@@ -151,13 +151,13 @@ public:
     }
 
     /**
-     * \param pos                       Desired position.
+     * \param pos                       Desired position, in grid coordinates.
      * \param size                      Desired slot size.
-     * \param walker                    Grid walker to use.
+     * \param metric                    Metric to use.
      * \returns                         Geometry of the free slot of desired size whose upper-left corner 
      *                                  is closest (as defined by the grid walker) to the given position.
      */
-    QRect closestFreeSlot(const QPoint &pos, const QSize &size, QnGridWalker *walker = NULL) const;
+    QRect closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPointF> *metric = NULL) const;
 
 signals:
     /**

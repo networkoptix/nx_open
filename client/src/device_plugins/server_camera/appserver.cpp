@@ -20,7 +20,7 @@ QString QnAppServerResourceSearcher::manufacture() const
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnServerCameraFactory::instance());
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
     QnResourceList resources;
 

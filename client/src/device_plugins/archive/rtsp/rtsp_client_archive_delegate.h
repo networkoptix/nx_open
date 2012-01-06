@@ -38,6 +38,9 @@ public:
 
     // Send motion data to client
     virtual void setSendMotion(bool value);
+
+    virtual void beforeSeek(qint64 time);
+    virtual void beforeChangeReverseMode(bool reverseMode);
 protected:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
@@ -63,6 +66,8 @@ private:
     bool m_singleShotMode;
     quint8 m_sendedCSec;
     qint64 m_lastSeekTime;
+    qint64 m_lastReceivedTime;
+    bool m_blockReopening;
 };
 
 #endif

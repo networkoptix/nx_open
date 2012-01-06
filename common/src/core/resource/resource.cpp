@@ -25,7 +25,23 @@ QnResource::~QnResource()
     disconnectAllConsumers();
 }
 
-QnResource& QnResource::operator=(const QnResource& other)
+void QnResource::updateInner(const QnResource& other)
+{
+    m_flags = other.m_flags;
+    m_name = other.m_name;
+    m_resourceParamList = other.m_resourceParamList;
+    m_id = other.m_id;
+    m_parentId = other.m_parentId;
+    m_typeId = other.m_typeId;
+    m_lastDiscoveredTime = other.m_lastDiscoveredTime;
+    m_tags = other.m_tags;
+    m_avalable = other.m_avalable;
+    m_url = other.m_url;
+    m_status = other.m_status;
+    m_streamParamList = other.m_streamParamList;
+}
+
+void QnResource::update(const QnResource& other)
 {
     foreach (QnResourceConsumer* consumer, m_consumers)
         consumer->beforeUpdate();
@@ -34,24 +50,11 @@ QnResource& QnResource::operator=(const QnResource& other)
         QWriteLocker writeLocker(&m_rwLock);
         QReadLocker readLocker(&other.m_rwLock);
 
-        m_flags = other.m_flags;
-        m_name = other.m_name;
-        m_resourceParamList = other.m_resourceParamList;
-        m_id = other.m_id;
-        m_parentId = other.m_parentId;
-        m_typeId = other.m_typeId;
-        m_lastDiscoveredTime = other.m_lastDiscoveredTime;
-        m_tags = other.m_tags;
-        m_avalable = other.m_avalable;
-        m_url = other.m_url;
-        m_status = other.m_status;
-        m_streamParamList = other.m_streamParamList;
+        updateInner(other);
     }
 
     foreach (QnResourceConsumer* consumer, m_consumers)
         consumer->afterUpdate();
-
-    return *this;
 }
 
 void QnResource::deserialize(const QnResourceParameters& parameters)

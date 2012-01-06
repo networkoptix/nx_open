@@ -50,6 +50,13 @@ public:
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }
     virtual void beforeClose() {}
+
+    /** This function calls from reader */
+    virtual void beforeSeek(qint64 time) {}
+
+    /** This function calls from reader */
+    virtual void beforeChangeReverseMode(bool reverseMode) {}
+
 protected:
     Flags m_flags;
 };

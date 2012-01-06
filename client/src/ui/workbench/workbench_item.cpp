@@ -51,6 +51,34 @@ bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
     return true;
 }
 
+bool QnWorkbenchItem::setCombinedGeometry(const QRectF &combinedGeometry) {
+    QRect geometry = combinedGeometry.toRect(); /* Conversion uses rounding, so all differences are in [-0.5, 0.5]. */
+    QRectF geometryDelta = QRectF(
+        combinedGeometry.topLeft() - geometry.topLeft(),
+        combinedGeometry.size() - geometry.size()
+    );
+
+    if(isPinned() && (!qFuzzyIsNull(geometryDelta.topLeft()) || !qFuzzyIsNull(geometryDelta.size())))
+        return false; /* Cannot set geometry delta for pinned items. */
+
+    if(!setGeometry(geometry))
+        return false;
+
+    if(!isPinned())
+        setGeometryDelta(geometryDelta);
+
+    return true;
+}
+
+QRectF QnWorkbenchItem::combinedGeometry() const {
+    return QRectF(
+        m_geometry.left() + m_geometryDelta.left(),
+        m_geometry.top() + m_geometryDelta.top(),
+        m_geometry.width() + m_geometryDelta.width(),
+        m_geometry.height() + m_geometryDelta.height()
+    );
+}
+
 bool QnWorkbenchItem::setFlag(ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return true;

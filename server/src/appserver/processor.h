@@ -7,7 +7,7 @@
 class QnAppserverResourceProcessor : public QnResourceProcessor
 {
 public:
-    QnAppserverResourceProcessor(const QnId& serverId, QnResourceFactory& resourceFactory);
+    QnAppserverResourceProcessor(const QnId& serverId);
 
     void processResources(const QnResourceList &resources);
 private:

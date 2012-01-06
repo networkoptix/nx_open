@@ -2,6 +2,7 @@
 #define QN_MAGNITUDE_H
 
 #include <typeinfo>
+#include <QMetaType>
 #include <utils/common/warnings.h>
 
 class QPointF;
@@ -30,6 +31,9 @@ qreal calculateMagnitude(const T &value, ...) {
     return 0.0;
 }
 
+template<class T>
+class TypedMagnitudeCalculator;
+
 class MagnitudeCalculator {
 public:
     /**
@@ -40,6 +44,15 @@ public:
      * \returns                         Magnitude calculator for the given type, or NULL if none.
      */
     static MagnitudeCalculator *forType(int type);
+
+    /**
+     * \tparam T                        Type to get magnitude calculator for.
+     * \returns                         Magnitude calculator for the given type, or NULL if none.
+     */
+    template<class T>
+    static TypedMagnitudeCalculator<T> *forType() {
+        return forType(qMetaTypeId<T>())->typed<T>();
+    }
 
     /**
      * This function is thread-safe.
@@ -73,6 +86,14 @@ public:
 
     qreal calculate(const void *value) const;
 
+    template<class T>
+    inline const TypedMagnitudeCalculator<T> *typed() const;;
+
+    template<class T>
+    TypedMagnitudeCalculator<T> *typed() {
+        return const_cast<TypedMagnitudeCalculator<T> *>(static_cast<const MagnitudeCalculator *>(this)->typed<T>());
+    }
+
 protected:
     /**
      * \param value                     Value to calculate magnitude for.
@@ -83,5 +104,29 @@ protected:
 private:
     int m_type;
 };
+
+
+template<class T>
+class TypedMagnitudeCalculator: public MagnitudeCalculator {
+public:
+    TypedMagnitudeCalculator(): MagnitudeCalculator(qMetaTypeId<T>()) {}
+
+    using MagnitudeCalculator::calculate;
+
+    qreal calculate(const T &value) const {
+        return MagnitudeCalculator::calculate(static_cast<const void *>(&value));
+    }
+};
+
+
+template<class T>
+const TypedMagnitudeCalculator<T> *MagnitudeCalculator::typed() const {
+    if(qMetaTypeId<T>() == m_type) {
+        return static_cast<const TypedMagnitudeCalculator<T> *>(this);
+    } else {
+        return NULL;
+    }
+}
+
 
 #endif // QN_MAGNITUDE_H

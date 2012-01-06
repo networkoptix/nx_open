@@ -317,7 +317,11 @@ QSizeF SceneUtility::eroded(const QSizeF &size, const MarginsF &amount) {
 }
 
 bool SceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
-    return size.width() > otherSize.width() && size.height() > otherSize.height();
+    return size.width() >= otherSize.width() && size.height() >= otherSize.height();
+}
+
+bool SceneUtility::contains(const QSize &size, const QSize &otherSize) {
+    return size.width() >= otherSize.width() && size.height() >= otherSize.height();
 }
 
 void SceneUtility::moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta) {
@@ -405,4 +409,44 @@ QGraphicsView *SceneUtility::view(QWidget *viewport) {
     assert(viewport != NULL);
 
     return checked_cast<QGraphicsView *>(viewport->parent());
+}
+
+float qFuzzyFloor(float value) {
+    float result = std::floor(value);
+
+    if(qFuzzyIsNull(value - result - 1.0f)) {
+        return result + 1.0f;
+    } else {
+        return result;
+    }
+}
+
+double qFuzzyFloor(double value) {
+    double result = std::floor(value);
+
+    if(qFuzzyIsNull(value - result - 1.0)) {
+        return result + 1.0;
+    } else {
+        return result;
+    }
+}
+
+float qFuzzyCeil(float value) {
+    float result = std::ceil(value);
+
+    if(qFuzzyIsNull(result - value - 1.0f)) {
+        return result - 1.0f;
+    } else {
+        return result;
+    }
+}
+
+double qFuzzyCeil(double value) {
+    double result = std::ceil(value);
+
+    if(qFuzzyIsNull(result - value - 1.0)) {
+        return result - 1.0;
+    } else {
+        return result;
+    }
 }

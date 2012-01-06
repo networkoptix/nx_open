@@ -47,7 +47,7 @@ bool DropInstrument::dragLeaveEvent(QWidget * /*viewport*/, QDragLeaveEvent * /*
 }
 
 bool DropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
-    QPoint gridPos = m_controller->workbench()->mapper()->mapToGrid(view(viewport)->mapToScene(event->pos()));
+    QPointF gridPos = m_controller->workbench()->mapper()->mapToGridF(view(viewport)->mapToScene(event->pos()));
 
     if(!m_resources.empty())
         m_controller->drop(m_resources, gridPos);

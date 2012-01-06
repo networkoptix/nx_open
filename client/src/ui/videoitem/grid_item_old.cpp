@@ -87,7 +87,7 @@ void CLGridItem::setVisibleAnimated(bool visible, int time_ms)
     else if (!isVisible())
         return;
 
-    m_animation = AnimationManager::instance().addAnimation(this, "opacity");
+    m_animation = AnimationManager::addAnimation(this, "opacity");
     m_animation->setDuration(time_ms);
     m_animation->setEasingCurve(QEasingCurve::InOutSine);
     m_animation->setStartValue(opacity());

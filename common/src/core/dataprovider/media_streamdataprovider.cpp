@@ -8,7 +8,8 @@
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
 m_qulity(QnQualityLowest),
-m_fps(MAX_LIVE_FPS)
+m_fps(MAX_LIVE_FPS),
+m_numberOfchannels(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
@@ -63,8 +64,12 @@ bool QnAbstractMediaStreamDataProvider::isMaxFps() const
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
     QMutexLocker mtx(&m_mutex);
-    int channel_num = m_mediaResource->getVideoLayout(this)->numberOfChannels();
-    for (int i = 0; i < channel_num; ++i)
+
+    if (m_numberOfchannels==0)
+        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->numberOfChannels();
+
+    
+    for (int i = 0; i < m_numberOfchannels; ++i)
         m_gotKeyFrame[i] = 0;
 }
 
@@ -77,8 +82,12 @@ bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
     QMutexLocker mtx(&m_mutex);
-    int channel_num = m_mediaResource->getVideoLayout(this)->numberOfChannels();
-    for (int i = 0; i < channel_num; ++i)
+
+    if (m_numberOfchannels==0)
+        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->numberOfChannels();
+
+   
+    for (int i = 0; i < m_numberOfchannels; ++i)
         if (m_gotKeyFrame[i]==0)
             return true;
 

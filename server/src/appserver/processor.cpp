@@ -2,10 +2,10 @@
 
 #include "core/resourcemanagment/resource_pool.h"
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId, QnResourceFactory& resourceFactory)
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId)
     : m_serverId(serverId)
 {
-    m_appServer = QnAppServerConnectionFactory::createConnection(resourceFactory);
+    m_appServer = QnAppServerConnectionFactory::createConnection();
 }
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
@@ -14,12 +14,13 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
     foreach (QnResourcePtr resource, resources)
     {
-        QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>();
+        QnCameraResourcePtr cameraResource = resource.dynamicCast<QnCameraResource>();
 
-        if (networkResource.isNull())
+        if (cameraResource.isNull())
             continue;
 
-        m_appServer->addCamera(*networkResource, m_serverId, cameras);
+        cameraResource->setParentId(m_serverId);
+        m_appServer->addCamera(*cameraResource, cameras);
     }
 
     QnResourcePool::instance()->addResources(cameras);

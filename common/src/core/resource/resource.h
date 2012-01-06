@@ -43,8 +43,7 @@ public:
 
     enum Status { Online, Offline };
 
-    enum
-    {
+    enum Flag {
         network = 0x01, // resource has ip and mac
         url = 0x02,  // has url, like file name
         streamprovider = 0x04,
@@ -59,6 +58,8 @@ public:
         server = 0x400,   // server resource
         remote = 0x800,   // remote (on-server) resource
 
+        layout = 0x1000,   // layout resource
+
         live_cam = live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
@@ -66,12 +67,11 @@ public:
         ARCHIVE = url | local | media | video | audio | streamprovider,     // local media file
         SINGLE_SHOT = url | local | media | still_image | streamprovider    // local still image file
     };
+    Q_DECLARE_FLAGS(Flags, Flag)
 
     QnResource();
     QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
-
-    virtual QnResource& operator=(const QnResource& other);
 
     virtual void deserialize(const QnResourceParameters& parameters);
 
@@ -189,7 +189,11 @@ public:
     static int commandProcQueSize();
     static bool commandProchasSuchDeviceInQueue(QnResourcePtr res);
 
+    void update(const QnResource& other);
+
 protected:
+    virtual void updateInner(const QnResource& other);
+
     // should change value in memory domain
     virtual bool getParamPhysical(const QString& name, QVariant& val);
 

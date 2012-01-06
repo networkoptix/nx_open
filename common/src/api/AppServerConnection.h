@@ -10,7 +10,7 @@
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
 #include "core/misc/scheduleTask.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/camera_resource.h"
 
 class AppSessionManager;
 class QnAppServerConnectionFactory;
@@ -29,7 +29,7 @@ public:
     int getResources(QList<QnResourcePtr>& resources);
 
     int addServer(const QnVideoServer&, QnVideoServerList& servers);
-    int addCamera(const QnNetworkResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
+    int addCamera(const QnCameraResource&, QList<QnResourcePtr>& cameras);
     int addStorage(const QnStorage&);
 
     int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId);
@@ -56,12 +56,15 @@ public:
     static QUrl defaultUrl();
     static void setDefaultUrl(const QUrl &url);
 
-    static QnAppServerConnectionPtr createConnection(QnResourceFactory &resourceFactory);
-    static QnAppServerConnectionPtr createConnection(const QUrl& url, QnResourceFactory &resourceFactory);
+    static void setDefaultFactory(QnResourceFactory*);
+
+    static QnAppServerConnectionPtr createConnection();
+    static QnAppServerConnectionPtr createConnection(const QUrl& url);
 
 private:
     QMutex m_mutex;
     QUrl m_url;
+    QnResourceFactory* m_resourceFactory;
 };
 
 #endif // APPSERVERCONNECTIONIMPL_H

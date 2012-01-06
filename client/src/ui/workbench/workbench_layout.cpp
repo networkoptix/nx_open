@@ -1,8 +1,10 @@
 #include "workbench_layout.h"
+#include <cassert>
+#include <limits>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
+#include <ui/common/scene_utility.h>
 #include "workbench_item.h"
-#include "grid_walker.h"
 
 namespace {
     template<class PointContainer>
@@ -15,6 +17,77 @@ namespace {
                 qnInsert(*points, points->end(), QPoint(c, r));
     }
 
+
+    class GridWalker {
+    public:
+        enum Border {
+            NoBorders = 0,
+            LeftBorder = 0x1,
+            RightBorder = 0x2,
+            TopBorder = 0x4,
+            BottomBorder = 0x8,
+            AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
+        };
+        Q_DECLARE_FLAGS(Borders, Border);
+
+        GridWalker() {
+            m_rect = QRect(0, 0, 1, 1);
+            m_pos = QPoint(0, 0);
+            m_delta = QPoint(0, 1);
+        }
+
+        QPoint next() {
+            assert(hasNext());
+
+            QPoint result = m_pos;
+            m_pos += m_delta;
+            return result;
+        }
+
+        bool hasNext() const {
+            return m_rect.contains(m_pos);
+        }
+
+        void expand(Border border) {
+            switch(border) {
+            case LeftBorder:
+                m_rect.setLeft(m_rect.left() - 1);
+                m_pos = m_rect.topLeft();
+                m_delta = QPoint(0, 1);
+                break;
+            case RightBorder:
+                m_rect.setRight(m_rect.right() + 1);
+                m_pos = m_rect.topRight();
+                m_delta = QPoint(0, 1);
+                break;
+            case TopBorder:
+                m_rect.setTop(m_rect.top() - 1);
+                m_pos = m_rect.topLeft();
+                m_delta = QPoint(1, 0);
+                break;
+            case BottomBorder:
+                m_rect.setBottom(m_rect.bottom() + 1);
+                m_pos = m_rect.bottomLeft();
+                m_delta = QPoint(1, 0);
+                break;
+            default:
+                assert(!"Unreachable");
+                break;
+            }
+        }
+
+        const QRect &rect() const {
+            return m_rect;
+        }
+
+    private:
+        QRect m_rect;
+        QPoint m_pos;
+        QPoint m_delta;
+    };
+
+    Q_DECLARE_OPERATORS_FOR_FLAGS(GridWalker::Borders);
+    
 } // anonymous namespace
 
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
@@ -288,16 +361,70 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
     return pos == m_itemsByUid.end() ? m_noItems : pos.value();
 }
 
-QRect QnWorkbenchLayout::closestFreeSlot(const QPoint &pos, const QSize &size, QnGridWalker *walker) const {
-    if(walker == NULL) {
-        QnAspectRatioGridWalker aspectRatioWalker(1.0);
-        return closestFreeSlot(pos, size, &aspectRatioWalker);
-    }
+QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPointF> *metric) const {
+    if(metric == NULL)
+        return closestFreeSlot(gridPos, size, MagnitudeCalculator::forType<QPointF>()); /* Use default metric if none provided. */
 
+    /* Grid cell where starting search position lies. */
+    QPoint gridCell = (gridPos - SceneUtility::toPoint(QSizeF(size)) / 2.0).toPoint();
+
+    /* Precalculate the point to which delta is applied for distance calculation. */
+    QPointF distanceBase = gridCell + SceneUtility::toPoint(QSizeF(size)) / 2.0;
+
+    /* Current bests. */
+    qreal bestDistance = std::numeric_limits<qreal>::max();
+    QPoint bestDelta = QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+
+    /* Border being walked. */
+    GridWalker::Border checkedBorder = GridWalker::NoBorders;
+
+    /* Borders that are known not to contain positions closer to the target than current best. */
+    GridWalker::Borders checkedBorders = 0;
+
+    GridWalker walker;
     while(true) {
-        QRect rect = QRect(pos + walker->next(), size);
-        if(!m_itemMap.isOccupied(rect))
-            return rect;
+        if(walker.hasNext()) {
+            QPoint delta = walker.next();
+
+            qreal distance = metric->calculate(distanceBase + delta - gridPos);
+            if(distance > bestDistance || qFuzzyCompare(distance, bestDistance))
+                continue;
+            checkedBorder = GridWalker::NoBorders;
+
+            if(m_itemMap.isOccupied(QRect(gridCell + delta, size)))
+                continue;
+
+            checkedBorders = 0;
+            bestDistance = distance;
+            bestDelta = delta;
+        } else {
+            checkedBorders |= checkedBorder;
+            if(checkedBorders == GridWalker::AllBorders && bestDistance < std::numeric_limits<qreal>::max())
+                return QRect(gridCell + bestDelta, size);
+
+            struct {
+                GridWalker::Border border;
+                QPoint delta;
+            } expansion[4] = {
+                {GridWalker::RightBorder,   QPoint(walker.rect().right() + 1,   gridCell.y())},
+                {GridWalker::LeftBorder,    QPoint(walker.rect().left() - 1,    gridCell.y())},
+                {GridWalker::BottomBorder,  QPoint(gridCell.x(),                walker.rect().bottom() + 1)},
+                {GridWalker::TopBorder,     QPoint(gridCell.x(),                walker.rect().top() - 1)},
+            };
+
+            GridWalker::Border bestBorder = GridWalker::NoBorders;
+            qreal bestBorderDistance = std::numeric_limits<qreal>::max();
+            for(int i = 0; i < 4; i++) {
+                qreal distance = metric->calculate(distanceBase + expansion[i].delta - gridPos);
+                if(distance < bestBorderDistance) {
+                    bestBorderDistance = distance;
+                    bestBorder = expansion[i].border;
+                }
+            }
+
+            walker.expand(bestBorder);
+            checkedBorder = bestBorder;
+        }
     }
 }
 

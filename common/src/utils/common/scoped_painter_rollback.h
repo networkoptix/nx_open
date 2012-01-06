@@ -55,23 +55,25 @@ namespace detail {
         }
     };
 
-    struct PainterAntialiasingAccessor {
+    template<QPainter::RenderHint renderHint>
+    struct PainterRenderHintAccessor {
         void operator()(QPainter *painter, bool antialiasing) const {
-            painter->setRenderHint(QPainter::Antialiasing, antialiasing);
+            painter->setRenderHint(renderHint, antialiasing);
         }
 
         bool operator()(QPainter *painter) const {
-            return painter->testRenderHint(QPainter::Antialiasing);
+            return painter->testRenderHint(renderHint);
         }
     };
 
 } // namespace detail
 
-typedef QnGenericScopedPainterRollback<QPen,        detail::PainterPenAccessor>             QnScopedPainterPenRollback;
-typedef QnGenericScopedPainterRollback<QBrush,      detail::PainterBrushAccessor>           QnScopedPainterBrushRollback;
-typedef QnGenericScopedPainterRollback<QTransform,  detail::PainterTransformAccessor>       QnScopedPainterTransformRollback;
-typedef QnGenericScopedPainterRollback<QFont,       detail::PainterFontAccessor>            QnScopedPainterFontRollback;
-typedef QnGenericScopedPainterRollback<bool,        detail::PainterAntialiasingAccessor>    QnScopedPainterAntialiasingRollback;
+typedef QnGenericScopedPainterRollback<QPen,        detail::PainterPenAccessor>                                             QnScopedPainterPenRollback;
+typedef QnGenericScopedPainterRollback<QBrush,      detail::PainterBrushAccessor>                                           QnScopedPainterBrushRollback;
+typedef QnGenericScopedPainterRollback<QTransform,  detail::PainterTransformAccessor>                                       QnScopedPainterTransformRollback;
+typedef QnGenericScopedPainterRollback<QFont,       detail::PainterFontAccessor>                                            QnScopedPainterFontRollback;
+typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::Antialiasing> >             QnScopedPainterAntialiasingRollback;
+typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen> >    QnScopedPainterNonCosmeticDefaultPenRollback;
 
 
 #endif // QN_SCOPED_PAINTER_ROLLBACK_H

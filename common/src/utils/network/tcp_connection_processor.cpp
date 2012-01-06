@@ -203,7 +203,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     }
 
     qDebug() << "Server response to " << d->socket->getPeerAddress();
-    qDebug() << response;
+    qDebug() << "\n" << response;
 
     QMutexLocker lock(&d->sockMutex);
     d->socket->send(response.data(), response.size());

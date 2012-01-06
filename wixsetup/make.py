@@ -11,6 +11,8 @@ from fixasfiles import fixasfiles
 
 from common.convert import rmtree
 
+set_env()
+
 if os.path.exists('bin'):
     rmtree('bin')
 
@@ -23,10 +25,6 @@ def gen_strings():
 
     strings_template = Template(xin)
     print >> xout, strings_template.substitute(APPLICATION_VERSION=APPLICATION_VERSION)
-
-os.putenv('ORGANIZATION_NAME', ORGANIZATION_NAME)
-os.putenv('APPLICATION_NAME', APPLICATION_NAME)
-os.putenv('APPLICATION_VERSION', APPLICATION_VERSION)
 
 # Generate Associations.wxs
 # gen_assoc()
@@ -43,7 +41,7 @@ fixasfiles()
 
 os.system(r'candle -dAppServerSourceDir="../appserver/build/exe.win32-2.7" -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION, WXS_FILES))
 
-output_file = 'bin/VMS-%s.msi' % APPLICATION_VERSION
+output_file = 'bin/VMS-%s.%s.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
 try:
     os.unlink(output_file)
 except OSError:

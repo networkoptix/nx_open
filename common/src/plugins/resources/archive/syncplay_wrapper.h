@@ -5,7 +5,7 @@
 #include "utils/media/externaltimesource.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "abstract_archive_stream_reader.h"
-
+#include "recording/time_period.h"
 
 class QnAbstractArchiveReader;
 class QnAbstractArchiveDelegate;
@@ -22,6 +22,7 @@ public:
 
     virtual qint64 getCurrentTime() const;
     virtual qint64 getDisplayedTime() const;
+    virtual qint64 getExternalTime() const;
     virtual qint64 getNextTime() const;
     virtual qint64 expectedTime() const;
 
@@ -33,6 +34,8 @@ public:
     virtual void resumeMedia();
     virtual void setSingleShotMode(bool single);
     virtual bool isMediaPaused() const;
+    void setPlaybackMask(const QnTimePeriodList& playbackMask);
+
     //virtual bool setMotionRegion(const QRegion& region);
     //virtual bool setSendMotion(bool value);
     //
@@ -55,6 +58,9 @@ private:
     void erase(QnAbstractArchiveDelegate* value);
     void reinitTime(qint64 newTime);
     qint64 getDisplayedTimeInternal() const;
+    void ensurePosAtPlaybackMask(qint64 timeUsec);
+    qint64 findTimeAtPlaybackMask(qint64 timeUsec);
+    bool jumpToInternal(qint64 mksec,  qint64 skipTime);
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

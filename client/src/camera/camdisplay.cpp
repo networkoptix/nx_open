@@ -535,6 +535,12 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         return true;
     }
 
+    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+    if (!vd && !ad)
+        return true;
+
+
     m_processedPackets++;
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
@@ -553,8 +559,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         return true; // skip data
 
 
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
     if (vd)
     {
         m_ignoringVideo = vd->ignore;
@@ -736,6 +740,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         //3) video and audio playing
         else
         {
+            // New av sync algorithm required MT decoding
+            if (!m_useMtDecoding)
+                setMTDecoding(true);
+
             QnCompressedVideoDataPtr incoming;
             if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE )
                 incoming = vd; // process packet
@@ -911,10 +919,24 @@ qint64 CLCamDisplay::getDisplayedTime() const
     return getCurrentTime();
 }
 
+qint64 CLCamDisplay::getExternalTime() const
+{
+    if (m_extTimeSrc)
+        return m_extTimeSrc->getDisplayedTime();
+    else
+        return getCurrentTime();
+}
+
+
 void CLCamDisplay::setExternalTimeSource(QnlTimeSource* value) 
 { 
     m_extTimeSrc = value; 
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
         m_display[i]->canUseBufferedFrameDisplayer(m_extTimeSrc == 0);
     }
+}
+
+bool CLCamDisplay::isRealTimeSource() const 
+{ 
+    return m_isRealTimeSource; 
 }

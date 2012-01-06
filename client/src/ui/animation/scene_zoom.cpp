@@ -24,22 +24,22 @@ CLSceneZoom::CLSceneZoom(GraphicsView* gview):
 
 CLSceneZoom::~CLSceneZoom()
 {
-	stopAnimation();
+    stopAnimation();
 }
 
 qreal CLSceneZoom::zoomToscale(qreal zoom) const
 {
-	return zoom*zoom;
+    return zoom*zoom;
 }
 
 qreal CLSceneZoom::scaleTozoom(qreal scale) const
 {
-	return sqrt(scale);
+    return sqrt(scale);
 }
 
 qreal CLSceneZoom::getZoom() const
 {
-	return m_zoom;
+    return m_zoom;
 }
 
 void CLSceneZoom::setZoom(qreal z)
@@ -83,11 +83,11 @@ void CLSceneZoom::setZoom(qreal z)
         QRectF item_rect = m_view->getSelectedItem()->sceneBoundingRect();
         QRectF view_rect = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
 
-        if ( item_rect.width() < view_rect.width()*0.95 && 
+        if ( item_rect.width() < view_rect.width()*0.95 &&
             item_rect.height() < view_rect.height()*0.95)
             m_view->getSelectedItem()->setFullScreen(false);
 
-        if ( view_rect.width()/item_rect.width() > 3.2  && 
+        if ( view_rect.width()/item_rect.width() > 3.2  &&
             view_rect.height()/item_rect.height() > 3.2)
             m_view->setZeroSelection();
 
@@ -143,10 +143,10 @@ void CLSceneZoom::setZoom(qreal z)
 void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, QPoint unmoved_point, CLAnimationCurve curve)
 {
     m_skipViewUpdate = false;
-    
+
     m_unmoved_point = unmoved_point;
-	m_targetzoom = z;
-	zoom_helper(duration, delay, curve);
+    m_targetzoom = z;
+    zoom_helper(duration, delay, curve);
 }
 
 void CLSceneZoom::zoom_minimum(int duration, int delay, QPoint unmoved_point, CLAnimationCurve curve)
@@ -154,7 +154,7 @@ void CLSceneZoom::zoom_minimum(int duration, int delay, QPoint unmoved_point, CL
     m_skipViewUpdate = false;
 
     m_unmoved_point = unmoved_point;
-	zoom_abs(m_view->getMinSceneZoom() , duration, delay, QPoint(0,0), curve);
+    zoom_abs(m_view->getMinSceneZoom() , duration, delay, QPoint(0,0), curve);
 }
 
 void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmoved_point, CLAnimationCurve curve)
@@ -162,8 +162,8 @@ void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmove
     m_skipViewUpdate = false;
 
     m_unmoved_point = unmoved_point;
-	m_targetzoom += delta;
-	zoom_helper(duration, delay, curve);
+    m_targetzoom += delta;
+    zoom_helper(duration, delay, curve);
 }
 
 //============================================================
@@ -179,21 +179,21 @@ void CLSceneZoom::zoom_helper(int duration, int delay, CLAnimationCurve curve)
 
     stopAnimation();
 
-	if (m_targetzoom>max_zoom)
-		m_targetzoom = max_zoom;
+    if (m_targetzoom>max_zoom)
+        m_targetzoom = max_zoom;
 
-	if (m_targetzoom < m_view->getMinSceneZoom())
-		m_targetzoom = m_view->getMinSceneZoom();
+    if (m_targetzoom < m_view->getMinSceneZoom())
+        m_targetzoom = m_view->getMinSceneZoom();
 
-	if (duration==0)
-	{
+    if (duration==0)
+    {
         m_zoom = m_targetzoom;
-		setZoom(m_zoom);
-	}
-	else
-	{
+        setZoom(m_zoom);
+    }
+    else
+    {
 
-        m_animation = AnimationManager::instance().addAnimation(this, "zoom");
+        m_animation = AnimationManager::addAnimation(this, "zoom");
 
         QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
         panimation->setStartValue(this->getZoom());
@@ -202,7 +202,7 @@ void CLSceneZoom::zoom_helper(int duration, int delay, CLAnimationCurve curve)
 
         panimation->setEasingCurve(easingCurve(curve));
 
-		start_helper(duration, delay);
-	}
+        start_helper(duration, delay);
+    }
 
 }

@@ -1,5 +1,6 @@
 #include "mainwnd.h"
 
+#include <QtCore/QFile>
 #include <QtCore/QPropertyAnimation>
 
 #include <QtGui/QBoxLayout>
@@ -98,7 +99,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
-        m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
+        m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), QPointF(0, 0));
 
     /* Prepare UI. */
     m_navigationWidget = new NavigationTreeWidget(this);
@@ -309,7 +310,7 @@ void MainWnd::itemActivated(uint resourceId)
 
     QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
     if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).isEmpty()) {
-        QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+        QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
         m_controller->drop(resource, gridPos);
     }
 }

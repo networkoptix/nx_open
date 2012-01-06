@@ -54,8 +54,23 @@ void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
     m_gotLivePacket = false;
 }
 
-qint64 QnRtspDataConsumer::getCurrentTime() const 
+qint64 QnRtspDataConsumer::getCurrentTime() const
+{
+    return m_lastSendTime; 
+}
+
+qint64 QnRtspDataConsumer::getNextTime() const
+{
+    return m_lastSendTime; 
+}
+
+qint64 QnRtspDataConsumer::getDisplayedTime() const 
 { 
+    return m_lastSendTime; 
+}
+
+qint64 QnRtspDataConsumer::getExternalTime() const
+{
     return m_lastSendTime; 
 }
 

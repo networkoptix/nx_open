@@ -60,6 +60,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
+    void playbackMaskChanged(const QnTimePeriodList& playbackMask);
 
 protected:
     void timerEvent(QTimerEvent* event);
@@ -70,7 +71,9 @@ protected:
     void setActualCamera(CLVideoCamera *camera);
     void updateActualCamera();
     void repaintMotionPeriods();
+
 private Q_SLOTS:
+    void setLiveMode(bool value);
     void onLiveModeChanged(bool value);
     void pause();
     void play();
@@ -99,6 +102,8 @@ private Q_SLOTS:
     void onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle);
     void onMotionPeriodLoadFailed(int status, int handle);
 
+    void onMrsButtonClicked();
+    void updateMotionPeriods(const QnTimePeriod& period);
 protected:
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
@@ -112,6 +117,7 @@ private:
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
+        QRegion region;
     };
 
     TimeSlider *m_timeSlider;
@@ -121,6 +127,7 @@ private:
     ImageButton *m_stepForwardButton;
     ImageButton *m_forwardButton;
     ImageButton *m_liveButton;
+    ImageButton *m_mrsButton;
     SpeedSlider *m_speedSlider;
     ImageButton *m_muteButton;
     VolumeSlider *m_volumeSlider;
@@ -140,6 +147,7 @@ private:
     MotionPeriods m_motionPeriodLoader;
 
     QnTimePeriod m_timePeriod;
+    QnTimePeriodList m_mergedMotionPeriods;
 
     //QnTimePeriodUpdater *m_fullTimePeriodUpdater;
 
