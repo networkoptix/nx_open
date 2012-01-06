@@ -1,5 +1,10 @@
 @echo off
-SET VERSION=1.2.91
+
+call version.py
+call version.bat
+SET VERSION=%APPLICATION_VERSION%.%BUILD_NUMBER%
+
+echo version = %VERSION%
 
 del /F /P c:\records
 
