@@ -230,13 +230,12 @@ int main(int argc, char *argv[])
     QnAutoTester autoTester(argc, argv);
 
     EveApplication application(argc, argv);
-    application.setQuitOnLastWindowClosed(true);
     application.setWindowIcon(Skin::icon(QLatin1String("appicon.png")));
+    application.setQuitOnLastWindowClosed(true);
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
         argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
-
     while (application.isRunning())
     {
         if (application.sendMessage(argsMessage))
@@ -337,12 +336,6 @@ int main(int argc, char *argv[])
     //=========================================================
 
     qApp->setStyle(Skin::style());
-
-    /*qApp->setStyleSheet(QLatin1String(
-            "QMenu {\n"
-            "font-family: Bodoni MT;\n"
-            "font-size: 18px;\n"
-            "}"));*/
 
     /*qApp->setStyleSheet(QLatin1String(
         "QMenu {\n"
