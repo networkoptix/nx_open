@@ -140,7 +140,7 @@ void QnPageSubItem::animateScale(qreal sc, unsigned int duration)
         return;
     }
 
-    m_scaleAnimation = AnimationManager::instance().addAnimation(this, "scale");
+    m_scaleAnimation = AnimationManager::addAnimation(this, "scale");
     m_scaleAnimation->setEasingCurve(QEasingCurve::OutBack);
     m_scaleAnimation->setDuration(duration);
     m_scaleAnimation->setStartValue(scale());
@@ -159,7 +159,7 @@ void QnPageSubItem::animateColor(QColor c, unsigned int duration)
         return;
     }
 
-    m_colorAnimation = AnimationManager::instance().addAnimation(this, "color");
+    m_colorAnimation = AnimationManager::addAnimation(this, "color");
     m_colorAnimation->setEasingCurve(QEasingCurve::OutBack);
     m_colorAnimation->setDuration(duration);
     m_colorAnimation->setStartValue(color());

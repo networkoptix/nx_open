@@ -67,7 +67,7 @@ void CLAbstractUnmovedItem::changeOpacity(qreal new_opacity, int duration)
     }
     else
     {
-        m_animation = AnimationManager::instance().addAnimation(this, "opacity");
+        m_animation = AnimationManager::addAnimation(this, "opacity");
         m_animation->setDuration(duration);
         m_animation->setStartValue(opacity());
         m_animation->setEndValue(new_opacity);
