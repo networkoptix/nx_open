@@ -45,6 +45,8 @@ private Q_SLOTS:
     void appServerError(int error);
     void appServerAuthenticationRequired();
 
+    void toggleShowNavTree();
+
 #if 0
 public:
     void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
@@ -66,6 +68,8 @@ private:
     TabWidget *m_tabWidget;
 
     static MainWnd *s_instance;
+
+    bool m_treeShown; // TODO: remove
 };
 
 #endif // MAINWND_H

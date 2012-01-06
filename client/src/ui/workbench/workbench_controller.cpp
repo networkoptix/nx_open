@@ -321,7 +321,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_display->setLayer(controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     /* Navigation slider. */
-    m_navigationItem = new NavigationItem();
+    m_navigationItem = new NavigationItem(controlsWidget);
 
     QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
     navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
@@ -332,34 +332,45 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
 
-    QGraphicsProxyWidget *treeItem = new QGraphicsProxyWidget();
-    treeItem->setWidget(m_treeWidget);
-    treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    m_treeItem = new QGraphicsProxyWidget(controlsWidget);
+    m_treeItem->setWidget(m_treeWidget);
+    m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
-    QnOpacityHoverItem *treeHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), treeItem);
+    QnOpacityHoverItem *treeHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_treeItem);
     treeHoverItem->setTargetHoverOpacity(hoverTreeOpacity);
     treeHoverItem->setTargetNormalOpacity(normalTreeOpacity);
     treeHoverItem->setAnimationSpeed(0.1);
     treeHoverItem->setAnimationTimeLimit(global_opacity_change_period);
-    
+
+    m_treePositionAnimator = new VariantAnimator(this);
+    m_treePositionAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_treePositionAnimator->setTargetObject(m_treeItem);
+    m_treePositionAnimator->setAccessor(new PropertyAccessor("pos"));
+    m_treePositionAnimator->setSpeed(100.0);
+    m_treePositionAnimator->setTimeLimit(500);
+
     /* Place it all in layout. */
-    QGraphicsLinearLayout *horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    horizontalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    horizontalLayout->setSpacing(0.0);
-    horizontalLayout->addItem(treeItem);
-    horizontalLayout->addStretch(0x1000);
+    //QGraphicsLinearLayout *horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    //horizontalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    //horizontalLayout->setSpacing(0.0);
+    //horizontalLayout->addItem(m_treeItem);
+    //horizontalLayout->addStretch(0x1000);
 
-    QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    verticalLayout->setSpacing(0.0);
-    verticalLayout->addItem(horizontalLayout);
-    verticalLayout->setStretchFactor(horizontalLayout, 0x1000);
-    verticalLayout->addItem(m_navigationItem);
-    controlsWidget->setLayout(verticalLayout);
+    //QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    //verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    //verticalLayout->setSpacing(0.0);
+    //verticalLayout->addItem(horizontalLayout);
+    //verticalLayout->setStretchFactor(horizontalLayout, 0x1000);
+    //verticalLayout->addStretch(0x1000);
+    //verticalLayout->addItem(m_navigationItem);
+    //controlsWidget->setLayout(verticalLayout);
 
+    connect(controlsWidget,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
+    connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
+    //at_controlsWidget_geometryChanged();
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -538,6 +549,17 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
+void QnWorkbenchController::hideTree() {
+    m_treePositionAnimator->animateTo(QPointF(-m_treeItem->size().width() - 100.0 /* Just in case */, 0.0));
+}
+
+void QnWorkbenchController::showTree() {
+    m_treePositionAnimator->animateTo(QPointF(0.0, 0.0));
+}
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING STARTED");
 
@@ -977,13 +999,45 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
         m_navigationItem->removeReserveCamera(widget->display()->camera());
 }
 
-void QnWorkbenchController::at_navigationItem_geometryChanged() {
+void QnWorkbenchController::updateViewportMargins() {
     m_display->setViewportMargins(QMargins(
-        0,
+        std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
         0,
         0,
         std::floor(m_navigationItem->size().height())
     ));
+}
+
+void QnWorkbenchController::at_controlsWidget_geometryChanged() {
+    QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
+    QSizeF size = controlsWidget->size();
+    if(qFuzzyCompare(m_controlsWidgetSize, size))
+        return;
+    m_controlsWidgetSize = size;
+
+    /* We lay everything out manually. */
+
+    m_navigationItem->setGeometry(QRectF(
+        0.0,
+        size.height() - m_navigationItem->size().height(),
+        size.width(),
+        m_navigationItem->size().height()
+    ));
+
+    m_treeItem->setGeometry(QRectF(
+        m_treeItem->pos().x(),
+        m_treeItem->pos().y(),
+        m_treeItem->size().width(),
+        size.height() - m_navigationItem->size().height()
+    ));
+}
+
+void QnWorkbenchController::at_navigationItem_geometryChanged() {
+    updateViewportMargins();
+}
+
+void QnWorkbenchController::at_treeItem_geometryChanged() {
+    updateViewportMargins();
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() 

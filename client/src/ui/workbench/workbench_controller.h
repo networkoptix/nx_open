@@ -13,6 +13,7 @@ class QGraphicsItem;
 class QMenu;
 class QLabel;
 class QPropertyAnimation;
+class QGraphicsProxyWidget;
 
 class InstrumentManager;
 class HandScrollInstrument;
@@ -26,6 +27,7 @@ class RotationInstrument;
 class MotionSelectionInstrument;
 class ClickInfo;
 class ResizingInfo;
+class VariantAnimator;
 
 class NavigationItem;
 class NavigationTreeWidget;
@@ -36,8 +38,6 @@ class QnWorkbench;
 class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
-class VariantAnimator;
-
 class QnScreenRecorder;
 
 
@@ -69,6 +69,9 @@ public:
     void drop(const QnResourcePtr &resource, const QPointF &gridPos);
     void drop(const QnResourceList &resources, const QPointF &gridPos);
 
+    void hideTree();
+    void showTree();
+
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
@@ -76,6 +79,7 @@ protected:
 
     VariantAnimator *opacityAnimator(QnResourceWidget *widget);
 
+    void updateViewportMargins();
 
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -109,6 +113,8 @@ protected Q_SLOTS:
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
     void at_navigationItem_geometryChanged();
+    void at_controlsWidget_geometryChanged();
+    void at_treeItem_geometryChanged();
 
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
@@ -143,6 +149,9 @@ private:
 
     /** Navigation tree widget. */
     NavigationTreeWidget *m_treeWidget;
+
+    /** Proxy widget for navigation tree widget. */
+    QGraphicsProxyWidget *m_treeItem;
 
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
@@ -232,6 +241,10 @@ private:
     QAction *m_showMotionAction;
     QAction *m_hideMotionAction;
     QAction *m_randomGridAction;
+
+    QSizeF m_controlsWidgetSize;
+
+    VariantAnimator *m_treePositionAnimator;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

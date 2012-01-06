@@ -53,7 +53,8 @@ MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
-      m_controller(0)
+      m_controller(0),
+      m_treeShown(true)
 {
     if (s_instance)
         qnWarning("Several instances of main window created, expect problems.");
@@ -152,14 +153,12 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
-#if 0
     // ###
     QAction *showNavTreeAction = new QAction(tr("<=|=>"), this);
     showNavTreeAction->setToolTip(tr("Toggle navigation tree show/hide"));
     connect(showNavTreeAction, SIGNAL(triggered()), this, SLOT(toggleShowNavTree()));
     toolBar->addAction(showNavTreeAction);
     //
-#endif
 
     addTab();
 
@@ -226,9 +225,16 @@ void MainWnd::closeTab(int index)
     }
 }
 
-#if 0
 void MainWnd::toggleShowNavTree()
 {
+    if(m_treeShown)
+        m_controller->hideTree();
+    else
+        m_controller->showTree();
+
+    m_treeShown = !m_treeShown;
+
+#if 0
     if (!m_navigationWidgetAnimation) {
         Q_ASSERT(m_splitter->indexOf(m_navigationWidget) == 0); // must be inserted already
 
@@ -277,8 +283,10 @@ void MainWnd::toggleShowNavTree()
     }
 
     m_navigationWidgetAnimation->start();
+#endif
 }
 
+#if 0
 void MainWnd::navTreeAnimationFinished()
 {
     if (QPropertyAnimation *animation = qobject_cast<QPropertyAnimation *>(sender())) {
