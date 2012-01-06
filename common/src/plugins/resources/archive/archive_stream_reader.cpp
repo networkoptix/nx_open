@@ -284,7 +284,6 @@ begin_label:
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
         if (!delegateForNegativeSpeed) {
-            m_lastGopSeekTime = -1;
             intChanneljumpTo(displayTime, 0);
             if (reverseMode) {
                 if (displayTime != DATETIME_NOW)
@@ -293,6 +292,7 @@ begin_label:
             else
                 setSkipFramesToTime(displayTime);
         }
+        m_lastGopSeekTime = -1;
         m_BOF = true;
     }
     m_dataMarker = m_newDataMarker;
