@@ -30,7 +30,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastGopSeekTime(-1),
     m_IFrameAfterJumpFound(false),
     m_requiredJumpTime(AV_NOPTS_VALUE),
-    m_lastUIJumpTime(AV_NOPTS_VALUE),
     m_lastFrameDuration(0),
     m_selectedAudioChannel(0),
     m_BOF(false),
@@ -243,9 +242,12 @@ begin_label:
         }
 	}
 
+    bool reverseMode = m_reverseMode;
     m_jumpMtx.lock();
-    if (m_requiredJumpTime != AV_NOPTS_VALUE)
+    if (m_requiredJumpTime != AV_NOPTS_VALUE 
+        && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
     {
+        /*
         if (m_newDataMarker) {
             QString s;
             QTextStream str(&s);
@@ -254,6 +256,7 @@ begin_label:
             str.flush();
             cl_log.log(s, cl_logALWAYS);
         }
+        */
         m_dataMarker = m_newDataMarker;
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
@@ -263,7 +266,6 @@ begin_label:
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
-        m_lastUIJumpTime = jumpTime;
 
         emit jumpOccured(jumpTime);
         m_BOF = true;
@@ -272,11 +274,14 @@ begin_label:
         m_jumpMtx.unlock();
     }
 
-    bool reverseMode = m_reverseMode;
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
-        qint64 displayTime = determineDisplayTime();
+        m_jumpMtx.lock();
+        qint64 displayTime = m_requiredJumpTime != AV_NOPTS_VALUE ? m_requiredJumpTime : determineDisplayTime();
+        m_requiredJumpTime = AV_NOPTS_VALUE;
+        m_jumpMtx.unlock();
+
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
         if (!delegateForNegativeSpeed) {
@@ -427,46 +432,6 @@ begin_label:
             videoData->flags |= AV_REVERSE_PACKET;
         }
 
-
-        /*
-        // -------------------------------------------
-        // workaround ffmpeg bugged seek
-        // todo: move it code to AVI delegate
-        if (videoData->channelNumber == 0 && dynamic_cast<QnAviArchiveDelegate*>(m_delegate))
-        {
-            if (m_lastUIJumpTime != AV_NOPTS_VALUE)
-            {
-                //QMutexLocker mutex(&m_cs);
-                if (m_lastUIJumpTime - m_currentTime > MAX_KEY_FIND_INTERVAL) 
-                {
-                    // can't find I-frame after jump. jump again and disable I-frame searcher
-                    m_currentData = QnAbstractMediaDataPtr();
-                    intChanneljumpTo(m_lastUIJumpTime, 0);
-                    m_lastUIJumpTime = AV_NOPTS_VALUE;
-                    goto begin_label;
-                }
-                else  
-                {
-                    if (videoData->flags & AV_PKT_FLAG_KEY) {
-                        m_IFrameAfterJumpFound = true;
-                        m_lastUIJumpTime = AV_NOPTS_VALUE;
-                    }
-                    if (!reverseMode && !m_IFrameAfterJumpFound)
-                    {
-                        m_currentData = QnAbstractMediaDataPtr();
-                        if (m_currentTime >= m_topIFrameTime) // m_topIFrameTime used as jump time
-                            intChanneljumpTo(m_topIFrameTime - BACKWARD_SEEK_STEP, 0);
-                        if (m_runing)
-                            goto begin_label;
-                        else
-                            return QnAbstractMediaDataPtr();
-                    }
-                }
-            }
-        }
-        */
-
-        // -------------------------------------------
 
 		if (m_skipFramesToTime)
 		{
