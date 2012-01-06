@@ -1,0 +1,46 @@
+#ifndef QN_CACHING_PROXY_WIDGET_H
+#define QN_CACHING_PROXY_WIDGET_H
+
+#include <QGraphicsProxyWidget>
+#include <QImage>
+
+/**
+ * Proxy widget that caches the widget's surface.
+ */
+class CachingProxyWidget: public QGraphicsProxyWidget {
+    Q_OBJECT;
+
+    typedef QGraphicsProxyWidget base_type;
+
+public:
+    CachingProxyWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+
+    virtual ~CachingProxyWidget();
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+
+private:
+    static int maxTextureSize();
+
+    void ensureTextureAllocated();
+    void ensureTextureSynchronized();
+    void ensureTextureSizeSynchronized();
+    void ensureCurrentWidgetSynchronized();
+
+    QWidget *currentWidget() const {
+        return m_currentWidget.data();
+    }
+
+private:
+    QWeakPointer<QWidget> m_currentWidget;
+    int m_maxTextureSize;
+    QPoint m_offset;
+    QImage m_image;
+    unsigned m_texture;
+    bool m_wholeTextureDirty;
+};
+
+
+#endif // QN_CACHING_PROXY_WIDGET_H
