@@ -14,6 +14,7 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QFileDialog>
+#include <QGraphicsProxyWidget>
 
 #include <core/resourcemanagment/security_cam_resource.h>
 #include <core/resource/directory_browser.h>
@@ -51,8 +52,10 @@
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
+#include <ui/graphics/items/opacity_hover_item.h>
 
 #include <ui/videoitem/navigationitem.h>
+#include <ui/navigationtreewidget.h>
 
 #include <ui/context_menu/menu_wrapper.h>
 
@@ -66,9 +69,6 @@
 
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motionmask_widget.h"
-#include "ui/navigationtreewidget.h"
-
-//#include "ui/graphics/items/caching_proxy_widget.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *);
 
@@ -167,7 +167,14 @@ namespace {
 
     const char *opacityAnimatorPropertyName = "_qn_itemOpacityAnimator";
 
+    /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
+
+    const qreal normalTreeOpacity = 0.7;
+    const qreal hoverTreeOpacity = 0.95;
+
+    const qreal normalSliderOpacity = 0.5;
+    const qreal hoverSliderOpacity = 0.95;
 
 } // anonymous namespace
 
@@ -313,35 +320,46 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
     m_display->setLayer(controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
+    /* Navigation slider. */
+    m_navigationItem = new NavigationItem();
+
+    QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
+    navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
+    navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
+    navigationHoverItem->setAnimationSpeed(0.1);
+    navigationHoverItem->setAnimationTimeLimit(global_opacity_change_period);
+    
+    /* Tree widget. */
+    m_treeWidget = new NavigationTreeWidget();
+
+    QGraphicsProxyWidget *treeItem = new QGraphicsProxyWidget();
+    treeItem->setWidget(m_treeWidget);
+    treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
+    QnOpacityHoverItem *treeHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), treeItem);
+    treeHoverItem->setTargetHoverOpacity(hoverTreeOpacity);
+    treeHoverItem->setTargetNormalOpacity(normalTreeOpacity);
+    treeHoverItem->setAnimationSpeed(0.1);
+    treeHoverItem->setAnimationTimeLimit(global_opacity_change_period);
+    
+    /* Place it all in layout. */
+    QGraphicsLinearLayout *horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    horizontalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    horizontalLayout->setSpacing(0.0);
+    horizontalLayout->addItem(treeItem);
+    horizontalLayout->addStretch(0x1000);
+
     QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
     verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    controlsWidget->setLayout(verticalLayout);
-    
-    m_navigationItem = new NavigationItem(controlsWidget);
-   
-
-
-    //NavigationTreeWidget *w = new NavigationTreeWidget();
-    //CachingProxyWidget *pw = new CachingProxyWidget();
-    //QGraphicsProxyWidget *pw = new QGraphicsProxyWidget();
-    //pw->setWidget(w);
-
-    //QGraphicsLinearLayout *hl = new QGraphicsLinearLayout(Qt::Horizontal);
-    //hl->addItem(pw);
-    //hl->addStretch(0x1000);
-
-    //verticalLayout->addItem(hl);
-    //verticalLayout->setStretchFactor(hl, 0x1000);
-
-
-
-
-    verticalLayout->addStretch(0x1000);
+    verticalLayout->setSpacing(0.0);
+    verticalLayout->addItem(horizontalLayout);
+    verticalLayout->setStretchFactor(horizontalLayout, 0x1000);
     verticalLayout->addItem(m_navigationItem);
+    controlsWidget->setLayout(verticalLayout);
 
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
-
+    connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -431,7 +449,7 @@ VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget
     animator = new VariantAnimator(widget);
     animator->setTargetObject(widget);
     animator->setTimer(display()->animationInstrument()->animationTimer());
-    animator->setAccessor(new QnPropertyAccessor("opacity"));
+    animator->setAccessor(new PropertyAccessor("opacity"));
     animator->setSpeed(1.0);
     widget->setProperty(opacityAnimatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
     return animator;
@@ -1186,3 +1204,16 @@ void QnWorkbenchController::at_randomGridAction_triggered() {
     display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
     display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
 }
+
+void QnWorkbenchController::at_treeWidget_activated(uint resourceId) {
+    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
+
+    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+    if (!mediaResource.isNull() && layout()->items(mediaResource->getUniqueId()).isEmpty()) {
+        QPointF gridPos = display()->mapViewportToGridF(display()->view()->viewport()->geometry().center());
+        drop(resource, gridPos);
+    }
+}
+
+
+

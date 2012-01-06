@@ -33,9 +33,12 @@ void AnimationTimerListener::stopListening() {
 }
 
 void AnimationTimerListener::setTimer(AnimationTimer *timer) {
-    timer->addListener(this);
+    if(timer != NULL) {
+        timer->addListener(this);
+    } else if(m_timer != NULL) {
+        m_timer->removeListener(this);
+    } 
 }
-
 
 AnimationTimer::AnimationTimer():
     m_lastTickTime(-1),

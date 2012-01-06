@@ -424,7 +424,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (onUserInput(true, true))
         return;
 
-    if (m_navigationItem && m_navigationItem->isMouseOver())
+    if (m_navigationItem) //&& m_navigationItem->isMouseOver()) // BROKEN
     {
         // do not zoom scene if mouse is over m_navigationItem
         QGraphicsView::wheelEvent(e);
@@ -2006,7 +2006,7 @@ void GraphicsView::goToSteadyMode(bool steady)
             onUserInput(false, false);
             return;
         }
-        if (m_navigationItem && m_navigationItem->isMouseOver())
+        if (m_navigationItem) //&& m_navigationItem->isMouseOver()) // BROKEN
         {
             onUserInput(false, false);
             return;
@@ -2026,7 +2026,7 @@ void GraphicsView::goToSteadyMode(bool steady)
                 item->hideIfNeeded(500);
         }
         if (m_navigationItem && !m_camLayout.hasLiveCameras())
-            m_navigationItem->hideIfNeeded(500);
+            ; //m_navigationItem->hideIfNeeded(500); // BROKEN
         if (m_searchItem)
         {
             m_searchItem->setVisible(false);
@@ -2044,7 +2044,7 @@ void GraphicsView::goToSteadyMode(bool steady)
                 item->show(500);
         }
         if (m_navigationItem)
-            m_navigationItem->show(500);
+            ; //m_navigationItem->show(500); // BROKEN
         if (m_searchItem)
         {
             m_searchItem->setVisible(true);

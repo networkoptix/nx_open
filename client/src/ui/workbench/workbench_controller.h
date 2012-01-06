@@ -28,6 +28,7 @@ class ClickInfo;
 class ResizingInfo;
 
 class NavigationItem;
+class NavigationTreeWidget;
 
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
@@ -126,6 +127,8 @@ protected Q_SLOTS:
 
     void at_randomGridAction_triggered();
 
+    void at_treeWidget_activated(uint resourceId);
+
 private:
     /* Global state. */
 
@@ -137,6 +140,9 @@ private:
 
     /** Navigation item. */
     NavigationItem *m_navigationItem;
+
+    /** Navigation tree widget. */
+    NavigationTreeWidget *m_treeWidget;
 
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];

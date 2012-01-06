@@ -53,8 +53,7 @@ MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
-      m_controller(0),
-      m_navigationWidgetAnimation(0)
+      m_controller(0)
 {
     if (s_instance)
         qnWarning("Several instances of main window created, expect problems.");
@@ -101,9 +100,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPointF(0, 0));
 
     /* Prepare UI. */
-    m_navigationWidget = new NavigationTreeWidget(this);
-    connect(m_navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
-
     m_tabWidget = new TabWidget(this);
     m_tabWidget->setMovable(true);
     m_tabWidget->setTabsClosable(true);
@@ -120,16 +116,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
     m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
 
-    m_splitter = new QSplitter(Qt::Horizontal, this);
-    m_splitter->setChildrenCollapsible(false);
-    m_splitter->addWidget(m_navigationWidget);
-    m_splitter->setStretchFactor(0, 1);
-    m_splitter->setCollapsible(0, true);
-    m_splitter->addWidget(m_tabWidget);
-    m_splitter->setStretchFactor(1, 99);
-    setCentralWidget(m_splitter);
-
-    m_splitter->handle(1)->installEventFilter(this);
+    setCentralWidget(m_tabWidget);
 
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
@@ -165,12 +152,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
+#if 0
     // ###
     QAction *showNavTreeAction = new QAction(tr("<=|=>"), this);
     showNavTreeAction->setToolTip(tr("Toggle navigation tree show/hide"));
     connect(showNavTreeAction, SIGNAL(triggered()), this, SLOT(toggleShowNavTree()));
     toolBar->addAction(showNavTreeAction);
     //
+#endif
 
     addTab();
 
@@ -237,6 +226,7 @@ void MainWnd::closeTab(int index)
     }
 }
 
+#if 0
 void MainWnd::toggleShowNavTree()
 {
     if (!m_navigationWidgetAnimation) {
@@ -301,18 +291,7 @@ void MainWnd::navTreeAnimationFinished()
         }
     }
 }
-
-void MainWnd::itemActivated(uint resourceId)
-{
-    // ### rewrite from scratch ;)
-    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId)));
-
-    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-    if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).isEmpty()) {
-        QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
-        m_controller->drop(resource, gridPos);
-    }
-}
+#endif
 
 #if 0
 void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
@@ -381,6 +360,7 @@ void MainWnd::handleMessage(const QString &message)
     activate();
 }
 
+#if 0
 bool MainWnd::eventFilter(QObject *watched, QEvent *event)
 {
     if (qobject_cast<QSplitterHandle *>(watched)) {
@@ -406,6 +386,7 @@ bool MainWnd::eventFilter(QObject *watched, QEvent *event)
 
     return QMainWindow::eventFilter(watched, event);
 }
+#endif
 
 void MainWnd::closeEvent(QCloseEvent *event)
 {

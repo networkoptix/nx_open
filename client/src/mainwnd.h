@@ -29,7 +29,6 @@ Q_SIGNALS:
     void mainWindowClosed();
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event);
     void closeEvent(QCloseEvent *event);
 
 private Q_SLOTS:
@@ -37,10 +36,6 @@ private Q_SLOTS:
     void currentTabChanged(int index);
     void closeTab(int index);
 
-    void toggleShowNavTree();
-    void navTreeAnimationFinished();
-
-    void itemActivated(uint resourceId);
     void handleMessage(const QString &message);
 
     void activate();
@@ -68,13 +63,7 @@ private:
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
-    QSplitter *m_splitter;
-    NavigationTreeWidget *m_navigationWidget;
     TabWidget *m_tabWidget;
-
-    QPropertyAnimation *m_navigationWidgetAnimation;
-
-    QPoint m_splitterClickedPos;
 
     static MainWnd *s_instance;
 };
