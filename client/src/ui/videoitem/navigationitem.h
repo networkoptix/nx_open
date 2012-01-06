@@ -61,7 +61,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
     void playbackMaskChanged(const QnTimePeriodList& playbackMask);
-
+    void clearMotionSelection();
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
