@@ -4,16 +4,12 @@
 #include "core/resource/resource.h"
 #include "api/AppServerConnection.h"
 
-class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
+class QnAppserverResourceProcessor : public QnResourceProcessor
 {
-    Q_OBJECT
 public:
     QnAppserverResourceProcessor(const QnId& serverId);
 
     void processResources(const QnResourceList &resources);
-
-private slots:
-    void finished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources);
 
 private:
     QnAppServerConnectionPtr m_appServer;

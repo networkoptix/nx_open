@@ -115,8 +115,6 @@ void QnResourceDiscoveryManager::run()
         {
             m_resourceProcessor->processResources(result);
 
-            exec();
-
             foreach (QnResourcePtr res, result)
             {
                 QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
