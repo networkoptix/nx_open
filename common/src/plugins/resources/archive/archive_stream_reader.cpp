@@ -361,7 +361,7 @@ begin_label:
             if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) 
             {
                 // seek from EOF to BOF occured
-                Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
+                //Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
                 setCurrentTime(m_topIFrameTime);
                 m_eof = false;
             }
@@ -401,7 +401,7 @@ begin_label:
                         }
                         intChanneljumpTo(seekTime, 0);
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
-                        Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
+                        //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
                         //return getNextData();
                         if (m_runing)
