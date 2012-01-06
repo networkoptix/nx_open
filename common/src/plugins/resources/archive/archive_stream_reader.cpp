@@ -292,8 +292,8 @@ begin_label:
             }
             else
                 setSkipFramesToTime(displayTime);
-            m_BOF = true;
         }
+        m_BOF = true;
     }
     m_dataMarker = m_newDataMarker;
 
