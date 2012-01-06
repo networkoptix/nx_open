@@ -740,6 +740,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         //3) video and audio playing
         else
         {
+            // New av sync algorithm required MT decoding
+            if (!m_useMtDecoding)
+                setMTDecoding(true);
+
             QnCompressedVideoDataPtr incoming;
             if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE )
                 incoming = vd; // process packet
