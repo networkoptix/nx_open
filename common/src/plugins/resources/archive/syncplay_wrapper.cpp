@@ -294,6 +294,10 @@ qint64 QnArchiveSyncPlayWrapper::getNextTime() const
     return displayTime;
 }
 
+qint64 QnArchiveSyncPlayWrapper::getExternalTime() const
+{
+    return getDisplayedTime();
+}
 
 qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
 {

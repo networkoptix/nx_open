@@ -3,6 +3,7 @@
 #include "utils/media/frame_info.h"
 #include "avi_files/avi_archive_delegate.h"
 #include "utils/common/util.h"
+#include "utils/media/externaltimesource.h"
 
 
 // used in reverse mode.
@@ -188,8 +189,9 @@ bool QnArchiveStreamReader::init()
          QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
          if (dp->isRealTimeSource())
              return DATETIME_NOW;
-         else
-            rez = qMax(rez, dp->getCurrentTime());
+         QnlTimeSource* timeSource = dynamic_cast<QnlTimeSource*>(dp);
+         if (timeSource)
+            rez = qMax(rez, timeSource->getExternalTime());
      }
      return rez;
  }
@@ -359,7 +361,7 @@ begin_label:
             if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) 
             {
                 // seek from EOF to BOF occured
-                //Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
+                Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
                 setCurrentTime(m_topIFrameTime);
                 m_eof = false;
             }
@@ -399,7 +401,7 @@ begin_label:
                         }
                         intChanneljumpTo(seekTime, 0);
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
-                        //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
+                        Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
                         //return getNextData();
                         if (m_runing)

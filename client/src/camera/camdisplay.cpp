@@ -913,10 +913,24 @@ qint64 CLCamDisplay::getDisplayedTime() const
     return getCurrentTime();
 }
 
+qint64 CLCamDisplay::getExternalTime() const
+{
+    if (m_extTimeSrc)
+        return m_extTimeSrc->getDisplayedTime();
+    else
+        return getCurrentTime();
+}
+
+
 void CLCamDisplay::setExternalTimeSource(QnlTimeSource* value) 
 { 
     m_extTimeSrc = value; 
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
         m_display[i]->canUseBufferedFrameDisplayer(m_extTimeSrc == 0);
     }
+}
+
+bool CLCamDisplay::isRealTimeSource() const 
+{ 
+    return m_isRealTimeSource; 
 }
