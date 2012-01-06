@@ -44,7 +44,13 @@ QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResou
 QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QRegion& motionRegion)
 {
     QnTimePeriodList result;
-    int status = m_sessionManager->recordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), result);
+    QByteArray errorString;
+    int status = m_sessionManager->recordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), result, errorString);
+    if (status)
+    {
+        qDebug() << errorString;
+    }
+
     return result;
 }
 

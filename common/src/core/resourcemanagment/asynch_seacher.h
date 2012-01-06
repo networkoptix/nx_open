@@ -17,7 +17,6 @@ class QnAbstractResourceSearcher;
 class QnResourceDiscoveryManager : public CLLongRunnable, public QnResourceFactory
 {
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
-    typedef QList<QnResourceProcessor*> ResourceProcessorList;
 
 public:
     ~QnResourceDiscoveryManager();
@@ -29,7 +28,7 @@ public:
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
-    void addResourceProcessor(QnResourceProcessor* processor);
+    void setResourceProcessor(QnResourceProcessor* processor);
 
     QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
 
@@ -58,7 +57,7 @@ private:
 private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
-    ResourceProcessorList m_resourceProcessors;
+    QnResourceProcessor* m_resourceProcessor;
 
     CLNetState m_netState;
 

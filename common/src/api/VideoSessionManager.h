@@ -27,7 +27,7 @@ class VideoServerSessionManager: public SessionManager
 public:
     VideoServerSessionManager(const QUrl &url, QObject *parent = 0);
 
-    int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList);
+    int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList, QByteArray& errorString);
 
     /** Returns handle if a request */
     int asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot);
