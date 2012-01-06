@@ -946,6 +946,7 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
     if(cameraResource != NULL) 
     {
         connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QRegion)), m_navigationItem, SLOT(loadMotionPeriods(QnResourcePtr, QRegion)));
+        connect(m_navigationItem, SIGNAL(clearMotionSelection()), widget, SLOT(clearMotionSelection()));
         m_navigationItem->addReserveCamera(widget->display()->camera());
     }
 }

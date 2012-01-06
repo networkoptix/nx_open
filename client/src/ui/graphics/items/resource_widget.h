@@ -239,22 +239,20 @@ public:
      */ 
     void addToMotionSelection(const QRect &gridRect);
 
-    /**
-     * Clears this widget's motion selection region.
-     */
-    void clearMotionSelection();
-
     using base_type::mapRectToScene;
 
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
     void motionRegionSelected(QnResourcePtr resource, QRegion region);
-
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
 
+    /**
+     * Clears this widget's motion selection region.
+     */
+    void clearMotionSelection();
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
