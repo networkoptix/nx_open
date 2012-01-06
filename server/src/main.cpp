@@ -275,6 +275,7 @@ void initAppServerConnection(const QSettings &settings)
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
+    QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
 }
 
 void initAppServerEventConnection(const QSettings &settings)
@@ -328,7 +329,7 @@ public:
         initAppServerEventConnection(settings);
         QnEventManager* eventManager = QnEventManager::instance();
 
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(QnResourceDiscoveryManager::instance());
+        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
         // The following is demo only. Remove it.
         QList<QnResourceTypePtr> resourceTypeList;
@@ -359,7 +360,7 @@ public:
         eventManager->run();
 
 
-        m_processor = new QnAppserverResourceProcessor(videoServer->getId(), QnResourceDiscoveryManager::instance());
+        m_processor = new QnAppserverResourceProcessor(videoServer->getId());
 
         QUrl rtspUrl(videoServer->getUrl());
         QUrl apiUrl(videoServer->getApiUrl());
@@ -413,6 +414,7 @@ public:
         //IPPH264Decoder::dll.init();
 
         //============================
+        QnResourceDiscoveryManager::instance().setServer(true);
         QnResourceDiscoveryManager::instance().addResourceProcessor(m_processor);
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());

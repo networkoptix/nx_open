@@ -7,51 +7,51 @@
 int limit_val(int val, int min_val, int max_val, bool mirror)
 {
 
-	if (!mirror)
-	{
-		if (val > max_val)
-			return max_val;
+    if (!mirror)
+    {
+        if (val > max_val)
+            return max_val;
 
-		if (val < min_val)
-			return min_val;
-	}
+        if (val < min_val)
+            return min_val;
+    }
 
-	int width = max_val - min_val;
+    int width = max_val - min_val;
 
-	if (val > max_val)
-	{
-		int x = val - min_val;
+    if (val > max_val)
+    {
+        int x = val - min_val;
 
-		x = (x%(2*width));// now x cannot be more than 2*width
-		x+=min_val;
+        x = (x%(2*width));// now x cannot be more than 2*width
+        x+=min_val;
 
-		if (x > max_val)
-		{
-			int diff = x - max_val; // so many bigger 
-			x = max_val - diff; // now x cannot be more than 2*width
-		}
+        if (x > max_val)
+        {
+            int diff = x - max_val; // so many bigger
+            x = max_val - diff; // now x cannot be more than 2*width
+        }
 
-		return x;
-	}
+        return x;
+    }
 
-	if (val < min_val)
-	{
+    if (val < min_val)
+    {
 
-		int x = max_val - val;
-		x = x%(2*width);
-		x = max_val - x;
+        int x = max_val - val;
+        x = x%(2*width);
+        x = max_val - x;
 
-		if (x < min_val)
-		{
-			int diff = min_val - x; // so many smaller 
-			x = min_val + diff; 
-		}
+        if (x < min_val)
+        {
+            int diff = min_val - x; // so many smaller
+            x = min_val + diff;
+        }
 
-		return x;
+        return x;
 
-	}
+    }
 
-	return val;
+    return val;
 }
 
 //========================================================================================
@@ -66,40 +66,40 @@ CLSceneMovement::CLSceneMovement(GraphicsView* gview):
 
 CLSceneMovement::~CLSceneMovement()
 {
-	stopAnimation();
+    stopAnimation();
 }
 
 void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay, CLAnimationCurve curve  )
 {
 
-	QPoint curr = m_view->viewport()->rect().center();
-	curr.rx()+=dx;
-	curr.ry()+=dy;
+    QPoint curr = m_view->viewport()->rect().center();
+    curr.rx()+=dx;
+    curr.ry()+=dy;
 
-	move(m_view->mapToScene(curr), duration, delay, curve);
+    move(m_view->mapToScene(curr), duration, delay, curve);
 
-	m_limited = limited; // this will overwrite false value set inside move_abs function above
+    m_limited = limited; // this will overwrite false value set inside move_abs function above
 }
 
 void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationCurve curve )
 {
     QMutexLocker _locker(&m_animationMutex);
-    
-	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
+
+    //cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
     stopAnimation();
 
-	m_limited = false;
+    m_limited = false;
 
-	if (duration==0)
-	{
-		setPosition(dest);
-	}
-	else
+    if (duration==0)
+    {
+        setPosition(dest);
+    }
+    else
     {
         m_startpoint = getPosition();
         m_delta = dest - m_startpoint;
-        
-        m_animation = AnimationManager::instance().addAnimation(this, "position");
+
+        m_animation = AnimationManager::addAnimation(this, "position");
         QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
         panimation->setStartValue(getPosition());
         panimation->setEndValue(dest);
@@ -107,7 +107,7 @@ void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationCu
 
         panimation->setEasingCurve(easingCurve(curve));
 
-		start_helper(duration, delay);
+        start_helper(duration, delay);
     }
 }
 
@@ -134,7 +134,7 @@ void CLSceneMovement::setPosition(QPointF p)
         QPointF final_dest = m_startpoint + m_delta;
         QPointF curr = m_view->mapToScene(m_view->viewport()->rect().center());
 
-        if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   ) 
+        if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   )
         {
             // if difference between final point and item center is more than curr and item center => moving out of item center
 //            int dx = curr.x() - wnd_center.x();

@@ -1,13 +1,13 @@
-//#include <vld.h>
 #include "eve_app.h"
 
 //#define CL_CUSOM_MAINWINDOW
 #ifdef CL_CUSOM_MAINWINDOW
 #include "ui/mainwindow.h"
+#else
+#include "mainwnd.h"
 #endif
 
 #include "version.h"
-#include "mainwnd.h"
 #include "settings.h"
 
 #include "decoders/video/ipp_h264_decoder.h"
@@ -198,6 +198,7 @@ void initAppServerConnection()
     }
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
+    QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
 
 void initAppServerEventConnection()
@@ -230,13 +231,12 @@ int main(int argc, char *argv[])
     QnAutoTester autoTester(argc, argv);
 
     EveApplication application(argc, argv);
-    application.setQuitOnLastWindowClosed(true);
     application.setWindowIcon(Skin::icon(QLatin1String("appicon.png")));
+    application.setQuitOnLastWindowClosed(true);
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
         argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
-
     while (application.isRunning())
     {
         if (application.sendMessage(argsMessage))
@@ -339,12 +339,6 @@ int main(int argc, char *argv[])
     qApp->setStyle(Skin::style());
 
     /*qApp->setStyleSheet(QLatin1String(
-            "QMenu {\n"
-            "font-family: Bodoni MT;\n"
-            "font-size: 18px;\n"
-            "}"));*/
-
-    /*qApp->setStyleSheet(QLatin1String(
         "QMenu {\n"
         "background-color: black;\n"
         "font-family: Bodoni MT;\n"
@@ -391,25 +385,24 @@ int main(int argc, char *argv[])
     MainWnd mainWindow(argc, argv);
 #endif
     mainWindow.show();
-    
+
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif
 
-    QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
-        &mainWindow, SLOT(handleMessage(const QString&)));
+    QObject::connect(&application, SIGNAL(messageReceived(QString)), &mainWindow, SLOT(handleMessage(QString)));
 
     QnEventManager::instance()->run();
 
-    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
+    if (autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
         QObject::connect(&autoTester, SIGNAL(finished()), &application, SLOT(quit()));
         autoTester.start();
     }
 
     int result = application.exec();
 
-    if(autoTester.state() == QnAutoTester::FINISHED) {
-        if(!autoTester.succeeded())
+    if (autoTester.state() == QnAutoTester::FINISHED) {
+        if (!autoTester.succeeded())
             result = 1;
 
         QTextStream out(stdout);

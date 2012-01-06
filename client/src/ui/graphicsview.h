@@ -18,7 +18,7 @@ class CLAbstractSceneItem;
 class CLVideoWindowItem;
 class QGraphicsPixmapItem;
 class QnLayerPainter;
-class CLAbstractDeviceSettingsDlg;
+class QDialog;
 class CLAbstractUnmovedItem;
 class QParallelAnimationGroup;
 class QInputEvent;
@@ -221,7 +221,7 @@ protected:
 
     QWidget* mMainWnd;
 
-    CLAbstractDeviceSettingsDlg* mDeviceDlg;
+    QDialog *mDeviceDlg;
 
     bool m_drawBkg;
     QnLayerPainter* m_animated_bckg;

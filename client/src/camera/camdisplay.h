@@ -45,8 +45,10 @@ public:
 	/**
 	 * \returns                         Current time in microseconds.
 	 */
+
     virtual qint64 getCurrentTime() const;
     virtual qint64 getDisplayedTime() const;
+    virtual qint64 getExternalTime() const;
     virtual qint64 getNextTime() const;
 
     void setMTDecoding(bool value);
@@ -54,7 +56,7 @@ public:
     void setSingleShotMode(bool single);
 
     QImage getScreenshot(int channel);
-    bool isRealTimeSource() const { return m_isRealTimeSource; }
+    bool isRealTimeSource() const;
 
     void setExternalTimeSource(QnlTimeSource* value);
 

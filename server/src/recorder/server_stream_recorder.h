@@ -22,6 +22,7 @@ protected:
     virtual void fileStarted(qint64 startTimeMs, const QString& fileName);
     virtual void fileFinished(qint64 durationMs, const QString& fileName);
     virtual QString fillFileName();
+    virtual bool canAcceptData() const;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
 private:
@@ -33,6 +34,7 @@ private:
     qint64 m_lastMotionTimeUsec;
     bool m_lastMotionContainData;
     bool m_needUpdateStreamParams;
+    mutable qint64 m_lastWarningTime;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

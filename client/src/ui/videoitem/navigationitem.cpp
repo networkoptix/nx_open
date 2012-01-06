@@ -116,7 +116,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
         setPalette(pal);
     }
 
-    
+
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
@@ -220,12 +220,24 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_muteButton->setChecked(m_volumeSlider->isMute());
 
     m_liveButton = new ImageButton(this);
-    //m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
-    m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Disabled, ImageButton::Background);
+    m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
     m_liveButton->setPreferredSize(20, 20);
     m_liveButton->setMaximumSize(m_liveButton->preferredSize());
+    m_liveButton->setCheckable(true);
+    m_liveButton->setChecked(m_timeSlider->isAtEnd());
     m_liveButton->setEnabled(false);
     m_liveButton->hide();
+
+    connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(setLiveMode(bool)));
+
+    m_mrsButton = new ImageButton(this);
+    m_mrsButton->addPixmap(Skin::pixmap(QLatin1String("mrs.png")), ImageButton::Active, ImageButton::Background);
+    m_mrsButton->setPreferredSize(20, 20);
+    m_mrsButton->setMaximumSize(m_mrsButton->preferredSize());
+    m_mrsButton->setEnabled(false);
+    m_mrsButton->hide();
+
+    connect(m_mrsButton, SIGNAL(clicked()), this, SLOT(onMrsButtonClicked()));
 
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
@@ -249,6 +261,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     rightLayoutH->setSpacing(3);
     rightLayoutH->addItem(m_timeLabel);
     rightLayoutH->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
+    rightLayoutH->addItem(m_mrsButton);
+    rightLayoutH->setAlignment(m_mrsButton, Qt::AlignCenter);
     rightLayoutH->addItem(m_liveButton);
     rightLayoutH->setAlignment(m_liveButton, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);
@@ -351,7 +365,7 @@ void NavigationItem::updateActualCamera()
 
 void NavigationItem::setActualCamera(CLVideoCamera *camera)
 {
-    if(m_camera == camera)
+    if (m_camera == camera)
         return;
 
     m_speedSlider->resetSpeed();
@@ -377,6 +391,14 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         setVisible(false);
         m_timeSlider->setScalingFactor(0);
     }
+}
+
+void NavigationItem::setLiveMode(bool value)
+{
+    if (value == m_timeSlider->isAtEnd())
+        return;
+
+    m_timeSlider->setCurrentValue(value ? DATETIME_NOW : m_timeSlider->minimumValue());
 }
 
 void NavigationItem::onLiveModeChanged(bool value)
@@ -409,7 +431,7 @@ void NavigationItem::updateSlider()
     qint64 endTime = reader->endTime();
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
-		m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentDateTime().toMSecsSinceEpoch()-10000); // if  nothing is recorded set minvalue to live-10sec
+        m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentDateTime().toMSecsSinceEpoch() - 10000); // if  nothing is recorded set minvalue to live-10sec
         m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
         if (m_timeSlider->minimumValue() == 0)
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
@@ -423,6 +445,7 @@ void NavigationItem::updateSlider()
             m_timeSlider->setCurrentValue(m_currentTime);
         }
         m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
+        m_mrsButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
 
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
@@ -443,7 +466,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
 
     qint64 w = m_timeSlider->sliderRange();
     qint64 t = m_timeSlider->viewPortPos();
-    if(t <= 0)
+    if (t <= 0)
         return;  // slider range still not initialized yet
 
     if (!m_motionPeriodLoader.contains(netRes)) {
@@ -470,12 +493,12 @@ bool NavigationItem::updateRecPeriodList(bool force)
 
     qint64 w = m_timeSlider->sliderRange();
     qint64 t = m_timeSlider->viewPortPos();
-    if(t <= 0) 
+    if (t <= 0)
         return false;  // slider range does not initialized now
 
     m_timePeriodUpdateTime = currentTime;
 
-    if(!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
+    if (!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
         return true;
 
     if (!m_camera)
@@ -484,13 +507,13 @@ bool NavigationItem::updateRecPeriodList(bool force)
     QnNetworkResourceList resources;
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
-        if(networkResource) 
+        if (networkResource)
             resources.push_back(networkResource);
     }
 
     /* Request interval no shorter than 1 hour. */
     const qint64 oneHour = 60ll * 60ll * 1000ll;
-    if(w < oneHour)
+    if (w < oneHour)
         w = oneHour;
 
     /* It is important to update the stored interval BEFORE sending request to
@@ -574,14 +597,15 @@ void NavigationItem::onValueChanged(qint64 time)
 
 void NavigationItem::smartSeek(qint64 timeMSec)
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    if(m_timeSlider->isAtEnd()) {
+    if (m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW);
 
         m_liveButton->show();
+        m_mrsButton->show();
     } else {
         timeMSec *= 1000;
         if (m_timeSlider->isMoving())
@@ -590,12 +614,13 @@ void NavigationItem::smartSeek(qint64 timeMSec)
             reader->jumpToPreviousFrame(timeMSec);
 
         m_liveButton->hide();
+        m_mrsButton->hide();
     }
 }
 
 void NavigationItem::pause()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -605,6 +630,7 @@ void NavigationItem::pause()
     reader->pauseMedia();
     m_camera->getCamCamDisplay()->pauseAudio();
     m_liveButton->hide();
+    m_mrsButton->hide();
 
     reader->setSingleShotMode(true);
     //m_camera->getCamCamDisplay()->setSingleShotMode(true);
@@ -612,7 +638,7 @@ void NavigationItem::pause()
 
 void NavigationItem::play()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -636,7 +662,7 @@ void NavigationItem::play()
 
 void NavigationItem::rewindBackward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -649,7 +675,7 @@ void NavigationItem::rewindBackward()
 
 void NavigationItem::rewindForward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -671,7 +697,7 @@ void NavigationItem::rewindForward()
 
 void NavigationItem::stepBackward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -700,7 +726,7 @@ void NavigationItem::stepBackward()
 
 void NavigationItem::stepForward()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -720,7 +746,7 @@ void NavigationItem::stepForward()
 
 void NavigationItem::onSliderPressed()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -731,7 +757,7 @@ void NavigationItem::onSliderPressed()
 
 void NavigationItem::onSliderReleased()
 {
-    if(m_camera == NULL)
+    if (m_camera == NULL)
         return;
 
     setActive(true);
@@ -851,4 +877,9 @@ void NavigationItem::setPlaying(bool playing)
 void NavigationItem::togglePlayPause()
 {
     setPlaying(!m_playing);
+}
+
+void NavigationItem::onMrsButtonClicked()
+{
+    // ### TODO
 }

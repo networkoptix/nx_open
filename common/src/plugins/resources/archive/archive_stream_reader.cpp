@@ -3,6 +3,7 @@
 #include "utils/media/frame_info.h"
 #include "avi_files/avi_archive_delegate.h"
 #include "utils/common/util.h"
+#include "utils/media/externaltimesource.h"
 
 
 // used in reverse mode.
@@ -29,7 +30,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastGopSeekTime(-1),
     m_IFrameAfterJumpFound(false),
     m_requiredJumpTime(AV_NOPTS_VALUE),
-    m_lastUIJumpTime(AV_NOPTS_VALUE),
     m_lastFrameDuration(0),
     m_selectedAudioChannel(0),
     m_BOF(false),
@@ -188,8 +188,9 @@ bool QnArchiveStreamReader::init()
          QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
          if (dp->isRealTimeSource())
              return DATETIME_NOW;
-         else
-            rez = qMax(rez, dp->getCurrentTime());
+         QnlTimeSource* timeSource = dynamic_cast<QnlTimeSource*>(dp);
+         if (timeSource)
+            rez = qMax(rez, timeSource->getExternalTime());
      }
      return rez;
  }
@@ -241,9 +242,12 @@ begin_label:
         }
 	}
 
+    bool reverseMode = m_reverseMode;
     m_jumpMtx.lock();
-    if (m_requiredJumpTime != AV_NOPTS_VALUE)
-        {
+    if (m_requiredJumpTime != AV_NOPTS_VALUE 
+        && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
+    {
+        /*
         if (m_newDataMarker) {
             QString s;
             QTextStream str(&s);
@@ -252,7 +256,7 @@ begin_label:
             str.flush();
             cl_log.log(s, cl_logALWAYS);
         }
-        m_dataMarker = m_newDataMarker;
+        */
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
         m_skipFramesToTime = m_tmpSkipFramesToTime;
@@ -261,7 +265,6 @@ begin_label:
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
-        m_lastUIJumpTime = jumpTime;
 
         emit jumpOccured(jumpTime);
         m_BOF = true;
@@ -270,15 +273,18 @@ begin_label:
         m_jumpMtx.unlock();
     }
 
-    bool reverseMode = m_reverseMode;
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
-        qint64 displayTime = determineDisplayTime();
+        m_jumpMtx.lock();
+        bool commandMergedWithJump = m_requiredJumpTime != AV_NOPTS_VALUE;
+        qint64 displayTime = commandMergedWithJump ? m_requiredJumpTime : determineDisplayTime();
+        m_requiredJumpTime = AV_NOPTS_VALUE;
+        m_jumpMtx.unlock();
+
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
         if (!delegateForNegativeSpeed) {
-            m_lastGopSeekTime = -1;
             intChanneljumpTo(displayTime, 0);
             if (reverseMode) {
                 if (displayTime != DATETIME_NOW)
@@ -286,9 +292,13 @@ begin_label:
             }
             else
                 setSkipFramesToTime(displayTime);
-            m_BOF = true;
         }
+        m_lastGopSeekTime = -1;
+        m_BOF = true;
+        if (commandMergedWithJump)
+            emit jumpOccured(displayTime);
     }
+    m_dataMarker = m_newDataMarker;
 
     QnCompressedVideoDataPtr videoData;
 	
@@ -359,6 +369,7 @@ begin_label:
             if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) 
             {
                 // seek from EOF to BOF occured
+                //Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
                 setCurrentTime(m_topIFrameTime);
                 m_eof = false;
             }
@@ -397,7 +408,8 @@ begin_label:
                             tmpVal = m_lengthMksec;
                         }
                         intChanneljumpTo(seekTime, 0);
-                        m_lastGopSeekTime = seekTime;
+                        m_lastGopSeekTime = m_topIFrameTime; //seekTime;
+                        //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
                         //return getNextData();
                         if (m_runing)
@@ -423,46 +435,6 @@ begin_label:
             videoData->flags |= AV_REVERSE_PACKET;
         }
 
-
-        /*
-        // -------------------------------------------
-        // workaround ffmpeg bugged seek
-        // todo: move it code to AVI delegate
-        if (videoData->channelNumber == 0 && dynamic_cast<QnAviArchiveDelegate*>(m_delegate))
-        {
-            if (m_lastUIJumpTime != AV_NOPTS_VALUE)
-            {
-                //QMutexLocker mutex(&m_cs);
-                if (m_lastUIJumpTime - m_currentTime > MAX_KEY_FIND_INTERVAL) 
-                {
-                    // can't find I-frame after jump. jump again and disable I-frame searcher
-                    m_currentData = QnAbstractMediaDataPtr();
-                    intChanneljumpTo(m_lastUIJumpTime, 0);
-                    m_lastUIJumpTime = AV_NOPTS_VALUE;
-                    goto begin_label;
-                }
-                else  
-                {
-                    if (videoData->flags & AV_PKT_FLAG_KEY) {
-                        m_IFrameAfterJumpFound = true;
-                        m_lastUIJumpTime = AV_NOPTS_VALUE;
-                    }
-                    if (!reverseMode && !m_IFrameAfterJumpFound)
-                    {
-                        m_currentData = QnAbstractMediaDataPtr();
-                        if (m_currentTime >= m_topIFrameTime) // m_topIFrameTime used as jump time
-                            intChanneljumpTo(m_topIFrameTime - BACKWARD_SEEK_STEP, 0);
-                        if (m_runing)
-                            goto begin_label;
-                        else
-                            return QnAbstractMediaDataPtr();
-                    }
-                }
-            }
-        }
-        */
-
-        // -------------------------------------------
 
 		if (m_skipFramesToTime)
 		{
@@ -601,9 +573,11 @@ bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
 
 void QnArchiveStreamReader::setReverseMode(bool value)
 {
-    if (value != m_reverseMode)
+    if (value != m_reverseMode) {
         m_lastJumpTime = AV_NOPTS_VALUE;
-    m_reverseMode = value;
+        m_reverseMode = value;
+        m_delegate->beforeChangeReverseMode(m_reverseMode);
+    }
 }
 
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const

@@ -6,6 +6,7 @@
 #include "utils/network/rtp_stream_parser.h"
 #include "core/datapacket/datapacket.h"
 #include "utils/network/rtpsession.h"
+#include "utils/media/externaltimesource.h"
 
 class QnRtspConnectionProcessor;
 
@@ -14,7 +15,7 @@ static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
 
-class QnRtspDataConsumer: public QnAbstractDataConsumer
+class QnRtspDataConsumer: public QnAbstractDataConsumer, public QnlTimeSource
 {
 public:
     QnRtspDataConsumer(QnRtspConnectionProcessor* owner);
@@ -24,7 +25,6 @@ public:
 
     void setLastSendTime(qint64 time);
     void setWaitCSeq(qint64 newTime, int sceq);
-    virtual qint64 getCurrentTime() const;
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
@@ -32,6 +32,11 @@ public:
     void lockDataQueue();
     void unlockDataQueue();
     void setSingleShotMode(bool value);
+
+    virtual qint64 getDisplayedTime() const;
+    virtual qint64 getCurrentTime() const;
+    virtual qint64 getNextTime() const;
+    virtual qint64 getExternalTime() const;
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);

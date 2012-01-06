@@ -8,7 +8,8 @@
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
 
-QnResourceDiscoveryManager::QnResourceDiscoveryManager()
+QnResourceDiscoveryManager::QnResourceDiscoveryManager():
+m_server(false)
 {
 }
 
@@ -22,6 +23,11 @@ QnResourceDiscoveryManager& QnResourceDiscoveryManager::instance()
     static QnResourceDiscoveryManager instance;
 
     return instance;
+}
+
+void QnResourceDiscoveryManager::setServer(bool serv)
+{
+    m_server = serv;
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
@@ -68,8 +74,7 @@ void QnResourceDiscoveryManager::pleaseStop()
 
 bool QnResourceDiscoveryManager::getResourceTypes()
 {
-    QnDummyResourceFactory dummyFactory;
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection(dummyFactory);
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
     QList<QnResourceTypePtr> resourceTypeList;
     if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
@@ -162,10 +167,30 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     it = resources.begin();
     while (it != resources.end())
     {
-        if (QnResourcePool::instance()->hasSuchResouce((*it)->getUniqueId()))
+        QnResourcePtr  rpResource = QnResourcePool::instance()->getResourceByUniqId((*it)->getUniqueId());
+
+        if (rpResource)
+        {
+            // if such res in ResourcePool
+            QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
+
+            if (newNetRes)
+            {
+                QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
+                
+                if (rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress())
+                {
+                    // if such network resource is in pool and has diff IP => should keep it 
+                    ++it;
+                    continue;
+                }
+            }
+
+
             it = resources.erase(it);
+        }
         else
-            ++it;
+            ++it; // new resource => shouls keep it 
     }
 
     //qDebug() << resources.size();
@@ -192,8 +217,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     // from just found
     foreach (QnResourcePtr res, resources)
     {
-        if (QnResourcePool::instance()->hasSuchResouce(res->getUniqueId()))
-            continue; // this ip is already taken into account
+        //if (QnResourcePool::instance()->hasSuchResouce(res->getUniqueId()))
+        //    continue; // this ip is already taken into account
 
         if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
@@ -221,14 +246,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         if (netRes)
         {
             quint32 ips = netRes->getHostAddress().toIPv4Address();
-            if (ipsList.count(ips) > 1)
+            if (ipsList.count(ips) > 0 && ipsList[ips] > 1)
                 netRes->setNetworkStatus(QnNetworkResource::BadHostAddr);
         }
     }
 
 
-    //marks all new network resources as badip if not accessible.
-    //if resources are present in resourcepull already it marks as badip as well
+    //marks all new network resources as badip if: 1) not in the same subnet and not accesible or 2) same subnet and conflicting 
     check_if_accessible(resources, threads);
 
 
@@ -279,7 +303,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     {
         QnNetworkResourcePtr netRes = (*it).dynamicCast<QnNetworkResource>();
         if (netRes && netRes->checkNetworkStatus(QnNetworkResource::BadHostAddr)) // if this is network resource and it has bad ip should stay
+        {
             it = resources.erase(it);
+            cl_log.log("!!! Cannot resolve conflict for: ", netRes->getHostAddress().toString(), cl_logERROR);
+        }
         else
             ++it;
     }
@@ -309,6 +336,59 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     if (resources.size())
         qDebug() << "Returning " << resources.size() << " resources";
 
+
+    //and now lets correct the ip of already existing resources 
+    it = resources.begin();
+    while (it != resources.end())
+    {
+        QnResourcePtr  rpResource = QnResourcePool::instance()->getResourceByUniqId((*it)->getUniqueId());
+
+        if (rpResource)
+        {
+            // if such res in ResourcePool
+            QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
+
+            if (newNetRes)
+            {
+                QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
+
+                if (rpNetRes)
+                {
+                    // if such network resource is in pool and has diff IP => should keep it 
+                    rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomain::QnDomainMemory);
+                    it = resources.erase(it);
+
+                    if (m_server)
+                    {
+                        QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
+                        if (cameraResource)
+                        {
+                            QnResourceList cameras;
+                            QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
+                            connect->addCamera(*cameraResource, cameras);
+                        }
+
+                    }
+
+                    continue;
+                }
+                else 
+                {
+                    Q_ASSERT(false);
+                }
+            }
+
+            Q_ASSERT(false);
+
+            
+        }
+        else
+            ++it; // nothing to do 
+    }
+
+
+
+
     return resources;
 }
 
@@ -326,7 +406,7 @@ struct check_if_accessible_STRUCT
 
     void f()
     {
-        bool acc = !resourceNet->checkNetworkStatus(QnNetworkResource::BadHostAddr); // bad ip already
+        bool acc = !resourceNet->checkNetworkStatus(QnNetworkResource::BadHostAddr); // not  bad ip so far
 
         if (acc)
         {
@@ -337,17 +417,9 @@ struct check_if_accessible_STRUCT
         }
 
 
-        QnResourcePtr existingResource = QnResourcePool::instance()->getResourceByUniqId( resourceNet->getUniqueId() );
-        if (existingResource)
-        {
-            // if such resource already exists; in the pool we should update acc flag
-            resourceNet = existingResource.dynamicCast<QnNetworkResource>();
-        }
-
-        if (acc)
-            resourceNet->removeNetworkStatus(QnNetworkResource::BadHostAddr);
-        else
+        if (!acc)
             resourceNet->addNetworkStatus(QnNetworkResource::BadHostAddr);
+
     }
 };
 

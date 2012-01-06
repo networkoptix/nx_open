@@ -43,7 +43,7 @@ VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     setStyle(new VolumeSliderProxyStyle(this));
 
     setRange(0, 100);
-    setSliderPosition(QtvAudioDevice::instance().volume() * 100);
+    setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
 
     connect(this, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
 }
@@ -59,13 +59,13 @@ VolumeSlider::~VolumeSlider()
 
 bool VolumeSlider::isMute() const
 {
-    return QtvAudioDevice::instance().isMute();
+    return QtvAudioDevice::instance()->isMute();
 }
 
 void VolumeSlider::setMute(bool mute)
 {
-    QtvAudioDevice::instance().setMute(mute);
-    setSliderPosition(QtvAudioDevice::instance().volume() * 100);
+    QtvAudioDevice::instance()->setMute(mute);
+    setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
 }
 
 void VolumeSlider::setToolTipItem(ToolTipItem *toolTip)
@@ -153,7 +153,7 @@ void VolumeSlider::timerEvent(QTimerEvent *event)
 
 void VolumeSlider::onValueChanged(int value)
 {
-    QtvAudioDevice::instance().setVolume(value / 100.0);
+    QtvAudioDevice::instance()->setVolume(value / 100.0);
 
     if (m_toolTipTimerId)
         killTimer(m_toolTipTimerId);
@@ -164,7 +164,7 @@ void VolumeSlider::onValueChanged(int value)
         initStyleOption(&opt);
         const QRectF sliderRect = QRectF(style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle));
         m_toolTip->setPos(sliderRect.center().x(), sliderRect.top());
-        m_toolTip->setText(!QtvAudioDevice::instance().isMute() ? tr("%1%").arg(value) : tr("Muted"));
+        m_toolTip->setText(!QtvAudioDevice::instance()->isMute() ? tr("%1%").arg(value) : tr("Muted"));
         m_toolTip->setVisible(true);
     }
 }

@@ -1,5 +1,6 @@
 #include "mainwnd.h"
 
+#include <QtCore/QFile>
 #include <QtCore/QPropertyAnimation>
 
 #include <QtGui/QBoxLayout>
@@ -98,7 +99,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
-        m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPointF(0, 0));
+        m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), QPointF(0, 0));
 
     /* Prepare UI. */
     m_tabWidget = new TabWidget(this);

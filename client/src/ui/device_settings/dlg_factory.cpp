@@ -4,11 +4,7 @@
 
 #include "device_settings_dlg.h"
 
-class Manufactures : public QList<CLAbstractDlgManufacture *>
-{
-public:
-    ~Manufactures() { qDeleteAll(*this); }
-};
+typedef QList<CLAbstractDlgManufacture *> Manufactures;
 
 Q_GLOBAL_STATIC(Manufactures, manufactures)
 
@@ -26,7 +22,7 @@ bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
     return false;
 }
 
-CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource)
+QDialog *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource)
 {
     if (!resource)
         return 0;

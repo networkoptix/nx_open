@@ -188,7 +188,7 @@ bool QtvSound::playImpl()
     checkOpenALErrorDebug(m_device);
     // if already playing
     if (AL_PLAYING != state) {
-        float volume = QtvAudioDevice::instance().volume();
+        float volume = QtvAudioDevice::instance()->volume();
         alSourcef(m_source, AL_GAIN, volume);
 
         // If there are Buffers in the Source Queue then the Source was starved of audio

@@ -218,7 +218,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
-    m_motionSelectionInstrument->recursiveDisable();
+    //m_motionSelectionInstrument->recursiveDisable();
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -1040,10 +1040,15 @@ void QnWorkbenchController::at_treeItem_geometryChanged() {
     updateViewportMargins();
 }
 
+void QnWorkbenchController::at_hideMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), false);
+    //m_motionSelectionInstrument->recursiveDisable();
+}
+
 void QnWorkbenchController::at_showMotionAction_triggered() 
 {
     displayMotionGrid(display()->scene()->selectedItems(), true);
-    m_motionSelectionInstrument->recursiveEnable();
+    //m_motionSelectionInstrument->recursiveEnable();
 
 #if 0
     
@@ -1055,11 +1060,6 @@ void QnWorkbenchController::at_showMotionAction_triggered()
     QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource()->getUniqueId());
     test2->show();
 #endif
-}
-
-void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(display()->scene()->selectedItems(), false);
-    m_motionSelectionInstrument->recursiveDisable();
 }
 
 int QnWorkbenchController::isMotionGridDisplayed() 

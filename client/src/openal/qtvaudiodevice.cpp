@@ -27,11 +27,11 @@ void alc_deinit(void);
 }
 #endif
 
-Q_GLOBAL_STATIC(QtvAudioDevice, getAudioDevice)
+Q_GLOBAL_STATIC(QtvAudioDevice, audioDevice)
 
-QtvAudioDevice &QtvAudioDevice::instance()
+QtvAudioDevice *QtvAudioDevice::instance()
 {
-    return *getAudioDevice();
+    return audioDevice();
 }
 
 QtvAudioDevice::QtvAudioDevice()

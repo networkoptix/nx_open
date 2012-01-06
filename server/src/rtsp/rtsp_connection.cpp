@@ -288,7 +288,7 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
 {
     Q_D(QnRtspConnectionProcessor);
     //return d->playTime + d->playTimer.elapsed()*1000 * d->rtspScale;
-    return d->dataProcessor->getCurrentTime();
+    return d->dataProcessor->getDisplayedTime();
 }
 
 void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
@@ -394,7 +394,7 @@ int QnRtspConnectionProcessor::composePlay()
             QnTimePeriodList motionPeriods;
             QRegion region;
             QString motionRegion = d->requestHeaders.value("x-motion-region").toUtf8();
-            if (!motionRegion.isNull())
+            if (motionRegion.size() > 0)
             {
                 QBuffer buffer;
                 buffer.open(QIODevice::ReadWrite);

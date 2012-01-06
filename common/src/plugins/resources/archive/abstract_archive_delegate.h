@@ -54,6 +54,9 @@ public:
     /** This function calls from reader */
     virtual void beforeSeek(qint64 time) {}
 
+    /** This function calls from reader */
+    virtual void beforeChangeReverseMode(bool reverseMode) {}
+
 protected:
     Flags m_flags;
 };
