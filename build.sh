@@ -8,10 +8,10 @@ done
 # Workaround buggy qtservice
 if [ `uname -s` == 'Darwin' ]
 then
-    SED_ARGS='-i ""'
+    SED_ARGS='-i .bak'
 else
     # Assume GNU sed
-    SED_ARGS='-i""'
+    SED_ARGS='-i.bak'
 fi
 
 sed $SED_ARGS "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" server/build/Makefile.debug
@@ -23,6 +23,8 @@ sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice.moc\)%\1%" server/b
 sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/build/Makefile.debug
 sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice.moc\)%\1%" server/build/Makefile.release
 sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" server/build/Makefile.release
+
+rm server/build/Makefile.debug.bak server/build/Makefile.release.bak
 
 for i in common server client
 do

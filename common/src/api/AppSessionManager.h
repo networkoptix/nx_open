@@ -18,15 +18,19 @@ class AppSessionManager : public SessionManager
 public:
     AppSessionManager(const QUrl &url);
 
-    int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes);
-    int getResources(QnApiResourceResponsePtr& resources);
+    int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes, QByteArray& errorString);
+    int getResources(QnApiResourceResponsePtr& resources, QByteArray& errorString);
 
-    int getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId);
-    int getStorages(QnApiStorageResponsePtr& resources);
+    int getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId, QByteArray& errorString);
+    int getStorages(QnApiStorageResponsePtr& resources, QByteArray& errorString);
 
-    int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers);
-    int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);
-    int addStorage(const ::xsd::api::storages::Storage&);
+    int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers, QByteArray& errorString);
+    int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras, QByteArray& errorString);
+
+    int addServerAsync(const ::xsd::api::servers::Server&, QObject* target, const char* slot);
+    int addCameraAsync(const ::xsd::api::cameras::Camera&, QObject* target, const char* slot);
+
+    int addStorage(const ::xsd::api::storages::Storage&, QByteArray& errorString);
 
 private:
     template<class Container>
@@ -36,7 +40,8 @@ private:
                                          const ::xml_schema::namespace_infomap&,
                                          const ::std::string& e,
                                          xml_schema::flags),
-                   std::auto_ptr<Container> (*loadFunction)(std::istream&, xml_schema::flags, const xml_schema::properties&))
+                   std::auto_ptr<Container> (*loadFunction)(std::istream&, xml_schema::flags, const xml_schema::properties&),
+                   QByteArray& errorString)
     {
         std::ostringstream os;
 
@@ -44,19 +49,35 @@ private:
 
         QByteArray reply;
 
-        int status = addObject(objectName, os.str().c_str(), reply);
+        int status = addObject(objectName, os.str().c_str(), reply, errorString);
         if (status == 0)
         {
             QTextStream stream(reply);
-            return loadObjects(stream.device(), objectsOut, loadFunction);
+            return loadObjects(stream.device(), objectsOut, loadFunction, errorString);
         }
 
         return status;
     }
 
     template<class Container>
+    int addObjectsAsync(const QString& objectName, const Container& objectsIn,
+                   void (*saveFunction) (std::ostream&,
+                                         const Container&,
+                                         const ::xml_schema::namespace_infomap&,
+                                         const ::std::string& e,
+                                         xml_schema::flags), QObject* target, const char* slot)
+    {
+        std::ostringstream os;
+
+        saveFunction(os, objectsIn, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
+
+        return sendAsyncPostRequest(objectName, os.str().c_str(), target, slot);
+    }
+
+    template<class Container>
     int getObjects(const QString& objectName, const QString& args, QSharedPointer<Container>& objects,
-                   std::auto_ptr<Container> (*loadFunction)(std::istream&, xml_schema::flags, const xml_schema::properties&) )
+                   std::auto_ptr<Container> (*loadFunction)(std::istream&, xml_schema::flags, const xml_schema::properties&),
+                   QByteArray& errorString)
     {
         QByteArray reply;
 
@@ -67,19 +88,23 @@ private:
         else
             request = QString("%1/%2").arg(objectName).arg(args);
 
-        int status = sendGetRequest(request, reply);
+        int status = sendGetRequest(request, reply, errorString);
         if (status == 0)
         {
             QTextStream stream(reply);
-            return loadObjects(stream.device(), objects, loadFunction);
+            return loadObjects(stream.device(), objects, loadFunction, errorString);
         }
 
         return status;
     }
 
+    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
+
+public:
     template<class Container>
-    int loadObjects(QIODevice* device, QSharedPointer<Container>& objects,
-                   std::auto_ptr<Container> (*loadFunction)(std::istream&, xml_schema::flags, const xml_schema::properties&) )
+    static int loadObjects(QIODevice* device, QSharedPointer<Container>& objects,
+                   std::auto_ptr<Container> (*loadFunction)(std::istream&, xml_schema::flags, const xml_schema::properties&),
+                    QByteArray& errorString)
     {
         try
         {
@@ -88,7 +113,8 @@ private:
         }
         catch (const xml_schema::exception& e)
         {
-            m_lastError = e.what();
+            errorString += "\nAppSessionManager::loadObjects(): ";
+            errorString += e.what();
 
             qDebug(e.what());
             return -1;
@@ -96,8 +122,6 @@ private:
 
         return 0;
     }
-
-    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
 
 private:
     static const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;

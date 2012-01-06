@@ -5,8 +5,6 @@
 #include <QtXml/QDomDocument>
 #include <QtXml/QXmlInputSource>
 
-#include <algorithm>
-
 #include "utils/network/synchttp.h"
 
 AppSessionManager::AppSessionManager(const QUrl &url)
@@ -14,23 +12,39 @@ AppSessionManager::AppSessionManager(const QUrl &url)
 {
 }
 
-int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr)
+int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr, QByteArray& errorString)
 {
     ::xsd::api::servers::Servers servers;
     servers.server().push_back(server);
 
-    return addObjects("server", servers, serversPtr, ::xsd::api::servers::servers, ::xsd::api::servers::servers);
+    return addObjects("server", servers, serversPtr, ::xsd::api::servers::servers, ::xsd::api::servers::servers, errorString);
 }
 
-int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnApiCameraResponsePtr& camerasPtr)
+int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnApiCameraResponsePtr& camerasPtr, QByteArray& errorString)
 {
     ::xsd::api::cameras::Cameras cameras;
     cameras.camera().push_back(camera);
 
-    return addObjects("camera", cameras, camerasPtr, ::xsd::api::cameras::cameras, ::xsd::api::cameras::cameras);
+    return addObjects("camera", cameras, camerasPtr, ::xsd::api::cameras::cameras, ::xsd::api::cameras::cameras, errorString);
 }
 
-int AppSessionManager::addStorage(const ::xsd::api::storages::Storage& storage)
+int AppSessionManager::addServerAsync(const ::xsd::api::servers::Server& server, QObject* target, const char* slot)
+{
+    ::xsd::api::servers::Servers servers;
+    servers.server().push_back(server);
+
+    return addObjectsAsync("server", servers, ::xsd::api::servers::servers, target, slot);
+}
+
+int AppSessionManager::addCameraAsync(const ::xsd::api::cameras::Camera& camera, QObject* target, const char* slot)
+{
+    ::xsd::api::cameras::Cameras cameras;
+    cameras.camera().push_back(camera);
+
+    return addObjectsAsync("camera", cameras, ::xsd::api::cameras::cameras, target, slot);
+}
+
+int AppSessionManager::addStorage(const ::xsd::api::storages::Storage& storage, QByteArray& errorString)
 {
     std::ostringstream os;
 
@@ -40,10 +54,10 @@ int AppSessionManager::addStorage(const ::xsd::api::storages::Storage& storage)
 
     QByteArray reply;
 
-    return addObject(QLatin1String("storage"), os.str().c_str(), reply);
+    return addObject(QLatin1String("storage"), os.str().c_str(), reply, errorString);
 }
 
-int AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
+int AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply, QByteArray& errorString)
 {
     QTextStream stream(&reply);
 
@@ -51,27 +65,30 @@ int AppSessionManager::addObject(const QString& objectName, const QByteArray& bo
     stream.readAll();
 
     if (status != 0)
-        m_lastError = formatNetworkError(status) + reply;
+    {
+        errorString += "\nAppSessionManager::addObject(): ";
+        errorString += formatNetworkError(status) + reply;
+    }
 
     return status;
 }
 
-int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes)
+int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes, QByteArray& errorString)
 {
-    return getObjects<xsd::api::resourceTypes::ResourceTypes>("resourceType", "", resourceTypes, xsd::api::resourceTypes::resourceTypes);
+    return getObjects<xsd::api::resourceTypes::ResourceTypes>("resourceType", "", resourceTypes, xsd::api::resourceTypes::resourceTypes, errorString);
 }
 
-int AppSessionManager::getStorages(QnApiStorageResponsePtr& xstorages)
+int AppSessionManager::getStorages(QnApiStorageResponsePtr& xstorages, QByteArray& errorString)
 {
-    return getObjects<xsd::api::storages::Storages>("storage", "", xstorages, xsd::api::storages::storages);
+    return getObjects<xsd::api::storages::Storages>("storage", "", xstorages, xsd::api::storages::storages, errorString);
 }
 
-int AppSessionManager::getCameras(QnApiCameraResponsePtr& cameras, const QnId& mediaServerId)
+int AppSessionManager::getCameras(QnApiCameraResponsePtr& cameras, const QnId& mediaServerId, QByteArray& errorString)
 {
-    return getObjects<xsd::api::cameras::Cameras>("camera", mediaServerId.toString(), cameras, xsd::api::cameras::cameras);
+    return getObjects<xsd::api::cameras::Cameras>("camera", mediaServerId.toString(), cameras, xsd::api::cameras::cameras, errorString);
 }
 
-int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
+int AppSessionManager::getResources(QnApiResourceResponsePtr& resources, QByteArray& errorString)
 {
-    return getObjects<xsd::api::resourcesEx::Resources>("resourceEx", "", resources, xsd::api::resourcesEx::resourcesEx);
+    return getObjects<xsd::api::resourcesEx::Resources>("resourceEx", "", resources, xsd::api::resourcesEx::resourcesEx, errorString);
 }

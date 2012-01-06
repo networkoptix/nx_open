@@ -170,9 +170,13 @@ QnVideoServerPtr registerServer(QnAppServerConnectionPtr appServerConnection, co
     server.setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 
     QnVideoServerList servers;
-    appServerConnection->addServer(server, servers);
+    QByteArray errorString;
+    if (appServerConnection->addServer(server, servers, errorString) != 0)
+    {
+        qDebug() << "registerServer(): Call to addServer failed. Reason: " << errorString;
 
-    Q_ASSERT(!servers.isEmpty());
+        return QnVideoServerPtr();
+    }
 
     return servers.at(0);
 }
@@ -336,10 +340,11 @@ public:
 
         for(;;)
         {
-            if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
+            QByteArray errorString;
+            if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
                 break;
 
-            qDebug() << "Can't get resource types: " << appServerConnection->lastError();
+            qDebug() << "Can't get resource types: " << errorString;
             QnSleep::msleep(1000);
         }
 
@@ -353,9 +358,14 @@ public:
             appserverHost = resolveHost(appserverHostString);
         } while (appserverHost.toIPv4Address() == 0);
         
-        QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverHost));
-        if (videoServer.isNull())
-            return;
+        QnVideoServerPtr videoServer;
+
+        while (videoServer.isNull())
+        {
+            videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverHost));
+            if (videoServer.isNull())
+                QnSleep::msleep(1000);
+        }
 
         eventManager->run();
 
@@ -374,7 +384,12 @@ public:
 
         // Get storages sample code.
         QnResourceList storages;
-        appServerConnection->getStorages(storages);
+        QByteArray errorString;
+        while (appServerConnection->getStorages(storages, errorString) != 0)
+        {
+            qDebug() << "QnMain::run(): Can't get storages. Reason: " << errorString;
+            QnSleep::msleep(1000);
+        }
 
         bool storageAdded = false;
         foreach (QnResourcePtr resource, storages)
@@ -398,8 +413,9 @@ public:
             storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
             storage->setSpaceLimit(5ll * 1024 * 1024 * 1024);
 
-            if (appServerConnection->addStorage(*storage))
-                qDebug() << "Couldn't add storage: " << appServerConnection->lastError();
+            QByteArray errorString;
+            if (appServerConnection->addStorage(*storage, errorString))
+                qDebug() << "Couldn't add storage: " << errorString;
 
             qnResPool->addResource(storage);
             qnStorageMan->addStorage(storage);
@@ -414,8 +430,7 @@ public:
         //IPPH264Decoder::dll.init();
 
         //============================
-        QnResourceDiscoveryManager::instance().setServer(true);
-        QnResourceDiscoveryManager::instance().addResourceProcessor(m_processor);
+        QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
         //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
@@ -423,8 +438,13 @@ public:
 
         QnScheduleTaskList scheduleTasks;
 
+        errorString.clear();
         QnSecurityCamResourceList cameras;
-        appServerConnection->getCameras(cameras, videoServer->getId());
+        while (appServerConnection->getCameras(cameras, videoServer->getId(), errorString) != 0)
+        {
+            qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
+            QnSleep::msleep(1000);
+        }
 
         foreach(QnSecurityCamResourcePtr camera, cameras)
         {

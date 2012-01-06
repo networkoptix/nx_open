@@ -91,6 +91,9 @@ copy_files(tools_path + '/bin/*.dll', 'bin/debug')
 if platform() == 'win32':
     copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
     copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
+elif platform() == 'mac':
+    copy_files(qjson_path + '/libqjson.0.dylib', 'bin/release')
+    copy_files(qjson_path + '/libqjson.0.dylib', 'bin/debug')
 elif platform() == 'linux':
     copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
     copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')

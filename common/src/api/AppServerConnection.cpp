@@ -14,6 +14,48 @@
 #include "api/Types.h"
 #include "api/AppSessionManager.h"
 
+
+void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, int handle)
+{
+    if (m_objectName == "server")
+    {
+        QnResourceList servers;
+        QnApiServerResponsePtr xsdServers;
+
+        QTextStream stream(result);
+
+        QByteArray errorString;
+        AppSessionManager::loadObjects(stream.device(), xsdServers, ::xsd::api::servers::servers, errorString);
+        if (status == 0)
+        {
+            parseServers(servers, xsdServers->server(), m_resourceFactory);
+        } else
+        {
+            errorString += SessionManager::formatNetworkError(status);
+        }
+
+        emit finished(handle, status, errorString, servers);
+    } else if (m_objectName == "camera")
+    {
+        QnResourceList cameras;
+        QnApiCameraResponsePtr xsdCameras;
+
+        QTextStream stream(result);
+
+        QByteArray errorString;
+        AppSessionManager::loadObjects(stream.device(), xsdCameras, ::xsd::api::cameras::cameras, errorString);
+        if (status == 0)
+        {
+            parseCameras(cameras, xsdCameras->camera(), m_resourceFactory);
+        } else
+        {
+            errorString += SessionManager::formatNetworkError(status);
+        }
+
+        emit finished(handle, status, errorString, cameras);
+    }
+}
+
 QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory)
     : m_sessionManager(new AppSessionManager(url)),
       m_resourceFactory(resourceFactory)
@@ -34,11 +76,11 @@ bool QnAppServerConnection::isConnected() const
     return true;
 }
 
-int QnAppServerConnection::getResourceTypes(QList<QnResourceTypePtr>& resourceTypes)
+int QnAppServerConnection::getResourceTypes(QList<QnResourceTypePtr>& resourceTypes, QByteArray& errorString)
 {
     QnApiResourceTypeResponsePtr xsdResourceTypes;
 
-    int status = m_sessionManager->getResourceTypes(xsdResourceTypes);
+    int status = m_sessionManager->getResourceTypes(xsdResourceTypes, errorString);
 
     if (!xsdResourceTypes.isNull())
         parseResourceTypes(resourceTypes, xsdResourceTypes->resourceType());
@@ -46,11 +88,11 @@ int QnAppServerConnection::getResourceTypes(QList<QnResourceTypePtr>& resourceTy
     return status;
 }
 
-int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
+int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources, QByteArray& errorString)
 {
     QnApiResourceResponsePtr xsdResources;
 
-    int status = m_sessionManager->getResources(xsdResources);
+    int status = m_sessionManager->getResources(xsdResources, errorString);
 
     if (!xsdResources.isNull())
     {
@@ -63,18 +105,13 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
     return status;
 }
 
-int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServerList& servers)
+int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServerList& servers, QByteArray& errorString)
 {
-    xsd::api::servers::Server server(serverIn.getId().toString().toStdString(),
-                                     serverIn.getName().toStdString(),
-                                     serverIn.getTypeId().toString().toStdString(),
-                                     serverIn.getUrl().toStdString(),
-                                     serverIn.getGuid().toStdString(),
-                                     serverIn.getApiUrl().toStdString());
+    QnApiServerPtr server = unparseServer(serverIn);
 
     QnApiServerResponsePtr xsdServers;
 
-    if (m_sessionManager->addServer(server, xsdServers) == 0)
+    if (m_sessionManager->addServer(*server, xsdServers, errorString) == 0)
     {
         parseServers(servers, xsdServers->server(), m_resourceFactory);
         return 0;
@@ -83,39 +120,13 @@ int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServe
     return 1;
 }
 
-int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, QList<QnResourcePtr>& cameras)
+int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, QList<QnResourcePtr>& cameras, QByteArray& errorString)
 {
-    xsd::api::cameras::Camera camera(cameraIn.getId().toString().toStdString(),
-                                     cameraIn.getName().toStdString(),
-                                     cameraIn.getTypeId().toString().toStdString(),
-                                     cameraIn.getUrl().toStdString(),
-                                     cameraIn.getMAC().toString().toStdString(),
-                                     cameraIn.getAuth().user().toStdString(),
-                                     cameraIn.getAuth().password().toStdString());
-
-    xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
-    foreach(const QnScheduleTask& scheduleTaskIn, cameraIn.getScheduleTasks())
-    {
-        xsd::api::scheduleTasks::ScheduleTask scheduleTask(
-                                                scheduleTaskIn.getStartTime(),
-                                                scheduleTaskIn.getEndTime(),
-                                                scheduleTaskIn.getDoRecordAudio(),
-                                                scheduleTaskIn.getRecordingType(),
-                                                scheduleTaskIn.getDayOfWeek(),
-                                                scheduleTaskIn.getBeforeThreshold(),
-                                                scheduleTaskIn.getAfterThreshold(),
-                                                scheduleTaskIn.getStreamQuality(),
-                                                scheduleTaskIn.getFps());
-
-        scheduleTasks.scheduleTask().push_back(scheduleTask);
-    }
-    camera.scheduleTasks(scheduleTasks);
-
-    camera.parentID(cameraIn.getParentId().toString().toStdString());
+    QnApiCameraPtr camera = unparseCamera(cameraIn);
 
     QnApiCameraResponsePtr xsdCameras;
 
-    if (m_sessionManager->addCamera(camera, xsdCameras) == 0)
+    if (m_sessionManager->addCamera(*camera, xsdCameras, errorString) == 0)
     {
         parseCameras(cameras, xsdCameras->camera(), m_resourceFactory);
         return 0;
@@ -124,7 +135,31 @@ int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, QList<QnR
     return 1;
 }
 
-int QnAppServerConnection::addStorage(const QnStorage& storageIn)
+int QnAppServerConnection::saveAsync(const QnVideoServer& serverIn, QObject* target, const char* slot)
+{
+    QnApiServerPtr server = unparseServer(serverIn);
+
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, "server");
+    QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
+
+    m_sessionManager->addServerAsync(*server, processor, SLOT(finished(int, const QByteArray&, int)));
+
+    return 0;
+}
+
+int QnAppServerConnection::saveAsync(const QnCameraResource& cameraIn, QObject* target, const char* slot)
+{
+    QnApiCameraPtr camera = unparseCamera(cameraIn);
+
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, "camera");
+    QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
+
+    m_sessionManager->addCameraAsync(*camera, processor, SLOT(finished(int, const QByteArray&, int)));
+
+    return 0;
+}
+
+int QnAppServerConnection::addStorage(const QnStorage& storageIn, QByteArray& errorString)
 {
     xsd::api::storages::Storage storage(storageIn.getId().toString().toStdString(),
                                          storageIn.getName().toStdString(),
@@ -134,14 +169,14 @@ int QnAppServerConnection::addStorage(const QnStorage& storageIn)
                                          storageIn.getSpaceLimit(),
                                          storageIn.getMaxStoreTime());
 
-    return m_sessionManager->addStorage(storage);
+    return m_sessionManager->addStorage(storage, errorString);
 }
 
-int QnAppServerConnection::getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId)
+int QnAppServerConnection::getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId, QByteArray& errorString)
 {
     QnApiCameraResponsePtr xsdCameras;
 
-    int status = m_sessionManager->getCameras(xsdCameras, mediaServerId);
+    int status = m_sessionManager->getCameras(xsdCameras, mediaServerId, errorString);
 
     if (!xsdCameras.isNull())
     {
@@ -151,11 +186,11 @@ int QnAppServerConnection::getCameras(QnSecurityCamResourceList& cameras, const 
     return status;
 }
 
-int QnAppServerConnection::getStorages(QnResourceList& storages)
+int QnAppServerConnection::getStorages(QnResourceList& storages, QByteArray& errorString)
 {
     QnApiStorageResponsePtr xsdStorages;
 
-    int status = m_sessionManager->getStorages(xsdStorages);
+    int status = m_sessionManager->getStorages(xsdStorages, errorString);
 
     if (!xsdStorages.isNull())
     {
@@ -164,12 +199,6 @@ int QnAppServerConnection::getStorages(QnResourceList& storages)
 
     return status;
 }
-
-QString QnAppServerConnection::lastError() const
-{
-    return m_sessionManager->lastError();
-}
-
 
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, theAppServerConnectionFactory)
 

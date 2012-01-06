@@ -36,10 +36,10 @@ void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* ser
     m_searchersList.push_back(serv);
 }
 
-void QnResourceDiscoveryManager::addResourceProcessor(QnResourceProcessor* processor)
+void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* processor)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    m_resourceProcessors.push_back(processor);
+    m_resourceProcessor = processor;
 }
 
 QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
@@ -76,8 +76,10 @@ bool QnResourceDiscoveryManager::getResourceTypes()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
+    QByteArray errorString;
+
     QList<QnResourceTypePtr> resourceTypeList;
-    if (appServerConnection->getResourceTypes(resourceTypeList) == 0)
+    if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
     {
         qnResTypePool->addResourceTypeList(resourceTypeList);
         qDebug() << "Got " << resourceTypeList.size() << " resource types";
@@ -85,7 +87,7 @@ bool QnResourceDiscoveryManager::getResourceTypes()
         return true;
     }
 
-    qDebug() << "Can't get resource types from Application server";
+    qDebug() << "Can't get resource types from Application server: " << errorString;
     return false;
 }
 
@@ -109,14 +111,18 @@ void QnResourceDiscoveryManager::run()
         if (ip_finished)
             CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("Cannot get available IP address."), cl_logWARNING);
 
-        foreach (QnResourceProcessor *processor, m_resourceProcessors)
-            processor->processResources(result);
-
-        foreach (QnResourcePtr res, result)
+        if (!result.isEmpty())
         {
-            QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
-            if (!resource.isNull())
-                resource->setStatus(QnResource::Online);
+            m_resourceProcessor->processResources(result);
+
+            exec();
+
+            foreach (QnResourcePtr res, result)
+            {
+                QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
+                if (!resource.isNull())
+                    resource->setStatus(QnResource::Online);
+            }
         }
 
         int global_delay_between_search = 1000;
@@ -355,7 +361,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 if (rpNetRes)
                 {
                     // if such network resource is in pool and has diff IP => should keep it 
-                    rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomain::QnDomainMemory);
+                    rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomainMemory);
                     it = resources.erase(it);
 
                     if (m_server)
@@ -363,9 +369,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                         QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
                         if (cameraResource)
                         {
+                            QByteArray errorString;
                             QnResourceList cameras;
                             QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                            connect->addCamera(*cameraResource, cameras);
+                            if (connect->addCamera(*cameraResource, cameras, errorString) != 0)
+                            {
+                                qDebug() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << errorString;
+                            }
                         }
 
                     }

@@ -5,6 +5,10 @@
 #include "core/resource/resource.h"
 #include "core/resource/video_server.h"
 
+typedef QSharedPointer<xsd::api::servers::Server> QnApiServerPtr;
+
+QnApiServerPtr unparseServer(const QnVideoServer& serverIn);
+
 template <class ResourcePtr>
 void parseServers(QList<ResourcePtr> &servers, const QnApiServers &xsdServers, QnResourceFactory &/*resourceFactory*/)
 {

@@ -15,6 +15,31 @@
 class AppSessionManager;
 class QnAppServerConnectionFactory;
 
+namespace conn_detail
+{
+    class ReplyProcessor : public QObject
+    {
+        Q_OBJECT
+
+    public:
+        ReplyProcessor(QnResourceFactory& resourceFactory, const QString& objectName)
+              : m_resourceFactory(resourceFactory),
+                m_objectName(objectName)
+        {
+        }
+
+    public slots:
+        void finished(int status, const QByteArray &result, int handle);
+
+    signals:
+        void finished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources);
+
+    private:
+        QnResourceFactory& m_resourceFactory;
+        QString m_objectName;
+    };
+}
+
 class QN_EXPORT QnAppServerConnection
 {
 public:
@@ -24,18 +49,21 @@ public:
 
     bool isConnected() const;
 
-    int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes);
+    int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes, QByteArray& errorString);
 
-    int getResources(QList<QnResourcePtr>& resources);
+    int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
-    int addServer(const QnVideoServer&, QnVideoServerList& servers);
-    int addCamera(const QnCameraResource&, QList<QnResourcePtr>& cameras);
-    int addStorage(const QnStorage&);
+    int addServer(const QnVideoServer&, QnVideoServerList& servers, QByteArray& errorString);
+    int addCamera(const QnCameraResource&, QList<QnResourcePtr>& cameras, QByteArray& errorString);
 
-    int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId);
-    int getStorages(QnResourceList& storages);
+    int addStorage(const QnStorage&, QByteArray& errorString);
 
-    QString lastError() const;
+    int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId, QByteArray& errorString);
+    int getStorages(QnResourceList& storages, QByteArray& errorString);
+
+    // Returns request id
+    int saveAsync(const QnVideoServer&, QObject*, const char*);
+    int saveAsync(const QnCameraResource&, QObject*, const char*);
 
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
@@ -55,7 +83,6 @@ class QN_EXPORT QnAppServerConnectionFactory
 public:
     static QUrl defaultUrl();
     static void setDefaultUrl(const QUrl &url);
-
     static void setDefaultFactory(QnResourceFactory*);
 
     static QnAppServerConnectionPtr createConnection();
