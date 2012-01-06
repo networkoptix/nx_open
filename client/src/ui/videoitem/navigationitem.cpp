@@ -523,6 +523,21 @@ void NavigationItem::updateSlider()
     }
 }
 
+void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
+{
+    foreach(CLVideoCamera *camera, m_reserveCameras) {
+        QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
+        if (netRes) 
+        {
+            MotionPeriods::iterator itr = m_motionPeriodLoader.find(netRes);
+            if (itr != m_motionPeriodLoader.end()) 
+            {
+                itr.value().loadingHandle = itr.value().loader->load(period, itr.value().region);
+            }
+        }
+    }
+}
+
 void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
@@ -550,9 +565,17 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
         }
         connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
         connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
+        p.region = region;
         m_motionPeriodLoader.insert(netRes, p);
     }
-    QnTimePeriod loadingPeriod(t - w, w * 3);
+    qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    QnTimePeriod loadingPeriod;
+    QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
+    loadingPeriod.startTimeMs = qMax(minTimeMs, t - w);
+    loadingPeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
+
+
     MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
     p.loadingHandle = p.loader->load(loadingPeriod, region);
 }
@@ -595,8 +618,10 @@ bool NavigationItem::updateRecPeriodList(bool force)
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
-    if (!resources.isEmpty())
+    if (!resources.isEmpty()) {
         m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
+        updateMotionPeriods(m_timePeriod);
+    }
     return true;
 }
 
