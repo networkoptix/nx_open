@@ -1,5 +1,6 @@
-#include "processor.h"
+#include <QThread>
 
+#include "processor.h"
 #include "core/resourcemanagment/resource_pool.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId)
@@ -19,9 +20,12 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
+        QByteArray errorString;
         cameraResource->setParentId(m_serverId);
-        m_appServer->addCamera(*cameraResource, cameras);
+        if (m_appServer->addCamera(*cameraResource, cameras, errorString) != 0)
+        {
+            qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
+        }
+        QnResourcePool::instance()->addResources(resources);
     }
-
-    QnResourcePool::instance()->addResources(cameras);
 }

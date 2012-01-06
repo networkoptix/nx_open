@@ -245,24 +245,6 @@ public:
 };
 
 
-class QnDummyResourceFactory : public QnResourceFactory
-{
-public:
-    static QnDummyResourceFactory& instance()
-    {
-        if (!m_instance)
-            m_instance = new QnDummyResourceFactory();
-
-        return *m_instance;
-    }
-
-    QnResourcePtr createResource(const QnId& /*resourceTypeId*/, const QnResourceParameters& /*parameters*/) { return QnResourcePtr(0); }
-
-private:
-    static QnDummyResourceFactory* m_instance;
-};
-
-
 class QnResourceProcessor
 {
 public:

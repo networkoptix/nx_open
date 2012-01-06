@@ -44,7 +44,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
     void playbackMaskChanged(const QnTimePeriodList& playbackMask);
-
+    void clearMotionSelection();
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
@@ -86,7 +86,7 @@ private Q_SLOTS:
     void onMotionPeriodLoadFailed(int status, int handle);
 
     void onMrsButtonClicked();
-
+    void updateMotionPeriods(const QnTimePeriod& period);
 protected:
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
@@ -96,6 +96,7 @@ private:
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
+        QRegion region;
     };
 
     TimeSlider *m_timeSlider;

@@ -3,10 +3,12 @@
 
 #include "api/Types.h"
 #include "core/resource/resource.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/camera_resource.h"
 #include "api/parsers/parse_schedule_tasks.h"
 
 // void parseCameras(QnSecurityCamResourceList& cameras, const QnApiCameras& xsdCameras, QnResourceFactory& resourceFactory);
+
+typedef QSharedPointer<xsd::api::cameras::Camera> QnApiCameraPtr;
 
 namespace
 {
@@ -30,6 +32,8 @@ namespace
     }
 }
 
+
+QnApiCameraPtr unparseCamera(const QnCameraResource& cameraIn);
 
 template <class ResourcePtr>
 void parseCameras(QList<ResourcePtr>& cameras, const QnApiCameras& xsdCameras, QnResourceFactory& resourceFactory)

@@ -10,6 +10,7 @@ public:
     QnAppserverResourceProcessor(const QnId& serverId);
 
     void processResources(const QnResourceList &resources);
+
 private:
     QnAppServerConnectionPtr m_appServer;
     QnId m_serverId;

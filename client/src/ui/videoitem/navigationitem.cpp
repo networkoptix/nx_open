@@ -221,7 +221,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_liveButton = new ImageButton(this);
     m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
-    m_liveButton->setPreferredSize(20, 20);
+    m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setMaximumSize(m_liveButton->preferredSize());
     m_liveButton->setCheckable(true);
     m_liveButton->setChecked(m_timeSlider->isAtEnd());
@@ -232,12 +232,15 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_mrsButton = new ImageButton(this);
     m_mrsButton->addPixmap(Skin::pixmap(QLatin1String("mrs.png")), ImageButton::Active, ImageButton::Background);
-    m_mrsButton->setPreferredSize(20, 20);
+    m_mrsButton->setPreferredSize(48, 24);
     m_mrsButton->setMaximumSize(m_mrsButton->preferredSize());
-    m_mrsButton->setEnabled(false);
+    //m_mrsButton->setEnabled(false);
+    m_mrsButton->setChecked(true);
     m_mrsButton->hide();
 
     connect(m_mrsButton, SIGNAL(clicked()), this, SLOT(onMrsButtonClicked()));
+
+    // -----------------
 
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
@@ -256,15 +259,26 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
         m_timeLabel->setPalette(pal);
     }
 
-    QGraphicsLinearLayout *rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
+    QGraphicsLinearLayout* rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
+    QGraphicsLinearLayout *rightsubLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
+    rightsubLayoutV->setSpacing(0);
+
+
     rightLayoutH->setContentsMargins(0, 0, 0, 0);
     rightLayoutH->setSpacing(3);
+
+
     rightLayoutH->addItem(m_timeLabel);
     rightLayoutH->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
-    rightLayoutH->addItem(m_mrsButton);
-    rightLayoutH->setAlignment(m_mrsButton, Qt::AlignCenter);
-    rightLayoutH->addItem(m_liveButton);
-    rightLayoutH->setAlignment(m_liveButton, Qt::AlignCenter);
+    
+    rightLayoutH->addItem(rightsubLayoutV);
+
+    rightsubLayoutV->addItem(m_mrsButton);
+    rightsubLayoutV->setAlignment(m_mrsButton, Qt::AlignCenter);
+    rightsubLayoutV->addItem(m_liveButton);
+    rightsubLayoutV->setAlignment(m_liveButton, Qt::AlignCenter);
+
+
     rightLayoutH->addItem(m_muteButton);
     rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -275,9 +289,9 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     rightLayoutV->addItem(m_volumeSlider);
     rightLayoutV->setAlignment(m_volumeSlider, Qt::AlignCenter);
     rightLayoutV->addStretch();
-    rightLayoutV->addItem(rightLayoutH);
     rightLayoutV->setAlignment(rightLayoutH, Qt::AlignBottom);
     rightLayoutV->addStretch();
+    rightLayoutV->addItem(rightLayoutH);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
@@ -433,10 +447,13 @@ void NavigationItem::updateSlider()
     {
         m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentDateTime().toMSecsSinceEpoch() - 10000); // if  nothing is recorded set minvalue to live-10sec
         m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
-        if (m_timeSlider->minimumValue() == 0)
+        if (m_timeSlider->minimumValue() == 0) {
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
-        else
-            m_timeLabel->setText(QString());//###QDateTime::fromMSecsSinceEpoch(m_timeSlider->maximumValue()).toString(Qt::SystemLocaleShortDate));
+        }
+        else {
+            m_timeLabel->setText(QString()); //(QDateTime::fromMSecsSinceEpoch(m_timeSlider->maximumValue()).toString(Qt::SystemLocaleShortDate));
+        }
+        //m_timeLabel->setVisible(m_timeLabel->text().length() > 0);
 
         quint64 time = m_camera->getCurrentTime();
         if (time != AV_NOPTS_VALUE)
@@ -445,9 +462,23 @@ void NavigationItem::updateSlider()
             m_timeSlider->setCurrentValue(m_currentTime);
         }
         m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
-        m_mrsButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
 
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
+    }
+}
+
+void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
+{
+    foreach(CLVideoCamera *camera, m_reserveCameras) {
+        QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
+        if (netRes) 
+        {
+            MotionPeriods::iterator itr = m_motionPeriodLoader.find(netRes);
+            if (itr != m_motionPeriodLoader.end()) 
+            {
+                itr.value().loadingHandle = itr.value().loader->load(period, itr.value().region);
+            }
+        }
     }
 }
 
@@ -478,9 +509,17 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
         }
         connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
         connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
+        p.region = region;
         m_motionPeriodLoader.insert(netRes, p);
     }
-    QnTimePeriod loadingPeriod(t - w, w * 3);
+    qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    QnTimePeriod loadingPeriod;
+    QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
+    loadingPeriod.startTimeMs = qMax(minTimeMs, t - w);
+    loadingPeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
+
+
     MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
     p.loadingHandle = p.loader->load(loadingPeriod, region);
 }
@@ -523,8 +562,10 @@ bool NavigationItem::updateRecPeriodList(bool force)
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
-    if (!resources.isEmpty())
+    if (!resources.isEmpty()) {
         m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
+        updateMotionPeriods(m_timePeriod);
+    }
     return true;
 }
 
@@ -553,7 +594,7 @@ void NavigationItem::repaintMotionPeriods()
     }
     m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
     m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
-
+    m_mrsButton->setVisible(!m_mergedMotionPeriods.isEmpty());
     emit playbackMaskChanged(m_mergedMotionPeriods);
 }
 
@@ -605,7 +646,6 @@ void NavigationItem::smartSeek(qint64 timeMSec)
         reader->jumpToPreviousFrame(DATETIME_NOW);
 
         m_liveButton->show();
-        m_mrsButton->show();
     } else {
         timeMSec *= 1000;
         if (m_timeSlider->isMoving())
@@ -614,7 +654,6 @@ void NavigationItem::smartSeek(qint64 timeMSec)
             reader->jumpToPreviousFrame(timeMSec);
 
         m_liveButton->hide();
-        m_mrsButton->hide();
     }
 }
 
@@ -881,5 +920,5 @@ void NavigationItem::togglePlayPause()
 
 void NavigationItem::onMrsButtonClicked()
 {
-    // ### TODO
+    emit clearMotionSelection();
 }

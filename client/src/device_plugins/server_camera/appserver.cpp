@@ -22,9 +22,13 @@ QnResourceList QnAppServerResourceSearcher::findResources()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
+    QByteArray errorString;
     QnResourceList resources;
 
-    appServerConnection->getResources(resources);
+    if (appServerConnection->getResources(resources, errorString) != 0)
+    {
+        qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << errorString;
+    }
 
     return resources;
 }

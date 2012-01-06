@@ -10,6 +10,7 @@ QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive)
 {
     qRegisterMetaType<QnResourcePtr>("QnResourcePtr");
+    qRegisterMetaType<QnResourceList>("QnResourceList");
     qRegisterMetaType<QnResource::Status>("QnResource::Status");
 
     clear();

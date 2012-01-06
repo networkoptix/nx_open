@@ -8,7 +8,7 @@ win* {
 
 QT = core gui network xml opengl multimedia webkit
 CONFIG += console x86 precompile_header
-CONFIG -= flat
+CONFIG -= flat app_bundle
 TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns
