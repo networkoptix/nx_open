@@ -272,6 +272,10 @@
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuClientDir" Name="$(env.APPLICATION_NAME) Client"
                                               WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
+                                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(env.APPLICATION_NAME) Client"
+                                              WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_desktop.exe">
+                                    </Shortcut>
+                                
                                 </File>
                             </Component>
                             
