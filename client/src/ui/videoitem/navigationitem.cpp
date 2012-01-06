@@ -103,8 +103,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, false);
-    setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-    setFlag(QGraphicsItem::ItemIsPanel, true);
 
     setCursor(Qt::ArrowCursor);
 

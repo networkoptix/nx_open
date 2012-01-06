@@ -112,8 +112,9 @@ protected Q_SLOTS:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
-    void at_navigationItem_geometryChanged();
+    void at_controlsWidget_deactivated();
     void at_controlsWidget_geometryChanged();
+    void at_navigationItem_geometryChanged();
     void at_treeItem_geometryChanged();
 
     void at_showMotionAction_triggered();

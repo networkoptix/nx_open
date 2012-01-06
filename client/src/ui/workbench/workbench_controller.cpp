@@ -23,6 +23,8 @@
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 
+#include <utils/common/event_signalizator.h>
+
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/preferences/preferences_wnd.h>
 
@@ -318,7 +320,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
+    controlsWidget->setFlag(QGraphicsItem::ItemIsPanel);
     m_display->setLayer(controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
+
+    QnSingleEventSignalizator *deactivationSignalizator = new QnSingleEventSignalizator(this);
+    deactivationSignalizator->setEventType(QEvent::WindowDeactivate);
+    controlsWidget->installEventFilter(deactivationSignalizator);
 
     /* Navigation slider. */
     m_navigationItem = new NavigationItem(controlsWidget);
@@ -335,6 +342,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treeItem = new QGraphicsProxyWidget(controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    m_treeItem->setFocusPolicy(Qt::StrongFocus);
 
     QnOpacityHoverItem *treeHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_treeItem);
     treeHoverItem->setTargetHoverOpacity(hoverTreeOpacity);
@@ -349,28 +357,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treePositionAnimator->setSpeed(100.0);
     m_treePositionAnimator->setTimeLimit(500);
 
-    /* Place it all in layout. */
-    //QGraphicsLinearLayout *horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    //horizontalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    //horizontalLayout->setSpacing(0.0);
-    //horizontalLayout->addItem(m_treeItem);
-    //horizontalLayout->addStretch(0x1000);
-
-    //QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    //verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    //verticalLayout->setSpacing(0.0);
-    //verticalLayout->addItem(horizontalLayout);
-    //verticalLayout->setStretchFactor(horizontalLayout, 0x1000);
-    //verticalLayout->addStretch(0x1000);
-    //verticalLayout->addItem(m_navigationItem);
-    //controlsWidget->setLayout(verticalLayout);
-
+    connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
     connect(controlsWidget,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
-    //at_controlsWidget_geometryChanged();
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -1009,6 +1001,11 @@ void QnWorkbenchController::updateViewportMargins() {
     ));
 }
 
+void QnWorkbenchController::at_controlsWidget_deactivated() {
+    /* Re-activate it. */
+    display()->scene()->setActiveWindow(m_uiElementsInstrument->widget());
+}
+
 void QnWorkbenchController::at_controlsWidget_geometryChanged() {
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
     QSizeF size = controlsWidget->size();
@@ -1269,6 +1266,4 @@ void QnWorkbenchController::at_treeWidget_activated(uint resourceId) {
         drop(resource, gridPos);
     }
 }
-
-
 
