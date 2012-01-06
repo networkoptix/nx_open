@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
     CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
     QnServerCameraProcessor serverCameraProcessor;
-    QnResourceDiscoveryManager::instance().addResourceProcessor(&serverCameraProcessor);
+    QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);
 
     //============================
     //QnResourceDirectoryBrowser

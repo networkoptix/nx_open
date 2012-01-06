@@ -30,10 +30,10 @@ void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* ser
     m_searchersList.push_back(serv);
 }
 
-void QnResourceDiscoveryManager::addResourceProcessor(QnResourceProcessor* processor)
+void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* processor)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    m_resourceProcessors.push_back(processor);
+    m_resourceProcessor = processor;
 }
 
 QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
@@ -106,14 +106,18 @@ void QnResourceDiscoveryManager::run()
         if (ip_finished)
             CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("Cannot get available IP address."), cl_logWARNING);
 
-        foreach (QnResourceProcessor *processor, m_resourceProcessors)
-            processor->processResources(result);
-
-        foreach (QnResourcePtr res, result)
+        if (!result.isEmpty())
         {
-            QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
-            if (!resource.isNull())
-                resource->setStatus(QnResource::Online);
+            m_resourceProcessor->processResources(result);
+
+            exec();
+
+            foreach (QnResourcePtr res, result)
+            {
+                QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
+                if (!resource.isNull())
+                    resource->setStatus(QnResource::Online);
+            }
         }
 
         int global_delay_between_search = 1000;

@@ -429,7 +429,7 @@ public:
         //IPPH264Decoder::dll.init();
 
         //============================
-        QnResourceDiscoveryManager::instance().addResourceProcessor(m_processor);
+        QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
         //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());

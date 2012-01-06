@@ -1,5 +1,6 @@
-#include "processor.h"
+#include <QThread>
 
+#include "processor.h"
 #include "core/resourcemanagment/resource_pool.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId, QnResourceFactory& resourceFactory)
@@ -37,4 +38,5 @@ void QnAppserverResourceProcessor::finished(int handle, int status, const QByteA
     qDebug() << "QnAppserverResourceProcessor::finished, h = " << handle << ", status = " << status << ", e = " << errorString << ", r = " << resources.size();
 
     QnResourcePool::instance()->addResources(resources);
+    QThread::currentThread()->exit();
 }
