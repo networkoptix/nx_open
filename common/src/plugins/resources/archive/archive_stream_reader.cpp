@@ -277,7 +277,8 @@ begin_label:
     if (reverseMode != m_prevReverseMode)
     {
         m_jumpMtx.lock();
-        qint64 displayTime = m_requiredJumpTime != AV_NOPTS_VALUE ? m_requiredJumpTime : determineDisplayTime();
+        bool commandMergedWithJump = m_requiredJumpTime != AV_NOPTS_VALUE;
+        qint64 displayTime = commandMergedWithJump ? m_requiredJumpTime : determineDisplayTime();
         m_requiredJumpTime = AV_NOPTS_VALUE;
         m_jumpMtx.unlock();
 
@@ -294,6 +295,8 @@ begin_label:
         }
         m_lastGopSeekTime = -1;
         m_BOF = true;
+        if (commandMergedWithJump)
+            emit jumpOccured(displayTime);
     }
     m_dataMarker = m_newDataMarker;
 
