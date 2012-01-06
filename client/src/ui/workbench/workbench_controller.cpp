@@ -220,7 +220,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
-    //m_motionSelectionInstrument->recursiveDisable();
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -354,7 +353,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treePositionAnimator->setTimer(display->animationInstrument()->animationTimer());
     m_treePositionAnimator->setTargetObject(m_treeItem);
     m_treePositionAnimator->setAccessor(new PropertyAccessor("pos"));
-    m_treePositionAnimator->setSpeed(100.0);
+    m_treePositionAnimator->setSpeed(m_treeItem->size().width() * 2.0);
     m_treePositionAnimator->setTimeLimit(500);
 
     connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
