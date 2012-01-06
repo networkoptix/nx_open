@@ -718,7 +718,6 @@ void NavigationItem::smartSeek(qint64 timeMSec)
         reader->jumpToPreviousFrame(DATETIME_NOW);
 
         m_liveButton->show();
-        m_mrsButton->show();
     } else {
         timeMSec *= 1000;
         if (m_timeSlider->isMoving())
@@ -727,7 +726,6 @@ void NavigationItem::smartSeek(qint64 timeMSec)
             reader->jumpToPreviousFrame(timeMSec);
 
         m_liveButton->hide();
-        m_mrsButton->hide();
     }
 }
 
