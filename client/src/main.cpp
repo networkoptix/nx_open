@@ -3,10 +3,11 @@
 //#define CL_CUSOM_MAINWINDOW
 #ifdef CL_CUSOM_MAINWINDOW
 #include "ui/mainwindow.h"
+#else
+#include "mainwnd.h"
 #endif
 
 #include "version.h"
-#include "mainwnd.h"
 #include "settings.h"
 
 #include "decoders/video/ipp_h264_decoder.h"
@@ -389,8 +390,7 @@ int main(int argc, char *argv[])
     addTestData();
 #endif
 
-    QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
-        &mainWindow, SLOT(handleMessage(const QString&)));
+    QObject::connect(&application, SIGNAL(messageReceived(QString)), &mainWindow, SLOT(handleMessage(QString)));
 
     QnEventManager::instance()->run();
 
