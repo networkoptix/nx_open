@@ -10,6 +10,21 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     m_lastMotionContainData = false;
     m_needUpdateStreamParams = false;
+    m_lastWarningTime = AV_NOPTS_VALUE;
+}
+
+bool QnServerStreamRecorder::canAcceptData() const
+{
+    bool rez = QnStreamRecorder::canAcceptData();
+    if (!rez) {
+        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        if (currentTime - m_lastWarningTime > 1000)
+        {
+            qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "frame rate decreased!";
+            m_lastWarningTime = currentTime;
+        }
+    }
+    return rez;
 }
 
 bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)

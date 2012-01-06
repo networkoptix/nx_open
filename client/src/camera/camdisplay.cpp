@@ -528,16 +528,18 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
-    if (!vd && !ad)
-        return true;
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
     if (metadata) {
         m_lastMetadata = metadata;
         return true;
     }
+
+    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+    if (!vd && !ad)
+        return true;
+
 
     m_processedPackets++;
 
