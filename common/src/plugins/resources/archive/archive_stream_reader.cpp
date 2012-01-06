@@ -257,7 +257,6 @@ begin_label:
             cl_log.log(s, cl_logALWAYS);
         }
         */
-        m_dataMarker = m_newDataMarker;
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
         m_skipFramesToTime = m_tmpSkipFramesToTime;
@@ -296,6 +295,7 @@ begin_label:
             m_BOF = true;
         }
     }
+    m_dataMarker = m_newDataMarker;
 
     QnCompressedVideoDataPtr videoData;
 	
