@@ -361,7 +361,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 if (rpNetRes)
                 {
                     // if such network resource is in pool and has diff IP => should keep it 
-                    rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomain::QnDomainMemory);
+                    rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomainMemory);
                     it = resources.erase(it);
 
                     if (m_server)
