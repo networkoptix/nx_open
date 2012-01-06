@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#include <QtCore/QFile>
+
 #include <QtGui/QBoxLayout>
 #include <QtGui/QSplitter>
 #include <QtGui/QToolBar>
@@ -161,7 +163,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     // Process input files
     const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
     for (int i = 1; i < argc; ++i)
-        m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), gridPos);
+        m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), gridPos);
 
     showNormal();
 }

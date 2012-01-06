@@ -160,23 +160,13 @@ QRect AppProxyStyle::subControlRect(ComplexControl control, const QStyleOptionCo
             const bool isMaximized = tb->titleBarState & Qt::WindowMaximized;
             const bool isFullScreen = tb->titleBarState & Qt::WindowFullScreen;
 
-            SubControl sc = subControl;
-            if (sc == SC_TitleBarNormalButton) { // check what it's good for
-               if (isMinimized)
-                  sc = SC_TitleBarMinButton;
-               else if (isMaximized)
-                  sc = SC_TitleBarMaxButton;
-               else
-                  break;
-            }
-
             const int frameWidth = pixelMetric(PM_MdiSubWindowFrameWidth, option, widget);
             const int controlMargin = 2;
             const int controlHeight = tb->rect.height() - controlMargin * 2;
             const int delta = controlHeight + controlMargin * 2;
             int offset = 0;
 
-            switch (sc) {
+            switch (subControl) {
             case SC_TitleBarLabel:
                 if (tb->titleBarFlags & (Qt::WindowTitleHint | Qt::WindowSystemMenuHint)) {
                     rect = tb->rect.adjusted(frameWidth, 0, -frameWidth, 0);
@@ -199,31 +189,39 @@ QRect AppProxyStyle::subControlRect(ComplexControl control, const QStyleOptionCo
             case SC_TitleBarShadeButton:
                 if (!isFullScreen && (tb->titleBarFlags & Qt::WindowShadeButtonHint))
                     offset += delta;
-                else if (sc == SC_TitleBarShadeButton)
+                else if (subControl == SC_TitleBarShadeButton)
                     break;
                 // fall through
             case SC_TitleBarUnshadeButton:
                 if (isFullScreen && (tb->titleBarFlags & Qt::WindowShadeButtonHint))
                     offset += delta;
-                else if (sc == SC_TitleBarUnshadeButton)
+                else if (subControl == SC_TitleBarUnshadeButton)
                     break;
                 // fall through
             case SC_TitleBarMinButton:
                 if (!isMinimized && (tb->titleBarFlags & Qt::WindowMinimizeButtonHint))
                     offset += delta;
-                else if (sc == SC_TitleBarMinButton)
+                else if (subControl == SC_TitleBarMinButton)
                     break;
                 // fall through
+            case SC_TitleBarNormalButton:
+                if (isMinimized && (tb->titleBarFlags & Qt::WindowMinimizeButtonHint))
+                    offset += delta;
+                else if (isMaximized && (tb->titleBarFlags & Qt::WindowMaximizeButtonHint))
+                    offset += delta;
+                else if (subControl == SC_TitleBarNormalButton)
+                    break;
+                //fall through
             case SC_TitleBarMaxButton:
                 if (!isMaximized && (tb->titleBarFlags & Qt::WindowMaximizeButtonHint))
                     offset += delta;
-                else if (sc == SC_TitleBarMaxButton)
+                else if (subControl == SC_TitleBarMaxButton)
                     break;
                 // fall through
             case SC_TitleBarCloseButton:
                 if (tb->titleBarFlags & Qt::WindowSystemMenuHint)
                     offset += delta;
-                else if (sc == SC_TitleBarCloseButton)
+                else if (subControl == SC_TitleBarCloseButton)
                     break;
                 rect.setRect(tb->rect.right() - offset, tb->rect.top() + controlMargin,
                              controlHeight, controlHeight);

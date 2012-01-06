@@ -57,151 +57,151 @@ CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int 
 
 CLAbstractSceneItem::~CLAbstractSceneItem()
 {
-	stop_animation();
+    stop_animation();
 }
 
 QString CLAbstractSceneItem::getName() const
 {
-	return mName;
+    return mName;
 }
 
 void CLAbstractSceneItem::setName(const QString& name)
 {
-	mName = name;
+    mName = name;
 }
 
 bool CLAbstractSceneItem::isEtitable() const
 {
-	return m_editable;
+    return m_editable;
 }
 
 void CLAbstractSceneItem::setEditable(bool editable)
 {
-	m_editable = editable;
+    m_editable = editable;
 }
 
 bool CLAbstractSceneItem::isZoomable() const
 {
-	return false;
+    return false;
 }
 
 CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 {
-	if (m_type!=VIDEO)
-		return 0;
+    if (m_type!=VIDEO)
+        return 0;
 
-	return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
+    return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
 }
 
 CLAbstractSceneItem::CLSceneItemType CLAbstractSceneItem::getType() const
 {
-	return m_type;
+    return m_type;
 }
 
 void CLAbstractSceneItem::setType(CLSceneItemType t)
 {
-	m_type = t;
+    m_type = t;
 }
 
 void CLAbstractSceneItem::setMaxSize(QSize size)
 {
-	m_max_width = size.width();
-	m_max_height = size.height();
-	onResize();
+    m_max_width = size.width();
+    m_max_height = size.height();
+    onResize();
 }
 
 QSize CLAbstractSceneItem::getMaxSize() const
 {
-	return QSize(m_max_width, m_max_height);
+    return QSize(m_max_width, m_max_height);
 }
 
 QSize CLAbstractSceneItem::onScreenSize() const
 {
-	return m_view->mapFromScene(sceneBoundingRect()).boundingRect().size();
+    return m_view->mapFromScene(sceneBoundingRect()).boundingRect().size();
 }
 
 QRectF CLAbstractSceneItem::boundingRect() const
 {
-	return QRectF(0,0,width(),height());
+    return QRectF(0,0,width(),height());
 }
 
 int CLAbstractSceneItem::height() const
 {
-	return m_max_height;
+    return m_max_height;
 }
 
 int CLAbstractSceneItem::width() const
 {
-	return m_max_width;
+    return m_max_width;
 }
 
 void CLAbstractSceneItem::setItemSelected(bool sel, bool animate , int delay )
 {
-	if (!m_selected && sel)
-		emit onSelected(this);
+    if (!m_selected && sel)
+        emit onSelected(this);
 
-	m_selected = sel;
+    m_selected = sel;
 
-	if (!m_selected)
-		setFullScreen(false);
+    if (!m_selected)
+        setFullScreen(false);
 
-	if (m_selected)
-	{
-		if (animate)
-			m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25, delay);
-		setZValue(global_base_scene_z_level+1);
-	}
-	else
-	{
-		if (animate)
-			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, delay);
-		setZValue(global_base_scene_z_level);
-	}
+    if (m_selected)
+    {
+        if (animate)
+            m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25, delay);
+        setZValue(global_base_scene_z_level+1);
+    }
+    else
+    {
+        if (animate)
+            m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, delay);
+        setZValue(global_base_scene_z_level);
+    }
 }
 
 bool CLAbstractSceneItem::isItemSelected() const
 {
-	return m_selected;
+    return m_selected;
 }
 
 void CLAbstractSceneItem::zoom_abs(qreal z, int duration, int /*delay*/)
 {
-	m_animationTransform.zoom_abs(z, duration, 0);
+    m_animationTransform.zoom_abs(z, duration, 0);
 }
 
 void CLAbstractSceneItem::z_rotate_delta(const QPointF &center, qreal angle, int duration, int delay)
 {
-	m_animationTransform.z_rotate_delta(center, angle, duration, delay);
+    m_animationTransform.z_rotate_delta(center, angle, duration, delay);
 }
 
 void CLAbstractSceneItem::z_rotate_abs(const QPointF &center, qreal angle, int duration, int delay)
 {
-	m_animationTransform.z_rotate_abs(center, angle, duration, delay);
+    m_animationTransform.z_rotate_abs(center, angle, duration, delay);
 }
 
 qreal CLAbstractSceneItem::getZoom() const
 {
-	return m_animationTransform.getZoom();
+    return m_animationTransform.getZoom();
 }
 
 CLAbstractComplicatedItem* CLAbstractSceneItem::getComplicatedItem() const
 {
-	return m_complicatedItem;
+    return m_complicatedItem;
 }
 
 void CLAbstractSceneItem::setComplicatedItem(CLAbstractComplicatedItem* complicatedItem)
 {
-	m_complicatedItem = complicatedItem;
+    m_complicatedItem = complicatedItem;
 }
 
 qreal CLAbstractSceneItem::getRotation() const
 {
-	return m_animationTransform.getRotation();
+    return m_animationTransform.getRotation();
 }
 
 void CLAbstractSceneItem::setRotation(qreal angle)
 {
-	m_animationTransform.z_rotate_abs(m_rotation_center, angle, 0, 0);
+    m_animationTransform.z_rotate_abs(m_rotation_center, angle, 0, 0);
 }
 
 void CLAbstractSceneItem::stop_animation()
@@ -222,107 +222,107 @@ void CLAbstractSceneItem::setFullScreen(bool full)
     if (!m_fullscreen)
         goToSteadyMode(false, true);
 
-	if (m_fullscreen )
-		emit onFullScreen(this);
+    if (m_fullscreen )
+        emit onFullScreen(this);
 }
 
 bool CLAbstractSceneItem::isFullScreen() const
 {
-	return m_fullscreen;
+    return m_fullscreen;
 }
 
 void CLAbstractSceneItem::setArranged(bool arr)
 {
-	m_arranged = arr;
+    m_arranged = arr;
 }
 
 bool CLAbstractSceneItem::isArranged() const
 {
-	return m_arranged;
+    return m_arranged;
 }
 
 void CLAbstractSceneItem::setCanDrop(bool val)
 {
-	m_can_be_droped = val;
+    m_can_be_droped = val;
 }
 
 QPointF CLAbstractSceneItem::getOriginalPos() const
 {
-	return m_originalPos;
+    return m_originalPos;
 
 }
 
 void CLAbstractSceneItem::setOriginalPos(const QPointF &pos)
 {
-	m_originalPos = pos;
+    m_originalPos = pos;
 }
 
 bool CLAbstractSceneItem::getOriginallyArranged() const
 {
-	return m_originallyArranged;
+    return m_originallyArranged;
 }
 
 void CLAbstractSceneItem::setOriginallyArranged(bool val)
 {
-	m_originallyArranged = val;
+    m_originallyArranged = val;
 }
 
 void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/)
 {
-	m_mouse_over = true;
+    m_mouse_over = true;
 
-	/*/
-	if (m_view->getSelectedItem()!=this &&(m_view->getZoom() < 0.25 || m_zoomOnhover))
-	{
-		if (m_z != 1)
-		{
-			m_z = 1;
-			setZValue(m_z);
-			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration, 0);
-		}
-	}
-	*/
+    /*/
+    if (m_view->getSelectedItem()!=this &&(m_view->getZoom() < 0.25 || m_zoomOnhover))
+    {
+        if (m_z != 1)
+        {
+            m_z = 1;
+            setZValue(m_z);
+            m_animationTransform.zoom_abs(1.11, item_hoverevent_duration, 0);
+        }
+    }
+    */
 
 }
 
 void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 {
 
-	m_mouse_over = false;
+    m_mouse_over = false;
 
-	/*/
-	if (m_view->getSelectedItem()!=this)
-	{
-		if (m_z != 0)
-		{
-			m_z = 0;
-			setZValue(m_z);
-			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, 0);
-		}
-	}
-	*/
+    /*/
+    if (m_view->getSelectedItem()!=this)
+    {
+        if (m_z != 0)
+        {
+            m_z = 0;
+            setZValue(m_z);
+            m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, 0);
+        }
+    }
+    */
 }
 
 void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
-	if (!isSelected()) // to avoid unselect all; see the code of QT
-		QGraphicsItem::mousePressEvent(event);
+    if (!isSelected()) // to avoid unselect all; see the code of QT
+        QGraphicsItem::mousePressEvent(event);
 
-	event->accept();
+    event->accept();
 }
 
 void CLAbstractSceneItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
-	emit onDoubleClick(this);
+    emit onDoubleClick(this);
 }
 
 void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
-	if (event->button()==Qt::LeftButton)
-		emit onPressed(this);
+    if (event->button()==Qt::LeftButton)
+        emit onPressed(this);
 
-	if (!isSelected())
-		QGraphicsItem::mouseReleaseEvent(event);
+    if (!isSelected())
+        QGraphicsItem::mouseReleaseEvent(event);
 }
 
 void CLAbstractSceneItem::drawSteadyWall(QPainter* painter)
@@ -345,117 +345,117 @@ void CLAbstractSceneItem::drawShadow(QPainter* painter)
     if (m_steadyMode || isFullScreen())
         return; // do not need to draw anything in this mode
 
-	QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());
-	QRect rect2(SHADOW_SIZE, height(), width()-SHADOW_SIZE, SHADOW_SIZE);
-	painter->fillRect(rect1, global_shadow_color);
-	painter->fillRect(rect2, global_shadow_color);
+    QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());
+    QRect rect2(SHADOW_SIZE, height(), width()-SHADOW_SIZE, SHADOW_SIZE);
+    painter->fillRect(rect1, global_shadow_color);
+    painter->fillRect(rect2, global_shadow_color);
 
-	if (getType()==IMAGE || getType()==VIDEO)
-	{
-		const int fr_w = 20;
-		painter->setPen(QPen(QColor(150,150,150,200),  fr_w, Qt::SolidLine));
-		painter->drawRect(-fr_w/2,-fr_w/2,width()+fr_w,height()+fr_w);
-	}
+    if (getType()==IMAGE || getType()==VIDEO)
+    {
+        const int fr_w = 20;
+        painter->setPen(QPen(QColor(150,150,150,200),  fr_w, Qt::SolidLine));
+        painter->drawRect(-fr_w/2,-fr_w/2,width()+fr_w,height()+fr_w);
+    }
 
 }
 
 void CLAbstractSceneItem::drawRotationHelper(bool val)
 {
-	m_draw_rotation_helper = val;
+    m_draw_rotation_helper = val;
 }
 
 void CLAbstractSceneItem::setRotationPointCenter(const QPointF &center)
 {
 
-	qreal angle = getRotation();
+    qreal angle = getRotation();
 
-	qreal cos_a = cos(angle*Pi/180);
-	qreal sin_a = sin(angle*Pi/180);
+    qreal cos_a = cos(angle*Pi/180);
+    qreal sin_a = sin(angle*Pi/180);
 
-	qreal x_old = (-m_rotation_center.x())*cos_a - (-m_rotation_center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates
-	qreal y_old = (-m_rotation_center.x())*sin_a +  (-m_rotation_center.y())*cos_a;
-	x_old += m_rotation_center.x(); // pos of the item after rotation in item coordinates
-	y_old += m_rotation_center.y();
+    qreal x_old = (-m_rotation_center.x())*cos_a - (-m_rotation_center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates
+    qreal y_old = (-m_rotation_center.x())*sin_a +  (-m_rotation_center.y())*cos_a;
+    x_old += m_rotation_center.x(); // pos of the item after rotation in item coordinates
+    y_old += m_rotation_center.y();
 
-	qreal x_new = (-center.x())*cos_a - (-center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates ( around nex center )
-	qreal y_new = (-center.x())*sin_a +  (-center.y())*cos_a;
-	x_new += center.x(); // pos of the item after rotation in item coordinates ( around nex center )
-	y_new += center.y();
+    qreal x_new = (-center.x())*cos_a - (-center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates ( around nex center )
+    qreal y_new = (-center.x())*sin_a +  (-center.y())*cos_a;
+    x_new += center.x(); // pos of the item after rotation in item coordinates ( around nex center )
+    y_new += center.y();
 
-	QPointF delta(x_old - x_new, y_old - y_new);
+    QPointF delta(x_old - x_new, y_old - y_new);
 
-	setPos(pos() + delta);
-	/**/
+    setPos(pos() + delta);
+    /**/
 
-	m_rotation_center  = center;
+    m_rotation_center  = center;
 }
 
 QPointF CLAbstractSceneItem::getRotationPointCenter() const
 {
-	return m_rotation_center;
+    return m_rotation_center;
 }
 
 void CLAbstractSceneItem::setRotationPointHand(const QPointF &point)
 {
 
-	m_rotation_hand = point;
+    m_rotation_hand = point;
 }
 
 void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 {
-	static QColor color1(255, 0, 0, 250);
-	static QColor color2(255, 0, 0, 100);
+    static QColor color1(255, 0, 0, 250);
+    static QColor color2(255, 0, 0, 100);
 
-	static const int r = 30;
-	static const int penWidth = 6;
-	static const int p_line_len = 220;
-	static const int arrowSize = 30;
+    static const int r = 30;
+    static const int penWidth = 6;
+    static const int p_line_len = 220;
+    static const int arrowSize = 30;
 
-	QRadialGradient gradient(m_rotation_center, r);
-	gradient.setColorAt(0, color1);
-	gradient.setColorAt(1, color2);
+    QRadialGradient gradient(m_rotation_center, r);
+    gradient.setColorAt(0, color1);
+    gradient.setColorAt(1, color2);
 
-	painter->save();
+    painter->save();
 
-	painter->setPen(QPen(color2, 0, Qt::SolidLine));
+    painter->setPen(QPen(color2, 0, Qt::SolidLine));
 
-	painter->setBrush(gradient);
+    painter->setBrush(gradient);
 //	painter->drawEllipse(m_rotation_center, r, r); // crash here while scene is "rotated"
 
-	painter->setPen(QPen(color2, penWidth, Qt::SolidLine));
-	painter->drawLine(m_rotation_center,m_rotation_hand);
+    painter->setPen(QPen(color2, penWidth, Qt::SolidLine));
+    painter->drawLine(m_rotation_center,m_rotation_hand);
 
-	// building new line
-	QLineF line(m_rotation_hand, m_rotation_center);
-	QLineF line_p = line.unitVector().normalVector();
-	line_p.setLength(p_line_len/2);
+    // building new line
+    QLineF line(m_rotation_hand, m_rotation_center);
+    QLineF line_p = line.unitVector().normalVector();
+    line_p.setLength(p_line_len/2);
 
-	line_p = QLineF(line_p.p2(),line_p.p1());
-	line_p.setLength(p_line_len);
+    line_p = QLineF(line_p.p2(),line_p.p1());
+    line_p.setLength(p_line_len);
 
-	painter->drawLine(line_p);
+    painter->drawLine(line_p);
 
-	double angle = ::acos(line_p.dx() / line_p.length());
-	if (line_p.dy() >= 0)
-		angle = TwoPi - angle;
+    double angle = ::acos(line_p.dx() / line_p.length());
+    if (line_p.dy() >= 0)
+        angle = TwoPi - angle;
 
-	qreal s = 2.5;
+    qreal s = 2.5;
 
-	QPointF sourceArrowP1 = line_p.p1() + QPointF(sin(angle + Pi / s) * arrowSize,
-		cos(angle + Pi / s) * arrowSize);
-	QPointF sourceArrowP2 = line_p.p1() + QPointF(sin(angle + Pi - Pi / s) * arrowSize,
-		cos(angle + Pi - Pi / s) * arrowSize);
-	QPointF destArrowP1 = line_p.p2() + QPointF(sin(angle - Pi / s) * arrowSize,
-		cos(angle - Pi / s) * arrowSize);
-	QPointF destArrowP2 = line_p.p2() + QPointF(sin(angle - Pi + Pi / s) * arrowSize,
-		cos(angle - Pi + Pi / s) * arrowSize);
+    QPointF sourceArrowP1 = line_p.p1() + QPointF(sin(angle + Pi / s) * arrowSize,
+        cos(angle + Pi / s) * arrowSize);
+    QPointF sourceArrowP2 = line_p.p1() + QPointF(sin(angle + Pi - Pi / s) * arrowSize,
+        cos(angle + Pi - Pi / s) * arrowSize);
+    QPointF destArrowP1 = line_p.p2() + QPointF(sin(angle - Pi / s) * arrowSize,
+        cos(angle - Pi / s) * arrowSize);
+    QPointF destArrowP2 = line_p.p2() + QPointF(sin(angle - Pi + Pi / s) * arrowSize,
+        cos(angle - Pi + Pi / s) * arrowSize);
 
-	painter->setBrush(color2);
-	painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
-	painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);
+    painter->setBrush(color2);
+    painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
+    painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);
 
-	painter->restore();
-	/**/
+    painter->restore();
+    /**/
 
 }
 
@@ -491,7 +491,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
 
         stopSteadyAnimation();
 
-        m_steady_animation = AnimationManager::instance().addAnimation(this, "steadycolor");
+        m_steady_animation = AnimationManager::addAnimation(this, "steadycolor");
         m_steady_animation->setDuration(global_opacity_change_period);
         m_steady_animation->setStartValue(steadyBlackColor());
         m_steady_animation->setEndValue(255);
@@ -518,7 +518,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
 
     stopSteadyAnimation();
 
-    m_steady_animation = AnimationManager::instance().addAnimation(this, "steadycolor");
+    m_steady_animation = AnimationManager::addAnimation(this, "steadycolor");
     m_steady_animation->setDuration(global_opacity_change_period);
     m_steady_animation->setStartValue(steadyBlackColor());
     m_steady_animation->setEndValue(0);
