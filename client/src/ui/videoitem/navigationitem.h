@@ -103,7 +103,7 @@ private Q_SLOTS:
     void onMotionPeriodLoadFailed(int status, int handle);
 
     void onMrsButtonClicked();
-
+    void updateMotionPeriods(const QnTimePeriod& period);
 protected:
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
@@ -117,6 +117,7 @@ private:
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
+        QRegion region;
     };
 
     TimeSlider *m_timeSlider;
