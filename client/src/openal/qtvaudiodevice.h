@@ -21,7 +21,7 @@ class QtvSound;
 class QtvAudioDevice
 {
 public:
-    static QtvAudioDevice &instance();
+    static QtvAudioDevice *instance();
 
     QtvAudioDevice();
     ~QtvAudioDevice();
