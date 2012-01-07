@@ -283,33 +283,41 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
     }
 
     QnParam &param = getResourceParamList().value(name);
-    /*
+    
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         return false;
     }
-    */
+    
 
-    if (domain == QnDomainMemory)
+    if (domain == QnDomainPhysical)
+    {
+        if (param.isStatic())
+            return false;
+            
+        if (!setParamPhysical(param.name(), val))
+            return false;
+    }
+
+
+    //QnDomainMemory should changed anyway
     {
         QReadLocker readLocker(&m_rwLock);
-        if (param.setValue(val)) {
-            if (param.isStatic())
-                setProperty(param.name().toUtf8(), val);
-            emit onParameterChanged(param.name(), val);
-            return true;
+        if (!param.setValue(val)) 
+        {
+            cl_log.log("cannot set such param!", cl_logWARNING);
+            return false;
+
         }
-    }
-    else if (domain == QnDomainPhysical)
-    {
-        if (!param.isStatic() && setParamPhysical(param.name(), val)) {
-            emit onParameterChanged(param.name(), val);
-            return true;
-        }
+
+        if (param.isStatic())
+            setProperty(param.name().toUtf8(), val);
     }
 
-    return false;
+
+    emit onParameterChanged(param.name(), val);
+    return true;
 }
 
 class QnResourceGetParamCommand : public QnResourceCommand
