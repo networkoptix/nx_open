@@ -260,7 +260,7 @@ public:
 
 public slots:
     void fitInView(bool animate = true);
-
+    void onDisplayingStateChanged(QnAbstractRenderer*, bool);
 signals:
     void viewportGrabbed();
     void viewportUngrabbed();
@@ -269,6 +269,7 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(QnWorkbench::ItemRole role);
     void playbackMaskChanged(const QnTimePeriodList&);
+    void displayingStateChanged(QnResourcePtr, bool);
 protected:
     virtual void tick(int deltaTime) override;
     

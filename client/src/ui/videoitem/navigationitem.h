@@ -17,6 +17,7 @@ class SpeedSlider;
 class TimeSlider;
 class VolumeSlider;
 class GraphicsLabel;
+class QnAbstractRenderer;
 
 class NavigationItem : public QGraphicsWidget
 {
@@ -85,18 +86,20 @@ private Q_SLOTS:
     void onMotionPeriodLoadFailed(int status, int handle);
 
     void updateMotionPeriods(const QnTimePeriod& period);
-
+    void onDisplayingStateChanged(QnResourcePtr, bool);
 protected:
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
 private:
     struct MotionPeriodLoader {
-        MotionPeriodLoader(): loadingHandle(0) {}
+        MotionPeriodLoader(): loadingHandle(0), enabled(true) {}
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
         QRegion region;
+        bool enabled;
     };
+    NavigationItem::MotionPeriodLoader* getMotionLoader(QnNetworkResourcePtr netRes);
 
     TimeSlider *m_timeSlider;
     ImageButton *m_backwardButton;

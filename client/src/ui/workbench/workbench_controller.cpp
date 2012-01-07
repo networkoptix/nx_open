@@ -330,6 +330,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Navigation slider. */
     m_navigationItem = new NavigationItem(controlsWidget);
 
+
     QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
     navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
     navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
@@ -363,6 +364,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(controlsWidget,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
+    connect(m_display, SIGNAL(displayingStateChanged(QnResourcePtr, bool)), m_navigationItem, SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
+
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
 

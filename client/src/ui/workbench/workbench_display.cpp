@@ -39,6 +39,7 @@
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
 
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
@@ -1065,4 +1066,11 @@ void QnWorkbenchDisplay::at_mapper_cellSizeChanged() {
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged() {
     synchronizeAllGeometries(true);
+}
+
+void QnWorkbenchDisplay::onDisplayingStateChanged(QnAbstractRenderer* renderer, bool displaying)
+{
+    QnResourceWidget *w = widget(renderer);
+    if(w)
+        emit displayingStateChanged(w->display()->dataProvider()->getResource(), displaying);
 }

@@ -99,7 +99,8 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 
     m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(m_display, this);
+    QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
+    new QnSyncPlayMixin(m_display, renderWatcher, this);
 
     // Prepare UI
     m_tabBar = new TabBar(this);

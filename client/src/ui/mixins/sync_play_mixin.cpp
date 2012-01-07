@@ -8,7 +8,7 @@
 #include <plugins/resources/archive/syncplay_wrapper.h>
 #include "render_watch_mixin.h"
 
-QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QObject *parent):
+QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin *renderWatcher, QObject *parent):
     QObject(parent),
     m_syncPlay(NULL),
     m_display(display)
@@ -29,7 +29,6 @@ QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QObject *parent):
     
 
     /* Prepare render watcher. */
-    QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(display, this);
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
 }
 

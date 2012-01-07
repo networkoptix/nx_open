@@ -92,7 +92,10 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(m_display, this);
+    QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
+    new QnSyncPlayMixin(m_display, renderWatcher, this);
+    connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SLOT(onDisplayingStateChanged(QnAbstractRenderer *, bool)));
+
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
