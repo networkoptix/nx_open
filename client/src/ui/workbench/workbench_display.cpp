@@ -595,6 +595,9 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 }
 
 void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins) {
+    if(m_viewportMargins == margins)
+        return;
+
     m_viewportMargins = margins;
     m_viewportAnimator->setViewportMargins(margins);
 

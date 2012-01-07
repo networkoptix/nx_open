@@ -25,7 +25,7 @@ public:
      * \returns                         Newly created settings dialog,
      *                                  or NULL if it could not be created.
      */
-    virtual QDialog *createDlg(QnResourcePtr resource) = 0;
+    virtual QDialog *createDlg(QnResourcePtr resource, QWidget *parent) = 0;
 };
 
 
@@ -48,7 +48,7 @@ public:
      *                                  given resource, or NULL if the dialog
      *                                  could not be created.
      */
-    static QDialog *createDlg(QnResourcePtr resource);
+    static QDialog *createDlg(QnResourcePtr resource, QWidget *parent = 0);
 
     /**
      * Registers a dialog manufacture with this factory.

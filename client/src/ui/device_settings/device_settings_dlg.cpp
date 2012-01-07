@@ -7,7 +7,6 @@
 
 #include "device_settings_tab.h"
 #include "settings.h"
-#include "settings_getter.h"
 #include "widgets.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource, QWidget *parent)
@@ -50,7 +49,6 @@ CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource,
 
 CLAbstractDeviceSettingsDlg::~CLAbstractDeviceSettingsDlg()
 {
-    qDeleteAll(mWgtsLst);
 }
 
 QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
@@ -63,11 +61,6 @@ void CLAbstractDeviceSettingsDlg::setParam(const QString &name, const QVariant &
     m_resource->setParamAsynch(name, val, QnDomainPhysical);
 }
 
-void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
-{
-    m_tabWidget->addTab(tab, tab->name());
-}
-
 CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name) const
 {
     foreach (CLDeviceSettingsTab *tab, m_tabs) {
@@ -78,46 +71,41 @@ CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name)
     return 0;
 }
 
-void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget *wgt)
+void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
 {
-    mWgtsLst.append(wgt);
+    m_tabWidget->addTab(tab, tab->name());
 }
 
-CLAbstractSettingsWidget *CLAbstractDeviceSettingsDlg::getWidgetByName(const QString &name) const
+QGroupBox *CLAbstractDeviceSettingsDlg::groupByName(const QString &name) const
 {
-    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst) {
-        if (name == wgt->param().name())
-            return wgt;
-    }
-
-    return 0;
+    return m_groups.value(name);
 }
 
-void CLAbstractDeviceSettingsDlg::putGroup(QGroupBox *group)
+void CLAbstractDeviceSettingsDlg::putGroup(const QString &name, QGroupBox *group)
 {
-    m_groups.append(group);
+    m_groups.insert(name, group);
 }
 
-QGroupBox *CLAbstractDeviceSettingsDlg::getGroupByName(const QString &name) const
-{
-    foreach (QGroupBox *groupBox, m_groups) {
-        if (name == groupBox->title())
-            return groupBox;
-    }
-
-    return 0;
-}
-
-QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::getWidgetsBygroup(const QString &group) const
+QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::widgetsByGroup(const QString &group) const
 {
     QList<CLAbstractSettingsWidget *> result;
 
-    foreach (CLAbstractSettingsWidget *wgt, mWgtsLst) {
+    foreach (CLAbstractSettingsWidget *wgt, m_widgets.values()) {
         if (wgt->group() == group)
             result.append(wgt);
     }
 
     return result;
+}
+
+CLAbstractSettingsWidget *CLAbstractDeviceSettingsDlg::widgetByName(const QString &name) const
+{
+    return m_widgets.value(name);
+}
+
+void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget *wgt)
+{
+    m_widgets.insert(wgt->param().name(), wgt);
 }
 
 void CLAbstractDeviceSettingsDlg::onClose()
@@ -129,10 +117,36 @@ void CLAbstractDeviceSettingsDlg::onSuggestions()
 {
 }
 
+#include "core/resource/resource_command_consumer.h"
+
+class QnDeviceGetParamCommand : public QnResourceCommand
+{
+public:
+    QnDeviceGetParamCommand(CLAbstractSettingsWidget *wgt)
+        : QnResourceCommand(wgt->resource()),
+          m_wgt(wgt)
+    {}
+
+    void execute()
+    {
+        if (!isConnectedToTheResource())
+            return;
+
+        QVariant val;
+        if (m_resource->getParam(m_wgt->param().name(), val, QnDomainPhysical))
+            QMetaObject::invokeMethod(m_wgt, "updateParam", Qt::QueuedConnection, Q_ARG(QVariant, val));
+    }
+
+private:
+    CLAbstractSettingsWidget *const m_wgt;
+};
+
+typedef QSharedPointer<QnDeviceGetParamCommand> QnDeviceGetParamCommandPtr;
+
 void CLAbstractDeviceSettingsDlg::onNewtab(int index)
 {
     const QString group = static_cast<CLDeviceSettingsTab *>(m_tabWidget->widget(index))->name();
-    foreach (CLAbstractSettingsWidget *wgt, getWidgetsBygroup(group)) {
+    foreach (CLAbstractSettingsWidget *wgt, widgetsByGroup(group)) {
         QnDeviceGetParamCommandPtr command(new QnDeviceGetParamCommand(wgt));
         QnResource::addCommandToProc(command);
     }

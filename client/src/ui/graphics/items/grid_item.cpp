@@ -30,7 +30,7 @@ QnGridItem::QnGridItem(QGraphicsItem *parent):
     setStateColor(DISALLOWED, QColor(255, 0, 0, 64));
 
     m_opacityAnimator->setTargetObject(this);
-    m_opacityAnimator->setAccessor(new QnPropertyAccessor("opacity"));
+    m_opacityAnimator->setAccessor(new PropertyAccessor("opacity"));
     m_opacityAnimator->setSpeed(1.0);
 
     setAcceptedMouseButtons(0);
@@ -163,7 +163,7 @@ VariantAnimator *QnGridItem::itemAnimator(QnGridHighlightItem *item) {
     animator = new VariantAnimator(item);
     animator->setTargetObject(item);
     animator->setTimer(m_opacityAnimator->timer());
-    animator->setAccessor(new QnPropertyAccessor("color"));
+    animator->setAccessor(new PropertyAccessor("color"));
     animator->setConverter(new QnColorToVectorConverter());
     animator->setSpeed(m_opacityAnimator->speed());
     connect(animator, SIGNAL(finished()), this, SLOT(at_itemAnimator_finished()));

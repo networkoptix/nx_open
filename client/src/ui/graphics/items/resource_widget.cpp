@@ -481,8 +481,7 @@ void QnResourceWidget::at_display_resourceUpdated() {
 // Painting
 // -------------------------------------------------------------------------- //
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
-    const QPaintEngine* paintEngine = painter->paintEngine();
-    if (!paintEngine) {
+    if (painter->paintEngine() == NULL) {
         qnWarning("No OpenGL-compatible paint engine was found.");
         return;
     }

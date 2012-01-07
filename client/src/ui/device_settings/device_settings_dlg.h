@@ -1,6 +1,7 @@
 #ifndef abstract_device_settings_dlg_h_1652
 #define abstract_device_settings_dlg_h_1652
 
+#include <QtCore/QHash>
 #include <QtCore/QList>
 
 #include <QtGui/QDialog>
@@ -24,8 +25,15 @@ public:
 
     QnResourcePtr resource() const;
 
+    CLDeviceSettingsTab *tabByName(const QString &name) const;
+    void addTab(CLDeviceSettingsTab *tab);
+
+    QGroupBox *groupByName(const QString &name) const;
+    void putGroup(const QString &name, QGroupBox *group);
+
+    QList<CLAbstractSettingsWidget *> widgetsByGroup(const QString &group) const;
+    CLAbstractSettingsWidget *widgetByName(const QString &name) const;
     void putWidget(CLAbstractSettingsWidget *wgt);
-    void putGroup(QGroupBox *group);
 
 public Q_SLOTS:
     virtual void setParam(const QString &name, const QVariant &val);
@@ -35,21 +43,13 @@ public Q_SLOTS:
     virtual void onNewtab(int index);
 
 protected:
-    void addTab(CLDeviceSettingsTab *tab);
-    CLAbstractSettingsWidget *getWidgetByName(const QString &name) const;
-    QGroupBox *getGroupByName(const QString &name) const;
-    CLDeviceSettingsTab *tabByName(const QString &name) const;
-
-    QList<CLAbstractSettingsWidget *> getWidgetsBygroup(const QString &group) const;
-
-protected:
     QnResourcePtr m_resource;
 
     QTabWidget *m_tabWidget;
     QDialogButtonBox *m_buttonBox;
 
-    QList<CLAbstractSettingsWidget *> mWgtsLst;
-    QList<QGroupBox *> m_groups;
+    QHash<QString, CLAbstractSettingsWidget *> m_widgets;
+    QHash<QString, QGroupBox *> m_groups;
     QList<CLDeviceSettingsTab *> m_tabs;
 };
 

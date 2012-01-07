@@ -47,6 +47,8 @@ QAction cm_rotate(QObject::tr("Rotation"), 0);
 
 QAction cm_open_containing_folder(QObject::tr("Open in containing folder..."), 0);
 
+QAction cm_showNavTree(QObject::tr("<=|=>"), 0);
+
 void initContextMenu()
 {
     cm_exit.setIcon(Skin::icon(QLatin1String("decorations/exit-application.png")));
@@ -136,4 +138,9 @@ void initContextMenu()
     }
     cm_rotate.setMenu(rotationMenu);
     cm_rotate.setToolTip(QObject::tr("Rotation"));
+
+
+    cm_showNavTree.setToolTip(QObject::tr("Toggle navigation tree show/hide"));
+    cm_showNavTree.setCheckable(true);
+    cm_showNavTree.setChecked(false);
 }

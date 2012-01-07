@@ -19,6 +19,12 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
     switch (control) {
 #ifndef QT_NO_SLIDER
     case CC_Slider:
+        if (widget) { // for old good widgets
+            ProxyStyle::drawComplexControl(control, option, painter, widget);
+            break;
+        }
+
+        // ### optimize in Bespin & remove
         if (const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
             if (sliderOption->orientation != Qt::Horizontal) {
                 qWarning("AppStyle: Non-horizontal sliders are not implemented. Falling back to the default painting.");

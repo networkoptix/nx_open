@@ -22,14 +22,14 @@ bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
     return false;
 }
 
-QDialog *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource)
+QDialog *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource, QWidget *parent)
 {
     if (!resource)
         return 0;
 
     foreach (CLAbstractDlgManufacture *manufacture, *manufactures()) {
         if (manufacture->canProduceDlg(resource))
-            return manufacture->createDlg(resource);
+            return manufacture->createDlg(resource, parent);
     }
 
     return 0;
