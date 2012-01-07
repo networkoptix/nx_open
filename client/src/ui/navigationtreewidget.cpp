@@ -1,6 +1,7 @@
 #include "navigationtreewidget.h"
 
 #include <QtGui/QAction>
+#include <QtGui/QApplication>
 #include <QtGui/QBoxLayout>
 #include <QtGui/QItemSelectionModel>
 #include <QtGui/QLineEdit>
@@ -150,14 +151,14 @@ NavigationTreeWidget::~NavigationTreeWidget()
 {
 }
 
-void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
+void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
 {
     QnResourceList resources;
     QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         resources.append(qnResPool->getResourceById(QnId(QString::number(index.data(Qt::UserRole + 1).toUInt()))));
 
-    QScopedPointer<QMenu> menu(new QMenu(this));
+    QScopedPointer<QMenu> menu(new QMenu);
 
     QAction *openAction = new QAction(tr("Open"), menu.data());
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
@@ -211,13 +212,15 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
     menu->addSeparator();
     menu->addAction(&cm_exit);
 
-    QAction *action = menu->exec(event->globalPos());
+    QAction *action = menu->exec(QCursor::pos());
+    if (!action)
+        return;
 
     if (resources.size() == 1)
     {
         const QnResourcePtr resource = resources.first();
         if (action == &cm_settings) { // ###
-            if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, this)) {
+            if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, QApplication::activeWindow())) {
                 dialog->exec();
                 delete dialog;
             }
