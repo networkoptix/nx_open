@@ -217,8 +217,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
     {
         const QnResourcePtr resource = resources.first();
         if (action == &cm_settings) { // ###
-            if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource)) {
-                dialog->setParent(this);
+            if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, this)) {
                 dialog->exec();
                 delete dialog;
             }
