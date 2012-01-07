@@ -14,8 +14,9 @@ class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchController;
 class QnWorkbenchDisplay;
+class QnDwm;
 
-class MainWnd : public QMainWindow
+class MainWnd : public QWidget
 {
     Q_OBJECT
 
@@ -30,6 +31,8 @@ Q_SIGNALS:
 
 protected:
     void closeEvent(QCloseEvent *event);
+
+    virtual bool winEvent(MSG *message, long *result) override;
 
 private Q_SLOTS:
     void addTab();
@@ -70,6 +73,8 @@ private:
     static MainWnd *s_instance;
 
     bool m_treeShown; // TODO: remove
+
+    QnDwm *m_dwm;
 };
 
 #endif // MAINWND_H

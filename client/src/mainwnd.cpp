@@ -50,10 +50,12 @@
 #include "settings.h"
 #include "version.h"
 
+#include "ui/dmw.h"
+
 MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
-    : QMainWindow(parent, flags),
+    : QWidget(parent, flags | Qt::CustomizeWindowHint | Qt::WindowTitleHint),
       m_controller(0),
       m_treeShown(true)
 {
@@ -61,6 +63,10 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         qnWarning("Several instances of main window created, expect problems.");
     else
         s_instance = this;
+
+    /* Set up dwm. */
+    m_dwm = new QnDwm(this);
+    m_dwm->extendFrameIntoClientArea();
 
     /* Set up QWidget. */
     setWindowTitle(APPLICATION_NAME);
@@ -102,7 +108,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), QPointF(0, 0));
 
     /* Prepare UI. */
-    m_tabWidget = new TabWidget(this);
+    m_tabWidget = new TabWidget(); 
     m_tabWidget->setMovable(true);
     m_tabWidget->setTabsClosable(true);
     m_tabWidget->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
@@ -118,8 +124,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
     m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
 
-    setCentralWidget(m_tabWidget);
-
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
 #ifdef Q_OS_WIN
@@ -128,15 +132,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     setContentsMargins(0, 0, 0, 0);
 #endif
 
-
-    // toolbars
-    QToolBar *toolBar = new QToolBar(this);
-    toolBar->setAllowedAreas(Qt::TopToolBarArea);
-    toolBar->addAction(&cm_exit);
-    toolBar->addAction(&cm_toggle_fullscreen);
-    toolBar->addAction(&cm_preferences);
-    addToolBar(Qt::TopToolBarArea, toolBar);
-
+    setContentsMargins(0, 0, 0, 0);
 
     // actions
     connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
@@ -150,7 +146,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
-    toolBar->addAction(reconnectAction);
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
@@ -158,12 +153,39 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     QAction *showNavTreeAction = new QAction(tr("<=|=>"), this);
     showNavTreeAction->setToolTip(tr("Toggle navigation tree show/hide"));
     connect(showNavTreeAction, SIGNAL(triggered()), this, SLOT(toggleShowNavTree()));
-    toolBar->addAction(showNavTreeAction);
     //
+
+    // toolbars
+    QToolBar *toolBar = new QToolBar();
+    toolBar->setAllowedAreas(Qt::TopToolBarArea);
+    toolBar->addAction(showNavTreeAction);
+    toolBar->addAction(reconnectAction);
+    toolBar->addAction(&cm_preferences);
+    toolBar->addAction(&cm_toggle_fullscreen);
+    toolBar->addAction(&cm_exit);
+
+
+    // layout
+    QHBoxLayout *titleBarLayout = new QHBoxLayout();
+    titleBarLayout->setContentsMargins(0, 0, 0, 0);
+    titleBarLayout->setSpacing(0);
+    titleBarLayout->addStretch(0x1000);
+    titleBarLayout->addWidget(toolBar);
+
+    QVBoxLayout *centralLayout = new QVBoxLayout();
+    centralLayout->setContentsMargins(0, 0, 0, 0);
+    centralLayout->setSpacing(0);
+    centralLayout->addSpacing(2);
+    centralLayout->addLayout(titleBarLayout);
+    centralLayout->addSpacing(2);
+    centralLayout->addWidget(m_tabWidget);
+
+    setLayout(centralLayout);
+
 
     addTab();
 
-    showFullScreen();
+    //showFullScreen();
 }
 
 MainWnd::~MainWnd()
@@ -399,7 +421,7 @@ bool MainWnd::eventFilter(QObject *watched, QEvent *event)
 
 void MainWnd::closeEvent(QCloseEvent *event)
 {
-    QMainWindow::closeEvent(event);
+    QWidget::closeEvent(event);
 
     if (event->isAccepted())
         Q_EMIT mainWindowClosed();
@@ -482,4 +504,11 @@ void MainWnd::appServerAuthenticationRequired()
     }
     delete dialog;
     dialog = 0;
+}
+
+bool MainWnd::winEvent(MSG *message, long *result) {
+    if(m_dwm->winEvent(message, result))
+        return true;
+
+    return QWidget::winEvent(message, result);
 }
