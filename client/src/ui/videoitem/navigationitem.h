@@ -102,8 +102,8 @@ private Q_SLOTS:
     void onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle);
     void onMotionPeriodLoadFailed(int status, int handle);
 
-    void onMrsButtonClicked();
     void updateMotionPeriods(const QnTimePeriod& period);
+
 protected:
 #ifdef EMULATE_CLUnMovedInteractiveOpacityItem
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);

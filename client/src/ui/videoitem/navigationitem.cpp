@@ -247,11 +247,11 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_mrsButton->addPixmap(Skin::pixmap(QLatin1String("mrs.png")), ImageButton::Active, ImageButton::Background);
     m_mrsButton->setPreferredSize(48, 24);
     m_mrsButton->setMaximumSize(m_mrsButton->preferredSize());
-    //m_mrsButton->setEnabled(false);
+    m_mrsButton->setCheckable(true);
     m_mrsButton->setChecked(true);
     m_mrsButton->hide();
 
-    connect(m_mrsButton, SIGNAL(clicked()), this, SLOT(onMrsButtonClicked()));
+    connect(m_mrsButton, SIGNAL(clicked()), this, SIGNAL(clearMotionSelection()));
 
     // -----------------
 
@@ -283,7 +283,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     rightLayoutH->addItem(m_timeLabel);
     rightLayoutH->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
-    
+
     rightLayoutH->addItem(rightsubLayoutV);
 
     rightsubLayoutV->addItem(m_mrsButton);
@@ -543,10 +543,10 @@ void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
 {
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
-        if (netRes) 
+        if (netRes)
         {
             MotionPeriods::iterator itr = m_motionPeriodLoader.find(netRes);
-            if (itr != m_motionPeriodLoader.end()) 
+            if (itr != m_motionPeriodLoader.end())
             {
                 itr.value().loadingHandle = itr.value().loader->load(period, itr.value().region);
             }
@@ -988,9 +988,4 @@ void NavigationItem::setPlaying(bool playing)
 void NavigationItem::togglePlayPause()
 {
     setPlaying(!m_playing);
-}
-
-void NavigationItem::onMrsButtonClicked()
-{
-    emit clearMotionSelection();
 }
