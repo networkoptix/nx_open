@@ -55,7 +55,7 @@
 MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
-    : QWidget(parent, flags | Qt::CustomizeWindowHint | Qt::WindowTitleHint),
+    : QWidget(parent, flags | Qt::CustomizeWindowHint),
       m_controller(0),
       m_treeShown(true)
 {

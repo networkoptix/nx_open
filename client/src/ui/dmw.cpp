@@ -243,11 +243,24 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
     /* Adjust (shrink) the client rectangle to accommodate the border. 
      * 
      * Don't include the title bar. */
-    nccsp->rgrc[0].bottom   += nccsp->rgrc[2].bottom - nccsp->rgrc[1].bottom;
-    nccsp->rgrc[0].left     += nccsp->rgrc[2].left - nccsp->rgrc[1].left;
-    nccsp->rgrc[0].right    += nccsp->rgrc[2].right - nccsp->rgrc[1].right;
+    RECT targetGeometry = nccsp->rgrc[0];
+    RECT sourceGeometry = nccsp->rgrc[1];
+    RECT sourceClientGeometry = nccsp->rgrc[2];
 
-    *result = 0;
+    /* New client geometry. */
+    nccsp->rgrc[0].top      += 0;
+    nccsp->rgrc[0].bottom   += sourceClientGeometry.bottom - sourceGeometry.bottom;
+    nccsp->rgrc[0].left     += sourceClientGeometry.left   - sourceGeometry.left;
+    nccsp->rgrc[0].right    += sourceClientGeometry.right  - sourceGeometry.right;
+
+    /* New geometry. */
+    nccsp->rgrc[1] = targetGeometry;
+    
+    /* Old geometry. */
+    nccsp->rgrc[2] = sourceGeometry;
+
+
+    *result = WVR_VALIDRECTS;
     return true;
 }
 
@@ -269,8 +282,6 @@ bool QnDwm::hitTestEvent(MSG *message, long *result) {
     default:
         break;
     }
-
-    qDebug() << d->widget->frameGeometry().top() - d->widget->geometry().top();
 
     /* There is a bug in Qt: coordinates for WM_NCHITTEST are supplied in screen coordinates, 
      * but Qt calls ClientToScreen for them. This is why we re-extract screen coordinates from lParam. */

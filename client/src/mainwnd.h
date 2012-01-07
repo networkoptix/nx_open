@@ -30,7 +30,7 @@ Q_SIGNALS:
     void mainWindowClosed();
 
 protected:
-    void closeEvent(QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *event) override;
 
     virtual bool winEvent(MSG *message, long *result) override;
 
