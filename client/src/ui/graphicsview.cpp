@@ -1,6 +1,5 @@
 #include "graphicsview.h"
 
-
 #include "video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
 #include "ui/mixins/render_watch_mixin.h"
@@ -96,8 +95,11 @@ extern qreal long_ratio;
 extern int limit_val(int val, int min_val, int max_val, bool mirror);
 //==============================================================================
 
-#include "../ui/videoitem/navigationitem.h"
-#include "../ui/videoitem/timeslider.h"
+#include "ui/videoitem/navigationitem.h"
+#include "ui/videoitem/timeslider.h"
+
+static const int NAVIGATIONITEM_HEIGHT = 60;
+
 GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget* mainWnd) :
     QGraphicsView(scene),
     m_xRotate(0),
@@ -424,7 +426,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (onUserInput(true, true))
         return;
 
-    if (m_navigationItem && m_navigationItem->isMouseOver())
+    if (m_navigationItem) //&& m_navigationItem->isMouseOver()) // BROKEN
     {
         // do not zoom scene if mouse is over m_navigationItem
         QGraphicsView::wheelEvent(e);
@@ -724,8 +726,8 @@ void GraphicsView::initDecoration()
 void GraphicsView::adjustAllStaticItems()
 {
     if (m_navigationItem) {
-        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT)));
-        m_navigationItem->resize(width(), NavigationItem::DEFAULT_HEIGHT);
+        m_navigationItem->setPos(mapToScene(QPoint(0, viewport()->height() - NAVIGATIONITEM_HEIGHT)));
+        m_navigationItem->resize(width(), NAVIGATIONITEM_HEIGHT);
     }
 
     foreach (CLAbstractUnmovedItem *item, m_staticItems)
@@ -1398,7 +1400,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
     }
 
     // hack hack hack buuue
-    if (event->pos().y() >= viewport()->height() - NavigationItem::DEFAULT_HEIGHT && event->pos().y() <= viewport()->height())
+    if (event->pos().y() >= viewport()->height() - NAVIGATIONITEM_HEIGHT && event->pos().y() <= viewport()->height())
     {
         QGraphicsView::contextMenuEvent(event);
         return;
@@ -2006,7 +2008,7 @@ void GraphicsView::goToSteadyMode(bool steady)
             onUserInput(false, false);
             return;
         }
-        if (m_navigationItem && m_navigationItem->isMouseOver())
+        if (m_navigationItem) //&& m_navigationItem->isMouseOver()) // BROKEN
         {
             onUserInput(false, false);
             return;
@@ -2026,7 +2028,7 @@ void GraphicsView::goToSteadyMode(bool steady)
                 item->hideIfNeeded(500);
         }
         if (m_navigationItem && !m_camLayout.hasLiveCameras())
-            m_navigationItem->hideIfNeeded(500);
+            ; //m_navigationItem->hideIfNeeded(500); // BROKEN
         if (m_searchItem)
         {
             m_searchItem->setVisible(false);
@@ -2044,7 +2046,7 @@ void GraphicsView::goToSteadyMode(bool steady)
                 item->show(500);
         }
         if (m_navigationItem)
-            m_navigationItem->show(500);
+            ; //m_navigationItem->show(500); // BROKEN
         if (m_searchItem)
         {
             m_searchItem->setVisible(true);
@@ -2324,7 +2326,7 @@ bool GraphicsView::isNavigationMode() const
 bool GraphicsView::mouseIsCloseToNavigationControl(const QPoint &mpos) const
 {
     int mouse_y = mpos.y();
-    int navigation_top = viewport()->height() - NavigationItem::DEFAULT_HEIGHT;
+    int navigation_top = viewport()->height() - NAVIGATIONITEM_HEIGHT;
     int navigation_top_gap  = navigation_top - 30;
 
     return mouse_y >= navigation_top_gap && mouse_y <= navigation_top;

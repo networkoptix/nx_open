@@ -18,8 +18,6 @@ class TimeSlider;
 class VolumeSlider;
 class GraphicsLabel;
 
-#define EMULATE_CLUnMovedInteractiveOpacityItem
-
 class NavigationItem : public QGraphicsWidget
 {
     Q_OBJECT
@@ -36,23 +34,6 @@ public:
 
     inline bool isPlaying() const { return m_playing; }
 
-    static const int DEFAULT_HEIGHT = 60; // ### remove
-
-#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
-    // isUnderMouse() replacement;
-    // qt bug 18797 When setting the flag ItemIgnoresTransformations for an item, it will receive mouse events as if it was transformed by the view.
-    inline bool isMouseOver() const { return m_underMouse; }
-
-    inline void hideIfNeeded(int duration) { hide(duration); }
-    void setVisibleAnimated(bool visible, int duration);
-    inline void hide(int duration) { setVisibleAnimated(false, duration); }
-    inline void show(int duration) { setVisibleAnimated(true, duration); }
-    void changeOpacity(qreal new_opacity, int duration = 0);
-
-public Q_SLOTS:
-    void stopAnimation();
-#endif
-
 public Q_SLOTS:
     void setMute(bool mute);
     void setPlaying(bool playing);
@@ -62,6 +43,7 @@ Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
     void playbackMaskChanged(const QnTimePeriodList& playbackMask);
     void clearMotionSelection();
+
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
@@ -105,10 +87,6 @@ private Q_SLOTS:
     void updateMotionPeriods(const QnTimePeriod& period);
 
 protected:
-#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-#endif
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
 private:
@@ -156,14 +134,6 @@ private:
         QTimer timer;
     } *restoreInfoTextData;
 
-#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
-    bool m_underMouse;
-
-    QPropertyAnimation *m_animation;
-
-    static qreal m_normal_opacity;//= 0.5;
-    static qreal m_active_opacity;//= 0.95;
-#endif
 };
 
 #endif // NAVIGATIONITEM_H

@@ -2,26 +2,19 @@
 
 #include <QtCore/QFile>
 
+#include <QtGui/QApplication>
 #include <QtGui/QBoxLayout>
-#include <QtGui/QSplitter>
 #include <QtGui/QToolBar>
-#include <QtGui/QToolButton>
 
 #include <QtNetwork/QNetworkReply>
 
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
 
-#include <core/resource/directory_browser.h>
 #include <core/resourcemanagment/asynch_seacher.h>
 #include <core/resourcemanagment/resource_pool.h>
 
-#include "ui/layout_navigator.h"
-#include "ui/video_cam_layout/layout_manager.h"
-#include "ui/video_cam_layout/start_screen_content.h"
-
 #include "ui/context_menu_helper.h"
-#include "ui/navigationtreewidget.h"
 
 #include "ui/dialogs/logindialog.h"
 #include "ui/preferences/preferences_wnd.h"
@@ -42,18 +35,15 @@
 
 #include "ui/skin/skin.h"
 
-#include <utils/common/util.h>
-#include <utils/common/warnings.h>
-
 #include "file_processor.h"
 #include "settings.h"
-#include "version.h"
 
 MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags flags)
     : FancyMainWindow(parent, flags | Qt::WindowShadeButtonHint),
       m_controller(0)
 {
-    setWindowTitle(APPLICATION_NAME);
+    setWindowTitle(QApplication::applicationName());
+
     setAttribute(Qt::WA_QuitOnClose);
     setAcceptDrops(true);
 
@@ -75,6 +65,8 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
+
+    addAction(&cm_showNavTree);
 
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
@@ -110,9 +102,6 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     new QnSyncPlayMixin(m_display, this);
 
     // Prepare UI
-    NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(this);
-    connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
-
     m_tabBar = new TabBar(this);
     m_tabBar->setDocumentMode(true);
     m_tabBar->setExpanding(false);
@@ -128,10 +117,11 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
         toolBar->setAllowedAreas(Qt::NoToolBarArea);
         toolBar->addAction(reconnectAction);
         toolBar->addAction(&cm_preferences);
+        toolBar->addAction(&cm_showNavTree);
         toolBar->addAction(newTabAction);
 
         QVBoxLayout *mainLayout = qobject_cast<QVBoxLayout *>(layout());
-        Q_ASSERT(mainLayout);
+        Q_ASSERT(mainLayout); // ###
         QHBoxLayout *tabBarLayout = new QHBoxLayout;
         tabBarLayout->setContentsMargins(0, 0, 0, 0);
         tabBarLayout->setSpacing(2);
@@ -140,14 +130,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
         mainLayout->insertLayout(1, tabBarLayout);
     }
 
-    m_splitter = new QSplitter(Qt::Horizontal, this);
-    m_splitter->setChildrenCollapsible(false);
-    m_splitter->addWidget(navigationWidget);
-    m_splitter->setStretchFactor(0, 1);
-    m_splitter->setCollapsible(0, true);
-    m_splitter->addWidget(m_view);
-    m_splitter->setStretchFactor(1, 99);
-    setCentralWidget(m_splitter);
+    setCentralWidget(m_view);
 
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
@@ -201,18 +184,6 @@ void MainWindow::closeTab(int index)
     delete layout;
 
     m_tabBar->removeTab(index);
-}
-
-void MainWindow::itemActivated(uint resourceId)
-{
-    // ### rewrite from scratch ;)
-    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId)));
-
-    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-    if (mediaResource && m_controller->layout()->items(mediaResource->getUniqueId()).isEmpty()) {
-        const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
-        m_controller->drop(resource, gridPos);
-    }
 }
 
 void MainWindow::handleMessage(const QString &message)

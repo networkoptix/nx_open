@@ -20,9 +20,9 @@ public:
  * Accessor that wraps the given functors.
  */
 template<class Getter, class Setter>
-class QnAccessorAdaptor: public AbstractAccessor {
+class AccessorAdaptor: public AbstractAccessor {
 public:
-    QnAccessorAdaptor(const Getter &getter, const Setter &setter): m_getter(getter), m_setter(setter) {}
+    AccessorAdaptor(const Getter &getter, const Setter &setter): m_getter(getter), m_setter(setter) {}
 
     virtual QVariant get(const QObject *object) const override {
         return m_getter(object);
@@ -46,16 +46,16 @@ private:
  */
 template<class Getter, class Setter>
 AbstractAccessor *newAccessor(const Getter &getter, const Setter &setter) {
-    return new QnAccessorAdaptor<Getter, Setter>(getter, setter);
+    return new AccessorAdaptor<Getter, Setter>(getter, setter);
 }
 
 
 /**
  * Accessor for Qt properties. 
  */
-class QnPropertyAccessor: public AbstractAccessor {
+class PropertyAccessor: public AbstractAccessor {
 public:
-    QnPropertyAccessor(const QByteArray &propertyName): m_propertyName(propertyName) {}
+    PropertyAccessor(const QByteArray &propertyName): m_propertyName(propertyName) {}
 
     virtual QVariant get(const QObject *object) const override {
         return object->property(m_propertyName.constData());

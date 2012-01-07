@@ -21,12 +21,12 @@ WidgetAnimator::WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geomet
 
     m_geometryAnimator = new RectAnimator(this);
     m_geometryAnimator->setTargetObject(widget);
-    m_geometryAnimator->setAccessor(new QnPropertyAccessor(geometryPropertyName));
+    m_geometryAnimator->setAccessor(new PropertyAccessor(geometryPropertyName));
     m_geometryAnimator->setEasingCurve(QEasingCurve::InOutBack);
 
     m_rotationAnimator = new VariantAnimator(this);
     m_rotationAnimator->setTargetObject(widget);
-    m_rotationAnimator->setAccessor(new QnPropertyAccessor(rotationPropertyName));
+    m_rotationAnimator->setAccessor(new PropertyAccessor(rotationPropertyName));
     m_rotationAnimator->setEasingCurve(QEasingCurve::InOutBack);
 
     addAnimator(m_geometryAnimator);

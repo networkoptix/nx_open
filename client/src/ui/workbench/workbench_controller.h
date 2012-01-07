@@ -13,6 +13,7 @@ class QGraphicsItem;
 class QMenu;
 class QLabel;
 class QPropertyAnimation;
+class QGraphicsProxyWidget;
 
 class InstrumentManager;
 class HandScrollInstrument;
@@ -26,8 +27,10 @@ class RotationInstrument;
 class MotionSelectionInstrument;
 class ClickInfo;
 class ResizingInfo;
+class VariantAnimator;
 
 class NavigationItem;
+class NavigationTreeWidget;
 
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
@@ -35,8 +38,6 @@ class QnWorkbench;
 class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
-class VariantAnimator;
-
 class QnScreenRecorder;
 
 
@@ -50,7 +51,6 @@ class QnWorkbenchController: public QObject, protected SceneUtility {
 
 public:
     QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent = NULL);
-
     virtual ~QnWorkbenchController();
 
     QnWorkbenchDisplay *display() const;
@@ -68,6 +68,9 @@ public:
     void drop(const QnResourcePtr &resource, const QPointF &gridPos);
     void drop(const QnResourceList &resources, const QPointF &gridPos);
 
+public Q_SLOTS:
+    void setTreeVisible(bool visible);
+
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
@@ -75,6 +78,7 @@ protected:
 
     VariantAnimator *opacityAnimator(QnResourceWidget *widget);
 
+    void updateViewportMargins();
 
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -107,7 +111,10 @@ protected Q_SLOTS:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
+    void at_controlsWidget_deactivated();
+    void at_controlsWidget_geometryChanged();
     void at_navigationItem_geometryChanged();
+    void at_treeItem_geometryChanged();
 
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
@@ -126,6 +133,8 @@ protected Q_SLOTS:
 
     void at_randomGridAction_triggered();
 
+    void at_treeWidget_activated(uint resourceId);
+
 private:
     /* Global state. */
 
@@ -137,6 +146,12 @@ private:
 
     /** Navigation item. */
     NavigationItem *m_navigationItem;
+
+    /** Navigation tree widget. */
+    NavigationTreeWidget *m_treeWidget;
+
+    /** Proxy widget for navigation tree widget. */
+    QGraphicsProxyWidget *m_treeItem;
 
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
@@ -182,7 +197,7 @@ private:
 
 
     /* Dragging-related state. */
-    
+
     /** Items that are being dragged. */
     QList<QGraphicsItem *> m_draggedItems;
 
@@ -226,6 +241,10 @@ private:
     QAction *m_showMotionAction;
     QAction *m_hideMotionAction;
     QAction *m_randomGridAction;
+
+    QSizeF m_controlsWidgetSize;
+
+    VariantAnimator *m_treePositionAnimator;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

@@ -44,6 +44,18 @@ inline void glVertices(const QPolygonF &polygon) {
         glVertex(point);
 }
 
+inline void glTexCoord(float x, float y) {
+    glTexCoord2f(x, y);
+}
+
+inline void glTexCoord(double x, double y) {
+    glTexCoord2d(x, y);
+}
+
+inline void glTexCoord(const QPointF &point) {
+    glTexCoord(point.x(), point.y());
+}
+
 inline void glTranslate(float x, float y) {
     glTranslatef(x, y, 1.0f);
 }

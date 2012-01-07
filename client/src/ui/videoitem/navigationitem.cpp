@@ -94,30 +94,15 @@ private:
 };
 
 
-#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
-qreal NavigationItem::m_normal_opacity = 0.5;
-qreal NavigationItem::m_active_opacity = 0.95;
-extern int global_opacity_change_period;
-#endif
-
 NavigationItem::NavigationItem(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
     restoreInfoTextData(0)
 {
-#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
-    m_underMouse = false;
-    m_animation = 0;
-    setAcceptHoverEvents(true);
-    setOpacity(m_normal_opacity);
-#endif
-
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, false);
-    setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-    setFlag(QGraphicsItem::ItemIsPanel, true);
 
     setCursor(Qt::ArrowCursor);
 
@@ -335,68 +320,9 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
 NavigationItem::~NavigationItem()
 {
-#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
-    stopAnimation();
-#endif
-
     delete m_timeSlider;
     delete m_timeLabel;
 }
-
-#ifdef EMULATE_CLUnMovedInteractiveOpacityItem
-void NavigationItem::setVisibleAnimated(bool visible, int duration)
-{
-    changeOpacity(visible ? m_normal_opacity : 0.0, duration);
-}
-
-void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    QGraphicsWidget::hoverEnterEvent(event);
-
-    m_underMouse = true;
-
-    changeOpacity(m_active_opacity, global_opacity_change_period);
-}
-
-void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    QGraphicsWidget::hoverLeaveEvent(event);
-
-    m_underMouse = false;
-
-    changeOpacity(m_normal_opacity, global_opacity_change_period);
-}
-
-void NavigationItem::changeOpacity(qreal new_opacity, int duration)
-{
-    stopAnimation();
-
-    if (duration == 0 || qFuzzyCompare(new_opacity, opacity()))
-    {
-        setOpacity(new_opacity);
-    }
-    else
-    {
-        m_animation = new QPropertyAnimation(this, "opacity", this);
-        m_animation->setDuration(duration);
-        m_animation->setStartValue(opacity());
-        m_animation->setEndValue(new_opacity);
-        m_animation->start();
-
-        connect(m_animation, SIGNAL(finished()), this, SLOT(stopAnimation()));
-    }
-}
-
-void NavigationItem::stopAnimation()
-{
-    if (m_animation)
-    {
-        m_animation->stop();
-        m_animation->deleteLater();
-        m_animation = 0;
-    }
-}
-#endif // EMULATE_CLUnMovedInteractiveOpacityItem
 
 void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 {

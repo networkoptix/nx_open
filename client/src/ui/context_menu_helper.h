@@ -47,4 +47,6 @@ extern QAction cm_rotate;
 
 extern QAction cm_open_containing_folder;
 
+extern QAction cm_showNavTree;
+
 #endif //context_menu_helper_h_1250

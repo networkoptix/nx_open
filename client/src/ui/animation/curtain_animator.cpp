@@ -15,12 +15,12 @@ QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
     m_frameColorAnimator(NULL)
 {
     m_curtainColorAnimator = new VariantAnimator(this);
-    m_curtainColorAnimator->setAccessor(new QnPropertyAccessor("color"));
+    m_curtainColorAnimator->setAccessor(new PropertyAccessor("color"));
     m_curtainColorAnimator->setConverter(new QnColorToVectorConverter());
     m_curtainColorAnimator->setTargetObject(NULL);
 
     m_frameColorAnimator = new VariantAnimator(this);
-    m_frameColorAnimator->setAccessor(new QnPropertyAccessor("frameColor"));
+    m_frameColorAnimator->setAccessor(new PropertyAccessor("frameColor"));
     m_frameColorAnimator->setConverter(new QnColorToVectorConverter());
     m_frameColorAnimator->setTargetObject(NULL);
 
