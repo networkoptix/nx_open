@@ -1,5 +1,6 @@
 #include "timeslider.h"
 
+#include <QGradient>
 #include <QtCore/QDateTime>
 #include <QtCore/QPair>
 #include <QtCore/QPropertyAnimation>
@@ -272,7 +273,8 @@ public:
         m_scaleSpeed(1.0),
         m_prevWheelDelta(INT_MAX),
         m_cachedXPos(INT64_MIN),
-        m_cachedOutsideCnt(INT64_MIN)
+        m_cachedOutsideCnt(INT64_MIN),
+        m_gradientReady(false)
     {
         setFlag(QGraphicsItem::ItemClipsToShape); // ### paints out of shape, bitch
 
@@ -338,7 +340,8 @@ private:
     int m_prevWheelDelta;
     double m_cachedXPos;
     double m_cachedOutsideCnt;
-
+    QBrush m_gradient;
+    bool m_gradientReady;
     QPair<qint64, qint64> m_selectedRange;
 };
 
@@ -438,23 +441,11 @@ static inline qint64 roundTime(qint64 msecs, int interval)
     return msecs - msecs%(intervals[interval].interval);
 }
 
-static inline void drawGradient(QPainter *painter, const QRectF &r, float height)
-{
-    painter->setCompositionMode(QPainter::CompositionMode_Source);
-    int MAX_COLOR = 64+64+16;
-    int MIN_COLOR = 64;
-    for (int i = r.top(); i < r.bottom(); ++i)
-    {
-        float part = (i - r.top()) / (float) height;
-        int k = part * (MAX_COLOR - MIN_COLOR) + MIN_COLOR;
-        painter->setPen(QColor(k,k,k,k));
-        painter->drawLine(QLineF(r.left(), i, r.width(), i));
-    }
-    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
-}
-
 void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    //QTime t;
+    //t.start();
+
     //GraphicsFrame::paint(painter, option, widget);
 
     const qreal halfHandleThickness = m_parent->m_slider->handleRect().width() / 2.0;
@@ -462,17 +453,18 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     if (qFuzzyIsNull(r.width()))
         return;
 
+    if (!m_gradientReady)
+    {
+        QLinearGradient gradient(QPointF(0,0), QPointF(0, r.height()));
+        gradient.setColorAt(0.0, QColor(64,64,64,64));
+        gradient.setColorAt(1.0, QColor(144,144,144,144));
+        m_gradient = QBrush(gradient);
+        m_gradientReady = true;
+    }
+    painter->fillRect(r, m_gradient);
+
     const QPalette pal = m_parent->palette();
-    /*
-    painter->setBrush(pal.brush(QPalette::Base));
-    painter->setPen(pal.color(QPalette::Base));
-    painter->drawRect(r);
-    */
-
-    drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
-
     painter->setPen(pal.color(QPalette::Text));
-
 
     qint64 timezoneOffset = 0;
     if (m_parent->minimumValue() != 0) {
@@ -627,6 +619,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     xpos = r.left() + m_parent->m_slider->value() * r.width() / (m_parent->m_slider->maximum() - m_parent->m_slider->minimum());
     painter->drawLine(QLineF(xpos, 0, xpos, rect().height()));
 
+    //qDebug() << "time=" << t.elapsed();
 }
 
 qint64 TimeLine::posToValue(qreal pos) const
