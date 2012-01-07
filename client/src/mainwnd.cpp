@@ -95,7 +95,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(m_display, this);
+    QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
+    new QnSyncPlayMixin(m_display, renderWatcher, this);
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -104,6 +105,10 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     /* Prepare UI. */
     m_navigationWidget = new NavigationTreeWidget(this);
     connect(m_navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
+
+    //connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)));
+    connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SLOT(onDisplayingStateChanged(QnAbstractRenderer *, bool)));
+
 
     m_tabWidget = new TabWidget(this);
     m_tabWidget->setMovable(true);

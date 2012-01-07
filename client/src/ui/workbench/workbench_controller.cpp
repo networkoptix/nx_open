@@ -319,6 +319,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     controlsWidget->setLayout(verticalLayout);
     
     m_navigationItem = new NavigationItem(controlsWidget);
+
    
 
 
@@ -341,6 +342,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
+    connect(m_display, SIGNAL(displayingStateChanged(QnResourcePtr, bool)), m_navigationItem, SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
+
 
 
     /* Connect to display. */

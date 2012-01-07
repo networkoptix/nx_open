@@ -8,13 +8,14 @@
 class QnWorkbenchDisplay;
 class QnResourceWidget;
 class QnArchiveSyncPlayWrapper;
+class QnRenderWatchMixin;
 
 class QnAbstractRenderer;
 
 class QnSyncPlayMixin: public QObject {
     Q_OBJECT;
 public:
-    QnSyncPlayMixin(QnWorkbenchDisplay *display, QObject *parent = NULL);
+    QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin *renderWatcher, QObject *parent = NULL);
 
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
