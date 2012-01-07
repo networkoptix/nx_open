@@ -440,20 +440,22 @@ static inline qint64 roundTime(qint64 msecs, int interval)
 
 static inline void drawGradient(QPainter *painter, const QRectF &r, float height)
 {
-    int MAX_COLOR = 64+16;
-    int MIN_COLOR = 0;
+    painter->setCompositionMode(QPainter::CompositionMode_Source);
+    int MAX_COLOR = 64+64+16;
+    int MIN_COLOR = 64;
     for (int i = r.top(); i < r.bottom(); ++i)
     {
-        int k = height - i;
-        k *= float(MAX_COLOR-MIN_COLOR) / height + MIN_COLOR;
+        float part = (i - r.top()) / (float) height;
+        int k = part * (MAX_COLOR - MIN_COLOR) + MIN_COLOR;
         painter->setPen(QColor(k,k,k,k));
         painter->drawLine(QLineF(r.left(), i, r.width(), i));
     }
+    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
 }
 
 void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    GraphicsFrame::paint(painter, option, widget);
+    //GraphicsFrame::paint(painter, option, widget);
 
     const qreal halfHandleThickness = m_parent->m_slider->handleRect().width() / 2.0;
     const QRectF r(halfHandleThickness, 0, rect().width() - halfHandleThickness * 2, rect().height() - frameWidth() * 2);
@@ -461,11 +463,16 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         return;
 
     const QPalette pal = m_parent->palette();
+    /*
     painter->setBrush(pal.brush(QPalette::Base));
     painter->setPen(pal.color(QPalette::Base));
     painter->drawRect(r);
+    */
+
     drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
+
     painter->setPen(pal.color(QPalette::Text));
+
 
     qint64 timezoneOffset = 0;
     if (m_parent->minimumValue() != 0) {
@@ -546,6 +553,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         opacity << qBound(MAX_MIN_OPACITY, float(pixelPerTime*interval.interval - minWidth)/60.0f, 1.0f);
     }
 
+
     // draw grid
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
@@ -618,6 +626,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(QPen(Qt::red, 3));
     xpos = r.left() + m_parent->m_slider->value() * r.width() / (m_parent->m_slider->maximum() - m_parent->m_slider->minimum());
     painter->drawLine(QLineF(xpos, 0, xpos, rect().height()));
+
 }
 
 qint64 TimeLine::posToValue(qreal pos) const
