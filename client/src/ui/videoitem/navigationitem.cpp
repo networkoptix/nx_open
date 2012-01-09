@@ -447,7 +447,7 @@ void NavigationItem::updateSlider()
     qint64 endTime = reader->endTime();
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
-        m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentDateTime().toMSecsSinceEpoch() - 10000); // if  nothing is recorded set minvalue to live-10sec
+        m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentMSecsSinceEpoch() - 10000); // if  nothing is recorded set minvalue to live-10sec
         m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
         if (m_timeSlider->minimumValue() == 0) {
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
@@ -520,7 +520,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     if (t <= 0)
         return;  // slider range still not initialized yet
 
-    qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     QnTimePeriod loadingPeriod;
     QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
@@ -534,7 +534,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
 
 bool NavigationItem::updateRecPeriodList(bool force)
 {
-    qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     if (!force && currentTime - m_timePeriodUpdateTime < TIME_PERIOD_UPDATE_INTERVAL)
         return true;
 

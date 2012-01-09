@@ -207,7 +207,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         reopen();
     if (result)
         m_lastPacketFlags = result->flags;
-    m_lastReceivedTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    m_lastReceivedTime = QDateTime::currentMSecsSinceEpoch();
     return result;
 }
 
@@ -460,7 +460,7 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
     if ((m_position == DATETIME_NOW || time == DATETIME_NOW) && 
-        qAbs(m_lastReceivedTime - QDateTime::currentDateTime().toMSecsSinceEpoch()) > 250)
+        qAbs(m_lastReceivedTime - QDateTime::currentMSecsSinceEpoch()) > 250)
     {
         m_blockReopening = true;
         close();

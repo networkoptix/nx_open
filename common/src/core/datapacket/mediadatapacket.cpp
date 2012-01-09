@@ -65,7 +65,7 @@ QnMetaDataV1::QnMetaDataV1():
     m_input = 0;
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
-    timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+    timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
     data.fill(0, data.capacity());
 }
 

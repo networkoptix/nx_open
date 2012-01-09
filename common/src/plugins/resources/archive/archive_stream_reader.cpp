@@ -395,7 +395,7 @@ begin_label:
                     if (seekTime != DATETIME_NOW)
                         seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
                     else
-                        seekTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
+                        seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
                     if (m_currentTime != seekTime) {
                         m_currentData = QnAbstractMediaDataPtr();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
@@ -404,7 +404,7 @@ begin_label:
                             if (m_delegate->endTime() != DATETIME_NOW)
                                 seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
                             else
-                                seekTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
+                                seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
                             tmpVal = m_lengthMksec;
                         }
                         intChanneljumpTo(seekTime, 0);

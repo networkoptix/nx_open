@@ -995,7 +995,7 @@ void TimeSlider::setMinimumValue(qint64 value)
 */
 qint64 TimeSlider::maximumValue() const
 {
-    return m_maximumValue == DATETIME_NOW ? QDateTime::currentDateTime().toMSecsSinceEpoch() : m_maximumValue;
+    return m_maximumValue == DATETIME_NOW ? QDateTime::currentMSecsSinceEpoch() : m_maximumValue;
 }
 
 void TimeSlider::setMaximumValue(qint64 value)

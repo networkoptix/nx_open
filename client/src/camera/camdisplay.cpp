@@ -167,7 +167,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     /*
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
     {
-        needToSleep = vd->timestamp - QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+        needToSleep = vd->timestamp - QDateTime::currentMSecsSinceEpoch()*1000;
     }
     else 
     */
