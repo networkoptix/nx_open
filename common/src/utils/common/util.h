@@ -129,6 +129,7 @@ inline bool qnFuzzyBetween(double value, double min, double max, double precisio
     return min * (1.0 - precision) <= value && value <= max * (1.0 + precision);
 }
 
+quint64 QN_EXPORT getUsecTimer();
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

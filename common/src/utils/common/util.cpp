@@ -162,3 +162,29 @@ qint64 getDiskFreeSpace(const QString& root) {
     }
 }
 #endif
+
+
+quint64 getUsecTimer()
+{
+#if defined(Q_OS_WIN32)
+    LARGE_INTEGER timer, freq;
+    QueryPerformanceCounter(&timer);
+    QueryPerformanceFrequency(&freq);
+    return (double) timer.QuadPart / (double) freq.QuadPart * 1000000.0;
+
+    static quint32 prevTics = 0;
+    static quint64 cycleCount = 0;
+    static QMutex timeMutex;
+    QMutexLocker lock(&timeMutex);
+    quint32 tics = (qint32) timeGetTime();
+    if (tics < prevTics) 
+        cycleCount+= 0x100000000ull;
+    prevTics = tics;
+    return ((quint64) tics + cycleCount) * 1000ull;
+#else
+    // POSIX
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    return tv.tv_sec * 1000000ull + tv.tv_usec;
+#endif
+} 
