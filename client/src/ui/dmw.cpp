@@ -47,7 +47,7 @@ public:
 
     void init(QWidget *widget);
 
-    void updateMetrics();
+    void updateThemeMetrics();
 
 public:
     bool valid;
@@ -57,8 +57,10 @@ public:
     PtrDwmExtendFrameIntoClientArea dwmExtendFrameIntoClientArea;
     PtrDwmGetColorizationColor dwmGetColorizationColor;
     PtrDwmDefWindowProc dwmDefWindowProc;
-    QMargins frameMargins;
-    int titleBarHeight;
+    QMargins widgetFrameMargins;
+    int widgetTitleBarHeight;
+    QMargins themeFrameMargins;
+    int themeTitleBarHeight;
 };
 
 QnDwmPrivate::QnDwmPrivate() { 
@@ -79,10 +81,13 @@ void QnDwmPrivate::init(QWidget *widget) {
 
     valid = dwmIsCompositionEnabled != NULL;
 
-    updateMetrics();
+    updateThemeMetrics();
+
+    widgetTitleBarHeight = themeTitleBarHeight;
+    widgetFrameMargins = themeFrameMargins;
 }
 
-void QnDwmPrivate::updateMetrics() {
+void QnDwmPrivate::updateThemeMetrics() {
     if(!valid)
         return;
 
@@ -91,24 +96,24 @@ void QnDwmPrivate::updateMetrics() {
     if(widget->windowFlags() & Qt::FramelessWindowHint || widget->windowFlags() & Qt::X11BypassWindowManagerHint) {
         frameX = 0;
         frameY = 0;
-        titleBarHeight = 0;
+        themeTitleBarHeight = 0;
     } else if(widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
         frameX = GetSystemMetrics(SM_CXFIXEDFRAME);
         frameY = GetSystemMetrics(SM_CYFIXEDFRAME);
-        titleBarHeight = GetSystemMetrics(SM_CYSMCAPTION);
+        themeTitleBarHeight = GetSystemMetrics(SM_CYSMCAPTION);
     } else {
         frameX = GetSystemMetrics(SM_CXSIZEFRAME);
         frameY = GetSystemMetrics(SM_CYSIZEFRAME);
-        titleBarHeight = GetSystemMetrics(SM_CYCAPTION);
+        themeTitleBarHeight = GetSystemMetrics(SM_CYCAPTION);
     }
 
-    frameMargins.setTop(frameY);
-    frameMargins.setBottom(frameY);
-    frameMargins.setLeft(frameX);
-    frameMargins.setRight(frameY);
+    themeFrameMargins.setTop(frameY);
+    themeFrameMargins.setBottom(frameY);
+    themeFrameMargins.setLeft(frameX);
+    themeFrameMargins.setRight(frameY);
 #else
-    frameMargins = QMargins(-1, -1, -1, -1);
-    titleBarHeight = -1;
+    themeFrameMargins = QMargins(-1, -1, -1, -1);
+    themeTitleBarHeight = -1;
 #endif
 }
 
@@ -199,12 +204,54 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
 #endif
 }
 
-QMargins QnDwm::frameMargins() {
-    return d->frameMargins;
+QMargins QnDwm::themeFrameMargins() {
+    return d->themeFrameMargins;
 }
 
-int QnDwm::titleBarHeight() {
-    return d->titleBarHeight;
+int QnDwm::themeTitleBarHeight() {
+    return d->themeTitleBarHeight;
+}
+
+QMargins QnDwm::systemFrameMargins() {
+    if(!d->valid)
+        goto error;
+
+    HWND hwnd = d->widget->winId();
+    BOOL status = S_OK;
+
+    RECT clientRect;
+    status = GetClientRect(d->widget->winId(), &clientRect);
+    if(!SUCCEEDED(status))
+        goto error;
+
+    RECT windowRect;
+    status = GetWindowRect(hwnd, &windowRect);
+    if(!SUCCEEDED(status))
+        goto error;
+
+    POINT clientTopLeft = {0, 0};
+    status = ClientToScreen(hwnd, &clientTopLeft);
+    if(!SUCCEEDED(status))
+        goto error;
+
+    return QMargins(
+        clientTopLeft.x - windowRect.left,
+        clientTopLeft.y - windowRect.top,
+        windowRect.right - clientTopLeft.x - clientRect.right,
+        windowRect.bottom - clientTopLeft.y - clientRect.bottom
+    );
+error:
+    return QMargins(-1, -1, -1, -1);
+}
+
+bool QnDwm::setSystemFrameMargins(const QMargins &margins) {
+    if(!d->valid)
+        return false;
+
+    HWND hwnd = d->widget->winId();
+    BOOL status = S_OK;
+
+    //status = SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_DEFERERASE | )
 }
 
 bool QnDwm::winEvent(MSG *message, long *result) {
@@ -217,9 +264,10 @@ bool QnDwm::winEvent(MSG *message, long *result) {
         return true;
 
     switch(message->message) {
-    case WM_NCCALCSIZE:     return calcSizeEvent(message, result);
-    case WM_NCHITTEST:      return hitTestEvent(message, result);
-    default:                return false;
+    case WM_NCCALCSIZE:             return calcSizeEvent(message, result);
+    case WM_NCHITTEST:              return hitTestEvent(message, result);
+    case WM_DWMCOMPOSITIONCHANGED:  return compositionChangedEvent(message, result);
+    default:                        return false;
     }
 #else
     return false;
@@ -249,9 +297,12 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
 
     /* New client geometry. */
     nccsp->rgrc[0].top      += 0;
-    nccsp->rgrc[0].bottom   += sourceClientGeometry.bottom - sourceGeometry.bottom;
-    nccsp->rgrc[0].left     += sourceClientGeometry.left   - sourceGeometry.left;
-    nccsp->rgrc[0].right    += sourceClientGeometry.right  - sourceGeometry.right;
+    nccsp->rgrc[0].bottom   += 0;
+    nccsp->rgrc[0].left     += 0;
+    nccsp->rgrc[0].right    += 0;
+    //nccsp->rgrc[0].bottom   += sourceClientGeometry.bottom - sourceGeometry.bottom;
+    //nccsp->rgrc[0].left     += sourceClientGeometry.left   - sourceGeometry.left;
+    //nccsp->rgrc[0].right    += sourceClientGeometry.right  - sourceGeometry.right;
 
     /* New geometry. */
     nccsp->rgrc[1] = targetGeometry;
@@ -290,9 +341,9 @@ bool QnDwm::hitTestEvent(MSG *message, long *result) {
     localPos.y = GET_Y_LPARAM(message->lParam);
     ScreenToClient(message->hwnd, &localPos);
 
-    if(localPos.y > d->frameMargins.top() + d->titleBarHeight) {
+    if(localPos.y > d->themeFrameMargins.top() + d->themeTitleBarHeight) {
         /* Do nothing. */
-    } else if(localPos.y < d->frameMargins.top()) {
+    } else if(localPos.y < d->themeFrameMargins.top()) {
         *result = HTTOP;
     } else {
         *result = HTCAPTION;
@@ -300,5 +351,15 @@ bool QnDwm::hitTestEvent(MSG *message, long *result) {
 
     return true;
 }
+
+bool QnDwm::compositionChangedEvent(MSG *message, long *result) {
+    Q_UNUSED(message);
+
+    emit compositionChanged(isCompositionEnabled());
+
+    *result = 0;
+    return true;
+}
+
 #endif
 

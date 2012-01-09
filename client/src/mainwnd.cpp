@@ -175,12 +175,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     QVBoxLayout *centralLayout = new QVBoxLayout();
     centralLayout->setContentsMargins(0, 0, 0, 0);
     centralLayout->setSpacing(0);
-    centralLayout->addSpacing(2);
     centralLayout->addLayout(titleBarLayout);
     centralLayout->addSpacing(2);
     centralLayout->addWidget(m_tabWidget);
 
     setLayout(centralLayout);
+
+    QMargins themeFrameMargins = m_dwm->themeFrameMargins();
+    setContentsMargins(themeFrameMargins.left(), 2, themeFrameMargins.right(), themeFrameMargins.bottom());
 
 
     addTab();
@@ -509,6 +511,29 @@ void MainWnd::appServerAuthenticationRequired()
 bool MainWnd::winEvent(MSG *message, long *result) {
     if(m_dwm->winEvent(message, result))
         return true;
+
+    /*if(message->message == WM_PAINT) {
+        RECT rect;
+        GetClientRect(message->hwnd, &rect);
+        ExcludeClipRect(GetDC(message->hwnd), 0, 0, width(), height());
+        return false;
+    }*/
+
+    //with GetClientRect do
+    //4	    ExcludeClipRect(DC, 0, GlassFrame.Top, Right, Bottom);
+   // 5	  inherited;
+
+    /*if(message->message == WM_NCPAINT) {
+        qDebug() << "WM_NCPAINT";
+        return true;
+    }*/
+
+    if(message->message == WM_NCACTIVATE) {
+        message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
+        
+        *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
+        return true;
+    }
 
     return QWidget::winEvent(message, result);
 }

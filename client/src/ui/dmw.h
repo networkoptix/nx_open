@@ -44,14 +44,26 @@ public:
      */
     bool winEvent(MSG *message, long *result);
 
-    QMargins frameMargins();
+    QMargins systemFrameMargins();
+    bool setSystemFrameMargins(const QMargins &margins);
 
-    int titleBarHeight();
+    QMargins themeFrameMargins();
+
+    int themeTitleBarHeight();
+
+signals:
+    /**
+     * This signal is emitted whenever windows composition mode gets enabled or disabled.
+     * 
+     * \param enabled                   Whether composition mode is enabled.
+     */
+    void compositionChanged(bool enabled);
 
 protected:
 #ifdef Q_OS_WIN
     bool hitTestEvent(MSG *message, long *result);
     bool calcSizeEvent(MSG *message, long *result);
+    bool compositionChangedEvent(MSG *message, long *result);
 #endif
 
 private:
