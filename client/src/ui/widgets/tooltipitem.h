@@ -1,8 +1,12 @@
 #ifndef TOOLTIPITEM_H
 #define TOOLTIPITEM_H
 
+#include <QGraphicsItem>
 #include <QStaticText>
-#include <QtGui/QGraphicsPixmapItem>
+#include <QPainterPath>
+#include <QPen>
+#include <QBrush>
+#include <QFont>
 
 class ToolTipItem: public QGraphicsItem
 {
@@ -48,8 +52,8 @@ private:
     QPen m_textPen;
     QBrush m_brush;
     
-    QStaticText m_text;
-    QString m_strText;
+    QStaticText m_staticText;
+    QString m_text;
     QSize m_textSize;
     QFont m_font;
 };

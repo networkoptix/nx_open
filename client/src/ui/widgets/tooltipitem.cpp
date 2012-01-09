@@ -15,16 +15,16 @@ ToolTipItem::ToolTipItem(QGraphicsItem *parent):
 
 const QString &ToolTipItem::text() const
 {
-    return m_strText;
+    return m_text;
 }
 
 void ToolTipItem::setText(const QString &text)
 {
-    if(m_strText == text)
+    if(m_text == text)
         return;
 
+    m_staticText = text;
     m_text = text;
-    m_strText = text;
     updateTextSize();
 }
 
@@ -103,8 +103,8 @@ void ToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     /* Draw text. */
     painter->setFont(m_font);
     painter->setPen(m_textPen);
-    //painter->drawText(m_contentRect, Qt::AlignCenter | Qt::TextDontClip, m_text);
-    painter->drawStaticText(m_contentRect.topLeft(), m_text);
+    //painter->drawText(m_contentRect, Qt::AlignCenter | Qt::TextDontClip, m_staticText);
+    painter->drawStaticText(m_contentRect.topLeft(), m_staticText);
 
     /* Draw outline. */
     painter->setPen(m_borderPen);
