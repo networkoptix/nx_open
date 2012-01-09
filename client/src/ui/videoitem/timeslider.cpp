@@ -99,7 +99,10 @@ protected:
     void sliderChange(SliderChange change);
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-
+    virtual void resizeEvent( QGraphicsSceneResizeEvent*)
+    {
+        invalidateHandleRect();
+    }
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
