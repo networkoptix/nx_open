@@ -1,5 +1,7 @@
 #include "timeslider.h"
 
+#include <QPainterPath>
+#include <QGradient>
 #include <QtCore/QDateTime>
 #include <QtCore/QPair>
 #include <QtCore/QPropertyAnimation>
@@ -35,7 +37,11 @@ QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progre
 static const float MIN_MIN_OPACITY = 0.1f;
 static const float MAX_MIN_OPACITY = 0.6f;
 static const float MIN_FONT_SIZE = 4.0f;
+static const float FONT_SIZE_CACHE_EPS = 0.1;
 static const int MAX_LABEL_WIDTH = 64;
+
+
+typedef QHash<unsigned, QImage*> TextCache;
 
 }
 
@@ -103,6 +109,7 @@ private:
     ToolTipItem *m_toolTip;
     mutable QRectF m_handleRect;
     int m_endSize;
+    QPixmap m_pixmap;
 };
 
 MySlider::MySlider(TimeSlider *parent)
@@ -174,6 +181,8 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
 
 void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    //qint64 t = getUsecTimer();
+
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
@@ -182,17 +191,22 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(QPen(Qt::gray, 2));
     painter->drawRect(r);
 
-    painter->setPen(QPen(Qt::darkGray, 1));
-    painter->drawRect(r);
+    //painter->setPen(QPen(Qt::darkGray, 1));
+    //painter->drawRect(r);
 
-    painter->setPen(QPen(QColor(0, 87, 207), 2));
     r.setRight(m_handleRect.center().x());
-    painter->drawRect(r);
+    //painter->setPen(QPen(QColor(0, 87, 207), 2));
+    //painter->drawRect(r);
 
+    
     QLinearGradient linearGrad(r.topLeft(), r.bottomRight());
     linearGrad.setColorAt(0, QColor(0, 43, 130));
     linearGrad.setColorAt(1, QColor(186, 239, 255));
+    //painter->setPen(QPen(Qt::green, 0));
+    painter->setBrush(linearGrad);
+    //painter->drawRect(r);
     painter->fillRect(r, linearGrad);
+    
 
     // Draw time periods
     if (!m_parent->recTimePeriodList().empty())
@@ -209,9 +223,13 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
     painter->fillRect(r, linearGrad);
 
+
     ensureHandleRect();
-    const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
+    if (m_pixmap.width() == 0)
+        m_pixmap = Skin::pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    painter->drawPixmap(m_handleRect.topLeft(), m_pixmap);
+
+    //qDebug() << "timeFinal=" << (getUsecTimer() - t)/1000.0;
 }
 
 void MySlider::sliderChange(SliderChange change)
@@ -272,7 +290,12 @@ public:
         m_scaleSpeed(1.0),
         m_prevWheelDelta(INT_MAX),
         m_cachedXPos(INT64_MIN),
-        m_cachedOutsideCnt(INT64_MIN)
+        m_cachedOutsideCnt(INT64_MIN),
+        m_gradientReady(false),
+        m_maxHeight(0),
+        m_cachedFontLevel(-1),
+        m_cachedFontMaxLevel(-1),
+        m_cachedFontPixelPerTime(-1)
     {
         setFlag(QGraphicsItem::ItemClipsToShape); // ### paints out of shape, bitch
 
@@ -285,6 +308,16 @@ public:
         m_wheelAnimation = new QPropertyAnimation(m_parent, "scalingFactor", this);
 
         connect(m_wheelAnimation, SIGNAL(finished()), m_parent, SLOT(onWheelAnimationFinished()));
+
+        QDateTime dt1 = QDateTime::currentDateTime();
+        QDateTime dt2 = dt1.toUTC();
+        dt1.setTimeSpec(Qt::UTC);
+        m_timezoneOffset = dt2.secsTo(dt1) * 1000ll;
+    }
+    ~TimeLine()
+    {
+        foreach(QImage* image, m_textCache)
+            delete image;
     }
 
     QPair<qint64, qint64> selectionRange() const;
@@ -312,8 +345,16 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void wheelEvent(QGraphicsSceneWheelEvent *event);
-
+    void updateFontCache(int level, int maxLevel, double pixelPerTime);
+    QImage* createTextImage(const QFont& font, const QString& text, bool doRotate);
 private:
+    int m_maxHeight;
+    QVector<int> m_fontWidths;
+    QVector<QFont> m_fonts;
+    double m_cachedFontPixelPerTime;
+    int m_cachedFontLevel;
+    int m_cachedFontMaxLevel;
+
     qint64 posToValue(qreal pos) const;
     qreal valueToPos(qint64 value) const;
 
@@ -338,8 +379,11 @@ private:
     int m_prevWheelDelta;
     double m_cachedXPos;
     double m_cachedOutsideCnt;
-
+    QBrush m_gradient;
+    bool m_gradientReady;
     QPair<qint64, qint64> m_selectedRange;
+    TextCache m_textCache;
+    qint64 m_timezoneOffset;
 };
 
 void TimeLine::wheelEvent(QGraphicsSceneWheelEvent *event)
@@ -438,45 +482,97 @@ static inline qint64 roundTime(qint64 msecs, int interval)
     return msecs - msecs%(intervals[interval].interval);
 }
 
-static inline void drawGradient(QPainter *painter, const QRectF &r, float height)
+void TimeLine::updateFontCache(int level, int maxLevel, double pixelPerTime)
 {
-    int MAX_COLOR = 64+16;
-    int MIN_COLOR = 0;
-    for (int i = r.top(); i < r.bottom(); ++i)
+    m_fonts.clear();
+    m_fontWidths.clear();
+    m_cachedFontPixelPerTime = pixelPerTime;
+    m_maxHeight = 0;
+    for (int i = level; i <= maxLevel; ++i)
     {
-        int k = height - i;
-        k *= float(MAX_COLOR-MIN_COLOR) / height + MIN_COLOR;
-        painter->setPen(QColor(k,k,k,k));
-        painter->drawLine(QLineF(r.left(), i, r.width(), i));
+        const IntervalInfo &interval = intervals[i];
+        const QString& text = interval.maxText;
+
+        QFont font = m_parent->font();
+        font.setPointSize(font.pointSize() + (i >= maxLevel-1) - (i <= level+1));
+        font.setBold(i == maxLevel);
+
+        QFontMetrics metric(font);
+        float textWidth = metric.width(text);
+        float sc = textWidth / (pixelPerTime*interval.interval);
+        while (sc > 1.0f/1.1f)
+        {
+            font.setPointSizeF(font.pointSizeF()-0.5);
+            if (font.pointSizeF() < MIN_FONT_SIZE)
+            {
+                textWidth = 0;
+                break;
+            }
+
+            metric = QFontMetrics(font);
+            textWidth = metric.width(text);
+            sc = textWidth / (pixelPerTime*interval.interval);
+        }
+
+        m_fonts << font;
+        m_fontWidths << textWidth;
+        if (textWidth > 0 && m_maxHeight < metric.height())
+            m_maxHeight = metric.height();
     }
+    m_cachedFontLevel = level;
+    m_cachedFontMaxLevel = maxLevel;
+}
+
+QImage* TimeLine::createTextImage(const QFont& font, const QString& text, bool doRotate)
+{
+    // Draw text line to image cache
+    QFontMetrics m(font);
+    QSize textSize = m.size(Qt::TextSingleLine, text);
+    QImage* textImage = new QImage(textSize.width(), textSize.height(), QImage::Format_ARGB32_Premultiplied);
+    textImage->fill(0);
+    QPainter p(textImage);
+    p.setCompositionMode(QPainter::CompositionMode_Source);
+    p.setPen(m_parent->palette().color(QPalette::Text));
+    p.setFont(font);
+    p.drawText(0,  m.ascent(), text);
+    p.end();
+
+    if (doRotate) {
+        QMatrix rm;
+        rm.rotate(90);
+        *textImage = textImage->transformed(rm);
+    }
+    return textImage;
 }
 
 void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    GraphicsFrame::paint(painter, option, widget);
+    //qint64 t = getUsecTimer();
+
+    //GraphicsFrame::paint(painter, option, widget);
 
     const qreal halfHandleThickness = m_parent->m_slider->handleRect().width() / 2.0;
     const QRectF r(halfHandleThickness, 0, rect().width() - halfHandleThickness * 2, rect().height() - frameWidth() * 2);
     if (qFuzzyIsNull(r.width()))
         return;
 
+    if (!m_gradientReady)
+    {
+        QLinearGradient gradient(QPointF(0,0), QPointF(0, r.height()));
+        gradient.setColorAt(0.0, QColor(64,64,64,64));
+        gradient.setColorAt(1.0, QColor(144,144,144,144));
+        m_gradient = QBrush(gradient);
+        m_gradientReady = true;
+    }
+    painter->fillRect(r, m_gradient);
+
     const QPalette pal = m_parent->palette();
-    painter->setBrush(pal.brush(QPalette::Base));
-    painter->setPen(pal.color(QPalette::Base));
-    painter->drawRect(r);
-    drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
     painter->setPen(pal.color(QPalette::Text));
 
-    qint64 timezoneOffset = 0;
-    if (m_parent->minimumValue() != 0) {
-        QDateTime dt1 = QDateTime::currentDateTime();
-        QDateTime dt2 = dt1.toUTC();
-        dt1.setTimeSpec(Qt::UTC);
-        timezoneOffset = dt2.secsTo(dt1) * 1000ll;
-    }
-
     const qint64 range = m_parent->sliderRange();
-    const qint64 pos = m_parent->viewPortPos() + timezoneOffset;
+    qint64 pos = m_parent->viewPortPos();
+    if (m_parent->minimumValue() != 0)
+        pos += m_timezoneOffset;
     const double pixelPerTime = r.width() / range;
 
     const int minWidth = 30;
@@ -510,41 +606,14 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QColor color = pal.color(QPalette::Text);
 
     QVector<float> opacity;
-    int maxHeight = 0;
-    QVector<int> widths;
-    QVector<QFont> fonts;
+    QVector<QPainterPath> paths;
+    paths.resize(maxLevel-level+1);
+    opacity.resize(maxLevel-level+1);
+
+    if (level != m_cachedFontLevel || maxLevel != m_cachedFontMaxLevel || qAbs( 1.0 - pixelPerTime/m_cachedFontPixelPerTime) > FONT_SIZE_CACHE_EPS)
+        updateFontCache(level, maxLevel, pixelPerTime);
     for (int i = level; i <= maxLevel; ++i)
-    {
-        const IntervalInfo &interval = intervals[i];
-        const QString text = QLatin1String(interval.maxText);
-
-        QFont font = m_parent->font();
-        font.setPointSize(font.pointSize() + (i >= maxLevel-1) - (i <= level+1));
-        font.setBold(i == maxLevel);
-
-        QFontMetrics metric(font);
-        float textWidth = metric.width(text);
-        float sc = textWidth / (pixelPerTime*interval.interval);
-        while (sc > 1.0f/1.1f)
-        {
-            font.setPointSizeF(font.pointSizeF()-0.5);
-            if (font.pointSizeF() < MIN_FONT_SIZE)
-            {
-                textWidth = 0;
-                break;
-            }
-
-            metric = QFontMetrics(font);
-            textWidth = metric.width(text);
-            sc = textWidth / (pixelPerTime*interval.interval);
-        }
-
-        fonts << font;
-        widths << textWidth;
-        if (textWidth > 0 && maxHeight < metric.height())
-            maxHeight = metric.height();
-        opacity << qBound(MAX_MIN_OPACITY, float(pixelPerTime*interval.interval - minWidth)/60.0f, 1.0f);
-    }
+        opacity[i-level] = qBound(MAX_MIN_OPACITY, float(pixelPerTime*intervals[i].interval - minWidth)/60.0f, 1.0f);
 
     // draw grid
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
@@ -555,45 +624,50 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
         const int arrayIndex = qMin(curLevel-level, opacity.size() - 1);
 
-        color.setAlphaF(opacity[arrayIndex]);
-        painter->setPen(color);
-        painter->setFont(fonts[arrayIndex]);
-
         const IntervalInfo &interval = intervals[curLevel];
         const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f);
-        painter->drawLine(QPointF(xpos, 0), QPointF(xpos, (r.height() - maxHeight - 3) * lineLen));
+        paths[arrayIndex].moveTo(QPointF(xpos, 0));
+        paths[arrayIndex].lineTo(QPointF(xpos, (r.height() - m_maxHeight - 3) * lineLen));
 
-        QString text;
-        if (curLevel < FIRST_DATE_INDEX)
+        if (m_fontWidths[arrayIndex] > 0)
         {
             const int labelNumber = (curTime/interval.interval)%interval.count;
-            text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
-        }
-        else
-        {
-            text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
-        }
+            int fontSize = m_fonts[arrayIndex].pointSizeF()*2;
+            unsigned hash;
+            if (curLevel < FIRST_DATE_INDEX)
+                hash = (128 + (fontSize << 24)) + (curLevel << 16) + interval.value*labelNumber;
+            else 
+                hash = (fontSize << 24) + curTime/1000/900; // curTime to 15 min granularity (we must keep integer number for months and years dates)
+            
+            QImage* textImage = m_textCache.value(hash);
+            if (textImage == 0)
+            {
+                QString text;
+                if (curLevel < FIRST_DATE_INDEX)
+                    text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
+                else
+                    text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
 
-        if (widths[arrayIndex] > 0)
-        {
-            if (curLevel == 0 /*|| (curLevel == arraysize(intervals) - 1 && m_parent->minimumValue() != 0) */)
-            {
-                painter->save();
-                painter->translate(xpos-3, (r.height() - maxHeight) * lineLen);
-                painter->rotate(90);
-                painter->drawText(2, 0, curLevel == 0 ? text : QDateTime::fromMSecsSinceEpoch(curTime).toString(Qt::ISODate));
-                painter->restore();
+                textImage= createTextImage(m_fonts[arrayIndex], text, curLevel == 0);
+                m_textCache.insert(hash, textImage);
             }
-            else
-            {
-                QRectF textRect(xpos - widths[arrayIndex]/2, (r.height() - maxHeight) * lineLen, widths[arrayIndex], 128);
-                if (textRect.left() < 0 && pos == 0)
-                    textRect.setLeft(0);
-                painter->drawText(textRect, Qt::AlignHCenter, text);
-            }
+
+            QPointF imagePos(xpos - textImage->width()/2, (r.height() - m_maxHeight) * lineLen + (curLevel == 0 ? 2 : 0) );
+            if (imagePos.x() < 0 && pos == 0)
+                imagePos.setX(0);
+            painter->setOpacity(opacity[arrayIndex]);
+            painter->drawImage(imagePos, *textImage);
         }
 
         xpos += intervals[level].interval * pixelPerTime;
+    }
+
+    painter->setOpacity(1.0);
+    for (int arrayIndex = 0; arrayIndex < paths.size(); ++arrayIndex)
+    {
+        color.setAlphaF(opacity[arrayIndex]);
+        painter->setPen(color);
+        painter->drawPath(paths[arrayIndex]);
     }
 
     // draw selection range
@@ -618,6 +692,8 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(QPen(Qt::red, 3));
     xpos = r.left() + m_parent->m_slider->value() * r.width() / (m_parent->m_slider->maximum() - m_parent->m_slider->minimum());
     painter->drawLine(QLineF(xpos, 0, xpos, rect().height()));
+
+    //qDebug() << "time=" << (getUsecTimer() - t)/1000.0;
 }
 
 qint64 TimeLine::posToValue(qreal pos) const

@@ -3,11 +3,7 @@
 
 #include <QtGui/QMainWindow>
 
-class QPropertyAnimation;
-class QSplitter;
-
-class NavigationTreeWidget;
-class TabWidget;
+class QTabWidget;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
@@ -48,7 +44,7 @@ private Q_SLOTS:
     void appServerError(int error);
     void appServerAuthenticationRequired();
 
-    void toggleShowNavTree();
+    void toggleDecorationsVisibility();
 
 #if 0
 public:
@@ -68,11 +64,10 @@ private:
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
-    TabWidget *m_tabWidget;
+    QTabWidget *m_tabWidget;
+    QToolBar *m_toolBar;
 
     static MainWnd *s_instance;
-
-    bool m_treeShown; // TODO: remove
 
     QnDwm *m_dwm;
 };

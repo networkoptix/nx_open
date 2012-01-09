@@ -3,9 +3,8 @@
 
 #include "fancymainwindow.h"
 
-class QSplitter;
-
-class TabBar;
+class QTabBar;
+class QToolBar;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
@@ -32,7 +31,6 @@ private Q_SLOTS:
     void currentTabChanged(int index);
     void closeTab(int index);
 
-    void itemActivated(uint resourceId);
     void handleMessage(const QString &message);
 
     void activate();
@@ -49,8 +47,8 @@ private:
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
-    QSplitter *m_splitter;
-    TabBar *m_tabBar;
+    QToolBar *m_toolBar;
+    QTabBar *m_tabBar;
 };
 
 #endif // MAINWINDOW_H

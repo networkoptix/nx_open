@@ -12,13 +12,6 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
       m_resource(resource),
       m_group(group)
 {
-    setAutoFillBackground(true);
-    {
-        QPalette pal = palette();
-        pal.setColor(backgroundRole(), Qt::black);
-        //setPalette(pal);
-    }
-
     //QVBoxLayout *mainLayout = new QVBoxLayout;
 
     int size = 175;
@@ -37,7 +30,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
             subgroupBox->setFixedSize(size, 420);
             subgroupBox->move(10+x, 10);
 
-            m_dialog->putGroup(subgroupBox);
+            m_dialog->putGroup(sub_group, subgroupBox);
 
             parent = subgroupBox;
 

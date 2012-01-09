@@ -167,10 +167,22 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
 
 bool QnMotionArchive::mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {
-    for (int i = maskStart; i <= maskEnd; ++i)
+    if (useSSE41())
     {
-        if (_mm_testz_si128(mask[i], data[i]) == 0)
-            return true;
+        for (int i = maskStart; i <= maskEnd; ++i)
+        {
+            if (_mm_testz_si128(mask[i], data[i]) == 0)
+                return true;
+        }
+    }
+    else 
+    {
+        static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0);
+        for (int i = maskStart; i <= maskEnd; ++i)
+        {
+            if (_mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(mask[i], data[i]), zerroValue)) == 0)
+                return true;
+        }
     }
     return false;
 }

@@ -420,6 +420,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
             int index = y*zones + x;
             QString m = md.at(index) ;
 
+
             if (m == "00" || m == "0")
                 continue;
 
@@ -431,6 +432,6 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
     }
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = INT64_MAX;
+    motion->m_duration = 1000*1000*1000; // 1000 sec 
     return motion;
 }

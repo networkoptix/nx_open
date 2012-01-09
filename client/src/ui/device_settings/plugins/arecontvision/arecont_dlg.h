@@ -10,7 +10,7 @@ public:
     AreconVisionDlgManufacture();
 
     bool canProduceDlg(QnResourcePtr resource) const;
-    QDialog *createDlg(QnResourcePtr resource);
+    QDialog *createDlg(QnResourcePtr resource, QWidget *parent);
 
 private:
     QList<QString> mPossibleNames;

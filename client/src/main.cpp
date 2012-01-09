@@ -288,8 +288,6 @@ int main(int argc, char *argv[])
     ffmpegInit();
 
     //===========================================================================
-    //IPPH264Decoder::dll.init();
-
 
     CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
@@ -392,7 +390,7 @@ int main(int argc, char *argv[])
     MainWnd mainWindow(argc, argv);
 #endif
     mainWindow.show();
-    
+
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif

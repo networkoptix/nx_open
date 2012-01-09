@@ -15,6 +15,8 @@ extern QAction cm_toggle_fullscreen;
 extern QAction cm_fitinview;
 extern QAction cm_arrange;
 
+extern QAction cm_hide_decorations;
+
 extern QAction cm_add_layout;
 extern QAction cm_restore_layout;
 extern QAction cm_save_layout;
@@ -46,5 +48,7 @@ extern QAction cm_layout_editor_change_t;
 extern QAction cm_rotate;
 
 extern QAction cm_open_containing_folder;
+
+extern QAction cm_showNavTree;
 
 #endif //context_menu_helper_h_1250

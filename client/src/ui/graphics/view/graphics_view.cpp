@@ -15,7 +15,12 @@ void QnLayerPainter::ensureUninstalled() {
 
 QnGraphicsView::QnGraphicsView(QGraphicsScene *scene, QWidget * parent):
     QGraphicsView(scene, parent)
-{}
+{
+    QPalette palette;
+    palette.setColor(QPalette::Background, Qt::black);
+    palette.setColor(QPalette::Base, Qt::black);
+    setPalette(palette);
+}
 
 QnGraphicsView::~QnGraphicsView() {
     while(!m_backgroundPainters.empty())
@@ -58,8 +63,7 @@ void QnGraphicsView::uninstallLayerPainter(QnLayerPainter *painter) {
 }
 
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {
-    base_type::drawBackground(painter, rect);
-
+    //base_type::drawBackground(painter, rect);
     foreach(QnLayerPainter *layerPainter, m_backgroundPainters)
         layerPainter->drawLayer(painter, rect);
 }

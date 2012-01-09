@@ -17,6 +17,7 @@ class SpeedSlider;
 class TimeSlider;
 class VolumeSlider;
 class GraphicsLabel;
+class QnAbstractRenderer;
 
 class NavigationItem : public QGraphicsWidget
 {
@@ -34,8 +35,6 @@ public:
 
     inline bool isPlaying() const { return m_playing; }
 
-    static const int DEFAULT_HEIGHT = 60; // ### remove
-
 public Q_SLOTS:
     void setMute(bool mute);
     void setPlaying(bool playing);
@@ -45,6 +44,7 @@ Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
     void playbackMaskChanged(const QnTimePeriodList& playbackMask);
     void clearMotionSelection();
+
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
@@ -85,19 +85,21 @@ private Q_SLOTS:
     void onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle);
     void onMotionPeriodLoadFailed(int status, int handle);
 
-    void onMrsButtonClicked();
     void updateMotionPeriods(const QnTimePeriod& period);
+    void onDisplayingStateChanged(QnResourcePtr, bool);
 protected:
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
 private:
     struct MotionPeriodLoader {
-        MotionPeriodLoader(): loadingHandle(0) {}
+        MotionPeriodLoader(): loadingHandle(0), enabled(true) {}
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
         QRegion region;
+        bool enabled;
     };
+    NavigationItem::MotionPeriodLoader* getMotionLoader(QnNetworkResourcePtr netRes);
 
     TimeSlider *m_timeSlider;
     ImageButton *m_backwardButton;

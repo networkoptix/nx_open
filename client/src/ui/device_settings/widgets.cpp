@@ -116,7 +116,7 @@ QWidget *SettingsMinMaxStepWidget::createWidget()
     m_slider->setValue(param().value().toInt());
 
     connect(m_slider, SIGNAL(sliderReleased()), this, SLOT(onValueChanged()));
-    connect(m_slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
+    connect(m_slider, SIGNAL(onKeyReleased()), this, SLOT(onValueChanged()));
     connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
 
     QVBoxLayout *layout = new QVBoxLayout(m_groupBox);

@@ -91,7 +91,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setLayout(layout);
 
     /* Set up motion-related stuff. */
-    m_motionMaskBinData = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
+    m_motionMaskBinData = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
+    memset(m_motionMaskBinData, 0, MD_WIDTH * MD_HEIGHT/8);
 
     /* Set up video rendering. */
     m_resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
@@ -352,7 +353,11 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     m_displayFlags = flags;
 
     if(changedFlags & DISPLAY_MOTION_GRID)
-        m_display->archiveReader()->setSendMotion(flags & DISPLAY_MOTION_GRID);
+    {
+        QnAbstractArchiveReader* ar = dynamic_cast<QnAbstractArchiveReader*>(m_display->archiveReader());
+        if (ar)
+            ar->setSendMotion(flags & DISPLAY_MOTION_GRID);
+    }
 }
 
 // -------------------------------------------------------------------------- //

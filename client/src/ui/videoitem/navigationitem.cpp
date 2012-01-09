@@ -103,6 +103,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, false);
+    //setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     setCursor(Qt::ArrowCursor);
 
@@ -171,6 +172,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_speedSlider = new SpeedSlider(Qt::Horizontal, this);
     m_speedSlider->setObjectName("SpeedSlider");
     m_speedSlider->setToolTipItem(new SliderToolTipItem(m_speedSlider));
+    m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
 
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
     connect(m_speedSlider, SIGNAL(frameBackward()), this, SLOT(stepBackward()));
@@ -232,17 +235,18 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_mrsButton->addPixmap(Skin::pixmap(QLatin1String("mrs.png")), ImageButton::Active, ImageButton::Background);
     m_mrsButton->setPreferredSize(48, 24);
     m_mrsButton->setMaximumSize(m_mrsButton->preferredSize());
-    //m_mrsButton->setEnabled(false);
+    m_mrsButton->setCheckable(true);
     m_mrsButton->setChecked(true);
     m_mrsButton->hide();
 
-    connect(m_mrsButton, SIGNAL(clicked()), this, SLOT(onMrsButtonClicked()));
+    connect(m_mrsButton, SIGNAL(clicked()), this, SIGNAL(clearMotionSelection()));
 
     // -----------------
 
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
+    m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
     connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
@@ -268,7 +272,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     rightLayoutH->addItem(m_timeLabel);
     rightLayoutH->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
-    
+
     rightLayoutH->addItem(rightsubLayoutV);
 
     rightsubLayoutV->addItem(m_mrsButton);
@@ -469,15 +473,30 @@ void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
 {
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
-        if (netRes) 
+        if (netRes)
         {
             MotionPeriods::iterator itr = m_motionPeriodLoader.find(netRes);
-            if (itr != m_motionPeriodLoader.end()) 
-            {
+            if (itr != m_motionPeriodLoader.end() && !itr.value().region.isEmpty())
                 itr.value().loadingHandle = itr.value().loader->load(period, itr.value().region);
-            }
         }
     }
+}
+
+NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnNetworkResourcePtr netRes)
+{
+    if (!m_motionPeriodLoader.contains(netRes)) 
+    {
+        MotionPeriodLoader p;
+        p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(netRes);
+        if (!p.loader) {
+            qWarning() << "Connection to a video server lost. Can't load motion info";
+            return 0;
+        }
+        connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
+        connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
+        m_motionPeriodLoader.insert(netRes, p);
+    }
+    return &m_motionPeriodLoader[netRes];
 }
 
 void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
@@ -486,9 +505,12 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     if (!netRes)
         return;
 
+    MotionPeriodLoader* p = getMotionLoader(netRes);
+    if (!p)
+        return;
+    p->region = region;
     if (region.isEmpty())
     {
-        m_motionPeriodLoader.remove(netRes);
         repaintMotionPeriods();
         return;
     }
@@ -498,18 +520,6 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     if (t <= 0)
         return;  // slider range still not initialized yet
 
-    if (!m_motionPeriodLoader.contains(netRes)) {
-        MotionPeriodLoader p;
-        p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(netRes);
-        if (!p.loader) {
-            qWarning() << "Connection to a video server lost. Can't load motion info";
-            return;
-        }
-        connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
-        connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
-        p.region = region;
-        m_motionPeriodLoader.insert(netRes, p);
-    }
     qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
     QnTimePeriod loadingPeriod;
     QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -518,8 +528,8 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     loadingPeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
 
 
-    MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
-    p.loadingHandle = p.loader->load(loadingPeriod, region);
+    //MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
+    p->loadingHandle = p->loader->load(loadingPeriod, region);
 }
 
 bool NavigationItem::updateRecPeriodList(bool force)
@@ -545,7 +555,11 @@ bool NavigationItem::updateRecPeriodList(bool force)
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
         if (networkResource)
-            resources.push_back(networkResource);
+        {
+            MotionPeriodLoader* motionLoader = getMotionLoader(networkResource);
+            if (motionLoader && motionLoader->enabled)
+                resources.push_back(networkResource);
+        }
     }
 
     /* Request interval no shorter than 1 hour. */
@@ -583,11 +597,26 @@ void NavigationItem::onTimePeriodLoaded(const QnTimePeriodList& timePeriods, int
         m_timeSlider->setRecTimePeriodList(timePeriods);
 }
 
+void NavigationItem::onDisplayingStateChanged(QnResourcePtr resource, bool visible)
+{
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!netRes)
+        return;
+
+    MotionPeriodLoader* loader = getMotionLoader(netRes);
+    if (loader && loader->enabled != visible) 
+    {
+        loader->enabled = visible;
+        updateRecPeriodList(true);
+        repaintMotionPeriods();
+    }
+}
+
 void NavigationItem::repaintMotionPeriods()
 {
     QVector<QnTimePeriodList> allPeriods;
     foreach(const MotionPeriodLoader& info, m_motionPeriodLoader.values()) {
-        if (!info.periods.isEmpty())
+        if (!info.periods.isEmpty() && info.enabled && !info.region.isEmpty())
             allPeriods << info.periods;
     }
     m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
@@ -914,9 +943,4 @@ void NavigationItem::setPlaying(bool playing)
 void NavigationItem::togglePlayPause()
 {
     setPlaying(!m_playing);
-}
-
-void NavigationItem::onMrsButtonClicked()
-{
-    emit clearMotionSelection();
 }

@@ -1,10 +1,9 @@
 #include "mainwnd.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QPropertyAnimation>
 
+#include <QtGui/QApplication>
 #include <QtGui/QBoxLayout>
-#include <QtGui/QSplitter>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
 
@@ -13,16 +12,16 @@
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
 
-#include <core/resource/directory_browser.h>
 #include <core/resourcemanagment/asynch_seacher.h>
 #include <core/resourcemanagment/resource_pool.h>
 
+#if 0
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/video_cam_layout/start_screen_content.h"
+#endif
 
 #include "ui/context_menu_helper.h"
-#include "ui/navigationtreewidget.h"
 
 #include "ui/dialogs/logindialog.h"
 #include "ui/preferences/preferences_wnd.h"
@@ -43,21 +42,33 @@
 
 #include "ui/skin/skin.h"
 
-#include <utils/common/util.h>
 #include <utils/common/warnings.h>
 
 #include "file_processor.h"
 #include "settings.h"
-#include "version.h"
 
 #include "ui/dmw.h"
 
 MainWnd *MainWnd::s_instance = 0;
 
+namespace {
+    // TODO: hack hack hack
+
+    class OpenTabWidget: public QTabWidget {
+    public:
+        QTabBar *extractTabBar() const {
+            return QTabWidget::tabBar();
+        }
+    };
+
+    QTabBar *tabBar(QTabWidget *widget) {
+        return static_cast<OpenTabWidget *>(widget)->extractTabBar();
+    }
+}
+
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
-      m_controller(0),
-      m_treeShown(true)
+      m_controller(0)
 {
     if (s_instance)
         qnWarning("Several instances of main window created, expect problems.");
@@ -69,7 +80,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_dwm->extendFrameIntoClientArea();
 
     /* Set up QWidget. */
-    setWindowTitle(APPLICATION_NAME);
+    setWindowTitle(QApplication::applicationName());
+
     setAttribute(Qt::WA_QuitOnClose);
     setAcceptDrops(true);
 
@@ -101,7 +113,10 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_controller = new QnWorkbenchController(m_display, this);
 
-    new QnSyncPlayMixin(m_display, this);
+    QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
+    new QnSyncPlayMixin(m_display, renderWatcher, this);
+    connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SLOT(onDisplayingStateChanged(QnAbstractRenderer *, bool)));
+
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -111,7 +126,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_tabWidget = new TabWidget(); 
     m_tabWidget->setMovable(true);
     m_tabWidget->setTabsClosable(true);
-    m_tabWidget->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
+    static_cast<TabWidget *>(m_tabWidget)->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
 
     connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
     connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
@@ -144,33 +159,28 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
+    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleDecorationsVisibility()));
+    addAction(&cm_hide_decorations);
+
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
-    // ###
-    QAction *showNavTreeAction = new QAction(tr("<=|=>"), this);
-    showNavTreeAction->setToolTip(tr("Toggle navigation tree show/hide"));
-    connect(showNavTreeAction, SIGNAL(triggered()), this, SLOT(toggleShowNavTree()));
-    //
-
     // toolbars
-    QToolBar *toolBar = new QToolBar();
-    toolBar->setAllowedAreas(Qt::TopToolBarArea);
-    toolBar->addAction(showNavTreeAction);
-    toolBar->addAction(reconnectAction);
-    toolBar->addAction(&cm_preferences);
-    toolBar->addAction(&cm_toggle_fullscreen);
-    toolBar->addAction(&cm_exit);
-
+    m_toolBar = new QToolBar();
+    m_toolBar->setAllowedAreas(Qt::TopToolBarArea);
+    m_toolBar->addAction(reconnectAction);
+    m_toolBar->addAction(&cm_preferences);
+    m_toolBar->addAction(&cm_toggle_fullscreen);
+    m_toolBar->addAction(&cm_exit);
 
     // layout
     QHBoxLayout *titleBarLayout = new QHBoxLayout();
     titleBarLayout->setContentsMargins(0, 0, 0, 0);
     titleBarLayout->setSpacing(0);
     titleBarLayout->addStretch(0x1000);
-    titleBarLayout->addWidget(toolBar);
+    titleBarLayout->addWidget(m_toolBar);
 
     QVBoxLayout *centralLayout = new QVBoxLayout();
     centralLayout->setContentsMargins(0, 0, 0, 0);
@@ -250,82 +260,6 @@ void MainWnd::closeTab(int index)
     }
 }
 
-void MainWnd::toggleShowNavTree()
-{
-    if(m_treeShown)
-        m_controller->hideTree();
-    else
-        m_controller->showTree();
-
-    m_treeShown = !m_treeShown;
-
-#if 0
-    if (!m_navigationWidgetAnimation) {
-        Q_ASSERT(m_splitter->indexOf(m_navigationWidget) == 0); // must be inserted already
-
-        m_navigationWidgetAnimation = new QPropertyAnimation(m_navigationWidget, "geometry", m_navigationWidget);
-        m_navigationWidgetAnimation->setDuration(250);
-
-        connect(m_navigationWidgetAnimation, SIGNAL(finished()), this, SLOT(navTreeAnimationFinished()));
-    }
-
-    m_navigationWidgetAnimation->stop();
-
-    if (m_splitter->indexOf(m_navigationWidget) != -1) {
-        QRect geom = m_navigationWidget->rect();
-        geom.moveTopLeft(m_navigationWidget->mapTo(this, geom.topLeft()));
-
-        m_navigationWidget->setParent(this);
-        m_splitter->stackUnder(m_navigationWidget);
-        m_navigationWidget->setGeometry(geom);
-        m_navigationWidget->show();
-
-        QWidget *tmpWidget = new QWidget(m_splitter);
-        tmpWidget->setFixedWidth(1);
-        m_splitter->insertWidget(0, tmpWidget);
-
-        m_splitter->handle(1)->removeEventFilter(this);
-        m_splitter->handle(1)->installEventFilter(this);
-
-        m_navigationWidgetAnimation->setDirection(QAbstractAnimation::Forward);
-        m_navigationWidgetAnimation->setStartValue(geom);
-        geom.moveLeft(-geom.width());
-        m_navigationWidgetAnimation->setEndValue(geom);
-    } else {
-        delete m_splitter->widget(0);
-
-        m_navigationWidget->show();
-
-        m_navigationWidgetAnimation->setDirection(QAbstractAnimation::Backward);
-        QRect geom = m_navigationWidgetAnimation->startValue().toRect();
-        geom.setTop(m_splitter->y());
-        geom.setHeight(m_splitter->height());
-        m_navigationWidgetAnimation->setStartValue(geom);
-        geom = m_navigationWidgetAnimation->endValue().toRect();
-        geom.setTop(m_splitter->y());
-        geom.setHeight(m_splitter->height());
-        m_navigationWidgetAnimation->setEndValue(geom);
-    }
-
-    m_navigationWidgetAnimation->start();
-#endif
-}
-
-#if 0
-void MainWnd::navTreeAnimationFinished()
-{
-    if (QPropertyAnimation *animation = qobject_cast<QPropertyAnimation *>(sender())) {
-        if (animation->direction() == QAbstractAnimation::Backward) {
-            m_splitter->insertWidget(0, m_navigationWidget);
-            m_splitter->setStretchFactor(0, 1);
-            m_splitter->setCollapsible(0, true);
-        } else {
-            m_navigationWidget->hide();
-        }
-    }
-}
-#endif
-
 #if 0
 void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
 {
@@ -392,34 +326,6 @@ void MainWnd::handleMessage(const QString &message)
 
     activate();
 }
-
-#if 0
-bool MainWnd::eventFilter(QObject *watched, QEvent *event)
-{
-    if (qobject_cast<QSplitterHandle *>(watched)) {
-        if (event->type() == QEvent::MouseButtonPress) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            if (mouseEvent->button() == Qt::LeftButton)
-                m_splitterClickedPos = mouseEvent->globalPos();
-        } else if (event->type() == QEvent::MouseMove) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            if (mouseEvent->buttons() & Qt::LeftButton) {
-                if (QPoint(mouseEvent->globalPos() - m_splitterClickedPos).manhattanLength() >= QApplication::startDragDistance())
-                    m_splitterClickedPos = QPoint();
-            }
-        } else if (event->type() == QEvent::MouseButtonRelease) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            if (mouseEvent->button() == Qt::LeftButton) {
-                if (!m_splitterClickedPos.isNull())
-                    toggleShowNavTree();
-                m_splitterClickedPos = QPoint();
-            }
-        }
-    }
-
-    return QMainWindow::eventFilter(watched, event);
-}
-#endif
 
 void MainWnd::closeEvent(QCloseEvent *event)
 {
@@ -536,4 +442,14 @@ bool MainWnd::winEvent(MSG *message, long *result) {
     }
 
     return QWidget::winEvent(message, result);
+}
+
+void MainWnd::toggleDecorationsVisibility() {
+    if(m_toolBar->isVisible()) {
+        m_toolBar->hide();
+        tabBar(m_tabWidget)->hide();
+    } else {
+        m_toolBar->show();
+        tabBar(m_tabWidget)->show();
+    }
 }

@@ -22,6 +22,8 @@ QAction cm_save_layout(QObject::tr("Save layout"), 0);
 QAction cm_save_layout_as(QObject::tr("Save layout as..."), 0);
 QAction cm_preferences(QObject::tr("Preferences"), 0);
 
+QAction cm_hide_decorations(QObject::tr("Hide decorations"), 0);
+
 QAction cm_editTags(QObject::tr("Edit tags..."), 0);
 
 QAction cm_fullscreen(QObject::tr("Fullscreen"), 0);
@@ -47,6 +49,8 @@ QAction cm_rotate(QObject::tr("Rotation"), 0);
 
 QAction cm_open_containing_folder(QObject::tr("Open in containing folder..."), 0);
 
+QAction cm_showNavTree(QObject::tr("<=|=>"), 0);
+
 void initContextMenu()
 {
     cm_exit.setIcon(Skin::icon(QLatin1String("decorations/exit-application.png")));
@@ -71,6 +75,9 @@ void initContextMenu()
 
     cm_editTags.setShortcut(QObject::tr("Alt+T"));
     cm_editTags.setShortcutContext(Qt::ApplicationShortcut);
+
+    cm_hide_decorations.setShortcut(QObject::tr("F11"));
+    cm_hide_decorations.setShortcutContext(Qt::ApplicationShortcut);
 
     QMenu *newItemMenu = new QMenu();
     newItemMenu->setTitle(QObject::tr("New Item"));
@@ -136,4 +143,9 @@ void initContextMenu()
     }
     cm_rotate.setMenu(rotationMenu);
     cm_rotate.setToolTip(QObject::tr("Rotation"));
+
+
+    cm_showNavTree.setToolTip(QObject::tr("Toggle navigation tree show/hide"));
+    cm_showNavTree.setCheckable(true);
+    cm_showNavTree.setChecked(false);
 }
