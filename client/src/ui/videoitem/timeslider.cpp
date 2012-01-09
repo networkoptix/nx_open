@@ -109,6 +109,7 @@ private:
     ToolTipItem *m_toolTip;
     mutable QRectF m_handleRect;
     int m_endSize;
+    QPixmap m_pixmap;
 };
 
 MySlider::MySlider(TimeSlider *parent)
@@ -180,6 +181,8 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
 
 void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    //qint64 t = getUsecTimer();
+
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
@@ -188,17 +191,22 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(QPen(Qt::gray, 2));
     painter->drawRect(r);
 
-    painter->setPen(QPen(Qt::darkGray, 1));
-    painter->drawRect(r);
+    //painter->setPen(QPen(Qt::darkGray, 1));
+    //painter->drawRect(r);
 
-    painter->setPen(QPen(QColor(0, 87, 207), 2));
     r.setRight(m_handleRect.center().x());
-    painter->drawRect(r);
+    //painter->setPen(QPen(QColor(0, 87, 207), 2));
+    //painter->drawRect(r);
 
+    
     QLinearGradient linearGrad(r.topLeft(), r.bottomRight());
     linearGrad.setColorAt(0, QColor(0, 43, 130));
     linearGrad.setColorAt(1, QColor(186, 239, 255));
+    //painter->setPen(QPen(Qt::green, 0));
+    painter->setBrush(linearGrad);
+    //painter->drawRect(r);
     painter->fillRect(r, linearGrad);
+    
 
     // Draw time periods
     if (!m_parent->recTimePeriodList().empty())
@@ -215,9 +223,13 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
     painter->fillRect(r, linearGrad);
 
+
     ensureHandleRect();
-    const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
+    if (m_pixmap.width() == 0)
+        m_pixmap = Skin::pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    painter->drawPixmap(m_handleRect.topLeft(), m_pixmap);
+
+    //qDebug() << "timeFinal=" << (getUsecTimer() - t)/1000.0;
 }
 
 void MySlider::sliderChange(SliderChange change)
