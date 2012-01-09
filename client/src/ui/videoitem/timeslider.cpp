@@ -190,7 +190,17 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QRectF r = contentsRect();
 
     painter->setPen(QPen(Qt::gray, 2));
-    painter->drawRect(r);
+    QPointF lines[8] = {
+        QPointF(r.topLeft()),
+        QPointF(r.topRight()),
+        QPointF(r.topRight()),
+        QPointF(r.bottomRight()),
+        QPointF(r.bottomRight()),
+        QPointF(r.bottomLeft()),
+        QPointF(r.bottomLeft()),
+        QPointF(r.topLeft())
+    };
+    painter->drawLines(lines, 4);
 
     //painter->setPen(QPen(Qt::darkGray, 1));
     //painter->drawRect(r);
