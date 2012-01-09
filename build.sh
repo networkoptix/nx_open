@@ -1,3 +1,5 @@
+set -e
+
 for i in common server client appserver
 do
   pushd $i
