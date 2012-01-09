@@ -1,19 +1,19 @@
 #ifndef QN_OPACITY_HOVER_ITEM_H
 #define QN_OPACITY_HOVER_ITEM_H
 
-#include <QGraphicsObject>
+#include <ui/processors/hover_processor.h>
 
 class VariantAnimator;
 class AnimationTimer;
 
-class QnOpacityHoverItem: public QGraphicsObject {
+class QnOpacityHoverItem: public HoverProcessor {
     Q_OBJECT;
     Q_PROPERTY(qreal targetOpacity READ targetOpacity WRITE setTargetOpacity);
 
-    typedef QGraphicsObject base_type;
+    typedef HoverProcessor base_type;
 
 public:
-    QnOpacityHoverItem(AnimationTimer *animationTimer, QGraphicsItem *target);
+    QnOpacityHoverItem(AnimationTimer *animationTimer, QGraphicsItem *parent = NULL);
 
     qreal targetOpacity() const;
 
@@ -27,10 +27,6 @@ public:
 
     void setAnimationTimeLimit(qreal timeLimitMSec);
 
-    bool isTargetUnderMouse() const {
-        return m_underMouse;
-    }
-
     virtual QRectF boundingRect() const override {
         return QRectF();
     }
@@ -40,11 +36,11 @@ public:
     }
 
 protected:
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-
-    virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
-
     void updateTargetOpacity(bool animate);
+
+protected slots:
+    void at_hoverEntered();
+    void at_hoverLeft();
 
 private:
     VariantAnimator *m_animator;

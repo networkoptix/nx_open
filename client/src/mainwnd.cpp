@@ -135,7 +135,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     toolBar->addAction(&cm_exit);
     toolBar->addAction(&cm_toggle_fullscreen);
     toolBar->addAction(&cm_preferences);
-    toolBar->addAction(&cm_showNavTree);
     addToolBar(Qt::TopToolBarArea, toolBar);
 
 
@@ -148,8 +147,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
-
-    addAction(&cm_showNavTree);
 
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));

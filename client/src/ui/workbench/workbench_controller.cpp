@@ -56,11 +56,13 @@
 #include <ui/graphics/items/grid_item.h>
 #include <ui/graphics/items/opacity_hover_item.h>
 
+#include <ui/processors/hover_processor.h>
+
 #include <ui/videoitem/navigationitem.h>
-#include "ui/navigationtreewidget.h"
+#include <ui/navigationtreewidget.h>
 
 #include <ui/context_menu/menu_wrapper.h>
-#include "ui/context_menu_helper.h"
+#include <ui/context_menu_helper.h>
 
 #include <file_processor.h>
 
@@ -327,31 +329,41 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     deactivationSignalizator->setEventType(QEvent::WindowDeactivate);
     controlsWidget->installEventFilter(deactivationSignalizator);
 
+    connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
+    connect(controlsWidget,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
+
     /* Navigation slider. */
     m_navigationItem = new NavigationItem(controlsWidget);
 
-
     QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
+    navigationHoverItem->setTargetItem(m_navigationItem);
     navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
     navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
     navigationHoverItem->setAnimationSpeed(0.1);
     navigationHoverItem->setAnimationTimeLimit(global_opacity_change_period);
 
+    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
+    connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
+    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_navigationItem,               SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
+
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
-
-    connect(&cm_showNavTree, SIGNAL(toggled(bool)), this, SLOT(setTreeVisible(bool)));
 
     m_treeItem = new QGraphicsProxyWidget(controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
 
-    QnOpacityHoverItem *treeHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_treeItem);
-    treeHoverItem->setTargetHoverOpacity(hoverTreeOpacity);
-    treeHoverItem->setTargetNormalOpacity(normalTreeOpacity);
-    treeHoverItem->setAnimationSpeed(0.1);
-    treeHoverItem->setAnimationTimeLimit(global_opacity_change_period);
+    m_treeHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_treeItem);
+    m_treeHoverItem->setTargetItem(m_treeItem);
+    m_treeHoverItem->setTargetHoverOpacity(hoverTreeOpacity);
+    m_treeHoverItem->setTargetNormalOpacity(normalTreeOpacity);
+    m_treeHoverItem->setAnimationSpeed(0.1);
+    m_treeHoverItem->setAnimationTimeLimit(global_opacity_change_period);
+
+    HoverProcessor *treeHidingProcessor = new HoverProcessor(m_treeItem);
+    treeHidingProcessor->setTargetItem(m_treeItem);
+    treeHidingProcessor->setHoverLeaveDelay(1000);
 
     m_treePositionAnimator = new VariantAnimator(this);
     m_treePositionAnimator->setTimer(display->animationInstrument()->animationTimer());
@@ -360,14 +372,19 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treePositionAnimator->setSpeed(m_treeItem->size().width() * 2.0);
     m_treePositionAnimator->setTimeLimit(500);
 
-    connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
-    connect(controlsWidget,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
-    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
-    connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList&)),                                       m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList&)));
-    connect(m_display, SIGNAL(displayingStateChanged(QnResourcePtr, bool)), m_navigationItem, SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
+    m_treeTriggerItem = new QGraphicsWidget(controlsWidget);
+    m_treeTriggerItem->stackBefore(m_treeItem); /* So that it doesn't eat tree's hover events. */
+
+    HoverProcessor *treeShowingProcessor = new HoverProcessor(m_treeTriggerItem);
+    treeShowingProcessor->setTargetItem(m_treeTriggerItem);
+    treeShowingProcessor->setHoverEnterDelay(250);
+
+    setTreeVisible(false, false);
 
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
+    connect(treeHidingProcessor,        SIGNAL(hoverLeft(QGraphicsItem *)),                                                         this,                           SLOT(at_treeWidget_hoverLeft()));
+    connect(treeShowingProcessor,       SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeWidgetTrigger_hoverEntered()));
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -546,9 +563,22 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-void QnWorkbenchController::setTreeVisible(bool visible)
+void QnWorkbenchController::setTreeVisible(bool visible, bool animate)
 {
-    m_treePositionAnimator->animateTo(visible ? QPointF(-m_treeItem->size().width() - 100.0 /* Just in case */, 0.0) : QPointF(0.0, 0.0));
+    m_treeVisible = visible;
+
+    QPointF newPos = visible ? 
+        QPointF(0.0, 0.0) : 
+        QPointF(-m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
+    if(animate) {
+        m_treePositionAnimator->animateTo(newPos);
+    } else {
+        m_treeItem->setPos(newPos);
+    }
+}
+
+void QnWorkbenchController::toggleTreeVisible() {
+    setTreeVisible(!m_treeVisible);
 }
 
 // -------------------------------------------------------------------------- //
@@ -1017,6 +1047,13 @@ void QnWorkbenchController::at_controlsWidget_geometryChanged() {
 
     /* We lay everything out manually. */
 
+    m_treeTriggerItem->setGeometry(QRectF(
+        0.0,
+        0.0,
+        5.0,
+        size.height()
+    ));
+
     m_navigationItem->setGeometry(QRectF(
         0.0,
         size.height() - m_navigationItem->size().height(),
@@ -1253,7 +1290,6 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     settings.endGroup();
 }
 
-
 void QnWorkbenchController::at_randomGridAction_triggered() {
     display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
     display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
@@ -1267,4 +1303,15 @@ void QnWorkbenchController::at_treeWidget_activated(uint resourceId) {
         QPointF gridPos = display()->mapViewportToGridF(display()->view()->viewport()->geometry().center());
         drop(resource, gridPos);
     }
+}
+
+void QnWorkbenchController::at_treeWidget_hoverLeft() {
+    qDebug("HOVER LEFT");
+
+    setTreeVisible(false);
+}
+
+void QnWorkbenchController::at_treeWidgetTrigger_hoverEntered() {
+    setTreeVisible(true);
+    m_treeHoverItem->forceHoverEnter();
 }

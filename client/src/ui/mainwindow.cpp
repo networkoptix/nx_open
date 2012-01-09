@@ -66,8 +66,6 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-    addAction(&cm_showNavTree);
-
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
 
@@ -118,7 +116,6 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
         toolBar->setAllowedAreas(Qt::NoToolBarArea);
         toolBar->addAction(reconnectAction);
         toolBar->addAction(&cm_preferences);
-        toolBar->addAction(&cm_showNavTree);
         toolBar->addAction(newTabAction);
 
         QVBoxLayout *mainLayout = qobject_cast<QVBoxLayout *>(layout());
