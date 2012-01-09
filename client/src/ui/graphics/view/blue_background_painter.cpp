@@ -88,7 +88,6 @@ void QnBlueBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
         gradientPainter->paint(color);
         glPopMatrix();
 
-
         glPopAttrib();
     }
     painter->endNativePainting();
