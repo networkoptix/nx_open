@@ -204,7 +204,7 @@ GraphicsSlider::~GraphicsSlider()
 */
 void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    qint64 time = getUsecTimer();
+    //qint64 time = getUsecTimer();
 
     Q_UNUSED(option)
 
