@@ -15,6 +15,8 @@ extern QAction cm_toggle_fullscreen;
 extern QAction cm_fitinview;
 extern QAction cm_arrange;
 
+extern QAction cm_hide_decorations;
+
 extern QAction cm_add_layout;
 extern QAction cm_restore_layout;
 extern QAction cm_save_layout;

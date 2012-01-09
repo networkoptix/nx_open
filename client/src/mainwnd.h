@@ -41,6 +41,8 @@ private Q_SLOTS:
     void appServerError(int error);
     void appServerAuthenticationRequired();
 
+    void toggleDecorationsVisibility();
+
 #if 0
 public:
     void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
@@ -60,6 +62,7 @@ private:
     QnGraphicsView *m_view;
 
     QTabWidget *m_tabWidget;
+    QToolBar *m_toolBar;
 
     static MainWnd *s_instance;
 };

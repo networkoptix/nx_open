@@ -9,7 +9,12 @@ HoverProcessor::HoverProcessor(QGraphicsItem *parent):
     m_hoverEnterTimerId(0),
     m_hoverLeaveTimerId(0),
     m_item(NULL)
-{}
+{
+    setFlags(ItemHasNoContents);
+    setAcceptedMouseButtons(0);
+    setEnabled(false);
+    setVisible(false);
+}
 
 HoverProcessor::~HoverProcessor() {
     return;
@@ -36,27 +41,19 @@ void HoverProcessor::setHoverLeaveDelay(int hoverLeaveDelayMSec) {
 
 void HoverProcessor::setTargetItem(QGraphicsItem *item) {
     if(!m_item.isNull())
-        m_item.data()->removeSceneEventFilter(this);
+        if(scene() != NULL)
+            m_item.data()->removeSceneEventFilter(this);
     
     m_item = item;
 
     if(!m_item.isNull()) {
-        m_item.data()->installSceneEventFilter(this);
+        if(scene() != NULL)
+            m_item.data()->installSceneEventFilter(this);
         m_item.data()->setAcceptHoverEvents(true);
     }
 }
 
-void HoverProcessor::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    killHoverLeaveTimer();
-
-    if(m_hoverEnterDelay == 0) {
-        processEnter();
-    } else {
-        m_hoverEnterTimerId = startTimer(m_hoverEnterDelay);
-    }
-}
-
-void HoverProcessor::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+void HoverProcessor::forceHoverLeave() {
     killHoverEnterTimer();
 
     if(m_hoverLeaveDelay == 0) {
@@ -66,12 +63,60 @@ void HoverProcessor::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     }
 }
 
+void HoverProcessor::forceHoverEnter() {
+    killHoverLeaveTimer();
+
+    if(m_hoverEnterDelay == 0) {
+        processEnter();
+    } else {
+        m_hoverEnterTimerId = startTimer(m_hoverEnterDelay);
+    }
+}
+
+bool HoverProcessor::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
+    if(watched == m_item.data()) {
+        switch(event->type()) {
+        case QEvent::GraphicsSceneHoverEnter:
+            forceHoverEnter();
+            event->ignore();
+            break;
+        case QEvent::GraphicsSceneHoverLeave:
+            forceHoverLeave();
+            event->ignore();
+            break;
+        default:
+            break;
+        }
+    }
+
+    return base_type::sceneEventFilter(watched, event);
+}
+
 void HoverProcessor::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_hoverEnterTimerId) {
         processEnter();
     } else if(event->timerId() == m_hoverLeaveTimerId) {
         processLeave();
     }
+}
+
+QVariant HoverProcessor::itemChange(GraphicsItemChange change, const QVariant &value) {
+    if(parentItem() != NULL) {
+        switch(change) {
+        case ItemSceneChange:
+            if(!m_item.isNull() && scene() != NULL)
+               m_item.data()->removeSceneEventFilter(this);
+            break;
+        case ItemSceneHasChanged:
+            if(!m_item.isNull() && scene() != NULL)
+                m_item.data()->installSceneEventFilter(this);
+            break;
+        default:
+            break;
+        }
+    }
+
+    return base_type::itemChange(change, value);
 }
 
 void HoverProcessor::processEnter() {

@@ -13,6 +13,9 @@
  */
 class HoverProcessor: public QGraphicsObject {
     Q_OBJECT;
+
+    typedef QGraphicsObject base_type;
+
 public:
     HoverProcessor(QGraphicsItem *parent = NULL);
 
@@ -36,14 +39,26 @@ public:
 
     void setHoverLeaveDelay(int hoverLeaveDelayMSec);
 
+    void forceHoverLeave();
+
+    void forceHoverEnter();
+
+    virtual QRectF boundingRect() const override {
+        return QRectF();
+    }
+
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override {
+        return;
+    }
+
 signals:
     void hoverEntered(QGraphicsItem *item);
     void hoverLeft(QGraphicsItem *item);
 
 protected:
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private:
     void processEnter();

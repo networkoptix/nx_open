@@ -39,6 +39,7 @@ class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
+class QnOpacityHoverItem;
 
 
 /**
@@ -69,7 +70,8 @@ public:
     void drop(const QnResourceList &resources, const QPointF &gridPos);
 
 public Q_SLOTS:
-    void setTreeVisible(bool visible);
+    void setTreeVisible(bool visible, bool animate = true);
+    void toggleTreeVisible();
 
 protected:
     void updateGeometryDelta(QnResourceWidget *widget);
@@ -135,6 +137,9 @@ protected Q_SLOTS:
 
     void at_treeWidget_activated(uint resourceId);
 
+    void at_treeWidget_hoverLeft();
+    void at_treeWidgetTrigger_hoverEntered();
+
 private:
     /* Global state. */
 
@@ -152,6 +157,15 @@ private:
 
     /** Proxy widget for navigation tree widget. */
     QGraphicsProxyWidget *m_treeItem;
+
+    /** Graphics widget that triggers tree widget visibility. */
+    QGraphicsWidget *m_treeTriggerItem;
+
+    /** Hover opacity item for tree widget. */
+    QnOpacityHoverItem *m_treeHoverItem;
+
+    /** Whether navigation tree is visible. */
+    bool m_treeVisible;
 
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
