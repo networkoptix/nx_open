@@ -85,9 +85,11 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     setAttribute(Qt::WA_QuitOnClose);
     setAcceptDrops(true);
 
-    QPalette pal = palette();
-    pal.setColor(backgroundRole(), app_bkr_color);
-    setPalette(pal);
+    {
+        QPalette pal = palette();
+        pal.setColor(backgroundRole(), app_bkr_color);
+        setPalette(pal);
+    }
 
     const int min_width = 800;
     setMinimumWidth(min_width);
@@ -96,6 +98,13 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene, this);
+    {
+        QPalette pal = m_view->palette();
+        pal.setColor(QPalette::Background, Qt::black);
+        pal.setColor(QPalette::Base, Qt::black);
+        m_view->setPalette(pal);
+    }
+    m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
