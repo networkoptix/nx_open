@@ -29,6 +29,10 @@ void SelectionOverlayHackInstrument::aboutToBeDisabledNotify() {
 }
 
 void SelectionOverlayHackInstrument::at_scene_selectionChanged() {
+    // TODO: Alexender, please check
+    if (!scene())
+        return;
+
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
 
     QnResourceWidget *newSingleSelectedWidget = selectedItems.size() == 1 ? dynamic_cast<QnResourceWidget *>(selectedItems.first()) : NULL;
