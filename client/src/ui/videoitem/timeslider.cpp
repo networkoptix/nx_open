@@ -41,7 +41,7 @@ static const float FONT_SIZE_CACHE_EPS = 0.1;
 static const int MAX_LABEL_WIDTH = 64;
 
 
-typedef QHash<unsigned, QImage*> TextCache;
+typedef QHash<unsigned, QPixmap*> TextCache;
 
 }
 
@@ -144,6 +144,7 @@ void MySlider::setToolTipItem(ToolTipItem *toolTip)
     delete m_toolTip;
 
     m_toolTip = toolTip;
+    //m_toolTip->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     if (m_toolTip)
         m_toolTip->setParentItem(this);
@@ -316,7 +317,7 @@ public:
     }
     ~TimeLine()
     {
-        foreach(QImage* image, m_textCache)
+        foreach(QPixmap* image, m_textCache)
             delete image;
     }
 
@@ -346,7 +347,7 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void wheelEvent(QGraphicsSceneWheelEvent *event);
     void updateFontCache(int level, int maxLevel, double pixelPerTime);
-    QImage* createTextImage(const QFont& font, const QString& text, bool doRotate);
+    QPixmap* createTextPixmap(const QFont& font, const QString& text, bool doRotate);
 private:
     int m_maxHeight;
     QVector<int> m_fontWidths;
@@ -523,14 +524,14 @@ void TimeLine::updateFontCache(int level, int maxLevel, double pixelPerTime)
     m_cachedFontMaxLevel = maxLevel;
 }
 
-QImage* TimeLine::createTextImage(const QFont& font, const QString& text, bool doRotate)
+QPixmap* TimeLine::createTextPixmap(const QFont& font, const QString& text, bool doRotate)
 {
     // Draw text line to image cache
     QFontMetrics m(font);
     QSize textSize = m.size(Qt::TextSingleLine, text);
-    QImage* textImage = new QImage(textSize.width(), textSize.height(), QImage::Format_ARGB32_Premultiplied);
-    textImage->fill(0);
-    QPainter p(textImage);
+    QPixmap* textPixmap = new QPixmap(textSize.width(), textSize.height());
+    textPixmap->fill(QColor(0,0,0,0));
+    QPainter p(textPixmap);
     p.setCompositionMode(QPainter::CompositionMode_Source);
     p.setPen(m_parent->palette().color(QPalette::Text));
     p.setFont(font);
@@ -540,9 +541,9 @@ QImage* TimeLine::createTextImage(const QFont& font, const QString& text, bool d
     if (doRotate) {
         QMatrix rm;
         rm.rotate(90);
-        *textImage = textImage->transformed(rm);
+        *textPixmap = textPixmap->transformed(rm);
     }
-    return textImage;
+    return textPixmap;
 }
 
 void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -639,8 +640,8 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             else 
                 hash = (fontSize << 24) + curTime/1000/900; // curTime to 15 min granularity (we must keep integer number for months and years dates)
             
-            QImage* textImage = m_textCache.value(hash);
-            if (textImage == 0)
+            QPixmap* textPixmap = m_textCache.value(hash);
+            if (textPixmap == 0)
             {
                 QString text;
                 if (curLevel < FIRST_DATE_INDEX)
@@ -648,15 +649,15 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
                 else
                     text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
 
-                textImage= createTextImage(m_fonts[arrayIndex], text, curLevel == 0);
-                m_textCache.insert(hash, textImage);
+                textPixmap= createTextPixmap(m_fonts[arrayIndex], text, curLevel == 0);
+                m_textCache.insert(hash, textPixmap);
             }
 
-            QPointF imagePos(xpos - textImage->width()/2, (r.height() - m_maxHeight) * lineLen + (curLevel == 0 ? 2 : 0) );
+            QPointF imagePos(xpos - textPixmap->width()/2, (r.height() - m_maxHeight) * lineLen + (curLevel == 0 ? 2 : 0) );
             if (imagePos.x() < 0 && pos == 0)
                 imagePos.setX(0);
             painter->setOpacity(opacity[arrayIndex]);
-            painter->drawImage(imagePos, *textImage);
+            painter->drawPixmap(imagePos, *textPixmap);
         }
 
         xpos += intervals[level].interval * pixelPerTime;
