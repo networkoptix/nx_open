@@ -5,7 +5,7 @@
 #include <QScopedPointer>
 #include "graphics_view.h" /* For QnLayerPainter. */
 
-#define QN_BACKGROUND_PAINTER_NO_OPENGL
+//#define QN_BACKGROUND_PAINTER_NO_OPENGL
 
 class QnBlueBackgroundPainter : public QnLayerPainter
 {
