@@ -94,7 +94,8 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 
 	if (c)
 	{
-		avcodec_close(c);
+        if (c->codec)
+            avcodec_close(c);
 		av_free(c);
 	}
 

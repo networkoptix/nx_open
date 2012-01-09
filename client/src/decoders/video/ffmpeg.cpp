@@ -91,7 +91,8 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 
 void CLFFmpegVideoDecoder::closeDecoder()
 {
-    avcodec_close(m_context);
+    if (m_context->codec)
+        avcodec_close(m_context);
 #ifdef _USE_DXVA
     m_decoderContext.close();
 #endif
@@ -208,8 +209,10 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 
 	closeDecoder();
 
-	if (m_passedContext)
-		avcodec_close(m_passedContext);
+    if (m_passedContext && m_passedContext->codec)
+    {
+        avcodec_close(m_passedContext);
+    }
 }
 
 void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
@@ -221,7 +224,8 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     //return;
 
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
-    avcodec_close(m_context);
+    if (m_context->codec)
+        avcodec_close(m_context);
 
     av_free(m_context);
     m_context = avcodec_alloc_context();

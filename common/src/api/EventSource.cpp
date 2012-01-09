@@ -1,15 +1,53 @@
 #include <QtNetwork>
 #include "EventSource.h"
 
-bool QnEvent::parse(const QByteArray& rawData)
-{   
-    QJson::Parser parser;
-    bool ok;
-    QVariant parsed = parser.parse(rawData, &ok);
+void QnJsonStreamParser::addData(const QByteArray& data)
+{
+    if (!incomplete.isEmpty())
+    {
+        incomplete += data;
 
-    if (!ok)
+        if (incomplete.endsWith('\n'))
+        {
+            foreach(QByteArray block, incomplete.trimmed().split('\n'))
+            {
+                blocks.enqueue(block);
+            }
+            incomplete.clear();
+        }
+    } else
+    {
+        if (data.endsWith('\n'))
+        {
+            foreach(QByteArray block, data.trimmed().split('\n'))
+            {
+                blocks.enqueue(block);
+            }
+        } else
+        {
+            incomplete = data;
+        }
+    }
+}
+
+bool QnJsonStreamParser::nextMessage(QVariant& parsed)
+{
+    if (blocks.isEmpty())
         return false;
 
+    QByteArray block = blocks.dequeue();
+
+    bool ok;
+    parsed = parser.parse(block, &ok);
+
+    if (!ok)
+        qDebug() << "QnJsonStreamParser::nextMessage(): Error parse block: " << block;
+
+    return ok;
+}
+
+bool QnEvent::load(const QVariant& parsed)
+{   
     QMap<QString, QVariant> dict = parsed.toMap();
 
     if (!dict.contains("type"))
@@ -98,13 +136,19 @@ void QnEventSource::httpReadyRead()
 {
     QByteArray data = reply->readAll().data();
 
-    qDebug() << "Event: " << data;
+    qDebug() << "Event data: " << data;
 
-    QnEvent event;
-    if (!event.parse(data))
-        qDebug() << "Can't parse event: " << data;
-    else
+    streamParser.addData(data);
+
+    QVariant parsed;
+    while (streamParser.nextMessage(parsed))
+    {
+        QnEvent event;
+        event.load(parsed);
+
+        qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
         emit eventReceived(event);
+    }
 }
 
 

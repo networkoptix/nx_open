@@ -11,9 +11,6 @@ from filetypes import all_filetypes, video_filetypes, image_filetypes
 
 FFMPEG_VERSION = '2011-08-29'
 
-if sys.platform == 'linux2':
-    FFMPEG_VERSION = '2011-12-27'
-
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 

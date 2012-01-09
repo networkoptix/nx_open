@@ -2,6 +2,7 @@
 
 #ifndef Q_OS_WIN
 #include <sys/statvfs.h>
+#include <sys/time.h>
 #endif
 
 bool removeDir(const QString &dirName)

@@ -54,7 +54,10 @@ void QnStreamRecorder::close()
 
         QMutexLocker mutex(&global_ffmpeg_mutex);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
-            avcodec_close(m_formatCtx->streams[i]->codec);
+        {
+            if (m_formatCtx->streams[i]->codec->codec)
+                avcodec_close(m_formatCtx->streams[i]->codec);
+        }
         if (m_formatCtx->pb)
             avio_close(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);

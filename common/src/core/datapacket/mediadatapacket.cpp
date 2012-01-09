@@ -21,6 +21,8 @@ QnMediaContext::QnMediaContext(CodecID codecId)
         m_ctx = avcodec_alloc_context();
         AVCodec* codec = avcodec_find_decoder(codecId);
         avcodec_open(m_ctx, codec);
+    } else {
+        m_ctx = 0;
     }
 }
 
@@ -34,7 +36,8 @@ QnMediaContext::~QnMediaContext()
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
     if (m_ctx) {
-        avcodec_close(m_ctx);
+        if (m_ctx->codec)
+            avcodec_close(m_ctx);
         av_free(m_ctx);
     }
 }

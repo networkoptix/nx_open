@@ -8,6 +8,7 @@
 #include <QUrl>
 #include <QTextStream>
 #include <QVariant>
+#include <QQueue>
 #include <qjson/parser.h>
 
 #include "utils/common/qnid.h"
@@ -26,7 +27,20 @@ struct QnEvent
     QString paramName;
     QString paramValue;
 
-    bool parse(const QByteArray& rawData);
+    bool load(const QVariant& parsed);
+};
+
+class QnJsonStreamParser
+{
+public:
+    void addData(const QByteArray& data);
+    bool nextMessage(QVariant& parsed);
+
+private:
+    QQueue<QByteArray> blocks;
+    QByteArray incomplete;
+
+    QJson::Parser parser;
 };
 
 class QnEventSource : public QObject
@@ -58,6 +72,8 @@ private:
     QNetworkAccessManager qnam;
     QNetworkReply *reply;
     int httpGetId;
+
+    QnJsonStreamParser streamParser;
 };
 
 #endif // _QN_EVENT_SOURCE_
