@@ -4,6 +4,7 @@
 #include "fancymainwindow.h"
 
 class QTabBar;
+class QToolBar;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
@@ -46,6 +47,7 @@ private:
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
+    QToolBar *m_toolBar;
     QTabBar *m_tabBar;
 };
 

@@ -3,28 +3,30 @@
 #include <QtGui/QPainter>
 
 #include "ui/widgets2/abstractgraphicsbutton_p.h"
+#include "utils/common/util.h"
 
 class ImageButtonPrivate : public AbstractGraphicsButtonPrivate
 {
     Q_DECLARE_PUBLIC(ImageButton)
 
 public:
-    ImageButtonPrivate() : AbstractGraphicsButtonPrivate() {}
+    ImageButtonPrivate() : AbstractGraphicsButtonPrivate(), isUnderMouse(false)
+    {
+    }
 
     QPixmap getPixmap(ImageButton::PixmapGroup group);
 
 private:
     QPixmap pixmaps[ImageButton::NGroups][ImageButton::Nroles];
+    bool isUnderMouse;
 };
 
 QPixmap ImageButtonPrivate::getPixmap(ImageButton::PixmapGroup group)
 {
     Q_Q(ImageButton);
 
-    QPixmap pix;
 
-    QStyleOption opt;
-    q->initStyleOption(&opt);
+    QPixmap pix;
 
     if (q->isDown())
         pix = pixmaps[group][ImageButton::Pressed];
@@ -32,7 +34,7 @@ QPixmap ImageButtonPrivate::getPixmap(ImageButton::PixmapGroup group)
         pix = pixmaps[group][ImageButton::Checked];
     else if (q->hasFocus() && !pixmaps[group][ImageButton::Focus].isNull())
         pix = pixmaps[group][ImageButton::Focus];
-    else if ((opt.state & QStyle::State_MouseOver) && !pixmaps[group][ImageButton::Hovered].isNull())
+    else if (isUnderMouse && !pixmaps[group][ImageButton::Hovered].isNull())
         pix = pixmaps[group][ImageButton::Hovered];
     else
         pix = pixmaps[group][ImageButton::Background];
@@ -64,10 +66,24 @@ void ImageButton::addPixmap(const QPixmap &pix, ImageButton::PixmapGroup group, 
 
 void ImageButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    //qint64 t = getUsecTimer();
+
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
     QPixmap pix = d_func()->getPixmap(isEnabled() ? Active : Disabled);
 
     painter->drawPixmap(rect(), pix, QRectF(pix.rect()));
+
+    //qDebug() << "time=" << (getUsecTimer() - t)/1000.0;
+}
+
+void ImageButton::hoverEnterEvent ( QGraphicsSceneHoverEvent * )
+{
+    d_func()->isUnderMouse = true;
+}
+
+void ImageButton::hoverLeaveEvent ( QGraphicsSceneHoverEvent * )
+{
+    d_func()->isUnderMouse = false;
 }

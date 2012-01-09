@@ -30,7 +30,8 @@ public:
 
 protected:
     explicit ImageButton(AbstractGraphicsButtonPrivate &dd, QGraphicsItem *parent = 0);
-
+    void hoverEnterEvent ( QGraphicsSceneHoverEvent * );
+    void hoverLeaveEvent ( QGraphicsSceneHoverEvent * );
 private:
     Q_DECLARE_PRIVATE(ImageButton)
 };
