@@ -22,6 +22,8 @@ QAction cm_save_layout(QObject::tr("Save layout"), 0);
 QAction cm_save_layout_as(QObject::tr("Save layout as..."), 0);
 QAction cm_preferences(QObject::tr("Preferences"), 0);
 
+QAction cm_hide_decorations(QObject::tr("Hide decorations"), 0);
+
 QAction cm_editTags(QObject::tr("Edit tags..."), 0);
 
 QAction cm_fullscreen(QObject::tr("Fullscreen"), 0);
@@ -73,6 +75,9 @@ void initContextMenu()
 
     cm_editTags.setShortcut(QObject::tr("Alt+T"));
     cm_editTags.setShortcutContext(Qt::ApplicationShortcut);
+
+    cm_hide_decorations.setShortcut(QObject::tr("F11"));
+    cm_hide_decorations.setShortcutContext(Qt::ApplicationShortcut);
 
     QMenu *newItemMenu = new QMenu();
     newItemMenu->setTitle(QObject::tr("New Item"));
