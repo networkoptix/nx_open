@@ -138,8 +138,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     QTime time;
     time.start();
 
-    m_netState.updateNetState(); // update net state before search
-
     //====================================
     //CL_LOG(cl_logDEBUG1) cl_log.log("looking for resources...", cl_logDEBUG1);
 
@@ -255,6 +253,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         }
     }
 
+    if (resources.size()) {
+        m_netState.updateNetState(); // update net state before working with discovered resources
+    }
 
     //marks all new network resources as badip if: 1) not in the same subnet and not accesible or 2) same subnet and conflicting 
     check_if_accessible(resources, threads);
