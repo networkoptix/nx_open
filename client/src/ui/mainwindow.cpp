@@ -112,18 +112,18 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     connect(m_tabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 
     {
-        QToolBar *toolBar = new QToolBar(this);
-        toolBar->setAllowedAreas(Qt::NoToolBarArea);
-        toolBar->addAction(reconnectAction);
-        toolBar->addAction(&cm_preferences);
-        toolBar->addAction(newTabAction);
+        m_toolBar = new QToolBar(this);
+        m_toolBar->setAllowedAreas(Qt::NoToolBarArea);
+        m_toolBar->addAction(reconnectAction);
+        m_toolBar->addAction(&cm_preferences);
+        m_toolBar->addAction(newTabAction);
 
         QVBoxLayout *mainLayout = qobject_cast<QVBoxLayout *>(layout());
         Q_ASSERT(mainLayout); // ###
         QHBoxLayout *tabBarLayout = new QHBoxLayout;
         tabBarLayout->setContentsMargins(0, 0, 0, 0);
         tabBarLayout->setSpacing(2);
-        tabBarLayout->addWidget(toolBar);
+        tabBarLayout->addWidget(m_toolBar);
         tabBarLayout->addWidget(m_tabBar, 255);
         mainLayout->insertLayout(1, tabBarLayout);
     }

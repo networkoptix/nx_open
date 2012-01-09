@@ -49,6 +49,21 @@
 
 MainWnd *MainWnd::s_instance = 0;
 
+namespace {
+    // TODO: hack hack hack
+
+    class OpenTabWidget: public QTabWidget {
+    public:
+        QTabBar *extractTabBar() const {
+            return QTabWidget::tabBar();
+        }
+    };
+
+    QTabBar *tabBar(QTabWidget *widget) {
+        return static_cast<OpenTabWidget *>(widget)->extractTabBar();
+    }
+}
+
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
       m_controller(0)
@@ -130,12 +145,12 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
 
     // toolbars
-    QToolBar *toolBar = new QToolBar(this);
-    toolBar->setAllowedAreas(Qt::TopToolBarArea);
-    toolBar->addAction(&cm_exit);
-    toolBar->addAction(&cm_toggle_fullscreen);
-    toolBar->addAction(&cm_preferences);
-    addToolBar(Qt::TopToolBarArea, toolBar);
+    m_toolBar = new QToolBar(this);
+    m_toolBar->setAllowedAreas(Qt::TopToolBarArea);
+    m_toolBar->addAction(&cm_exit);
+    m_toolBar->addAction(&cm_toggle_fullscreen);
+    m_toolBar->addAction(&cm_preferences);
+    addToolBar(Qt::TopToolBarArea, m_toolBar);
 
 
     // actions
@@ -148,9 +163,12 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
+    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleDecorationsVisibility()));
+    addAction(&cm_hide_decorations);
+
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
-    toolBar->addAction(reconnectAction);
+    m_toolBar->addAction(reconnectAction);
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
@@ -371,4 +389,14 @@ void MainWnd::appServerAuthenticationRequired()
     }
     delete dialog;
     dialog = 0;
+}
+
+void MainWnd::toggleDecorationsVisibility() {
+    if(m_toolBar->isVisible()) {
+        m_toolBar->hide();
+        tabBar(m_tabWidget)->hide();
+    } else {
+        m_toolBar->show();
+        tabBar(m_tabWidget)->show();
+    }
 }
