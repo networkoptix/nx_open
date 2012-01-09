@@ -103,6 +103,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, false);
+    //setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     setCursor(Qt::ArrowCursor);
 
@@ -171,6 +172,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_speedSlider = new SpeedSlider(Qt::Horizontal, this);
     m_speedSlider->setObjectName("SpeedSlider");
     m_speedSlider->setToolTipItem(new SliderToolTipItem(m_speedSlider));
+    m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
 
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
     connect(m_speedSlider, SIGNAL(frameBackward()), this, SLOT(stepBackward()));
@@ -243,6 +246,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
+    m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
     connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
