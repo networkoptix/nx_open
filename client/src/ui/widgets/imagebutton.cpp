@@ -14,38 +14,35 @@ public:
     {
     }
 
-    QPixmap getPixmap(ImageButton::PixmapGroup group);
+    // I have used reference (&) because of GL painter is cached Pixmaps in GL texture map, where key is internal Pixmap ID.
+    QPixmap& getPixmap(ImageButton::PixmapGroup group);
 
 private:
     QPixmap pixmaps[ImageButton::NGroups][ImageButton::Nroles];
     bool isUnderMouse;
 };
 
-QPixmap ImageButtonPrivate::getPixmap(ImageButton::PixmapGroup group)
+QPixmap& ImageButtonPrivate::getPixmap(ImageButton::PixmapGroup group)
 {
     Q_Q(ImageButton);
 
 
-    QPixmap pix;
-
     if (q->isDown())
-        pix = pixmaps[group][ImageButton::Pressed];
+        return pixmaps[group][ImageButton::Pressed];
     else if (q->isChecked())
-        pix = pixmaps[group][ImageButton::Checked];
+        return pixmaps[group][ImageButton::Checked];
     else if (q->hasFocus() && !pixmaps[group][ImageButton::Focus].isNull())
-        pix = pixmaps[group][ImageButton::Focus];
+        return pixmaps[group][ImageButton::Focus];
     else if (isUnderMouse && !pixmaps[group][ImageButton::Hovered].isNull())
-        pix = pixmaps[group][ImageButton::Hovered];
+        return pixmaps[group][ImageButton::Hovered];
     else
-        pix = pixmaps[group][ImageButton::Background];
+        return pixmaps[group][ImageButton::Background];
 
-    if (pix.isNull())
-        pix = pixmaps[group][ImageButton::Background];
+    if (!pixmaps[group][ImageButton::Background].isNull())
+        return pixmaps[group][ImageButton::Background];
 
-    if (pix.isNull())
-        pix = pixmaps[ImageButton::Active][ImageButton::Background];
+    return pixmaps[ImageButton::Active][ImageButton::Background];
 
-    return pix;
 }
 
 
@@ -71,7 +68,8 @@ void ImageButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    QPixmap pix = d_func()->getPixmap(isEnabled() ? Active : Disabled);
+    QPixmap& pix = d_func()->getPixmap(isEnabled() ? Active : Disabled);
+
 
     painter->drawPixmap(rect(), pix, QRectF(pix.rect()));
 
