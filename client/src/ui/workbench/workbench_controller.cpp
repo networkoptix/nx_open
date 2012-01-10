@@ -1179,7 +1179,7 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
     m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
     m_recordingLabel->setText(tr("Recording started"));
     m_recordingLabel->setAlignment(Qt::AlignCenter);
-    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
+    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
     m_recordingLabel->setFocusPolicy(Qt::NoFocus);
     m_recordingLabel->show();
 
