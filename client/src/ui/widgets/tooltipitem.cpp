@@ -20,7 +20,7 @@ const QString &ToolTipItem::text() const
 
 void ToolTipItem::setText(const QString &text)
 {
-    if(m_strText == text)
+    if (m_strText == text)
         return;
 
     m_text = text;
@@ -35,9 +35,6 @@ const QFont &ToolTipItem::font() const
 
 void ToolTipItem::setFont(const QFont &font)
 {
-    if(m_font == font)
-        return;
-
     m_font = font;
     updateTextSize();
 }
@@ -59,7 +56,7 @@ const QPen &ToolTipItem::borderPen() const
 
 void ToolTipItem::setBorderPen(const QPen &borderPen)
 {
-    if(m_borderPen == borderPen)
+    if (m_borderPen == borderPen)
         return;
 
     m_borderPen = borderPen;
@@ -103,7 +100,7 @@ void ToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     /* Draw text. */
     painter->setFont(m_font);
     painter->setPen(m_textPen);
-    //painter->drawText(m_contentRect, Qt::AlignCenter | Qt::TextDontClip, m_text);
+    //painter->drawText(m_contentRect, Qt::AlignCenter | Qt::TextDontClip, m_strText);
     painter->drawStaticText(m_contentRect.topLeft(), m_text);
 
     /* Draw outline. */
@@ -121,7 +118,7 @@ void ToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 void ToolTipItem::updateTextSize()
 {
     QSize textSize = QFontMetrics(font()).size(Qt::AlignCenter, text());
-    if(textSize == m_textSize)
+    if (textSize == m_textSize)
         return;
 
     m_textSize = textSize;
@@ -165,12 +162,12 @@ void ToolTipItem::updateParameters(QPainterPath *borderShape, QRectF *contentRec
 
 void ToolTipItem::ensureParameters() const
 {
-    if(m_parametersValid)
+    if (m_parametersValid)
         return;
 
     updateParameters(&m_borderShape, &m_contentRect);
 
-    if(m_borderPen.isCosmetic()) {
+    if (m_borderPen.isCosmetic()) {
         m_itemShape = m_borderShape;
     } else {
         QPainterPathStroker stroker;

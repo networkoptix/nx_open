@@ -99,14 +99,14 @@ protected:
     void sliderChange(SliderChange change);
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-    virtual void resizeEvent( QGraphicsSceneResizeEvent*)
-    {
-        invalidateHandleRect();
-    }
+
+    void resizeEvent(QGraphicsSceneResizeEvent *event);
+
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
     void drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color);
+
 private:
     TimeSlider *m_parent;
     ToolTipItem *m_toolTip;
@@ -212,7 +212,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     //painter->setPen(QPen(QColor(0, 87, 207), 2));
     //painter->drawRect(r);
 
-    
+
     QLinearGradient linearGrad(r.topLeft(), r.bottomRight());
     linearGrad.setColorAt(0, QColor(0, 43, 130));
     linearGrad.setColorAt(1, QColor(186, 239, 255));
@@ -220,7 +220,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setBrush(linearGrad);
     //painter->drawRect(r);
     painter->fillRect(r, linearGrad);
-    
+
 
     // Draw time periods
     if (!m_parent->recTimePeriodList().empty())
@@ -265,6 +265,13 @@ QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
     }
 
     return GraphicsSlider::itemChange(change, value);
+}
+
+void MySlider::resizeEvent(QGraphicsSceneResizeEvent *event)
+{
+    GraphicsSlider::resizeEvent(event);
+
+    invalidateHandleRect();
 }
 
 void MySlider::invalidateHandleRect()
@@ -561,7 +568,8 @@ QPixmap* TimeLine::createTextPixmap(const QFont& font, const QString& text, bool
 
 void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    //qint64 t = getUsecTimer();
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
 
     //GraphicsFrame::paint(painter, option, widget);
 
@@ -650,9 +658,9 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             unsigned hash;
             if (curLevel < FIRST_DATE_INDEX)
                 hash = (128 + (fontSize << 24)) + (curLevel << 16) + interval.value*labelNumber;
-            else 
+            else
                 hash = (fontSize << 24) + curTime/1000/900; // curTime to 15 min granularity (we must keep integer number for months and years dates)
-            
+
             QPixmap* textPixmap = m_textCache.value(hash);
             if (textPixmap == 0)
             {
@@ -706,8 +714,6 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(QPen(Qt::red, 3));
     xpos = r.left() + m_parent->m_slider->value() * r.width() / (m_parent->m_slider->maximum() - m_parent->m_slider->minimum());
     painter->drawLine(QLineF(xpos, 0, xpos, rect().height()));
-
-    //qDebug() << "time=" << (getUsecTimer() - t)/1000.0;
 }
 
 qint64 TimeLine::posToValue(qreal pos) const

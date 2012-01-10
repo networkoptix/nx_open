@@ -351,6 +351,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
 
+    connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
+
     m_treeItem = new QGraphicsProxyWidget(controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -569,8 +571,8 @@ void QnWorkbenchController::setTreeVisible(bool visible, bool animate)
 {
     m_treeVisible = visible;
 
-    QPointF newPos = visible ? 
-        QPointF(0.0, 0.0) : 
+    QPointF newPos = visible ?
+        QPointF(0.0, 0.0) :
         QPointF(-m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
     if(animate) {
         m_treePositionAnimator->animateTo(newPos);

@@ -146,6 +146,4 @@ void initContextMenu()
 
 
     cm_showNavTree.setToolTip(QObject::tr("Toggle navigation tree show/hide"));
-    cm_showNavTree.setCheckable(true);
-    cm_showNavTree.setChecked(false);
 }

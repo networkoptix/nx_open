@@ -18,7 +18,6 @@ public:
 protected:
     GraphicsWidget *q_ptr;
 
-private:
     /** QTBUG-18797: When setting the flag ItemIgnoresTransformations for an item,
      * it will receive mouse events as if it was transformed by the view. */
     uint isUnderMouse : 1;
