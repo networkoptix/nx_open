@@ -4,21 +4,13 @@
 class QN_EXPORT FileTypeSupport
 {
 public:
-    FileTypeSupport();
+    static bool isFileSupported(const QString &filename);
 
-    bool isFileSupported(const QString& filename) const;
+    static bool isMovieFileExt(const QString &filename);
+    static bool isImageFileExt(const QString &filename);
 
-    bool isMovieFileExt(const QString& filename) const;
-    bool isImageFileExt(const QString& filename) const;
-
-    const QStringList& imagesFilter() const;
-    const QStringList& moviesFilter() const;
-private:
-    QStringList m_imageFileExtensions;
-    QStringList m_movieFileExtensions;
-
-    QStringList m_imageFileFilter;
-    QStringList m_movieFileFilter;
+    static const QStringList &imagesFilter();
+    static const QStringList &moviesFilter();
 };
 
 #endif // uniclient_filetypesupport_h

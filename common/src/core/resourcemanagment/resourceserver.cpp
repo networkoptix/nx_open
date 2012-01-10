@@ -61,21 +61,25 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(const QnId& resourceTyp
 
 //=============================================================================
 
+QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_pathListToCheck;
+}
+
 void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
 {
     QMutexLocker locker(&m_mutex);
     m_pathListToCheck = paths;
 }
 
-void QnAbstractFileResourceSearcher::clearPathCheckList()
+QnResourceList QnAbstractFileResourceSearcher::checkFiles(const QStringList &files) const
 {
-    QMutexLocker locker(&m_mutex);
-    m_pathListToCheck.clear();
-}
+    QnResourceList result;
+    foreach (const QString &file, files) {
+        if (QnResourcePtr res = checkFile(file))
+            result.append(res);
+    }
 
-
-QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
-{
-    QMutexLocker locker(&m_mutex);
-    return m_pathListToCheck;
+    return result;
 }

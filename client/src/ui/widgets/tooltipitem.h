@@ -1,8 +1,8 @@
 #ifndef TOOLTIPITEM_H
 #define TOOLTIPITEM_H
 
-#include <QStaticText>
-#include <QtGui/QGraphicsPixmapItem>
+#include <QtGui/QGraphicsItem>
+#include <QtGui/QStaticText>
 
 class ToolTipItem: public QGraphicsItem
 {
@@ -11,6 +11,9 @@ public:
 
     const QString &text() const;
     void setText(const QString &text);
+
+    QTextOption textOption() const;
+    void setTextOption(const QTextOption &textOption);
 
     const QFont &font() const;
     void setFont(const QFont &font);
@@ -32,25 +35,19 @@ protected:
 
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
-    virtual void updateParameters(QPainterPath *borderShape, QRectF *contentRect) const;
-
 private:
-    void ensureParameters() const;
-    void invalidateParameters();
-    void updateTextSize();
+    void recalcTextSize();
+    void recalcShape();
 
 private:
     mutable QPainterPath m_itemShape, m_borderShape;
-    mutable QRectF m_boundingRect, m_contentRect;
-    mutable bool m_parametersValid;
+    mutable QRectF m_boundingRect, m_textRect;
 
     QPen m_borderPen;
     QPen m_textPen;
     QBrush m_brush;
-    
-    QStaticText m_text;
-    QString m_strText;
-    QSize m_textSize;
+
+    QStaticText m_staticText;
     QFont m_font;
 };
 

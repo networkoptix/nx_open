@@ -4,6 +4,7 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QBoxLayout>
+#include <QtGui/QFileDialog>
 #include <QtGui/QToolBar>
 
 #include <QtNetwork/QNetworkReply>
@@ -11,7 +12,7 @@
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
 
-#include <core/resourcemanagment/asynch_seacher.h>
+#include <core/resourcemanagment/asynch_seacher.h> // QnResourceDiscoveryManager
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"
@@ -25,7 +26,6 @@
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/blue_background_painter.h"
 
-#include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
@@ -65,6 +65,11 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
+
+    addAction(&cm_showNavTree);
+
+    connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
+    addAction(&cm_open_file);
 
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
     connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
@@ -112,18 +117,19 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     connect(m_tabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 
     {
-        m_toolBar = new QToolBar(this);
-        m_toolBar->setAllowedAreas(Qt::NoToolBarArea);
-        m_toolBar->addAction(reconnectAction);
-        m_toolBar->addAction(&cm_preferences);
-        m_toolBar->addAction(newTabAction);
+        QToolBar *toolBar = new QToolBar(this);
+        toolBar->setAllowedAreas(Qt::NoToolBarArea);
+        toolBar->addAction(reconnectAction);
+        toolBar->addAction(&cm_preferences);
+        toolBar->addAction(&cm_showNavTree);
+        toolBar->addAction(newTabAction);
 
         QVBoxLayout *mainLayout = qobject_cast<QVBoxLayout *>(layout());
         Q_ASSERT(mainLayout); // ###
         QHBoxLayout *tabBarLayout = new QHBoxLayout;
         tabBarLayout->setContentsMargins(0, 0, 0, 0);
         tabBarLayout->setSpacing(2);
-        tabBarLayout->addWidget(m_toolBar);
+        tabBarLayout->addWidget(toolBar);
         tabBarLayout->addWidget(m_tabBar, 255);
         mainLayout->insertLayout(1, tabBarLayout);
     }
@@ -142,15 +148,22 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     addTab();
 
     // Process input files
-    const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
     for (int i = 1; i < argc; ++i)
-        m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), gridPos);
+        m_controller->drop(QFile::decodeName(argv[i]));
 
     showNormal();
 }
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    FancyMainWindow::closeEvent(event);
+
+    if (event->isAccepted())
+        Q_EMIT mainWindowClosed();
 }
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
@@ -186,19 +199,24 @@ void MainWindow::closeTab(int index)
 
 void MainWindow::handleMessage(const QString &message)
 {
-    const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-    const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
-    m_controller->drop(files, gridPos);
+    m_controller->drop(message.split(QLatin1Char('\n'), QString::SkipEmptyParts));
 
     activate();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::openFile()
 {
-    FancyMainWindow::closeEvent(event);
-
-    if (event->isAccepted())
-        Q_EMIT mainWindowClosed();
+    QFileDialog dialog(this, tr("Open file"));
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+    QStringList filters;
+    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
+    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("All files (*.*)");
+    dialog.setNameFilters(filters);
+    if (dialog.exec())
+        m_controller->drop(dialog.selectedFiles());
 }
 
 void MainWindow::activate()

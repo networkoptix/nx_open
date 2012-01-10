@@ -351,6 +351,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
 
+    connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
+
     m_treeItem = new QGraphicsProxyWidget(controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -495,27 +497,27 @@ void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPointF &gridPos
 
 void QnWorkbenchController::drop(const QString &file, const QPointF &gridPos, bool findAccepted) {
     QList<QString> files;
-    files.push_back(file);
+    files.push_back(fromNativePath(file));
     drop(files, gridPos, findAccepted);
 }
 
 void QnWorkbenchController::drop(const QList<QString> &files, const QPointF &gridPos, bool findAccepted) {
     const QList<QString> validFiles = !findAccepted ? files : QnFileProcessor::findAcceptedFiles(files);
-    if(validFiles.empty())
-        return;
-
-    drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
+    if (!validFiles.empty())
+        drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
 }
 
 void QnWorkbenchController::drop(const QnResourceList &resources, const QPointF &gridPos) {
-    foreach(const QnResourcePtr &resource, resources)
+    foreach (const QnResourcePtr &resource, resources)
         drop(resource, gridPos);
 }
 
 void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &gridPos) {
+    const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
+
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
     item->setFlag(QnWorkbenchItem::Pinned, false);
-    item->setCombinedGeometry(QRectF(gridPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
+    item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
     layout()->addItem(item);
 
     QnResourceWidget *widget = display()->widget(item);
@@ -569,8 +571,8 @@ void QnWorkbenchController::setTreeVisible(bool visible, bool animate)
 {
     m_treeVisible = visible;
 
-    QPointF newPos = visible ? 
-        QPointF(0.0, 0.0) : 
+    QPointF newPos = visible ?
+        QPointF(0.0, 0.0) :
         QPointF(-m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
     if(animate) {
         m_treePositionAnimator->animateTo(newPos);
@@ -1279,9 +1281,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
                 continue;
             }
 
-            QnResourcePtr res = QnResourceDirectoryBrowser::instance().checkFile(filePath);
-            if (res)
-                qnResPool->addResource(res);
+            QnFileProcessor::createResourcesForFile(filePath);
 
             settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
         } else {

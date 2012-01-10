@@ -18,7 +18,7 @@ public:
     { return QnFileProcessor::findAcceptedFiles(QStringList() << url.toLocalFile()); }
 
     static QnResourcePtr createResourcesForFile(const QString &file);
-    static QnResourceList createResourcesForFiles(const QList<QString> &files);
+    static QnResourceList createResourcesForFiles(const QStringList &files);
 };
 
 #endif // QN_FILE_PROCESSOR_H

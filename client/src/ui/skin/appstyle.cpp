@@ -4,8 +4,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QStyleOption>
 
-#include <QGraphicsView>
-
 #include "skin.h"
 
 static const float global_dialog_opacity = 0.9f;
@@ -21,10 +19,10 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
     switch (control) {
 #ifndef QT_NO_SLIDER
     case CC_Slider:
-        /* There is no real point in differentiating between graphic sliders and normal sliders.
-         * If there is such a need, it can be done by checking whether widget is a QGraphicsView's viewport:
-         * 
-         * if(widget && widget->parent() && qobject_cast<QGraphicsView *>(widget->parent()) && static_cast<QGraphicsView *>(widget->parent())->viewport() == widget) */
+        if (widget && widget->inherits("QAbstractSlider")) { // for old good widgets
+            ProxyStyle::drawComplexControl(control, option, painter, widget);
+            break;
+        }
 
         // ### optimize in Bespin & remove
         if (const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {

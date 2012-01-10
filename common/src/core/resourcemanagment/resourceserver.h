@@ -68,14 +68,14 @@ protected:
     QnAbstractFileResourceSearcher() {}
 
 public:
-    // sets the Path check List
-    void setPathCheckList(const QStringList& paths);
-    void clearPathCheckList();
-
-    virtual QnResourcePtr checkFile(const QString& filename) = 0;
-
-protected:
     QStringList getPathCheckList() const;
+    void setPathCheckList(const QStringList& paths);
+    inline void clearPathCheckList()
+    { setPathCheckList(QStringList()); }
+
+    // creates an instance of proper resource from file
+    virtual QnResourcePtr checkFile(const QString &filename) const = 0;
+    QnResourceList checkFiles(const QStringList &files) const;
 
 protected:
     mutable QMutex m_mutex;

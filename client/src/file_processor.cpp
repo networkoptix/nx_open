@@ -61,7 +61,7 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file)
     return result;
 }
 
-QnResourceList QnFileProcessor::createResourcesForFiles(const QList<QString> &files)
+QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files)
 {
     QnResourceList result = QnResourceDirectoryBrowser::instance().checkFiles(files);
 

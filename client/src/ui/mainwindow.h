@@ -4,7 +4,6 @@
 #include "fancymainwindow.h"
 
 class QTabBar;
-class QToolBar;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
@@ -33,6 +32,8 @@ private Q_SLOTS:
 
     void handleMessage(const QString &message);
 
+    void openFile();
+
     void activate();
     void toggleFullScreen();
     void editPreferences();
@@ -47,7 +48,6 @@ private:
     QnWorkbench *m_workbench;
     QnGraphicsView *m_view;
 
-    QToolBar *m_toolBar;
     QTabBar *m_tabBar;
 };
 

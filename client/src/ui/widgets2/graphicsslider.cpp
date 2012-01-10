@@ -9,7 +9,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleOption>
-#include "utils/common/util.h"
 
 void GraphicsSliderPrivate::init()
 {
@@ -204,8 +203,6 @@ GraphicsSlider::~GraphicsSlider()
 */
 void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    //qint64 time = getUsecTimer();
-
     Q_UNUSED(option)
 
     Q_D(GraphicsSlider);
@@ -223,8 +220,6 @@ void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     }
 
     style()->drawComplexControl(QStyle::CC_Slider, &opt, painter, widget);
-
-    //qDebug() << "sliderPaintEvent=" << (getUsecTimer()-time)/1000.0;
 }
 
 /*!

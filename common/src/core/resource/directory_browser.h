@@ -17,9 +17,7 @@ public:
     virtual QString manufacture() const;
     virtual QnResourceList findResources();
 
-    // creates an instance of proper resource from file
-    virtual QnResourcePtr checkFile(const QString &filename);
-    virtual QnResourceList checkFiles(const QList<QString> &files);
+    virtual QnResourcePtr checkFile(const QString &filename) const;
 
 protected:
     static QnResourcePtr createArchiveResource(const QString& xfile);

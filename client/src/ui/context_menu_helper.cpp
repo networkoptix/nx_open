@@ -61,6 +61,7 @@ void initContextMenu()
     cm_preferences.setShortcut(QObject::tr("Ctrl+P"));
     cm_preferences.setShortcutContext(Qt::ApplicationShortcut);
 
+    cm_open_file.setIcon(Skin::icon(QLatin1String("folder.png")));
     cm_open_file.setShortcut(QObject::tr("Ctrl+O"));
     cm_open_file.setShortcutContext(Qt::ApplicationShortcut);
 
@@ -146,6 +147,4 @@ void initContextMenu()
 
 
     cm_showNavTree.setToolTip(QObject::tr("Toggle navigation tree show/hide"));
-    cm_showNavTree.setCheckable(true);
-    cm_showNavTree.setChecked(false);
 }
