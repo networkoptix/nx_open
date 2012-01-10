@@ -4,6 +4,7 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QBoxLayout>
+#include <QtGui/QFileDialog>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
 
@@ -12,7 +13,7 @@
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
 
-#include <core/resourcemanagment/asynch_seacher.h>
+#include <core/resourcemanagment/asynch_seacher.h> // QnResourceDiscoveryManager
 #include <core/resourcemanagment/resource_pool.h>
 
 #if 0
@@ -163,6 +164,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
+    connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
+    addAction(&cm_open_file);
+
     connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleDecorationsVisibility()));
     addAction(&cm_hide_decorations);
 
@@ -180,6 +184,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 MainWnd::~MainWnd()
 {
     s_instance = 0;
+}
+
+void MainWnd::closeEvent(QCloseEvent *event)
+{
+    QMainWindow::closeEvent(event);
+
+    if (event->isAccepted())
+        Q_EMIT mainWindowClosed();
 }
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
@@ -303,12 +315,23 @@ void MainWnd::handleMessage(const QString &message)
     activate();
 }
 
-void MainWnd::closeEvent(QCloseEvent *event)
+void MainWnd::openFile()
 {
-    QMainWindow::closeEvent(event);
-
-    if (event->isAccepted())
-        Q_EMIT mainWindowClosed();
+    QFileDialog dialog(this, tr("Open file"));
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+    QStringList filters;
+    filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
+    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("All files (*.*)");
+    dialog.setNameFilters(filters);
+    if (dialog.exec()) {
+        const QStringList files = QnFileProcessor::findAcceptedFiles(dialog.selectedFiles());
+        if (!files.isEmpty()) {
+            const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
+            m_controller->drop(files, gridPos);
+        }
+    }
 }
 
 void MainWnd::activate()

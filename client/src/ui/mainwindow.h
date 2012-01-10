@@ -32,6 +32,8 @@ private Q_SLOTS:
 
     void handleMessage(const QString &message);
 
+    void openFile();
+
     void activate();
     void toggleFullScreen();
     void editPreferences();
