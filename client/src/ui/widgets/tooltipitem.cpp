@@ -10,42 +10,20 @@ ToolTipItem::ToolTipItem(QGraphicsItem *parent):
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
-    QTextOption textOption;
-    textOption.setAlignment(Qt::AlignCenter);
-    textOption.setFlags(QTextOption::IncludeTrailingSpaces);
-    textOption.setWrapMode(QTextOption::NoWrap);
-    setTextOption(textOption);
-
     recalcShape();
 }
 
 const QString &ToolTipItem::text() const
 {
-    return m_staticText.text();
+    return m_text;
 }
 
 void ToolTipItem::setText(const QString &text)
 {
-    if (m_staticText.text() == text)
+    if (m_text == text)
         return;
 
-    m_staticText.setText(text);
-    recalcTextSize();
-    update();
-}
-
-QTextOption ToolTipItem::textOption() const
-{
-    return m_staticText.textOption();
-}
-
-void ToolTipItem::setTextOption(const QTextOption &textOption)
-{
-    // ### Qt bug: QTextOption has no operator==
-//    if (m_staticText.textOption() == textOption)
-//        return;
-
-    m_staticText.setTextOption(textOption);
+    m_text = text;
     recalcTextSize();
     update();
 }
@@ -118,9 +96,10 @@ void ToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->fillPath(m_borderShape, m_brush);
 
     /* Draw text. */
-    painter->setFont(m_font);
-    painter->setPen(m_textPen);
-    painter->drawStaticText(m_textRect.topLeft(), m_staticText);
+    //painter->setFont(m_font);
+    //painter->setPen(m_textPen);
+    //painter->drawStaticText(m_textRect.topLeft(), m_staticText);
+    painter->drawPixmap(m_textRect.topLeft(), m_textPixmap);
 
     /* Draw outline. */
     painter->setPen(m_borderPen);
@@ -136,7 +115,6 @@ void ToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 void ToolTipItem::recalcTextSize()
 {
-    m_staticText.prepare(transform(), m_font);
     recalcShape();
 }
 
@@ -148,8 +126,16 @@ void ToolTipItem::recalcShape()
         static const qreal arrowHeight = 8.0;
         static const qreal arrowWidth = 8.0;
 
-        const QSizeF textSize = m_staticText.size();
+        QFontMetrics m(m_font);
+        const QSizeF textSize = m.size(Qt::TextSingleLine, m_text);
         const QSizeF paddingSize = textSize + QSizeF(padding * 2, padding * 2);
+
+        m_textPixmap = QPixmap(textSize.toSize());
+        m_textPixmap.fill(QColor(0,0,0,0));
+        QPainter textPainter(&m_textPixmap);
+        textPainter.setFont(m_font);
+        textPainter.setPen(m_textPen);
+        textPainter.drawText(0, m.ascent(), m_text);
 
         /* Half padding width */
         const float hw = paddingSize.width() / 2;
