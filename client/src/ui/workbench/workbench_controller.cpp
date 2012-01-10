@@ -384,12 +384,15 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     treeShowingProcessor->setTargetItem(m_treeTriggerItem);
     treeShowingProcessor->setHoverEnterDelay(250);
 
+#if 0
     setTreeVisible(false, false);
+
+    connect(treeHidingProcessor,        SIGNAL(hoverLeft(QGraphicsItem *)),                                                         this,                           SLOT(at_treeWidget_hoverLeft()));
+    connect(treeShowingProcessor,       SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeWidgetTrigger_hoverEntered()));
+#endif
 
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
-    connect(treeHidingProcessor,        SIGNAL(hoverLeft(QGraphicsItem *)),                                                         this,                           SLOT(at_treeWidget_hoverLeft()));
-    connect(treeShowingProcessor,       SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeWidgetTrigger_hoverEntered()));
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
