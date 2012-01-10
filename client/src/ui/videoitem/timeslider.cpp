@@ -620,8 +620,8 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QColor color = pal.color(QPalette::Text);
 
     QVector<float> opacity;
-    QVector<QPainterPath> paths;
-    paths.resize(maxLevel-level+1);
+    QVector<QVector<QPointF> > linesList;
+    linesList.resize(maxLevel-level+1);
     opacity.resize(maxLevel-level+1);
 
     if (level != m_cachedFontLevel || maxLevel != m_cachedFontMaxLevel || qAbs( 1.0 - pixelPerTime/m_cachedFontPixelPerTime) > FONT_SIZE_CACHE_EPS)
@@ -640,8 +640,9 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
         const IntervalInfo &interval = intervals[curLevel];
         const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f);
-        paths[arrayIndex].moveTo(QPointF(xpos, 0));
-        paths[arrayIndex].lineTo(QPointF(xpos, (r.height() - m_maxHeight - 3) * lineLen));
+        linesList[arrayIndex] << QPointF(xpos, 0);
+        linesList[arrayIndex] << QPointF(xpos, (r.height() - m_maxHeight - 3) * lineLen);
+        
 
         if (m_fontWidths[arrayIndex] > 0)
         {
@@ -677,11 +678,11 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     painter->setOpacity(1.0);
-    for (int arrayIndex = 0; arrayIndex < paths.size(); ++arrayIndex)
+    for (int arrayIndex = 0; arrayIndex < linesList.size(); ++arrayIndex)
     {
         color.setAlphaF(opacity[arrayIndex]);
         painter->setPen(color);
-        painter->drawPath(paths[arrayIndex]);
+        painter->drawLines(linesList[arrayIndex]);
     }
 
     // draw selection range
