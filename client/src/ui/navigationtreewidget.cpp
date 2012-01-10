@@ -5,33 +5,38 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QItemSelectionModel>
 #include <QtGui/QLineEdit>
-#include <QtGui/QMouseEvent>
 #include <QtGui/QMenu>
-#include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QTabWidget>
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
 
-#include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
+#include "ui/dialogs/tagseditdialog.h"
 #include "ui/context_menu_helper.h"
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/models/resourcemodel.h"
 #include "ui/skin/skin.h"
-#include "ui/context_menu/menu_wrapper.h"
+#include "youtube/youtubeuploaddialog.h"
+
+
+#include <QtGui/QSortFilterProxyModel>
 
 class NavigationTreeSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
-    NavigationTreeSortFilterProxyModel(QObject *parent = 0)
+    explicit NavigationTreeSortFilterProxyModel(QObject *parent = 0)
         : QSortFilterProxyModel(parent)
-    {}
+    {
+    }
 
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
     {
-        return !source_parent.isValid() || QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+        if (!source_parent.isValid())
+            return true;
+
+        return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
     }
 };
 
@@ -72,6 +77,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_resourcesModel = new ResourceModel(this);
 
     m_resourcesTreeView = new QTreeView(this);
+    m_resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_resourcesTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_resourcesTreeView->setAllColumnsShowFocus(true);
     m_resourcesTreeView->setRootIsDecorated(true);
@@ -84,6 +90,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
     m_searchTreeView = new QTreeView(this);
+    m_searchTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_searchTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_searchTreeView->setAllColumnsShowFocus(true);
     m_searchTreeView->setRootIsDecorated(true);
@@ -164,11 +171,9 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
     menu->addAction(openAction);
     menu->addSeparator();
-    if (resources.size() == 1)
-    {
+    if (resources.size() == 1) {
         const QnResourcePtr resource = resources.first();
-        if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT))
-        {
+        if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT)) {
             menu->addAction(&cm_editTags);
 
             if (resource->associatedWithFile())
@@ -179,29 +184,21 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
 
             if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::SINGLE_SHOT))
                 menu->addAction(&cm_open_containing_folder);
-        }
-        else if (resource->checkFlag(QnResource::live_cam))
-        {
+        } else if (resource->checkFlag(QnResource::live_cam)) {
             // ### Start/Stop recording (Ctrl+R)
             // ### Delete(if no connection)(Shift+Del)
             menu->addAction(&cm_editTags);
             // ### Export selected... (Ctrl+E)
-        }
-        else if (resource->checkFlag(QnResource::server))
-        {
+        } else if (resource->checkFlag(QnResource::server)) {
             // ### New camera
         }
         // ### handle layouts
 
         if (CLDeviceSettingsDlgFactory::canCreateDlg(resource))
             menu->addAction(&cm_settings);
-    }
-    else if (resources.size() > 1)
-    {
+    } else if (resources.size() > 1) {
         // ###
-    }
-    else
-    {
+    } else {
         menu->addAction(&cm_open_file);
         menu->addAction(&cm_new_item);
     }
@@ -216,28 +213,32 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     if (!action)
         return;
 
-    if (resources.size() == 1)
-    {
+    if (resources.size() == 1) {
         const QnResourcePtr resource = resources.first();
-        if (action == &cm_settings) { // ###
+        if (action == &cm_settings) { // ### move to app-global scope
             if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, QApplication::activeWindow())) {
                 dialog->exec();
                 delete dialog;
             }
+        } else if (action == &cm_editTags) { // ### move to app-global scope
+            TagsEditDialog dialog(QStringList() << resource->getUniqueId(), this);
+            dialog.setWindowModality(Qt::ApplicationModal);
+            dialog.exec();
+        } else if (action == &cm_upload_youtube) { // ### move to app-global scope
+            YouTubeUploadDialog dialog(resource, this);
+            dialog.setWindowModality(Qt::ApplicationModal);
+            dialog.exec();
         }
     }
 }
 
 void NavigationTreeWidget::filterChanged(const QString &filter)
 {
-    if (!filter.isEmpty())
-    {
+    if (!filter.isEmpty()) {
         m_clearFilterButton->show();
         m_searchProxyModel->setFilterWildcard(QLatin1Char('*') + filter + QLatin1Char('*'));
         m_searchTreeView->expandAll();
-    }
-    else
-    {
+    } else {
         m_clearFilterButton->hide();
         //m_searchProxyModel->invalidate();
         m_searchProxyModel->setFilterRegExp(QLatin1String("^$")); // ###
