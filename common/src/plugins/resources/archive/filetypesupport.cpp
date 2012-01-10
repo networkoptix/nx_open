@@ -1,32 +1,44 @@
 #include "filetypesupport.h"
+
 #include "filetypes.h"
 #include "utils/common/util.h"
 
+class FileTypeSupportPrivate
+{
+public:
+    FileTypeSupportPrivate();
 
-FileTypeSupport::FileTypeSupport()
+    QStringList imageFileExtensions;
+    QStringList movieFileExtensions;
+
+    QStringList imageFileFilter;
+    QStringList movieFileFilter;
+};
+
+FileTypeSupportPrivate::FileTypeSupportPrivate()
 {
     for (unsigned i = 0; i < arraysize(IMAGE_FILETYPES); i++)
     {
-        // TODO
-        // m_imageFileExtensions << QLatin1String(".") + QString::fromLatin1(IMAGE_FILETYPES[i]);
-        // m_imageFileFilter << QLatin1String("*.") + QString::fromLatin1(IMAGE_FILETYPES[i]);
-        m_movieFileExtensions << QLatin1String(".") + QString::fromLatin1(IMAGE_FILETYPES[i]);
-        m_movieFileFilter << QLatin1String("*.") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        // ### TODO
+        // imageFileExtensions << QLatin1String(".") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        // imageFileFilter << QLatin1String("*.") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        movieFileExtensions << QLatin1String(".") + QString::fromLatin1(IMAGE_FILETYPES[i]);
+        movieFileFilter << QLatin1String("*.") + QString::fromLatin1(IMAGE_FILETYPES[i]);
     }
 
     for (unsigned i = 0; i < arraysize(VIDEO_FILETYPES); i++)
     {
-        m_movieFileExtensions << QLatin1String(".") + QString::fromLatin1(VIDEO_FILETYPES[i]);
-        m_movieFileFilter << QLatin1String("*.") + QString::fromLatin1(VIDEO_FILETYPES[i]);
+        movieFileExtensions << QLatin1String(".") + QString::fromLatin1(VIDEO_FILETYPES[i]);
+        movieFileFilter << QLatin1String("*.") + QString::fromLatin1(VIDEO_FILETYPES[i]);
     }
 }
 
-bool FileTypeSupport::isMovieFileExt(const QString& filename) const
-{
-    QString lowerFilename = filename.toLower();
+Q_GLOBAL_STATIC(FileTypeSupportPrivate, priv)
 
-    foreach(QString ext, m_movieFileExtensions)
-    {
+bool FileTypeSupport::isMovieFileExt(const QString &filename)
+{
+    const QString lowerFilename = filename.toLower();
+    foreach (const QString &ext, priv()->movieFileExtensions) {
         if (lowerFilename.endsWith(ext))
             return true;
     }
@@ -34,12 +46,10 @@ bool FileTypeSupport::isMovieFileExt(const QString& filename) const
     return false;
 }
 
-bool FileTypeSupport::isImageFileExt(const QString& filename) const
+bool FileTypeSupport::isImageFileExt(const QString &filename)
 {
-    QString lowerFilename = filename.toLower();
-
-    foreach(QString ext, m_imageFileExtensions)
-    {
+    const QString lowerFilename = filename.toLower();
+    foreach (const QString &ext, priv()->imageFileExtensions) {
         if (lowerFilename.endsWith(ext))
             return true;
     }
@@ -47,17 +57,17 @@ bool FileTypeSupport::isImageFileExt(const QString& filename) const
     return false;
 }
 
-bool FileTypeSupport::isFileSupported(const QString& filename) const
+bool FileTypeSupport::isFileSupported(const QString &filename)
 {
     return isImageFileExt(filename) || isMovieFileExt(filename);
 }
 
-const QStringList& FileTypeSupport::imagesFilter() const
+const QStringList &FileTypeSupport::imagesFilter()
 {
-    return m_imageFileFilter;
+    return priv()->imageFileFilter;
 }
 
-const QStringList& FileTypeSupport::moviesFilter() const
+const QStringList &FileTypeSupport::moviesFilter()
 {
-    return m_movieFileFilter;
+    return priv()->movieFileFilter;
 }

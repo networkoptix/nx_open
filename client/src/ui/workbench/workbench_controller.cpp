@@ -1281,9 +1281,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
                 continue;
             }
 
-            QnResourcePtr res = QnResourceDirectoryBrowser::instance().checkFile(filePath);
-            if (res)
-                qnResPool->addResource(res);
+            QnFileProcessor::createResourcesForFile(filePath);
 
             settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
         } else {

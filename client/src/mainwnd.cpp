@@ -245,8 +245,7 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
 
     cl_log.log(QLatin1String("Entering addFilesToCurrentOrNewLayout"), cl_logALWAYS);
 
-    QnResourceList rlst = QnResourceDirectoryBrowser::instance().checkFiles(files);
-    qnResPool->addResources(rlst);
+    QnFileProcessor::createResourcesForFiles(files);
 
     // If current content created by opening files or DND, use it. Otherwise create new one.
     LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();

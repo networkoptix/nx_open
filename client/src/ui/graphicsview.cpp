@@ -2981,9 +2981,7 @@ void GraphicsView::toggleRecording()
                     continue;
                 }
 
-                QnResourcePtr res = QnResourceDirectoryBrowser::instance().checkFile(filePath);
-                if (res)
-                    qnResPool->addResource(res);
+                QnFileProcessor::createResourcesForFile(filePath);
 
                 settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
             }
@@ -3422,9 +3420,7 @@ void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoWindowItem* item)
             // ### handle errors
         }
 
-        QnResourcePtr res = QnResourceDirectoryBrowser::instance().checkFile(filePath);
-        if (res)
-            qnResPool->addResource(res);
+        QnFileProcessor::createResourcesForFile(filePath);
 
         settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
     }

@@ -84,28 +84,13 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     return result;
 }
 
-
-
-QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename)
+QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const
 {
     QFile file(filename);
     if (!file.exists())
         return QnResourcePtr(0);
 
     return createArchiveResource(filename);
-}
-
-QnResourceList QnResourceDirectoryBrowser::checkFiles(const QList<QString> &files)
-{
-    QnResourceList result;
-    foreach(QString file, files)
-    {
-        QnResourcePtr res = checkFile(file);
-        if (res)
-            result.push_back(res);
-    }
-
-    return result;
 }
 
 //=============================================================================================
@@ -119,36 +104,27 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
         return result;
 
     QDir dir(directory);
-    if (!dir.exists())
-        return result;
-
-    //foreach (const QFileInfo &fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
-    QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
+    const QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
     foreach (const QFileInfo &fi, flist)
     {
         if (shouldStop())
             return result;
 
-        QString t = fi.absoluteFilePath();
-
+        QString absoluteFilePath = fi.absoluteFilePath();
         if (fi.isDir())
         {
-            if (fi.absoluteFilePath() == directory)
-                continue;
-
-            result.append(findResources(fi.absoluteFilePath()));
+            if (absoluteFilePath != directory)
+                result.append(findResources(absoluteFilePath));
         }
         else
         {
-            QnResourcePtr res = createArchiveResource(fi.absoluteFilePath());
-            if (res!=0)
+            QnResourcePtr res = createArchiveResource(absoluteFilePath);
+            if (res)
             {
-                cl_log.log("created local resource: ", fi.absoluteFilePath() , cl_logALWAYS);
+                cl_log.log("created local resource: ", absoluteFilePath, cl_logALWAYS);
                 result.append(res);
             }
         }
-
-
     }
 
     return result;
@@ -156,17 +132,14 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
 
 QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& xfile)
 {
-    static FileTypeSupport m_fileTypeSupport;
-
-    //if (m_fileTypeSupport.isImageFileExt(xfile))
+    //if (FileTypeSupport::isImageFileExt(xfile))
     //    return QnResourcePtr(new QnLocalFileResource(xfile));
-    //else 
     if (CLAviDvdDevice::isAcceptedUrl(xfile))
         return QnResourcePtr(new CLAviDvdDevice(xfile));
-    else if (CLAviBluRayDevice::isAcceptedUrl(xfile))
+    if (CLAviBluRayDevice::isAcceptedUrl(xfile))
         return QnResourcePtr(new CLAviBluRayDevice(xfile));
-    else if (m_fileTypeSupport.isMovieFileExt(xfile))
+    if (FileTypeSupport::isMovieFileExt(xfile))
         return QnResourcePtr(new QnAviResource(xfile));
-    else
-        return QnResourcePtr(0);
+
+    return QnResourcePtr(0);
 }
