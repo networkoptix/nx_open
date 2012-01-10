@@ -47,7 +47,7 @@
 #include "file_processor.h"
 #include "settings.h"
 
-#include "ui/dmw.h"
+#include "ui/dwm.h"
 
 MainWnd *MainWnd::s_instance = 0;
 

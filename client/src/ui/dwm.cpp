@@ -1,4 +1,4 @@
-#include "dmw.h"
+#include "dwm.h"
 #include <QLibrary>
 #include <QWidget>
 #include <qt_windows.h>
