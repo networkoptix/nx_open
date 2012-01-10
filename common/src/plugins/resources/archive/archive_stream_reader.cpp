@@ -68,7 +68,7 @@ void QnArchiveStreamReader::nextFrame()
         return;
     }
     emit nextFrameOccured();
-   QMutexLocker lock(&m_jumpMtx);
+    QMutexLocker lock(&m_jumpMtx);
 	m_singleQuantProcessed = false;
 	m_singleShowWaitCond.wakeAll();
 }
@@ -277,10 +277,10 @@ begin_label:
     if (reverseMode != m_prevReverseMode)
     {
         m_jumpMtx.lock();
-        bool commandMergedWithJump = m_requiredJumpTime != AV_NOPTS_VALUE;
-        qint64 displayTime = commandMergedWithJump ? m_requiredJumpTime : determineDisplayTime();
+        qint64 jumpTime = m_requiredJumpTime;
         m_requiredJumpTime = AV_NOPTS_VALUE;
         m_jumpMtx.unlock();
+        qint64 displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime();
 
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
@@ -295,7 +295,7 @@ begin_label:
         }
         m_lastGopSeekTime = -1;
         m_BOF = true;
-        if (commandMergedWithJump)
+        if (jumpTime != AV_NOPTS_VALUE)
             emit jumpOccured(displayTime);
     }
     m_dataMarker = m_newDataMarker;

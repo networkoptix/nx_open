@@ -106,13 +106,14 @@ private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
     void drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color);
-
+    void createEndPixmap();
 private:
     TimeSlider *m_parent;
     ToolTipItem *m_toolTip;
     mutable QRectF m_handleRect;
     int m_endSize;
     QPixmap m_pixmap;
+    QPixmap m_endPixmap;
 };
 
 MySlider::MySlider(TimeSlider *parent)
@@ -122,6 +123,22 @@ MySlider::MySlider(TimeSlider *parent)
       m_endSize(0)
 {
     setToolTipItem(new StyledToolTipItem);
+}
+
+void MySlider::createEndPixmap()
+{
+    QRectF r = contentsRect();
+    qreal l = r.left() + QStyle::sliderPositionFromValue(minimum(), maximum(), maximum() - m_endSize, r.width());
+    r = QRectF(0, 0, r.right() - l, r.height());
+
+    QLinearGradient linearGrad = QLinearGradient(r.topLeft(), r.topRight());
+    linearGrad.setColorAt(0, QColor(0, 255, 0, 0));
+    linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
+
+    m_endPixmap = QPixmap(r.size().toSize());
+    m_endPixmap.fill(QColor(0,0,0,0));
+    QPainter painter(&m_endPixmap);
+    painter.fillRect(0,0, m_endPixmap.width(), m_endPixmap.height(), linearGrad);
 }
 
 bool MySlider::isAtEnd() const
@@ -192,7 +209,9 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     QRectF r = contentsRect();
 
-    painter->setPen(QPen(Qt::gray, 2));
+
+    painter->setPen(QPen(Qt::gray));
+    
     QPointF lines[8] = {
         QPointF(r.topLeft()),
         QPointF(r.topRight()),
@@ -204,7 +223,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         QPointF(r.topLeft())
     };
     painter->drawLines(lines, 4);
-
+    
     //painter->setPen(QPen(Qt::darkGray, 1));
     //painter->drawRect(r);
 
@@ -228,7 +247,13 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     if (!m_parent->motionTimePeriodList().empty())
         drawTimePeriods(painter, m_parent->motionTimePeriodList(), QColor(0, 255, 0));
 
+
     r = contentsRect();
+#if 1
+    if (m_endPixmap.width() == 0)
+        createEndPixmap();
+    painter->drawPixmap(r.topRight() - QPointF(m_endPixmap.width(), 0), m_endPixmap);
+#else    
     qreal l = r.left() + QStyle::sliderPositionFromValue(minimum(), maximum(), maximum() - m_endSize, r.width());
     r = QRectF(l, r.top(), r.right() - l, r.height());
 
@@ -236,7 +261,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(0, QColor(0, 255, 0, 0));
     linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
     painter->fillRect(r, linearGrad);
-
+#endif    
 
     ensureHandleRect();
     if (m_pixmap.width() == 0)
@@ -628,8 +653,8 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QColor color = pal.color(QPalette::Text);
 
     QVector<float> opacity;
-    QVector<QPainterPath> paths;
-    paths.resize(maxLevel-level+1);
+    QVector<QVector<QPointF> > linesList;
+    linesList.resize(maxLevel-level+1);
     opacity.resize(maxLevel-level+1);
 
     if (level != m_cachedFontLevel || maxLevel != m_cachedFontMaxLevel || qAbs( 1.0 - pixelPerTime/m_cachedFontPixelPerTime) > FONT_SIZE_CACHE_EPS)
@@ -648,8 +673,9 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
         const IntervalInfo &interval = intervals[curLevel];
         const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f);
-        paths[arrayIndex].moveTo(QPointF(xpos, 0));
-        paths[arrayIndex].lineTo(QPointF(xpos, (r.height() - m_maxHeight - 3) * lineLen));
+        linesList[arrayIndex] << QPointF(xpos, 0);
+        linesList[arrayIndex] << QPointF(xpos, (r.height() - m_maxHeight - 3) * lineLen);
+        
 
         if (m_fontWidths[arrayIndex] > 0)
         {
@@ -685,11 +711,11 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     painter->setOpacity(1.0);
-    for (int arrayIndex = 0; arrayIndex < paths.size(); ++arrayIndex)
+    for (int arrayIndex = 0; arrayIndex < linesList.size(); ++arrayIndex)
     {
         color.setAlphaF(opacity[arrayIndex]);
         painter->setPen(color);
-        painter->drawPath(paths[arrayIndex]);
+        painter->drawLines(linesList[arrayIndex]);
     }
 
     // draw selection range
