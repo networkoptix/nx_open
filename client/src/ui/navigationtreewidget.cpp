@@ -210,14 +210,15 @@ void NavigationTreeWidget::workbenchLayoutChanged()
 
     m_searchProxyModel = m_controller->layout()->property("model").value<ResourceSortFilterProxyModel *>(); // ###
     if (!m_searchProxyModel) {
-        m_controller->layout()->setProperty("model", QVariant::fromValue(new ResourceSortFilterProxyModel(m_controller->workbench()))); // ###
-        m_searchProxyModel = m_controller->layout()->property("model").value<ResourceSortFilterProxyModel *>(); // ###
-        m_searchProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-        m_searchProxyModel->setFilterKeyColumn(0);
-        m_searchProxyModel->setFilterRole(Qt::UserRole + 2);
-        m_searchProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-        m_searchProxyModel->setDynamicSortFilter(true);
-        m_searchProxyModel->setSourceModel(m_resourcesModel);
+        ResourceSortFilterProxyModel *proxyModel = new ResourceSortFilterProxyModel(m_controller->workbench());
+        proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+        proxyModel->setFilterKeyColumn(0);
+        proxyModel->setFilterRole(Qt::UserRole + 2);
+        proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        proxyModel->setDynamicSortFilter(true);
+        proxyModel->setSourceModel(m_resourcesModel);
+        m_searchProxyModel = proxyModel;
+        m_controller->layout()->setProperty("model", QVariant::fromValue(proxyModel)); // ###
     }
 
     connect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
