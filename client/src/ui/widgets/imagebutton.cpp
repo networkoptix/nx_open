@@ -24,7 +24,7 @@ const QPixmap &ImageButtonPrivate::getPixmap(ImageButton::PixmapGroup group) con
 
     if (q->isDown())
         return pixmaps[group][ImageButton::Pressed];
-    if (q->isChecked())
+    if (q->isChecked() && !pixmaps[group][ImageButton::Checked].isNull())
         return pixmaps[group][ImageButton::Checked];
     if (q->hasFocus() && !pixmaps[group][ImageButton::Focus].isNull())
         return pixmaps[group][ImageButton::Focus];
