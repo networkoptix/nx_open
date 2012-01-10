@@ -26,7 +26,6 @@
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/blue_background_painter.h"
 
-#include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
@@ -149,9 +148,8 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     addTab();
 
     // Process input files
-    const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
     for (int i = 1; i < argc; ++i)
-        m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), gridPos);
+        m_controller->drop(QFile::decodeName(argv[i]));
 
     showNormal();
 }
@@ -201,9 +199,7 @@ void MainWindow::closeTab(int index)
 
 void MainWindow::handleMessage(const QString &message)
 {
-    const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-    const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
-    m_controller->drop(files, gridPos);
+    m_controller->drop(message.split(QLatin1Char('\n'), QString::SkipEmptyParts));
 
     activate();
 }
@@ -218,13 +214,8 @@ void MainWindow::openFile()
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("All files (*.*)");
     dialog.setNameFilters(filters);
-    if (dialog.exec()) {
-        const QStringList files = QnFileProcessor::findAcceptedFiles(dialog.selectedFiles());
-        if (!files.isEmpty()) {
-            const QPointF gridPos = m_controller->display()->mapViewportToGridF(m_controller->display()->view()->viewport()->geometry().center());
-            m_controller->drop(files, gridPos);
-        }
-    }
+    if (dialog.exec())
+        m_controller->drop(dialog.selectedFiles());
 }
 
 void MainWindow::activate()

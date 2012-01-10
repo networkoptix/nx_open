@@ -62,12 +62,12 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    void drop(const QUrl &url, const QPointF &gridPos, bool findAccepted = true);
-    void drop(const QList<QUrl> &urls, const QPointF &gridPos, bool findAccepted = true);
-    void drop(const QString &file, const QPointF &gridPos, bool findAccepted = true);
-    void drop(const QList<QString> &files, const QPointF &gridPos, bool findAccepted = true);
-    void drop(const QnResourcePtr &resource, const QPointF &gridPos);
-    void drop(const QnResourceList &resources, const QPointF &gridPos);
+    void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
+    void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
+    void drop(const QString &file, const QPointF &gridPos = QPointF(), bool findAccepted = true);
+    void drop(const QList<QString> &files, const QPointF &gridPos = QPointF(), bool findAccepted = true);
+    void drop(const QnResourcePtr &resource, const QPointF &gridPos = QPointF());
+    void drop(const QnResourceList &resources, const QPointF &gridPos = QPointF());
 
 public Q_SLOTS:
     void setTreeVisible(bool visible, bool animate = true);
