@@ -79,6 +79,22 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_dwm = new QnDwm(this);
     m_dwm->extendFrameIntoClientArea();
 
+    QMargins frameMargins = m_dwm->themeFrameMargins();
+
+    m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
+    m_dwm->emulateFrame(true);
+    m_dwm->setEmulatedFrameMargins(frameMargins);
+    m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that window is click-draggable no matter where the user clicked. */
+    
+    setContentsMargins(frameMargins); //themeFrameMargins.left(), 2, themeFrameMargins.right(), themeFrameMargins.bottom());
+
+    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
+    // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
+#ifdef Q_OS_WIN
+    //setContentsMargins(0, 1, 0, 0);
+#endif
+
+
     /* Set up QWidget. */
     setWindowTitle(QApplication::applicationName());
 
@@ -87,7 +103,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     {
         QPalette pal = palette();
-        pal.setColor(backgroundRole(), app_bkr_color);
+        //pal.setColor(backgroundRole(), app_bkr_color);
+        pal.setColor(backgroundRole(), Qt::transparent);
         setPalette(pal);
     }
 
@@ -97,7 +114,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
-    m_view = new QnGraphicsView(scene, this);
+    m_view = new QnGraphicsView(scene);
     {
         QPalette pal = m_view->palette();
         pal.setColor(QPalette::Background, Qt::black);
@@ -148,16 +165,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
     m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
 
-    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
-    // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
-#ifdef Q_OS_WIN
-    setContentsMargins(0, 1, 0, 0);
-#else
-    setContentsMargins(0, 0, 0, 0);
-#endif
-
-    setContentsMargins(0, 0, 0, 0);
-
     // actions
     connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
     addAction(&cm_exit);
@@ -199,11 +206,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     centralLayout->addWidget(m_tabWidget);
 
     setLayout(centralLayout);
-
-    QMargins themeFrameMargins = m_dwm->themeFrameMargins();
-    setContentsMargins(themeFrameMargins.left(), 2, themeFrameMargins.right(), themeFrameMargins.bottom());
-
-
+    
     addTab();
 
     //showFullScreen();
@@ -427,29 +430,6 @@ bool MainWnd::winEvent(MSG *message, long *result) {
     if(m_dwm->winEvent(message, result))
         return true;
 
-    /*if(message->message == WM_PAINT) {
-        RECT rect;
-        GetClientRect(message->hwnd, &rect);
-        ExcludeClipRect(GetDC(message->hwnd), 0, 0, width(), height());
-        return false;
-    }*/
-
-    //with GetClientRect do
-    //4	    ExcludeClipRect(DC, 0, GlassFrame.Top, Right, Bottom);
-   // 5	  inherited;
-
-    /*if(message->message == WM_NCPAINT) {
-        qDebug() << "WM_NCPAINT";
-        return true;
-    }*/
-
-    if(message->message == WM_NCACTIVATE) {
-        message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
-        
-        *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
-        return true;
-    }
-
     return QWidget::winEvent(message, result);
 }
 
@@ -462,3 +442,6 @@ void MainWnd::toggleDecorationsVisibility() {
         tabBar(m_tabWidget)->show();
     }
 }
+
+
+

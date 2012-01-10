@@ -106,9 +106,6 @@ protected Q_SLOTS:
     void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
-    void at_viewportGrabbed();
-    void at_viewportUngrabbed();
-
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);

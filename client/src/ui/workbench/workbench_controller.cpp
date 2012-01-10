@@ -390,8 +390,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(at_viewportGrabbed()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(at_viewportUngrabbed()));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
@@ -967,14 +965,6 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickI
 
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
     m_display->fitInView();
-}
-
-void QnWorkbenchController::at_viewportGrabbed() {
-    qDebug("VIEWPORT GRABBED");
-}
-
-void QnWorkbenchController::at_viewportUngrabbed() {
-    qDebug("VIEWPORT UNGRABBED");
 }
 
 void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role) {

@@ -5,10 +5,10 @@
 #include <utils/common/warnings.h>
 
 #ifdef Q_OS_WIN
-#    define NOMINMAX
-#    include <Windows.h>
-#    include <WindowsX.h>
-#endif
+
+#define NOMINMAX
+#include <Windows.h>
+#include <WindowsX.h>
 
 /* The following definitions are from <dwmapi.h>. 
  * They are here so that everything would compile even if we don't have that include file. */
@@ -39,6 +39,9 @@ typedef HRESULT (WINAPI *PtrDwmEnableBlurBehindWindow)(HWND hWnd, const _DWM_BLU
 typedef HRESULT (WINAPI *PtrDwmGetColorizationColor)(DWORD *pcrColorization, BOOL *pfOpaqueBlend);
 typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *plResult);
 
+#endif
+
+
 class QnDwmPrivate {
 public:
     QnDwmPrivate();
@@ -47,20 +50,30 @@ public:
 
     void init(QWidget *widget);
 
-    void updateThemeMetrics();
-
 public:
-    bool valid;
+    /** Widget that we're working on. */
     QWidget *widget;
+
+#ifdef Q_OS_WIN
+    /** Whether DWM is available. */
+    bool hasDwm;
+
+    /* Function pointers for functions from dwmapi.dll. */
     PtrDwmIsCompositionEnabled dwmIsCompositionEnabled;
     PtrDwmEnableBlurBehindWindow dwmEnableBlurBehindWindow;
     PtrDwmExtendFrameIntoClientArea dwmExtendFrameIntoClientArea;
     PtrDwmGetColorizationColor dwmGetColorizationColor;
     PtrDwmDefWindowProc dwmDefWindowProc;
-    QMargins widgetFrameMargins;
-    int widgetTitleBarHeight;
-    QMargins themeFrameMargins;
-    int themeTitleBarHeight;
+    
+    /** Widget frame margins specified by the user. */
+    QMargins userFrameMargins;
+
+    bool overrideFrameMargins;
+#endif
+
+    bool emulateFrame;
+    QMargins emulatedFrameMargins;
+    int emulatedTitleBarHeight;
 };
 
 QnDwmPrivate::QnDwmPrivate() { 
@@ -77,44 +90,29 @@ void QnDwmPrivate::init(QWidget *widget) {
     dwmEnableBlurBehindWindow       = (PtrDwmEnableBlurBehindWindow)    dwmLib.resolve("DwmEnableBlurBehindWindow");
     dwmGetColorizationColor         = (PtrDwmGetColorizationColor)      dwmLib.resolve("DwmGetColorizationColor");
     dwmDefWindowProc                = (PtrDwmDefWindowProc)             dwmLib.resolve("DwmDefWindowProc");
+
+    hasDwm = 
+        dwmIsCompositionEnabled != NULL && 
+        dwmExtendFrameIntoClientArea != NULL &&
+        dwmEnableBlurBehindWindow != NULL &&
+        dwmGetColorizationColor != NULL &&
+        dwmDefWindowProc != NULL;
+
+    overrideFrameMargins = false;
 #endif
 
-    valid = dwmIsCompositionEnabled != NULL;
-
-    updateThemeMetrics();
-
-    widgetTitleBarHeight = themeTitleBarHeight;
-    widgetFrameMargins = themeFrameMargins;
+    emulateFrame = false;
+    emulatedTitleBarHeight = 0;
 }
 
-void QnDwmPrivate::updateThemeMetrics() {
-    if(!valid)
-        return;
+bool filter(void *p) {
+    MSG *message = static_cast<MSG *>(p);
 
-#ifdef Q_OS_WIN
-    int frameX, frameY;
-    if(widget->windowFlags() & Qt::FramelessWindowHint || widget->windowFlags() & Qt::X11BypassWindowManagerHint) {
-        frameX = 0;
-        frameY = 0;
-        themeTitleBarHeight = 0;
-    } else if(widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
-        frameX = GetSystemMetrics(SM_CXFIXEDFRAME);
-        frameY = GetSystemMetrics(SM_CYFIXEDFRAME);
-        themeTitleBarHeight = GetSystemMetrics(SM_CYSMCAPTION);
-    } else {
-        frameX = GetSystemMetrics(SM_CXSIZEFRAME);
-        frameY = GetSystemMetrics(SM_CYSIZEFRAME);
-        themeTitleBarHeight = GetSystemMetrics(SM_CYCAPTION);
+    if(message->message == WM_ERASEBKGND) {
+        return true;
     }
 
-    themeFrameMargins.setTop(frameY);
-    themeFrameMargins.setBottom(frameY);
-    themeFrameMargins.setLeft(frameX);
-    themeFrameMargins.setRight(frameY);
-#else
-    themeFrameMargins = QMargins(-1, -1, -1, -1);
-    themeTitleBarHeight = -1;
-#endif
+    return false;
 }
 
 QnDwm::QnDwm(QWidget *widget):
@@ -126,6 +124,8 @@ QnDwm::QnDwm(QWidget *widget):
         return;
     }
 
+    QAbstractEventDispatcher::instance()->setEventFilter(filter);
+
     d->init(widget);
 }
 
@@ -135,10 +135,13 @@ QnDwm::~QnDwm() {
 }
 
 bool QnDwm::enableBlurBehindWindow(bool enable) {
-    if(!d->valid)
+    if(d->widget == NULL)
         return false;
 
 #ifdef Q_OS_WIN
+    if(!d->hasDwm)
+        return false;
+
     _DWM_BLURBEHIND blurBehind = {0};
     HRESULT status = S_OK;
     blurBehind.fEnable = enable;
@@ -159,11 +162,11 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
 #endif
 }
 
-bool QnDwm::isCompositionEnabled() {
-    if (!d->valid)
-        return false;
-    
+bool QnDwm::isCompositionEnabled() const {
 #ifdef Q_OS_WIN
+    if (!d->hasDwm)
+        return false;
+
     HRESULT status = S_OK;
     BOOL result = false;
     
@@ -180,10 +183,13 @@ bool QnDwm::isCompositionEnabled() {
 }
 
 bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
-    if(!d->valid)
+    if(d->widget == NULL)
         return false;
 
 #ifdef Q_OS_WIN
+    if(!d->hasDwm)
+        return false;
+
     HRESULT status = S_OK;
     _MARGINS winMargins;
     winMargins.cxLeftWidth      = margins.left();
@@ -194,7 +200,9 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     status = d->dwmExtendFrameIntoClientArea(d->widget->winId(), &winMargins);
         
     if (SUCCEEDED(status)) {
+        //d->widget->setAttribute(Qt::WA_TranslucentBackground, true);
         d->widget->setAttribute(Qt::WA_TranslucentBackground, true);
+        d->widget->setAttribute(Qt::WA_NoSystemBackground, true);
         return true;
     } else {
         return false;
@@ -204,61 +212,147 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
 #endif
 }
 
-QMargins QnDwm::themeFrameMargins() {
-    return d->themeFrameMargins;
+QMargins QnDwm::themeFrameMargins() const {
+    if(d->widget == NULL)
+        return QMargins(-1, -1, -1, -1);
+
+#ifdef Q_OS_WIN
+    int frameX, frameY;
+    if((d->widget->windowFlags() & Qt::FramelessWindowHint) || (d->widget->windowFlags() & Qt::X11BypassWindowManagerHint)) {
+        frameX = 0;
+        frameY = 0;
+    } else if(d->widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
+        frameX = GetSystemMetrics(SM_CXFIXEDFRAME);
+        frameY = GetSystemMetrics(SM_CYFIXEDFRAME);
+    } else {
+        frameX = GetSystemMetrics(SM_CXSIZEFRAME);
+        frameY = GetSystemMetrics(SM_CYSIZEFRAME);
+    }
+
+    return QMargins(frameX, frameY, frameX, frameY);
+#else
+    return QMargins(-1, -1, -1, -1);
+#endif
 }
 
-int QnDwm::themeTitleBarHeight() {
-    return d->themeTitleBarHeight;
+int QnDwm::themeTitleBarHeight() const {
+    if(d->widget == NULL)
+        return -1;
+
+#ifdef Q_OS_WIN
+    if((d->widget->windowFlags() & Qt::FramelessWindowHint) || (d->widget->windowFlags() & Qt::X11BypassWindowManagerHint)) {
+        return 0;
+    } else if(d->widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
+        return GetSystemMetrics(SM_CYSMCAPTION);
+    } else {
+        return GetSystemMetrics(SM_CYCAPTION);
+    }
+#else
+    return -1;
+#endif
 }
 
-QMargins QnDwm::systemFrameMargins() {
-    if(!d->valid)
-        goto error;
+bool QnDwm::emulateFrame(bool emulate) {
+    if(d->widget == NULL)
+        return false;
 
+    if(d->emulateFrame == emulate)
+        return true;
+
+#ifdef Q_OS_WIN
+    d->emulateFrame = emulate;
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool QnDwm::isFrameEmulated() const {
+    return d->emulateFrame;
+}
+
+void QnDwm::setEmulatedFrameMargins(const QMargins &margins) {
+    d->emulatedFrameMargins = margins;
+}
+
+QMargins QnDwm::emulatedFrameMargins() const {
+    return d->emulatedFrameMargins;
+}
+
+void QnDwm::setEmulatedTitleBarHeight(int height) {
+    d->emulatedTitleBarHeight = height;
+}
+
+int QnDwm::emulatedTitleBarHeight() const {
+    return d->emulatedTitleBarHeight;
+}
+
+QMargins QnDwm::currentFrameMargins() const {
+    QMargins errorValue(-1, -1, -1, -1);
+
+    if(d->widget == NULL)
+        return errorValue;
+
+#ifdef Q_OS_WIN
     HWND hwnd = d->widget->winId();
     BOOL status = S_OK;
 
     RECT clientRect;
     status = GetClientRect(d->widget->winId(), &clientRect);
     if(!SUCCEEDED(status))
-        goto error;
+        return errorValue;
 
     RECT windowRect;
     status = GetWindowRect(hwnd, &windowRect);
     if(!SUCCEEDED(status))
-        goto error;
+        return errorValue;
 
     POINT clientTopLeft = {0, 0};
     status = ClientToScreen(hwnd, &clientTopLeft);
     if(!SUCCEEDED(status))
-        goto error;
+        return errorValue;
 
     return QMargins(
-        clientTopLeft.x - windowRect.left,
-        clientTopLeft.y - windowRect.top,
-        windowRect.right - clientTopLeft.x - clientRect.right,
-        windowRect.bottom - clientTopLeft.y - clientRect.bottom
+        (clientTopLeft.x + clientRect.left) - windowRect.left,
+        (clientTopLeft.y + clientRect.top) - windowRect.top,
+        windowRect.right - (clientTopLeft.x + clientRect.right),
+        windowRect.bottom - (clientTopLeft.y + clientRect.bottom)
     );
-error:
+#else
     return QMargins(-1, -1, -1, -1);
+#endif
 }
 
-bool QnDwm::setSystemFrameMargins(const QMargins &margins) {
-    if(!d->valid)
-        return false;
-
-    HWND hwnd = d->widget->winId();
-    BOOL status = S_OK;
-
-    //status = SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_DEFERERASE | )
-}
-
-bool QnDwm::winEvent(MSG *message, long *result) {
-    if(!d->valid)
+bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
+    if(d->widget == NULL)
         return false;
 
 #ifdef Q_OS_WIN
+    HWND hwnd = d->widget->winId();
+    BOOL status = S_OK;
+
+    /* Store supplied frame margins. They will be used in WM_NCCALCSIZE handler. */
+    d->userFrameMargins = margins;
+    d->overrideFrameMargins = true;
+
+    status = SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    if(!SUCCEEDED(status))
+        return false;
+
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool QnDwm::winEvent(MSG *message, long *result) {
+    if(d->widget == NULL)
+        return false;
+
+#ifdef Q_OS_WIN
+    if(!d->hasDwm)
+        return false;
+
     BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
     if (handled)
         return true;
@@ -267,6 +361,7 @@ bool QnDwm::winEvent(MSG *message, long *result) {
     case WM_NCCALCSIZE:             return calcSizeEvent(message, result);
     case WM_NCHITTEST:              return hitTestEvent(message, result);
     case WM_DWMCOMPOSITIONCHANGED:  return compositionChangedEvent(message, result);
+    case WM_NCACTIVATE:             return activateEvent(message, result);
     default:                        return false;
     }
 #else
@@ -276,6 +371,9 @@ bool QnDwm::winEvent(MSG *message, long *result) {
 
 #ifdef Q_OS_WIN
 bool QnDwm::calcSizeEvent(MSG *message, long *result) {
+    if(!d->overrideFrameMargins)
+        return false;
+
     /* From WM_NCCALCSIZE docs:
      *
      * If wParam is TRUE, it specifies that the application should indicate which 
@@ -286,68 +384,115 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
     if(!message->wParam)
         return false;
 
-    NCCALCSIZE_PARAMS *nccsp = (NCCALCSIZE_PARAMS *) message->lParam;
+    NCCALCSIZE_PARAMS *params = (NCCALCSIZE_PARAMS *) message->lParam;
 
-    /* Adjust (shrink) the client rectangle to accommodate the border. 
+    /* Store input. */
+    RECT targetGeometry = params->rgrc[0];
+    RECT sourceGeometry = params->rgrc[1];
+    /* RECT sourceClientGeometry = params->rgrc[2]; */
+
+    /* Prepare output.
      * 
-     * Don't include the title bar. */
-    RECT targetGeometry = nccsp->rgrc[0];
-    RECT sourceGeometry = nccsp->rgrc[1];
-    RECT sourceClientGeometry = nccsp->rgrc[2];
+     * 0 - the coordinates of the new client rectangle resulting from the move or resize.
+     * 1 - the valid destination rectangle.
+     * 2 - the valid source rectangle. */
+    params->rgrc[1] = targetGeometry;
+    params->rgrc[2] = sourceGeometry;
 
     /* New client geometry. */
-    nccsp->rgrc[0].top      += 0;
-    nccsp->rgrc[0].bottom   += 0;
-    nccsp->rgrc[0].left     += 0;
-    nccsp->rgrc[0].right    += 0;
-    //nccsp->rgrc[0].bottom   += sourceClientGeometry.bottom - sourceGeometry.bottom;
-    //nccsp->rgrc[0].left     += sourceClientGeometry.left   - sourceGeometry.left;
-    //nccsp->rgrc[0].right    += sourceClientGeometry.right  - sourceGeometry.right;
-
-    /* New geometry. */
-    nccsp->rgrc[1] = targetGeometry;
-    
-    /* Old geometry. */
-    nccsp->rgrc[2] = sourceGeometry;
-
+    params->rgrc[0].top      += d->userFrameMargins.top();
+    params->rgrc[0].bottom   += d->userFrameMargins.bottom();
+    params->rgrc[0].left     += d->userFrameMargins.left();
+    params->rgrc[0].right    += d->userFrameMargins.right();
 
     *result = WVR_VALIDRECTS;
+    //*result = WVR_REDRAW;
     return true;
 }
 
+namespace {
+    int sweep(int v, int v0, int v1, int v2, int v3, int r0, int r1, int r2, int r3, int r4) {
+        /* Note that [v0, v3] and [v1, v2] are treated as closed segments. */
+
+        if(v <= v2) {
+            if(v < v1) {
+                if (v < v0) {
+                    return r0;
+                } else {
+                    return r1;
+                }
+            } else {
+                return r2;
+            }
+        } else if(v <= v3) {
+            return r3;
+        } else {
+            return r4;
+        }
+    }
+
+    int frameSectionMap[5][5] = {
+        {HTNOWHERE,     HTNOWHERE,      HTNOWHERE,      HTNOWHERE,      HTNOWHERE},
+        {HTNOWHERE,     HTTOPLEFT,      HTTOP,          HTTOPRIGHT,     HTNOWHERE},
+        {HTNOWHERE,     HTLEFT,         HTCLIENT,       HTRIGHT,        HTNOWHERE},
+        {HTNOWHERE,     HTBOTTOMLEFT,   HTBOTTOM,       HTBOTTOMRIGHT,  HTNOWHERE},
+        {HTNOWHERE,     HTNOWHERE,      HTNOWHERE,      HTNOWHERE,      HTNOWHERE}
+    };
+
+} // anonymous namespace
+
 bool QnDwm::hitTestEvent(MSG *message, long *result) {
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
-        
+    if(!d->emulateFrame)    
+        return true;
+
+    /* Leave buttons as is. */
     switch(*result) {
-    case HTCLIENT:
     case HTMINBUTTON:
     case HTMAXBUTTON:
     case HTCLOSE:
-        *result = HTCAPTION;
-        break;
-    case HTLEFT:
-    case HTRIGHT:
-    case HTTOPLEFT:
-    case HTTOPRIGHT:
         return true;
     default:
         break;
     }
 
+    BOOL status = S_OK;
+
     /* There is a bug in Qt: coordinates for WM_NCHITTEST are supplied in screen coordinates, 
      * but Qt calls ClientToScreen for them. This is why we re-extract screen coordinates from lParam. */
-    POINT localPos;
-    localPos.x = GET_X_LPARAM(message->lParam);
-    localPos.y = GET_Y_LPARAM(message->lParam);
-    ScreenToClient(message->hwnd, &localPos);
+    POINT systemPos;
+    systemPos.x = GET_X_LPARAM(message->lParam);
+    systemPos.y = GET_Y_LPARAM(message->lParam);
+    QPoint pos = QPoint(systemPos.x, systemPos.y);
 
-    if(localPos.y > d->themeFrameMargins.top() + d->themeTitleBarHeight) {
-        /* Do nothing. */
-    } else if(localPos.y < d->themeFrameMargins.top()) {
-        *result = HTTOP;
-    } else {
+    /* Get frame rect from the system. */
+    RECT systemRect;
+    status = GetWindowRect(message->hwnd, &systemRect);
+    if(!SUCCEEDED(status))
+        return false;
+
+    QRect frameRect = QRect(QPoint(systemRect.left, systemRect.top), QPoint(systemRect.right, systemRect.bottom));
+    
+    /* Calculate emulated client rect, title bar excluded. */
+    QRect clientRect = QRect(
+        QPoint(
+            frameRect.left() + d->emulatedFrameMargins.left(),
+            frameRect.top() + d->emulatedFrameMargins.top()
+        ),
+        QPoint(
+            frameRect.right() - d->emulatedFrameMargins.right(),
+            frameRect.bottom() - d->emulatedFrameMargins.bottom()
+        )
+    );
+
+    /* Find window frame section. */
+    int row = sweep(pos.x(), frameRect.left(), clientRect.left(), clientRect.right(),  frameRect.right(),  0, 1, 2, 3, 4);
+    int col = sweep(pos.y(), frameRect.top(),  clientRect.top(),  clientRect.bottom(), frameRect.bottom(), 0, 1, 2, 3, 4);
+    *result = frameSectionMap[col][row];
+
+    /* Handle title bar. */
+    if(*result == HTCLIENT && pos.y() <= clientRect.top() + d->emulatedTitleBarHeight)
         *result = HTCAPTION;
-    }
 
     return true;
 }
@@ -358,8 +503,17 @@ bool QnDwm::compositionChangedEvent(MSG *message, long *result) {
     emit compositionChanged(isCompositionEnabled());
 
     *result = 0;
+    return false; /* It's OK to let it fall through. */
+}
+
+bool QnDwm::activateEvent(MSG *message, long *result) {
+    message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
+
+    *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
     return true;
 }
+
+
 
 #endif
 
