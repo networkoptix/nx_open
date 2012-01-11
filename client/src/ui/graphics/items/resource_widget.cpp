@@ -23,7 +23,7 @@ namespace {
     const qreal defaultFrameWidth = 0.5;
 
     /** Default frame color. */
-    const QColor defaultFrameColor = QColor(128, 128, 128, 196);
+    const QColor defaultFrameColor = global_frame_color;
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.

@@ -59,6 +59,24 @@ MarginsF SceneUtility::cwiseDiv(const MarginsF &l, const MarginsF &r) {
     );
 }
 
+QMargins SceneUtility::cwiseSub(const QMargins &l, const QMargins &r) {
+    return QMargins(
+        l.left()   - r.left(), 
+        l.top()    - r.top(), 
+        l.right()  - r.right(), 
+        l.bottom() - r.bottom()
+    );
+}
+
+QMargins SceneUtility::cwiseAdd(const QMargins &l, const QMargins &r) {
+    return QMargins(
+        l.left()   + r.left(), 
+        l.top()    + r.top(), 
+        l.right()  + r.right(), 
+        l.bottom() + r.bottom()
+    );
+}
+
 QColor SceneUtility::transparent(const QColor &color) {
     QColor result = color;
     result.setAlpha(0);
