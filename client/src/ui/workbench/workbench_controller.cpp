@@ -530,10 +530,8 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
         return;
     }
 
-    if(!resource.dynamicCast<QnMediaResource>()) {
-        qnWarning("Dropping resources of type '%1' is not supported.", resource->metaObject()->className());
-        return;
-    }
+    if (!resource->checkFlag(QnResource::media))
+        return; // ### upsupported for now
 
     const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
 
