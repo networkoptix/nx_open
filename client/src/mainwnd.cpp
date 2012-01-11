@@ -473,6 +473,19 @@ bool MainWnd::isTitleVisible() const {
 }
 
 void MainWnd::updateDwmState() {
+    if(!m_dwm->isSupported()) {
+        m_drawCustomFrame = false;
+        
+        setAttribute(Qt::WA_NoSystemBackground, false);
+        setAttribute(Qt::WA_TranslucentBackground, false);
+
+        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        m_titleLayout->setContentsMargins(0, 0, 0, 0);
+        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+
+        return; /* Do nothing on systems where our tricks are not supported. */
+    }
+
     if(isFullScreen()) {
         /* Full screen mode. */
 
