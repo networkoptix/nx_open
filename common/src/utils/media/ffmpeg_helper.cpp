@@ -590,10 +590,11 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
 
 AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
 {
+    QMutexLocker mutex(&global_ffmpeg_mutex);
+
     AVCodec* codec = 0;
     AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();
 
-    QMutexLocker lock(&global_ffmpeg_mutex);
     QByteArray tmpArray(data, dataLen);
     QBuffer buffer(&tmpArray);
     buffer.open(QIODevice::ReadOnly);
