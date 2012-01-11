@@ -396,8 +396,13 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
         {
             result = nextPacket;
             m_nextDataPacket[ssrc] = QnAbstractDataPacketPtr(0); // EOF video frame reached
-            if (mediaPacket && m_position != DATETIME_NOW)
-                m_position = mediaPacket->timestamp;
+            if (mediaPacket)
+            {
+                if (mediaPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)
+                    m_position = DATETIME_NOW;
+                else
+                    m_position = mediaPacket->timestamp;
+            }
         }
     }
     return result;
