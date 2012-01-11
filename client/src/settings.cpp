@@ -21,6 +21,8 @@ QColor global_motion_selection_rubber_band_border_color(16, 128+16, 16, 255);
 QColor global_motion_selection_rubber_band_color(0, 255, 0, 64);
 QColor global_motion_selection_color(0, 255, 0, 40);
 
+QColor global_frame_color(128, 128, 128, 196);
+
 // how often we run new device search and how often layout synchronizes with device manager
 int devices_update_interval = 1000;
 

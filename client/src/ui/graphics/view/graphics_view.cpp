@@ -14,13 +14,9 @@ void QnLayerPainter::ensureUninstalled() {
 
 
 QnGraphicsView::QnGraphicsView(QGraphicsScene *scene, QWidget * parent):
-    QGraphicsView(scene, parent)
-{
-    QPalette palette;
-    palette.setColor(QPalette::Background, Qt::black);
-    palette.setColor(QPalette::Base, Qt::black);
-    setPalette(palette);
-}
+    QGraphicsView(scene, parent),
+    m_paintFlags(0)
+{}
 
 QnGraphicsView::~QnGraphicsView() {
     while(!m_backgroundPainters.empty())
@@ -28,6 +24,10 @@ QnGraphicsView::~QnGraphicsView() {
 
     while(!m_foregroundPainters.empty())
         uninstallLayerPainter(m_foregroundPainters[0]);
+}
+
+void QnGraphicsView::setPaintFlags(PaintFlags paintFlags) {
+    m_paintFlags = paintFlags;
 }
 
 void QnGraphicsView::installLayerPainter(QnLayerPainter *painter, QGraphicsScene::SceneLayer layer) {
@@ -63,13 +63,16 @@ void QnGraphicsView::uninstallLayerPainter(QnLayerPainter *painter) {
 }
 
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {
-    //base_type::drawBackground(painter, rect);
+    if(!(m_paintFlags & BACKGROUND_DONT_INVOKE_BASE))
+        base_type::drawBackground(painter, rect);
+
     foreach(QnLayerPainter *layerPainter, m_backgroundPainters)
         layerPainter->drawLayer(painter, rect);
 }
 
 void QnGraphicsView::drawForeground(QPainter *painter, const QRectF &rect) {
-    base_type::drawForeground(painter, rect);
+    if(!(m_paintFlags & FOREGROUND_DONT_INVOKE_BASE))
+        base_type::drawForeground(painter, rect);
 
     foreach(QnLayerPainter *layerPainter, m_foregroundPainters)
         layerPainter->drawLayer(painter, rect);
