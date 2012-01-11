@@ -135,6 +135,17 @@ int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, QList<QnR
     return 1;
 }
 
+int QnAppServerConnection::saveAsync(const QnResource& resource, QObject* target, const char* slot)
+{
+    if (dynamic_cast<const QnVideoServer*>(&resource))
+        return saveAsync(*dynamic_cast<const QnVideoServer*>(&resource), target, slot);
+
+    if (dynamic_cast<const QnCameraResource*>(&resource))
+        return saveAsync(*dynamic_cast<const QnCameraResource*>(&resource), target, slot);
+
+    return 0;
+}
+
 int QnAppServerConnection::saveAsync(const QnVideoServer& serverIn, QObject* target, const char* slot)
 {
     QnApiServerPtr server = unparseServer(serverIn);

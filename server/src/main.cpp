@@ -240,6 +240,7 @@ int serverMain(int argc, char *argv[])
     cl_log.setLogLevel(cl_logWARNING);
 #endif
 
+    cl_log.setLogLevel(cl_logDEBUG1);
     CL_LOG(cl_logALWAYS)
     {
         cl_log.log(QLatin1String("\n\n========================================"), cl_logALWAYS);

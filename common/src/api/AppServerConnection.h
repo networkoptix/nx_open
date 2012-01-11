@@ -65,6 +65,8 @@ public:
     int saveAsync(const QnVideoServer&, QObject*, const char*);
     int saveAsync(const QnCameraResource&, QObject*, const char*);
 
+    int saveAsync(const QnResource& resource, QObject* target, const char* slot);
+
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 

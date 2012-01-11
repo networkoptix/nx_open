@@ -71,6 +71,9 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 
     if (parameters.contains(QLatin1String("url")))
         setUrl(parameters[QLatin1String("url")]);
+
+    if (parameters.contains(QLatin1String("status")))
+        setStatus(parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline);
 }
 
 QnId QnResource::getParentId() const

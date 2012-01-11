@@ -26,6 +26,44 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         {
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
         }
+
+        foreach(QnResourcePtr resource, resources)
+        {
+            QObject::connect(resource.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
+        }
+
         QnResourcePool::instance()->addResources(resources);
     }
+}
+
+void QnAppserverResourceProcessor::requestFinished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources)
+{
+    if (status == 0 && !resources.isEmpty())
+    {
+        qDebug() << "Successfully updated resource" << resources[0]->getName();
+    } else
+    {
+        qDebug() << "Failed to update resource";
+    }
+
+}
+
+void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+{
+    QObject* xsender = sender();
+
+    if (!xsender)
+    {
+        qDebug() << "QnAppserverResourceProcessor::onResourceStatusChanged() is not indended to be called directly";
+        return;
+    }
+
+    QnResource* resource = dynamic_cast<QnResource*>(xsender);
+    if (!resource)
+    {
+        qDebug() << "QnAppserverResourceProcessor::onResourceStatusChanged() should be connected to QnResource::onResourceStatusChanged() signal";
+        return;
+    }
+
+    m_appServer->saveAsync(*resource, this, SLOT(requestFinished(int, int, const QByteArray&, const QnResourceList&)));
 }
