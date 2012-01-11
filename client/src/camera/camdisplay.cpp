@@ -548,15 +548,16 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         onRealTimeStreamHint(mediaIsLive);
 
     float speed = m_speed;
-    if (m_prevSpeed != speed) {
-        processNewSpeed(speed);
-        m_prevSpeed = speed;
-    }
-
     bool speedIsNegative = speed < 0;
     bool dataIsNegative = media->flags & AV_REVERSE_PACKET;
     if (speedIsNegative != dataIsNegative)
         return true; // skip data
+
+    if (m_prevSpeed != speed) 
+    {
+        processNewSpeed(speed);
+        m_prevSpeed = speed;
+    }
 
 
     if (vd)
@@ -805,6 +806,8 @@ void CLCamDisplay::playAudio(bool play)
         m_audioDisplay->clearDeviceBuffer();
     else
         m_audioDisplay->resume();
+    if (!play)
+        setMTDecoding(false);
 }
 
 //==========================================================================
