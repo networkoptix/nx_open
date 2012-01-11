@@ -31,14 +31,13 @@ Q_SIGNALS:
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
-
-    virtual bool event(QEvent *event) override;
+    virtual void paintEvent(QPaintEvent *event) override;
 
 #ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
 
-private Q_SLOTS:
+protected Q_SLOTS:
     void addTab();
     void currentTabChanged(int index);
     void closeTab(int index);
@@ -52,9 +51,12 @@ private Q_SLOTS:
     void appServerError(int error);
     void appServerAuthenticationRequired();
 
-    void toggleDecorationsVisibility();
+    void toggleTitleVisibility();
 
     void updateDwmState();
+
+protected:
+    bool isTitleVisible() const;
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
@@ -64,13 +66,14 @@ private:
     QnGraphicsView *m_view;
 
     QTabWidget *m_tabWidget;
-    QWidget *m_titleWidget;
 
     QSpacerItem *m_titleSpacer;
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_viewLayout;
+    QBoxLayout *m_globalLayout;
 
     QnDwm *m_dwm;
+    bool m_drawCustomFrame;
 };
 
 #endif // MAINWND_H

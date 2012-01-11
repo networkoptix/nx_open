@@ -80,6 +80,17 @@ namespace {
         return button;
     }
 
+    void setVisibleRecursively(QLayout *layout, bool visible) {
+        for(int i = 0, count = layout->count(); i < count; i++) {
+            QLayoutItem *item = layout->itemAt(i);
+            if(item->widget()) {
+                item->widget()->setVisible(visible);
+            } else if(item->layout()) {
+                setVisibleRecursively(item->layout(), visible);
+            }
+        }
+    }
+
     int minimalWindowWidth = 800;
     int minimalWindowHeight = 600;
 
@@ -87,7 +98,8 @@ namespace {
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
-      m_controller(0)
+      m_controller(0),
+      m_drawCustomFrame(false)
 {
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
@@ -145,7 +157,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleDecorationsVisibility()));
+    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleTitleVisibility()));
     addAction(&cm_hide_decorations);
 
     QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
@@ -170,12 +182,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
     m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
 
-    /* Title widget. */
-    m_titleWidget = new QWidget();
-    m_titleWidget->setContentsMargins(0, 0, 0, 0);
-    m_titleWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-    m_titleWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
-    
+    /* Title layout. We cannot create a widget for title bar since there appears to be
+     * no way to make it transparent for non-client area windows messages. */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
@@ -185,8 +193,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_titleLayout->addWidget(newActionButton(&cm_toggle_fullscreen));
     m_titleLayout->addWidget(newActionButton(&cm_exit));
 
-    m_titleWidget->setLayout(m_titleLayout);
-
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
@@ -194,14 +200,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_titleSpacer = new QSpacerItem(0, 0);
 
-    QBoxLayout *windowLayout = new QVBoxLayout();
-    windowLayout->setContentsMargins(0, 0, 0, 0);
-    windowLayout->setSpacing(0);
-    windowLayout->addWidget(m_titleWidget);
-    windowLayout->addSpacerItem(m_titleSpacer);
-    windowLayout->addLayout(m_viewLayout);
+    m_globalLayout = new QVBoxLayout();
+    m_globalLayout->setContentsMargins(0, 0, 0, 0);
+    m_globalLayout->setSpacing(0);
+    m_globalLayout->addLayout(m_titleLayout);
+    m_globalLayout->addSpacerItem(m_titleSpacer);
+    m_globalLayout->addLayout(m_viewLayout);
 
-    setLayout(windowLayout);
+    setLayout(m_globalLayout);
     
     /* Add single tab. */
     addTab();
@@ -232,6 +238,21 @@ void MainWnd::changeEvent(QEvent *event) {
         updateDwmState();
 
     base_type::changeEvent(event);
+}
+
+void MainWnd::paintEvent(QPaintEvent *event) {
+    /* Draw frame if needed. */
+    if(m_drawCustomFrame) {
+        QPainter painter(this);
+
+        painter.setPen(QPen(global_frame_color, 3));
+        painter.drawRect(QRect(
+            0,
+            0,
+            width() - 1,
+            height() - 1
+        ));
+    }
 }
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
@@ -434,36 +455,43 @@ void MainWnd::appServerAuthenticationRequired()
     dialog = 0;
 }
 
-bool MainWnd::winEvent(MSG *message, long *result) {
-    if(m_dwm->winEvent(message, result))
-        return true;
+void MainWnd::toggleTitleVisibility() {
+    if(isTitleVisible()) {
+        m_globalLayout->takeAt(0);
+        m_titleLayout->setParent(NULL);
+        setVisibleRecursively(m_titleLayout, false);
+    } else {
+        m_globalLayout->insertLayout(0, m_titleLayout);
+        setVisibleRecursively(m_titleLayout, true);
+    }
 
-    return base_type::winEvent(message, result);
+    updateDwmState();
 }
 
-void MainWnd::toggleDecorationsVisibility() {
-    if(m_titleWidget->isVisible()) {
-        m_titleWidget->hide();
-        tabBar(m_tabWidget)->hide();
-    } else {
-        m_titleWidget->show();
-        tabBar(m_tabWidget)->show();
-    }
+bool MainWnd::isTitleVisible() const {
+    return m_globalLayout->itemAt(0) == m_titleLayout;
 }
 
 void MainWnd::updateDwmState() {
     if(isFullScreen()) {
+        /* Full screen mode. */
+
+        m_drawCustomFrame = false;
+
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
+        m_dwm->disableSystemFramePainting();
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->emulateFrame(false);
+        m_dwm->disableBlurBehindWindow();
+
+        m_dwm->disableFrameEmulation();
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
 #ifdef Q_OS_WIN
-        setContentsMargins(0, 1, 0, 0);
+        setContentsMargins(0, 0, 0, 1);
 #else
         setContentMargins(0, 0, 0, 0);
 #endif
@@ -472,43 +500,74 @@ void MainWnd::updateDwmState() {
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isCompositionEnabled()) {
+        /* Windowed with aero glass. */
+
+        m_drawCustomFrame = false;
+
         if(!m_dwm->isCompositionEnabled())
             qnWarning("Transitioning to glass state when aero composition is disabled. Expect display artifacts.");
+
+        QMargins frameMargins = m_dwm->themeFrameMargins();
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
 
+        m_dwm->disableSystemFramePainting();
         m_dwm->extendFrameIntoClientArea();
+        m_dwm->setCurrentFrameMargins(QMargins(1, 0, 1, 1)); /* Can't set (0, 0, 0, 0) here as it will cause awful display artifacts. */
+        m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is also needed to prevent display artifacts. */
 
-        QMargins frameMargins = m_dwm->themeFrameMargins();
-        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 1)); /* Can't set (0, 0, 0, 0) here as it will cause awful display artifacts. */
-
-        m_dwm->emulateFrame(true);
+        m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
         m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that window is click-draggable no matter where the user clicked. */
 
-        //setContentsMargins(SceneUtility::cwiseSub(frameMargins, QMargins(0, 0, 0, 1)));
         setContentsMargins(0, 0, 0, 0);
 
         m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
-        m_titleLayout->setContentsMargins(0, 0, 0, 0);
-        m_viewLayout->setContentsMargins(frameMargins.left(), 0, frameMargins.right(), frameMargins.bottom() - 1);
+        m_titleLayout->setContentsMargins(2, 2, 2, 2);
+        m_viewLayout->setContentsMargins(
+            frameMargins.left() - 1, 
+            isTitleVisible() ? 0 : frameMargins.top(), 
+            frameMargins.right() - 1, 
+            frameMargins.bottom() - 1
+        );
     } else {
+        /* Windowed without aero glass. */
+
+        m_drawCustomFrame = true;
+
+        QMargins frameMargins = m_dwm->themeFrameMargins();
+
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
+        m_dwm->disableSystemFramePainting();
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
-        m_dwm->setCurrentFrameMargins(SceneUtility::cwiseAdd(m_dwm->themeFrameMargins(), QMargins(0, m_dwm->themeTitleBarHeight(), 0, 0)));
-        m_dwm->emulateFrame(false);
+        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
+        m_dwm->disableBlurBehindWindow();
+
+        m_dwm->enableFrameEmulation();
+        m_dwm->setEmulatedFrameMargins(frameMargins);
+        m_dwm->setEmulatedTitleBarHeight(0x1000);
 
         setContentsMargins(0, 0, 0, 0);
 
         m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
-        m_titleLayout->setContentsMargins(0, 0, 0, 0);
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+        m_titleLayout->setContentsMargins(2, 2, 2, 2);
+        m_viewLayout->setContentsMargins(
+            frameMargins.left(), 
+            isTitleVisible() ? 0 : frameMargins.top(), 
+            frameMargins.right(), 
+            frameMargins.bottom() - 1
+        );
     }
 }
 
-bool MainWnd::event(QEvent *event) {
-    return QWidget::event(event);
+#ifdef Q_OS_WIN
+bool MainWnd::winEvent(MSG *message, long *result) {
+    if(m_dwm->winEvent(message, result))
+        return true;
+
+    return base_type::winEvent(message, result);
 }
+#endif

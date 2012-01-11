@@ -24,6 +24,12 @@ public:
      */
     bool isCompositionEnabled() const;
 
+    bool enableSystemFramePainting(bool enable = true);
+
+    bool disableSystemFramePainting(bool disable = true) {
+        return enableSystemFramePainting(!disable);
+    }
+
     /**
      * Enables blur-behind on a widget.
      * 
@@ -33,7 +39,11 @@ public:
      * \param enable                    Whether the blur should be enabled.
      * \returns                         Whether the blur was successfully enabled.
      */
-    bool enableBlurBehindWindow(bool enable);
+    bool enableBlurBehindWindow(bool enable = true);
+
+    bool disableBlurBehindWindow(bool disable = true) {
+        return enableBlurBehindWindow(!disable);
+    }
 
     /**
      * This function controls the rendering of the frame inside a window.
@@ -82,10 +92,14 @@ public:
      * Emulation is performed by feeding the proper frame sections to the OS even
      * when frame section is queried for client area.
      * 
-     * \param emulate                   Whether window frame should be emulated.
+     * \param enable                    Whether window frame should be emulated.
      * \returns                         Whether window frame emulation mode was successfully changed.
      */
-    bool emulateFrame(bool emulate = true);
+    bool enableFrameEmulation(bool enable = true);
+
+    bool disableFrameEmulation(bool disable = true) {
+        return enableFrameEmulation(!disable);
+    }
 
     /**
      * \returns                         Whether window frame is emulated.
@@ -143,6 +157,7 @@ protected:
     bool calcSizeEvent(MSG *message, long *result);
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
+    bool ncPaintEvent(MSG *message, long *result);
 #endif
 
 private:

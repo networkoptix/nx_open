@@ -69,6 +69,7 @@ public:
     QMargins userFrameMargins;
 
     bool overrideFrameMargins;
+    bool systemPaintFrame;
 #endif
 
     bool emulateFrame;
@@ -99,6 +100,7 @@ void QnDwmPrivate::init(QWidget *widget) {
         dwmDefWindowProc != NULL;
 
     overrideFrameMargins = false;
+    systemPaintFrame = true;
 #endif
 
     emulateFrame = false;
@@ -124,6 +126,18 @@ QnDwm::~QnDwm() {
 
 bool QnDwm::isSupported() const {
 #ifdef Q_OS_WIN
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool QnDwm::enableSystemFramePainting(bool enable) {
+    if(d->widget == NULL)
+        return false;
+
+#ifdef Q_OS_WIN
+    d->systemPaintFrame = enable;
     return true;
 #else
     return false;
@@ -235,15 +249,15 @@ int QnDwm::themeTitleBarHeight() const {
 #endif
 }
 
-bool QnDwm::emulateFrame(bool emulate) {
+bool QnDwm::enableFrameEmulation(bool enable) {
     if(d->widget == NULL)
         return false;
 
-    if(d->emulateFrame == emulate)
+    if(d->emulateFrame == enable)
         return true;
 
 #ifdef Q_OS_WIN
-    d->emulateFrame = emulate;
+    d->emulateFrame = enable;
     return true;
 #else
     return false;
@@ -345,6 +359,7 @@ bool QnDwm::winEvent(MSG *message, long *result) {
     case WM_NCHITTEST:              return hitTestEvent(message, result);
     case WM_DWMCOMPOSITIONCHANGED:  return compositionChangedEvent(message, result);
     case WM_NCACTIVATE:             return activateEvent(message, result);
+    case WM_NCPAINT:                return ncPaintEvent(message, result);
     default:                        return false;
     }
 }
@@ -384,8 +399,8 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
     params->rgrc[0].left     += d->userFrameMargins.left();
     params->rgrc[0].right    -= d->userFrameMargins.right();
 
-    *result = WVR_VALIDRECTS;
-    //*result = WVR_REDRAW;
+    //*result = WVR_VALIDRECTS;
+    *result = WVR_REDRAW;
     return true;
 }
 
@@ -489,10 +504,21 @@ bool QnDwm::compositionChangedEvent(MSG *message, long *result) {
 }
 
 bool QnDwm::activateEvent(MSG *message, long *result) {
-    message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
+    if(!d->systemPaintFrame)
+        message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
 
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
     return true;
+}
+
+bool QnDwm::ncPaintEvent(MSG *message, long *result) {
+    if(!d->systemPaintFrame) {
+        /* An application should return zero if it processes this message. */
+        *result = 0;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 #endif
