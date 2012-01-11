@@ -122,7 +122,6 @@ void AppStyle::unpolish(QWidget *widget)
     ProxyStyle::unpolish(widget);
 }
 
-
 AppProxyStyle::AppProxyStyle(QStyle *style)
     : QProxyStyle(style)
 {

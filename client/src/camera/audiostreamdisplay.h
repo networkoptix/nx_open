@@ -1,15 +1,11 @@
 #ifndef audiostreamdisplay_h_1811
 #define audiostreamdisplay_h_1811
 
-
-
 #include "decoders/audio/audio_struct.h"
 #include "openal/qtvsound.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/common/aligned_data.h"
-
-
 
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
