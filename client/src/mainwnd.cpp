@@ -6,6 +6,7 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
+#include <QtGui/QCloseEvent>
 
 #include <QtNetwork/QNetworkReply>
 
@@ -41,6 +42,7 @@
 #include "ui/widgets3/tabwidget.h"
 
 #include "ui/skin/skin.h"
+#include "ui/proxystyle.h"
 
 #include <utils/common/warnings.h>
 
@@ -48,8 +50,6 @@
 #include "settings.h"
 
 #include "ui/dwm.h"
-
-MainWnd *MainWnd::s_instance = 0;
 
 namespace {
     // TODO: hack hack hack
@@ -64,36 +64,35 @@ namespace {
     QTabBar *tabBar(QTabWidget *widget) {
         return static_cast<OpenTabWidget *>(widget)->extractTabBar();
     }
+
+    QToolButton *newActionButton(QAction *action) {
+        QToolButton *button = new QToolButton();
+        button->setDefaultAction(action);
+        
+        int iconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
+        button->setIconSize(QSize(iconSize, iconSize));
+
+        /* Tool buttons may end up being non-square o_O. We don't allow that. */
+        QSize sizeHint = button->sizeHint();
+        int buttonSize = qMin(sizeHint.width(), sizeHint.height());
+        button->setFixedSize(buttonSize, buttonSize);
+
+        return button;
+    }
+
+    int minimalWindowWidth = 800;
+    int minimalWindowHeight = 600;
+
 }
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
       m_controller(0)
 {
-    if (s_instance)
-        qnWarning("Several instances of main window created, expect problems.");
-    else
-        s_instance = this;
-
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
-    m_dwm->extendFrameIntoClientArea();
 
-    QMargins frameMargins = m_dwm->themeFrameMargins();
-
-    m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-    m_dwm->emulateFrame(true);
-    m_dwm->setEmulatedFrameMargins(frameMargins);
-    m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that window is click-draggable no matter where the user clicked. */
-    
-    setContentsMargins(frameMargins); //themeFrameMargins.left(), 2, themeFrameMargins.right(), themeFrameMargins.bottom());
-
-    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
-    // Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
-#ifdef Q_OS_WIN
-    //setContentsMargins(0, 1, 0, 0);
-#endif
-
+    connect(m_dwm, SIGNAL(compositionChanged(bool)), this, SLOT(updateDwmState()));
 
     /* Set up QWidget. */
     setWindowTitle(QApplication::applicationName());
@@ -101,21 +100,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     setAttribute(Qt::WA_QuitOnClose);
     setAcceptDrops(true);
 
-    {
-        QPalette pal = palette();
-        //pal.setColor(backgroundRole(), app_bkr_color);
-        pal.setColor(backgroundRole(), Qt::transparent);
-        setPalette(pal);
-    }
-
-    const int min_width = 800;
-    setMinimumWidth(min_width);
-    setMinimumHeight(min_width * 3 / 4);
+    setMinimumWidth(minimalWindowWidth);
+    setMinimumHeight(minimalWindowHeight);
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene);
     {
+        /* Adjust palette so that inherited background painting is not needed. */
         QPalette pal = m_view->palette();
         pal.setColor(QPalette::Background, Qt::black);
         pal.setColor(QPalette::Base, Qt::black);
@@ -143,29 +135,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     new QnSyncPlayMixin(m_display, renderWatcher, this);
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SLOT(onDisplayingStateChanged(QnAbstractRenderer *, bool)));
 
-
-    /* Process input files. */
-    for (int i = 1; i < argc; ++i)
-        m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), QPointF(0, 0));
-
-    /* Prepare UI. */
-    m_tabWidget = new TabWidget(); 
-    m_tabWidget->setMovable(true);
-    m_tabWidget->setTabsClosable(true);
-    static_cast<TabWidget *>(m_tabWidget)->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
-
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
-    connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
-
-    QToolButton *newTabButton = new QToolButton(m_tabWidget);
-    newTabButton->setToolTip(tr("New Tab"));
-    newTabButton->setShortcut(QKeySequence::New);
-    newTabButton->setIcon(Skin::icon(QLatin1String("plus.png")));
-    newTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
-    m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
-
-    // actions
+    /* Actions. */
     connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
     addAction(&cm_exit);
 
@@ -183,38 +153,85 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
-    // toolbars
-    m_toolBar = new QToolBar();
-    m_toolBar->setAllowedAreas(Qt::TopToolBarArea);
-    m_toolBar->addAction(reconnectAction);
-    m_toolBar->addAction(&cm_preferences);
-    m_toolBar->addAction(&cm_toggle_fullscreen);
-    m_toolBar->addAction(&cm_exit);
+    /* Tab widget. */
+    m_tabWidget = new TabWidget(); 
+    m_tabWidget->setMovable(true);
+    m_tabWidget->setTabsClosable(true);
+    static_cast<TabWidget *>(m_tabWidget)->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
 
-    // layout
-    QHBoxLayout *titleBarLayout = new QHBoxLayout();
-    titleBarLayout->setContentsMargins(0, 0, 0, 0);
-    titleBarLayout->setSpacing(0);
-    titleBarLayout->addStretch(0x1000);
-    titleBarLayout->addWidget(m_toolBar);
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
+    connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 
-    QVBoxLayout *centralLayout = new QVBoxLayout();
-    centralLayout->setContentsMargins(0, 0, 0, 0);
-    centralLayout->setSpacing(0);
-    centralLayout->addLayout(titleBarLayout);
-    centralLayout->addSpacing(2);
-    centralLayout->addWidget(m_tabWidget);
+    QToolButton *newTabButton = new QToolButton(m_tabWidget);
+    newTabButton->setToolTip(tr("New Tab"));
+    newTabButton->setShortcut(QKeySequence::New);
+    newTabButton->setIcon(Skin::icon(QLatin1String("plus.png")));
+    newTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
+    m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
 
-    setLayout(centralLayout);
+    /* Title widget. */
+    m_titleWidget = new QWidget();
+    m_titleWidget->setContentsMargins(0, 0, 0, 0);
+    m_titleWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+    m_titleWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
     
+    m_titleLayout = new QHBoxLayout();
+    m_titleLayout->setContentsMargins(0, 0, 0, 0);
+    m_titleLayout->setSpacing(0);
+    m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(newActionButton(reconnectAction));
+    m_titleLayout->addWidget(newActionButton(&cm_preferences));
+    m_titleLayout->addWidget(newActionButton(&cm_toggle_fullscreen));
+    m_titleLayout->addWidget(newActionButton(&cm_exit));
+
+    m_titleWidget->setLayout(m_titleLayout);
+
+    /* Layouts. */
+    m_viewLayout = new QVBoxLayout();
+    m_viewLayout->setContentsMargins(0, 0, 0, 0);
+    m_viewLayout->addWidget(m_tabWidget);
+
+    m_titleSpacer = new QSpacerItem(0, 0);
+
+    QBoxLayout *windowLayout = new QVBoxLayout();
+    windowLayout->setContentsMargins(0, 0, 0, 0);
+    windowLayout->setSpacing(0);
+    windowLayout->addWidget(m_titleWidget);
+    windowLayout->addSpacerItem(m_titleSpacer);
+    windowLayout->addLayout(m_viewLayout);
+
+    setLayout(windowLayout);
+    
+    /* Add single tab. */
     addTab();
 
+    /* Process input files. */
+    for (int i = 1; i < argc; ++i)
+        m_controller->drop(fromNativePath(QFile::decodeName(argv[i])), QPointF(0, 0));
+
     //showFullScreen();
+    updateDwmState();
 }
 
 MainWnd::~MainWnd()
 {
-    s_instance = 0;
+    return;
+}
+
+void MainWnd::closeEvent(QCloseEvent *event)
+{
+    base_type::closeEvent(event);
+
+    if (event->isAccepted())
+        Q_EMIT mainWindowClosed();
+}
+
+void MainWnd::changeEvent(QEvent *event) {
+    if(event->type() == QEvent::WindowStateChange)
+        updateDwmState();
+
+    base_type::changeEvent(event);
 }
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
@@ -339,29 +356,20 @@ void MainWnd::handleMessage(const QString &message)
     activate();
 }
 
-void MainWnd::closeEvent(QCloseEvent *event)
-{
-    QWidget::closeEvent(event);
-
-    if (event->isAccepted())
-        Q_EMIT mainWindowClosed();
-}
-
 void MainWnd::activate()
 {
-    if (isFullScreen())
+    /*if (isFullScreen())
         showFullScreen();
     else
         showNormal();
     raise();
-    activateWindow();
+    activateWindow();*/
 }
 
 void MainWnd::toggleFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
-        resize(600, 400);
     } else {
         showFullScreen();
     }
@@ -430,18 +438,77 @@ bool MainWnd::winEvent(MSG *message, long *result) {
     if(m_dwm->winEvent(message, result))
         return true;
 
-    return QWidget::winEvent(message, result);
+    return base_type::winEvent(message, result);
 }
 
 void MainWnd::toggleDecorationsVisibility() {
-    if(m_toolBar->isVisible()) {
-        m_toolBar->hide();
+    if(m_titleWidget->isVisible()) {
+        m_titleWidget->hide();
         tabBar(m_tabWidget)->hide();
     } else {
-        m_toolBar->show();
+        m_titleWidget->show();
         tabBar(m_tabWidget)->show();
     }
 }
 
+void MainWnd::updateDwmState() {
+    if(isFullScreen()) {
+        setAttribute(Qt::WA_NoSystemBackground, false);
+        setAttribute(Qt::WA_TranslucentBackground, false);
 
+        m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
+        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
+        m_dwm->emulateFrame(false);
 
+        /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
+         * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
+#ifdef Q_OS_WIN
+        setContentsMargins(0, 1, 0, 0);
+#else
+        setContentMargins(0, 0, 0, 0);
+#endif
+        
+        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        m_titleLayout->setContentsMargins(0, 0, 0, 0);
+        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+    } else if(m_dwm->isCompositionEnabled()) {
+        if(!m_dwm->isCompositionEnabled())
+            qnWarning("Transitioning to glass state when aero composition is disabled. Expect display artifacts.");
+
+        setAttribute(Qt::WA_NoSystemBackground, true);
+        setAttribute(Qt::WA_TranslucentBackground, true);
+
+        m_dwm->extendFrameIntoClientArea();
+
+        QMargins frameMargins = m_dwm->themeFrameMargins();
+        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 1)); /* Can't set (0, 0, 0, 0) here as it will cause awful display artifacts. */
+
+        m_dwm->emulateFrame(true);
+        m_dwm->setEmulatedFrameMargins(frameMargins);
+        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that window is click-draggable no matter where the user clicked. */
+
+        //setContentsMargins(SceneUtility::cwiseSub(frameMargins, QMargins(0, 0, 0, 1)));
+        setContentsMargins(0, 0, 0, 0);
+
+        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        m_titleLayout->setContentsMargins(0, 0, 0, 0);
+        m_viewLayout->setContentsMargins(frameMargins.left(), 0, frameMargins.right(), frameMargins.bottom() - 1);
+    } else {
+        setAttribute(Qt::WA_NoSystemBackground, false);
+        setAttribute(Qt::WA_TranslucentBackground, false);
+
+        m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
+        m_dwm->setCurrentFrameMargins(SceneUtility::cwiseAdd(m_dwm->themeFrameMargins(), QMargins(0, m_dwm->themeTitleBarHeight(), 0, 0)));
+        m_dwm->emulateFrame(false);
+
+        setContentsMargins(0, 0, 0, 0);
+
+        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        m_titleLayout->setContentsMargins(0, 0, 0, 0);
+        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+    }
+}
+
+bool MainWnd::event(QEvent *event) {
+    return QWidget::event(event);
+}

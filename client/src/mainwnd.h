@@ -4,6 +4,8 @@
 #include <QtGui/QMainWindow>
 
 class QTabWidget;
+class QBoxLayout;
+class QSpacerItem;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
@@ -14,21 +16,27 @@ class QnDwm;
 
 class MainWnd : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    typedef QWidget base_type;
 
 public:
     MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
+    
     virtual ~MainWnd();
-
-    static MainWnd* instance() { return s_instance; }
 
 Q_SIGNALS:
     void mainWindowClosed();
 
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
 
+    virtual bool event(QEvent *event) override;
+
+#ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
+#endif
 
 private Q_SLOTS:
     void addTab();
@@ -46,16 +54,7 @@ private Q_SLOTS:
 
     void toggleDecorationsVisibility();
 
-#if 0
-public:
-    void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
-    void goToNewLayoutContent(LayoutContent* newl);
-
-private:
-    void destroyNavigator(CLLayoutNavigator *&nav);
-
-    CLLayoutNavigator *m_normalView;
-#endif
+    void updateDwmState();
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
@@ -65,9 +64,11 @@ private:
     QnGraphicsView *m_view;
 
     QTabWidget *m_tabWidget;
-    QToolBar *m_toolBar;
+    QWidget *m_titleWidget;
 
-    static MainWnd *s_instance;
+    QSpacerItem *m_titleSpacer;
+    QBoxLayout *m_titleLayout;
+    QBoxLayout *m_viewLayout;
 
     QnDwm *m_dwm;
 };

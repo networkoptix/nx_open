@@ -83,14 +83,6 @@ int AppStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidge
     return ProxyStyle::styleHint(hint, option, widget, returnData);
 }
 
-QPalette AppStyle::standardPalette() const {
-    QPalette palette = ProxyStyle::standardPalette();
-
-    palette.setColor(QPalette::Window, Qt::transparent);
-
-    return palette;
-}
-
 void AppStyle::polish(QApplication *application)
 {
     ProxyStyle::polish(application);
@@ -111,10 +103,6 @@ void AppStyle::unpolish(QApplication *application)
 void AppStyle::polish(QWidget *widget)
 {
     ProxyStyle::polish(widget);
-
-    QPalette palette = widget->palette();
-    palette.setColor(widget->backgroundRole(), Qt::transparent);
-    widget->setPalette(palette);
 
 /*    if (widget) {
         if (widget->inherits("QDialog"))

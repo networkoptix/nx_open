@@ -16,8 +16,6 @@ public:
 
     int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const;
 
-    QPalette standardPalette() const;
-
     void polish(QApplication *application);
     void unpolish(QApplication *application);
     void polish(QWidget *widget);

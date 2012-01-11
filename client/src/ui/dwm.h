@@ -15,12 +15,9 @@ public:
     virtual ~QnDwm();
 
     /**
-     * Enables blur-behind on a widget.
-     *
-     * \param enable                    Whether the blur should be enabled.
-     * \returns                         Whether the blur was successfully enabled.
+     * \returns                         Whether this API is supported. 
      */
-    bool enableBlurBehindWindow(bool enable);
+    bool isSupported() const;
 
     /**
      * \returns                         Whether Windows DWM composition is currently enabled on the system.
@@ -28,22 +25,27 @@ public:
     bool isCompositionEnabled() const;
 
     /**
+     * Enables blur-behind on a widget.
+     * 
+     * Note that for aero glass to work, <tt>WA_TranslucentBackground</tt> and
+     * <tt>WA_NoSystemBackground</tt> attributes must be set.
+     *
+     * \param enable                    Whether the blur should be enabled.
+     * \returns                         Whether the blur was successfully enabled.
+     */
+    bool enableBlurBehindWindow(bool enable);
+
+    /**
      * This function controls the rendering of the frame inside a window.
      * Note that passing margins of -1 (the default value) will completely
      * remove the frame from the window.
      *
+     * Note that for aero glass to work, <tt>WA_TranslucentBackground</tt> and
+     * <tt>WA_NoSystemBackground</tt> attributes must be set.
+     *
      * \param margins                   Frame extension margins.
      */
     bool extendFrameIntoClientArea(const QMargins &margins = QMargins(-1, -1, -1, -1));
-
-    /**
-     * This function is to be called from widget's <tt>winEvent</tt> handler.
-     * 
-     * \param message                   Windows message.
-     * \param[out] result               Result of message processing.
-     * \returns                         Whether the message was processsed.
-     */
-    bool winEvent(MSG *message, long *result);
 
     /**
      * Note that this function queries frame margins from the system and returned
@@ -115,6 +117,17 @@ public:
      * \returns                         Currently set emulated title bar height.
      */
     int emulatedTitleBarHeight() const;
+
+#ifdef Q_OS_WIN
+    /**
+     * This function is to be called from widget's <tt>winEvent</tt> handler.
+     * 
+     * \param message                   Windows message.
+     * \param[out] result               Result of message processing.
+     * \returns                         Whether the message was processsed.
+     */
+    bool winEvent(MSG *message, long *result);
+#endif
 
 signals:
     /**

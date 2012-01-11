@@ -105,16 +105,6 @@ void QnDwmPrivate::init(QWidget *widget) {
     emulatedTitleBarHeight = 0;
 }
 
-bool filter(void *p) {
-    MSG *message = static_cast<MSG *>(p);
-
-    if(message->message == WM_ERASEBKGND) {
-        return true;
-    }
-
-    return false;
-}
-
 QnDwm::QnDwm(QWidget *widget):
     QObject(widget),
     d(new QnDwmPrivate())
@@ -124,14 +114,20 @@ QnDwm::QnDwm(QWidget *widget):
         return;
     }
 
-    QAbstractEventDispatcher::instance()->setEventFilter(filter);
-
     d->init(widget);
 }
 
 QnDwm::~QnDwm() {
     delete d;
     d = NULL;
+}
+
+bool QnDwm::isSupported() const {
+#ifdef Q_OS_WIN
+    return true;
+#else
+    return false;
+#endif
 }
 
 bool QnDwm::enableBlurBehindWindow(bool enable) {
@@ -150,13 +146,7 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     
     status = d->dwmEnableBlurBehindWindow(d->widget->winId(), &blurBehind);
     
-    if(SUCCEEDED(status)) {
-        d->widget->setAttribute(Qt::WA_TranslucentBackground, enable);
-        d->widget->setAttribute(Qt::WA_NoSystemBackground, enable);
-        return true;
-    } else {
-        return false;
-    }
+    return SUCCEEDED(status);
 #else
     return false;
 #endif
@@ -199,14 +189,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     
     status = d->dwmExtendFrameIntoClientArea(d->widget->winId(), &winMargins);
         
-    if (SUCCEEDED(status)) {
-        //d->widget->setAttribute(Qt::WA_TranslucentBackground, true);
-        d->widget->setAttribute(Qt::WA_TranslucentBackground, true);
-        d->widget->setAttribute(Qt::WA_NoSystemBackground, true);
-        return true;
-    } else {
-        return false;
-    }
+    return SUCCEEDED(status);
 #else
     return false;
 #endif
@@ -345,11 +328,11 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
 #endif
 }
 
+#ifdef Q_OS_WIN
 bool QnDwm::winEvent(MSG *message, long *result) {
     if(d->widget == NULL)
         return false;
 
-#ifdef Q_OS_WIN
     if(!d->hasDwm)
         return false;
 
@@ -364,12 +347,8 @@ bool QnDwm::winEvent(MSG *message, long *result) {
     case WM_NCACTIVATE:             return activateEvent(message, result);
     default:                        return false;
     }
-#else
-    return false;
-#endif
 }
 
-#ifdef Q_OS_WIN
 bool QnDwm::calcSizeEvent(MSG *message, long *result) {
     if(!d->overrideFrameMargins)
         return false;
@@ -401,9 +380,9 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
 
     /* New client geometry. */
     params->rgrc[0].top      += d->userFrameMargins.top();
-    params->rgrc[0].bottom   += d->userFrameMargins.bottom();
+    params->rgrc[0].bottom   -= d->userFrameMargins.bottom();
     params->rgrc[0].left     += d->userFrameMargins.left();
-    params->rgrc[0].right    += d->userFrameMargins.right();
+    params->rgrc[0].right    -= d->userFrameMargins.right();
 
     *result = WVR_VALIDRECTS;
     //*result = WVR_REDRAW;
@@ -442,7 +421,10 @@ namespace {
 } // anonymous namespace
 
 bool QnDwm::hitTestEvent(MSG *message, long *result) {
-    *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
+    BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
+    if(!handled)
+        *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
+
     if(!d->emulateFrame)    
         return true;
 
@@ -512,8 +494,6 @@ bool QnDwm::activateEvent(MSG *message, long *result) {
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
     return true;
 }
-
-
 
 #endif
 
