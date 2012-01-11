@@ -80,8 +80,6 @@ def generate_info_plist():
 def gen_version_h():
     revision = os.popen('hg id -i').read().strip()
 
-    if platform() == 'linux':
-        os.putenv('LD_LIBRARY_PATH', os.path.join(ffmpeg_path_release, 'lib'))
     ffmpeg_output = os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()
     print ffmpeg_output
     ffmpeg_version = re.search(r'(N-[^\s]*)', ffmpeg_output).groups()[0]
