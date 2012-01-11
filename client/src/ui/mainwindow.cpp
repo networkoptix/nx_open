@@ -159,6 +159,25 @@ MainWindow::~MainWindow()
 {
 }
 
+Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::DynamicPropertyChange) {
+        if (static_cast<QDynamicPropertyChangeEvent *>(event)->propertyName() == "caption") {
+            if (QnWorkbenchLayout *layout = qobject_cast<QnWorkbenchLayout *>(watched)) {
+                const QString caption = layout->property("caption").toString();
+                for (int i = 0; i < m_tabBar->count(); ++i) {
+                    if (layout == m_tabBar->tabData(i).value<QnWorkbenchLayout *>()) // ###
+                        m_tabBar->setTabText(i, caption);
+                }
+            }
+        }
+    }
+
+    return FancyMainWindow::eventFilter(watched, event);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     FancyMainWindow::closeEvent(event);
@@ -167,13 +186,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
         Q_EMIT mainWindowClosed();
 }
 
-Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
-
 void MainWindow::addTab()
 {
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout(m_view);
+    layout->installEventFilter(this);
     const int index = m_tabBar->addTab(Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
-    m_tabBar->setTabData(index, QVariant::fromValue(new QnWorkbenchLayout(m_view))); // ###
+    m_tabBar->setTabData(index, QVariant::fromValue(layout)); // ###
     m_tabBar->setCurrentIndex(index);
+    if (m_tabBar->count() == 1)
+        currentTabChanged(index);
 }
 
 void MainWindow::currentTabChanged(int index)
@@ -193,6 +214,7 @@ void MainWindow::closeTab(int index)
         m_workbench->setLayout(0);
 
     QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>(); // ###
+    layout->removeEventFilter(this);
     delete layout;
 
     m_tabBar->removeTab(index);

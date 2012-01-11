@@ -351,6 +351,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
     m_treeWidget->setWorkbenchController(this);
+    connect(m_treeWidget, SIGNAL(newTabRequested()), m_display->view()->window(), SLOT(addTab()));
 
     connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
 
@@ -531,6 +532,9 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     if (!resource->checkFlag(QnResource::media))
         return; // ### upsupported for now
 
+    workbench()->setItem(QnWorkbench::RAISED, NULL);
+    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+
     const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
 
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
@@ -586,14 +590,11 @@ void QnWorkbenchController::setTreeVisible(bool visible, bool animate)
 {
     m_treeVisible = visible;
 
-    QPointF newPos = visible ?
-        QPointF(0.0, 0.0) :
-        QPointF(-m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
-    if(animate) {
+    QPointF newPos = QPointF(visible ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
+    if (animate)
         m_treePositionAnimator->animateTo(newPos);
-    } else {
+    else
         m_treeItem->setPos(newPos);
-    }
 }
 
 void QnWorkbenchController::toggleTreeVisible() {
