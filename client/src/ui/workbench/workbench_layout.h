@@ -11,8 +11,8 @@
 class QnWorkbenchItem;
 
 /**
- * Layout of a workbench. 
- * 
+ * Layout of a workbench.
+ *
  * Contains workbench items and information on their positions. Provides the
  * necessary functions for moving items around.
  */
@@ -26,7 +26,7 @@ public:
 
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent object for this ui layout.
      */
     QnWorkbenchLayout(QObject *parent = NULL);
@@ -36,14 +36,15 @@ public:
      */
     virtual ~QnWorkbenchLayout();
 
+public Q_SLOTS:
     /**
      * Adds the given item to this layout. This layout takes ownership of the
      * given item. If the given item already belongs to some other layout,
      * it will first be removed from that layout.
-     * 
+     *
      * If the position where the item is to be placed is occupied, the item
      * will be placed unpinned.
-     * 
+     *
      * \param item                      Item to add.
      */
     void addItem(QnWorkbenchItem *item);
@@ -51,11 +52,17 @@ public:
     /**
      * Removes the given item from this layout. Item's ownership is passed
      * to the caller.
-     * 
+     *
      * \param item                      Item to remove
      */
     void removeItem(QnWorkbenchItem *item);
 
+    /**
+     * Clears this layout by removing all its items.
+     */
+    void clear();
+
+public:
     /**
      * \param item                      Item to check.
      * \param geometry                  New position.
@@ -134,14 +141,11 @@ public:
     }
 
     /**
-     * Clears this layout by removing all its items.
+     * \returns                         Whether there are no items on this layout.
      */
-    void clear();
-
-    /**
-     * \returns                         Whether there are no items on this layout. 
-     */
-    bool empty() const;
+    bool isEmpty() const {
+        return m_items.isEmpty();
+    }
 
     /**
      * \returns                         Bounding rectangle of all pinned items in this layout.
@@ -154,14 +158,14 @@ public:
      * \param pos                       Desired position, in grid coordinates.
      * \param size                      Desired slot size.
      * \param metric                    Metric to use.
-     * \returns                         Geometry of the free slot of desired size whose upper-left corner 
+     * \returns                         Geometry of the free slot of desired size whose upper-left corner
      *                                  is closest (as defined by the grid walker) to the given position.
      */
     QRect closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPointF> *metric = NULL) const;
 
-signals:
+Q_SIGNALS:
     /**
-     * This signal is emitted when this layout is about to be destroyed 
+     * This signal is emitted when this layout is about to be destroyed
      * (i.e. its destructor has started).
      */
     void aboutToBeDestroyed();
@@ -170,7 +174,7 @@ signals:
      * This signal is emitted whenever an item is added to this layout.
      * At the time of emit all internal data structures are already updated
      * to include the added item.
-     * 
+     *
      * \param item                      Item that was added.
      */
     void itemAdded(QnWorkbenchItem *item);
@@ -180,13 +184,13 @@ signals:
      * this layout. At the time of emit the item is still valid, but
      * all internal data structures are already updated not to include the
      * removed item.
-     * 
+     *
      * \param item                      Item that was removed.
      */
     void itemRemoved(QnWorkbenchItem *item);
 
     /**
-     * This signal is emitted whenever bounding rectangle of this layout changes. 
+     * This signal is emitted whenever bounding rectangle of this layout changes.
      */
     void boundingRectChanged();
 
