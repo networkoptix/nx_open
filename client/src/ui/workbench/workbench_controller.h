@@ -62,6 +62,12 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
+    /**
+     * \param resource                  Resource to get item for.
+     * \returns                         Item for the given resource.
+     */
+    QnWorkbenchItem *item(const QnResourcePtr &resource) const;
+
     void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QString &file, const QPointF &gridPos = QPointF(), bool findAccepted = true);

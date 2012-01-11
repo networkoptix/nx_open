@@ -2919,7 +2919,7 @@ void GraphicsView::toggleRecording()
         label->setMask(createRoundRegion(18, 18, label->rect()));
         label->setText(tr("Recording started"));
         label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
+        label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
         label->setFocusPolicy(Qt::NoFocus);
         label->show();
 

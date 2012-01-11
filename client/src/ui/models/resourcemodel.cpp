@@ -43,20 +43,15 @@ QnResourcePtr ResourceModel::resourceFromIndex(const QModelIndex &index) const
     return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
 }
 
-QnResourcePtr ResourceModel::resourceFromItem(QStandardItem *item) const
+QModelIndex ResourceModel::indexFromResource(QnResourcePtr resource) const
 {
-    return resourceFromIndex(item->index());
+    return indexFromResourceId(resource->getId().hash());
 }
 
-QStandardItem *ResourceModel::itemFromResource(QnResourcePtr resource) const
-{
-    return itemFromResourceId(resource->getId().hash());
-}
-
-QStandardItem *ResourceModel::itemFromResourceId(uint id) const
+QModelIndex ResourceModel::indexFromResourceId(uint id) const // ### remove; use use indexFromResource() instead
 {
     const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
-    return !indexList.isEmpty() ? itemFromIndex(indexList.first()) : 0;
+    return indexList.value(0);
 }
 
 static inline QIcon iconForResource(QnResourcePtr resource)
@@ -192,4 +187,105 @@ bool ResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction actio
     }
 
     return true;
+}
+
+
+ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent)
+    : QSortFilterProxyModel(parent)
+{
+    parseFilterString();
+}
+
+static inline bool matchesCategoryFilter(const QList<QRegExp> &filters, const QString &value)
+{
+    for (int i = 0; i < filters.size(); ++i) {
+        if (value.contains(filters[i]))
+            return true;
+    }
+
+    return false;
+}
+
+bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    if (!source_parent.isValid())
+        return true;
+
+    if (m_parsedFilterString != filterRegExp().pattern())
+        const_cast<ResourceSortFilterProxyModel *>(this)->parseFilterString();
+    if (m_parsedFilterString.isEmpty())
+        return false;
+
+    QnResourcePtr resource = qnResPool->getResourceById(sourceModel()->index(source_row, 0, source_parent).data(Qt::UserRole + 1));
+    if (!resource)
+        return false;
+
+    if (m_flagsFilter != 0) {
+        if (resource->flags() & m_flagsFilter)
+            return true;
+    }
+
+    if (!m_filters[Id].isEmpty()) {
+        const QString id = QString::number(resource->getId().hash());
+        if (matchesCategoryFilter(m_filters[Id], id))
+            return true;
+    }
+
+    if (!m_filters[Name].isEmpty()) {
+        const QString name = resource->getName();
+        if (matchesCategoryFilter(m_filters[Name], name))
+            return true;
+    }
+
+    if (!m_filters[Tags].isEmpty()) {
+        QString tags = resource->tagList().join(QLatin1String("\",\""));
+        if (!tags.isEmpty())
+            tags = QLatin1Char('"') + tags + QLatin1Char('"');
+        if (matchesCategoryFilter(m_filters[Tags], tags))
+            return true;
+    }
+
+    return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+}
+
+static inline QString normalizedFilterString(const QString &str)
+{
+    QString ret = str;
+    ret.replace(QLatin1Char('"'), QString());
+    return ret;
+}
+
+void ResourceSortFilterProxyModel::parseFilterString()
+{
+    m_flagsFilter = 0;
+    for (uint i = 0; i < NumFilterCategories; ++i)
+        m_filters[i].clear();
+
+    m_parsedFilterString = filterRegExp().pattern();
+    if (m_parsedFilterString.isEmpty())
+        return;
+
+    const QRegExp::PatternSyntax patternSyntax = filterRegExp().patternSyntax();
+    if (patternSyntax != QRegExp::FixedString && patternSyntax != QRegExp::Wildcard && patternSyntax != QRegExp::WildcardUnix)
+        return;
+
+    QString filterString = normalizedFilterString(m_parsedFilterString);
+    foreach (const QString &filter, filterString.split(QRegExp(QLatin1String("[\\s\\|;+]")), QString::SkipEmptyParts)) {
+        const int idx = filter.indexOf(QLatin1Char(':'));
+        FilterCategory category = Text;
+        const QString pattern = filter.mid(idx + 1);
+        if (idx != -1) {
+            const QString key = filter.left(idx).toLower();
+            if (key == QLatin1String("id"))
+                category = Id;
+            else if (key == QLatin1String("name"))
+                category = Name;
+            else if (key == QLatin1String("tag"))
+                category = Tags;
+        } else {
+            if (pattern == QLatin1String("live"))
+                m_flagsFilter |= QnResource::live;
+        }
+        m_filters[category].append(QRegExp(pattern, category == Id ? Qt::CaseSensitive : Qt::CaseInsensitive, patternSyntax));
+    }
 }
