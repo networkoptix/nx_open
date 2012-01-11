@@ -20,7 +20,7 @@ const QString &ToolTipItem::text() const
 
 void ToolTipItem::setText(const QString &text)
 {
-    if(m_text == text)
+    if (m_text == text)
         return;
 
     m_text = text;
@@ -35,9 +35,6 @@ const QFont &ToolTipItem::font() const
 
 void ToolTipItem::setFont(const QFont &font)
 {
-    if(m_font == font)
-        return;
-
     m_font = font;
     recalcTextSize();
     update();

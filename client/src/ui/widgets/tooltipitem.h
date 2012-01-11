@@ -3,9 +3,6 @@
 
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QStaticText>
-#include <QPen>
-#include <QBrush>
-#include <QFont>
 
 class ToolTipItem: public QGraphicsItem
 {
