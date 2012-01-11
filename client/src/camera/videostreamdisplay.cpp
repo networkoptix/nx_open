@@ -396,7 +396,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
 
-    bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
+    bool enableFrameQueue = true; //reverseMode ? true : m_enableFrameQueue;
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
@@ -458,7 +458,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         return Status_Displayed;
     }
 
-    if (reverseMode != m_prevReverseMode) {
+    if (reverseMode != m_prevReverseMode) 
+    {
         clearReverseQueue();
         QMutexLocker lock(&m_mtx);
         dec->resetDecoder(data);
@@ -483,7 +484,10 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     m_mtx.lock();
 
     if (data->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
+    {
+        m_drawer->waitForFrameDisplayed(0);
         dec->resetDecoder(data);
+    }
 
     if ((data->flags & AV_REVERSE_BLOCK_START) && m_lightCPUmode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
@@ -502,6 +506,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         delete tmpOutFrame;
         m_flushedBeforeReverseStart = true;
         reorderPrevFrames();
+        if (!m_queueUsed)
+            m_drawer->waitForFrameDisplayed(0); // codec frame may be displayed now
         dec->resetDecoder(data);
     }
 
@@ -599,6 +605,7 @@ bool CLVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
     if (outFrame->data[0]) {
         if (enableFrameQueue) 
         {
+            Q_ASSERT(!outFrame->isExternalData());
             if (m_bufferedFrameDisplayer)
             {
                 bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
@@ -622,11 +629,15 @@ bool CLVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
             m_drawer->draw(outFrame);
             m_drawer->waitForFrameDisplayed(outFrame->channel);
         }
-        if (reverseMode) {
-            if (m_prevFrameToDelete)
-                delete m_prevFrameToDelete;
-            m_prevFrameToDelete = outFrame;
+
+        if (m_prevFrameToDelete) {
+            Q_ASSERT(outFrame != m_prevFrameToDelete);
+            Q_ASSERT(!m_prevFrameToDelete->isExternalData());
+            delete m_prevFrameToDelete;
+            m_prevFrameToDelete = 0;
         }
+        if (reverseMode) 
+            m_prevFrameToDelete = outFrame;
         return !m_bufferedFrameDisplayer;
     }
     else {

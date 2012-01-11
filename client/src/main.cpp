@@ -44,6 +44,7 @@
 #include "core/resource/directory_browser.h"
 
 #include "tests/auto_tester.h"
+#include "plugins/resources/d-link/dlink_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -309,6 +310,10 @@ int main(int argc, char *argv[])
 
     QnPlAxisResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+
+    QnPlDlinkResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+
 #endif
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());

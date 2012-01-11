@@ -54,6 +54,7 @@ m_checkH264ResolutionChange(false),
 m_context(0),
 m_forceSliceDecoding(-1)
 {
+    QMutexLocker mutex(&global_ffmpeg_mutex);
 	if (data->context)
 	{
 		m_passedContext = avcodec_alloc_context();
@@ -64,7 +65,6 @@ m_forceSliceDecoding(-1)
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
 	openDecoder(data);
 }
 void CLFFmpegVideoDecoder::flush()

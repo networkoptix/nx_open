@@ -31,7 +31,9 @@ void QnPlDlinkResource::setIframeDistance(int frames, int timems)
 
 QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
 {
-    return new MJPEGtreamreader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
+    //return new MJPEGtreamreader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
+    //return new MJPEGtreamreader(toSharedPointer(), "video/mjpg.cgi");
+    return new MJPEGtreamreader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
 }
 
 void QnPlDlinkResource::setCropingPhysical(QRect croping)

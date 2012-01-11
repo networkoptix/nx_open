@@ -15,6 +15,8 @@ static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for
 
 static const int MAX_VIDEO_JITTER = 2;
 
+extern QMutex global_ffmpeg_mutex;
+
 extern "C"
 {
     #include <libavformat/avformat.h>
@@ -454,9 +456,8 @@ bool DesktopFileEncoder::init()
             m_captureResolution,
             m_widget);
     m_grabber->setLogo(m_logo);
-    avcodec_init();
-    av_register_all();
 
+    QMutexLocker mutex(&global_ffmpeg_mutex);
 
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
@@ -839,6 +840,8 @@ void DesktopFileEncoder::closeStream()
 
     if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
+
+    QMutexLocker mutex(&global_ffmpeg_mutex);
 
     if (m_videoCodecCtx)
         avcodec_close(m_videoCodecCtx);

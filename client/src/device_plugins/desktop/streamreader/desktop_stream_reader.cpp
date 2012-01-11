@@ -1,5 +1,6 @@
-
 #include "desktop_stream_reader.h"
+
+extern QMutex global_ffmpeg_mutex;
 
 struct FffmpegLog
 {
@@ -46,10 +47,7 @@ CLDesktopStreamreader::~CLDesktopStreamreader()
 
 bool CLDesktopStreamreader::init()
 {
-    // must be called before using avcodec
-    avcodec_init();
-    // register all the codecs (you can also register only the codec you wish to have smaller code
-    avcodec_register_all();
+    QMutexLocker mutex(&global_ffmpeg_mutex);
 
     av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
@@ -133,6 +131,9 @@ void CLDesktopStreamreader::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
+
+    QMutexLocker mutex(&global_ffmpeg_mutex);
+
     if (m_videoCodecCtx)
         avcodec_close(m_videoCodecCtx);
     m_videoCodecCtx = 0;
