@@ -59,7 +59,8 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
     for (int i = 0; i < ipaddrs.size();++i)
     {
         QUdpSocket sock;
-        sock.bind(ipaddrs.at(i), 0);
+        if (!sock.bind(ipaddrs.at(i), 0))
+            continue;
 
         // sending broadcast
 
