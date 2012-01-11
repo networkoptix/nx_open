@@ -99,13 +99,20 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 QString smac = MACToString(mac);
                 QString name  = "Dlink";
 
+                bool haveToContinue = false;
                 foreach(QnResourcePtr res, result)
                 {
                     QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
                     if (net_res->getMAC().toString() == smac)
-                        continue; // already found;
+                    {
+                        haveToContinue = true;
+                        break; // already found;
+                    }
                 }
+
+                if (haveToContinue)
+                    break;
 
 
                 QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
@@ -118,6 +125,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 resource->setName(name);
                 resource->setMAC(smac);
                 resource->setHostAddress(sender, QnDomainMemory);
+                QString s = sender.toString();
                 resource->setDiscoveryAddr(ipaddrs.at(i));
 
                 result.push_back(resource);
