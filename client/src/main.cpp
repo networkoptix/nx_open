@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
     QStringList dirs;
     dirs << Settings::instance().mediaRoot();
     QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
 
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
