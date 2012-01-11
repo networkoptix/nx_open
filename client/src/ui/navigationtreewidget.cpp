@@ -5,39 +5,59 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QItemSelectionModel>
 #include <QtGui/QLineEdit>
-#include <QtGui/QMouseEvent>
 #include <QtGui/QMenu>
-#include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QTabWidget>
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
 
-#include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"
 #include "ui/device_settings/dlg_factory.h"
+#include "ui/dialogs/tagseditdialog.h"
 #include "ui/models/resourcemodel.h"
 #include "ui/skin/skin.h"
-#include "ui/context_menu/menu_wrapper.h"
+#include "ui/workbench/workbench.h"
+#include "ui/workbench/workbench_controller.h"
+#include "ui/workbench/workbench_layout.h"
+#include "youtube/youtubeuploaddialog.h"
 
-class NavigationTreeSortFilterProxyModel : public QSortFilterProxyModel
+
+#include <QtGui/QStyledItemDelegate>
+
+class NavigationTreeItemDelegate : public QStyledItemDelegate
 {
 public:
-    NavigationTreeSortFilterProxyModel(QObject *parent = 0)
-        : QSortFilterProxyModel(parent)
-    {}
+    explicit NavigationTreeItemDelegate(NavigationTreeWidget *parent)
+        : QStyledItemDelegate(parent)
+    {
+        Q_ASSERT(parent);
+    }
 
 protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const
     {
-        return !source_parent.isValid() || QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+        QStyledItemDelegate::initStyleOption(option, index);
+
+        NavigationTreeWidget *navTree = static_cast<NavigationTreeWidget *>(parent());
+        if (navTree->m_controller) {
+            QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+            if (navTree->m_controller->layout()->items().contains(navTree->m_controller->item(resource)))
+                option->font.setBold(true);
+        }
+/*        if (navTree->m_searchProxyModel) {
+            const QModelIndex proxyIndex = navTree->m_searchProxyModel->mapFromSource(index);
+            if (proxyIndex.isValid())
+                option->font.setBold(true);
+        }*/
     }
 };
 
 
 NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      m_searchProxyModel(0),
+      m_controller(0)
 {
     m_previousItemButton = new QToolButton(this);
     m_previousItemButton->setText(QLatin1String("<"));
@@ -64,14 +84,18 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_clearFilterButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     m_clearFilterButton->setIcon(Skin::icon(QLatin1String("clear.png")));
     m_clearFilterButton->setIconSize(QSize(16, 16));
+    m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
 
     connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
+
+    m_filterTimerId = 0;
 
 
     m_resourcesModel = new ResourceModel(this);
 
     m_resourcesTreeView = new QTreeView(this);
+    m_resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_resourcesTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_resourcesTreeView->setAllColumnsShowFocus(true);
     m_resourcesTreeView->setRootIsDecorated(true);
@@ -80,10 +104,12 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_resourcesTreeView->setUniformRowHeights(true);
     m_resourcesTreeView->setWordWrap(false);
     m_resourcesTreeView->setDragDropMode(QAbstractItemView::DragDrop);
+    m_resourcesTreeView->setItemDelegate(new NavigationTreeItemDelegate(this));
 
     connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
     m_searchTreeView = new QTreeView(this);
+    m_searchTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_searchTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_searchTreeView->setAllColumnsShowFocus(true);
     m_searchTreeView->setRootIsDecorated(true);
@@ -95,16 +121,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
-    m_searchProxyModel = new NavigationTreeSortFilterProxyModel(m_searchTreeView);
-    m_searchProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    m_searchProxyModel->setFilterKeyColumn(0);
-    m_searchProxyModel->setFilterRole(Qt::UserRole + 2);
-    m_searchProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    m_searchProxyModel->setDynamicSortFilter(true);
-    m_searchProxyModel->setSourceModel(m_resourcesModel);
-
     m_resourcesTreeView->setModel(m_resourcesModel);
-    m_searchTreeView->setModel(m_searchProxyModel);
     //QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
 
 
@@ -143,12 +160,101 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     setMaximumWidth(350);
 
     setAcceptDrops(true);
-
-    filterChanged(QString());
 }
 
 NavigationTreeWidget::~NavigationTreeWidget()
 {
+}
+
+void NavigationTreeWidget::setWorkbenchController(QnWorkbenchController *controller)
+{
+    if (m_controller) {
+        disconnect(m_controller->workbench(), SIGNAL(layoutAboutToBeChanged()), this, SLOT(workbenchLayoutAboutToBeChanged()));
+        disconnect(m_controller->workbench(), SIGNAL(layoutChanged()), this, SLOT(workbenchLayoutChanged()));
+    }
+
+    workbenchLayoutAboutToBeChanged();
+    m_controller = controller;
+    m_searchProxyModel = 0;
+    workbenchLayoutChanged();
+
+    if (m_controller) {
+        connect(m_controller->workbench(), SIGNAL(layoutAboutToBeChanged()), this, SLOT(workbenchLayoutAboutToBeChanged()));
+        connect(m_controller->workbench(), SIGNAL(layoutChanged()), this, SLOT(workbenchLayoutChanged()));
+    }
+}
+
+void NavigationTreeWidget::workbenchLayoutAboutToBeChanged()
+{
+    if (!m_controller)
+        return;
+
+    if (m_searchProxyModel) {
+        disconnect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
+        disconnect(m_searchProxyModel.data(), SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(handleRemoveRows(QModelIndex,int,int)));
+    }
+
+    disconnect(m_controller->layout(), SIGNAL(itemAdded(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
+    disconnect(m_controller->layout(), SIGNAL(itemRemoved(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
+}
+
+Q_DECLARE_METATYPE(ResourceSortFilterProxyModel *) // ###
+
+void NavigationTreeWidget::workbenchLayoutChanged()
+{
+    if (!m_controller)
+        return;
+
+    connect(m_controller->layout(), SIGNAL(itemAdded(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
+    connect(m_controller->layout(), SIGNAL(itemRemoved(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
+
+    m_searchProxyModel = m_controller->layout()->property("model").value<ResourceSortFilterProxyModel *>(); // ###
+    if (!m_searchProxyModel) {
+        ResourceSortFilterProxyModel *proxyModel = new ResourceSortFilterProxyModel(m_controller->workbench());
+        proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+        proxyModel->setFilterKeyColumn(0);
+        proxyModel->setFilterRole(Qt::UserRole + 2);
+        proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        proxyModel->setDynamicSortFilter(true);
+        proxyModel->setSourceModel(m_resourcesModel);
+        m_searchProxyModel = proxyModel;
+        m_controller->layout()->setProperty("model", QVariant::fromValue(proxyModel)); // ###
+    }
+
+    connect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
+    connect(m_searchProxyModel.data(), SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(handleRemoveRows(QModelIndex,int,int)));
+
+    m_searchTreeView->setModel(m_searchProxyModel);
+    m_searchTreeView->expandAll();
+
+    disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
+    m_filterLineEdit->setText(m_searchProxyModel->filterRegExp().pattern()); // ###
+    m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
+    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
+}
+
+void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first, int last)
+{
+    if (!m_controller || !m_searchProxyModel)
+        return;
+
+    for (int row = first; row <= last; ++row) {
+        const QModelIndex index = m_searchProxyModel->index(row, 0, parent);
+        QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+        m_controller->drop(resource);
+    }
+}
+
+void NavigationTreeWidget::handleRemoveRows(const QModelIndex &parent, int first, int last)
+{
+    if (!m_controller || !m_searchProxyModel)
+        return;
+
+    for (int row = first; row <= last; ++row) {
+        const QModelIndex index = m_searchProxyModel->index(row, 0, parent);
+        QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+        m_controller->layout()->removeItem(m_controller->item(resource));
+    }
 }
 
 void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
@@ -156,7 +262,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     QnResourceList resources;
     QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
-        resources.append(qnResPool->getResourceById(QnId(QString::number(index.data(Qt::UserRole + 1).toUInt()))));
+        resources.append(qnResPool->getResourceById(index.data(Qt::UserRole + 1)));
 
     QScopedPointer<QMenu> menu(new QMenu);
 
@@ -164,11 +270,9 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
     menu->addAction(openAction);
     menu->addSeparator();
-    if (resources.size() == 1)
-    {
+    if (resources.size() == 1) {
         const QnResourcePtr resource = resources.first();
-        if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT))
-        {
+        if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT)) {
             menu->addAction(&cm_editTags);
 
             if (resource->associatedWithFile())
@@ -179,29 +283,21 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
 
             if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::SINGLE_SHOT))
                 menu->addAction(&cm_open_containing_folder);
-        }
-        else if (resource->checkFlag(QnResource::live_cam))
-        {
+        } else if (resource->checkFlag(QnResource::live_cam)) {
             // ### Start/Stop recording (Ctrl+R)
             // ### Delete(if no connection)(Shift+Del)
             menu->addAction(&cm_editTags);
             // ### Export selected... (Ctrl+E)
-        }
-        else if (resource->checkFlag(QnResource::server))
-        {
+        } else if (resource->checkFlag(QnResource::server)) {
             // ### New camera
         }
         // ### handle layouts
 
         if (CLDeviceSettingsDlgFactory::canCreateDlg(resource))
             menu->addAction(&cm_settings);
-    }
-    else if (resources.size() > 1)
-    {
+    } else if (resources.size() > 1) {
         // ###
-    }
-    else
-    {
+    } else {
         menu->addAction(&cm_open_file);
         menu->addAction(&cm_new_item);
     }
@@ -216,32 +312,47 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     if (!action)
         return;
 
-    if (resources.size() == 1)
-    {
+    if (resources.size() == 1) {
         const QnResourcePtr resource = resources.first();
-        if (action == &cm_settings) { // ###
+        if (action == &cm_settings) { // ### move to app-global scope
             if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, QApplication::activeWindow())) {
                 dialog->exec();
                 delete dialog;
             }
+        } else if (action == &cm_editTags) { // ### move to app-global scope
+            TagsEditDialog dialog(QStringList() << resource->getUniqueId(), this);
+            dialog.setWindowModality(Qt::ApplicationModal);
+            dialog.exec();
+        } else if (action == &cm_upload_youtube) { // ### move to app-global scope
+            YouTubeUploadDialog dialog(resource, this);
+            dialog.setWindowModality(Qt::ApplicationModal);
+            dialog.exec();
         }
     }
 }
 
+void NavigationTreeWidget::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_filterTimerId) {
+        killTimer(m_filterTimerId);
+        m_filterTimerId = 0;
+
+        if (m_searchProxyModel) {
+            m_searchProxyModel->setFilterWildcard(m_filterLineEdit->text());
+            m_searchTreeView->expandAll();
+        }
+    }
+
+    QWidget::timerEvent(event);
+}
+
 void NavigationTreeWidget::filterChanged(const QString &filter)
 {
-    if (!filter.isEmpty())
-    {
-        m_clearFilterButton->show();
-        m_searchProxyModel->setFilterWildcard(QLatin1Char('*') + filter + QLatin1Char('*'));
-        m_searchTreeView->expandAll();
-    }
-    else
-    {
-        m_clearFilterButton->hide();
-        //m_searchProxyModel->invalidate();
-        m_searchProxyModel->setFilterRegExp(QLatin1String("^$")); // ###
-    }
+    m_clearFilterButton->setVisible(!filter.isEmpty());
+
+    if (m_filterTimerId != 0)
+        killTimer(m_filterTimerId);
+    m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 50) : 0);
 }
 
 void NavigationTreeWidget::itemActivated(const QModelIndex &index)

@@ -12,9 +12,6 @@ public:
     const QString &text() const;
     void setText(const QString &text);
 
-    QTextOption textOption() const;
-    void setTextOption(const QTextOption &textOption);
-
     const QFont &font() const;
     void setFont(const QFont &font);
 
@@ -47,7 +44,8 @@ private:
     QPen m_textPen;
     QBrush m_brush;
 
-    QStaticText m_staticText;
+    QString m_text;
+    QPixmap m_textPixmap;
     QFont m_font;
 };
 

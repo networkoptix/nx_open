@@ -350,6 +350,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
+    m_treeWidget->setWorkbenchController(this);
 
     connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
 
@@ -383,12 +384,15 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     treeShowingProcessor->setTargetItem(m_treeTriggerItem);
     treeShowingProcessor->setHoverEnterDelay(250);
 
+#if 0
     setTreeVisible(false, false);
+
+    connect(treeHidingProcessor,        SIGNAL(hoverLeft(QGraphicsItem *)),                                                         this,                           SLOT(at_treeWidget_hoverLeft()));
+    connect(treeShowingProcessor,       SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeWidgetTrigger_hoverEntered()));
+#endif
 
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
-    connect(treeHidingProcessor,        SIGNAL(hoverLeft(QGraphicsItem *)),                                                         this,                           SLOT(at_treeWidget_hoverLeft()));
-    connect(treeShowingProcessor,       SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeWidgetTrigger_hoverEntered()));
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -470,6 +474,14 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
 }
 
+QnWorkbenchItem *QnWorkbenchController::item(const QnResourcePtr &resource) const
+{
+    if (QnResourceWidget *widget = m_display->widget(resource))
+        return widget->item();
+
+    return 0;
+}
+
 VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget) {
     VariantAnimator *animator = widget->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
     if(animator != NULL)
@@ -497,40 +509,42 @@ void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPointF &gridPos
 
 void QnWorkbenchController::drop(const QString &file, const QPointF &gridPos, bool findAccepted) {
     QList<QString> files;
-    files.push_back(file);
+    files.push_back(fromNativePath(file));
     drop(files, gridPos, findAccepted);
 }
 
 void QnWorkbenchController::drop(const QList<QString> &files, const QPointF &gridPos, bool findAccepted) {
     const QList<QString> validFiles = !findAccepted ? files : QnFileProcessor::findAcceptedFiles(files);
-    if(validFiles.empty())
-        return;
-
-    drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
+    if (!validFiles.empty())
+        drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
 }
 
 void QnWorkbenchController::drop(const QnResourceList &resources, const QPointF &gridPos) {
-    foreach(const QnResourcePtr &resource, resources)
+    foreach (const QnResourcePtr &resource, resources)
         drop(resource, gridPos);
 }
 
 void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &gridPos) {
+    if (!resource) {
+        qnNullWarning(resource);
+        return;
+    }
+
+    const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
+
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
     item->setFlag(QnWorkbenchItem::Pinned, false);
-    item->setCombinedGeometry(QRectF(gridPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
+    item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
     layout()->addItem(item);
 
     QnResourceWidget *widget = display()->widget(item);
+    Q_ASSERT(widget);
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
-    qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
-    QSize size(1, 1);
-    if(estimatedAspectRatio > 1.0) {
-        size = bestSingleBoundedSize(mapper(), 1, Qt::Vertical, estimatedAspectRatio);
-    } else {
-        size = bestSingleBoundedSize(mapper(), 1, Qt::Horizontal, estimatedAspectRatio);
-    }
+    const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
+    const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
+    const QSize size = bestSingleBoundedSize(mapper(), 1, orientation, estimatedAspectRatio);
 
     /* Adjust item's geometry for the new size. */
     if(size != item->geometry().size()) {
@@ -1168,7 +1182,7 @@ void QnWorkbenchController::at_startRecordingAction_triggered() {
     m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
     m_recordingLabel->setText(tr("Recording started"));
     m_recordingLabel->setAlignment(Qt::AlignCenter);
-    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
+    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
     m_recordingLabel->setFocusPolicy(Qt::NoFocus);
     m_recordingLabel->show();
 

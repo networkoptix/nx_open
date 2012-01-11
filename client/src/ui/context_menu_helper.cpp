@@ -61,6 +61,7 @@ void initContextMenu()
     cm_preferences.setShortcut(QObject::tr("Ctrl+P"));
     cm_preferences.setShortcutContext(Qt::ApplicationShortcut);
 
+    cm_open_file.setIcon(Skin::icon(QLatin1String("folder.png")));
     cm_open_file.setShortcut(QObject::tr("Ctrl+O"));
     cm_open_file.setShortcutContext(Qt::ApplicationShortcut);
 
