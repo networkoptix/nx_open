@@ -456,10 +456,11 @@ void NavigationItem::updateSlider()
             m_currentTime = time != DATETIME_NOW ? time/1000 : time;
             m_timeSlider->setCurrentValue(m_currentTime);
         }
-        m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
 
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
+
+    m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
 }
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
@@ -665,7 +666,7 @@ void NavigationItem::smartSeek(qint64 timeMSec)
     if (m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW);
 
-        m_liveButton->show();
+        m_liveButton->setChecked(true);
     } else {
         timeMSec *= 1000;
         if (m_timeSlider->isMoving())
@@ -673,7 +674,7 @@ void NavigationItem::smartSeek(qint64 timeMSec)
         else
             reader->jumpToPreviousFrame(timeMSec);
 
-        m_liveButton->hide();
+        m_liveButton->setChecked(false);
     }
 }
 

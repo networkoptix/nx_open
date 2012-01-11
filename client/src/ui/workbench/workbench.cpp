@@ -42,6 +42,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
     QRect oldBoundingRect;
     QRect newBoundingRect;
 
+    Q_EMIT layoutAboutToBeChanged();
     /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
     if(m_layout != NULL) {
@@ -59,7 +60,7 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
         m_dummyLayout->clear();
         m_layout = m_dummyLayout;
     }
-    emit layoutChanged();
+    Q_EMIT layoutChanged();
 
     /* Set up new layout. */
     if(m_layout != NULL) {

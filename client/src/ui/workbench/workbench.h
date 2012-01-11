@@ -111,7 +111,7 @@ public:
      */
     void setItem(ItemRole role, QnWorkbenchItem *item);
 
-signals:
+Q_SIGNALS:
     /**
      * This signal is emitted while the workbench is still intact, but is about
      * to be destroyed.
@@ -129,6 +129,11 @@ signals:
      * \param role                      Item role.
      */
     void itemChanged(QnWorkbench::ItemRole role);
+
+    /**
+     * This signal is emitted whenever the layout of this workbench is about to be changed.
+     */
+    void layoutAboutToBeChanged();
 
     /**
      * This signal is emitted whenever the layout of this workbench changes.
