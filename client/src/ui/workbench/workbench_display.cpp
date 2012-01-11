@@ -345,12 +345,11 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         /* Don't even try to uncomment this one, it slows everything down. */
         //m_view->setCacheMode(QGraphicsView::CacheBackground);
 
-        /* We don't need scrollbars & frame. */
+        /* We don't need scrollbars. */
         m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        m_view->setFrameShape(QFrame::NoFrame);
 
-        /* This may be needed by other instruments. */
+        /* This may be needed by instruments. */
         m_view->setDragMode(QGraphicsView::NoDrag);
         m_view->viewport()->setAcceptDrops(true);
 

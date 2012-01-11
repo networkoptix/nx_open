@@ -1,9 +1,10 @@
 #ifndef MAINWND_H
 #define MAINWND_H
 
-#include <QtGui/QMainWindow>
+#include <QWidget>
+#include <QScopedPointer>
 
-class QTabWidget;
+class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
 
@@ -12,6 +13,7 @@ class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchController;
 class QnWorkbenchDisplay;
+class QnWorkbenchLayout;
 class QnDwm;
 
 class MainWnd : public QWidget
@@ -38,9 +40,9 @@ protected:
 #endif
 
 protected Q_SLOTS:
-    void addTab();
-    void currentTabChanged(int index);
-    void closeTab(int index);
+    void newLayout();
+    void changeCurrentLayout(int index);
+    void removeLayout(int index);
 
     void handleMessage(const QString &message);
 
@@ -65,14 +67,15 @@ private:
     QnWorkbenchController *m_controller;
     QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
+
     QnGraphicsView *m_view;
+    QTabBar *m_tabBar;
 
-    QTabWidget *m_tabWidget;
-
-    QSpacerItem *m_titleSpacer;
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
+
+    bool m_titleVisible;
 
     QnDwm *m_dwm;
     bool m_drawCustomFrame;

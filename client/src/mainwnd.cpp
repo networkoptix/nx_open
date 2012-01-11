@@ -17,12 +17,6 @@
 #include <core/resourcemanagment/asynch_seacher.h> // QnResourceDiscoveryManager
 #include <core/resourcemanagment/resource_pool.h>
 
-#if 0
-#include "ui/layout_navigator.h"
-#include "ui/video_cam_layout/layout_manager.h"
-#include "ui/video_cam_layout/start_screen_content.h"
-#endif
-
 #include "ui/context_menu_helper.h"
 
 #include "ui/dialogs/logindialog.h"
@@ -51,21 +45,12 @@
 
 #include "ui/dwm.h"
 
+Q_DECLARE_METATYPE(QnWorkbenchLayout *);
+
 namespace {
-    // TODO: hack hack hack
 
-    class OpenTabWidget: public QTabWidget {
-    public:
-        QTabBar *extractTabBar() const {
-            return QTabWidget::tabBar();
-        }
-    };
-
-    QTabBar *tabBar(QTabWidget *widget) {
-        return static_cast<OpenTabWidget *>(widget)->extractTabBar();
-    }
-
-    QToolButton *newActionButton(QAction *action) {
+    QToolButton *newActionButton(QAction *action) 
+    {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
         
@@ -80,7 +65,8 @@ namespace {
         return button;
     }
 
-    void setVisibleRecursively(QLayout *layout, bool visible) {
+    void setVisibleRecursively(QLayout *layout, bool visible) 
+    {
         for(int i = 0, count = layout->count(); i < count; i++) {
             QLayoutItem *item = layout->itemAt(i);
             if(item->widget()) {
@@ -99,7 +85,8 @@ namespace {
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
       m_controller(0),
-      m_drawCustomFrame(false)
+      m_drawCustomFrame(false),
+      m_titleVisible(true)
 {
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
@@ -108,24 +95,46 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     /* Set up QWidget. */
     setWindowTitle(QApplication::applicationName());
-
-    setAttribute(Qt::WA_QuitOnClose);
     setAcceptDrops(true);
-
     setMinimumWidth(minimalWindowWidth);
     setMinimumHeight(minimalWindowHeight);
+    {
+        QPalette palette = this->palette();
+        palette.setColor(QPalette::Window, Qt::black);
+        setPalette(palette);
+    }
+
+    /* Set up actions. */
+    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
+    addAction(&cm_exit);
+
+    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+    addAction(&cm_toggle_fullscreen);
+
+    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
+    addAction(&cm_preferences);
+
+    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleTitleVisibility()));
+    addAction(&cm_hide_decorations);
+
+    QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
+    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+
+    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene);
     {
         /* Adjust palette so that inherited background painting is not needed. */
-        QPalette pal = m_view->palette();
-        pal.setColor(QPalette::Background, Qt::black);
-        pal.setColor(QPalette::Base, Qt::black);
-        m_view->setPalette(pal);
+        QPalette palette = m_view->palette();
+        palette.setColor(QPalette::Background, Qt::black);
+        palette.setColor(QPalette::Base, Qt::black);
+        m_view->setPalette(palette);
     }
     m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
+    m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
+    m_view->setMidLineWidth(1);
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
@@ -147,46 +156,39 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     new QnSyncPlayMixin(m_display, renderWatcher, this);
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SLOT(onDisplayingStateChanged(QnAbstractRenderer *, bool)));
 
-    /* Actions. */
-    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
-    addAction(&cm_exit);
+    /* Tab bar. */
+    m_tabBar = new QTabBar();
+    m_tabBar->setMovable(true);
+    m_tabBar->setTabsClosable(true);
+    m_tabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+    m_tabBar->setDrawBase(false);
+    m_tabBar->setShape(QTabBar::TriangularNorth);
 
-    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
-    addAction(&cm_toggle_fullscreen);
+    connect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(changeCurrentLayout(int)));
+    connect(m_tabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(removeLayout(int)));
 
-    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
-    addAction(&cm_preferences);
-
-    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleTitleVisibility()));
-    addAction(&cm_hide_decorations);
-
-    QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
-    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
-
-    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
-
-    /* Tab widget. */
-    m_tabWidget = new TabWidget(); 
-    m_tabWidget->setMovable(true);
-    m_tabWidget->setTabsClosable(true);
-    static_cast<TabWidget *>(m_tabWidget)->setSelectionBehaviorOnRemove(TabWidget::SelectPreviousTab);
-
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
-    connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
-
-    QToolButton *newTabButton = new QToolButton(m_tabWidget);
+    /* New tab button. */
+    QToolButton *newTabButton = new QToolButton();
     newTabButton->setToolTip(tr("New Tab"));
     newTabButton->setShortcut(QKeySequence::New);
     newTabButton->setIcon(Skin::icon(QLatin1String("plus.png")));
     newTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    connect(newTabButton, SIGNAL(clicked()), this, SLOT(addTab()));
-    m_tabWidget->setCornerWidget(newTabButton, Qt::TopLeftCorner);
+    connect(newTabButton, SIGNAL(clicked()), this, SLOT(newLayout()));
+
+    /* Tab bar layout. To snap tab bar to graphics view. */
+    QVBoxLayout *tabBarLayout = new QVBoxLayout();
+    tabBarLayout->setContentsMargins(0, 0, 0, 0);
+    tabBarLayout->setSpacing(0);
+    tabBarLayout->addStretch(0x1000);
+    tabBarLayout->addWidget(m_tabBar);
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
+    m_titleLayout->addLayout(tabBarLayout);
+    m_titleLayout->addWidget(newTabButton);
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(reconnectAction));
     m_titleLayout->addWidget(newActionButton(&cm_preferences));
@@ -196,21 +198,20 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    m_viewLayout->addWidget(m_tabWidget);
-
-    m_titleSpacer = new QSpacerItem(0, 0);
+    m_viewLayout->setSpacing(0);
+    m_viewLayout->addWidget(m_view);
 
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
     m_globalLayout->addLayout(m_titleLayout);
-    m_globalLayout->addSpacerItem(m_titleSpacer);
     m_globalLayout->addLayout(m_viewLayout);
+    m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
 
     setLayout(m_globalLayout);
     
     /* Add single tab. */
-    addTab();
+    newLayout();
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -255,59 +256,50 @@ void MainWnd::paintEvent(QPaintEvent *) {
     }
 }
 
-Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
-
-void MainWnd::addTab()
+void MainWnd::newLayout()
 {
-    QWidget *widget = new QWidget(m_tabWidget);
-    QVBoxLayout *layout = new QVBoxLayout(widget); // ensure widget's layout
-    layout->setContentsMargins(0, 0, 0, 0);
+    int index = m_tabBar->addTab(Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
 
-    widget->setProperty("SceneState", QVariant::fromValue(new QnWorkbenchLayout(widget))); // ###
-
-    int index = m_tabWidget->addTab(widget, Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
-    m_tabWidget->setCurrentIndex(index);
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+    m_tabBar->setTabData(index, QVariant::fromValue<QnWorkbenchLayout *>(layout));
+    
+    m_tabBar->setCurrentIndex(index);
 }
 
-void MainWnd::currentTabChanged(int index)
+void MainWnd::changeCurrentLayout(int index)
 {
-    if (QWidget *widget = m_view->parentWidget()) {
-        if (m_tabWidget->indexOf(widget) != -1) {
-            if (QLayout *layout = widget->layout())
-                layout->removeWidget(m_view);
-        }
+    if(index < 0 || index >= m_tabBar->count()) {
+        qnWarning("Layout index out of bounds: %1 not in [%2, %3).", index, 0, m_tabBar->count());
+        return;
     }
 
-    m_workbench->setLayout(0);
+    if(m_tabBar->currentIndex() != index)
+        m_tabBar->setCurrentIndex(index);
 
-    if (QWidget *widget = m_tabWidget->widget(index)) {
-        if (QLayout *layout = widget->layout())
-            layout->addWidget(m_view);
+    m_workbench->setLayout(m_tabBar->tabData(index).value<QnWorkbenchLayout *>());
+    m_display->fitInView(false);
 
-        m_workbench->setLayout(widget->property("SceneState").value<QnWorkbenchLayout *>()); // ###
-        m_display->fitInView(false);
-
-        /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
-        m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
-    }
+    /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
+    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
 }
 
-void MainWnd::closeTab(int index)
+void MainWnd::removeLayout(int index)
 {
-    if (m_tabWidget->count() == 1)
-        return; // don't close last tab
-
-    if (QWidget *widget = m_tabWidget->widget(index)) {
-        QnWorkbenchLayout *layout = widget->property("SceneState").value<QnWorkbenchLayout *>(); // ###
-        if (widget->close()) {
-            if (m_tabWidget->currentIndex() == index)
-                m_workbench->setLayout(0);
-
-            delete layout;
-
-            m_tabWidget->removeTab(index);
-        }
+    if(index < 0 || index >= m_tabBar->count()) {
+        qnWarning("Layout index out of bounds: %1 not in [%2, %3).", index, 0, m_tabBar->count());
+        return;
     }
+
+    if (m_tabBar->count() <= 1)
+        return; /* Don't remove the last layout. */
+
+    if(m_tabBar->currentIndex() == index)
+        m_workbench->setLayout(NULL);
+
+    QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>();
+    delete layout;
+
+    m_tabBar->removeTab(index);
 }
 
 #if 0
@@ -468,31 +460,35 @@ void MainWnd::appServerAuthenticationRequired()
     dialog = 0;
 }
 
-void MainWnd::toggleTitleVisibility() {
+void MainWnd::toggleTitleVisibility() 
+{
     if(isTitleVisible()) {
         m_globalLayout->takeAt(0);
         m_titleLayout->setParent(NULL);
         setVisibleRecursively(m_titleLayout, false);
+        m_titleVisible = false;
     } else {
         m_globalLayout->insertLayout(0, m_titleLayout);
         setVisibleRecursively(m_titleLayout, true);
+        m_titleVisible = true;
     }
 
     updateDwmState();
 }
 
-bool MainWnd::isTitleVisible() const {
-    return m_globalLayout->itemAt(0) == m_titleLayout;
+bool MainWnd::isTitleVisible() const 
+{
+    return m_titleVisible;
 }
 
-void MainWnd::updateDwmState() {
+void MainWnd::updateDwmState() 
+{
     if(!m_dwm->isSupported()) {
         m_drawCustomFrame = false;
         
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
-        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -522,7 +518,6 @@ void MainWnd::updateDwmState() {
         setContentMargins(0, 0, 0, 0);
 #endif
         
-        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isCompositionEnabled()) {
@@ -549,8 +544,7 @@ void MainWnd::updateDwmState() {
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
-        m_titleLayout->setContentsMargins(2, 2, 2, 2);
+        m_titleLayout->setContentsMargins(frameMargins.left() - 1, 2, 2, 0);
         m_viewLayout->setContentsMargins(
             frameMargins.left() - 1, 
             isTitleVisible() ? 0 : frameMargins.top(), 
@@ -578,8 +572,7 @@ void MainWnd::updateDwmState() {
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleSpacer->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
-        m_titleLayout->setContentsMargins(2, 2, 2, 2);
+        m_titleLayout->setContentsMargins(frameMargins.left() - 1, 2, 2, 0);
         m_viewLayout->setContentsMargins(
             frameMargins.left(), 
             isTitleVisible() ? 0 : frameMargins.top(), 
@@ -590,7 +583,8 @@ void MainWnd::updateDwmState() {
 }
 
 #ifdef Q_OS_WIN
-bool MainWnd::winEvent(MSG *message, long *result) {
+bool MainWnd::winEvent(MSG *message, long *result) 
+{
     if(m_dwm->winEvent(message, result))
         return true;
 
