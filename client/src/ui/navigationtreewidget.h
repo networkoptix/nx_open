@@ -32,6 +32,8 @@ protected:
 Q_SIGNALS:
     void activated(uint resourceId);
 
+    void newTabRequested();
+
 private Q_SLOTS:
     void filterChanged(const QString &filter);
     void itemActivated(const QModelIndex &index);

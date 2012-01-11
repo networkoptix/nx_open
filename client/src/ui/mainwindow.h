@@ -23,6 +23,7 @@ Q_SIGNALS:
     void mainWindowClosed();
 
 protected:
+    bool eventFilter(QObject *watched, QEvent *event);
     void closeEvent(QCloseEvent *event);
 
 private Q_SLOTS:
