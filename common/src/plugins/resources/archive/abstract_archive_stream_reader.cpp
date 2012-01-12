@@ -4,7 +4,6 @@
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnClientPullMediaStreamProvider(dev),
-    m_lengthMksec(0),
     m_needToSleep(0),
     m_delegate(0),
     m_navDelegate(0),
@@ -16,12 +15,6 @@ QnAbstractArchiveReader::~QnAbstractArchiveReader()
 {
     stop();
     delete m_delegate;
-}
-
-// returns len of archive in mksec
-quint64 QnAbstractArchiveReader::lengthMksec() const
-{
-    return m_lengthMksec;
 }
 
 // ------------------- Audio tracks -------------------------
@@ -91,4 +84,12 @@ void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec)
         jumpTo(qMax(0ll, mksec - 200 * 1000), mksec);
     else
         jumpTo(mksec, 0);
+}
+
+quint64 QnAbstractArchiveReader::lengthMksec() const
+{
+    if (m_delegate)
+        return m_delegate->endTime() - m_delegate->startTime();
+    else
+        return AV_NOPTS_VALUE;
 }

@@ -53,6 +53,9 @@ private:
 
     QList<QnMediaContextPtr> m_contexts;
 
+    /** Semaphore that is shared between all QnAviArchiveDelegate instances. */
+    QSharedPointer<QSemaphore> m_semaphore;
+
     friend class QnAviAudioLayout;
 };
 
