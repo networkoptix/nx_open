@@ -41,6 +41,26 @@ void QnTimePeriod::addPeriod(const QnTimePeriod& timePeriod)
     durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
 }
 
+QnTimePeriodList QnTimePeriod::agregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs)
+{
+    QnTimePeriodList result;
+    if (periods.isEmpty())
+        return result;
+    result << periods[0];
+
+    for (int i = 1; i < periods.size(); ++i)
+    {
+        QnTimePeriod& last = result.last();
+        if (last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs)
+            last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
+        else
+            result << periods[i];
+    }
+
+    return result;
+}
+
+
 QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> periods)
 {
     QnTimePeriodList result;
