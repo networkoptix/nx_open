@@ -899,6 +899,7 @@ QnGLRenderer::RenderStatus QnGLRenderer::paintEvent(const QRectF &r)
     QMutexLocker locker(&m_displaySync);
     if (curImg && curImg == m_curImg && curImg->isDisplaying()) {
         curImg->setDisplaying(false);
+        m_curImg = 0;
         m_waitCon.wakeAll();
     }
 

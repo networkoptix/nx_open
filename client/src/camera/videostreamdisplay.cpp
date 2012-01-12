@@ -396,7 +396,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
 
-    bool enableFrameQueue = true; //reverseMode ? true : m_enableFrameQueue;
+    bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
