@@ -653,45 +653,50 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
 
     ensureMotionMask();
 
-    painter->setPen(QPen(QColor(255, 255, 255, 40)));
+    QVector<QPointF> gridLines;
+
     for (int x = 0; x < MD_WIDTH; ++x) 
     {
         if (m_motionMask.isEmpty())
         {
-            painter->drawLine(QPointF(x*xStep, 0.0), QPointF(x*xStep, rect.height()));
+            gridLines << QPointF(x*xStep, 0.0) << QPointF(x*xStep, rect.height());
         }
         else {
             QRegion lineRect(x, 0, 1, MD_HEIGHT+1);
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                painter->drawLine(QPointF(x*xStep, r.top()*yStep), QPointF(x*xStep, r.bottom()*yStep));
+                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, r.bottom()*yStep);
             }
         }
     }
     for (int y = 0; y < MD_HEIGHT; ++y) {
         if (m_motionMask.isEmpty()) {
-            painter->drawLine(QPointF(0.0, y*yStep), QPointF(rect.width(), y*yStep));
+            gridLines << QPointF(0.0, y*yStep) << QPointF(rect.width(), y*yStep);
         }
         else {
             QRegion lineRect(0, y, MD_WIDTH+1, 1);
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                painter->drawLine(QPointF(r.left()*xStep, y*yStep), QPointF(r.right()*xStep, y*yStep));
+                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF(r.right()*xStep, y*yStep);
             }
         }
     }
+    painter->setPen(QPen(QColor(255, 255, 255, 40)));
+    painter->drawLines(gridLines);
+
     if (!motion)
         return;
 
+    QPainterPath motionPath;
     motion->removeMotion(m_motionMaskBinData);
-
-    painter->setPen(QPen(QColor(255, 0, 0, 80)));
     for (int y = 0; y < MD_HEIGHT; ++y)
         for (int x = 0; x < MD_WIDTH; ++x)
             if(motion->isMotionAt(x, y))
-                painter->drawRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
+                motionPath.addRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
+    painter->setPen(QPen(QColor(255, 0, 0, 80)));
+    painter->drawPath(motionPath);
 }
 
 void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time)
