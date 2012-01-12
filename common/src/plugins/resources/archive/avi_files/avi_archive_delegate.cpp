@@ -1,6 +1,7 @@
 #include "avi_archive_delegate.h"
 
 #include <QtCore/QSemaphore>
+#include <QtCore/QSharedPointer>
 
 #include "stdint.h"
 #include <libavformat/avformat.h>
@@ -9,7 +10,7 @@
 
 extern QMutex global_ffmpeg_mutex;
 
-Q_GLOBAL_STATIC_WITH_ARGS(QSemaphore, aviSemaphore, (4))
+Q_GLOBAL_STATIC_WITH_ARGS(QSharedPointer<QSemaphore>, aviSemaphore, (new QSemaphore(4)))
 
 class QnSemaphoreLocker
 {
@@ -127,7 +128,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_videoLayout(0),
     m_firstVideoIndex(0),
     m_audioStreamIndex(-1),
-    m_selectedAudioChannel(0)
+    m_selectedAudioChannel(0),
+    m_semaphore(*aviSemaphore())
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -165,7 +167,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
-    QnSemaphoreLocker locker(aviSemaphore());
+    QnSemaphoreLocker locker(m_semaphore.data());
 
     if (!findStreams())
         return QnAbstractMediaDataPtr();
