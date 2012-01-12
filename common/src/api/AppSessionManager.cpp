@@ -12,7 +12,7 @@ AppSessionManager::AppSessionManager(const QUrl &url)
 {
 }
 
-int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr, QByteArray& errorString)
+int AppSessionManager::registerServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr, QByteArray& errorString)
 {
     ::xsd::api::servers::Servers servers;
     servers.server().push_back(server);
@@ -28,7 +28,7 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
     return addObjects("camera", cameras, camerasPtr, ::xsd::api::cameras::cameras, ::xsd::api::cameras::cameras, errorString);
 }
 
-int AppSessionManager::addServerAsync(const ::xsd::api::servers::Server& server, QObject* target, const char* slot)
+int AppSessionManager::registerServerAsync(const ::xsd::api::servers::Server& server, QObject* target, const char* slot)
 {
     ::xsd::api::servers::Servers servers;
     servers.server().push_back(server);

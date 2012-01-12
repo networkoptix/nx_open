@@ -271,6 +271,8 @@ int main(int argc, char *argv[])
         cl_log.log(QFile::decodeName(argv[0]), cl_logALWAYS);
     }
 
+    qInstallMsgHandler(qDebugCLLogHandler);
+
     Settings& settings = Settings::instance();
     settings.load(dataLocation + QLatin1String("/settings.xml"));
 

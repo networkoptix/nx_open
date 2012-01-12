@@ -6,6 +6,11 @@
 #include "settings.h"
 #include "version.h"
 
+QnAppServerResourceSearcher::QnAppServerResourceSearcher()
+    : m_isFirstTime(true)
+{
+}
+
 QnAppServerResourceSearcher& QnAppServerResourceSearcher::instance()
 {
     static QnAppServerResourceSearcher _instance;
@@ -20,6 +25,9 @@ QString QnAppServerResourceSearcher::manufacture() const
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
+    if (!m_isFirstTime)
+        return QnResourceList();
+
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
     QByteArray errorString;
@@ -28,6 +36,9 @@ QnResourceList QnAppServerResourceSearcher::findResources()
     if (appServerConnection->getResources(resources, errorString) != 0)
     {
         qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << errorString;
+    } else
+    {
+        m_isFirstTime = false;
     }
 
     return resources;

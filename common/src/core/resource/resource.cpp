@@ -35,7 +35,7 @@ void QnResource::updateInner(const QnResource& other)
     m_tags = other.m_tags;
     m_avalable = other.m_avalable;
     m_url = other.m_url;
-    m_status = other.m_status;
+    setStatus(other.m_status);
     m_streamParamList = other.m_streamParamList;
 }
 
@@ -71,6 +71,9 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 
     if (parameters.contains(QLatin1String("url")))
         setUrl(parameters[QLatin1String("url")]);
+
+    if (parameters.contains(QLatin1String("status")))
+        setStatus(parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline, true);
 }
 
 QnId QnResource::getParentId() const
@@ -410,12 +413,14 @@ QnResource::Status QnResource::getStatus() const
     return m_status;
 }
 
-void QnResource::setStatus(QnResource::Status status)
+void QnResource::setStatus(QnResource::Status status, bool ignoreHandlers)
 {
     if (m_status == status) // if status did not changed => do nothing
         return;
 
-    if (m_status == Offline && status == Online)
+    qDebug() << "Setting status: " << (status == QnResource::Online ? "Active" : "Inactive");
+
+    if (m_status == Offline && status == Online && !ignoreHandlers)
         beforeUse();
 
     Status old_status;
@@ -424,7 +429,9 @@ void QnResource::setStatus(QnResource::Status status)
         old_status = m_status;
         m_status = status;
     }
-    emit onStatusChanged(old_status, status);
+
+    if (!ignoreHandlers)
+        emit onStatusChanged(old_status, status);
 }
 
 

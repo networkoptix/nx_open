@@ -14,6 +14,7 @@
 #include "api/Types.h"
 #include "api/AppSessionManager.h"
 
+#include "utils/common/sleep.h"
 
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, int handle)
 {
@@ -105,15 +106,16 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources, QByteAr
     return status;
 }
 
-int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServerList& servers, QByteArray& errorString)
+int QnAppServerConnection::registerServer(const QnVideoServer& serverIn, QnVideoServerList& servers, QByteArray& errorString)
 {
     QnApiServerPtr server = unparseServer(serverIn);
 
     QnApiServerResponsePtr xsdServers;
 
-    if (m_sessionManager->addServer(*server, xsdServers, errorString) == 0)
+    if (m_sessionManager->registerServer(*server, xsdServers, errorString) == 0)
     {
         parseServers(servers, xsdServers->server(), m_resourceFactory);
+
         return 0;
     }
 
@@ -135,6 +137,17 @@ int QnAppServerConnection::addCamera(const QnCameraResource& cameraIn, QList<QnR
     return 1;
 }
 
+int QnAppServerConnection::saveAsync(const QnResource& resource, QObject* target, const char* slot)
+{
+    if (dynamic_cast<const QnVideoServer*>(&resource))
+        return saveAsync(*dynamic_cast<const QnVideoServer*>(&resource), target, slot);
+
+    if (dynamic_cast<const QnCameraResource*>(&resource))
+        return saveAsync(*dynamic_cast<const QnCameraResource*>(&resource), target, slot);
+
+    return 0;
+}
+
 int QnAppServerConnection::saveAsync(const QnVideoServer& serverIn, QObject* target, const char* slot)
 {
     QnApiServerPtr server = unparseServer(serverIn);
@@ -142,7 +155,7 @@ int QnAppServerConnection::saveAsync(const QnVideoServer& serverIn, QObject* tar
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, "server");
     QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
 
-    m_sessionManager->addServerAsync(*server, processor, SLOT(finished(int, const QByteArray&, int)));
+    m_sessionManager->registerServerAsync(*server, processor, SLOT(finished(int, const QByteArray&, int)));
 
     return 0;
 }
@@ -242,3 +255,25 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
 {
     return createConnection(defaultUrl());
 }
+
+void initResourceTypes(QnAppServerConnectionPtr appServerConnection)
+{
+    if (!qnResTypePool->isEmpty())
+        return;
+
+    // The following is demo only. Remove it.
+    QList<QnResourceTypePtr> resourceTypeList;
+
+    for(;;)
+    {
+        QByteArray errorString;
+        if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
+            break;
+
+        qDebug() << "Can't get resource types: " << errorString;
+        QnSleep::msleep(1000);
+    }
+
+    qnResTypePool->addResourceTypeList(resourceTypeList);
+}
+

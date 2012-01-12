@@ -91,7 +91,7 @@ public:
     void setTypeId(const QnId& id);
 
     Status getStatus() const;
-    void setStatus(Status status);
+    void setStatus(Status status, bool ignoreHandlers = false);
 
 
     // flags like network media and so on

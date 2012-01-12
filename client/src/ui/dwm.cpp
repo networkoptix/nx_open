@@ -1,10 +1,11 @@
 #include "dwm.h"
 #include <QLibrary>
 #include <QWidget>
-#include <qt_windows.h>
 #include <utils/common/warnings.h>
 
 #ifdef Q_OS_WIN
+
+#include <qt_windows.h>
 
 #define NOMINMAX
 #include <Windows.h>

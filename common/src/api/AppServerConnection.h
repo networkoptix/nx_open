@@ -53,7 +53,7 @@ public:
 
     int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
-    int addServer(const QnVideoServer&, QnVideoServerList& servers, QByteArray& errorString);
+    int registerServer(const QnVideoServer&, QnVideoServerList& servers, QByteArray& errorString);
     int addCamera(const QnCameraResource&, QList<QnResourcePtr>& cameras, QByteArray& errorString);
 
     int addStorage(const QnStorage&, QByteArray& errorString);
@@ -64,6 +64,8 @@ public:
     // Returns request id
     int saveAsync(const QnVideoServer&, QObject*, const char*);
     int saveAsync(const QnCameraResource&, QObject*, const char*);
+
+    int saveAsync(const QnResource& resource, QObject* target, const char* slot);
 
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
@@ -93,5 +95,7 @@ private:
     QUrl m_url;
     QnResourceFactory* m_resourceFactory;
 };
+
+void initResourceTypes(QnAppServerConnectionPtr appServerConnection);
 
 #endif // APPSERVERCONNECTIONIMPL_H

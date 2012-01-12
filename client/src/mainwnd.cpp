@@ -530,7 +530,7 @@ void MainWnd::updateDwmState()
 #ifdef Q_OS_WIN
         setContentsMargins(0, 0, 0, 1);
 #else
-        setContentMargins(0, 0, 0, 0);
+        setContentsMargins(0, 0, 0, 0);
 #endif
         
         m_titleLayout->setContentsMargins(0, 0, 0, 0);

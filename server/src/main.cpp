@@ -172,9 +172,9 @@ QnVideoServerPtr registerServer(QnAppServerConnectionPtr appServerConnection, co
 
     QnVideoServerList servers;
     QByteArray errorString;
-    if (appServerConnection->addServer(server, servers, errorString) != 0)
+    if (appServerConnection->registerServer(server, servers, errorString) != 0)
     {
-        qDebug() << "registerServer(): Call to addServer failed. Reason: " << errorString;
+        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
 
         return QnVideoServerPtr();
     }
@@ -336,20 +336,7 @@ public:
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-        // The following is demo only. Remove it.
-        QList<QnResourceTypePtr> resourceTypeList;
-
-        for(;;)
-        {
-            QByteArray errorString;
-            if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
-                break;
-
-            qDebug() << "Can't get resource types: " << errorString;
-            QnSleep::msleep(1000);
-        }
-
-        qnResTypePool->addResourceTypeList(resourceTypeList);
+        initResourceTypes(appServerConnection);
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
         
@@ -452,6 +439,9 @@ public:
 
         foreach(QnSecurityCamResourcePtr camera, cameras)
         {
+            qDebug() << "Connecting resource: " << camera->getName();
+            QObject::connect(camera.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), m_processor, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
+
             qnResPool->addResource(camera);
 
             QnRecordingManager::instance()->updateSchedule(camera);
