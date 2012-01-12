@@ -50,10 +50,12 @@ public:
     inline void resetSelectionRange()
     { setSelectionRange(0, 0); }
 
-    const QnTimePeriodList &recTimePeriodList() const { return m_recTimePeriodList; }
-    const QnTimePeriodList &motionTimePeriodList() const { return m_motionTimePeriodList; }
-    void setRecTimePeriodList(const QnTimePeriodList &timePeriodList) { m_recTimePeriodList = timePeriodList; }
-    void setMotionTimePeriodList(const QnTimePeriodList &timePeriodList) { m_motionTimePeriodList = timePeriodList; }
+    //const QnTimePeriodList &recTimePeriodList() const { return m_recTimePeriodList; }
+    //const QnTimePeriodList &motionTimePeriodList() const { return m_motionTimePeriodList; }
+    const QnTimePeriodList &recTimePeriodList(int msInPixel);
+    const QnTimePeriodList &motionTimePeriodList(int msInPixel);
+    void setRecTimePeriodList(const QnTimePeriodList &timePeriodList);
+    void setMotionTimePeriodList(const QnTimePeriodList &timePeriodList);
 
     bool isAtEnd();
     void setEndSize(qreal size);
@@ -117,6 +119,10 @@ private:
 
     QnTimePeriodList m_recTimePeriodList;
     QnTimePeriodList m_motionTimePeriodList;
+
+    QnTimePeriodList m_agregatedRecTimePeriodList;
+    QnTimePeriodList m_agregatedMotionTimePeriodList;
+    int m_aggregatedMsInPixel;
 
     qreal m_endSize;
 
