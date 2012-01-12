@@ -6,6 +6,8 @@
 class QnAppServerResourceSearcher : virtual public QnAbstractResourceSearcher
 {
 public:
+    QnAppServerResourceSearcher();
+
     static QnAppServerResourceSearcher& instance();
 
     virtual QString manufacture() const;
@@ -14,6 +16,9 @@ public:
 
     virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
     virtual bool isResourceTypeSupported(const QnId& resourceTypeId) const;
+
+private:
+    bool m_isFirstTime;
 };
 
 #endif // COMMON_APPSERVER_H
