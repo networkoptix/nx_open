@@ -339,7 +339,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
     m_treeWidget->setWorkbenchController(this);
-    m_treeWidget->tabBar()->setDrawBase(false);
     {
         QPalette palette = m_treeWidget->palette();
         palette.setColor(QPalette::Window, Qt::transparent);
@@ -1155,7 +1154,7 @@ void QnWorkbenchController::at_controlsWidget_geometryChanged() {
 
 void QnWorkbenchController::at_navigationItem_geometryChanged() {
     updateTreeGeometry();
-    
+
     updateViewportMargins();
 }
 

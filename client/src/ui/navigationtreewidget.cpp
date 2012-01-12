@@ -166,17 +166,6 @@ NavigationTreeWidget::~NavigationTreeWidget()
 {
 }
 
-QTabBar *NavigationTreeWidget::tabBar() const {
-    class OpenTabWidget: public QTabWidget {
-    public:
-        QTabBar *tabBar() const {
-            return QTabWidget::tabBar();
-        }
-    };
-
-    return static_cast<OpenTabWidget *>(m_tabWidget)->tabBar();
-}
-
 void NavigationTreeWidget::setWorkbenchController(QnWorkbenchController *controller)
 {
     if (m_controller) {

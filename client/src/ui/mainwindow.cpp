@@ -16,6 +16,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"
+#include "ui/navigationtreewidget.h"
 
 #include "ui/dialogs/logindialog.h"
 #include "ui/preferences/preferences_wnd.h"
@@ -86,6 +87,17 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     // Set up scene & view
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene, this);
+    m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
+    m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
+    m_view->setLineWidth(1);
+    m_view->setAutoFillBackground(true);
+    {
+        /* Adjust palette so that inherited background painting is not needed. */
+        QPalette pal = m_view->palette();
+        pal.setColor(QPalette::Background, Qt::black);
+        pal.setColor(QPalette::Base, Qt::black);
+        m_view->setPalette(pal);
+    }
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
@@ -102,6 +114,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     m_display->setView(m_view);
 
     m_controller = new QnWorkbenchController(m_display, this);
+    connect(m_controller->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(addTab()));
 
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
     new QnSyncPlayMixin(m_display, renderWatcher, this);
