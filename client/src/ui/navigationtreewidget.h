@@ -9,7 +9,6 @@ class QAbstractItemModel;
 class QLineEdit;
 class QSortFilterProxyModel;
 class QTabWidget;
-class QTabBar;
 class QToolButton;
 class QTreeView;
 class QModelIndex;
@@ -25,8 +24,6 @@ public:
     ~NavigationTreeWidget();
 
     void setWorkbenchController(QnWorkbenchController *controller);
-
-    QTabBar *tabBar() const;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
