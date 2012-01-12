@@ -302,9 +302,6 @@ bool QnDwm::enableTitleBarDrag(bool enable) {
     if(d->widget == NULL)
         return false;
 
-    if(d->emulateFrame == enable)
-        return true;
-
 #ifdef Q_OS_WIN
     d->titleBarDrag = enable;
     return true;
