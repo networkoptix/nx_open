@@ -282,12 +282,34 @@ int QnDwm::emulatedTitleBarHeight() const {
     return d->emulatedTitleBarHeight;
 }
 
-void QnDwm::enableDoubleClickProcessing(bool enable) {
+bool QnDwm::enableDoubleClickProcessing(bool enable) {
+    if(d->widget == NULL)
+        return false;
+
+    if(d->emulateFrame == enable)
+        return true;
+
+#ifdef Q_OS_WIN
     d->processDoubleClicks = enable;
+    return true;
+#else 
+    return false;
+#endif
 }
 
-void QnDwm::enableTitleBarDrag(bool enable) {
+bool QnDwm::enableTitleBarDrag(bool enable) {
+    if(d->widget == NULL)
+        return false;
+
+    if(d->emulateFrame == enable)
+        return true;
+
+#ifdef Q_OS_WIN
     d->titleBarDrag = enable;
+    return true;
+#else 
+    return false;
+#endif
 }
 
 QMargins QnDwm::currentFrameMargins() const {

@@ -132,16 +132,30 @@ public:
      */
     int emulatedTitleBarHeight() const;
 
-    void enableDoubleClickProcessing(bool enable = true);
+    /**
+     * Enables or disable processing of double clicks on title bar.
+     * When enabled, double clicks can be tracked by connecting to the 
+     * <tt>titleBarDoubleClicked</tt> signal.
+     * 
+     * \param enable                    Whether double click processing is to be enabled.
+     * \returns                         Whether double click processing mode was successfully changed.
+     */
+    bool enableDoubleClickProcessing(bool enable = true);
 
-    void disableDoubleClickProcessing(bool disable = true) {
-        enableDoubleClickProcessing(!disable);
+    bool disableDoubleClickProcessing(bool disable = true) {
+        return enableDoubleClickProcessing(!disable);
     }
 
-    void enableTitleBarDrag(bool enable = true);
+    /**
+     * Enables or disables window dragging by clicking on a title bar.
+     * 
+     * \param enable                    Whether dragging is to be enabled.
+     * \returns                         Whether dragging mode was successfully changed.
+     */
+    bool enableTitleBarDrag(bool enable = true);
 
-    void disableTitleBarDrag(bool disable = true) {
-        enableTitleBarDrag(!disable);
+    bool disableTitleBarDrag(bool disable = true) {
+        return enableTitleBarDrag(!disable);
     }
 
 #ifdef Q_OS_WIN
