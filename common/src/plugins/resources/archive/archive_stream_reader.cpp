@@ -480,7 +480,9 @@ begin_label:
 
 			if (m_nextData)
 			{
-				if (!reverseMode && m_nextData->timestamp < m_skipFramesToTime)
+                if (m_nextData->flags & QnAbstractMediaData::MediaFlags_LIVE)
+                    setSkipFramesToTime(0);
+				else if (!reverseMode && m_nextData->timestamp < m_skipFramesToTime)
 					videoData->ignore = true;
                 else if (reverseMode && m_nextData->timestamp > m_skipFramesToTime)
                     videoData->ignore = true;
