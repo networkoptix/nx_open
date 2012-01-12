@@ -132,7 +132,7 @@ void ToolTipItem::recalcShape()
 
         m_textPixmap = QPixmap(textSize.toSize());
         m_textPixmap.fill(QColor(0,0,0,0));
-        QPainter textPainter(&m_textPixmap);
+        QPainter textPainter(&m_textPixmap); // TODO: "QPainter::begin: Paint device returned engine == 0, type: 2"
         textPainter.setFont(m_font);
         textPainter.setPen(m_textPen);
         textPainter.drawText(0, m.ascent(), m_text);

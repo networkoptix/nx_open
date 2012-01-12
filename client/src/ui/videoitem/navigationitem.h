@@ -44,6 +44,7 @@ Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
     void playbackMaskChanged(const QnTimePeriodList& playbackMask);
     void clearMotionSelection();
+    void actualCameraChanged(CLVideoCamera *camera);
 
 protected:
     void timerEvent(QTimerEvent* event);

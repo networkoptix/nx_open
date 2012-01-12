@@ -15,6 +15,8 @@ class QLabel;
 class QPropertyAnimation;
 class QGraphicsProxyWidget;
 
+class CLVideoCamera;
+
 class InstrumentManager;
 class HandScrollInstrument;
 class WheelZoomInstrument;
@@ -28,6 +30,8 @@ class MotionSelectionInstrument;
 class ClickInfo;
 class ResizingInfo;
 class VariantAnimator;
+class AnimatorGroup;
+class HoverProcessor;
 
 class NavigationItem;
 class NavigationTreeWidget;
@@ -68,6 +72,10 @@ public:
      */
     QnWorkbenchItem *item(const QnResourcePtr &resource) const;
 
+    NavigationTreeWidget *treeWidget() const {
+        return m_treeWidget;
+    }
+
     void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QString &file, const QPointF &gridPos = QPointF(), bool findAccepted = true);
@@ -77,6 +85,7 @@ public:
 
 public Q_SLOTS:
     void setTreeVisible(bool visible, bool animate = true);
+    void setSliderVisible(bool visible, bool animate = true);
     void toggleTreeVisible();
 
 protected:
@@ -87,6 +96,8 @@ protected:
     VariantAnimator *opacityAnimator(QnResourceWidget *widget);
 
     void updateViewportMargins();
+
+    void updateTreeGeometry();
 
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -112,17 +123,9 @@ protected Q_SLOTS:
     void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
-    void at_viewportGrabbed();
-    void at_viewportUngrabbed();
-
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
-
-    void at_controlsWidget_deactivated();
-    void at_controlsWidget_geometryChanged();
-    void at_navigationItem_geometryChanged();
-    void at_treeItem_geometryChanged();
 
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
@@ -141,10 +144,20 @@ protected Q_SLOTS:
 
     void at_randomGridAction_triggered();
 
-    void at_treeWidget_activated(uint resourceId);
+    void at_controlsWidget_deactivated();
+    void at_controlsWidget_geometryChanged();
 
-    void at_treeWidget_hoverLeft();
-    void at_treeWidgetTrigger_hoverEntered();
+    void at_navigationItem_geometryChanged();
+    void at_navigationItem_actualCameraChanged(CLVideoCamera *camera);
+
+    void at_treeItem_geometryChanged();
+    void at_treeWidget_activated(uint resourceId);
+    void at_treeHidingProcessor_hoverLeft();
+    void at_treeShowingProcessor_hoverEntered();
+    void at_treeOpacityProcessor_hoverLeft();
+    void at_treeOpacityProcessor_hoverEntered();
+
+
 
 private:
     /* Global state. */
@@ -164,18 +177,31 @@ private:
     /** Proxy widget for navigation tree widget. */
     QGraphicsProxyWidget *m_treeItem;
 
+    QGraphicsWidget *m_treeBackgroundItem;
+
     /** Graphics widget that triggers tree widget visibility. */
     QGraphicsWidget *m_treeTriggerItem;
-
-    /** Hover opacity item for tree widget. */
-    QnOpacityHoverItem *m_treeHoverItem;
 
     /** Whether navigation tree is visible. */
     bool m_treeVisible;
 
+    bool m_sliderVisible;
+
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
+    /** Hover opacity item for tree widget. */
+    HoverProcessor *m_treeHidingProcessor;
+
+    HoverProcessor *m_treeShowingProcessor;
+
+    HoverProcessor *m_treeOpacityProcessor;
+
+    VariantAnimator *m_treeOpacityAnimator;
+    VariantAnimator *m_treeBackgroundOpacityAnimator;
+    AnimatorGroup *m_treeOpacityAnimatorGroup;
+    VariantAnimator *m_treePositionAnimator;
+    VariantAnimator *m_sliderPositionAnimator;
 
     /* Instruments. */
 
@@ -263,8 +289,6 @@ private:
     QAction *m_randomGridAction;
 
     QSizeF m_controlsWidgetSize;
-
-    VariantAnimator *m_treePositionAnimator;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

@@ -1,1 +1,1 @@
-QMutex global_ffmpeg_mutex;
+QMutex global_ffmpeg_mutex(QMutex::Recursive);

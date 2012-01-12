@@ -17,6 +17,8 @@ extern QColor global_motion_selection_rubber_band_border_color;
 extern QColor global_motion_selection_rubber_band_color;
 extern QColor global_motion_selection_color;
 
+extern QColor global_frame_color;
+
 extern qreal global_decoration_opacity;
 extern qreal global_decoration_max_opacity;
 

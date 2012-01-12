@@ -15,6 +15,7 @@ struct QN_EXPORT QnTimePeriod
     bool operator==(const QnTimePeriod& other) const;
 
     static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
+    static QnTimePeriodList agregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
     
     /** Encode(compress) data to a byteArray. 
     * TimePeriods must be arranged by time and does not intersects. If condition is not meet, function returns false

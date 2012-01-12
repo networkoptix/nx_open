@@ -395,6 +395,7 @@ int main(int argc, char *argv[])
 #else
     MainWnd mainWindow(argc, argv);
 #endif
+    mainWindow.setAttribute(Qt::WA_QuitOnClose);
     mainWindow.show();
 
 #ifdef TEST_RTSP_SERVER

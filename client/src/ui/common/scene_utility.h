@@ -27,6 +27,8 @@ public:
     static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
+    static QMargins cwiseSub(const QMargins &l, const QMargins &r);
+    static QMargins cwiseAdd(const QMargins &l, const QMargins &r);
 
     static QColor transparent(const QColor &color);
 

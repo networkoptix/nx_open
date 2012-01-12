@@ -52,11 +52,24 @@ class QnGraphicsView: public QGraphicsView {
     typedef QGraphicsView base_type;
 
 public:
+    enum PaintFlag {
+        BACKGROUND_DONT_INVOKE_BASE = 0x1, /**< Don't invoke inherited implementation when drawing background. */
+        FOREGROUND_DONT_INVOKE_BASE = 0x2  /**< Don't invoke inherited implementation when drawing foreground. */
+    };
+    Q_DECLARE_FLAGS(PaintFlags, PaintFlag);
+
     QnGraphicsView(QGraphicsScene *scene, QWidget * parent = NULL);
 
     virtual ~QnGraphicsView();
 
+    PaintFlags paintFlags() const {
+        return m_paintFlags;
+    }
+
+    void setPaintFlags(PaintFlags paintFlags);
+
     void installLayerPainter(QnLayerPainter *painter, QGraphicsScene::SceneLayer layer);
+
     void uninstallLayerPainter(QnLayerPainter *painter);
 
 protected:
@@ -64,8 +77,11 @@ protected:
     virtual void drawForeground(QPainter *painter, const QRectF &rect) override;
 
 private:
+    PaintFlags m_paintFlags;
     QList<QnLayerPainter *> m_foregroundPainters;
     QList<QnLayerPainter *> m_backgroundPainters;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnGraphicsView::PaintFlags)
 
 #endif // QN_GRAPHICS_VIEW_H

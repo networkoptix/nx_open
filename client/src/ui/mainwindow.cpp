@@ -16,6 +16,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"
+#include "ui/navigationtreewidget.h"
 
 #include "ui/dialogs/logindialog.h"
 #include "ui/preferences/preferences_wnd.h"
@@ -86,6 +87,17 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     // Set up scene & view
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene, this);
+    m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
+    m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
+    m_view->setLineWidth(1);
+    m_view->setAutoFillBackground(true);
+    {
+        /* Adjust palette so that inherited background painting is not needed. */
+        QPalette pal = m_view->palette();
+        pal.setColor(QPalette::Background, Qt::black);
+        pal.setColor(QPalette::Base, Qt::black);
+        m_view->setPalette(pal);
+    }
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
@@ -102,6 +114,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     m_display->setView(m_view);
 
     m_controller = new QnWorkbenchController(m_display, this);
+    connect(m_controller->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(addTab()));
 
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
     new QnSyncPlayMixin(m_display, renderWatcher, this);
@@ -159,6 +172,25 @@ MainWindow::~MainWindow()
 {
 }
 
+Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::DynamicPropertyChange) {
+        if (static_cast<QDynamicPropertyChangeEvent *>(event)->propertyName() == "caption") {
+            if (QnWorkbenchLayout *layout = qobject_cast<QnWorkbenchLayout *>(watched)) {
+                const QString caption = layout->property("caption").toString();
+                for (int i = 0; i < m_tabBar->count(); ++i) {
+                    if (layout == m_tabBar->tabData(i).value<QnWorkbenchLayout *>()) // ###
+                        m_tabBar->setTabText(i, caption);
+                }
+            }
+        }
+    }
+
+    return FancyMainWindow::eventFilter(watched, event);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     FancyMainWindow::closeEvent(event);
@@ -167,13 +199,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
         Q_EMIT mainWindowClosed();
 }
 
-Q_DECLARE_METATYPE(QnWorkbenchLayout *) // ###
-
 void MainWindow::addTab()
 {
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout(m_view);
+    layout->installEventFilter(this);
     const int index = m_tabBar->addTab(Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
-    m_tabBar->setTabData(index, QVariant::fromValue(new QnWorkbenchLayout(m_view))); // ###
+    m_tabBar->setTabData(index, QVariant::fromValue(layout)); // ###
     m_tabBar->setCurrentIndex(index);
+    if (m_tabBar->count() == 1)
+        currentTabChanged(index);
 }
 
 void MainWindow::currentTabChanged(int index)
@@ -193,6 +227,7 @@ void MainWindow::closeTab(int index)
         m_workbench->setLayout(0);
 
     QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>(); // ###
+    layout->removeEventFilter(this);
     delete layout;
 
     m_tabBar->removeTab(index);

@@ -337,6 +337,9 @@ void NavigationTreeWidget::timerEvent(QTimerEvent *event)
         killTimer(m_filterTimerId);
         m_filterTimerId = 0;
 
+        if (m_controller)
+            m_controller->layout()->setProperty("caption", m_filterLineEdit->text()); // ### unescape, normalize, etc.
+
         if (m_searchProxyModel) {
             m_searchProxyModel->setFilterWildcard(m_filterLineEdit->text());
             m_searchTreeView->expandAll();
@@ -349,6 +352,9 @@ void NavigationTreeWidget::timerEvent(QTimerEvent *event)
 void NavigationTreeWidget::filterChanged(const QString &filter)
 {
     m_clearFilterButton->setVisible(!filter.isEmpty());
+
+    if (m_controller && m_controller->layout()->property("caption").toString().isEmpty() && !m_controller->layout()->isEmpty())
+        Q_EMIT newTabRequested();
 
     if (m_filterTimerId != 0)
         killTimer(m_filterTimerId);

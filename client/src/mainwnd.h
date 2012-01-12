@@ -1,36 +1,48 @@
 #ifndef MAINWND_H
 #define MAINWND_H
 
-#include <QtGui/QMainWindow>
+#include <QWidget>
+#include <QScopedPointer>
 
-class QTabWidget;
+class QTabBar;
+class QBoxLayout;
+class QSpacerItem;
 
 class QnBlueBackgroundPainter;
 class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchController;
 class QnWorkbenchDisplay;
+class QnWorkbenchLayout;
+class QnDwm;
 
-class MainWnd : public QMainWindow
+class MainWnd : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    typedef QWidget base_type;
 
 public:
     MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
+    
     virtual ~MainWnd();
-
-    static MainWnd* instance() { return s_instance; }
 
 Q_SIGNALS:
     void mainWindowClosed();
 
 protected:
-    void closeEvent(QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
+    virtual void paintEvent(QPaintEvent *event) override;
 
-private Q_SLOTS:
-    void addTab();
-    void currentTabChanged(int index);
-    void closeTab(int index);
+#ifdef Q_OS_WIN
+    virtual bool winEvent(MSG *message, long *result) override;
+#endif
+
+protected Q_SLOTS:
+    void newLayout();
+    void changeCurrentLayout(int index);
+    void removeLayout(int index);
 
     void handleMessage(const QString &message);
 
@@ -43,30 +55,30 @@ private Q_SLOTS:
     void appServerError(int error);
     void appServerAuthenticationRequired();
 
-    void toggleDecorationsVisibility();
+    void toggleTitleVisibility();
 
-#if 0
-public:
-    void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
-    void goToNewLayoutContent(LayoutContent* newl);
+    void updateDwmState();
 
-private:
-    void destroyNavigator(CLLayoutNavigator *&nav);
-
-    CLLayoutNavigator *m_normalView;
-#endif
+protected:
+    bool isTitleVisible() const;
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
     QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
+
     QnGraphicsView *m_view;
+    QTabBar *m_tabBar;
 
-    QTabWidget *m_tabWidget;
-    QToolBar *m_toolBar;
+    QBoxLayout *m_titleLayout;
+    QBoxLayout *m_viewLayout;
+    QBoxLayout *m_globalLayout;
 
-    static MainWnd *s_instance;
+    bool m_titleVisible;
+
+    QnDwm *m_dwm;
+    bool m_drawCustomFrame;
 };
 
 #endif // MAINWND_H

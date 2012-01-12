@@ -39,6 +39,7 @@ static const float MAX_MIN_OPACITY = 0.6f;
 static const float MIN_FONT_SIZE = 4.0f;
 static const float FONT_SIZE_CACHE_EPS = 0.1;
 static const int MAX_LABEL_WIDTH = 64;
+static const qreal UPDATE_PERIODS_EPS = 0.05;
 
 
 typedef QHash<unsigned, QPixmap*> TextCache;
@@ -102,9 +103,12 @@ protected:
 
     void resizeEvent(QGraphicsSceneResizeEvent *event);
 
+    void updateToolTipPos();
+
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
+    qreal getMsInPixel() const;
     void drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color);
     void createEndPixmap();
 private:
@@ -114,6 +118,8 @@ private:
     int m_endSize;
     QPixmap m_pixmap;
     QPixmap m_endPixmap;
+    QnTimePeriodList m_recTimePeriodList;
+    QnTimePeriodList m_motionTimePeriodList;
 };
 
 MySlider::MySlider(TimeSlider *parent)
@@ -123,6 +129,12 @@ MySlider::MySlider(TimeSlider *parent)
       m_endSize(0)
 {
     setToolTipItem(new StyledToolTipItem);
+}
+
+void MySlider::updateToolTipPos()
+{
+    ensureHandleRect();
+    m_toolTip->setPos(m_handleRect.center().x(), m_handleRect.top());
 }
 
 void MySlider::createEndPixmap()
@@ -170,31 +182,45 @@ void MySlider::setToolTipItem(ToolTipItem *toolTip)
         m_toolTip->setParentItem(this);
 }
 
+qreal MySlider::getMsInPixel() const
+{
+    qreal w = contentsRect().width() - m_handleRect.width();
+    const qint64 range = m_parent->sliderRange();
+    return range/w;
+}
+
 void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color)
 {
-    const qint64 range = m_parent->sliderRange();
+    if (timePeriods.isEmpty())
+        return;
+
     const qint64 pos = m_parent->viewPortPos() /*+ timezoneOffset*/;
 
     QRectF contentsRect = this->contentsRect();
     qreal x = contentsRect.left() + m_handleRect.width() / 2;
-    qreal w = contentsRect.width() - m_handleRect.width();
 
-    // TODO: use lower_bound here and draw only what is actually needed.
-    foreach(const QnTimePeriod &period, timePeriods)
+    qreal msInPixel = getMsInPixel();
+
+    QnTimePeriodList::const_iterator beginItr = timePeriods.findNearestPeriod(pos, true);
+    QnTimePeriodList::const_iterator endItr = timePeriods.findNearestPeriod(pos+m_parent->sliderRange(), false);
+
+    //foreach(const QnTimePeriod &period, timePeriods)
+    for (QnTimePeriodList::const_iterator itr = beginItr; itr <= endItr; ++itr)
     {
-        qreal left = x + static_cast<qreal>(period.startTimeMs - pos) / range * w;
+        const QnTimePeriod& period = *itr;
+        qreal left = x + static_cast<qreal>(period.startTimeMs - pos) / msInPixel;
         left = qMax(left, contentsRect.left());
 
         qreal right;
         if (period.durationMs == -1) {
             right = contentsRect.right();
         } else {
-            right = x + static_cast<qreal>((period.startTimeMs + period.durationMs) - pos) / range * w;
+            right = x + static_cast<qreal>((period.startTimeMs + period.durationMs) - pos) / msInPixel;
             right = qMin(right, contentsRect.right());
         }
 
-        if (left > right)
-            continue;
+        //if (left > right)
+        //    continue;
 
         painter->fillRect(left, contentsRect.top(), qMax(1.0,right - left), contentsRect.height(), color);
     }
@@ -242,11 +268,10 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 
     // Draw time periods
-    if (!m_parent->recTimePeriodList().empty())
-        drawTimePeriods(painter, m_parent->recTimePeriodList(), QColor(255, 0, 0));
-    if (!m_parent->motionTimePeriodList().empty())
-        drawTimePeriods(painter, m_parent->motionTimePeriodList(), QColor(0, 255, 0));
+    qreal msInPixel = getMsInPixel();
 
+    drawTimePeriods(painter, m_parent->recTimePeriodList(msInPixel), QColor(255, 0, 0));
+    drawTimePeriods(painter, m_parent->motionTimePeriodList(msInPixel), QColor(0, 255, 0));
 
     r = contentsRect();
 #if 1
@@ -277,8 +302,7 @@ void MySlider::sliderChange(SliderChange change)
 
     if (change == SliderValueChange && m_toolTip) {
         invalidateHandleRect();
-        ensureHandleRect();
-        m_toolTip->setPos(m_handleRect.center().x(), m_handleRect.top());
+        updateToolTipPos();
     }
 }
 
@@ -297,6 +321,7 @@ void MySlider::resizeEvent(QGraphicsSceneResizeEvent *event)
     GraphicsSlider::resizeEvent(event);
 
     invalidateHandleRect();
+    updateToolTipPos();
 }
 
 void MySlider::invalidateHandleRect()
@@ -933,7 +958,8 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_delta(0),
     m_isUserInput(false),
     m_centralise(true),
-    m_endSize(0.0)
+    m_endSize(0.0),
+    m_aggregatedMsInPixel(-1)
 {
     qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
 
@@ -1268,4 +1294,38 @@ void TimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     m_slider->setEndSize(m_endSize * (m_slider->maximum() - m_slider->minimum()) / (m_slider->size().width())); // Hack hack hack
 
     GraphicsWidget::paint(painter, option, widget);
+}
+
+const QnTimePeriodList& TimeSlider::recTimePeriodList(int msInPixel)
+{
+    if (m_aggregatedMsInPixel != msInPixel)
+    {
+        m_agregatedRecTimePeriodList = QnTimePeriod::agregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
+        m_agregatedMotionTimePeriodList = QnTimePeriod::agregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
+        m_aggregatedMsInPixel = msInPixel;
+    }
+    return m_agregatedRecTimePeriodList;
+}
+
+const QnTimePeriodList& TimeSlider::motionTimePeriodList(int msInPixel)
+{
+    if (m_aggregatedMsInPixel != msInPixel)
+    {
+        m_agregatedRecTimePeriodList = QnTimePeriod::agregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
+        m_agregatedMotionTimePeriodList = QnTimePeriod::agregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
+        m_aggregatedMsInPixel = msInPixel;
+    }
+    return m_agregatedMotionTimePeriodList;
+}
+
+void TimeSlider::setRecTimePeriodList(const QnTimePeriodList &timePeriodList) 
+{ 
+    m_recTimePeriodList = timePeriodList;
+    m_aggregatedMsInPixel = -1;
+}
+
+void TimeSlider::setMotionTimePeriodList(const QnTimePeriodList &timePeriodList) 
+{ 
+    m_motionTimePeriodList = timePeriodList; 
+    m_aggregatedMsInPixel = -1;
 }
