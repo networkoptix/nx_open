@@ -51,7 +51,7 @@ QnTimePeriodList QnTimePeriod::agregateTimePeriods(const QnTimePeriodList& perio
     for (int i = 1; i < periods.size(); ++i)
     {
         QnTimePeriod& last = result.last();
-        if (last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs)
+        if (periods[i].durationMs != -1 && last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs)
             last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
         else
             result << periods[i];

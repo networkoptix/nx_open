@@ -201,7 +201,7 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
 
     qreal msInPixel = getMsInPixel();
 
-    QnTimePeriodList::const_iterator beginItr = timePeriods.findNearestPeriod(pos, true);
+    QnTimePeriodList::const_iterator beginItr = timePeriods.findNearestPeriod(pos, false);
     QnTimePeriodList::const_iterator endItr = timePeriods.findNearestPeriod(pos+m_parent->sliderRange(), false);
 
     //foreach(const QnTimePeriod &period, timePeriods)
