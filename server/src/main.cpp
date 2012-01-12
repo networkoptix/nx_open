@@ -241,7 +241,6 @@ int serverMain(int argc, char *argv[])
     cl_log.setLogLevel(cl_logWARNING);
 #endif
 
-    cl_log.setLogLevel(cl_logDEBUG1);
     CL_LOG(cl_logALWAYS)
     {
         cl_log.log(QLatin1String("\n\n========================================"), cl_logALWAYS);
@@ -337,20 +336,7 @@ public:
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-        // The following is demo only. Remove it.
-        QList<QnResourceTypePtr> resourceTypeList;
-
-        for(;;)
-        {
-            QByteArray errorString;
-            if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
-                break;
-
-            qDebug() << "Can't get resource types: " << errorString;
-            QnSleep::msleep(1000);
-        }
-
-        qnResTypePool->addResourceTypeList(resourceTypeList);
+        initResourceTypes(appServerConnection);
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
         
@@ -453,6 +439,9 @@ public:
 
         foreach(QnSecurityCamResourcePtr camera, cameras)
         {
+            qDebug() << "Connecting resource: " << camera->getName();
+            QObject::connect(camera.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), m_processor, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
+
             qnResPool->addResource(camera);
 
             QnRecordingManager::instance()->updateSchedule(camera);

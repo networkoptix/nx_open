@@ -45,8 +45,6 @@ protected:
     virtual void run();
 
 private:
-    bool getResourceTypes();
-
     // returns new resources( not from pool) or updates some in resource pool
     QnResourceList findNewResources(bool *ip_finished);
 

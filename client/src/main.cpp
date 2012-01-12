@@ -264,13 +264,14 @@ int main(int argc, char *argv[])
     cl_log.setLogLevel(cl_logWARNING);
 #endif
 
-    cl_log.setLogLevel(cl_logDEBUG1);
     CL_LOG(cl_logALWAYS)
     {
         cl_log.log(QLatin1String("\n\n========================================"), cl_logALWAYS);
         cl_log.log(cl_logALWAYS, "Software version %s", APPLICATION_VERSION);
         cl_log.log(QFile::decodeName(argv[0]), cl_logALWAYS);
     }
+
+    qInstallMsgHandler(qDebugCLLogHandler);
 
     Settings& settings = Settings::instance();
     settings.load(dataLocation + QLatin1String("/settings.xml"));

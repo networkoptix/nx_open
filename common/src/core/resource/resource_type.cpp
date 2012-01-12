@@ -154,3 +154,10 @@ QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QSt
     Q_ASSERT(false);
     return QnId();
 }
+
+bool QnResourceTypePool::isEmpty() const
+{
+    QMutexLocker lock(&m_mutex);
+
+    return m_resourceTypeMap.isEmpty();
+}

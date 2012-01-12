@@ -35,7 +35,7 @@ void QnResource::updateInner(const QnResource& other)
     m_tags = other.m_tags;
     m_avalable = other.m_avalable;
     m_url = other.m_url;
-    m_status = other.m_status;
+    setStatus(other.m_status);
     m_streamParamList = other.m_streamParamList;
 }
 

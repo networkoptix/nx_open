@@ -14,6 +14,7 @@
 #include "api/Types.h"
 #include "api/AppSessionManager.h"
 
+#include "utils/common/sleep.h"
 
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, int handle)
 {
@@ -254,3 +255,25 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
 {
     return createConnection(defaultUrl());
 }
+
+void initResourceTypes(QnAppServerConnectionPtr appServerConnection)
+{
+    if (!qnResTypePool->isEmpty())
+        return;
+
+    // The following is demo only. Remove it.
+    QList<QnResourceTypePtr> resourceTypeList;
+
+    for(;;)
+    {
+        QByteArray errorString;
+        if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
+            break;
+
+        qDebug() << "Can't get resource types: " << errorString;
+        QnSleep::msleep(1000);
+    }
+
+    qnResTypePool->addResourceTypeList(resourceTypeList);
+}
+

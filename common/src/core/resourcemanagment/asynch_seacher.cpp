@@ -72,27 +72,11 @@ void QnResourceDiscoveryManager::pleaseStop()
     CLLongRunnable::pleaseStop();
 }
 
-bool QnResourceDiscoveryManager::getResourceTypes()
-{
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
-    QByteArray errorString;
-
-    QList<QnResourceTypePtr> resourceTypeList;
-    if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
-    {
-        qnResTypePool->addResourceTypeList(resourceTypeList);
-        qDebug() << "Got " << resourceTypeList.size() << " resource types";
-
-        return true;
-    }
-
-    qDebug() << "Can't get resource types from Application server: " << errorString;
-    return false;
-}
-
 void QnResourceDiscoveryManager::run()
 {
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    initResourceTypes(appServerConnection);
+
     while (!needToStop())
     {
         bool ip_finished;

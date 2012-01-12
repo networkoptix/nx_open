@@ -69,6 +69,7 @@ public:
 
     QnId getResourceTypeId(const QString& manufacture, const QString& name) const;
 
+    bool isEmpty() const;
 private:
     mutable QMutex m_mutex;
     typedef QMap<QnId, QnResourceTypePtr> QnResourceTypeMap;
