@@ -745,6 +745,11 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 
     m_display->synchronize(widget->item());
 
+    /* Un-raise the raised item if it was the one being resized. */
+    QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+    if(raisedItem == widget->item())
+        workbench()->setItem(QnWorkbench::RAISED, NULL);
+
     /* Clean up resizing state. */
     m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
     m_resizedWidgetRect = QRect();
