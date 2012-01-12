@@ -27,13 +27,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
         }
 
-        foreach(QnResourcePtr resource, resources)
-        {
-            QObject::connect(resource.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
-        }
-
-        QnResourcePool::instance()->addResources(resources);
+        qDebug() << "Connecting resource: " << resource->getName();
+        QObject::connect(resource.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
     }
+
+    QnResourcePool::instance()->addResources(resources);
 }
 
 void QnAppserverResourceProcessor::requestFinished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources)

@@ -105,15 +105,16 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources, QByteAr
     return status;
 }
 
-int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServerList& servers, QByteArray& errorString)
+int QnAppServerConnection::registerServer(const QnVideoServer& serverIn, QnVideoServerList& servers, QByteArray& errorString)
 {
     QnApiServerPtr server = unparseServer(serverIn);
 
     QnApiServerResponsePtr xsdServers;
 
-    if (m_sessionManager->addServer(*server, xsdServers, errorString) == 0)
+    if (m_sessionManager->registerServer(*server, xsdServers, errorString) == 0)
     {
         parseServers(servers, xsdServers->server(), m_resourceFactory);
+
         return 0;
     }
 
@@ -153,7 +154,7 @@ int QnAppServerConnection::saveAsync(const QnVideoServer& serverIn, QObject* tar
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, "server");
     QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
 
-    m_sessionManager->addServerAsync(*server, processor, SLOT(finished(int, const QByteArray&, int)));
+    m_sessionManager->registerServerAsync(*server, processor, SLOT(finished(int, const QByteArray&, int)));
 
     return 0;
 }

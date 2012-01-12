@@ -53,7 +53,7 @@ public:
 
     int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
-    int addServer(const QnVideoServer&, QnVideoServerList& servers, QByteArray& errorString);
+    int registerServer(const QnVideoServer&, QnVideoServerList& servers, QByteArray& errorString);
     int addCamera(const QnCameraResource&, QList<QnResourcePtr>& cameras, QByteArray& errorString);
 
     int addStorage(const QnStorage&, QByteArray& errorString);

@@ -24,10 +24,10 @@ public:
     int getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId, QByteArray& errorString);
     int getStorages(QnApiStorageResponsePtr& resources, QByteArray& errorString);
 
-    int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers, QByteArray& errorString);
+    int registerServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers, QByteArray& errorString);
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras, QByteArray& errorString);
 
-    int addServerAsync(const ::xsd::api::servers::Server&, QObject* target, const char* slot);
+    int registerServerAsync(const ::xsd::api::servers::Server&, QObject* target, const char* slot);
     int addCameraAsync(const ::xsd::api::cameras::Camera&, QObject* target, const char* slot);
 
     int addStorage(const ::xsd::api::storages::Storage&, QByteArray& errorString);

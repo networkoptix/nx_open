@@ -172,9 +172,9 @@ QnVideoServerPtr registerServer(QnAppServerConnectionPtr appServerConnection, co
 
     QnVideoServerList servers;
     QByteArray errorString;
-    if (appServerConnection->addServer(server, servers, errorString) != 0)
+    if (appServerConnection->registerServer(server, servers, errorString) != 0)
     {
-        qDebug() << "registerServer(): Call to addServer failed. Reason: " << errorString;
+        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
 
         return QnVideoServerPtr();
     }

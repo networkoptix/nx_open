@@ -30,5 +30,6 @@ QnApiCameraPtr unparseCamera(const QnCameraResource& cameraIn)
     camera->scheduleTasks(scheduleTasks);
     camera->parentID(cameraIn.getParentId().toString().toStdString());
 
+    camera->status((cameraIn.getStatus() == QnResource::Online) ? "A" : "I");
     return camera;
 }

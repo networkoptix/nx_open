@@ -93,17 +93,6 @@ bool QnResourceDiscoveryManager::getResourceTypes()
 
 void QnResourceDiscoveryManager::run()
 {
-    bool gotResourceTypes = false;
-    while (!needToStop() && !gotResourceTypes)
-    {
-        gotResourceTypes = getResourceTypes();
-        if (!gotResourceTypes)
-        {
-            int global_delay_between_search = 1000;
-            smartSleep(global_delay_between_search);
-        }
-    }
-
     while (!needToStop())
     {
         bool ip_finished;
