@@ -44,7 +44,7 @@ typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, L
 
 class QnDwmPrivate {
 public:
-    QnDwmPrivate();
+    QnDwmPrivate() {}
 
     virtual ~QnDwmPrivate() {}
 
@@ -77,10 +77,6 @@ public:
     int emulatedTitleBarHeight;
 };
 
-QnDwmPrivate::QnDwmPrivate() { 
-    memset(this, 0, sizeof(this)); 
-}
-
 void QnDwmPrivate::init(QWidget *widget) {
     this->widget = widget;
 
@@ -111,10 +107,8 @@ QnDwm::QnDwm(QWidget *widget):
     QObject(widget),
     d(new QnDwmPrivate())
 {
-    if(widget == NULL) {
+    if(widget == NULL)
         qnNullWarning(widget);
-        return;
-    }
 
     d->init(widget);
 }
