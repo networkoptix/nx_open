@@ -197,7 +197,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     int subChannelNumber = media->subChannelNumber;
 
     m_owner->clearBuffer();
-    if (!metadata)
+    if (!metadata && media->compressionType)
     {
         QList<QnMediaContextPtr>& ctxData = m_ctxSended[rtspChannelNum];
         while (ctxData.size() <= subChannelNumber)
@@ -235,7 +235,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     m_mutex.unlock();
 
-    for (int dataRest = media->data.size(); dataRest > 0; dataRest -= sendLen)
+    for (int dataRest = media->data.size(); dataRest > 0 || ffHeaderSize; dataRest -= sendLen)
     {
         while (m_pauseNetwork && !m_needStop)
         {
@@ -268,8 +268,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             ffHeaderSize = 0;
         }
 
-        Q_ASSERT(sendLen > 0);
-        m_owner->bufferData(curData, sendLen);
+        if(sendLen > 0)
+            m_owner->bufferData(curData, sendLen);
         curData += sendLen;
 
     }

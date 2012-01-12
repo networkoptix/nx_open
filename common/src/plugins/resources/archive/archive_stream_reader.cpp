@@ -200,6 +200,8 @@ bool QnArchiveStreamReader::getNextVideoPacket()
         if (!m_nextData)
             return false;
 
+        if (m_nextData->dataType == QnAbstractMediaData::EMPTY_DATA)
+            return false; // EOF/BOF reached
         if (m_nextData->dataType == QnAbstractMediaData::META_V1)
             m_skippedMetadata << m_nextData;
 
@@ -207,6 +209,18 @@ bool QnArchiveStreamReader::getNextVideoPacket()
         if (video && video->channelNumber == 0)
             return true; // packet with primary video channel
     }
+}
+
+QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMode)
+{
+    QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
+    rez->timestamp = isReverseMode ? 0 : DATETIME_NOW;
+    if (m_BOF)
+        rez->flags |= QnAbstractMediaData::MediaFlags_BOF;
+    if (isReverseMode)
+        rez->flags |= AV_REVERSE_PACKET;
+    rez->opaque = m_dataMarker;
+    return rez;
 }
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
@@ -295,6 +309,14 @@ begin_label:
             emit jumpOccured(displayTime);
     }
     m_dataMarker = m_newDataMarker;
+
+    if (reverseMode && m_topIFrameTime > 0 && m_topIFrameTime <= m_delegate->startTime() && !m_cycleMode)
+    {
+        // BOF reached in reverse mode
+        m_eof = true;
+        return createEmptyPacket(reverseMode);
+    }
+
 
     QnCompressedVideoDataPtr videoData;
 	
@@ -397,11 +419,18 @@ begin_label:
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         if (m_lastGopSeekTime == m_delegate->startTime()) 
                         {
-                            if (m_delegate->endTime() != DATETIME_NOW)
-                                seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
-                            else
-                                seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
-                            tmpVal = m_delegate->endTime();
+                            if (m_cycleMode)
+                            {
+                                if (m_delegate->endTime() != DATETIME_NOW)
+                                    seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
+                                else
+                                    seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
+                                tmpVal = m_delegate->endTime();
+                            }
+                            else {
+                                m_eof = true;
+                                return createEmptyPacket(reverseMode);
+                            }
                         }
                         intChanneljumpTo(seekTime, 0);
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
@@ -440,7 +469,12 @@ begin_label:
                 {
                     // Some error or end of file. Stop reading frames.
                     setSkipFramesToTime(0);
+                    QnAbstractMediaDataPtr tmp = m_nextData;
                     m_nextData.clear();
+                    if (tmp && tmp->dataType == QnAbstractMediaData::EMPTY_DATA)
+                    {
+                        return createEmptyPacket(reverseMode); // EOF/BOF reached
+                    }
                 }
 			}
 

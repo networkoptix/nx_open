@@ -37,6 +37,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)
         : data(alignment, capacity),
+        timestamp(AV_NOPTS_VALUE),
         flags(MediaFlags_None),
         channelNumber(0),
         subChannelNumber(0),
@@ -50,7 +51,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 	{
 	}
 
-	enum DataType {VIDEO, AUDIO, CONTAINER, META_V1};
+	enum DataType {VIDEO, AUDIO, CONTAINER, META_V1, EMPTY_DATA};
 
 	CLByteArray data;
 	DataType dataType;
@@ -73,8 +74,10 @@ struct QnEmptyMediaData : public QnAbstractMediaData
 {
     QnEmptyMediaData(): QnAbstractMediaData(16,0)
     {
+        dataType = EMPTY_DATA;
     }
 };
+typedef QSharedPointer<QnEmptyMediaData> QnEmptyMediaDataPtr;
 
 struct QnMetaDataV1;
 typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;

@@ -320,7 +320,11 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             quint8 cseq = *payload++;
             quint8 flags = *payload++;
 
-            if (dataType == QnAbstractMediaData::META_V1)
+            if (dataType == QnAbstractMediaData::EMPTY_DATA)
+            {
+                nextPacket = QnEmptyMediaDataPtr(new QnEmptyMediaData());
+            }
+            else if (dataType == QnAbstractMediaData::META_V1)
             {
                 if (dataSize != MD_WIDTH*MD_HEIGHT/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
                 {

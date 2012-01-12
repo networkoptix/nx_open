@@ -57,6 +57,7 @@ protected:
     bool openFormatContext();
     void setCurrentTime(qint64 value);
     virtual void pleaseStop();
+    QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
 protected:
     qint64 m_currentTime;
     qint64 m_topIFrameTime;

@@ -537,8 +537,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
-    if (!vd && !ad)
-        return true;
+    //if (!vd && !ad)
+    //    return true;
 
 
     m_processedPackets++;
@@ -576,8 +576,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             return true; // ignore audio packet to prevent after jump detection
         }
     }
-    else
-        return true;
+    //else
+    //    return true;
 
     bool isReversePacket = media->flags & AV_REVERSE_PACKET;
     bool isReverseMode = speed < 0.0;
@@ -599,9 +599,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (!m_bofReceived)
             return true; // jump finished, but old data received
 
-        qint64 ts = vd? vd->timestamp : ad->timestamp;
         // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
-        if (ad && ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
+        if (ad && ad->timestamp < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
             return true; // skip packet
         // clear everything we can
         m_bofReceived = false;
@@ -611,6 +610,28 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_afterJump = false;
         //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
+
+    QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
+    if (emptyData)
+    {
+        // One camera from several sync cameras may reach BOF/EOF
+		// move current time position to the edge to prevent other cameras blocking
+        m_lastDisplayedVideoTime = emptyData->timestamp;
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+            m_display[i]->setLastDisplayedTime(m_lastDisplayedVideoTime);
+        }
+        if (m_buffering && m_executingJump == 0) 
+        {
+            QMutexLocker lock(&m_timeMutex);
+            if (m_extTimeSrc)
+                m_extTimeSrc->onBufferingFinished(this);
+            m_buffering = false;
+        }
+        msleep(50);
+        return true;
+    }
+
+
 
     bool flushCurrentBuffer = false;
     bool audioParamsChanged = ad && m_playingFormat != ad->format;
