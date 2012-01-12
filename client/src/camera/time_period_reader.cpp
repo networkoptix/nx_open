@@ -78,6 +78,11 @@ void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &ti
         {
             if (status == 0) {
                 QVector<QnTimePeriodList> periods;
+                if (!timePeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1) 
+                {
+                    if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs)
+                        m_loadedData.last().durationMs = 0;
+                }
                 periods << m_loadedData << timePeriods;
                 m_loadedData = QnTimePeriod::mergeTimePeriods(periods); // union data
 
