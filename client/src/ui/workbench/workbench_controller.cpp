@@ -415,7 +415,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_treeShowingProcessor,     SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeShowingProcessor_hoverEntered()));
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
-    connect(m_treeWidget,               SIGNAL(newTabRequested()),                                                                  m_display->view()->window(),    SLOT(newLayout())); // TODO: move to mainwnd
 
     /* Navigation slider. */
     m_navigationItem = new NavigationItem(controlsWidget);
@@ -1411,6 +1410,8 @@ void QnWorkbenchController::at_treeOpacityProcessor_hoverLeft() {
 }
 
 void QnWorkbenchController::at_treeOpacityProcessor_hoverEntered() {
+    setTreeVisible(true);
+
     m_treeOpacityAnimatorGroup->pause();
 
     m_treeOpacityAnimator->setTargetValue(hoverTreeOpacity);

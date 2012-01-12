@@ -18,6 +18,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"
+#include "ui/navigationtreewidget.h"
 
 #include "ui/dialogs/logindialog.h"
 #include "ui/preferences/preferences_wnd.h"
@@ -152,6 +153,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_display->setView(m_view);
 
     m_controller = new QnWorkbenchController(m_display, this);
+    connect(m_controller->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(newLayout()));
+
 
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
     new QnSyncPlayMixin(m_display, renderWatcher, this);

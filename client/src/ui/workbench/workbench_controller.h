@@ -72,6 +72,10 @@ public:
      */
     QnWorkbenchItem *item(const QnResourcePtr &resource) const;
 
+    NavigationTreeWidget *treeWidget() const {
+        return m_treeWidget;
+    }
+
     void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QString &file, const QPointF &gridPos = QPointF(), bool findAccepted = true);
