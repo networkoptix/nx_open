@@ -336,30 +336,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
     connect(controlsWidget,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
 
-    /* Navigation slider. */
-    m_navigationItem = new NavigationItem(controlsWidget);
-
-    QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
-    navigationHoverItem->setTargetItem(m_navigationItem);
-    navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
-    navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
-    navigationHoverItem->setAnimationSpeed(0.1);
-    navigationHoverItem->setAnimationTimeLimit(global_opacity_change_period);
-
-    m_sliderPositionAnimator = new VariantAnimator(this);
-    m_sliderPositionAnimator->setTimer(display->animationInstrument()->animationTimer());
-    m_sliderPositionAnimator->setTargetObject(m_navigationItem);
-    m_sliderPositionAnimator->setAccessor(new PropertyAccessor("pos"));
-    m_sliderPositionAnimator->setSpeed(m_navigationItem->size().height() * 2.0);
-    m_sliderPositionAnimator->setTimeLimit(500);
-
-    setSliderVisible(false, false);
-
-    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
-    connect(m_navigationItem,           SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(at_navigationItem_actualCameraChanged(CLVideoCamera *)));
-    connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
-    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_navigationItem,               SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
-
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
     m_treeWidget->setWorkbenchController(this);
@@ -440,6 +416,30 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
     connect(m_treeWidget,               SIGNAL(newTabRequested()),                                                                  m_display->view()->window(),    SLOT(newLayout())); // TODO: move to mainwnd
+
+    /* Navigation slider. */
+    m_navigationItem = new NavigationItem(controlsWidget);
+
+    QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
+    navigationHoverItem->setTargetItem(m_navigationItem);
+    navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
+    navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
+    navigationHoverItem->setAnimationSpeed(0.1);
+    navigationHoverItem->setAnimationTimeLimit(global_opacity_change_period);
+
+    m_sliderPositionAnimator = new VariantAnimator(this);
+    m_sliderPositionAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_sliderPositionAnimator->setTargetObject(m_navigationItem);
+    m_sliderPositionAnimator->setAccessor(new PropertyAccessor("pos"));
+    m_sliderPositionAnimator->setSpeed(m_navigationItem->size().height() * 2.0);
+    m_sliderPositionAnimator->setTimeLimit(500);
+
+    setSliderVisible(false, false);
+
+    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
+    connect(m_navigationItem,           SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(at_navigationItem_actualCameraChanged(CLVideoCamera *)));
+    connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
+    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_navigationItem,               SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
