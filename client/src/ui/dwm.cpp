@@ -70,6 +70,8 @@ public:
 
     bool overrideFrameMargins;
     bool systemPaintFrame;
+    bool processDoubleClicks;
+    bool titleBarDrag;
 #endif
 
     bool emulateFrame;
@@ -97,6 +99,8 @@ void QnDwmPrivate::init(QWidget *widget) {
 
     overrideFrameMargins = false;
     systemPaintFrame = true;
+    processDoubleClicks = false;
+    titleBarDrag = true;
 #endif
 
     emulateFrame = false;
@@ -278,6 +282,14 @@ int QnDwm::emulatedTitleBarHeight() const {
     return d->emulatedTitleBarHeight;
 }
 
+void QnDwm::enableDoubleClickProcessing(bool enable) {
+    d->processDoubleClicks = enable;
+}
+
+void QnDwm::enableTitleBarDrag(bool enable) {
+    d->titleBarDrag = enable;
+}
+
 QMargins QnDwm::currentFrameMargins() const {
     QMargins errorValue(-1, -1, -1, -1);
 
@@ -354,6 +366,8 @@ bool QnDwm::winEvent(MSG *message, long *result) {
     case WM_DWMCOMPOSITIONCHANGED:  return compositionChangedEvent(message, result);
     case WM_NCACTIVATE:             return activateEvent(message, result);
     case WM_NCPAINT:                return ncPaintEvent(message, result);
+    case WM_NCLBUTTONDBLCLK:        return ncLeftButtonDoubleClickEvent(message, result);
+    case WM_SYSCOMMAND:             return sysCommandEvent(message, result);
     default:                        return false;
     }
 }
@@ -511,6 +525,32 @@ bool QnDwm::ncPaintEvent(MSG *message, long *result) {
         *result = 0;
         return true;
     } else {
+        return false;
+    }
+}
+
+bool QnDwm::ncLeftButtonDoubleClickEvent(MSG *message, long *result) {
+    if(!d->processDoubleClicks)    
+        return false;
+
+    if(message->wParam == HTCAPTION) {
+        emit titleBarDoubleClicked();
+        return true;
+    }
+
+    return false;
+}
+
+bool QnDwm::sysCommandEvent(MSG *message, long *result) {
+    switch(message->wParam & 0xFFF0) {
+    case SC_MOVE:
+        if(d->titleBarDrag) {
+            return false;
+        } else {
+            *result = 0; 
+            return true; 
+        }
+    default:
         return false;
     }
 }

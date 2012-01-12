@@ -132,6 +132,18 @@ public:
      */
     int emulatedTitleBarHeight() const;
 
+    void enableDoubleClickProcessing(bool enable = true);
+
+    void disableDoubleClickProcessing(bool disable = true) {
+        enableDoubleClickProcessing(!disable);
+    }
+
+    void enableTitleBarDrag(bool enable = true);
+
+    void disableTitleBarDrag(bool disable = true) {
+        enableTitleBarDrag(!disable);
+    }
+
 #ifdef Q_OS_WIN
     /**
      * This function is to be called from widget's <tt>winEvent</tt> handler.
@@ -151,6 +163,12 @@ signals:
      */
     void compositionChanged(bool enabled);
 
+    /**
+     * This signal is emitted whenever the user double-clicks on widget title bar.
+     * Double click processing must be enabled.
+     */
+    void titleBarDoubleClicked();
+
 protected:
 #ifdef Q_OS_WIN
     bool hitTestEvent(MSG *message, long *result);
@@ -158,6 +176,8 @@ protected:
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
     bool ncPaintEvent(MSG *message, long *result);
+    bool ncLeftButtonDoubleClickEvent(MSG *message, long *result);
+    bool sysCommandEvent(MSG *message, long *result);
 #endif
 
 private:

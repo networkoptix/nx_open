@@ -93,6 +93,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_dwm = new QnDwm(this);
 
     connect(m_dwm, SIGNAL(compositionChanged(bool)), this, SLOT(updateDwmState()));
+    connect(m_dwm, SIGNAL(titleBarDoubleClicked()), this, SLOT(toggleFullScreen()));
 
     /* Set up QWidget. */
     setWindowTitle(QApplication::applicationName());
@@ -517,8 +518,12 @@ void MainWnd::updateDwmState()
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
+        m_dwm->enableDoubleClickProcessing();
+        m_dwm->disableTitleBarDrag();
 
-        m_dwm->disableFrameEmulation();
+        m_dwm->enableFrameEmulation();
+        m_dwm->setEmulatedFrameMargins(QMargins(0, 0, 0, 0));
+        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that window is click-draggable no matter where the user clicked. */
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
@@ -547,6 +552,8 @@ void MainWnd::updateDwmState()
         m_dwm->extendFrameIntoClientArea();
         m_dwm->setCurrentFrameMargins(QMargins(1, 0, 1, 1)); /* Can't set (0, 0, 0, 0) here as it will cause awful display artifacts. */
         m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is also needed to prevent display artifacts. */
+        m_dwm->enableDoubleClickProcessing();
+        m_dwm->enableTitleBarDrag();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
@@ -575,6 +582,8 @@ void MainWnd::updateDwmState()
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
+        m_dwm->enableDoubleClickProcessing();
+        m_dwm->enableTitleBarDrag();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
