@@ -29,8 +29,8 @@ void SelectionOverlayHackInstrument::aboutToBeDisabledNotify() {
 }
 
 void SelectionOverlayHackInstrument::at_scene_selectionChanged() {
-    // TODO: Alexender, please check
-    if (!scene())
+    /* We may get here from scene's destructor. In this case scene() returns NULL. */
+    if (scene() == NULL)
         return;
 
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();

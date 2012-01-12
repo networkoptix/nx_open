@@ -190,8 +190,10 @@ public:
     }
 
     /**
-     * \returns                        Graphics scene that this instrument is
-     *                                 installed to, or NULL if none.
+     * Note that this function returns NULL if this instrument isn't installed to
+     * any scene, or if the scene that it is installed to is being destroyed.
+     *
+     * \returns                        Graphics scene that this instrument is installed to.
      */
     QGraphicsScene *scene() const {
         return m_scene;
