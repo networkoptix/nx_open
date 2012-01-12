@@ -102,6 +102,8 @@ protected:
 
     void resizeEvent(QGraphicsSceneResizeEvent *event);
 
+    void updateToolTipPos();
+
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
@@ -123,6 +125,12 @@ MySlider::MySlider(TimeSlider *parent)
       m_endSize(0)
 {
     setToolTipItem(new StyledToolTipItem);
+}
+
+void MySlider::updateToolTipPos()
+{
+    ensureHandleRect();
+    m_toolTip->setPos(m_handleRect.center().x(), m_handleRect.top());
 }
 
 void MySlider::createEndPixmap()
@@ -277,8 +285,7 @@ void MySlider::sliderChange(SliderChange change)
 
     if (change == SliderValueChange && m_toolTip) {
         invalidateHandleRect();
-        ensureHandleRect();
-        m_toolTip->setPos(m_handleRect.center().x(), m_handleRect.top());
+        updateToolTipPos();
     }
 }
 
@@ -297,6 +304,7 @@ void MySlider::resizeEvent(QGraphicsSceneResizeEvent *event)
     GraphicsSlider::resizeEvent(event);
 
     invalidateHandleRect();
+    updateToolTipPos();
 }
 
 void MySlider::invalidateHandleRect()
