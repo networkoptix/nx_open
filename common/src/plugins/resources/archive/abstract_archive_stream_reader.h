@@ -82,7 +82,6 @@ Q_SIGNALS:
     void prevFrameOccured();
 protected:
     bool m_cycleMode;
-    quint64 m_lengthMksec;
     qint64 m_needToSleep;
     QnAbstractArchiveDelegate* m_delegate;
     QnAbstractNavigator* m_navDelegate;

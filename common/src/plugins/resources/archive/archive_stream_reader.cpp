@@ -165,10 +165,6 @@ bool QnArchiveStreamReader::init()
     m_delegate->setAudioChannel(m_selectedAudioChannel);
     m_channel_number = m_delegate->getVideoLayout()->numberOfChannels();
 
-    m_lengthMksec = contentLength();
-    if (m_lengthMksec == AV_NOPTS_VALUE)
-        m_lengthMksec = 0;
-
     // Alloc common resources
     m_lastFrameDuration = 0;
 
@@ -405,7 +401,7 @@ begin_label:
                                 seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
                             else
                                 seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
-                            tmpVal = m_lengthMksec;
+                            tmpVal = m_delegate->endTime();
                         }
                         intChanneljumpTo(seekTime, 0);
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
@@ -525,7 +521,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
 		{
             if (m_cycleMode)
             {
-                if (m_lengthMksec < 1000 * 1000 * 5)
+                if (m_delegate->endTime() < 1000 * 1000 * 5)
                     msleep(200); // prevent to fast file walk for very short files.
                 m_delegate->close();
                 m_skippedMetadata.clear();
