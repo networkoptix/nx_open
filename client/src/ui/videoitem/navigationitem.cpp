@@ -390,8 +390,6 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
     if (m_camera)
     {
-        setVisible(true);
-
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -399,9 +397,10 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     }
     else
     {
-        setVisible(false);
         m_timeSlider->setScalingFactor(0);
     }
+
+    emit actualCameraChanged(m_camera);
 }
 
 void NavigationItem::setLiveMode(bool value)

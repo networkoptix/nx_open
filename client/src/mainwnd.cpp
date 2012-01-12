@@ -125,6 +125,10 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene);
+    m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
+    m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
+    m_view->setLineWidth(1);
+    m_view->setAutoFillBackground(true);
     {
         /* Adjust palette so that inherited background painting is not needed. */
         QPalette palette = m_view->palette();
@@ -132,9 +136,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         palette.setColor(QPalette::Base, Qt::black);
         m_view->setPalette(palette);
     }
-    m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
-    m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
-    m_view->setMidLineWidth(1);
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
@@ -483,6 +484,12 @@ bool MainWnd::isTitleVisible() const
 
 void MainWnd::updateDwmState() 
 {
+    if(isFullScreen()) {
+        m_view->setLineWidth(0);
+    } else {
+        m_view->setLineWidth(1);
+    }
+
     if(!m_dwm->isSupported()) {
         m_drawCustomFrame = false;
         
