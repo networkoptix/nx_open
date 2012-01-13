@@ -88,6 +88,25 @@ namespace {
 
     Q_DECLARE_OPERATORS_FOR_FLAGS(GridWalker::Borders);
 
+    class DistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
+    public:
+        DistanceMagnitudeCalculator(const QPointF &origin): 
+            m_origin(origin),
+            m_calculator(MagnitudeCalculator::forType<QPointF>())
+        {}
+
+    protected:
+        virtual qreal calculateInternal(const void *value) const override {
+            const QPoint &p = *static_cast<const QPoint *>(value);
+
+            return m_calculator->calculate(p - m_origin);
+        }
+
+    private:
+        QPointF m_origin;
+        TypedMagnitudeCalculator<QPointF> *m_calculator;
+    };
+
 } // anonymous namespace
 
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
@@ -367,15 +386,14 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
     return pos == m_itemsByUid.end() ? m_noItems : pos.value();
 }
 
-QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPointF> *metric) const {
-    if(metric == NULL)
-        return closestFreeSlot(gridPos, size, MagnitudeCalculator::forType<QPointF>()); /* Use default metric if none provided. */
+QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric) const {
+    if(metric == NULL) {
+        DistanceMagnitudeCalculator metric(gridPos - SceneUtility::toPoint(QSizeF(size)) / 2.0);
+        return closestFreeSlot(gridPos, size, &metric); /* Use default metric if none provided. */
+    }
 
     /* Grid cell where starting search position lies. */
     QPoint gridCell = (gridPos - SceneUtility::toPoint(QSizeF(size)) / 2.0).toPoint();
-
-    /* Precalculate the point to which delta is applied for distance calculation. */
-    QPointF distanceBase = gridCell + SceneUtility::toPoint(QSizeF(size)) / 2.0;
 
     /* Current bests. */
     qreal bestDistance = std::numeric_limits<qreal>::max();
@@ -392,7 +410,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
         if(walker.hasNext()) {
             QPoint delta = walker.next();
 
-            qreal distance = metric->calculate(distanceBase + delta - gridPos);
+            qreal distance = metric->calculate(gridCell + delta);
             if(distance > bestDistance || qFuzzyCompare(distance, bestDistance))
                 continue;
             checkedBorder = GridWalker::NoBorders;
@@ -421,7 +439,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
             GridWalker::Border bestBorder = GridWalker::NoBorders;
             qreal bestBorderDistance = std::numeric_limits<qreal>::max();
             for(int i = 0; i < 4; i++) {
-                qreal distance = metric->calculate(distanceBase + expansion[i].delta - gridPos);
+                qreal distance = metric->calculate(gridCell + expansion[i].delta);
                 if(distance < bestBorderDistance) {
                     bestBorderDistance = distance;
                     bestBorder = expansion[i].border;

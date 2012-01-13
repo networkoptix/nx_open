@@ -64,7 +64,6 @@ public:
     QN_DECLARE_GLOBAL_ACCESSOR(qreal,   decorationMaxOpacity,           DECORATION_MAX_OPACITY);
     QN_DECLARE_GLOBAL_ACCESSOR(qreal,   baseSceneZ,                     BASE_SCENE_Z_LEVEL);
     QN_DECLARE_GLOBAL_ACCESSOR(int,     gridAppearanceDelay,            GRID_APPEARANCE_DELAY);
-
 #undef QN_DECLARE_GLOBAL_ACCESSOR
 
 private:
