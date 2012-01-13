@@ -227,7 +227,7 @@ bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModel
     if (m_parsedFilterString.isEmpty())
         return false;
 
-    QnResourcePtr resource = qnResPool->getResourceById(sourceModel()->index(source_row, 0, source_parent).data(Qt::UserRole + 1));
+    QnResourcePtr resource = resourceFromIndex(sourceModel()->index(source_row, 0, source_parent));
     if (!resource)
         return false;
 
@@ -256,7 +256,28 @@ bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModel
             return true;
     }
 
-    return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+    if (!m_filters[Text].isEmpty()) {
+        const int filter_role = filterRole();
+        const int filter_column = filterKeyColumn();
+        if (filter_column == -1) {
+            const int columnCount = sourceModel()->columnCount(source_parent);
+            for (int column = 0; column < columnCount; ++column) {
+                const QModelIndex source_index = sourceModel()->index(source_row, column, source_parent);
+                const QString text = source_index.data(filter_role).toString();
+                if (matchesCategoryFilter(m_filters[Text], text))
+                    return true;
+            }
+        } else {
+            const QModelIndex source_index = sourceModel()->index(source_row, filter_column, source_parent);
+            if (source_index.isValid()) { // the column may not exist
+                const QString text = source_index.data(filter_role).toString();
+                if (matchesCategoryFilter(m_filters[Text], text))
+                    return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 static inline QString normalizedFilterString(const QString &str)
@@ -297,6 +318,7 @@ void ResourceSortFilterProxyModel::parseFilterString()
             if (pattern == QLatin1String("live"))
                 m_flagsFilter |= QnResource::live;
         }
-        m_filters[category].append(QRegExp(pattern, category == Id ? Qt::CaseSensitive : Qt::CaseInsensitive, patternSyntax));
+        const QRegExp rx(pattern, category == Id ? Qt::CaseSensitive : Qt::CaseInsensitive, patternSyntax);
+        m_filters[category].append(rx);
     }
 }
