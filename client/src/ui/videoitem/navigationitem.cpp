@@ -521,7 +521,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     loadingPeriod.startTimeMs = qMax(minTimeMs, t - w);
     loadingPeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
     
-    loadingPeriod = loadingPeriod.addPeriod(m_motionPeriod);
+    loadingPeriod.addPeriod(m_motionPeriod);
     
 
     //MotionPeriodLoader& p = m_motionPeriodLoader[netRes];

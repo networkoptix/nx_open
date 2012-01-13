@@ -84,7 +84,11 @@ namespace {
 }
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
+#ifdef Q_OS_WIN
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
+#else
+    : QWidget(parent),
+#endif
       m_controller(0),
       m_drawCustomFrame(false),
       m_titleVisible(true)
