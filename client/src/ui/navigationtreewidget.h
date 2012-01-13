@@ -5,15 +5,17 @@
 
 #include <QtGui/QWidget>
 
-class QAbstractItemModel;
 class QLineEdit;
-class QSortFilterProxyModel;
 class QTabWidget;
 class QToolButton;
 class QTreeView;
 class QModelIndex;
 
 class QnWorkbenchController;
+class QnWorkbenchItem;
+
+class ResourceModel;
+class ResourceSortFilterProxyModel;
 
 class NavigationTreeWidget : public QWidget
 {
@@ -41,6 +43,9 @@ private Q_SLOTS:
 
     void workbenchLayoutAboutToBeChanged();
     void workbenchLayoutChanged();
+    void workbenchLayoutItemAdded(QnWorkbenchItem *item);
+    void workbenchLayoutItemRemoved(QnWorkbenchItem *item);
+
     void handleInsertRows(const QModelIndex &parent, int first, int last);
     void handleRemoveRows(const QModelIndex &parent, int first, int last);
 
@@ -53,9 +58,9 @@ private:
     QToolButton *m_clearFilterButton;
     int m_filterTimerId;
 
-    QAbstractItemModel *m_resourcesModel;
+    ResourceModel *m_resourcesModel;
     QTreeView *m_resourcesTreeView;
-    QPointer<QSortFilterProxyModel> m_searchProxyModel;
+    QPointer<ResourceSortFilterProxyModel> m_searchProxyModel;
     QTreeView *m_searchTreeView;
 
     QPointer<QnWorkbenchController> m_controller;
