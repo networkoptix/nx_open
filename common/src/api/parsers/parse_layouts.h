@@ -3,8 +3,8 @@
 
 
 #include "api/Types.h"
-#include "core/resource/resource.h"
+#include "core/resource/layout_data.h"
 
-void parseLayouts(QList<QnResourcePtr>& layouts, const QnApiLayouts& xsdLayouts, QnResourceFactory& resourceFactory);
+void parseLayouts(QnLayoutDataList& layouts, const QnApiLayouts& xsdLayouts);
 
 #endif // _eve_parse_layouts_

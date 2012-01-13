@@ -21,17 +21,11 @@
     <xs:all>
       <xs:element name="id" type="xs:string"/>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="typeId" type="xs:string"/>
-      <xs:element name="status" type="xs:string"/>
-      <xs:element name="background_url" type="xs:string"/>
-      
-      <xs:element name="user" type="users:User"/>
-      <xs:element name="properties" type="resources:Properties" minOccurs="0"/>
-      <xs:element name="contents" type="Contents" minOccurs="0"/>
+      <xs:element name="items" type="Items" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
   
-  <xs:complexType name="Contents">
+  <xs:complexType name="Items">
     <xs:sequence> 
       <xs:element maxOccurs="unbounded" name="item" type="Item"/>
     </xs:sequence>
@@ -40,14 +34,12 @@
   <xs:complexType name="Item">
     <xs:all>
       <xs:element name="resourceId" type="xs:string"/>
-      <xs:element name="left" type="xs:int"/>
-      <xs:element name="top" type="xs:int"/>
-      <xs:element name="right" type="xs:int"/>
-      <xs:element name="bottom" type="xs:int"/>
-      <xs:element name="videoRectLeft" type="xs:int"/>
-      <xs:element name="videoRectTop" type="xs:int"/>
-      <xs:element name="videoRectRight" type="xs:int"/>
-      <xs:element name="videoRectBottom" type="xs:int"/>
+      <xs:element name="flags" type="xs:int"/>
+      <xs:element name="left" type="xs:double"/>
+      <xs:element name="top" type="xs:double"/>
+      <xs:element name="right" type="xs:double"/>
+      <xs:element name="bottom" type="xs:double"/>
+      <xs:element name="rotation" type="xs:double"/>
     </xs:all>
   </xs:complexType>
 </xs:schema>

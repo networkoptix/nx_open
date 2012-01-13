@@ -83,6 +83,11 @@ int AppSessionManager::getStorages(QnApiStorageResponsePtr& xstorages, QByteArra
     return getObjects<xsd::api::storages::Storages>("storage", "", xstorages, xsd::api::storages::storages, errorString);
 }
 
+int AppSessionManager::getLayouts(QnApiLayoutResponsePtr& xlayouts, QByteArray& errorString)
+{
+    return getObjects<xsd::api::layouts::Layouts>("layout", "", xlayouts, xsd::api::layouts::layouts, errorString);
+}
+
 int AppSessionManager::getCameras(QnApiCameraResponsePtr& cameras, const QnId& mediaServerId, QByteArray& errorString)
 {
     return getObjects<xsd::api::cameras::Cameras>("camera", mediaServerId.toString(), cameras, xsd::api::cameras::cameras, errorString);

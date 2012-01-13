@@ -121,6 +121,15 @@ QnWorkbenchLayout::~QnWorkbenchLayout() {
     blockSignals(signalsBlocked);
 }
 
+void QnWorkbenchLayout::load(const QnLayoutData& layoutData)
+{
+    // TODO: need to set id and name here
+    foreach (const QnLayoutItemData& itemData, layoutData.items)
+    {
+        // TODO: need to create layout items here
+    }
+}
+
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     if(item == NULL) {
         qnNullWarning(item);

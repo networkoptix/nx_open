@@ -8,6 +8,7 @@
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <ui/common/magnitude.h>
+#include "core/resource/layout_data.h"
 
 class QnWorkbenchItem;
 
@@ -18,7 +19,7 @@ class QnWorkbenchItem;
  * necessary functions for moving items around.
  */
 class QnWorkbenchLayout: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     struct Disposition {
         QSet<QPoint> free;
@@ -36,6 +37,11 @@ public:
      * Virtual destructor.
      */
     virtual ~QnWorkbenchLayout();
+
+    /**
+      * Load from QnLayoutData
+      */
+    void load(const QnLayoutData&);
 
 public Q_SLOTS:
     /**

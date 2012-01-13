@@ -99,7 +99,6 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources, QByteAr
     {
         parseCameras(resources, xsdResources->cameras().camera(), m_resourceFactory);
         parseServers(resources, xsdResources->servers().server(), m_serverFactory);
-        parseLayouts(resources, xsdResources->layouts().layout(), m_resourceFactory);
         parseUsers(resources, xsdResources->users().user(), m_resourceFactory);
     }
 
@@ -208,6 +207,20 @@ int QnAppServerConnection::getStorages(QnResourceList& storages, QByteArray& err
     if (!xsdStorages.isNull())
     {
         parseStorages(storages, xsdStorages->storage(), m_resourceFactory);
+    }
+
+    return status;
+}
+
+int QnAppServerConnection::getLayouts(QnLayoutDataList& layouts, QByteArray& errorString)
+{
+    QnApiLayoutResponsePtr xsdLayouts;
+
+    int status = m_sessionManager->getLayouts(xsdLayouts, errorString);
+
+    if (!xsdLayouts.isNull())
+    {
+        parseLayouts(layouts, xsdLayouts->layout());
     }
 
     return status;
