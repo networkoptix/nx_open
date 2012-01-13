@@ -8,6 +8,7 @@ QnTimePeriodReader::QnTimePeriodReader(const QnVideoServerConnectionPtr &connect
     m_resource(resource)
 {
     m_fakeHandle = INT_MAX/2;
+    qRegisterMetaType<QnTimePeriodList>("QnTimePeriodList");
     connect(this, SIGNAL(delayedReady(const QnTimePeriodList&, int)), this, SIGNAL(ready(const QnTimePeriodList&, int)), Qt::QueuedConnection);
 }
 
