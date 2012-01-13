@@ -37,8 +37,6 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
 {
     setupUi(this);
 
-    //setWindowOpacity(.90);
-
     QString label = creditsLabel->text();
     label = label.replace(QLatin1String("ORGANIZATION_NAME"), QLatin1String(ORGANIZATION_NAME) + QLatin1String("(tm)"));
     label = label.replace(QLatin1String("APPLICATION_NAME"), QLatin1String(APPLICATION_NAME));
@@ -143,6 +141,7 @@ void PreferencesWindow::updateView()
 
     totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
 
+    groupBox_9->hide(); // ### handle settingsData.maxVideoItems and remove this line
     maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
 
     downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
