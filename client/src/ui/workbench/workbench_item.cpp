@@ -18,8 +18,7 @@ QnWorkbenchItem::~QnWorkbenchItem() {
 
 void QnWorkbenchItem::load(const QnLayoutItemData& itemData)
 {
-    m_flags = itemData.flags;
-
+    // TODO: set flags here
     setCombinedGeometry(itemData.combinedGeometry);
     setRotation(itemData.rotation);
 }
