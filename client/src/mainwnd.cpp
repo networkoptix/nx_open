@@ -37,6 +37,7 @@
 #include "ui/widgets3/tabwidget.h"
 
 #include "ui/skin/skin.h"
+#include "ui/skin/globals.h"
 #include "ui/proxystyle.h"
 
 #include <utils/common/warnings.h>
@@ -256,7 +257,7 @@ void MainWnd::paintEvent(QPaintEvent *) {
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(global_frame_color, 3));
+        painter.setPen(QPen(Globals::frameColor(), 3));
         painter.drawRect(QRect(
             0,
             0,

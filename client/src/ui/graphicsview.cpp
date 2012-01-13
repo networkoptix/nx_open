@@ -25,6 +25,7 @@
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/ui_common.h"
 #include "ui/skin/skin.h"
+#include "ui/skin/globals.h"
 #include "ui/animation/property_animation.h"
 #include "ui/preferences/preferences_wnd.h"
 #include "ui/preferences/recordingsettingswidget.h"
@@ -190,7 +191,7 @@ GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget* mainWnd) :
     //setAlignment(Qt::AlignVCenter);
 
     QPalette pal = palette();
-    pal.setColor(backgroundRole(), app_bkr_color);
+    pal.setColor(backgroundRole(), Globals::backgroundColor());
     setPalette(pal);
 
     connect(&m_secTimer, SIGNAL(timeout ()), this , SLOT(onSecTimer()) );
@@ -604,25 +605,25 @@ void GraphicsView::initDecoration()
 
     if (exitButton)
     {
-        item = new CLUnMovedPixtureButton(button_exit, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/exit-application.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_exit, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("decorations/exit-application.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (toggleFullscreen)
     {
-        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/fullscreen.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("decorations/fullscreen.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (settings)
     {
-        item = new CLUnMovedPixtureButton(button_settings, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/settings.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_settings, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("decorations/settings.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (level_up)
     {
-        item = new CLUnMovedPixtureButton(button_level_up, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/level-up.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_level_up, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("decorations/level-up.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
@@ -640,19 +641,19 @@ void GraphicsView::initDecoration()
 
     if (square_layout)
     {
-        item = new CLUnMovedPixtureButton(button_squarelayout, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/square-view.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_squarelayout, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("decorations/square-view.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (long_layout)
     {
-        item = new CLUnMovedPixtureButton(button_longlayout, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/horizontal-view.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_longlayout, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("decorations/horizontal-view.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (sigle_line_layout)
     {
-        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/single-line-view.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("decorations/single-line-view.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
@@ -671,7 +672,7 @@ void GraphicsView::initDecoration()
 #endif
         m_searchItem->show();
 
-        item = new CLUnMovedPixtureButton(button_searchlive, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("webcam.png")), decoration_size * 0.8, decoration_size * 0.8, 255);
+        item = new CLUnMovedPixtureButton(button_searchlive, 0, Globals::decorationOpacity(), 1.0, Skin::path(QLatin1String("webcam.png")), decoration_size * 0.8, decoration_size * 0.8, 255);
         addStaticItem(item);
 #else
         m_searchItem = new CLSearchEditItem(this, content);
@@ -1054,7 +1055,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
                 item->setPos(wnd_pos+delta);
                 item->setArranged(false);
 
-                item->setZValue(global_base_scene_z_level + 2); // moving items should be on top
+                item->setZValue(Globals::baseSceneZ() + 2); // moving items should be on top
 
                 if (m_camLayout.getGridEngine().getItemToSwapWith(item) || m_camLayout.getGridEngine().canBeDropedHere(item))
                     item->setCanDrop(true);
@@ -2089,7 +2090,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
         //enableMultipleSelection(false, false);
 
-        m_gridItem->hideAnimated(global_grid_aparence_delay);
+        m_gridItem->hideAnimated(Globals::gridAppearanceDelay());
         break;
     }
 }
@@ -2114,25 +2115,25 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
     switch (e->key())
     {
         case Qt::Key_S:
-            global_show_item_text=!global_show_item_text;
+            Globals::showItemText(!Globals::showItemText());
             break;
 
         case Qt::Key_Q:
             m_yRotate += 1;
-            global_rotation_angel+=(0.01)/10;
+            Globals::rotationAngle(Globals::rotationAngle() + 0.01/10);
             updateTransform(0.01);
             break;
 
         case Qt::Key_W:
             m_yRotate -= 1;
-            global_rotation_angel+=(-0.01)/10;
+            Globals::rotationAngle(Globals::rotationAngle() - 0.01/10);
             updateTransform(-0.01);
             break;
 
         case Qt::Key_E:
             m_yRotate -= 1;
-            updateTransform(-global_rotation_angel*10);
-            global_rotation_angel = 0;
+            updateTransform(-Globals::rotationAngle()*10);
+            Globals::rotationAngle(0);
             break;
 
         case Qt::Key_Control:
@@ -2141,7 +2142,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
             enableMultipleSelection(true);
 
             if (m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::GridEnable))
-                m_gridItem->showAnimated(global_grid_aparence_delay);
+                m_gridItem->showAnimated(Globals::gridAppearanceDelay());
 
             break;
 
@@ -3550,7 +3551,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             item->setArranged(false);
             m_ignoreMouse.ignoreNextMs(duration, true);
 
-            item_to_swap_with->setZValue(global_base_scene_z_level + 1); // this item
+            item_to_swap_with->setZValue(Globals::baseSceneZ() + 1); // this item
             anim = AnimationManager::addAnimation(item_to_swap_with, "pos");
             anim->setStartValue(item_to_swap_with->pos());
             anim->setEndValue(item_to_swap_with_newPos);
@@ -3605,7 +3606,7 @@ void GraphicsView::on_grid_drop_animation_finished()
 {
     foreach (CLAbstractSceneItem *item, m_camLayout.getItemList())
     {
-        item->setZValue(global_base_scene_z_level);
+        item->setZValue(Globals::baseSceneZ());
         item->setArranged(true);
     }
     m_camLayout.updateSceneRect();

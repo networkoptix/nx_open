@@ -25,6 +25,7 @@
 #include "ui/mixins/render_watch_mixin.h"
 #include "core/resourcemanagment/security_cam_resource.h"
 #include "file_processor.h"
+#include "ui/skin/globals.h"
 
 int  SLOT_WIDTH = 640*10;
 int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
@@ -265,9 +266,9 @@ void SceneLayout::onTimer()
         m_view->start();
     }
 
-    if (m_items.count()>0 && m_timer.interval()!=devices_update_interval)
+    if (m_items.count()>0 && m_timer.interval()!=Globals::deviceUpdateInterval())
     {
-        m_timer.setInterval(devices_update_interval);
+        m_timer.setInterval(Globals::deviceUpdateInterval());
     }
 
     if (m_view->getPageSelector())

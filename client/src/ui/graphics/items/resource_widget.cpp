@@ -6,6 +6,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
+#include <ui/skin/globals.h>
 #include <core/resourcemanagment/security_cam_resource.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
@@ -22,7 +23,7 @@ namespace {
     const qreal defaultFrameWidth = 0.5;
 
     /** Default frame color. */
-    const QColor defaultFrameColor = global_frame_color;
+    const QColor defaultFrameColor = Globals::frameColor();
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -69,7 +70,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_shadow = new QnPolygonalShadowItem();
     QnPolygonalShadowItem *shadow = m_shadow.data();
     shadow->setParent(this);
-    shadow->setColor(global_shadow_color);
+    shadow->setColor(Globals::shadowColor());
     shadow->setShapeProvider(this);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setShadowDisplacement(defaultShadowDisplacement);
@@ -554,7 +555,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
             /* Selection. */
             if(!m_channelState[i].motionSelection.isEmpty())
-                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, global_motion_selection_color);
+                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, Globals::motionSelectionColor());
         }
     }
 
@@ -589,7 +590,7 @@ void QnResourceWidget::drawSelection(const QRectF &rect) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    QColor color = global_selection_color;
+    QColor color = Globals::selectionColor();
     color.setAlpha(color.alpha() * effectiveOpacity());
     glColor(color);
     glBegin(GL_QUADS);

@@ -27,6 +27,7 @@
 
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/preferences/preferences_wnd.h>
+#include <ui/skin/globals.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -387,12 +388,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treeOpacityAnimator = new VariantAnimator(this); /* Speed of 1.0 is OK here. */
     m_treeOpacityAnimator->setTargetObject(m_treeItem);
     m_treeOpacityAnimator->setAccessor(new PropertyAccessor("opacity"));
-    m_treeOpacityAnimator->setTimeLimit(global_opacity_change_period);
+    m_treeOpacityAnimator->setTimeLimit(Globals::opacityChangePeriod());
 
     m_treeBackgroundOpacityAnimator = new VariantAnimator(this);
     m_treeBackgroundOpacityAnimator->setTargetObject(m_treeBackgroundItem);
     m_treeBackgroundOpacityAnimator->setAccessor(new PropertyAccessor("opacity"));
-    m_treeBackgroundOpacityAnimator->setTimeLimit(global_opacity_change_period);
+    m_treeBackgroundOpacityAnimator->setTimeLimit(Globals::opacityChangePeriod());
 
     m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
     m_treeOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
@@ -422,7 +423,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
     navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
     navigationHoverItem->setAnimationSpeed(0.1);
-    navigationHoverItem->setAnimationTimeLimit(global_opacity_change_period);
+    navigationHoverItem->setAnimationTimeLimit(Globals::opacityChangePeriod());
 
     m_sliderPositionAnimator = new VariantAnimator(this);
     m_sliderPositionAnimator->setTimer(display->animationInstrument()->animationTimer());

@@ -1,5 +1,5 @@
 #include "qnschedulegridwidget.h"
-#include "ui/graphics/instruments/motion_selection_instrument.h"
+#include "ui/skin/globals.h"
 #include "settings.h"
 
 static const int TEXT_SPACING = 4;
@@ -164,8 +164,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
 
 
     // draw selection
-    p.setPen(global_motion_selection_rubber_band_border_color);
-    p.setBrush(global_motion_selection_rubber_band_color);
+    p.setPen(Globals::motionRubberBandBorderColor());
+    p.setBrush(Globals::motionRubberBandColor());
     if (!m_selectedRect.isEmpty())
         p.drawRect(m_selectedRect);
 }

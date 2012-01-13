@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/skin/globals.h>
 #include <settings.h>
 
 class MotionSelectionItem: public QGraphicsObject {
@@ -26,8 +27,8 @@ public:
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(global_motion_selection_rubber_band_border_color));
-        QnScopedPainterBrushRollback brushRollback(painter, QColor(global_motion_selection_rubber_band_color));
+        QnScopedPainterPenRollback penRollback(painter, Globals::motionRubberBandBorderColor());
+        QnScopedPainterBrushRollback brushRollback(painter, Globals::motionRubberBandColor());
         painter->drawRect(boundingRect());
     }
 
