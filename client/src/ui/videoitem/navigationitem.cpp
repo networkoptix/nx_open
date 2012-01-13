@@ -464,6 +464,7 @@ void NavigationItem::updateSlider()
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
 {
+    m_motionPeriod = period;
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
         if (netRes)
@@ -538,8 +539,8 @@ bool NavigationItem::updateRecPeriodList(bool force)
 
     m_timePeriodUpdateTime = currentTime;
 
-    if (!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
-        return true;
+    //if (!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
+    //    return true;
 
     if (!m_camera)
         return false;
@@ -567,9 +568,14 @@ bool NavigationItem::updateRecPeriodList(bool force)
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
-    if (!resources.isEmpty()) {
-        m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
-        updateMotionPeriods(m_timePeriod);
+    if (!resources.isEmpty()) 
+    {
+        bool timePeriodAlreadyLoaded = !force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs;
+        if (!timePeriodAlreadyLoaded)
+            m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
+        bool motionPeriodAlreadyLoaded = m_motionPeriod.startTimeMs <= t && t + w <= m_motionPeriod.startTimeMs + m_motionPeriod.durationMs;
+        if (!motionPeriodAlreadyLoaded)
+            updateMotionPeriods(m_timePeriod);
     }
     return true;
 }

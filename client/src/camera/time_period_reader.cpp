@@ -8,6 +8,7 @@ QnTimePeriodReader::QnTimePeriodReader(const QnVideoServerConnectionPtr &connect
     m_resource(resource)
 {
     m_fakeHandle = INT_MAX/2;
+    connect(this, SIGNAL(delayedReady(const QnTimePeriodList&, int)), this, SIGNAL(ready(const QnTimePeriodList&, int)), Qt::QueuedConnection);
 }
 
 int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& region)
@@ -25,7 +26,8 @@ int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& regi
         {
             // data already loaded
             m_fakeHandle++;
-            emit ready(m_loadedData, m_fakeHandle);
+            //emit ready(m_loadedData, m_fakeHandle);
+            emit delayedReady(m_loadedData, m_fakeHandle);
             return m_fakeHandle; 
         }
     }
