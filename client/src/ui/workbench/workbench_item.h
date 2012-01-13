@@ -6,6 +6,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource.h>
+#include "core/resource/layout_data.h"
 
 class QnWorkbenchLayout;
 
@@ -35,6 +36,11 @@ public:
      * Virtual destructor.
      */
     virtual ~QnWorkbenchItem();
+
+    /**
+      * Load from QnLayoutData
+      */
+    void load(const QnLayoutItemData&);
 
     /**
      * \returns                         Layout that this item belongs to, if any.
