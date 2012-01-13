@@ -412,7 +412,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeOpacityProcessor_hoverEntered()));
     connect(m_treeHidingProcessor,      SIGNAL(hoverLeft(QGraphicsItem *)),                                                         this,                           SLOT(at_treeHidingProcessor_hoverLeft()));
     connect(m_treeShowingProcessor,     SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeShowingProcessor_hoverEntered()));
-    connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
 
     /* Navigation slider. */
@@ -575,6 +574,9 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
 
     if (!resource->checkFlag(QnResource::media))
         return; // ### upsupported for now
+
+    if (!layout()->items(resource->getUniqueId()).isEmpty())
+        return; // avoid duplicates
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
@@ -1382,16 +1384,6 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 void QnWorkbenchController::at_randomGridAction_triggered() {
     display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
     display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
-}
-
-void QnWorkbenchController::at_treeWidget_activated(uint resourceId) {
-    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
-
-    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-    if (!mediaResource.isNull() && layout()->items(mediaResource->getUniqueId()).isEmpty()) {
-        QPointF gridPos = display()->mapViewportToGridF(display()->view()->viewport()->geometry().center());
-        drop(resource, gridPos);
-    }
 }
 
 void QnWorkbenchController::at_treeHidingProcessor_hoverLeft() {

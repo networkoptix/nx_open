@@ -24,7 +24,7 @@ class MainWnd : public QWidget
 
 public:
     MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
-    
+
     virtual ~MainWnd();
 
 Q_SIGNALS:
@@ -45,6 +45,8 @@ protected Q_SLOTS:
     void removeLayout(int index);
 
     void handleMessage(const QString &message);
+
+    void treeWidgetItemActivated(uint resourceId);
 
     void openFile();
 

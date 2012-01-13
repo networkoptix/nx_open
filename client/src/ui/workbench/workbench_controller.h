@@ -151,7 +151,6 @@ protected Q_SLOTS:
     void at_navigationItem_actualCameraChanged(CLVideoCamera *camera);
 
     void at_treeItem_geometryChanged();
-    void at_treeWidget_activated(uint resourceId);
     void at_treeHidingProcessor_hoverLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeOpacityProcessor_hoverLeft();

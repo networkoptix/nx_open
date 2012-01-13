@@ -24,6 +24,7 @@
 #include "ui/mixins/sync_play_mixin.h"
 #include "ui/mixins/render_watch_mixin.h"
 
+#include "ui/graphics/items/resource_widget.h"
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/blue_background_painter.h"
 
@@ -114,10 +115,13 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     m_display->setView(m_view);
 
     m_controller = new QnWorkbenchController(m_display, this);
+    connect(m_controller->display(), SIGNAL(widgetChanged(QnWorkbench::ItemRole)), this, SLOT(currentWidgetChanged()));
     connect(m_controller->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(addTab()));
+    connect(m_controller->treeWidget(), SIGNAL(activated(uint)), this, SLOT(treeWidgetItemActivated(uint)));
 
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
     new QnSyncPlayMixin(m_display, renderWatcher, this);
+
 
     // Prepare UI
     m_tabBar = new TabBar(this);
@@ -238,6 +242,20 @@ void MainWindow::handleMessage(const QString &message)
     m_controller->drop(message.split(QLatin1Char('\n'), QString::SkipEmptyParts));
 
     activate();
+}
+
+void MainWindow::treeWidgetItemActivated(uint resourceId)
+{
+    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
+    m_controller->drop(resource);
+}
+
+void MainWindow::currentWidgetChanged()
+{
+    QString newTitle = QApplication::applicationName();
+    if (QnResourceWidget *widget = m_controller->display()->widget(QnWorkbench::ZOOMED))
+        newTitle += QLatin1String(" - ") + widget->resource()->getName();
+    setWindowTitle(newTitle);
 }
 
 void MainWindow::openFile()
