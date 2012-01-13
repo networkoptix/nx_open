@@ -123,7 +123,7 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     if(item->isPinned())
         m_itemMap.fill(item->geometry(), item);
     m_rectSet.insert(item->geometry());
-    m_itemsByUid[item->resourceUniqueId()].insert(item);
+    m_itemsByUid[item->resource()->getUniqueId()].insert(item);
 
     updateBoundingRectInternal();
 
@@ -144,7 +144,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     if(item->isPinned())
         m_itemMap.clear(item->geometry());
     m_rectSet.remove(item->geometry());
-    m_itemsByUid[item->resourceUniqueId()].remove(item);
+    m_itemsByUid[item->resource()->getUniqueId()].remove(item);
 
     item->m_layout = NULL;
     m_items.remove(item);
@@ -338,6 +338,15 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem *item) {
     m_itemMap.clear(item->geometry());
     item->setFlagInternal(QnWorkbenchItem::Pinned, false);
     return true;
+}
+
+QnWorkbenchItem *QnWorkbenchLayout::item(const QnResourcePtr &resource) const {
+    foreach (QnWorkbenchItem *item, m_items) {
+        if (item->resource() == resource)
+            return item;
+    }
+
+    return NULL;
 }
 
 QnWorkbenchItem *QnWorkbenchLayout::item(const QPoint &position) const {

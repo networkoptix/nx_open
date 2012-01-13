@@ -23,8 +23,6 @@ m_editedView(0)
     pal.setColor(backgroundRole(), app_bkr_color);
     setPalette(pal);
 
-    //setWindowOpacity(.90);
-
     //=======================================================
 
     const int min_wisth = 1000;

@@ -10,8 +10,6 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
 
-#include <core/resourcemanagment/resource_pool.h>
-
 #include "ui/context_menu_helper.h"
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/dialogs/tagseditdialog.h"
@@ -19,6 +17,7 @@
 #include "ui/skin/skin.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"
+#include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench_layout.h"
 #include "youtube/youtubeuploaddialog.h"
 
@@ -41,9 +40,11 @@ protected:
 
         NavigationTreeWidget *navTree = static_cast<NavigationTreeWidget *>(parent());
         if (navTree->m_controller) {
-            QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
-            if (navTree->m_controller->layout()->items().contains(navTree->m_controller->item(resource)))
-                option->font.setBold(true);
+            if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model())) {
+                QnResourcePtr resource = model->resourceFromIndex(index);
+                if (navTree->m_controller->layout()->item(resource))
+                    option->font.setBold(true);
+            }
         }
 /*        if (navTree->m_searchProxyModel) {
             const QModelIndex proxyIndex = navTree->m_searchProxyModel->mapFromSource(index);
@@ -55,9 +56,7 @@ protected:
 
 
 NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
-    : QWidget(parent),
-      m_searchProxyModel(0),
-      m_controller(0)
+    : QWidget(parent)
 {
     m_previousItemButton = new QToolButton(this);
     m_previousItemButton->setText(QLatin1String("<"));
@@ -189,13 +188,15 @@ void NavigationTreeWidget::workbenchLayoutAboutToBeChanged()
     if (!m_controller)
         return;
 
+    QnWorkbenchLayout *layout = m_controller->layout();
+
     if (m_searchProxyModel) {
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(handleRemoveRows(QModelIndex,int,int)));
     }
 
-    disconnect(m_controller->layout(), SIGNAL(itemAdded(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
-    disconnect(m_controller->layout(), SIGNAL(itemRemoved(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
+    disconnect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
+    disconnect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
 }
 
 Q_DECLARE_METATYPE(ResourceSortFilterProxyModel *) // ###
@@ -205,10 +206,12 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     if (!m_controller)
         return;
 
-    connect(m_controller->layout(), SIGNAL(itemAdded(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
-    connect(m_controller->layout(), SIGNAL(itemRemoved(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(clearSelection())); // ### update(QModelIndex)
+    QnWorkbenchLayout *layout = m_controller->layout();
 
-    m_searchProxyModel = m_controller->layout()->property("model").value<ResourceSortFilterProxyModel *>(); // ###
+    connect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
+    connect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
+
+    m_searchProxyModel = layout->property("model").value<ResourceSortFilterProxyModel *>(); // ###
     if (!m_searchProxyModel) {
         ResourceSortFilterProxyModel *proxyModel = new ResourceSortFilterProxyModel(m_controller->workbench());
         proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -218,7 +221,7 @@ void NavigationTreeWidget::workbenchLayoutChanged()
         proxyModel->setDynamicSortFilter(true);
         proxyModel->setSourceModel(m_resourcesModel);
         m_searchProxyModel = proxyModel;
-        m_controller->layout()->setProperty("model", QVariant::fromValue(proxyModel)); // ###
+        layout->setProperty("model", QVariant::fromValue(proxyModel)); // ###
     }
 
     connect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
@@ -227,10 +230,24 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     m_searchTreeView->setModel(m_searchProxyModel);
     m_searchTreeView->expandAll();
 
-    disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
+    const bool oldBblockSignals = m_filterLineEdit->blockSignals(true);
     m_filterLineEdit->setText(m_searchProxyModel->filterRegExp().pattern()); // ###
     m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
-    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
+    m_filterLineEdit->blockSignals(oldBblockSignals);
+}
+
+void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
+{
+    const QnResourcePtr &resource = item->resource();
+
+    m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
+}
+
+void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
+{
+    const QnResourcePtr &resource = item->resource();
+
+    m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
 }
 
 void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first, int last)
@@ -240,7 +257,7 @@ void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first
 
     for (int row = first; row <= last; ++row) {
         const QModelIndex index = m_searchProxyModel->index(row, 0, parent);
-        QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+        QnResourcePtr resource = m_searchProxyModel->resourceFromIndex(index);
         m_controller->drop(resource);
     }
 }
@@ -252,17 +269,21 @@ void NavigationTreeWidget::handleRemoveRows(const QModelIndex &parent, int first
 
     for (int row = first; row <= last; ++row) {
         const QModelIndex index = m_searchProxyModel->index(row, 0, parent);
-        QnResourcePtr resource = qnResPool->getResourceById(index.data(Qt::UserRole + 1));
-        m_controller->layout()->removeItem(m_controller->item(resource));
+        QnResourcePtr resource = m_searchProxyModel->resourceFromIndex(index);
+        m_controller->remove(resource);
     }
 }
 
 void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
 {
     QnResourceList resources;
-    QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
-    foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
-        resources.append(qnResPool->getResourceById(index.data(Qt::UserRole + 1)));
+    if (m_tabWidget->currentIndex() == 0) {
+        foreach (const QModelIndex &index, m_resourcesTreeView->selectionModel()->selectedRows())
+            resources.append(m_resourcesModel->resourceFromIndex(index));
+    } else /*if (m_tabWidget->currentIndex() == 1)*/ {
+        foreach (const QModelIndex &index, m_searchTreeView->selectionModel()->selectedRows())
+            resources.append(m_searchProxyModel->resourceFromIndex(index));
+    }
 
     QScopedPointer<QMenu> menu(new QMenu);
 
@@ -353,7 +374,7 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
 {
     m_clearFilterButton->setVisible(!filter.isEmpty());
 
-    if (m_controller && m_controller->layout()->property("caption").toString().isEmpty() && !m_controller->layout()->isEmpty())
+    if (m_controller && !m_controller->layout()->isEmpty() && m_controller->layout()->property("caption").toString().isEmpty())
         Q_EMIT newTabRequested();
 
     if (m_filterTimerId != 0)
@@ -363,7 +384,13 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
 
 void NavigationTreeWidget::itemActivated(const QModelIndex &index)
 {
-    Q_EMIT activated(index.data(Qt::UserRole + 1).toUInt());
+    QnResourcePtr resource;
+    if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model()))
+        resource = model->resourceFromIndex(index);
+    else if (const ResourceSortFilterProxyModel *model = qobject_cast<const ResourceSortFilterProxyModel *>(index.model()))
+        resource = model->resourceFromIndex(index);
+    if (resource)
+        Q_EMIT activated(resource->getId().hash());
 }
 
 void NavigationTreeWidget::open()

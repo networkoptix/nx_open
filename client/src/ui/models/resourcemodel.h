@@ -17,9 +17,10 @@ public:
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 
-protected:
     QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
     QModelIndex indexFromResource(QnResourcePtr resource) const;
+
+protected:
     QModelIndex indexFromResourceId(uint id) const; // ### remove; use use indexFromResource() instead
     inline QnResourcePtr resourceFromItem(QStandardItem *item) const
     { return resourceFromIndex(item->index()); }
@@ -48,6 +49,9 @@ class ResourceSortFilterProxyModel : public QSortFilterProxyModel
 
 public:
     explicit ResourceSortFilterProxyModel(QObject *parent = 0);
+
+    QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
+    QModelIndex indexFromResource(QnResourcePtr resource) const;
 
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;

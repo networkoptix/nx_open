@@ -102,22 +102,18 @@ void AppStyle::polish(QWidget *widget)
 {
     ProxyStyle::polish(widget);
 
-/*    if (widget) {
-        if (widget->inherits("QDialog"))
-            widget->setWindowOpacity(global_dialog_opacity);
-        else if (widget->inherits("QMenu"))
-            widget->setWindowOpacity(global_menu_opacity);
-    }*/
+/*    if (widget->inherits("QDialog"))
+        widget->setWindowOpacity(global_dialog_opacity);
+    else if (widget->inherits("QMenu"))
+        widget->setWindowOpacity(global_menu_opacity);*/
 }
 
 void AppStyle::unpolish(QWidget *widget)
 {
-    /*if (widget) {
-        if (widget->inherits("QDialog"))
-            widget->setWindowOpacity(1.0);
-        else if (widget->inherits("QMenu"))
-            widget->setWindowOpacity(1.0);
-    }*/
+/*    if (widget->inherits("QDialog"))
+        widget->setWindowOpacity(1.0);
+    else if (widget->inherits("QMenu"))
+        widget->setWindowOpacity(1.0);*/
 
     ProxyStyle::unpolish(widget);
 }

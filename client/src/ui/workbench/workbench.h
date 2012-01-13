@@ -124,13 +124,6 @@ Q_SIGNALS:
     void modeChanged();
 
     /**
-     * This signal is emitted whenever a new item is assigned to the role.
-     *
-     * \param role                      Item role.
-     */
-    void itemChanged(QnWorkbench::ItemRole role);
-
-    /**
      * This signal is emitted whenever the layout of this workbench is about to be changed.
      */
     void layoutAboutToBeChanged();
@@ -160,6 +153,13 @@ Q_SIGNALS:
      * \param item                      Item that is about to be removed.
      */
     void itemRemoved(QnWorkbenchItem *item);
+
+    /**
+     * This signal is emitted whenever a new item is assigned to the role.
+     *
+     * \param role                      Item role.
+     */
+    void itemChanged(QnWorkbench::ItemRole role);
 
     void boundingRectChanged();
 

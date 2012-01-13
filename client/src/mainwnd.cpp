@@ -50,11 +50,11 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action) 
+    QToolButton *newActionButton(QAction *action)
     {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
-        
+
         int iconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
         button->setIconSize(QSize(iconSize, iconSize));
 
@@ -66,7 +66,7 @@ namespace {
         return button;
     }
 
-    void setVisibleRecursively(QLayout *layout, bool visible) 
+    void setVisibleRecursively(QLayout *layout, bool visible)
     {
         for(int i = 0, count = layout->count(); i < count; i++) {
             QLayoutItem *item = layout->itemAt(i);
@@ -155,11 +155,12 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_controller = new QnWorkbenchController(m_display, this);
     connect(m_controller->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(newLayout()));
-
+    connect(m_controller->treeWidget(), SIGNAL(activated(uint)), this, SLOT(treeWidgetItemActivated(uint)));
 
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
     new QnSyncPlayMixin(m_display, renderWatcher, this);
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SLOT(onDisplayingStateChanged(QnAbstractRenderer *, bool)));
+
 
     /* Tab bar. */
     m_tabBar = new QTabBar();
@@ -214,7 +215,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
 
     setLayout(m_globalLayout);
-    
+
     /* Add single tab. */
     newLayout();
 
@@ -267,7 +268,7 @@ void MainWnd::newLayout()
 
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
     m_tabBar->setTabData(index, QVariant::fromValue<QnWorkbenchLayout *>(layout));
-    
+
     m_tabBar->setCurrentIndex(index);
 }
 
@@ -372,6 +373,12 @@ void MainWnd::handleMessage(const QString &message)
     activate();
 }
 
+void MainWnd::treeWidgetItemActivated(uint resourceId)
+{
+    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
+    m_controller->drop(resource);
+}
+
 void MainWnd::openFile()
 {
     QFileDialog dialog(this, tr("Open file"));
@@ -465,7 +472,7 @@ void MainWnd::appServerAuthenticationRequired()
     dialog = 0;
 }
 
-void MainWnd::toggleTitleVisibility() 
+void MainWnd::toggleTitleVisibility()
 {
     if(isTitleVisible()) {
         m_globalLayout->takeAt(0);
@@ -481,12 +488,12 @@ void MainWnd::toggleTitleVisibility()
     updateDwmState();
 }
 
-bool MainWnd::isTitleVisible() const 
+bool MainWnd::isTitleVisible() const
 {
     return m_titleVisible;
 }
 
-void MainWnd::updateDwmState() 
+void MainWnd::updateDwmState()
 {
     if(isFullScreen()) {
         m_view->setLineWidth(0);
@@ -496,7 +503,7 @@ void MainWnd::updateDwmState()
 
     if(!m_dwm->isSupported()) {
         m_drawCustomFrame = false;
-        
+
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -532,7 +539,7 @@ void MainWnd::updateDwmState()
 #else
         setContentsMargins(0, 0, 0, 0);
 #endif
-        
+
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isCompositionEnabled()) {
@@ -563,9 +570,9 @@ void MainWnd::updateDwmState()
 
         m_titleLayout->setContentsMargins(frameMargins.left() - 1, 2, 2, 0);
         m_viewLayout->setContentsMargins(
-            frameMargins.left() - 1, 
-            isTitleVisible() ? 0 : frameMargins.top(), 
-            frameMargins.right() - 1, 
+            frameMargins.left() - 1,
+            isTitleVisible() ? 0 : frameMargins.top(),
+            frameMargins.right() - 1,
             frameMargins.bottom() - 1
         );
     } else {
@@ -593,16 +600,16 @@ void MainWnd::updateDwmState()
 
         m_titleLayout->setContentsMargins(frameMargins.left() - 1, 2, 2, 0);
         m_viewLayout->setContentsMargins(
-            frameMargins.left(), 
-            isTitleVisible() ? 0 : frameMargins.top(), 
-            frameMargins.right(), 
+            frameMargins.left(),
+            isTitleVisible() ? 0 : frameMargins.top(),
+            frameMargins.right(),
             frameMargins.bottom() - 1
         );
     }
 }
 
 #ifdef Q_OS_WIN
-bool MainWnd::winEvent(MSG *message, long *result) 
+bool MainWnd::winEvent(MSG *message, long *result)
 {
     if(m_dwm->winEvent(message, result))
         return true;

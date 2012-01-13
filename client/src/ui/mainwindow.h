@@ -33,6 +33,10 @@ private Q_SLOTS:
 
     void handleMessage(const QString &message);
 
+    void treeWidgetItemActivated(uint resourceId);
+
+    void currentWidgetChanged();
+
     void openFile();
 
     void activate();

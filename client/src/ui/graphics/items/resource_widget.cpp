@@ -6,7 +6,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
-#include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/security_cam_resource.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
@@ -95,7 +94,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     memset(m_motionMaskBinData, 0, MD_WIDTH * MD_HEIGHT/8);
 
     /* Set up video rendering. */
-    m_resource = qnResPool->getResourceByUniqId(item->resourceUniqueId());
+    m_resource = item->resource();
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(at_display_resourceUpdated()));
 
@@ -258,7 +257,7 @@ void QnResourceWidget::ensureMotionMask()
         return;
 
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
-    if (camera) 
+    if (camera)
     {
         m_motionMask = camera->getMotionMask();
         QnMetaDataV1::createMask(m_motionMask, m_motionMaskBinData);
@@ -319,7 +318,7 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
     emit aboutToBeDestroyed();
 }
 
-QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos) 
+QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos)
 {
     QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(MD_WIDTH, MD_HEIGHT)))));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
@@ -655,7 +654,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
 
     QVector<QPointF> gridLines;
 
-    for (int x = 0; x < MD_WIDTH; ++x) 
+    for (int x = 0; x < MD_WIDTH; ++x)
     {
         if (m_motionMask.isEmpty())
         {
@@ -710,7 +709,7 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qi
         font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
         QFontMetrics metric(font);
         QSize size = metric.size(Qt::TextSingleLine, text);
-        
+
         QnScopedPainterFontRollback fontRollback(painter, font);
         QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
         painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+2, text);
@@ -731,7 +730,7 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
     painter->drawPath(path);
 }
 
-void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect) 
+void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     if (!camera)

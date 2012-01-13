@@ -196,6 +196,17 @@ ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent)
     parseFilterString();
 }
 
+QnResourcePtr ResourceSortFilterProxyModel::resourceFromIndex(const QModelIndex &index) const
+{
+    return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+}
+
+QModelIndex ResourceSortFilterProxyModel::indexFromResource(QnResourcePtr resource) const
+{
+    const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, resource->getId().hash(), 1, Qt::MatchExactly | Qt::MatchRecursive);
+    return indexList.value(0);
+}
+
 static inline bool matchesCategoryFilter(const QList<QRegExp> &filters, const QString &value)
 {
     for (int i = 0; i < filters.size(); ++i) {

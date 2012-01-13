@@ -412,7 +412,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeOpacityProcessor_hoverEntered()));
     connect(m_treeHidingProcessor,      SIGNAL(hoverLeft(QGraphicsItem *)),                                                         this,                           SLOT(at_treeHidingProcessor_hoverLeft()));
     connect(m_treeShowingProcessor,     SIGNAL(hoverEntered(QGraphicsItem *)),                                                      this,                           SLOT(at_treeShowingProcessor_hoverEntered()));
-    connect(m_treeWidget,               SIGNAL(activated(uint)),                                                                    this,                           SLOT(at_treeWidget_activated(uint)));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
 
     /* Navigation slider. */
@@ -517,14 +516,6 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
 }
 
-QnWorkbenchItem *QnWorkbenchController::item(const QnResourcePtr &resource) const
-{
-    if (QnResourceWidget *widget = m_display->widget(resource))
-        return widget->item();
-
-    return 0;
-}
-
 VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget) {
     VariantAnimator *animator = widget->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
     if(animator != NULL)
@@ -576,12 +567,15 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     if (!resource->checkFlag(QnResource::media))
         return; // ### upsupported for now
 
+    if (!layout()->items(resource->getUniqueId()).isEmpty())
+        return; // avoid duplicates
+
     workbench()->setItem(QnWorkbench::RAISED, NULL);
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
 
     const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
 
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
+    QnWorkbenchItem *item = new QnWorkbenchItem(resource);
     item->setFlag(QnWorkbenchItem::Pinned, false);
     item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
     layout()->addItem(item);
@@ -609,6 +603,11 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     layout()->pinItem(item, geometry);
 
     display()->fitInView();
+}
+
+void QnWorkbenchController::remove(const QnResourcePtr &resource)
+{
+    layout()->removeItem(layout()->item(resource));
 }
 
 void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
@@ -1382,16 +1381,6 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 void QnWorkbenchController::at_randomGridAction_triggered() {
     display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
     display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
-}
-
-void QnWorkbenchController::at_treeWidget_activated(uint resourceId) {
-    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
-
-    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-    if (!mediaResource.isNull() && layout()->items(mediaResource->getUniqueId()).isEmpty()) {
-        QPointF gridPos = display()->mapViewportToGridF(display()->view()->viewport()->geometry().center());
-        drop(resource, gridPos);
-    }
 }
 
 void QnWorkbenchController::at_treeHidingProcessor_hoverLeft() {

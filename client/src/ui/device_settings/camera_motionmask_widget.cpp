@@ -4,16 +4,17 @@
 #include "ui/workbench/workbench_item.h"
 #include "ui/graphicsview.h"
 
-QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QString& unicId, QWidget* parent): QWidget(parent)
+QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QnResourcePtr &resource, QWidget *parent)
+    : QWidget(parent)
 {
-    m_widget = new QnResourceWidget(new QnWorkbenchItem(unicId), 0);
+    m_widget = new QnResourceWidget(new QnWorkbenchItem(resource), 0);
     m_widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
 
     m_widget->setEnclosingGeometry(geometry());
     m_widget->setFrameWidth(0);
 
     m_scene.addItem(m_widget);
-    
+
     m_view = new QGraphicsView(&m_scene);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

@@ -1,10 +1,11 @@
 #ifndef QN_WORKBENCH_ITEM_H
 #define QN_WORKBENCH_ITEM_H
 
-#include <QObject>
-#include <QScopedPointer>
-#include <QRectF>
-#include <QRect>
+#include <QtCore/QObject>
+#include <QtCore/QRect>
+#include <QtCore/QScopedPointer>
+
+#include <core/resource/resource.h>
 
 class QnWorkbenchLayout;
 
@@ -25,10 +26,10 @@ public:
     /**
      * Constructor.
      *
-     * \param resourceUniqueId          Unique identifier of a resource.
+     * \param resource                  Resource associated with this item.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QString &resourceUniqueId, QObject *parent = NULL);
+    QnWorkbenchItem(const QnResourcePtr &resource, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -43,10 +44,10 @@ public:
     }
 
     /**
-     * \returns                         Unique identifier of a resource associated with this item.
+     * \returns                         Resource associated with this item.
      */
-    const QString &resourceUniqueId() const {
-        return m_resourceUniqueId;
+    const QnResourcePtr &resource() const {
+        return m_resource;
     }
 
     /**
@@ -88,7 +89,7 @@ public:
     bool setGeometryDelta(const QRectF &geometryDelta);
 
     /**
-     * \param combinedGeometry          New combined geometry for this item. 
+     * \param combinedGeometry          New combined geometry for this item.
      *                                  New geometry and geometry delta will be calculated based on this value.
      * \returns                         Whether the combined geometry was successfully changed.
      */
@@ -165,8 +166,8 @@ private:
     /** Layout that this item belongs to. */
     QnWorkbenchLayout *m_layout;
 
-    /** Unique identifier of a resource associated with this item. */
-    QString m_resourceUniqueId;
+    /** Resource associated with this item. */
+    QnResourcePtr m_resource;
 
     /** Grid-relative geometry of an item, in grid cells. */
     QRect m_geometry;
