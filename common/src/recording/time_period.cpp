@@ -1,6 +1,7 @@
 #include "time_period.h"
 #include "utils/common/util.h"
 
+
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
 {
     return first.startTimeMs < other.startTimeMs;
@@ -39,6 +40,19 @@ void QnTimePeriod::addPeriod(const QnTimePeriod& timePeriod)
     qint64 endPoint2 = timePeriod.startTimeMs + timePeriod.durationMs;
     startTimeMs = qMin(startTimeMs, timePeriod.startTimeMs);
     durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
+}
+
+QnTimePeriod QnTimePeriod::intersect(const QnTimePeriod& other) const
+{
+    if (durationMs == -1 || other.startTimeMs == -1)
+        return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), -1);
+
+    if (other.startTimeMs > startTimeMs + durationMs || startTimeMs > other.startTimeMs + other.durationMs)
+        return QnTimePeriod();
+
+    qint64 start = qMax(startTimeMs, other.startTimeMs);
+    qint64 end = qMin(startTimeMs + durationMs, other.startTimeMs + other.durationMs);
+    return QnTimePeriod(start, end - start);
 }
 
 QnTimePeriodList QnTimePeriod::agregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs)
