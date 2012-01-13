@@ -17,6 +17,7 @@
 #include "ui/skin/skin.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"
+#include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench_layout.h"
 #include "youtube/youtubeuploaddialog.h"
 
@@ -41,7 +42,7 @@ protected:
         if (navTree->m_controller) {
             if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model())) {
                 QnResourcePtr resource = model->resourceFromIndex(index);
-                if (navTree->m_controller->layout()->items().contains(navTree->m_controller->item(resource)))
+                if (navTree->m_controller->layout()->item(resource))
                     option->font.setBold(true);
             }
         }
@@ -187,13 +188,15 @@ void NavigationTreeWidget::workbenchLayoutAboutToBeChanged()
     if (!m_controller)
         return;
 
+    QnWorkbenchLayout *layout = m_controller->layout();
+
     if (m_searchProxyModel) {
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(handleRemoveRows(QModelIndex,int,int)));
     }
 
-    disconnect(m_controller->layout(), SIGNAL(itemAdded(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
-    disconnect(m_controller->layout(), SIGNAL(itemRemoved(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
+    disconnect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
+    disconnect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
 }
 
 Q_DECLARE_METATYPE(ResourceSortFilterProxyModel *) // ###
@@ -203,10 +206,12 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     if (!m_controller)
         return;
 
-    connect(m_controller->layout(), SIGNAL(itemAdded(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
-    connect(m_controller->layout(), SIGNAL(itemRemoved(QnWorkbenchItem*)), m_resourcesTreeView, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
+    QnWorkbenchLayout *layout = m_controller->layout();
 
-    m_searchProxyModel = m_controller->layout()->property("model").value<ResourceSortFilterProxyModel *>(); // ###
+    connect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
+    connect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
+
+    m_searchProxyModel = layout->property("model").value<ResourceSortFilterProxyModel *>(); // ###
     if (!m_searchProxyModel) {
         ResourceSortFilterProxyModel *proxyModel = new ResourceSortFilterProxyModel(m_controller->workbench());
         proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -216,7 +221,7 @@ void NavigationTreeWidget::workbenchLayoutChanged()
         proxyModel->setDynamicSortFilter(true);
         proxyModel->setSourceModel(m_resourcesModel);
         m_searchProxyModel = proxyModel;
-        m_controller->layout()->setProperty("model", QVariant::fromValue(proxyModel)); // ###
+        layout->setProperty("model", QVariant::fromValue(proxyModel)); // ###
     }
 
     connect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
@@ -233,12 +238,16 @@ void NavigationTreeWidget::workbenchLayoutChanged()
 
 void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 {
-    m_resourcesTreeView->clearSelection(); // ### optimize with update(QModelIndex)
+    const QnResourcePtr &resource = item->resource();
+
+    m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
 }
 
 void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
 {
-    m_resourcesTreeView->clearSelection(); // ### optimize with update(QModelIndex)
+    const QnResourcePtr &resource = item->resource();
+
+    m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
 }
 
 void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first, int last)
@@ -261,7 +270,7 @@ void NavigationTreeWidget::handleRemoveRows(const QModelIndex &parent, int first
     for (int row = first; row <= last; ++row) {
         const QModelIndex index = m_searchProxyModel->index(row, 0, parent);
         QnResourcePtr resource = m_searchProxyModel->resourceFromIndex(index);
-        m_controller->layout()->removeItem(m_controller->item(resource));
+        m_controller->remove(resource);
     }
 }
 
@@ -365,7 +374,7 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
 {
     m_clearFilterButton->setVisible(!filter.isEmpty());
 
-    if (m_controller && m_controller->layout()->property("caption").toString().isEmpty() && !m_controller->layout()->isEmpty())
+    if (m_controller && !m_controller->layout()->isEmpty() && m_controller->layout()->property("caption").toString().isEmpty())
         Q_EMIT newTabRequested();
 
     if (m_filterTimerId != 0)

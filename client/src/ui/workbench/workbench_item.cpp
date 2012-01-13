@@ -4,9 +4,9 @@
 
 #include "workbench_layout.h"
 
-QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUniqueId, QObject *parent):
+QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
-    m_resourceUniqueId(resourceUniqueId),
+    m_resource(resource),
     m_layout(NULL),
     m_flags(Pinned),
     m_rotation(0.0)

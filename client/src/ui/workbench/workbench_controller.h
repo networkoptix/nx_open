@@ -66,12 +66,6 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    /**
-     * \param resource                  Resource to get item for.
-     * \returns                         Item for the given resource.
-     */
-    QnWorkbenchItem *item(const QnResourcePtr &resource) const;
-
     NavigationTreeWidget *treeWidget() const {
         return m_treeWidget;
     }
@@ -82,6 +76,8 @@ public:
     void drop(const QList<QString> &files, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QnResourcePtr &resource, const QPointF &gridPos = QPointF());
     void drop(const QnResourceList &resources, const QPointF &gridPos = QPointF());
+
+    void remove(const QnResourcePtr &resource);
 
 public Q_SLOTS:
     void setTreeVisible(bool visible, bool animate = true);

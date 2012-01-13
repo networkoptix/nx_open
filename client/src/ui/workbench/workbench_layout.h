@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSet>
 #include <QHash>
+#include <core/resource/resource.h>
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <ui/common/magnitude.h>
@@ -108,6 +109,12 @@ public:
      * \returns                         Whether the item was unpinned.
      */
     bool unpinItem(QnWorkbenchItem *item);
+
+    /**
+     * \param resource                  Resource to get item for.
+     * \returns                         Item associated with the given resource, or NULL if there is no such item.
+     */
+    QnWorkbenchItem *item(const QnResourcePtr &resource) const;
 
     /**
      * \param position                  Position to get item at.

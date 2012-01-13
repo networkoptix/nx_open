@@ -516,14 +516,6 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
 }
 
-QnWorkbenchItem *QnWorkbenchController::item(const QnResourcePtr &resource) const
-{
-    if (QnResourceWidget *widget = m_display->widget(resource))
-        return widget->item();
-
-    return 0;
-}
-
 VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget) {
     VariantAnimator *animator = widget->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
     if(animator != NULL)
@@ -583,7 +575,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
 
     const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
 
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
+    QnWorkbenchItem *item = new QnWorkbenchItem(resource);
     item->setFlag(QnWorkbenchItem::Pinned, false);
     item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
     layout()->addItem(item);
@@ -611,6 +603,11 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     layout()->pinItem(item, geometry);
 
     display()->fitInView();
+}
+
+void QnWorkbenchController::remove(const QnResourcePtr &resource)
+{
+    layout()->removeItem(layout()->item(resource));
 }
 
 void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {

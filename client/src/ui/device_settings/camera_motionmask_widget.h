@@ -4,17 +4,19 @@
 #include <QGLWidget>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include "utils/common/qnid.h"
+#include <core/resource/resource.h>
 
 class QnResourceWidget;
 
 class QnCameraMotionMaskWidget: public QWidget
 {
 public:
-    QnCameraMotionMaskWidget(const QString& unicId, QWidget* parent = 0);
+    QnCameraMotionMaskWidget(const QnResourcePtr &resource, QWidget *parent = 0);
     virtual ~QnCameraMotionMaskWidget();
+
 protected:
     virtual void resizeEvent(QResizeEvent* event);
+
 private:
     QGraphicsScene m_scene;
     QGraphicsView* m_view;
