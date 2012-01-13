@@ -4,7 +4,7 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
-extern bool global_show_item_text;
+#include "ui/skin/globals.h"
 
 CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height, QString name)
     : CLAbstractSceneItem(view, max_width, max_height,name),
@@ -127,7 +127,7 @@ void CLImageItem::drawStuff(QPainter* painter)
 
 void CLImageItem::drawInfoText(QPainter* painter)
 {
-    // ignore global_show_item_text
+    // ignore Globals::showItemText()
     if (!m_extraInfoText.isEmpty())
     {
         painter->setFont(QFont(QLatin1String("Times"), 150));
@@ -135,13 +135,13 @@ void CLImageItem::drawInfoText(QPainter* painter)
 
         QRectF r = painter->boundingRect(boundingRect(), Qt::AlignLeft | Qt::AlignTop, m_extraInfoText);
         r.moveTopLeft(QPointF(5, 5));
-        if (global_show_item_text && (m_showimagesize || m_showinfotext))
+        if (Globals::showItemText() && (m_showimagesize || m_showinfotext))
             r.moveTop(20 + QFontMetrics(m_Info_Font).height());
 
         painter->drawText(r, m_extraInfoText);
     }
 
-    if (!global_show_item_text)
+    if (!Globals::showItemText())
         return;
 
     painter->setFont(m_Info_Font);

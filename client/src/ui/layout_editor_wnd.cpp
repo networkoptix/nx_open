@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
+#include "ui/skin/globals.h"
 #include "ui_common.h"
 
 
@@ -20,7 +21,7 @@ m_editedView(0)
     setAutoFillBackground(false);
 
     QPalette pal = palette();
-    pal.setColor(backgroundRole(), app_bkr_color);
+    pal.setColor(backgroundRole(), Globals::backgroundColor());
     setPalette(pal);
 
     //=======================================================

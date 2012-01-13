@@ -2,6 +2,8 @@
 
 #include <QtGui/QItemEditorFactory>
 
+#include <ui/skin/globals.h>
+
 #include "widgets.h"
 #include "device_settings_dlg.h"
 #include "settings.h"
@@ -26,7 +28,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
             QGroupBox *subgroupBox = new QGroupBox(this);
             subgroupBox->setObjectName(group + sub_group);
             subgroupBox->setTitle(sub_group);
-            subgroupBox->setFont(settings_font);
+            subgroupBox->setFont(Globals::settingsFont());
             subgroupBox->setFixedSize(size, 420);
             subgroupBox->move(10+x, 10);
 
@@ -71,7 +73,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
 
                 QWidget *widget = awidget->widget();
                 widget->setParent(parent);
-                widget->setFont(settings_font);
+                widget->setFont(Globals::settingsFont());
 
                 if (!param.description().isEmpty())
                     widget->setToolTip(param.description());

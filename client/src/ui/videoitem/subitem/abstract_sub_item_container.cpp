@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "recording_sign_item.h"
 #include "ui/skin/skin.h"
+#include "ui/skin/globals.h"
 
 CLAbstractSubItemContainer::CLAbstractSubItemContainer(QGraphicsItem* parent):
 QGraphicsItem(parent)
@@ -42,11 +43,11 @@ bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
     switch(type)
     {
     case CloseSubItem:
-        item = new CLImgSubItem(this, Skin::path(QLatin1String("close.png")), type, global_decoration_opacity, global_decoration_max_opacity, 300, 300);
+        item = new CLImgSubItem(this, Skin::path(QLatin1String("close.png")), type, Globals::decorationOpacity(), Globals::decorationMaxOpacity(), 300, 300);
         break;
 
     case MakeScreenshotSubItem:
-        item = new CLImgSubItem(this, Skin::path(QLatin1String("camera.png")), type, global_decoration_opacity, global_decoration_max_opacity, 300, 300);
+        item = new CLImgSubItem(this, Skin::path(QLatin1String("camera.png")), type, Globals::decorationOpacity(), Globals::decorationMaxOpacity(), 300, 300);
         break;
 
     case RecordingSubItem:

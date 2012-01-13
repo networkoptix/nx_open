@@ -7,6 +7,7 @@
 #include <QtGui/QRadioButton>
 
 #include "settings.h"
+#include "ui/skin/globals.h"
 
 SettingsSlider::SettingsSlider(Qt::Orientation orientation, QWidget *parent)
     : QSlider(orientation, parent)
@@ -160,7 +161,7 @@ QWidget *SettingsEnumerationWidget::createWidget()
 
         QRadioButton *button = new QRadioButton(name, groupBox);
         button->setObjectName(name);
-        button->setFont(settings_font);
+        button->setFont(Globals::settingsFont());
         button->setChecked(name == param().value().toString());
 
         connect(button, SIGNAL(clicked()), this, SLOT(onClicked()));

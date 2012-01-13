@@ -6,6 +6,7 @@
 #include "subitem/abstract_image_sub_item.h"
 #include "subitem/recording_sign_item.h"
 #include "ui/graphicsview.h"
+#include "ui/skin/globals.h"
 #include "ui/animation/property_animation.h"
 
 
@@ -13,12 +14,11 @@ static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
 
 extern int item_select_duration;
-extern qreal selected_item_zoom;
 extern int item_hoverevent_duration;
+extern qreal selected_item_zoom;
+
 
 #define SHADOW_SIZE 100
-
-extern int global_opacity_change_period;
 
 CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height, QString name) :
     CLAbstractSubItemContainer(0),
@@ -45,7 +45,7 @@ CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int 
 {
     setAcceptsHoverEvents(true);
 
-    setZValue(global_base_scene_z_level);
+    setZValue(Globals::baseSceneZ());
 
     //setFlag(QGraphicsItem::ItemIsFocusable);
 
@@ -149,13 +149,13 @@ void CLAbstractSceneItem::setItemSelected(bool sel, bool animate , int delay )
     {
         if (animate)
             m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25, delay);
-        setZValue(global_base_scene_z_level+1);
+        setZValue(Globals::baseSceneZ()+1);
     }
     else
     {
         if (animate)
             m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, delay);
-        setZValue(global_base_scene_z_level);
+        setZValue(Globals::baseSceneZ());
     }
 }
 
@@ -347,8 +347,8 @@ void CLAbstractSceneItem::drawShadow(QPainter* painter)
 
     QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());
     QRect rect2(SHADOW_SIZE, height(), width()-SHADOW_SIZE, SHADOW_SIZE);
-    painter->fillRect(rect1, global_shadow_color);
-    painter->fillRect(rect2, global_shadow_color);
+    painter->fillRect(rect1, Globals::shadowColor());
+    painter->fillRect(rect2, Globals::shadowColor());
 
     if (getType()==IMAGE || getType()==VIDEO)
     {
@@ -480,7 +480,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
         QList<CLAbstractSubItem*> childrenLst = subItemList();
         foreach(CLAbstractSubItem* sub_item, childrenLst)
         {
-            sub_item->hide(global_opacity_change_period*(!instant));
+            sub_item->hide(Globals::opacityChangePeriod()*(!instant));
         }
 
         if (instant)
@@ -492,7 +492,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
         stopSteadyAnimation();
 
         m_steady_animation = AnimationManager::addAnimation(this, "steadycolor");
-        m_steady_animation->setDuration(global_opacity_change_period);
+        m_steady_animation->setDuration(Globals::opacityChangePeriod());
         m_steady_animation->setStartValue(steadyBlackColor());
         m_steady_animation->setEndValue(255);
         m_steady_animation->start();
@@ -505,7 +505,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
     QList<CLAbstractSubItem*> childrenLst = subItemList();
     foreach(CLAbstractSubItem* sub_item, childrenLst)
     {
-        sub_item->show(global_opacity_change_period*(!instant));
+        sub_item->show(Globals::opacityChangePeriod()*(!instant));
     }
 
     if (instant)
@@ -519,7 +519,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
     stopSteadyAnimation();
 
     m_steady_animation = AnimationManager::addAnimation(this, "steadycolor");
-    m_steady_animation->setDuration(global_opacity_change_period);
+    m_steady_animation->setDuration(Globals::opacityChangePeriod());
     m_steady_animation->setStartValue(steadyBlackColor());
     m_steady_animation->setEndValue(0);
     m_steady_animation->start();
