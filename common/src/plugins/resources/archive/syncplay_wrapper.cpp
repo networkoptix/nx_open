@@ -245,8 +245,10 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
 
-    if (getDisplayedTime() != DATETIME_NOW)
+    if (getDisplayedTime() != DATETIME_NOW) {
         reader->jumpToPreviousFrame(getCurrentTime());
+        reader->setSpeed(d->speed);
+    }
 
     //connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
     //connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
