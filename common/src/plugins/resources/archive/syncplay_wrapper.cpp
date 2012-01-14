@@ -166,6 +166,8 @@ bool QnArchiveSyncPlayWrapper::jumpToInternal(qint64 mksec,  qint64 skipTime)
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->lastJumpTime = skipTime ? skipTime : mksec;
+    if (d->speed < 0 && d->lastJumpTime == DATETIME_NOW)
+        d->lastJumpTime = QDateTime::currentMSecsSinceEpoch()*1000ll; // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
     d->timer.restart();
     bool rez = false;
     foreach(ReaderInfo info, d->readers)
