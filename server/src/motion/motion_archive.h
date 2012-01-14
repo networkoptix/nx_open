@@ -110,6 +110,7 @@ private:
 
     qint64 m_minMotionTime;
     qint64 m_maxMotionTime;
+    qint64 m_lastTimestamp;
 };
 
 #endif // __MOTION_WRITER_H__
