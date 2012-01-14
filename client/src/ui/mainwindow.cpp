@@ -37,6 +37,7 @@
 #include "ui/widgets3/tabbar.h"
 
 #include "ui/skin/skin.h"
+#include "ui/skin/globals.h"
 
 #include "file_processor.h"
 #include "settings.h"
@@ -51,7 +52,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     setAcceptDrops(true);
 
     QPalette pal = palette();
-    pal.setColor(backgroundRole(), app_bkr_color);
+    pal.setColor(backgroundRole(), Globals::backgroundColor());
     setPalette(pal);
 
     const int min_width = 800;

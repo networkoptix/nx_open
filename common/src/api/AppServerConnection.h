@@ -11,6 +11,7 @@
 #include "core/resource/qnstorage.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"
+#include "core/resource/layout_data.h"
 
 class AppSessionManager;
 class QnAppServerConnectionFactory;
@@ -60,6 +61,7 @@ public:
 
     int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId, QByteArray& errorString);
     int getStorages(QnResourceList& storages, QByteArray& errorString);
+    int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
 
     // Returns request id
     int saveAsync(const QnVideoServer&, QObject*, const char*);

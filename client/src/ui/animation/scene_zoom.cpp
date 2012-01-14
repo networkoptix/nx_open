@@ -5,6 +5,7 @@
 #include "settings.h"
 #include "ui/videoitem/abstract_scene_item.h"
 #include "ui/animation/property_animation.h"
+#include "ui/skin/globals.h"
 
 
 static const qreal max_zoom = 4.0;
@@ -57,7 +58,7 @@ void CLSceneZoom::setZoom(qreal z)
 
     QTransform tr;
     tr.scale(scl, scl);
-    tr.rotate(global_rotation_angel, Qt::YAxis);
+    tr.rotate(Globals::rotationAngle(), Qt::YAxis);
 
     m_skipViewUpdate = m_view->transform() != tr;
     m_view->setTransform(tr);

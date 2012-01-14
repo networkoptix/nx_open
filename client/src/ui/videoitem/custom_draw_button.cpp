@@ -1,6 +1,7 @@
 #include "custom_draw_button.h"
 
 #include "settings.h"
+#include "ui/skin/globals.h"
 
 QFont buttonFont()
 {
@@ -63,7 +64,7 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
 	//painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	//painter->setRenderHint(QPainter::Antialiasing);
 
-	painter->fillPath(mShadowRectPath, global_shadow_color);
+	painter->fillPath(mShadowRectPath, Globals::shadowColor());
 
 	QColor border_color(20,20,160);
 	if (m_mouse_over)

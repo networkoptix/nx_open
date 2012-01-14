@@ -41,6 +41,7 @@ namespace {
             add(new StandardMagnitudeCalculator<int>());
             add(new StandardMagnitudeCalculator<float>());
             add(new StandardMagnitudeCalculator<double>());
+            add(new StandardMagnitudeCalculator<QPoint>());
             add(new StandardMagnitudeCalculator<QPointF>());
             add(new StandardMagnitudeCalculator<QSizeF>());
             add(new StandardMagnitudeCalculator<QRectF>());
@@ -91,8 +92,16 @@ qreal calculateMagnitude(double value) {
     return std::abs(value);
 }
 
+qreal calculateMagnitude(const QPoint &value) {
+    return calculateMagnitude(QPointF(value));
+}
+
 qreal calculateMagnitude(const QPointF &value) {
     return std::sqrt(value.x() * value.x() + value.y() * value.y());
+}
+
+qreal calculateMagnitude(const QSize &value) {
+    return calculateMagnitude(QSizeF(value));
 }
 
 qreal calculateMagnitude(const QSizeF &value) {

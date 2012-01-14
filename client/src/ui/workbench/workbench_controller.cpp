@@ -27,6 +27,7 @@
 
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/preferences/preferences_wnd.h>
+#include <ui/skin/globals.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -79,20 +80,46 @@
 Q_DECLARE_METATYPE(VariantAnimator *);
 
 namespace {
-    class AspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPointF> {
+    class AspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
     public:
-        AspectRatioMagnitudeCalculator(qreal aspectRatio):
+        AspectRatioMagnitudeCalculator(const QPointF &origin, const QSize &size, const QRect &boundary, qreal aspectRatio):
+            m_origin(origin),
+            m_size(SceneUtility::toPoint(size)),
+            m_boundary(boundary),
             m_aspectRatio(aspectRatio)
         {}
 
     protected:
         virtual qreal calculateInternal(const void *value) const override {
-            const QPointF &p = *static_cast<const QPointF *>(value);
+            const QPoint &p = *static_cast<const QPoint *>(value);
 
-            return qMax(qAbs(p.x() / m_aspectRatio), qAbs(p.y()));
+            //qDebug() << p;
+
+            QPointF delta = p + QPointF(m_size) / 2.0 - m_origin;
+            qreal spaceDistance = qMax(qAbs(delta.x() / m_aspectRatio), qAbs(delta.y()));
+
+            QRect extendedRect = QRect(
+                QPoint(
+                    qMin(m_boundary.left(), p.x()),
+                    qMin(m_boundary.top(), p.y())
+                ), 
+                QPoint(
+                    qMax(m_boundary.right(), p.x() + m_size.x() - 1),
+                    qMax(m_boundary.bottom(), p.y() + m_size.y() - 1)
+                )
+            );
+            qreal aspectDistance = qAbs(std::log(SceneUtility::aspectRatio(extendedRect) / m_aspectRatio));
+
+            qreal extensionDistance = qAbs(m_boundary.width() - extendedRect.width()) + qAbs(m_boundary.height() - extendedRect.height());
+
+            qreal k = (m_boundary.width() + m_boundary.height());
+            return k * k * extensionDistance + k * aspectDistance + spaceDistance;
         }
 
     private:
+        QPointF m_origin;
+        QPoint m_size;
+        QRect m_boundary;
         qreal m_aspectRatio;
     };
 
@@ -387,12 +414,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treeOpacityAnimator = new VariantAnimator(this); /* Speed of 1.0 is OK here. */
     m_treeOpacityAnimator->setTargetObject(m_treeItem);
     m_treeOpacityAnimator->setAccessor(new PropertyAccessor("opacity"));
-    m_treeOpacityAnimator->setTimeLimit(global_opacity_change_period);
+    m_treeOpacityAnimator->setTimeLimit(Globals::opacityChangePeriod());
 
     m_treeBackgroundOpacityAnimator = new VariantAnimator(this);
     m_treeBackgroundOpacityAnimator->setTargetObject(m_treeBackgroundItem);
     m_treeBackgroundOpacityAnimator->setAccessor(new PropertyAccessor("opacity"));
-    m_treeBackgroundOpacityAnimator->setTimeLimit(global_opacity_change_period);
+    m_treeBackgroundOpacityAnimator->setTimeLimit(Globals::opacityChangePeriod());
 
     m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
     m_treeOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
@@ -422,7 +449,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
     navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
     navigationHoverItem->setAnimationSpeed(0.1);
-    navigationHoverItem->setAnimationTimeLimit(global_opacity_change_period);
+    navigationHoverItem->setAnimationTimeLimit(Globals::opacityChangePeriod());
 
     m_sliderPositionAnimator = new VariantAnimator(this);
     m_sliderPositionAnimator->setTimer(display->animationInstrument()->animationTimer());
@@ -598,7 +625,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     }
 
     /* Pin the item. */
-    AspectRatioMagnitudeCalculator metric(aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
+    AspectRatioMagnitudeCalculator metric(gridPos, size, workbench()->layout()->boundingRect(), aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
     QRect geometry = layout()->closestFreeSlot(gridPos, size, &metric);
     layout()->pinItem(item, geometry);
 
