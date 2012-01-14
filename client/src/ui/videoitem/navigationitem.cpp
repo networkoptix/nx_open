@@ -646,10 +646,16 @@ void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, i
 
 void NavigationItem::onValueChanged(qint64 time)
 {
-    if (m_currentTime == time)
+    if (m_camera == 0)
         return;
 
-    if (m_camera == 0)
+    if (m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamCamDisplay()->isRealTimeSource()) 
+    {
+        smartSeek(DATETIME_NOW);
+        return;
+    }
+
+    if (m_currentTime == time)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());

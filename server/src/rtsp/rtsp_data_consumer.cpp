@@ -156,12 +156,14 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         metadata = metadata;
     }
 
+    /*
     if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
     {
         m_dataQueue.clear();
         m_owner->switchToLive(); // it is archive EOF
         return true;
     }
+    */
 
     if (m_owner->isLiveDP(media->dataProvider)) {
         media->flags |= QnAbstractMediaData::MediaFlags_LIVE;

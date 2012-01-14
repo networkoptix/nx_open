@@ -572,8 +572,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
             else if (!m_eof)
             {
                 m_eof = true;
-                QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
-                return rez;
+                return createEmptyPacket(isReverseMode());
             }
         }
 		break;

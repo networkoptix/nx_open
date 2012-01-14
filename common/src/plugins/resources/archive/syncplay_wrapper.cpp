@@ -323,8 +323,8 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     {
         if (info.enabled) {
             qint64 time = info.cam->getCurrentTime();
-            if (time == DATETIME_NOW)
-                time = QDateTime::currentMSecsSinceEpoch()*1000;
+            //if (time == DATETIME_NOW)
+            //    time = QDateTime::currentMSecsSinceEpoch()*1000;
             if (displayTime == AV_NOPTS_VALUE)
                 displayTime = time;
             else if (time != AV_NOPTS_VALUE)
@@ -539,7 +539,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     }
 
     qint64 displayedTime =  getDisplayedTimeInternal();
-    if (displayedTime == AV_NOPTS_VALUE)
+    if (displayedTime == AV_NOPTS_VALUE || displayedTime == DATETIME_NOW)
         return displayedTime;
     if (d->speed >= 0) 
         return qMin(expectTime, displayedTime + SYNC_EPS);

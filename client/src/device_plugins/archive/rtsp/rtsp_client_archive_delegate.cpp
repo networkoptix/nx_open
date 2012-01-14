@@ -16,7 +16,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_rtpData(0),
     m_position(DATETIME_NOW),
     m_opened(false),
-    m_waitBOF(false),
+    //m_waitBOF(false),
     m_lastPacketFlags(-1),
     m_closing(false),
     m_singleShotMode(false),
@@ -72,7 +72,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 
 void QnRtspClientArchiveDelegate::beforeClose()
 {
-    m_waitBOF = false;
+    //m_waitBOF = false;
     m_closing = true;
     if (m_rtpData)
         m_rtpData->getSocket()->close();
@@ -80,7 +80,7 @@ void QnRtspClientArchiveDelegate::beforeClose()
 
 void QnRtspClientArchiveDelegate::close()
 {
-    m_waitBOF = false;
+    //m_waitBOF = false;
     m_rtspSession.stop();
     m_rtpData = 0;
     m_lastPacketFlags = -1;
@@ -182,6 +182,9 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
 
+        if (result && m_sendedCSec != result->opaque && !(result->flags & QnAbstractMediaData::MediaFlags_LIVE))
+            result.clear(); // ignore old archive data
+        /*
         if (result && m_waitBOF)
         {
             if ((result->flags & QnAbstractMediaData::MediaFlags_BOF) &&
@@ -202,6 +205,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
             else
                 result.clear();
         }
+        */
     }
     if (!result)
         reopen();
@@ -227,7 +231,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
     else
         m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
-    m_waitBOF = true;
+    //m_waitBOF = true;
 	/*
     QString s;
     QTextStream str(&s);
@@ -427,7 +431,7 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
         m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
     }
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
-    m_waitBOF = true;
+    //m_waitBOF = true;
 
     if (fromLive) 
         m_position = AV_NOPTS_VALUE;
