@@ -41,8 +41,6 @@
 
 static const int DEFAUT_RTSP_PORT = 50000;
 
-QMutex global_ffmpeg_mutex;
-
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
