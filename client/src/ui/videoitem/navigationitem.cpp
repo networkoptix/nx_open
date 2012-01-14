@@ -203,7 +203,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setMaximumSize(m_liveButton->preferredSize());
     m_liveButton->setCheckable(true);
-    m_liveButton->setChecked(m_timeSlider->isAtEnd());
+    m_liveButton->setChecked(m_camera && m_camera->getCamCamDisplay()->isRealTimeSource());
     m_liveButton->setEnabled(false);
     m_liveButton->hide();
 
@@ -405,7 +405,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
 void NavigationItem::setLiveMode(bool value)
 {
-    if (value == m_timeSlider->isAtEnd())
+    if (m_camera && value == m_camera->getCamCamDisplay()->isRealTimeSource())
         return;
 
     m_timeSlider->setCurrentValue(value ? DATETIME_NOW : m_timeSlider->minimumValue());
@@ -413,6 +413,7 @@ void NavigationItem::setLiveMode(bool value)
 
 void NavigationItem::onLiveModeChanged(bool value)
 {
+    m_timeSlider->setLiveMode(value);
     if (value)
         m_speedSlider->resetSpeed();
 }
@@ -662,7 +663,7 @@ void NavigationItem::onValueChanged(qint64 time)
     //if (reader->isSkippingFrames())
     //    return;
 
-    if (reader->isRealTimeSource() && m_timeSlider->isAtEnd())
+    if (reader->isRealTimeSource())
         return;
 
     smartSeek(time);

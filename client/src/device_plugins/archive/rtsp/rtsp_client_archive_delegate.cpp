@@ -219,8 +219,8 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
 {
     m_blockReopening = false;
 
-    if (time == m_position)
-        return time;
+    //if (time == m_position)
+    //    return time;
 
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
