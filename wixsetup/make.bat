@@ -12,8 +12,7 @@ cd ..\client
 cd ..\server
 @start /B /WAIT convert.py
 
-cd ..\appserver
-@start /B /WAIT convert.py
+cd ..\appserver\setup
 @start /B /WAIT setup.py build
 
 cd %CURRENTDIR%
