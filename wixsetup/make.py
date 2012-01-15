@@ -39,7 +39,7 @@ WXS_FILES = "MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarni
 os.system(r'heat dir ..\appserver\setup\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
 fixasfiles()
 
-os.system(r'candle -dAppServerSourceDir="../appserver/build/exe.win32-2.7" -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION, WXS_FILES))
+os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION, WXS_FILES))
 
 output_file = 'bin/VMS-%s.%s.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
 try:
