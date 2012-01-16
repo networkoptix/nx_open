@@ -1,5 +1,5 @@
-#ifndef QN_HOVER_PROCESSOR_H
-#define QN_HOVER_PROCESSOR_H
+#ifndef QN_HOVER_FOCUS_PROCESSOR_H
+#define QN_HOVER_FOCUS_PROCESSOR_H
 
 #include <QGraphicsObject>
 #include <ui/common/weak_graphics_item_pointer.h>
@@ -11,37 +11,45 @@
  * This processor is not as generic as others as there is no real need in
  * generic hover processor.
  */
-class HoverProcessor: public QGraphicsObject {
+class HoverFocusProcessor: public QGraphicsObject {
     Q_OBJECT;
 
     typedef QGraphicsObject base_type;
 
 public:
-    HoverProcessor(QGraphicsItem *parent = NULL);
+    HoverFocusProcessor(QGraphicsItem *parent = NULL);
 
-    virtual ~HoverProcessor();
+    virtual ~HoverFocusProcessor();
 
-    void setTargetItem(QGraphicsItem *item);
+    void addTargetItem(QGraphicsItem *item);
 
-    QGraphicsItem *targetItem() const {
-        return m_item.data();
-    }
+    void removeTargetItem(QGraphicsItem *item);
+
+    QList<QGraphicsItem *> targetItems() const;
 
     int hoverEnterDelay() const {
         return m_hoverEnterDelay;
     }
 
+    void setHoverEnterDelay(int hoverEnterDelayMSec);
+
     int hoverLeaveDelay() const {
         return m_hoverLeaveDelay;
     }
 
-    void setHoverEnterDelay(int hoverEnterDelayMSec);
-
     void setHoverLeaveDelay(int hoverLeaveDelayMSec);
 
-    void forceHoverLeave();
+    int focusEnterDelay() const {
+        return m_hoverEnterDelay;
+    }
 
-    void forceHoverEnter();
+    void setFocusEnterDelay(int focusEnterDelayMSec);
+
+    int focusLeaveDelay() const {
+        return m_hoverLeaveDelay;
+    }
+
+    void setFocusLeaveDelay(int focusLeaveDelayMSec);
 
     virtual QRectF boundingRect() const override {
         return QRectF();
@@ -51,9 +59,19 @@ public:
         return;
     }
 
+public slots:
+    void forceHoverLeave();
+    void forceHoverEnter();
+    void forceFocusLeave();
+    void forceFocusEnter();
+
 signals:
-    void hoverEntered(QGraphicsItem *item);
-    void hoverLeft(QGraphicsItem *item);
+    void hoverEntered();
+    void hoverLeft();
+    void focusEntered();
+    void focusLeft();
+    void hoverFocusEntered();
+    void hoverFocusLeft();
 
 protected:
     virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
@@ -61,19 +79,29 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private:
-    void processEnter();
-    void processLeave();
+    void processHoverEnter();
+    void processHoverLeave();
+    void processFocusEnter();
+    void processFocusLeave();
 
     void killHoverEnterTimer();
     void killHoverLeaveTimer();
+    void killFocusEnterTimer();
+    void killFocusLeaveTimer();
 
 private:
     int m_hoverEnterDelay;
     int m_hoverLeaveDelay;
+    int m_focusEnterDelay;
+    int m_focusLeaveDelay;
     int m_hoverEnterTimerId;
     int m_hoverLeaveTimerId;
-    WeakGraphicsItemPointer m_item;
+    int m_focusEnterTimerId;
+    int m_focusLeaveTimerId;
+    bool m_hovered;
+    bool m_focused;
+    QList<WeakGraphicsItemPointer> m_items;
 };
 
 
-#endif // QN_HOVER_PROCESSOR_H
+#endif // QN_HOVER_FOCUS_PROCESSOR_H

@@ -85,7 +85,6 @@ void CLLog::log(const QString& msg1, int val, const QString& msg2, CLLogLevel lo
     QTextStream(&str) << msg1 << val << msg2;
 
     log(str, loglevel);
-
 }
 
 void CLLog::log(const QString& msg1, int val, const QString& msg2, int val2, CLLogLevel loglevel)
@@ -97,7 +96,6 @@ void CLLog::log(const QString& msg1, int val, const QString& msg2, int val2, CLL
     QTextStream(&str) << msg1 << val << msg2 << val2;
 
     log(str, loglevel);
-
 }
 
 void CLLog::log(const QString& msg, qreal val, CLLogLevel loglevel)
@@ -109,7 +107,6 @@ void CLLog::log(const QString& msg, qreal val, CLLogLevel loglevel)
     QTextStream(&str) << msg << val;
 
     log(str, loglevel);
-
 }
 
 void CLLog::log(const QString& msg, CLLogLevel loglevel)
@@ -139,7 +136,6 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 
     if (m_file.size() >= m_max_file_size)
         openNextFile();
-
 }
 
 void CLLog::log(CLLogLevel loglevel, const char* format, ...)

@@ -3,6 +3,7 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <utils/common/warnings.h>
+#include <ui/skin/globals.h>
 
 namespace {
     const char *opacityAnimatorPropertyName = "_qn_opacityAnimator";
@@ -24,7 +25,7 @@ Q_DECLARE_METATYPE(VariantAnimator *);
 
 Q_GLOBAL_STATIC(VariantAnimator, staticVariantAnimator);
 
-VariantAnimator *opacityAnimator(QGraphicsObject *item) {
+VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {
     if(item == NULL) {
         qnNullWarning(item);
         return staticVariantAnimator();
@@ -55,6 +56,8 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item) {
     animator->setTimer(animationInstrument->animationTimer());
     animator->setAccessor(new OpacityAccessor());
     animator->setTargetObject(item);
+    animator->setTimeLimit(Globals::opacityChangePeriod());
+    animator->setSpeed(speed);
 
     item->setProperty(opacityAnimatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
 

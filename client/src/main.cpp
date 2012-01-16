@@ -218,8 +218,14 @@ static QtMsgHandler defaultMsgHandler = 0;
 
 static void myMsgHandler(QtMsgType type, const char *msg)
 {
-    if (defaultMsgHandler)
+    if (defaultMsgHandler) {
         defaultMsgHandler(type, msg);
+    } else { /* Default message handler. */
+#ifdef _DEBUG
+        QTextStream err(stderr);
+        err << msg << endl << flush;
+#endif
+    }
 
     clLogMsgHandler(type, msg);
 }

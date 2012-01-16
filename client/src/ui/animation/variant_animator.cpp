@@ -22,6 +22,9 @@ VariantAnimator::~VariantAnimator() {
 }
 
 void VariantAnimator::setSpeed(qreal speed) {
+    if(qFuzzyCompare(speed, m_speed))
+        return;
+
     if(speed <= 0.0) {
         qnWarning("Invalid non-positive speed %1.", speed);
         return;

@@ -2,13 +2,18 @@
 #include <QTimerEvent>
 #include <utils/common/warnings.h>
 
-HoverProcessor::HoverProcessor(QGraphicsItem *parent):
+HoverFocusProcessor::HoverFocusProcessor(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_hoverEnterDelay(0),
     m_hoverLeaveDelay(0),
+    m_focusEnterDelay(0),
+    m_focusLeaveDelay(0),
     m_hoverEnterTimerId(0),
     m_hoverLeaveTimerId(0),
-    m_item(NULL)
+    m_focusEnterTimerId(0),
+    m_focusLeaveTimerId(0),
+    m_hovered(false),
+    m_focused(false)
 {
     setFlags(ItemHasNoContents);
     setAcceptedMouseButtons(0);
@@ -16,11 +21,11 @@ HoverProcessor::HoverProcessor(QGraphicsItem *parent):
     setVisible(false);
 }
 
-HoverProcessor::~HoverProcessor() {
+HoverFocusProcessor::~HoverFocusProcessor() {
     return;
 }
 
-void HoverProcessor::setHoverEnterDelay(int hoverEnterDelayMSec) {
+void HoverFocusProcessor::setHoverEnterDelay(int hoverEnterDelayMSec) {
     if(hoverEnterDelayMSec < 0) {
         qnWarning("Invalid negative hover enter delay '%1'.", hoverEnterDelayMSec);
         return;
@@ -29,7 +34,7 @@ void HoverProcessor::setHoverEnterDelay(int hoverEnterDelayMSec) {
     m_hoverEnterDelay = hoverEnterDelayMSec;
 }
 
-void HoverProcessor::setHoverLeaveDelay(int hoverLeaveDelayMSec) {
+void HoverFocusProcessor::setHoverLeaveDelay(int hoverLeaveDelayMSec) {
     if(hoverLeaveDelayMSec < 0) {
         qnWarning("Invalid negative hover leave delay '%1'.", hoverLeaveDelayMSec);
         return;
@@ -38,78 +43,150 @@ void HoverProcessor::setHoverLeaveDelay(int hoverLeaveDelayMSec) {
     m_hoverLeaveDelay = hoverLeaveDelayMSec;
 }
 
+void HoverFocusProcessor::setFocusEnterDelay(int focusEnterDelayMSec) {
+    if(focusEnterDelayMSec < 0) {
+        qnWarning("Invalid negative focus enter delay '%1'.", focusEnterDelayMSec);
+        return;
+    }
 
-void HoverProcessor::setTargetItem(QGraphicsItem *item) {
-    if(!m_item.isNull())
-        if(scene() != NULL)
-            m_item.data()->removeSceneEventFilter(this);
-    
-    m_item = item;
+    m_focusEnterDelay = focusEnterDelayMSec;
+}
 
-    if(!m_item.isNull()) {
-        if(scene() != NULL)
-            m_item.data()->installSceneEventFilter(this);
-        m_item.data()->setAcceptHoverEvents(true);
+void HoverFocusProcessor::setFocusLeaveDelay(int focusLeaveDelayMSec) {
+    if(focusLeaveDelayMSec < 0) {
+        qnWarning("Invalid negative focus leave delay '%1'.", focusLeaveDelayMSec);
+        return;
+    }
+
+    m_focusLeaveDelay = focusLeaveDelayMSec;
+}
+
+void HoverFocusProcessor::addTargetItem(QGraphicsItem *item) {
+    if(item == NULL) {
+        qnNullWarning(item);
+        return;
+    }
+
+    if(scene() != NULL)
+        item->installSceneEventFilter(this);
+    item->setAcceptHoverEvents(true);
+
+    m_items.push_back(item);
+}
+
+void HoverFocusProcessor::removeTargetItem(QGraphicsItem *item) {
+    if(item == NULL)
+        return; /* Removing an item that is not there is OK, even if it's a NULL item. */
+
+    for(int i = 0; i < m_items.size(); i++) {
+        if(m_items[i].data() == item) {
+            if(scene() != NULL)
+                item->removeSceneEventFilter(this);
+            m_items.removeAt(i);
+            return;
+        }
     }
 }
 
-void HoverProcessor::forceHoverLeave() {
+QList<QGraphicsItem *> HoverFocusProcessor::targetItems() const {
+    QList<QGraphicsItem *> result;
+    foreach(const WeakGraphicsItemPointer &item, m_items)
+        if(!item.isNull())
+            result.push_back(item.data());
+    return result;
+}
+
+void HoverFocusProcessor::forceHoverLeave() {
     killHoverEnterTimer();
 
     if(m_hoverLeaveDelay == 0) {
-        processLeave();
-    } else {
+        processHoverLeave();
+    } else if(m_hoverLeaveTimerId == 0) {
         m_hoverLeaveTimerId = startTimer(m_hoverLeaveDelay);
     }
 }
 
-void HoverProcessor::forceHoverEnter() {
+void HoverFocusProcessor::forceHoverEnter() {
     killHoverLeaveTimer();
 
     if(m_hoverEnterDelay == 0) {
-        processEnter();
-    } else {
+        processHoverEnter();
+    } else if(m_hoverEnterTimerId == 0) {
         m_hoverEnterTimerId = startTimer(m_hoverEnterDelay);
     }
 }
 
-bool HoverProcessor::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
-    if(watched == m_item.data()) {
-        switch(event->type()) {
-        case QEvent::GraphicsSceneHoverEnter:
-            forceHoverEnter();
-            event->ignore();
-            break;
-        case QEvent::GraphicsSceneHoverLeave:
-            forceHoverLeave();
-            event->ignore();
-            break;
-        default:
-            break;
-        }
+void HoverFocusProcessor::forceFocusLeave() {
+    killFocusEnterTimer();
+
+    if(m_focusLeaveDelay == 0) {
+        processFocusLeave();
+    } else if(m_focusLeaveTimerId == 0) {
+        m_focusLeaveTimerId = startTimer(m_focusLeaveDelay);
+    }
+}
+
+void HoverFocusProcessor::forceFocusEnter() {
+    killFocusLeaveTimer();
+
+    if(m_focusEnterDelay == 0) {
+        processFocusEnter();
+    } else if(m_focusEnterTimerId == 0) {
+        m_focusEnterTimerId = startTimer(m_focusEnterDelay);
+    }
+}
+
+bool HoverFocusProcessor::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
+    switch(event->type()) {
+    case QEvent::GraphicsSceneHoverEnter:
+        forceHoverEnter();
+        event->ignore();
+        break;
+    case QEvent::GraphicsSceneHoverLeave:
+        forceHoverLeave();
+        event->ignore();
+        break;
+    case QEvent::FocusIn:
+        forceFocusEnter();
+        event->ignore();
+        break;
+    case QEvent::FocusOut:
+        forceFocusLeave();
+        event->ignore();
+        break;
+    default:
+        break;
     }
 
     return base_type::sceneEventFilter(watched, event);
 }
 
-void HoverProcessor::timerEvent(QTimerEvent *event) {
+void HoverFocusProcessor::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_hoverEnterTimerId) {
-        processEnter();
+        processHoverEnter();
     } else if(event->timerId() == m_hoverLeaveTimerId) {
-        processLeave();
+        processHoverLeave();
+    } else if(event->timerId() == m_focusEnterTimerId) {
+        processFocusEnter();
+    } else if(event->timerId() == m_focusLeaveTimerId) {
+        processFocusLeave();
     }
 }
 
-QVariant HoverProcessor::itemChange(GraphicsItemChange change, const QVariant &value) {
+QVariant HoverFocusProcessor::itemChange(GraphicsItemChange change, const QVariant &value) {
     if(parentItem() != NULL) {
         switch(change) {
         case ItemSceneChange:
-            if(!m_item.isNull() && scene() != NULL)
-               m_item.data()->removeSceneEventFilter(this);
+            if(scene() != NULL)
+                foreach(const WeakGraphicsItemPointer &item, m_items)
+                    if(!item.isNull())
+                        item.data()->removeSceneEventFilter(this);
             break;
         case ItemSceneHasChanged:
-            if(!m_item.isNull() && scene() != NULL)
-                m_item.data()->installSceneEventFilter(this);
+            if(scene() != NULL)
+                foreach(const WeakGraphicsItemPointer &item, m_items)
+                    if(!item.isNull())
+                        item.data()->installSceneEventFilter(this);
             break;
         default:
             break;
@@ -119,19 +196,43 @@ QVariant HoverProcessor::itemChange(GraphicsItemChange change, const QVariant &v
     return base_type::itemChange(change, value);
 }
 
-void HoverProcessor::processEnter() {
+void HoverFocusProcessor::processHoverEnter() {
     killHoverEnterTimer();
 
-    emit hoverEntered(m_item.data());
+    m_hovered = true;
+    emit hoverEntered();
+    if(m_focused)
+        emit hoverFocusEntered();
 }
 
-void HoverProcessor::processLeave() {
+void HoverFocusProcessor::processHoverLeave() {
     killHoverLeaveTimer();
 
-    emit hoverLeft(m_item.data());
+    m_hovered = false;
+    emit hoverLeft();
+    if(!m_focused)
+        emit hoverFocusLeft();
 }
 
-void HoverProcessor::killHoverEnterTimer() {
+void HoverFocusProcessor::processFocusEnter() {
+    killFocusEnterTimer();
+
+    m_focused = true;
+    emit focusEntered();
+    if(m_hovered)
+        emit hoverFocusEntered();
+}
+
+void HoverFocusProcessor::processFocusLeave() {
+    killFocusLeaveTimer();
+
+    m_focused = false;
+    emit focusLeft();
+    if(!m_hovered)
+        emit hoverFocusLeft();
+}
+
+void HoverFocusProcessor::killHoverEnterTimer() {
     if(m_hoverEnterTimerId == 0)
         return;
     
@@ -139,10 +240,26 @@ void HoverProcessor::killHoverEnterTimer() {
     m_hoverEnterTimerId = 0;
 }
 
-void HoverProcessor::killHoverLeaveTimer() {
+void HoverFocusProcessor::killHoverLeaveTimer() {
     if(m_hoverLeaveTimerId == 0)
         return;
 
     killTimer(m_hoverLeaveTimerId);
     m_hoverLeaveTimerId = 0;
+}
+
+void HoverFocusProcessor::killFocusEnterTimer() {
+    if(m_focusEnterTimerId == 0)
+        return;
+
+    killTimer(m_focusEnterTimerId);
+    m_focusEnterTimerId = 0;
+}
+
+void HoverFocusProcessor::killFocusLeaveTimer() {
+    if(m_focusLeaveTimerId == 0)
+        return;
+
+    killTimer(m_focusLeaveTimerId);
+    m_focusLeaveTimerId = 0;
 }
