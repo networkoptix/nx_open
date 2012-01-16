@@ -215,6 +215,7 @@ void DeviceFileCatalog::deserializeTitleFile()
 
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
+    Q_ASSERT(chunk.durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
 
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
@@ -229,6 +230,7 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 
 void DeviceFileCatalog::updateDuration(int durationMs)
 {
+    Q_ASSERT(durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
     m_chunks.last().durationMs = durationMs;
     QTextStream str(&m_file);
