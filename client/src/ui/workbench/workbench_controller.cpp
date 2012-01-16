@@ -1158,7 +1158,7 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 
 void QnWorkbenchController::updateViewportMargins() {
     m_display->setViewportMargins(QMargins(
-        std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
+        0, //std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
         0,
         0,
         std::floor(qMax(0.0, m_uiElementsInstrument->widget()->size().height() - m_navigationItem->pos().y()))
