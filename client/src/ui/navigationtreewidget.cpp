@@ -340,11 +340,11 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
                 delete dialog;
             }
         } else if (action == &cm_editTags) { // ### move to app-global scope
-            TagsEditDialog dialog(QStringList() << resource->getUniqueId(), this);
+            TagsEditDialog dialog(QStringList() << resource->getUniqueId(), QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
         } else if (action == &cm_upload_youtube) { // ### move to app-global scope
-            YouTubeUploadDialog dialog(resource, this);
+            YouTubeUploadDialog dialog(resource, QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
         }
