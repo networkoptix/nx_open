@@ -8,23 +8,12 @@ QnLocalVideoServer::QnLocalVideoServer()
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlag(server | local);
     setName(QLatin1String("Local"));
-    setId(QnId()); // ###
     setStatus(Online);
-}
-
-QnLocalVideoServer::~QnLocalVideoServer()
-{
 }
 
 QString QnLocalVideoServer::getUniqueId() const
 {
     return QLatin1String("LocalServer");
-}
-
-QnAbstractStreamDataProvider *QnLocalVideoServer::createDataProviderInternal(ConnectionRole role)
-{
-    Q_UNUSED(role)
-    return 0;
 }
 
 
@@ -47,11 +36,6 @@ QString QnVideoServer::getUniqueId() const
     if (!getId().isValid())
         nonConstThis->setId(QnId::generateSpecialId());
     return QLatin1String("Server ") + getId().toString();
-}
-
-QnAbstractStreamDataProvider* QnVideoServer::createDataProviderInternal(ConnectionRole /*role*/)
-{
-    return 0;
 }
 
 void QnVideoServer::setApiUrl(const QString& restUrl)

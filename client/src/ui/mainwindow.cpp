@@ -341,9 +341,8 @@ void MainWindow::appServerAuthenticationRequired()
             QnResourceDiscoveryManager::instance().stop();
 
             // don't remove local resources
-            const QnResourceList localResources = qnResPool->getResourcesWithFlag(QnResource::local);
-            qnResPool->clear();
-            qnResPool->addResources(localResources);
+            const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
+            qnResPool->removeResources(remoteResources);
 
             QnResourceDiscoveryManager::instance().start();
             QnResource::startCommandProc();

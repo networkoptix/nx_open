@@ -9,10 +9,8 @@ class QnLocalVideoServer : public QnResource
 {
 public:
     QnLocalVideoServer();
-    virtual ~QnLocalVideoServer();
 
     virtual QString getUniqueId() const;
-    virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role);
 };
 
 
@@ -26,7 +24,6 @@ public:
     virtual ~QnVideoServer();
 
     virtual QString getUniqueId() const;
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;

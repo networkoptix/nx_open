@@ -196,7 +196,7 @@ protected:
     virtual bool setParamPhysical(const QString& name, const QVariant& val);
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
 protected:
     //typedef QMap<QnId, QnParamList > QnParamLists; // key - resource type ID
