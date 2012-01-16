@@ -74,6 +74,18 @@ void QnResourceDiscoveryManager::pleaseStop()
 
 void QnResourceDiscoveryManager::run()
 {
+
+    ResourceSearcherList searchersList;
+    {
+        QMutexLocker locker(&m_searchersListMutex);
+        searchersList = m_searchersList;
+    }
+
+    foreach (QnAbstractResourceSearcher *searcher, searchersList)
+       searcher->setShouldBeUsed(true);
+
+
+
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     initResourceTypes(appServerConnection);
 

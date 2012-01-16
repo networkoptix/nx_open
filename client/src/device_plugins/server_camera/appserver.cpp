@@ -25,8 +25,6 @@ QString QnAppServerResourceSearcher::manufacture() const
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
-    if (!m_isFirstTime)
-        return QnResourceList();
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
@@ -38,7 +36,7 @@ QnResourceList QnAppServerResourceSearcher::findResources()
         qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << errorString;
     } else
     {
-        m_isFirstTime = false;
+        setShouldBeUsed(false);
     }
 
     return resources;
