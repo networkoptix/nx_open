@@ -597,6 +597,9 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     if (!layout()->items(resource->getUniqueId()).isEmpty())
         return; // avoid duplicates
 
+    if (layout()->items().size() >= 24)
+        return; // TODO: item limit must be changeable.
+
     workbench()->setItem(QnWorkbench::RAISED, NULL);
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
 
