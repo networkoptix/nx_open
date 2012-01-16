@@ -68,30 +68,45 @@ static inline QIcon iconForResource(const QnResourcePtr &resource)
     else if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::server_archive))
         iconName = QLatin1String("media.png");
 
-    return !iconName.isEmpty() ? Skin::icon(iconName) : QIcon();
+    QIcon icon;
+    if (!iconName.isEmpty()) {
+        QPixmap mainPix = Skin::pixmap(iconName);
+        if (resource->getStatus() != QnResource::Online) {
+            const QString overlayIconName = resource->getStatus() == QnResource::Offline ? QLatin1String("offline.png") : QLatin1String("unauthorized.png");
+            const QPixmap overlayPix = Skin::pixmap(overlayIconName, QSize(mainPix.width() / 2, mainPix.height() / 2));
+            QPainter painter(&mainPix);
+            painter.drawPixmap(mainPix.width() / 2, mainPix.height() / 2, overlayPix);
+        }
+        icon.addPixmap(mainPix);
+    }
+
+    return icon;
 }
 
 void ResourceModel::addResource(const QnResourcePtr &resource)
 {
+    QStandardItem *item = 0;
     if (resource->checkFlag(QnResource::server)) {
-        QStandardItem *root = new QStandardItem(resource->getName());
-        root->setData(resource->getId().hash(), Qt::UserRole + 1);
-        root->setData(resource->toSearchString(), Qt::UserRole + 2);
-        root->setIcon(iconForResource(resource));
-        root->setEditable(false);
-        root->setSelectable(false);
-        appendRow(root);
+        item = new QStandardItem;
+        item->setSelectable(false);
+        appendRow(item);
     } else if (QStandardItem *root = itemFromResourceId(resource->getParentId().hash())) {
-        QStandardItem *child = new QStandardItem(resource->getName());
-        child->setData(resource->getId().hash(), Qt::UserRole + 1);
-        child->setData(resource->toSearchString(), Qt::UserRole + 2);
-        child->setIcon(iconForResource(resource));
-        child->setEditable(false);
-        root->appendRow(child);
+        item = new QStandardItem;
+        root->appendRow(item);
     } else {
         qWarning("ResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
                  resource->getParentId().hash(), resource->getId().hash());
+        return;
     }
+
+    connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(_q_resourceChanged()));
+
+    item->setText(resource->getName());
+    item->setToolTip(resource->getName());
+    item->setData(resource->getId().hash(), Qt::UserRole + 1);
+    item->setData(resource->toSearchString(), Qt::UserRole + 2);
+    item->setIcon(iconForResource(resource));
+    item->setEditable(false);
 }
 
 void ResourceModel::removeResource(const QnResourcePtr &resource)
@@ -99,6 +114,8 @@ void ResourceModel::removeResource(const QnResourcePtr &resource)
     if (QStandardItem *item = itemFromResource(resource)) {
         foreach (QStandardItem *rowItem, takeRow(item->row()))
             delete rowItem;
+
+        disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(_q_resourceChanged()));
     }
 }
 
@@ -123,6 +140,14 @@ void ResourceModel::_q_removeResource(const QnResourcePtr &resource)
     }
 
     removeResource(resource);
+}
+
+void ResourceModel::_q_resourceChanged()
+{
+    const QnResourcePtr resource = qobject_cast<QnResource *>(sender())->toSharedPointer(); // ###
+
+    if (QStandardItem *item = itemFromResource(resource))
+        item->setIcon(iconForResource(resource));
 }
 
 QStringList ResourceModel::mimeTypes() const
