@@ -41,7 +41,7 @@ class QN_EXPORT QnResource : public QObject //: public CLRefCounter
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
 
-    enum Status { Online, Offline };
+    enum Status { Online, Offline, UnAuthorized };
 
     enum Flag {
         network = 0x01, // resource has ip and mac
