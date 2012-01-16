@@ -57,6 +57,7 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
 #include <ui/graphics/items/opacity_hover_item.h>
+#include <ui/graphics/items/bookmark_widget.h>
 
 #include <ui/processors/hover_processor.h>
 
