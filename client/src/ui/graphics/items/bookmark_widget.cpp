@@ -9,6 +9,7 @@ namespace {
 QnBookmarkWidget::QnBookmarkWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsWidget(parent, windowFlags),
     m_shape(RoundedNorth),
+    m_frameWidth(0),
     m_shapeValid(false)
 {}
 
@@ -20,8 +21,9 @@ void QnBookmarkWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     ensureShape();
 
     QPalette palette = this->palette();
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QnScopedPainterBrushRollback brushRollback(painter, palette.brush(QPalette::Window));
-    QnScopedPainterPenRollback penRollback(painter, QPen(palette.brush(QPalette::WindowText), 0));
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette.brush(QPalette::WindowText), m_frameWidth));
     painter->drawPath(m_borderShape);
 }
 
@@ -45,6 +47,14 @@ void QnBookmarkWidget::setBookmarkShape(Shape shape) {
 
     m_shape = shape;
     invalidateShape();
+    update();
+}
+
+void QnBookmarkWidget::setFrameWidth(qreal frameWidth) {
+    if(qFuzzyCompare(m_frameWidth, frameWidth))
+        return;
+
+    m_frameWidth = frameWidth;
     update();
 }
 

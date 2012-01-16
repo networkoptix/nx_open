@@ -21,12 +21,12 @@ QnWorkbench::QnWorkbench(QObject *parent):
 }
 
 QnWorkbench::~QnWorkbench() {
-    m_dummyLayout = NULL;
-    clear();
-
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
+
+    m_dummyLayout = NULL;
+    clear();
 }
 
 void QnWorkbench::clear() {
@@ -38,10 +38,9 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
     if(m_layout == layout)
         return;
 
-    QRect oldBoundingRect;
-    QRect newBoundingRect;
+    QRect oldBoundingRect, newBoundingRect;
 
-    Q_EMIT layoutAboutToBeChanged();
+    emit layoutAboutToBeChanged();
     /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
     if(m_layout != NULL) {
@@ -59,10 +58,14 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
         m_dummyLayout->clear();
         m_layout = m_dummyLayout;
     }
-    Q_EMIT layoutChanged();
-
-    /* Set up new layout. */
+    
+    /* Set up new layout. 
+     * 
+     * The fact that new layout is NULL means that we're in destructor, so no
+     * signals should be emitted. */
     if(m_layout != NULL) {
+        emit layoutChanged();
+
         connect(m_layout, SIGNAL(itemAdded(QnWorkbenchItem *)),             this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
         connect(m_layout, SIGNAL(itemRemoved(QnWorkbenchItem *)),           this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
         connect(m_layout, SIGNAL(aboutToBeDestroyed()),                     this, SLOT(at_layout_aboutToBeDestroyed()));
@@ -72,10 +75,10 @@ void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
             at_layout_itemAdded(item);
 
         newBoundingRect = m_layout->boundingRect();
-    }
 
-    if (newBoundingRect != oldBoundingRect)
-        emit boundingRectChanged();
+        if (newBoundingRect != oldBoundingRect)
+            emit boundingRectChanged();
+    }
 }
 
 void QnWorkbench::setMode(Mode mode) {

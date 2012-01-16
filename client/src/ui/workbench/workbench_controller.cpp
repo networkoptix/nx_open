@@ -401,6 +401,17 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     }
     m_treeBackgroundItem->stackBefore(m_treeItem);
 
+    m_treeBookmarkItem = new QnBookmarkWidget(controlsWidget);
+    {
+        QPalette palette = m_treeBookmarkItem->palette();
+        palette.setColor(QPalette::Window, QColor(0, 0, 0, 64));
+        palette.setColor(QPalette::WindowText, QColor(0, 0, 0, 255));
+        m_treeBookmarkItem->setPalette(palette);
+    }
+    m_treeBookmarkItem->setBookmarkShape(QnBookmarkWidget::RoundedEast);
+    m_treeBookmarkItem->resize(20, 60);
+    m_treeBookmarkItem->setFrameWidth(0.5);
+
     m_treeHidingProcessor = new HoverProcessor(m_treeItem);
     m_treeHidingProcessor->setTargetItem(m_treeItem);
     m_treeHidingProcessor->setHoverLeaveDelay(1000);
@@ -1194,6 +1205,7 @@ void QnWorkbenchController::at_navigationItem_actualCameraChanged(CLVideoCamera 
 
 void QnWorkbenchController::at_treeItem_geometryChanged() {
     m_treeBackgroundItem->setGeometry(m_treeItem->geometry());
+    m_treeBookmarkItem->setPos(m_treeItem->geometry().topRight());
 
     updateViewportMargins();
 }

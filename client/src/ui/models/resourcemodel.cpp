@@ -15,6 +15,7 @@ ResourceModel::ResourceModel(QObject *parent)
 {
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(_q_addResource(QnResourcePtr)));
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(_q_removeResource(QnResourcePtr)));
+    connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(_q_resourceChanged(QnResourcePtr)));
 
     const QnResourceList resources = qnResPool->getResources();
     foreach (const QnResourcePtr &server, resources) {
@@ -99,8 +100,6 @@ void ResourceModel::addResource(const QnResourcePtr &resource)
         return;
     }
 
-    connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(_q_resourceChanged()));
-
     item->setText(resource->getName());
     item->setToolTip(resource->getName());
     item->setData(resource->getId().hash(), Qt::UserRole + 1);
@@ -114,8 +113,6 @@ void ResourceModel::removeResource(const QnResourcePtr &resource)
     if (QStandardItem *item = itemFromResource(resource)) {
         foreach (QStandardItem *rowItem, takeRow(item->row()))
             delete rowItem;
-
-        disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(_q_resourceChanged()));
     }
 }
 
@@ -142,12 +139,15 @@ void ResourceModel::_q_removeResource(const QnResourcePtr &resource)
     removeResource(resource);
 }
 
-void ResourceModel::_q_resourceChanged()
+void ResourceModel::_q_resourceChanged(const QnResourcePtr &resource)
 {
-    const QnResourcePtr resource = qobject_cast<QnResource *>(sender())->toSharedPointer(); // ###
-
-    if (QStandardItem *item = itemFromResource(resource))
+    if (QStandardItem *item = itemFromResource(resource)) {
+        item->setText(resource->getName());
+        item->setToolTip(resource->getName());
+        item->setData(resource->getId().hash(), Qt::UserRole + 1);
+        item->setData(resource->toSearchString(), Qt::UserRole + 2);
         item->setIcon(iconForResource(resource));
+    }
 }
 
 QStringList ResourceModel::mimeTypes() const

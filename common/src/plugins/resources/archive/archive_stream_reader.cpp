@@ -677,11 +677,6 @@ bool QnArchiveStreamReader::isSkippingFrames() const
 
 void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, qint64 skipTime)
 {
-    if (m_requiredJumpTime != AV_NOPTS_VALUE)
-        emit jumpCanceled(m_requiredJumpTime);
-    emit beforeJump(mksec);
-    m_delegate->beforeSeek(mksec);
-
     //cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     //cl_log.log("skipTime=", skipTime, cl_logALWAYS);
     m_singleQuantProcessed=false;
@@ -694,6 +689,7 @@ void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, q
 
 void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
 {
+	beforeJumpInternal(mksec);
     QMutexLocker mutex(&m_jumpMtx);
     m_exactJumpToSpecifiedFrame = true;
     channeljumpToUnsync(mksec, 0, mksec);
@@ -701,6 +697,7 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
 
 void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int marker)
 {
+	beforeJumpInternal(mksec);
     QMutexLocker mutex(&m_jumpMtx);
     m_newDataMarker = marker;
     m_exactJumpToSpecifiedFrame = !findIFrame;
@@ -716,6 +713,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     bool needJump = mksec != m_lastJumpTime;
     if (needJump)
     {
+		beforeJumpInternal(mksec);
         QMutexLocker mutex(&m_jumpMtx);
         channeljumpToUnsync(mksec, 0, skipTime);
     }
@@ -724,6 +722,14 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     if (isSingleShotMode())
         CLLongRunnable::resume();
     return needJump;
+}
+
+void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
+{
+	if (m_requiredJumpTime != AV_NOPTS_VALUE)
+		emit jumpCanceled(m_requiredJumpTime);
+	emit beforeJump(mksec);
+	m_delegate->beforeSeek(mksec);
 }
 
 bool QnArchiveStreamReader::setSendMotion(bool value)

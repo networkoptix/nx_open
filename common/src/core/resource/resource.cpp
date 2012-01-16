@@ -526,6 +526,12 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
     return dataProvider;
 }
 
+QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole role)
+{
+    Q_UNUSED(role)
+    return 0;
+}
+
 // -----------------------------------------------------------------------------
 // Temporary until real ResourceFactory is implemented
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, commandProcessor)

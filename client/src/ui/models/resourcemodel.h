@@ -35,7 +35,7 @@ protected:
 private Q_SLOTS:
     void _q_addResource(const QnResourcePtr &resource);
     void _q_removeResource(const QnResourcePtr &resource);
-    void _q_resourceChanged();
+    void _q_resourceChanged(const QnResourcePtr &resource);
 
 private:
     Q_DISABLE_COPY(ResourceModel)
