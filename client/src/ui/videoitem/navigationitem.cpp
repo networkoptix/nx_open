@@ -393,7 +393,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-        setPlaying(!reader->onPause());
+        setPlaying(!reader->isMediaPaused());
     }
     else
     {
@@ -460,7 +460,7 @@ void NavigationItem::updateSlider()
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
+    m_liveButton->setVisible(!reader->isMediaPaused() && m_camera->getCamCamDisplay()->isRealTimeSource());
 }
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
@@ -722,7 +722,7 @@ void NavigationItem::play()
     if (!reader)
         return;
 
-    if (reader->onPause() && reader->isRealTimeSource()) {
+    if (reader->isMediaPaused() && reader->isRealTimeSource()) {
         reader->resumeMedia();
         reader->jumpToPreviousFrame(m_camera->getCurrentTime());
     }
@@ -755,7 +755,7 @@ void NavigationItem::rewindForward()
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    bool stopped = reader->onPause();
+    bool stopped = reader->isMediaPaused();
     if (stopped)
         play();
 
