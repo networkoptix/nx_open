@@ -515,8 +515,13 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         QRectF rect = channelRect(i);
         QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect, effectiveOpacity());
 
-        /* Draw selected / not selected overlay. */
-        drawSelection(rect);
+        /* Draw black rectangle if nothing was drawn. */
+        if(status != QnRenderStatus::RENDERED_OLD_FRAME && status != QnRenderStatus::RENDERED_NEW_FRAME) {
+            glBegin(GL_QUADS);
+            glColor4f(0.0, 0.0, 0.0, 1.0);
+            glVertices(rect);
+            glEnd();
+        }
 
         /* Update channel state. */
         if(status == QnRenderStatus::RENDERED_NEW_FRAME)
@@ -531,16 +536,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             setOverlayIcon(i, NO_ICON);
         }
 
-        /* Draw black rectangle if there is nothing to draw. */
-        if(status != QnRenderStatus::RENDERED_OLD_FRAME && status != QnRenderStatus::RENDERED_NEW_FRAME) {
-            glBegin(GL_QUADS);
-            glColor4f(0.0, 0.0, 0.0, 1.0);
-            glVertices(rect);
-            glEnd();
-        }
-
         /* Draw overlay icon. */
         drawOverlayIcon(i, rect);
+
+        /* Draw selected / not selected overlay. */
+        drawSelection(rect);
     }
     painter->endNativePainting();
 
