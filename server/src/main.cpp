@@ -536,6 +536,16 @@ private:
     QnMain m_main;
 };
 
+void stopServer(int signal)
+{
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
+    QnRecordingManager::instance()->stop();
+
+    if (serviceMain)
+        serviceMain->stopObjects();
+    xercesc::XMLPlatformUtils::Terminate ();
+}
 int main(int argc, char* argv[])
 {
     QnVideoService service(argc, argv);
