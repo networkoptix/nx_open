@@ -26,6 +26,12 @@ public:
 
     void setBookmarkShape(Shape shape);
 
+    qreal frameWidth() const {
+        return m_frameWidth;
+    }
+
+    void setFrameWidth(qreal frameWidth);
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 protected:
@@ -37,6 +43,7 @@ protected:
 
 private:
     Shape m_shape;
+    qreal m_frameWidth;
     
     mutable bool m_shapeValid;
     mutable QPainterPath m_borderShape;
