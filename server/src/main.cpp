@@ -327,7 +327,7 @@ public:
 
     void stopObjects()
     {
-        if (m_restServer) 
+        if (m_restServer)
         {
             delete m_restServer;
             m_restServer = 0;
@@ -339,7 +339,7 @@ public:
             m_rtspListener = 0;
         }
 
-        if (m_processor) 
+        if (m_processor)
         {
             delete m_processor;
             m_processor = 0;
@@ -360,13 +360,13 @@ public:
         initResourceTypes(appServerConnection);
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-
+        
         QHostAddress appserverHost;
         do
         {
             appserverHost = resolveHost(appserverHostString);
         } while (appserverHost.toIPv4Address() == 0);
-
+        
         QnVideoServerPtr videoServer;
 
         while (videoServer.isNull())
@@ -536,12 +536,6 @@ private:
     QnMain m_main;
 };
 
-int main(int argc, char* argv[])
-{
-    QnVideoService service(argc, argv);
-    return service.exec();
-}
-
 void stopServer(int signal)
 {
     QnResource::stopCommandProc();
@@ -552,4 +546,8 @@ void stopServer(int signal)
         serviceMain->stopObjects();
     xercesc::XMLPlatformUtils::Terminate ();
 }
-
+int main(int argc, char* argv[])
+{
+    QnVideoService service(argc, argv);
+    return service.exec();
+}

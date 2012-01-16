@@ -171,7 +171,6 @@ bool QnArchiveStreamReader::init()
     // Alloc common resources
     m_lastFrameDuration = 0;
 
-    emit realTimeStreamHint(m_delegate->isRealTimeSource());
     if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_SlowSource)
         emit slowSourceHint();
 

@@ -58,7 +58,6 @@ public:
     void disconnectFromResource();
 signals:
     void videoParamsChanged(AVCodecContext * codec);
-    void realTimeStreamHint(bool value);
     void slowSourceHint();
     void speedChanged(double value);
 protected:

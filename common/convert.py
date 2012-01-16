@@ -126,7 +126,7 @@ def setup_ffmpeg():
     if platform() == 'win32':
         ffmpeg += '-mingw'
     elif platform() == 'mac':
-        ffmpeg += '-macos'
+        ffmpeg += '-mac'
     elif platform() == 'linux':
         ffmpeg += '-linux'
 

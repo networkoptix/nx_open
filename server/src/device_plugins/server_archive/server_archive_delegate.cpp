@@ -316,7 +316,7 @@ begin_label:
         }
 
     }
-    if (m_afterSeek)
+    if (data && m_afterSeek)
     {
         data->flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_afterSeek = false;

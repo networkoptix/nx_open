@@ -269,24 +269,22 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
     return createConnection(defaultUrl());
 }
 
-void initResourceTypes(QnAppServerConnectionPtr appServerConnection)
+bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 {
     if (!qnResTypePool->isEmpty())
-        return;
+        return true;
 
-    // The following is demo only. Remove it.
     QList<QnResourceTypePtr> resourceTypeList;
 
-    for(;;)
+    QByteArray errorString;
+    if (appServerConnection->getResourceTypes(resourceTypeList, errorString) != 0)
     {
-        QByteArray errorString;
-        if (appServerConnection->getResourceTypes(resourceTypeList, errorString) == 0)
-            break;
-
         qDebug() << "Can't get resource types: " << errorString;
-        QnSleep::msleep(1000);
+        return false;
     }
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
+
+    return true;
 }
 

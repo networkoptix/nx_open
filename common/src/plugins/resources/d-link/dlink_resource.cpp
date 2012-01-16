@@ -7,6 +7,7 @@ const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setAuth("admin", "");
+    setFlags(server_live_cam);
 }
 
 bool QnPlDlinkResource::isResourceAccessible()

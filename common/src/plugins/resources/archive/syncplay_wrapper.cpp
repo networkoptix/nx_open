@@ -250,6 +250,9 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     Q_D(QnArchiveSyncPlayWrapper);
     if (reader == 0)
         return;
+
+    qint64 currentTime = getDisplayedTime();
+
     QMutexLocker lock(&d->timeMutex);
 
     reader->setNavDelegate(this);
@@ -265,8 +268,8 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
 
-    if (getDisplayedTime() != DATETIME_NOW) {
-        reader->jumpToPreviousFrame(getCurrentTime());
+    if (currentTime != DATETIME_NOW) {
+        reader->jumpToPreviousFrame(currentTime);
         reader->setSpeed(d->speed);
     }
 
