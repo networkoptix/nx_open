@@ -392,8 +392,11 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     {
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
-        QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-        setPlaying(!reader->isMediaPaused());
+        QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+		if (reader)
+			setPlaying(!reader->isMediaPaused());
+		else
+			setPlaying(true);
     }
     else
     {

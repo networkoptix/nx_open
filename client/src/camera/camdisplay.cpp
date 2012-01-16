@@ -343,7 +343,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 void CLCamDisplay::onBeforeJump(qint64 time)
 {
-    onRealTimeStreamHint(time == DATETIME_NOW);
+    onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
    /*
     if (time < 1000000ll * 100000)
