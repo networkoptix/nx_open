@@ -18,23 +18,23 @@ public:
     bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 
     QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
-    QModelIndex indexFromResource(QnResourcePtr resource) const;
+    QModelIndex indexFromResource(const QnResourcePtr &resource) const;
 
 protected:
     QModelIndex indexFromResourceId(uint id) const; // ### remove; use use indexFromResource() instead
     inline QnResourcePtr resourceFromItem(QStandardItem *item) const
     { return resourceFromIndex(item->index()); }
-    inline QStandardItem *itemFromResource(QnResourcePtr resource) const
+    inline QStandardItem *itemFromResource(const QnResourcePtr &resource) const
     { return itemFromIndex(indexFromResource(resource)); }
     inline QStandardItem *itemFromResourceId(uint id) const
     { return itemFromIndex(indexFromResourceId(id)); }
 
-    void addResource(QnResourcePtr resource);
-    void removeResource(QnResourcePtr resource);
+    void addResource(const QnResourcePtr &resource);
+    void removeResource(const QnResourcePtr &resource);
 
 private Q_SLOTS:
-    void _q_addResource(QnResourcePtr resource);
-    void _q_removeResource(QnResourcePtr resource);
+    void _q_addResource(const QnResourcePtr &resource);
+    void _q_removeResource(const QnResourcePtr &resource);
 
 private:
     Q_DISABLE_COPY(ResourceModel)
@@ -51,13 +51,16 @@ public:
     explicit ResourceSortFilterProxyModel(QObject *parent = 0);
 
     QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
-    QModelIndex indexFromResource(QnResourcePtr resource) const;
+    QModelIndex indexFromResource(const QnResourcePtr &resource) const;
 
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 
 private:
+    bool matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
+                        QAbstractItemModel *sourceModel, int source_row, const QModelIndex &source_parent) const;
     void parseFilterString();
+    void buildFilters(const QSet<QString> parts[], QRegExp *filters);
 
 private:
     Q_DISABLE_COPY(ResourceSortFilterProxyModel)
@@ -66,10 +69,11 @@ private:
     uint m_flagsFilter;
 
     enum FilterCategory {
-        Text, Id, Name, Tags,
+        Text, Name, Tags, Id,
         NumFilterCategories
     };
-    QList<QRegExp> m_filters[NumFilterCategories];
+    QRegExp m_negfilters[NumFilterCategories];
+    QRegExp m_filters[NumFilterCategories];
 };
 
 #endif // RESOURCEMODEL_H
