@@ -439,13 +439,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Navigation slider. */
     m_navigationItem = new NavigationItem(controlsItem);
+    m_navigationItem->setOpacity(normalSliderOpacity);
 
-    /*QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
-    navigationHoverItem->setTargetItem(m_navigationItem);
-    navigationHoverItem->setTargetHoverOpacity(hoverSliderOpacity);
-    navigationHoverItem->setTargetNormalOpacity(normalSliderOpacity);
-    navigationHoverItem->setAnimationSpeed(0.1);
-    navigationHoverItem->setAnimationTimeLimit(Globals::opacityChangePeriod());*/
+    m_sliderOpacityProcessor = new HoverFocusProcessor(controlsItem);
+    m_sliderOpacityProcessor->addTargetItem(m_navigationItem);
 
     m_sliderPositionAnimator = new VariantAnimator(this);
     m_sliderPositionAnimator->setTimer(display->animationInstrument()->animationTimer());
@@ -456,6 +453,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     setSliderVisible(false, false);
 
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_sliderOpacityProcessor_hoverEntered()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_sliderOpacityProcessor_hoverLeft()));
     connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
     connect(m_navigationItem,           SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(at_navigationItem_actualCameraChanged(CLVideoCamera *)));
     connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
@@ -1176,6 +1175,14 @@ void QnWorkbenchController::at_navigationItem_geometryChanged() {
 
 void QnWorkbenchController::at_navigationItem_actualCameraChanged(CLVideoCamera *camera) {
     setSliderVisible(camera != NULL, true);
+}
+
+void QnWorkbenchController::at_sliderOpacityProcessor_hoverEntered() {
+    opacityAnimator(m_navigationItem)->animateTo(hoverSliderOpacity);
+}
+
+void QnWorkbenchController::at_sliderOpacityProcessor_hoverLeft() {
+    opacityAnimator(m_navigationItem)->animateTo(normalSliderOpacity);
 }
 
 void QnWorkbenchController::at_treeItem_geometryChanged() {

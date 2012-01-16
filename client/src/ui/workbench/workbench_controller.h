@@ -144,6 +144,8 @@ protected Q_SLOTS:
 
     void at_navigationItem_geometryChanged();
     void at_navigationItem_actualCameraChanged(CLVideoCamera *camera);
+    void at_sliderOpacityProcessor_hoverEntered();
+    void at_sliderOpacityProcessor_hoverLeft();
 
     void at_treeItem_geometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
@@ -190,6 +192,8 @@ private:
     HoverFocusProcessor *m_treeShowingProcessor;
 
     HoverFocusProcessor *m_treeOpacityProcessor;
+
+    HoverFocusProcessor *m_sliderOpacityProcessor;
 
     AnimatorGroup *m_treeOpacityAnimatorGroup;
     VariantAnimator *m_treePositionAnimator;
