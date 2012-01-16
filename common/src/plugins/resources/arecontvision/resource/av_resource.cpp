@@ -16,9 +16,11 @@
 
 const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
 
-QnPlAreconVisionResource::QnPlAreconVisionResource():
-m_totalMdZones(64)
+QnPlAreconVisionResource::QnPlAreconVisionResource()
+    : m_totalMdZones(64)
 {
+    connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+            this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -28,11 +30,8 @@ bool QnPlAreconVisionResource::isPanoramic() const
 
 bool QnPlAreconVisionResource::isDualSensor() const
 {
-    QString name = getName();
-    if (name.contains("3130") || name.contains("3135"))
-        return true;
-
-    return false;
+    const QString name = getName();
+    return name.contains(QLatin1String("3130")) || name.contains(QLatin1String("3135"));
 }
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
@@ -208,8 +207,11 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     return result;
 }
 
-void QnPlAreconVisionResource::beforeUse()
+void QnPlAreconVisionResource::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
+    if (!(oldStatus == Offline && newStatus == Online))
+        return;
+
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
 
@@ -376,7 +378,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QVari
 }
 
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString name)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
     QnId rt = qnResTypePool->getResourceTypeId(MANUFACTURE, name);
     if (!rt.isValid())
@@ -411,21 +413,10 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(const
 }
 
 
-bool QnPlAreconVisionResource::isPanoramic(QString name)
+bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {
-    if (name.contains("8180"))
-        return true;
-
-    if (name.contains("8185"))
-        return true;
-
-    if (name.contains("8360"))
-        return true;
-
-    if (name.contains("8365"))
-        return true;
-
-    return false;
+    return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) ||
+           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365"));
 }
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()

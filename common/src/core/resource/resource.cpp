@@ -413,23 +413,17 @@ QnResource::Status QnResource::getStatus() const
     return m_status;
 }
 
-void QnResource::setStatus(QnResource::Status status, bool ignoreHandlers)
+void QnResource::setStatus(QnResource::Status newStatus, bool ignoreHandlers)
 {
-    if (m_status == status) // if status did not changed => do nothing
-        return;
-
-    if (m_status == Offline && status == Online && !ignoreHandlers)
-        beforeUse();
-
-    Status old_status;
+    Status oldStatus;
     {
         QWriteLocker writeLocker(&m_rwLock);
-        old_status = m_status;
-        m_status = status;
+        oldStatus = m_status;
+        m_status = newStatus;
     }
 
-    if (!ignoreHandlers)
-        emit onStatusChanged(old_status, status);
+    if (oldStatus != newStatus && !ignoreHandlers)
+        Q_EMIT statusChanged(oldStatus, newStatus);
 }
 
 

@@ -28,7 +28,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         }
 
         qDebug() << "Connecting resource: " << resource->getName();
-        QObject::connect(resource.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
+        QObject::connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+                         this, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
     }
 
     QnResourcePool::instance()->addResources(resources);
