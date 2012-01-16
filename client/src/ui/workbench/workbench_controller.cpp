@@ -432,6 +432,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     m_treeTriggerItem = new QGraphicsWidget(controlsItem);
     m_treeTriggerItem->stackBefore(m_treeItem); /* So that it doesn't eat tree's hover events. */
+    m_treeBookmarkItem->stackBefore(m_treeTriggerItem);
 
     HoverProcessor *m_treeShowingProcessor = new HoverProcessor(m_treeTriggerItem);
     m_treeShowingProcessor->setTargetItem(m_treeTriggerItem);
