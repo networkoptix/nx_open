@@ -299,7 +299,7 @@ void initAppServerEventConnection(const QSettings &settings)
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
-class QnMain : public QThread
+class QnMain : public CLLongRunnable
 {
 public:
     QnMain(int argc, char* argv[])
@@ -314,13 +314,21 @@ public:
     ~QnMain()
     {
         if (m_restServer)
+        {
+            m_restServer->stop();
             delete m_restServer;
+        }
 
         if (m_rtspListener)
+        {
+            m_rtspListener->stop();
             delete m_rtspListener;
+        }
 
         if (m_processor)
+        {
             delete m_processor;
+        }
     }
 
     void run()
@@ -334,7 +342,10 @@ public:
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-        initResourceTypes(appServerConnection);
+        while (!needToStop() && !initResourceTypes(appServerConnection))
+        {
+            QnSleep::msleep(1000);
+        }
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
         
@@ -505,6 +516,7 @@ protected:
 
     void stop()
     {
+        m_main.stop();
         stopServer(0);
         xercesc::XMLPlatformUtils::Terminate ();
     }
