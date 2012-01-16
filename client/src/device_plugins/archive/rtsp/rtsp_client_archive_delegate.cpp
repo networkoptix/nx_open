@@ -215,7 +215,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     return result;
 }
 
-qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
+qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     m_blockReopening = false;
 
@@ -228,8 +228,12 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
     if (!m_opened && m_resource) {
         open(m_resource);
     }
-    else
+    else {
+        if (!findIFrame)
+            m_rtspSession.setAdditionAttribute("x-no-find-iframe", "1");
         m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
+        m_rtspSession.removeAdditionAttribute("x-no-find-iframe");
+    }
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
     //m_waitBOF = true;
 	/*

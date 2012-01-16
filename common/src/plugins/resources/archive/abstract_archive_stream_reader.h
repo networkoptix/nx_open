@@ -8,6 +8,7 @@
 class QnAbstractNavigator
 {
 public:
+    virtual void directJumpToNonKeyFrame(qint64 mksec) = 0;
     virtual bool jumpTo(qint64 mksec,  qint64 skipTime) = 0;
     virtual void previousFrame(qint64 mksec) = 0;
     virtual void nextFrame() = 0;
@@ -50,6 +51,7 @@ public:
       */
     quint64 lengthMksec() const;
 
+    virtual void directJumpToNonKeyFrame(qint64 mksec) = 0;
     void jumpToPreviousFrame(qint64 mksec);
 
 

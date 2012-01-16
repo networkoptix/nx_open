@@ -154,6 +154,24 @@ void QnArchiveSyncPlayWrapper::setSingleShotMode(bool value)
         reinitTime(getDisplayedTime());
 }
 
+void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    d->lastJumpTime = mksec;
+    d->timer.restart();
+    foreach(ReaderInfo info, d->readers)
+    {
+        if (info.enabled)
+        {
+            info.reader->setNavDelegate(0);
+            info.reader->directJumpToNonKeyFrame(mksec);
+            info.reader->setNavDelegate(this);
+            d->processingJump = true;
+        }
+    }
+}
+
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
     qint64 newTime = findTimeAtPlaybackMask(mksec);

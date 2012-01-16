@@ -226,7 +226,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     return data;
 }
 
-qint64 QnAviArchiveDelegate::seek(qint64 time)
+qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     if (!findStreams())
         return -1;

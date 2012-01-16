@@ -724,7 +724,7 @@ void NavigationItem::play()
 
     if (reader->isMediaPaused() && reader->isRealTimeSource()) {
         reader->resumeMedia();
-        reader->jumpToPreviousFrame(m_camera->getCurrentTime());
+        reader->directJumpToNonKeyFrame(m_camera->getCurrentTime()+1);
     }
     else {
         reader->resumeMedia();
