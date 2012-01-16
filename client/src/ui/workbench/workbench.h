@@ -161,6 +161,10 @@ Q_SIGNALS:
      */
     void itemChanged(QnWorkbench::ItemRole role);
 
+    /**
+     * This signal is emitted whenever the bounding rect of this workbench's 
+     * layout changes.
+     */
     void boundingRectChanged();
 
 private slots:
