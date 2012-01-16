@@ -27,6 +27,7 @@ public:
     virtual qint64 expectedTime() const;
 
     // nav delegate
+    virtual void directJumpToNonKeyFrame(qint64 mksec);
     virtual bool jumpTo(qint64 mksec,  qint64 skipTime);
     virtual void previousFrame(qint64 mksec);
     virtual void nextFrame();
@@ -52,7 +53,6 @@ private slots:
 private:
     qint64 minTime() const;
     qint64 endTime() const;
-    //qint64 seek (qint64 time);
     qint64 secondTime() const;
     //void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void erase(QnAbstractArchiveDelegate* value);

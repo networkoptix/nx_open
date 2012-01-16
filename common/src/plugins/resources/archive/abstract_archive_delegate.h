@@ -35,7 +35,8 @@ public:
     virtual qint64 startTime() = 0;
     virtual qint64 endTime() = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
-    virtual qint64 seek (qint64 time) = 0;
+    // If findIFrame=true, jump to position before time to a nearest IFrame.
+    virtual qint64 seek (qint64 time, bool findIFrame) = 0;
     virtual QnVideoResourceLayout* getVideoLayout() = 0;
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
 

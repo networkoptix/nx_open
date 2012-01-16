@@ -417,7 +417,8 @@ int QnRtspConnectionProcessor::composePlay()
 
             {
                 d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
-                d->archiveDP->jumpWithMarker(d->startTime, d->lastPlayCSeq);
+                bool findIFrame = d->requestHeaders.value("x-no-find-iframe").isNull();
+                d->archiveDP->jumpWithMarker(d->startTime, findIFrame, d->lastPlayCSeq);
             }
         }
     }

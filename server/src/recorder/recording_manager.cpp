@@ -33,6 +33,13 @@ void QnRecordingManager::stop()
         recorder->pleaseStop();
     foreach(QnServerStreamRecorder* recorder, m_recordMap.values()) {
         recorder->stop();
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorder->getResource());
+        if (camera)
+        {
+            QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader();
+            if (reader)
+                reader->removeDataProcessor(recorder);
+        }
         delete recorder;
     }
     m_recordMap.clear();

@@ -526,6 +526,16 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     QnResourceWidget *widget = new QnResourceWidget(item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
+    QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
+    togglePinButton->setPixmap(Skin::pixmap(QLatin1String("pin.png")));
+    togglePinButton->setCheckedPixmap(Skin::pixmap(QLatin1String("unpin.png")));
+    togglePinButton->setCheckable(true);
+    togglePinButton->setChecked(item->isPinned());
+    togglePinButton->setMinimumSize(QSizeF(10.0, 10.0));
+    togglePinButton->setMaximumSize(QSizeF(10.0, 10.0));
+    connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
+    widget->addButton(togglePinButton);
+
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setPixmap(Skin::pixmap(QLatin1String("close.png")));
     closeButton->setMinimumSize(QSizeF(10.0, 10.0));

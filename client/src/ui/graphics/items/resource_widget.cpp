@@ -304,7 +304,7 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
 }
 
 void QnResourceWidget::addButton(QGraphicsLayoutItem *button) {
-    m_buttonsLayout->insertItem(1, button);
+    m_buttonsLayout->addItem(button);
 }
 
 void QnResourceWidget::removeButton(QGraphicsLayoutItem *button) {

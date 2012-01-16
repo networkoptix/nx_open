@@ -182,7 +182,7 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSe
     return timeMs*1000;
 }
 
-qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
+qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
 {
     QTime t;
     t.start();
@@ -216,7 +216,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
     else {
         chunkOffset = qBound(0ll, time - m_currentChunk.startTimeMs*1000, m_currentChunk.durationMs*1000 - BACKWARD_SEEK_STEP);
     }
-    qint64 seekRez = m_aviDelegate->seek(chunkOffset);
+    qint64 seekRez = m_aviDelegate->seek(chunkOffset, findIFrame);
     if (seekRez == -1)
         return seekRez;
     qint64 rez = m_currentChunk.startTimeMs*1000 + seekRez;
@@ -233,7 +233,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time)
     return rez;
 }
 
-qint64 QnServerArchiveDelegate::seek(qint64 time)
+qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     m_tmpData.clear();
     // change time by playback mask
@@ -245,7 +245,7 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
         if (m_eof)
             return -1; 
     }
-    return seekInternal(time);
+    return seekInternal(time, findIFrame);
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
@@ -308,7 +308,7 @@ begin_label:
                     if (waitMotionCnt > 1)
                         QnSleep::msleep(10);
 
-                    seekInternal(newTime);
+                    seekInternal(newTime, true);
                     waitMotionCnt++;
                     goto begin_label;
                 }

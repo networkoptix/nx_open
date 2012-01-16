@@ -41,7 +41,7 @@ class QN_EXPORT QnResource : public QObject //: public CLRefCounter
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
 
-    enum Status { Online, Offline, UnAuthorized };
+    enum Status { Offline, Unauthorized, Online };
 
     enum Flag {
         network = 0x01, // resource has ip and mac
@@ -91,12 +91,12 @@ public:
     void setTypeId(const QnId& id);
 
     Status getStatus() const;
-    void setStatus(Status status, bool ignoreHandlers = false);
+    void setStatus(Status newStatus, bool ignoreHandlers = false);
 
 
     // flags like network media and so on
     unsigned long flags() const;
-    bool checkFlag(unsigned long flag) const;
+    inline bool checkFlag(unsigned long flag) const { return (flags() & flag) == flag; }
     void setFlags(unsigned long flags);
     void addFlag(unsigned long flag);
     void removeFlag(unsigned long flag);
@@ -150,18 +150,13 @@ public:
     virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
     //=============
 
-    // this function is called by stream reader before start read;
-    // on in case of connection lost and restored
-    virtual void beforeUse() {}
-
-
     //QnParamList& getDeviceParamList();// returns params that can be changed on device level
     //const QnParamList& getDeviceParamList() const;
     QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
 
     //virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
-    bool associatedWithFile() const;
+    inline bool associatedWithFile() const { return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0; }
 
     QString getUrl() const;
     void setUrl(const QString& value);
@@ -179,7 +174,7 @@ public:
 
 Q_SIGNALS:
     void onParameterChanged(const QString &name, const QVariant &value);
-    void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
+    void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
 public:
     // this is thread to process commands like setparam

@@ -34,6 +34,11 @@
 #include <fstream>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "utils/common/log.h"
+
+class QnMain;
+static QnMain* serviceMain = 0;
+void stopServer(int signal);
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -180,13 +185,6 @@ QnVideoServerPtr registerServer(QnAppServerConnectionPtr appServerConnection, co
     return servers.at(0);
 }
 
-void stopServer(int signal)
-{
-    QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
-    QnRecordingManager::instance()->stop();
-}
-
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <stdio.h>
@@ -196,6 +194,16 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
     return true;
 }
 #endif
+
+static QtMsgHandler defaultMsgHandler = 0;
+
+static void myMsgHandler(QtMsgType type, const char *msg)
+{
+    if (defaultMsgHandler)
+        defaultMsgHandler(type, msg);
+
+    clLogMsgHandler(type, msg);
+}
 
 int serverMain(int argc, char *argv[])
 {
@@ -246,7 +254,7 @@ int serverMain(int argc, char *argv[])
         cl_log.log(QFile::decodeName(qApp->argv()[0]), cl_logALWAYS);
     }
 
-    qInstallMsgHandler(qDebugCLLogHandler);
+    defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
     QnResource::startCommandProc();
 
@@ -299,7 +307,7 @@ void initAppServerEventConnection(const QSettings &settings)
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
-class QnMain : public CLLongRunnable
+class QnMain : public QThread
 {
 public:
     QnMain(int argc, char* argv[])
@@ -309,25 +317,32 @@ public:
         m_rtspListener(0),
         m_restServer(0)
     {
+        serviceMain = this;
     }
 
     ~QnMain()
     {
+        stopObjects();
+    }
+
+    void stopObjects()
+    {
         if (m_restServer)
         {
-            m_restServer->stop();
             delete m_restServer;
+            m_restServer = 0;
         }
 
         if (m_rtspListener)
         {
-            m_rtspListener->stop();
             delete m_rtspListener;
+            m_rtspListener = 0;
         }
 
         if (m_processor)
         {
             delete m_processor;
+            m_processor = 0;
         }
     }
 
@@ -342,10 +357,7 @@ public:
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-        while (!needToStop() && !initResourceTypes(appServerConnection))
-        {
-            QnSleep::msleep(1000);
-        }
+        initResourceTypes(appServerConnection);
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
         
@@ -449,7 +461,8 @@ public:
         foreach(QnSecurityCamResourcePtr camera, cameras)
         {
             qDebug() << "Connecting resource: " << camera->getName();
-            QObject::connect(camera.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), m_processor, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
+            QObject::connect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+                             m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
 
             qnResPool->addResource(camera);
 
@@ -516,9 +529,7 @@ protected:
 
     void stop()
     {
-        m_main.stop();
         stopServer(0);
-        xercesc::XMLPlatformUtils::Terminate ();
     }
 
 private:
