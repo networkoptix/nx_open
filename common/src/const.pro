@@ -1,7 +1,11 @@
 TEMPLATE = lib
 QT *= multimedia network xml
-CONFIG += x86 precompile_header %BUILDLIB
+CONFIG += precompile_header %BUILDLIB
 CONFIG -= flat
+
+win32 {
+  CONFIG += x86
+}
 
 FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR

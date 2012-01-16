@@ -87,7 +87,10 @@ void QnResourceDiscoveryManager::run()
 
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    initResourceTypes(appServerConnection);
+    while (!needToStop() && !initResourceTypes(appServerConnection))
+    {
+        QnSleep::msleep(1000);
+    }
 
     while (!needToStop())
     {

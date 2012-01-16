@@ -98,6 +98,6 @@ private:
     QnResourceFactory* m_resourceFactory;
 };
 
-void initResourceTypes(QnAppServerConnectionPtr appServerConnection);
+bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);
 
 #endif // APPSERVERCONNECTIONIMPL_H

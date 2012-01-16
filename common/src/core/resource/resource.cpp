@@ -35,12 +35,14 @@ void QnResource::updateInner(const QnResource& other)
     m_tags = other.m_tags;
     m_avalable = other.m_avalable;
     m_url = other.m_url;
-    setStatus(other.m_status);
+    setStatus(other.m_status, true);
     m_streamParamList = other.m_streamParamList;
 }
 
 void QnResource::update(const QnResource& other)
 {
+    Status old = m_status;
+
     foreach (QnResourceConsumer* consumer, m_consumers)
         consumer->beforeUpdate();
 
@@ -49,6 +51,11 @@ void QnResource::update(const QnResource& other)
         QReadLocker readLocker(&other.m_rwLock);
 
         updateInner(other);
+    }
+
+    if (old != m_status)
+    {
+        emit statusChanged(old, m_status);
     }
 
     foreach (QnResourceConsumer* consumer, m_consumers)
