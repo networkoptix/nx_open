@@ -18,6 +18,7 @@ signals:
     void ready(const QnTimePeriodList &timePeriods, int handle);
     void failed(int status, int handle);
 
+    void delayedReady(const QnTimePeriodList &timePeriods, int handle);
 private slots:
     void at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle);
 

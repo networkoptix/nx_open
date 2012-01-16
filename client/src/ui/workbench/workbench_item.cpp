@@ -16,6 +16,13 @@ QnWorkbenchItem::~QnWorkbenchItem() {
     ensureRemoved();
 }
 
+void QnWorkbenchItem::load(const QnLayoutItemData& itemData)
+{
+    // TODO: set flags here
+    setCombinedGeometry(itemData.combinedGeometry);
+    setRotation(itemData.rotation);
+}
+
 void QnWorkbenchItem::ensureRemoved() {
     if(m_layout != NULL)
         m_layout->removeItem(this);

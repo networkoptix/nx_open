@@ -959,7 +959,8 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_isUserInput(false),
     m_centralise(true),
     m_endSize(0.0),
-    m_aggregatedMsInPixel(-1)
+    m_aggregatedMsInPixel(-1),
+    m_isLiveMode(false)
 {
     qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
 
@@ -996,9 +997,15 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onSliderValueChanged(int)));
 }
 
+
 TimeSlider::~TimeSlider()
 {
     m_animation->stop();
+}
+
+void TimeSlider::setLiveMode(bool value)
+{
+    m_isLiveMode = value;
 }
 
 ToolTipItem *TimeSlider::toolTipItem() const
@@ -1228,7 +1235,7 @@ void TimeSlider::updateSlider()
         m_isUserInput = false;
     }
 
-    if (isAtEnd()) {
+    if (m_isLiveMode) {
         m_slider->setToolTip("Live");
     } else {
         if (m_minimumValue == 0)

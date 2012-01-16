@@ -56,8 +56,9 @@ public:
     const QnTimePeriodList &motionTimePeriodList(int msInPixel);
     void setRecTimePeriodList(const QnTimePeriodList &timePeriodList);
     void setMotionTimePeriodList(const QnTimePeriodList &timePeriodList);
-
+    
     bool isAtEnd();
+    void setLiveMode(bool value);
     void setEndSize(qreal size);
 
 public Q_SLOTS:
@@ -125,6 +126,7 @@ private:
     int m_aggregatedMsInPixel;
 
     qreal m_endSize;
+    bool m_isLiveMode;
 
     friend class TimeLine;
     friend class MySlider;

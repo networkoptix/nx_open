@@ -166,6 +166,8 @@ bool QnArchiveSyncPlayWrapper::jumpToInternal(qint64 mksec,  qint64 skipTime)
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->lastJumpTime = skipTime ? skipTime : mksec;
+    if (d->speed < 0 && d->lastJumpTime == DATETIME_NOW)
+        d->lastJumpTime = QDateTime::currentMSecsSinceEpoch()*1000ll; // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
     d->timer.restart();
     bool rez = false;
     foreach(ReaderInfo info, d->readers)
@@ -245,8 +247,10 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
 
-    if (getDisplayedTime() != DATETIME_NOW)
+    if (getDisplayedTime() != DATETIME_NOW) {
         reader->jumpToPreviousFrame(getCurrentTime());
+        reader->setSpeed(d->speed);
+    }
 
     //connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
     //connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
@@ -323,8 +327,8 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     {
         if (info.enabled) {
             qint64 time = info.cam->getCurrentTime();
-            if (time == DATETIME_NOW)
-                time = QDateTime::currentMSecsSinceEpoch()*1000;
+            //if (time == DATETIME_NOW)
+            //    time = QDateTime::currentMSecsSinceEpoch()*1000;
             if (displayTime == AV_NOPTS_VALUE)
                 displayTime = time;
             else if (time != AV_NOPTS_VALUE)
@@ -539,7 +543,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     }
 
     qint64 displayedTime =  getDisplayedTimeInternal();
-    if (displayedTime == AV_NOPTS_VALUE)
+    if (displayedTime == AV_NOPTS_VALUE || displayedTime == DATETIME_NOW)
         return displayedTime;
     if (d->speed >= 0) 
         return qMin(expectTime, displayedTime + SYNC_EPS);

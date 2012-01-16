@@ -119,40 +119,10 @@
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
                         <Directory Id="VmsAppServerDir" Name="AppServer">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
-                                <File Id="appserverexe" Name="appserver.exe" Source="../appserver/build/exe.win32-2.7/appserver.exe" KeyPath="yes">
+                                <File Id="appserverexe" Name="appserver.exe" Source="../appserver/setup/build/exe.win32-2.7/appserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="VMS Application Server" Scope="any" IgnoreFailure="yes"/>                                                                        
                                 </File>
                                 
-<!--                                <File Id="dbconfigexe" Name="dbconfig.exe" Source="../appserver/build/exe.win32-2.7/dbconfig.exe"/>
-                                <File Id="bz2pyd" Name="bz2.pyd" Source="../appserver/build/exe.win32-2.7/bz2.pyd"/>
-                                <File Id="cx_Freezeutilpyd" Name="cx_Freeze.util.pyd" Source="../appserver/build/exe.win32-2.7/cx_Freeze.util.pyd"/>
-                                <File Id="cx_Logging" Name="cx_Logging.pyd" Source="../appserver/build/exe.win32-2.7/cx_Logging.pyd"/>
-                                <File Id="libraryzip" Name="library.zip" Source="../appserver/build/exe.win32-2.7/library.zip"/>
-                                <File Id="perfmonpyd" Name="perfmon.pyd" Source="../appserver/build/exe.win32-2.7/perfmon.pyd"/>
-                                <File Id="pyexpatpyd" Name="pyexpat.pyd" Source="../appserver/build/exe.win32-2.7/pyexpat.pyd"/>
-                                <File Id="python27dll" Name="python27.dll" Source="../appserver/build/exe.win32-2.7/python27.dll"/>
-                                <File Id="pythoncom27dll" Name="pythoncom27.dll" Source="../appserver/build/exe.win32-2.7/pythoncom27.dll"/>
-                                <File Id="pywintypes27dll" Name="pywintypes27.dll" Source="../appserver/build/exe.win32-2.7/pywintypes27.dll"/>
-                                <File Id="selectpyd" Name="select.pyd" Source="../appserver/build/exe.win32-2.7/select.pyd"/>
-                                <File Id="servicemanagerpyd" Name="servicemanager.pyd" Source="../appserver/build/exe.win32-2.7/servicemanager.pyd"/>
-                                <File Id="sqlite3dll" Name="sqlite3.dll" Source="../appserver/build/exe.win32-2.7/sqlite3.dll"/>
-                                <File Id="unicodedatapyd" Name="unicodedata.pyd" Source="../appserver/build/exe.win32-2.7/unicodedata.pyd"/>
-                                <File Id="win32apipyd" Name="win32api.pyd" Source="../appserver/build/exe.win32-2.7/win32api.pyd"/>
-                                <File Id="win32eventpyd" Name="win32event.pyd" Source="../appserver/build/exe.win32-2.7/win32event.pyd"/>
-                                <File Id="win32evtlogpyd" Name="win32evtlog.pyd" Source="../appserver/build/exe.win32-2.7/win32evtlog.pyd"/>
-                                <File Id="win32filepyd" Name="win32file.pyd" Source="../appserver/build/exe.win32-2.7/win32file.pyd"/>
-                                <File Id="win32pipepyd" Name="win32pipe.pyd" Source="../appserver/build/exe.win32-2.7/win32pipe.pyd"/>
-                                <File Id="win32servicepyd" Name="win32service.pyd" Source="../appserver/build/exe.win32-2.7/win32service.pyd"/>
-                                <File Id="win32wnetpyd" Name="win32wnet.pyd" Source="../appserver/build/exe.win32-2.7/win32wnet.pyd"/>
-                                <File Id="_ctypespyd" Name="_ctypes.pyd" Source="../appserver/build/exe.win32-2.7/_ctypes.pyd"/>
-                                <File Id="_hashlibpyd" Name="_hashlib.pyd" Source="../appserver/build/exe.win32-2.7/_hashlib.pyd"/>
-                                <File Id="_msipyd" Name="_msi.pyd" Source="../appserver/build/exe.win32-2.7/_msi.pyd"/>
-                                <File Id="_socketpyd" Name="_socket.pyd" Source="../appserver/build/exe.win32-2.7/_socket.pyd"/>
-                                <File Id="_sqlite3pyd" Name="_sqlite3.pyd" Source="../appserver/build/exe.win32-2.7/_sqlite3.pyd"/>
-                                <File Id="_sslpyd" Name="_ssl.pyd" Source="../appserver/build/exe.win32-2.7/_ssl.pyd"/>
-                                <File Id="win32comshellshellpyd" Name="win32com.shell.shell.pyd" Source="../appserver/build/exe.win32-2.7/win32com.shell.shell.pyd"/>
-                                
--->
                                 <ServiceInstall Id="VmsAppServerService"
                                                 Name="VmsAppServer"
                                                 DisplayName="Network Optix VMS Application Server"
@@ -175,32 +145,8 @@
                                     <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
                             </Component>
-
-<!--                            
-                            <Component Id="AppServerConfiguration" Guid="{D8207C19-74B0-463b-BC59-395555FCE7C9}">
-                                <File Id="serverconf" Name="server.conf" Source="../appserver/build/exe.win32-2.7/server.conf"/>
-                            </Component> -->
-                            
-                            <!-- <Directory Id="AppServerDatabaseDir" Name="db">
-                                <Component Id="AppServerDatabase" Guid="{C3C3F0CE-F976-40ef-AC81-FDED1B4C94DE}">
-                                    <File Id="appserver.db" Name="appserver.db" Source="../appserver/build/exe.win32-2.7/db/appserver.db"/>
-                                </Component>
-                            </Directory> -->
-                            
-                            <Directory Id="AppServerResourcesDir" Name="resources">
-                                <Component Id="AppServerResources" Guid="{C9BCF856-4075-4e46-BEC0-FB4107F3C257}">
-                                    <File Id="arecontvisionxml" Name="arecontvision.xml" Source="../appserver/build/exe.win32-2.7/resources/arecontvision.xml"/>
-                                </Component>
-                            </Directory>
-                            
-                            <Directory Id="AppServerTemplatesDir" Name="templates">
-                                <Component Id="AppServerTemplates" Guid="{1AD5EB76-DDE6-44bf-B414-635BBF7E8DFE}">
-                                    <File Id="html404" Name="404.html" Source="../appserver/build/exe.win32-2.7/templates/404.html"/>
-                                    <File Id="html500" Name="500.html" Source="../appserver/build/exe.win32-2.7/templates/500.html"/>
-                                </Component>
-                            </Directory>
                         </Directory>
-                        
+
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../server/bin/release/mediaserver.exe" KeyPath="yes">
@@ -394,10 +340,6 @@
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="AppServerConfiguration" />
-            
-            <!-- <ComponentRef Id="AppServerDatabase" /> -->
-            <ComponentRef Id="AppServerResources" />
-            <ComponentRef Id="AppServerTemplates" />
             
             <ComponentRef Id='ProgramMenuAppServerDir' />
         </Feature>

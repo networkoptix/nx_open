@@ -1,16 +1,25 @@
 #include "tooltipitem.h"
-
+#include <cmath>
 #include <QtGui/QPainter>
 #include <QtGui/QGraphicsSceneEvent>
+#include <utils/common/scoped_painter_rollback.h>
+
+namespace 
+{
+    const qreal roundingRadius = 5.0;
+    const qreal padding = -1.0;
+    const qreal arrowHeight = 8.0;
+    const qreal arrowWidth = 8.0;
+}
 
 ToolTipItem::ToolTipItem(QGraphicsItem *parent):
-    QGraphicsItem(parent)
+    QGraphicsItem(parent),
+    m_shapeValid(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
-    setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
-    recalcShape();
+    setCacheMode(QGraphicsItem::ItemCoordinateCache);
 }
 
 const QString &ToolTipItem::text() const
@@ -24,7 +33,7 @@ void ToolTipItem::setText(const QString &text)
         return;
 
     m_text = text;
-    recalcTextSize();
+    updateTextSize();
     update();
 }
 
@@ -35,8 +44,11 @@ const QFont &ToolTipItem::font() const
 
 void ToolTipItem::setFont(const QFont &font)
 {
+    if(m_font == font)
+        return;
+
     m_font = font;
-    recalcTextSize();
+    updateTextSize();
     update();
 }
 
@@ -47,6 +59,9 @@ const QPen &ToolTipItem::textPen() const
 
 void ToolTipItem::setTextPen(const QPen &textPen)
 {
+    if(m_textPen == textPen)
+        return;
+
     m_textPen = textPen;
     update();
 }
@@ -62,7 +77,7 @@ void ToolTipItem::setBorderPen(const QPen &borderPen)
         return;
 
     m_borderPen = borderPen;
-    recalcShape();
+    invalidateShape();
     update();
 }
 
@@ -73,17 +88,25 @@ const QBrush &ToolTipItem::brush() const
 
 void ToolTipItem::setBrush(const QBrush &brush)
 {
+    if(m_brush == brush)
+        return;
+
     m_brush = brush;
+    invalidateShape();
     update();
 }
 
 QRectF ToolTipItem::boundingRect() const
 {
+    ensureShape();
+
     return m_boundingRect;
 }
 
 QPainterPath ToolTipItem::shape() const
 {
+    ensureShape();
+
     return m_itemShape;
 }
 
@@ -92,18 +115,16 @@ void ToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    /* Draw background. */
-    painter->fillPath(m_borderShape, m_brush);
-
-    /* Draw text. */
-    //painter->setFont(m_font);
-    //painter->setPen(m_textPen);
-    //painter->drawStaticText(m_textRect.topLeft(), m_staticText);
-    painter->drawPixmap(m_textRect.topLeft(), m_textPixmap);
-
-    /* Draw outline. */
+    /* Render background. */
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     painter->setPen(m_borderPen);
+    painter->setBrush(m_brush);
     painter->drawPath(m_borderShape);
+
+    /* Render text. */
+    painter->setFont(m_font);
+    painter->setPen(m_textPen);
+    painter->drawText(QRectF(-m_textSize.width() / 2, -arrowHeight - roundingRadius - padding - m_textSize.height(), m_textSize.width(), m_textSize.height()), Qt::AlignCenter, m_text);
 }
 
 void ToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
@@ -113,29 +134,21 @@ void ToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
     QGraphicsItem::wheelEvent(event);
 }
 
-void ToolTipItem::recalcTextSize()
+void ToolTipItem::invalidateShape() 
 {
-    recalcShape();
+    m_shapeValid = false;
+
+    prepareGeometryChange();
 }
 
-void ToolTipItem::recalcShape()
+void ToolTipItem::ensureShape() const 
 {
+    if(m_shapeValid)
+        return;
+
+    /* Prepare border shape. */
     {
-        static const qreal roundingRadius = 5.0;
-        static const qreal padding = -1.0;
-        static const qreal arrowHeight = 8.0;
-        static const qreal arrowWidth = 8.0;
-
-        QFontMetrics m(m_font);
-        const QSizeF textSize = m.size(Qt::TextSingleLine, m_text);
-        const QSizeF paddingSize = textSize + QSizeF(padding * 2, padding * 2);
-
-        m_textPixmap = QPixmap(textSize.toSize());
-        m_textPixmap.fill(QColor(0,0,0,0));
-        QPainter textPainter(&m_textPixmap); // TODO: "QPainter::begin: Paint device returned engine == 0, type: 2"
-        textPainter.setFont(m_font);
-        textPainter.setPen(m_textPen);
-        textPainter.drawText(0, m.ascent(), m_text);
+        const QSizeF paddingSize = m_textSize + QSizeF(padding * 2, padding * 2);
 
         /* Half padding width */
         const float hw = paddingSize.width() / 2;
@@ -150,15 +163,14 @@ void ToolTipItem::recalcShape()
         m_borderShape.arcTo(QRectF(hw, -arrowHeight - paddingSize.height() - 2 * roundingRadius, roundingRadius, roundingRadius), 0, 90);
         m_borderShape.lineTo(-hw, -arrowHeight - paddingSize.height() - 2 * roundingRadius);
         m_borderShape.arcTo(QRectF(-hw - roundingRadius, -arrowHeight - paddingSize.height() - 2 * roundingRadius, roundingRadius, roundingRadius), 90, 90);
-        m_borderShape.lineTo(-hw - roundingRadius, -arrowHeight);
+        m_borderShape.lineTo(-hw - roundingRadius, -arrowHeight - roundingRadius);
         m_borderShape.arcTo(QRectF(-hw - roundingRadius, -arrowHeight - roundingRadius, roundingRadius, roundingRadius), 180, 90);
 
         m_borderShape.lineTo(-arrowWidth / 2, -arrowHeight);
         m_borderShape.closeSubpath();
-
-        m_textRect = QRectF(-textSize.width() / 2, -arrowHeight - roundingRadius - padding - textSize.height(), textSize.width(), textSize.height());
     }
 
+    /* Calculate item shape & bounding rect. */
     if (m_borderPen.isCosmetic()) {
         m_itemShape = m_borderShape;
     } else {
@@ -168,6 +180,16 @@ void ToolTipItem::recalcShape()
         m_itemShape.addPath(m_borderShape);
         m_itemShape = m_itemShape.simplified();
     }
-
     m_boundingRect = m_itemShape.boundingRect();
+}
+
+void ToolTipItem::updateTextSize() 
+{
+    QFontMetrics metrics(m_font);
+    QSize textSize = metrics.size(Qt::TextSingleLine, m_text);
+    if(textSize == m_textSize)
+        return;
+
+    m_textSize = textSize;
+    invalidateShape();
 }

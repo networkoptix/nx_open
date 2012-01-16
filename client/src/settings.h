@@ -4,29 +4,6 @@
 #include <QUrl>
 #include <QColor>
 
-extern qreal global_rotation_angel;
-extern bool global_show_item_text;
-extern QFont settings_font;
-extern int devices_update_interval;
-extern QColor global_shadow_color;
-extern QColor app_bkr_color;
-extern QColor global_selection_color;
-extern QColor global_can_be_dropped_color;
-
-extern QColor global_motion_selection_rubber_band_border_color;
-extern QColor global_motion_selection_rubber_band_color;
-extern QColor global_motion_selection_color;
-
-extern QColor global_frame_color;
-
-extern qreal global_decoration_opacity;
-extern qreal global_decoration_max_opacity;
-
-extern qreal global_base_scene_z_level;
-
-extern int global_grid_aparence_delay;
-extern int global_opacity_change_period;
-
 class Settings
 {
 public:

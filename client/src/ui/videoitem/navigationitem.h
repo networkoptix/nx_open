@@ -129,6 +129,7 @@ private:
     MotionPeriods m_motionPeriodLoader;
 
     QnTimePeriod m_timePeriod;
+    QnTimePeriod m_motionPeriod;
     QnTimePeriodList m_mergedMotionPeriods;
 
     //QnTimePeriodUpdater *m_fullTimePeriodUpdater;

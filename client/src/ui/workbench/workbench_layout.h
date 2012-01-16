@@ -8,6 +8,7 @@
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <ui/common/magnitude.h>
+#include "core/resource/layout_data.h"
 
 class QnWorkbenchItem;
 
@@ -18,7 +19,7 @@ class QnWorkbenchItem;
  * necessary functions for moving items around.
  */
 class QnWorkbenchLayout: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     struct Disposition {
         QSet<QPoint> free;
@@ -36,6 +37,11 @@ public:
      * Virtual destructor.
      */
     virtual ~QnWorkbenchLayout();
+
+    /**
+      * Load from QnLayoutData
+      */
+    void load(const QnLayoutData&);
 
 public Q_SLOTS:
     /**
@@ -162,13 +168,14 @@ public:
     }
 
     /**
-     * \param pos                       Desired position, in grid coordinates.
+     * \param gridPos                   Desired position, in grid coordinates.
      * \param size                      Desired slot size.
-     * \param metric                    Metric to use.
+     * \param metric                    Metric of the gridspace to use for determining the closest slot.
+     *                                  Positions of the top-left corner of the slot at hand will be passed to it.
      * \returns                         Geometry of the free slot of desired size whose upper-left corner
-     *                                  is closest (as defined by the grid walker) to the given position.
+     *                                  is closest (as defined by the metric) to the given position.
      */
-    QRect closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPointF> *metric = NULL) const;
+    QRect closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric = NULL) const;
 
 Q_SIGNALS:
     /**

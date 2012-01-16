@@ -104,7 +104,8 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
 QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource): 
     m_resource(resource),
-    m_lastDetailedData(new QnMetaDataV1())
+    m_lastDetailedData(new QnMetaDataV1()),
+    m_lastTimestamp(AV_NOPTS_VALUE)
 {
     m_camResource = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
@@ -381,6 +382,19 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
 {
     bool rez = true;
 
+    if (m_lastTimestamp == AV_NOPTS_VALUE) {
+        m_lastDetailedData->m_duration = 0;
+        m_lastDetailedData->timestamp = data->timestamp;
+    }
+    else {
+        if(data->timestamp - m_lastTimestamp <= MAX_FRAME_DURATION*1000ll) {
+            m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
+        }
+        else {
+            ; // close motion period at previous packet
+        }
+    }
+
     if (data->timestamp - m_lastDetailedData->timestamp < DETAILED_AGGREGATE_INTERVAL*1000000ll)
     {
         //qDebug() << "addMotion=" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz")
@@ -391,12 +405,13 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
     }
     else {
         // save to disk
-        m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
         if (!m_lastDetailedData->isEmpty())
             rez = saveToArchiveInternal(m_lastDetailedData);
         m_lastDetailedData = data;
+        m_lastDetailedData->m_duration = 0;
         //qDebug() << "start new Motion" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz");
     }
+    m_lastTimestamp = data->timestamp;
     return rez;
 }
 

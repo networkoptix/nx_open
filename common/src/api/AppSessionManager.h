@@ -23,6 +23,7 @@ public:
 
     int getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId, QByteArray& errorString);
     int getStorages(QnApiStorageResponsePtr& resources, QByteArray& errorString);
+    int getLayouts(QnApiLayoutResponsePtr& layouts, QByteArray& errorString);
 
     int registerServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers, QByteArray& errorString);
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras, QByteArray& errorString);

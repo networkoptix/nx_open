@@ -203,7 +203,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setMaximumSize(m_liveButton->preferredSize());
     m_liveButton->setCheckable(true);
-    m_liveButton->setChecked(m_timeSlider->isAtEnd());
+    m_liveButton->setChecked(m_camera && m_camera->getCamCamDisplay()->isRealTimeSource());
     m_liveButton->setEnabled(false);
     m_liveButton->hide();
 
@@ -393,7 +393,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-        setPlaying(!reader->onPause());
+        setPlaying(!reader->isMediaPaused());
     }
     else
     {
@@ -405,7 +405,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
 void NavigationItem::setLiveMode(bool value)
 {
-    if (value == m_timeSlider->isAtEnd())
+    if (m_camera && value == m_camera->getCamCamDisplay()->isRealTimeSource())
         return;
 
     m_timeSlider->setCurrentValue(value ? DATETIME_NOW : m_timeSlider->minimumValue());
@@ -413,6 +413,7 @@ void NavigationItem::setLiveMode(bool value)
 
 void NavigationItem::onLiveModeChanged(bool value)
 {
+    m_timeSlider->setLiveMode(value);
     if (value)
         m_speedSlider->resetSpeed();
 }
@@ -459,11 +460,12 @@ void NavigationItem::updateSlider()
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
+    m_liveButton->setVisible(!reader->isMediaPaused() && m_camera->getCamCamDisplay()->isRealTimeSource());
 }
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
 {
+    m_motionPeriod = period;
     foreach(CLVideoCamera *camera, m_reserveCameras) {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
         if (netRes)
@@ -519,7 +521,9 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     loadingPeriod.startTimeMs = qMax(minTimeMs, t - w);
     loadingPeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
-
+    
+    m_motionPeriod = m_motionPeriod.intersect(loadingPeriod);
+    
 
     //MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
     p->loadingHandle = p->loader->load(loadingPeriod, region);
@@ -538,8 +542,8 @@ bool NavigationItem::updateRecPeriodList(bool force)
 
     m_timePeriodUpdateTime = currentTime;
 
-    if (!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
-        return true;
+    //if (!force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs)
+    //    return true;
 
     if (!m_camera)
         return false;
@@ -567,9 +571,14 @@ bool NavigationItem::updateRecPeriodList(bool force)
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
-    if (!resources.isEmpty()) {
-        m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
-        updateMotionPeriods(m_timePeriod);
+    if (!resources.isEmpty()) 
+    {
+        bool timePeriodAlreadyLoaded = !force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs;
+        if (!timePeriodAlreadyLoaded)
+            m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
+        bool motionPeriodAlreadyLoaded = m_motionPeriod.startTimeMs <= t && t + w <= m_motionPeriod.startTimeMs + m_motionPeriod.durationMs;
+        if (!motionPeriodAlreadyLoaded)
+            updateMotionPeriods(m_timePeriod);
     }
     return true;
 }
@@ -638,17 +647,23 @@ void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, i
 
 void NavigationItem::onValueChanged(qint64 time)
 {
-    if (m_currentTime == time)
+    if (m_camera == 0)
         return;
 
-    if (m_camera == 0)
+    if (m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamCamDisplay()->isRealTimeSource()) 
+    {
+        smartSeek(DATETIME_NOW);
+        return;
+    }
+
+    if (m_currentTime == time)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     //if (reader->isSkippingFrames())
     //    return;
 
-    if (reader->isRealTimeSource() && m_timeSlider->isAtEnd())
+    if (reader->isRealTimeSource())
         return;
 
     smartSeek(time);
@@ -707,7 +722,7 @@ void NavigationItem::play()
     if (!reader)
         return;
 
-    if (reader->onPause() && reader->isRealTimeSource()) {
+    if (reader->isMediaPaused() && reader->isRealTimeSource()) {
         reader->resumeMedia();
         reader->jumpToPreviousFrame(m_camera->getCurrentTime());
     }
@@ -740,7 +755,7 @@ void NavigationItem::rewindForward()
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    bool stopped = reader->onPause();
+    bool stopped = reader->isMediaPaused();
     if (stopped)
         play();
 

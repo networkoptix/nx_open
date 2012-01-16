@@ -1,6 +1,7 @@
 #include "video_wnd_item.h"
 #include "camera/camera.h"
 #include "ui/graphicsview.h"
+#include "ui/skin/globals.h"
 #include "settings.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "utils/media/frame_info.h"
@@ -283,7 +284,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (drawSelection)
     {
         painter->fillRect(QRect(0, 0, width(), height()),
-            m_can_be_droped ? global_can_be_dropped_color :  global_selection_color);
+            m_can_be_droped ? Globals::canBeDroppedColor() :  Globals::selectionColor());
     }
 
     frameDisplayed();
@@ -304,7 +305,7 @@ void CLVideoWindowItem::drawStuff(QPainter* painter)
     drawShadow(painter);
 
     //============
-    if (m_showing_text && m_showfps && global_show_item_text)
+    if (m_showing_text && m_showfps && Globals::showItemText())
     {
         drawFPS(painter);	// ahtung! drawText takes huge(!) ammount of cpu
     }

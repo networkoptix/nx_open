@@ -5,7 +5,9 @@
 #include <QMetaType>
 #include <utils/common/warnings.h>
 
+class QPoint;
 class QPointF;
+class QSize;
 class QSizeF;
 class QRectF;
 class QVector2D;
@@ -17,7 +19,9 @@ class QVariant;
 qreal calculateMagnitude(int value);
 qreal calculateMagnitude(float value);
 qreal calculateMagnitude(double value);
+qreal calculateMagnitude(const QPoint &value);
 qreal calculateMagnitude(const QPointF &value);
+qreal calculateMagnitude(const QSize &value);
 qreal calculateMagnitude(const QSizeF &value);
 qreal calculateMagnitude(const QVector2D &value);
 qreal calculateMagnitude(const QVector3D &value);
@@ -67,6 +71,11 @@ public:
      * \param type                      <tt>QMetaType::Type</tt> for this magnitude calculator.
      */
     MagnitudeCalculator(int type): m_type(type) {}
+
+    /**
+     * Virtual destructor. 
+     */
+    virtual ~MagnitudeCalculator() {}
 
     /**
      * \returns                         <tt>QMetaType::Type</tt> of this magnitude calculator.

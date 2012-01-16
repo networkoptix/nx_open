@@ -60,7 +60,7 @@ private:
     bool m_opened;
     qint64 m_lastRtspTime;
     QnResourcePtr m_resource;
-    bool m_waitBOF;
+    //bool m_waitBOF;
     int m_lastPacketFlags;
     bool m_closing;
     bool m_singleShotMode;

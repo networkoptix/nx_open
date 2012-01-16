@@ -1,6 +1,7 @@
 #include "recorder_item.h"
 #include "settings.h"
 #include "ui/ui_common.h"
+#include "ui/skin/globals.h"
 #include "recorder/recorder_display.h"
 
 CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip)
@@ -64,7 +65,7 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 {
 	Q_UNUSED(widget);
 
-	painter->fillPath(mShadowRectPath, global_shadow_color);
+	painter->fillPath(mShadowRectPath, Globals::shadowColor());
 
 	QColor border_color(20,20,160);
 	if (m_mouse_over)
@@ -102,7 +103,7 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
 	if (option->state & QStyle::State_Selected)
 	{
-		painter->fillPath(mRoundRectPath, m_can_be_droped ? global_can_be_dropped_color :  global_selection_color );
+		painter->fillPath(mRoundRectPath, m_can_be_droped ? Globals::canBeDroppedColor() : Globals::selectionColor() );
 	}
 
 }

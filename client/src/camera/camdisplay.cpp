@@ -182,8 +182,6 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (m_isRealTimeSource)
     {
-        //sleep = false;
-        
         if (m_dataQueue.size() > 0) {
             sleep = false;
             m_realTimeHurryUp = 5;
@@ -199,13 +197,6 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_realTimeHurryUp = false;
             }
         }
-        
-       
-        /*
-        needToSleep -= (m_dataQueue.size()) * 2 * 1000;
-        if (needToSleep > MAX_VALID_SLEEP_LIVE_TIME)
-            needToSleep = 0;
-        */
     }
 
     m_previousVideoTime = currentTime;
@@ -352,7 +343,9 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 void CLCamDisplay::onBeforeJump(qint64 time)
 {
-    /*
+    onRealTimeStreamHint(time == DATETIME_NOW);
+
+   /*
     if (time < 1000000ll * 100000)
         cl_log.log("before jump to ", time, cl_logWARNING);
     else
@@ -544,7 +537,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     m_processedPackets++;
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (mediaIsLive != m_isRealTimeSource)
+    if (mediaIsLive != m_isRealTimeSource && !m_buffering)
         onRealTimeStreamHint(mediaIsLive);
 
     float speed = m_speed;

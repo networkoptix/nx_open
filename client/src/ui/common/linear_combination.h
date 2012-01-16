@@ -57,6 +57,11 @@ public:
     LinearCombinator(int type);
 
     /**
+     * Virtual destructor. 
+     */
+    virtual ~LinearCombinator() {}
+
+    /**
      * \returns                         <tt>QMetaType::Type</tt> of this linear combinator.
      */
     int type() const {

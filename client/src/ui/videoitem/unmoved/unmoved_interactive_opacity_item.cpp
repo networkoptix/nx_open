@@ -1,6 +1,6 @@
 #include "unmoved_interactive_opacity_item.h"
+#include "ui/skin/globals.h"
 
-extern int global_opacity_change_period;
 
 CLUnMovedInteractiveOpacityItem::CLUnMovedInteractiveOpacityItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity):
     CLAbstractUnmovedItem(name, parent),
@@ -25,12 +25,12 @@ void CLUnMovedInteractiveOpacityItem::hoverEnterEvent(QGraphicsSceneHoverEvent *
 {
     CLAbstractUnmovedItem::hoverEnterEvent(event);
 
-    changeOpacity(m_active_opacity, global_opacity_change_period);
+    changeOpacity(m_active_opacity, Globals::opacityChangePeriod());
 }
 
 void CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     CLAbstractUnmovedItem::hoverLeaveEvent(event);
 
-    changeOpacity(m_normal_opacity, global_opacity_change_period);
+    changeOpacity(m_normal_opacity, Globals::opacityChangePeriod());
 }
