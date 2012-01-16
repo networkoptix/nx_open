@@ -1099,7 +1099,7 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
     QnResourceWidget *navigatedWidget = m_widgetByRole[QnWorkbench::ZOOMED];
     if(navigatedWidget == NULL)
         navigatedWidget = m_widgetByRole[QnWorkbench::RAISED];
-    m_navigationItem->setVideoCamera(widget == NULL ? NULL : navigatedWidget->display()->camera());
+    m_navigationItem->setVideoCamera(navigatedWidget == NULL ? NULL : navigatedWidget->display()->camera());
 
 
     switch(role) {
