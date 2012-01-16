@@ -21,13 +21,12 @@ QnWorkbench::QnWorkbench(QObject *parent):
 }
 
 QnWorkbench::~QnWorkbench() {
+    m_dummyLayout = NULL;
     clear();
 
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
-
-    m_dummyLayout = NULL;
 }
 
 void QnWorkbench::clear() {

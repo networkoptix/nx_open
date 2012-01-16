@@ -45,6 +45,7 @@ public:
 
     bool setMotionRegion(const QRegion& region);
     bool setSendMotion(bool value);
+
 protected:
     virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);
 
@@ -58,11 +59,11 @@ protected:
     void setCurrentTime(qint64 value);
     virtual void pleaseStop();
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
+
 protected:
     qint64 m_currentTime;
     qint64 m_topIFrameTime;
     qint64 m_bottomIFrameTime;
-    
 
 
     int m_primaryVideoIdx;
@@ -81,7 +82,6 @@ protected:
 
 private:
     int m_selectedAudioChannel;
-    static QSemaphore aviSemaphore ;
     bool m_eof;
     bool m_reverseMode;
     bool m_prevReverseMode;
@@ -97,6 +97,7 @@ private:
     qint64 m_BOFTime;
     int m_dataMarker;
     int m_newDataMarker;
+
 private:
     qint64 m_lastJumpTime;
     qint64 m_skipFramesToTime;

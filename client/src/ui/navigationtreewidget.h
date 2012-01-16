@@ -57,6 +57,7 @@ private:
     QLineEdit *m_filterLineEdit;
     QToolButton *m_clearFilterButton;
     int m_filterTimerId;
+    bool m_dontSyncWithLayout;
 
     ResourceModel *m_resourcesModel;
     QTreeView *m_resourcesTreeView;

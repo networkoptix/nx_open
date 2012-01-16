@@ -337,13 +337,13 @@ public:
         initResourceTypes(appServerConnection);
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-        
+
         QHostAddress appserverHost;
         do
         {
             appserverHost = resolveHost(appserverHostString);
         } while (appserverHost.toIPv4Address() == 0);
-        
+
         QnVideoServerPtr videoServer;
 
         while (videoServer.isNull())
@@ -438,7 +438,8 @@ public:
         foreach(QnSecurityCamResourcePtr camera, cameras)
         {
             qDebug() << "Connecting resource: " << camera->getName();
-            QObject::connect(camera.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), m_processor, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
+            QObject::connect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+                             m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
 
             qnResPool->addResource(camera);
 
