@@ -197,6 +197,16 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
+static QtMsgHandler defaultMsgHandler = 0;
+
+static void myMsgHandler(QtMsgType type, const char *msg)
+{
+    if (defaultMsgHandler)
+        defaultMsgHandler(type, msg);
+
+    clLogMsgHandler(type, msg);
+}
+
 int serverMain(int argc, char *argv[])
 {
     Q_UNUSED(argc)
@@ -246,7 +256,7 @@ int serverMain(int argc, char *argv[])
         cl_log.log(QFile::decodeName(qApp->argv()[0]), cl_logALWAYS);
     }
 
-    qInstallMsgHandler(qDebugCLLogHandler);
+    defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
     QnResource::startCommandProc();
 
