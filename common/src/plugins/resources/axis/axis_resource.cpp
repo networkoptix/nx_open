@@ -7,6 +7,7 @@ const char* QnPlAxisResource::MANUFACTURE = "Axis";
 QnPlAxisResource::QnPlAxisResource()
 {
     setAuth("root", "1");
+    setFlags(server_live_cam);
 }
 
 bool QnPlAxisResource::isResourceAccessible()
