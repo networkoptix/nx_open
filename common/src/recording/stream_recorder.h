@@ -28,6 +28,8 @@ public:
 
     void setStartOffset(qint64 value);
 
+    QnResourcePtr getResource() const { return m_device; }
+
 Q_SIGNALS:
     void recordingFailed(QString errMessage);
     void recordingStarted();

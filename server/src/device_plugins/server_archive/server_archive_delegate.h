@@ -25,7 +25,7 @@ public:
     virtual qint64 startTime();
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual qint64 seek (qint64 time);
+    virtual qint64 seek (qint64 time, bool findIFrame);
     virtual QnVideoResourceLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
 
@@ -34,7 +34,7 @@ public:
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk);
     qint64 correctTimeByMask(qint64 time, bool useReverseSearch);
-    qint64 seekInternal(qint64 time);
+    qint64 seekInternal(qint64 time, bool findIFrame);
     void loadPlaybackMask(qint64 msTime, bool useReverseSearch);
 private:
     bool m_opened;

@@ -216,7 +216,7 @@ void initAppServerEventConnection()
 
 static QtMsgHandler defaultMsgHandler = 0;
 
-void myMsgHandler(QtMsgType type, const char *msg)
+static void myMsgHandler(QtMsgType type, const char *msg)
 {
     if (defaultMsgHandler)
         defaultMsgHandler(type, msg);
@@ -311,6 +311,7 @@ int main(int argc, char *argv[])
     QnResourceDirectoryBrowser::instance().setLocal(true);
     QStringList dirs;
     dirs << Settings::instance().mediaRoot();
+    dirs << Settings::instance().auxMediaRoots();
     QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
 
