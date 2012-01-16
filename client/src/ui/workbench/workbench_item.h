@@ -40,7 +40,7 @@ public:
     /**
       * Load from QnLayoutData
       */
-    void load(const QnLayoutItemData&);
+    void load(const QnLayoutItemData &data);
 
     /**
      * \returns                         Layout that this item belongs to, if any.
@@ -122,13 +122,6 @@ public:
     }
 
     /**
-     * \returns                         Whether this item is pinned.
-     */
-    bool isPinned() const {
-        return checkFlag(Pinned);
-    }
-
-    /**
      * Note that this function will fail when trying to pin an item into a
      * position that is already occupied.
      *
@@ -139,18 +132,31 @@ public:
     bool setFlag(ItemFlag flag, bool value = true);
 
     /**
+     * \returns                         Whether this item is pinned.
+     */
+    bool isPinned() const {
+        return checkFlag(Pinned);
+    }
+
+    /**
      * \returns                         Rotation angle of this item.
      */
     qreal rotation() const {
         return m_rotation;
     }
 
+public Q_SLOTS:
+    inline void setPinned(bool value)
+    { setFlag(Pinned, value); }
+    inline void togglePinned()
+    { setPinned(!isPinned()); }
+
     /**
      * \param degrees                   New rotation value for this item, in degrees.
      */
     void setRotation(qreal rotation);
 
-signals:
+Q_SIGNALS:
     void geometryChanged();
     void geometryDeltaChanged();
     void flagsChanged();

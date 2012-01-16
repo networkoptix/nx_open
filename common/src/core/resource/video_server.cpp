@@ -5,10 +5,11 @@
 QnLocalVideoServer::QnLocalVideoServer()
     : QnResource()
 {
-    //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer")));
+    //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlag(server | local);
     setName(QLatin1String("Local"));
-    setId(QnId());
+    setId(QnId()); // ###
+    setStatus(Online);
 }
 
 QnLocalVideoServer::~QnLocalVideoServer()

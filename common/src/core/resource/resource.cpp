@@ -107,12 +107,6 @@ unsigned long QnResource::flags() const
     return m_flags;
 }
 
-bool QnResource::checkFlag(unsigned long flag) const
-{
-    QReadLocker readLocker(&m_rwLock);
-    return (m_flags & flag) == flag;
-}
-
 void QnResource::setFlags(unsigned long flags)
 {
     QWriteLocker writeLocker(&m_rwLock);
@@ -129,11 +123,6 @@ void QnResource::removeFlag(unsigned long flag)
 {
     QWriteLocker writeLocker(&m_rwLock);
     m_flags &= ~flag;
-}
-
-bool QnResource::associatedWithFile() const
-{
-    return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0;
 }
 
 QString QnResource::toString() const

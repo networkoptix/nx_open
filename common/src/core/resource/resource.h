@@ -96,7 +96,7 @@ public:
 
     // flags like network media and so on
     unsigned long flags() const;
-    bool checkFlag(unsigned long flag) const;
+    inline bool checkFlag(unsigned long flag) const { return (flags() & flag) == flag; }
     void setFlags(unsigned long flags);
     void addFlag(unsigned long flag);
     void removeFlag(unsigned long flag);
@@ -156,7 +156,7 @@ public:
 
     //virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
-    bool associatedWithFile() const;
+    inline bool associatedWithFile() const { return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0; }
 
     QString getUrl() const;
     void setUrl(const QString& value);
