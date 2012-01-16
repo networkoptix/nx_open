@@ -31,6 +31,7 @@
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
+#include <ui/animation/widget_opacity_animator.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
@@ -57,7 +58,7 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
 #include <ui/graphics/items/opacity_hover_item.h>
-#include <ui/graphics/items/bookmark_widget.h>
+#include <ui/graphics/items/image_button_widget.h>
 
 #include <ui/processors/hover_processor.h>
 
@@ -77,6 +78,7 @@
 
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motionmask_widget.h"
+#include "ui/skin/skin.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *);
 
@@ -198,8 +200,6 @@ namespace {
     QPoint invalidDragDelta() {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
-
-    const char *opacityAnimatorPropertyName = "_qn_itemOpacityAnimator";
 
     /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
@@ -353,16 +353,16 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Create controls. */
-    QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
-    controlsWidget->setFlag(QGraphicsItem::ItemIsPanel);
-    m_display->setLayer(controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
+    QGraphicsWidget *controlsItem = m_uiElementsInstrument->widget();
+    controlsItem->setFlag(QGraphicsItem::ItemIsPanel);
+    m_display->setLayer(controlsItem, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     QnSingleEventSignalizator *deactivationSignalizator = new QnSingleEventSignalizator(this);
     deactivationSignalizator->setEventType(QEvent::WindowDeactivate);
-    controlsWidget->installEventFilter(deactivationSignalizator);
+    controlsItem->installEventFilter(deactivationSignalizator);
 
     connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
-    connect(controlsWidget,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
+    connect(controlsItem,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
@@ -376,7 +376,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
 
-    m_treeItem = new QGraphicsProxyWidget(controlsWidget);
+    m_treeItem = new QGraphicsProxyWidget(controlsItem);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
@@ -384,7 +384,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treeOpacityProcessor = new HoverProcessor(m_treeItem);
     m_treeOpacityProcessor->setTargetItem(m_treeItem);
 
-    m_treeBackgroundItem = new QGraphicsWidget(controlsWidget);
+    m_treeBackgroundItem = new QGraphicsWidget(controlsItem);
     m_treeBackgroundItem->setAutoFillBackground(true);
     {
         QPalette palette = m_treeBackgroundItem->palette();
@@ -401,16 +401,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     }
     m_treeBackgroundItem->stackBefore(m_treeItem);
 
-    m_treeBookmarkItem = new QnBookmarkWidget(controlsWidget);
-    {
-        QPalette palette = m_treeBookmarkItem->palette();
-        palette.setColor(QPalette::Window, QColor(0, 0, 0, 64));
-        palette.setColor(QPalette::WindowText, QColor(0, 0, 0, 255));
-        m_treeBookmarkItem->setPalette(palette);
-    }
-    m_treeBookmarkItem->setBookmarkShape(QnBookmarkWidget::RoundedEast);
-    m_treeBookmarkItem->resize(20, 60);
-    m_treeBookmarkItem->setFrameWidth(0.5);
+    m_treeBookmarkItem = new QnImageButtonWidget(controlsItem);
+    m_treeBookmarkItem->resize(15, 45);
 
     m_treeHidingProcessor = new HoverProcessor(m_treeItem);
     m_treeHidingProcessor->setTargetItem(m_treeItem);
@@ -438,7 +430,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treeOpacityAnimatorGroup->addAnimator(m_treeOpacityAnimator);
     m_treeOpacityAnimatorGroup->addAnimator(m_treeBackgroundOpacityAnimator);
 
-    m_treeTriggerItem = new QGraphicsWidget(controlsWidget);
+    m_treeTriggerItem = new QGraphicsWidget(controlsItem);
     m_treeTriggerItem->stackBefore(m_treeItem); /* So that it doesn't eat tree's hover events. */
 
     HoverProcessor *m_treeShowingProcessor = new HoverProcessor(m_treeTriggerItem);
@@ -454,7 +446,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
 
     /* Navigation slider. */
-    m_navigationItem = new NavigationItem(controlsWidget);
+    m_navigationItem = new NavigationItem(controlsItem);
 
     QnOpacityHoverItem *navigationHoverItem = new QnOpacityHoverItem(display->animationInstrument()->animationTimer(), m_navigationItem);
     navigationHoverItem->setTargetItem(m_navigationItem);
@@ -556,16 +548,18 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 }
 
 VariantAnimator *QnWorkbenchController::opacityAnimator(QnResourceWidget *widget) {
-    VariantAnimator *animator = widget->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
-    if(animator != NULL)
-        return animator;
+    VariantAnimator *animator = ::opacityAnimator(widget);
 
-    animator = new VariantAnimator(widget);
-    animator->setTargetObject(widget);
-    animator->setTimer(display()->animationInstrument()->animationTimer());
-    animator->setAccessor(new PropertyAccessor("opacity"));
-    animator->setSpeed(1.0);
-    widget->setProperty(opacityAnimatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
+    if(!qFuzzyCompare(animator->speed(), 1.0)) {
+        if(animator->isRunning()) {
+            animator->pause();
+            animator->setSpeed(1.0);
+            animator->start();
+        } else {
+            animator->setSpeed(1.0);
+        }
+    }
+
     return animator;
 }
 
@@ -673,6 +667,16 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::setTreeVisible(bool visible, bool animate)
 {
+    if(m_treeVisible != visible) {
+        if(visible) {
+            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::BACKGROUND_ROLE, Skin::pixmap("slide_left.png"));
+            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::HOVERED_ROLE, Skin::pixmap("slide_left_hover.png"));
+        } else {
+            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::BACKGROUND_ROLE, Skin::pixmap("slide_right.png"));
+            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::HOVERED_ROLE, Skin::pixmap("slide_right_hover.png"));
+        }
+    }
+
     m_treeVisible = visible;
 
     QPointF newPos = QPointF(visible ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
@@ -1204,8 +1208,13 @@ void QnWorkbenchController::at_navigationItem_actualCameraChanged(CLVideoCamera 
 }
 
 void QnWorkbenchController::at_treeItem_geometryChanged() {
-    m_treeBackgroundItem->setGeometry(m_treeItem->geometry());
-    m_treeBookmarkItem->setPos(m_treeItem->geometry().topRight());
+    QRectF treeItemGeometry = m_treeItem->geometry();
+
+    m_treeBackgroundItem->setGeometry(treeItemGeometry);
+    m_treeBookmarkItem->setPos(QPointF(
+        treeItemGeometry.right(),
+        (treeItemGeometry.top() + treeItemGeometry.bottom() - m_treeBookmarkItem->size().height()) / 2
+    ));
 
     updateViewportMargins();
 }

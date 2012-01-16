@@ -5,19 +5,26 @@
 #include <QPixmap>
 #include <ui/processors/clickable.h>
 
+/**
+ * A lightweight button widget that does not use style for painting. 
+ */
 class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
     Q_OBJECT;
 
     typedef Clickable<QGraphicsWidget> base_type;
 
 public:
+    enum PixmapRole {
+        BACKGROUND_ROLE,
+        HOVERED_ROLE,
+        CHECKED_ROLE,
+        ROLE_COUNT
+    };
+
     QnImageButtonWidget(QGraphicsItem *parent = NULL);
 
-    const QPixmap &pixmap() const { return m_pixmap; }
-    void setPixmap(const QPixmap &pixmap);
-
-    const QPixmap &checkedPixmap() const { return m_checkedPixmap; }
-    void setCheckedPixmap(const QPixmap &pixmap);
+    const QPixmap &pixmap(PixmapRole role) const;
+    void setPixmap(PixmapRole role, const QPixmap &pixmap);
 
     bool isCheckable() const { return m_checkable; }
 
@@ -33,17 +40,26 @@ public Q_SLOTS:
 Q_SIGNALS:
     void clicked();
     void toggled(bool checked);
+    void hoverEntered();
+    void hoverLeft();
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
-    QPixmap m_pixmap;
-    QPixmap m_checkedPixmap;
+    void drawPixmap(QPainter *painter, PixmapRole role);
+    bool hasPixmap(PixmapRole role);
+    void setUnderMouse(bool underMouse);
+
+private:
+    QPixmap m_pixmaps[ROLE_COUNT];
     bool m_checkable;
     bool m_checked;
+    bool m_underMouse;
 };
 
 

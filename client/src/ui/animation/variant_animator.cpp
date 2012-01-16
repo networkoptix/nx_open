@@ -27,13 +27,15 @@ void VariantAnimator::setSpeed(qreal speed) {
         return;
     }
 
-    if(isRunning()) {
-        qnWarning("Cannot change speed of a running animator.");
-        return;
-    }
-
+    bool running = isRunning();
+    if(running)
+        pause();
+    
     m_speed = speed;
     invalidateDuration();
+
+    if(running)
+        start();
 }
 
 void VariantAnimator::setAccessor(AbstractAccessor *accessor) {
@@ -132,7 +134,14 @@ QVariant VariantAnimator::toExternal(const QVariant &internal) const {
 }
 
 void VariantAnimator::setTargetValue(const QVariant &targetValue) {
+    bool running = isRunning();
+    if(running)
+        pause();
+
     updateTargetValue(toInternal(targetValue));
+
+    if(running)
+        start();
 }
 
 void VariantAnimator::setInternalTypeInternal(int newInternalType) {

@@ -44,7 +44,7 @@ class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
 class QnOpacityHoverItem;
-class QnBookmarkWidget;
+class QnImageButtonWidget;
 
 
 /**
@@ -178,7 +178,7 @@ private:
     /** Graphics widget that triggers tree widget visibility. */
     QGraphicsWidget *m_treeTriggerItem;
 
-    QnBookmarkWidget *m_treeBookmarkItem;
+    QnImageButtonWidget *m_treeBookmarkItem;
 
     /** Whether navigation tree is visible. */
     bool m_treeVisible;
