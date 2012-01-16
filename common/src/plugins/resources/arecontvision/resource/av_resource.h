@@ -12,9 +12,11 @@
 class QDomElement;
 
 
-// this class and inherited must be very light to create 
+// this class and inherited must be very light to create
 class QnPlAreconVisionResource : public QnCameraResource
 {
+    Q_OBJECT
+
 public:
     static const char* MANUFACTURE;
 
@@ -27,28 +29,27 @@ public:
     bool isPanoramic() const;
     bool isDualSensor() const;
 
-	virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain);
+    virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain);
 
     QString toSearchString() const;
 
-	virtual bool getDescription() {return true;};
+    virtual bool getDescription() {return true;};
 
-	//========
-	virtual QnResourcePtr updateResource();
-	//========
+    //========
+    virtual QnResourcePtr updateResource();
+    //========
 
-    virtual void beforeUse();
     virtual QString manufacture() const;
     virtual bool isResourceAccessible();
     virtual bool updateMACAddress();
 
     virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) const;
 
-    
+
     virtual QImage getImage(int channnel, QDateTime time, QnStreamQuality quality);
 
 
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames 
+    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
     virtual void setCropingPhysical(QRect croping);
 
     //virtual QnMediaInfo getMediaInfo() const;
@@ -58,25 +59,26 @@ public:
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    // should change value in memory domain 
+    // should change value in memory domain
     virtual bool getParamPhysical(const QString& name, QVariant& val);
 
     // should just do physical job( network or so ) do not care about memory domain
     virtual bool setParamPhysical(const QString& name, const QVariant& val);
+
 public:
-    static QnPlAreconVisionResource* createResourceByName(QString name);
+    static QnPlAreconVisionResource* createResourceByName(const QString &name);
     static QnPlAreconVisionResource* createResourceByTypeId(const QnId& rt);
 
-    static bool isPanoramic(QString name);
+    static bool isPanoramic(const QString &name);
 
 protected:
-
     QString m_description;
 
-private:
-    
-    int m_totalMdZones;
+private Q_SLOTS:
+    void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
+private:
+    int m_totalMdZones;
 };
 
 typedef QSharedPointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
