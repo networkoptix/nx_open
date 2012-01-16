@@ -564,6 +564,8 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
         return;
     }
 
+    if (layout()->items().size() > 40) return; // ### plz don't crash
+
     if (!resource->checkFlag(QnResource::media))
         return; // ### upsupported for now
 

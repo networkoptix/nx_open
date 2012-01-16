@@ -467,7 +467,7 @@ CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
 // QnWorkbenchDisplay :: mutators
 // -------------------------------------------------------------------------- //
 void QnWorkbenchDisplay::fitInView(bool animate) {
-    QRectF targetGeometry; 
+    QRectF targetGeometry;
 
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
     if(zoomedItem != NULL) {
@@ -582,12 +582,12 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
+    disconnect(widget, NULL, this, NULL);
+
     m_widgetByItem.remove(item);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.remove(widget->renderer());
     m_widgetByResource.remove(widget->resource());
-
-    disconnect(widget, NULL, this, NULL);
 
     if(destroyWidget)
         delete widget;
@@ -796,10 +796,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         QSizeF targetSize = enclosingGeometry.size();
         /*
         if(qFuzzyCompare(currentSize, targetSize)) {
-            // Item was moved without resizing. 
+            // Item was moved without resizing.
             easingCurve = QEasingCurve::InOutBack;
         } else if(contains(targetSize, currentSize)) {
-            //Item was resized up. 
+            //Item was resized up.
             easingCurve = QEasingCurve::InBack;
         } else {
             // Item was resized down.
@@ -953,7 +953,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         if(oldItem != NULL) {
             synchronize(oldItem);
         }
-        
+
         if(item != NULL) {
             bringToFront(item);
             synchronize(item, true);
