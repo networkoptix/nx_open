@@ -216,7 +216,7 @@ void initAppServerEventConnection()
 
 static QtMsgHandler defaultMsgHandler = 0;
 
-void myMsgHandler(QtMsgType type, const char *msg)
+static void myMsgHandler(QtMsgType type, const char *msg)
 {
     if (defaultMsgHandler)
         defaultMsgHandler(type, msg);
