@@ -56,7 +56,8 @@ protected:
 
 
 NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      m_filterTimerId(0)
 {
     m_previousItemButton = new QToolButton(this);
     m_previousItemButton->setText(QLatin1String("<"));
@@ -87,8 +88,6 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
-
-    m_filterTimerId = 0;
 
 
     m_resourcesModel = new ResourceModel(this);
@@ -230,10 +229,10 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     m_searchTreeView->setModel(m_searchProxyModel);
     m_searchTreeView->expandAll();
 
-    const bool oldBblockSignals = m_filterLineEdit->blockSignals(true);
+    disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     m_filterLineEdit->setText(m_searchProxyModel->filterRegExp().pattern()); // ###
     m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
-    m_filterLineEdit->blockSignals(oldBblockSignals);
+    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
 }
 
 void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
@@ -379,7 +378,8 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
 
     if (m_filterTimerId != 0)
         killTimer(m_filterTimerId);
-    m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 50) : 0);
+    m_filterTimerId = 0; if (filter.size() < 3) return; // ### remove after resource_widget initialization fixup
+    m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 0) : 0);
 }
 
 void NavigationTreeWidget::itemActivated(const QModelIndex &index)
