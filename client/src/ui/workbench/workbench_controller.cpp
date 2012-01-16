@@ -102,7 +102,7 @@ namespace {
                 QPoint(
                     qMin(m_boundary.left(), p.x()),
                     qMin(m_boundary.top(), p.y())
-                ), 
+                ),
                 QPoint(
                     qMax(m_boundary.right(), p.x() + m_size.x() - 1),
                     qMax(m_boundary.bottom(), p.y() + m_size.y() - 1)
@@ -590,6 +590,9 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
         qnNullWarning(resource);
         return;
     }
+
+    if (layout()->items().size() >= 24)
+        return; // TODO: item limit must be changeable.
 
     if (!resource->checkFlag(QnResource::media))
         return; // ### upsupported for now

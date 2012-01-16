@@ -39,7 +39,7 @@ protected:
         QStyledItemDelegate::initStyleOption(option, index);
 
         NavigationTreeWidget *navTree = static_cast<NavigationTreeWidget *>(parent());
-        if (navTree->m_controller) {
+        if (navTree->m_controller && navTree->m_controller->layout()) {
             if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model())) {
                 QnResourcePtr resource = model->resourceFromIndex(index);
                 if (navTree->m_controller->layout()->item(resource))
@@ -56,7 +56,9 @@ protected:
 
 
 NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      m_filterTimerId(0),
+      m_dontSyncWithLayout(false)
 {
     m_previousItemButton = new QToolButton(this);
     m_previousItemButton->setText(QLatin1String("<"));
@@ -75,7 +77,6 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     m_filterLineEdit = new QLineEdit(this);
     m_filterLineEdit->setPlaceholderText(tr("Search"));
-    m_filterLineEdit->setMaxLength(150);
 
     m_clearFilterButton = new QToolButton(this);
     m_clearFilterButton->setText(QLatin1String("X"));
@@ -87,8 +88,6 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
-
-    m_filterTimerId = 0;
 
 
     m_resourcesModel = new ResourceModel(this);
@@ -185,7 +184,7 @@ void NavigationTreeWidget::setWorkbenchController(QnWorkbenchController *control
 
 void NavigationTreeWidget::workbenchLayoutAboutToBeChanged()
 {
-    if (!m_controller)
+    if (!m_controller || !m_controller->layout())
         return;
 
     QnWorkbenchLayout *layout = m_controller->layout();
@@ -203,7 +202,7 @@ Q_DECLARE_METATYPE(ResourceSortFilterProxyModel *) // ###
 
 void NavigationTreeWidget::workbenchLayoutChanged()
 {
-    if (!m_controller)
+    if (!m_controller || !m_controller->layout())
         return;
 
     QnWorkbenchLayout *layout = m_controller->layout();
@@ -213,7 +212,7 @@ void NavigationTreeWidget::workbenchLayoutChanged()
 
     m_searchProxyModel = layout->property("model").value<ResourceSortFilterProxyModel *>(); // ###
     if (!m_searchProxyModel) {
-        ResourceSortFilterProxyModel *proxyModel = new ResourceSortFilterProxyModel(m_controller->workbench());
+        ResourceSortFilterProxyModel *proxyModel = new ResourceSortFilterProxyModel(layout);
         proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
         proxyModel->setFilterKeyColumn(0);
         proxyModel->setFilterRole(Qt::UserRole + 2);
@@ -230,10 +229,10 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     m_searchTreeView->setModel(m_searchProxyModel);
     m_searchTreeView->expandAll();
 
-    const bool oldBblockSignals = m_filterLineEdit->blockSignals(true);
+    disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     m_filterLineEdit->setText(m_searchProxyModel->filterRegExp().pattern()); // ###
     m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
-    m_filterLineEdit->blockSignals(oldBblockSignals);
+    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
 }
 
 void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
@@ -241,6 +240,22 @@ void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
     const QnResourcePtr &resource = item->resource();
 
     m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
+
+    if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
+        const QModelIndex index = m_searchProxyModel->indexFromResource(resource);
+        if (!index.isValid()) {
+            // ### improve/optimize
+            QString subFilter = QLatin1String("id:") + QString::number(resource->getId().hash());
+            QString filter = m_filterLineEdit->text();
+            filter.replace(QLatin1Char('-') + subFilter, QString());
+            if (!filter.contains(QLatin1Char('+') + subFilter))
+                filter += QLatin1Char('+') + subFilter;
+            m_filterLineEdit->setText(filter);
+            // ###
+        } else if (m_searchTreeView->isVisible()) {
+            m_searchTreeView->update(index);
+        }
+    }
 }
 
 void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
@@ -248,6 +263,20 @@ void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
     const QnResourcePtr &resource = item->resource();
 
     m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
+
+    if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
+        const QModelIndex index = m_searchProxyModel->indexFromResource(resource);
+        if (index.isValid()) {
+            // ### improve/optimize
+            QString subFilter = QLatin1String("id:") + QString::number(resource->getId().hash());
+            QString filter = m_filterLineEdit->text();
+            filter.replace(QLatin1Char('+') + subFilter, QString());
+            if (!filter.contains(QLatin1Char('-') + subFilter))
+                filter += QLatin1Char('-') + subFilter;
+            m_filterLineEdit->setText(filter);
+            // ###
+        }
+    }
 }
 
 void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first, int last)
@@ -341,11 +370,11 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
                 delete dialog;
             }
         } else if (action == &cm_editTags) { // ### move to app-global scope
-            TagsEditDialog dialog(QStringList() << resource->getUniqueId(), this);
+            TagsEditDialog dialog(QStringList() << resource->getUniqueId(), QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
         } else if (action == &cm_upload_youtube) { // ### move to app-global scope
-            YouTubeUploadDialog dialog(resource, this);
+            YouTubeUploadDialog dialog(resource, QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
         }
@@ -358,11 +387,15 @@ void NavigationTreeWidget::timerEvent(QTimerEvent *event)
         killTimer(m_filterTimerId);
         m_filterTimerId = 0;
 
-        if (m_controller)
-            m_controller->layout()->setProperty("caption", m_filterLineEdit->text()); // ### unescape, normalize, etc.
+        if (m_controller) {
+            if (QnWorkbenchLayout *layout = m_controller->layout())
+                layout->setProperty("caption", m_filterLineEdit->text()); // ### unescape, normalize, etc.
+        }
 
         if (m_searchProxyModel) {
+            m_dontSyncWithLayout = true;
             m_searchProxyModel->setFilterWildcard(m_filterLineEdit->text());
+            m_dontSyncWithLayout = false;
             m_searchTreeView->expandAll();
         }
     }
@@ -372,14 +405,25 @@ void NavigationTreeWidget::timerEvent(QTimerEvent *event)
 
 void NavigationTreeWidget::filterChanged(const QString &filter)
 {
+    if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
+        m_filterLineEdit->clear();
+        return;
+    }
+
     m_clearFilterButton->setVisible(!filter.isEmpty());
 
-    if (m_controller && !m_controller->layout()->isEmpty() && m_controller->layout()->property("caption").toString().isEmpty())
-        Q_EMIT newTabRequested();
+    if (m_controller) {
+        if (QnWorkbenchLayout *layout = m_controller->layout()) {
+            // open a new tab, if needed
+            if (!layout->isEmpty() && layout->property("caption").toString().isEmpty())
+                Q_EMIT newTabRequested();
+        }
+    }
 
     if (m_filterTimerId != 0)
         killTimer(m_filterTimerId);
-    m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 50) : 0);
+    m_filterTimerId = 0; if (!filter.isEmpty() && filter.size() < 3) return; // ### remove after resource_widget initialization fixup
+    m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 0) : 0);
 }
 
 void NavigationTreeWidget::itemActivated(const QModelIndex &index)

@@ -160,8 +160,9 @@ void DeviceFileCatalog::deserializeTitleFile()
     do {
         line = m_file.readLine();
         QList<QByteArray> fields = line.split(';');
-        if (fields.size() < 3)
+        if (fields.size() < 4) {
             continue;
+        }
         int coeff = 1; // compabiliy with previous version (convert usec to ms)
         if (fields[0].length() >= 16)
             coeff = 1000;

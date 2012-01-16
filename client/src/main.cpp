@@ -214,6 +214,16 @@ void initAppServerEventConnection()
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
+static QtMsgHandler defaultMsgHandler = 0;
+
+void myMsgHandler(QtMsgType type, const char *msg)
+{
+    if (defaultMsgHandler)
+        defaultMsgHandler(type, msg);
+
+    clLogMsgHandler(type, msg);
+}
+
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
@@ -251,7 +261,6 @@ int main(int argc, char *argv[])
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     const QString dataLocation = getDataDirectory();
-    qDebug() << "Loc: " << dataLocation;
     if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
         return 0;
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
@@ -271,7 +280,7 @@ int main(int argc, char *argv[])
         cl_log.log(QFile::decodeName(argv[0]), cl_logALWAYS);
     }
 
-    qInstallMsgHandler(qDebugCLLogHandler);
+    defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
     Settings& settings = Settings::instance();
     settings.load(dataLocation + QLatin1String("/settings.xml"));

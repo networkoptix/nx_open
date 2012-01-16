@@ -67,8 +67,6 @@ public:
             m_semaphore.tryAcquire(1,50);
     }
 
-    bool onPause() const { return m_onPause; }
-
     void smartSleep(int ms) // not precise 
     {
         int n = ms/100;
@@ -84,7 +82,8 @@ public:
             msleep(ms%100);
         }
     }
-
+protected:
+    bool onPause() const { return m_onPause; }
 protected:
     bool m_runing;
     volatile bool m_needStop;

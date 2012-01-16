@@ -2,7 +2,6 @@
 #define TOOLTIPITEM_H
 
 #include <QtGui/QGraphicsItem>
-#include <QtGui/QStaticText>
 
 class ToolTipItem: public QGraphicsItem
 {
@@ -33,19 +32,20 @@ protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 private:
-    void recalcTextSize();
-    void recalcShape();
+    void invalidateShape();
+    void ensureShape() const;
+    void updateTextSize();
 
 private:
+    mutable bool m_shapeValid;
     mutable QPainterPath m_itemShape, m_borderShape;
-    mutable QRectF m_boundingRect, m_textRect;
+    mutable QRectF m_boundingRect;
 
     QPen m_borderPen;
     QPen m_textPen;
     QBrush m_brush;
-
     QString m_text;
-    QPixmap m_textPixmap;
+    QSize m_textSize;
     QFont m_font;
 };
 

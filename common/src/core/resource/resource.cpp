@@ -286,19 +286,19 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
     }
 
     QnParam &param = getResourceParamList().value(name);
-    
+
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         return false;
     }
-    
+
 
     if (domain == QnDomainPhysical)
     {
         if (param.isStatic())
             return false;
-            
+
         if (!setParamPhysical(param.name(), val))
             return false;
     }
@@ -307,7 +307,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
     //QnDomainMemory should changed anyway
     {
         QReadLocker readLocker(&m_rwLock);
-        if (!param.setValue(val)) 
+        if (!param.setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
             return false;
@@ -417,8 +417,6 @@ void QnResource::setStatus(QnResource::Status status, bool ignoreHandlers)
 {
     if (m_status == status) // if status did not changed => do nothing
         return;
-
-    qDebug() << "Setting status: " << (status == QnResource::Online ? "Active" : "Inactive");
 
     if (m_status == Offline && status == Online && !ignoreHandlers)
         beforeUse();

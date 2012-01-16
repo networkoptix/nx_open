@@ -17,11 +17,11 @@ ResourceModel::ResourceModel(QObject *parent)
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(_q_removeResource(QnResourcePtr)));
 
     const QnResourceList resources = qnResPool->getResources();
-    foreach (QnResourcePtr server, resources) {
+    foreach (const QnResourcePtr &server, resources) {
         if (server->checkFlag(QnResource::server)) {
             addResource(server);
             const QnId serverId = server->getId();
-            foreach (QnResourcePtr resource, resources) {
+            foreach (const QnResourcePtr &resource, resources) {
                 if (resource->getParentId() == serverId && !resource->checkFlag(QnResource::server))
                     addResource(resource);
             }
@@ -43,7 +43,7 @@ QnResourcePtr ResourceModel::resourceFromIndex(const QModelIndex &index) const
     return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
 }
 
-QModelIndex ResourceModel::indexFromResource(QnResourcePtr resource) const
+QModelIndex ResourceModel::indexFromResource(const QnResourcePtr &resource) const
 {
     return indexFromResourceId(resource->getId().hash());
 }
@@ -54,7 +54,7 @@ QModelIndex ResourceModel::indexFromResourceId(uint id) const // ### remove; use
     return indexList.value(0);
 }
 
-static inline QIcon iconForResource(QnResourcePtr resource)
+static inline QIcon iconForResource(const QnResourcePtr &resource)
 {
     QString iconName;
     if (resource->checkFlag(QnResource::server))
@@ -71,7 +71,7 @@ static inline QIcon iconForResource(QnResourcePtr resource)
     return !iconName.isEmpty() ? Skin::icon(iconName) : QIcon();
 }
 
-void ResourceModel::addResource(QnResourcePtr resource)
+void ResourceModel::addResource(const QnResourcePtr &resource)
 {
     if (resource->checkFlag(QnResource::server)) {
         QStandardItem *root = new QStandardItem(resource->getName());
@@ -94,7 +94,7 @@ void ResourceModel::addResource(QnResourcePtr resource)
     }
 }
 
-void ResourceModel::removeResource(QnResourcePtr resource)
+void ResourceModel::removeResource(const QnResourcePtr &resource)
 {
     if (QStandardItem *item = itemFromResource(resource)) {
         foreach (QStandardItem *rowItem, takeRow(item->row()))
@@ -102,7 +102,7 @@ void ResourceModel::removeResource(QnResourcePtr resource)
     }
 }
 
-void ResourceModel::_q_addResource(QnResourcePtr resource)
+void ResourceModel::_q_addResource(const QnResourcePtr &resource)
 {
     if (sender() != qnResPool && !qnResPool->getResourceById(resource->getId())) {
         qnResPool->addResource(resource); // emits resourceAdded; thus return
@@ -115,7 +115,7 @@ void ResourceModel::_q_addResource(QnResourcePtr resource)
     addResource(resource);
 }
 
-void ResourceModel::_q_removeResource(QnResourcePtr resource)
+void ResourceModel::_q_removeResource(const QnResourcePtr &resource)
 {
     if (sender() != qnResPool && qnResPool->getResourceById(resource->getId())) {
         qnResPool->removeResource(resource); // emits resourceRemoved; thus return
@@ -201,17 +201,54 @@ QnResourcePtr ResourceSortFilterProxyModel::resourceFromIndex(const QModelIndex 
     return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
 }
 
-QModelIndex ResourceSortFilterProxyModel::indexFromResource(QnResourcePtr resource) const
+QModelIndex ResourceSortFilterProxyModel::indexFromResource(const QnResourcePtr &resource) const
 {
     const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, resource->getId().hash(), 1, Qt::MatchExactly | Qt::MatchRecursive);
     return indexList.value(0);
 }
 
-static inline bool matchesCategoryFilter(const QList<QRegExp> &filters, const QString &value)
+bool ResourceSortFilterProxyModel::matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
+                                                  QAbstractItemModel *sourceModel, int source_row, const QModelIndex &source_parent) const
 {
-    for (int i = 0; i < filters.size(); ++i) {
-        if (value.contains(filters[i]))
+    if (!filters[Id].isEmpty()) {
+        const QString id = QString::number(resource->getId().hash());
+        if (filters[Id].exactMatch(id))
             return true;
+    }
+
+    if (!filters[Name].isEmpty()) {
+        const QString name = resource->getName();
+        if (filters[Name].exactMatch(name))
+            return true;
+    }
+
+    if (!filters[Tags].isEmpty()) {
+        QString tags = resource->tagList().join(QLatin1String("\",\""));
+        if (!tags.isEmpty())
+            tags = QLatin1Char('"') + tags + QLatin1Char('"');
+        if (filters[Tags].exactMatch(tags))
+            return true;
+    }
+
+    if (!filters[Text].isEmpty()) {
+        const int filter_role = filterRole();
+        const int filter_column = filterKeyColumn();
+        if (filter_column == -1) {
+            const int columnCount = sourceModel->columnCount(source_parent);
+            for (int column = 0; column < columnCount; ++column) {
+                const QModelIndex source_index = sourceModel->index(source_row, column, source_parent);
+                const QString text = source_index.data(filter_role).toString();
+                if (filters[Text].exactMatch(text))
+                    return true;
+            }
+        } else {
+            const QModelIndex source_index = sourceModel->index(source_row, filter_column, source_parent);
+            if (source_index.isValid()) { // the column may not exist
+                const QString text = source_index.data(filter_role).toString();
+                if (filters[Text].exactMatch(text))
+                    return true;
+            }
+        }
     }
 
     return false;
@@ -220,15 +257,18 @@ static inline bool matchesCategoryFilter(const QList<QRegExp> &filters, const QS
 bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
     if (!source_parent.isValid())
-        return true;
+        return true; // include root nodes
 
     if (m_parsedFilterString != filterRegExp().pattern())
         const_cast<ResourceSortFilterProxyModel *>(this)->parseFilterString();
     if (m_parsedFilterString.isEmpty())
         return false;
 
-    QnResourcePtr resource = qnResPool->getResourceById(sourceModel()->index(source_row, 0, source_parent).data(Qt::UserRole + 1));
+    QnResourcePtr resource = resourceFromIndex(sourceModel()->index(source_row, 0, source_parent));
     if (!resource)
+        return false;
+
+    if (matchesFilters(m_negfilters, resource, sourceModel(), source_row, source_parent))
         return false;
 
     if (m_flagsFilter != 0) {
@@ -236,27 +276,10 @@ bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModel
             return true;
     }
 
-    if (!m_filters[Id].isEmpty()) {
-        const QString id = QString::number(resource->getId().hash());
-        if (matchesCategoryFilter(m_filters[Id], id))
-            return true;
-    }
+    if (matchesFilters(m_filters, resource, sourceModel(), source_row, source_parent))
+        return true;
 
-    if (!m_filters[Name].isEmpty()) {
-        const QString name = resource->getName();
-        if (matchesCategoryFilter(m_filters[Name], name))
-            return true;
-    }
-
-    if (!m_filters[Tags].isEmpty()) {
-        QString tags = resource->tagList().join(QLatin1String("\",\""));
-        if (!tags.isEmpty())
-            tags = QLatin1Char('"') + tags + QLatin1Char('"');
-        if (matchesCategoryFilter(m_filters[Tags], tags))
-            return true;
-    }
-
-    return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+    return false;
 }
 
 static inline QString normalizedFilterString(const QString &str)
@@ -270,7 +293,7 @@ void ResourceSortFilterProxyModel::parseFilterString()
 {
     m_flagsFilter = 0;
     for (uint i = 0; i < NumFilterCategories; ++i)
-        m_filters[i].clear();
+        m_filters[i] = QRegExp(); // ### don't invalidate filters which weren't changed
 
     m_parsedFilterString = filterRegExp().pattern();
     if (m_parsedFilterString.isEmpty())
@@ -280,23 +303,62 @@ void ResourceSortFilterProxyModel::parseFilterString()
     if (patternSyntax != QRegExp::FixedString && patternSyntax != QRegExp::Wildcard && patternSyntax != QRegExp::WildcardUnix)
         return;
 
-    QString filterString = normalizedFilterString(m_parsedFilterString);
-    foreach (const QString &filter, filterString.split(QRegExp(QLatin1String("[\\s\\|;+]")), QString::SkipEmptyParts)) {
-        const int idx = filter.indexOf(QLatin1Char(':'));
+    QSet<QString> filters[NumFilterCategories];
+    QSet<QString> negfilters[NumFilterCategories];
+
+    const QString filterString = normalizedFilterString(m_parsedFilterString);
+    QRegExp rx(QLatin1String("(\\W?)(\\w+:)?(\\w*)"), Qt::CaseSensitive, QRegExp::RegExp2);
+    int pos = 0;
+    while ((pos = rx.indexIn(filterString, pos)) != -1) {
+        pos += rx.matchedLength();
+        if (rx.matchedLength() == 0)
+            break;
+
+        const QString sign = rx.cap(1);
+        const QString key = rx.cap(2).toLower();
+        const QString pattern = rx.cap(3);
+        if (pattern.isEmpty())
+            continue;
+
         FilterCategory category = Text;
-        const QString pattern = filter.mid(idx + 1);
-        if (idx != -1) {
-            const QString key = filter.left(idx).toLower();
-            if (key == QLatin1String("id"))
+        if (!key.isEmpty()) {
+            if (key == QLatin1String("id:"))
                 category = Id;
-            else if (key == QLatin1String("name"))
+            else if (key == QLatin1String("name:"))
                 category = Name;
-            else if (key == QLatin1String("tag"))
+            else if (key == QLatin1String("tag:"))
                 category = Tags;
         } else {
             if (pattern == QLatin1String("live"))
                 m_flagsFilter |= QnResource::live;
         }
-        m_filters[category].append(QRegExp(pattern, category == Id ? Qt::CaseSensitive : Qt::CaseInsensitive, patternSyntax));
+        if (sign == QLatin1String("-"))
+            negfilters[category].insert(pattern);
+        else
+            filters[category].insert(pattern);
+    }
+
+    buildFilters(filters, m_filters);
+    buildFilters(negfilters, m_negfilters);
+}
+
+void ResourceSortFilterProxyModel::buildFilters(const QSet<QString> parts[], QRegExp *filters)
+{
+    for (uint i = 0; i < NumFilterCategories; ++i) {
+        if (!parts[i].isEmpty()) {
+            QString pattern;
+            foreach (const QString &part, parts[i]) {
+                if (!pattern.isEmpty())
+                    pattern += QLatin1Char('|');
+                pattern += QRegExp::escape(part);
+            }
+            pattern = QLatin1Char('(') + pattern + QLatin1Char(')');
+            if (i < Id) {
+                pattern = QLatin1String(".*") + pattern + QLatin1String(".*");
+                filters[i] = QRegExp(pattern, Qt::CaseInsensitive, QRegExp::RegExp2);
+            } else {
+                filters[i] = QRegExp(pattern, Qt::CaseSensitive, QRegExp::RegExp2);
+            }
+        }
     }
 }
