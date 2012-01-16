@@ -660,7 +660,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     int maxLen = maxLevel - level;
 
     double xpos = r.left() - qRound64(pixelPerTime * pos);
-    int outsideCnt = -xpos / (intervals[level].interval * pixelPerTime);
+    qint64 outsideCnt = -xpos / (intervals[level].interval * pixelPerTime);
     if (outsideCnt - m_cachedOutsideCnt == 1)
         outsideCnt = m_cachedOutsideCnt;
     else
