@@ -33,7 +33,10 @@ public:
     static bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
     static QString serializeLayout(const QnVideoResourceLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
-    void jumpWithMarker(qint64 mksec, int marker);
+    void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
+
+    // jump to frame directly ignoring start of GOP
+    virtual void directJumpToNonKeyFrame(qint64 mksec);
 
     virtual bool jumpTo(qint64 mksec, qint64 skipTime);
     virtual void nextFrame();
@@ -47,8 +50,6 @@ public:
     bool setSendMotion(bool value);
 
 protected:
-    virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);
-
     virtual bool init();
 
     virtual ByteIOContext* getIOContext();
@@ -99,6 +100,8 @@ private:
     int m_newDataMarker;
 
 private:
+    bool m_exactJumpToSpecifiedFrame;
+    bool m_ignoreSkippingFrame;
     qint64 m_lastJumpTime;
     qint64 m_skipFramesToTime;
     bool m_singleShot;
