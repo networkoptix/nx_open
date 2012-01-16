@@ -28,8 +28,6 @@ public:
     void setIndex(quint16 value);
     quint16 getIndex() const;
 
-protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // at seconds

@@ -3,11 +3,12 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
-#include "plugins/resources/archive/filetypesupport.h"
-#include "file_resource.h"
+
+#include "core/resource/file_resource.h"
+#include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_device.h"
 #include "plugins/resources/archive/avi_files/avi_bluray_device.h"
-
+#include "plugins/resources/archive/filetypesupport.h"
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
@@ -103,6 +104,8 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
     if (shouldStop())
         return result;
 
+    const QnId localServerId = qnResPool->getResourceByUniqId(QLatin1String("LocalServer"))->getId();
+
     QDir dir(directory);
     const QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
     foreach (const QFileInfo &fi, flist)
@@ -121,6 +124,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
             QnResourcePtr res = createArchiveResource(absoluteFilePath);
             if (res)
             {
+                res->setParentId(localServerId);
                 cl_log.log("created local resource: ", absoluteFilePath, cl_logALWAYS);
                 result.append(res);
             }
