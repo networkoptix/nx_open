@@ -34,6 +34,7 @@
 #include <fstream>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "utils/common/log.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
