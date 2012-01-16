@@ -378,7 +378,7 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
 
     if (m_filterTimerId != 0)
         killTimer(m_filterTimerId);
-    m_filterTimerId = 0; if (filter.size() < 3) return; // ### remove after resource_widget initialization fixup
+    m_filterTimerId = 0; if (!filter.isEmpty() && filter.size() < 3) return; // ### remove after resource_widget initialization fixup
     m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 0) : 0);
 }
 
