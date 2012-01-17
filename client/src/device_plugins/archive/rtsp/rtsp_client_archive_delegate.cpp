@@ -84,6 +84,7 @@ void QnRtspClientArchiveDelegate::close()
     m_rtspSession.stop();
     m_rtpData = 0;
     m_lastPacketFlags = -1;
+    m_nextDataPacket.clear();
     deleteContexts();
     m_opened = false;
 }
