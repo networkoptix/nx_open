@@ -10,8 +10,8 @@ CLDesktopDevice::CLDesktopDevice(int index)
     addFlag(local_live_cam);
 
     const QString name = QLatin1String("Desktop") + QString::number(index + 1);
-    setUrl(name);
     setName(name);
+    setUrl(name);
 }
 
 QString CLDesktopDevice::toString() const

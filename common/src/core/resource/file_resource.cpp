@@ -11,17 +11,17 @@ QnLocalFileResource::QnLocalFileResource(const QString &filename)
 {
     QFileInfo fi(filename);
     setName(fi.fileName());
-    m_fileName = fi.absoluteFilePath();
+    setUrl(fi.absoluteFilePath());
 
-    addFlag(QnResource::SINGLE_SHOT);
+    addFlag(SINGLE_SHOT);
+}
+
+QString QnLocalFileResource::getUniqueId() const
+{
+    return getUrl();
 }
 
 QnAbstractStreamDataProvider* QnLocalFileResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     return new CLSingleShotFileStreamreader(toSharedPointer());
-}
-
-QString QnLocalFileResource::getUniqueId() const
-{
-    return m_fileName;
 }

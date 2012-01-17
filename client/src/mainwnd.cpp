@@ -121,6 +121,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
+    connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
+    addAction(&cm_open_file);
+
     connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleTitleVisibility()));
     addAction(&cm_hide_decorations);
 

@@ -222,7 +222,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     //if (time == m_position)
     //    return time;
 
-    deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
+    //deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
 
     if (!m_opened && m_resource) {
@@ -331,6 +331,11 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             if (dataType == QnAbstractMediaData::EMPTY_DATA)
             {
                 nextPacket = QnEmptyMediaDataPtr(new QnEmptyMediaData());
+				if (dataSize != 0)
+				{
+					qWarning() << "Unexpected data size for EOF/BOF packet. got" << dataSize << "expected" << 0 << "bytes. Packet ignored.";
+					return result;
+				}
             }
             else if (dataType == QnAbstractMediaData::META_V1)
             {

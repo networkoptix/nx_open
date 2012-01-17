@@ -105,23 +105,27 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
     const QPixmap &hoverPixmap = actualPixmap(m_state | HOVERED);
     const QPixmap &normalPixmap = actualPixmap(m_state & ~HOVERED);
 
-    qreal o = painter->opacity();
-    qreal k = m_hoverProgress;
-
-    /* Calculate layer opacities so that total opacity is 'o'. */
-    qreal o1 = (o - k * o) / (1 - k * o);
-    qreal o2 = k * o;
-
-    if(!qFuzzyIsNull(o1)) {
-        painter->setOpacity(o1);
+    if(&hoverPixmap == &normalPixmap) {
         painter->drawPixmap(rect(), normalPixmap, normalPixmap.rect());
-    }
-    if(!qFuzzyIsNull(o2)) {
-        painter->setOpacity(o2);
-        painter->drawPixmap(rect(), hoverPixmap,  normalPixmap.rect());
-    }
+    } else {
+        qreal o = painter->opacity();
+        qreal k = m_hoverProgress;
 
-    painter->setOpacity(o);
+        /* Calculate layer opacities so that total opacity is 'o'. */
+        qreal o1 = (o - k * o) / (1 - k * o);
+        qreal o2 = k * o;
+
+        if(!qFuzzyIsNull(o1)) {
+            painter->setOpacity(o1);
+            painter->drawPixmap(rect(), normalPixmap, normalPixmap.rect());
+        }
+        if(!qFuzzyIsNull(o2)) {
+            painter->setOpacity(o2);
+            painter->drawPixmap(rect(), hoverPixmap,  hoverPixmap.rect());
+        }
+
+        painter->setOpacity(o);
+    }
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
