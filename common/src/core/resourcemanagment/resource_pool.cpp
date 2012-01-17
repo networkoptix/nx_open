@@ -28,9 +28,8 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     QMutexLocker locker(&m_resourcesMtx);
 
-    foreach (const QnResourcePtr &resource, resources)
-    {
-        if (!resource->getParentId().isValid() && !resource->checkFlag(QnResource::server))
+    foreach (const QnResourcePtr &resource, resources) {
+        if (!resource->getParentId().isValid() && resource->checkFlag(QnResource::local))
             resource->setParentId(localServer->getId());
         if (!resource->getId().isValid()) {
             if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
@@ -40,15 +39,11 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
     }
 
-    foreach (const QnResourcePtr &resource, resources)
-    {
-        /*
-        if ((resource.dynamicCast<QnNetworkResource>()) && (resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) 
-        {
+    foreach (const QnResourcePtr &resource, resources) {
+        /*if ((resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) {
             qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local neither remote)");
-            //continue; // ignore
-        }
-        /*/
+            continue; // ignore
+        }*/
 
         const QnId &resId = resource->getId();
         if (!m_resources.contains(resId))
@@ -71,8 +66,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
     QMutexLocker locker(&m_resourcesMtx);
 
-    foreach (const QnResourcePtr &resource, resources)
-    {
+    foreach (const QnResourcePtr &resource, resources) {
         if (resource != localServer && m_resources.remove(resource->getId()) != 0)
             removedResources.append(resource);
     }
@@ -87,7 +81,8 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 void QnResourcePool::handleResourceChange()
 {
     const QnResourcePtr resource = qobject_cast<QnResource *>(sender())->toSharedPointer();
-    Q_EMIT resourceChanged(resource);
+
+    QMetaObject::invokeMethod(this, "resourceChanged", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
 }
 
 QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const

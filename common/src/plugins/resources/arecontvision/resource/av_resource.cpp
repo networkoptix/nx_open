@@ -21,7 +21,6 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
     connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
             this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
-    
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -378,7 +377,6 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QVari
     return true;
 }
 
-
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
     QnId rt = qnResTypePool->getResourceTypeId(MANUFACTURE, name);
@@ -412,7 +410,6 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(const
 
     return res;
 }
-
 
 bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {

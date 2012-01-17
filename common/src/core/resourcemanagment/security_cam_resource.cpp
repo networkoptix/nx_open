@@ -2,9 +2,10 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 QnSecurityCamResource::QnSecurityCamResource()
+    : QnMediaResource(),
+      m_dpFactory(0)
 {
-    m_dpFactory = 0;
-    addFlag(QnResource::live_cam);
+    addFlag(live_cam);
 }
 
 QnSecurityCamResource::~QnSecurityCamResource()
