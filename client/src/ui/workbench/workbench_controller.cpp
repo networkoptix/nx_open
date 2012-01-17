@@ -365,6 +365,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
     m_treeWidget->setWorkbenchController(this);
+    m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_treeWidget->palette();
         palette.setColor(QPalette::Window, Qt::transparent);
@@ -700,7 +701,7 @@ void QnWorkbenchController::updateTreeGeometry() {
         m_treeItem->pos().x(),
         m_treeItem->pos().y(),
         m_treeItem->size().width(),
-        m_navigationItem->pos().y() - m_treeItem->pos().y()
+        qMin(m_navigationItem->pos().y(), m_uiElementsInstrument->widget()->size().height()) - m_treeItem->pos().y()
     );
 
     if(qFuzzyCompare(geometry, m_treeItem->geometry()))

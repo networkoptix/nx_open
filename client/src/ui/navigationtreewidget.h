@@ -29,6 +29,7 @@ public:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
+    void wheelEvent(QWheelEvent *event);
     void timerEvent(QTimerEvent *event);
 
 Q_SIGNALS:
