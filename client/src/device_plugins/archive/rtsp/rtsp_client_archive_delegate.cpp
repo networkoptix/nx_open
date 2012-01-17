@@ -357,7 +357,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 
                 nextPacket = QnMetaDataV1Ptr(metadata);
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO)
+            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
             {
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
@@ -375,7 +375,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                     video->height = context->ctx()->coded_height;
                 }
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
+            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
                 QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
                 audio->format.fromAvStream(context->ctx());
@@ -383,7 +383,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             }
             else
             {
-                qWarning() << "Unsupported RTP media type " << (context ? context->ctx()->codec_type : 0);
+                qWarning() << "Unsupported RTP codec or packet type. codec=" << (context ? context->ctx()->codec_type : 0) << "dataType=" << dataType;
                 return result;
             }
 
