@@ -145,17 +145,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         {
             QnResourceList lst = searcher->findResources();
             
-            foreach(QnResourcePtr r, lst)
+            if (searcher->isLocal())
             {
-                if (searcher->isLocal())
-                {
+                foreach(QnResourcePtr r, lst)
                     r->addFlag(QnResource::local);
-                }
-                else
-                {
-                    if (r.dynamicCast<QnNetworkResource>())
-                        r->addFlag(QnResource::server);
-                }
             }
 
             resources.append(lst);
