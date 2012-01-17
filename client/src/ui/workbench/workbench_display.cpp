@@ -527,8 +527,8 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
-    togglePinButton->setPixmap(QnImageButtonWidget::BACKGROUND_ROLE, Skin::pixmap(QLatin1String("pin.png")));
-    togglePinButton->setPixmap(QnImageButtonWidget::CHECKED_ROLE,    Skin::pixmap(QLatin1String("unpin.png")));
+    togglePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("pin.png")));
+    togglePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("unpin.png")));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
     togglePinButton->setMinimumSize(QSizeF(10.0, 10.0));
@@ -537,7 +537,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     widget->addButton(togglePinButton);
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setPixmap(QnImageButtonWidget::BACKGROUND_ROLE, Skin::pixmap(QLatin1String("close.png")));
+    closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("close.png")));
     closeButton->setMinimumSize(QSizeF(10.0, 10.0));
     closeButton->setMaximumSize(QSizeF(10.0, 10.0));
     connect(closeButton, SIGNAL(clicked()), item, SLOT(deleteLater()));

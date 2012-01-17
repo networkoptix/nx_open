@@ -60,7 +60,7 @@ public:
     bool isAtEnd();
     void setLiveMode(bool value);
     void setEndSize(qreal size);
-
+    bool isUserInput() const { return m_isUserInput; }
 public Q_SLOTS:
     void setMinimumValue(qint64 value);
     void setMaximumValue(qint64 value);

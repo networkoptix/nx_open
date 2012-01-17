@@ -307,7 +307,7 @@ void initAppServerEventConnection(const QSettings &settings)
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
-class QnMain : public QThread
+class QnMain : public CLLongRunnable
 {
 public:
     QnMain(int argc, char* argv[])
@@ -357,7 +357,13 @@ public:
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-        initResourceTypes(appServerConnection);
+        while (!needToStop() && !initResourceTypes(appServerConnection))
+        {
+            QnSleep::msleep(1000);
+        }
+
+        if (needToStop())
+            return;
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
         

@@ -152,7 +152,7 @@ protected Q_SLOTS:
     void at_treeShowingProcessor_hoverEntered();
     void at_treeOpacityProcessor_hoverLeft();
     void at_treeOpacityProcessor_hoverEntered();
-    void at_treeBookmarkItem_clicked();
+    void at_treeBookmarkItem_toggled(bool checked);
 
 
 

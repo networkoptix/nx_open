@@ -138,11 +138,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         QMutexLocker locker(&m_searchersListMutex);
         searchersList = m_searchersList;
     }
+    
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
         if (searcher->shouldBeUsed() && !needToStop())
         {
             QnResourceList lst = searcher->findResources();
+            
             if (searcher->isLocal())
             {
                 foreach(QnResourcePtr r, lst)

@@ -1,7 +1,23 @@
 #include "image_button_widget.h"
+#include <cassert>
 #include <QPainter>
 #include <QCursor>
 #include <utils/common/warnings.h>
+
+namespace {
+    bool checkPixmapGroupRole(QnImageButtonWidget::PixmapFlags *flags) {
+        bool result = true;
+
+        if(*flags < 0 || *flags > QnImageButtonWidget::FLAGS_MAX) {
+            qnWarning("Invalid pixmap flags '%1'.", static_cast<int>(*flags));
+            *flags = 0;
+            result = false;
+        }
+
+        return result;
+    }
+
+} // anonymous namespace
 
 QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
@@ -17,22 +33,17 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     setCursor(Qt::ArrowCursor);
 }
 
-const QPixmap &QnImageButtonWidget::pixmap(PixmapRole role) const {
-    if(role < 0 || role >= ROLE_COUNT) {
-        qnWarning("Invalid pixmap role '%1'.", static_cast<int>(role));
-        role = BACKGROUND_ROLE;
-    }
+const QPixmap &QnImageButtonWidget::pixmap(PixmapFlags flags) const {
+    checkPixmapGroupRole(&flags);
 
-    return m_pixmaps[role];
+    return m_pixmaps[flags];
 }
 
-void QnImageButtonWidget::setPixmap(PixmapRole role, const QPixmap &pixmap) {
-    if(role < 0 || role >= ROLE_COUNT) {
-        qnWarning("Invalid pixmap role '%1'.", static_cast<int>(role));
+void QnImageButtonWidget::setPixmap(PixmapFlags flags, const QPixmap &pixmap) {
+    if(!checkPixmapGroupRole(&flags))
         return;
-    }
 
-    m_pixmaps[role] = pixmap;
+    m_pixmaps[flags] = pixmap;
     update();
 }
 
@@ -58,21 +69,33 @@ void QnImageButtonWidget::setChecked(bool checked)
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    if (m_checked && hasPixmap(CHECKED_ROLE)) {
-        drawPixmap(painter, CHECKED_ROLE);
-    } else if(m_underMouse && hasPixmap(HOVERED_ROLE)) {
-        drawPixmap(painter, HOVERED_ROLE);
-    } else {
-        drawPixmap(painter, BACKGROUND_ROLE);
+#define STATE(IS_CHECKED, IS_UNDER_MOUSE) (((int)IS_CHECKED << 1) | (int)IS_UNDER_MOUSE)
+    switch(STATE(m_checked, m_underMouse)) {
+    case STATE(true, true):
+        if(drawPixmap(painter, CHECKED | HOVERED))
+            break;
+    case STATE(true, false):
+        if(drawPixmap(painter, CHECKED))
+            break;
+    case STATE(false, true):
+        if(drawPixmap(painter, HOVERED))
+            break;
+    case STATE(false, false):
+        if(drawPixmap(painter, 0))
+            break;
+    default:
+        break;
     }
+#undef STATE
 }
 
-bool QnImageButtonWidget::hasPixmap(PixmapRole role) {
-    return !m_pixmaps[role].isNull();
-}
-
-void QnImageButtonWidget::drawPixmap(QPainter *painter, PixmapRole role) {
-    painter->drawPixmap(rect(), m_pixmaps[role], m_pixmaps[role].rect());
+bool QnImageButtonWidget::drawPixmap(QPainter *painter, PixmapFlags flags) {
+    if(m_pixmaps[flags].isNull()) {
+        return false;
+    } else {
+        painter->drawPixmap(rect(), m_pixmaps[flags], m_pixmaps[flags].rect());
+        return true;
+    }
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {

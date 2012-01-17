@@ -21,7 +21,7 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
     connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
             this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
-    setFlags(server_live_cam);
+    
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const

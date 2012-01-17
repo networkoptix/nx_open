@@ -659,8 +659,10 @@ void NavigationItem::onValueChanged(qint64 time)
         return;
     }
 
-    if (m_currentTime == time)
+    if (m_currentTime == time || !m_timeSlider->isUserInput()) {
+        updateRecPeriodList(false);
         return;
+    }
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     //if (reader->isSkippingFrames())

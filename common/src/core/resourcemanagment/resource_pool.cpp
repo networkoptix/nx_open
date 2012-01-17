@@ -42,10 +42,13 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
-        if ((resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) {
+        /*
+        if ((resource.dynamicCast<QnNetworkResource>()) && (resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) 
+        {
             qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local neither remote)");
             //continue; // ignore
         }
+        /*/
 
         const QnId &resId = resource->getId();
         if (!m_resources.contains(resId))
