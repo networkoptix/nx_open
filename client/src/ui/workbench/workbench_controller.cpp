@@ -400,6 +400,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treeBookmarkItem = new QnImageButtonWidget(controlsItem);
     m_treeBookmarkItem->resize(15, 45);
     m_treeBookmarkItem->setOpacity(normalTreeBackgroundOpacity);
+    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("slide_right.png"));
+    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap("slide_right_hover.png"));
+    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("slide_left.png"));
+    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::HOVERED, Skin::pixmap("slide_left_hover.png"));
+    m_treeBookmarkItem->setCheckable(true);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(controlsItem);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -430,7 +435,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     setTreeVisible(false, false);
 
-    connect(m_treeBookmarkItem,         SIGNAL(clicked()),                                                                          this,                           SLOT(at_treeBookmarkItem_clicked()));
+    connect(m_treeBookmarkItem,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treeBookmarkItem_toggled(bool)));
     connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_treeOpacityProcessor_hoverLeft()));
     connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeOpacityProcessor_hoverEntered()));
     connect(m_treeHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_treeHidingProcessor_hoverFocusLeft()));
@@ -642,25 +647,15 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::setTreeVisible(bool visible, bool animate)
 {
-    if(m_treeVisible != visible) {
-        if(visible) {
-            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::BACKGROUND_ROLE, Skin::pixmap("slide_left.png"));
-            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::HOVERED_ROLE, Skin::pixmap("slide_left_hover.png"));
-        } else {
-            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::BACKGROUND_ROLE, Skin::pixmap("slide_right.png"));
-            m_treeBookmarkItem->setPixmap(QnImageButtonWidget::HOVERED_ROLE, Skin::pixmap("slide_right_hover.png"));
-        }
-    }
-
-    qDebug() << m_treeItem->hasFocus();
-
     m_treeVisible = visible;
+    m_treeBookmarkItem->setChecked(visible);
 
     QPointF newPos = QPointF(visible ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
-    if (animate)
+    if (animate) {
         m_treePositionAnimator->animateTo(newPos);
-    else
+    } else {
         m_treeItem->setPos(newPos);
+    }
 }
 
 void QnWorkbenchController::setSliderVisible(bool visible, bool animate) {
@@ -1438,7 +1433,7 @@ void QnWorkbenchController::at_treeOpacityProcessor_hoverEntered() {
     m_treeOpacityAnimatorGroup->start();
 }
 
-void QnWorkbenchController::at_treeBookmarkItem_clicked() {
+void QnWorkbenchController::at_treeBookmarkItem_toggled(bool checked) {
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
-    setTreeVisible(!m_treeVisible);
+    setTreeVisible(checked);
 }
