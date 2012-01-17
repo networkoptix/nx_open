@@ -26,6 +26,7 @@ EVETOOLS_DIR = %EVETOOLS_DIR
 TARGET = mediaserver
 
 include(../contrib/qtservice/src/qtservice.pri)
+include(../../common/contrib/qtsingleapplication/src/qtsinglecoreapplication.pri)
 
 win32: RC_FILE = server.rc
 

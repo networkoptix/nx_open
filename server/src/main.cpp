@@ -1,3 +1,4 @@
+#include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
@@ -35,6 +36,8 @@
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "utils/common/log.h"
+
+static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
 class QnMain;
 static QnMain* serviceMain = 0;
@@ -307,7 +310,7 @@ void initAppServerEventConnection(const QSettings &settings)
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
-class QnMain : public QThread
+class QnMain : public CLLongRunnable
 {
 public:
     QnMain(int argc, char* argv[])
@@ -357,7 +360,13 @@ public:
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-        initResourceTypes(appServerConnection);
+        while (!needToStop() && !initResourceTypes(appServerConnection))
+        {
+            QnSleep::msleep(1000);
+        }
+
+        if (needToStop())
+            return;
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
         
@@ -500,25 +509,32 @@ private:
     QnRestServer* m_restServer;
 };
 
-class QnVideoService : public QtService<QCoreApplication>
+class QnVideoService : public QtService<QtSingleCoreApplication>
 {
 public:
     QnVideoService(int argc, char **argv)
-        : QtService<QCoreApplication>(argc, argv, "Network Optix VMS Media Server"),
+        : QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
         m_main(argc, argv)
     {
-        setServiceDescription("Network Optix VMS Media Server.");
+        setServiceDescription(SERVICE_NAME);
     }
 
 protected:
     void start()
     {
-        QCoreApplication *app = application();
+        QtSingleCoreApplication *app = application();
         QString guid = serverGuid();
 
         if (guid.isEmpty())
         {
             cl_log.log("Can't save guid. Run once as administrator.", cl_logERROR);
+            qApp->quit();
+            return;
+        }
+
+        if (app->isRunning())
+        {
+            cl_log.log("Server already started", cl_logERROR);
             qApp->quit();
             return;
         }

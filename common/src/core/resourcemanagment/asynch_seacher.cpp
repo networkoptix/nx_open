@@ -74,7 +74,6 @@ void QnResourceDiscoveryManager::pleaseStop()
 
 void QnResourceDiscoveryManager::run()
 {
-
     ResourceSearcherList searchersList;
     {
         QMutexLocker locker(&m_searchersListMutex);
@@ -82,9 +81,7 @@ void QnResourceDiscoveryManager::run()
     }
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
-       searcher->setShouldBeUsed(true);
-
-
+        searcher->setShouldBeUsed(true);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     while (!needToStop() && !initResourceTypes(appServerConnection))
@@ -103,8 +100,7 @@ void QnResourceDiscoveryManager::run()
         {
             m_resourceProcessor->processResources(result);
 
-            foreach (QnResourcePtr res, result)
-            {
+            foreach (const QnResourcePtr &res, result) {
                 QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
                 if (!resource.isNull())
                     resource->setStatus(QnResource::Online);
@@ -138,25 +134,14 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         QMutexLocker locker(&m_searchersListMutex);
         searchersList = m_searchersList;
     }
-    
+
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
         if (searcher->shouldBeUsed() && !needToStop())
         {
             QnResourceList lst = searcher->findResources();
-            
-            foreach(QnResourcePtr r, lst)
-            {
-                if (searcher->isLocal())
-                {
-                    r->addFlag(QnResource::local);
-                }
-                else
-                {
-                    if (r.dynamicCast<QnNetworkResource>())
-                        r->addFlag(QnResource::server);
-                }
-            }
+            foreach (const QnResourcePtr &res, lst)
+                res->addFlag(searcher->isLocal() ? QnResource::local : QnResource::remote);
 
             resources.append(lst);
         }
@@ -166,8 +151,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     it = resources.begin();
     while (it != resources.end())
     {
-        QnResourcePtr  rpResource = QnResourcePool::instance()->getResourceByUniqId((*it)->getUniqueId());
-
+        QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
         if (rpResource)
         {
             // if such res in ResourcePool
@@ -176,10 +160,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             if (newNetRes)
             {
                 QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-                
                 if (rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress())
                 {
-                    // if such network resource is in pool and has diff IP => should keep it 
+                    // if such network resource is in pool and has diff IP => should keep it
                     ++it;
                     continue;
                 }
@@ -189,7 +172,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             it = resources.erase(it);
         }
         else
-            ++it; // new resource => shouls keep it 
+            ++it; // new resource => shouls keep it
     }
 
     //qDebug() << resources.size();
@@ -197,7 +180,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
     // from pool
     QMap<quint32, int> ipsList;
-    foreach (QnResourcePtr res, QnResourcePool::instance()->getResourcesWithFlag(QnResource::network))
+    foreach (const QnResourcePtr &res, qnResPool->getResourcesWithFlag(QnResource::network))
     {
         if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
@@ -214,9 +197,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     }
 
     // from just found
-    foreach (QnResourcePtr res, resources)
+    foreach (const QnResourcePtr &res, resources)
     {
-        //if (QnResourcePool::instance()->hasSuchResouce(res->getUniqueId()))
+        //if (qnResPool->hasSuchResouce(res->getUniqueId()))
         //    continue; // this ip is already taken into account
 
         if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
@@ -236,7 +219,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
     // now let's mark conflicting resources( just new )
     // in pool could not be 2 resources with same ip
-    foreach (QnResourcePtr res, resources)
+    foreach (const QnResourcePtr &res, resources)
     {
         if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
@@ -254,7 +237,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         m_netState.updateNetState(); // update net state before working with discovered resources
     }
 
-    //marks all new network resources as badip if: 1) not in the same subnet and not accesible or 2) same subnet and conflicting 
+    //marks all new network resources as badip if: 1) not in the same subnet and not accesible or 2) same subnet and conflicting
     check_if_accessible(resources, threads);
 
 
@@ -315,12 +298,12 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
 
     // at this point lets combine back all resources
-    foreach (QnResourcePtr res, readyToGo)
+    foreach (const QnResourcePtr &res, readyToGo)
         resources.push_back(res);
 
 
     QnResourceList swapList;
-    foreach (QnResourcePtr res, resources)
+    foreach (const QnResourcePtr &res, resources)
     {
         if (res->unknownResource())
         {
@@ -339,12 +322,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         qDebug() << "Returning " << resources.size() << " resources";
 
 
-    //and now lets correct the ip of already existing resources 
+    //and now lets correct the ip of already existing resources
     it = resources.begin();
     while (it != resources.end())
     {
-        QnResourcePtr  rpResource = QnResourcePool::instance()->getResourceByUniqId((*it)->getUniqueId());
-
+        QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
         if (rpResource)
         {
             // if such res in ResourcePool
@@ -353,10 +335,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             if (newNetRes)
             {
                 QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-
                 if (rpNetRes)
                 {
-                    // if such network resource is in pool and has diff IP => should keep it 
+                    // if such network resource is in pool and has diff IP => should keep it
                     rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomainMemory);
                     it = resources.erase(it);
 
@@ -378,7 +359,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
                     continue;
                 }
-                else 
+                else
                 {
                     Q_ASSERT(false);
                 }
@@ -386,10 +367,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
             Q_ASSERT(false);
 
-            
+
         }
         else
-            ++it; // nothing to do 
+            ++it; // nothing to do
     }
 
 
@@ -433,13 +414,12 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
 {
     QList<check_if_accessible_STRUCT> checkLst;
 
-    foreach(QnResourcePtr res, justfoundList)
+    foreach (const QnResourcePtr &res, justfoundList)
     {
         if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
 
         QnNetworkResourcePtr nr = res.dynamicCast<QnNetworkResource>();
-
         if (!nr)
             continue;
 
@@ -458,7 +438,7 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
 
 void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList, const CLIPList& busy_list, bool *ip_finished)
 {
-    foreach(QnResourcePtr res, resourceList)
+    foreach (const QnResourcePtr &res, resourceList)
     {
         QnNetworkResourcePtr resource = res.dynamicCast<QnNetworkResource>();
 
@@ -482,4 +462,3 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
         }
     }
 }
-
