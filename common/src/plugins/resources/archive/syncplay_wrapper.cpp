@@ -175,7 +175,10 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
     qint64 newTime = findTimeAtPlaybackMask(mksec);
-    skipTime += newTime - mksec;
+    //skipTime += newTime - mksec;
+	if (newTime != mksec)
+		skipTime = 0;
+
     return jumpToInternal(newTime, skipTime);
 }
 
