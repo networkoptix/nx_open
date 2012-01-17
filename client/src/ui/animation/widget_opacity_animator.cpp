@@ -40,20 +40,14 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {
         return staticVariantAnimator();
     }
 
-    const QList<InstrumentManager *> managers =  InstrumentManager::managersOf(item->scene());
-    if(managers.empty()) {
-        qnWarning("Cannot create opacity animator for an item on a scene with no instrument managers.");
-        return staticVariantAnimator();
-    }
-
-    AnimationInstrument *animationInstrument = managers[0]->instrument<AnimationInstrument>();
-    if(animationInstrument == NULL) {
+    AnimationTimer *animationTimer = InstrumentManager::animationTimerOf(item->scene());
+    if(animationTimer == NULL) {
         qnWarning("Cannot create opacity animator for an item on a scene that has no associated animation instrument.");
         return staticVariantAnimator();
     }
 
     animator = new VariantAnimator(item);
-    animator->setTimer(animationInstrument->animationTimer());
+    animator->setTimer(animationTimer);
     animator->setAccessor(new OpacityAccessor());
     animator->setTargetObject(item);
     animator->setTimeLimit(Globals::opacityChangePeriod());

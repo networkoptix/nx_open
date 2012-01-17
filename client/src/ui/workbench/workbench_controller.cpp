@@ -405,6 +405,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("slide_left.png"));
     m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::HOVERED, Skin::pixmap("slide_left_hover.png"));
     m_treeBookmarkItem->setCheckable(true);
+    m_treeBookmarkItem->setAnimationSpeed(4.0);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(controlsItem);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);

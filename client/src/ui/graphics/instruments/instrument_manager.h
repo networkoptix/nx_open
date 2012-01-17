@@ -154,6 +154,8 @@ public:
      */
     static QList<InstrumentManager *> managersOf(QGraphicsScene *scene);
 
+    static AnimationTimer *animationTimerOf(QGraphicsScene *scene);
+
 private slots:
     void at_view_destroyed(QObject *view);
     void at_viewport_destroyed(QObject *viewport);
