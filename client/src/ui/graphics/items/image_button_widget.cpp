@@ -3,9 +3,12 @@
 #include <QPainter>
 #include <QCursor>
 #include <utils/common/warnings.h>
+#include <ui/animation/accessor.h>
+#include <ui/animation/variant_animator.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 
 namespace {
-    bool checkPixmapGroupRole(QnImageButtonWidget::PixmapFlags *flags) {
+    bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {
         bool result = true;
 
         if(*flags < 0 || *flags > QnImageButtonWidget::FLAGS_MAX) {
@@ -19,27 +22,50 @@ namespace {
 
 } // anonymous namespace
 
+class QnImageButtonHoverProgressAccessor: public AbstractAccessor {
+    virtual QVariant get(const QObject *object) const override {
+        return static_cast<const QnImageButtonWidget *>(object)->m_hoverProgress;
+    }
+
+    virtual void set(QObject *object, const QVariant &value) const override {
+        QnImageButtonWidget *widget = static_cast<QnImageButtonWidget *>(object);
+        if(qFuzzyCompare(widget->m_hoverProgress, value.toReal()))
+            return;
+
+        widget->m_hoverProgress = value.toReal();
+        widget->update();
+    }
+};
+
 QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
     m_checkable(false), 
-    m_checked(false),
-    m_underMouse(false)
+    m_state(0),
+    m_hoverProgress(0.0)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
     setAcceptsHoverEvents(true);
 
+    m_animator = new VariantAnimator(this);
+    m_animator->setTargetObject(this);
+    m_animator->setAccessor(new QnImageButtonHoverProgressAccessor());
+    m_animator->setTimer(InstrumentManager::animationTimerOf(scene()));
+
     /* When hovering over a button, a cursor should always change to arrow pointer. */
     setCursor(Qt::ArrowCursor);
+
+    /* Init animator timer. */
+    itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
 }
 
-const QPixmap &QnImageButtonWidget::pixmap(PixmapFlags flags) const {
+const QPixmap &QnImageButtonWidget::pixmap(StateFlags flags) const {
     checkPixmapGroupRole(&flags);
 
     return m_pixmaps[flags];
 }
 
-void QnImageButtonWidget::setPixmap(PixmapFlags flags, const QPixmap &pixmap) {
+void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap) {
     if(!checkPixmapGroupRole(&flags))
         return;
 
@@ -54,48 +80,48 @@ void QnImageButtonWidget::setCheckable(bool checkable)
 
     m_checkable = checkable;
     if (!m_checkable)
-        m_checked = false;
+        updateState(m_state & ~CHECKED);
     update();
 }
 
 void QnImageButtonWidget::setChecked(bool checked)
 {
-    if (!m_checkable || m_checked == checked)
+    if (!m_checkable || checked == isChecked())
         return;
 
-    m_checked = checked;
+    updateState(checked ? (m_state | CHECKED) : (m_state & ~CHECKED));
     update();
-    Q_EMIT toggled(m_checked);
+}
+
+qreal QnImageButtonWidget::animationSpeed() const {
+    return m_animator->speed();
+}
+
+void QnImageButtonWidget::setAnimationSpeed(qreal animationSpeed) {
+    m_animator->setSpeed(animationSpeed);
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-#define STATE(IS_CHECKED, IS_UNDER_MOUSE) (((int)IS_CHECKED << 1) | (int)IS_UNDER_MOUSE)
-    switch(STATE(m_checked, m_underMouse)) {
-    case STATE(true, true):
-        if(drawPixmap(painter, CHECKED | HOVERED))
-            break;
-    case STATE(true, false):
-        if(drawPixmap(painter, CHECKED))
-            break;
-    case STATE(false, true):
-        if(drawPixmap(painter, HOVERED))
-            break;
-    case STATE(false, false):
-        if(drawPixmap(painter, 0))
-            break;
-    default:
-        break;
-    }
-#undef STATE
-}
+    const QPixmap &hoverPixmap = actualPixmap(m_state | HOVERED);
+    const QPixmap &normalPixmap = actualPixmap(m_state & ~HOVERED);
 
-bool QnImageButtonWidget::drawPixmap(QPainter *painter, PixmapFlags flags) {
-    if(m_pixmaps[flags].isNull()) {
-        return false;
-    } else {
-        painter->drawPixmap(rect(), m_pixmaps[flags], m_pixmaps[flags].rect());
-        return true;
+    qreal o = painter->opacity();
+    qreal k = m_hoverProgress;
+
+    /* Calculate layer opacities so that total opacity is 'o'. */
+    qreal o1 = (o - k * o) / (1 - k * o);
+    qreal o2 = k * o;
+
+    if(!qFuzzyIsNull(o1)) {
+        painter->setOpacity(o1);
+        painter->drawPixmap(rect(), normalPixmap, normalPixmap.rect());
     }
+    if(!qFuzzyIsNull(o2)) {
+        painter->setOpacity(o2);
+        painter->drawPixmap(rect(), hoverPixmap,  normalPixmap.rect());
+    }
+
+    painter->setOpacity(o);
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
@@ -106,29 +132,67 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
 void QnImageButtonWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     event->accept(); /* Buttons are opaque to hover events. */
 
-    setUnderMouse(true);
+    updateState(m_state | HOVERED);
 }
 
 void QnImageButtonWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     event->accept(); /* Buttons are opaque to hover events. */
 
-    setUnderMouse(true); /* In case we didn't receive the hover enter event. */
+    updateState(m_state | HOVERED); /* In case we didn't receive the hover enter event. */
 }
 
 void QnImageButtonWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     event->accept(); /* Buttons are opaque to hover events. */
 
-    setUnderMouse(false);
+    updateState(m_state & ~HOVERED);
 }
 
-void QnImageButtonWidget::setUnderMouse(bool underMouse) {
-    if(m_underMouse == underMouse)
+QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
+    switch(change) {
+    case ItemSceneHasChanged:
+        m_animator->setTimer(InstrumentManager::animationTimerOf(scene()));
+        break;
+    default:
+        break;
+    }
+
+    return base_type::itemChange(change, value);
+}
+
+const QPixmap &QnImageButtonWidget::actualPixmap(StateFlags flags) {
+    const QPixmap &default = m_pixmaps[0];
+
+    switch(flags) {
+#define TRY(FLAGS)                                                              \
+        if(!m_pixmaps[(FLAGS)].isNull())                                        \
+            return m_pixmaps[(FLAGS)];
+    case CHECKED_HOVERED:
+        TRY(CHECKED | HOVERED);
+        TRY(CHECKED);
+        return default;
+    case CHECKED:
+        TRY(CHECKED);
+        return default;
+    case HOVERED:
+        TRY(HOVERED);
+        return default;
+    case 0:
+        return default;
+    default:
+        return default;
+#undef TRY
+    }
+}
+
+void QnImageButtonWidget::updateState(StateFlags state) {
+    if(m_state == state)
         return;
 
-    m_underMouse = underMouse;
-    if(m_underMouse) {
-        Q_EMIT hoverEntered();
-    } else {
-        Q_EMIT hoverLeft();
-    }
+    StateFlags oldState = m_state;
+    m_state = state;
+
+    if((oldState ^ m_state) & CHECKED)
+        Q_EMIT toggled(isChecked());
+
+    m_animator->animateTo(isHovered() ? 1.0 : 0.0);
 }
