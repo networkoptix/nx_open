@@ -190,6 +190,9 @@ bool QnArchiveStreamReader::init()
          if (timeSource)
             rez = qMax(rez, timeSource->getExternalTime());
      }
+	 if(rez == AV_NOPTS_VALUE) {
+		rez = m_currentTime;
+	 }
      return rez;
  }
 
