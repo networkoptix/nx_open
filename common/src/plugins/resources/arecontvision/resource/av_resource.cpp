@@ -304,10 +304,10 @@ void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
     getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
     getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
 
-    setParamAsynch("sensorleft", 0, QnDomainPhysical);
-    setParamAsynch("sensortop", 0, QnDomainPhysical);
-    setParamAsynch("sensorwidth", maxSensorWidth, QnDomainPhysical);
-    setParamAsynch("sensorheight", maxSensorHight, QnDomainPhysical);
+    setParamAsync("sensorleft", 0, QnDomainPhysical);
+    setParamAsync("sensortop", 0, QnDomainPhysical);
+    setParamAsync("sensorwidth", maxSensorWidth, QnDomainPhysical);
+    setParamAsync("sensorheight", maxSensorHight, QnDomainPhysical);
 }
 
 int QnPlAreconVisionResource::totalMdZones() const

@@ -29,7 +29,7 @@ void QnClientPullMediaStreamProvider::run()
 		}
 
 
-		if (QnResource::commandProchasSuchDeviceInQueue(m_resource)) // if command processor has something in the queue for this device let it go first
+		if (QnResource::commandProcHasSuchResourceInQueue(m_resource)) // if command processor has something in the queue for this device let it go first
 		{
 			QnSleep::msleep(5);
 			continue;

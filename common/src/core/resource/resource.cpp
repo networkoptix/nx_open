@@ -348,7 +348,7 @@ private:
 
 typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 
-void QnResource::getParamAsynch(const QString &name, QnDomain domain)
+void QnResource::getParamAsync(const QString &name, QnDomain domain)
 {
     QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(), name, domain));
     addCommandToProc(command);
@@ -380,7 +380,7 @@ private:
 
 typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
-void QnResource::setParamAsynch(const QString& name, const QVariant& val, QnDomain domain)
+void QnResource::setParamAsync(const QString& name, const QVariant& val, QnDomain domain)
 {
     QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(), name, val, domain));
     addCommandToProc(command);
@@ -558,12 +558,12 @@ void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
     commandProcessor()->putData(data);
 }
 
-int QnResource::commandProcQueSize()
+int QnResource::commandProcQueueSize()
 {
     return commandProcessor()->queueSize();
 }
 
-bool QnResource::commandProchasSuchDeviceInQueue(QnResourcePtr res)
+bool QnResource::commandProcHasSuchResourceInQueue(QnResourcePtr res)
 {
     return commandProcessor()->hasSuchResourceInQueue(res);
 }
