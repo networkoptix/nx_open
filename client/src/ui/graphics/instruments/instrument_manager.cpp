@@ -8,6 +8,7 @@
 #include "instrument.h"
 #include "instrument_event_dispatcher.h"
 #include "instrument_paint_syncer.h"
+#include "animation_instrument.h"
 
 namespace {
     /** Name of the property to store a list of scene's instrument managers. */
@@ -502,6 +503,18 @@ QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) 
     return scene->property(managersPropertyName).value<QList<InstrumentManager *> >();
 }
 
+AnimationTimer *InstrumentManager::animationTimerOf(QGraphicsScene *scene) {
+    if(scene == NULL)
+        return NULL;
+    
+    foreach(const InstrumentManager *manager, InstrumentManager::managersOf(scene)) {
+        AnimationInstrument *animationInstrument = manager->instrument<AnimationInstrument>();
+        if(animationInstrument != NULL)
+            return animationInstrument->animationTimer();
+    }
+
+    return NULL;
+}
 
 void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference, QList<Instrument *> *target) {
     assert(instrument != NULL && target != NULL);
