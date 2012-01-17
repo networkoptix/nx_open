@@ -24,7 +24,7 @@ BUILDLIB = %BUILDLIB
 FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
-include(../contrib/qtsingleapplication/src/qtsingleapplication.pri)
+include(../../common/contrib/qtsingleapplication/src/qtsingleapplication.pri)
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
