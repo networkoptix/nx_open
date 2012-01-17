@@ -174,7 +174,7 @@ protected:
 
     virtual void createApplication(int &argc, char **argv)
     {
-        app = new Application(argc, argv);
+        app = new Application(serviceName(), argc, argv);
         QCoreApplication *a = app;
         Q_UNUSED(a);
     }
