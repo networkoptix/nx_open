@@ -443,3 +443,9 @@ void NavigationTreeWidget::open()
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         itemActivated(index);
 }
+
+void NavigationTreeWidget::wheelEvent(QWheelEvent *event) 
+{
+    /* So that wheel events do not get propagated past the tree widget. */
+    event->accept();
+}

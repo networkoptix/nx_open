@@ -364,6 +364,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
     m_treeWidget->setWorkbenchController(this);
+    m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_treeWidget->palette();
         palette.setColor(QPalette::Window, Qt::transparent);
