@@ -104,8 +104,6 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
     if (shouldStop())
         return result;
 
-    const QnId localServerId = qnResPool->getResourceByUniqId(QLatin1String("LocalServer"))->getId();
-
     QDir dir(directory);
     const QList<QFileInfo> flist = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
     foreach (const QFileInfo &fi, flist)
@@ -124,7 +122,6 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
             QnResourcePtr res = createArchiveResource(absoluteFilePath);
             if (res)
             {
-                res->setParentId(localServerId);
                 cl_log.log("created local resource: ", absoluteFilePath, cl_logALWAYS);
                 result.append(res);
             }
