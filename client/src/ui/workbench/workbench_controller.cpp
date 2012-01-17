@@ -678,7 +678,7 @@ void QnWorkbenchController::updateTreeGeometry() {
         m_treeItem->pos().x(),
         m_treeItem->pos().y(),
         m_treeItem->size().width(),
-        m_navigationItem->pos().y() - m_treeItem->pos().y()
+        qMin(m_navigationItem->pos().y(), m_uiElementsInstrument->widget()->size().height()) - m_treeItem->pos().y()
     );
 
     if(qFuzzyCompare(geometry, m_treeItem->geometry()))
