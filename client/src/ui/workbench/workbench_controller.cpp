@@ -1199,12 +1199,16 @@ void QnWorkbenchController::at_sliderOpacityProcessor_hoverLeft() {
 }
 
 void QnWorkbenchController::at_treeItem_geometryChanged() {
-    QRectF treeItemGeometry = m_treeItem->geometry();
+    QRectF geometry = m_treeItem->geometry();
 
-    m_treeBackgroundItem->setGeometry(treeItemGeometry);
+    bool visible = geometry.right() >= 0.0;
+    m_treeItem->setVisible(visible);
+    m_treeBackgroundItem->setVisible(visible);
+
+    m_treeBackgroundItem->setGeometry(geometry);
     m_treeBookmarkItem->setPos(QPointF(
-        treeItemGeometry.right(),
-        (treeItemGeometry.top() + treeItemGeometry.bottom() - m_treeBookmarkItem->size().height()) / 2
+        geometry.right(),
+        (geometry.top() + geometry.bottom() - m_treeBookmarkItem->size().height()) / 2
     ));
 
     updateViewportMargins();

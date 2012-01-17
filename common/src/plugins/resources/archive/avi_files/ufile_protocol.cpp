@@ -1,7 +1,24 @@
 // This is URLPrococol to allow ffmpeg use files with non-ascii filenames
 
+static QSemaphore sem(4);
+
+
+class QnSemaphoreLocker
+{
+public:
+    inline QnSemaphoreLocker(QSemaphore *sem) : m_sem(sem)
+        { m_sem->acquire(); }
+    inline ~QnSemaphoreLocker()
+        { m_sem->release(); }
+
+private:
+    QSemaphore *m_sem;
+};
+
 static int ufile_open(URLContext *h, const char *filename, int flags)
 {
+    QnSemaphoreLocker sem_locker(&sem);
+
     av_strstart(filename, "ufile:", &filename);
 
     QFile *f = new QFile(QString::fromUtf8(filename));
@@ -37,6 +54,8 @@ static int ufile_open(URLContext *h, const char *filename, int flags)
 
 static int ufile_close(URLContext *h)
 {
+    QnSemaphoreLocker sem_locker(&sem);
+
     QFile *f = (QFile *) h->priv_data;
 
     if (f)
@@ -50,12 +69,16 @@ static int ufile_close(URLContext *h)
 
 static int ufile_read(URLContext *h, unsigned char *buf, int size)
 {
+    QnSemaphoreLocker sem_locker(&sem);
+
     QFile* pFile = ((QFile *) h->priv_data);
     return (int) pFile->read((char*)buf, size);
 }
 
 static int ufile_write(URLContext *h, const unsigned char *buf, int size)
 {
+    QnSemaphoreLocker sem_locker(&sem);
+
     QFile* pFile = ((QFile *) h->priv_data);
     return (int) pFile->write((const char*)buf, size);
 }
@@ -63,6 +86,8 @@ static int ufile_write(URLContext *h, const unsigned char *buf, int size)
 
 static int64_t ufile_seek(URLContext *h, int64_t pos, int whence)
 {
+    QnSemaphoreLocker sem_locker(&sem);
+
     QFile* pFile = ((QFile *) h->priv_data);
 
     switch (whence)

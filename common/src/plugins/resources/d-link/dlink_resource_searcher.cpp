@@ -7,6 +7,8 @@
 char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(request, sizeof(request));
 
+char DCS[] = {'D', 'C', 'S', '-'};
+
 
 QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher()
 {
@@ -89,7 +91,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
                 sock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
 
-                if (senderPort!=62976 || datagram.size() < 32) // minimum response size
+                if (senderPort != 62976 || datagram.size() < 32) // minimum response size
                     continue;
 
                 const unsigned char* data = (unsigned char*)(datagram.data());
