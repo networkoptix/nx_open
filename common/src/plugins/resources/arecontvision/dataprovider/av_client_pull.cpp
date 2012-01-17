@@ -49,36 +49,36 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     {
     case QnQualityHighest:
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("resolution", "full", QnDomainPhysical);
+            avRes->setParamAsync("resolution", "full", QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("Quality", "17", QnDomainPhysical); // panoramic
+            avRes->setParamAsync("Quality", "17", QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 15);
         break;
 
     case QnQualityHigh:
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("resolution", "full", QnDomainPhysical);
+            avRes->setParamAsync("resolution", "full", QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("Quality", "11", QnDomainPhysical); // panoramic
+            avRes->setParamAsync("Quality", "11", QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 7);
         break;
 
     case QnQualityNormal:
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("resolution", "half", QnDomainPhysical);
+            avRes->setParamAsync("resolution", "half", QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("Quality", "15", QnDomainPhysical); // panoramic
+            avRes->setParamAsync("Quality", "15", QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 13);
         break;
@@ -86,12 +86,12 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     case QnQualityLow:
     case QnQualityLowest:
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("resolution", "half", QnDomainPhysical);
+            avRes->setParamAsync("resolution", "half", QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsynch("Quality", "11", QnDomainPhysical); // panoramic
+            avRes->setParamAsync("Quality", "11", QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 6);
         break;

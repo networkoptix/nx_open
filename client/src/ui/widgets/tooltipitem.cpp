@@ -186,7 +186,7 @@ void ToolTipItem::ensureShape() const
 void ToolTipItem::updateTextSize() 
 {
     QFontMetrics metrics(m_font);
-    QSize textSize = metrics.size(Qt::TextSingleLine, m_text);
+    QSize textSize = metrics.size(0, m_text);
     if(textSize == m_textSize)
         return;
 

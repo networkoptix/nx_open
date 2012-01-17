@@ -31,7 +31,7 @@ class ClickInfo;
 class ResizingInfo;
 class VariantAnimator;
 class AnimatorGroup;
-class HoverProcessor;
+class HoverFocusProcessor;
 
 class NavigationItem;
 class NavigationTreeWidget;
@@ -44,7 +44,7 @@ class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
 class QnOpacityHoverItem;
-class QnBookmarkWidget;
+class QnImageButtonWidget;
 
 
 /**
@@ -89,8 +89,6 @@ protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();
-
-    VariantAnimator *opacityAnimator(QnResourceWidget *widget);
 
     void updateViewportMargins();
 
@@ -146,12 +144,15 @@ protected Q_SLOTS:
 
     void at_navigationItem_geometryChanged();
     void at_navigationItem_actualCameraChanged(CLVideoCamera *camera);
+    void at_sliderOpacityProcessor_hoverEntered();
+    void at_sliderOpacityProcessor_hoverLeft();
 
     void at_treeItem_geometryChanged();
-    void at_treeHidingProcessor_hoverLeft();
+    void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeOpacityProcessor_hoverLeft();
     void at_treeOpacityProcessor_hoverEntered();
+    void at_treeBookmarkItem_clicked();
 
 
 
@@ -175,10 +176,7 @@ private:
 
     QGraphicsWidget *m_treeBackgroundItem;
 
-    /** Graphics widget that triggers tree widget visibility. */
-    QGraphicsWidget *m_treeTriggerItem;
-
-    QnBookmarkWidget *m_treeBookmarkItem;
+    QnImageButtonWidget *m_treeBookmarkItem;
 
     /** Whether navigation tree is visible. */
     bool m_treeVisible;
@@ -189,14 +187,14 @@ private:
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
     /** Hover opacity item for tree widget. */
-    HoverProcessor *m_treeHidingProcessor;
+    HoverFocusProcessor *m_treeHidingProcessor;
 
-    HoverProcessor *m_treeShowingProcessor;
+    HoverFocusProcessor *m_treeShowingProcessor;
 
-    HoverProcessor *m_treeOpacityProcessor;
+    HoverFocusProcessor *m_treeOpacityProcessor;
 
-    VariantAnimator *m_treeOpacityAnimator;
-    VariantAnimator *m_treeBackgroundOpacityAnimator;
+    HoverFocusProcessor *m_sliderOpacityProcessor;
+
     AnimatorGroup *m_treeOpacityAnimatorGroup;
     VariantAnimator *m_treePositionAnimator;
     VariantAnimator *m_sliderPositionAnimator;

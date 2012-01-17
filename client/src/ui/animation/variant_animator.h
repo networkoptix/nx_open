@@ -127,13 +127,12 @@ public:
     void setTargetValue(const QVariant &targetValue);
 
     /**
-     * Convenience function that pauses the animator, sets its target value,
-     * and resumes it.
+     * Convenience function that sets animator's target value and starts it if
+     * it is not running.
      * 
      * \param value                     Target value.
      */
     void animateTo(const QVariant &value) {
-        pause();
         setTargetValue(value);
         start();
     }

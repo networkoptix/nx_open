@@ -118,7 +118,7 @@ void ResourceModel::removeResource(const QnResourcePtr &resource)
 
 void ResourceModel::_q_addResource(const QnResourcePtr &resource)
 {
-    if (sender() != qnResPool && !qnResPool->getResourceById(resource->getId())) {
+    if (sender() != qnResPool) {
         qnResPool->addResource(resource); // emits resourceAdded; thus return
         return;
     }
@@ -131,7 +131,7 @@ void ResourceModel::_q_addResource(const QnResourcePtr &resource)
 
 void ResourceModel::_q_removeResource(const QnResourcePtr &resource)
 {
-    if (sender() != qnResPool && qnResPool->getResourceById(resource->getId())) {
+    if (sender() != qnResPool) {
         qnResPool->removeResource(resource); // emits resourceRemoved; thus return
         return;
     }
@@ -208,7 +208,7 @@ bool ResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction actio
         resources += QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
     foreach (const QnResourcePtr &resource, resources) {
         if (resource->checkFlag(QnResource::local) && !resource->checkFlag(QnResource::server))
-            addResource(resource);
+            _q_addResource(resource);
     }
 
     return true;
@@ -317,8 +317,11 @@ static inline QString normalizedFilterString(const QString &str)
 void ResourceSortFilterProxyModel::parseFilterString()
 {
     m_flagsFilter = 0;
-    for (uint i = 0; i < NumFilterCategories; ++i)
-        m_filters[i] = QRegExp(); // ### don't invalidate filters which weren't changed
+    for (uint i = 0; i < NumFilterCategories; ++i) {
+         // ### don't invalidate filters which weren't changed
+        m_filters[i] = QRegExp();
+        m_negfilters[i] = QRegExp();
+    }
 
     m_parsedFilterString = filterRegExp().pattern();
     if (m_parsedFilterString.isEmpty())
