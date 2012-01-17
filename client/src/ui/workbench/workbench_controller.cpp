@@ -80,7 +80,7 @@
 #include "ui/device_settings/camera_motionmask_widget.h"
 #include "ui/skin/skin.h"
 
-Q_DECLARE_METATYPE(VariantAnimator *);
+Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
     class AspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
@@ -195,7 +195,7 @@ namespace {
         );
     }
 
-    QPoint invalidDragDelta() {
+    static QPoint invalidDragDelta() {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
 
@@ -492,7 +492,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
 #endif
     m_randomGridAction                  = newAction(tr("Randomize grid"), tr(""),                   this);
-    //QAction *exitAction                 = newAction(tr("Exit"),                 tr("Alt+F4"),       this);
     m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
     m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
 
@@ -696,7 +695,7 @@ void QnWorkbenchController::updateTreeGeometry() {
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     qDebug("RESIZING STARTED");
 
-    m_resizedWidget = dynamic_cast<QnResourceWidget *>(item);
+    m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
     if(m_resizedWidget == NULL)
         return;
 
@@ -788,7 +787,7 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
     /* Build item lists. */
     m_draggedItems = items;
     foreach (QGraphicsItem *item, m_draggedItems) {
-        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)
             continue;
 
@@ -959,7 +958,7 @@ void QnWorkbenchController::at_item_leftPressed(QGraphicsView *, QGraphicsItem *
     if(item->isSelected())
         return;
 
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
 }
@@ -971,7 +970,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(workbench()->item(QnWorkbench::ZOOMED) != NULL)
         return; /* Don't change currently raised item if we're zoomed. It is surprising for the user. */
 
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
 
@@ -981,7 +980,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
 
@@ -1010,7 +1009,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
 }
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
 
@@ -1018,7 +1017,7 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
-    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
 
@@ -1208,7 +1207,8 @@ void QnWorkbenchController::at_showMotionAction_triggered()
     test1->show();
 #endif
 #if 0
-    QnResourceWidget* widget = dynamic_cast<QnResourceWidget*> (display()->scene()->selectedItems()[0]);
+    QGraphicsItem *item = display()->scene()->selectedItems().first();
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource()->getUniqueId());
     test2->show();
 #endif
@@ -1220,7 +1220,7 @@ int QnWorkbenchController::isMotionGridDisplayed()
     bool allNonDisplayed = true;
     foreach(QGraphicsItem *item, display()->scene()->selectedItems())
     {
-        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)
             continue;
         allDisplayed &= widget->isMotionGridDisplayed();
@@ -1236,7 +1236,7 @@ int QnWorkbenchController::isMotionGridDisplayed()
 
 void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
     foreach(QGraphicsItem *item, items) {
-        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)
             continue;
 
