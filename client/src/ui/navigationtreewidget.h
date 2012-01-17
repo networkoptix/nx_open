@@ -30,6 +30,7 @@ public:
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void timerEvent(QTimerEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
 Q_SIGNALS:
     void activated(uint resourceId);
