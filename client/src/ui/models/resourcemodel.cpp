@@ -317,8 +317,11 @@ static inline QString normalizedFilterString(const QString &str)
 void ResourceSortFilterProxyModel::parseFilterString()
 {
     m_flagsFilter = 0;
-    for (uint i = 0; i < NumFilterCategories; ++i)
-        m_filters[i] = QRegExp(); // ### don't invalidate filters which weren't changed
+    for (uint i = 0; i < NumFilterCategories; ++i) {
+         // ### don't invalidate filters which weren't changed
+        m_filters[i] = QRegExp();
+        m_negfilters[i] = QRegExp();
+    }
 
     m_parsedFilterString = filterRegExp().pattern();
     if (m_parsedFilterString.isEmpty())
