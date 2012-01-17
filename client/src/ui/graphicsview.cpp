@@ -221,7 +221,7 @@ GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget* mainWnd) :
     // ### connect(&cm_new_item, SIGNAL(triggered()), this, SLOT());
     addAction(&cm_new_item);
 
-    connect(&cm_start_video_recording, SIGNAL(triggered()), this, SLOT(toggleRecording()));
+    connect(&cm_toggle_recording, SIGNAL(triggered()), this, SLOT(toggleRecording()));
     connect(&cm_recording_settings, SIGNAL(triggered()), this, SLOT(recordingSettings()));
     addAction(&cm_screen_recording);
 
@@ -1443,14 +1443,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
 
             //if (dev->checkFlag(QnResource::live))
             {
-                if (cam->isRecording())
-                {
-                    menu.addAction(&cm_stop_recording);
-                }
-                else
-                {
-                    menu.addAction(&cm_start_recording);
-                }
+                menu.addAction(&cm_toggle_recording);
 
                 if (contextMenuHelper_existRecordedVideo(cam) /* && !cam->isRecording()*/)
                     menu.addAction(&cm_view_recorded);
@@ -1548,11 +1541,8 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
         if (allItemsRemovable)
             menu.addAction(&cm_remove_from_disk);
 
-        if (haveAtLeastOneNonrecordingCam)
-            menu.addAction(&cm_start_recording);
-
-        if (haveAtLeastOneRecordingCam )
-            menu.addAction(&cm_stop_recording);
+        if (haveAtLeastOneNonrecordingCam || haveAtLeastOneRecordingCam)
+            menu.addAction(&cm_toggle_recording);
     }
     else
     {
@@ -1561,11 +1551,6 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
         // on void menu...
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
-            QMenu * recordingMenu = new QMenu(tr("Screen Recording"), &menu);
-
-            recordingMenu->addAction(&cm_start_video_recording);
-            recordingMenu->addAction(&cm_recording_settings);
-//            menu.addSeparator();
             menu.addAction(&cm_fitinview);
             menu.addAction(&cm_arrange);
 
@@ -1575,7 +1560,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
                 //menu.addMenu(&layout_editor_menu);
             }
 
-            menu.addMenu(recordingMenu);
+            menu.addAction(&cm_screen_recording);
 
             bool saved_content = false;
             LayoutContent* current =  m_camLayout.getContent();
@@ -1708,13 +1693,13 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
             {
                 show_device_settings_helper(dev);
             }
-            else if (act == &cm_start_recording && cam)
+            else if (act == &cm_toggle_recording && cam)
             {
                 disconnect(cam, SIGNAL(recordingFailed(QString)), this, SLOT(onRecordingFailed(QString)));
                 connect(cam, SIGNAL(recordingFailed(QString)), this, SLOT(onRecordingFailed(QString)));
                 cam->startRecording();
             }
-            else if (act == &cm_stop_recording && cam)
+            else if (act == &cm_toggle_recording && cam)
             {
                 cam->stopRecording();
             }
@@ -1801,7 +1786,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
                     removeFileDeviceItem(static_cast<CLAbstractSceneItem*>(item));
             }
         }
-        else if (act == &cm_start_recording || act == &cm_stop_recording)
+        else if (act == &cm_toggle_recording)
         {
             foreach (CLAbstractSubItemContainer *item, selectedItems)
             {
@@ -1814,14 +1799,14 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
                 CLVideoCamera* cam = dynamic_cast<CLVideoCamera*>(ca);
                 if (cam)
                 {
-                    if (act == &cm_start_recording)
+                    if (cm_toggle_recording.isChecked())
                     {
                         if (cam->isRecording())
                             continue;
 
                         cam->startRecording();
                     }
-                    else if (act == &cm_stop_recording)
+                    else
                     {
                         cam->stopRecording();
                     }
@@ -2843,7 +2828,7 @@ void GraphicsView::onExportRange(qint64 begin, qint64 end)
 void GraphicsView::toggleRecording()
 {
 #ifdef Q_OS_WIN
-    bool recording = cm_start_video_recording.property("recoding").toBool();
+    bool recording = cm_toggle_recording.property("recoding").toBool();
     if (!recording)
     {
         QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
@@ -2910,8 +2895,8 @@ void GraphicsView::toggleRecording()
             return;
         }
 
-        cm_start_video_recording.setProperty("recoding", true);
-        cm_start_video_recording.setProperty("encoder", QVariant::fromValue(qobject_cast<QObject *>(desktopEncoder)));
+        cm_toggle_recording.setProperty("recoding", true);
+        cm_toggle_recording.setProperty("encoder", QVariant::fromValue(qobject_cast<QObject *>(desktopEncoder)));
 
         QLabel *label = new QLabel(viewport());
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
@@ -2935,11 +2920,11 @@ void GraphicsView::toggleRecording()
     }
     else
     {
-        DesktopFileEncoder *desktopEncoder = qobject_cast<DesktopFileEncoder *>(cm_start_video_recording.property("encoder").value<QObject *>());
+        DesktopFileEncoder *desktopEncoder = qobject_cast<DesktopFileEncoder *>(cm_toggle_recording.property("encoder").value<QObject *>());
 
         // stop capturing
-        cm_start_video_recording.setProperty("recoding", QVariant());
-        cm_start_video_recording.setProperty("encoder", QVariant());
+        cm_toggle_recording.setProperty("recoding", QVariant());
+        cm_toggle_recording.setProperty("encoder", QVariant());
 
         if (!desktopEncoder)
             return;

@@ -321,7 +321,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     menu->addAction(openAction);
     menu->addSeparator();
     if (resources.size() == 1) {
-        const QnResourcePtr resource = resources.first();
+        const QnResourcePtr &resource = resources.first();
         if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT)) {
             menu->addAction(&cm_editTags);
 
@@ -363,22 +363,29 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
         return;
 
     if (resources.size() == 1) {
-        const QnResourcePtr resource = resources.first();
-        if (action == &cm_settings) { // ### move to app-global scope
+        const QnResourcePtr &resource = resources.first();
+        if (action == &cm_remove_from_disk) {
+            m_controller->deleteLocalResources(QnResourceList() << resource);
+        } else if (action == &cm_settings) { // ### move to app-global scope ?
             if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, QApplication::activeWindow())) {
                 dialog->exec();
                 delete dialog;
             }
-        } else if (action == &cm_editTags) { // ### move to app-global scope
+        } else if (action == &cm_editTags) { // ### move to app-global scope ?
             TagsEditDialog dialog(QStringList() << resource->getUniqueId(), QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
-        } else if (action == &cm_upload_youtube) { // ### move to app-global scope
+        } else if (action == &cm_upload_youtube) { // ### move to app-global scope ?
             YouTubeUploadDialog dialog(resource, QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
         }
     }
+}
+
+void NavigationTreeWidget::wheelEvent(QWheelEvent *event)
+{
+    event->accept(); // do not propagate wheel events past the tree widget
 }
 
 void NavigationTreeWidget::timerEvent(QTimerEvent *event)
@@ -442,10 +449,4 @@ void NavigationTreeWidget::open()
     QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         itemActivated(index);
-}
-
-void NavigationTreeWidget::wheelEvent(QWheelEvent *event) 
-{
-    /* So that wheel events do not get propagated past the tree widget. */
-    event->accept();
 }
