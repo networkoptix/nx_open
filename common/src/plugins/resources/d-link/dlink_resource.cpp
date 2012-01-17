@@ -6,7 +6,7 @@ const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 
 QnPlDlinkResource::QnPlDlinkResource()
 {
-    setAuth("admin", "");
+    setAuth("admin", "1");
     
 }
 
