@@ -321,7 +321,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     menu->addAction(openAction);
     menu->addSeparator();
     if (resources.size() == 1) {
-        const QnResourcePtr resource = resources.first();
+        const QnResourcePtr &resource = resources.first();
         if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT)) {
             menu->addAction(&cm_editTags);
 
@@ -363,17 +363,19 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
         return;
 
     if (resources.size() == 1) {
-        const QnResourcePtr resource = resources.first();
-        if (action == &cm_settings) { // ### move to app-global scope
+        const QnResourcePtr &resource = resources.first();
+        if (action == &cm_remove_from_disk) {
+            m_controller->deleteLocalResources(QnResourceList() << resource);
+        } else if (action == &cm_settings) { // ### move to app-global scope ?
             if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, QApplication::activeWindow())) {
                 dialog->exec();
                 delete dialog;
             }
-        } else if (action == &cm_editTags) { // ### move to app-global scope
+        } else if (action == &cm_editTags) { // ### move to app-global scope ?
             TagsEditDialog dialog(QStringList() << resource->getUniqueId(), QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
-        } else if (action == &cm_upload_youtube) { // ### move to app-global scope
+        } else if (action == &cm_upload_youtube) { // ### move to app-global scope ?
             YouTubeUploadDialog dialog(resource, QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);
             dialog.exec();
