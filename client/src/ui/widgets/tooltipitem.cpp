@@ -181,6 +181,8 @@ void ToolTipItem::ensureShape() const
         m_itemShape = m_itemShape.simplified();
     }
     m_boundingRect = m_itemShape.boundingRect();
+
+    m_shapeValid = true;
 }
 
 void ToolTipItem::updateTextSize() 
