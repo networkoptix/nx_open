@@ -80,6 +80,7 @@ private:
     mutable QMutex m_resourcesMtx;
     typedef QMap<QnId, QnResourcePtr> ResourceMap;
     ResourceMap m_resources;
+    QnResourcePtr localServer;
 };
 
 #endif //resource_pool_h_1537

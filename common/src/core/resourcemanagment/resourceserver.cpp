@@ -4,7 +4,7 @@
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
 m_shouldStop(false),
-m_sholudbeUsed(true),
+m_shouldbeUsed(true),
 m_localResources(false)
 {
 
@@ -18,13 +18,13 @@ QnAbstractResourceSearcher::~QnAbstractResourceSearcher()
 
 void QnAbstractResourceSearcher::setShouldBeUsed(bool use)
 {
-    m_sholudbeUsed = use;
+    m_shouldbeUsed = use;
 }
 
 
 bool QnAbstractResourceSearcher::shouldBeUsed() const
 {
-    return m_sholudbeUsed;
+    return m_shouldbeUsed;
 }
 
 void QnAbstractResourceSearcher::pleaseStop()

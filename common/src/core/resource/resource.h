@@ -129,7 +129,7 @@ public:
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed onParameterChanged signal is emitted
-    void getParamAsynch(const QString &name, QnDomain domain);
+    void getParamAsync(const QString &name, QnDomain domain);
 
 
     // return true if no error
@@ -137,7 +137,7 @@ public:
 
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
-    void setParamAsynch(const QString& name, const QVariant& val, QnDomain domain );
+    void setParamAsync(const QString& name, const QVariant& val, QnDomain domain );
 
     // ==============================================================================
 
@@ -181,8 +181,8 @@ public:
     static void startCommandProc();
     static void stopCommandProc();
     static void addCommandToProc(QnAbstractDataPacketPtr data);
-    static int commandProcQueSize();
-    static bool commandProchasSuchDeviceInQueue(QnResourcePtr res);
+    static int commandProcQueueSize();
+    static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 
     void update(const QnResource& other);
 

@@ -41,7 +41,7 @@ protected:
     bool shouldStop() const;
 
 protected:
-    bool m_sholudbeUsed;
+    bool m_shouldbeUsed;
     volatile bool m_shouldStop;
 
 private:

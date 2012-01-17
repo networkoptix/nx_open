@@ -58,7 +58,7 @@ QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
 
 void CLAbstractDeviceSettingsDlg::setParam(const QString &name, const QVariant &val)
 {
-    m_resource->setParamAsynch(name, val, QnDomainPhysical);
+    m_resource->setParamAsync(name, val, QnDomainPhysical);
 }
 
 CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name) const

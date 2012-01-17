@@ -13,7 +13,8 @@ QnResourcePool::QnResourcePool() : QObject(),
     qRegisterMetaType<QnResourceList>("QnResourceList");
     qRegisterMetaType<QnResource::Status>("QnResource::Status");
 
-    addResource(QnResourcePtr(new QnLocalVideoServer));
+    localServer = QnResourcePtr(new QnLocalVideoServer);
+    addResource(localServer);
 }
 
 QnResourcePool *QnResourcePool::instance()
@@ -29,16 +30,25 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
-        if (!resource->getId().isValid())
-            resource->setId(QnId::generateSpecialId());
+        if (!resource->getParentId().isValid() && !resource->checkFlag(QnResource::server))
+            resource->setParentId(localServer->getId());
+        if (!resource->getId().isValid()) {
+            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
+                resource->setId(existing->getId());
+            else
+                resource->setId(QnId::generateSpecialId());
+        }
     }
 
     foreach (const QnResourcePtr &resource, resources)
     {
-        if ((resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) {
+        /*
+        if ((resource.dynamicCast<QnNetworkResource>()) && (resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) 
+        {
             qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local neither remote)");
             //continue; // ignore
         }
+        /*/
 
         const QnId &resId = resource->getId();
         if (!m_resources.contains(resId))
@@ -63,7 +73,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
-        if (m_resources.remove(resource->getId()) != 0)
+        if (resource != localServer && m_resources.remove(resource->getId()) != 0)
             removedResources.append(resource);
     }
 
