@@ -19,6 +19,8 @@ public:
 
     static QnResourcePtr createResourcesForFile(const QString &file);
     static QnResourceList createResourcesForFiles(const QStringList &files);
+
+    static void deleteLocalResources(const QnResourceList &resources);
 };
 
 #endif // QN_FILE_PROCESSOR_H

@@ -21,6 +21,8 @@
 #include "ui/workbench/workbench_layout.h"
 #include "youtube/youtubeuploaddialog.h"
 
+#include "file_processor.h"
+
 
 #include <QtGui/QStyledItemDelegate>
 
@@ -155,7 +157,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 #endif
 
     setMinimumWidth(180);
-    setMaximumWidth(350);
+    setMaximumWidth(300);
 
     setAcceptDrops(true);
 }
@@ -365,7 +367,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     if (resources.size() == 1) {
         const QnResourcePtr &resource = resources.first();
         if (action == &cm_remove_from_disk) {
-            m_controller->deleteLocalResources(QnResourceList() << resource);
+            QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
         } else if (action == &cm_settings) { // ### move to app-global scope ?
             if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, QApplication::activeWindow())) {
                 dialog->exec();

@@ -2,7 +2,7 @@
 #include <cassert>
 #include <cmath> /* For std::floor. */
 #include <limits>
-#include <QFile>
+
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGLWidget>
@@ -618,36 +618,15 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
 
 void QnWorkbenchController::remove(const QnResourcePtr &resource)
 {
-    layout()->removeItem(layout()->item(resource));
+    QnWorkbenchLayout *layout = this->layout();
+    layout->removeItem(layout->item(resource));
 }
 
 void QnWorkbenchController::remove(const QnResourceList &resources)
 {
+    QnWorkbenchLayout *layout = this->layout();
     foreach (const QnResourcePtr &resource, resources)
-        layout()->removeItem(layout()->item(resource));
-}
-
-void QnWorkbenchController::deleteLocalResources(const QnResourceList &resources_)
-{
-    QnResourceList resources;
-    foreach (const QnResourcePtr &resource, resources_) {
-        if (resource->checkFlag(QnResource::url | QnResource::local))
-            resources.append(resource);
-    }
-    if (resources.isEmpty())
-        return;
-
-    QString text;
-    if (resources.size() == 1)
-        text = tr("Are you sure you want to delete file '%1'?").arg(resources.first()->getUniqueId());
-    else
-        text = tr("Are you sure you want to delete %1 files?").arg(resources.size());
-    if (QMessageBox::question(display()->view(), tr("Delete file(s)?"), text,
-                              QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Cancel) {
-        qnResPool->removeResources(resources);
-        foreach (const QnResourcePtr &resource, resources)
-            QFile::remove(resource->getUrl());
-    }
+        layout->removeItem(layout->item(resource));
 }
 
 void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {

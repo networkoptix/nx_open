@@ -81,8 +81,6 @@ public:
     void remove(const QnResourcePtr &resource);
     void remove(const QnResourceList &resources);
 
-    void deleteLocalResources(const QnResourceList &resources);
-
 public Q_SLOTS:
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
