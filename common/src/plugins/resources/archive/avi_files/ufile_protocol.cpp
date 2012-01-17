@@ -12,9 +12,9 @@ class SemaphoreLocker
 {
 public:
     inline SemaphoreLocker(QSemaphore *sem) : m_sem(sem)
-    { m_sem->acquire(); }
+    { if (m_sem) m_sem->acquire(); }
     inline ~SemaphoreLocker()
-    { m_sem->release(); }
+    { if (m_sem) m_sem->release(); }
 
 private:
     QSemaphore *m_sem;
