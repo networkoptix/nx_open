@@ -13,29 +13,33 @@ class QBufferedFile: public QFile
 public:
     QBufferedFile(const QString& fileName, int bufferSize = 1024*1024*2): QFile(fileName), m_bufferSize(bufferSize) 
     {
-        m_writeBuffer = new quint8[bufferSize];
-        m_writeBufferLen = 0;
-        m_writeBufferPos = 0;
+        m_buffer = new quint8[bufferSize];
+        m_bufferLen = 0;
+        m_bufferPos = 0;
+        m_totalWrited = 0;
     }
     virtual ~QBufferedFile()
     {
-        delete [] m_writeBuffer;
+        delete [] m_buffer;
     }
     virtual qint64	size () const
     {
-        return QFile::size() + m_writeBufferLen;
+        if (isWritable())
+            return m_totalWrited + m_bufferLen;
+        else
+            return QFile::size(); 
     }
 
     virtual qint64	pos() const
     {
-        return QFile::pos() + m_writeBufferLen;
+        return QFile::pos() + m_bufferPos;
     }
 
     void flushBuffer()
     {
-        QFile::writeData((char*) m_writeBuffer, m_writeBufferLen);
-        m_writeBufferLen = 0;
-        m_writeBufferPos = 0;
+        m_totalWrited += QFile::writeData((char*) m_buffer, m_bufferLen);
+        m_bufferLen = 0;
+        m_bufferPos = 0;
     }
 
     virtual void close()
@@ -47,20 +51,23 @@ public:
 protected:
     virtual qint64	writeData ( const char * data, qint64 len )
     {
+        //return QFile::writeData(data, len);
+
         int rez = len;
         while (len > 0)
         {
-            int toWrite = qMin((int) len, m_bufferSize - m_writeBufferPos);
-            memcpy(m_writeBuffer + m_writeBufferPos, data, toWrite);
-            m_writeBufferPos += toWrite;
-            m_writeBufferLen = qMax(m_writeBufferLen, m_writeBufferPos);
-            if (m_writeBufferLen == m_bufferSize) {
-                int writed = QFile::writeData((char*) m_writeBuffer, m_bufferSize/2);
+            int toWrite = qMin((int) len, m_bufferSize - m_bufferPos);
+            memcpy(m_buffer + m_bufferPos, data, toWrite);
+            m_bufferPos += toWrite;
+            m_bufferLen = qMax(m_bufferLen, m_bufferPos);
+            if (m_bufferLen == m_bufferSize) {
+                int writed = QFile::writeData((char*) m_buffer, m_bufferSize/2);
+                m_totalWrited += writed;
                 if (writed !=  m_bufferSize/2)
                     return writed;
-                m_writeBufferLen -= writed;
-                m_writeBufferPos -= writed;
-                memmove(m_writeBuffer, m_writeBuffer + writed, m_writeBufferLen);
+                m_bufferLen -= writed;
+                m_bufferPos -= writed;
+                memmove(m_buffer, m_buffer + writed, m_bufferLen);
             }
             len -= toWrite;
             data += toWrite;
@@ -69,11 +76,11 @@ protected:
     }
 private:
     int m_bufferSize;
-    quint8* m_writeBuffer;
-    qint64 m_totalWrited;
+    quint8* m_buffer;
 public:
-    int m_writeBufferLen;
-    int m_writeBufferPos;
+    int m_bufferLen;
+    int m_bufferPos;
+    qint64 m_totalWrited;
 };
 
 class SemaphoreLocker
@@ -102,7 +109,10 @@ static int ufile_open(URLContext *h, const char *filename, int flags)
     QFile::OpenMode mode;
 
     if ((flags & AVIO_FLAG_READ) != 0 && (flags & AVIO_FLAG_WRITE) != 0)
+    {
+        Q_ASSERT_X(1, Q_FUNC_INFO, "Not supported");
         mode = QIODevice::ReadWrite;
+    }
     else if ((flags & AVIO_FLAG_WRITE) != 0)
         mode = QIODevice::WriteOnly | QIODevice::Unbuffered;
     else
@@ -139,8 +149,6 @@ static int ufile_read(URLContext *h, unsigned char *buf, int size)
 
     QBufferedFile *pFile = reinterpret_cast<QBufferedFile *>(h->priv_data);
 
-    Q_ASSERT(!pFile->isWritable());
-
     return (int) pFile->read((char*)buf, size);
 }
 
@@ -176,15 +184,16 @@ static int64_t ufile_seek(URLContext *h, int64_t pos, int whence)
         default:
             return AVERROR(ENOENT);
     }
+
     absolutePos = qMin(pFile->size(), absolutePos);
-    qint64 bufferOffset = absolutePos - (pFile->size() - pFile->m_writeBufferLen);
-    if (bufferOffset < 0 || bufferOffset > pFile->m_writeBufferLen)
+    qint64 bufferOffset = absolutePos - (pFile->size() - pFile->m_bufferLen);
+    if (bufferOffset < 0 || bufferOffset > pFile->m_bufferLen)
     {
         pFile->flushBuffer();
         return pFile->seek(absolutePos);
     }
     else {
-        pFile->m_writeBufferPos = bufferOffset;
+        pFile->m_bufferPos = bufferOffset;
         return absolutePos;
     }
 }
