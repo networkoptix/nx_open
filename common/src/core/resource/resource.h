@@ -218,8 +218,6 @@ private:
 
     QStringList m_tags;
 
-    bool m_avalable;
-
     QString m_url; //-
 
     Status m_status;

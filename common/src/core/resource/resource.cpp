@@ -13,7 +13,6 @@ QnResource::QnResource()
     : QObject(),
       m_rwLock(QReadWriteLock::Recursive),
       m_flags(0),
-      m_avalable(true),
       m_status(Offline)
 {
 }
@@ -32,7 +31,6 @@ void QnResource::updateInner(const QnResource& other)
     m_name = other.m_name;
     m_lastDiscoveredTime = other.m_lastDiscoveredTime;
     m_tags = other.m_tags;
-    m_avalable = other.m_avalable;
     m_url = other.m_url;
 }
 
