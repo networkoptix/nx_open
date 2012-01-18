@@ -27,7 +27,6 @@ void QnResource::updateInner(const QnResource& other)
 {
     m_flags = other.m_flags;
     m_name = other.m_name;
-    m_resourceParamList = other.m_resourceParamList;
     m_id = other.m_id;
     m_parentId = other.m_parentId;
     m_typeId = other.m_typeId;
