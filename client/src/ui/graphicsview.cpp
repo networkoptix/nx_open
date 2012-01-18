@@ -33,7 +33,7 @@
 #include "youtube/youtubeuploaddialog.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_device.h"
 #include "utils/common/rand.h"

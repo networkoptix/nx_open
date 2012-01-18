@@ -115,7 +115,7 @@ AVVideoLayout180 avVideoLayout180;
 CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
 {
     setName(name);
-    if (name.contains("8180") || name.contains("8185"))
+    if (name.contains("8180") || name.contains("8185") || name.contains("20185"))
         m_vrl = &avVideoLayout180;
     else
         m_vrl = &avVideoLayout360;

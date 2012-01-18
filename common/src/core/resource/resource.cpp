@@ -200,7 +200,7 @@ QnParamList &QnResource::getResourceParamList() const
         }
         paramType->name = mProperty.name();
         paramType->ui = mProperty.isDesignable();
-        paramType->isStatic = true;
+        paramType->isPhysical = false;
         //resType->addParamType(paramType);
         QnParam newParam(paramType);
         resourceParamList.append(newParam);
@@ -253,20 +253,20 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     {
         QReadLocker readLocker(&m_rwLock);
         val = param.value();
-        if (param.isStatic())
+        if (!param.isPhysical())
             val = this->property(param.name().toUtf8()).toString();
         return true;
     }
     else if (domain == QnDomainPhysical)
     {
-        if (!param.isStatic() && getParamPhysical(param.name(), val)) {
+        if (param.isPhysical() && getParamPhysical(param.name(), val)) {
             emit onParameterChanged(param.name(), val);
             return true;
         }
     }
     else if (domain == QnDomainDatabase)
     {
-        if (!param.isStatic())
+        if (param.isPhysical())
             return true;
     }
 
@@ -292,10 +292,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
 
     if (domain == QnDomainPhysical)
     {
-        if (param.isStatic())
-            return false;
-
-        if (!setParamPhysical(param.name(), val))
+        if (!param.isPhysical() || !setParamPhysical(param.name(), val))
             return false;
     }
 
@@ -310,7 +307,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
 
         }
 
-        if (param.isStatic())
+        if (!param.isPhysical())
             setProperty(param.name().toUtf8(), val);
     }
 

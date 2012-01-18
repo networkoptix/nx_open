@@ -17,8 +17,8 @@
 #include <QFileDialog>
 #include <QGraphicsProxyWidget>
 
-#include <core/resourcemanagment/security_cam_resource.h>
 #include <core/resource/directory_browser.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>

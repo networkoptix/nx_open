@@ -1,16 +1,12 @@
 #ifndef QnPlAreconVisionResource_h_1252
 #define QnPlAreconVisionResource_h_1252
 
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 
-
-
-
 class QDomElement;
-
 
 // this class and inherited must be very light to create
 class QnPlAreconVisionResource : public QnCameraResource
