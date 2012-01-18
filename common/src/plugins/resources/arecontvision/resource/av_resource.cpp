@@ -15,6 +15,8 @@
 #include "utils/network/ping.h"
 
 const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
+#define MAX_RESPONSE_LEN (4*1024)
+
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64)
@@ -334,7 +336,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QVariant& v
     if (connection.doGET(request)!=CL_HTTP_SUCCESS)
         return false;
 
-    char c_response[200];
+    char c_response[MAX_RESPONSE_LEN];
 
     int result_size =  connection.read(c_response,sizeof(c_response));
 
@@ -413,7 +415,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(const
 
 bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {
-    return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) ||
+    return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) ||
            name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365"));
 }
 
