@@ -227,7 +227,6 @@ private:
     mutable QnParamList m_resourceParamList;
 
 
-    mutable QnParamList m_streamParamList; //-
     mutable QMutex m_consumersMtx;
     QSet<QnResourceConsumer*> m_consumers;
 };
