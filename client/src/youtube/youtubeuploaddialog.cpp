@@ -160,7 +160,7 @@ void YouTubeUploadDialog::authFailed()
     dialog.setLayout(dialogLayout);
 #else
     PreferencesWindow dialog(this);
-    dialog.setCurrentTab(5);
+    dialog.setCurrentTab(4);
 #endif
 
     if (dialog.exec() == QDialog::Accepted) {

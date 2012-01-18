@@ -58,7 +58,7 @@ LoginDialog::~LoginDialog()
 void LoginDialog::testSettings()
 {
     QUrl url = currentUrl();
-    
+
     if (!url.isValid())
     {
         QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
@@ -75,7 +75,7 @@ QUrl LoginDialog::currentUrl()
     const int row = ui->storedConnectionsComboBox->currentIndex();
 
     QUrl url;
-    
+
     QString host = m_connectionsModel->item(row, 1)->text();
     int port = m_connectionsModel->item(row, 2)->text().toInt();
 
@@ -178,7 +178,7 @@ void LoginDialog::currentIndexChanged(int index)
 void LoginDialog::configureStoredConnections()
 {
     PreferencesWindow preferencesDialog(this);
-    preferencesDialog.setCurrentTab(2);
+    preferencesDialog.setCurrentTab(1);
 
     if (preferencesDialog.exec() == QDialog::Accepted)
         updateStoredConnections();

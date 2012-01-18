@@ -48,22 +48,19 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
 #endif
     creditsLabel->setText(label);
 
+    connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
+    tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
 
-#ifdef Q_OS_WIN
     videoRecorderWidget = new RecordingSettingsWidget(this);
     tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
-#endif
 
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
-    tabWidget->insertTab(5, youTubeSettingsWidget, tr("YouTube"));
+    tabWidget->insertTab(4, youTubeSettingsWidget, tr("YouTube"));
 
 #ifndef CL_TRIAL_MODE
     licenseWidget = new LicenseWidget(this);
-    tabWidget->insertTab(6, licenseWidget, tr("License"));
+    tabWidget->insertTab(5, licenseWidget, tr("License"));
 #endif
-
-    connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
-    tabWidget->insertTab(2, connectionsSettingsWidget, tr("Connections"));
 
     Settings::instance().fillData(m_settingsData);
 
@@ -82,9 +79,8 @@ void PreferencesWindow::accept()
 {
     m_settingsData.maxVideoItems = maxVideoItemsSpinBox->value();
     m_settingsData.downmixAudio = downmixAudioCheckBox->isChecked();
-    m_settingsData.allowChangeIP = allowChangeIPCheckBox->isChecked();
 
-    Settings& settings = Settings::instance();
+    Settings &settings = Settings::instance();
     settings.update(m_settingsData);
     settings.save();
 
@@ -120,8 +116,6 @@ void PreferencesWindow::updateView()
     foreach (const QString &auxMediaRoot, m_settingsData.auxMediaRoots)
         auxMediaRootsList->addItem(QDir::toNativeSeparators(auxMediaRoot));
 
-    allowChangeIPCheckBox->setChecked(m_settingsData.allowChangeIP);
-
     const QList<QNetworkAddressEntry> ipv4entries = getAllIPv4AddressEntries();
 
     networkInterfacesList->clear();
@@ -141,7 +135,7 @@ void PreferencesWindow::updateView()
 
     totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
 
-    groupBox_9->hide(); // ### handle settingsData.maxVideoItems and remove this line
+    lookAndFeelGroupBox->hide(); // ### handle settingsData.maxVideoItems and remove this line
     maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
 
     downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
