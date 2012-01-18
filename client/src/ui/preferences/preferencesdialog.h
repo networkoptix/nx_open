@@ -19,10 +19,8 @@ public:
         PageGeneral = 0,
         PageConnections = 1,
         PageRecordingSettings = 2,
-        PageYouTubeSettings = 3
-#ifndef CL_TRIAL_MODE
-        , PageLicense = 4
-#endif
+        PageYouTubeSettings = 3,
+        PageLicense = 4
     };
 
     PreferencesDialog(QWidget *parent = 0);

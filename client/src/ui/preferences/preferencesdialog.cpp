@@ -3,17 +3,19 @@
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/ui_common.h"
+#include "ui/context_menu_helper.h"
+
 #include "connectionssettingswidget.h"
 #include "licensewidget.h"
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
-#include "core/resource/directory_browser.h"
-#include "core/resource/network_resource.h"
-#include "core/resource/resource.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "utils/common/util.h"
-#include "utils/network/nettools.h"
+#include <core/resource/directory_browser.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include <utils/common/util.h>
+#include <utils/network/nettools.h>
 
 static inline QString cameraInfoString(QnResourcePtr resource)
 {
@@ -51,6 +53,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     licenseWidget = new LicenseWidget(this);
     tabWidget->insertTab(4, licenseWidget, tr("License"));
 #endif
+
+    QPushButton *aboutButton = buttonBox->addButton(cm_about.text(), QDialogButtonBox::HelpRole);
+    connect(aboutButton, SIGNAL(clicked()), &cm_about, SLOT(trigger()));
+
 
     Settings::instance().fillData(m_settingsData);
 
