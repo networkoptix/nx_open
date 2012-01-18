@@ -200,6 +200,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
         result->setHostAddress(getHostAddress(), QnDomainMemory);
         result->setMAC(getMAC());
         result->setId(getId());
+        result->setFlags(flags());
     }
     else
     {
