@@ -32,7 +32,7 @@ struct QN_EXPORT QnParamType
 
     bool ui;
     bool isReadOnly;
-    bool isStatic;
+    bool isPhysical;
 
     bool setDefVal(const QVariant &val); // safe way to set value
 };
@@ -62,7 +62,7 @@ struct QN_EXPORT QnParam
     const QList<QVariant>& possibleValues() const { return m_paramType->possible_values; }
     const QString& description() const { return m_paramType->description; }
     bool isUiParam() const { return m_paramType->ui; }
-    bool isStatic() const { return m_paramType->isStatic; }
+    bool isPhysical() const { return m_paramType->isPhysical; }
     const bool isReadOnly() const { return m_paramType->isReadOnly; }
     const QString netHelper() const { return m_paramType->paramNetHelper; }
 

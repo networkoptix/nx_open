@@ -4,7 +4,7 @@
 QnParamType::QnParamType(const QString& name, const QVariant &val)
     : type(Value), name(name), default_value(val),
       min_val(0.0), max_val(0.0), step(0.0),
-      ui(false), isReadOnly(false), isStatic(false)
+      ui(false), isReadOnly(false), isPhysical(true)
 {
     type = Value;
     this->name = name;
@@ -15,7 +15,7 @@ QnParamType::QnParamType(const QString& name, const QVariant &val)
 QnParamType::QnParamType()
     : type(None),
       min_val(0.0), max_val(0.0), step(0.0),
-      ui(false), isReadOnly(false), isStatic(false)
+      ui(false), isReadOnly(false), isPhysical(true)
 {
 }
 
