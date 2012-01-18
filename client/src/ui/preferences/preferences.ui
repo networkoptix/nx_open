@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>395</height>
+    <width>650</width>
+    <height>563</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -81,9 +81,16 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QListWidget" name="auxMediaRootsList"/>
+             <widget class="QListWidget" name="auxMediaRootsList">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>110</height>
+               </size>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -94,8 +101,8 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>20</width>
-                  <height>40</height>
+                  <width>10</width>
+                  <height>10</height>
                  </size>
                 </property>
                </spacer>
@@ -124,8 +131,8 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>20</width>
-                  <height>40</height>
+                  <width>10</width>
+                  <height>10</height>
                  </size>
                 </property>
                </spacer>
@@ -137,21 +144,14 @@
          </layout>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="appearanceTab">
-      <attribute name="title">
-       <string>Appearance</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_14">
        <item>
-        <widget class="QGroupBox" name="groupBox_9">
+        <widget class="QGroupBox" name="lookAndFeelGroupBox">
          <property name="title">
           <string>Look and Feel</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="maxVideoItemsLabel">
             <property name="text">
              <string>Maximum video items on the scene (*)</string>
             </property>
@@ -221,60 +221,24 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="restartIsNeededWarningLabel">
-         <property name="text">
-          <string>* Application restart is needed for these changes to take effect</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="networkTab">
-      <attribute name="title">
-       <string>Network</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_12">
-       <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="NetworkInterfacesGroupBox">
          <property name="title">
-          <string>Interfaces</string>
+          <string>Network Interfaces</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_13">
           <item>
-           <widget class="QListWidget" name="networkInterfacesList"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_4">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Conflict resolving</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_11">
-          <item>
-           <widget class="QCheckBox" name="allowChangeIPCheckBox">
-            <property name="text">
-             <string>Allow to change camera IP address if required for cameras to work (for this run only)</string>
+           <widget class="QListWidget" name="networkInterfacesList">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>110</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -605,22 +569,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>440</x>
      <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>auxMediaRootsList</sender>
-   <signal>itemSelectionChanged()</signal>
-   <receiver>PreferencesDialog</receiver>
-   <slot>auxMediaFolderSelectionChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>272</x>
-     <y>230</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>314</x>
-     <y>197</y>
     </hint>
    </hints>
   </connection>
