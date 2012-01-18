@@ -1346,7 +1346,7 @@ void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &v
 
 void QnWorkbenchController::at_recordingSettingsAction_triggered() {
     QScopedPointer<PreferencesWindow> dialog(new PreferencesWindow(display()->view()));
-    dialog->setCurrentTab(3);
+    dialog->setCurrentTab(2);
     dialog->exec();
 }
 

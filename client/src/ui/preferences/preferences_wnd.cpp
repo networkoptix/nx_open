@@ -39,15 +39,17 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
 
+    tabWidget->removeTab(2); // ###
+
     videoRecorderWidget = new RecordingSettingsWidget(this);
-    tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
+    tabWidget->insertTab(2, videoRecorderWidget, tr("Screen Recorder"));
 
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
-    tabWidget->insertTab(4, youTubeSettingsWidget, tr("YouTube"));
+    tabWidget->insertTab(3, youTubeSettingsWidget, tr("YouTube"));
 
 #ifndef CL_TRIAL_MODE
     licenseWidget = new LicenseWidget(this);
-    tabWidget->insertTab(5, licenseWidget, tr("License"));
+    tabWidget->insertTab(4, licenseWidget, tr("License"));
 #endif
 
     Settings::instance().fillData(m_settingsData);
