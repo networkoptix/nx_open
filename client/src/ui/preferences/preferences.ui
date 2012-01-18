@@ -213,7 +213,7 @@
           <item>
            <widget class="QCheckBox" name="downmixAudioCheckBox">
             <property name="text">
-             <string>Downmix the Audio from 5.1 to 2.1 channels (*)</string>
+             <string>Downmix the Audio from 5.1 to 2.1 channels (restart required)</string>
             </property>
            </widget>
           </item>

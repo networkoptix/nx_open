@@ -122,7 +122,6 @@ void PreferencesWindow::updateView()
 
     totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
 
-    lookAndFeelGroupBox->hide(); // ### handle settingsData.maxVideoItems and remove this line
     maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
 
     downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
