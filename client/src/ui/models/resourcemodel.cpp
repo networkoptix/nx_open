@@ -1,6 +1,7 @@
 #include "resourcemodel.h"
 
 #include <QtCore/QMimeData>
+#include <QtCore/QUrl>
 
 #include <core/resourcemanagment/resource_pool.h>
 
@@ -41,7 +42,7 @@ ResourceModel::~ResourceModel()
 
 QnResourcePtr ResourceModel::resourceFromIndex(const QModelIndex &index) const
 {
-    return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+    return index.column() == 0 ? qnResPool->getResourceById(index.data(Qt::UserRole + 1)) : QnResourcePtr(0);
 }
 
 QModelIndex ResourceModel::indexFromResource(const QnResourcePtr &resource) const
@@ -171,8 +172,7 @@ QMimeData *ResourceModel::mimeData(const QModelIndexList &indexes) const
         if (types.contains(resourceFormat) || types.contains(urlFormat)) {
             QnResourceList resources;
             foreach (const QModelIndex &index, indexes) {
-                QnResourcePtr resource = resourceFromIndex(index);
-                if (resource)
+                if (QnResourcePtr resource = resourceFromIndex(index))
                     resources.append(resource);
             }
             if (types.contains(resourceFormat))
@@ -225,7 +225,7 @@ ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent)
 
 QnResourcePtr ResourceSortFilterProxyModel::resourceFromIndex(const QModelIndex &index) const
 {
-    return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+    return index.column() == 0 ? qnResPool->getResourceById(index.data(Qt::UserRole + 1)) : QnResourcePtr(0);
 }
 
 QModelIndex ResourceSortFilterProxyModel::indexFromResource(const QnResourcePtr &resource) const
