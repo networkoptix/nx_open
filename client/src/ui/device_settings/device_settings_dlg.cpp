@@ -3,6 +3,7 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QGroupBox>
+#include <QtGui/QMessageBox>
 #include <QtGui/QTabWidget>
 
 #include "device_settings_tab.h"
@@ -55,6 +56,18 @@ QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
 
 void CLAbstractDeviceSettingsDlg::accept()
 {
+    // ### save at once, probably in async way
+    foreach (CLAbstractSettingsWidget *widget, m_widgets.values()) {
+        const QnParam &param = widget->param();
+        if (!m_resource->setParam(param.name(), param.value(), param.isPhysical() ? QnDomainPhysical : QnDomainMemory)) {
+            if (QMessageBox::warning(this, tr("Unable to save changes"), tr("Please try save changes later."),
+                                     QMessageBox::Ok | QMessageBox::Close, QMessageBox::Ok) == QMessageBox::Close) {
+                reject();
+            }
+            return;
+        }
+    }
+
     QDialog::accept();
 }
 
