@@ -18,6 +18,7 @@
 #include "ui/context_menu_helper.h"
 #include "ui/navigationtreewidget.h"
 
+#include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
 #include "ui/preferences/preferences_wnd.h"
 
@@ -66,6 +67,9 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 
     connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
     addAction(&cm_toggle_fullscreen);
+
+    connect(&cm_about, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
+    addAction(&cm_about);
 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
@@ -294,9 +298,17 @@ void MainWindow::toggleFullScreen()
     }
 }
 
+void MainWindow::showAboutDialog()
+{
+    AboutDialog dialog(this);
+    dialog.setWindowModality(Qt::ApplicationModal);
+    dialog.exec();
+}
+
 void MainWindow::editPreferences()
 {
     PreferencesWindow dialog(this);
+    dialog.setWindowModality(Qt::ApplicationModal);
     dialog.exec();
 }
 

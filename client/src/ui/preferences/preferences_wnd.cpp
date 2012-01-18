@@ -14,7 +14,6 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "utils/common/util.h"
 #include "utils/network/nettools.h"
-#include "version.h"
 
 static inline QString cameraInfoString(QnResourcePtr resource)
 {
@@ -36,17 +35,6 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
       connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
 {
     setupUi(this);
-
-    QString label = creditsLabel->text();
-    label = label.replace(QLatin1String("ORGANIZATION_NAME"), QLatin1String(ORGANIZATION_NAME) + QLatin1String("(tm)"));
-    label = label.replace(QLatin1String("APPLICATION_NAME"), QLatin1String(APPLICATION_NAME));
-    label = label.replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR));
-    label = label.replace(QLatin1String("FFMPEG_VERSION"), QLatin1String(FFMPEG_VERSION));
-#ifndef Q_OS_DARWIN
-    //if (QApplication::style()->objectName() == QLatin1String("Bespin"))
-    label += QLatin1String("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Bespin style</span><span style=\" font-size:8pt;\"> </span><span style=\" font-size:8pt; font-weight:600;\">latest svn version</span><span style=\" font-size:8pt;\"> - Copyright (C) 2007-2010 Thomas Luebking</span></p>");
-#endif
-    creditsLabel->setText(label);
 
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
@@ -109,7 +97,6 @@ void PreferencesWindow::accept()
 
 void PreferencesWindow::updateView()
 {
-    versionLabel->setText(QLatin1String(APPLICATION_VERSION) + " (" + QLatin1String(APPLICATION_REVISION) + ")");
     mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
     auxMediaRootsList->clear();
