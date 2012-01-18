@@ -20,6 +20,10 @@ public:
     QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
     QModelIndex indexFromResource(const QnResourcePtr &resource) const;
 
+protected Q_SLOTS:
+    void addResource(const QnResourcePtr &resource);
+    void removeResource(const QnResourcePtr &resource);
+
 protected:
     QModelIndex indexFromResourceId(uint id) const; // ### remove; use use indexFromResource() instead
     inline QnResourcePtr resourceFromItem(QStandardItem *item) const
@@ -28,9 +32,6 @@ protected:
     { return itemFromIndex(indexFromResource(resource)); }
     inline QStandardItem *itemFromResourceId(uint id) const
     { return itemFromIndex(indexFromResourceId(id)); }
-
-    void addResource(const QnResourcePtr &resource);
-    void removeResource(const QnResourcePtr &resource);
 
 private Q_SLOTS:
     void _q_addResource(const QnResourcePtr &resource);

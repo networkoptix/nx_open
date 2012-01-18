@@ -17,14 +17,14 @@ ResourceModel::ResourceModel(QObject *parent)
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(_q_removeResource(QnResourcePtr)));
     connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(_q_resourceChanged(QnResourcePtr)));
 
-    const QnResourceList resources = qnResPool->getResources();
+    const QnResourceList resources = qnResPool->getResources(); // make a snapshot
     foreach (const QnResourcePtr &server, resources) {
         if (server->checkFlag(QnResource::server)) {
-            addResource(server);
+            _q_addResource(server);
             const QnId serverId = server->getId();
             foreach (const QnResourcePtr &resource, resources) {
                 if (resource->getParentId() == serverId && !resource->checkFlag(QnResource::server))
-                    addResource(resource);
+                    _q_addResource(resource);
             }
         }
     }
@@ -86,7 +86,30 @@ static inline QIcon iconForResource(const QnResourcePtr &resource)
 
 void ResourceModel::addResource(const QnResourcePtr &resource)
 {
-    QStandardItem *item = 0;
+    if (sender() != qnResPool) {
+        qnResPool->addResource(resource); // emits resourceAdded; thus return
+        return;
+    }
+
+    _q_addResource(resource);
+}
+
+void ResourceModel::removeResource(const QnResourcePtr &resource)
+{
+    if (sender() != qnResPool) {
+        qnResPool->removeResource(resource); // emits resourceRemoved; thus return
+        return;
+    }
+
+    _q_removeResource(resource);
+}
+
+void ResourceModel::_q_addResource(const QnResourcePtr &resource)
+{
+    QStandardItem *item = itemFromResource(resource);
+    if (item)
+        return; // avoid duplicates
+
     if (resource->checkFlag(QnResource::server)) {
         item = new QStandardItem;
         item->setSelectable(false);
@@ -108,35 +131,14 @@ void ResourceModel::addResource(const QnResourcePtr &resource)
     item->setEditable(false);
 }
 
-void ResourceModel::removeResource(const QnResourcePtr &resource)
-{
-    if (QStandardItem *item = itemFromResource(resource)) {
-        foreach (QStandardItem *rowItem, takeRow(item->row()))
-            delete rowItem;
-    }
-}
-
-void ResourceModel::_q_addResource(const QnResourcePtr &resource)
-{
-    if (sender() != qnResPool) {
-        qnResPool->addResource(resource); // emits resourceAdded; thus return
-        return;
-    }
-
-    if (itemFromResource(resource))
-        return; // avoid duplicates
-
-    addResource(resource);
-}
-
 void ResourceModel::_q_removeResource(const QnResourcePtr &resource)
 {
-    if (sender() != qnResPool) {
-        qnResPool->removeResource(resource); // emits resourceRemoved; thus return
-        return;
+    if (QStandardItem *item = itemFromResource(resource)) {
+        if (item->parent())
+            item->parent()->removeRow(item->row());
+        else
+            removeRow(item->row());
     }
-
-    removeResource(resource);
 }
 
 void ResourceModel::_q_resourceChanged(const QnResourcePtr &resource)

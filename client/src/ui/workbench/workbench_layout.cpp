@@ -1,9 +1,14 @@
 #include "workbench_layout.h"
-#include <cassert>
+
 #include <limits>
+
+#include <core/resourcemanagment/resource_pool.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
-#include <ui/common/scene_utility.h>
+
+#include "ui/common/scene_utility.h"
+
 #include "workbench_item.h"
 
 namespace {
@@ -28,7 +33,7 @@ namespace {
             BottomBorder = 0x8,
             AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
         };
-        Q_DECLARE_FLAGS(Borders, Border);
+        Q_DECLARE_FLAGS(Borders, Border)
 
         GridWalker() {
             m_rect = QRect(0, 0, 1, 1);
@@ -37,7 +42,7 @@ namespace {
         }
 
         QPoint next() {
-            assert(hasNext());
+            Q_ASSERT(hasNext());
 
             QPoint result = m_pos;
             m_pos += m_delta;
@@ -71,7 +76,6 @@ namespace {
                 m_delta = QPoint(1, 0);
                 break;
             default:
-                assert(!"Unreachable");
                 break;
             }
         }
@@ -86,11 +90,11 @@ namespace {
         QPoint m_delta;
     };
 
-    Q_DECLARE_OPERATORS_FOR_FLAGS(GridWalker::Borders);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(GridWalker::Borders)
 
     class DistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
     public:
-        DistanceMagnitudeCalculator(const QPointF &origin): 
+        DistanceMagnitudeCalculator(const QPointF &origin):
             m_origin(origin),
             m_calculator(MagnitudeCalculator::forType<QPointF>())
         {}
@@ -109,11 +113,14 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
-    QObject(parent)
-{}
+QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent)
+    : QObject(parent)
+{
+    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(resourceRemoved(QnResourcePtr)));
+}
 
-QnWorkbenchLayout::~QnWorkbenchLayout() {
+QnWorkbenchLayout::~QnWorkbenchLayout()
+{
     clear();
 
     bool signalsBlocked = blockSignals(false);
@@ -182,11 +189,16 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     emit itemRemoved(item);
 }
 
-void QnWorkbenchLayout::clear() {
-    foreach (QnWorkbenchItem *item, m_items) {
-        removeItem(item);
-        delete item;
-    }
+void QnWorkbenchLayout::clear()
+{
+    foreach (QnWorkbenchItem *item, m_items)
+		delete item;
+    m_items.clear();
+}
+
+void QnWorkbenchLayout::resourceRemoved(const QnResourcePtr &resource)
+{
+    delete item(resource);
 }
 
 bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem *item, const QRect &geometry, Disposition *disposition) {
