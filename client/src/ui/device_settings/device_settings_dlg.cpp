@@ -16,28 +16,25 @@ CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource,
 {
     setWindowTitle(tr("Camera settings: %1").arg(m_resource->toString()));
 
-    int width = 610;
-    int height = 490;
-
-    resize(width, height);
+    resize(610, 490);
 
     m_tabWidget = new QTabWidget(this);
 
     foreach (const QString &group, m_resource->getResourceParamList().groupList())
         m_tabs.append(new CLDeviceSettingsTab(this, m_resource, group));
 
-    m_buttonBox = new QDialogButtonBox(this);
-    m_buttonBox->setFocusPolicy(Qt::NoFocus);
+    m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Reset | QDialogButtonBox::Close, Qt::Horizontal, this);
 
-    QPushButton *suggestionsBtn = new QPushButton(tr("Suggestions..."), this);
-    suggestionsBtn->setFocusPolicy(Qt::NoFocus);
-    connect(suggestionsBtn, SIGNAL(released()), this, SLOT(onSuggestions()));
-    m_buttonBox->addButton(suggestionsBtn, QDialogButtonBox::ActionRole);
+    QPushButton *suggestionsButton = m_buttonBox->addButton(tr("Suggestions..."), QDialogButtonBox::ActionRole);
+    connect(suggestionsButton, SIGNAL(clicked()), this, SLOT(onSuggestions()));
 
-    QPushButton *closeBtn = new QPushButton(tr("Close"), this);
-    closeBtn->setFocusPolicy(Qt::NoFocus);
-    connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
-    m_buttonBox->addButton(closeBtn, QDialogButtonBox::RejectRole);
+    foreach (QAbstractButton *button, m_buttonBox->buttons())
+        button->setFocusPolicy(Qt::NoFocus);
+
+    connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(m_buttonBox->button(QDialogButtonBox::Reset), SIGNAL(clicked()), this, SLOT(reset()));
+
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_tabWidget);
@@ -56,9 +53,28 @@ QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
     return m_resource;
 }
 
+void CLAbstractDeviceSettingsDlg::accept()
+{
+    QDialog::accept();
+}
+
+void CLAbstractDeviceSettingsDlg::reject()
+{
+    QDialog::reject();
+}
+
+void CLAbstractDeviceSettingsDlg::reset()
+{
+}
+
 void CLAbstractDeviceSettingsDlg::setParam(const QString &name, const QVariant &val)
 {
     m_resource->setParamAsync(name, val, QnDomainPhysical);
+}
+
+QList<CLDeviceSettingsTab *> CLAbstractDeviceSettingsDlg::tabs() const
+{
+    return m_tabs;
 }
 
 CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name) const
@@ -76,6 +92,11 @@ void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
     m_tabWidget->addTab(tab, tab->name());
 }
 
+QList<QGroupBox *> CLAbstractDeviceSettingsDlg::groups() const
+{
+    return m_groups.values();
+}
+
 QGroupBox *CLAbstractDeviceSettingsDlg::groupByName(const QString &name) const
 {
     return m_groups.value(name);
@@ -84,6 +105,11 @@ QGroupBox *CLAbstractDeviceSettingsDlg::groupByName(const QString &name) const
 void CLAbstractDeviceSettingsDlg::putGroup(const QString &name, QGroupBox *group)
 {
     m_groups.insert(name, group);
+}
+
+QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::widgets() const
+{
+    return m_widgets.values();
 }
 
 QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::widgetsByGroup(const QString &group) const
@@ -103,14 +129,9 @@ CLAbstractSettingsWidget *CLAbstractDeviceSettingsDlg::widgetByName(const QStrin
     return m_widgets.value(name);
 }
 
-void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget *wgt)
+void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget *widget)
 {
-    m_widgets.insert(wgt->param().name(), wgt);
-}
-
-void CLAbstractDeviceSettingsDlg::onClose()
-{
-    close();
+    m_widgets.insert(widget->param().name(), widget);
 }
 
 void CLAbstractDeviceSettingsDlg::onSuggestions()
