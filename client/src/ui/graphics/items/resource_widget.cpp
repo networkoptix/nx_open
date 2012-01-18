@@ -277,7 +277,7 @@ void QnResourceWidget::ensureMotionMask()
 
     }
     m_motionMaskValid = true;
-};
+}
 
 void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
     ChannelState &state = m_channelState[channel];

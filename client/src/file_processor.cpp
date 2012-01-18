@@ -89,7 +89,7 @@ void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
     else
         text = QObject::tr("Are you sure you want to delete %1 files?").arg(resources.size());
     if (QMessageBox::question(QApplication::activeWindow(), QObject::tr("Delete file(s)?"), text,
-                              QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Cancel) {
+                              QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Yes) {
         qnResPool->removeResources(resources);
         foreach (const QnResourcePtr &resource, resources)
             QFile::remove(resource->getUrl());

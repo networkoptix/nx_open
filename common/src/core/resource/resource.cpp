@@ -512,15 +512,11 @@ void QnResource::disconnectAllConsumers()
 {
     QMutexLocker locker(&m_consumersMtx);
 
-    foreach(QnResourceConsumer* con, m_consumers)
-    {
-        con->beforeDisconnectFromResource();
-    }
+    foreach (QnResourceConsumer *consumer, m_consumers)
+        consumer->beforeDisconnectFromResource();
 
-    foreach(QnResourceConsumer* con, m_consumers)
-    {
-        con->disconnectFromResource();
-    }
+    foreach (QnResourceConsumer *consumer, m_consumers)
+        consumer->disconnectFromResource();
 
     m_consumers.clear();
 }

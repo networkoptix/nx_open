@@ -10,6 +10,8 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
 
+#include <core/resourcemanagment/resource_pool.h>
+
 #include "ui/context_menu_helper.h"
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/dialogs/tagseditdialog.h"

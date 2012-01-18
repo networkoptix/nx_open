@@ -17,6 +17,12 @@ QnResourcePool::QnResourcePool() : QObject(),
     addResource(localServer);
 }
 
+QnResourcePool::~QnResourcePool()
+{
+    QMutexLocker locker(&m_resourcesMtx);
+    m_resources.clear();
+}
+
 QnResourcePool *QnResourcePool::instance()
 {
     return globalResourcePool();

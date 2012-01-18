@@ -30,6 +30,7 @@ class QN_EXPORT QnResourcePool : public QObject
 
 public:
     QnResourcePool();
+    ~QnResourcePool();
 
     static QnResourcePool *instance();
 
@@ -65,9 +66,9 @@ public:
     QnResourceList findResourcesByCriteria(const CLDeviceCriteria &cr) const;
 
 Q_SIGNALS:
-    void resourceAdded(const QnResourcePtr &res);
-    void resourceRemoved(const QnResourcePtr &res);
-    void resourceChanged(const QnResourcePtr &res);
+    void resourceAdded(const QnResourcePtr &resource);
+    void resourceRemoved(const QnResourcePtr &resource);
+    void resourceChanged(const QnResourcePtr &resource);
 
 private Q_SLOTS:
     void handleResourceChange();

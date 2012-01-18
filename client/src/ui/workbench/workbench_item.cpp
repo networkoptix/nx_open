@@ -10,10 +10,13 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr &resource, QObject *parent)
     m_layout(NULL),
     m_flags(Pinned),
     m_rotation(0.0)
-{}
+{
+}
 
-QnWorkbenchItem::~QnWorkbenchItem() {
-    ensureRemoved();
+QnWorkbenchItem::~QnWorkbenchItem()
+{
+    if (m_layout)
+        m_layout->removeItem(this);
 }
 
 void QnWorkbenchItem::load(const QnLayoutItemData& itemData)
@@ -22,12 +25,6 @@ void QnWorkbenchItem::load(const QnLayoutItemData& itemData)
     setCombinedGeometry(itemData.combinedGeometry);
     setRotation(itemData.rotation);
 }
-
-void QnWorkbenchItem::ensureRemoved() {
-    if(m_layout != NULL)
-        m_layout->removeItem(this);
-}
-
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {
     if(m_layout != NULL)
         return m_layout->moveItem(this, geometry);
