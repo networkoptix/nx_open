@@ -1,6 +1,6 @@
 #include "recording_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
@@ -48,7 +48,7 @@ void QnRecordingManager::stop()
 void QnRecordingManager::onNewResource(QnResourcePtr res)
 {
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
-    if (camera) 
+    if (camera)
     {
         QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
         cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
@@ -85,7 +85,7 @@ void QnRecordingManager::recordingFailed(QString errMessage)
     QnServerStreamRecorder* recorder = static_cast<QnServerStreamRecorder*>(sender());
     for (QMap<QnResourcePtr, QnServerStreamRecorder*>::iterator itr = m_recordMap.begin(); itr != m_recordMap.end(); ++itr)
     {
-        if (itr.value() == recorder) 
+        if (itr.value() == recorder)
         {
             qnCameraPool->removeVideoCamera(itr.key());
             m_recordMap.erase(itr);
@@ -100,7 +100,7 @@ void QnRecordingManager::onRemoveResource(QnResourcePtr res)
     QMap<QnResourcePtr, QnServerStreamRecorder*>::iterator itr = m_recordMap.find(res);
     if (itr == m_recordMap.end())
         return;
-    
+
     qnCameraPool->removeVideoCamera(itr.key());
     QnServerStreamRecorder* recorder = static_cast<QnServerStreamRecorder*>(itr.value());
     m_recordMap.erase(itr);
@@ -123,7 +123,7 @@ Q_GLOBAL_STATIC(QnServerDataProviderFactory, inst);
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {
-    if (role == QnResource::Role_Archive) 
+    if (role == QnResource::Role_Archive)
     {
         QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
         archiveReader->setCycleMode(false);

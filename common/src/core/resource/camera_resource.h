@@ -2,7 +2,7 @@
 #define _camera_resource
 
 #include "network_resource.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "security_cam_resource.h"
 
 class QnCameraResource;
 typedef QSharedPointer<QnCameraResource> QnCameraResourcePtr;

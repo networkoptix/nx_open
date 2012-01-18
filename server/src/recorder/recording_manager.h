@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include "core/resource/resource.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "core/misc/scheduleTask.h"
 
 class QnServerStreamRecorder;

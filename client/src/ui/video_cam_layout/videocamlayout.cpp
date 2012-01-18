@@ -23,7 +23,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "ui/mixins/render_watch_mixin.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "file_processor.h"
 #include "ui/skin/globals.h"
 

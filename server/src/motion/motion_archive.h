@@ -8,7 +8,7 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/sse_helper.h"
 #include "recorder/device_file_catalog.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 
 static const int MOTION_INDEX_HEADER_SIZE = 16;
 static const int MOTION_INDEX_RECORD_SIZE = 8;
@@ -48,7 +48,7 @@ private:
     QVector<IndexRecord> m_index;
     IndexHeader m_indexHeader;
     QFile m_motionFile;
-    
+
     int m_motionLoadedStart;
     int m_motionLoadedEnd;
 
@@ -95,7 +95,7 @@ private:
     QnNetworkResourcePtr m_resource;
     QnSecurityCamResourcePtr m_camResource;
     qint64 m_lastDateForCurrentFile;
-    
+
     QFile m_detailedMotionFile;
     QFile m_detailedIndexFile;
     qint64 m_firstTime;
