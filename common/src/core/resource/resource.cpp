@@ -25,38 +25,32 @@ QnResource::~QnResource()
 
 void QnResource::updateInner(const QnResource& other)
 {
-    m_flags = other.m_flags;
-    m_name = other.m_name;
     m_id = other.m_id;
     m_parentId = other.m_parentId;
     m_typeId = other.m_typeId;
+    m_flags = other.m_flags;
+    m_name = other.m_name;
     m_lastDiscoveredTime = other.m_lastDiscoveredTime;
     m_tags = other.m_tags;
     m_avalable = other.m_avalable;
     m_url = other.m_url;
-    setStatus(other.m_status, true);
 }
 
 void QnResource::update(const QnResource& other)
 {
-    Status old = m_status;
-
-    foreach (QnResourceConsumer* consumer, m_consumers)
+    foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
 
     {
-        QWriteLocker writeLocker(&m_rwLock);
         QReadLocker readLocker(&other.m_rwLock);
-
-        updateInner(other);
+        {
+            QWriteLocker writeLocker(&m_rwLock);
+            updateInner(other);
+        }
+        setStatus(other.m_status);
     }
 
-    if (old != m_status)
-    {
-        emit statusChanged(old, m_status);
-    }
-
-    foreach (QnResourceConsumer* consumer, m_consumers)
+    foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
 }
 
