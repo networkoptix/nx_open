@@ -27,7 +27,7 @@
 #include "ui/skin/skin.h"
 #include "ui/skin/globals.h"
 #include "ui/animation/property_animation.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 #include "ui/preferences/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
 #include "youtube/youtubeuploaddialog.h"
@@ -2519,8 +2519,8 @@ void GraphicsView::onDecorationItemPressed(const QString &name)
     }
     else if (name == button_settings)
     {
-        PreferencesWindow preferencesDialog(this);
-        preferencesDialog.exec();
+        PreferencesDialog dialog(this);
+        dialog.exec();
     }
     else if (name == button_searchlive)
     {
@@ -2984,9 +2984,9 @@ void GraphicsView::toggleRecording()
 
 void GraphicsView::recordingSettings()
 {
-    PreferencesWindow preferencesDialog(this);
-    preferencesDialog.setCurrentTab(2);
-    preferencesDialog.exec();
+    PreferencesDialog dialog(this);
+    dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
+    dialog.exec();
 }
 
 void GraphicsView::toggleFullScreen()

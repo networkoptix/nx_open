@@ -22,7 +22,7 @@
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 
 #include "ui/mixins/sync_play_mixin.h"
 #include "ui/mixins/render_watch_mixin.h"
@@ -434,7 +434,7 @@ void MainWnd::showAboutDialog()
 
 void MainWnd::editPreferences()
 {
-    PreferencesWindow dialog(this);
+    PreferencesDialog dialog(this);
     dialog.setWindowModality(Qt::ApplicationModal);
     dialog.exec();
 }

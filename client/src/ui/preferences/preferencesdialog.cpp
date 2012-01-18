@@ -1,4 +1,4 @@
-#include "preferences_wnd.h"
+#include "preferencesdialog.h"
 
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "ui/video_cam_layout/layout_manager.h"
@@ -19,7 +19,7 @@ static inline QString cameraInfoString(QnResourcePtr resource)
 {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (networkResource) {
-        return PreferencesWindow::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
+        return PreferencesDialog::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
             .arg(networkResource->getName())
             .arg(networkResource->getMAC().toString())
             .arg(networkResource->getHostAddress().toString())
@@ -30,7 +30,7 @@ static inline QString cameraInfoString(QnResourcePtr resource)
 }
 
 
-PreferencesWindow::PreferencesWindow(QWidget *parent)
+PreferencesDialog::PreferencesDialog(QWidget *parent)
     : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
       connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
 {
@@ -61,11 +61,11 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
     //connect(CLDeviceSearcher::instance(), SIGNAL(newNetworkDevices()), this, SLOT(updateCameras())); todo
 }
 
-PreferencesWindow::~PreferencesWindow()
+PreferencesDialog::~PreferencesDialog()
 {
 }
 
-void PreferencesWindow::accept()
+void PreferencesDialog::accept()
 {
     m_settingsData.maxVideoItems = maxVideoItemsSpinBox->value();
     m_settingsData.downmixAudio = downmixAudioCheckBox->isChecked();
@@ -97,7 +97,7 @@ void PreferencesWindow::accept()
     QDialog::accept();
 }
 
-void PreferencesWindow::updateView()
+void PreferencesDialog::updateView()
 {
     mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
@@ -129,7 +129,7 @@ void PreferencesWindow::updateView()
     downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
 }
 
-void PreferencesWindow::updateStoredConnections()
+void PreferencesDialog::updateStoredConnections()
 {
     QList<Settings::ConnectionData> connections;
     foreach (const Settings::ConnectionData &conn, Settings::connections()) {
@@ -141,7 +141,7 @@ void PreferencesWindow::updateStoredConnections()
     connectionsSettingsWidget->setConnections(connections);
 }
 
-void PreferencesWindow::updateCameras()
+void PreferencesDialog::updateCameras()
 {
     cl_log.log("Updating camera list", cl_logALWAYS);
 
@@ -152,7 +152,7 @@ void PreferencesWindow::updateCameras()
     updateView();
 }
 
-void PreferencesWindow::mainMediaFolderBrowse()
+void PreferencesDialog::mainMediaFolderBrowse()
 {
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -168,12 +168,12 @@ void PreferencesWindow::mainMediaFolderBrowse()
     updateView();
 }
 
-void PreferencesWindow::auxMediaFolderSelectionChanged()
+void PreferencesDialog::auxMediaFolderSelectionChanged()
 {
     auxRemovePushButton->setEnabled(!auxMediaRootsList->selectedItems().isEmpty());
 }
 
-void PreferencesWindow::auxMediaFolderBrowse()
+void PreferencesDialog::auxMediaFolderBrowse()
 {
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -196,7 +196,7 @@ void PreferencesWindow::auxMediaFolderBrowse()
     updateView();
 }
 
-void PreferencesWindow::auxMediaFolderRemove()
+void PreferencesDialog::auxMediaFolderRemove()
 {
     foreach (QListWidgetItem *item, auxMediaRootsList->selectedItems())
         m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
@@ -204,13 +204,13 @@ void PreferencesWindow::auxMediaFolderRemove()
     updateView();
 }
 
-void PreferencesWindow::cameraSelected(int row)
+void PreferencesDialog::cameraSelected(int row)
 {
     if (row >= 0 && row < m_cameras.size())
         cameraInfoLabel->setText(m_cameras[row].second);
 }
 
-void PreferencesWindow::setCurrentTab(int index)
+void PreferencesDialog::setCurrentPage(PreferencesDialog::SettingsPage page)
 {
-    tabWidget->setCurrentIndex(index);
+    tabWidget->setCurrentIndex(int(page));
 }

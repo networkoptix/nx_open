@@ -27,7 +27,7 @@
 #include <utils/common/event_signalizator.h>
 
 #include <ui/screen_recording/screen_recorder.h>
-#include <ui/preferences/preferences_wnd.h>
+#include <ui/preferences/preferencesdialog.h>
 #include <ui/skin/globals.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -1345,9 +1345,9 @@ void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &v
 }
 
 void QnWorkbenchController::at_recordingSettingsAction_triggered() {
-    QScopedPointer<PreferencesWindow> dialog(new PreferencesWindow(display()->view()));
-    dialog->setCurrentTab(2);
-    dialog->exec();
+    PreferencesDialog dialog(display()->view());
+    dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
+    dialog.exec();
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
