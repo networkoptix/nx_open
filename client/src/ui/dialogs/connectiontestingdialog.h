@@ -26,7 +26,7 @@ public Q_SLOTS:
     virtual void reject();
 
     void timeout();
-    void testResults(int status, const QByteArray &data, int requstHandle);
+    void testResults(int status, const QByteArray &data, int requestHandle);
 
 private:
     void testSettings();
@@ -38,7 +38,7 @@ private:
     QUrl m_url;
 
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
-    
+
     QnAppServerConnectionPtr connection;
 };
 

@@ -90,6 +90,8 @@ public Q_SLOTS:
     void stopRecording();
 
 protected:
+    bool eventFilter(QObject *watched, QEvent *event);
+
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();

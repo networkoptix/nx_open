@@ -6,7 +6,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "core/resource/resource.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 #include "ui/skin/skin.h"
 #include "connectiontestingdialog.h"
 
@@ -58,7 +58,7 @@ LoginDialog::~LoginDialog()
 void LoginDialog::testSettings()
 {
     QUrl url = currentUrl();
-    
+
     if (!url.isValid())
     {
         QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
@@ -75,7 +75,7 @@ QUrl LoginDialog::currentUrl()
     const int row = ui->storedConnectionsComboBox->currentIndex();
 
     QUrl url;
-    
+
     QString host = m_connectionsModel->item(row, 1)->text();
     int port = m_connectionsModel->item(row, 2)->text().toInt();
 
@@ -177,9 +177,9 @@ void LoginDialog::currentIndexChanged(int index)
 
 void LoginDialog::configureStoredConnections()
 {
-    PreferencesWindow preferencesDialog(this);
-    preferencesDialog.setCurrentTab(2);
+    PreferencesDialog dialog(this);
+    dialog.setCurrentPage(PreferencesDialog::PageConnections);
 
-    if (preferencesDialog.exec() == QDialog::Accepted)
+    if (dialog.exec() == QDialog::Accepted)
         updateStoredConnections();
 }

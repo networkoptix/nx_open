@@ -17,8 +17,8 @@
 #include <QFileDialog>
 #include <QGraphicsProxyWidget>
 
-#include <core/resourcemanagment/security_cam_resource.h>
 #include <core/resource/directory_browser.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
@@ -27,7 +27,7 @@
 #include <utils/common/event_signalizator.h>
 
 #include <ui/screen_recording/screen_recorder.h>
-#include <ui/preferences/preferences_wnd.h>
+#include <ui/preferences/preferencesdialog.h>
 #include <ui/skin/globals.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -617,15 +617,42 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
 
 void QnWorkbenchController::remove(const QnResourcePtr &resource)
 {
-    QnWorkbenchLayout *layout = this->layout();
-    layout->removeItem(layout->item(resource));
+    delete layout()->item(resource);
 }
 
 void QnWorkbenchController::remove(const QnResourceList &resources)
 {
     QnWorkbenchLayout *layout = this->layout();
     foreach (const QnResourcePtr &resource, resources)
-        layout->removeItem(layout->item(resource));
+        delete layout->item(resource);
+}
+
+bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
+{
+    if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
+        if (event->type() == QEvent::Close) {
+            QList<QnResourceWidget *> selectedWidgets;
+            foreach (QGraphicsItem *item, display()->scene()->selectedItems()) {
+                if (QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : 0)
+                    selectedWidgets.append(widget);
+            }
+            if (selectedWidgets.removeOne(widget) && !selectedWidgets.isEmpty()) {
+                event->ignore();
+                if (QMessageBox::question(display()->view(), tr("Close confirmation"), tr("Close %n item(s)?", 0, selectedWidgets.size() + 1),
+                                          QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok) == QMessageBox::Ok) {
+                    event->accept();
+                    foreach (QnResourceWidget *widget, selectedWidgets) {
+                        widget->removeEventFilter(this);
+                        widget->close();
+                    }
+                }
+
+                return event->isAccepted();
+            }
+        }
+    }
+
+    return QObject::eventFilter(watched, event);
 }
 
 void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
@@ -1106,6 +1133,8 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
 
+    widget->installEventFilter(this);
+
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
     if(cameraResource != NULL)
     {
@@ -1118,6 +1147,8 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
+
+    widget->removeEventFilter(this);
 
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
     if(cameraResource != NULL)
@@ -1345,9 +1376,9 @@ void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &v
 }
 
 void QnWorkbenchController::at_recordingSettingsAction_triggered() {
-    QScopedPointer<PreferencesWindow> dialog(new PreferencesWindow(display()->view()));
-    dialog->setCurrentTab(4);
-    dialog->exec();
+    PreferencesDialog dialog(display()->view());
+    dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
+    dialog.exec();
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {

@@ -218,8 +218,6 @@ private:
 
     QStringList m_tags;
 
-    bool m_avalable;
-
     QString m_url; //-
 
     Status m_status;
@@ -227,7 +225,6 @@ private:
     mutable QnParamList m_resourceParamList;
 
 
-    mutable QnParamList m_streamParamList; //-
     mutable QMutex m_consumersMtx;
     QSet<QnResourceConsumer*> m_consumers;
 };

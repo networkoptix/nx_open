@@ -25,19 +25,25 @@ public:
 
     QnResourcePtr resource() const;
 
+    QList<CLDeviceSettingsTab *> tabs() const;
     CLDeviceSettingsTab *tabByName(const QString &name) const;
     void addTab(CLDeviceSettingsTab *tab);
 
+    QList<QGroupBox *> groups() const;
     QGroupBox *groupByName(const QString &name) const;
     void putGroup(const QString &name, QGroupBox *group);
 
+    QList<CLAbstractSettingsWidget *> widgets() const;
     QList<CLAbstractSettingsWidget *> widgetsByGroup(const QString &group) const;
     CLAbstractSettingsWidget *widgetByName(const QString &name) const;
-    void putWidget(CLAbstractSettingsWidget *wgt);
+    void putWidget(CLAbstractSettingsWidget *widget);
 
 public Q_SLOTS:
+    virtual void accept();
+    virtual void reject();
+    virtual void reset();
+
     virtual void setParam(const QString &name, const QVariant &val);
-    virtual void onClose();
     virtual void onSuggestions();
 
     virtual void onNewtab(int index);

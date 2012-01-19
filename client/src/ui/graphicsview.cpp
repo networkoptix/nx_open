@@ -27,13 +27,13 @@
 #include "ui/skin/skin.h"
 #include "ui/skin/globals.h"
 #include "ui/animation/property_animation.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 #include "ui/preferences/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
 #include "youtube/youtubeuploaddialog.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_device.h"
 #include "utils/common/rand.h"
@@ -2519,8 +2519,8 @@ void GraphicsView::onDecorationItemPressed(const QString &name)
     }
     else if (name == button_settings)
     {
-        PreferencesWindow preferencesDialog(this);
-        preferencesDialog.exec();
+        PreferencesDialog dialog(this);
+        dialog.exec();
     }
     else if (name == button_searchlive)
     {
@@ -2984,9 +2984,9 @@ void GraphicsView::toggleRecording()
 
 void GraphicsView::recordingSettings()
 {
-    PreferencesWindow preferencesDialog(this);
-    preferencesDialog.setCurrentTab(4);
-    preferencesDialog.exec();
+    PreferencesDialog dialog(this);
+    dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
+    dialog.exec();
 }
 
 void GraphicsView::toggleFullScreen()

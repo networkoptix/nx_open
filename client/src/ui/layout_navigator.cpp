@@ -3,7 +3,7 @@
 #include "video_cam_layout/layout_manager.h"
 #include "camera/gl_renderer.h"
 #include "settings.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 
 extern QString start_screen;
 
@@ -149,10 +149,8 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
         {
             //mNewContent = CLSceneLayoutManager::instance().getAllRecordersContent();
             //goToNewLayoutContent();
-            PreferencesWindow* preferencesDialog = new PreferencesWindow();
-            preferencesDialog->exec();
-            delete preferencesDialog;
-
+            PreferencesDialog dialog;
+            dialog.exec();
         }
 
         if (itemname==button_layout)

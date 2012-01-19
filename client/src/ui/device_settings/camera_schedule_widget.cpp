@@ -77,25 +77,25 @@ void CameraScheduleWidget::updateGridParams()
     else if (ui->btnNoRecord->isChecked())
         color = ui->btnNoRecord->color();
 
-    ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Color, color.rgba());
+    ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorParam, color.rgba());
     if (ui->btnNoRecord->isChecked())
     {
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QLatin1String("-"));
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, QLatin1String("-"));
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, QLatin1String("-"));
     }
     else
     {
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_First, QString::number(ui->fpsSpinBox->value()));
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ParamType_Second, getShortText(ui->comboBoxQuality->currentText()));
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QString::number(ui->fpsSpinBox->value()));
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->comboBoxQuality->currentText()));
     }
 }
 
 void CameraScheduleWidget::onNeedReadCellParams(QPoint cell)
 {
     m_disableUpdateGridParams = true;
-    QColor color(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ParamType_Color).toUInt());
-    double fps(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ParamType_First).toDouble());
-    QString shortQuality(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ParamType_Second).toString());
+    QColor color(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ColorParam).toUInt());
+    double fps(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::FirstParam).toDouble());
+    QString shortQuality(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::SecondParam).toString());
 
     if (color == ui->btnRecordAlways->color())
         ui->btnRecordAlways->setChecked(true);

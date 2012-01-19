@@ -6,6 +6,9 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QRadioButton>
 
+#include "camera_schedule_widget.h"
+#include "qnschedulegridwidget.h"
+
 #include "settings.h"
 #include "ui/skin/globals.h"
 
@@ -218,6 +221,42 @@ void SettingsButtonWidget::onClicked()
 }
 
 void SettingsButtonWidget::updateParam(const QVariant &/*value*/)
+{
+    //cl_log.log("updateParam", cl_logALWAYS);
+}
+
+//==================================================
+SettingsScheduleGridWidget::SettingsScheduleGridWidget(QnResourcePtr dev, const QnParam &param)
+    : CLAbstractSettingsWidget(dev, param)
+{
+}
+
+QWidget *SettingsScheduleGridWidget::createWidget()
+{
+    QnScheduleGridWidget *widget = new QnScheduleGridWidget();
+
+    return widget;
+}
+
+void SettingsScheduleGridWidget::updateParam(const QVariant &value)
+{
+    //cl_log.log("updateParam", cl_logALWAYS);
+}
+
+//==================================================
+SettingsCameraScheduleWidget::SettingsCameraScheduleWidget(QnResourcePtr dev, const QnParam &param)
+    : CLAbstractSettingsWidget(dev, param)
+{
+}
+
+QWidget *SettingsCameraScheduleWidget::createWidget()
+{
+    CameraScheduleWidget *widget = new CameraScheduleWidget();
+
+    return widget;
+}
+
+void SettingsCameraScheduleWidget::updateParam(const QVariant &value)
 {
     //cl_log.log("updateParam", cl_logALWAYS);
 }

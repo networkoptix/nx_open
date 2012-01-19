@@ -4,10 +4,8 @@
 
 QMutex QnVideoCameraPool::m_staticMtx;
 
-
 QnVideoCameraPool::QnVideoCameraPool()
 {
-
 }
 
 void QnVideoCameraPool::stop()
