@@ -220,7 +220,7 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-//    signal(SIGABRT, stopServer);
+    signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
     Q_INIT_RESOURCE(api);
@@ -451,6 +451,7 @@ public:
         //IPPH264Decoder::dll.init();
 
         //============================
+        QnResourceDiscoveryManager::instance().setServer(true);
         QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());

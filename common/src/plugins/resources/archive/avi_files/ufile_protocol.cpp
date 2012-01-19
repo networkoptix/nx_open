@@ -5,83 +5,9 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSemaphore>
+#include "utils/common/buffered_file.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QSemaphore, semaphore, (4))
-
-class QBufferedFile: public QFile
-{
-public:
-    QBufferedFile(const QString& fileName, int bufferSize = 1024*1024*2): QFile(fileName), m_bufferSize(bufferSize) 
-    {
-        m_buffer = new quint8[bufferSize];
-        m_bufferLen = 0;
-        m_bufferPos = 0;
-        m_totalWrited = 0;
-    }
-    virtual ~QBufferedFile()
-    {
-        delete [] m_buffer;
-    }
-    virtual qint64	size () const
-    {
-        if (isWritable())
-            return m_totalWrited + m_bufferLen;
-        else
-            return QFile::size(); 
-    }
-
-    virtual qint64	pos() const
-    {
-        return QFile::pos() + m_bufferPos;
-    }
-
-    void flushBuffer()
-    {
-        m_totalWrited += QFile::writeData((char*) m_buffer, m_bufferLen);
-        m_bufferLen = 0;
-        m_bufferPos = 0;
-    }
-
-    virtual void close()
-    {
-        flushBuffer();
-        QFile::close();
-    }
-
-protected:
-    virtual qint64	writeData ( const char * data, qint64 len )
-    {
-        //return QFile::writeData(data, len);
-
-        int rez = len;
-        while (len > 0)
-        {
-            int toWrite = qMin((int) len, m_bufferSize - m_bufferPos);
-            memcpy(m_buffer + m_bufferPos, data, toWrite);
-            m_bufferPos += toWrite;
-            m_bufferLen = qMax(m_bufferLen, m_bufferPos);
-            if (m_bufferLen == m_bufferSize) {
-                int writed = QFile::writeData((char*) m_buffer, m_bufferSize/2);
-                m_totalWrited += writed;
-                if (writed !=  m_bufferSize/2)
-                    return writed;
-                m_bufferLen -= writed;
-                m_bufferPos -= writed;
-                memmove(m_buffer, m_buffer + writed, m_bufferLen);
-            }
-            len -= toWrite;
-            data += toWrite;
-        }
-        return rez;
-    }
-private:
-    int m_bufferSize;
-    quint8* m_buffer;
-public:
-    int m_bufferLen;
-    int m_bufferPos;
-    qint64 m_totalWrited;
-};
 
 class SemaphoreLocker
 {
@@ -98,6 +24,17 @@ private:
 
 static int ufile_open(URLContext *h, const char *filename, int flags)
 {
+    /*
+    char buf[2 * SECTOR_SIZE - 1], *p;
+    memset(buf, 0xf0, sizeof(buf));
+    DWORD dwWritten = 0;
+    p = (char *) ((DWORD) (buf + SECTOR_SIZE - 1) & ~(SECTOR_SIZE - 1));
+    HANDLE hFile = CreateFile(L"c:/test.ggg", GENERIC_WRITE,
+        FILE_SHARE_READ, NULL, CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, NULL);
+    WriteFile(hFile, p, SECTOR_SIZE, &dwWritten, NULL);
+    */
+
     SemaphoreLocker locker(semaphore());
 
     av_strstart(filename, "ufile:", &filename);
@@ -123,7 +60,12 @@ static int ufile_open(URLContext *h, const char *filename, int flags)
         dir.mkpath(QFileInfo(filename).absolutePath());
     }
 
-    if (!pFile->open(mode))
+    int systemFlags = 0;
+#ifdef Q_OS_WIN
+    if (flags & AVIO_FLAG_WRITE)
+        systemFlags = FILE_FLAG_NO_BUFFERING;
+#endif
+    if (!pFile->open(mode, systemFlags))
         return AVERROR(ENOENT);
 
     h->priv_data = (void *)pFile.take();
@@ -185,17 +127,7 @@ static int64_t ufile_seek(URLContext *h, int64_t pos, int whence)
             return AVERROR(ENOENT);
     }
 
-    absolutePos = qMin(pFile->size(), absolutePos);
-    qint64 bufferOffset = absolutePos - (pFile->size() - pFile->m_bufferLen);
-    if (bufferOffset < 0 || bufferOffset > pFile->m_bufferLen)
-    {
-        pFile->flushBuffer();
-        return pFile->seek(absolutePos);
-    }
-    else {
-        pFile->m_bufferPos = bufferOffset;
-        return absolutePos;
-    }
+    return pFile->seek(absolutePos);
 }
 
 URLProtocol ufile_protocol = {

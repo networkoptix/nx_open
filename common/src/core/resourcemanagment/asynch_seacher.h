@@ -24,6 +24,7 @@ public:
     static QnResourceDiscoveryManager& instance();
 
     void setServer(bool serv);
+    bool isServer() const;
 
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
