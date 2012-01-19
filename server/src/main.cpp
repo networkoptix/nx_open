@@ -36,6 +36,7 @@
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "utils/common/log.h"
+#include "camera/camera_pool.h"
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
@@ -344,7 +345,7 @@ public:
 
         if (m_processor)
         {
-            delete m_processor;
+            m_processor->deleteLater();
             m_processor = 0;
         }
     }
@@ -560,6 +561,8 @@ void stopServer(int signal)
 
     if (serviceMain)
         serviceMain->stopObjects();
+
+    QnVideoCameraPool::instance()->stop();
     xercesc::XMLPlatformUtils::Terminate ();
 }
 int main(int argc, char* argv[])

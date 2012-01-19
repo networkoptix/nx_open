@@ -14,6 +14,8 @@ public:
     static QnVideoCameraPool* instance();
     virtual ~QnVideoCameraPool();
 
+    void stop();
+
     QnVideoCamera* getVideoCamera(QnResourcePtr res);
     void removeVideoCamera(QnResourcePtr res);
 private:
