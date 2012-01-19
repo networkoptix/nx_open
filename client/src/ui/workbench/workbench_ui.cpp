@@ -56,16 +56,16 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
 
     /* Create controls. */
-    QGraphicsWidget *controlsItem = m_uiElementsInstrument->widget();
-    controlsItem->setFlag(QGraphicsItem::ItemIsPanel);
-    m_display->setLayer(controlsItem, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
+    m_controlsWidget = m_uiElementsInstrument->widget();
+    m_controlsWidget->setFlag(QGraphicsItem::ItemIsPanel);
+    m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     QnSingleEventSignalizator *deactivationSignalizator = new QnSingleEventSignalizator(this);
     deactivationSignalizator->setEventType(QEvent::WindowDeactivate);
-    controlsItem->installEventFilter(deactivationSignalizator);
+    m_controlsWidget->installEventFilter(deactivationSignalizator);
 
     connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
-    connect(controlsItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
+    connect(m_controlsWidget,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
@@ -79,13 +79,13 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
 
-    m_treeItem = new QGraphicsProxyWidget(controlsItem);
+    m_treeItem = new QGraphicsProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
     m_treeItem->setOpacity(normalTreeOpacity);
 
-    m_treeBackgroundItem = new QGraphicsWidget(controlsItem);
+    m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
     {
         QPalette palette = m_treeBackgroundItem->palette();
@@ -103,7 +103,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeBackgroundItem->stackBefore(m_treeItem);
     m_treeBackgroundItem->setOpacity(normalTreeBackgroundOpacity);
 
-    m_treeBookmarkItem = new QnImageButtonWidget(controlsItem);
+    m_treeBookmarkItem = new QnImageButtonWidget(m_controlsWidget);
     m_treeBookmarkItem->resize(15, 45);
     m_treeBookmarkItem->setOpacity(normalTreeBackgroundOpacity);
     m_treeBookmarkItem->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("slide_right.png"));
@@ -113,17 +113,17 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeBookmarkItem->setCheckable(true);
     m_treeBookmarkItem->setAnimationSpeed(4.0);
 
-    m_treeOpacityProcessor = new HoverFocusProcessor(controlsItem);
+    m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
     m_treeOpacityProcessor->addTargetItem(m_treeBookmarkItem);
 
-    m_treeHidingProcessor = new HoverFocusProcessor(controlsItem);
+    m_treeHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeHidingProcessor->addTargetItem(m_treeItem);
     m_treeHidingProcessor->addTargetItem(m_treeBookmarkItem);
     m_treeHidingProcessor->setHoverLeaveDelay(1000);
     m_treeHidingProcessor->setFocusLeaveDelay(1000);
 
-    m_treeShowingProcessor = new HoverFocusProcessor(controlsItem);
+    m_treeShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeShowingProcessor->addTargetItem(m_treeBookmarkItem);
     m_treeShowingProcessor->setHoverEnterDelay(250);
 
@@ -150,10 +150,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
 
     /* Navigation slider. */
-    m_navigationItem = new NavigationItem(controlsItem);
+    m_navigationItem = new NavigationItem(m_controlsWidget);
     m_navigationItem->setOpacity(normalSliderOpacity);
 
-    m_sliderOpacityProcessor = new HoverFocusProcessor(controlsItem);
+    m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_navigationItem);
 
     m_sliderPositionAnimator = new VariantAnimator(this);
@@ -219,17 +219,30 @@ void QnWorkbenchUi::toggleTreeVisible() {
 
 void QnWorkbenchUi::updateTreeGeometry() {
     QPointF sliderTargetPos;
+    bool deferrable;
     if(m_sliderPositionAnimator->isRunning()) {
         sliderTargetPos = m_sliderPositionAnimator->targetValue().toPointF();
+        QPointF sliderPos = m_navigationItem->pos();
+
+        /* If animation is about to end, then geometry sync cannot be deferred. */
+        deferrable = !qFuzzyCompare(sliderTargetPos, sliderPos);
     } else {
         sliderTargetPos = m_navigationItem->pos();
+        deferrable = false;
     }
+
+    qreal oldWidth = m_treeItem->size().width();
+    qreal oldHeight = m_treeItem->size().height();
+    qreal newWidth = oldWidth;
+    qreal newHeight = qMin(sliderTargetPos.y(), m_controlsWidget->size().height()) - m_treeItem->pos().y();
+    if(deferrable && newHeight < oldHeight)
+        return;
 
     QRectF geometry = QRectF(
         m_treeItem->pos().x(),
         m_treeItem->pos().y(),
-        m_treeItem->size().width(),
-        qMin(sliderTargetPos.y(), m_uiElementsInstrument->widget()->size().height()) - m_treeItem->pos().y()
+        newWidth,
+        newHeight
     );
 
     if(qFuzzyCompare(geometry, m_treeItem->geometry()))
@@ -243,7 +256,7 @@ void QnWorkbenchUi::updateViewportMargins() {
         0, //std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
         0,
         0,
-        std::floor(qMax(0.0, m_uiElementsInstrument->widget()->size().height() - m_navigationItem->pos().y()))
+        std::floor(qMax(0.0, m_controlsWidget->size().height() - m_navigationItem->pos().y()))
     ));
 }
 
