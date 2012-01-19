@@ -21,6 +21,7 @@
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/masked_proxy_widget.h>
 
 #include <ui/processors/hover_processor.h>
 
@@ -100,7 +101,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
     m_treeBackgroundItem->setOpacity(normalTreeBackgroundOpacity);
 
-    m_treeItem = new QGraphicsProxyWidget(m_controlsWidget);
+    m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
@@ -229,6 +230,16 @@ void QnWorkbenchUi::toggleTreeVisible() {
 }
 
 void QnWorkbenchUi::updateTreeGeometry() {
+    /* Update painting rect the "fair" way. */
+    QRectF paintGeometry = QRectF(
+        m_treeItem->pos().x(),
+        m_treeItem->pos().y(),
+        m_treeItem->size().width(),
+        qMin(m_navigationItem->pos().y(), m_controlsWidget->size().height()) - m_treeItem->pos().y()
+    );
+    m_treeItem->setPaintGeometry(paintGeometry);
+
+    /* Update real geometry. */
     QPointF sliderTargetPos;
     bool deferrable;
     if(m_sliderPositionAnimator->isRunning()) {

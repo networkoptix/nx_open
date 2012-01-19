@@ -5,8 +5,6 @@
 #include <ui/common/scene_utility.h>
 #include "workbench.h"
 
-class QGraphicsProxyWidget;
-
 class CLVideoCamera;
 
 class InstrumentManager;
@@ -21,6 +19,7 @@ class NavigationTreeWidget;
 class QnWorkbenchDisplay;
 class QnImageButtonWidget;
 class QnResourceWidget;
+class QnMaskedProxyWidget;
 
 
 class QnWorkbenchUi: public QObject, protected SceneUtility {
@@ -96,7 +95,7 @@ private:
     NavigationTreeWidget *m_treeWidget;
 
     /** Proxy widget for navigation tree widget. */
-    QGraphicsProxyWidget *m_treeItem;
+    QnMaskedProxyWidget *m_treeItem;
 
     QGraphicsWidget *m_treeBackgroundItem;
 

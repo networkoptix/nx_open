@@ -6,6 +6,9 @@
 
 /**
  * Proxy widget that caches the widget's surface.
+ * 
+ * Currently unused as <tt>QGraphicsItem::setCacheMode</tt> can be used to
+ * achieve the same result.
  */
 class CachingProxyWidget: public QGraphicsProxyWidget {
     Q_OBJECT;

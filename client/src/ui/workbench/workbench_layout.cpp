@@ -160,9 +160,9 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     m_rectSet.insert(item->geometry());
     m_itemsByUid[item->resource()->getUniqueId()].insert(item);
 
-    updateBoundingRectInternal();
-
     emit itemAdded(item);
+
+    updateBoundingRectInternal();
 }
 
 void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
@@ -184,9 +184,9 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     item->m_layout = NULL;
     m_items.remove(item);
 
-    updateBoundingRectInternal();
-
     emit itemRemoved(item);
+
+    updateBoundingRectInternal();
 }
 
 void QnWorkbenchLayout::clear()
