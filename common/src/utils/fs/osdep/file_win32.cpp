@@ -37,8 +37,11 @@ bool QnFile::open(QIODevice::OpenMode& openMode, unsigned int systemDependentFla
     int accessRights = 0;
     if (openMode & QIODevice::ReadOnly)
         accessRights |= GENERIC_READ;
-    if (openMode & QIODevice::WriteOnly)
+    if (openMode & QIODevice::WriteOnly) {
         accessRights |= GENERIC_WRITE;
+        if (!(openMode & QIODevice::ReadOnly))
+            shareMode = FILE_SHARE_READ;
+    }
 
     SECURITY_ATTRIBUTES securityAtts = { sizeof(SECURITY_ATTRIBUTES), NULL, FALSE };
 

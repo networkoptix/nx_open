@@ -7,6 +7,9 @@
 #include <QtCore/QSemaphore>
 #include "utils/common/buffered_file.h"
 
+static const int IO_BLOCK_SIZE = 1024*1024*4;
+static const int FFMPEG_BUFFER_SIZE = 1024*1024;
+
 Q_GLOBAL_STATIC_WITH_ARGS(QSemaphore, semaphore, (4))
 
 class SemaphoreLocker
@@ -24,36 +27,30 @@ private:
 
 static int ufile_open(URLContext *h, const char *filename, int flags)
 {
-    /*
-    char buf[2 * SECTOR_SIZE - 1], *p;
-    memset(buf, 0xf0, sizeof(buf));
-    DWORD dwWritten = 0;
-    p = (char *) ((DWORD) (buf + SECTOR_SIZE - 1) & ~(SECTOR_SIZE - 1));
-    HANDLE hFile = CreateFile(L"c:/test.ggg", GENERIC_WRITE,
-        FILE_SHARE_READ, NULL, CREATE_ALWAYS,
-        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, NULL);
-    WriteFile(hFile, p, SECTOR_SIZE, &dwWritten, NULL);
-    */
 
     SemaphoreLocker locker(semaphore());
 
     av_strstart(filename, "ufile:", &filename);
 
-    QScopedPointer<QBufferedFile> pFile(new QBufferedFile(QString::fromUtf8(filename)));
-    if (!pFile)
-        return AVERROR(ENOMEM);
-
     QFile::OpenMode mode;
+    bool useBuffer = false;
 
     if ((flags & AVIO_FLAG_READ) != 0 && (flags & AVIO_FLAG_WRITE) != 0)
     {
         Q_ASSERT_X(1, Q_FUNC_INFO, "Not supported");
         mode = QIODevice::ReadWrite;
     }
-    else if ((flags & AVIO_FLAG_WRITE) != 0)
+    else if ((flags & AVIO_FLAG_WRITE) != 0) {
         mode = QIODevice::WriteOnly | QIODevice::Unbuffered;
+        useBuffer = true;
+    }
     else
         mode = QIODevice::ReadOnly;
+
+    QScopedPointer<QBufferedFile> pFile(new QBufferedFile(QString::fromUtf8(filename), useBuffer ? IO_BLOCK_SIZE : 0, useBuffer ? FFMPEG_BUFFER_SIZE : 0));
+    if (!pFile)
+        return AVERROR(ENOMEM);
+
 
     if (mode & QIODevice::WriteOnly) {
         QDir dir;

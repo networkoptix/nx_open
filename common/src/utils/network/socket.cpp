@@ -73,7 +73,7 @@ static void fillAddr(const QString &address, unsigned short port,
     // is supposedly obsolete
     throw SocketException("Failed to resolve name (gethostbyname())");
   }
-  addr.sin_addr.s_addr = *((in_addr_t *) host->h_addr_list[0]);
+  addr.sin_addr.s_addr = *((quint32 *) host->h_addr_list[0]);
 
   addr.sin_port = htons(port);     // Assign port in network byte order
 }
