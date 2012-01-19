@@ -5,8 +5,6 @@
 #include <ui/common/scene_utility.h>
 #include "workbench.h"
 
-class QGraphicsProxyWidget;
-
 class CLVideoCamera;
 
 class InstrumentManager;
@@ -21,6 +19,7 @@ class NavigationTreeWidget;
 class QnWorkbenchDisplay;
 class QnImageButtonWidget;
 class QnResourceWidget;
+class QnMaskedProxyWidget;
 
 
 class QnWorkbenchUi: public QObject, protected SceneUtility {
@@ -61,7 +60,7 @@ protected Q_SLOTS:
     void at_sliderOpacityProcessor_hoverEntered();
     void at_sliderOpacityProcessor_hoverLeft();
 
-    void at_treeItem_geometryChanged();
+    void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeOpacityProcessor_hoverLeft();
@@ -96,7 +95,7 @@ private:
     NavigationTreeWidget *m_treeWidget;
 
     /** Proxy widget for navigation tree widget. */
-    QGraphicsProxyWidget *m_treeItem;
+    QnMaskedProxyWidget *m_treeItem;
 
     QGraphicsWidget *m_treeBackgroundItem;
 

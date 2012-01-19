@@ -21,6 +21,7 @@
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/masked_proxy_widget.h>
 
 #include <ui/processors/hover_processor.h>
 
@@ -100,7 +101,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
     m_treeBackgroundItem->setOpacity(normalTreeBackgroundOpacity);
 
-    m_treeItem = new QGraphicsProxyWidget(m_controlsWidget);
+    m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
@@ -158,7 +159,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeOpacityProcessor_hoverEntered()));
     connect(m_treeHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_treeHidingProcessor_hoverFocusLeft()));
     connect(m_treeShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeShowingProcessor_hoverEntered()));
-    connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
+    connect(m_treeItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_treeItem_paintGeometryChanged()));
+    connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_paintGeometryChanged()));
 
     /* Navigation slider. */
     m_navigationItem = new NavigationItem(m_controlsWidget);
@@ -229,6 +231,16 @@ void QnWorkbenchUi::toggleTreeVisible() {
 }
 
 void QnWorkbenchUi::updateTreeGeometry() {
+    /* Update painting rect the "fair" way. */
+    QRectF paintGeometry = QRectF(
+        m_treeItem->pos().x(),
+        m_treeItem->pos().y(),
+        m_treeItem->size().width(),
+        qMin(m_navigationItem->pos().y(), m_controlsWidget->size().height()) - m_treeItem->pos().y()
+    );
+    m_treeItem->setPaintGeometry(paintGeometry);
+
+    /* Update real geometry. */
     QPointF sliderTargetPos;
     bool deferrable;
     if(m_sliderPositionAnimator->isRunning()) {
@@ -347,22 +359,22 @@ void QnWorkbenchUi::at_sliderOpacityProcessor_hoverLeft() {
     opacityAnimator(m_navigationItem)->animateTo(normalSliderOpacity);
 }
 
-void QnWorkbenchUi::at_treeItem_geometryChanged() {
-    QRectF geometry = m_treeItem->geometry();
+void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
+    QRectF paintGeometry = m_treeItem->paintGeometry();
 
-    bool visible = geometry.right() >= 0.0;
+    bool visible = paintGeometry.right() >= 0.0;
     m_treeItem->setVisible(visible);
     m_treeBackgroundItem->setVisible(visible);
     m_treePinButton->setVisible(visible);
 
-    m_treeBackgroundItem->setGeometry(geometry);
+    m_treeBackgroundItem->setGeometry(paintGeometry);
     m_treeShowButton->setPos(QPointF(
-        geometry.right(),
-        (geometry.top() + geometry.bottom() - m_treeShowButton->size().height()) / 2
+        paintGeometry.right(),
+        (paintGeometry.top() + paintGeometry.bottom() - m_treeShowButton->size().height()) / 2
     ));
     m_treePinButton->setPos(QPointF(
-        geometry.right() - m_treePinButton->size().width(),
-        geometry.top()
+        paintGeometry.right() - m_treePinButton->size().width(),
+        paintGeometry.top()
     ));
 
     updateViewportMargins();
