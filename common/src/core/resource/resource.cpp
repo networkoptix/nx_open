@@ -13,7 +13,6 @@ QnResource::QnResource()
     : QObject(),
       m_rwLock(QReadWriteLock::Recursive),
       m_flags(0),
-      m_avalable(true),
       m_status(Offline)
 {
 }
@@ -25,40 +24,31 @@ QnResource::~QnResource()
 
 void QnResource::updateInner(const QnResource& other)
 {
-    m_flags = other.m_flags;
-    m_name = other.m_name;
-    m_resourceParamList = other.m_resourceParamList;
     m_id = other.m_id;
     m_parentId = other.m_parentId;
     m_typeId = other.m_typeId;
+    m_flags = other.m_flags;
+    m_name = other.m_name;
     m_lastDiscoveredTime = other.m_lastDiscoveredTime;
     m_tags = other.m_tags;
-    m_avalable = other.m_avalable;
     m_url = other.m_url;
-    setStatus(other.m_status, true);
-    m_streamParamList = other.m_streamParamList;
 }
 
 void QnResource::update(const QnResource& other)
 {
-    Status old = m_status;
-
-    foreach (QnResourceConsumer* consumer, m_consumers)
+    foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
 
     {
-        QWriteLocker writeLocker(&m_rwLock);
         QReadLocker readLocker(&other.m_rwLock);
-
-        updateInner(other);
+        {
+            QWriteLocker writeLocker(&m_rwLock);
+            updateInner(other);
+        }
+        setStatus(other.m_status);
     }
 
-    if (old != m_status)
-    {
-        emit statusChanged(old, m_status);
-    }
-
-    foreach (QnResourceConsumer* consumer, m_consumers)
+    foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
 }
 
@@ -242,19 +232,20 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 {
-    if (!hasSuchParam(name))
+    const QnParamList &params = getResourceParamList();
+    if (!params.contains(name))
     {
-        cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
+        cl_log.log("QnResource::getParam(): requested param does not exist!", cl_logWARNING);
         return false;
     }
 
-    const QnParam &param = getResourceParamList().value(name);
+    const QnParam &param = params.value(name);
     if (domain == QnDomainMemory)
     {
         QReadLocker readLocker(&m_rwLock);
         val = param.value();
         if (!param.isPhysical())
-            val = this->property(param.name().toUtf8()).toString();
+            val = property(param.name().toUtf8()).toString();
         return true;
     }
     else if (domain == QnDomainPhysical)
@@ -275,13 +266,14 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 
 bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain domain)
 {
-    if (!hasSuchParam(name))
+    QnParamList &params = getResourceParamList();
+    if (!params.contains(name))
     {
-        cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
+        cl_log.log("QnResource::setParam(): requested param does not exist!", cl_logWARNING);
         return false;
     }
 
-    QnParam &param = getResourceParamList().value(name);
+    QnParam &param = params.value(name);
 
     if (param.isReadOnly())
     {
@@ -289,13 +281,11 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
         return false;
     }
 
-
     if (domain == QnDomainPhysical)
     {
         if (!param.isPhysical() || !setParamPhysical(param.name(), val))
             return false;
     }
-
 
     //QnDomainMemory should changed anyway
     {
@@ -311,8 +301,8 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
             setProperty(param.name().toUtf8(), val);
     }
 
+    Q_EMIT onParameterChanged(param.name(), val);
 
-    emit onParameterChanged(param.name(), val);
     return true;
 }
 

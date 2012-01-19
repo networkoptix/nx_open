@@ -57,6 +57,8 @@ protected:
     void repaintMotionPeriods();
 
 private Q_SLOTS:
+    void setSyncMode(bool value);
+
     void setLiveMode(bool value);
     void onLiveModeChanged(bool value);
     void pause();
@@ -110,6 +112,7 @@ private:
     ImageButton *m_forwardButton;
     ImageButton *m_liveButton;
     ImageButton *m_mrsButton;
+    ImageButton *m_syncButton;
     SpeedSlider *m_speedSlider;
     ImageButton *m_muteButton;
     VolumeSlider *m_volumeSlider;

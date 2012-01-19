@@ -1,23 +1,23 @@
 #include "qnschedulegridwidget.h"
+
 #include "ui/skin/globals.h"
 #include "settings.h"
 
-static const int TEXT_SPACING = 4;
 static const QColor NORMAL_LABEL_COLOR(255,255,255);
 static const QColor WEEKEND_LABEL_COLOR(255,128,128);
 static const QColor SELECTED_LABEL_COLOR(64,128, 192);
 
-QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
-    QWidget(parent)
+QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
+    : QWidget(parent)
 {
-    m_defaultParams[ParamType_Color] = QColor(COLOR_LIGHT,0, 0).rgba();
-    m_defaultParams[ParamType_First] = 1;
-    m_defaultParams[ParamType_Second] = "Lo";
+    m_defaultParams[FirstParam] = 1;
+    m_defaultParams[SecondParam] = "Lo";
+    m_defaultParams[ColorParam] = QColor(COLOR_LIGHT,0, 0).rgba();
 
-    for (int x = 0; x < COL_COUNT; ++x)
+    for (int x = 0; x < columnCount(); ++x)
     {
-        for (int y = 0; y < ROW_COUNT; ++y)
-            qCopy(m_defaultParams, &m_defaultParams[ParamNum_Dummy], m_gridParams[x][y]);
+        for (int y = 0; y < rowCount(); ++y)
+            qCopy(m_defaultParams, &m_defaultParams[ParamType_Count], m_gridParams[x][y]);
     }
     QDate date(2010,1,1);
     date = date.addDays(1 - date.dayOfWeek());
@@ -36,10 +36,10 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
 
 }
 
-qreal QnScheduleGridWidget::getCellSize()
+qreal QnScheduleGridWidget::getCellSize() const
 {
-    qreal cellWidth = (width() - 0.5 - m_gridLeftOffset)/(qreal)COL_COUNT;
-    qreal cellHeight = (height() - 0.5 - m_gridTopOffset)/(qreal)ROW_COUNT;
+    qreal cellWidth = (width() - 0.5 - m_gridLeftOffset)/(qreal)columnCount();
+    qreal cellHeight = (height() - 0.5 - m_gridTopOffset)/(qreal)rowCount();
     return qMin(cellWidth, cellHeight);
 }
 
@@ -76,7 +76,7 @@ void QnScheduleGridWidget::initMetrics()
     }
 }
 
-void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
+void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
     if (m_weekDaysSize.isEmpty())
@@ -84,7 +84,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
     qreal cellSize = getCellSize();
 
     p.setFont(m_labelsFont);
-    for (int y = 0; y < ROW_COUNT; ++y)
+    for (int y = 0; y < rowCount(); ++y)
     {
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
             p.setPen(SELECTED_LABEL_COLOR);
@@ -94,7 +94,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
             p.setPen(WEEKEND_LABEL_COLOR);
         p.drawText(QRect(0, cellSize*y+m_gridTopOffset, m_gridLeftOffset-TEXT_SPACING, cellSize), Qt::AlignRight | Qt::AlignVCenter, m_weekDays[y]);
     }
-    for (int x = 0; x < COL_COUNT; ++x) {
+    for (int x = 0; x < columnCount(); ++x) {
         if (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == x)
             p.setPen(SELECTED_LABEL_COLOR);
         else
@@ -107,11 +107,11 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
     p.translate(m_gridLeftOffset, m_gridTopOffset);
 
     // draw grid colors/text
-    for (int x = 0; x < COL_COUNT; ++x)
+    for (int x = 0; x < columnCount(); ++x)
     {
-        for (int y = 0; y < ROW_COUNT; ++y)
+        for (int y = 0; y < rowCount(); ++y)
         {
-            QColor color(m_gridParams[x][y][ParamType_Color].toUInt());
+            QColor color(m_gridParams[x][y][ColorParam].toUInt());
             if (!m_mousePressed) {
                 if (y == m_mouseMoveCell.y() && x == m_mouseMoveCell.x() ||
                     m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x() ||
@@ -135,24 +135,24 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
                 QPoint p1 = QPointF(leftTop.x(), rightBottom.y()).toPoint();
                 QPoint p2(p1.x() + int(cellSize+0.5), p1.y() - int(cellSize+0.5));
                 p.drawLine(p1, p2);
-                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize/2.0, cellSize/2.0)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][ParamType_First].toString());
-                p.drawText(QRectF(leftTop+QPointF(cellSize/2.0, cellSize/2.0), rightBottom), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][ParamType_Second].toString());
+                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize/2.0, cellSize/2.0)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
+                p.drawText(QRectF(leftTop+QPointF(cellSize/2.0, cellSize/2.0), rightBottom), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][SecondParam].toString());
             }
             else if (m_showFirstParam)
-                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][ParamType_First].toString());
+                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
             else if (m_showSecondParam)
-                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][ParamType_Second].toString());
+                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][SecondParam].toString());
             p.setPen(QColor(255,255,255));
 
         }
     }
 
     // draw grid lines
-    p.setPen(QColor(255,255,255));
-    for (int x = 0; x <= COL_COUNT; ++x)
-        p.drawLine(QPointF(cellSize*x, 0), QPointF(cellSize*x, cellSize*ROW_COUNT));
-    for (int y = 0; y <= ROW_COUNT; ++y)
-        p.drawLine(QPointF(0, y*cellSize), QPointF(cellSize*COL_COUNT, y*cellSize));
+    p.setPen(QColor(255, 255, 255));
+    for (int x = 0; x <= columnCount(); ++x)
+        p.drawLine(QPointF(cellSize*x, 0), QPointF(cellSize * x, cellSize * rowCount()));
+    for (int y = 0; y <= rowCount(); ++y)
+        p.drawLine(QPointF(0, y*cellSize), QPointF(cellSize * columnCount(), y * cellSize));
 
     p.translate(-m_gridLeftOffset, -m_gridTopOffset);
 
@@ -170,15 +170,21 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent * event)
         p.drawRect(m_selectedRect);
 }
 
+void QnScheduleGridWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
 
-void QnScheduleGridWidget::leaveEvent(QEvent * event )
+    initMetrics();
+}
+
+void QnScheduleGridWidget::leaveEvent(QEvent *)
 {
     m_mouseMovePos = QPoint(-1,-1);
     m_mouseMoveCell = QPoint(-2, -2);
     update();
 }
 
-void QnScheduleGridWidget::mouseMoveEvent(QMouseEvent * event )
+void QnScheduleGridWidget::mouseMoveEvent(QMouseEvent *event)
 {
     m_mouseMovePos = event->pos();
     if (m_mousePressed && (event->pos() - m_mousePressPos).manhattanLength() >= QApplication::startDragDistance())
@@ -194,27 +200,27 @@ void QnScheduleGridWidget::mouseMoveEvent(QMouseEvent * event )
     }
 }
 
-QPoint QnScheduleGridWidget::getCell(const QPoint& p, bool doTruncate)
+QPoint QnScheduleGridWidget::getCell(const QPoint &p, bool doTruncate) const
 {
     qreal cellSize = getCellSize();
     int cellX = (p.x() - m_gridLeftOffset)/cellSize;
     int cellY = (p.y() - m_gridTopOffset)/cellSize;
 
     if (doTruncate)
-        return QPoint(qBound(0, COL_COUNT-1, cellX), qBound(0, ROW_COUNT-1, cellY));
+        return QPoint(qBound(0, columnCount() - 1, cellX), qBound(0, rowCount() - 1, cellY));
 
     if (p.x() < m_gridLeftOffset)
         cellX = -1;
     if (p.y() < m_gridTopOffset)
         cellY = -1;
 
-    if (cellX < COL_COUNT && cellY < ROW_COUNT)
+    if (cellX < columnCount() && cellY < rowCount())
         return QPoint(cellX, cellY);
-    else
-        return QPoint(-2, -2);
+
+    return QPoint(-2, -2);
 }
 
-void QnScheduleGridWidget::mousePressEvent(QMouseEvent * event )
+void QnScheduleGridWidget::mousePressEvent(QMouseEvent *event)
 {
     QPoint cell = getCell(event->pos(), false);
     if (event->modifiers() & Qt::AltModifier)
@@ -228,16 +234,16 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent * event )
     m_mousePressed = true;
     if (cell.x() == -1 && cell.y() == -1)
     {
-        for (int y = 0; y < ROW_COUNT; ++y)
-            for (int x = 0; x < COL_COUNT; ++x)
+        for (int y = 0; y < rowCount(); ++y)
+            for (int x = 0; x < columnCount(); ++x)
                 updateCellValue(QPoint(x, y));
     }
     else if (cell.x() == -1) {
-        for (int x = 0; x < COL_COUNT; ++x)
+        for (int x = 0; x < columnCount(); ++x)
             updateCellValue(QPoint(x, cell.y()));
     }
     else if (cell.y() == -1) {
-        for (int y = 0; y < ROW_COUNT; ++y)
+        for (int y = 0; y < rowCount(); ++y)
             updateCellValue(QPoint(cell.x(), y));
     }
     else {
@@ -250,12 +256,12 @@ void QnScheduleGridWidget::updateCellValue(const QPoint& cell)
 {
     if (cell.x() >= 0 && cell.y() >= 0)
     {
-        qCopy(m_defaultParams, &m_defaultParams[ParamNum_Dummy], m_gridParams[cell.x()][cell.y()]);
+        qCopy(m_defaultParams, &m_defaultParams[ParamType_Count], m_gridParams[cell.x()][cell.y()]);
         update();
     }
 }
 
-void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent * event)
+void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_mousePressed)
     {
@@ -275,7 +281,7 @@ void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent * event)
 
 void QnScheduleGridWidget::setDefaultParam(ParamType number, const QVariant& value)
 {
-    m_defaultParams[(int)number] = value;
+    m_defaultParams[number] = value;
 }
 
 void QnScheduleGridWidget::setShowFirstParam(bool value)
@@ -290,12 +296,9 @@ void QnScheduleGridWidget::setShowSecondParam(bool value)
     update();
 }
 
-void QnScheduleGridWidget::resizeEvent(QResizeEvent * event)
+QVariant QnScheduleGridWidget::getCellParam(const QPoint &cell, ParamType paramType) const
 {
-    initMetrics();
-}
-
-QVariant QnScheduleGridWidget::getCellParam(const QPoint& cell, ParamType paramType)
-{
+    if (cell.x() < 0 || cell.x() >= columnCount() || cell.y() < 0 || cell.y() >= rowCount())
+        return QVariant();
     return m_gridParams[cell.x()][cell.y()][paramType];
 }

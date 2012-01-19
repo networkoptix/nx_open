@@ -8,7 +8,6 @@
 #include <QtAlgorithms>
 
 #include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
 
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -525,6 +524,23 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     QnResourceWidget *widget = new QnResourceWidget(item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
+    widget->setAttribute(Qt::WA_DeleteOnClose);
+
+    widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
+    widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
+    widget->setFlag(QGraphicsItem::ItemIsMovable, true);
+
+    widget->setFocusPolicy(Qt::StrongFocus);
+    widget->setWindowFlags(Qt::Window);
+
+    /* Unsetting this flag is VERY important. If it is set, graphics scene
+     * will mess with widget's z value and bring it to front every time
+     * it is clicked. This will wreak havoc in our layered system.
+     *
+     * Note that this flag must be unset after Qt::Window window flag is set
+     * because the latter automatically sets the former. */
+    widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
     togglePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("pin.png")));
@@ -542,26 +558,10 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     closeButton->setMinimumSize(QSizeF(10.0, 10.0));
     closeButton->setMaximumSize(QSizeF(10.0, 10.0));
     closeButton->setAnimationSpeed(4.0);
-    connect(closeButton, SIGNAL(clicked()), item, SLOT(deleteLater()));
+    connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
     widget->addButton(closeButton);
 
     m_scene->addItem(widget);
-
-    widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
-    widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    widget->setFlag(QGraphicsItem::ItemIsMovable, true);
-
-    widget->setFocusPolicy(Qt::StrongFocus);
-    widget->setWindowFlags(Qt::Window);
-
-    /* Unsetting this flag is VERY important. If it is set, graphics scene
-     * will mess with widget's z value and bring it to front every time
-     * it is clicked. This will wreak havoc in our layered system.
-     *
-     * Note that this flag must be unset after Qt::Window window flag is set
-     * because the latter automatically sets the former. */
-    widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
     connect(item, SIGNAL(geometryChanged()),        this, SLOT(at_item_geometryChanged()));
     connect(item, SIGNAL(geometryDeltaChanged()),   this, SLOT(at_item_geometryDeltaChanged()));
@@ -586,15 +586,15 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
 void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget) {
     disconnect(item, NULL, this, NULL);
 
-    QnResourceWidget *widget = m_widgetByItem[item];
+    QnResourceWidget *widget = m_widgetByItem.value(item);
     if(widget == NULL) {
-        qnCritical("No widget exists for the item being removed, which means that something went terribly wrong.");
+        // already cleaned-up
         return;
     }
 
-    emit widgetAboutToBeRemoved(widget);
-
     disconnect(widget, NULL, this, NULL);
+
+    emit widgetAboutToBeRemoved(widget);
 
     m_widgetByItem.remove(item);
     if(widget->renderer() != NULL)
@@ -1052,11 +1052,9 @@ void QnWorkbenchDisplay::at_uncurtained() {
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
-    /* Holy crap! Somebody's destroying our widgets. Disconnect from the scene. */
-    QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
-    removeItemInternal(widget->item(), false);
-
-    setScene(NULL);
+    QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(sender());
+    if (widget && widget->item())
+        removeItemInternal(widget->item(), false);
 }
 
 void QnWorkbenchDisplay::at_scene_destroyed() {

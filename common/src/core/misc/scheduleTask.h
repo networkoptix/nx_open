@@ -35,6 +35,8 @@ public:
           m_fps(fps)
     {}
 
+    bool operator<(const QnScheduleTask &other) const;
+
     QnId getId() const { return m_id; }
     QnId getSourceId() const { return m_sourceId; }
     RecordingType getRecordingType() const { return m_recordType; }
@@ -44,10 +46,8 @@ public:
     QnStreamQuality getStreamQuality() const { return m_streamQuality; }
     bool getDoRecordAudio() const { return m_doRecordAudio; }
     int getDayOfWeek() const { return m_dayOfWeek; }
-    int getStartTime() const { return m_startTime; } 
+    int getStartTime() const { return m_startTime; }
     int getEndTime() const { return m_endTime; }
-
-
 
     /*
     * Duration at ms
@@ -64,11 +64,7 @@ public:
     */
     bool containTimeMs(int weekTimeMs) const;
 
-    bool operator<(const QnScheduleTask &other) const;
-
-    // Add getters and settings here
-
-// private:
+private:
     QnId m_id;
     QnId m_sourceId;
     int m_startTime;

@@ -12,7 +12,7 @@
 
 #define USE_PREFERENCESWND
 #ifdef USE_PREFERENCESWND
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 #endif
 
 YouTubeUploadDialog::YouTubeUploadDialog(QnResourcePtr resource, QWidget *parent) :
@@ -159,8 +159,9 @@ void YouTubeUploadDialog::authFailed()
     dialogLayout->addWidget(buttonBox);
     dialog.setLayout(dialogLayout);
 #else
-    PreferencesWindow dialog(this);
-    dialog.setCurrentTab(4);
+    PreferencesDialog dialog(this);
+    dialog.setCurrentPage(PreferencesDialog::PageYouTubeSettings);
+    dialog.exec();
 #endif
 
     if (dialog.exec() == QDialog::Accepted) {

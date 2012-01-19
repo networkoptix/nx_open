@@ -6,7 +6,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "core/resource/resource.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 #include "ui/skin/skin.h"
 #include "connectiontestingdialog.h"
 
@@ -177,9 +177,9 @@ void LoginDialog::currentIndexChanged(int index)
 
 void LoginDialog::configureStoredConnections()
 {
-    PreferencesWindow preferencesDialog(this);
-    preferencesDialog.setCurrentTab(1);
+    PreferencesDialog dialog(this);
+    dialog.setCurrentPage(PreferencesDialog::PageConnections);
 
-    if (preferencesDialog.exec() == QDialog::Accepted)
+    if (dialog.exec() == QDialog::Accepted)
         updateStoredConnections();
 }

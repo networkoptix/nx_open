@@ -18,8 +18,9 @@
 #include "ui/context_menu_helper.h"
 #include "ui/navigationtreewidget.h"
 
+#include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 
 #include "ui/mixins/sync_play_mixin.h"
 #include "ui/mixins/render_watch_mixin.h"
@@ -33,6 +34,7 @@
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_display.h"
+#include "ui/workbench/workbench_ui.h"
 
 #include "ui/widgets3/tabbar.h"
 
@@ -66,6 +68,9 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 
     connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
     addAction(&cm_toggle_fullscreen);
+
+    connect(&cm_about, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
+    addAction(&cm_about);
 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
@@ -117,8 +122,11 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 
     m_controller = new QnWorkbenchController(m_display, this);
     connect(m_controller->display(), SIGNAL(widgetChanged(QnWorkbench::ItemRole)), this, SLOT(currentWidgetChanged()));
-    connect(m_controller->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(addTab()));
-    connect(m_controller->treeWidget(), SIGNAL(activated(uint)), this, SLOT(treeWidgetItemActivated(uint)));
+
+    m_ui = new QnWorkbenchUi(m_display, this);
+    m_ui->treeWidget()->setWorkbenchController(m_controller);
+    connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(addTab()));
+    connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(treeWidgetItemActivated(uint)));
 
     QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
     new QnSyncPlayMixin(m_display, renderWatcher, this);
@@ -294,9 +302,17 @@ void MainWindow::toggleFullScreen()
     }
 }
 
+void MainWindow::showAboutDialog()
+{
+    AboutDialog dialog(this);
+    dialog.setWindowModality(Qt::ApplicationModal);
+    dialog.exec();
+}
+
 void MainWindow::editPreferences()
 {
-    PreferencesWindow dialog(this);
+    PreferencesDialog dialog(this);
+    dialog.setWindowModality(Qt::ApplicationModal);
     dialog.exec();
 }
 

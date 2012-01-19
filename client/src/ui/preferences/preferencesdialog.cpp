@@ -1,26 +1,27 @@
-#include "preferences_wnd.h"
+#include "preferencesdialog.h"
 
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/ui_common.h"
+#include "ui/context_menu_helper.h"
+
 #include "connectionssettingswidget.h"
 #include "licensewidget.h"
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
-#include "core/resource/directory_browser.h"
-#include "core/resource/network_resource.h"
-#include "core/resource/resource.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "utils/common/util.h"
-#include "utils/network/nettools.h"
-#include "version.h"
+#include <core/resource/directory_browser.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include <utils/common/util.h>
+#include <utils/network/nettools.h>
 
 static inline QString cameraInfoString(QnResourcePtr resource)
 {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (networkResource) {
-        return PreferencesWindow::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
+        return PreferencesDialog::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
             .arg(networkResource->getName())
             .arg(networkResource->getMAC().toString())
             .arg(networkResource->getHostAddress().toString())
@@ -31,36 +32,31 @@ static inline QString cameraInfoString(QnResourcePtr resource)
 }
 
 
-PreferencesWindow::PreferencesWindow(QWidget *parent)
+PreferencesDialog::PreferencesDialog(QWidget *parent)
     : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
       connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
 {
     setupUi(this);
 
-    QString label = creditsLabel->text();
-    label = label.replace(QLatin1String("ORGANIZATION_NAME"), QLatin1String(ORGANIZATION_NAME) + QLatin1String("(tm)"));
-    label = label.replace(QLatin1String("APPLICATION_NAME"), QLatin1String(APPLICATION_NAME));
-    label = label.replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR));
-    label = label.replace(QLatin1String("FFMPEG_VERSION"), QLatin1String(FFMPEG_VERSION));
-#ifndef Q_OS_DARWIN
-    //if (QApplication::style()->objectName() == QLatin1String("Bespin"))
-    label += QLatin1String("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Bespin style</span><span style=\" font-size:8pt;\"> </span><span style=\" font-size:8pt; font-weight:600;\">latest svn version</span><span style=\" font-size:8pt;\"> - Copyright (C) 2007-2010 Thomas Luebking</span></p>");
-#endif
-    creditsLabel->setText(label);
-
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
 
+    tabWidget->removeTab(2); // ###
+
     videoRecorderWidget = new RecordingSettingsWidget(this);
-    tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
+    tabWidget->insertTab(2, videoRecorderWidget, tr("Screen Recorder"));
 
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
-    tabWidget->insertTab(4, youTubeSettingsWidget, tr("YouTube"));
+    tabWidget->insertTab(3, youTubeSettingsWidget, tr("YouTube"));
 
 #ifndef CL_TRIAL_MODE
     licenseWidget = new LicenseWidget(this);
-    tabWidget->insertTab(5, licenseWidget, tr("License"));
+    tabWidget->insertTab(4, licenseWidget, tr("License"));
 #endif
+
+    QPushButton *aboutButton = buttonBox->addButton(cm_about.text(), QDialogButtonBox::HelpRole);
+    connect(aboutButton, SIGNAL(clicked()), &cm_about, SLOT(trigger()));
+
 
     Settings::instance().fillData(m_settingsData);
 
@@ -71,11 +67,11 @@ PreferencesWindow::PreferencesWindow(QWidget *parent)
     //connect(CLDeviceSearcher::instance(), SIGNAL(newNetworkDevices()), this, SLOT(updateCameras())); todo
 }
 
-PreferencesWindow::~PreferencesWindow()
+PreferencesDialog::~PreferencesDialog()
 {
 }
 
-void PreferencesWindow::accept()
+void PreferencesDialog::accept()
 {
     m_settingsData.maxVideoItems = maxVideoItemsSpinBox->value();
     m_settingsData.downmixAudio = downmixAudioCheckBox->isChecked();
@@ -107,9 +103,8 @@ void PreferencesWindow::accept()
     QDialog::accept();
 }
 
-void PreferencesWindow::updateView()
+void PreferencesDialog::updateView()
 {
-    versionLabel->setText(QLatin1String(APPLICATION_VERSION) + " (" + QLatin1String(APPLICATION_REVISION) + ")");
     mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
     auxMediaRootsList->clear();
@@ -135,13 +130,12 @@ void PreferencesWindow::updateView()
 
     totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
 
-    lookAndFeelGroupBox->hide(); // ### handle settingsData.maxVideoItems and remove this line
     maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
 
     downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
 }
 
-void PreferencesWindow::updateStoredConnections()
+void PreferencesDialog::updateStoredConnections()
 {
     QList<Settings::ConnectionData> connections;
     foreach (const Settings::ConnectionData &conn, Settings::connections()) {
@@ -153,7 +147,7 @@ void PreferencesWindow::updateStoredConnections()
     connectionsSettingsWidget->setConnections(connections);
 }
 
-void PreferencesWindow::updateCameras()
+void PreferencesDialog::updateCameras()
 {
     cl_log.log("Updating camera list", cl_logALWAYS);
 
@@ -164,7 +158,7 @@ void PreferencesWindow::updateCameras()
     updateView();
 }
 
-void PreferencesWindow::mainMediaFolderBrowse()
+void PreferencesDialog::mainMediaFolderBrowse()
 {
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -180,12 +174,12 @@ void PreferencesWindow::mainMediaFolderBrowse()
     updateView();
 }
 
-void PreferencesWindow::auxMediaFolderSelectionChanged()
+void PreferencesDialog::auxMediaFolderSelectionChanged()
 {
     auxRemovePushButton->setEnabled(!auxMediaRootsList->selectedItems().isEmpty());
 }
 
-void PreferencesWindow::auxMediaFolderBrowse()
+void PreferencesDialog::auxMediaFolderBrowse()
 {
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -208,7 +202,7 @@ void PreferencesWindow::auxMediaFolderBrowse()
     updateView();
 }
 
-void PreferencesWindow::auxMediaFolderRemove()
+void PreferencesDialog::auxMediaFolderRemove()
 {
     foreach (QListWidgetItem *item, auxMediaRootsList->selectedItems())
         m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
@@ -216,13 +210,13 @@ void PreferencesWindow::auxMediaFolderRemove()
     updateView();
 }
 
-void PreferencesWindow::cameraSelected(int row)
+void PreferencesDialog::cameraSelected(int row)
 {
     if (row >= 0 && row < m_cameras.size())
         cameraInfoLabel->setText(m_cameras[row].second);
 }
 
-void PreferencesWindow::setCurrentTab(int index)
+void PreferencesDialog::setCurrentPage(PreferencesDialog::SettingsPage page)
 {
-    tabWidget->setCurrentIndex(index);
+    tabWidget->setCurrentIndex(int(page));
 }

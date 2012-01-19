@@ -1,5 +1,7 @@
 #include "camera_motionmask_widget.h"
 
+#include <QGLWidget>
+
 #include "ui/graphics/items/resource_widget.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/graphicsview.h"
@@ -26,9 +28,8 @@ QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QnResourcePtr &resource
     //m_view->fitInView(m_widget, Qt::KeepAspectRatio);
     //m_view->show();
 
-    QVBoxLayout *layout = new QVBoxLayout();
+    QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(m_view);
-
     setLayout(layout);
 }
 
@@ -37,9 +38,10 @@ QnCameraMotionMaskWidget::~QnCameraMotionMaskWidget()
     //delete m_view;
 }
 
-
-void QnCameraMotionMaskWidget::resizeEvent(QResizeEvent* event)
+void QnCameraMotionMaskWidget::resizeEvent(QResizeEvent *event)
 {
+    QWidget::resizeEvent(event);
+
     //m_view->setGeometry(geometry());
     m_widget->setEnclosingGeometry(geometry());
 }

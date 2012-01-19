@@ -369,13 +369,13 @@ public:
             return;
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-        
+
         QHostAddress appserverHost;
         do
         {
             appserverHost = resolveHost(appserverHostString);
         } while (appserverHost.toIPv4Address() == 0);
-        
+
         QnVideoServerPtr videoServer;
 
         while (videoServer.isNull())
@@ -467,7 +467,7 @@ public:
             QnSleep::msleep(1000);
         }
 
-        foreach(QnSecurityCamResourcePtr camera, cameras)
+        foreach(const QnSecurityCamResourcePtr &camera, cameras)
         {
             qDebug() << "Connecting resource: " << camera->getName();
             QObject::connect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
@@ -478,20 +478,20 @@ public:
             QnRecordingManager::instance()->updateSchedule(camera);
         }
 
-        foreach (QnScheduleTask scheduleTask, scheduleTasks)
+        foreach (const QnScheduleTask &scheduleTask, scheduleTasks)
         {
             QString str;
             QTextStream stream(&str);
 
-            stream << "ScheduleTask " << scheduleTask.m_id.toString() <<
-                scheduleTask.m_afterThreshold <<
-                scheduleTask.m_beforeThreshold <<
-                scheduleTask.m_dayOfWeek <<
-                scheduleTask.m_doRecordAudio <<
-                scheduleTask.m_startTime <<
-                scheduleTask.m_endTime <<
-                scheduleTask.m_recordType <<
-                scheduleTask.m_sourceId.toString();
+            stream << "ScheduleTask " << scheduleTask.getId().toString() <<
+                scheduleTask.getAfterThreshold() <<
+                scheduleTask.getBeforeThreshold() <<
+                scheduleTask.getDayOfWeek() <<
+                scheduleTask.getDoRecordAudio() <<
+                scheduleTask.getStartTime() <<
+                scheduleTask.getEndTime() <<
+                scheduleTask.getRecordingType() <<
+                scheduleTask.getSourceId().toString();
             cl_log.log(str, cl_logALWAYS);
         }
 
