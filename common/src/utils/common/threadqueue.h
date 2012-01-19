@@ -72,8 +72,11 @@ public:
     void removeFrontByCondition(const ConditionFunc& cond)
     {
         QMutexLocker mutex(&m_cs);
-        while (!m_queue.isEmpty() && cond(m_queue.front()))
+        while (!m_queue.isEmpty() && cond(m_queue.front())) 
+        {
+            m_sem.acquire(1);
             m_queue.dequeue();
+        }
     }
 
     int size() const
