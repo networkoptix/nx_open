@@ -218,11 +218,18 @@ void QnWorkbenchUi::toggleTreeVisible() {
 }
 
 void QnWorkbenchUi::updateTreeGeometry() {
+    QPointF sliderTargetPos;
+    if(m_sliderPositionAnimator->isRunning()) {
+        sliderTargetPos = m_sliderPositionAnimator->targetValue().toPointF();
+    } else {
+        sliderTargetPos = m_navigationItem->pos();
+    }
+
     QRectF geometry = QRectF(
         m_treeItem->pos().x(),
         m_treeItem->pos().y(),
         m_treeItem->size().width(),
-        qMin(m_navigationItem->pos().y(), m_uiElementsInstrument->widget()->size().height()) - m_treeItem->pos().y()
+        qMin(sliderTargetPos.y(), m_uiElementsInstrument->widget()->size().height()) - m_treeItem->pos().y()
     );
 
     if(qFuzzyCompare(geometry, m_treeItem->geometry()))
