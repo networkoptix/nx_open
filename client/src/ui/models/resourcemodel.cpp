@@ -1,4 +1,5 @@
 #include "resourcemodel.h"
+#include "resourcemodel_p.h"
 
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
@@ -125,12 +126,18 @@ static inline QIcon iconForResource(const QnResourcePtr &resource)
 }
 
 
-ResourceModel::ResourceModel(QObject *parent)
-    : QStandardItemModel(parent)
+void ResourceModelPrivate::init()
 {
-    connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(_q_addResource(QnResourcePtr)));
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(_q_removeResource(QnResourcePtr)));
-    connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(_q_resourceChanged(QnResourcePtr)));
+    Q_Q(ResourceModel);
+
+    QHash<int, QByteArray> roles = q->roleNames();
+    roles.insert(Qt::UserRole + 1, "id");
+    roles.insert(Qt::UserRole + 2, "searchString");
+    q->setRoleNames(roles);
+
+    q->connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), q, SLOT(_q_addResource(QnResourcePtr)));
+    q->connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), q, SLOT(_q_removeResource(QnResourcePtr)));
+    q->connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), q, SLOT(_q_resourceChanged(QnResourcePtr)));
 
     const QnResourceList resources = qnResPool->getResources(); // make a snapshot
     foreach (const QnResourcePtr &server, resources) {
@@ -143,11 +150,64 @@ ResourceModel::ResourceModel(QObject *parent)
             }
         }
     }
+}
 
-    QHash<int, QByteArray> roles = roleNames();
-    roles.insert(Qt::UserRole + 1, "id");
-    roles.insert(Qt::UserRole + 2, "searchString");
-    setRoleNames(roles);
+void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
+{
+    QStandardItem *item = itemFromResource(resource);
+    if (item)
+        return; // avoid duplicates
+
+    if (resource->checkFlag(QnResource::server)) {
+        item = new QStandardItem;
+        item->setSelectable(false);
+        q_func()->appendRow(item);
+    } else if (QStandardItem *root = itemFromResourceId(resource->getParentId().hash())) {
+        item = new QStandardItem;
+        root->appendRow(item);
+    } else {
+        qWarning("ResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
+                 resource->getParentId().hash(), resource->getId().hash());
+        return;
+    }
+
+    item->setText(resource->getName());
+    item->setToolTip(resource->getName());
+    item->setData(resource->getId().hash(), Qt::UserRole + 1);
+    item->setData(resource->toSearchString(), Qt::UserRole + 2);
+    item->setIcon(iconForResource(resource));
+    item->setEditable(false);
+}
+
+void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
+{
+    if (QStandardItem *item = itemFromResource(resource)) {
+        if (item->parent())
+            item->parent()->removeRow(item->row());
+        else
+            q_func()->removeRow(item->row());
+    }
+}
+
+void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
+{
+    if (QStandardItem *item = itemFromResource(resource)) {
+        item->setText(resource->getName());
+        item->setToolTip(resource->getName());
+        item->setData(resource->getId().hash(), Qt::UserRole + 1);
+        item->setData(resource->toSearchString(), Qt::UserRole + 2);
+        item->setIcon(iconForResource(resource));
+    }
+}
+
+
+ResourceModel::ResourceModel(QObject *parent)
+    : QStandardItemModel(parent), d_ptr(new ResourceModelPrivate)
+{
+    Q_D(ResourceModel);
+
+    d->q_ptr = this;
+    d->init();
 }
 
 ResourceModel::~ResourceModel()
@@ -177,7 +237,7 @@ void ResourceModel::addResource(const QnResourcePtr &resource)
         return;
     }
 
-    _q_addResource(resource);
+    d_func()->_q_addResource(resource);
 }
 
 void ResourceModel::removeResource(const QnResourcePtr &resource)
@@ -187,55 +247,7 @@ void ResourceModel::removeResource(const QnResourcePtr &resource)
         return;
     }
 
-    _q_removeResource(resource);
-}
-
-void ResourceModel::_q_addResource(const QnResourcePtr &resource)
-{
-    QStandardItem *item = itemFromResource(resource);
-    if (item)
-        return; // avoid duplicates
-
-    if (resource->checkFlag(QnResource::server)) {
-        item = new QStandardItem;
-        item->setSelectable(false);
-        appendRow(item);
-    } else if (QStandardItem *root = itemFromResourceId(resource->getParentId().hash())) {
-        item = new QStandardItem;
-        root->appendRow(item);
-    } else {
-        qWarning("ResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
-                 resource->getParentId().hash(), resource->getId().hash());
-        return;
-    }
-
-    item->setText(resource->getName());
-    item->setToolTip(resource->getName());
-    item->setData(resource->getId().hash(), Qt::UserRole + 1);
-    item->setData(resource->toSearchString(), Qt::UserRole + 2);
-    item->setIcon(iconForResource(resource));
-    item->setEditable(false);
-}
-
-void ResourceModel::_q_removeResource(const QnResourcePtr &resource)
-{
-    if (QStandardItem *item = itemFromResource(resource)) {
-        if (item->parent())
-            item->parent()->removeRow(item->row());
-        else
-            removeRow(item->row());
-    }
-}
-
-void ResourceModel::_q_resourceChanged(const QnResourcePtr &resource)
-{
-    if (QStandardItem *item = itemFromResource(resource)) {
-        item->setText(resource->getName());
-        item->setToolTip(resource->getName());
-        item->setData(resource->getId().hash(), Qt::UserRole + 1);
-        item->setData(resource->toSearchString(), Qt::UserRole + 2);
-        item->setIcon(iconForResource(resource));
-    }
+    d_func()->_q_removeResource(resource);
 }
 
 QStringList ResourceModel::mimeTypes() const
@@ -477,3 +489,5 @@ void ResourceSortFilterProxyModel::buildFilters(const QSet<QString> parts[], QRe
         }
     }
 }
+
+#include "moc_resourcemodel.cpp"
