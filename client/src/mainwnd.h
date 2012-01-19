@@ -12,6 +12,7 @@ class QnBlueBackgroundPainter;
 class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchController;
+class QnWorkbenchUi;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnDwm;
@@ -69,6 +70,7 @@ protected:
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
+    QnWorkbenchUi *m_ui;
     QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
 

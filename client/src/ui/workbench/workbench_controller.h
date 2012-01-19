@@ -13,7 +13,6 @@ class QGraphicsItem;
 class QMenu;
 class QLabel;
 class QPropertyAnimation;
-class QGraphicsProxyWidget;
 
 class CLVideoCamera;
 
@@ -24,17 +23,10 @@ class DragInstrument;
 class RubberBandInstrument;
 class ResizingInstrument;
 class DropInstrument;
-class UiElementsInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
 class ClickInfo;
 class ResizingInfo;
-class VariantAnimator;
-class AnimatorGroup;
-class HoverFocusProcessor;
-
-class NavigationItem;
-class NavigationTreeWidget;
 
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
@@ -43,8 +35,6 @@ class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
-class QnOpacityHoverItem;
-class QnImageButtonWidget;
 
 
 /**
@@ -67,10 +57,6 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    NavigationTreeWidget *treeWidget() const {
-        return m_treeWidget;
-    }
-
     void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QString &file, const QPointF &gridPos = QPointF(), bool findAccepted = true);
@@ -82,10 +68,6 @@ public:
     void remove(const QnResourceList &resources);
 
 public Q_SLOTS:
-    void setTreeVisible(bool visible, bool animate = true);
-    void setSliderVisible(bool visible, bool animate = true);
-    void toggleTreeVisible();
-
     void startRecording();
     void stopRecording();
 
@@ -95,10 +77,6 @@ protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();
-
-    void updateViewportMargins();
-
-    void updateTreeGeometry();
 
 protected Q_SLOTS:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -113,7 +91,6 @@ protected Q_SLOTS:
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
     void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
@@ -143,63 +120,18 @@ protected Q_SLOTS:
 
     void at_randomGridAction_triggered();
 
-    void at_controlsWidget_deactivated();
-    void at_controlsWidget_geometryChanged();
-
-    void at_navigationItem_geometryChanged();
-    void at_navigationItem_actualCameraChanged(CLVideoCamera *camera);
-    void at_sliderOpacityProcessor_hoverEntered();
-    void at_sliderOpacityProcessor_hoverLeft();
-
-    void at_treeItem_geometryChanged();
-    void at_treeHidingProcessor_hoverFocusLeft();
-    void at_treeShowingProcessor_hoverEntered();
-    void at_treeOpacityProcessor_hoverLeft();
-    void at_treeOpacityProcessor_hoverEntered();
-    void at_treeBookmarkItem_toggled(bool checked);
-
 private:
     /* Global state. */
 
-    /** Display synchronizer. */
+    /** Workbench display. */
     QnWorkbenchDisplay *m_display;
 
     /** Instrument manager for the scene. */
     InstrumentManager *m_manager;
 
-    /** Navigation item. */
-    NavigationItem *m_navigationItem;
-
-    /** Navigation tree widget. */
-    NavigationTreeWidget *m_treeWidget;
-
-    /** Proxy widget for navigation tree widget. */
-    QGraphicsProxyWidget *m_treeItem;
-
-    QGraphicsWidget *m_treeBackgroundItem;
-
-    QnImageButtonWidget *m_treeBookmarkItem;
-
-    /** Whether navigation tree is visible. */
-    bool m_treeVisible;
-
-    bool m_sliderVisible;
-
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
-    /** Hover opacity item for tree widget. */
-    HoverFocusProcessor *m_treeHidingProcessor;
-
-    HoverFocusProcessor *m_treeShowingProcessor;
-
-    HoverFocusProcessor *m_treeOpacityProcessor;
-
-    HoverFocusProcessor *m_sliderOpacityProcessor;
-
-    AnimatorGroup *m_treeOpacityAnimatorGroup;
-    VariantAnimator *m_treePositionAnimator;
-    VariantAnimator *m_sliderPositionAnimator;
 
     /* Instruments. */
 
@@ -223,9 +155,6 @@ private:
 
     /** Archive drop instrument. */
     DropInstrument *m_archiveDropInstrument;
-
-    /** Ui elements instrument. */
-    UiElementsInstrument *m_uiElementsInstrument;
 
     /** Motion selection instrument. */
     MotionSelectionInstrument *m_motionSelectionInstrument;
@@ -258,13 +187,12 @@ private:
     QList<QRect> m_dragGeometries;
 
 
+    /* Screen recording-related state. */
+
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;
 
-    /** Layout item context menu. */
-    QMenu *m_itemContextMenu;
-
-    /** Mark recorder countdown is canceled. */
+    /** Whether recorder countdown is canceled. */
     bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
@@ -273,11 +201,15 @@ private:
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
 
+
+    /* Context menu-related state. */
+
+    /** Layout item context menu. */
+    QMenu *m_itemContextMenu;
+
     QAction *m_showMotionAction;
     QAction *m_hideMotionAction;
     QAction *m_randomGridAction;
-
-    QSizeF m_controlsWidgetSize;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

@@ -17,14 +17,14 @@
 #include <QFileDialog>
 #include <QGraphicsProxyWidget>
 
+#include <utils/common/util.h>
+
 #include <core/resource/directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
-
-#include <utils/common/event_signalizator.h>
 
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/preferences/preferencesdialog.h>
@@ -49,7 +49,6 @@
 #include <ui/graphics/instruments/selection_fixup_instrument.h>
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/graphics/instruments/resizing_instrument.h>
-#include <ui/graphics/instruments/ui_elements_instrument.h>
 #include <ui/graphics/instruments/resize_hover_instrument.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
@@ -58,12 +57,6 @@
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
-#include <ui/graphics/items/image_button_widget.h>
-
-#include <ui/processors/hover_processor.h>
-
-#include <ui/videoitem/navigationitem.h>
-#include <ui/navigationtreewidget.h>
 
 #include <ui/context_menu/menu_wrapper.h>
 #include <ui/context_menu_helper.h>
@@ -202,15 +195,6 @@ namespace {
     /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
 
-    const qreal normalTreeOpacity = 0.85;
-    const qreal hoverTreeOpacity = 0.95;
-
-    const qreal normalTreeBackgroundOpacity = 0.5;
-    const qreal hoverTreeBackgroundOpacity = 1.0;
-
-    const qreal normalSliderOpacity = 0.5;
-    const qreal hoverSliderOpacity = 0.95;
-
 } // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
@@ -246,7 +230,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
     m_archiveDropInstrument = new DropInstrument(this, this);
-    m_uiElementsInstrument = new UiElementsInstrument(this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_dragInstrument = new DragInstrument(this);
@@ -280,7 +263,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, mouseEventTypes, this));
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::INSTALL_AFTER, m_display->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_dragInstrument);
@@ -289,7 +271,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_archiveDropInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
-    connect(itemLeftClickInstrument,    SIGNAL(pressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftPressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -349,125 +330,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_dragInstrument,               SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_resizingInstrument,           SLOT(recursiveEnable()));
-
-    /* Create controls. */
-    QGraphicsWidget *controlsItem = m_uiElementsInstrument->widget();
-    controlsItem->setFlag(QGraphicsItem::ItemIsPanel);
-    m_display->setLayer(controlsItem, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
-
-    QnSingleEventSignalizator *deactivationSignalizator = new QnSingleEventSignalizator(this);
-    deactivationSignalizator->setEventType(QEvent::WindowDeactivate);
-    controlsItem->installEventFilter(deactivationSignalizator);
-
-    connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
-    connect(controlsItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
-
-    /* Tree widget. */
-    m_treeWidget = new NavigationTreeWidget();
-    m_treeWidget->setWorkbenchController(this);
-    m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
-    {
-        QPalette palette = m_treeWidget->palette();
-        palette.setColor(QPalette::Window, Qt::transparent);
-        palette.setColor(QPalette::Base, Qt::transparent);
-        m_treeWidget->setPalette(palette);
-    }
-
-    connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
-
-    m_treeItem = new QGraphicsProxyWidget(controlsItem);
-    m_treeItem->setWidget(m_treeWidget);
-    m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-    m_treeItem->setFocusPolicy(Qt::StrongFocus);
-    m_treeItem->setOpacity(normalTreeOpacity);
-
-    m_treeBackgroundItem = new QGraphicsWidget(controlsItem);
-    m_treeBackgroundItem->setAutoFillBackground(true);
-    {
-        QPalette palette = m_treeBackgroundItem->palette();
-
-        QLinearGradient gradient(0, 0, 1, 0);
-        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        gradient.setColorAt(0.0,  QColor(0, 0, 0, 255));
-        gradient.setColorAt(0.99, QColor(0, 0, 0, 64));
-        gradient.setColorAt(1.0,  QColor(0, 0, 0, 255));
-        gradient.setSpread(QGradient::RepeatSpread);
-
-        palette.setBrush(QPalette::Window, QBrush(gradient));
-        m_treeBackgroundItem->setPalette(palette);
-    }
-    m_treeBackgroundItem->stackBefore(m_treeItem);
-    m_treeBackgroundItem->setOpacity(normalTreeBackgroundOpacity);
-
-    m_treeBookmarkItem = new QnImageButtonWidget(controlsItem);
-    m_treeBookmarkItem->resize(15, 45);
-    m_treeBookmarkItem->setOpacity(normalTreeBackgroundOpacity);
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("slide_right.png"));
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap("slide_right_hover.png"));
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("slide_left.png"));
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::HOVERED, Skin::pixmap("slide_left_hover.png"));
-    m_treeBookmarkItem->setCheckable(true);
-    m_treeBookmarkItem->setAnimationSpeed(4.0);
-
-    m_treeOpacityProcessor = new HoverFocusProcessor(controlsItem);
-    m_treeOpacityProcessor->addTargetItem(m_treeItem);
-    m_treeOpacityProcessor->addTargetItem(m_treeBookmarkItem);
-
-    m_treeHidingProcessor = new HoverFocusProcessor(controlsItem);
-    m_treeHidingProcessor->addTargetItem(m_treeItem);
-    m_treeHidingProcessor->addTargetItem(m_treeBookmarkItem);
-    m_treeHidingProcessor->setHoverLeaveDelay(1000);
-    m_treeHidingProcessor->setFocusLeaveDelay(1000);
-
-    m_treeShowingProcessor = new HoverFocusProcessor(controlsItem);
-    m_treeShowingProcessor->addTargetItem(m_treeBookmarkItem);
-    m_treeShowingProcessor->setHoverEnterDelay(250);
-
-    m_treePositionAnimator = new VariantAnimator(this);
-    m_treePositionAnimator->setTimer(display->animationInstrument()->animationTimer());
-    m_treePositionAnimator->setTargetObject(m_treeItem);
-    m_treePositionAnimator->setAccessor(new PropertyAccessor("pos"));
-    m_treePositionAnimator->setSpeed(m_treeItem->size().width() * 2.0);
-    m_treePositionAnimator->setTimeLimit(500);
-
-    m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_treeOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeItem));
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBackgroundItem)); /* Speed of 1.0 is OK here. */
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBookmarkItem));
-
-    setTreeVisible(false, false);
-
-    connect(m_treeBookmarkItem,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treeBookmarkItem_toggled(bool)));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_treeOpacityProcessor_hoverLeft()));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeOpacityProcessor_hoverEntered()));
-    connect(m_treeHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_treeHidingProcessor_hoverFocusLeft()));
-    connect(m_treeShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeShowingProcessor_hoverEntered()));
-    connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
-
-    /* Navigation slider. */
-    m_navigationItem = new NavigationItem(controlsItem);
-    m_navigationItem->setOpacity(normalSliderOpacity);
-
-    m_sliderOpacityProcessor = new HoverFocusProcessor(controlsItem);
-    m_sliderOpacityProcessor->addTargetItem(m_navigationItem);
-
-    m_sliderPositionAnimator = new VariantAnimator(this);
-    m_sliderPositionAnimator->setTimer(display->animationInstrument()->animationTimer());
-    m_sliderPositionAnimator->setTargetObject(m_navigationItem);
-    m_sliderPositionAnimator->setAccessor(new PropertyAccessor("pos"));
-    m_sliderPositionAnimator->setSpeed(m_navigationItem->size().height() * 2.0);
-    m_sliderPositionAnimator->setTimeLimit(500);
-
-    setSliderVisible(false, false);
-
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_sliderOpacityProcessor_hoverEntered()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_sliderOpacityProcessor_hoverLeft()));
-    connect(m_navigationItem,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_navigationItem_geometryChanged()));
-    connect(m_navigationItem,           SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(at_navigationItem_actualCameraChanged(CLVideoCamera *)));
-    connect(m_navigationItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
-    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_navigationItem,               SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
-
+    
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -674,45 +537,185 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-void QnWorkbenchController::setTreeVisible(bool visible, bool animate)
+int QnWorkbenchController::isMotionGridDisplayed()
 {
-    m_treeVisible = visible;
-    m_treeBookmarkItem->setChecked(visible);
+    bool allDisplayed = true;
+    bool allNonDisplayed = true;
+    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
+    {
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+        if(widget == NULL)
+            continue;
+        allDisplayed &= widget->isMotionGridDisplayed();
+        allNonDisplayed &= !widget->isMotionGridDisplayed();
+    }
+    if (allDisplayed)
+        return 1;
+    else if (allNonDisplayed)
+        return 0;
+    else
+        return -1;
+}
 
-    QPointF newPos = QPointF(visible ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
-    if (animate) {
-        m_treePositionAnimator->animateTo(newPos);
-    } else {
-        m_treeItem->setPos(newPos);
+void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
+    foreach(QGraphicsItem *item, items) {
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+        if(widget == NULL)
+            continue;
+
+        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
     }
 }
 
-void QnWorkbenchController::setSliderVisible(bool visible, bool animate) {
-    m_sliderVisible = visible;
 
-    QPointF newPos = QPointF(0.0, m_uiElementsInstrument->widget()->size().height() + (visible ? -m_navigationItem->size().height() : 32.0 /* So that tooltips are not visible. */));
-    if (animate)
-        m_sliderPositionAnimator->animateTo(newPos);
-    else
-        m_navigationItem->setPos(newPos);
-}
-
-void QnWorkbenchController::toggleTreeVisible() {
-    setTreeVisible(!m_treeVisible);
-}
-
-void QnWorkbenchController::updateTreeGeometry() {
-    QRectF geometry = QRectF(
-        m_treeItem->pos().x(),
-        m_treeItem->pos().y(),
-        m_treeItem->size().width(),
-        qMin(m_navigationItem->pos().y(), m_uiElementsInstrument->widget()->size().height()) - m_treeItem->pos().y()
-    );
-
-    if(qFuzzyCompare(geometry, m_treeItem->geometry()))
+// -------------------------------------------------------------------------- //
+// Screen recording
+// -------------------------------------------------------------------------- //
+void QnWorkbenchController::startRecording()
+{
+    if (!m_screenRecorder->isSupported() || m_screenRecorder->isRecording())
         return;
 
-    m_treeItem->setGeometry(geometry);
+    m_countdownCanceled = false;
+
+    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
+    if (widget == NULL) {
+        qnWarning("Viewport was expected to be a QGLWidget.");
+        return;
+    }
+
+    QWidget *view = display()->view();
+
+    if (m_recordingLabel == 0)
+        m_recordingLabel = new QLabel(view);
+    m_recordingLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    m_recordingLabel->resize(200, 200);
+    m_recordingLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_recordingLabel->size()) / 2);
+
+    m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
+    m_recordingLabel->setText(tr("Recording start in..."));
+    m_recordingLabel->setAlignment(Qt::AlignCenter);
+    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
+    m_recordingLabel->setFocusPolicy(Qt::NoFocus);
+    m_recordingLabel->show();
+
+    if (m_recordingAnimation == 0)
+        m_recordingAnimation = new QPropertyAnimation(m_recordingLabel, "windowOpacity", m_recordingLabel);
+    m_recordingAnimation->setEasingCurve(QEasingCurve::OutCubic);
+    m_recordingAnimation->setDuration(3000);
+    m_recordingAnimation->setStartValue(1.0);
+    m_recordingAnimation->setEndValue(0.6);
+
+    m_recordingAnimation->disconnect();
+    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
+    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
+    m_recordingAnimation->start();
+
+    cm_toggle_recording.setText(tr("Stop Screen Recording"));
+}
+
+void QnWorkbenchController::stopRecording()
+{
+    if (!m_screenRecorder->isSupported())
+        return;
+
+    if (!m_screenRecorder->isRecording()) {
+        m_countdownCanceled = true;
+        return;
+    }
+
+    m_screenRecorder->stopRecording();
+}
+
+void QnWorkbenchController::at_recordingAnimation_finished()
+{
+    m_recordingLabel->hide();
+    if (!m_countdownCanceled) {
+        if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
+            m_screenRecorder->startRecording(widget);
+    }
+    m_countdownCanceled = false;
+}
+
+void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &)
+{
+    static double TICKS = 3;
+
+    QPropertyAnimation *animation = qobject_cast<QPropertyAnimation *>(sender());
+    if (!animation)
+        return;
+
+    double normValue = 1.0 - (double) animation->currentTime() / animation->duration();
+
+    QLabel *label = qobject_cast<QLabel *>(animation->targetObject());
+    if (!label)
+        return;
+
+    if (m_countdownCanceled) {
+        label->setText(tr("Cancelled"));
+        return;
+    }
+
+    double d = normValue * (TICKS+1);
+    if (d < TICKS) {
+        const int n = int (d) + 1;
+        label->setText(tr("Recording start in...") + QString::number(n));
+    }
+}
+
+void QnWorkbenchController::at_screenRecorder_recordingStarted() {
+    return;
+}
+
+void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
+    cm_toggle_recording.setText(tr("Start Screen Recording"));
+
+    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
+}
+
+void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
+    cm_toggle_recording.setText(tr("Start Screen Recording"));
+
+    QString suggetion = QFileInfo(recordedFileName).fileName();
+    if (suggetion.isEmpty())
+        suggetion = tr("recorded_video");
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("videoRecording"));
+
+    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString selectedFilter;
+    while (1) {
+        QString filePath = QFileDialog::getSaveFileName(
+            display()->view(),
+            tr("Save Recording As..."),
+            previousDir + QLatin1Char('/') + suggetion,
+            tr("Transport Stream (*.ts)"),
+            &selectedFilter,
+            QFileDialog::DontUseNativeDialog
+        );
+
+        if (!filePath.isEmpty()) {
+            if (!filePath.endsWith(QLatin1String(".ts"), Qt::CaseInsensitive))
+                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
+
+            QFile::remove(filePath);
+            if (!QFile::rename(recordedFileName, filePath)) {
+                QString message = QObject::tr("Can't overwrite file '%1'. Please try another name.").arg(filePath);
+                CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
+                QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                continue;
+            }
+
+            QnFileProcessor::createResourcesForFile(filePath);
+
+            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+        } else {
+            QFile::remove(recordedFileName);
+        }
+        break;
+    }
+    settings.endGroup();
 }
 
 
@@ -720,8 +723,6 @@ void QnWorkbenchController::updateTreeGeometry() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
-    qDebug("RESIZING STARTED");
-
     m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
     if(m_resizedWidget == NULL)
         return;
@@ -770,8 +771,6 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 }
 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
-    qDebug("RESIZING FINISHED");
-
     if(m_resizedWidget != item)
         return;
 
@@ -802,8 +801,6 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 }
 
 void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
-    qDebug("DRAGGING STARTED");
-
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
     m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
@@ -909,8 +906,6 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
 }
 
 void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
-    qDebug("DRAGGING FINISHED");
-
     if(m_draggedWorkbenchItems.empty())
         return;
 
@@ -975,19 +970,6 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *
     default:
         break;
     }
-}
-
-// TODO: remove function
-void QnWorkbenchController::at_item_leftPressed(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
-    if(info.modifiers() != 0)
-        return;
-
-    if(item->isSelected())
-        return;
-
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget == NULL)
-        return;
 }
 
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -1109,13 +1091,6 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
 
     m_widgetByRole[role] = widget;
 
-    /* Update navigation item's target. */
-    QnResourceWidget *navigatedWidget = m_widgetByRole[QnWorkbench::ZOOMED];
-    if(navigatedWidget == NULL)
-        navigatedWidget = m_widgetByRole[QnWorkbench::RAISED];
-    m_navigationItem->setVideoCamera(navigatedWidget == NULL ? NULL : navigatedWidget->display()->camera());
-
-
     switch(role) {
     case QnWorkbench::ZOOMED: {
         bool effective = widget == NULL;
@@ -1134,14 +1109,6 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
         return;
 
     widget->installEventFilter(this);
-
-    QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
-    if(cameraResource != NULL)
-    {
-        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QRegion)), m_navigationItem, SLOT(loadMotionPeriods(QnResourcePtr, QRegion)));
-        connect(m_navigationItem, SIGNAL(clearMotionSelection()), widget, SLOT(clearMotionSelection()));
-        m_navigationItem->addReserveCamera(widget->display()->camera());
-    }
 }
 
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -1149,78 +1116,6 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
         return;
 
     widget->removeEventFilter(this);
-
-    QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
-    if(cameraResource != NULL)
-        m_navigationItem->removeReserveCamera(widget->display()->camera());
-}
-
-void QnWorkbenchController::updateViewportMargins() {
-    m_display->setViewportMargins(QMargins(
-        0, //std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
-        0,
-        0,
-        std::floor(qMax(0.0, m_uiElementsInstrument->widget()->size().height() - m_navigationItem->pos().y()))
-    ));
-}
-
-void QnWorkbenchController::at_controlsWidget_deactivated() {
-    /* Re-activate it. */
-    display()->scene()->setActiveWindow(m_uiElementsInstrument->widget());
-}
-
-void QnWorkbenchController::at_controlsWidget_geometryChanged() {
-    QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
-    QSizeF size = controlsWidget->size();
-    if(qFuzzyCompare(m_controlsWidgetSize, size))
-        return;
-    QSizeF oldSize = m_controlsWidgetSize;
-    m_controlsWidgetSize = size;
-
-    /* We lay everything out manually. */
-
-    m_navigationItem->setGeometry(QRectF(
-        0.0,
-        m_navigationItem->pos().y() - oldSize.height() + size.height(),
-        size.width(),
-        m_navigationItem->size().height()
-    ));
-
-    updateTreeGeometry();
-}
-
-void QnWorkbenchController::at_navigationItem_geometryChanged() {
-    updateTreeGeometry();
-
-    updateViewportMargins();
-}
-
-void QnWorkbenchController::at_navigationItem_actualCameraChanged(CLVideoCamera *camera) {
-    setSliderVisible(camera != NULL, true);
-}
-
-void QnWorkbenchController::at_sliderOpacityProcessor_hoverEntered() {
-    opacityAnimator(m_navigationItem)->animateTo(hoverSliderOpacity);
-}
-
-void QnWorkbenchController::at_sliderOpacityProcessor_hoverLeft() {
-    opacityAnimator(m_navigationItem)->animateTo(normalSliderOpacity);
-}
-
-void QnWorkbenchController::at_treeItem_geometryChanged() {
-    QRectF geometry = m_treeItem->geometry();
-
-    bool visible = geometry.right() >= 0.0;
-    m_treeItem->setVisible(visible);
-    m_treeBackgroundItem->setVisible(visible);
-
-    m_treeBackgroundItem->setGeometry(geometry);
-    m_treeBookmarkItem->setPos(QPointF(
-        geometry.right(),
-        (geometry.top() + geometry.bottom() - m_treeBookmarkItem->size().height()) / 2
-    ));
-
-    updateViewportMargins();
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
@@ -1245,34 +1140,9 @@ void QnWorkbenchController::at_showMotionAction_triggered()
 #endif
 }
 
-int QnWorkbenchController::isMotionGridDisplayed()
-{
-    bool allDisplayed = true;
-    bool allNonDisplayed = true;
-    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
-    {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
-            continue;
-        allDisplayed &= widget->isMotionGridDisplayed();
-        allNonDisplayed &= !widget->isMotionGridDisplayed();
-    }
-    if (allDisplayed)
-        return 1;
-    else if (allNonDisplayed)
-        return 0;
-    else
-        return -1;
-}
-
-void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
-    foreach(QGraphicsItem *item, items) {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
-            continue;
-
-        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
-    }
+void QnWorkbenchController::at_randomGridAction_triggered() {
+    display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
+    display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
 }
 
 void QnWorkbenchController::at_toggleRecordingAction_triggered() {
@@ -1283,190 +1153,8 @@ void QnWorkbenchController::at_toggleRecordingAction_triggered() {
     }
 }
 
-void QnWorkbenchController::startRecording()
-{
-    if (!m_screenRecorder->isSupported() || m_screenRecorder->isRecording())
-        return;
-
-    m_countdownCanceled = false;
-
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
-        return;
-    }
-
-    QWidget *view = display()->view();
-
-    if (m_recordingLabel == 0)
-        m_recordingLabel = new QLabel(view);
-    m_recordingLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-    m_recordingLabel->resize(200, 200);
-    m_recordingLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_recordingLabel->size()) / 2);
-
-    m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
-    m_recordingLabel->setText(tr("Recording start in..."));
-    m_recordingLabel->setAlignment(Qt::AlignCenter);
-    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
-    m_recordingLabel->setFocusPolicy(Qt::NoFocus);
-    m_recordingLabel->show();
-
-    if (m_recordingAnimation == 0)
-        m_recordingAnimation = new QPropertyAnimation(m_recordingLabel, "windowOpacity", m_recordingLabel);
-    m_recordingAnimation->setEasingCurve(QEasingCurve::OutCubic);
-    m_recordingAnimation->setDuration(3000);
-    m_recordingAnimation->setStartValue(1.0);
-    m_recordingAnimation->setEndValue(0.6);
-
-    m_recordingAnimation->disconnect();
-    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
-    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
-    m_recordingAnimation->start();
-
-    cm_toggle_recording.setText(tr("Stop Screen Recording"));
-}
-
-void QnWorkbenchController::stopRecording()
-{
-    if (!m_screenRecorder->isSupported())
-        return;
-
-    if (!m_screenRecorder->isRecording()) {
-        m_countdownCanceled = true;
-        return;
-    }
-
-    m_screenRecorder->stopRecording();
-}
-
-void QnWorkbenchController::at_recordingAnimation_finished()
-{
-    m_recordingLabel->hide();
-    if (!m_countdownCanceled) {
-        if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            m_screenRecorder->startRecording(widget);
-    }
-    m_countdownCanceled = false;
-}
-
-void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &value)
-{
-    static double TICKS = 3;
-
-    QPropertyAnimation *animation = qobject_cast<QPropertyAnimation *>(sender());
-    if (!animation)
-        return;
-
-    double normValue = 1.0 - (double) animation->currentTime() / animation->duration();
-
-    QLabel *label = qobject_cast<QLabel *>(animation->targetObject());
-    if (!label)
-        return;
-
-    if (m_countdownCanceled) {
-        label->setText(tr("Cancelled"));
-        return;
-    }
-
-    double d = normValue * (TICKS+1);
-    if (d < TICKS) {
-        const int n = int (d) + 1;
-        label->setText(tr("Recording start in...") + QString::number(n));
-    }
-}
-
 void QnWorkbenchController::at_recordingSettingsAction_triggered() {
     PreferencesDialog dialog(display()->view());
     dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
     dialog.exec();
-}
-
-void QnWorkbenchController::at_screenRecorder_recordingStarted() {
-}
-
-void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    cm_toggle_recording.setText(tr("Start Screen Recording"));
-
-    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
-}
-
-void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
-    cm_toggle_recording.setText(tr("Start Screen Recording"));
-
-    QString suggetion = QFileInfo(recordedFileName).fileName();
-    if (suggetion.isEmpty())
-        suggetion = tr("recorded_video");
-
-    QSettings settings;
-    settings.beginGroup(QLatin1String("videoRecording"));
-
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    QString selectedFilter;
-    while (1) {
-        QString filePath = QFileDialog::getSaveFileName(
-            display()->view(),
-            tr("Save Recording As..."),
-            previousDir + QLatin1Char('/') + suggetion,
-            tr("Transport Stream (*.ts)"),
-            &selectedFilter,
-            QFileDialog::DontUseNativeDialog
-        );
-
-        if (!filePath.isEmpty()) {
-            if (!filePath.endsWith(QLatin1String(".ts"), Qt::CaseInsensitive))
-                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
-
-            QFile::remove(filePath);
-            if (!QFile::rename(recordedFileName, filePath)) {
-                QString message = QObject::tr("Can't overwrite file '%1'. Please try another name.").arg(filePath);
-                CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
-                continue;
-            }
-
-            QnFileProcessor::createResourcesForFile(filePath);
-
-            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
-        } else {
-            QFile::remove(recordedFileName);
-        }
-        break;
-    }
-    settings.endGroup();
-}
-
-void QnWorkbenchController::at_randomGridAction_triggered() {
-    display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
-    display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
-}
-
-void QnWorkbenchController::at_treeHidingProcessor_hoverFocusLeft() {
-    setTreeVisible(false);
-}
-
-void QnWorkbenchController::at_treeShowingProcessor_hoverEntered() {
-    setTreeVisible(true);
-    m_treeHidingProcessor->forceHoverEnter();
-    m_treeOpacityProcessor->forceHoverEnter();
-}
-
-void QnWorkbenchController::at_treeOpacityProcessor_hoverLeft() {
-    m_treeOpacityAnimatorGroup->pause();
-    opacityAnimator(m_treeItem)->setTargetValue(normalTreeOpacity);
-    opacityAnimator(m_treeBackgroundItem)->setTargetValue(normalTreeBackgroundOpacity);
-    opacityAnimator(m_treeBookmarkItem)->setTargetValue(normalTreeBackgroundOpacity);
-    m_treeOpacityAnimatorGroup->start();
-}
-
-void QnWorkbenchController::at_treeOpacityProcessor_hoverEntered() {
-    m_treeOpacityAnimatorGroup->pause();
-    opacityAnimator(m_treeItem)->setTargetValue(hoverTreeOpacity);
-    opacityAnimator(m_treeBackgroundItem)->setTargetValue(hoverTreeBackgroundOpacity);
-    opacityAnimator(m_treeBookmarkItem)->setTargetValue(hoverTreeBackgroundOpacity);
-    m_treeOpacityAnimatorGroup->start();
-}
-
-void QnWorkbenchController::at_treeBookmarkItem_toggled(bool checked) {
-    m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
-    setTreeVisible(checked);
 }
