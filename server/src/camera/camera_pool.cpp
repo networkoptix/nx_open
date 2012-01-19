@@ -11,10 +11,18 @@ QnVideoCameraPool::QnVideoCameraPool()
 
 QnVideoCameraPool::~QnVideoCameraPool()
 {
+    stop();
+}
+
+void QnVideoCameraPool::stop()
+{
     foreach(QnVideoCamera* camera, m_cameras.values())
         camera->beforeDisconnectFromResource();
-    foreach(QnVideoCamera* camera, m_cameras.values())
+    foreach(QnVideoCamera* camera, m_cameras.values()) {
+        camera->stop();
         delete camera;
+    }
+    m_cameras.clear();
 }
 
 QnVideoCameraPool* QnVideoCameraPool::instance()
