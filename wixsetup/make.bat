@@ -28,4 +28,4 @@ MSBuild ..\server\src\server.vcproj /t:Rebuild /p:Configuration=%CONFIG%
 MSBuild PropsCA\PropsCA.vcproj /t:Rebuild /p:Configuration=Release
 MSBuild EveAssocCA\EveAssocCA.vcproj /t:Rebuild /p:Configuration=Release
 
-@start /B /WAIT make.py %1
+@start /B /WAIT make.py %CONFIG%

@@ -13,15 +13,15 @@ from common.convert import rmtree
 
 set_env()
 
-if len(sys.argv) == 2 and sys.argv[1] == 'debug':
+if len(sys.argv) == 2 and sys.argv[1].lower() == 'debug':
     CONFIG = 'Debug'
 else:
     CONFIG = 'Release'
 
 os.environ['CONFIG'] = CONFIG    
 
-if os.path.exists('bin'):
-    rmtree('bin')
+if os.path.exists(os.path.join('bin', CONFIG)):
+    rmtree(os.path.join('bin', CONFIG))
 
 if os.path.exists('obj'):
     rmtree('obj')
