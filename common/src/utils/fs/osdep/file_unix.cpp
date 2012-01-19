@@ -112,7 +112,7 @@ qint64 QnFile::size() const
 	return -1;
 }
 
-qint64 QnFile::seek( int64_t offset)
+qint64 QnFile::seek( qint64 offset)
 {
 	if( !isOpen() )
 		return (qint64)-1;
@@ -125,7 +125,7 @@ qint64 QnFile::seek( int64_t offset)
 #endif	
 }
 
-bool QnFile::truncate( uint64_t newFileSize )
+bool QnFile::truncate( qint64 newFileSize )
 {
 #ifdef Q_OS_DARWIN
 	return ftruncate( (long)m_impl, newFileSize ) == 0;
