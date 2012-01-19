@@ -164,7 +164,7 @@ QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVaria
 }
 
 const QPixmap &QnImageButtonWidget::actualPixmap(StateFlags flags) {
-    const QPixmap &default = m_pixmaps[0];
+    const QPixmap &standard = m_pixmaps[0];
 
     switch(flags) {
 #define TRY(FLAGS)                                                              \
@@ -173,17 +173,17 @@ const QPixmap &QnImageButtonWidget::actualPixmap(StateFlags flags) {
     case CHECKED_HOVERED:
         TRY(CHECKED | HOVERED);
         TRY(CHECKED);
-        return default;
+        return standard;
     case CHECKED:
         TRY(CHECKED);
-        return default;
+        return standard;
     case HOVERED:
         TRY(HOVERED);
-        return default;
+        return standard;
     case 0:
-        return default;
+        return standard;
     default:
-        return default;
+        return standard;
 #undef TRY
     }
 }
