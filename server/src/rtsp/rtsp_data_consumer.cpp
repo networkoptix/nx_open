@@ -31,6 +31,11 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_timer.start();
 }
 
+QnRtspDataConsumer::~QnRtspDataConsumer()
+{
+    stop();
+}
+
   void QnRtspDataConsumer::pauseNetwork()
 {
     m_pauseNetwork = true;

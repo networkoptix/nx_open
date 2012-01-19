@@ -9,7 +9,7 @@ QnRtspListener::QnRtspListener(const QHostAddress& address, int port):
 
 QnRtspListener::~QnRtspListener()
 {
-
+    stop();
 }
 
 CLLongRunnable* QnRtspListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)

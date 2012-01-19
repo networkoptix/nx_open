@@ -326,6 +326,8 @@ public:
 
     ~QnMain()
     {
+        stop();
+
         stopObjects();
     }
 
@@ -345,7 +347,7 @@ public:
 
         if (m_processor)
         {
-            m_processor->deleteLater();
+            delete m_processor;
             m_processor = 0;
         }
     }

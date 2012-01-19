@@ -10,7 +10,7 @@ class QN_EXPORT QnAbstractDataConsumer : public CLLongRunnable
 
 public:
     QnAbstractDataConsumer(int maxQueueSize);
-    virtual ~QnAbstractDataConsumer(){}
+    virtual ~QnAbstractDataConsumer(){ stop(); }
 
     /**
       * @return true is there is any space in the queue, false otherwise

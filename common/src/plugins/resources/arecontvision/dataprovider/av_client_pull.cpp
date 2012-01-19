@@ -35,6 +35,7 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res)
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 {
+    stop();
 }
 
 void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()

@@ -9,6 +9,8 @@ QnRestServer::QnRestServer(const QHostAddress& address, int port):
 
 QnRestServer::~QnRestServer()
 {
+    stop();
+
     foreach(QnRestRequestHandler* handler, m_handlers)
     {
         delete handler;

@@ -12,6 +12,8 @@ QnVideoCamera::QnVideoCamera(QnResourcePtr resource):
 
 QnVideoCamera::~QnVideoCamera()
 {
+    stop();
+
     delete m_reader;
 }
 

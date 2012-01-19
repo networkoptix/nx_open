@@ -59,6 +59,8 @@ QnArchiveStreamReader::onStatusChanged(QnResource::Status oldStatus, QnResource:
 
 QnArchiveStreamReader::~QnArchiveStreamReader()
 {
+    stop();
+
     delete m_frameTypeExtractor;
     m_frameTypeExtractor = 0;
 }

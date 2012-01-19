@@ -13,6 +13,11 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     m_lastWarningTime = AV_NOPTS_VALUE;
 }
 
+QnServerStreamRecorder::~QnServerStreamRecorder()
+{
+    stop();
+}
+
 bool QnServerStreamRecorder::canAcceptData() const
 {
     bool rez = QnStreamRecorder::canAcceptData();
