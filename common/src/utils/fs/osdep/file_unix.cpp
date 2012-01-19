@@ -80,14 +80,14 @@ bool QnFile::close()
 	return false;
 }
 
-int QnFile::read( void* buffer, quint32 count ) const
+qint64 QnFile::read( char* buffer, qint64 count )
 {
 	if( !isOpen() )
 		return -1;
 	return ::read( (long)m_impl, buffer, count );
 }
 
-int QnFile::write( const void* buffer, quint32 count )
+qint64 QnFile::write( const char* buffer, qint64 count )
 {
 	if( !isOpen() )
 		return -1;
@@ -99,7 +99,7 @@ bool QnFile::isOpen() const
 	return m_impl != (void*)0xffffffff;
 }
 
-bool QnFile::size( uint64_t* const fileSize ) const
+qint64 QnFile::size() const
 {
     bool res = false;
 
@@ -107,36 +107,21 @@ bool QnFile::size( uint64_t* const fileSize ) const
 
     if( isOpen() &&  ( fstat64( (long)m_impl, &buf ) == 0 ) )
     {
-    	*fileSize = buf.st_size;
-    	res = true;
+    	return buf.st_size;
     }
-
-	return res;
+	return -1;
 }
 
-uint64_t QnFile::seek( int64_t offset, SeekMethod whence )
+qint64 QnFile::seek( int64_t offset)
 {
 	if( !isOpen() )
-		return (uint64_t)-1;
+		return (qint64)-1;
 
-	int sWhence = 0;
-	switch( whence )
-	{
-	case smBegin:
-		sWhence = SEEK_SET;
-		break;
-	case smCurrent:
-		sWhence = SEEK_CUR;
-		break;
-	case smEnd:
-		sWhence = SEEK_END;
-		break;
-	}
 
 #ifdef Q_OS_DARWIN
-	return lseek( (long)m_impl, offset, sWhence );
+	return lseek( (long)m_impl, offset, SEEK_SET);
 #else
-	return lseek64( (long)m_impl, offset, sWhence );
+	return lseek64( (long)m_impl, offset, SEEK_SET);
 #endif	
 }
 
