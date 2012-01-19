@@ -36,11 +36,12 @@
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "utils/common/log.h"
+#include "camera/camera_pool.h"
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
 class QnMain;
-static QnMain* serviceMain = 0;
+static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -320,11 +321,13 @@ public:
         m_rtspListener(0),
         m_restServer(0)
     {
-        serviceMain = this;
+        serviceMainInstance = this;
     }
 
     ~QnMain()
     {
+        quit();
+        stop();
         stopObjects();
     }
 
@@ -555,16 +558,27 @@ private:
 
 void stopServer(int signal)
 {
+    qApp->quit();
+}
+
+int main(int argc, char* argv[])
+{
+    QnVideoService service(argc, argv);
+
+    int result = service.exec();
+
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
     QnRecordingManager::instance()->stop();
 
-    if (serviceMain)
-        serviceMain->stopObjects();
+    QnVideoCameraPool::instance()->stop();
+
+    if (serviceMainInstance)
+    {
+        serviceMainInstance->stopObjects();
+        serviceMainInstance = 0;
+    }
+
     xercesc::XMLPlatformUtils::Terminate ();
-}
-int main(int argc, char* argv[])
-{
-    QnVideoService service(argc, argv);
-    return service.exec();
+    return result;
 }

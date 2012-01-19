@@ -3,7 +3,8 @@
 #include <ui/common/scene_utility.h>
 
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    QGraphicsProxyWidget(parent, windowFlags)
+    QGraphicsProxyWidget(parent, windowFlags),
+    m_pixmapDirty(true)
 {}
 
 QnMaskedProxyWidget::~QnMaskedProxyWidget() {
@@ -28,17 +29,21 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
     if (renderRect.isEmpty())
         return;
 
-    /* Disable QPainter's default pen being cosmetic. This allows widgets and
-     * styles to follow Qt's existing defaults without getting ugly cosmetic
-     * lines when scaled. */
-    bool restore = !(painter->renderHints() & QPainter::NonCosmeticDefaultPen);
-    painter->setRenderHints(QPainter::NonCosmeticDefaultPen, true);
+    if(m_pixmapDirty) {
+        m_pixmap = QPixmap::grabWidget(this->widget(), this->widget()->rect());
+        m_pixmapDirty = false;
+    }
 
-    this->widget()->render(painter, renderRect.topLeft(), renderRect);
+    painter->drawPixmap(renderRect, m_pixmap, QRectF(renderRect.topLeft() - rect().topLeft(), renderRect.size()));
+}
 
-    /* Restore the render hints if necessary. */
-    if (restore)
-        painter->setRenderHints(QPainter::NonCosmeticDefaultPen, false);
+bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
+    if(object == widget()) {
+        if(event->type() == QEvent::UpdateRequest)
+            m_pixmapDirty = true;
+    }
+
+    return base_type::eventFilter(object, event);
 }
 
 void QnMaskedProxyWidget::setPaintRect(const QRectF &paintRect) {

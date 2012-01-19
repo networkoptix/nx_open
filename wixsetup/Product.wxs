@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="CE572797-45BF-4f1c-A783-369EA79C597E">
@@ -149,7 +149,7 @@
 
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
-                                <File Id="ServerExe" Name="mediaserver.exe" Source="../server/bin/release/mediaserver.exe" KeyPath="yes">
+                                <File Id="ServerExe" Name="mediaserver.exe" Source="../server/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="VMS Media Server" Scope="any" IgnoreFailure="yes"/>                                    
                                 </File>
                                 
@@ -181,38 +181,38 @@
                             </Component>
                             
                             <Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
-                                <File Id="ServerAvcodecDll" Name="avcodec-53.dll" Source="../server/bin/release/avcodec-53.dll"/>
-                                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="../server/bin/release/avdevice-53.dll"/>
-                                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="../server/bin/release/avfilter-2.dll"/>
-                                <File Id="ServerAvformatDll" Name="avformat-53.dll" Source="../server/bin/release/avformat-53.dll"/>
-                                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="../server/bin/release/avutil-51.dll"/>
-                                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="../server/bin/release/swscale-2.dll"/>
+                                <File Id="ServerAvcodecDll" Name="avcodec-53.dll" Source="../server/bin/$(env.CONFIG)/avcodec-53.dll"/>
+                                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="../server/bin/$(env.CONFIG)/avdevice-53.dll"/>
+                                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="../server/bin/$(env.CONFIG)/avfilter-2.dll"/>
+                                <File Id="ServerAvformatDll" Name="avformat-53.dll" Source="../server/bin/$(env.CONFIG)/avformat-53.dll"/>
+                                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="../server/bin/$(env.CONFIG)/avutil-51.dll"/>
+                                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="../server/bin/$(env.CONFIG)/swscale-2.dll"/>
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
-                                <File Id="ServerQtCore4.dll" Name="QtCore4.dll" Source="$(env.QTDIR)\bin\QtCore4.dll"/>
-                                <File Id="ServerQtGui4.dll" Name="QtGui4.dll" Source="$(env.QTDIR)\bin\QtGui4.dll"/>
-                                <File Id="ServerQtMultimedia4.dll" Name="QtMultimedia4.dll" Source="$(env.QTDIR)\bin\QtMultimedia4.dll"/>
-                                <File Id="ServerQtNetwork4.dll" Name="QtNetwork4.dll" Source="$(env.QTDIR)\bin\QtNetwork4.dll"/>
-                                <File Id="ServerQtOpenGL4.dll" Name="QtOpenGL4.dll" Source="$(env.QTDIR)\bin\QtOpenGL4.dll"/>
-                                <File Id="ServerQtWebKit4.dll" Name="QtWebKit4.dll" Source="$(env.QTDIR)\bin\QtWebKit4.dll"/>
-                                <File Id="ServerQtXml4.dll" Name="QtXml4.dll" Source="$(env.QTDIR)\bin\QtXml4.dll"/>
-                                <File Id="ServerQtXmlPatterns4.dll" Name="QtXmlPatterns4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns4.dll"/>
-                                <File Id="ServerPhonon4.dll" Name="phonon4.dll" Source="$(env.QTDIR)\bin\phonon4.dll"/>
+                                <File Id="ServerQtCored4.dll" Name="QtCored4.dll" Source="$(env.QTDIR)\bin\QtCored4.dll"/>
+                                <File Id="ServerQtGuid4.dll" Name="QtGuid4.dll" Source="$(env.QTDIR)\bin\QtGuid4.dll"/>
+                                <File Id="ServerQtMultimediad4.dll" Name="QtMultimediad4.dll" Source="$(env.QTDIR)\bin\QtMultimediad4.dll"/>
+                                <File Id="ServerQtNetworkd4.dll" Name="QtNetworkd4.dll" Source="$(env.QTDIR)\bin\QtNetworkd4.dll"/>
+                                <File Id="ServerQtOpenGLd4.dll" Name="QtOpenGLd4.dll" Source="$(env.QTDIR)\bin\QtOpenGLd4.dll"/>
+                                <File Id="ServerQtWebKitd4.dll" Name="QtWebKitd4.dll" Source="$(env.QTDIR)\bin\QtWebKitd4.dll"/>
+                                <File Id="ServerQtXmld4.dll" Name="QtXmld4.dll" Source="$(env.QTDIR)\bin\QtXmld4.dll"/>
+                                <File Id="ServerQtXmlPatternsd4.dll" Name="QtXmlPatternsd4.dll" Source="$(env.QTDIR)\bin\QtXmlPatternsd4.dll"/>
+                                <File Id="ServerPhonond4.dll" Name="phonond4.dll" Source="$(env.QTDIR)\bin\phonond4.dll"/>
                             </Component>
                             
                             <Component Id="ServerXerces" Guid="{B81B02A6-9CC1-4b16-9E03-A4AD91624B5E}">
-                                <File Id="ServerXercescDll" Name="xerces-c_3_1.dll" Source="../server/bin/release/xerces-c_3_1.dll"/>
+                                <File Id="ServerXercescDll" Name="xerces-c_3_1.dll" Source="../server/bin/$(env.CONFIG)/xerces-c_3_1.dll"/>
                             </Component>
 
                             <Component Id="ServerQjson" Guid="{809F73F7-A313-4190-8DF5-389D6B57064B}">
-                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="../server/bin/release/qjson.dll"/>
+                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="../server/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
                         </Directory>
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <File Id="ClientExe" Name="client.exe" Source="../client/bin/release/client.exe" KeyPath="yes">
+                                <File Id="ClientExe" Name="client.exe" Source="../client/bin/$(env.CONFIG)/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="VMS Client" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuClientDir" Name="$(env.APPLICATION_NAME) Client"
@@ -245,24 +245,24 @@
                             </Directory>
                             
                             <Component Id="ClientFFmpegLibraries" Guid="{5D256521-DE39-4264-A44F-69728AA650EF}">
-                                <File Id="ClientAvcodecDll" Name="avcodec-53.dll" Source="../client/bin/release/avcodec-53.dll"/>
-                                <File Id="ClientAvdeviceDll" Name="avdevice-53.dll" Source="../client/bin/release/avdevice-53.dll"/>
-                                <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="../client/bin/release/avfilter-2.dll"/>
-                                <File Id="ClientAvformatDll" Name="avformat-53.dll" Source="../client/bin/release/avformat-53.dll"/>
-                                <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="../client/bin/release/avutil-51.dll"/>
-                                <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="../client/bin/release/swscale-2.dll"/>
+                                <File Id="ClientAvcodecDll" Name="avcodec-53.dll" Source="../client/bin/$(env.CONFIG)/avcodec-53.dll"/>
+                                <File Id="ClientAvdeviceDll" Name="avdevice-53.dll" Source="../client/bin/$(env.CONFIG)/avdevice-53.dll"/>
+                                <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="../client/bin/$(env.CONFIG)/avfilter-2.dll"/>
+                                <File Id="ClientAvformatDll" Name="avformat-53.dll" Source="../client/bin/$(env.CONFIG)/avformat-53.dll"/>
+                                <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="../client/bin/$(env.CONFIG)/avutil-51.dll"/>
+                                <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="../client/bin/$(env.CONFIG)/swscale-2.dll"/>
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
-                                <File Id="ClientQtCore4.dll" Name="QtCore4.dll" Source="$(env.QTDIR)\bin\QtCore4.dll"/>
-                                <File Id="ClientQtGui4.dll" Name="QtGui4.dll" Source="$(env.QTDIR)\bin\QtGui4.dll"/>
-                                <File Id="ClientQtMultimedia4.dll" Name="QtMultimedia4.dll" Source="$(env.QTDIR)\bin\QtMultimedia4.dll"/>
-                                <File Id="ClientQtNetwork4.dll" Name="QtNetwork4.dll" Source="$(env.QTDIR)\bin\QtNetwork4.dll"/>
-                                <File Id="ClientQtOpenGL4.dll" Name="QtOpenGL4.dll" Source="$(env.QTDIR)\bin\QtOpenGL4.dll"/>
-                                <File Id="ClientQtWebKit4.dll" Name="QtWebKit4.dll" Source="$(env.QTDIR)\bin\QtWebKit4.dll"/>
-                                <File Id="ClientQtXml4.dll" Name="QtXml4.dll" Source="$(env.QTDIR)\bin\QtXml4.dll"/>
-                                <File Id="ClientQtXmlPatterns4.dll" Name="QtXmlPatterns4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns4.dll"/>
-                                <File Id="ClientPhonon4.dll" Name="phonon4.dll" Source="$(env.QTDIR)\bin\phonon4.dll"/>
+                                <File Id="ClientQtCored4.dll" Name="QtCored4.dll" Source="$(env.QTDIR)\bin\QtCored4.dll"/>
+                                <File Id="ClientQtGuid4.dll" Name="QtGuid4.dll" Source="$(env.QTDIR)\bin\QtGuid4.dll"/>
+                                <File Id="ClientQtMultimediad4.dll" Name="QtMultimediad4.dll" Source="$(env.QTDIR)\bin\QtMultimediad4.dll"/>
+                                <File Id="ClientQtNetworkd4.dll" Name="QtNetworkd4.dll" Source="$(env.QTDIR)\bin\QtNetworkd4.dll"/>
+                                <File Id="ClientQtOpenGLd4.dll" Name="QtOpenGLd4.dll" Source="$(env.QTDIR)\bin\QtOpenGLd4.dll"/>
+                                <File Id="ClientQtWebKitd4.dll" Name="QtWebKitd4.dll" Source="$(env.QTDIR)\bin\QtWebKitd4.dll"/>
+                                <File Id="ClientQtXmld4.dll" Name="QtXmld4.dll" Source="$(env.QTDIR)\bin\QtXmld4.dll"/>
+                                <File Id="ClientQtXmlPatternsd4.dll" Name="QtXmlPatternsd4.dll" Source="$(env.QTDIR)\bin\QtXmlPatternsd4.dll"/>
+                                <File Id="ClientPhonond4.dll" Name="phonond4.dll" Source="$(env.QTDIR)\bin\phonond4.dll"/>
                             </Component>
                             
                             <Component Id="ClientOpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
@@ -276,16 +276,20 @@
                             </Component>
                             
                             <Component Id="ClientXerces" Guid="{50CE2C40-DE8E-4619-979F-2C227009D4BB}">
-                                <File Id="ClientXercescDll" Name="xerces-c_3_1.dll" Source="../client/bin/release/xerces-c_3_1.dll"/>
+                                <File Id="ClientXercescDll" Name="xerces-c_3_1.dll" Source="../client/bin/$(env.CONFIG)/xerces-c_3_1.dll"/>
                             </Component>
                             
                             <Component Id="ClientQjson" Guid="{E22DFDE7-0917-4feb-971D-74457D2DAD71}">
-                                <File Id="ClientQjsonDll" Name="qjson.dll" Source="../client/bin/release/qjson.dll"/>
+                                <File Id="ClientQjsonDll" Name="qjson.dll" Source="../client/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
 
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
-                                    <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\release\styles\bespin.dll"/>
+        <?if $(env.CONFIG) = Debug ?>
+                                    <File Id="bespind.dll" Name="bespind.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespind.dll"/>
+        <?else?>
+                                    <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin.dll"/>
+        <?endif?>
                                 </Component>
                             </Directory>
                             
@@ -328,11 +332,19 @@
         <DirectoryRef Id="TARGETDIR">
             <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
+        <?if $(env.CONFIG) = Debug ?>
+            <Merge Id="VCRedist3" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_DebugCRT_x86.msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist4" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_DebugCRT_x86.msm" DiskId="1" Language="0"/>
+        <?endif?>
         </DirectoryRef>
         
         <Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
             <MergeRef Id="VCRedist1"/>
             <MergeRef Id="VCRedist2"/>
+        <?if $(env.CONFIG) = Debug ?>
+            <MergeRef Id="VCRedist3"/>
+            <MergeRef Id="VCRedist4"/>
+        <?endif?>
         </Feature>
         
         <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Application Server" Level="1"

@@ -34,6 +34,7 @@ m_prebufferingUsec(0)
 
 QnStreamRecorder::~QnStreamRecorder()
 {
+    stop();
 	close();
 }
 

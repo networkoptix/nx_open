@@ -13,6 +13,8 @@ m_streamParser(0)
 
 RTPH264Streamreader::~RTPH264Streamreader()
 {
+    stop();
+
     delete m_streamParser;    
 }
 

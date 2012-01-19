@@ -19,6 +19,7 @@ class QnRtspDataConsumer: public QnAbstractDataConsumer, public QnlTimeSource
 {
 public:
     QnRtspDataConsumer(QnRtspConnectionProcessor* owner);
+    ~QnRtspDataConsumer();
 
     void pauseNetwork();
     void resumeNetwork();

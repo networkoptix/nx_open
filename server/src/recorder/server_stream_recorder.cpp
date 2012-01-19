@@ -10,7 +10,12 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     m_lastMotionContainData = false;
     m_needUpdateStreamParams = false;
-    m_lastWarningTime = 0;
+    m_lastWarningTime = AV_NOPTS_VALUE;
+}
+
+QnServerStreamRecorder::~QnServerStreamRecorder()
+{
+    stop();
 }
 
 bool QnServerStreamRecorder::canAcceptData() const

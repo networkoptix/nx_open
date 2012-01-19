@@ -22,7 +22,7 @@ QnRestConnectionProcessor::QnRestConnectionProcessor(TCPSocket* socket, QnTcpLis
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
 {
-
+    stop();
 }
 
 void QnRestConnectionProcessor::run()
