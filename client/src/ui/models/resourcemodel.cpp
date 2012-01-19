@@ -11,6 +11,120 @@
 
 #include "file_processor.h"
 
+enum IconKey {
+    IconTypeUnknown = 0,
+    IconTypeServer = 0x0001,
+    IconTypeLayout = 0x0002,
+    IconTypeCamera = 0x0004,
+    IconTypeImage = 0x0008,
+    IconTypeMedia = 0x0010,
+    IconTypeMask = 0x0fff,
+
+    IconStateLocal = 0x1000,
+    IconStateOffline = 0x2000,
+    IconStateUnauthorized = 0x4000,
+    IconStateMask = 0xf000
+};
+
+typedef QHash<quint32, QIcon> IconCache;
+Q_GLOBAL_STATIC(IconCache, iconCache)
+
+static void invalidateIconCache()
+{
+    IconCache *cache = iconCache();
+    if (!cache)
+        return;
+
+    cache->clear();
+
+    cache->insert(IconTypeUnknown, QIcon());
+    cache->insert(IconTypeServer | IconStateLocal, Skin::icon(QLatin1String("home.png")));
+    cache->insert(IconTypeServer, Skin::icon(QLatin1String("server.png")));
+    cache->insert(IconTypeLayout, Skin::icon(QLatin1String("layout.png")));
+    cache->insert(IconTypeCamera, Skin::icon(QLatin1String("webcam.png")));
+    cache->insert(IconTypeImage, Skin::icon(QLatin1String("snapshot.png")));
+    cache->insert(IconTypeMedia, Skin::icon(QLatin1String("media.png")));
+
+    cache->insert(IconStateOffline, Skin::icon(QLatin1String("offline.png")));
+    cache->insert(IconStateUnauthorized, Skin::icon(QLatin1String("unauthorized.png")));
+}
+
+static QIcon iconForKey(quint32 key)
+{
+    IconCache *cache = iconCache();
+    if (!cache)
+        return QIcon();
+
+    if (cache->isEmpty())
+        invalidateIconCache();
+
+    if ((key & IconTypeMask) == IconTypeUnknown)
+        key = IconTypeUnknown;
+
+    if (!cache->contains(key)) {
+        QIcon icon;
+        quint32 state;
+        if ((key & IconStateMask) != 0) {
+            for (state = IconStateUnauthorized; state >= IconStateLocal; state >>= 1) {
+                if ((key & state) != 0) {
+                    icon = iconForKey(key & ~state);
+                    break;
+                }
+            }
+        }
+        if (!icon.isNull()) {
+            QIcon overlayIcon;
+            if (cache->contains(state))
+                overlayIcon = cache->value(state);
+            if (!overlayIcon.isNull()) {
+                QPixmap pixmap = icon.pixmap(QSize(256, 256));
+                {
+                    QPainter painter(&pixmap);
+                    QRect r = pixmap.rect();
+                    // ### allow overlay combinations
+                    r.setTopLeft(r.center());
+                    overlayIcon.paint(&painter, r, Qt::AlignRight | Qt::AlignBottom);
+                }
+                icon = QIcon(pixmap);
+            }
+        }
+        cache->insert(key, icon);
+    }
+
+    return cache->value(key);
+}
+
+static inline QIcon iconForResource(const QnResourcePtr &resource)
+{
+    quint32 key = IconTypeUnknown;
+
+    const quint32 flags = resource->flags();
+    if ((flags & QnResource::server) == QnResource::server)
+        key |= IconTypeServer;
+    else if ((flags & QnResource::layout) == QnResource::layout)
+        key |= IconTypeLayout;
+    else if ((flags & QnResource::live_cam) == QnResource::live_cam)
+        key |= IconTypeCamera;
+    else if ((flags & QnResource::SINGLE_SHOT) == QnResource::SINGLE_SHOT)
+        key |= IconTypeImage;
+    else if ((flags & QnResource::ARCHIVE) == QnResource::ARCHIVE)
+        key |= IconTypeMedia;
+    else if ((flags & QnResource::server_archive) == QnResource::server_archive)
+        key |= IconTypeMedia;
+
+    if ((flags & QnResource::local) == QnResource::local)
+        key |= IconStateLocal;
+
+    const QnResource::Status status = resource->getStatus();
+    if (status == QnResource::Offline)
+        key |= IconStateOffline;
+    else if (status == QnResource::Unauthorized)
+        key |= IconStateUnauthorized;
+
+    return iconForKey(key);
+}
+
+
 ResourceModel::ResourceModel(QObject *parent)
     : QStandardItemModel(parent)
 {
@@ -54,35 +168,6 @@ QModelIndex ResourceModel::indexFromResourceId(uint id) const // ### remove; use
 {
     const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
     return indexList.value(0);
-}
-
-static inline QIcon iconForResource(const QnResourcePtr &resource)
-{
-    QString iconName;
-    if (resource->checkFlag(QnResource::server))
-        iconName = resource->checkFlag(QnResource::remote) ? QLatin1String("server.png") : QLatin1String("home.png");
-    else if (resource->checkFlag(QnResource::layout))
-        iconName = QLatin1String("layout.png");
-    else if (resource->checkFlag(QnResource::live_cam))
-        iconName = QLatin1String("webcam.png");
-    else if (resource->checkFlag(QnResource::SINGLE_SHOT))
-        iconName = QLatin1String("snapshot.png");
-    else if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::server_archive))
-        iconName = QLatin1String("media.png");
-
-    QIcon icon;
-    if (!iconName.isEmpty()) {
-        QPixmap mainPix = Skin::pixmap(iconName);
-        if (resource->getStatus() != QnResource::Online) {
-            const QString overlayIconName = resource->getStatus() == QnResource::Offline ? QLatin1String("offline.png") : QLatin1String("unauthorized.png");
-            const QPixmap overlayPix = Skin::pixmap(overlayIconName, QSize(mainPix.width() / 2, mainPix.height() / 2));
-            QPainter painter(&mainPix);
-            painter.drawPixmap(mainPix.width() / 2, mainPix.height() / 2, overlayPix);
-        }
-        icon.addPixmap(mainPix);
-    }
-
-    return icon;
 }
 
 void ResourceModel::addResource(const QnResourcePtr &resource)
