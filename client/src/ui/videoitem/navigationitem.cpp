@@ -221,6 +221,17 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     connect(m_mrsButton, SIGNAL(clicked()), this, SIGNAL(clearMotionSelection()));
 
+    m_syncButton = new ImageButton(this);
+    m_syncButton->setObjectName("SyncButton");
+    m_syncButton->addPixmap(Skin::pixmap(QLatin1String("sync.png")), ImageButton::Active, ImageButton::Background);
+    m_syncButton->addPixmap(Skin::pixmap(QLatin1String("sync_checked.png")), ImageButton::Active, ImageButton::Checked);
+    m_syncButton->setPreferredSize(48, 24);
+    m_syncButton->setMaximumSize(m_syncButton->preferredSize());
+    m_syncButton->setCheckable(true);
+    m_syncButton->setChecked(true);
+
+    connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(setSyncMode(bool)));
+
 
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
@@ -266,6 +277,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     QGraphicsLinearLayout *rightSublayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightSublayoutV->setContentsMargins(0, 0, 0, 0);
     rightSublayoutV->setSpacing(0);
+    rightSublayoutV->addItem(m_syncButton);
+    rightSublayoutV->setAlignment(m_syncButton, Qt::AlignCenter);
     rightSublayoutV->addItem(m_mrsButton);
     rightSublayoutV->setAlignment(m_mrsButton, Qt::AlignCenter);
     rightSublayoutV->addItem(m_liveButton);
@@ -393,10 +406,10 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
         QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-		if (reader)
-			setPlaying(!reader->isMediaPaused());
-		else
-			setPlaying(true);
+        if (reader)
+            setPlaying(!reader->isMediaPaused());
+        else
+            setPlaying(true);
     }
     else
     {
@@ -404,6 +417,11 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     }
 
     emit actualCameraChanged(m_camera);
+}
+
+void NavigationItem::setSyncMode(bool value)
+{
+    // ###
 }
 
 void NavigationItem::setLiveMode(bool value)
@@ -524,9 +542,9 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     loadingPeriod.startTimeMs = qMax(minTimeMs, t - w);
     loadingPeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
-    
+
     m_motionPeriod = m_motionPeriod.intersect(loadingPeriod);
-    
+
 
     //MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
     p->loadingHandle = p->loader->load(loadingPeriod, region);
@@ -574,7 +592,7 @@ bool NavigationItem::updateRecPeriodList(bool force)
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
-    if (!resources.isEmpty()) 
+    if (!resources.isEmpty())
     {
         bool timePeriodAlreadyLoaded = !force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs;
         if (!timePeriodAlreadyLoaded)
@@ -653,7 +671,7 @@ void NavigationItem::onValueChanged(qint64 time)
     if (m_camera == 0)
         return;
 
-    if (m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamCamDisplay()->isRealTimeSource()) 
+    if (m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamCamDisplay()->isRealTimeSource())
     {
         smartSeek(DATETIME_NOW);
         return;
