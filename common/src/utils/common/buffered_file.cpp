@@ -2,12 +2,63 @@
 
 static const int SECTOR_SIZE = 32768;
 
+QueueFileWriter QBufferedFile::m_queueWriter;
 
-QBufferedFile::QBufferedFile(const QString& fileName, int bufferSize): 
-    QnFile(fileName), 
-    m_bufferSize(bufferSize) 
+
+// -------------- QueueFileWriter ------------
+
+QueueFileWriter::QueueFileWriter()
 {
-    m_buffer = (quint8*) qMallocAligned(bufferSize, SECTOR_SIZE);
+    start();
+}
+
+
+QueueFileWriter::~QueueFileWriter()
+{
+    stop();
+}
+
+qint64 QueueFileWriter::write(QBufferedFile* file, const char * data, qint64 len)
+{
+    if (m_needStop)
+        return -1;
+
+    FileBlockInfo fb(file, data, len);
+    QMutexLocker lock(&fb.mutex);
+    m_dataQueue.push(&fb);
+    fb.condition.wait(&fb.mutex);
+    return fb.result;
+}
+
+void QueueFileWriter::run()
+{
+    FileBlockInfo* fileBlock;
+    while (!m_needStop)
+    {
+        if (m_dataQueue.pop(fileBlock, 100))
+        {
+            QMutexLocker lock(&fileBlock->mutex);
+            fileBlock->result = fileBlock->file->writeUnbuffered(fileBlock->data, fileBlock->len);
+            fileBlock->condition.wakeAll();
+        }
+    }
+
+    while (m_dataQueue.pop(fileBlock, 1))
+    {
+        QMutexLocker lock(&fileBlock->mutex);
+        fileBlock->result = -1;
+        fileBlock->condition.wakeAll();
+    }
+}
+
+// -------------- QBufferedFile -------------
+
+QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int minBufferSize): 
+    QnFile(fileName), 
+    m_bufferSize(fileBlockSize+minBufferSize) 
+{
+    m_minBufferSize = minBufferSize;
+    m_buffer = (quint8*) qMallocAligned(m_bufferSize, SECTOR_SIZE);
     m_bufferLen = 0;
     m_bufferPos = 0;
     m_totalWrited = 0;
@@ -38,10 +89,29 @@ void QBufferedFile::disableDirectIO()
     m_isDirectIO = false;
 }
 
+qint64 QBufferedFile::writeUnbuffered(const char * data, qint64 len )
+{
+    return QnFile::write(data, len);
+}
+
 void QBufferedFile::flushBuffer()
 {
+    quint8* bufferToWrite = m_buffer;
+    if (m_isDirectIO) 
+    {
+        int toWrite = (m_bufferLen/SECTOR_SIZE)*SECTOR_SIZE;
+        //qint64 writed = QnFile::write((char*) m_buffer, toWrite);
+        qint64 writed = m_queueWriter.write(this, (const char*) m_buffer, toWrite);
+        if (writed == toWrite)
+        {
+            m_totalWrited += writed;
+            m_filePos += writed;
+            m_bufferLen -= writed;
+            bufferToWrite += writed;
+        }
+    }
     disableDirectIO();
-    qint64 writed = QnFile::write((char*) m_buffer, m_bufferLen);
+    qint64 writed = QnFile::write((char*) bufferToWrite, m_bufferLen);
     if (writed > 0)
     {
         m_totalWrited += writed;
@@ -67,6 +137,9 @@ qint64	QBufferedFile::read (char * data, qint64 len )
 
 qint64	QBufferedFile::write ( const char * data, qint64 len )
 {
+    if (m_bufferSize == 0)
+        return QnFile::write((char*) m_buffer, m_bufferSize - m_minBufferSize);
+
     int rez = len;
     while (len > 0)
     {
@@ -74,12 +147,17 @@ qint64	QBufferedFile::write ( const char * data, qint64 len )
         memcpy(m_buffer + m_bufferPos, data, toWrite);
         m_bufferPos += toWrite;
         m_bufferLen = qMax(m_bufferLen, m_bufferPos);
-        if (m_bufferLen == m_bufferSize) {
-            int writed = QnFile::write((char*) m_buffer, m_bufferSize/2);
+        if (m_bufferLen == m_bufferSize) 
+        {
+            int writed;
+            if (m_isDirectIO)
+                writed = m_queueWriter.write(this, (const char*) m_buffer, m_bufferSize - m_minBufferSize);
+            else
+                writed = QnFile::write((char*) m_buffer, m_bufferSize - m_minBufferSize);
             m_totalWrited += writed;
-            if (writed !=  m_bufferSize/2)
+            if (writed !=  m_bufferSize - m_minBufferSize)
                 return writed;
-            m_filePos += m_bufferLen/2;
+            m_filePos += writed;
             m_bufferLen -= writed;
             m_bufferPos -= writed;
             memmove(m_buffer, m_buffer + writed, m_bufferLen);
@@ -93,6 +171,7 @@ qint64	QBufferedFile::write ( const char * data, qint64 len )
 bool QBufferedFile::seek(qint64 pos)
 {
     qint64 bufferOffset = pos - (size() - m_bufferLen);
+
     if (bufferOffset < 0 || bufferOffset > m_bufferLen)
     {
         flushBuffer();
