@@ -285,7 +285,11 @@
 
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
-                                    <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespind.dll"/>
+        <?if $(env.CONFIG) = Debug ?>
+                                    <File Id="bespind.dll" Name="bespind.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespind.dll"/>
+        <?else?>
+                                    <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin.dll"/>
+        <?endif?>
                                 </Component>
                             </Directory>
                             
