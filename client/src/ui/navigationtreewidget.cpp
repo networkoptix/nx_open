@@ -45,8 +45,7 @@ protected:
         NavigationTreeWidget *navTree = static_cast<NavigationTreeWidget *>(parent());
         if (navTree->m_controller && navTree->m_controller->layout()) {
             if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model())) {
-                QnResourcePtr resource = model->resourceFromIndex(index);
-                if (navTree->m_controller->layout()->item(resource))
+                if (navTree->m_controller->layout()->item(model->resource(index)))
                     option->font.setBold(true);
             }
         }
@@ -243,13 +242,13 @@ void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 {
     const QnResourcePtr &resource = item->resource();
 
-    m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
+    m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
     if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
         const QModelIndex index = m_searchProxyModel->indexFromResource(resource);
         if (!index.isValid()) {
             // ### improve/optimize
-            QString subFilter = QLatin1String("id:") + QString::number(resource->getId().hash());
+            QString subFilter = QLatin1String("id:") + resource->getId().toString();
             QString filter = m_filterLineEdit->text();
             filter.replace(QLatin1Char('-') + subFilter, QString());
             if (!filter.contains(QLatin1Char('+') + subFilter))
@@ -266,13 +265,13 @@ void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
 {
     const QnResourcePtr &resource = item->resource();
 
-    m_resourcesTreeView->update(m_resourcesModel->indexFromResource(resource));
+    m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
     if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
         const QModelIndex index = m_searchProxyModel->indexFromResource(resource);
         if (index.isValid()) {
             // ### improve/optimize
-            QString subFilter = QLatin1String("id:") + QString::number(resource->getId().hash());
+            QString subFilter = QLatin1String("id:") + resource->getId().toString();
             QString filter = m_filterLineEdit->text();
             filter.replace(QLatin1Char('+') + subFilter, QString());
             if (!filter.contains(QLatin1Char('-') + subFilter))
@@ -312,7 +311,8 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     QnResourceList resources;
     if (m_tabWidget->currentIndex() == 0) {
         foreach (const QModelIndex &index, m_resourcesTreeView->selectionModel()->selectedRows())
-            resources.append(m_resourcesModel->resourceFromIndex(index));
+            //resources.append(m_resourcesModel->resourceFromIndex(index));
+            resources.append(m_resourcesModel->resource(index));
     } else /*if (m_tabWidget->currentIndex() == 1)*/ {
         foreach (const QModelIndex &index, m_searchTreeView->selectionModel()->selectedRows())
             resources.append(m_searchProxyModel->resourceFromIndex(index));
@@ -446,11 +446,11 @@ void NavigationTreeWidget::itemActivated(const QModelIndex &index)
 {
     QnResourcePtr resource;
     if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model()))
-        resource = model->resourceFromIndex(index);
+        resource = model->resource(index);
     else if (const ResourceSortFilterProxyModel *model = qobject_cast<const ResourceSortFilterProxyModel *>(index.model()))
         resource = model->resourceFromIndex(index);
     if (resource)
-        Q_EMIT activated(resource->getId().hash());
+        Q_EMIT activated(resource->getId());
 }
 
 void NavigationTreeWidget::open()
