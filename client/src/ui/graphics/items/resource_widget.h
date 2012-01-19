@@ -67,7 +67,7 @@ public:
      * \returns                         Workbench item associated with this widget. Never returns NULL.
      */
     QnWorkbenchItem *item() const {
-        return m_item;
+        return m_item.data();
     }
 
     /**
@@ -331,7 +331,7 @@ private:
 
 private:
     /** Layout item. */
-    QnWorkbenchItem *m_item;
+    QWeakPointer<QnWorkbenchItem> m_item;
 
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;

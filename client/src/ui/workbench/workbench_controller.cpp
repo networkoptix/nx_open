@@ -617,15 +617,27 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
 
 void QnWorkbenchController::remove(const QnResourcePtr &resource)
 {
-    QnWorkbenchLayout *layout = this->layout();
-    layout->removeItem(layout->item(resource));
+    delete layout()->item(resource);
 }
 
 void QnWorkbenchController::remove(const QnResourceList &resources)
 {
     QnWorkbenchLayout *layout = this->layout();
     foreach (const QnResourcePtr &resource, resources)
-        layout->removeItem(layout->item(resource));
+        delete layout->item(resource);
+}
+
+bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
+{
+    if (qobject_cast<QnResourceWidget *>(watched)) {
+        if (event->type() == QEvent::Close) {
+            event->accept();
+            //event->setAccepted(QMessageBox::question(display()->view(), tr("Close?"), tr("Really close?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok) == QMessageBox::Ok); // ###
+            return true;
+        }
+    }
+
+    return QObject::eventFilter(watched, event);
 }
 
 void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
@@ -1106,6 +1118,8 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
 
+    widget->installEventFilter(this);
+
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
     if(cameraResource != NULL)
     {
@@ -1118,6 +1132,8 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
+
+    widget->removeEventFilter(this);
 
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
     if(cameraResource != NULL)
