@@ -392,6 +392,11 @@ void NavigationTreeWidget::wheelEvent(QWheelEvent *event)
     event->accept(); // do not propagate wheel events past the tree widget
 }
 
+void NavigationTreeWidget::mousePressEvent(QMouseEvent *event)
+{
+    event->accept(); // Prevent surprising click-through scenarios.
+}
+
 void NavigationTreeWidget::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_filterTimerId) {

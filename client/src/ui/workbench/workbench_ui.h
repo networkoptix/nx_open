@@ -66,7 +66,8 @@ protected Q_SLOTS:
     void at_treeShowingProcessor_hoverEntered();
     void at_treeOpacityProcessor_hoverLeft();
     void at_treeOpacityProcessor_hoverEntered();
-    void at_treeBookmarkItem_toggled(bool checked);
+    void at_treeShowButton_toggled(bool checked);
+    void at_treePinButton_toggled(bool checked);
 
 private:
     /* Global state. */
@@ -99,12 +100,16 @@ private:
 
     QGraphicsWidget *m_treeBackgroundItem;
 
-    QnImageButtonWidget *m_treeBookmarkItem;
+    QnImageButtonWidget *m_treeShowButton;
+
+    QnImageButtonWidget *m_treePinButton;
 
     /** Whether navigation tree is visible. */
     bool m_treeVisible;
 
     bool m_sliderVisible;
+
+    bool m_treePinned;
 
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];

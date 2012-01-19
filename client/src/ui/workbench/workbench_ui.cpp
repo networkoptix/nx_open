@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsProxyWidget>
+#include <QStyle>
 
 #include <utils/common/event_signalizator.h>
 
@@ -49,7 +50,10 @@ namespace {
 QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
     m_display(display),
-    m_manager(display->instrumentManager())
+    m_manager(display->instrumentManager()),
+    m_treePinned(false),
+    m_sliderVisible(false),
+    m_treeVisible(false)
 {
     /* Install and configure instruments. */
     m_uiElementsInstrument = new UiElementsInstrument(this);
@@ -65,7 +69,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_controlsWidget->installEventFilter(deactivationSignalizator);
 
     connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
-    connect(m_controlsWidget,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
+    connect(m_controlsWidget,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
@@ -78,12 +82,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
 
     connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
-
-    m_treeItem = new QGraphicsProxyWidget(m_controlsWidget);
-    m_treeItem->setWidget(m_treeWidget);
-    m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-    m_treeItem->setFocusPolicy(Qt::StrongFocus);
-    m_treeItem->setOpacity(normalTreeOpacity);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
@@ -100,31 +98,43 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_treeBackgroundItem->setPalette(palette);
     }
-    m_treeBackgroundItem->stackBefore(m_treeItem);
     m_treeBackgroundItem->setOpacity(normalTreeBackgroundOpacity);
 
-    m_treeBookmarkItem = new QnImageButtonWidget(m_controlsWidget);
-    m_treeBookmarkItem->resize(15, 45);
-    m_treeBookmarkItem->setOpacity(normalTreeBackgroundOpacity);
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("slide_right.png"));
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap("slide_right_hover.png"));
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("slide_left.png"));
-    m_treeBookmarkItem->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::HOVERED, Skin::pixmap("slide_left_hover.png"));
-    m_treeBookmarkItem->setCheckable(true);
-    m_treeBookmarkItem->setAnimationSpeed(4.0);
+    m_treeItem = new QGraphicsProxyWidget(m_controlsWidget);
+    m_treeItem->setWidget(m_treeWidget);
+    m_treeItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    m_treeItem->setFocusPolicy(Qt::StrongFocus);
+    m_treeItem->setOpacity(normalTreeOpacity);
+
+    m_treePinButton = new QnImageButtonWidget(m_controlsWidget);
+    m_treePinButton->resize(24, 24);
+    m_treePinButton->setOpacity(normalTreeBackgroundOpacity);
+    m_treePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("pin.png"));
+    m_treePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("unpin.png"));
+    m_treePinButton->setCheckable(true);
+
+    m_treeShowButton = new QnImageButtonWidget(m_controlsWidget);
+    m_treeShowButton->resize(15, 45);
+    m_treeShowButton->setOpacity(normalTreeBackgroundOpacity);
+    m_treeShowButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("slide_right.png"));
+    m_treeShowButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap("slide_right_hover.png"));
+    m_treeShowButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("slide_left.png"));
+    m_treeShowButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::HOVERED, Skin::pixmap("slide_left_hover.png"));
+    m_treeShowButton->setCheckable(true);
+    m_treeShowButton->setAnimationSpeed(4.0);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
-    m_treeOpacityProcessor->addTargetItem(m_treeBookmarkItem);
+    m_treeOpacityProcessor->addTargetItem(m_treeShowButton);
 
     m_treeHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeHidingProcessor->addTargetItem(m_treeItem);
-    m_treeHidingProcessor->addTargetItem(m_treeBookmarkItem);
+    m_treeHidingProcessor->addTargetItem(m_treeShowButton);
     m_treeHidingProcessor->setHoverLeaveDelay(1000);
     m_treeHidingProcessor->setFocusLeaveDelay(1000);
 
     m_treeShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_treeShowingProcessor->addTargetItem(m_treeBookmarkItem);
+    m_treeShowingProcessor->addTargetItem(m_treeShowButton);
     m_treeShowingProcessor->setHoverEnterDelay(250);
 
     m_treePositionAnimator = new VariantAnimator(this);
@@ -138,11 +148,12 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeItem));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBackgroundItem)); /* Speed of 1.0 is OK here. */
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBookmarkItem));
+    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
 
     setTreeVisible(false, false);
 
-    connect(m_treeBookmarkItem,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treeBookmarkItem_toggled(bool)));
+    connect(m_treePinButton,            SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treePinButton_toggled(bool)));
+    connect(m_treeShowButton,           SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treeShowButton_toggled(bool)));
     connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_treeOpacityProcessor_hoverLeft()));
     connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeOpacityProcessor_hoverEntered()));
     connect(m_treeHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_treeHidingProcessor_hoverFocusLeft()));
@@ -193,7 +204,7 @@ QnWorkbench *QnWorkbenchUi::workbench() const {
 void QnWorkbenchUi::setTreeVisible(bool visible, bool animate)
 {
     m_treeVisible = visible;
-    m_treeBookmarkItem->setChecked(visible);
+    m_treeShowButton->setChecked(visible);
 
     QPointF newPos = QPointF(visible ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case */, 0.0);
     if (animate) {
@@ -342,22 +353,29 @@ void QnWorkbenchUi::at_treeItem_geometryChanged() {
     bool visible = geometry.right() >= 0.0;
     m_treeItem->setVisible(visible);
     m_treeBackgroundItem->setVisible(visible);
+    m_treePinButton->setVisible(visible);
 
     m_treeBackgroundItem->setGeometry(geometry);
-    m_treeBookmarkItem->setPos(QPointF(
+    m_treeShowButton->setPos(QPointF(
         geometry.right(),
-        (geometry.top() + geometry.bottom() - m_treeBookmarkItem->size().height()) / 2
+        (geometry.top() + geometry.bottom() - m_treeShowButton->size().height()) / 2
+    ));
+    m_treePinButton->setPos(QPointF(
+        geometry.right() - m_treePinButton->size().width(),
+        geometry.top()
     ));
 
     updateViewportMargins();
 }
 
 void QnWorkbenchUi::at_treeHidingProcessor_hoverFocusLeft() {
-    setTreeVisible(false);
+    if(!m_treePinned) 
+        setTreeVisible(false);
 }
 
 void QnWorkbenchUi::at_treeShowingProcessor_hoverEntered() {
-    setTreeVisible(true);
+    if(!m_treePinned) 
+        setTreeVisible(true);
     m_treeHidingProcessor->forceHoverEnter();
     m_treeOpacityProcessor->forceHoverEnter();
 }
@@ -366,7 +384,7 @@ void QnWorkbenchUi::at_treeOpacityProcessor_hoverLeft() {
     m_treeOpacityAnimatorGroup->pause();
     opacityAnimator(m_treeItem)->setTargetValue(normalTreeOpacity);
     opacityAnimator(m_treeBackgroundItem)->setTargetValue(normalTreeBackgroundOpacity);
-    opacityAnimator(m_treeBookmarkItem)->setTargetValue(normalTreeBackgroundOpacity);
+    opacityAnimator(m_treeShowButton)->setTargetValue(normalTreeBackgroundOpacity);
     m_treeOpacityAnimatorGroup->start();
 }
 
@@ -374,11 +392,19 @@ void QnWorkbenchUi::at_treeOpacityProcessor_hoverEntered() {
     m_treeOpacityAnimatorGroup->pause();
     opacityAnimator(m_treeItem)->setTargetValue(hoverTreeOpacity);
     opacityAnimator(m_treeBackgroundItem)->setTargetValue(hoverTreeBackgroundOpacity);
-    opacityAnimator(m_treeBookmarkItem)->setTargetValue(hoverTreeBackgroundOpacity);
+    opacityAnimator(m_treeShowButton)->setTargetValue(hoverTreeBackgroundOpacity);
     m_treeOpacityAnimatorGroup->start();
 }
 
-void QnWorkbenchUi::at_treeBookmarkItem_toggled(bool checked) {
+void QnWorkbenchUi::at_treeShowButton_toggled(bool checked) {
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
     setTreeVisible(checked);
+}
+
+void QnWorkbenchUi::at_treePinButton_toggled(bool checked) {
+    m_treePinned = checked;
+    
+    if(checked) {
+        setTreeVisible(true);
+    }
 }
