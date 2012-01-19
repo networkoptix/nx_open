@@ -159,7 +159,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeOpacityProcessor_hoverEntered()));
     connect(m_treeHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_treeHidingProcessor_hoverFocusLeft()));
     connect(m_treeShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeShowingProcessor_hoverEntered()));
-    connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_geometryChanged()));
+    connect(m_treeItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_treeItem_paintGeometryChanged()));
+    connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_paintGeometryChanged()));
 
     /* Navigation slider. */
     m_navigationItem = new NavigationItem(m_controlsWidget);
@@ -358,22 +359,22 @@ void QnWorkbenchUi::at_sliderOpacityProcessor_hoverLeft() {
     opacityAnimator(m_navigationItem)->animateTo(normalSliderOpacity);
 }
 
-void QnWorkbenchUi::at_treeItem_geometryChanged() {
-    QRectF geometry = m_treeItem->geometry();
+void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
+    QRectF paintGeometry = m_treeItem->paintGeometry();
 
-    bool visible = geometry.right() >= 0.0;
+    bool visible = paintGeometry.right() >= 0.0;
     m_treeItem->setVisible(visible);
     m_treeBackgroundItem->setVisible(visible);
     m_treePinButton->setVisible(visible);
 
-    m_treeBackgroundItem->setGeometry(geometry);
+    m_treeBackgroundItem->setGeometry(paintGeometry);
     m_treeShowButton->setPos(QPointF(
-        geometry.right(),
-        (geometry.top() + geometry.bottom() - m_treeShowButton->size().height()) / 2
+        paintGeometry.right(),
+        (paintGeometry.top() + paintGeometry.bottom() - m_treeShowButton->size().height()) / 2
     ));
     m_treePinButton->setPos(QPointF(
-        geometry.right() - m_treePinButton->size().width(),
-        geometry.top()
+        paintGeometry.right() - m_treePinButton->size().width(),
+        paintGeometry.top()
     ));
 
     updateViewportMargins();

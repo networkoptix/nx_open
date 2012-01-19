@@ -60,7 +60,7 @@ protected Q_SLOTS:
     void at_sliderOpacityProcessor_hoverEntered();
     void at_sliderOpacityProcessor_hoverLeft();
 
-    void at_treeItem_geometryChanged();
+    void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeOpacityProcessor_hoverLeft();
