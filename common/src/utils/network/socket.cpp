@@ -73,7 +73,7 @@ static void fillAddr(const QString &address, unsigned short port,
     // is supposedly obsolete
     throw SocketException("Failed to resolve name (gethostbyname())");
   }
-  addr.sin_addr.s_addr = *((unsigned long *) host->h_addr_list[0]);
+  addr.sin_addr.s_addr = *((in_addr_t *) host->h_addr_list[0]);
 
   addr.sin_port = htons(port);     // Assign port in network byte order
 }
@@ -308,7 +308,7 @@ void CommunicatingSocket::setReadTimeOut( unsigned int ms )
 #ifdef Q_OS_WIN32
 	if ( setsockopt (sockDesc, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0)
 #else
-	if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
         cl_log.log("Timeout function failed", cl_logALWAYS);
@@ -423,14 +423,25 @@ TCPServerSocket::TCPServerSocket(const QString &localAddress,
 }
 
 TCPSocket *TCPServerSocket::accept()  {
-  int newConnSD;
-  if ((newConnSD = ::accept(sockDesc, NULL, 0)) < 0) {
-    return 0;
-  }
+    fd_set read_set;
+    struct timeval timeout;
+    FD_ZERO(&read_set);
+    FD_SET(sockDesc, &read_set);
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
 
-  TCPSocket* result = new TCPSocket(newConnSD);
-  result->mConnected = true;
-  return result;
+    if (::select(sockDesc + 1, &read_set, NULL, NULL, &timeout) <= 0)
+        return 0;
+
+    int newConnSD;
+    if ((newConnSD = ::accept(sockDesc, NULL, 0)) < 0)
+    {
+        return 0;
+    }
+
+    TCPSocket* result = new TCPSocket(newConnSD);
+    result->mConnected = true;
+    return result;
 }
 
 void TCPServerSocket::setListen(int queueLen)  {

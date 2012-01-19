@@ -54,7 +54,7 @@ m_request(requst)
 
 MJPEGtreamreader::~MJPEGtreamreader()
 {
-
+    stop();
 }
 
 QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()

@@ -175,11 +175,11 @@ DesktopFileEncoder::EncodedAudioInfo::EncodedAudioInfo(DesktopFileEncoder* owner
 
 DesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
 {
+    stop();
+
     if (m_speexPreprocess)
         speex_preprocess_state_destroy(m_speexPreprocess);
     m_speexPreprocess = 0;
-
-    stop();
 }
 
 int DesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()

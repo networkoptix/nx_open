@@ -17,11 +17,15 @@ cd ..\appserver\setup
 
 cd %CURRENTDIR%
 
-MSBuild ..\common\src\common.vcproj /t:Rebuild /p:Configuration=Release
-MSBuild ..\client\src\client.vcproj /t:Rebuild /p:Configuration=Release
-MSBuild ..\server\src\server.vcproj /t:Rebuild /p:Configuration=Release
+set CONFIG=%1
+
+if [%1] == [] set CONFIG=Release
+
+MSBuild ..\common\src\common.vcproj /t:Rebuild /p:Configuration=%CONFIG%
+MSBuild ..\client\src\client.vcproj /t:Rebuild /p:Configuration=%CONFIG%
+MSBuild ..\server\src\server.vcproj /t:Rebuild /p:Configuration=%CONFIG%
 
 MSBuild PropsCA\PropsCA.vcproj /t:Rebuild /p:Configuration=Release
 MSBuild EveAssocCA\EveAssocCA.vcproj /t:Rebuild /p:Configuration=Release
 
-@start /B /WAIT make.py
+@start /B /WAIT make.py %CONFIG%

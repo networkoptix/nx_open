@@ -97,6 +97,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(TCPSocket* socket, QnTcpLis
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
+    stop();
 }
 
 bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)

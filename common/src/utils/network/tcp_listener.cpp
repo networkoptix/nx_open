@@ -60,8 +60,9 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
 QnTcpListener::~QnTcpListener()
 {
     Q_D(QnTcpListener);
-    d->serverSocket->close();
     stop();
+
+    d->serverSocket->close();
     delete d->serverSocket;
     delete d_ptr;
 }

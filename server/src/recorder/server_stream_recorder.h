@@ -10,6 +10,7 @@ class QnServerStreamRecorder: public QnStreamRecorder
 {
 public:
     QnServerStreamRecorder(QnResourcePtr dev);
+    ~QnServerStreamRecorder();
 
     void updateSchedule(const QnScheduleTaskList& schedule);
 protected:
