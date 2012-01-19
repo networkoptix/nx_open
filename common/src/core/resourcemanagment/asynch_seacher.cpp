@@ -30,6 +30,11 @@ void QnResourceDiscoveryManager::setServer(bool serv)
     m_server = serv;
 }
 
+bool QnResourceDiscoveryManager::isServer() const
+{
+    return m_server;
+}
+
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
@@ -100,11 +105,14 @@ void QnResourceDiscoveryManager::run()
         {
             m_resourceProcessor->processResources(result);
 
-            foreach (const QnResourcePtr &res, result) {
+            foreach (const QnResourcePtr &res, result) 
+            {
                 QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
-                if (!resource.isNull())
+                if (!resource.isNull() && !resource.dynamicCast<QnCameraResource>()) // if this is not client and cams did not came from server
                     resource->setStatus(QnResource::Online);
             }
+
+
         }
 
         int global_delay_between_search = 1000;
@@ -341,8 +349,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                     rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomainMemory);
                     it = resources.erase(it);
 
-                    if (m_server)
+                    if (isServer())
                     {
+                        // not stand alone 
                         QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
                         if (cameraResource)
                         {
