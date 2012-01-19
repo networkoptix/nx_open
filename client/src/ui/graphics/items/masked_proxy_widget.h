@@ -3,9 +3,6 @@
 
 #include <QGraphicsProxyWidget>
 
-/**
- * This one doesn't work as wanted.  
- */
 class QnMaskedProxyWidget: public QGraphicsProxyWidget {
     Q_OBJECT;
 
