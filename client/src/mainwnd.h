@@ -52,6 +52,8 @@ protected Q_SLOTS:
 
     void activate();
     void toggleFullScreen();
+
+    void showAboutDialog();
     void editPreferences();
 
     void appServerError(int error);

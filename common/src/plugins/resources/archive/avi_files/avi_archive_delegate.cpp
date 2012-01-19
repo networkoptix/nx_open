@@ -10,20 +10,6 @@
 
 extern QMutex global_ffmpeg_mutex;
 
-Q_GLOBAL_STATIC_WITH_ARGS(QSharedPointer<QSemaphore>, aviSemaphore, (new QSemaphore(4)))
-
-class QnSemaphoreLocker
-{
-public:
-    inline QnSemaphoreLocker(QSemaphore *sem) : m_sem(sem)
-    { m_sem->tryAcquire(); }
-    inline ~QnSemaphoreLocker()
-    { m_sem->release(); }
-
-private:
-    QSemaphore *m_sem;
-};
-
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
@@ -128,8 +114,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_videoLayout(0),
     m_firstVideoIndex(0),
     m_audioStreamIndex(-1),
-    m_selectedAudioChannel(0),
-    m_semaphore(*aviSemaphore())
+    m_selectedAudioChannel(0)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -167,8 +152,6 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
-    QnSemaphoreLocker locker(m_semaphore.data());
-
     if (!findStreams())
         return QnAbstractMediaDataPtr();
 

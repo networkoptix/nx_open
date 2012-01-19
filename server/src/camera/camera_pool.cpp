@@ -1,13 +1,12 @@
 #include "camera_pool.h"
+
 #include "video_camera.h"
-#include "core/resourcemanagment/security_cam_resource.h"
+#include "core/resource/security_cam_resource.h"
 
 QMutex QnVideoCameraPool::m_staticMtx;
 
-
 QnVideoCameraPool::QnVideoCameraPool()
 {
-
 }
 
 QnVideoCameraPool::~QnVideoCameraPool()

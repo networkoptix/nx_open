@@ -35,7 +35,7 @@ void QnClientPullMediaStreamProvider::run()
 			continue;
 		}
 
-		QnAbstractDataPacketPtr data = getNextData();
+		QnAbstractMediaDataPtr data = getNextData();
 		//continue;
 
 		if (data==0)
@@ -66,6 +66,12 @@ void QnClientPullMediaStreamProvider::run()
 
 			continue;
 		}
+
+        
+        
+        if (getResource()->checkFlag(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+            data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+
 
         getResource()->setStatus(QnResource::Online);
 

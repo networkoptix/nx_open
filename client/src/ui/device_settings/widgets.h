@@ -142,4 +142,32 @@ private Q_SLOTS:
     void onClicked();
 };
 
+//==============================================
+class SettingsScheduleGridWidget : public CLAbstractSettingsWidget
+{
+    Q_OBJECT
+
+public:
+    SettingsScheduleGridWidget(QnResourcePtr dev, const QnParam &param);
+
+protected:
+    QWidget *createWidget();
+
+    void updateParam(const QVariant &value);
+};
+
+//==============================================
+class SettingsCameraScheduleWidget : public CLAbstractSettingsWidget
+{
+    Q_OBJECT
+
+public:
+    SettingsCameraScheduleWidget(QnResourcePtr dev, const QnParam &param);
+
+protected:
+    QWidget *createWidget();
+
+    void updateParam(const QVariant &value);
+};
+
 #endif //settings_widgets_h_1820

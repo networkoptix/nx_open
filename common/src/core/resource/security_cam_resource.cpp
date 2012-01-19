@@ -1,4 +1,5 @@
 #include "security_cam_resource.h"
+
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 QnSecurityCamResource::QnSecurityCamResource()
@@ -17,8 +18,7 @@ void QnSecurityCamResource::updateInner(const QnResource& other)
     QnMediaResource::updateInner(other);
 
     const QnSecurityCamResource* other_casted = dynamic_cast<const QnSecurityCamResource*>(&other);
-    if (other_casted)
-    {
+    if (other_casted) {
         m_motionMask = other_casted->m_motionMask;
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }
@@ -28,7 +28,6 @@ QString QnSecurityCamResource::oemName() const
 {
     return manufacture();
 }
-
 
 int QnSecurityCamResource::getMaxFps()
 {
@@ -74,10 +73,9 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 {
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default)
         return createLiveDataProvider();
-    else if (m_dpFactory)
+    if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
-    else
-        return 0;
+    return 0;
 }
 
 void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)

@@ -84,6 +84,7 @@ void QnRtspClientArchiveDelegate::close()
     m_rtspSession.stop();
     m_rtpData = 0;
     m_lastPacketFlags = -1;
+    m_nextDataPacket.clear();
     deleteContexts();
     m_opened = false;
 }
@@ -222,7 +223,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     //if (time == m_position)
     //    return time;
 
-    deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
+    //deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
 
     if (!m_opened && m_resource) {
@@ -331,6 +332,11 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             if (dataType == QnAbstractMediaData::EMPTY_DATA)
             {
                 nextPacket = QnEmptyMediaDataPtr(new QnEmptyMediaData());
+				if (dataSize != 0)
+				{
+					qWarning() << "Unexpected data size for EOF/BOF packet. got" << dataSize << "expected" << 0 << "bytes. Packet ignored.";
+					return result;
+				}
             }
             else if (dataType == QnAbstractMediaData::META_V1)
             {
@@ -351,7 +357,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 
                 nextPacket = QnMetaDataV1Ptr(metadata);
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO)
+            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
             {
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
@@ -369,7 +375,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                     video->height = context->ctx()->coded_height;
                 }
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
+            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
                 QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
                 audio->format.fromAvStream(context->ctx());
@@ -377,7 +383,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             }
             else
             {
-                qWarning() << "Unsupported RTP media type " << (context ? context->ctx()->codec_type : 0);
+                qWarning() << "Unsupported RTP codec or packet type. codec=" << (context ? context->ctx()->codec_type : 0) << "dataType=" << dataType;
                 return result;
             }
 

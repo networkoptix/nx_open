@@ -63,6 +63,10 @@ void CLServerPushStreamreader::run()
 			continue;
 		}
 
+        if (getResource()->checkFlag(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+            data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+
+
         getResource()->setStatus(QnResource::Online);
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);

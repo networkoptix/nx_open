@@ -6,7 +6,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "core/resource/resource.h"
-#include "ui/preferences/preferences_wnd.h"
+#include "ui/preferences/preferencesdialog.h"
 #include "ui/skin/skin.h"
 #include "connectiontestingdialog.h"
 
@@ -51,11 +51,11 @@ void ConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void ConnectionTestingDialog::testResults(int status, const QByteArray &data, int requstHandle)
+void ConnectionTestingDialog::testResults(int status, const QByteArray &data, int requestHandle)
 {
     if (m_timeoutTimer.isActive())
         m_timeoutTimer.stop();
-    else 
+    else
         return;
 
     ui->progressBar->setValue(ui->progressBar->maximum());

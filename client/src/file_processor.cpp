@@ -1,7 +1,11 @@
 #include "file_processor.h"
 
 #include <QtCore/QDirIterator>
+#include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+
+#include <QtGui/QApplication>
+#include <QtGui/QMessageBox>
 
 #include <core/resource/directory_browser.h>
 #include <core/resourcemanagment/resource_pool.h>
@@ -26,16 +30,15 @@ QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
         } else if (CLAviBluRayDevice::isAcceptedUrl(path)) {
             acceptedFiles.append(path);
         } else {
-            FileTypeSupport fileTypeSupport;
             QFileInfo fileInfo(path);
             if (fileInfo.isDir()) {
                 QDirIterator it(path, QDirIterator::Subdirectories);
                 while (it.hasNext()) {
                     QString nextFilename = it.next();
-                    if (it.fileInfo().isFile() && fileTypeSupport.isFileSupported(nextFilename))
+                    if (it.fileInfo().isFile() && FileTypeSupport::isFileSupported(nextFilename))
                         acceptedFiles.append(nextFilename);
                 }
-            } else if (fileInfo.isFile() && fileTypeSupport.isFileSupported(path)) {
+            } else if (fileInfo.isFile() && FileTypeSupport::isFileSupported(path)) {
                 acceptedFiles.append(path);
             }
         }
@@ -70,3 +73,25 @@ QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files
     return result;
 }
 
+void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
+{
+    QnResourceList resources;
+    foreach (const QnResourcePtr &resource, resources_) {
+        if (resource->checkFlag(QnResource::url | QnResource::local))
+            resources.append(resource);
+    }
+    if (resources.isEmpty())
+        return;
+
+    QString text;
+    if (resources.size() == 1)
+        text = QObject::tr("Are you sure you want to delete file '%1'?").arg(resources.first()->getUniqueId());
+    else
+        text = QObject::tr("Are you sure you want to delete %1 files?").arg(resources.size());
+    if (QMessageBox::question(QApplication::activeWindow(), QObject::tr("Delete file(s)?"), text,
+                              QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Yes) {
+        qnResPool->removeResources(resources);
+        foreach (const QnResourcePtr &resource, resources)
+            QFile::remove(resource->getUrl());
+    }
+}

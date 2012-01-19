@@ -208,11 +208,13 @@ Q_SIGNALS:
      */
     void boundingRectChanged();
 
-protected:
+private Q_SLOTS:
+    void resourceRemoved(const QnResourcePtr &resource);
+
+private:
     template<bool returnEarly>
     bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition);
 
-private:
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
     void updateBoundingRectInternal();
 

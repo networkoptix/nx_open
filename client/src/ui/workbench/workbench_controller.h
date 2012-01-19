@@ -79,13 +79,19 @@ public:
     void drop(const QnResourceList &resources, const QPointF &gridPos = QPointF());
 
     void remove(const QnResourcePtr &resource);
+    void remove(const QnResourceList &resources);
 
 public Q_SLOTS:
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
     void toggleTreeVisible();
 
+    void startRecording();
+    void stopRecording();
+
 protected:
+    bool eventFilter(QObject *watched, QEvent *event);
+
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();
@@ -125,16 +131,14 @@ protected Q_SLOTS:
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
 
-    void at_startRecordingAction_triggered();
-    void at_stopRecordingAction_triggered();
     void at_toggleRecordingAction_triggered();
-    void at_recordingSettingsActions_triggered();
+    void at_recordingSettingsAction_triggered();
 
     void at_screenRecorder_error(const QString &errorMessage);
     void at_screenRecorder_recordingStarted();
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
-    void at_recordingAnimation_valueChanged(QVariant value);
+    void at_recordingAnimation_valueChanged(const QVariant &value);
     void at_recordingAnimation_finished();
 
     void at_randomGridAction_triggered();
@@ -153,8 +157,6 @@ protected Q_SLOTS:
     void at_treeOpacityProcessor_hoverLeft();
     void at_treeOpacityProcessor_hoverEntered();
     void at_treeBookmarkItem_toggled(bool checked);
-
-
 
 private:
     /* Global state. */
@@ -261,15 +263,6 @@ private:
 
     /** Layout item context menu. */
     QMenu *m_itemContextMenu;
-
-    /** Start screen recording action. */
-    QAction *m_startRecordingAction;
-
-    /** Stop screen recording action. */
-    QAction *m_stopRecordingAction;
-
-    /** Open recording setting dialog. */
-    QAction *m_recordingSettingsActions;
 
     /** Mark recorder countdown is canceled. */
     bool m_countdownCanceled;

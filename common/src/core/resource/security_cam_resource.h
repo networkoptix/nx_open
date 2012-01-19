@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QRegion>
-#include "../resource/media_resource.h"
+#include "media_resource.h"
 #include "core/misc/scheduleTask.h"
 
 class QnDataProviderFactory
@@ -39,7 +39,6 @@ public:
 
     void setScheduleTasks(const QnScheduleTaskList& scheduleTasks);
     const QnScheduleTaskList getScheduleTasks() const;
-
 
 signals:
     void motionMaskChanged(QRegion region);

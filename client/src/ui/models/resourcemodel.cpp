@@ -1,6 +1,8 @@
 #include "resourcemodel.h"
+#include "resourcemodel_p.h"
 
 #include <QtCore/QMimeData>
+#include <QtCore/QUrl>
 
 #include <core/resourcemanagment/resource_pool.h>
 
@@ -10,87 +12,156 @@
 
 #include "file_processor.h"
 
-ResourceModel::ResourceModel(QObject *parent)
-    : QStandardItemModel(parent)
-{
-    connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(_q_addResource(QnResourcePtr)));
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(_q_removeResource(QnResourcePtr)));
-    connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(_q_resourceChanged(QnResourcePtr)));
+enum IconKey {
+    IconTypeUnknown = 0,
+    IconTypeServer = 0x0001,
+    IconTypeLayout = 0x0002,
+    IconTypeCamera = 0x0004,
+    IconTypeImage = 0x0008,
+    IconTypeMedia = 0x0010,
+    IconTypeMask = 0x0fff,
 
-    const QnResourceList resources = qnResPool->getResources();
-    foreach (const QnResourcePtr &server, resources) {
-        if (server->checkFlag(QnResource::server)) {
-            addResource(server);
-            const QnId serverId = server->getId();
-            foreach (const QnResourcePtr &resource, resources) {
-                if (resource->getParentId() == serverId && !resource->checkFlag(QnResource::server))
-                    addResource(resource);
+    IconStateLocal = 0x1000,
+    IconStateOffline = 0x2000,
+    IconStateUnauthorized = 0x4000,
+    IconStateMask = 0xf000
+};
+
+typedef QHash<quint32, QIcon> IconCache;
+Q_GLOBAL_STATIC(IconCache, iconCache)
+
+static void invalidateIconCache()
+{
+    IconCache *cache = iconCache();
+    if (!cache)
+        return;
+
+    cache->clear();
+
+    cache->insert(IconTypeUnknown, QIcon());
+    cache->insert(IconTypeServer | IconStateLocal, Skin::icon(QLatin1String("home.png")));
+    cache->insert(IconTypeServer, Skin::icon(QLatin1String("server.png")));
+    cache->insert(IconTypeLayout, Skin::icon(QLatin1String("layout.png")));
+    cache->insert(IconTypeCamera, Skin::icon(QLatin1String("webcam.png")));
+    cache->insert(IconTypeImage, Skin::icon(QLatin1String("snapshot.png")));
+    cache->insert(IconTypeMedia, Skin::icon(QLatin1String("media.png")));
+
+    cache->insert(IconStateOffline, Skin::icon(QLatin1String("offline.png")));
+    cache->insert(IconStateUnauthorized, Skin::icon(QLatin1String("unauthorized.png")));
+}
+
+static QIcon iconForKey(quint32 key)
+{
+    IconCache *cache = iconCache();
+    if (!cache)
+        return QIcon();
+
+    if (cache->isEmpty())
+        invalidateIconCache();
+
+    if ((key & IconTypeMask) == IconTypeUnknown)
+        key = IconTypeUnknown;
+
+    if (!cache->contains(key)) {
+        QIcon icon;
+        quint32 state;
+        if ((key & IconStateMask) != 0) {
+            for (state = IconStateUnauthorized; state >= IconStateLocal; state >>= 1) {
+                if ((key & state) != 0) {
+                    icon = iconForKey(key & ~state);
+                    break;
+                }
             }
         }
+        if (!icon.isNull()) {
+            QIcon overlayIcon;
+            if (cache->contains(state))
+                overlayIcon = cache->value(state);
+            if (!overlayIcon.isNull()) {
+                QPixmap pixmap = icon.pixmap(QSize(256, 256));
+                {
+                    QPainter painter(&pixmap);
+                    QRect r = pixmap.rect();
+                    // ### allow overlay combinations
+                    r.setTopLeft(r.center());
+                    overlayIcon.paint(&painter, r, Qt::AlignRight | Qt::AlignBottom);
+                }
+                icon = QIcon(pixmap);
+            }
+        }
+        cache->insert(key, icon);
     }
 
-    QHash<int, QByteArray> roles = roleNames();
-    roles.insert(Qt::UserRole + 1, "id");
-    roles.insert(Qt::UserRole + 2, "searchString");
-    setRoleNames(roles);
-}
-
-ResourceModel::~ResourceModel()
-{
-}
-
-QnResourcePtr ResourceModel::resourceFromIndex(const QModelIndex &index) const
-{
-    return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
-}
-
-QModelIndex ResourceModel::indexFromResource(const QnResourcePtr &resource) const
-{
-    return indexFromResourceId(resource->getId().hash());
-}
-
-QModelIndex ResourceModel::indexFromResourceId(uint id) const // ### remove; use use indexFromResource() instead
-{
-    const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
-    return indexList.value(0);
+    return cache->value(key);
 }
 
 static inline QIcon iconForResource(const QnResourcePtr &resource)
 {
-    QString iconName;
-    if (resource->checkFlag(QnResource::server))
-        iconName = resource->checkFlag(QnResource::remote) ? QLatin1String("server.png") : QLatin1String("home.png");
-    else if (resource->checkFlag(QnResource::layout))
-        iconName = QLatin1String("layout.png");
-    else if (resource->checkFlag(QnResource::live_cam))
-        iconName = QLatin1String("webcam.png");
-    else if (resource->checkFlag(QnResource::SINGLE_SHOT))
-        iconName = QLatin1String("snapshot.png");
-    else if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::server_archive))
-        iconName = QLatin1String("media.png");
+    quint32 key = IconTypeUnknown;
 
-    QIcon icon;
-    if (!iconName.isEmpty()) {
-        QPixmap mainPix = Skin::pixmap(iconName);
-        if (resource->getStatus() != QnResource::Online) {
-            const QString overlayIconName = resource->getStatus() == QnResource::Offline ? QLatin1String("offline.png") : QLatin1String("unauthorized.png");
-            const QPixmap overlayPix = Skin::pixmap(overlayIconName, QSize(mainPix.width() / 2, mainPix.height() / 2));
-            QPainter painter(&mainPix);
-            painter.drawPixmap(mainPix.width() / 2, mainPix.height() / 2, overlayPix);
-        }
-        icon.addPixmap(mainPix);
-    }
+    const quint32 flags = resource->flags();
+    if ((flags & QnResource::server) == QnResource::server)
+        key |= IconTypeServer;
+    else if ((flags & QnResource::layout) == QnResource::layout)
+        key |= IconTypeLayout;
+    else if ((flags & QnResource::live_cam) == QnResource::live_cam)
+        key |= IconTypeCamera;
+    else if ((flags & QnResource::SINGLE_SHOT) == QnResource::SINGLE_SHOT)
+        key |= IconTypeImage;
+    else if ((flags & QnResource::ARCHIVE) == QnResource::ARCHIVE)
+        key |= IconTypeMedia;
+    else if ((flags & QnResource::server_archive) == QnResource::server_archive)
+        key |= IconTypeMedia;
 
-    return icon;
+    if ((flags & QnResource::local) == QnResource::local)
+        key |= IconStateLocal;
+
+    const QnResource::Status status = resource->getStatus();
+    if (status == QnResource::Offline)
+        key |= IconStateOffline;
+    else if (status == QnResource::Unauthorized)
+        key |= IconStateUnauthorized;
+
+    return iconForKey(key);
 }
 
-void ResourceModel::addResource(const QnResourcePtr &resource)
+
+void ResourceModelPrivate::init()
 {
-    QStandardItem *item = 0;
+    Q_Q(ResourceModel);
+
+    QHash<int, QByteArray> roles = q->roleNames();
+    roles.insert(Qt::UserRole + 1, "id");
+    roles.insert(Qt::UserRole + 2, "searchString");
+    q->setRoleNames(roles);
+
+    q->connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), q, SLOT(_q_addResource(QnResourcePtr)));
+    q->connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), q, SLOT(_q_removeResource(QnResourcePtr)));
+    q->connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), q, SLOT(_q_resourceChanged(QnResourcePtr)));
+
+    const QnResourceList resources = qnResPool->getResources(); // make a snapshot
+    foreach (const QnResourcePtr &server, resources) {
+        if (server->checkFlag(QnResource::server)) {
+            _q_addResource(server);
+            const QnId serverId = server->getId();
+            foreach (const QnResourcePtr &resource, resources) {
+                if (resource->getParentId() == serverId && !resource->checkFlag(QnResource::server))
+                    _q_addResource(resource);
+            }
+        }
+    }
+}
+
+void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
+{
+    QStandardItem *item = itemFromResource(resource);
+    if (item)
+        return; // avoid duplicates
+
     if (resource->checkFlag(QnResource::server)) {
         item = new QStandardItem;
         item->setSelectable(false);
-        appendRow(item);
+        q_func()->appendRow(item);
     } else if (QStandardItem *root = itemFromResourceId(resource->getParentId().hash())) {
         item = new QStandardItem;
         root->appendRow(item);
@@ -108,38 +179,17 @@ void ResourceModel::addResource(const QnResourcePtr &resource)
     item->setEditable(false);
 }
 
-void ResourceModel::removeResource(const QnResourcePtr &resource)
+void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
 {
     if (QStandardItem *item = itemFromResource(resource)) {
-        foreach (QStandardItem *rowItem, takeRow(item->row()))
-            delete rowItem;
+        if (item->parent())
+            item->parent()->removeRow(item->row());
+        else
+            q_func()->removeRow(item->row());
     }
 }
 
-void ResourceModel::_q_addResource(const QnResourcePtr &resource)
-{
-    if (sender() != qnResPool) {
-        qnResPool->addResource(resource); // emits resourceAdded; thus return
-        return;
-    }
-
-    if (itemFromResource(resource))
-        return; // avoid duplicates
-
-    addResource(resource);
-}
-
-void ResourceModel::_q_removeResource(const QnResourcePtr &resource)
-{
-    if (sender() != qnResPool) {
-        qnResPool->removeResource(resource); // emits resourceRemoved; thus return
-        return;
-    }
-
-    removeResource(resource);
-}
-
-void ResourceModel::_q_resourceChanged(const QnResourcePtr &resource)
+void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
 {
     if (QStandardItem *item = itemFromResource(resource)) {
         item->setText(resource->getName());
@@ -148,6 +198,56 @@ void ResourceModel::_q_resourceChanged(const QnResourcePtr &resource)
         item->setData(resource->toSearchString(), Qt::UserRole + 2);
         item->setIcon(iconForResource(resource));
     }
+}
+
+
+ResourceModel::ResourceModel(QObject *parent)
+    : QStandardItemModel(parent), d_ptr(new ResourceModelPrivate)
+{
+    Q_D(ResourceModel);
+
+    d->q_ptr = this;
+    d->init();
+}
+
+ResourceModel::~ResourceModel()
+{
+}
+
+QnResourcePtr ResourceModel::resourceFromIndex(const QModelIndex &index) const
+{
+    return index.column() == 0 ? qnResPool->getResourceById(index.data(Qt::UserRole + 1)) : QnResourcePtr(0);
+}
+
+QModelIndex ResourceModel::indexFromResource(const QnResourcePtr &resource) const
+{
+    return indexFromResourceId(resource->getId().hash());
+}
+
+QModelIndex ResourceModel::indexFromResourceId(uint id) const // ### remove; use use indexFromResource() instead
+{
+    const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
+    return indexList.value(0);
+}
+
+void ResourceModel::addResource(const QnResourcePtr &resource)
+{
+    if (sender() != qnResPool) {
+        qnResPool->addResource(resource); // emits resourceAdded; thus return
+        return;
+    }
+
+    d_func()->_q_addResource(resource);
+}
+
+void ResourceModel::removeResource(const QnResourcePtr &resource)
+{
+    if (sender() != qnResPool) {
+        qnResPool->removeResource(resource); // emits resourceRemoved; thus return
+        return;
+    }
+
+    d_func()->_q_removeResource(resource);
 }
 
 QStringList ResourceModel::mimeTypes() const
@@ -169,8 +269,7 @@ QMimeData *ResourceModel::mimeData(const QModelIndexList &indexes) const
         if (types.contains(resourceFormat) || types.contains(urlFormat)) {
             QnResourceList resources;
             foreach (const QModelIndex &index, indexes) {
-                QnResourcePtr resource = resourceFromIndex(index);
-                if (resource)
+                if (QnResourcePtr resource = resourceFromIndex(index))
                     resources.append(resource);
             }
             if (types.contains(resourceFormat))
@@ -223,7 +322,7 @@ ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent)
 
 QnResourcePtr ResourceSortFilterProxyModel::resourceFromIndex(const QModelIndex &index) const
 {
-    return qnResPool->getResourceById(index.data(Qt::UserRole + 1));
+    return index.column() == 0 ? qnResPool->getResourceById(index.data(Qt::UserRole + 1)) : QnResourcePtr(0);
 }
 
 QModelIndex ResourceSortFilterProxyModel::indexFromResource(const QnResourcePtr &resource) const
@@ -390,3 +489,5 @@ void ResourceSortFilterProxyModel::buildFilters(const QSet<QString> parts[], QRe
         }
     }
 }
+
+#include "moc_resourcemodel.cpp"

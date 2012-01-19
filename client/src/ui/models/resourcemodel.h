@@ -5,6 +5,7 @@
 
 #include "core/resource/resource.h"
 
+class ResourceModelPrivate;
 class ResourceModel : public QStandardItemModel
 {
     Q_OBJECT
@@ -19,26 +20,19 @@ public:
 
     QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
     QModelIndex indexFromResource(const QnResourcePtr &resource) const;
-
-protected:
     QModelIndex indexFromResourceId(uint id) const; // ### remove; use use indexFromResource() instead
-    inline QnResourcePtr resourceFromItem(QStandardItem *item) const
-    { return resourceFromIndex(item->index()); }
-    inline QStandardItem *itemFromResource(const QnResourcePtr &resource) const
-    { return itemFromIndex(indexFromResource(resource)); }
-    inline QStandardItem *itemFromResourceId(uint id) const
-    { return itemFromIndex(indexFromResourceId(id)); }
 
+protected Q_SLOTS:
     void addResource(const QnResourcePtr &resource);
     void removeResource(const QnResourcePtr &resource);
 
-private Q_SLOTS:
-    void _q_addResource(const QnResourcePtr &resource);
-    void _q_removeResource(const QnResourcePtr &resource);
-    void _q_resourceChanged(const QnResourcePtr &resource);
-
 private:
     Q_DISABLE_COPY(ResourceModel)
+    Q_DECLARE_PRIVATE(ResourceModel)
+    const QScopedPointer<ResourceModelPrivate> d_ptr;
+    Q_PRIVATE_SLOT(d_func(), void _q_addResource(const QnResourcePtr &resource))
+    Q_PRIVATE_SLOT(d_func(), void _q_removeResource(const QnResourcePtr &resource))
+    Q_PRIVATE_SLOT(d_func(), void _q_resourceChanged(const QnResourcePtr &resource))
 };
 
 

@@ -163,11 +163,6 @@ Q_SIGNALS:
     void rotationChanged();
 
 protected:
-    /**
-     * Ensures that this item does not belong to any layout.
-     */
-    void ensureRemoved();
-
     void setGeometryInternal(const QRect &geometry);
 
     void setFlagInternal(ItemFlag flag, bool value);

@@ -6,10 +6,11 @@
 void initContextMenu();
 
 extern QAction cm_new_item;
+extern QAction cm_about;
 extern QAction cm_exit;
 extern QAction cm_open_file;
 extern QAction cm_screen_recording;
-extern QAction cm_start_video_recording;
+extern QAction cm_toggle_recording;
 extern QAction cm_recording_settings;
 extern QAction cm_toggle_fullscreen;
 extern QAction cm_fitinview;
@@ -30,8 +31,6 @@ extern QAction cm_fullscreen;
 extern QAction cm_remove_from_layout;
 extern QAction cm_remove_from_disk;
 extern QAction cm_settings;
-extern QAction cm_start_recording;
-extern QAction cm_stop_recording;
 extern QAction cm_view_recorded;
 extern QAction cm_save_recorded_as;
 extern QAction cm_take_screenshot;

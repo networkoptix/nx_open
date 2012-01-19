@@ -7,13 +7,14 @@
 
 #include "ui/context_menu/menu_wrapper.h"
 
-QAction cm_new_item(QObject::tr("New Item"), 0);
+QAction cm_new_item(QObject::tr("New Item..."), 0);
+QAction cm_about(QObject::tr("About..."), 0);
 QAction cm_exit(QObject::tr("Exit"), 0);
 QAction cm_fitinview(QObject::tr("Fit in View"), 0);
 QAction cm_open_file(QObject::tr("Open file(s)..."), 0);
 QAction cm_screen_recording(QObject::tr("Screen Recording"), 0);
-QAction cm_start_video_recording(QObject::tr("Start/Stop Recording"), 0);
-QAction cm_recording_settings(QObject::tr("Recording settings"), 0);
+QAction cm_toggle_recording(QObject::tr("Start Screen Recording"), 0);
+QAction cm_recording_settings(QObject::tr("Screen Recording Settings"), 0);
 QAction cm_toggle_fullscreen(QObject::tr("Toggle fullscreen"), 0);
 QAction cm_arrange(QObject::tr("Arrange"), 0);
 QAction cm_add_layout(QObject::tr("Add new layout..."), 0);
@@ -30,8 +31,6 @@ QAction cm_fullscreen(QObject::tr("Fullscreen"), 0);
 QAction cm_remove_from_layout(QObject::tr("Remove"), 0);
 QAction cm_remove_from_disk(QObject::tr("Delete file(s)"), 0);
 QAction cm_settings(QObject::tr("Settings..."), 0);
-QAction cm_start_recording(QObject::tr("Start recording"), 0);
-QAction cm_stop_recording(QObject::tr("Stop recording"), 0);
 QAction cm_view_recorded(QObject::tr("View recorded video"), 0);
 QAction cm_save_recorded_as(QObject::tr("Save recorded video as..."), 0);
 QAction cm_take_screenshot(QObject::tr("Take screenshot..."), 0);
@@ -53,13 +52,18 @@ QAction cm_showNavTree(QObject::tr("<=|=>"), 0);
 
 void initContextMenu()
 {
+    cm_about.setIcon(Skin::icon(QLatin1String("info.png")));
+    cm_about.setMenuRole(QAction::AboutRole);
+
     cm_exit.setIcon(Skin::icon(QLatin1String("decorations/exit-application.png")));
     cm_exit.setShortcut(QObject::tr("Alt+F4"));
     cm_exit.setShortcutContext(Qt::ApplicationShortcut);
+    cm_exit.setMenuRole(QAction::QuitRole);
 
     cm_preferences.setIcon(Skin::icon(QLatin1String("decorations/settings.png")));
     cm_preferences.setShortcut(QObject::tr("Ctrl+P"));
     cm_preferences.setShortcutContext(Qt::ApplicationShortcut);
+    cm_preferences.setMenuRole(QAction::PreferencesRole);
 
     cm_open_file.setIcon(Skin::icon(QLatin1String("folder.png")));
     cm_open_file.setShortcut(QObject::tr("Ctrl+O"));
@@ -89,12 +93,12 @@ void initContextMenu()
     cm_new_item.setIcon(Skin::icon(QLatin1String("plus.png")));
     cm_new_item.setToolTip(QObject::tr("New Item"));
 
-    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << QObject::tr("Alt+R") << Qt::Key_MediaRecord);
-    cm_start_video_recording.setShortcutContext(Qt::ApplicationShortcut);
+    cm_toggle_recording.setShortcuts(QList<QKeySequence>() << QObject::tr("Alt+R") << Qt::Key_MediaRecord);
+    cm_toggle_recording.setShortcutContext(Qt::ApplicationShortcut);
 
     QMenu *screenRecordingMenu = new QMenu();
     screenRecordingMenu->setTitle(QObject::tr("Screen Recording"));
-    screenRecordingMenu->addAction(&cm_start_video_recording);
+    screenRecordingMenu->addAction(&cm_toggle_recording);
     screenRecordingMenu->addAction(&cm_recording_settings);
     cm_screen_recording.setMenu(screenRecordingMenu);
     cm_screen_recording.setToolTip(QObject::tr("Screen Recording"));

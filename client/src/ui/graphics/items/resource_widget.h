@@ -36,19 +36,18 @@ public:
         DISPLAY_SELECTION_OVERLAY, /**< Whether selected / not selected state should be displayed. */
         DISPLAY_MOTION_GRID,       /**< Whether a grid with motion detection is to be displayed. */
     };
-
-    Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag);
+    Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
     /**
      * Constructor.
-     * 
+     *
      * \param item                      Workbench item that this resource widget will represent.
      * \param parent                    Parent item.
      */
     QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
 
     /**
-     * Virtual destructor. 
+     * Virtual destructor.
      */
     virtual ~QnResourceWidget();
 
@@ -58,7 +57,7 @@ public:
     const QnResourcePtr &resource() const;
 
     /**
-     * \returns                         Associated renderer, if any. 
+     * \returns                         Associated renderer, if any.
      */
     QnResourceWidgetRenderer *renderer() const {
         return m_renderer;
@@ -68,11 +67,11 @@ public:
      * \returns                         Workbench item associated with this widget. Never returns NULL.
      */
     QnWorkbenchItem *item() const {
-        return m_item;
+        return m_item.data();
     }
 
     /**
-     * \returns                         Display associated with this widget. 
+     * \returns                         Display associated with this widget.
      */
     QnResourceDisplay *display() const {
         return m_display;
@@ -129,8 +128,8 @@ public:
     virtual void setGeometry(const QRectF &geometry) override;
 
     /**
-     * \returns                         Aspect ratio of this widget. 
-     *                                  Negative value will be returned if this 
+     * \returns                         Aspect ratio of this widget.
+     *                                  Negative value will be returned if this
      *                                  widget does not have aspect ratio.
      */
     qreal aspectRatio() const {
@@ -145,11 +144,11 @@ public:
     }
 
     /**
-     * Every widget is considered to be inscribed into an enclosing rectangle with a 
-     * fixed aspect ratio. When aspect ratio of the widget itself changes, it is 
+     * Every widget is considered to be inscribed into an enclosing rectangle with a
+     * fixed aspect ratio. When aspect ratio of the widget itself changes, it is
      * re-inscribed into its enclosed rectangle.
      *
-     * \returns                         Aspect ratio of the enclosing rectangle for this widget. 
+     * \returns                         Aspect ratio of the enclosing rectangle for this widget.
      */
     qreal enclosingAspectRatio() const {
         return m_enclosingAspectRatio;
@@ -184,14 +183,14 @@ public:
 
     /**
      * Removes a button from this widget.
-     * 
+     *
      * \param button                    Button to add. Ownership of the button is
      *                                  transferred to the caller.
      */
     void removeButton(QGraphicsLayoutItem *button);
 
     /**
-     * \returns                         Display flags for this widget. 
+     * \returns                         Display flags for this widget.
      */
     DisplayFlags displayFlags() const {
         return m_displayFlags;
@@ -211,8 +210,8 @@ public:
     void setDisplayFlags(DisplayFlags flags);
 
     /**
-     * \returns                         Whether a grid with motion detection is 
-     *                                  displayed over a video. 
+     * \returns                         Whether a grid with motion detection is
+     *                                  displayed over a video.
      */
     bool isMotionGridDisplayed() const {
         return m_displayFlags & DISPLAY_MOTION_GRID;
@@ -236,16 +235,12 @@ public:
     /**
      * \param gridRect                  Rectangle in grid coordinates to add to
      *                                  selected motion region of this widget.
-     */ 
+     */
     void addToMotionSelection(const QRect &gridRect);
 
     using base_type::mapRectToScene;
 
-signals:
-    void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
-    void aboutToBeDestroyed();
-    void motionRegionSelected(QnResourcePtr resource, QRegion region);
-public slots:
+public Q_SLOTS:
     void showActivityDecorations();
     void hideActivityDecorations();
 
@@ -253,6 +248,12 @@ public slots:
      * Clears this widget's motion selection region.
      */
     void clearMotionSelection();
+
+Q_SIGNALS:
+    void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
+    void aboutToBeDestroyed();
+    void motionRegionSelected(QnResourcePtr resource, QRegion region);
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -274,7 +275,7 @@ protected:
 
     void ensureAboutToBeDestroyedEmitted();
 
-private slots:
+private Q_SLOTS:
     void at_sourceSizeChanged(const QSize &size);
     void at_display_resourceUpdated();
 
@@ -284,7 +285,7 @@ private:
      * \returns                         Rectangle in local coordinates where given channel is to be drawn.
      */
     QRectF channelRect(int channel) const;
-    
+
     void ensureMotionMask();
 
     void invalidateMotionMask();
@@ -303,7 +304,7 @@ private:
 
         /** Time when the last icon change has occurred, in milliseconds since epoch. */
         qint64 iconChangeTimeMSec;
-        
+
         /** Whether the icon should fade in on change. */
         bool iconFadeInNeeded;
 
@@ -330,7 +331,7 @@ private:
 
 private:
     /** Layout item. */
-    QnWorkbenchItem *m_item;
+    QWeakPointer<QnWorkbenchItem> m_item;
 
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;
