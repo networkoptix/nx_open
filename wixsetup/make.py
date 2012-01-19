@@ -13,6 +13,13 @@ from common.convert import rmtree
 
 set_env()
 
+if len(sys.argv) == 2 and sys.argv[1] == 'debug':
+    CONFIG = 'Debug'
+else:
+    CONFIG = 'Release'
+
+os.environ['CONFIG'] = CONFIG    
+
 if os.path.exists('bin'):
     rmtree('bin')
 
@@ -39,15 +46,18 @@ WXS_FILES = "MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarni
 os.system(r'heat dir ..\appserver\setup\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
 fixasfiles()
 
-os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION, WXS_FILES))
+os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
 
-output_file = 'bin/VMS-%s.%s.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
+if CONFIG == 'Debug':
+    output_file = 'bin/VMS-%s.%s-Debug.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
+else:
+    output_file = 'bin/VMS-%s.%s.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
 try:
     os.unlink(output_file)
 except OSError:
     pass
 
-os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -out %s -pdbout bin\Release\EVEMediaPlayerSetup.wixpdb obj\Release\*.wixobj' % output_file)
+os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -out %s -pdbout bin\%s\EVEMediaPlayerSetup.wixpdb obj\%s\*.wixobj' % (output_file, CONFIG, CONFIG))
 
 os.system(r'cscript FixExitDialog.js %s' % output_file)
 
