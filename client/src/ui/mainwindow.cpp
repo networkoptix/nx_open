@@ -121,9 +121,10 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     m_display->setView(m_view);
 
     m_controller = new QnWorkbenchController(m_display, this);
+    connect(m_controller->display(), SIGNAL(widgetChanged(QnWorkbench::ItemRole)), this, SLOT(currentWidgetChanged()));
+
     m_ui = new QnWorkbenchUi(m_display, this);
     m_ui->treeWidget()->setWorkbenchController(m_controller);
-    connect(m_controller->display(), SIGNAL(widgetChanged(QnWorkbench::ItemRole)), this, SLOT(currentWidgetChanged()));
     connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(addTab()));
     connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(treeWidgetItemActivated(uint)));
 
