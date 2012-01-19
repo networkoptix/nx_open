@@ -94,6 +94,23 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 if (senderPort != 62976 || datagram.size() < 32) // minimum response size
                     continue;
 
+                int iqpos = datagram.indexOf("DCS-");
+
+                if (iqpos<0)
+                    continue;
+
+                /*
+                int macpos = responseData.indexOf("00", iqpos);
+                if (macpos < 0)
+                    return QnNetworkResourcePtr(0);
+
+                for (int i = iqpos; i < macpos; i++)
+                {
+                    name += QLatin1Char(responseData[i]);
+                }
+                /**/
+
+
                 const unsigned char* data = (unsigned char*)(datagram.data());
 
                 unsigned char mac[6];
