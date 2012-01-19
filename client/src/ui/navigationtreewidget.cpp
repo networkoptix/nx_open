@@ -459,3 +459,4 @@ void NavigationTreeWidget::open()
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         itemActivated(index);
 }
+

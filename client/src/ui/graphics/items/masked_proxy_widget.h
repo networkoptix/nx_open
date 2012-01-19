@@ -3,6 +3,9 @@
 
 #include <QGraphicsProxyWidget>
 
+/**
+ * This one doesn't work as wanted.  
+ */
 class QnMaskedProxyWidget: public QGraphicsProxyWidget {
     Q_OBJECT;
 
@@ -25,11 +28,15 @@ public:
 
     void setPaintGeometry(const QRectF &paintGeometry);
 
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+
 signals:
     void paintRectChanged();
 
 private:
     QRectF m_paintRect;
+    bool m_pixmapDirty;
+    QPixmap m_pixmap;
 };
 
 
