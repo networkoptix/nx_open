@@ -629,11 +629,26 @@ void QnWorkbenchController::remove(const QnResourceList &resources)
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
-    if (qobject_cast<QnResourceWidget *>(watched)) {
+    if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
         if (event->type() == QEvent::Close) {
-            event->accept();
-            //event->setAccepted(QMessageBox::question(display()->view(), tr("Close?"), tr("Really close?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok) == QMessageBox::Ok); // ###
-            return true;
+            QList<QnResourceWidget *> selectedWidgets;
+            foreach (QGraphicsItem *item, display()->scene()->selectedItems()) {
+                if (QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : 0)
+                    selectedWidgets.append(widget);
+            }
+            if (selectedWidgets.removeOne(widget) && !selectedWidgets.isEmpty()) {
+                event->ignore();
+                if (QMessageBox::question(display()->view(), tr("Close confirmation"), tr("Close %n item(s)?", 0, selectedWidgets.size() + 1),
+                                          QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok) == QMessageBox::Ok) {
+                    event->accept();
+                    foreach (QnResourceWidget *widget, selectedWidgets) {
+                        widget->removeEventFilter(this);
+                        widget->close();
+                    }
+                }
+
+                return event->isAccepted();
+            }
         }
     }
 
