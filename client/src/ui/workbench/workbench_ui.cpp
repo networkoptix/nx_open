@@ -361,10 +361,8 @@ void QnWorkbenchUi::at_sliderOpacityProcessor_hoverLeft() {
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
     QRectF paintGeometry = m_treeItem->paintGeometry();
 
-    bool visible = paintGeometry.right() >= 0.0;
-    m_treeItem->setVisible(visible);
-    m_treeBackgroundItem->setVisible(visible);
-    m_treePinButton->setVisible(visible);
+    /* Don't hide tree item here. It will repaint itself when shown, which will
+     * degrade performance. */
 
     m_treeBackgroundItem->setGeometry(paintGeometry);
     m_treeShowButton->setPos(QPointF(

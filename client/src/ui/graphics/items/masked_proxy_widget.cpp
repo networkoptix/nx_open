@@ -2,6 +2,29 @@
 #include <QStyleOptionGraphicsItem>
 #include <ui/common/scene_utility.h>
 
+#include <QtGui/../../src/gui/graphicsview/qgraphicsproxywidget_p.h>
+
+namespace {
+    template<class Base>
+    class Object: public Base {
+    public:
+        bool processEvent(QEvent *event) {
+            return this->event(event);
+        }
+
+        bool staticProcessEvent(QEvent *event) {
+            return this->Base::event(event);
+        }
+    };
+
+    template<class Base>
+    Object<Base> *open(Base *object) {
+        return static_cast<Object<Base> *>(object);
+    }
+
+}
+
+
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
     m_pixmapDirty(true)
@@ -39,8 +62,13 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
     if(object == widget()) {
-        if(event->type() == QEvent::UpdateRequest)
+        if(event->type() == QEvent::UpdateRequest) {
             m_pixmapDirty = true;
+            /*open(object)->processEvent(event);
+            
+            qDebug() << QGraphicsItem::d_ptr->needsRepaint;
+            return true;*/
+        }
     }
 
     return base_type::eventFilter(object, event);
