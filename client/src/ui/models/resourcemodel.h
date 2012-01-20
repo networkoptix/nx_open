@@ -55,6 +55,8 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _q_addResource(const QnResourcePtr &resource))
     Q_PRIVATE_SLOT(d_func(), void _q_removeResource(const QnResourcePtr &resource))
     Q_PRIVATE_SLOT(d_func(), void _q_resourceChanged(const QnResourcePtr &resource))
+
+    friend class ResourceSortFilterProxyModel;
 };
 
 

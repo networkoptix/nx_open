@@ -102,6 +102,29 @@ static QIcon iconForKey(quint32 key)
 #ifdef USE_OLD_RESOURCEMODEL
 static inline QIcon iconForResource(quint32 m_flags, QnResource::Status m_status)
 #else
+
+Node::Node(const QnResourcePtr &resource)
+{
+    m_id = resource->getId();
+    m_parentId = resource->getParentId();
+    m_flags = resource->flags();
+    m_status = resource->getStatus();
+    m_name = resource->getName();
+    m_searchString = resource->toSearchString();
+}
+
+void Node::updateFromResource(const QnResourcePtr &resource)
+{
+    m_status = resource->getStatus();
+    m_name = resource->getName();
+    m_searchString = resource->toSearchString();
+}
+
+QnResourcePtr Node::resource() const
+{
+    return qnResPool->getResourceById(m_id);
+}
+
 QIcon Node::icon() const
 #endif
 {
@@ -131,51 +154,23 @@ QIcon Node::icon() const
     return iconForKey(key);
 }
 
-#ifndef USE_OLD_RESOURCEMODEL
-static void getNodeList(QList<Node *> *infos)
-{
-    const QnResourceList resources = qnResPool->getResources(); // make a snapshot
-    foreach (const QnResourcePtr &server, resources) {
-        if (server->checkFlag(QnResource::server)) {
-            //_q_addResource(server);
-            infos->append(ResourceModelPrivate::createNode(server));
-            const QnId serverId = server->getId();
-            foreach (const QnResourcePtr &resource, resources) {
-                if (resource->getParentId() == serverId && !resource->checkFlag(QnResource::server)) {
-                    //_q_addResource(resource);
-                    infos->append(ResourceModelPrivate::createNode(resource));
-                }
-            }
-        }
-    }
-}
-#endif
 
-
-ResourceModelPrivate::ResourceModelPrivate() : q_ptr(0)
+ResourceModelPrivate::ResourceModelPrivate()
+    : q_ptr(0)
 {
 }
 
 ResourceModelPrivate::~ResourceModelPrivate()
 {
 #ifndef USE_OLD_RESOURCEMODEL
-    abort();
-
-    nodes[0].remove(0); // mandatory!
-    qDeleteAll(nodes.value(0));
-    nodes.clear();
+    Q_ASSERT(!nodes.values().contains(&root));
+    qDeleteAll(nodes);
 #endif
-
-    q_ptr = 0;
 }
 
 void ResourceModelPrivate::init()
 {
     Q_Q(ResourceModel);
-
-#ifndef USE_OLD_RESOURCEMODEL
-    nodes[0].append(&root); // mandatory!
-#endif
 
     QHash<int, QByteArray> roles = q->roleNames();
     roles.insert(Qt::UserRole + 1, "id");
@@ -186,9 +181,6 @@ void ResourceModelPrivate::init()
     q->connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), q, SLOT(_q_removeResource(QnResourcePtr)));
     q->connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), q, SLOT(_q_resourceChanged(QnResourcePtr)));
 
-#ifndef USE_OLD_RESOURCEMODEL
-    // ### call refresh() instead
-#endif
     const QnResourceList resources = qnResPool->getResources(); // make a snapshot
     foreach (const QnResourcePtr &server, resources) {
         if (server->checkFlag(QnResource::server)) {
@@ -203,19 +195,6 @@ void ResourceModelPrivate::init()
 }
 
 #ifndef USE_OLD_RESOURCEMODEL
-Node *ResourceModelPrivate::createNode(const QnResourcePtr &resource)
-{
-    Node *node = q_check_ptr(new Node);
-    node->m_id = resource->getId();
-    node->m_parentId = resource->getParentId();
-    node->m_flags = resource->flags();
-    node->m_status = resource->getStatus();
-    node->m_name = resource->getName();
-    node->m_searchString = resource->toSearchString();
-
-    return node;
-}
-
 Node *ResourceModelPrivate::node(const QModelIndex &index) const
 {
     if (!index.isValid())
@@ -228,14 +207,21 @@ Node *ResourceModelPrivate::node(const QModelIndex &index) const
 
 Node *ResourceModelPrivate::node(const QnId &id) const
 {
-    if (id.isValid() && id != root.id()) {
-        foreach (Node *node, nodes.value(0)) {
-            if (id == node->id())
-                return node;
-        }
+    if (id.isValid()) {
+        if (Node *node = nodes.value(id, 0))
+            return node;
     }
-
     return const_cast<Node *>(&root);
+}
+
+QModelIndex ResourceModelPrivate::index(int row, int column, const QModelIndex &parent) const
+{
+    Node *parentNode = this->node(parent);
+    Q_ASSERT(parentNode);
+
+    Node *node = nodeTree.value(parentNode).at(row);
+    Q_ASSERT(node);
+    return q_func()->createIndex(row, column, node);
 }
 
 QModelIndex ResourceModelPrivate::index(Node *node, int column) const
@@ -246,7 +232,7 @@ QModelIndex ResourceModelPrivate::index(Node *node, int column) const
     Node *parentNode = this->node(node->parentId());
     Q_ASSERT(parentNode);
 
-    const int row = nodes.value(parentNode).indexOf(node);
+    const int row = nodeTree.value(parentNode).indexOf(node);
     Q_ASSERT(row >= 0);
     return q_func()->createIndex(row, column, node);
 }
@@ -260,24 +246,26 @@ void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
 
+    Q_ASSERT(resource && resource->getId().isValid());
+
     Node *node = this->node(resource);
     if (node && node != &root)
         return; // avoid duplicates
 
-    node = ResourceModelPrivate::createNode(resource);
+    node = new Node(resource);
     const QModelIndex parentIndex = this->index(node->parentId());
-/*    if ((node->flags() & QnResource::server) != QnResource::server && !parentIndex.isValid()) {
+    if ((node->flags() & QnResource::server) != QnResource::server && !parentIndex.isValid()) {
         qWarning("ResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
                  node->parentId(), node->id());
         delete node;
         return;
-    }*/
+    }
 
     const int row = q->rowCount(parentIndex); // ### optimize for dynamic sort
     q->beginInsertRows(parentIndex, row, row);
 
-    nodes[0].append(node);
-    nodes[this->node(parentIndex)].insert(row, 1, node);
+    nodes[node->id()] = node;
+    nodeTree[this->node(parentIndex)].insert(row, 1, node);
 
     q->endInsertRows();
 }
@@ -285,6 +273,8 @@ void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
 void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
+
+    Q_ASSERT(resource && resource->getId().isValid());
 
     Node *node = this->node(resource);
     if (!node || node == &root)
@@ -296,8 +286,8 @@ void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
     const int row = index.row();
     q->beginRemoveRows(parentIndex, row, row);
 
-    nodes[0].remove(nodes.value(0).indexOf(node));
-    nodes[this->node(parentIndex)].remove(row, 1);
+    nodes.remove(node->id());
+    nodeTree[this->node(parentIndex)].remove(row, 1);
 
     q->endRemoveRows();
 }
@@ -306,13 +296,13 @@ void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
 
+    Q_ASSERT(resource && resource->getId().isValid());
+
     Node *node = this->node(resource);
     if (!node || node == &root)
         return; // nothing to change
 
-    Node *tmpNode = ResourceModelPrivate::createNode(resource);
-    *node = *tmpNode;
-    delete tmpNode;
+    node->updateFromResource(resource);
 
     const QModelIndex index = this->index(node);
     Q_EMIT q->dataChanged(index, index);
@@ -413,7 +403,7 @@ QModelIndex ResourceModel::index(const QnResourcePtr &resource) const
 QnResourcePtr ResourceModel::resource(const QModelIndex &index) const
 {
     Node *node = d_func()->node(index);
-    return node ? qnResPool->getResourceById(node->id()) : QnResourcePtr(0);
+    return node ? node->resource() : QnResourcePtr(0);
 }
 
 QModelIndex ResourceModel::index(const QnResourcePtr &resource) const
@@ -429,8 +419,7 @@ QModelIndex ResourceModel::index(int row, int column, const QModelIndex &parent)
     Q_D(const ResourceModel);
     if (row < 0 || column < 0 || row >= rowCount(parent) || column >= columnCount(parent))
         return QModelIndex();
-    Node *node = d->nodes.value(d->node(parent)).at(row);
-    return createIndex(row, column, node);
+    return d->index(row, column, parent);
 }
 
 /*!
@@ -468,7 +457,7 @@ int ResourceModel::rowCount(const QModelIndex &parent) const
     if (parent.column() > 0)
         return 0;
     Node *node = d->node(parent);
-    return d->nodes.value(node).size();
+    return d->nodeTree.value(node).size();
 }
 
 /*!
@@ -682,7 +671,7 @@ bool ResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction actio
     // decode and insert
     QnResourceList resources;
     if (!mimeData->hasFormat(format))
-       resources += deserializeResources(mimeData->data(format));
+        resources += deserializeResources(mimeData->data(format));
     else if (mimeData->hasUrls())
         resources += QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
     foreach (const QnResourcePtr &resource, resources) {
@@ -702,25 +691,29 @@ Qt::DropActions ResourceModel::supportedDropActions() const
 }
 
 
-bool ResourceSortFilterProxyModelPrivate::matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
-                                                         int source_row, const QModelIndex &source_parent) const
+ResourceSortFilterProxyModelPrivate::ResourceSortFilterProxyModelPrivate()
+    : q_ptr(0)
+{
+}
+
+bool ResourceSortFilterProxyModelPrivate::matchesFilters(const QRegExp filters[], Node *node, int source_row, const QModelIndex &source_parent) const
 {
     Q_Q(const ResourceSortFilterProxyModel);
 
     if (!filters[Id].isEmpty()) {
-        const QString id = QString::number(resource->getId());
+        const QString id = QString::number(node->id());
         if (filters[Id].exactMatch(id))
             return true;
     }
 
     if (!filters[Name].isEmpty()) {
-        const QString name = resource->getName();
+        const QString name = node->name();
         if (filters[Name].exactMatch(name))
             return true;
     }
 
     if (!filters[Tags].isEmpty()) {
-        QString tags = resource->tagList().join(QLatin1String("\",\""));
+        QString tags = node->resource()->tagList().join(QLatin1String("\",\""));
         if (!tags.isEmpty())
             tags = QLatin1Char('"') + tags + QLatin1Char('"');
         if (filters[Tags].exactMatch(tags))
@@ -875,19 +868,19 @@ bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModel
     if (d->parsedFilterString.isEmpty())
         return false;
 
-    QnResourcePtr resource = resourceModel->resource(resourceModel->index(source_row, 0, source_parent));
-    if (!resource)
+    Node *node = resourceModel->d_func()->node(resourceModel->index(source_row, 0, source_parent));
+    if (!node || node->id() == 0)
         return false;
 
-    if (d->matchesFilters(d->negfilters, resource, source_row, source_parent))
+    if (d->matchesFilters(d->negfilters, node, source_row, source_parent))
         return false;
 
     if (d->flagsFilter != 0) {
-        if ((resource->flags() & d->flagsFilter) != 0)
+        if ((node->flags() & d->flagsFilter) != 0)
             return true;
     }
 
-    if (d->matchesFilters(d->filters, resource, source_row, source_parent))
+    if (d->matchesFilters(d->filters, node, source_row, source_parent))
         return true;
 
     return false;
