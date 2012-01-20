@@ -20,9 +20,8 @@ public:
         DEFAULT = 0,
         CHECKED = 0x1,
         HOVERED = 0x2,
-        FLAGS_MAX = 0x3,
-
-        CHECKED_HOVERED = CHECKED | HOVERED
+        DISABLED = 0x4,
+        FLAGS_MAX = 0x7
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag);
 
@@ -40,6 +39,10 @@ public:
 
     bool isHovered() const { return state() & HOVERED; }
 
+    bool isDisabled() const { return state() & DISABLED; }
+
+    bool isEnabled() const { return !isEnabled(); }
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     qreal animationSpeed() const;
@@ -49,11 +52,14 @@ public:
 public Q_SLOTS:
     void setCheckable(bool checkable);
     void setChecked(bool checked);
+    void setEnabled(bool enabled = true);
+    void setDisabled(bool disabled = false);
     inline void toggle() { setChecked(!isChecked()); }
 
 Q_SIGNALS:
-    void clicked();
+    void clicked(bool checked = false);
     void toggled(bool checked);
+    void enabled();
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;

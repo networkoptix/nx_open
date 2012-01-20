@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QCursor>
 #include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <ui/animation/accessor.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/instrument_manager.h>
@@ -50,7 +51,6 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     m_animator = new VariantAnimator(this);
     m_animator->setTargetObject(this);
     m_animator->setAccessor(new QnImageButtonHoverProgressAccessor());
-    m_animator->setTimer(InstrumentManager::animationTimerOf(scene()));
 
     /* When hovering over a button, a cursor should always change to arrow pointer. */
     setCursor(Qt::ArrowCursor);
@@ -93,6 +93,20 @@ void QnImageButtonWidget::setChecked(bool checked)
     update();
 }
 
+void QnImageButtonWidget::setEnabled(bool enabled)
+{
+    setDisabled(!enabled);
+}
+
+void QnImageButtonWidget::setDisabled(bool disabled)
+{
+    if(isDisabled() == disabled)
+        return;
+
+    updateState(disabled ? (m_state | DISABLED) : (m_state & ~DISABLED));
+    update();
+}
+
 qreal QnImageButtonWidget::animationSpeed() const {
     return m_animator->speed();
 }
@@ -129,8 +143,11 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
-    Q_EMIT clicked();
+    if(isDisabled())
+        return;
+
     toggle();
+    Q_EMIT clicked(isChecked());
 }
 
 void QnImageButtonWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
@@ -166,19 +183,44 @@ QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVaria
 const QPixmap &QnImageButtonWidget::actualPixmap(StateFlags flags) {
     const QPixmap &standard = m_pixmaps[0];
 
+    /* Some compilers don't allow expressions in case labels, so we have to
+     * precalculate them. */
+    enum {
+        CHECKED_HOVERED_DISABLED = CHECKED | HOVERED | DISABLED,
+        CHECKED_HOVERED = CHECKED | HOVERED,
+        CHECKED_DISABLED = CHECKED | DISABLED,
+        HOVERED_DISABLED = HOVERED | DISABLED,
+    };
+
     switch(flags) {
 #define TRY(FLAGS)                                                              \
         if(!m_pixmaps[(FLAGS)].isNull())                                        \
             return m_pixmaps[(FLAGS)];
+    case CHECKED_HOVERED_DISABLED:
+        TRY(CHECKED | HOVERED | DISABLED);
+        TRY(CHECKED | DISABLED);
+        TRY(CHECKED);
+        return standard;
     case CHECKED_HOVERED:
         TRY(CHECKED | HOVERED);
         TRY(CHECKED);
+        return standard;
+    case CHECKED_DISABLED:
+        TRY(CHECKED | DISABLED);
+        TRY(CHECKED);
+        return standard;
+    case HOVERED_DISABLED:
+        TRY(HOVERED | DISABLED);
+        TRY(DISABLED);
         return standard;
     case CHECKED:
         TRY(CHECKED);
         return standard;
     case HOVERED:
         TRY(HOVERED);
+        return standard;
+    case DISABLED:
+        TRY(DISABLED);
         return standard;
     case 0:
         return standard;

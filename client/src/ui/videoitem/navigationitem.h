@@ -18,6 +18,7 @@ class TimeSlider;
 class VolumeSlider;
 class GraphicsLabel;
 class QnAbstractRenderer;
+class QnImageButtonWidget;
 
 class NavigationItem : public QGraphicsWidget
 {
@@ -59,7 +60,6 @@ protected:
 private Q_SLOTS:
     void setSyncMode(bool value);
 
-    void setLiveMode(bool value);
     void onLiveModeChanged(bool value);
     void pause();
     void play();
@@ -90,6 +90,9 @@ private Q_SLOTS:
 
     void updateMotionPeriods(const QnTimePeriod& period);
     void onDisplayingStateChanged(QnResourcePtr, bool);
+
+    void at_liveButton_clicked(bool checked);
+
 protected:
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
@@ -110,7 +113,7 @@ private:
     ImageButton *m_playButton;
     ImageButton *m_stepForwardButton;
     ImageButton *m_forwardButton;
-    ImageButton *m_liveButton;
+    QnImageButtonWidget *m_liveButton;
     ImageButton *m_mrsButton;
     ImageButton *m_syncButton;
     SpeedSlider *m_speedSlider;

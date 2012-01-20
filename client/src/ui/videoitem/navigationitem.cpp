@@ -19,6 +19,7 @@
 #include "ui/widgets/speedslider.h"
 #include "ui/widgets/volumeslider.h"
 #include "ui/widgets/tooltipitem.h"
+#include "ui/graphics/items/image_button_widget.h"
 
 #include "ui/widgets2/graphicslabel.h"
 
@@ -197,17 +198,22 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_muteButton->setCheckable(true);
     m_muteButton->setChecked(m_volumeSlider->isMute());
 
-    m_liveButton = new ImageButton(this);
+    m_liveButton = new QnImageButtonWidget(this);
     m_liveButton->setObjectName("LiveButton");
-    m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
+    m_liveButton->setPixmap(0,                              Skin::pixmap(QLatin1String("live.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::HOVERED,   Skin::pixmap(QLatin1String("live_hovered.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::CHECKED,   Skin::pixmap(QLatin1String("live_checked.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::DISABLED,  Skin::pixmap(QLatin1String("live_disabled.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("live_disabled.png")));
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setMaximumSize(m_liveButton->preferredSize());
+    m_liveButton->setMinimumSize(m_liveButton->preferredSize());
     m_liveButton->setCheckable(true);
     m_liveButton->setChecked(m_camera && m_camera->getCamCamDisplay()->isRealTimeSource());
-    m_liveButton->setEnabled(false);
-    m_liveButton->hide();
+    m_liveButton->setAnimationSpeed(4.0);
+    //m_liveButton->setEnabled(false);
 
-    connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(setLiveMode(bool)));
+    connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(at_liveButton_clicked(bool)));
 
     m_mrsButton = new ImageButton(this);
     m_mrsButton->setObjectName("MRSButton");
@@ -355,6 +361,7 @@ void NavigationItem::addReserveCamera(CLVideoCamera *camera)
 
     updateActualCamera();
     m_forceTimePeriodLoading = !updateRecPeriodList(true);
+    m_liveButton->setEnabled(true);
 }
 
 void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
@@ -367,6 +374,8 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
     if (netRes)
         m_motionPeriodLoader.remove(netRes);
     repaintMotionPeriods();
+    if(m_reserveCameras.empty())
+        m_liveButton->setEnabled(false);
 }
 
 void NavigationItem::updateActualCamera()
@@ -424,14 +433,6 @@ void NavigationItem::setSyncMode(bool value)
     // ###
 }
 
-void NavigationItem::setLiveMode(bool value)
-{
-    if (m_camera && value == m_camera->getCamCamDisplay()->isRealTimeSource())
-        return;
-
-    m_timeSlider->setCurrentValue(value ? DATETIME_NOW : m_timeSlider->minimumValue());
-}
-
 void NavigationItem::onLiveModeChanged(bool value)
 {
     m_timeSlider->setLiveMode(value);
@@ -481,7 +482,7 @@ void NavigationItem::updateSlider()
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    m_liveButton->setVisible(!reader->isMediaPaused() && m_camera->getCamCamDisplay()->isRealTimeSource());
+    m_liveButton->setChecked(!reader->isMediaPaused() && m_camera->getCamCamDisplay()->isRealTimeSource());
 }
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
@@ -726,7 +727,6 @@ void NavigationItem::pause()
 
     reader->pauseMedia();
     m_camera->getCamCamDisplay()->pauseAudio();
-    m_liveButton->hide();
     m_mrsButton->hide();
 
     reader->setSingleShotMode(true);
@@ -974,4 +974,22 @@ void NavigationItem::setPlaying(bool playing)
 void NavigationItem::togglePlayPause()
 {
     setPlaying(!m_playing);
+}
+
+void NavigationItem::at_liveButton_clicked(bool checked)
+{
+    if (m_camera && checked == m_camera->getCamCamDisplay()->isRealTimeSource()) {
+        qnWarning("Camera live state and live button state are not in sync, investigate.");
+        return;
+    }
+
+    if(!checked) {
+        m_liveButton->toggle(); /* Don't allow jumps back from live. */
+        return;
+    }
+
+    m_timeSlider->setLiveMode(true);
+    m_timeSlider->setCurrentValue(m_timeSlider->maximumValue());
+    smartSeek(DATETIME_NOW);
+    //m_timeSlider->setCurrentValue(checked ? DATETIME_NOW : m_timeSlider->minimumValue());
 }
