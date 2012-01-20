@@ -55,10 +55,13 @@ void QueueFileWriter::run()
 
 QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int minBufferSize): 
     QnFile(fileName), 
-    m_bufferSize(fileBlockSize+minBufferSize) 
+    m_bufferSize(fileBlockSize+minBufferSize),
+    m_buffer(0)
+
 {
     m_minBufferSize = minBufferSize;
-    m_buffer = (quint8*) qMallocAligned(m_bufferSize, SECTOR_SIZE);
+    if (m_bufferSize > 0)
+        m_buffer = (quint8*) qMallocAligned(m_bufferSize, SECTOR_SIZE);
     m_bufferLen = 0;
     m_bufferPos = 0;
     m_totalWrited = 0;
