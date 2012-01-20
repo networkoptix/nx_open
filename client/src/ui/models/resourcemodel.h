@@ -60,6 +60,7 @@ private:
 
 #include <QtGui/QSortFilterProxyModel>
 
+class ResourceSortFilterProxyModelPrivate;
 class ResourceSortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -74,23 +75,9 @@ protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 
 private:
-    bool matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
-                        QAbstractItemModel *sourceModel, int source_row, const QModelIndex &source_parent) const;
-    void parseFilterString();
-    void buildFilters(const QSet<QString> parts[], QRegExp *filters);
-
-private:
     Q_DISABLE_COPY(ResourceSortFilterProxyModel)
-
-    QString m_parsedFilterString;
-    uint m_flagsFilter;
-
-    enum FilterCategory {
-        Text, Name, Tags, Id,
-        NumFilterCategories
-    };
-    QRegExp m_negfilters[NumFilterCategories];
-    QRegExp m_filters[NumFilterCategories];
+    Q_DECLARE_PRIVATE(ResourceSortFilterProxyModel)
+    const QScopedPointer<ResourceSortFilterProxyModelPrivate> d_ptr;
 };
 
 #endif // RESOURCEMODEL_H

@@ -702,27 +702,11 @@ Qt::DropActions ResourceModel::supportedDropActions() const
 }
 
 
-ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
+bool ResourceSortFilterProxyModelPrivate::matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
+                                                         int source_row, const QModelIndex &source_parent) const
 {
-    parseFilterString();
-}
+    Q_Q(const ResourceSortFilterProxyModel);
 
-QnResourcePtr ResourceSortFilterProxyModel::resourceFromIndex(const QModelIndex &index) const
-{
-    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
-    return resourceModel ? resourceModel->resource(mapToSource(index)) : QnResourcePtr(0);
-}
-
-QModelIndex ResourceSortFilterProxyModel::indexFromResource(const QnResourcePtr &resource) const
-{
-    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
-    return resourceModel ? mapFromSource(resourceModel->index(resource)) : QModelIndex();
-}
-
-bool ResourceSortFilterProxyModel::matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
-                                                  QAbstractItemModel *sourceModel, int source_row, const QModelIndex &source_parent) const
-{
     if (!filters[Id].isEmpty()) {
         const QString id = QString::number(resource->getId());
         if (filters[Id].exactMatch(id))
@@ -744,18 +728,19 @@ bool ResourceSortFilterProxyModel::matchesFilters(const QRegExp filters[], const
     }
 
     if (!filters[Text].isEmpty()) {
-        const int filter_role = filterRole();
-        const int filter_column = filterKeyColumn();
+        Q_ASSERT(source_parent.isValid()); // checked in filterAcceptsRow()
+        const int filter_role = q->filterRole();
+        const int filter_column = q->filterKeyColumn();
         if (filter_column == -1) {
-            const int columnCount = sourceModel->columnCount(source_parent);
+            const int columnCount = source_parent.model()->columnCount(source_parent);
             for (int column = 0; column < columnCount; ++column) {
-                const QModelIndex source_index = sourceModel->index(source_row, column, source_parent);
+                const QModelIndex source_index = source_parent.child(source_row, column);
                 const QString text = source_index.data(filter_role).toString();
                 if (filters[Text].exactMatch(text))
                     return true;
             }
         } else {
-            const QModelIndex source_index = sourceModel->index(source_row, filter_column, source_parent);
+            const QModelIndex source_index = source_parent.child(source_row, filter_column);
             if (source_index.isValid()) { // the column may not exist
                 const QString text = source_index.data(filter_role).toString();
                 if (filters[Text].exactMatch(text))
@@ -767,66 +752,57 @@ bool ResourceSortFilterProxyModel::matchesFilters(const QRegExp filters[], const
     return false;
 }
 
-bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
-{
-    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
-    if (!resourceModel)
-        return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
-
-    if (!source_parent.isValid())
-        return true; // include root nodes
-
-    if (m_parsedFilterString != filterRegExp().pattern())
-        const_cast<ResourceSortFilterProxyModel *>(this)->parseFilterString();
-    if (m_parsedFilterString.isEmpty())
-        return false;
-
-    QnResourcePtr resource = resourceModel->resource(resourceModel->index(source_row, 0, source_parent));
-    if (!resource)
-        return false;
-
-    if (matchesFilters(m_negfilters, resource, sourceModel(), source_row, source_parent))
-        return false;
-
-    if (m_flagsFilter != 0) {
-        if (resource->flags() & m_flagsFilter)
-            return true;
-    }
-
-    if (matchesFilters(m_filters, resource, sourceModel(), source_row, source_parent))
-        return true;
-
-    return false;
-}
-
-static inline QString normalizedFilterString(const QString &str)
+QString ResourceSortFilterProxyModelPrivate::normalizedFilterString(const QString &str)
 {
     QString ret = str;
     ret.replace(QLatin1Char('"'), QString());
     return ret;
 }
 
-void ResourceSortFilterProxyModel::parseFilterString()
+void ResourceSortFilterProxyModelPrivate::buildFilters(const QSet<QString> parts[], QRegExp *filters)
 {
-    m_flagsFilter = 0;
+    for (uint i = 0; i < NumFilterCategories; ++i) {
+        if (!parts[i].isEmpty()) {
+            QString pattern;
+            foreach (const QString &part, parts[i]) {
+                if (!pattern.isEmpty())
+                    pattern += QLatin1Char('|');
+                pattern += QRegExp::escape(part);
+            }
+            pattern = QLatin1Char('(') + pattern + QLatin1Char(')');
+            if (i < Id) {
+                pattern = QLatin1String(".*") + pattern + QLatin1String(".*");
+                filters[i] = QRegExp(pattern, Qt::CaseInsensitive, QRegExp::RegExp2);
+            } else {
+                filters[i] = QRegExp(pattern, Qt::CaseSensitive, QRegExp::RegExp2);
+            }
+        }
+    }
+}
+
+void ResourceSortFilterProxyModelPrivate::parseFilterString()
+{
+    Q_Q(ResourceSortFilterProxyModel);
+
+    flagsFilter = 0;
     for (uint i = 0; i < NumFilterCategories; ++i) {
          // ### don't invalidate filters which weren't changed
-        m_filters[i] = QRegExp();
-        m_negfilters[i] = QRegExp();
+        filters[i] = QRegExp();
+        negfilters[i] = QRegExp();
     }
 
-    m_parsedFilterString = filterRegExp().pattern();
-    if (m_parsedFilterString.isEmpty())
+    parsedFilterString = q->filterRegExp().pattern();
+    if (parsedFilterString.isEmpty())
         return;
 
-    const QRegExp::PatternSyntax patternSyntax = filterRegExp().patternSyntax();
+    const QRegExp::PatternSyntax patternSyntax = q->filterRegExp().patternSyntax();
     if (patternSyntax != QRegExp::FixedString && patternSyntax != QRegExp::Wildcard && patternSyntax != QRegExp::WildcardUnix)
         return;
 
-    QSet<QString> filters[NumFilterCategories];
-    QSet<QString> negfilters[NumFilterCategories];
+    QSet<QString> filters_[NumFilterCategories];
+    QSet<QString> negfilters_[NumFilterCategories];
 
-    const QString filterString = normalizedFilterString(m_parsedFilterString);
+    const QString filterString = normalizedFilterString(parsedFilterString);
     QRegExp rx(QLatin1String("(\\W?)(\\w+:)?(\\w*)"), Qt::CaseSensitive, QRegExp::RegExp2);
     int pos = 0;
     while ((pos = rx.indexIn(filterString, pos)) != -1) {
@@ -850,37 +826,71 @@ void ResourceSortFilterProxyModel::parseFilterString()
                 category = Tags;
         } else {
             if (pattern == QLatin1String("live"))
-                m_flagsFilter |= QnResource::live;
+                flagsFilter |= QnResource::live;
         }
         if (sign == QLatin1String("-"))
-            negfilters[category].insert(pattern);
+            negfilters_[category].insert(pattern);
         else
-            filters[category].insert(pattern);
+            filters_[category].insert(pattern);
     }
 
-    buildFilters(filters, m_filters);
-    buildFilters(negfilters, m_negfilters);
+    buildFilters(filters_, filters);
+    buildFilters(negfilters_, negfilters);
 }
 
-void ResourceSortFilterProxyModel::buildFilters(const QSet<QString> parts[], QRegExp *filters)
+
+ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent)
+    : QSortFilterProxyModel(parent), d_ptr(new ResourceSortFilterProxyModelPrivate)
 {
-    for (uint i = 0; i < NumFilterCategories; ++i) {
-        if (!parts[i].isEmpty()) {
-            QString pattern;
-            foreach (const QString &part, parts[i]) {
-                if (!pattern.isEmpty())
-                    pattern += QLatin1Char('|');
-                pattern += QRegExp::escape(part);
-            }
-            pattern = QLatin1Char('(') + pattern + QLatin1Char(')');
-            if (i < Id) {
-                pattern = QLatin1String(".*") + pattern + QLatin1String(".*");
-                filters[i] = QRegExp(pattern, Qt::CaseInsensitive, QRegExp::RegExp2);
-            } else {
-                filters[i] = QRegExp(pattern, Qt::CaseSensitive, QRegExp::RegExp2);
-            }
-        }
+    Q_D(ResourceSortFilterProxyModel);
+    d->q_ptr = this;
+    d->parseFilterString();
+}
+
+QnResourcePtr ResourceSortFilterProxyModel::resourceFromIndex(const QModelIndex &index) const
+{
+    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
+    return resourceModel ? resourceModel->resource(mapToSource(index)) : QnResourcePtr(0);
+}
+
+QModelIndex ResourceSortFilterProxyModel::indexFromResource(const QnResourcePtr &resource) const
+{
+    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
+    return resourceModel ? mapFromSource(resourceModel->index(resource)) : QModelIndex();
+}
+
+bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    Q_D(const ResourceSortFilterProxyModel);
+
+    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
+    if (!resourceModel)
+        return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+
+    if (!source_parent.isValid())
+        return true; // include root nodes
+
+    if (d->parsedFilterString != filterRegExp().pattern())
+        const_cast<ResourceSortFilterProxyModelPrivate *>(d)->parseFilterString();
+    if (d->parsedFilterString.isEmpty())
+        return false;
+
+    QnResourcePtr resource = resourceModel->resource(resourceModel->index(source_row, 0, source_parent));
+    if (!resource)
+        return false;
+
+    if (d->matchesFilters(d->negfilters, resource, source_row, source_parent))
+        return false;
+
+    if (d->flagsFilter != 0) {
+        if ((resource->flags() & d->flagsFilter) != 0)
+            return true;
     }
+
+    if (d->matchesFilters(d->filters, resource, source_row, source_parent))
+        return true;
+
+    return false;
 }
 
 #include "moc_resourcemodel.cpp"

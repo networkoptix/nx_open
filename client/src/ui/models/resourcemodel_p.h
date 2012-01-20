@@ -86,12 +86,42 @@ public:
     void _q_removeResource(const QnResourcePtr &resource);
     void _q_resourceChanged(const QnResourcePtr &resource);
 
+private:
     ResourceModel *q_ptr;
 
 #ifndef USE_OLD_RESOURCEMODEL
     Node root;
     QHash<Node *, QVector<Node *> > nodes;
 #endif
+};
+
+
+class ResourceSortFilterProxyModelPrivate
+{
+    Q_DECLARE_PUBLIC(ResourceSortFilterProxyModel)
+
+public:
+    ResourceSortFilterProxyModelPrivate() : q_ptr(0) {}
+
+    bool matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
+                        int source_row, const QModelIndex &source_parent) const;
+
+    static QString normalizedFilterString(const QString &str);
+    static void buildFilters(const QSet<QString> parts[], QRegExp *filters);
+    void parseFilterString();
+
+private:
+    ResourceSortFilterProxyModel *q_ptr;
+
+    QString parsedFilterString;
+    uint flagsFilter;
+
+    enum FilterCategory {
+        Text, Name, Tags, Id,
+        NumFilterCategories
+    };
+    QRegExp negfilters[NumFilterCategories];
+    QRegExp filters[NumFilterCategories];
 };
 
 #endif // RESOURCEMODEL_P_H
