@@ -211,7 +211,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_liveButton->setCheckable(true);
     m_liveButton->setChecked(m_camera && m_camera->getCamCamDisplay()->isRealTimeSource());
     m_liveButton->setAnimationSpeed(4.0);
-    //m_liveButton->setEnabled(false);
+    m_liveButton->setEnabled(false);
 
     connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(at_liveButton_clicked(bool)));
 
@@ -249,7 +249,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_timeLabel = new GraphicsLabel(this);
     m_timeLabel->setObjectName("TimeLabel");
-    m_timeLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed, QSizePolicy::Label);
+    m_timeLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Label);
     {
         QPalette pal = m_timeLabel->palette();
         pal.setColor(QPalette::Window, QColor(0, 0, 0, 0));
@@ -280,25 +280,31 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     leftLayoutV->addItem(buttonsLayout);
     leftLayoutV->setAlignment(buttonsLayout, Qt::AlignBottom);
 
-    QGraphicsLinearLayout *rightSublayoutV = new QGraphicsLinearLayout(Qt::Vertical);
-    rightSublayoutV->setContentsMargins(0, 0, 0, 0);
-    rightSublayoutV->setSpacing(0);
-    rightSublayoutV->addItem(m_syncButton);
-    rightSublayoutV->setAlignment(m_syncButton, Qt::AlignCenter);
-    rightSublayoutV->addItem(m_mrsButton);
-    rightSublayoutV->setAlignment(m_mrsButton, Qt::AlignCenter);
-    rightSublayoutV->addItem(m_liveButton);
-    rightSublayoutV->setAlignment(m_liveButton, Qt::AlignCenter);
+    QGraphicsLinearLayout *rightSublayoutVL = new QGraphicsLinearLayout(Qt::Vertical);
+    rightSublayoutVL->setContentsMargins(0, 0, 0, 0);
+    rightSublayoutVL->setSpacing(0);
+    rightSublayoutVL->addItem(m_timeLabel);
+    rightSublayoutVL->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
+    rightSublayoutVL->addItem(m_mrsButton);
+    rightSublayoutVL->setAlignment(m_mrsButton, Qt::AlignCenter);
+
+    QGraphicsLinearLayout *rightSublayoutVR = new QGraphicsLinearLayout(Qt::Vertical);
+    rightSublayoutVR->setContentsMargins(0, 0, 0, 0);
+    rightSublayoutVR->setSpacing(0);
+    rightSublayoutVR->addItem(m_syncButton);
+    rightSublayoutVR->setAlignment(m_syncButton, Qt::AlignCenter);
+    rightSublayoutVR->addItem(m_liveButton);
+    rightSublayoutVR->setAlignment(m_liveButton, Qt::AlignCenter);
 
     QGraphicsLinearLayout *rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutH->setContentsMargins(0, 0, 0, 0);
     rightLayoutH->setSpacing(3);
-    rightLayoutH->addItem(m_timeLabel);
-    rightLayoutH->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
-    rightLayoutH->addItem(rightSublayoutV);
-    rightLayoutH->setAlignment(rightSublayoutV, Qt::AlignCenter);
+    rightLayoutH->addItem(rightSublayoutVL);
+    rightLayoutH->setAlignment(rightSublayoutVL, Qt::AlignLeft | Qt::AlignVCenter);
+    rightLayoutH->addItem(rightSublayoutVR);
+    rightLayoutH->setAlignment(rightSublayoutVR, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);
-    rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignVCenter);
+    rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignTop);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -307,9 +313,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     rightLayoutV->addItem(m_volumeSlider);
     rightLayoutV->setAlignment(m_volumeSlider, Qt::AlignCenter);
     rightLayoutV->addStretch();
-    rightLayoutV->setAlignment(rightLayoutH, Qt::AlignBottom);
-    rightLayoutV->addStretch();
     rightLayoutV->addItem(rightLayoutH);
+    rightLayoutV->setAlignment(rightLayoutH, Qt::AlignBottom);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
