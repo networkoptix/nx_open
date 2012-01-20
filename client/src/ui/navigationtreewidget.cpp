@@ -122,9 +122,6 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
 
-    m_resourcesTreeView->setModel(m_resourcesModel);
-    //QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
-
 
     QHBoxLayout *topLayout = new QHBoxLayout;
     topLayout->setSpacing(3);
@@ -132,7 +129,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     topLayout->addWidget(m_nextItemButton);
     topLayout->addWidget(m_filterLineEdit);
     topLayout->addWidget(m_clearFilterButton);
-#if 1
+
     QWidget *searchTab = new QWidget(this);
 
     QVBoxLayout *searchTabLayout = new QVBoxLayout;
@@ -149,18 +146,13 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
-#else
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->addLayout(topLayout);
-    mainLayout->addWidget(m_resourcesTreeView);
-    setLayout(mainLayout);
-#endif
 
     setMinimumWidth(180);
     setMaximumWidth(300);
 
-    setAcceptDrops(true);
+
+    m_resourcesTreeView->setModel(m_resourcesModel);
+    //QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
 }
 
 NavigationTreeWidget::~NavigationTreeWidget()
@@ -221,7 +213,6 @@ void NavigationTreeWidget::workbenchLayoutChanged()
         proxyModel->setFilterRole(Qt::UserRole + 2);
         proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         proxyModel->setDynamicSortFilter(true);
-        proxyModel->setSourceModel(m_resourcesModel);
         m_searchProxyModel = proxyModel;
         layout->setProperty("model", QVariant::fromValue(proxyModel)); // ###
     }
@@ -436,6 +427,9 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
         }
     }
 
+    if (m_searchProxyModel && m_searchProxyModel->sourceModel() != m_resourcesModel)
+        m_searchProxyModel->setSourceModel(m_resourcesModel);
+
     if (m_filterTimerId != 0)
         killTimer(m_filterTimerId);
     m_filterTimerId = 0; if (!filter.isEmpty() && filter.size() < 3) return; // ### remove after resource_widget initialization fixup
@@ -459,4 +453,3 @@ void NavigationTreeWidget::open()
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         itemActivated(index);
 }
-
