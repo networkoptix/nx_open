@@ -710,13 +710,14 @@ ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent)
 
 QnResourcePtr ResourceSortFilterProxyModel::resourceFromIndex(const QModelIndex &index) const
 {
-    return index.column() == 0 ? qnResPool->getResourceById(index.data(Qt::UserRole + 1).toInt()) : QnResourcePtr(0);
+    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
+    return resourceModel ? resourceModel->resource(mapToSource(index)) : QnResourcePtr(0);
 }
 
 QModelIndex ResourceSortFilterProxyModel::indexFromResource(const QnResourcePtr &resource) const
 {
-    const QModelIndexList indexList = match(index(0, 0), Qt::UserRole + 1, QVariant(resource->getId()), 1, Qt::MatchExactly | Qt::MatchRecursive);
-    return indexList.value(0);
+    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
+    return resourceModel ? mapFromSource(resourceModel->index(resource)) : QModelIndex();
 }
 
 bool ResourceSortFilterProxyModel::matchesFilters(const QRegExp filters[], const QnResourcePtr &resource,
@@ -768,6 +769,10 @@ bool ResourceSortFilterProxyModel::matchesFilters(const QRegExp filters[], const
 
 bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
+    ResourceModel *resourceModel = qobject_cast<ResourceModel *>(sourceModel());
+    if (!resourceModel)
+        return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+
     if (!source_parent.isValid())
         return true; // include root nodes
 
@@ -776,7 +781,7 @@ bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModel
     if (m_parsedFilterString.isEmpty())
         return false;
 
-    QnResourcePtr resource = resourceFromIndex(sourceModel()->index(source_row, 0, source_parent));
+    QnResourcePtr resource = resourceModel->resource(resourceModel->index(source_row, 0, source_parent));
     if (!resource)
         return false;
 
