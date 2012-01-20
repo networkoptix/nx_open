@@ -11,6 +11,12 @@
         <?else?>
         <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
         <?endif?>
+
+        <?if $(env.CONFIG) = Debug ?>
+            <?define suffix = "d" ?>
+        <?else?>
+            <?define suffix = "" ?>
+        <?endif?>
         
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
@@ -190,15 +196,14 @@
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
-                                <File Id="ServerQtCored4.dll" Name="QtCored4.dll" Source="$(env.QTDIR)\bin\QtCored4.dll"/>
-                                <File Id="ServerQtGuid4.dll" Name="QtGuid4.dll" Source="$(env.QTDIR)\bin\QtGuid4.dll"/>
-                                <File Id="ServerQtMultimediad4.dll" Name="QtMultimediad4.dll" Source="$(env.QTDIR)\bin\QtMultimediad4.dll"/>
-                                <File Id="ServerQtNetworkd4.dll" Name="QtNetworkd4.dll" Source="$(env.QTDIR)\bin\QtNetworkd4.dll"/>
-                                <File Id="ServerQtOpenGLd4.dll" Name="QtOpenGLd4.dll" Source="$(env.QTDIR)\bin\QtOpenGLd4.dll"/>
-                                <File Id="ServerQtWebKitd4.dll" Name="QtWebKitd4.dll" Source="$(env.QTDIR)\bin\QtWebKitd4.dll"/>
-                                <File Id="ServerQtXmld4.dll" Name="QtXmld4.dll" Source="$(env.QTDIR)\bin\QtXmld4.dll"/>
-                                <File Id="ServerQtXmlPatternsd4.dll" Name="QtXmlPatternsd4.dll" Source="$(env.QTDIR)\bin\QtXmlPatternsd4.dll"/>
-                                <File Id="ServerPhonond4.dll" Name="phonond4.dll" Source="$(env.QTDIR)\bin\phonond4.dll"/>
+                                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
+                                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
+                                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll"/>
+                                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
+                                <File Id="ServerQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll"/>
+                                <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll"/>
+                                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
+                                <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
                             </Component>
                             
                             <Component Id="ServerXerces" Guid="{B81B02A6-9CC1-4b16-9E03-A4AD91624B5E}">
@@ -254,15 +259,14 @@
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
-                                <File Id="ClientQtCored4.dll" Name="QtCored4.dll" Source="$(env.QTDIR)\bin\QtCored4.dll"/>
-                                <File Id="ClientQtGuid4.dll" Name="QtGuid4.dll" Source="$(env.QTDIR)\bin\QtGuid4.dll"/>
-                                <File Id="ClientQtMultimediad4.dll" Name="QtMultimediad4.dll" Source="$(env.QTDIR)\bin\QtMultimediad4.dll"/>
-                                <File Id="ClientQtNetworkd4.dll" Name="QtNetworkd4.dll" Source="$(env.QTDIR)\bin\QtNetworkd4.dll"/>
-                                <File Id="ClientQtOpenGLd4.dll" Name="QtOpenGLd4.dll" Source="$(env.QTDIR)\bin\QtOpenGLd4.dll"/>
-                                <File Id="ClientQtWebKitd4.dll" Name="QtWebKitd4.dll" Source="$(env.QTDIR)\bin\QtWebKitd4.dll"/>
-                                <File Id="ClientQtXmld4.dll" Name="QtXmld4.dll" Source="$(env.QTDIR)\bin\QtXmld4.dll"/>
-                                <File Id="ClientQtXmlPatternsd4.dll" Name="QtXmlPatternsd4.dll" Source="$(env.QTDIR)\bin\QtXmlPatternsd4.dll"/>
-                                <File Id="ClientPhonond4.dll" Name="phonond4.dll" Source="$(env.QTDIR)\bin\phonond4.dll"/>
+                                <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
+                                <File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
+                                <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll"/>
+                                <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
+                                <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll"/>
+                                <File Id="ClientQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll"/>
+                                <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
+                                <File Id="ClientQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
                             </Component>
                             
                             <Component Id="ClientOpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
@@ -285,11 +289,7 @@
 
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
-        <?if $(env.CONFIG) = Debug ?>
-                                    <File Id="bespind.dll" Name="bespind.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespind.dll"/>
-        <?else?>
-                                    <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin.dll"/>
-        <?endif?>
+                                    <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll"/>
                                 </Component>
                             </Directory>
                             
