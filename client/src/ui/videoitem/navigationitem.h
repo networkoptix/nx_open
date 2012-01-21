@@ -18,6 +18,8 @@ class TimeSlider;
 class VolumeSlider;
 class GraphicsLabel;
 class QnAbstractRenderer;
+class QnAbstractArchiveReader;
+class QnImageButtonWidget;
 
 class NavigationItem : public QGraphicsWidget
 {
