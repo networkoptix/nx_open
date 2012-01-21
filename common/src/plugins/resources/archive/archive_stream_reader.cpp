@@ -539,7 +539,8 @@ begin_label:
 
 
     // ensure Pos At playback mask
-    if (m_runing && usePlaybackMask() && videoData && !videoData->ignore && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE))
+    if (m_runing && usePlaybackMask() && videoData && !videoData->ignore && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+        && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
