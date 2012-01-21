@@ -30,13 +30,13 @@ QnResourcePool *QnResourcePool::instance()
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    ResourceMap newResources; // sort by id
-
     QMutexLocker locker(&m_resourcesMtx);
 
     foreach (const QnResourcePtr &resource, resources) {
-        if (!resource->getParentId().isValid() && resource->checkFlag(QnResource::local))
-            resource->setParentId(localServer->getId());
+        if (!resource->getParentId().isValid()) {
+            if (resource->checkFlag(QnResource::local))
+                resource->setParentId(localServer->getId());
+        }
         if (!resource->getId().isValid()) {
             if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
                 resource->setId(existing->getId());
@@ -45,16 +45,18 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
     }
 
+    QMap<QnId, QnResourcePtr> newResources; // sort by id
+
     foreach (const QnResourcePtr &resource, resources) {
         /*if ((resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) {
             qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local neither remote)");
             continue; // ignore
         }*/
 
-        const QnId &resId = resource->getId();
-        if (!m_resources.contains(resId))
-        {
-            m_resources.insert(resId, resource);
+        const QnId resId = resource->getId();
+        if (!m_resources.contains(resId)) {
+            m_resources[resId] = resource;
+            m_resourceTree[resource->getParentId()].append(resource); // unsorted
             newResources.insert(resId, resource);
         }
     }
@@ -73,8 +75,14 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     QMutexLocker locker(&m_resourcesMtx);
 
     foreach (const QnResourcePtr &resource, resources) {
-        if (resource != localServer && m_resources.remove(resource->getId()) != 0)
+        if (resource == localServer) // special case
+            continue;
+
+        const QnId resId = resource->getId();
+        if (m_resources.remove(resId) != 0) {
+            m_resourceTree[resource->getParentId()].removeOne(resource);
             removedResources.append(resource);
+        }
     }
 
     foreach (const QnResourcePtr &resource, removedResources) {
@@ -91,24 +99,21 @@ void QnResourcePool::handleResourceChange()
     QMetaObject::invokeMethod(this, "resourceChanged", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
 }
 
+QnResourceList QnResourcePool::getResources() const
+{
+    QMutexLocker locker(&m_resourcesMtx);
+    return m_resources.values();
+}
+
 QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const
 {
-    if (id.isValid())
-    {
-        QMutexLocker locker(&m_resourcesMtx);
-        ResourceMap::const_iterator it = m_resources.constFind(id);
-        if (it != m_resources.constEnd())
-            return it.value();
-    }
-
-    return QnResourcePtr(0);
+    return m_resources.value(id, QnResourcePtr(0));
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources)
-    {
+    foreach (const QnResourcePtr &resource, m_resources) {
         if (resource->getUrl() == url)
             return resource;
     }
@@ -119,9 +124,8 @@ QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
 QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString &mac) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources)
-    {
-        QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
         if (netResource != 0 && netResource->getMAC().toString() == mac)
             return netResource;
     }
@@ -132,8 +136,7 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString &mac) con
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources)
-    {
+    foreach (const QnResourcePtr &resource, m_resources) {
         if (resource->getUniqueId() == id)
             return resource;
     }
@@ -143,20 +146,7 @@ QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
 
 bool QnResourcePool::hasSuchResouce(const QString &uniqid) const
 {
-    QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources)
-    {
-        if (resource->getUniqueId() == uniqid)
-            return true;
-    }
-
-    return false;
-}
-
-QnResourceList QnResourcePool::getResources() const
-{
-    QMutexLocker locker(&m_resourcesMtx);
-    return m_resources.values();
+    return !getResourceByUniqId(uniqid).isNull();
 }
 
 QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag) const
@@ -164,8 +154,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag) const
     QnResourceList result;
 
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources)
-    {
+    foreach (const QnResourcePtr &resource, m_resources) {
         if (resource->checkFlag(flag))
             result.append(resource);
     }
@@ -175,19 +164,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag) const
 
 QnResourceList QnResourcePool::getResourcesWithParentId(const QnId &id) const
 {
-    QnResourceList result;
-
-    if (id.isValid())
-    {
-        QMutexLocker locker(&m_resourcesMtx);
-        foreach (const QnResourcePtr &resource, m_resources)
-        {
-            if (resource->getParentId() == id)
-                result.append(resource);
-        }
-    }
-
-    return result;
+    return m_resourceTree.value(id);
 }
 
 

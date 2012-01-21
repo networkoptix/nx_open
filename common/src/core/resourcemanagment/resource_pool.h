@@ -2,7 +2,7 @@
 #define resource_pool_h_1537
 
 #include <QtCore/QList>
-#include <QtCore/QMap>
+#include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
 
@@ -79,9 +79,9 @@ private:
 
 private:
     mutable QMutex m_resourcesMtx;
-    typedef QMap<QnId, QnResourcePtr> ResourceMap;
-    ResourceMap m_resources;
     QnResourcePtr localServer;
+    QHash<QnId, QnResourcePtr> m_resources;
+    QHash<QnId, QnResourceList> m_resourceTree;
 };
 
 #endif //resource_pool_h_1537
