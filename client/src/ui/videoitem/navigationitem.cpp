@@ -19,6 +19,7 @@
 #include "ui/widgets/speedslider.h"
 #include "ui/widgets/volumeslider.h"
 #include "ui/widgets/tooltipitem.h"
+#include "ui/graphics/items/image_button_widget.h"
 
 #include "ui/widgets2/graphicslabel.h"
 
@@ -197,17 +198,22 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_muteButton->setCheckable(true);
     m_muteButton->setChecked(m_volumeSlider->isMute());
 
-    m_liveButton = new ImageButton(this);
+    m_liveButton = new QnImageButtonWidget(this);
     m_liveButton->setObjectName("LiveButton");
-    m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
+    m_liveButton->setPixmap(0,                              Skin::pixmap(QLatin1String("live.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::HOVERED,   Skin::pixmap(QLatin1String("live_hovered.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::CHECKED,   Skin::pixmap(QLatin1String("live_checked.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::DISABLED,  Skin::pixmap(QLatin1String("live_disabled.png")));
+    m_liveButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("live_disabled.png")));
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setMaximumSize(m_liveButton->preferredSize());
+    m_liveButton->setMinimumSize(m_liveButton->preferredSize());
     m_liveButton->setCheckable(true);
     m_liveButton->setChecked(m_camera && m_camera->getCamCamDisplay()->isRealTimeSource());
+    m_liveButton->setAnimationSpeed(4.0);
     m_liveButton->setEnabled(false);
-    m_liveButton->hide();
 
-    connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(setLiveMode(bool)));
+    connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(at_liveButton_clicked(bool)));
 
     m_mrsButton = new ImageButton(this);
     m_mrsButton->setObjectName("MRSButton");
@@ -244,7 +250,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_timeLabel = new GraphicsLabel(this);
     m_timeLabel->setObjectName("TimeLabel");
-    m_timeLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed, QSizePolicy::Label);
+    m_timeLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Label);
     {
         QPalette pal = m_timeLabel->palette();
         pal.setColor(QPalette::Window, QColor(0, 0, 0, 0));
@@ -275,25 +281,31 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     leftLayoutV->addItem(buttonsLayout);
     leftLayoutV->setAlignment(buttonsLayout, Qt::AlignBottom);
 
-    QGraphicsLinearLayout *rightSublayoutV = new QGraphicsLinearLayout(Qt::Vertical);
-    rightSublayoutV->setContentsMargins(0, 0, 0, 0);
-    rightSublayoutV->setSpacing(0);
-    rightSublayoutV->addItem(m_syncButton);
-    rightSublayoutV->setAlignment(m_syncButton, Qt::AlignCenter);
-    rightSublayoutV->addItem(m_mrsButton);
-    rightSublayoutV->setAlignment(m_mrsButton, Qt::AlignCenter);
-    rightSublayoutV->addItem(m_liveButton);
-    rightSublayoutV->setAlignment(m_liveButton, Qt::AlignCenter);
+    QGraphicsLinearLayout *rightSublayoutVL = new QGraphicsLinearLayout(Qt::Vertical);
+    rightSublayoutVL->setContentsMargins(0, 0, 0, 0);
+    rightSublayoutVL->setSpacing(0);
+    rightSublayoutVL->addItem(m_timeLabel);
+    rightSublayoutVL->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
+    rightSublayoutVL->addItem(m_mrsButton);
+    rightSublayoutVL->setAlignment(m_mrsButton, Qt::AlignCenter);
+
+    QGraphicsLinearLayout *rightSublayoutVR = new QGraphicsLinearLayout(Qt::Vertical);
+    rightSublayoutVR->setContentsMargins(0, 0, 0, 0);
+    rightSublayoutVR->setSpacing(0);
+    rightSublayoutVR->addItem(m_syncButton);
+    rightSublayoutVR->setAlignment(m_syncButton, Qt::AlignCenter);
+    rightSublayoutVR->addItem(m_liveButton);
+    rightSublayoutVR->setAlignment(m_liveButton, Qt::AlignCenter);
 
     QGraphicsLinearLayout *rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutH->setContentsMargins(0, 0, 0, 0);
     rightLayoutH->setSpacing(3);
-    rightLayoutH->addItem(m_timeLabel);
-    rightLayoutH->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
-    rightLayoutH->addItem(rightSublayoutV);
-    rightLayoutH->setAlignment(rightSublayoutV, Qt::AlignCenter);
+    rightLayoutH->addItem(rightSublayoutVL);
+    rightLayoutH->setAlignment(rightSublayoutVL, Qt::AlignLeft | Qt::AlignVCenter);
+    rightLayoutH->addItem(rightSublayoutVR);
+    rightLayoutH->setAlignment(rightSublayoutVR, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);
-    rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignVCenter);
+    rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignTop);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -302,9 +314,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     rightLayoutV->addItem(m_volumeSlider);
     rightLayoutV->setAlignment(m_volumeSlider, Qt::AlignCenter);
     rightLayoutV->addStretch();
-    rightLayoutV->setAlignment(rightLayoutH, Qt::AlignBottom);
-    rightLayoutV->addStretch();
     rightLayoutV->addItem(rightLayoutH);
+    rightLayoutV->setAlignment(rightLayoutH, Qt::AlignBottom);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
@@ -356,6 +367,7 @@ void NavigationItem::addReserveCamera(CLVideoCamera *camera)
 
     updateActualCamera();
     m_forceTimePeriodLoading = !updateRecPeriodList(true);
+    m_liveButton->setEnabled(true);
 }
 
 void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
@@ -368,6 +380,8 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
     if (netRes)
         m_motionPeriodLoader.remove(netRes);
     repaintMotionPeriods();
+    if(m_reserveCameras.empty())
+        m_liveButton->setEnabled(false);
 }
 
 void NavigationItem::updateActualCamera()
@@ -422,14 +436,6 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     emit actualCameraChanged(m_camera);
 }
 
-void NavigationItem::setLiveMode(bool value)
-{
-    if (m_camera && value == m_camera->getCamCamDisplay()->isRealTimeSource())
-        return;
-
-    m_timeSlider->setCurrentValue(value ? DATETIME_NOW : m_timeSlider->minimumValue());
-}
-
 void NavigationItem::onLiveModeChanged(bool value)
 {
     m_timeSlider->setLiveMode(value);
@@ -479,7 +485,7 @@ void NavigationItem::updateSlider()
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    m_liveButton->setVisible(!reader->isMediaPaused() && m_camera->getCamCamDisplay()->isRealTimeSource());
+    m_liveButton->setChecked(!reader->isMediaPaused() && m_camera->getCamCamDisplay()->isRealTimeSource());
 }
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
@@ -764,7 +770,6 @@ void NavigationItem::pause()
 
     reader->pauseMedia();
     m_camera->getCamCamDisplay()->pauseAudio();
-    m_liveButton->hide();
     m_mrsButton->hide();
 
     reader->setSingleShotMode(true);
@@ -1012,6 +1017,24 @@ void NavigationItem::setPlaying(bool playing)
 void NavigationItem::togglePlayPause()
 {
     setPlaying(!m_playing);
+}
+
+void NavigationItem::at_liveButton_clicked(bool checked)
+{
+    if (m_camera && checked == m_camera->getCamCamDisplay()->isRealTimeSource()) {
+        qnWarning("Camera live state and live button state are not in sync, investigate.");
+        return;
+    }
+
+    if(!checked) {
+        m_liveButton->toggle(); /* Don't allow jumps back from live. */
+        return;
+    }
+
+    m_timeSlider->setLiveMode(true);
+    m_timeSlider->setCurrentValue(m_timeSlider->maximumValue());
+    smartSeek(DATETIME_NOW);
+    //m_timeSlider->setCurrentValue(checked ? DATETIME_NOW : m_timeSlider->minimumValue());
 }
 
 void NavigationItem::onSyncButtonToggled(bool value)

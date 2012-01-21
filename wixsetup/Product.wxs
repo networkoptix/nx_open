@@ -11,6 +11,12 @@
         <?else?>
         <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
         <?endif?>
+
+        <?if $(env.CONFIG) = Debug ?>
+            <?define suffix = "d" ?>
+        <?else?>
+            <?define suffix = "" ?>
+        <?endif?>
         
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
@@ -44,7 +50,14 @@
         <Property Id="SERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="SERVER_RTSP_PORT" Secure="yes" Value="8001"/>
         <Property Id="SERVER_API_PORT" Secure="yes" Value="8002"/>
-        <Property Id="SERVER_DIRECTORY" Secure="yes"/>
+        <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
+            <RegistrySearch Id="ServerDirectoryReg"
+                    Root="HKLM"
+                    Key="Software\Network Optix\VMS Media Server"
+                    Name="mediaDir"
+                    Type="raw" 
+                    Win64="no"/>
+        </Property>
         
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -52,18 +65,27 @@
         <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="appserver"/>
         <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
+        <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
+            <RegistrySearch Id="ClientDirectoryReg"
+                    Root="HKCU"
+                    Key="Software\Network Optix\VMS Media Client"
+                    Name="mediaRoot"
+                    Type="raw"
+                    Win64="no"/>
+        </Property>
         
         <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
         <Binary Id="EveAssocCA.dll" SourceFile="EveAssocCA\Release\EveAssocCA.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
-        <CustomAction Id="SetProperties" BinaryKey="PropsCA.dll" DllEntry="SetProperties" Execute="firstSequence" />
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
+        
         <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[MOVIESFOLDER]\VMS Server Media" />
         <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\VMS Client Media" />
-        <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="" />
-        <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="" />
+        
+        <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
+        <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
         
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
               Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
@@ -81,14 +103,17 @@
         </Upgrade>
         
         <InstallUISequence>
-            <Custom Action="SetProperties" Before="SetMoviesFolder" />
             <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
-            <Custom Action="AssignClientFolder" Before="CostInitialize">CLIENT_FOLDER=""</Custom>
-            <Custom Action="AssignServerFolder" Before="CostInitialize">SERVER_FOLDER=""</Custom>
             
-            <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+            <Custom Action="ResetClientFolder" Before="AssignClientFolder"/>
+            <Custom Action="ResetServerFolder" Before="AssignServerFolder"/>
+            
+            <Custom Action="AssignClientFolder" Before="CostInitialize">CLIENT_DIRECTORY=""</Custom>
+            <Custom Action="AssignServerFolder" Before="CostInitialize">SERVER_DIRECTORY=""</Custom>
+            
+  <!--          <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
             <Custom Action="ResetServerFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-        </InstallUISequence>
+  -->      </InstallUISequence>
         
         <InstallExecuteSequence>
             <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
@@ -190,15 +215,14 @@
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
-                                <File Id="ServerQtCored4.dll" Name="QtCored4.dll" Source="$(env.QTDIR)\bin\QtCored4.dll"/>
-                                <File Id="ServerQtGuid4.dll" Name="QtGuid4.dll" Source="$(env.QTDIR)\bin\QtGuid4.dll"/>
-                                <File Id="ServerQtMultimediad4.dll" Name="QtMultimediad4.dll" Source="$(env.QTDIR)\bin\QtMultimediad4.dll"/>
-                                <File Id="ServerQtNetworkd4.dll" Name="QtNetworkd4.dll" Source="$(env.QTDIR)\bin\QtNetworkd4.dll"/>
-                                <File Id="ServerQtOpenGLd4.dll" Name="QtOpenGLd4.dll" Source="$(env.QTDIR)\bin\QtOpenGLd4.dll"/>
-                                <File Id="ServerQtWebKitd4.dll" Name="QtWebKitd4.dll" Source="$(env.QTDIR)\bin\QtWebKitd4.dll"/>
-                                <File Id="ServerQtXmld4.dll" Name="QtXmld4.dll" Source="$(env.QTDIR)\bin\QtXmld4.dll"/>
-                                <File Id="ServerQtXmlPatternsd4.dll" Name="QtXmlPatternsd4.dll" Source="$(env.QTDIR)\bin\QtXmlPatternsd4.dll"/>
-                                <File Id="ServerPhonond4.dll" Name="phonond4.dll" Source="$(env.QTDIR)\bin\phonond4.dll"/>
+                                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
+                                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
+                                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll"/>
+                                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
+                                <File Id="ServerQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll"/>
+                                <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll"/>
+                                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
+                                <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
                             </Component>
                             
                             <Component Id="ServerXerces" Guid="{B81B02A6-9CC1-4b16-9E03-A4AD91624B5E}">
@@ -254,15 +278,14 @@
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
-                                <File Id="ClientQtCored4.dll" Name="QtCored4.dll" Source="$(env.QTDIR)\bin\QtCored4.dll"/>
-                                <File Id="ClientQtGuid4.dll" Name="QtGuid4.dll" Source="$(env.QTDIR)\bin\QtGuid4.dll"/>
-                                <File Id="ClientQtMultimediad4.dll" Name="QtMultimediad4.dll" Source="$(env.QTDIR)\bin\QtMultimediad4.dll"/>
-                                <File Id="ClientQtNetworkd4.dll" Name="QtNetworkd4.dll" Source="$(env.QTDIR)\bin\QtNetworkd4.dll"/>
-                                <File Id="ClientQtOpenGLd4.dll" Name="QtOpenGLd4.dll" Source="$(env.QTDIR)\bin\QtOpenGLd4.dll"/>
-                                <File Id="ClientQtWebKitd4.dll" Name="QtWebKitd4.dll" Source="$(env.QTDIR)\bin\QtWebKitd4.dll"/>
-                                <File Id="ClientQtXmld4.dll" Name="QtXmld4.dll" Source="$(env.QTDIR)\bin\QtXmld4.dll"/>
-                                <File Id="ClientQtXmlPatternsd4.dll" Name="QtXmlPatternsd4.dll" Source="$(env.QTDIR)\bin\QtXmlPatternsd4.dll"/>
-                                <File Id="ClientPhonond4.dll" Name="phonond4.dll" Source="$(env.QTDIR)\bin\phonond4.dll"/>
+                                <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
+                                <File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
+                                <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll"/>
+                                <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
+                                <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll"/>
+                                <File Id="ClientQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll"/>
+                                <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
+                                <File Id="ClientQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
                             </Component>
                             
                             <Component Id="ClientOpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
@@ -285,11 +308,7 @@
 
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
-        <?if $(env.CONFIG) = Debug ?>
-                                    <File Id="bespind.dll" Name="bespind.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespind.dll"/>
-        <?else?>
-                                    <File Id="bespin.dll" Name="bespin.dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin.dll"/>
-        <?endif?>
+                                    <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll"/>
                                 </Component>
                             </Directory>
                             

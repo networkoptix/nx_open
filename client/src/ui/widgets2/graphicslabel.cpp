@@ -70,7 +70,7 @@ void GraphicsLabel::clear()
 }
 
 QSizeF GraphicsLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
-    if(which == Qt::MinimumSize)
+    if(which == Qt::MinimumSize || which == Qt::PreferredSize)
         return d_func()->textItem->boundingRect().size();
 
     return base_type::sizeHint(which, constraint);
@@ -93,3 +93,4 @@ void GraphicsLabel::changeEvent(QEvent *event) {
 
     base_type::changeEvent(event);
 }
+
