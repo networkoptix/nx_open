@@ -3,6 +3,7 @@
 
 #include <QUrl>
 #include <QColor>
+#include <QSettings>
 
 class Settings
 {
@@ -22,7 +23,7 @@ public:
     void update(const Data& data);
     void fillData(Data& data) const;
 
-    void load(const QString& fileName);
+    void load();
     void save();
 
     int maxVideoItems() const;
@@ -66,7 +67,7 @@ private:
 
 private:
     mutable QReadWriteLock m_RWLock;
-    QString m_fileName;
+    QSettings m_settings;
 
     Data m_data;
 };
