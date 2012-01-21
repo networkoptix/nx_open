@@ -11,7 +11,28 @@ QList<QHostAddress> getAllIPv4Addresses()
     for (int i = 0; i < ipaddrs.size(); ++i)
     {
         if (QAbstractSocket::IPv4Protocol == ipaddrs.at(i).protocol() && ipaddrs.at(i)!=QHostAddress::LocalHost)
-            result.push_back(ipaddrs.at(i));
+        {
+            static bool allowedInterfaceReady = false;
+            static QList<QHostAddress> allowedInterfaces;
+            if (!allowedInterfaceReady)
+            {
+                for (int j = 1; j < qApp->argc(); ++j)
+                {
+                    QString arg = qApp->argv()[j];
+                    arg = arg.toLower();
+                    while (arg.startsWith('-'))
+                        arg = arg.mid(1);
+                    if (arg.startsWith("allowedinterfaces=")) {
+                        QStringList tmp = arg.split('=')[1].split(';');
+                        foreach(QString s, tmp)
+                            allowedInterfaces << QHostAddress(s);
+                    }
+                }
+                allowedInterfaceReady = true;
+            }
+            if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(ipaddrs.at(i)))
+                result.push_back(ipaddrs.at(i));
+        }
     }
 
     return result;
