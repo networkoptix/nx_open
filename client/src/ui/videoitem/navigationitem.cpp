@@ -230,7 +230,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_syncButton->setCheckable(true);
     m_syncButton->setChecked(true);
 
-    connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(setSyncMode(bool)));
+    //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
+    connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
 
 
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
@@ -410,6 +411,8 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
             setPlaying(!reader->isMediaPaused());
         else
             setPlaying(true);
+        if (!m_syncButton->isChecked())
+            updateRecPeriodList(true);
     }
     else
     {
@@ -417,11 +420,6 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     }
 
     emit actualCameraChanged(m_camera);
-}
-
-void NavigationItem::setSyncMode(bool value)
-{
-    // ###
 }
 
 void NavigationItem::setLiveMode(bool value)
@@ -498,12 +496,14 @@ void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
     }
 }
 
-NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnNetworkResourcePtr netRes)
+NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnAbstractArchiveReader* reader)
 {
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (reader->getResource());
     if (!m_motionPeriodLoader.contains(netRes))
     {
         MotionPeriodLoader p;
         p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(netRes);
+        p.reader = reader;
         if (!p.loader) {
             qWarning() << "Connection to a video server lost. Can't load motion info";
             return 0;
@@ -515,13 +515,13 @@ NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnNetworkRes
     return &m_motionPeriodLoader[netRes];
 }
 
-void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
+void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return;
 
-    MotionPeriodLoader* p = getMotionLoader(netRes);
+    MotionPeriodLoader* p = getMotionLoader(reader);
     if (!p)
         return;
     p->region = region;
@@ -538,7 +538,6 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QRegion region)
 
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     QnTimePeriod loadingPeriod;
-    QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     loadingPeriod.startTimeMs = qMax(minTimeMs, t - w);
     loadingPeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
@@ -569,15 +568,24 @@ bool NavigationItem::updateRecPeriodList(bool force)
     if (!m_camera)
         return false;
 
+    QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     QnNetworkResourceList resources;
-    foreach(CLVideoCamera *camera, m_reserveCameras) {
-        QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
-        if (networkResource)
+    if (m_syncButton->isChecked())
+    {
+        foreach(CLVideoCamera *camera, m_reserveCameras) 
         {
-            MotionPeriodLoader* motionLoader = getMotionLoader(networkResource);
-            if (motionLoader && motionLoader->enabled)
-                resources.push_back(networkResource);
+            QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
+            if (networkResource)
+            {
+                if (camera->isVisible())
+                    resources.push_back(networkResource);
+            }
         }
+    }
+    else {
+        QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(reader->getResource());
+        if (networkResource)
+            resources.push_back(networkResource);
     }
 
     /* Request interval no shorter than 1 hour. */
@@ -588,7 +596,6 @@ bool NavigationItem::updateRecPeriodList(bool force)
     /* It is important to update the stored interval BEFORE sending request to
      * the server. Request is blocking and starts an event loop, so we may get
      * into this method again. */
-    QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
@@ -620,16 +627,26 @@ void NavigationItem::onTimePeriodLoaded(const QnTimePeriodList& timePeriods, int
         m_timeSlider->setRecTimePeriodList(timePeriods);
 }
 
+CLVideoCamera* NavigationItem::findCameraByResource(QnResourcePtr resource)
+{
+    foreach(CLVideoCamera* camera, m_reserveCameras)
+    {
+        if (camera->getDevice() == resource)
+            return camera;
+    }
+    return 0;
+}
+
 void NavigationItem::onDisplayingStateChanged(QnResourcePtr resource, bool visible)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return;
 
-    MotionPeriodLoader* loader = getMotionLoader(netRes);
-    if (loader && loader->enabled != visible)
+    CLVideoCamera* camera = findCameraByResource(resource);
+    if (camera && camera->isVisible() != visible)
     {
-        loader->enabled = visible;
+        camera->setVisible(visible);
         updateRecPeriodList(true);
         repaintMotionPeriods();
     }
@@ -637,15 +654,36 @@ void NavigationItem::onDisplayingStateChanged(QnResourcePtr resource, bool visib
 
 void NavigationItem::repaintMotionPeriods()
 {
+    QnAbstractArchiveReader *currentReader = 0;
+    if (m_camera)
+        currentReader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    bool useSync = m_syncButton->isChecked();
+
     QVector<QnTimePeriodList> allPeriods;
-    foreach(const MotionPeriodLoader& info, m_motionPeriodLoader.values()) {
-        if (!info.periods.isEmpty() && info.enabled && !info.region.isEmpty())
+    for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
+    {
+        const MotionPeriodLoader& info = itr.value();
+        CLVideoCamera* camera = findCameraByResource(info.reader->getResource());
+        if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.region.isEmpty())
             allPeriods << info.periods;
+        if (useSync) 
+            info.reader->setPlaybackMask(QnTimePeriodList()); // at syncMode playback mask goes to SyncPlay instead of reader
+        else {
+            info.reader->setPlaybackMask(info.periods);
+            if (info.reader == currentReader) {
+                m_timeSlider->setMotionTimePeriodList(info.periods);
+                m_mrsButton->setVisible(!info.periods.isEmpty());
+                emit playbackMaskChanged(info.periods);
+            }
+        }
     }
-    m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
-    m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
-    m_mrsButton->setVisible(!m_mergedMotionPeriods.isEmpty());
-    emit playbackMaskChanged(m_mergedMotionPeriods);
+    if (useSync)
+    {
+        m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
+        m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
+        m_mrsButton->setVisible(!m_mergedMotionPeriods.isEmpty());
+        emit playbackMaskChanged(m_mergedMotionPeriods);
+    }
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
@@ -974,4 +1012,17 @@ void NavigationItem::setPlaying(bool playing)
 void NavigationItem::togglePlayPause()
 {
     setPlaying(!m_playing);
+}
+
+void NavigationItem::onSyncButtonToggled(bool value)
+{
+    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    qint64 currentTime = m_camera->getCurrentTime();
+
+    emit enableItemSync(value);
+    repaintMotionPeriods();
+    updateRecPeriodList(true);
+    reader->jumpTo(currentTime, 0);
+    reader->setSpeed(1.0);
+    m_speedSlider->resetSpeed();
 }

@@ -10,7 +10,8 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* video
     m_recorder(0),
     m_GenerateEndOfStreamSignal(generateEndOfStreamSignal),
     m_reader(reader),
-    m_extTimeSrc(0)
+    m_extTimeSrc(0),
+    m_isVisible(true)
 {
     cl_log.log(QLatin1String("Creating camera for "), m_device->toString(), cl_logDEBUG1);
 
@@ -53,7 +54,7 @@ CLVideoCamera::~CLVideoCamera()
 
 qint64 CLVideoCamera::getCurrentTime() const
 {
-    if (m_extTimeSrc)
+    if (m_extTimeSrc && m_extTimeSrc->isEnabled())
 	    return m_extTimeSrc->getDisplayedTime();
     else
         return m_camdispay.getDisplayedTime();

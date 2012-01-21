@@ -18,6 +18,7 @@ class TimeSlider;
 class VolumeSlider;
 class GraphicsLabel;
 class QnAbstractRenderer;
+class QnAbstractArchiveReader;
 
 class NavigationItem : public QGraphicsWidget
 {
@@ -38,14 +39,14 @@ public:
 public Q_SLOTS:
     void setMute(bool mute);
     void setPlaying(bool playing);
-    void loadMotionPeriods(QnResourcePtr resource, QRegion region);
-
+    void loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region);
+    void onSyncButtonToggled(bool value);
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
     void playbackMaskChanged(const QnTimePeriodList& playbackMask);
+    void enableItemSync(bool value);
     void clearMotionSelection();
     void actualCameraChanged(CLVideoCamera *camera);
-
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
@@ -57,8 +58,6 @@ protected:
     void repaintMotionPeriods();
 
 private Q_SLOTS:
-    void setSyncMode(bool value);
-
     void setLiveMode(bool value);
     void onLiveModeChanged(bool value);
     void pause();
@@ -92,17 +91,17 @@ private Q_SLOTS:
     void onDisplayingStateChanged(QnResourcePtr, bool);
 protected:
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
-
+    CLVideoCamera* findCameraByResource(QnResourcePtr resource);
 private:
     struct MotionPeriodLoader {
-        MotionPeriodLoader(): loadingHandle(0), enabled(true) {}
+        MotionPeriodLoader(): loadingHandle(0), reader(0) {}
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
         QRegion region;
-        bool enabled;
+        QnAbstractArchiveReader* reader;
     };
-    NavigationItem::MotionPeriodLoader* getMotionLoader(QnNetworkResourcePtr netRes);
+    MotionPeriodLoader* getMotionLoader(QnAbstractArchiveReader* reader);
 
     TimeSlider *m_timeSlider;
     ImageButton *m_backwardButton;

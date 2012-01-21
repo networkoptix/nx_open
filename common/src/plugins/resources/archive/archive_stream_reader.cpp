@@ -275,7 +275,6 @@ begin_label:
         }
         */
         qint64 jumpTime = m_requiredJumpTime;
-        m_lastGopSeekTime = -1;
         m_skipFramesToTime = m_tmpSkipFramesToTime;
         m_ignoreSkippingFrame = m_exactJumpToSpecifiedFrame;
         m_tmpSkipFramesToTime = 0;
@@ -424,7 +423,7 @@ begin_label:
                     else
                         seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
                     if (m_currentTime != seekTime) {
-                        m_currentData = QnAbstractMediaDataPtr();
+                        m_currentData.clear();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         if (m_lastGopSeekTime == m_delegate->startTime())
                         {
@@ -538,7 +537,28 @@ begin_label:
     //if (m_currentData)
     //    cl_log.log("timestamp=", QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
 
+
+    // ensure Pos At playback mask
+    if (m_runing && usePlaybackMask() && videoData && !videoData->ignore && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE))
+    {
+        m_playbackMaskSync.lock();
+        qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
+        m_playbackMaskSync.unlock();
+        if (newTime != m_currentData->timestamp)
+        {
+            intChanneljumpTo(newTime, 0);
+            m_skipFramesToTime = newTime;
+            m_BOF = true;
+            goto begin_label;
+        }
+    }
+
     return m_currentData;
+}
+
+bool QnArchiveStreamReader::usePlaybackMask() const
+{
+    return !m_navDelegate || !m_navDelegate->isEnabled();
 }
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
@@ -559,6 +579,7 @@ void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
     m_exactJumpToSpecifiedFrame = false;
     m_wakeup = true;
     m_bottomIFrameTime = -1;
+    m_lastGopSeekTime = -1;
     m_topIFrameTime = seekRez != -1 ? seekRez : mksec;
     m_IFrameAfterJumpFound = false;
     m_eof = false;
@@ -714,14 +735,24 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
-    bool needJump = mksec != m_lastJumpTime;
+    qint64 newTime = mksec;
+    if (usePlaybackMask()) {
+        m_playbackMaskSync.lock();
+        newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
+        m_playbackMaskSync.unlock();
+    }
+    if (newTime != mksec)
+        skipTime = 0;
+
+
+    bool needJump = newTime != m_lastJumpTime;
     if (needJump)
     {
-		beforeJumpInternal(mksec);
+		beforeJumpInternal(newTime);
         QMutexLocker mutex(&m_jumpMtx);
-        channeljumpToUnsync(mksec, 0, skipTime);
+        channeljumpToUnsync(newTime, 0, skipTime);
     }
-    m_lastJumpTime = mksec;
+    m_lastJumpTime = newTime;
 
     if (isSingleShotMode())
         CLLongRunnable::resume();
@@ -772,4 +803,10 @@ bool QnArchiveStreamReader::setMotionRegion(const QRegion& region)
     else {
         return false;
     }
+}
+
+void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)
+{
+    QMutexLocker lock(&m_playbackMaskSync);
+    m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }

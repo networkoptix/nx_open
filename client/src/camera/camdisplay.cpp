@@ -223,7 +223,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 //t.start();
                 int sign = speed >= 0 ? 1 : -1;
 
-                while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed)
+                while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed && useSync(vd))
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
@@ -504,7 +504,7 @@ void CLCamDisplay::processNewSpeed(float speed)
 bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
     //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
-    return m_extTimeSrc && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE);
+    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE);
 }
 
 bool CLCamDisplay::canAcceptData() const
@@ -938,7 +938,7 @@ qint64 CLCamDisplay::getDisplayedTime() const
 
 qint64 CLCamDisplay::getExternalTime() const
 {
-    if (m_extTimeSrc)
+    if (m_extTimeSrc && m_extTimeSrc->isEnabled())
         return m_extTimeSrc->getDisplayedTime();
     else
         return getCurrentTime();

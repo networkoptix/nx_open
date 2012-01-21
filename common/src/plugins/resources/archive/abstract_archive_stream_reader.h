@@ -4,6 +4,7 @@
 #include "abstract_archive_delegate.h"
 #include "utils/common/adaptivesleep.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
+#include "recording/time_period.h"
 
 class QnAbstractNavigator
 {
@@ -17,6 +18,10 @@ public:
     virtual void setSingleShotMode(bool single) = 0;
 
     virtual bool isMediaPaused() const = 0;
+
+    virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
+
+    virtual bool isEnabled() const { return true; }
 
     // playback filter by motion detection mask
     //virtual bool setMotionRegion(const QRegion& region) = 0;

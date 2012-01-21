@@ -19,6 +19,7 @@ class QnVideoResourceLayout;
 class QnWorkbenchItem;
 class QnResourceDisplay;
 class QnPolygonalShadowItem;
+class QnAbstractArchiveReader;
 
 class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
@@ -252,7 +253,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
-    void motionRegionSelected(QnResourcePtr resource, QRegion region);
+    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
