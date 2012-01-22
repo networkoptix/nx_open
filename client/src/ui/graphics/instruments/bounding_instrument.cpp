@@ -151,6 +151,12 @@ public:
         setPositionEnforced(false);
         setSizeEnforced(false);
         setView(view);
+
+        m_isSizeCorrected = false;
+        m_isPositionCorrected = true;
+
+        m_stickyLogScaleHi = 1.0;
+        m_stickyLogScaleLo = -1.0;
     }
 
     void update() {
@@ -244,6 +250,9 @@ public:
         qint64 dtMSec = time - m_lastTickTime;
         qreal dt = dtMSec / 1000.0;
 
+        /** Whether sticky scale values need to be adjusted. */
+        bool stickyScaleDirty = false;
+
         /* Scene viewport center at the end of the last tick. */
         QPointF oldCenter = m_sceneViewportCenter;
         
@@ -254,7 +263,8 @@ public:
         if(!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {
             /* Calculate old scale. */
             qreal logOldScale;
-            calculateRelativeScale(&logOldScale);
+            if(m_isSizeCorrected)
+                calculateRelativeScale(&logOldScale);
 
             /* Calculate fixed point. */
             bool fixedPointExists;
@@ -265,18 +275,22 @@ public:
             updateParameters();
 
             /* Apply zoom correction. */
-            qreal logScale, powFactor;
-            calculateRelativeScale(&logScale, &powFactor);
-            if(!qnFuzzyBetween(logScale, -1.0, 1.0) && !qFuzzyCompare(logScale, logOldScale)) {
-                qreal logFactor = calculateCorrection(logOldScale, logScale, -1.0, 1.0);
+            if(m_isSizeCorrected) {
+                qreal logScale, powFactor;
+                calculateRelativeScale(&logScale, &powFactor);
+                if(!qnFuzzyBetween(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
+                    qreal logFactor = calculateCorrection(logOldScale, logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
 
-                SceneUtility::scaleViewport(m_view, std::exp(logFactor * powFactor));
+                    SceneUtility::scaleViewport(m_view, std::exp(logFactor * powFactor));
 
-                /* Calculate relative correction and move viewport. */
-                qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
-                SceneUtility::moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
+                    /* Calculate relative correction and move viewport. */
+                    qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
+                    SceneUtility::moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
 
-                updateParameters();
+                    updateParameters();
+                } else {
+                    stickyScaleDirty = true;
+                }
             }
 
             /* Apply center correction. */
@@ -296,7 +310,7 @@ public:
             if(m_isSizeEnforced) {
                 qreal logScale, powFactor;
                 calculateRelativeScale(&logScale, &powFactor);
-                qreal logDirection = calculateDistance(logScale, -1.0, 1.0);
+                qreal logDirection = calculateDistance(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
                 if(!qFuzzyIsNull(logDirection)) {
                     qreal logDelta = dt * (m_logScaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
                     if(std::abs(logDelta) > std::abs(logDirection))
@@ -305,6 +319,8 @@ public:
                     SceneUtility::scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
 
                     updateParameters();
+                } else {
+                    stickyScaleDirty = true;
                 }
             }
 
@@ -329,7 +345,24 @@ public:
             updateParameters();
         }
 
+        /* Adjust sticky scale if needed. */
+        if(stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0))) {
+            qreal logScale, powFactor;
+            calculateRelativeScale(&logScale, &powFactor);
+
+            m_stickyLogScaleLo = qMin(-1.0, qMax(logScale, m_stickyLogScaleLo));
+            m_stickyLogScaleHi = qMax( 1.0, qMin(logScale, m_stickyLogScaleHi));
+        }
+
         m_lastTickTime = time;
+    }
+
+    void stickScale() {
+        qreal logScale, powFactor;
+        calculateRelativeScale(&logScale, &powFactor);
+
+        m_stickyLogScaleLo = qMin(-1.0, logScale);
+        m_stickyLogScaleHi = qMax(1.0, logScale);
     }
 
 protected:
@@ -435,6 +468,12 @@ public:
     /** Whether position boundary is enforced with animation. */
     bool m_isPositionEnforced;
 
+    /** Whether zooming outsize size boundary is corrected. */
+    bool m_isSizeCorrected;
+
+    /** Whether motion outside position boundary is corrected. */
+    bool m_isPositionCorrected;
+
 
     /* 'Derived' state. */
 
@@ -465,8 +504,14 @@ public:
     /** Viewport rectangle, in scene coordinates. */
     QRectF m_sceneViewportRect;
 
-    /* Position of viewport center, in scene coordinates. */
+    /** Position of viewport center, in scene coordinates. */
     QPointF m_sceneViewportCenter;
+
+    /** Sticky log scale upper bound. */
+    qreal m_stickyLogScaleHi;
+
+    /** Sticky log scale lower bound. */
+    qreal m_stickyLogScaleLo;
 };
 
 
@@ -636,3 +681,7 @@ void BoundingInstrument::dontEnforceSize(QGraphicsView *view) {
     setSizeEnforced(view, false);
 }
 
+void BoundingInstrument::stickScale(QGraphicsView *view) {
+    if(ViewData *d = checkView(view))
+        d->stickScale();
+}

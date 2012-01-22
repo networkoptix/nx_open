@@ -87,6 +87,8 @@ public:
      */
     void setSizeEnforced(QGraphicsView *view, bool sizeEnforced = true);
 
+    void stickScale(QGraphicsView *view);
+
 public slots:
     void enforcePosition(QGraphicsView *view);
     void dontEnforcePosition(QGraphicsView *view);
