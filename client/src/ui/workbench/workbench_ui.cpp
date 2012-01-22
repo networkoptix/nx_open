@@ -321,9 +321,9 @@ void QnWorkbenchUi::updateTreeGeometry() {
 
 void QnWorkbenchUi::updateViewportMargins() {
     m_display->setViewportMargins(QMargins(
-        /*0,*/ std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
-        0,
-        0,
+        m_treePinned ? std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())) : 0.0,
+        0.0,
+        0.0,
         std::floor(qMax(0.0, m_controlsWidget->size().height() - m_sliderItem->pos().y()))
     ));
 }
@@ -469,9 +469,10 @@ void QnWorkbenchUi::at_treeShowButton_toggled(bool checked) {
 void QnWorkbenchUi::at_treePinButton_toggled(bool checked) {
     m_treePinned = checked;
     
-    if(checked) {
+    if(checked)
         setTreeVisible(true);
-    }
+
+    updateViewportMargins();
 }
 
 
