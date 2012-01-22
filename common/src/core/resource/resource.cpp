@@ -11,7 +11,7 @@
 
 QnResource::QnResource()
     : QObject(),
-      m_rwLock(QReadWriteLock::Recursive),
+      m_mutex(QMutex::Recursive),
       m_flags(0),
       m_status(Offline)
 {
@@ -40,9 +40,9 @@ void QnResource::update(const QnResource& other)
         consumer->beforeUpdate();
 
     {
-        QReadLocker readLocker(&other.m_rwLock);
+        QMutexLocker mutexLocker(&m_mutex);
         {
-            QWriteLocker writeLocker(&m_rwLock);
+            QMutexLocker mutexLocker(&m_mutex);
             updateInner(other);
         }
         setStatus(other.m_status);
@@ -75,50 +75,50 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 
 QnId QnResource::getParentId() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_parentId;
 }
 
 void QnResource::setParentId(const QnId& parent)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_parentId = parent;
 }
 
 
 QString QnResource::getName() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_name;
 }
 
 void QnResource::setName(const QString& name)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_name = name;
 }
 
 unsigned long QnResource::flags() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_flags;
 }
 
 void QnResource::setFlags(unsigned long flags)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_flags = flags;
 }
 
 void QnResource::addFlag(unsigned long flag)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_flags |= flag;
 }
 
 void QnResource::removeFlag(unsigned long flag)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_flags &= ~flag;
 }
 
@@ -143,7 +143,7 @@ QnParamList &QnResource::getResourceParamList() const
 {
     QnId restypeid;
     {
-        QReadLocker readLocker(&m_rwLock);
+        QMutexLocker mutexLocker(&m_mutex);
         if (!m_resourceParamList.isEmpty())
             return m_resourceParamList;
         restypeid = m_typeId;
@@ -203,7 +203,7 @@ QnParamList &QnResource::getResourceParamList() const
         resourceParamList.append(newParam);
     }
 
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     if (m_resourceParamList.isEmpty())
         m_resourceParamList = resourceParamList;
 
@@ -242,7 +242,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     const QnParam &param = params.value(name);
     if (domain == QnDomainMemory)
     {
-        QReadLocker readLocker(&m_rwLock);
+        QMutexLocker mutexLocker(&m_mutex);
         val = param.value();
         if (!param.isPhysical())
             val = property(param.name().toUtf8()).toString();
@@ -289,7 +289,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
 
     //QnDomainMemory should changed anyway
     {
-        QReadLocker readLocker(&m_rwLock);
+        QMutexLocker mutexLocker(&m_mutex);
         if (!param.setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
@@ -380,19 +380,19 @@ bool QnResource::unknownResource() const
 
 QnId QnResource::getTypeId() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_typeId;
 }
 
 void QnResource::setTypeId(const QnId& id)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_typeId = id;
 }
 
 QnResource::Status QnResource::getStatus() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_status;
 }
 
@@ -400,7 +400,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool ignoreHandlers)
 {
     Status oldStatus;
     {
-        QWriteLocker writeLocker(&m_rwLock);
+        QMutexLocker mutexLocker(&m_mutex);
         oldStatus = m_status;
         m_status = newStatus;
     }
@@ -412,13 +412,13 @@ void QnResource::setStatus(QnResource::Status newStatus, bool ignoreHandlers)
 
 QDateTime QnResource::getLastDiscoveredTime() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_lastDiscoveredTime;
 }
 
 void QnResource::setLastDiscoveredTime(const QDateTime &time)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_lastDiscoveredTime = time;
 }
 
@@ -426,54 +426,54 @@ void QnResource::setLastDiscoveredTime(const QDateTime &time)
 
 QnId QnResource::getId() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_id;
 }
 void QnResource::setId(const QnId& id) {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_id = id;
 }
 
 QString QnResource::getUrl() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_url;
 }
 
 void QnResource::setUrl(const QString& value)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_url = value;
 }
 
 void QnResource::addTag(const QString& tag)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     if (!m_tags.contains(tag))
         m_tags.push_back(tag);
 }
 
 void QnResource::setTags(const QStringList& tags)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_tags = tags;
 }
 
 void QnResource::removeTag(const QString& tag)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_tags.removeAll(tag);
 }
 
 bool QnResource::hasTag(const QString& tag) const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_tags.contains(tag);
 }
 
 QStringList QnResource::tagList() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_tags;
 }
 

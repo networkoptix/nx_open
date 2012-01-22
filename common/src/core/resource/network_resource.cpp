@@ -63,26 +63,26 @@ bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain /*domain
 
 QnMacAddress QnNetworkResource::getMAC() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_macAddress;
 }
 
 void  QnNetworkResource::setMAC(QnMacAddress mac)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
 }
 
 void QnNetworkResource::setAuth(const QString& user, QString password)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_auth.setUser(user);
     m_auth.setPassword(password);
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_auth;
 }
 
@@ -99,13 +99,13 @@ void QnNetworkResource::setAuthenticated(bool auth)
 
 QHostAddress QnNetworkResource::getDiscoveryAddr() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_localAddress;
 }
 
 void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_localAddress = addr;
 }
 
@@ -125,37 +125,37 @@ QString QnNetworkResource::toSearchString() const
 
 void QnNetworkResource::addNetworkStatus(QnNetworkStatus status)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_networkStatus |=  status;
 }
 
 void QnNetworkResource::removeNetworkStatus(QnNetworkStatus status)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_networkStatus &=  (~status);
 }
 
 bool QnNetworkResource::checkNetworkStatus(QnNetworkStatus status) const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_networkStatus & status;
 }
 
 void QnNetworkResource::setNetworkStatus(QnNetworkStatus status)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_networkStatus = status;
 }
 
 void QnNetworkResource::setNetworkTimeout(unsigned int timeout)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     m_networkTimeout = timeout;
 }
 
 unsigned int QnNetworkResource::getNetworkTimeout() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_networkTimeout;
 }
 

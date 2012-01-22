@@ -85,13 +85,13 @@ void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFact
 
 QRegion QnSecurityCamResource::getMotionMask() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_motionMask;
 }
 
 void QnSecurityCamResource::setMotionMask(const QRegion& mask)
 {
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     if (m_motionMask == mask)
         return;
     m_motionMask = mask;

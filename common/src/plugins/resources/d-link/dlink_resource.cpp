@@ -47,7 +47,7 @@ void QnPlDlinkResource::setCropingPhysical(QRect croping)
 
 QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
 {
-    QReadLocker readLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     return m_camInfo;
 }
 
@@ -82,7 +82,7 @@ void QnPlDlinkResource::updateCamInfo()
     QAuthenticator auth = getAuth();
 
 
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
 
     QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  addr, 80, 1000, auth);
 
@@ -158,7 +158,7 @@ void QnPlDlinkResource::onStatusChanged(QnResource::Status oldStatus, QnResource
     bool inited ;
     
     {
-        QReadLocker readLocker(&m_rwLock);
+        QMutexLocker mutexLocker(&m_mutex);
         inited = m_camInfo.inited();
     }
     
