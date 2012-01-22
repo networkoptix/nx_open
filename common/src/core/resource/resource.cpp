@@ -1,5 +1,10 @@
 #include "resource.h"
 
+#include <QMetaObject>
+#include <QMetaProperty>
+
+#include "utils/common/warnings.h"
+
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resourcemanagment/resource_pool.h"
 
@@ -477,19 +482,26 @@ QStringList QnResource::tagList() const
     return m_tags;
 }
 
-void QnResource::addConsumer(QnResourceConsumer* consumer)
+void QnResource::addConsumer(QnResourceConsumer *consumer)
 {
     QMutexLocker locker(&m_consumersMtx);
+
+    if(m_consumers.contains(consumer)) {
+        qnWarning("Given resource consumer '%1' is already associated with this resource.", typeid(*consumer).name());
+        return;
+    }
+
     m_consumers.insert(consumer);
 }
 
-void QnResource::removeConsumer(QnResourceConsumer* consumer)
+void QnResource::removeConsumer(QnResourceConsumer *consumer)
 {
     QMutexLocker locker(&m_consumersMtx);
+
     m_consumers.remove(consumer);
 }
 
-bool QnResource::hasSuchConsumer(QnResourceConsumer* consumer) const
+bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
 {
     QMutexLocker locker(&m_consumersMtx);
     return m_consumers.contains(consumer);
@@ -511,8 +523,10 @@ void QnResource::disconnectAllConsumers()
 QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role)
 {
     QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);
-    if (dataProvider)
-        addConsumer(dataProvider);
+
+    if(dataProvider != NULL && dataProvider->getResource() != this)
+        qnCritical("createDataProviderInternal() returned a data provider that is not associated with current resource."); /* This may cause hard to debug problems. */
+
     return dataProvider;
 }
 

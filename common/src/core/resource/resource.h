@@ -32,7 +32,7 @@ enum QN_EXPORT QnDomain
 
 typedef QMap<QString, QString> QnResourceParameters;
 
-class QN_EXPORT QnResource : public QObject //: public CLRefCounter
+class QN_EXPORT QnResource : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show at GUI
@@ -167,10 +167,7 @@ public:
     bool hasTag(const QString& tag) const;
     QStringList tagList() const;
 
-    void addConsumer(QnResourceConsumer* consumer);
-    void removeConsumer(QnResourceConsumer* consumer);
-    bool hasSuchConsumer(QnResourceConsumer* consumer) const;
-    void disconnectAllConsumers();
+    bool hasConsumer(QnResourceConsumer *consumer) const;
 
 Q_SIGNALS:
     void onParameterChanged(const QString &name, const QVariant &value);
@@ -204,6 +201,16 @@ protected:
 
 protected:
     mutable QMutex m_mutex;
+
+private:
+    /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only. 
+     * Using it from other places may break invariants. */
+
+    friend class QnResourceConsumer;
+
+    void addConsumer(QnResourceConsumer *consumer);
+    void removeConsumer(QnResourceConsumer *consumer);
+    void disconnectAllConsumers();
 
 private:
     QnId m_id;

@@ -20,13 +20,11 @@ const QnResourcePtr &QnResourceConsumer::getResource() const
 
 bool QnResourceConsumer::isConnectedToTheResource() const
 {
-    return m_resource->hasSuchConsumer(const_cast<QnResourceConsumer*>(this));
+    return m_resource->hasConsumer(const_cast<QnResourceConsumer*>(this));
 }
 
 void QnResourceConsumer::disconnectFromResource()
 {
-    if (!isConnectedToTheResource())
-        return;
-
     m_resource->removeConsumer(this);
 }
+
