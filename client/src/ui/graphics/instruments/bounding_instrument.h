@@ -2,6 +2,7 @@
 #define QN_BOUNDING_INSTRUMENT_H
 
 #include <QRect>
+#include <QSet>
 #include <QTransform>
 #include <ui/animation/animation_timer.h>
 #include <ui/common/margins.h>

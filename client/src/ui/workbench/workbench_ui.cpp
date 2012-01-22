@@ -19,6 +19,7 @@
 #include <ui/graphics/instruments/ui_elements_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
+#include <ui/graphics/instruments/bounding_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
@@ -49,8 +50,8 @@ namespace {
     const qreal normalTitleOpacity = 0.5;
     const qreal hoverTitleOpacity = 0.95;
 
-
 } // anonymous namespace
+
 
 QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
@@ -320,7 +321,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
 
 void QnWorkbenchUi::updateViewportMargins() {
     m_display->setViewportMargins(QMargins(
-        0, //std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
+        /*0,*/ std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())),
         0,
         0,
         std::floor(qMax(0.0, m_controlsWidget->size().height() - m_sliderItem->pos().y()))
