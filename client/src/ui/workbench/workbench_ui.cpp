@@ -263,21 +263,21 @@ void QnWorkbenchUi::toggleTreeVisible() {
 }
 
 
-QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &controlGeometry, const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
+QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &controlRect, const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         treeGeometry.x(),
-        qMax(titleGeometry.bottom(), controlGeometry.y())
+        qMax(titleGeometry.bottom(), 0.0)
     );
     QSizeF size(
         treeGeometry.width(),
-        qMin(sliderGeometry.y(), controlGeometry.bottom()) - pos.y()
+        qMin(sliderGeometry.y(), controlRect.bottom()) - pos.y()
     );
     return QRectF(pos, size);
 }
 
 void QnWorkbenchUi::updateTreeGeometry() {
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedTreeGeometry(m_controlsWidget->geometry(), m_treeItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry());
+    QRectF geometry = updatedTreeGeometry(m_controlsWidget->rect(), m_treeItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry());
     m_treeItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
     
     /* Always change position. */
@@ -307,7 +307,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
     }
 
     /* Calculate target geometry. */
-    geometry = updatedTreeGeometry(m_controlsWidget->geometry(), m_treeItem->geometry(), QRectF(titlePos, m_treeItem->size()), QRectF(sliderPos, m_sliderItem->size()));
+    geometry = updatedTreeGeometry(m_controlsWidget->rect(), m_treeItem->geometry(), QRectF(titlePos, m_treeItem->size()), QRectF(sliderPos, m_sliderItem->size()));
     if(qFuzzyCompare(geometry, m_treeItem->geometry()))
         return;
 
