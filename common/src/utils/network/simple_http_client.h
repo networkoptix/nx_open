@@ -87,4 +87,7 @@ private:
     QAuthenticator m_auth;
 };
 
+QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
+
+
 #endif //__SIMPLE_HTTP_CLIENT__
