@@ -47,7 +47,7 @@ protected:
 
     void updateTreeGeometry();
 
-    static QRectF updatedTreeGeometry(const QRectF &controlGeometry, const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
+    QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
 
 protected Q_SLOTS:
     void at_display_widgetChanged(QnWorkbench::ItemRole role);

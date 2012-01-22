@@ -263,7 +263,9 @@ void QnWorkbenchUi::toggleTreeVisible() {
 }
 
 
-QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &controlRect, const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
+QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
+    QRectF controlRect = m_controlsWidget->rect();
+    
     QPointF pos(
         treeGeometry.x(),
         qMax(titleGeometry.bottom(), 0.0)
@@ -277,42 +279,40 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &controlRect, const QRect
 
 void QnWorkbenchUi::updateTreeGeometry() {
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedTreeGeometry(m_controlsWidget->rect(), m_treeItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry());
+    QRectF geometry = updatedTreeGeometry(m_treeItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry());
     m_treeItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
     
     /* Always change position. */
     m_treeItem->setPos(geometry.topLeft());
 
-    /* Whether actual size change can be deferred. */
-    bool deferrable = true;
+    /* Whether actual size change should be deferred. */
+    bool defer = false;
 
     /* Calculate slider target position. */
     QPointF sliderPos;
     if(m_sliderYAnimator->isRunning()) {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_sliderYAnimator->targetValue().toReal());
-        deferrable &= !qFuzzyCompare(sliderPos, m_sliderItem->pos()); /* If animation is about to end, then geometry sync cannot be deferred. */
+        defer |= !qFuzzyCompare(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         sliderPos = m_sliderItem->pos();
-        deferrable &= false;
     }
 
     /* Calculate title target position. */
     QPointF titlePos;
     if(m_titleYAnimator->isRunning()) {
         titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
-        deferrable &= !qFuzzyCompare(titlePos, m_treeItem->pos());
+        defer |= !qFuzzyCompare(titlePos, m_titleItem->pos());
     } else {
-        titlePos = m_treeItem->pos();
-        deferrable &= false;
+        titlePos = m_titleItem->pos();
     }
 
     /* Calculate target geometry. */
-    geometry = updatedTreeGeometry(m_controlsWidget->rect(), m_treeItem->geometry(), QRectF(titlePos, m_treeItem->size()), QRectF(sliderPos, m_sliderItem->size()));
+    geometry = updatedTreeGeometry(m_treeItem->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_sliderItem->size()));
     if(qFuzzyCompare(geometry, m_treeItem->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
-    if(deferrable && geometry.height() < m_treeItem->size().height())
+    if(defer && geometry.height() < m_treeItem->size().height())
         return;
 
     m_treeItem->resize(geometry.size());
