@@ -203,7 +203,7 @@ protected:
     //static QnParamLists staticResourcesParamLists; // list of all supported resources params list
 
 protected:
-    mutable QReadWriteLock m_rwLock;
+    mutable QMutex m_mutex;
 
 private:
     QnId m_id;

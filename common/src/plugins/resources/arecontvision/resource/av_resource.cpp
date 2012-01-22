@@ -351,7 +351,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QVariant& v
 
     QByteArray rarray = response.mid(index+1);
 
-    QWriteLocker writeLocker(&m_rwLock);
+    QMutexLocker mutexLocker(&m_mutex);
     param.setValue(QString(rarray.data()));
 
     val = param.value();

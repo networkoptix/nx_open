@@ -94,22 +94,20 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 if (senderPort != 62976 || datagram.size() < 32) // minimum response size
                     continue;
 
+                QString name  = "DCS-";
+
                 int iqpos = datagram.indexOf("DCS-");
 
                 if (iqpos<0)
                     continue;
 
-                /*
-                int macpos = responseData.indexOf("00", iqpos);
-                if (macpos < 0)
-                    return QnNetworkResourcePtr(0);
+                iqpos+=name.length();
 
-                for (int i = iqpos; i < macpos; i++)
+                while (iqpos < datagram.size() && datagram[iqpos] != (char)0)
                 {
-                    name += QLatin1Char(responseData[i]);
+                    name += QLatin1Char(datagram[iqpos]);
+                    ++iqpos;
                 }
-                /**/
-
 
                 const unsigned char* data = (unsigned char*)(datagram.data());
 
@@ -117,7 +115,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 memcpy(mac,data + 6,6);
 
                 QString smac = MACToString(mac);
-                QString name  = "Dlink";
+                
 
                 bool haveToContinue = false;
                 foreach(QnResourcePtr res, result)

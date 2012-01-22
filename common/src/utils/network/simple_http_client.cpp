@@ -383,3 +383,30 @@ QString CLSimpleHTTPClient::digestAccess(const QString& request) const
 
     return result;
 }
+
+
+QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
+{
+    CLSimpleHTTPClient http (host, port, timeout, auth);
+    http.doGET(fileName);
+
+    
+
+    QByteArray file;
+    file.reserve(capacity);
+
+    while (http.isOpened())
+    {
+        int curr_size = file.size();
+
+        file.resize(curr_size + 1450);
+
+        int readed = http.read(file.data() + curr_size, 1450);
+
+        if (readed < 1450)
+            file.resize(curr_size + readed);
+
+    }
+
+    return file;
+}
