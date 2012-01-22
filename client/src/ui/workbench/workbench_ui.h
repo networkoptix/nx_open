@@ -9,6 +9,7 @@ class CLVideoCamera;
 
 class InstrumentManager;
 class UiElementsInstrument;
+class ActivityListenerInstrument;
 class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
@@ -50,6 +51,9 @@ protected:
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
 
 protected Q_SLOTS:
+    void at_activityStopped();
+    void at_activityStarted();
+
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
@@ -71,6 +75,16 @@ protected Q_SLOTS:
     void at_treePinButton_toggled(bool checked);
 
 private:
+    struct VisibilityState {
+        VisibilityState(): treeVisible(false), sliderVisible(false) {}
+
+        /** Whether the tree is visible. */
+        bool treeVisible;
+
+        /** Whether navigation slider is visible. */
+        bool sliderVisible;
+    };
+
     /* Global state. */
 
     /** Workbench display. */
@@ -82,6 +96,9 @@ private:
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;
 
+    /** Activity listener instrument. */
+    ActivityListenerInstrument *m_controlsActivityInstrument;
+
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
@@ -91,13 +108,18 @@ private:
     /** Stored size of ui controls widget. */
     QSizeF m_controlsWidgetSize;
 
+    VisibilityState m_visibility;
+
+    VisibilityState m_storedVisibility;
+
+    bool m_inactive;
+
 
     /* Slider-related state. */
 
     /** Navigation item. */
     NavigationItem *m_sliderItem;
 
-    /** Whether navigation slider is visible. */
     bool m_sliderVisible;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
@@ -123,9 +145,6 @@ private:
 
     /** Button to pin the tree. */
     QnImageButtonWidget *m_treePinButton;
-
-    /** Whether the tree is visible. */
-    bool m_treeVisible;
 
     /** Whether the tree is pinned. */
     bool m_treePinned;

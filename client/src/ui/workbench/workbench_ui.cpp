@@ -20,6 +20,7 @@
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
+#include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
@@ -50,6 +51,8 @@ namespace {
     const qreal normalTitleOpacity = 0.5;
     const qreal hoverTitleOpacity = 0.95;
 
+    const int hideConstrolsTimeoutMSec = 2000;
+
 } // anonymous namespace
 
 
@@ -58,12 +61,21 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_display(display),
     m_manager(display->instrumentManager()),
     m_treePinned(false),
-    m_sliderVisible(false),
-    m_treeVisible(false)
+    m_inactive(false)
 {
+    memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
+
     /* Install and configure instruments. */
     m_uiElementsInstrument = new UiElementsInstrument(this);
+    m_controlsActivityInstrument = new ActivityListenerInstrument(hideConstrolsTimeoutMSec, this);
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
+    m_manager->installInstrument(m_controlsActivityInstrument);
+
+    m_controlsActivityInstrument->recursiveDisable();
+
+    connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
+    connect(m_controlsActivityInstrument, SIGNAL(activityResumed()),                                                                this,                           SLOT(at_activityStarted()));
+
 
     /* Create controls. */
     m_controlsWidget = m_uiElementsInstrument->widget();
@@ -238,7 +250,7 @@ QnWorkbench *QnWorkbenchUi::workbench() const {
 
 void QnWorkbenchUi::setTreeVisible(bool visible, bool animate)
 {
-    m_treeVisible = visible;
+    m_visibility.treeVisible = visible;
     m_treeShowButton->setChecked(visible);
 
     qreal newX = visible ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case. */;
@@ -250,7 +262,7 @@ void QnWorkbenchUi::setTreeVisible(bool visible, bool animate)
 }
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
-    m_sliderVisible = visible;
+    m_visibility.sliderVisible = visible;
 
     qreal newY = m_controlsWidget->size().height() + (visible ? -m_sliderItem->size().height() : 32.0 /* So that tooltips are not visible. */);
     if (animate)
@@ -260,7 +272,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
 }
 
 void QnWorkbenchUi::toggleTreeVisible() {
-    setTreeVisible(!m_treeVisible);
+    setTreeVisible(!m_visibility.treeVisible);
 }
 
 
@@ -333,11 +345,23 @@ void QnWorkbenchUi::updateViewportMargins() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchUi::at_display_widgetChanged(QnWorkbench::ItemRole role) {
+    QnResourceWidget *widget = m_display->widget(role);
+    QnResourceWidget *oldWidget = m_widgetByRole[role];
+    m_widgetByRole[role] = widget;
+
+    /* Tune activity listener instrument. */
+    if(role == QnWorkbench::ZOOMED) {
+        if(oldWidget == NULL)
+            m_controlsActivityInstrument->recursiveEnable();
+        if(widget == NULL)
+            m_controlsActivityInstrument->recursiveDisable();
+    }
+
     /* Update navigation item's target. */
-    QnResourceWidget *widget = m_display->widget(QnWorkbench::ZOOMED);
-    if(widget == NULL)
-        widget = m_display->widget(QnWorkbench::RAISED);
-    m_sliderItem->setVideoCamera(widget == NULL ? NULL : widget->display()->camera());
+    QnResourceWidget *targetWidget = m_widgetByRole[QnWorkbench::ZOOMED];
+    if(targetWidget == NULL)
+        targetWidget = m_widgetByRole[QnWorkbench::RAISED];
+    m_sliderItem->setVideoCamera(targetWidget == NULL ? NULL : targetWidget->display()->camera());
 }
 
 void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -475,4 +499,22 @@ void QnWorkbenchUi::at_treePinButton_toggled(bool checked) {
     updateViewportMargins();
 }
 
+void QnWorkbenchUi::at_activityStopped() {
+    m_inactive = true;
+    m_storedVisibility = m_visibility;
+
+    setSliderVisible(false);
+    setTreeVisible(false);
+
+    m_treeShowButton->hide();
+}
+
+void QnWorkbenchUi::at_activityStarted() {
+    m_inactive = false;
+
+    setSliderVisible(m_storedVisibility.sliderVisible);
+    setTreeVisible(m_storedVisibility.treeVisible);
+
+    m_treeShowButton->show();
+}
 
