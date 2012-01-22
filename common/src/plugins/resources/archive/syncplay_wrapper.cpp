@@ -59,7 +59,7 @@ public:
     
     bool processingJump;
     bool enabled;
-    QnPlaybackMaskHelper playbackMaskHelper;
+    //QnPlaybackMaskHelper playbackMaskHelper;
 };
 
 // ------------------- QnArchiveSyncPlayWrapper ----------------------------
@@ -175,18 +175,6 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
 }
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-    qint64 newTime = mksec;
-    if (!d->processingJump)
-        newTime = d->playbackMaskHelper.findTimeAtPlaybackMask(mksec, d->speed >= 0);
-	if (newTime != mksec)
-		skipTime = 0;
-
-    return jumpToInternal(newTime, skipTime);
-}
-
-bool QnArchiveSyncPlayWrapper::jumpToInternal(qint64 mksec,  qint64 skipTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
@@ -339,10 +327,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
     if (d->lastJumpTime == DATETIME_NOW)
         return DATETIME_NOW;
 
-    qint64 rez = getDisplayedTimeInternal();
-    if (rez != DATETIME_NOW)
-        const_cast<QnArchiveSyncPlayWrapper*>(this)->ensurePosAtPlaybackMask(rez);
-    return rez;
+    return getDisplayedTimeInternal();
 }
 
 qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
@@ -595,25 +580,6 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
             d->readers[i].enabled = !value;
             break;
         }
-    }
-}
-
-void QnArchiveSyncPlayWrapper::setPlaybackMask(const QnTimePeriodList& playbackMask)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-    QMutexLocker lock(&d->timeMutex);
-    d->playbackMaskHelper.setPlaybackMask(playbackMask);
-}
-
-void QnArchiveSyncPlayWrapper::ensurePosAtPlaybackMask(qint64 timeUsec)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-    qint64 newTime = timeUsec;
-    if (!d->processingJump)
-        newTime = d->playbackMaskHelper.findTimeAtPlaybackMask(timeUsec, d->speed >= 0);
-    if (newTime != timeUsec)
-    {
-        jumpToInternal(newTime, newTime);
     }
 }
 

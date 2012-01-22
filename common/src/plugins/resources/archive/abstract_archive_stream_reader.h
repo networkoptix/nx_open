@@ -19,7 +19,7 @@ public:
 
     virtual bool isMediaPaused() const = 0;
 
-    virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
+    //virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
 
     virtual bool isEnabled() const { return true; }
 
@@ -78,6 +78,7 @@ public:
 
     virtual bool setMotionRegion(const QRegion& region) = 0;
     virtual bool setSendMotion(bool value) = 0;
+    virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
 
 Q_SIGNALS:
     void beforeJump(qint64 mksec);

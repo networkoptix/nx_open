@@ -44,7 +44,7 @@ public Q_SLOTS:
     void onSyncButtonToggled(bool value);
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
-    void playbackMaskChanged(const QnTimePeriodList& playbackMask);
+    //void playbackMaskChanged(const QnTimePeriodList& playbackMask);
     void enableItemSync(bool value);
     void clearMotionSelection();
     void actualCameraChanged(CLVideoCamera *camera);
@@ -130,7 +130,7 @@ private:
     qint64 m_timePeriodUpdateTime;
     bool m_forceTimePeriodLoading;
 
-    typedef QMap<QnNetworkResourcePtr, MotionPeriodLoader> MotionPeriods;
+    typedef QMap<QnResourcePtr, MotionPeriodLoader> MotionPeriods;
     MotionPeriods m_motionPeriodLoader;
 
     QnTimePeriod m_timePeriod;

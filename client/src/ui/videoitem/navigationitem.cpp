@@ -504,33 +504,54 @@ void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
 
 NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnAbstractArchiveReader* reader)
 {
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (reader->getResource());
-    if (!m_motionPeriodLoader.contains(netRes))
+    QnResourcePtr resource = reader->getResource();
+    if (!m_motionPeriodLoader.contains(resource))
     {
         MotionPeriodLoader p;
-        p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(netRes);
         p.reader = reader;
+        p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(resource);
+#ifndef DEBUG_MOTION
         if (!p.loader) {
             qWarning() << "Connection to a video server lost. Can't load motion info";
             return 0;
         }
+#endif
         connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
         connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
-        m_motionPeriodLoader.insert(netRes, p);
+        m_motionPeriodLoader.insert(resource, p);
     }
-    return &m_motionPeriodLoader[netRes];
+    return &m_motionPeriodLoader[resource];
+}
+
+QnTimePeriodList generateTestPeriods(const QnTimePeriod& interval)
+{
+    QnTimePeriodList result;
+    qint64 curTime = interval.startTimeMs;
+    qint64 endTime = interval.startTimeMs + interval.durationMs;
+    while (curTime < endTime)
+    {
+        qint64 dur = ((rand() % 95)+5) * 1000;
+        result << QnTimePeriod(curTime, qMin(endTime - curTime, dur));
+        curTime += dur;
+        curTime += ((rand() % 95)+5) * 1000;
+    }
+
+    return result;
 }
 
 void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region)
 {
+#ifndef DEBUG_MOTION
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return;
+#endif
 
     MotionPeriodLoader* p = getMotionLoader(reader);
     if (!p)
         return;
     p->region = region;
+
     if (region.isEmpty())
     {
         repaintMotionPeriods();
@@ -539,9 +560,10 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchive
 
     qint64 w = m_timeSlider->sliderRange();
     qint64 t = m_timeSlider->viewPortPos();
+#ifndef DEBUG_MOTION
     if (t <= 0)
         return;  // slider range still not initialized yet
-
+#endif
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     QnTimePeriod loadingPeriod;
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
@@ -551,7 +573,13 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchive
     m_motionPeriod = m_motionPeriod.intersect(loadingPeriod);
 
 
-    //MotionPeriodLoader& p = m_motionPeriodLoader[netRes];
+#ifdef DEBUG_MOTION
+    // for motion periods testing on local files
+    p->periods = generateTestPeriods(loadingPeriod);
+    repaintMotionPeriods();
+    return;
+#endif
+
     p->loadingHandle = p->loader->load(loadingPeriod, region);
 }
 
@@ -672,23 +700,28 @@ void NavigationItem::repaintMotionPeriods()
         CLVideoCamera* camera = findCameraByResource(info.reader->getResource());
         if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.region.isEmpty())
             allPeriods << info.periods;
-        if (useSync) 
-            info.reader->setPlaybackMask(QnTimePeriodList()); // at syncMode playback mask goes to SyncPlay instead of reader
-        else {
-            info.reader->setPlaybackMask(info.periods);
+        if (!useSync) 
+        {
+            QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
+            info.reader->setPlaybackMask(tp);
             if (info.reader == currentReader) {
-                m_timeSlider->setMotionTimePeriodList(info.periods);
+                m_timeSlider->setMotionTimePeriodList(tp);
                 m_mrsButton->setVisible(!info.periods.isEmpty());
-                emit playbackMaskChanged(info.periods);
+                //emit playbackMaskChanged(info.periods);
             }
         }
     }
     if (useSync)
     {
         m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
+        for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
+        {
+            const MotionPeriodLoader& info = itr.value();
+            info.reader->setPlaybackMask(m_mergedMotionPeriods);
+        }
         m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
         m_mrsButton->setVisible(!m_mergedMotionPeriods.isEmpty());
-        emit playbackMaskChanged(m_mergedMotionPeriods);
+        //emit playbackMaskChanged(m_mergedMotionPeriods);
     }
 }
 

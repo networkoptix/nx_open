@@ -35,7 +35,7 @@ public:
     virtual void resumeMedia();
     virtual void setSingleShotMode(bool single);
     virtual bool isMediaPaused() const;
-    void setPlaybackMask(const QnTimePeriodList& playbackMask);
+    //void setPlaybackMask(const QnTimePeriodList& playbackMask);
 
 
     void setEnabled(bool value);
@@ -61,9 +61,7 @@ private:
     void erase(QnAbstractArchiveDelegate* value);
     void reinitTime(qint64 newTime);
     qint64 getDisplayedTimeInternal() const;
-    void ensurePosAtPlaybackMask(qint64 timeUsec);
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
-    bool jumpToInternal(qint64 mksec,  qint64 skipTime);
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);
