@@ -3,6 +3,7 @@
 #include <QtCore/QMetaObject>
 
 #include "core/resource/video_server.h"
+#include "utils/common/warnings.h"
 
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
@@ -38,21 +39,19 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                 resource->setParentId(localServer->getId());
         }
         if (!resource->getId().isValid()) {
-            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
+            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId())) {
+                qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.", resource->getUniqueId());
+
                 resource->setId(existing->getId());
-            else
+            } else {
                 resource->setId(QnId::generateSpecialId());
+            }
         }
     }
 
     QMap<QnId, QnResourcePtr> newResources; // sort by id
 
     foreach (const QnResourcePtr &resource, resources) {
-        /*if ((resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) {
-            qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local neither remote)");
-            continue; // ignore
-        }*/
-
         const QnId resId = resource->getId();
         if (!m_resources.contains(resId)) {
             m_resources[resId] = resource;
