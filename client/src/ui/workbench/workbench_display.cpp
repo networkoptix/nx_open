@@ -870,7 +870,8 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
 
     m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
-    m_boundingInstrument->stickScale(m_view);
+    if(m_itemByRole[QnWorkbench::ZOOMED] == NULL)
+        m_boundingInstrument->stickScale(m_view);
 }
 
 void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
