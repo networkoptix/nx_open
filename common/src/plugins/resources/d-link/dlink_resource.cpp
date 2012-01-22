@@ -155,9 +155,15 @@ void QnPlDlinkResource::onStatusChanged(QnResource::Status oldStatus, QnResource
     if (!(oldStatus == Offline && newStatus == Online))
         return;
 
+    bool inited ;
     
-    QWriteLocker writeLocker(&m_rwLock);
-    if (!m_camInfo.inited())
+    {
+        QReadLocker readLocker(&m_rwLock);
+        inited = m_camInfo.inited();
+    }
+    
+
+    if (inited)
     {
         updateCamInfo();
     }
