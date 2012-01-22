@@ -25,11 +25,17 @@ QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin
     /* Connect to display. */
     connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),              this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),   this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(display,    SIGNAL(playbackMaskChanged(const QnTimePeriodList&)), this,   SLOT(at_playback_mask_changed(const QnTimePeriodList&)));
+    //connect(display,    SIGNAL(playbackMaskChanged(const QnTimePeriodList&)), this,   SLOT(at_playback_mask_changed(const QnTimePeriodList&)));
+    connect(display,    SIGNAL(enableItemSync(bool)),                         this,   SLOT(at_enable_sync(bool)));
     
 
     /* Prepare render watcher. */
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
+}
+
+void QnSyncPlayMixin::at_enable_sync(bool value) 
+{
+    m_syncPlay->setEnabled(value);
 }
 
 void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -70,7 +76,9 @@ void QnSyncPlayMixin::at_renderWatcher_displayingStateChanged(QnAbstractRenderer
     m_syncPlay->onConsumerBlocksReader(widget->display()->dataProvider(), !displaying);
 }
 
+/*
 void QnSyncPlayMixin::at_playback_mask_changed(const QnTimePeriodList& playbackMask)
 {
     m_syncPlay->setPlaybackMask(playbackMask);
 }
+*/

@@ -50,7 +50,14 @@
         <Property Id="SERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="SERVER_RTSP_PORT" Secure="yes" Value="8001"/>
         <Property Id="SERVER_API_PORT" Secure="yes" Value="8002"/>
-        <Property Id="SERVER_DIRECTORY" Secure="yes"/>
+        <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
+            <RegistrySearch Id="ServerDirectoryReg"
+                    Root="HKLM"
+                    Key="Software\Network Optix\VMS Media Server"
+                    Name="mediaDir"
+                    Type="raw" 
+                    Win64="no"/>
+        </Property>
         
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -58,18 +65,27 @@
         <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="appserver"/>
         <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
+        <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
+            <RegistrySearch Id="ClientDirectoryReg"
+                    Root="HKCU"
+                    Key="Software\Network Optix\VMS Media Client"
+                    Name="mediaRoot"
+                    Type="raw"
+                    Win64="no"/>
+        </Property>
         
         <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
         <Binary Id="EveAssocCA.dll" SourceFile="EveAssocCA\Release\EveAssocCA.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
-        <CustomAction Id="SetProperties" BinaryKey="PropsCA.dll" DllEntry="SetProperties" Execute="firstSequence" />
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
+        
         <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[MOVIESFOLDER]\VMS Server Media" />
         <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\VMS Client Media" />
-        <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="" />
-        <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="" />
+        
+        <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
+        <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
         
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
               Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
@@ -87,14 +103,17 @@
         </Upgrade>
         
         <InstallUISequence>
-            <Custom Action="SetProperties" Before="SetMoviesFolder" />
             <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
-            <Custom Action="AssignClientFolder" Before="CostInitialize">CLIENT_FOLDER=""</Custom>
-            <Custom Action="AssignServerFolder" Before="CostInitialize">SERVER_FOLDER=""</Custom>
             
-            <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+            <Custom Action="ResetClientFolder" Before="AssignClientFolder"/>
+            <Custom Action="ResetServerFolder" Before="AssignServerFolder"/>
+            
+            <Custom Action="AssignClientFolder" Before="CostInitialize">CLIENT_DIRECTORY=""</Custom>
+            <Custom Action="AssignServerFolder" Before="CostInitialize">SERVER_DIRECTORY=""</Custom>
+            
+  <!--          <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
             <Custom Action="ResetServerFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-        </InstallUISequence>
+  -->      </InstallUISequence>
         
         <InstallExecuteSequence>
             <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>

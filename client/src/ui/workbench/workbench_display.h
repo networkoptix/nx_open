@@ -268,8 +268,9 @@ signals:
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(QnWorkbench::ItemRole role);
-    void playbackMaskChanged(const QnTimePeriodList&);
+    //void playbackMaskChanged(const QnTimePeriodList&);
     void displayingStateChanged(QnResourcePtr, bool);
+    void enableItemSync(bool value);
 protected:
     virtual void tick(int deltaTime) override;
     

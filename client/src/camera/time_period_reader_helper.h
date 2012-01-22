@@ -12,7 +12,7 @@ public:
     QnTimePeriodReaderHelper();
 
     static QnTimePeriodReaderHelper* instance();
-    QnTimePeriodUpdaterPtr createUpdater(QnNetworkResourcePtr netRes);
+    QnTimePeriodUpdaterPtr createUpdater(QnResourcePtr resource);
     int load(const QnNetworkResourceList& netResList, const QnTimePeriod& period);
 signals:
     void ready(const QnTimePeriodList &timePeriods, int handle);

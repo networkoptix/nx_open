@@ -5,6 +5,7 @@
 #include "abstract_archive_stream_reader.h"
 #include "utils/media/externaltimesource.h"
 #include "utils/common/util.h"
+#include "playbackmask_helper.h"
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -37,6 +38,7 @@ public:
         inJumpCount = 0;
         speed = 1.0;
         processingJump = false;
+        enabled = true;
     }
 
 
@@ -55,9 +57,9 @@ public:
     QTime timer;
     double speed;
     
-    QnTimePeriodList playbackMask;
-    QnTimePeriod m_curPlaybackPeriod;
     bool processingJump;
+    bool enabled;
+    //QnPlaybackMaskHelper playbackMaskHelper;
 };
 
 // ------------------- QnArchiveSyncPlayWrapper ----------------------------
@@ -174,16 +176,6 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
-    qint64 newTime = findTimeAtPlaybackMask(mksec);
-    //skipTime += newTime - mksec;
-	if (newTime != mksec)
-		skipTime = 0;
-
-    return jumpToInternal(newTime, skipTime);
-}
-
-bool QnArchiveSyncPlayWrapper::jumpToInternal(qint64 mksec,  qint64 skipTime)
-{
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->lastJumpTime = skipTime ? skipTime : mksec;
@@ -286,7 +278,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    if (d->blockSetSpeedSignal)
+    if (!d->enabled || d->blockSetSpeedSignal)
         return;
     d->blockSetSpeedSignal = true;
     foreach(ReaderInfo info, d->readers)
@@ -335,10 +327,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
     if (d->lastJumpTime == DATETIME_NOW)
         return DATETIME_NOW;
 
-    qint64 rez = getDisplayedTimeInternal();
-    if (rez != DATETIME_NOW)
-        const_cast<QnArchiveSyncPlayWrapper*>(this)->ensurePosAtPlaybackMask(rez);
-    return rez;
+    return getDisplayedTimeInternal();
 }
 
 qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
@@ -582,7 +571,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
     {
         if (d->readers[i].reader == reader) 
         {
-            if (!d->readers[i].enabled && !value && d->lastJumpTime != DATETIME_NOW)
+            if (d->enabled && !d->readers[i].enabled && !value && d->lastJumpTime != DATETIME_NOW)
             {
                 d->readers[i].reader->setNavDelegate(0);
                 d->readers[i].reader->jumpToPreviousFrame(getCurrentTime());
@@ -594,51 +583,19 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
     }
 }
 
-void QnArchiveSyncPlayWrapper::setPlaybackMask(const QnTimePeriodList& playbackMask)
+void QnArchiveSyncPlayWrapper::setEnabled(bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    d->playbackMask = playbackMask;
-    d->m_curPlaybackPeriod.clear();
+    d->enabled = value;
+    foreach(ReaderInfo info, d->readers)
+    {
+        info.reader->setNavDelegate(value ? this : 0);
+    }
 }
 
-void QnArchiveSyncPlayWrapper::ensurePosAtPlaybackMask(qint64 timeUsec)
+bool QnArchiveSyncPlayWrapper::isEnabled() const
 {
-    Q_D(QnArchiveSyncPlayWrapper);
-    qint64 newTime = findTimeAtPlaybackMask(timeUsec);
-    if (newTime != timeUsec)
-    {
-        jumpToInternal(newTime, newTime);
-    }
-    /*
-    if (d->playbackMask.isEmpty() || d->m_curPlaybackPeriod.containTime(timeMs) || d->processingJump)
-        return;
-    QnTimePeriodList::const_iterator itr = d->playbackMask.findNearestPeriod(timeMs, d->speed >= 0);
-    if (itr == d->playbackMask.end())
-        jumpTo(DATETIME_NOW, DATETIME_NOW);
-    d->m_curPlaybackPeriod = *itr;
-    if (!d->m_curPlaybackPeriod.containTime(timeMs))
-    {
-        qint64 seekTime = d->speed >= 0 ? d->m_curPlaybackPeriod.startTimeMs : d->m_curPlaybackPeriod.startTimeMs + d->m_curPlaybackPeriod.durationMs - BACKWARD_SEEK_STEP;
-        jumpTo(seekTime*1000, seekTime*1000);
-    }
-    */
-}
-
-qint64 QnArchiveSyncPlayWrapper::findTimeAtPlaybackMask(qint64 timeUsec)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-    qint64 timeMs = timeUsec/1000;
-    if (d->playbackMask.isEmpty() || d->m_curPlaybackPeriod.containTime(timeMs) || d->processingJump)
-        return timeUsec;
-    QnTimePeriodList::const_iterator itr = d->playbackMask.findNearestPeriod(timeMs, d->speed >= 0);
-    if (itr == d->playbackMask.end()) {
-        d->playbackMask.findNearestPeriod(timeMs, d->speed >= 0);
-        return DATETIME_NOW;
-    }
-    d->m_curPlaybackPeriod = *itr;
-    if (!d->m_curPlaybackPeriod.containTime(timeMs))
-        return d->speed >= 0 ? d->m_curPlaybackPeriod.startTimeMs*1000 : (d->m_curPlaybackPeriod.startTimeMs + d->m_curPlaybackPeriod.durationMs)*1000 - BACKWARD_SEEK_STEP;
-    else
-        return timeUsec;
+    Q_D(const QnArchiveSyncPlayWrapper);
+    return d->enabled;
 }

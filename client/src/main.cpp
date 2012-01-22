@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
     Settings& settings = Settings::instance();
-    settings.load(dataLocation + QLatin1String("/settings.xml"));
+    settings.load();
 
     if (!settings.isAfterFirstRun() && !getMoviesDirectory().isEmpty())
         settings.addAuxMediaRoot(getMoviesDirectory());

@@ -54,6 +54,8 @@ public:
 
     void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
 
+    bool isVisible() const { return m_isVisible; }
+    void setVisible(bool value) { m_isVisible = value; }
 signals:
     void reachedTheEnd();
     void recordingFailed(QString errMessage);
@@ -62,6 +64,7 @@ protected slots:
     void onReachedTheEnd();
 
 private:
+    bool m_isVisible;
     QnMediaResourcePtr m_device;
     CLVideoWindowItem* m_videoWindow;
     CLCamDisplay m_camdispay;

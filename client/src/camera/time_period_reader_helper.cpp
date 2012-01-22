@@ -100,13 +100,16 @@ void QnTimePeriodReaderHelper::onLoadingFailed(int status, int handle)
     }
 }
 
-QnTimePeriodUpdaterPtr QnTimePeriodReaderHelper::createUpdater(QnNetworkResourcePtr netRes)
+QnTimePeriodUpdaterPtr QnTimePeriodReaderHelper::createUpdater(QnResourcePtr resource)
 {
-    QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(qnResPool->getResourceById(netRes->getParentId()));
+    QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(qnResPool->getResourceById(resource->getParentId()));
     if (!serverResource)
         return QnTimePeriodUpdaterPtr();
     QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
     if (!serverConnection)
+        return QnTimePeriodUpdaterPtr();
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!netRes)
         return QnTimePeriodUpdaterPtr();
     return QnTimePeriodUpdaterPtr(new QnTimePeriodReader(serverConnection, netRes));
 }

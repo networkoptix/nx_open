@@ -19,9 +19,10 @@ public:
 
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
+    void at_enable_sync(bool value);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
-    void at_playback_mask_changed(const QnTimePeriodList& playbackMask);
+    //void at_playback_mask_changed(const QnTimePeriodList& playbackMask);
 private:
     QnArchiveSyncPlayWrapper *m_syncPlay;
     QWeakPointer<QnWorkbenchDisplay> m_display;

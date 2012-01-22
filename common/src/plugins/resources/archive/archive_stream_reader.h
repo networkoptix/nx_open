@@ -6,6 +6,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 #include <libavformat/avformat.h>
+#include "playbackmask_helper.h"
 
 struct AVFormatContext;
 
@@ -49,6 +50,7 @@ public:
     bool setMotionRegion(const QRegion& region);
     bool setSendMotion(bool value);
 
+    void setPlaybackMask(const QnTimePeriodList& playbackMask);
 protected:
     virtual bool init();
 
@@ -61,6 +63,7 @@ protected:
     virtual void pleaseStop();
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
 	void beforeJumpInternal(qint64 mksec);
+    bool usePlaybackMask() const;
 protected:
     qint64 m_currentTime;
     qint64 m_topIFrameTime;
@@ -111,6 +114,9 @@ private:
     QnAbstractMediaDataPtr m_currentData;
     QnAbstractMediaDataPtr m_nextData;
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
+
+    QMutex m_playbackMaskSync;
+    QnPlaybackMaskHelper m_playbackMaskHelper;
 
     qint64 determineDisplayTime();
     void intChanneljumpTo(qint64 mksec, int channel);

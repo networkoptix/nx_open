@@ -41,51 +41,25 @@ void Settings::update(const Settings::Data& data)
     m_data.downmixAudio = data.downmixAudio;
 }
 
-void Settings::load(const QString& fileName)
+void Settings::load()
 {
     QWriteLocker _lock(&m_RWLock);
 
-    m_fileName = fileName;
-
     reset();
 
-    QFile settingsFile(m_fileName);
-    if (settingsFile.exists())
-    {
-        if (settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            QXmlStreamReader xml(&settingsFile);
-            while (!xml.atEnd())
-            {
-                xml.readNext();
+    m_data.mediaRoot = fromNativePath(m_settings.value("mediaRoot").toString());
 
-                if (xml.isStartElement())
-                {
-                    if (xml.name() == QLatin1String("mediaRoot"))
-                        m_data.mediaRoot = fromNativePath(xml.readElementText());
-                    else if (xml.name() == QLatin1String("auxMediaRoot"))
-                        m_data.auxMediaRoots.push_back(fromNativePath(xml.readElementText()));
-                    else if (xml.name() == QLatin1String("afterFirstRun"))
-                        m_data.afterFirstRun = xml.readElementText() == QLatin1String("true");
-                    else if (xml.name() == QLatin1String("maxVideoItems"))
-                        m_data.maxVideoItems = qBound(0, xml.readElementText().toInt(), 32);
-                    else if (xml.name() == QLatin1String("downmixAudio"))
-                        m_data.downmixAudio = xml.readElementText() == QLatin1String("true");
-                }
-            }
-
-            if (xml.hasError())
-                reset();
-        }
-        else
-        {
-            cl_log.log(QLatin1String("Can't open settings file"), cl_logERROR);
-        }
-    }
-    else
+    int size = m_settings.beginReadArray("auxMediaRoot");
+    for (int i = 0; i < size; ++i)
     {
-        cl_log.log(QLatin1String("No settings file"), cl_logERROR);
+        m_settings.setArrayIndex(i);
+        m_data.auxMediaRoots.push_back(fromNativePath(m_settings.value("path").toString()));
     }
+    m_settings.endArray();
+
+    m_data.afterFirstRun = (m_settings.value("afterFirstRun").toString() == "true");
+    m_data.maxVideoItems = m_settings.value("maxVideoItems", 32).toInt();
+    m_data.downmixAudio = (m_settings.value("downmixAudio") == "true");
 
     if (m_data.mediaRoot.isEmpty())
         m_data.mediaRoot = getMoviesDirectory() + QLatin1String("/EVE Media/");
@@ -95,40 +69,20 @@ void Settings::save()
 {
     QWriteLocker _lock(&m_RWLock);
 
-    QFile settingsFile(m_fileName);
+    m_settings.setValue("mediaRoot", QDir::toNativeSeparators(m_data.mediaRoot));
 
-    if (!settingsFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    m_settings.beginWriteArray("auxMediaRoot", m_data.auxMediaRoots.size());
+    int size = m_data.auxMediaRoots.size();
+    for (int i = 0; i < size; ++i)
     {
-        cl_log.log(QLatin1String("Can't open settings file"), cl_logERROR);
-        return;
+        m_settings.setArrayIndex(i);
+        m_settings.setValue("path", m_data.auxMediaRoots[i]);
     }
+    m_settings.endArray();
 
-    QXmlStreamWriter stream(&settingsFile);
-    stream.setAutoFormatting(true);
-    stream.writeStartDocument();
-    {
-        stream.writeStartElement(QLatin1String("settings"));
-        {
-            stream.writeStartElement(QLatin1String("config"));
-            {
-                stream.writeTextElement(QLatin1String("mediaRoot"), QDir::toNativeSeparators(m_data.mediaRoot));
-
-                foreach (const QString &auxMediaRoot, m_data.auxMediaRoots)
-                    stream.writeTextElement(QLatin1String("auxMediaRoot"), QDir::toNativeSeparators(auxMediaRoot));
-
-                stream.writeTextElement(QLatin1String("afterFirstRun"), QLatin1String("true"));
-
-                stream.writeTextElement(QLatin1String("maxVideoItems"), QString::number(m_data.maxVideoItems));
-
-                stream.writeTextElement(QLatin1String("downmixAudio"), m_data.downmixAudio ? QLatin1String("true") : QLatin1String("false"));
-            }
-            stream.writeEndElement(); // config
-        }
-        stream.writeEndElement(); // settings
-    }
-    stream.writeEndDocument();
-
-    settingsFile.close();
+    m_settings.setValue("afterFirstRun", "true");
+    m_settings.setValue("maxVideoItems", QString::number(m_data.maxVideoItems));
+    m_settings.setValue("downmixAudio", m_data.downmixAudio ? "true" : "false");
 }
 
 int Settings::maxVideoItems() const
