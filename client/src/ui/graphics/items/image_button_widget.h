@@ -17,11 +17,12 @@ class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
 
 public:
     enum StateFlag {
-        DEFAULT = 0,
-        CHECKED = 0x1,
-        HOVERED = 0x2,
-        DISABLED = 0x4,
-        FLAGS_MAX = 0x7
+        DEFAULT = 0,        /**< Default button state. */
+        CHECKED = 0x1,      /**< Button is checkable and is checked. */
+        PRESSED = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
+        HOVERED = 0x4,      /**< Button is hovered over. */
+        DISABLED = 0x8,     /**< Button is disabled. */
+        FLAGS_MAX = 0xF
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag);
 
@@ -70,7 +71,7 @@ protected:
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-private:
+protected:
     const QPixmap &actualPixmap(StateFlags flags);
     void updateState(StateFlags state);
 

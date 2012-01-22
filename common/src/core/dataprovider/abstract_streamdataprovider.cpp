@@ -86,7 +86,7 @@ void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
 
 bool QnAbstractStreamDataProvider::isConnectedToTheResource() const
 {
-    return m_resource->hasSuchConsumer(const_cast<QnAbstractStreamDataProvider*>(this));
+    return m_resource->hasConsumer(const_cast<QnAbstractStreamDataProvider*>(this));
 }
 
 void QnAbstractStreamDataProvider::disconnectFromResource()

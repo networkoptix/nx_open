@@ -14,16 +14,17 @@ class QnResource;
 class QnNetworkResource;
 class CLRecorderDevice;
 
-// this class holds all resources in the system which are READY TO BE USED( as long as resource is in the pool => share pointer counter >= 1)
-// so if resource is in the pool it guaranties it cannot be deleted
-// in addition to that it also can give list of resources based on some criteria
-// and helps to administrate resources
-
-
-// if resource is conflicting it must not be placed in resource
-
-#define qnResPool QnResourcePool::instance()
-
+/** 
+ * This class holds all resources in the system that are READY TO BE USED 
+ * (as long as resource is in the pool => shared pointer counter >= 1).
+ * 
+ * If resource is in the pool it is guaranteed that it won't be deleted.
+ * 
+ * Resource pool can also give a list of resources based on some criteria
+ * and helps to administrate resources.
+ * 
+ * If resource is conflicting it must not be placed in resource pool.
+ */
 class QN_EXPORT QnResourcePool : public QObject
 {
     Q_OBJECT
@@ -83,5 +84,8 @@ private:
     QHash<QnId, QnResourcePtr> m_resources;
     QHash<QnId, QnResourceList> m_resourceTree;
 };
+
+
+#define qnResPool QnResourcePool::instance()
 
 #endif //resource_pool_h_1537
