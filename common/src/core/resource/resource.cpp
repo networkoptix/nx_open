@@ -232,33 +232,41 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 {
-    const QnParamList &params = getResourceParamList();
-    if (!params.contains(name))
-    {
-        cl_log.log("QnResource::getParam(): requested param does not exist!", cl_logWARNING);
-        return false;
-    }
 
-    const QnParam &param = params.value(name);
-    if (domain == QnDomainMemory)
+    bool physical;
+    QString param_name;
+    
     {
         QMutexLocker mutexLocker(&m_mutex);
-        val = param.value();
-        if (!param.isPhysical())
-            val = property(param.name().toUtf8()).toString();
-        return true;
-    }
-    else if (domain == QnDomainPhysical)
-    {
-        if (param.isPhysical() && getParamPhysical(param.name(), val)) {
-            emit onParameterChanged(param.name(), val);
+        const QnParamList &params = getResourceParamList();
+        if (!params.contains(name))
+        {
+            cl_log.log("QnResource::getParam(): requested param does not exist!", cl_logWARNING);
+            return false;
+        }
+
+        const QnParam &param = params.value(name);
+        if (domain == QnDomainMemory)
+        {
+            val = param.value();
+            if (!param.isPhysical())
+                val = property(param.name().toUtf8()).toString();
             return true;
         }
+
+        physical = param.isPhysical();
+        param_name = param.name();
     }
-    else if (domain == QnDomainDatabase)
+
+
+    
+    if (domain == QnDomainPhysical)
     {
-        if (param.isPhysical())
+        if (physical && getParamPhysical(param_name, val)) 
+        {
+            emit onParameterChanged(param_name, val);
             return true;
+        }
     }
 
     return false;
@@ -266,30 +274,51 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 
 bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain domain)
 {
-    QnParamList &params = getResourceParamList();
-    if (!params.contains(name))
-    {
-        cl_log.log("QnResource::setParam(): requested param does not exist!", cl_logWARNING);
-        return false;
-    }
+    
+    if (setSpecialParam(name, val, domain))
+        return true;
 
-    QnParam &param = params.value(name);
 
-    if (param.isReadOnly())
+    bool physical;
+    QString param_name;
+    
     {
-        cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
-        return false;
+        QMutexLocker mutexLocker(&m_mutex);
+
+        QnParamList &params = getResourceParamList();
+        if (!params.contains(name))
+        {
+            cl_log.log("QnResource::setParam(): requested param does not exist!", cl_logWARNING);
+            return false;
+        }
+
+        QnParam &param = params.value(name);
+
+        if (param.isReadOnly())
+        {
+            cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+            return false;
+        }
+
+        physical = param.isPhysical();
+        param_name = param.name();
+
+
     }
 
     if (domain == QnDomainPhysical)
     {
-        if (!param.isPhysical() || !setParamPhysical(param.name(), val))
+        if (!physical || !setParamPhysical(param_name, val))
             return false;
     }
 
     //QnDomainMemory should changed anyway
     {
         QMutexLocker mutexLocker(&m_mutex);
+
+        QnParamList &params = getResourceParamList();
+        QnParam &param = params.value(name);
+
         if (!param.setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
@@ -301,7 +330,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
             setProperty(param.name().toUtf8(), val);
     }
 
-    Q_EMIT onParameterChanged(param.name(), val);
+    Q_EMIT onParameterChanged(param_name, val);
 
     return true;
 }

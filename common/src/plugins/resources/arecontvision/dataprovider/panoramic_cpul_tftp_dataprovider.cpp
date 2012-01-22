@@ -50,7 +50,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     int quality = 15;
 
     {
-        //QMutexLocker mutex(&m_mtx);
+        QMutexLocker mutex(&m_mutex);
 
         h264 = isH264();;
 

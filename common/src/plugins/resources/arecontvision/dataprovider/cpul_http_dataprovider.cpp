@@ -40,18 +40,9 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
     bool h264;
 
     {
-            //QMutexLocker mutex(&m_mtx);
+            QMutexLocker mutex(&m_mutex);
 
             h264 = isH264();
-
-            /*
-            if (m_streamParam.exists("Codec")) // cam is not jpeg only
-            {
-                CLParam codec = m_streamParam.get("Codec");
-                if (codec.value.value != QString("JPEG"))
-                    h264 = true;
-            }
-            */
 
             if (!m_streamParam.contains("Quality") || !m_streamParam.contains("resolution") ||
                 !m_streamParam.contains("image_left") || !m_streamParam.contains("image_top") ||

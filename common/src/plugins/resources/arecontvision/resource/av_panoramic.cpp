@@ -171,9 +171,6 @@ bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QVa
 
 bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
 {
-    if (QnPlAreconVisionResource::setSpecialParam(name, val, domain))
-        return true;
-
     if (name == QLatin1String("resolution"))
     {
         if (val.toString() == QLatin1String("half"))

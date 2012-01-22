@@ -7,7 +7,7 @@
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
-m_qulity(QnQualityLowest),
+m_qulity(QnQualityNormal),
 m_fps(MAX_LIVE_FPS),
 m_numberOfchannels(0)
 {
