@@ -8,7 +8,7 @@
 #include "utils/common/buffered_file.h"
 
 static const int IO_BLOCK_SIZE = 1024*1024*4;
-static const int FFMPEG_BUFFER_SIZE = 1024*1024;
+static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
 
 Q_GLOBAL_STATIC_WITH_ARGS(QSemaphore, semaphore, (4))
 
