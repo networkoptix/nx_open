@@ -57,7 +57,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     QString request;
 
-    unsigned int forecast_size = 0;
+
     int left;
     int top;
     int right;
@@ -190,12 +190,10 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     }
     /**/
 
-    forecast_size = resolutionFULL ? (width*height)/4  : (width*height)/8; // 0.25 meg per megapixel as maximum
-
     CLSimpleTFTPClient tftp_client( getResource().dynamicCast<QnPlAreconVisionResource>()->getHostAddress().toString().toLatin1().data(),  m_timeout, 3);
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
-    CLByteArray& img = videoData->data;
+    
+    CLByteArray& img = m_videoFrameBuff;
 
     //==========================================
     int expectable_header_size;
@@ -298,12 +296,12 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     m_last_cam_width = size.width;
     m_last_cam_height = size.height;
 
-    videoData->flags |= AV_PKT_FLAG_KEY;
+    bool iFrame = true;
     if (h264)
     {
 
         if (last_packet[iframe_index-1] == 0)
-            videoData->flags &= ~AV_PKT_FLAG_KEY;
+            iFrame = false;
 
         //==========================================
         //put unit delimetr at the end of the frame
@@ -315,7 +313,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         img.write(&c,1); //1
         c = 0x09;
         img.write(&c,1); //0x09
-        c = (videoData->flags&AV_PKT_FLAG_KEY) ? 0x10 : 0x30;
+        c = (iFrame) ? 0x10 : 0x30;
         img.write(&c,1); // 0x10
 
         //==========================================
@@ -351,7 +349,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
         // we also need to put very begining of SH
         dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
-        dst[4] = (videoData->flags&AV_PKT_FLAG_KEY) ? 0x65 : 0x41;
+        dst[4] = (iFrame) ? 0x65 : 0x41;
 
         img.prepareToWrite(8);
         dst = img.data() + img.size();
@@ -363,6 +361,16 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         // writes JPEG header at very begining
         AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_name.toLatin1().data());
     }
+
+
+    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
+
+    CLByteArray& imgToSend = videoData->data;
+    imgToSend.write(m_videoFrameBuff);
+    m_videoFrameBuff.clear();
+
+    if (iFrame)
+        videoData->flags |= AV_PKT_FLAG_KEY;
 
     videoData->compressionType = h264 ? CODEC_ID_H264 : CODEC_ID_MJPEG;
     videoData->width = size.width;
