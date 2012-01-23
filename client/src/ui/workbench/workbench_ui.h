@@ -41,10 +41,11 @@ public:
 public Q_SLOTS:
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
+    void setTitleVisible(bool visible, bool animate = true);
     void toggleTreeVisible();
 
 protected:
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal sliderY);
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);
     void updateViewportMargins();
 
     void updateTreeGeometry();
@@ -74,6 +75,10 @@ protected Q_SLOTS:
     void at_treeOpacityProcessor_hoverEntered();
     void at_treeShowButton_toggled(bool checked);
     void at_treePinButton_toggled(bool checked);
+
+    void at_titleItem_geometryChanged();
+    void at_titleOpacityProcessor_hoverEntered();
+    void at_titleOpacityProcessor_hoverLeft();
 
 private:
     struct VisibilityState {
@@ -169,14 +174,16 @@ private:
 
     /* Title-related state. */
 
-    /** Background widget for the title bar. */
+    /** Title bar widget. */
     QGraphicsWidget *m_titleItem;
+
+    /** Background widget for the title bar. */
+    QGraphicsWidget *m_titleBackgroundItem;
 
     /** Animator for title's position. */
     VariantAnimator *m_titleYAnimator;
 
-    /** Application close button. */
-    QnImageButtonWidget *m_titleCloseButton;
+    HoverFocusProcessor *m_titleOpacityProcessor;
 
 };
 

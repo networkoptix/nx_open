@@ -423,7 +423,8 @@ void QnImageButtonWidget::invalidatePixmapCache() {
 // QnZoomingImageButtonWidget
 // -------------------------------------------------------------------------- //
 QnZoomingImageButtonWidget::QnZoomingImageButtonWidget(QGraphicsItem *parent):
-    QnImageButtonWidget(parent)
+    QnImageButtonWidget(parent),
+    m_scaleFactor(1.0)
 {}
 
 void QnZoomingImageButtonWidget::paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState) {
@@ -433,7 +434,7 @@ void QnZoomingImageButtonWidget::paintPixmap(QPainter *painter, StateFlags displ
     } else {
         rect = this->rect();
 
-        QPointF d = SceneUtility::toPoint(rect.size()) * 0.075;
+        QPointF d = SceneUtility::toPoint(rect.size()) * (1.0 - m_scaleFactor) / 2.0;
         rect = QRectF(
             rect.topLeft() + d,
             rect.bottomRight() - d

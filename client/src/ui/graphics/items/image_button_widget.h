@@ -126,8 +126,19 @@ class QnZoomingImageButtonWidget: public QnImageButtonWidget {
 public:
     QnZoomingImageButtonWidget(QGraphicsItem *parent = NULL);
 
+    qreal scaleFactor() const {
+        return m_scaleFactor;
+    }
+
+    void setScaleFactor(qreal scaleFactor) {
+        m_scaleFactor = scaleFactor;
+    }
+
 protected:
     virtual void paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState) override;
+
+private:
+    qreal m_scaleFactor;
 };
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H

@@ -129,9 +129,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
     addAction(&cm_open_file);
 
-    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleTitleVisibility()));
-    addAction(&cm_hide_decorations);
-
     connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
     addAction(&cm_reconnect);
 
@@ -422,10 +419,16 @@ void MainWnd::activate()
 
 void MainWnd::toggleFullScreen()
 {
+    toggleTitleVisibility();
+
     if (isFullScreen()) {
         showNormal();
+
+        m_ui->setTitleVisible(false, false);
     } else {
         showFullScreen();
+
+        m_ui->setTitleVisible(true, false);
     }
 }
 
