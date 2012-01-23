@@ -68,7 +68,7 @@ bool CLByteArray::reallocate(unsigned int new_capacity)
         return true;
 
     //char *new_data = (char *)qReallocAligned(m_data, new_capacity + CLBYTEARRAY_PADDING_SIZE, m_capacity, m_alignment);
-    char *new_data = (char *)qReallocAligned(0, new_capacity + CLBYTEARRAY_PADDING_SIZE, m_capacity, m_alignment);
+    char *new_data = (char *)qMallocAligned(new_capacity + CLBYTEARRAY_PADDING_SIZE, m_alignment);
     qMemCopy(new_data, m_data, m_size);
     qFreeAligned(m_data);
 
