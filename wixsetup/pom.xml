@@ -85,6 +85,7 @@
 							<workingDirectory>${baseDir}</workingDirectory>
 							<arguments>
 								<argument>make.py</argument>
+								<argument>${msbuild.configuration}</argument>
 							</arguments>							
 						</configuration>					
 					</execution>
