@@ -12,7 +12,6 @@ char DCS[] = {'D', 'C', 'S', '-'};
 
 QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher()
 {
-
 }
 
 QnPlDlinkResourceSearcher& QnPlDlinkResourceSearcher::instance()
@@ -21,8 +20,7 @@ QnPlDlinkResourceSearcher& QnPlDlinkResourceSearcher::instance()
     return inst;
 }
 
-
-QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnNetworkResourcePtr result;
 
@@ -115,7 +113,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 memcpy(mac,data + 6,6);
 
                 QString smac = MACToString(mac);
-                
+
 
                 bool haveToContinue = false;
                 foreach(QnResourcePtr res, result)

@@ -51,7 +51,7 @@ bool QnResourceType::isCamera() const
     return m_isCamera;
 }
 
-void QnResourceType::addAdditionalParent(const QnId& parent)
+void QnResourceType::addAdditionalParent(QnId parent)
 {
     if (parent != m_parentId)
         m_additionalParentList << parent;
@@ -85,11 +85,8 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
 
         paramTypeList += m_paramTypeList;
 
-        foreach(const QnId& parentId, allParentList())
-        {
-            QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId);
-
-            if (!parent.isNull())
+        foreach (QnId parentId, allParentList()) {
+            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId))
                 paramTypeList += parent->paramTypeList();
         }
 
@@ -120,7 +117,7 @@ QnResourceTypePool *QnResourceTypePool::instance()
     return theResourceTypePool();
 }
 
-QnResourceTypePtr QnResourceTypePool::getResourceType(const QnId& id) const
+QnResourceTypePtr QnResourceTypePool::getResourceType(QnId id) const
 {
     QMutexLocker lock(&m_mutex);
     QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.find(id);

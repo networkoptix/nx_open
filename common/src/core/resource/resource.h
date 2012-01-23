@@ -76,10 +76,10 @@ public:
     virtual void deserialize(const QnResourceParameters& parameters);
 
     QnId getId() const;
-    void setId(const QnId& id);
+    void setId(QnId id);
 
     QnId getParentId() const;
-    void setParentId(const QnId& parent);
+    void setParentId(QnId parent);
 
     // device unique identifier
     virtual QString getUniqueId() const = 0;
@@ -88,7 +88,7 @@ public:
     // TypeId unique string id for resource with SUCH list of params and CLASS
     // in other words TypeId can be used instantiate the right resource
     QnId getTypeId() const;
-    void setTypeId(const QnId& id);
+    void setTypeId(QnId id);
 
     Status getStatus() const;
     void setStatus(Status newStatus, bool ignoreHandlers = false);
@@ -203,7 +203,7 @@ protected:
     mutable QMutex m_mutex;
 
 private:
-    /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only. 
+    /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
 
     friend class QnResourceConsumer;
@@ -240,14 +240,14 @@ private:
 class QnResourceFactory
 {
 public:
-    virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) = 0;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) = 0;
 };
 
 
 class QnResourceProcessor
 {
 public:
-    virtual void processResources(const QnResourceList& resources) = 0;
+    virtual void processResources(const QnResourceList &resources) = 0;
 };
 
 

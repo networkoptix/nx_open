@@ -13,7 +13,8 @@ public:
     enum RecordingType { RecordingType_Run, RecordingType_MotionOnly, RecordingType_Never };
 
     QnScheduleTask()
-        : m_startTime(0), m_endTime(0),
+        : m_id(0), m_resourceId(0),
+          m_startTime(0), m_endTime(0),
           m_doRecordAudio(false),
           m_recordType(RecordingType_Run),
           m_dayOfWeek(1),
@@ -21,10 +22,10 @@ public:
           m_streamQuality(QnQualityHighest),
           m_fps(10)
     {}
-    QnScheduleTask(QnId id, QnId sourceId, int startTime, int endTime,
+    QnScheduleTask(QnId id, QnId resourceId, int startTime, int endTime,
                    bool doRecordAudio, RecordingType recordType, int dayOfWeek, int beforeThreshold, int afterThreshold,
                    QnStreamQuality streamQuality = QnQualityHighest, int fps = 10)
-        : m_id(id), m_sourceId(sourceId),
+        : m_id(id), m_resourceId(resourceId),
           m_startTime(startTime), m_endTime(endTime),
           m_doRecordAudio(doRecordAudio),
           m_recordType(recordType),
@@ -38,7 +39,7 @@ public:
     bool operator<(const QnScheduleTask &other) const;
 
     QnId getId() const { return m_id; }
-    QnId getSourceId() const { return m_sourceId; }
+    QnId getResourceId() const { return m_resourceId; }
     RecordingType getRecordingType() const { return m_recordType; }
     int getBeforeThreshold() const { return m_beforeThreshold; }
     int getAfterThreshold() const { return m_afterThreshold; }
@@ -66,7 +67,7 @@ public:
 
 private:
     QnId m_id;
-    QnId m_sourceId;
+    QnId m_resourceId;
     int m_startTime;
     int m_endTime;
     bool m_doRecordAudio;

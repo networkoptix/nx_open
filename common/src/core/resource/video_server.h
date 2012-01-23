@@ -43,7 +43,7 @@ private:
 class QnVideoServerFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 };
 
 typedef QSharedPointer<QnVideoServer> QnVideoServerPtr;

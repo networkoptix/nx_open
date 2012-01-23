@@ -110,7 +110,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const
+QnResourcePtr QnResourcePool::getResourceById(QnId id) const
 {
     return m_resources.value(id, QnResourcePtr(0));
 }
@@ -167,7 +167,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag) const
     return result;
 }
 
-QnResourceList QnResourcePool::getResourcesWithParentId(const QnId &id) const
+QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
 {
     return m_resourceTree.value(id);
 }

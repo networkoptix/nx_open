@@ -62,7 +62,7 @@ public:
     void init();
 
 #ifdef USE_OLD_RESOURCEMODEL
-    inline QStandardItem *item(const QnId &id) const
+    inline QStandardItem *item(QnId id) const
     { Q_Q(const ResourceModel); return q->itemFromIndex(index(id)); }
     inline QStandardItem *item(const QnResourcePtr &resource) const
     { Q_Q(const ResourceModel); return q->itemFromIndex(q->index(resource)); }
@@ -70,13 +70,13 @@ public:
     { Q_Q(const ResourceModel); return q->resource(item->index()); }
 #else
     Node *node(const QModelIndex &index) const;
-    Node *node(const QnId &id) const;
+    Node *node(QnId id) const;
     inline Node *node(const QnResourcePtr &resource) const
     { return node(resource->getId()); }
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex index(Node *node, int column = 0) const;
 #endif
-    QModelIndex index(const QnId &id, int column = 0) const;
+    QModelIndex index(QnId id, int column = 0) const;
     inline QModelIndex index(const QnResourcePtr &resource, int column = 0) const
     { return index(resource->getId(), column); }
 

@@ -391,7 +391,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
     return createResourceByTypeId(rt);
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(const QnId& rt)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 

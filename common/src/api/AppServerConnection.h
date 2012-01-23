@@ -59,7 +59,7 @@ public:
 
     int addStorage(const QnStorage&, QByteArray& errorString);
 
-    int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId, QByteArray& errorString);
+    int getCameras(QnSecurityCamResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
     int getStorages(QnResourceList& storages, QByteArray& errorString);
     int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
 

@@ -205,7 +205,7 @@ Node *ResourceModelPrivate::node(const QModelIndex &index) const
     return node;
 }
 
-Node *ResourceModelPrivate::node(const QnId &id) const
+Node *ResourceModelPrivate::node(QnId id) const
 {
     if (id.isValid()) {
         if (Node *node = nodes.value(id, 0))
@@ -237,7 +237,7 @@ QModelIndex ResourceModelPrivate::index(Node *node, int column) const
     return q_func()->createIndex(row, column, node);
 }
 
-QModelIndex ResourceModelPrivate::index(const QnId &id, int column) const
+QModelIndex ResourceModelPrivate::index(QnId id, int column) const
 {
     return index(node(id), column);
 }
@@ -308,7 +308,7 @@ void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
     Q_EMIT q->dataChanged(index, index);
 }
 #else
-QModelIndex ResourceModelPrivate::index(const QnId &id, int column) const
+QModelIndex ResourceModelPrivate::index(QnId id, int column) const
 {
     Q_Q(const ResourceModel);
     QModelIndex index;

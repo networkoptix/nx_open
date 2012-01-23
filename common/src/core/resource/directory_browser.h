@@ -8,9 +8,7 @@ class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
     QnResourceDirectoryBrowser();
 
 public:
-    virtual ~QnResourceDirectoryBrowser();
-
-    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 
     static QnResourceDirectoryBrowser &instance();
 

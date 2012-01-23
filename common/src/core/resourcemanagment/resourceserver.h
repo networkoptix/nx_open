@@ -27,7 +27,7 @@ public:
     // returns all available devices
     virtual QnResourceList findResources() = 0;
 
-    virtual bool isResourceTypeSupported(const QnId& resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
 
     // is some cases search might take time
     //if pleaseStop is called search will be interrupted

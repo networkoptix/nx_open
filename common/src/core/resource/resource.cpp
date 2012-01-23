@@ -84,7 +84,7 @@ QnId QnResource::getParentId() const
     return m_parentId;
 }
 
-void QnResource::setParentId(const QnId& parent)
+void QnResource::setParentId(QnId parent)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_parentId = parent;
@@ -389,7 +389,7 @@ QnId QnResource::getTypeId() const
     return m_typeId;
 }
 
-void QnResource::setTypeId(const QnId& id)
+void QnResource::setTypeId(QnId id)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_typeId = id;
@@ -434,7 +434,7 @@ QnId QnResource::getId() const
     QMutexLocker mutexLocker(&m_mutex);
     return m_id;
 }
-void QnResource::setId(const QnId& id) {
+void QnResource::setId(QnId id) {
     QMutexLocker mutexLocker(&m_mutex);
     m_id = id;
 }

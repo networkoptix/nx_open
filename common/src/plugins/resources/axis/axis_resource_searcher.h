@@ -7,17 +7,16 @@
 class QnPlAxisResourceSearcher : public OnvifResourceSearcher
 {
     QnPlAxisResourceSearcher();
+
 public:
-
-    ~QnPlAxisResourceSearcher(){};
-
     static QnPlAxisResourceSearcher& instance();
 
-    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
-    // return the manufacture of the server 
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    // return the manufacture of the server
     virtual QString manufacture() const;
 
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+
 protected:
     QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData);
 };

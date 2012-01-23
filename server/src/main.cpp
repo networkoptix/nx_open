@@ -487,15 +487,16 @@ public:
             QString str;
             QTextStream stream(&str);
 
-            stream << "ScheduleTask " << scheduleTask.getId().toString() <<
-                scheduleTask.getAfterThreshold() <<
-                scheduleTask.getBeforeThreshold() <<
-                scheduleTask.getDayOfWeek() <<
-                scheduleTask.getDoRecordAudio() <<
-                scheduleTask.getStartTime() <<
-                scheduleTask.getEndTime() <<
-                scheduleTask.getRecordingType() <<
-                scheduleTask.getSourceId().toString();
+            stream << "ScheduleTask "
+                   << scheduleTask.getId().toString()
+                   << scheduleTask.getAfterThreshold()
+                   << scheduleTask.getBeforeThreshold()
+                   << scheduleTask.getDayOfWeek()
+                   << scheduleTask.getDoRecordAudio()
+                   << scheduleTask.getStartTime()
+                   << scheduleTask.getEndTime()
+                   << scheduleTask.getRecordingType()
+                   << scheduleTask.getResourceId().toString();
             cl_log.log(str, cl_logALWAYS);
         }
 

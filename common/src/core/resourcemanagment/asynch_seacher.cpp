@@ -48,7 +48,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnResourcePtr result;
 
@@ -106,7 +106,7 @@ void QnResourceDiscoveryManager::run()
         {
             m_resourceProcessor->processResources(result);
 
-            foreach (const QnResourcePtr &res, result) 
+            foreach (const QnResourcePtr &res, result)
             {
                 QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
                 if (!resource.isNull() && !resource.dynamicCast<QnServerCamera>()) // if this is not client and cams did not came from server
@@ -352,7 +352,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
                     if (isServer())
                     {
-                        // not stand alone 
+                        // not stand alone
                         QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
                         if (cameraResource)
                         {
