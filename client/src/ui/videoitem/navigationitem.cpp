@@ -425,8 +425,10 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
             setPlaying(!reader->isMediaPaused());
         else
             setPlaying(true);
-        if (!m_syncButton->isChecked())
+        if (!m_syncButton->isChecked()) {
             updateRecPeriodList(true);
+            repaintMotionPeriods();
+        }
     }
     else
     {
@@ -694,23 +696,29 @@ void NavigationItem::repaintMotionPeriods()
     bool useSync = m_syncButton->isChecked();
 
     QVector<QnTimePeriodList> allPeriods;
+    bool isMotionExist = false;
+    bool isMotionFound = false;
     for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
     {
         const MotionPeriodLoader& info = itr.value();
         CLVideoCamera* camera = findCameraByResource(info.reader->getResource());
         if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.region.isEmpty())
             allPeriods << info.periods;
+        isMotionExist |= !info.periods.isEmpty();
         if (!useSync) 
         {
             QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
             info.reader->setPlaybackMask(tp);
-            if (info.reader == currentReader) {
+            if (info.reader == currentReader)
+            {
+                isMotionFound = true;
                 m_timeSlider->setMotionTimePeriodList(tp);
-                m_mrsButton->setVisible(!info.periods.isEmpty());
-                //emit playbackMaskChanged(info.periods);
             }
         }
     }
+    if (!useSync && !isMotionFound) 
+        m_timeSlider->setMotionTimePeriodList(QnTimePeriodList()); // // not motion for selected item
+
     if (useSync)
     {
         m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
@@ -721,9 +729,8 @@ void NavigationItem::repaintMotionPeriods()
                 reader->setPlaybackMask(m_mergedMotionPeriods);
         }
         m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
-        m_mrsButton->setVisible(!m_mergedMotionPeriods.isEmpty());
-        //emit playbackMaskChanged(m_mergedMotionPeriods);
     }
+    m_mrsButton->setVisible(isMotionExist);
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
