@@ -293,12 +293,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
     const bool isCodecContext = ssrc & 1; // odd numbers - codec context, even numbers - data
     if (isCodecContext)
     {
-        if (!m_contextMap.contains(ssrc))
-        {
-            QnMediaContextPtr context(new QnMediaContext(payload, dataSize));
-            if (context)
-                m_contextMap.insert(ssrc, context);
-        }
+        QnMediaContextPtr context(new QnMediaContext(payload, dataSize));
+        m_contextMap[ssrc] = context;
     }
     else
     {
