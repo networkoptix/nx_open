@@ -714,10 +714,11 @@ void NavigationItem::repaintMotionPeriods()
     if (useSync)
     {
         m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
-        for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
+        foreach(CLVideoCamera* camera, m_reserveCameras)
         {
-            const MotionPeriodLoader& info = itr.value();
-            info.reader->setPlaybackMask(m_mergedMotionPeriods);
+            QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*> (camera->getStreamreader());
+            if (reader)
+                reader->setPlaybackMask(m_mergedMotionPeriods);
         }
         m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
         m_mrsButton->setVisible(!m_mergedMotionPeriods.isEmpty());

@@ -539,7 +539,7 @@ begin_label:
 
 
     // ensure Pos At playback mask
-    if (m_runing && usePlaybackMask() && videoData && !videoData->ignore && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (m_runing && videoData && !videoData->ignore && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();
@@ -555,11 +555,6 @@ begin_label:
     }
 
     return m_currentData;
-}
-
-bool QnArchiveStreamReader::usePlaybackMask() const
-{
-    return !m_navDelegate || !m_navDelegate->isEnabled();
 }
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
@@ -737,11 +732,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     }
 
     qint64 newTime = mksec;
-    if (usePlaybackMask()) {
-        m_playbackMaskSync.lock();
-        newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
-        m_playbackMaskSync.unlock();
-    }
+    m_playbackMaskSync.lock();
+    newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
+    m_playbackMaskSync.unlock();
     if (newTime != mksec)
         skipTime = 0;
 

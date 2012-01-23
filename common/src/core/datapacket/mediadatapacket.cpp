@@ -105,7 +105,7 @@ bool QnMetaDataV1::isEmpty() const
     {
         for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
         {
-            if (_mm_movemask_epi8(_mm_cmpeq_epi32(src[i], zerroValue)) == 0)
+            if (_mm_movemask_epi8(_mm_cmpeq_epi32(src[i], zerroValue)) != 0xffff)
                 return false;
         }
     }
