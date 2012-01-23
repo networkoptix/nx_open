@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsLinearLayout>
 #include <QStyle>
 
 #include <utils/common/event_signalizator.h>
@@ -31,6 +32,7 @@
 #include <ui/navigationtreewidget.h>
 #include <ui/context_menu_helper.h>
 #include <ui/skin/skin.h>
+#include <ui/context_menu_helper.h>
 
 #include "workbench.h"
 #include "workbench_display.h"
@@ -221,7 +223,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
     m_titleItem->setOpacity(normalTitleOpacity);
     m_titleItem->resize(100, 100);
-    m_titleItem->setPos(0.0, -100.0);
+    m_titleItem->setPos(0.0, 0.0);
 
     m_titleYAnimator = new VariantAnimator(this);
     m_titleYAnimator->setTimer(display->animationInstrument()->animationTimer());
@@ -229,6 +231,21 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
     m_titleYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
     m_titleYAnimator->setTimeLimit(500);
+
+    m_titleCloseButton = new QnZoomingImageButtonWidget();
+    m_titleCloseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
+    m_titleCloseButton->setMaximumSize(28, 28);
+    m_titleCloseButton->setMinimumSize(28, 28);
+    m_titleCloseButton->setDefaultAction(&cm_exit);
+    m_titleCloseButton->setAnimationSpeed(4.0);
+    m_titleCloseButton->setCached(true);
+
+
+
+    QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
+    titleLayout->addStretch(0x1000);
+    titleLayout->addItem(m_titleCloseButton);
+    m_titleItem->setLayout(titleLayout);
 
     /* Connect to display. */ 
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));

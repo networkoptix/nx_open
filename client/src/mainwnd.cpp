@@ -132,8 +132,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleTitleVisibility()));
     addAction(&cm_hide_decorations);
 
-    QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
-    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    addAction(&cm_reconnect);
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
@@ -212,7 +212,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newTabButton);
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(reconnectAction));
+    m_titleLayout->addWidget(newActionButton(&cm_reconnect));
     m_titleLayout->addWidget(newActionButton(&cm_preferences));
     m_titleLayout->addWidget(newActionButton(&cm_toggle_fullscreen));
     m_titleLayout->addWidget(newActionButton(&cm_exit));

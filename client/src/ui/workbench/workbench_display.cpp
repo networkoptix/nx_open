@@ -789,7 +789,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         calculateExpansionValues(enclosingGeometry.top(),  enclosingGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
 
         enclosingGeometry = enclosingGeometry.adjusted(xp1, yp1, xp2, yp2);
-
     }
 
     /* Update Z value. */

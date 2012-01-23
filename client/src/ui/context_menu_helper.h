@@ -8,6 +8,7 @@ void initContextMenu();
 extern QAction cm_new_item;
 extern QAction cm_about;
 extern QAction cm_exit;
+extern QAction cm_reconnect;
 extern QAction cm_open_file;
 extern QAction cm_screen_recording;
 extern QAction cm_toggle_recording;

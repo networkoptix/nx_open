@@ -77,13 +77,16 @@ protected Q_SLOTS:
 
 private:
     struct VisibilityState {
-        VisibilityState(): treeVisible(false), sliderVisible(false) {}
+        VisibilityState(): treeVisible(false), sliderVisible(false), titleVisible(false) {}
 
         /** Whether the tree is visible. */
         bool treeVisible;
 
         /** Whether navigation slider is visible. */
         bool sliderVisible;
+
+        /** Whether title bar is visible. */
+        bool titleVisible;
     };
 
     /* Global state. */
@@ -120,8 +123,6 @@ private:
 
     /** Navigation item. */
     NavigationItem *m_sliderItem;
-
-    bool m_sliderVisible;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
@@ -171,7 +172,12 @@ private:
     /** Background widget for the title bar. */
     QGraphicsWidget *m_titleItem;
 
+    /** Animator for title's position. */
     VariantAnimator *m_titleYAnimator;
+
+    /** Application close button. */
+    QnImageButtonWidget *m_titleCloseButton;
+
 };
 
 #endif // QN_WORKBENCH_UI_H
