@@ -196,10 +196,11 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     QnNetworkResourcePtr result(createResourceByName(model.toString()));
     if (result)
     {
-        result->update(*this);
         result->setName(model.toString());
         result->setHostAddress(getHostAddress(), QnDomainMemory);
         result->setMAC(getMAC());
+        result->setId(getId());
+        result->setFlags(flags());
     }
     else
     {
