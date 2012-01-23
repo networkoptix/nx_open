@@ -50,7 +50,7 @@ void QnResource::update(const QnResource& other)
             QMutexLocker mutexLocker(&m_mutex);
             updateInner(other);
         }
-        setStatus(other.m_status);
+        setStatus(other.m_status, true);
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
