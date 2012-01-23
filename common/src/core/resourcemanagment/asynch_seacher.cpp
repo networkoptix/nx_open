@@ -7,7 +7,7 @@
 #include "resource_pool.h"
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
-#include "../../../client/src/device_plugins/server_camera/server_camera.h"
+
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
 m_server(false)
@@ -105,15 +105,6 @@ void QnResourceDiscoveryManager::run()
         if (!result.isEmpty())
         {
             m_resourceProcessor->processResources(result);
-
-            foreach (const QnResourcePtr &res, result) 
-            {
-                QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
-                if (!resource.isNull() && !resource.dynamicCast<QnServerCamera>()) // if this is not client and cams did not came from server
-                    resource->setStatus(QnResource::Online);
-            }
-
-
         }
 
         int global_delay_between_search = 1000;
