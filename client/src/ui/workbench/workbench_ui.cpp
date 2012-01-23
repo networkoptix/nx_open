@@ -331,12 +331,20 @@ void QnWorkbenchUi::updateTreeGeometry() {
     m_treeItem->resize(geometry.size());
 }
 
+QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal sliderY) {
+    return QMargins(
+        m_treePinned ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
+        0.0,
+        0.0,
+        std::floor(qMax(0.0, m_controlsWidget->size().height() - sliderY))
+    );
+}
+
 void QnWorkbenchUi::updateViewportMargins() {
-    m_display->setViewportMargins(QMargins(
-        m_treePinned ? std::floor(qMax(0.0, m_treeItem->pos().x() + m_treeItem->size().width())) : 0.0,
-        0.0,
-        0.0,
-        std::floor(qMax(0.0, m_controlsWidget->size().height() - m_sliderItem->pos().y()))
+    m_display->setViewportMargins(calculateViewportMargins(
+        m_treeXAnimator->isRunning() ? m_treeXAnimator->targetValue().toReal() : m_treeItem->pos().x(),
+        m_treeItem->size().width(),
+        m_sliderYAnimator->isRunning() ? m_sliderYAnimator->targetValue().toReal() : m_sliderItem->pos().y()
     ));
 }
 

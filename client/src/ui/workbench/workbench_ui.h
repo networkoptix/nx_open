@@ -44,6 +44,7 @@ public Q_SLOTS:
     void toggleTreeVisible();
 
 protected:
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal sliderY);
     void updateViewportMargins();
 
     void updateTreeGeometry();

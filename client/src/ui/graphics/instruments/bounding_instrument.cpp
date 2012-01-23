@@ -302,6 +302,8 @@ public:
 
                 updateParameters();
             }
+        } else {
+            m_fixedPoint = m_viewportRect.center();
         }
 
         /* Enforce. */
