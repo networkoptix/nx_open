@@ -21,12 +21,14 @@ public:
     bool isCameraRecoring(QnResourcePtr camera);
 
     void updateSchedule(QnSecurityCamResourcePtr camera);
+
+    QnServerStreamRecorder* findRecorder(QnResourcePtr res) const;
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
     void recordingFailed(QString errMessage);
 private:
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
 
     QMap<QnResourcePtr, QnServerStreamRecorder*> m_recordMap;
     QMap<QnId, QnScheduleTaskList> m_scheduleByCamera;
