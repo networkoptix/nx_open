@@ -83,7 +83,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_display(display),
     m_manager(display->instrumentManager()),
     m_treePinned(false),
-    m_inactive(false)
+    m_inactive(false),
+    m_titleUsed(false)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -246,13 +247,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleItem = new QGraphicsWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
 
-    m_titleYAnimator = new VariantAnimator(this);
-    m_titleYAnimator->setTimer(display->animationInstrument()->animationTimer());
-    m_titleYAnimator->setTargetObject(m_titleItem);
-    m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_titleYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
-    m_titleYAnimator->setTimeLimit(500);
-
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -264,10 +258,18 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
+    m_titleYAnimator = new VariantAnimator(this);
+    m_titleYAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_titleYAnimator->setTargetObject(m_titleItem);
+    m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
+    m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0);
+    m_titleYAnimator->setTimeLimit(500);
+
     m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_titleOpacityProcessor->addTargetItem(m_titleItem);
 
-    setTitleVisible(false, false);
+    setTitleVisible(true, false);
+    setTitleUsed(false);
 
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_titleOpacityProcessor_hoverEntered()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_titleOpacityProcessor_hoverLeft()));
@@ -317,6 +319,9 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
 void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
     m_visibility.titleVisible = visible;
 
+    if(!m_titleUsed)
+        return;
+
     qreal newY = visible ? 0.0 : -m_titleItem->size().height() - 1.0;
     if (animate)
         m_titleYAnimator->animateTo(newY);
@@ -324,10 +329,26 @@ void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
         m_titleItem->setY(newY);
 }
 
+void QnWorkbenchUi::setTitleUsed(bool titleUsed) {
+    m_titleItem->setVisible(titleUsed);
+    m_titleBackgroundItem->setVisible(titleUsed);
+
+    if(titleUsed) {
+        m_titleUsed = titleUsed;
+
+        setTitleVisible(m_visibility.titleVisible, false);
+
+        at_titleItem_geometryChanged();
+    } else {
+        m_titleItem->setPos(0.0, -m_titleItem->size().height() - 1.0);
+
+        m_titleUsed = titleUsed;
+    }
+}
+
 void QnWorkbenchUi::toggleTreeVisible() {
     setTreeVisible(!m_visibility.treeVisible);
 }
-
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QRectF controlRect = m_controlsWidget->rect();
@@ -592,6 +613,9 @@ void QnWorkbenchUi::at_titleOpacityProcessor_hoverLeft() {
 }
 
 void QnWorkbenchUi::at_titleItem_geometryChanged() {
+    if(!m_titleUsed) 
+        return;
+    
     updateTreeGeometry();
 
     m_titleBackgroundItem->setGeometry(m_titleItem->geometry());

@@ -425,11 +425,11 @@ void MainWnd::toggleFullScreen()
     if (isFullScreen()) {
         showNormal();
 
-        m_ui->setTitleVisible(false, false);
+        m_ui->setTitleUsed(false);
     } else {
         showFullScreen();
 
-        m_ui->setTitleVisible(true, false);
+        m_ui->setTitleUsed(true);
     }
 }
 

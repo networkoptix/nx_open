@@ -38,7 +38,12 @@ public:
         return m_treeWidget;
     }
 
+    bool isTitleUsed() const {
+        return m_titleUsed;
+    }
+
 public Q_SLOTS:
+    void setTitleUsed(bool titleUsed);
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
     void setTitleVisible(bool visible, bool animate = true);
@@ -184,6 +189,8 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
+
+    bool m_titleUsed;
 
 };
 
