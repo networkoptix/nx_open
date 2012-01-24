@@ -429,6 +429,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
             updateRecPeriodList(true);
             repaintMotionPeriods();
         }
+        m_timeSlider->setLiveMode(reader->isRealTimeSource());
     }
     else
     {
@@ -1082,11 +1083,15 @@ void NavigationItem::onSyncButtonToggled(bool value)
 {
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     qint64 currentTime = m_camera->getCurrentTime();
+    if (reader->isRealTimeSource())
+        currentTime = DATETIME_NOW;
 
     emit enableItemSync(value);
     repaintMotionPeriods();
     updateRecPeriodList(true);
-    reader->jumpTo(currentTime, 0);
-    reader->setSpeed(1.0);
+    if (value) {
+        reader->jumpTo(currentTime, 0);
+        reader->setSpeed(1.0);
+    }
     m_speedSlider->resetSpeed();
 }
