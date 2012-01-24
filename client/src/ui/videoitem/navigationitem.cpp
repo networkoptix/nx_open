@@ -1094,4 +1094,6 @@ void NavigationItem::onSyncButtonToggled(bool value)
         reader->setSpeed(1.0);
     }
     m_speedSlider->resetSpeed();
+    if (!value)
+        updateActualCamera();
 }
