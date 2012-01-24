@@ -33,18 +33,24 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 {
     QMutexLocker locker(&m_resourcesMtx);
 
-    foreach (const QnResourcePtr &resource, resources) {
-        if (!resource->getParentId().isValid()) {
+    foreach (const QnResourcePtr &resource, resources) 
+    {
+        if (!resource->getParentId().isValid()) 
+        {
             if (resource->checkFlag(QnResource::local))
                 resource->setParentId(localServer->getId());
         }
-        if (!resource->getId().isValid()) {
+
+        if (!resource->getId().isValid()) 
+        {
             if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId())) {
                 qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.",
                           resource->getUniqueId().toLocal8Bit().constData());
 
                 resource->setId(existing->getId());
-            } else {
+            } 
+            else 
+            {
                 resource->setId(QnId::generateSpecialId());
             }
         }
@@ -52,21 +58,24 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     QMap<QnId, QnResourcePtr> newResources; // sort by id
 
-    foreach (const QnResourcePtr &resource, resources) {
+    foreach (const QnResourcePtr &resource, resources) 
+    {
         /*if ((resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) {
             qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local neither remote)");
             continue; // ignore
         }*/
 
         const QnId resId = resource->getId();
-        if (!m_resources.contains(resId)) {
+        if (!m_resources.contains(resId)) 
+        {
             m_resources[resId] = resource;
             m_resourceTree[resource->getParentId()].append(resource); // unsorted
             newResources.insert(resId, resource);
         }
     }
 
-    foreach (const QnResourcePtr &resource, newResources.values()) {
+    foreach (const QnResourcePtr &resource, newResources.values()) 
+    {
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
 
         QMetaObject::invokeMethod(this, "resourceAdded", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));

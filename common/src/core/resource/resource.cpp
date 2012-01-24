@@ -47,7 +47,7 @@ void QnResource::update(const QnResource& other)
 
     {
         QMutexLocker mutexLocker(&m_mutex); // this is virtual atomic operation; so mutexes shold be outside
-        QMutexLocker mutexLocker(&other.m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        QMutexLocker mutexLocker2(&other.m_mutex); // this is virtual atomic operation; so mutexes shold be outside
         updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
 
