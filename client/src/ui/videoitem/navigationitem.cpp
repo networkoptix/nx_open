@@ -1053,6 +1053,7 @@ void NavigationItem::setPlaying(bool playing)
         m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
 
         pause();
+        m_timeSlider->setLiveMode(false);
     }
 }
 
