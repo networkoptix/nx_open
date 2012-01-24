@@ -1,7 +1,8 @@
 #include "resource.h"
 
-#include <QMetaObject>
-#include <QMetaProperty>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QMetaObject>
+#include <QtCore/QMetaProperty>
 
 #include "utils/common/warnings.h"
 
@@ -13,6 +14,10 @@
 #include "resource_consumer.h"
 
 #include <limits.h>
+
+static const char *property_descriptions[] = {
+    QT_TRANSLATE_NOOP("QnResource", "URL")
+};
 
 QnResource::QnResource()
     : QObject(),
@@ -203,6 +208,11 @@ QnParamList &QnResource::getResourceParamList() const
             }
         }
         paramType->setDefVal(QVariant(mProperty.userType(), (void *)0));
+        for (int j = 0; j < mObject->classInfoCount(); ++j) {
+            QMetaClassInfo mClassInfo = mObject->classInfo(j);
+            if (qstrcmp(mClassInfo.name(), mProperty.name()) == 0)
+                paramType->description = QCoreApplication::translate("QnResource", mClassInfo.value());
+        }
 
         QnParam newParam(paramType, mProperty.read(this));
         resourceParamList.append(newParam);

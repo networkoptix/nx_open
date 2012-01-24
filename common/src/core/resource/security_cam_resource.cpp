@@ -2,6 +2,10 @@
 
 #include "plugins/resources/archive/archive_stream_reader.h"
 
+static const char *property_descriptions[] = {
+    QT_TRANSLATE_NOOP("QnResource", "Camera Scheduling")
+};
+
 QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
       m_dpFactory(0)
