@@ -146,66 +146,74 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 QnParamList &QnResource::getResourceParamList() const
 {
-    QnId restypeid;
+    QnId resTypeId;
     {
         QMutexLocker mutexLocker(&m_mutex);
         if (!m_resourceParamList.isEmpty())
             return m_resourceParamList;
-        restypeid = m_typeId;
+        resTypeId = m_typeId;
     }
-
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(restypeid);
-    if (!resType)
-        return m_resourceParamList;
 
     QnParamList resourceParamList;
 
     // 1. read Q_PROPERTY params
     const QMetaObject *mObject = metaObject();
-    for (int i = 0; i < mObject->propertyCount(); ++i) {
+    for (int i = 1; i < mObject->propertyCount(); ++i) { // from 1 to skip `objectName`
         const QMetaProperty mProperty = mObject->property(i);
-        QnParamTypePtr paramType(new QnParamType());
-        switch (mProperty.userType()) {
-        case QVariant::Bool:
-            paramType->type = QnParamType::Boolen;
-            break;
-        case QVariant::UInt:
-            paramType->type = QnParamType::MinMaxStep;
-            paramType->min_val = 0;
-            paramType->max_val = UINT_MAX;
-            break;
-        case QVariant::Int:
-            paramType->type = QnParamType::MinMaxStep;
-            paramType->min_val = INT_MIN;
-            paramType->max_val = INT_MAX;
-            break;
-        case QVariant::ULongLong:
-            paramType->type = QnParamType::MinMaxStep;
-            paramType->min_val = 0;
-            paramType->max_val = ULLONG_MAX;
-            break;
-        case QVariant::LongLong:
-            paramType->type = QnParamType::MinMaxStep;
-            paramType->min_val = LLONG_MIN;
-            paramType->max_val = LLONG_MAX;
-            break;
-        default:
-            paramType->type = QnParamType::Value;
-            break;
-        }
-        paramType->name = mProperty.name();
+        QnParamTypePtr paramType(new QnParamType);
+        paramType->name = QString::fromLatin1(mProperty.name());
         paramType->ui = mProperty.isDesignable();
+        paramType->isReadOnly = mProperty.isWritable();
         paramType->isPhysical = false;
-        //resType->addParamType(paramType);
-        QnParam newParam(paramType);
+        if (mProperty.isEnumType()) {
+            paramType->type = QnParamType::Enumeration;
+            const QMetaEnum mEnumerator = mProperty.enumerator();
+            for (int i = 0; i < mEnumerator.keyCount(); ++i) {
+                paramType->ui_possible_values.append(mEnumerator.key(i));
+                paramType->possible_values.append(mEnumerator.value(i));
+            }
+        } else {
+            switch (mProperty.userType()) {
+            case QVariant::Bool:
+                paramType->type = QnParamType::Boolen;
+                break;
+            case QVariant::UInt:
+                paramType->type = QnParamType::MinMaxStep;
+                paramType->min_val = 0;
+                paramType->max_val = UINT_MAX;
+                break;
+            case QVariant::Int:
+                paramType->type = QnParamType::MinMaxStep;
+                paramType->min_val = INT_MIN;
+                paramType->max_val = INT_MAX;
+                break;
+            case QVariant::ULongLong:
+                paramType->type = QnParamType::MinMaxStep;
+                paramType->min_val = 0;
+                paramType->max_val = ULLONG_MAX;
+                break;
+            case QVariant::LongLong:
+                paramType->type = QnParamType::MinMaxStep;
+                paramType->min_val = LLONG_MIN;
+                paramType->max_val = LLONG_MAX;
+                break;
+            default:
+                paramType->type = QnParamType::Value;
+                break;
+            }
+        }
+        paramType->setDefVal(QVariant(mProperty.userType(), (void *)0));
+
+        QnParam newParam(paramType, mProperty.read(this));
         resourceParamList.append(newParam);
     }
 
     // 2. read AppServer params
-    foreach (QnParamTypePtr paramType, resType->paramTypeList()) {
-        QnParam newParam(paramType);
-        newParam.setValue(paramType->default_value);
-        resourceParamList.append(newParam);
+    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) {
+        foreach (const QnParamTypePtr &paramType, resType->paramTypeList()) {
+            QnParam newParam(paramType, paramType->default_value);
+            resourceParamList.append(newParam);
+        }
     }
 
     QMutexLocker mutexLocker(&m_mutex);
