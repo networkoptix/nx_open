@@ -64,7 +64,7 @@ public:
 public Q_SLOTS:
     void setMinimumValue(qint64 value);
     void setMaximumValue(qint64 value);
-    void setCurrentValue(qint64 value);
+    void setCurrentValue(qint64 value, bool forceUpdate = false);
     void setScalingFactor(double factor);
 
     inline void zoomIn()

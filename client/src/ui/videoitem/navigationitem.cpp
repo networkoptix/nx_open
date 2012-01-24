@@ -482,7 +482,7 @@ void NavigationItem::updateSlider()
         if (time != AV_NOPTS_VALUE)
         {
             m_currentTime = time != DATETIME_NOW ? time/1000 : time;
-            m_timeSlider->setCurrentValue(m_currentTime);
+            m_timeSlider->setCurrentValue(m_currentTime, true);
         }
 
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
@@ -1053,6 +1053,7 @@ void NavigationItem::setPlaying(bool playing)
         m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
 
         pause();
+        m_timeSlider->setLiveMode(false);
     }
 }
 
@@ -1094,4 +1095,6 @@ void NavigationItem::onSyncButtonToggled(bool value)
         reader->setSpeed(1.0);
     }
     m_speedSlider->resetSpeed();
+    if (!value)
+        updateActualCamera();
 }
