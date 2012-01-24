@@ -17,6 +17,7 @@ QAction cm_screen_recording(QObject::tr("Screen Recording"), 0);
 QAction cm_toggle_recording(QObject::tr("Start Screen Recording"), 0);
 QAction cm_recording_settings(QObject::tr("Screen Recording Settings"), 0);
 QAction cm_toggle_fullscreen(QObject::tr("Toggle fullscreen"), 0);
+QAction cm_toggle_fps(QObject::tr("Toggle FPS display"), 0);
 QAction cm_arrange(QObject::tr("Arrange"), 0);
 QAction cm_add_layout(QObject::tr("Add new layout..."), 0);
 QAction cm_restore_layout(QObject::tr("Restore layout"), 0);
@@ -115,6 +116,9 @@ void initContextMenu()
     cm_toggle_fullscreen.setShortcuts(shortcuts);
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
     cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/fullscreen.png")));
+
+    cm_toggle_fps.setShortcut(QObject::tr("Ctrl+Alt+F"));
+    cm_toggle_fps.setShortcutContext(Qt::ApplicationShortcut);
 
     QMenu *itemDistanceMenu = new QMenu();
     itemDistanceMenu->setTitle(QObject::tr("Item distance"));

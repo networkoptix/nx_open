@@ -131,6 +131,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_fpsItem->setPalette(palette);
     }
 
+    setFpsVisible(false);
+
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
 
 
@@ -472,6 +474,8 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
         m_fpsCountingInstrument->recursiveEnable();
     else
         m_fpsCountingInstrument->recursiveDisable();
+
+    m_fpsItem->setText(QString());
 }
 
 
