@@ -482,7 +482,7 @@ void NavigationItem::updateSlider()
         if (time != AV_NOPTS_VALUE)
         {
             m_currentTime = time != DATETIME_NOW ? time/1000 : time;
-            m_timeSlider->setCurrentValue(m_currentTime);
+            m_timeSlider->setCurrentValue(m_currentTime, true);
         }
 
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading

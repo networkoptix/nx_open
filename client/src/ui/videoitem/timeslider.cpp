@@ -1089,13 +1089,13 @@ qint64 TimeSlider::currentValue() const
     return m_currentValue;
 }
 
-void TimeSlider::setCurrentValue(qint64 value)
+void TimeSlider::setCurrentValue(qint64 value, bool forceUpdate)
 {
 /*    if (value == DATETIME_NOW)
         return; // ###*/
 
     value = qBound(m_minimumValue, value, maximumValue());
-    if (m_currentValue == value)
+    if (m_currentValue == value && !forceUpdate)
         return;
 
     m_currentValue = value;
