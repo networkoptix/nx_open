@@ -263,7 +263,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
 
-    if (currentTime != DATETIME_NOW) {
+    if (d->enabled && currentTime != DATETIME_NOW) {
         reader->jumpToPreviousFrame(currentTime);
         reader->setSpeed(d->speed);
     }
