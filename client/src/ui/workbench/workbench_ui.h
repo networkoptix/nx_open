@@ -10,12 +10,14 @@ class CLVideoCamera;
 class InstrumentManager;
 class UiElementsInstrument;
 class ActivityListenerInstrument;
+class FpsCountingInstrument;
 class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
 class NavigationItem;
 class NavigationTreeWidget;
+class GraphicsLabel;
 
 class QnWorkbenchDisplay;
 class QnImageButtonWidget;
@@ -42,6 +44,10 @@ public:
         return m_titleUsed;
     }
 
+    bool isFpsVisible() const;
+
+    void setFpsVisible(bool fpsVisible);
+
 public Q_SLOTS:
     void setTitleUsed(bool titleUsed);
     void setTreeVisible(bool visible, bool animate = true);
@@ -54,12 +60,14 @@ protected:
     void updateViewportMargins();
 
     void updateTreeGeometry();
+    void updateFpsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
 
 protected Q_SLOTS:
     void at_activityStopped();
     void at_activityStarted();
+    void at_fpsChanged(qreal fps);
 
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -84,6 +92,8 @@ protected Q_SLOTS:
     void at_titleItem_geometryChanged();
     void at_titleOpacityProcessor_hoverEntered();
     void at_titleOpacityProcessor_hoverLeft();
+
+    void at_fpsItem_geometryChanged();
 
 private:
     struct VisibilityState {
@@ -110,6 +120,9 @@ private:
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;
 
+    /** Fps counting instrument. */
+    FpsCountingInstrument *m_fpsCountingInstrument;
+
     /** Activity listener instrument. */
     ActivityListenerInstrument *m_controlsActivityInstrument;
 
@@ -127,6 +140,8 @@ private:
     VisibilityState m_storedVisibility;
 
     bool m_inactive;
+
+    GraphicsLabel *m_fpsItem;
 
 
     /* Slider-related state. */
