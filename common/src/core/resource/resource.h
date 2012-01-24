@@ -240,6 +240,8 @@ private:
 class QnResourceFactory
 {
 public:
+    virtual ~QnResourceFactory() {};
+
     virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) = 0;
 };
 
@@ -247,6 +249,8 @@ public:
 class QnResourceProcessor
 {
 public:
+    virtual ~QnResourceProcessor() {};
+
     virtual void processResources(const QnResourceList& resources) = 0;
 };
 
