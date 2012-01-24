@@ -14,6 +14,8 @@ public:
 class QnSecurityCamResource : virtual public QnMediaResource
 {
     Q_OBJECT
+    Q_PROPERTY(QnScheduleTaskList scheduleTasks READ getScheduleTasks WRITE setScheduleTasks)
+
 public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
@@ -37,10 +39,10 @@ public:
     void setMotionMask(const QRegion& mask);
     QRegion getMotionMask() const;
 
-    void setScheduleTasks(const QnScheduleTaskList& scheduleTasks);
-    const QnScheduleTaskList getScheduleTasks() const;
+    void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
+    const QnScheduleTaskList &getScheduleTasks() const;
 
-signals:
+Q_SIGNALS:
     void motionMaskChanged(QRegion region);
 
 protected:

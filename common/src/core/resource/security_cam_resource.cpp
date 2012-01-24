@@ -6,6 +6,9 @@ QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
       m_dpFactory(0)
 {
+    qRegisterMetaType<QnScheduleTask>();
+    qRegisterMetaType<QnScheduleTaskList>();
+
     addFlag(live_cam);
 }
 
@@ -98,12 +101,12 @@ void QnSecurityCamResource::setMotionMask(const QRegion& mask)
     emit motionMaskChanged(mask);
 }
 
-void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks)
+void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {
     m_scheduleTasks = scheduleTasks;
 }
 
-const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
+const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 {
     return m_scheduleTasks;
 }
