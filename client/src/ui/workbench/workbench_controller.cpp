@@ -1132,7 +1132,15 @@ void QnWorkbenchController::at_hideMotionAction_triggered() {
 
 void QnWorkbenchController::at_showMotionAction_triggered()
 {
-    displayMotionGrid(display()->scene()->selectedItems(), true);
+    QList<QGraphicsItem*> items;
+    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
+    {
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+        if (widget && qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()))
+            items << item;
+    }
+
+    displayMotionGrid(items, true);
     //m_motionSelectionInstrument->recursiveEnable();
 
 #if 0
