@@ -38,6 +38,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 {
     setupUi(this);
 
+    connect(auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+            this, SLOT(auxMediaFolderSelectionChanged()));
+
+
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
 
