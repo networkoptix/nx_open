@@ -1,8 +1,8 @@
 #ifndef QN_PARAM_H
 #define QN_PARAM_H
 
+#include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>
 
@@ -46,8 +46,8 @@ struct QN_EXPORT QnParam
 {
     QnParam() : m_paramType(new QnParamType) {}
     QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant())
-        : m_paramType(paramType), m_value(value)
-    {}
+        : m_paramType(paramType)
+    { setValue(value); }
 
     bool setValue(const QVariant &val); // safe way to set value
     const QVariant& value() const { return m_value; }
@@ -77,13 +77,11 @@ Q_DECLARE_TYPEINFO(QnParam, Q_COMPLEX_TYPE);
 class QN_EXPORT QnParamList
 {
 public:
-    typedef QMap<QString, QnParam> QnParamMap;
-
-    void inheritedFrom(const QnParamList& other);
-    bool contains(const QString& name) const;
-    QnParam& value(const QString& name);
-    const QnParam value(const QString& name) const;
-    void append(const QnParam& param);
+    void unite(const QnParamList &other);
+    bool contains(const QString &name) const;
+    QnParam &value(const QString &name);
+    const QnParam value(const QString &name) const;
+    void append(const QnParam &param);
     bool isEmpty() const;
     QList<QnParam> list() const;
 
@@ -93,6 +91,7 @@ public:
     QnParamList paramList(const QString &group, const QString &subgroup) const;
 
 private:
+    typedef QHash<QString, QnParam> QnParamMap;
     QnParamMap m_params;
 };
 
