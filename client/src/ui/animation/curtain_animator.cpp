@@ -21,7 +21,6 @@ QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
 
     m_frameOpacityAnimator = new VariantAnimator(this);
     m_frameOpacityAnimator->setAccessor(new PropertyAccessor("frameOpacity"));
-    m_frameOpacityAnimator->setConverter(new QnColorToVectorConverter());
     m_frameOpacityAnimator->setTargetObject(NULL);
 
     addAnimator(m_curtainColorAnimator);
@@ -75,7 +74,7 @@ void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget) {
     restoreFrameColor();
     m_frameOpacity = frontWidget->frameOpacity();
     m_frameOpacityAnimator->setTargetObject(frontWidget);
-    m_frameOpacityAnimator->setTargetValue(SceneUtility::transparent(m_frameOpacity));
+    m_frameOpacityAnimator->setTargetValue(0.0);
 
     m_curtainColorAnimator->setTargetValue(m_curtainColor);
     curtain->show();
