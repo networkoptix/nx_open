@@ -45,7 +45,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     if (m_needUpdateStreamParams)
     {
         QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (media->dataProvider);
-        if (mediaProvider) 
+        if (mediaProvider)
         {
             mediaProvider->setFps(m_currentScheduleTask.getFps());
             mediaProvider->setQuality(m_currentScheduleTask.getStreamQuality());
@@ -131,7 +131,7 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
                 qint64 absoluteScheduleTime = weekStartDateTime.toMSecsSinceEpoch() + itr->startTimeMs();
 
                 if (itr->containTimeMs(scheduleTimeMs)) {
-                    m_lastSchedulePeriod = QnTimePeriod(absoluteScheduleTime, itr->durationMs()); 
+                    m_lastSchedulePeriod = QnTimePeriod(absoluteScheduleTime, itr->durationMs());
                     updateRecordingType(*itr);
                     m_needUpdateStreamParams = true;
                     //m_skipDataToTime = AV_NOPTS_VALUE;
@@ -140,7 +140,7 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
                     if (timeMs > absoluteScheduleTime)
                         absoluteScheduleTime = weekStartDateTime.addDays(7).toMSecsSinceEpoch() + itr->startTimeMs();
                     //m_skipDataToTime = absoluteScheduleTime;
-                    QnScheduleTask noRecordTask(QnId::generateSpecialId(), m_device->getId(), 0, 0, false, QnScheduleTask::RecordingType_Never, 1, 0, 0);
+                    QnScheduleTask noRecordTask(QnId::generateSpecialId(), m_device->getId(), 1, 0, 0, QnScheduleTask::RecordingType_Never, 0, 0);
                     qint64 curTime = packetDateTime.toMSecsSinceEpoch();
                     m_lastSchedulePeriod = QnTimePeriod(curTime, absoluteScheduleTime - curTime);
                     updateRecordingType(noRecordTask);
@@ -164,7 +164,7 @@ void QnServerStreamRecorder::updateSchedule(const QnScheduleTaskList& schedule)
 
 QString QnServerStreamRecorder::fillFileName()
 {
-    if (m_fixedFileName.isEmpty()) 
+    if (m_fixedFileName.isEmpty())
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
