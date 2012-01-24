@@ -22,9 +22,6 @@ namespace {
     /** Default frame width. */
     const qreal defaultFrameWidth = 0.5;
 
-    /** Default frame color. */
-    const QColor defaultFrameColor = Globals::frameColor();
-
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
      *
@@ -63,6 +60,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameWidth(0.0),
+    m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
     m_displayFlags(DISPLAY_SELECTION_OVERLAY)
 {
@@ -77,7 +75,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     invalidateShadowShape();
 
     /* Set up frame. */
-    setFrameColor(defaultFrameColor);
     setFrameWidth(defaultFrameWidth);
 
     /* Set up buttons layout. */
@@ -571,12 +568,16 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+    if(qFuzzyIsNull(m_frameOpacity))
+        return;
+
     QSizeF size = this->size();
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = m_frameColor;
+    QColor color = palette().color(isSelected() ? QPalette::Active : QPalette::Inactive, QPalette::Shadow);
 
+    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
     painter->fillRect(QRectF(-fw,     -fw,     w + fw * 2,  fw), color);
     painter->fillRect(QRectF(-fw,     h,       w + fw * 2,  fw), color);

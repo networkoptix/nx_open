@@ -15,6 +15,7 @@ Globals::Globals(QObject *parent):
     setValue(MOTION_RUBBER_BAND_COLOR, QColor(0, 255, 0, 64));
     setValue(MOTION_SELECTION_COLOR, QColor(0, 255, 0, 40));
     setValue(FRAME_COLOR, QColor(128, 128, 128, 196));
+    setValue(SELECTED_FRAME_COLOR, QColor(64, 130, 180, 128));
     setValue(OPACITY_CHANGE_PERIOD, 500);
 
     // DEPRECATED
