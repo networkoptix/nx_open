@@ -6,6 +6,12 @@
 void QnServerCameraProcessor::processResources(const QnResourceList &resources)
 {
     QnResourcePool::instance()->addResources(resources);
+
+    foreach(QnResourcePtr res, resources)
+    {
+        if (!res.dynamicCast<QnServerCamera>())
+            res->setStatus(QnResource::Online);
+    }
 }
 
 QnServerCamera::QnServerCamera()
