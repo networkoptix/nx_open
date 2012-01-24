@@ -89,11 +89,25 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         return false;
     if (!sameDir) {
         dir.cd(prefix);
-        m_existFileList = dir.entryList(QDir::Files);
+        m_existFileList = dir.entryInfoList(QDir::Files);
     }
     QString fName = strPadLeft(QString::number(chunk.fileIndex), 3, '0') + QString(".mkv");
-    if (!m_existFileList.contains(fName))
+
+    bool found = false;
+    foreach(const QFileInfo& info, m_existFileList)
+    {
+        if (info.fileName() == fName)
+        {
+            found = true;
+            if (info.size() == 0)
+                return false;
+            break;
+        }
+    }
+    if (!found)
         return false;
+    //if (!m_existFileList.contains(fName))
+    //    return false;
 
     m_duplicateName = fName == m_prevFileName;
     m_prevFileName = fName;
@@ -149,6 +163,17 @@ QList<QDate> DeviceFileCatalog::recordedMonthList()
     return rez;
 }
 
+void DeviceFileCatalog::addChunk(const Chunk& chunk, qint64 lastStartTime)
+{
+    if (chunk.startTimeMs > lastStartTime) {
+        m_chunks << chunk;
+    }
+    else {
+        ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
+        m_chunks.insert(itr, chunk);
+    }
+};
+
 void DeviceFileCatalog::deserializeTitleFile()
 {
     QMutexLocker lock(&m_mutex);
@@ -157,6 +182,7 @@ void DeviceFileCatalog::deserializeTitleFile()
 
     m_file.readLine(); // read header
     QByteArray line;
+    qint64 lastStartTime = 0;
     do {
         line = m_file.readLine();
         QList<QByteArray> fields = line.split(';');
@@ -176,20 +202,26 @@ void DeviceFileCatalog::deserializeTitleFile()
             needRewriteFile = true;
             chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs);
         }
-        if (fileExists(chunk)) 
+
+        if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
+        {
+            // Skip chunks for unavaileble storage
+             //addChunk(chunk, lastStartTime);
+        }
+        else if (fileExists(chunk)) 
         {
             if (lastFileDuplicateName()) {
                 m_chunks.last() = chunk;
                 needRewriteFile = true;
             }       
-            else {
-                ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), startTime);
-                m_chunks.insert(itr, chunk);
-            }
+            else 
+                addChunk(chunk, lastStartTime);
         }
         else {
             needRewriteFile = true;
         }
+        lastStartTime = startTime;
+
     } while (!line.isEmpty());
     newFile.close();
     if (needRewriteFile && newFile.open(QFile::WriteOnly))

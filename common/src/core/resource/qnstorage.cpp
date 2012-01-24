@@ -1,4 +1,5 @@
 #include "qnstorage.h"
+#include "utils/common/util.h"
 
 QnStorage::QnStorage():
     QnResource(),
@@ -6,7 +7,7 @@ QnStorage::QnStorage():
     m_maxStoreTime(0),
     m_index(0)
 {
-
+    setStatus(Offline);
 }
 
 QnStorage::~QnStorage()
@@ -47,4 +48,25 @@ void QnStorage::setIndex(quint16 value)
 quint16 QnStorage::getIndex() const
 {
     return m_index;
+}
+
+void QnStorage::setUrl(const QString& value)
+{
+    QnResource::setUrl(value);
+    QString tmpDir = closeDirPath(value) + QString("tmp") + QString::number(rand());
+    QDir dir(tmpDir);
+    if (dir.exists()) {
+        setStatus(Online);
+        dir.remove(tmpDir);
+    }
+    else {
+        if (dir.mkpath(tmpDir))
+        {
+            dir.rmdir(tmpDir);
+            setStatus(Online);
+        }
+        else {
+            setStatus(Offline);
+        }
+    }
 }
