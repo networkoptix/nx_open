@@ -1069,6 +1069,11 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
     if(workbench() == NULL)
         return;
 
+#if 0
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+        qDebug() << resource->getName();
+#endif
+
     workbench()->setItem(QnWorkbench::RAISED, NULL);
 }
 
