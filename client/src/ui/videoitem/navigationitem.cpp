@@ -704,10 +704,10 @@ void NavigationItem::repaintMotionPeriods()
         CLVideoCamera* camera = findCameraByResource(info.reader->getResource());
         if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.region.isEmpty())
             allPeriods << info.periods;
-        isMotionExist |= !info.periods.isEmpty();
+        QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
+        isMotionExist |= !tp.isEmpty();
         if (!useSync) 
         {
-            QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
             info.reader->setPlaybackMask(tp);
             if (info.reader == currentReader)
             {
