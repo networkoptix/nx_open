@@ -541,6 +541,7 @@ int QnWorkbenchController::isMotionGridDisplayed()
 {
     bool allDisplayed = true;
     bool allNonDisplayed = true;
+    bool isCameraSelected = false;
     foreach(QGraphicsItem *item, display()->scene()->selectedItems())
     {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -548,7 +549,10 @@ int QnWorkbenchController::isMotionGridDisplayed()
             continue;
         allDisplayed &= widget->isMotionGridDisplayed();
         allNonDisplayed &= !widget->isMotionGridDisplayed();
+        isCameraSelected |= qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()) != 0;
     }
+    if (!isCameraSelected)
+        return -2;
     if (allDisplayed)
         return 1;
     else if (allNonDisplayed)
@@ -1008,7 +1012,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         m_itemContextMenu->addAction(m_hideMotionAction);
     else if (gridnowDisplayed == 0)
         m_itemContextMenu->addAction(m_showMotionAction);
-    else {
+    else if (gridnowDisplayed == -1) {
         m_itemContextMenu->addAction(m_hideMotionAction);
         m_itemContextMenu->addAction(m_showMotionAction);
     }
