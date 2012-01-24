@@ -35,8 +35,9 @@ typedef QMap<QString, QString> QnResourceParameters;
 class QN_EXPORT QnResource : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show at GUI
+    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show in GUI
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
+    Q_CLASSINFO("url", "URL")
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
@@ -133,11 +134,11 @@ public:
 
 
     // return true if no error
-    virtual bool setParam(const QString& name, const QVariant& val, QnDomain domain);
+    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
 
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
-    void setParamAsync(const QString& name, const QVariant& val, QnDomain domain );
+    void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
 
     // ==============================================================================
 
