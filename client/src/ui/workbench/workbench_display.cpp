@@ -33,6 +33,7 @@
 #include <ui/graphics/items/grid_item.h>
 
 #include "ui/skin/skin.h"
+#include "ui/skin/globals.h"
 
 #include "workbench_layout.h"
 #include "workbench_item.h"
@@ -542,6 +543,13 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
      * Note that this flag must be unset after Qt::Window window flag is set
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
+
+    {
+        QPalette palette = widget->palette();
+        palette.setColor(QPalette::Active, QPalette::Shadow, Globals::selectedFrameColor());
+        palette.setColor(QPalette::Inactive, QPalette::Shadow, Globals::frameColor());
+        widget->setPalette(palette);
+    }
 
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
     togglePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("pin.png")));
