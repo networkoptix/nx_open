@@ -719,7 +719,7 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     if(m_view == NULL) {
         return QRectF();
     } else {
-        return mapRectToScene(m_view, eroded(m_view->viewport()->rect(), m_viewportMargins));
+        return mapRectToScene(m_view, (m_marginFlags & MARGINS_AFFECT_SIZE) ? eroded(m_view->viewport()->rect(), m_viewportMargins) : m_view->viewport()->rect());
     }
 }
 

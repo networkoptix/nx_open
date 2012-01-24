@@ -1039,7 +1039,10 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
         QRectF viewportGeometry = m_display->viewportGeometry();
         QRectF zoomedItemGeometry = m_display->itemGeometry(zoomedItem);
 
-        if(contains(zoomedItemGeometry.size(), viewportGeometry.size()) && !qFuzzyCompare(viewportGeometry, zoomedItemGeometry)) {
+        if(
+            (viewportGeometry.width() < zoomedItemGeometry.width() && !qFuzzyCompare(viewportGeometry.width(), zoomedItemGeometry.width())) ||
+            (viewportGeometry.height() < zoomedItemGeometry.height() && !qFuzzyCompare(viewportGeometry.height(), zoomedItemGeometry.height()))
+        ) {
             workbench()->setItem(QnWorkbench::ZOOMED, NULL);
             workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
         } else {
