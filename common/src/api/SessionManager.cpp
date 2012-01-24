@@ -1,10 +1,12 @@
 #include "SessionManager.h"
 
 #include <QtCore/QBuffer>
+#include <QtCore/QThread>
 
 #include <QtNetwork/QNetworkReply>
 
 #include "utils/network/synchttp.h"
+#include "utils/common/warnings.h"
 
 QAtomicInt SessionManager::m_handle(1);
 
@@ -32,6 +34,9 @@ SessionManager::SessionManager(const QUrl &url, QObject *parent)
 
 SessionManager::~SessionManager()
 {
+    if(QThread::currentThread() != this->thread())
+        qnWarning("Deleting session manager from another thread is dangerous and may lead to unexpected crashes.");
+
     m_httpClient->deleteLater();
 }
 

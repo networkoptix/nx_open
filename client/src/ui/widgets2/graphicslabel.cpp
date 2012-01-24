@@ -8,6 +8,9 @@ void GraphicsLabelPrivate::init()
     textItem = new QGraphicsSimpleTextItem(q);
     updateTextBrush();
     updateTextFont();
+    textItem->setAcceptedMouseButtons(0);
+    textItem->setAcceptsHoverEvents(false);
+    textItem->setFlags(0);
 
     q->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred, QSizePolicy::Label));
 }

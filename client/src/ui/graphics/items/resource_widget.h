@@ -23,7 +23,7 @@ class QnAbstractArchiveReader;
 
 class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
-    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
+    Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement);
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry);
@@ -86,17 +86,17 @@ public:
     }
 
     /**
-     * \returns                         Frame color of this widget.
+     * \returns                         Frame opacity of this widget.
      */
-    const QColor &frameColor() const {
-        return m_frameColor;
+    qreal frameOpacity() const {
+        return m_frameOpacity;
     }
 
     /**
-     * \param frameColor                New frame color for this widget.
+     * \param frameColor                New frame opacity for this widget.
      */
-    void setFrameColor(const QColor &frameColor) {
-        m_frameColor = frameColor;
+    void setFrameOpacity(qreal frameOpacity) {
+        m_frameOpacity = frameOpacity;
     }
 
     /**
@@ -364,8 +364,8 @@ private:
     /** Shadow item. */
     QWeakPointer<QnPolygonalShadowItem> m_shadow;
 
-    /** Frame color. */
-    QColor m_frameColor;
+    /** Frame opacity. */
+    qreal m_frameOpacity;
 
     /** Shadow displacement. */
     QPointF m_shadowDisplacement;

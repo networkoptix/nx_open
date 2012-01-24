@@ -132,6 +132,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
     addAction(&cm_reconnect);
 
+    connect(&cm_toggle_fps, SIGNAL(triggered()), this, SLOT(toggleFpsDisplay()));
+    addAction(&cm_toggle_fps);
+
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
     /* Set up scene & view. */
@@ -513,6 +516,11 @@ void MainWnd::toggleTitleVisibility()
     }
 
     updateDwmState();
+}
+
+void MainWnd::toggleFpsDisplay() 
+{
+    m_ui->setFpsVisible(!m_ui->isFpsVisible());
 }
 
 bool MainWnd::isTitleVisible() const

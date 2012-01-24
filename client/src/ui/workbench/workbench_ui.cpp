@@ -23,9 +23,12 @@
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
 #include <ui/graphics/instruments/activity_listener_instrument.h>
+#include <ui/graphics/instruments/fps_counting_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
+
+#include <ui/widgets2/graphicslabel.h>
 
 #include <ui/processors/hover_processor.h>
 
@@ -89,16 +92,19 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
     /* Install and configure instruments. */
+    m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(hideConstrolsTimeoutMSec, this);
+    
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
+    m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_controlsActivityInstrument);
 
     m_controlsActivityInstrument->recursiveDisable();
 
     connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
     connect(m_controlsActivityInstrument, SIGNAL(activityResumed()),                                                                this,                           SLOT(at_activityStarted()));
-
+    connect(m_fpsCountingInstrument,    SIGNAL(fpsChanged(qreal)),                                                                  this,                           SLOT(at_fpsChanged(qreal)));
 
     /* Create controls. */
     m_controlsWidget = m_uiElementsInstrument->widget();
@@ -111,6 +117,24 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
     connect(m_controlsWidget,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
+
+
+    /* Fps counter. */
+    m_fpsItem = new GraphicsLabel(m_controlsWidget);
+    m_fpsItem->setAcceptedMouseButtons(0);
+    m_fpsItem->setAcceptsHoverEvents(false);
+    m_fpsItem->setFont(QFont("Courier New", 10));
+    {
+        QPalette palette = m_fpsItem->palette();
+        palette.setColor(QPalette::Window, QColor(0, 0, 0, 0));
+        palette.setColor(QPalette::WindowText, QColor(63, 159, 216));
+        m_fpsItem->setPalette(palette);
+    }
+
+    setFpsVisible(false);
+
+    connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
+
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
@@ -405,6 +429,18 @@ void QnWorkbenchUi::updateTreeGeometry() {
     m_treeItem->resize(geometry.size());
 }
 
+void QnWorkbenchUi::updateFpsGeometry() {
+    QPointF pos = QPointF(
+        m_controlsWidget->size().width() - m_fpsItem->size().width(),
+        m_titleUsed ? m_titleItem->geometry().bottom() : 0.0
+    );
+
+    if(qFuzzyCompare(pos, m_fpsItem->pos()))
+        return;
+
+    m_fpsItem->setPos(pos);
+}
+
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY) {
     return QMargins(
         m_treePinned ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
@@ -424,10 +460,33 @@ void QnWorkbenchUi::updateViewportMargins() {
     ));
 }
 
+bool QnWorkbenchUi::isFpsVisible() const {
+    return m_fpsItem->isVisible();
+}
+
+void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
+    if(fpsVisible == isFpsVisible())
+        return;
+
+    m_fpsItem->setVisible(fpsVisible);
+    
+    if(fpsVisible)
+        m_fpsCountingInstrument->recursiveEnable();
+    else
+        m_fpsCountingInstrument->recursiveDisable();
+
+    m_fpsItem->setText(QString());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchUi::at_fpsChanged(qreal fps) {
+    m_fpsItem->setText(QString::number(fps, 'g', 4));
+    m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
+}
+
 void QnWorkbenchUi::at_activityStopped() {
     m_inactive = true;
     m_storedVisibility = m_visibility;
@@ -523,6 +582,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
     ));
 
     updateTreeGeometry();
+    updateFpsGeometry();
 }
 
 void QnWorkbenchUi::at_navigationItem_geometryChanged() {
@@ -616,8 +676,12 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     if(!m_titleUsed) 
         return;
     
+    updateFpsGeometry();
     updateTreeGeometry();
 
     m_titleBackgroundItem->setGeometry(m_titleItem->geometry());
 }
 
+void QnWorkbenchUi::at_fpsItem_geometryChanged() {
+    updateFpsGeometry();
+}
