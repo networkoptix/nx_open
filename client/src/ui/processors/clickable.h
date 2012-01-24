@@ -36,11 +36,14 @@ protected:
             return;
 
         event->accept();
+        pressedNotify(event);
     }
 
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override {
         if(!(event->button() & m_clickableButtons))
             return;
+
+        releasedNotify(event);
 
         if(!this->boundingRect().contains(event->pos()))
             return; /* If the button was released outside the item boundaries, then it is not a click. */
@@ -55,6 +58,10 @@ protected:
      * \param event                     Event that caused the mouse click to be generated.
      */
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) { Q_UNUSED(event); };
+
+    virtual void pressedNotify(QGraphicsSceneMouseEvent *event) { Q_UNUSED(event); };
+
+    virtual void releasedNotify(QGraphicsSceneMouseEvent *event) { Q_UNUSED(event); };
 
 private:
     Qt::MouseButtons m_clickableButtons;

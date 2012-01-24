@@ -10,6 +10,7 @@
 QAction cm_new_item(QObject::tr("New Item..."), 0);
 QAction cm_about(QObject::tr("About..."), 0);
 QAction cm_exit(QObject::tr("Exit"), 0);
+QAction cm_reconnect(QObject::tr("Reconnect"), 0);
 QAction cm_fitinview(QObject::tr("Fit in View"), 0);
 QAction cm_open_file(QObject::tr("Open file(s)..."), 0);
 QAction cm_screen_recording(QObject::tr("Screen Recording"), 0);
@@ -59,6 +60,8 @@ void initContextMenu()
     cm_exit.setShortcut(QObject::tr("Alt+F4"));
     cm_exit.setShortcutContext(Qt::ApplicationShortcut);
     cm_exit.setMenuRole(QAction::QuitRole);
+
+    cm_reconnect.setIcon(Skin::icon(QLatin1String("connect.png")));
 
     cm_preferences.setIcon(Skin::icon(QLatin1String("decorations/settings.png")));
     cm_preferences.setShortcut(QObject::tr("Ctrl+P"));

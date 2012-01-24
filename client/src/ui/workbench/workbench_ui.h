@@ -38,13 +38,19 @@ public:
         return m_treeWidget;
     }
 
+    bool isTitleUsed() const {
+        return m_titleUsed;
+    }
+
 public Q_SLOTS:
+    void setTitleUsed(bool titleUsed);
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
+    void setTitleVisible(bool visible, bool animate = true);
     void toggleTreeVisible();
 
 protected:
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal sliderY);
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);
     void updateViewportMargins();
 
     void updateTreeGeometry();
@@ -75,15 +81,22 @@ protected Q_SLOTS:
     void at_treeShowButton_toggled(bool checked);
     void at_treePinButton_toggled(bool checked);
 
+    void at_titleItem_geometryChanged();
+    void at_titleOpacityProcessor_hoverEntered();
+    void at_titleOpacityProcessor_hoverLeft();
+
 private:
     struct VisibilityState {
-        VisibilityState(): treeVisible(false), sliderVisible(false) {}
+        VisibilityState(): treeVisible(false), sliderVisible(false), titleVisible(false) {}
 
         /** Whether the tree is visible. */
         bool treeVisible;
 
         /** Whether navigation slider is visible. */
         bool sliderVisible;
+
+        /** Whether title bar is visible. */
+        bool titleVisible;
     };
 
     /* Global state. */
@@ -120,8 +133,6 @@ private:
 
     /** Navigation item. */
     NavigationItem *m_sliderItem;
-
-    bool m_sliderVisible;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
@@ -168,10 +179,19 @@ private:
 
     /* Title-related state. */
 
-    /** Background widget for the title bar. */
+    /** Title bar widget. */
     QGraphicsWidget *m_titleItem;
 
+    /** Background widget for the title bar. */
+    QGraphicsWidget *m_titleBackgroundItem;
+
+    /** Animator for title's position. */
     VariantAnimator *m_titleYAnimator;
+
+    HoverFocusProcessor *m_titleOpacityProcessor;
+
+    bool m_titleUsed;
+
 };
 
 #endif // QN_WORKBENCH_UI_H

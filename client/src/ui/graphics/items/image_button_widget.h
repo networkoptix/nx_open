@@ -5,6 +5,9 @@
 #include <QPixmap>
 #include <ui/processors/clickable.h>
 
+class QAction;
+class QIcon;
+
 class VariantAnimator;
 
 /**
@@ -32,6 +35,8 @@ public:
 
     void setPixmap(StateFlags flags, const QPixmap &pixmap);
 
+    void setIcon(const QIcon &icon);
+
     StateFlags state() const { return m_state; }
 
     bool isCheckable() const { return m_checkable; }
@@ -50,6 +55,14 @@ public:
 
     void setAnimationSpeed(qreal animationSpeed);
 
+    void setDefaultAction(QAction *action);
+
+    QAction *defaultAction() const;
+
+    bool isCached() const;
+
+    void setCached(bool cached);
+
 public Q_SLOTS:
     void setCheckable(bool checkable);
     void setChecked(bool checked);
@@ -64,28 +77,68 @@ Q_SIGNALS:
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
+    virtual void pressedNotify(QGraphicsSceneMouseEvent *event) override;
+    virtual void releasedNotify(QGraphicsSceneMouseEvent *event) override;
 
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+    virtual bool event(QEvent *event) override;
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
+    virtual void paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState);
+
 protected:
-    const QPixmap &actualPixmap(StateFlags flags);
+    StateFlags displayState(StateFlags flags);
+    const QPixmap &cachedPixmap(StateFlags flags);
     void updateState(StateFlags state);
+
+    void ensurePixmapCache();
+    void invalidatePixmapCache();
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
     QPixmap m_pixmaps[FLAGS_MAX + 1];
+    mutable QPixmap m_pixmapCache[FLAGS_MAX + 1];
+    mutable bool m_pixmapCacheValid;
+
     StateFlags m_state;
     bool m_checkable;
+    bool m_cached;
 
     VariantAnimator *m_animator;
     qreal m_hoverProgress;
+
+    QAction *m_action;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags);
+
+
+class QnZoomingImageButtonWidget: public QnImageButtonWidget {
+    Q_OBJECT;
+
+    typedef QnImageButtonWidget base_type;
+
+public:
+    QnZoomingImageButtonWidget(QGraphicsItem *parent = NULL);
+
+    qreal scaleFactor() const {
+        return m_scaleFactor;
+    }
+
+    void setScaleFactor(qreal scaleFactor) {
+        m_scaleFactor = scaleFactor;
+    }
+
+protected:
+    virtual void paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState) override;
+
+private:
+    qreal m_scaleFactor;
+};
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H
