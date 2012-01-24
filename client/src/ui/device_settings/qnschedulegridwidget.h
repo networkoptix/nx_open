@@ -26,6 +26,7 @@ public:
     inline int columnCount() const { return COL_COUNT; }
 
     QVariant getCellParam(const QPoint &cell, ParamType paramType) const;
+    void setCellParam(const QPoint &cell, ParamType paramType, const QVariant &value);
 
 Q_SIGNALS:
     void needReadCellParams(const QPoint &cell);
