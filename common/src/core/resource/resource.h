@@ -159,7 +159,7 @@ public:
     inline bool associatedWithFile() const { return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0; }
 
     QString getUrl() const;
-    void setUrl(const QString& value);
+    virtual void setUrl(const QString& value);
 
     void addTag(const QString& tag);
     void setTags(const QStringList& tags);

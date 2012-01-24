@@ -49,6 +49,7 @@ public:
 
     static QString dateTimeStr(qint64 dateTimeMs);
     QnStoragePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
+    bool isStorageAvailable(int storage_index) const { return storageRoot(storage_index)->getStatus() == QnResource::Online; }
     DeviceFileCatalogPtr getFileCatalog(const QString& mac);
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
     void loadFullFileCatalog();

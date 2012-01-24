@@ -9,6 +9,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period.h"
+#include <QFileInfo>
 
 class DeviceFileCatalog: public QObject
 {
@@ -51,6 +52,7 @@ public:
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
+    void addChunk(const Chunk& chunk, qint64 lastStartTime);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs);
     QList<QDate> recordedMonthList();
 private:
@@ -61,7 +63,7 @@ private:
     QString m_macAddress;
 
     QPair<int, bool> m_prevParts[4];
-    QStringList m_existFileList;
+    QFileInfoList m_existFileList;
     bool m_duplicateName;
     QString m_prevFileName;
 };

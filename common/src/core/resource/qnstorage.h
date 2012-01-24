@@ -27,7 +27,7 @@ public:
      */
     void setIndex(quint16 value);
     quint16 getIndex() const;
-
+    virtual void setUrl(const QString& value);
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // at seconds
