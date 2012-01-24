@@ -386,7 +386,7 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
 
 void NavigationItem::updateActualCamera()
 {
-    if (m_forcedCamera != NULL) {
+    if (m_forcedCamera != NULL || !m_syncButton->isChecked()) {
         setActualCamera(m_forcedCamera);
         return;
     }
