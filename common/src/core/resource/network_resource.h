@@ -14,6 +14,8 @@ typedef QList<QnNetworkResourcePtr> QnNetworkResourceList;
 
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
+    Q_OBJECT;
+
 public:
     enum QnNetworkStatus
     {

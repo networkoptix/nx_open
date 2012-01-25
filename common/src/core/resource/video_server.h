@@ -7,6 +7,8 @@
 
 class QnLocalVideoServer : public QnResource
 {
+    Q_OBJECT;
+
 public:
     QnLocalVideoServer();
 
