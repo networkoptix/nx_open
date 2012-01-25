@@ -25,8 +25,11 @@ public:
     inline int rowCount() const { return ROW_COUNT; }
     inline int columnCount() const { return COL_COUNT; }
 
-    QVariant getCellParam(const QPoint &cell, ParamType paramType) const;
-    void setCellParam(const QPoint &cell, ParamType paramType, const QVariant &value);
+    QVariant getCellValue(const QPoint &cell, ParamType paramType) const;
+    void setCellValue(const QPoint &cell, ParamType paramType, const QVariant &value);
+    void resetCellValues(const QPoint &cell);
+
+    virtual QSize minimumSizeHint() const;
 
 Q_SIGNALS:
     void needReadCellParams(const QPoint &cell);
@@ -43,7 +46,7 @@ private:
     qreal getCellSize() const;
     QPoint getCell(const QPoint &p, bool doTruncate) const;
     void initMetrics();
-    void updateCellValue(const QPoint& cell);
+    void updateCellValues(const QPoint &cell);
 
 private:
     typedef QVariant CellParams[ParamType_Count];

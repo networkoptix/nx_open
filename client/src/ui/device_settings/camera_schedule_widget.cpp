@@ -39,7 +39,7 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
 
             QnScheduleTask::RecordingType recordType = QnScheduleTask::RecordingType_Run;
             {
-                QColor color(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ColorParam).toUInt());
+                QColor color(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
                 if (color == ui->btnRecordAlways->color())
                     recordType = QnScheduleTask::RecordingType_Run;
                 else if (color == ui->btnRecordMotion->color())
@@ -51,7 +51,7 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
             }
             QnStreamQuality streamQuality = QnQualityHighest;
             {
-                QString shortQuality(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::SecondParam).toString());
+                QString shortQuality(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::SecondParam).toString());
                 if (shortQuality == QLatin1String("Lo"))
                     streamQuality = QnQualityLow;
                 else if (shortQuality == QLatin1String("Md"))
@@ -63,7 +63,7 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
                 else
                     qWarning("SecondParam wasn't acknowledged. fallback to 'Highest'");
             }
-            int fps = fps = ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::FirstParam).toInt();
+            int fps = fps = ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
             if (fps == 0)
                 fps = 10;
 
@@ -95,6 +95,11 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
 
 void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasks)
 {
+    for (int y = 0; y < ui->gridWidget->rowCount(); ++y) {
+        for (int x = 0; x < ui->gridWidget->columnCount(); ++x)
+            ui->gridWidget->resetCellValues(QPoint(x, y));
+    }
+
     foreach (const QnScheduleTask &task, tasks) {
         const int row = task.getDayOfWeek() - 1;
 
@@ -124,9 +129,9 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasks)
         for (int col = task.getStartTime() / 3600; col < task.getEndTime() / 3600; ++col) {
             const QPoint cell(col, row);
 
-            ui->gridWidget->setCellParam(cell, QnScheduleGridWidget::ColorParam, color.rgba());
-            ui->gridWidget->setCellParam(cell, QnScheduleGridWidget::SecondParam, shortQuality);
-            ui->gridWidget->setCellParam(cell, QnScheduleGridWidget::FirstParam, fps);
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::ColorParam, color.rgba());
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, shortQuality);
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
         }
     }
 }
@@ -196,9 +201,9 @@ void CameraScheduleWidget::updateGridParams()
 void CameraScheduleWidget::onNeedReadCellParams(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
-    QColor color(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::ColorParam).toUInt());
-    double fps(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::FirstParam).toDouble());
-    QString shortQuality(ui->gridWidget->getCellParam(cell, QnScheduleGridWidget::SecondParam).toString());
+    QColor color(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
+    double fps(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
+    QString shortQuality(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::SecondParam).toString());
 
     if (color == ui->btnRecordAlways->color())
         ui->btnRecordAlways->setChecked(true);

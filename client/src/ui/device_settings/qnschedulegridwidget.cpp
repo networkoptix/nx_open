@@ -1,5 +1,7 @@
 #include "qnschedulegridwidget.h"
 
+#include <QtGui/QApplication>
+
 #include "ui/skin/globals.h"
 #include "settings.h"
 
@@ -34,12 +36,13 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_showFirstParam = true;
     m_showSecondParam = true;
 
+    m_labelsFont = font();
 }
 
 qreal QnScheduleGridWidget::getCellSize() const
 {
-    qreal cellWidth = (width() - 0.5 - m_gridLeftOffset)/(qreal)columnCount();
-    qreal cellHeight = (height() - 0.5 - m_gridTopOffset)/(qreal)rowCount();
+    qreal cellWidth = ((qreal)width() - 0.5 - m_gridLeftOffset)/columnCount();
+    qreal cellHeight = ((qreal)height() - 0.5 - m_gridTopOffset)/rowCount();
     return qMin(cellWidth, cellHeight);
 }
 
@@ -47,7 +50,7 @@ void QnScheduleGridWidget::initMetrics()
 {
     // determine labels font size
     m_labelsFont.setBold(true);
-    qreal fontSize = 7.0;
+    qreal fontSize = 10.0;
     do
     {
         m_gridLeftOffset = 0;
@@ -55,10 +58,11 @@ void QnScheduleGridWidget::initMetrics()
         m_labelsFont.setPointSizeF(fontSize);
         QFontMetrics metric(m_labelsFont);
         for (int i = 0; i < 7; ++i) {
-            m_weekDaysSize << metric.size(Qt::TextSingleLine, m_weekDays[i]);
-            m_gridLeftOffset = qMax(m_gridLeftOffset, m_weekDaysSize.last().width());
+            QSize sz = metric.size(Qt::TextSingleLine, m_weekDays[i]);
+            m_weekDaysSize << sz;
+            m_gridLeftOffset = qMax(sz.width(), m_gridLeftOffset);
+            m_gridTopOffset = qMax(sz.height(), m_gridTopOffset);
         }
-        m_gridTopOffset = metric.size(Qt::TextSingleLine, QLatin1String("23")).height();
         m_gridLeftOffset += TEXT_SPACING;
         m_gridTopOffset += TEXT_SPACING;
         fontSize += 0.5;
@@ -70,10 +74,29 @@ void QnScheduleGridWidget::initMetrics()
     while (1)
     {
         QFontMetrics metrics(m_gridFont);
-        if (metrics.width("Md") > cellSize/2.2)
+        if (metrics.width(QLatin1String("Md")) > cellSize/2.2)
             break;
         m_gridFont.setPointSizeF(m_gridFont.pointSizeF()+0.5);
     }
+}
+
+QSize QnScheduleGridWidget::minimumSizeHint() const
+{
+    QSize sz;
+
+    qreal fontSize = 14.0;
+
+    QFont font = m_labelsFont;
+    font.setBold(true);
+    font.setPointSizeF(fontSize);
+
+    QFontMetrics fm(font);
+    sz = fm.size(Qt::TextSingleLine, QLatin1String("xXx"));
+    sz += QSize(TEXT_SPACING, TEXT_SPACING);
+    qreal cellSize = qMin(sz.width(), sz.height());
+    sz = QSize(cellSize * (columnCount() + 1), cellSize * (rowCount() + 1));
+
+    return sz.expandedTo(QApplication::globalStrut());
 }
 
 void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
@@ -84,8 +107,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
     qreal cellSize = getCellSize();
 
     p.setFont(m_labelsFont);
-    for (int y = 0; y < rowCount(); ++y)
-    {
+    for (int y = 0; y < rowCount(); ++y) {
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
             p.setPen(SELECTED_LABEL_COLOR);
         else if (y < 5)
@@ -234,27 +256,28 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent *event)
     m_mousePressed = true;
     if (cell.x() == -1 && cell.y() == -1)
     {
-        for (int y = 0; y < rowCount(); ++y)
+        for (int y = 0; y < rowCount(); ++y) {
             for (int x = 0; x < columnCount(); ++x)
-                updateCellValue(QPoint(x, y));
+                updateCellValues(QPoint(x, y));
+        }
     }
     else if (cell.x() == -1) {
         for (int x = 0; x < columnCount(); ++x)
-            updateCellValue(QPoint(x, cell.y()));
+            updateCellValues(QPoint(x, cell.y()));
     }
     else if (cell.y() == -1) {
         for (int y = 0; y < rowCount(); ++y)
-            updateCellValue(QPoint(cell.x(), y));
+            updateCellValues(QPoint(cell.x(), y));
     }
     else {
-        updateCellValue(cell);
+        updateCellValues(cell);
     }
     update();
 }
 
-void QnScheduleGridWidget::updateCellValue(const QPoint& cell)
+void QnScheduleGridWidget::updateCellValues(const QPoint& cell)
 {
-    if (cell.x() < 0 || cell.y() < 0)
+    if (cell.x() < 0 || cell.y() < 0 || cell.x() >= columnCount() || cell.y() >= rowCount())
         return;
 
     qCopy(m_defaultParams, &m_defaultParams[ParamType_Count], m_gridParams[cell.x()][cell.y()]);
@@ -271,7 +294,7 @@ void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent *event)
         for (int x = r.left(); x <= r.right(); ++x)
         {
             for (int y = r.top(); y <= r.bottom(); ++y)
-                updateCellValue(QPoint(x,y));
+                updateCellValues(QPoint(x,y));
         }
     }
     m_mousePressed = false;
@@ -296,21 +319,33 @@ void QnScheduleGridWidget::setShowSecondParam(bool value)
     update();
 }
 
-QVariant QnScheduleGridWidget::getCellParam(const QPoint &cell, ParamType paramType) const
+QVariant QnScheduleGridWidget::getCellValue(const QPoint &cell, ParamType paramType) const
 {
-    if (cell.x() < 0 || cell.x() >= columnCount() || cell.y() < 0 || cell.y() >= rowCount())
+    if (cell.x() < 0 || cell.y() < 0 || cell.x() >= columnCount() || cell.y() >= rowCount())
         return QVariant();
     if (paramType < 0 || paramType >= ParamType_Count)
         return QVariant();
-    const QVariant &value = m_gridParams[cell.x()][cell.y()][paramType];
-    return value.isValid() ? value : m_defaultParams[paramType];
+    return m_gridParams[cell.x()][cell.y()][paramType];
 }
 
-void QnScheduleGridWidget::setCellParam(const QPoint &cell, ParamType paramType, const QVariant &value)
+void QnScheduleGridWidget::setCellValue(const QPoint &cell, ParamType paramType, const QVariant &value)
 {
-    if (cell.x() < 0 || cell.x() >= columnCount() || cell.y() < 0 || cell.y() >= rowCount())
+    if (cell.x() < 0 || cell.y() < 0 || cell.x() >= columnCount() || cell.y() >= rowCount())
         return;
     if (paramType < 0 || paramType >= ParamType_Count)
         return;
-    m_gridParams[cell.x()][cell.y()][paramType] = value.isValid() ? value : m_defaultParams[paramType];
+    m_gridParams[cell.x()][cell.y()][paramType] = value;
+    update();
+}
+
+void QnScheduleGridWidget::resetCellValues(const QPoint& cell)
+{
+    if (cell.x() < 0 || cell.y() < 0 || cell.x() >= columnCount() || cell.y() >= rowCount())
+        return;
+
+    QVariant *p = m_gridParams[cell.x()][cell.y()];
+    QVariant *e = p + ParamType_Count;
+    while (p != e)
+        *p++ = QVariant();
+    update();
 }
