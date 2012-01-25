@@ -9,8 +9,6 @@
 
 class MJPEGtreamreader: public CLServerPushStreamreader
 {
-private:
-    enum {BLOCK_SIZE = 1460};
 public:
 	MJPEGtreamreader(QnResourcePtr res, const QString& requst);
 	virtual ~MJPEGtreamreader();
@@ -23,13 +21,7 @@ protected:
 private:
     CLSimpleHTTPClient* mHttpClient;
 
-    char mData[BLOCK_SIZE];
-    int mDataRemainedBeginIndex;
-    int mReaded;
-
     QString m_request;
-
-
 };
 
 #endif //cl_mjpeg_dataprovider_h_1140

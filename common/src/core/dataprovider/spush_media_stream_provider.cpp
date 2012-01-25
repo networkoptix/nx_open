@@ -26,7 +26,7 @@ void CLServerPushStreamreader::run()
             openStream();
             if (!isStreamOpened())
             {
-                QnSleep::msleep(20); // to avoid large CPU usage
+                QnSleep::msleep(100); // to avoid large CPU usage
 
                 closeStream(); // to release resources 
 

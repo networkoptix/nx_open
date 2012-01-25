@@ -344,18 +344,17 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
     return sended;
 }
 
-int CommunicatingSocket::recv(void *buffer, int bufferLen)
+int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
 {
-    int rtn;
-  if ((rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, 0)) < 0)
-  {
-      int errCode = getSystemErrCode();
-      if (errCode != ERR_TIMEOUT)
-	    mConnected = false;
-	  return -1;
-  }
-
-  return rtn;
+    int rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, flags);
+    if (rtn < 0)
+    {
+        int errCode = getSystemErrCode();
+        if (errCode != ERR_TIMEOUT)
+        mConnected = false;
+            return -1;
+    }
+    return rtn;
 }
 
 QString CommunicatingSocket::getForeignAddress()
@@ -510,6 +509,11 @@ void UDPSocket::disconnect()  {
   }
 }
 
+void UDPSocket::setDestPort(unsigned short foreignPort)
+{
+    m_destAddr->sin_port = htons(foreignPort);
+}
+
 void UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreignPort)
 {
     fillAddr(foreignAddress, foreignPort, *m_destAddr);
@@ -530,18 +534,16 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 }
 
 int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
-    unsigned short &sourcePort)  {
-  sockaddr_in clntAddr;
-  socklen_t addrLen = sizeof(clntAddr);
-  int rtn;
-  if ((rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0,
-                      (sockaddr *) &clntAddr, (socklen_t *) &addrLen)) < 0) {
-    throw SocketException("Receive failed (recvfrom())", true);
-  }
-  sourceAddress = inet_ntoa(clntAddr.sin_addr);
-  sourcePort = ntohs(clntAddr.sin_port);
-
-  return rtn;
+    unsigned short &sourcePort)  
+{
+    sockaddr_in clntAddr;
+    socklen_t addrLen = sizeof(clntAddr);
+    int rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0, (sockaddr *) &clntAddr, (socklen_t *) &addrLen);
+    if (rtn >= 0) {
+        sourceAddress = inet_ntoa(clntAddr.sin_addr);
+        sourcePort = ntohs(clntAddr.sin_port);
+    }
+    return rtn;
 }
 
 void UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {

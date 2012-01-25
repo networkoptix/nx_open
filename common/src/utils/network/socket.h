@@ -167,7 +167,7 @@ public:
    *   @return number of bytes read, 0 for EOF, and -1 for error
    *   @exception SocketException thrown if unable to receive data
    */
-  int recv(void *buffer, int bufferLen);
+  int recv(void *buffer, int bufferLen, int flags = 0);
 
   /**
    *   Get the foreign address.  Call connect() before calling recv()
@@ -291,6 +291,8 @@ public:
   ~UDPSocket();
 
   void setDestAddr(const QString &foreignAddress, unsigned short foreignPort);
+
+  void setDestPort(unsigned short foreignPort);
 
   /**
    *   Unset foreign address and port

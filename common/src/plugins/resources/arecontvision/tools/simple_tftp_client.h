@@ -1,9 +1,10 @@
 #ifndef __SIMPLE_TFTP_CLIENT__1117
 #define __SIMPLE_TFTP_CLIENT__1117
 #include <QString>
-
+#include "utils/network/socket.h"
 
 class CLByteArray;
+
 // this class is designed just to be friendly with AV cams;( I doubd it can be usefull with smth else)
 class CLSimpleTFTPClient
 {
@@ -17,8 +18,10 @@ class CLSimpleTFTPClient
 	//2) more friendly with wireless network ( it hates acks).
 
 public:
-	CLSimpleTFTPClient(const QString& ip, unsigned int timeout, unsigned int retry);
+	CLSimpleTFTPClient(const QHostAddress& ip, unsigned int timeout, unsigned int retry);
 	~CLSimpleTFTPClient(){};
+
+    const QHostAddress& getHostAddress() const { return m_hostAddress; }
 
 	int read(const QString& fn, CLByteArray& data);
 	const unsigned char* getLastPacket(int& size) const
@@ -40,10 +43,12 @@ private:
 	int m_timeout;
 	int m_status;
 	QString m_ip;
+    QHostAddress m_hostAddress;
 
 	int m_wish_blk_size;
 	int m_curr_blk_size;
 
+    UDPSocket m_sock;
 };
 
 #endif //__SIMPLE_TFTP_CLIENT__1117

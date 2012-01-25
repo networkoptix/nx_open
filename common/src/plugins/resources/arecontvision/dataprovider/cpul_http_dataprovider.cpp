@@ -168,12 +168,12 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
     if (h264) // for jpej keyFrame always true
     {
-        if (!http_client.header().contains(QLatin1String("Content-Type"))) // very strange
+        if (!http_client.header().contains("Content-Type")) // very strange
         {
             videoData->flags &= ~AV_PKT_FLAG_KEY;
         }
         else
-            if (http_client.header().value(QLatin1String("Content-Type")) == QLatin1String("video/H.264P"))
+            if (http_client.header().value("Content-Type") == "video/H.264P")
                 videoData->flags &= ~AV_PKT_FLAG_KEY;
 
     }

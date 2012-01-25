@@ -3,6 +3,7 @@
 
 #include "av_client_pull.h"
 
+class CLSimpleTFTPClient;
 
 //single sensor TFTP reader
 // arecont vision TFTP stack is faster (for JPEG image; for H.264 they are almost equal )( you can get more fps with it )
@@ -12,10 +13,7 @@ class AVPanoramicClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamRea
 public:
 	explicit AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res);
 
-	~AVPanoramicClientPullSSTFTPStreamreader()
-	{
-		stop();
-	}
+	~AVPanoramicClientPullSSTFTPStreamreader();
 
 protected:
 	virtual QnAbstractMediaDataPtr getNextData();
@@ -34,6 +32,8 @@ protected:
     bool m_panoramic;
     bool m_dualsensor;
     QString m_name;
+
+    CLSimpleTFTPClient* m_tftp_client;
 };
 
 #endif //cpull_httpreader_1119

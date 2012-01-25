@@ -36,7 +36,7 @@ public:
 
     void close();
 
-    QHash<QString, QString> header() const
+    QHash<QByteArray, QByteArray> header() const
     {
         return m_header;
     }
@@ -62,18 +62,18 @@ private:
     CLHttpStatus getNextLine();
     void getAuthInfo();
 
-    QString basicAuth() const;
+    QByteArray basicAuth() const;
     QString digestAccess(const QString&) const;
 
     int readHeaders();
 
 private:
-    QString m_line;
+    QByteArray m_line;
 
     QHostAddress m_host;
     int m_port;
 
-    QHash<QString, QString> m_header;
+    QHash<QByteArray, QByteArray> m_header;
     QString m_contentType;
     unsigned int m_contentLen;
     unsigned int m_readed;
