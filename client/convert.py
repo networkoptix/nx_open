@@ -81,7 +81,6 @@ def gen_version_h():
     revision = os.popen('hg id -i').read().strip()
 
     ffmpeg_output = os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()
-    print ffmpeg_output
     ffmpeg_version = re.search(r'(N-[^\s]*)', ffmpeg_output).groups()[0]
 
     version_h = open('src/version.h', 'w')

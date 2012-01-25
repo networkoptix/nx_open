@@ -12,6 +12,7 @@
 #include "resource_command_consumer.h"
 #include "resource_consumer.h"
 
+#include <typeinfo>
 #include <limits.h>
 
 QnResource::QnResource()
