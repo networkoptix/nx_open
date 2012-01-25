@@ -10,8 +10,12 @@ QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
       m_dpFactory(0)
 {
-    qRegisterMetaType<QnScheduleTask>();
-    qRegisterMetaType<QnScheduleTaskList>();
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnScheduleTask>();
+        qRegisterMetaType<QnScheduleTaskList>();
+        metaTypesInitialized = true;
+    }
 
     addFlag(live_cam);
 }

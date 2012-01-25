@@ -25,6 +25,11 @@ QnResource::QnResource()
       m_flags(0),
       m_status(Offline)
 {
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnParam>();
+        metaTypesInitialized = true;
+    }
 }
 
 QnResource::~QnResource()
