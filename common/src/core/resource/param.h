@@ -1,8 +1,8 @@
 #ifndef QN_PARAM_H
 #define QN_PARAM_H
 
+#include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>
 
@@ -37,8 +37,6 @@ struct QN_EXPORT QnParamType
     bool setDefVal(const QVariant &val); // safe way to set value
 };
 
-Q_DECLARE_TYPEINFO(QnParamType, Q_COMPLEX_TYPE);
-
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 
@@ -46,20 +44,22 @@ struct QN_EXPORT QnParam
 {
     QnParam() : m_paramType(new QnParamType) {}
     QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant())
-        : m_paramType(paramType), m_value(value)
-    {}
+        : m_paramType(paramType)
+    { setValue(value); }
+
+    bool isValid() const { return !m_paramType->name.isEmpty(); }
 
     bool setValue(const QVariant &val); // safe way to set value
-    const QVariant& value() const { return m_value; }
+    const QVariant &value() const { return m_value; }
     const QVariant &defaultValue() const { return m_paramType->default_value; }
-    const QString& name() const { return m_paramType->name; }
-    const QString& group() const { return m_paramType->group; }
-    const QString& subgroup() const { return m_paramType->subgroup; }
+    const QString &name() const { return m_paramType->name; }
+    const QString &group() const { return m_paramType->group; }
+    const QString &subGroup() const { return m_paramType->subgroup; }
     double minValue() const { return m_paramType->min_val; }
     double maxValue() const { return m_paramType->max_val; }
     QnParamType::DataType type() const { return m_paramType->type;}
-    const QList<QVariant>& uiPossibleValues() const { return m_paramType->ui_possible_values; }
-    const QList<QVariant>& possibleValues() const { return m_paramType->possible_values; }
+    const QList<QVariant> &uiPossibleValues() const { return m_paramType->ui_possible_values; }
+    const QList<QVariant> &possibleValues() const { return m_paramType->possible_values; }
     const QString& description() const { return m_paramType->description; }
     bool isUiParam() const { return m_paramType->ui; }
     bool isPhysical() const { return m_paramType->isPhysical; }
@@ -71,28 +71,29 @@ private:
     QVariant m_value;
 };
 
+Q_DECLARE_METATYPE(QnParam)
 Q_DECLARE_TYPEINFO(QnParam, Q_COMPLEX_TYPE);
 
 
 class QN_EXPORT QnParamList
 {
 public:
-    typedef QMap<QString, QnParam> QnParamMap;
-
-    void inheritedFrom(const QnParamList& other);
-    bool contains(const QString& name) const;
-    QnParam& value(const QString& name);
-    const QnParam value(const QString& name) const;
-    void append(const QnParam& param);
+    void unite(const QnParamList &other);
+    bool contains(const QString &name) const;
+    QnParam &operator[](const QString &name);
+    const QnParam operator[](const QString &name) const;
+    const QnParam value(const QString &name) const;
+    void append(const QnParam &param);
     bool isEmpty() const;
     QList<QnParam> list() const;
 
     QList<QString> groupList() const;
     QList<QString> subGroupList(const QString &group) const;
 
-    QnParamList paramList(const QString &group, const QString &subgroup) const;
+    QnParamList paramList(const QString &group, const QString &subGroup = QString()) const;
 
 private:
+    typedef QHash<QString, QnParam> QnParamMap;
     QnParamMap m_params;
 };
 

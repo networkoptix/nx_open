@@ -6,6 +6,12 @@
 void QnServerCameraProcessor::processResources(const QnResourceList &resources)
 {
     QnResourcePool::instance()->addResources(resources);
+
+    foreach(QnResourcePtr res, resources)
+    {
+        if (!res.dynamicCast<QnServerCamera>())
+            res->setStatus(QnResource::Online);
+    }
 }
 
 QnServerCamera::QnServerCamera()
@@ -38,13 +44,13 @@ void QnServerCamera::setCropingPhysical(QRect croping)
 
 }
 
-const QnVideoResourceLayout* QnServerCamera::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider) 
+const QnVideoResourceLayout* QnServerCamera::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getVideoLayout();
 }
 
-const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) 
+const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getAudioLayout();
@@ -69,7 +75,7 @@ QString QnServerCamera::getUniqueId() const
 
 // --------------------------- QnServerCameraFactory -----------------------------
 
-QnResourcePtr QnServerCameraFactory::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnResourcePtr resource;
 

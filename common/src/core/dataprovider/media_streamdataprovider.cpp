@@ -7,7 +7,7 @@
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
-m_qulity(QnQualityNormal),
+m_quality(QnQualityNormal),
 m_fps(MAX_LIVE_FPS),
 m_numberOfchannels(0)
 {
@@ -30,7 +30,7 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 {
     QMutexLocker mtx(&m_mutex);
-    m_qulity = q;
+    m_quality = q;
     updateStreamParamsBasedOnQuality();
     //setNeedKeyData();
 }
@@ -38,7 +38,7 @@ void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 {
     QMutexLocker mtx(&m_mutex);
-    return m_qulity;
+    return m_quality;
 }
 
 // for live providers only

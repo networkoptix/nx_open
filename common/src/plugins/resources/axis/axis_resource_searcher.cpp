@@ -2,11 +2,8 @@
 #include "core/resource/network_resource.h"
 #include "axis_resource.h"
 
-
-
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
 {
-
 }
 
 QnPlAxisResourceSearcher& QnPlAxisResourceSearcher::instance()
@@ -15,8 +12,7 @@ QnPlAxisResourceSearcher& QnPlAxisResourceSearcher::instance()
     return inst;
 }
 
-
-QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnNetworkResourcePtr result;
 

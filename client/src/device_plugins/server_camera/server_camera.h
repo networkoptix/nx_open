@@ -30,7 +30,7 @@ protected:
 class QnServerCameraFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 
     static QnServerCameraFactory& instance();
 };

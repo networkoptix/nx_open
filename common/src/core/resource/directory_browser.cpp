@@ -14,12 +14,7 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
 }
 
-QnResourceDirectoryBrowser::~QnResourceDirectoryBrowser()
-{
-}
-
-
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnResourcePtr result;
 

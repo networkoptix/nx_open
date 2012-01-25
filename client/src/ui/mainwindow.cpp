@@ -75,13 +75,11 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-    addAction(&cm_showNavTree);
-
     connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
     addAction(&cm_open_file);
 
-    QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
-    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    addAction(&cm_reconnect);
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
@@ -146,7 +144,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     {
         QToolBar *toolBar = new QToolBar(this);
         toolBar->setAllowedAreas(Qt::NoToolBarArea);
-        toolBar->addAction(reconnectAction);
+        toolBar->addAction(&cm_reconnect);
         toolBar->addAction(&cm_preferences);
         toolBar->addAction(&cm_showNavTree);
         toolBar->addAction(newTabAction);

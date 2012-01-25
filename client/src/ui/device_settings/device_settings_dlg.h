@@ -12,7 +12,6 @@ class QDialogButtonBox;
 class QGroupBox;
 class QTabWidget;
 
-class CLAbstractSettingsWidget;
 class CLDeviceSettingsTab;
 
 class CLAbstractDeviceSettingsDlg : public QDialog
@@ -33,28 +32,41 @@ public:
     QGroupBox *groupByName(const QString &name) const;
     void putGroup(const QString &name, QGroupBox *group);
 
-    QList<CLAbstractSettingsWidget *> widgets() const;
-    QList<CLAbstractSettingsWidget *> widgetsByGroup(const QString &group) const;
-    CLAbstractSettingsWidget *widgetByName(const QString &name) const;
-    void putWidget(CLAbstractSettingsWidget *widget);
+    QList<QWidget *> widgets() const;
+    QList<QWidget *> widgetsByGroup(const QString &group, const QString &subGroup = QString()) const;
+    QWidget *widgetByName(const QString &name) const;
+    void registerWidget(QWidget *widget, const QnParam &param);
+
+    QnParam param(QWidget *widget) const;
 
 public Q_SLOTS:
     virtual void accept();
     virtual void reject();
     virtual void reset();
 
-    virtual void setParam(const QString &name, const QVariant &val);
-    virtual void onSuggestions();
+protected:
+    virtual QList<QString> tabsOrder() const;
 
-    virtual void onNewtab(int index);
+    void setParam(const QString &paramName, const QVariant &value);
+
+private Q_SLOTS:
+    void buildTabs();
+    void saveParam();
+
+    void saveSuccess();
+    void saveError();
+
+    void currentTabChanged(int index);
 
 protected:
-    QnResourcePtr m_resource;
-
     QTabWidget *m_tabWidget;
     QDialogButtonBox *m_buttonBox;
 
-    QHash<QString, CLAbstractSettingsWidget *> m_widgets;
+private:
+    const QnResourcePtr m_resource;
+    const QnParamList m_params; // a snaphost of resource's param list
+
+    QHash<QString, QWidget *> m_widgets;
     QHash<QString, QGroupBox *> m_groups;
     QList<CLDeviceSettingsTab *> m_tabs;
 };

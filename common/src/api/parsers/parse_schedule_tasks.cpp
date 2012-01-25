@@ -13,15 +13,15 @@ void parseScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnApiScheduleTa
     {
         QnScheduleTask scheduleTask(       i->id().present() ? (*(i->id())).c_str() : "",
                                            i->sourceId().present() ? (*(i->sourceId())).c_str() : "",
+                                           i->dayOfWeek(),
                                            i->startTime(),
                                            i->endTime(),
-                                           i->doRecordAudio(),
                                            (QnScheduleTask::RecordingType) i->recordType(),
-                                           i->dayOfWeek(),
                                            i->beforeThreshold(),
                                            i->afterThreshold(),
                                            (QnStreamQuality)i->streamQuality(),
-                                           i->fps()
+                                           i->fps(),
+                                           i->doRecordAudio()
                                         );
 
         scheduleTasks.append(scheduleTask);

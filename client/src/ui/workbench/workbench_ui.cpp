@@ -95,7 +95,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(hideConstrolsTimeoutMSec, this);
-    
+
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_controlsActivityInstrument);
@@ -135,6 +135,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
 
+    connect(&cm_toggle_fps, SIGNAL(toggled(bool)), this, SLOT(setFpsVisible(bool)));
+    m_display->view()->addAction(&cm_toggle_fps);
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
@@ -147,6 +149,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
 
     connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeVisible()));
+    m_treeWidget->addAction(&cm_showNavTree);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
@@ -299,7 +302,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_titleOpacityProcessor_hoverLeft()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
 
-    /* Connect to display. */ 
+    /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -328,6 +331,10 @@ void QnWorkbenchUi::setTreeVisible(bool visible, bool animate)
     } else {
         m_treeItem->setX(newX);
     }
+}
+
+void QnWorkbenchUi::toggleTreeVisible() {
+    setTreeVisible(!m_visibility.treeVisible);
 }
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
@@ -370,13 +377,9 @@ void QnWorkbenchUi::setTitleUsed(bool titleUsed) {
     }
 }
 
-void QnWorkbenchUi::toggleTreeVisible() {
-    setTreeVisible(!m_visibility.treeVisible);
-}
-
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QRectF controlRect = m_controlsWidget->rect();
-    
+
     QPointF pos(
         treeGeometry.x(),
         qMax(titleGeometry.bottom(), 0.0)
@@ -392,7 +395,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
     /* Update painting rect the "fair" way. */
     QRectF geometry = updatedTreeGeometry(m_treeItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry());
     m_treeItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
-    
+
     /* Always change position. */
     m_treeItem->setPos(geometry.topLeft());
 
@@ -469,13 +472,15 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
         return;
 
     m_fpsItem->setVisible(fpsVisible);
-    
+
     if(fpsVisible)
         m_fpsCountingInstrument->recursiveEnable();
     else
         m_fpsCountingInstrument->recursiveDisable();
 
     m_fpsItem->setText(QString());
+
+    cm_toggle_fps.setChecked(fpsVisible);
 }
 
 
@@ -534,7 +539,7 @@ void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
 
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 #ifndef DEBUG_MOTION
-    if(cameraResource != NULL) 
+    if(cameraResource != NULL)
 #endif
     {
         connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QRegion)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QRegion)));
@@ -623,12 +628,12 @@ void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
 }
 
 void QnWorkbenchUi::at_treeHidingProcessor_hoverFocusLeft() {
-    if(!m_treePinned) 
+    if(!m_treePinned)
         setTreeVisible(false);
 }
 
 void QnWorkbenchUi::at_treeShowingProcessor_hoverEntered() {
-    if(!m_treePinned) 
+    if(!m_treePinned)
         setTreeVisible(true);
     m_treeHidingProcessor->forceHoverEnter();
     m_treeOpacityProcessor->forceHoverEnter();
@@ -657,7 +662,7 @@ void QnWorkbenchUi::at_treeShowButton_toggled(bool checked) {
 
 void QnWorkbenchUi::at_treePinButton_toggled(bool checked) {
     m_treePinned = checked;
-    
+
     if(checked)
         setTreeVisible(true);
 
@@ -673,9 +678,9 @@ void QnWorkbenchUi::at_titleOpacityProcessor_hoverLeft() {
 }
 
 void QnWorkbenchUi::at_titleItem_geometryChanged() {
-    if(!m_titleUsed) 
+    if(!m_titleUsed)
         return;
-    
+
     updateFpsGeometry();
     updateTreeGeometry();
 

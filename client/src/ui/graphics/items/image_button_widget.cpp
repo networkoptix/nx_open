@@ -56,7 +56,7 @@ class QnImageButtonHoverProgressAccessor: public AbstractAccessor {
 QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
     m_pixmapCacheValid(false),
-    m_checkable(false), 
+    m_checkable(false),
     m_cached(false),
     m_state(0),
     m_hoverProgress(0.0),
@@ -88,7 +88,7 @@ const QPixmap &QnImageButtonWidget::cachedPixmap(StateFlags flags) {
         return m_pixmaps[flags];
     } else {
         ensurePixmapCache();
-        
+
         return m_pixmapCache[flags];
     }
 }
@@ -194,11 +194,11 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
     if(isDisabled())
         return;
 
-    toggle();
-    Q_EMIT clicked(isChecked());
-
     if(m_action != NULL)
         m_action->trigger();
+    else
+        toggle();
+    Q_EMIT clicked(isChecked());
 }
 
 void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {
@@ -342,7 +342,7 @@ void QnImageButtonWidget::updateState(StateFlags state) {
         Q_EMIT toggled(isChecked());
 
         if(m_action != NULL)
-            m_action->toggle();
+            m_action->setChecked(isChecked());
     }
 
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED))
@@ -361,7 +361,7 @@ void QnImageButtonWidget::setDefaultAction(QAction *action) {
 
     setIcon(action->icon());
     setToolTip(action->toolTip());
-    
+
     setCheckable(action->isCheckable());
     setChecked(action->isChecked());
     setEnabled(action->isEnabled());

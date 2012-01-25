@@ -4,12 +4,29 @@
 
 #include "device_settings_dlg.h"
 
+#include "plugins/arecontvision/arecont_dlg.h"
+
+class DefaultDlgManufacture : public CLAbstractDlgManufacture
+{
+public:
+    inline bool canProduceDlg(QnResourcePtr resource) const
+    { return resource->checkFlag(QnResource::live_cam); }
+    inline QDialog *createDlg(QnResourcePtr resource, QWidget *parent)
+    { return new CLAbstractDeviceSettingsDlg(resource, parent); }
+};
+
 typedef QList<CLAbstractDlgManufacture *> Manufactures;
 
 Q_GLOBAL_STATIC(Manufactures, manufactures)
 
 
-bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
+void CLDeviceSettingsDlgFactory::initialize()
+{
+    CLDeviceSettingsDlgFactory::registerDlgManufacture(new DefaultDlgManufacture);
+    CLDeviceSettingsDlgFactory::registerDlgManufacture(new AreconVisionDlgManufacture);
+}
+
+bool CLDeviceSettingsDlgFactory::canCreateDlg(const QnResourcePtr &resource)
 {
     if (!resource)
         return false;
@@ -22,7 +39,7 @@ bool CLDeviceSettingsDlgFactory::canCreateDlg(QnResourcePtr resource)
     return false;
 }
 
-QDialog *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource, QWidget *parent)
+QDialog *CLDeviceSettingsDlgFactory::createDlg(const QnResourcePtr &resource, QWidget *parent)
 {
     if (!resource)
         return 0;
@@ -38,5 +55,5 @@ QDialog *CLDeviceSettingsDlgFactory::createDlg(QnResourcePtr resource, QWidget *
 void CLDeviceSettingsDlgFactory::registerDlgManufacture(CLAbstractDlgManufacture *manufacture)
 {
     if (manufacture)
-        manufactures()->append(manufacture);
+        manufactures()->prepend(manufacture);
 }

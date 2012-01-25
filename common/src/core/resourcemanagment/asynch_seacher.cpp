@@ -8,7 +8,6 @@
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
 
-
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
 m_server(false)
 {
@@ -48,7 +47,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnResourcePtr result;
 
@@ -343,7 +342,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
                     if (isServer())
                     {
-                        // not stand alone 
+                        // not stand alone
                         QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
                         if (cameraResource)
                         {

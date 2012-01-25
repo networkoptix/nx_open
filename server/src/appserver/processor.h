@@ -9,7 +9,7 @@ class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
     Q_OBJECT
 
 public:
-    QnAppserverResourceProcessor(const QnId& serverId);
+    QnAppserverResourceProcessor(QnId serverId);
 
     void processResources(const QnResourceList &resources);
 

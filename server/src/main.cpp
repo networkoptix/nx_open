@@ -431,7 +431,7 @@ public:
             QnStoragePtr storage(new QnStorage());
             storage->setParentId(videoServer->getId());
             storage->setName("Initial");
-            storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
+            storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
             storage->setSpaceLimit(5ll * 1024 * 1024 * 1024);
 
             QByteArray errorString;
@@ -487,15 +487,16 @@ public:
             QString str;
             QTextStream stream(&str);
 
-            stream << "ScheduleTask " << scheduleTask.getId().toString() <<
-                scheduleTask.getAfterThreshold() <<
-                scheduleTask.getBeforeThreshold() <<
-                scheduleTask.getDayOfWeek() <<
-                scheduleTask.getDoRecordAudio() <<
-                scheduleTask.getStartTime() <<
-                scheduleTask.getEndTime() <<
-                scheduleTask.getRecordingType() <<
-                scheduleTask.getSourceId().toString();
+            stream << "ScheduleTask "
+                   << scheduleTask.getId().toString()
+                   << scheduleTask.getAfterThreshold()
+                   << scheduleTask.getBeforeThreshold()
+                   << scheduleTask.getDayOfWeek()
+                   << scheduleTask.getDoRecordAudio()
+                   << scheduleTask.getStartTime()
+                   << scheduleTask.getEndTime()
+                   << scheduleTask.getRecordingType()
+                   << scheduleTask.getResourceId().toString();
             cl_log.log(str, cl_logALWAYS);
         }
 

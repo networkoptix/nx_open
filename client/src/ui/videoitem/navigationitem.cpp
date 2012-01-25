@@ -421,15 +421,19 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
         QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-        if (reader)
+
+
+        if (reader) {
             setPlaying(!reader->isMediaPaused());
+            m_timeSlider->setLiveMode(reader->isRealTimeSource());
+        }
         else
             setPlaying(true);
         if (!m_syncButton->isChecked()) {
             updateRecPeriodList(true);
             repaintMotionPeriods();
         }
-        m_timeSlider->setLiveMode(reader->isRealTimeSource());
+
     }
     else
     {

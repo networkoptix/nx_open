@@ -135,10 +135,8 @@ QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider
 }
 
 
-bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QVariant& val )
+bool CLArecontPanoramicResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
-    QnParam param = getResourceParamList().value(name);
-
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
 
@@ -182,7 +180,7 @@ bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QVar
     {
         int q = val.toInt();
         if (q >= 1 && q <= 21)
-            return setCamQulity(q);
+            return setCamQuality(q);
     }
 
     return false;
@@ -199,7 +197,7 @@ bool CLArecontPanoramicResource::setResolution(bool full)
     return true;
 }
 
-bool CLArecontPanoramicResource::setCamQulity(int q)
+bool CLArecontPanoramicResource::setCamQuality(int q)
 {
     if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
         return false;

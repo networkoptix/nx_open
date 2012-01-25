@@ -35,8 +35,9 @@ typedef QMap<QString, QString> QnResourceParameters;
 class QN_EXPORT QnResource : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show at GUI
+    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show in GUI
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
+    Q_CLASSINFO("url", "URL")
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
@@ -76,10 +77,10 @@ public:
     virtual void deserialize(const QnResourceParameters& parameters);
 
     QnId getId() const;
-    void setId(const QnId& id);
+    void setId(QnId id);
 
     QnId getParentId() const;
-    void setParentId(const QnId& parent);
+    void setParentId(QnId parent);
 
     // device unique identifier
     virtual QString getUniqueId() const = 0;
@@ -88,7 +89,7 @@ public:
     // TypeId unique string id for resource with SUCH list of params and CLASS
     // in other words TypeId can be used instantiate the right resource
     QnId getTypeId() const;
-    void setTypeId(const QnId& id);
+    void setTypeId(QnId id);
 
     Status getStatus() const;
     void setStatus(Status newStatus, bool ignoreHandlers = false);
@@ -120,7 +121,7 @@ public:
 
     // ==================================================
 
-    QnParamList &getResourceParamList() const;// returns params that can be changed on device level
+    QnParamList getResourceParamList() const; // returns params that can be changed on device level
 
     bool hasSuchParam(const QString &name) const;
 
@@ -128,16 +129,16 @@ public:
     bool getParam(const QString &name, QVariant &val, QnDomain domain);
 
     // same as getParam is invoked in separate thread.
-    // as soon as param changed onParameterChanged signal is emitted
+    // as soon as param changed parameterValueChanged() signal is emitted
     void getParamAsync(const QString &name, QnDomain domain);
 
 
     // return true if no error
-    virtual bool setParam(const QString& name, const QVariant& val, QnDomain domain);
+    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
 
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
-    void setParamAsync(const QString& name, const QVariant& val, QnDomain domain );
+    void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
 
     // ==============================================================================
 
@@ -170,7 +171,7 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
 Q_SIGNALS:
-    void onParameterChanged(const QString &name, const QVariant &value);
+    void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
 public:
@@ -186,11 +187,10 @@ public:
 protected:
     virtual void updateInner(const QnResource& other);
 
-    // should change value in memory domain
-    virtual bool getParamPhysical(const QString& name, QVariant& val);
+    // should just do physical job ( network or so ) do not care about memory domain
+    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
+    virtual bool setParamPhysical(const QnParam &param, const QVariant &val);
 
-    // should just do physical job( network or so ) do not care about memory domain
-    virtual bool setParamPhysical(const QString& name, const QVariant& val);
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
@@ -203,7 +203,7 @@ protected:
     mutable QMutex m_mutex;
 
 private:
-    /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only. 
+    /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
 
     friend class QnResourceConsumer;
@@ -240,18 +240,18 @@ private:
 class QnResourceFactory
 {
 public:
-    virtual ~QnResourceFactory() {};
+    virtual ~QnResourceFactory() {}
 
-    virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) = 0;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) = 0;
 };
 
 
 class QnResourceProcessor
 {
 public:
-    virtual ~QnResourceProcessor() {};
+    virtual ~QnResourceProcessor() {}
 
-    virtual void processResources(const QnResourceList& resources) = 0;
+    virtual void processResources(const QnResourceList &resources) = 0;
 };
 
 

@@ -42,17 +42,17 @@ QnResourceList QnAppServerResourceSearcher::findResources()
     return resources;
 }
 
-QnResourcePtr QnAppServerResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+bool QnAppServerResourceSearcher::isResourceTypeSupported(QnId resourceTypeId) const
+{
+    Q_UNUSED(resourceTypeId)
+
+    return true;
+}
+
+QnResourcePtr QnAppServerResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     Q_UNUSED(resourceTypeId)
     Q_UNUSED(parameters)
 
     return QnResourcePtr(0);
-}
-
-bool QnAppServerResourceSearcher::isResourceTypeSupported(const QnId& resourceTypeId) const
-{
-    Q_UNUSED(resourceTypeId)
-
-    return true;
 }

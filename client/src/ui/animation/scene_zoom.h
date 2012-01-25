@@ -30,7 +30,7 @@ public:
 protected:
 	void zoom_helper(int duration, int delay, CLAnimationCurve curve);
 
-	void set_qulity_helper();
+	void set_quality_helper();
 
 protected:
 	qreal m_zoom, m_targetzoom;

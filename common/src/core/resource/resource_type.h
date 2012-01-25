@@ -19,10 +19,10 @@ public:
     //QnResourceType(const QString& name);
     virtual ~QnResourceType();
 
-    void setId(const QnId& value) { m_id = value; }
+    void setId(QnId value) { m_id = value; }
     QnId getId() const { return m_id;}
 
-    void setParentId(const QnId& value) { m_parentId = value; }
+    void setParentId(QnId value) { m_parentId = value; }
     QnId getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }
@@ -33,7 +33,7 @@ public:
 
     bool isCamera() const;
 
-    void addAdditionalParent(const QnId& parent);
+    void addAdditionalParent(QnId parent);
     QList<QnId> allParentList() const;
 
     void addParamType(QnParamTypePtr param);
@@ -63,7 +63,7 @@ class QN_EXPORT QnResourceTypePool
 public:
     static QnResourceTypePool *instance();
 
-    QnResourceTypePtr getResourceType(const QnId& id) const;
+    QnResourceTypePtr getResourceType(QnId id) const;
     void addResourceType(QnResourceTypePtr resourceType);
     void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
 

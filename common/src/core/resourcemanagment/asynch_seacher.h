@@ -31,7 +31,7 @@ public:
     void addDeviceServer(QnAbstractResourceSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 
     virtual void pleaseStop();
 

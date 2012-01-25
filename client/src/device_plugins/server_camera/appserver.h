@@ -14,8 +14,8 @@ public:
 
     virtual QnResourceList findResources();
 
-    virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
-    virtual bool isResourceTypeSupported(const QnId& resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 
 private:
     bool m_isFirstTime;

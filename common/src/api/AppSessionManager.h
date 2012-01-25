@@ -21,7 +21,7 @@ public:
     int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes, QByteArray& errorString);
     int getResources(QnApiResourceResponsePtr& resources, QByteArray& errorString);
 
-    int getCameras(QnApiCameraResponsePtr& scheduleTasks, const QnId& mediaServerId, QByteArray& errorString);
+    int getCameras(QnApiCameraResponsePtr& scheduleTasks, QnId mediaServerId, QByteArray& errorString);
     int getStorages(QnApiStorageResponsePtr& resources, QByteArray& errorString);
     int getLayouts(QnApiLayoutResponsePtr& layouts, QByteArray& errorString);
 
