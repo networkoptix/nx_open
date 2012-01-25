@@ -11,9 +11,9 @@
 static const qreal max_zoom = 4.0;
 static const qreal def_zoom = 0.22;
 
-static const qreal low_normal_qulity_zoom = 0.22;
-static const qreal normal_hight_qulity_zoom = 0.30;
-static const qreal hight_highest_qulity_zoom = 0.32;
+static const qreal low_normal_quality_zoom = 0.22;
+static const qreal normal_hight_quality_zoom = 0.30;
+static const qreal hight_highest_quality_zoom = 0.32;
 
 CLSceneZoom::CLSceneZoom(GraphicsView* gview):
     CLAnimation(gview),
@@ -96,19 +96,19 @@ void CLSceneZoom::setZoom(qreal z)
 
     if (zooming_out)
     {
-        if (m_quality==QnQualityHighest && getZoom() <= hight_highest_qulity_zoom)
+        if (m_quality==QnQualityHighest && getZoom() <= hight_highest_quality_zoom)
         {
             m_view->setAllItemsQuality(QnQualityHigh, false);
             m_quality = QnQualityHigh;
         }
 
-        if (m_quality==QnQualityHigh && getZoom() <= normal_hight_qulity_zoom)
+        if (m_quality==QnQualityHigh && getZoom() <= normal_hight_quality_zoom)
         {
             m_view->setAllItemsQuality(QnQualityNormal, false);
             m_quality = QnQualityNormal;
         }
 
-        else if (m_quality==QnQualityNormal&& getZoom() <= low_normal_qulity_zoom)
+        else if (m_quality==QnQualityNormal&& getZoom() <= low_normal_quality_zoom)
         {
             m_view->setAllItemsQuality(QnQualityLow, false);
             m_quality = QnQualityLow;
@@ -116,19 +116,19 @@ void CLSceneZoom::setZoom(qreal z)
     }
     else// zoomin in
     {
-        if (m_quality==QnQualityLow && getZoom() > low_normal_qulity_zoom)
+        if (m_quality==QnQualityLow && getZoom() > low_normal_quality_zoom)
         {
             m_view->setAllItemsQuality(QnQualityNormal, true);
             m_quality = QnQualityNormal;
         }
 
-        else if (m_quality==QnQualityNormal && getZoom() > normal_hight_qulity_zoom)
+        else if (m_quality==QnQualityNormal && getZoom() > normal_hight_quality_zoom)
         {
             m_view->setAllItemsQuality(QnQualityHigh, true);
             m_quality = QnQualityHigh;
         }
 
-        else if (m_quality==QnQualityHigh && getZoom() > hight_highest_qulity_zoom)
+        else if (m_quality==QnQualityHigh && getZoom() > hight_highest_quality_zoom)
         {
             m_view->setAllItemsQuality(QnQualityHighest, true);
             m_quality = QnQualityHighest;
@@ -169,7 +169,7 @@ void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmove
 
 //============================================================
 
-void CLSceneZoom::set_qulity_helper()
+void CLSceneZoom::set_quality_helper()
 {
 
 }

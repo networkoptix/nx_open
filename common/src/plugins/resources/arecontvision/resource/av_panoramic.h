@@ -20,7 +20,7 @@ protected:
 
 private:
     bool setResolution(bool full);
-    bool setCamQulity(int q);
+    bool setCamQuality(int q);
 
 protected:
     QnVideoResourceLayout* m_vrl;
