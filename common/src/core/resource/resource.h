@@ -37,6 +37,8 @@ class QN_EXPORT QnResource : public QObject
     Q_OBJECT
     Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show in GUI
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
+    Q_FLAGS(Flags Flag)
+    Q_ENUMS(ConnectionRole Status)
     Q_CLASSINFO("url", "URL")
 
 public:

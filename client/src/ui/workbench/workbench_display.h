@@ -44,6 +44,9 @@ class CLCamDisplay;
  */
 class QnWorkbenchDisplay: public QObject, protected AnimationTimerListener, protected SceneUtility {
     Q_OBJECT;
+    Q_FLAGS(MarginFlags MarginFlag);
+    Q_ENUMS(Layer);
+
 public:
     /**
      * Layer of an item.

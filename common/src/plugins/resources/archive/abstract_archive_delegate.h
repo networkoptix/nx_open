@@ -19,13 +19,16 @@ class QnAbstractFilterPlaybackDelegate
 
 class QnAbstractArchiveDelegate: public QObject
 {
+    Q_OBJECT;
+    Q_FLAGS(Flags Flag);
+
 public:
-    enum __Flags 
+    enum Flag 
     { 
         Flag_SlowSource = 1, 
         Flag_CanProcessNegativeSpeed = 2 // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
     };
-    Q_DECLARE_FLAGS(Flags, __Flags);
+    Q_DECLARE_FLAGS(Flags, Flag);
 
     QnAbstractArchiveDelegate(): m_flags(0) {}
     virtual ~QnAbstractArchiveDelegate() {}

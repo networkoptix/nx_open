@@ -7,6 +7,9 @@ class QTimer;
 
 class QnAutoTester: public QObject {
     Q_OBJECT;
+    Q_FLAGS(Tests Test);
+    Q_ENUMS(State);
+
 public:
     enum Test {
         RESOURCE_SUBSTRING = 0x1 /**< Test for the presence of a substring in resource names. */

@@ -138,18 +138,9 @@ void QnImageButtonWidget::setChecked(bool checked)
     update();
 }
 
-void QnImageButtonWidget::setEnabled(bool enabled)
-{
-    setDisabled(!enabled);
-}
-
 void QnImageButtonWidget::setDisabled(bool disabled)
 {
-    if(isDisabled() == disabled)
-        return;
-
-    updateState(disabled ? (m_state | DISABLED) : (m_state & ~DISABLED));
-    update();
+    setEnabled(!disabled);
 }
 
 qreal QnImageButtonWidget::animationSpeed() const {
@@ -245,6 +236,9 @@ QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVaria
     case ItemSceneHasChanged:
         m_animator->setTimer(InstrumentManager::animationTimerOf(scene()));
         break;
+    case ItemEnabledHasChanged:
+        updateState(isDisabled() ? (m_state | DISABLED) : (m_state & ~DISABLED));
+        break;
     default:
         break;
     }
@@ -338,12 +332,15 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     StateFlags oldState = m_state;
     m_state = state;
 
-    if((oldState ^ m_state) & CHECKED) {
+    if((oldState ^ m_state) & CHECKED) { /* CHECKED has changed, emit notification signal and sync with action. */
         Q_EMIT toggled(isChecked());
 
         if(m_action != NULL)
             m_action->setChecked(isChecked());
     }
+
+    if((oldState ^ m_state) & DISABLED) /* DISABLED has changed, perform back-sync. */
+        setDisabled(m_state & DISABLED);
 
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED))
         m_action->hover();
@@ -357,7 +354,7 @@ void QnImageButtonWidget::setDefaultAction(QAction *action) {
         return;
 
     if (!this->actions().contains(action))
-        addAction(action);
+        addAction(action); /* This way we will receive action-related events and thus will track changes in action state. */
 
     setIcon(action->icon());
     setToolTip(action->toolTip());

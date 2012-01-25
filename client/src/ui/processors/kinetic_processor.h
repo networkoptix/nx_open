@@ -33,6 +33,10 @@
  * processor is destroyed.
  */
 class KineticProcessor : public QObject, public AnimationTimerListener {
+    Q_OBJECT;
+    Q_FLAGS(Flags Flag);
+    Q_ENUMS(State);
+
 public:
     enum Flag {
         /** When this flag is set, delta time between events is ignored and
