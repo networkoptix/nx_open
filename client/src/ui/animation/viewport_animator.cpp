@@ -8,57 +8,11 @@
 #include <utils/common/checked_cast.h>
 #include <ui/common/linear_combination.h>
 #include <ui/common/magnitude.h>
-#include "accessor.h"
-
-class ViewportRectAccessor: public AbstractAccessor {
-public:
-    virtual QVariant get(const QObject *object) const override {
-        const QGraphicsView *view = checked_cast<const QGraphicsView *>(object);
-
-        return SceneUtility::mapRectToScene(view, SceneUtility::eroded(view->viewport()->rect(), m_margins));
-    }
-
-    virtual void set(QObject *object, const QVariant &value) const override {
-        QGraphicsView *view = checked_cast<QGraphicsView *>(object);
-        QRectF sceneRect = value.toRectF();
-
-        /* Extend to match aspect ratio. */
-        sceneRect = aspectRatioAdjusted(view, sceneRect);
-
-        /* Adjust for margins. */
-        MarginsF extension = SceneUtility::cwiseDiv(m_margins, QSizeF(view->viewport()->size()));
-        extension = SceneUtility::cwiseMul(SceneUtility::cwiseDiv(extension, MarginsF(1.0, 1.0, 1.0, 1.0) - extension), sceneRect.size());
-        sceneRect = SceneUtility::dilated(sceneRect, extension);
-
-        /* Set! */
-        SceneUtility::moveViewportSceneTo(view, sceneRect.center());
-        SceneUtility::scaleViewportTo(view, sceneRect.size(), Qt::KeepAspectRatioByExpanding);
-    }
-
-    const QMargins &margins() const {
-        return m_margins;
-    }
-
-    void setMargins(const QMargins &margins) {
-        m_margins = margins;
-    }
-
-    QRectF aspectRatioAdjusted(QGraphicsView *view, const QRectF &sceneRect) const {
-        return SceneUtility::expanded(
-            SceneUtility::aspectRatio(SceneUtility::eroded(view->viewport()->size(), m_margins)), 
-            sceneRect, 
-            Qt::KeepAspectRatioByExpanding, 
-            Qt::AlignCenter
-        );
-    }
-
-private:
-    QMargins m_margins;
-};
+#include "viewport_geometry_accessor.h"
 
 ViewportAnimator::ViewportAnimator(QObject *parent):
     base_type(parent),
-    m_accessor(new ViewportRectAccessor()),
+    m_accessor(new ViewportGeometryAccessor()),
     m_relativeSpeed(0.0)
 {
     setAccessor(m_accessor);
@@ -106,10 +60,30 @@ void ViewportAnimator::setViewportMargins(const QMargins &margins) {
     }
 }
 
+Qn::MarginFlags ViewportAnimator::marginFlags() const {
+    return m_accessor->marginFlags();
+}
+
+void ViewportAnimator::setMarginFlags(Qn::MarginFlags marginFlags) {
+    if(marginFlags == m_accessor->marginFlags())
+        return;
+
+    QRectF targetValue = this->targetValue().toRectF();
+
+    m_accessor->setMarginFlags(marginFlags);
+
+    if(isRunning()) {
+        /* Margin flags were changed, restart needed to avoid jitter. */
+        pause();
+        setTargetValue(targetValue);
+        start();
+    }
+}
+
 int ViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
     QGraphicsView *view = this->view();
-    QRectF startRect = m_accessor->aspectRatioAdjusted(view, from.toRectF());
-    QRectF targetRect = m_accessor->aspectRatioAdjusted(view, to.toRectF());
+    QRectF startRect = m_accessor->adjustedToViewport(view, from.toRectF());
+    QRectF targetRect = m_accessor->adjustedToViewport(view, to.toRectF());
 
     return base_type::estimatedDuration(startRect, targetRect);
 }

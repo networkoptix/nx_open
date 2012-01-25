@@ -25,6 +25,8 @@ public:
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
+    static MarginsF cwiseMul(const QSizeF &l, const MarginsF &r);
+    static MarginsF cwiseDiv(const QSizeF &l, const MarginsF &r);
     static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
     static QMargins cwiseSub(const QMargins &l, const QMargins &r);
@@ -251,6 +253,15 @@ public:
      * \returns                         Eroded size.
      */
     static QSizeF eroded(const QSizeF &size, const MarginsF &amount);
+
+    /**
+     * Erodes the given size by the given amount.
+     * 
+     * \param size                      Size to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded size.
+     */
+    static QSize eroded(const QSize &size, const QMargins &amount);
 
     /**
      * \param size                      Size to check for containment.

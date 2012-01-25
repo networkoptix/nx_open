@@ -162,7 +162,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_display = new QnWorkbenchDisplay(m_workbench, this);
     m_display->setScene(scene);
     m_display->setView(m_view);
-    m_display->setMarginFlags(QnWorkbenchDisplay::MARGINS_AFFECT_POSITION);
+    m_display->setMarginFlags(Qn::MARGINS_AFFECT_POSITION);
 
     m_controller = new QnWorkbenchController(m_display, this);
     m_ui = new QnWorkbenchUi(m_display, this);
