@@ -16,6 +16,7 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
     Q_PROPERTY(QnScheduleTaskList scheduleTasks READ getScheduleTasks WRITE setScheduleTasks)
     Q_CLASSINFO("scheduleTasks", "Camera Scheduling")
+    Q_CLASSINFO("scheduleTasks_group", "Camera Scheduling")
 
 public:
     QnSecurityCamResource();

@@ -165,10 +165,12 @@ QnParamList &QnResource::getResourceParamList() const
     const QMetaObject *mObject = metaObject();
     for (int i = 1; i < mObject->propertyCount(); ++i) { // from 1 to skip `objectName`
         const QMetaProperty mProperty = mObject->property(i);
+        QByteArray propertyName(mProperty.name());
+
         QnParamTypePtr paramType(new QnParamType);
-        paramType->name = QString::fromLatin1(mProperty.name());
+        paramType->name = QString::fromLatin1(propertyName.constData(), propertyName.size());
+        paramType->isReadOnly = !mProperty.isWritable();
         paramType->ui = mProperty.isDesignable();
-        paramType->isReadOnly = mProperty.isWritable();
         paramType->isPhysical = false;
         if (mProperty.isEnumType()) {
             paramType->type = QnParamType::Enumeration;
@@ -210,8 +212,12 @@ QnParamList &QnResource::getResourceParamList() const
         paramType->setDefVal(QVariant(mProperty.userType(), (void *)0));
         for (int j = 0; j < mObject->classInfoCount(); ++j) {
             QMetaClassInfo mClassInfo = mObject->classInfo(j);
-            if (qstrcmp(mClassInfo.name(), mProperty.name()) == 0)
+            if (propertyName == mClassInfo.name())
                 paramType->description = QCoreApplication::translate("QnResource", mClassInfo.value());
+            else if (propertyName + "_group" == mClassInfo.name())
+                paramType->group = QString::fromLatin1(mClassInfo.value());
+            else if (propertyName + "_subgroup" == mClassInfo.name())
+                paramType->subgroup = QString::fromLatin1(mClassInfo.value());
         }
 
         QnParam newParam(paramType, mProperty.read(this));
@@ -432,7 +438,6 @@ void QnResource::setStatus(QnResource::Status newStatus, bool ignoreHandlers)
         Q_EMIT statusChanged(oldStatus, newStatus);
 }
 
-
 QDateTime QnResource::getLastDiscoveredTime() const
 {
     QMutexLocker mutexLocker(&m_mutex);
@@ -444,8 +449,6 @@ void QnResource::setLastDiscoveredTime(const QDateTime &time)
     QMutexLocker mutexLocker(&m_mutex);
     m_lastDiscoveredTime = time;
 }
-
-
 
 QnId QnResource::getId() const
 {
