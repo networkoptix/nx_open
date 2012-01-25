@@ -327,7 +327,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
         //==========================================
         char* dst = img.data();
-        //if (videoData->keyFrame) // only if I frame we need SPS&PPS
+        if (iFrame) // only if I frame we need SPS&PPS
         {
             unsigned char h264header[50];
             int header_size = create_sps_pps(size.width, size.height, 0, h264header, sizeof(h264header));
@@ -348,13 +348,11 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
             memcpy(dst, h264header, header_size);
             dst+= header_size;
         }
-        /*
         else
         {
             img.ignore_first_bytes(expectable_header_size); // if you decoder needs compressed data alignment, just do not do it. ffmpeg will delay one frame if do not do it.
             dst+=expectable_header_size;
         }
-        /**/
 
         // we also need to put very begining of SH
         dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
