@@ -42,7 +42,7 @@ AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreade
 
 QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 {
-    QString request;
+    QByteArray request;
 
     unsigned int forecast_size = 0;
 
@@ -73,16 +73,16 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     }
 
     if (!h264)
-        request += QLatin1String("image");
+        request.append("image");
     else
-        request += QLatin1String("h264?ssn=") + QString::number(streamID);
+        request.append("h264?ssn=").append(QByteArray::number(streamID));
 
     if (h264)
     {
         if (needKeyData())
-            request += QLatin1String(";iframe=1;");
+            request.append(";iframe=1;");
         else
-            request += QLatin1String(";iframe=0;");
+            request.append(";iframe=0;");
 
     }
 
@@ -127,7 +127,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     //==========================================
 
-    int readed = m_tftp_client->read(request.toLatin1().data(), img);
+    int readed = m_tftp_client->read(request, img);
 
     if (readed == 0) // cannot read data
     {
