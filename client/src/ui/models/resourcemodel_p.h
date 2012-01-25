@@ -61,8 +61,6 @@ public:
 
     void init();
 
-    void checkConsistency() const;
-
 #ifdef USE_OLD_RESOURCEMODEL
     inline QStandardItem *item(QnId id) const
     { Q_Q(const ResourceModel); return q->itemFromIndex(index(id)); }
@@ -71,6 +69,9 @@ public:
     inline QnResourcePtr resource(QStandardItem *item) const
     { Q_Q(const ResourceModel); return q->resource(item->index()); }
 #else
+    void insertNode(Node *parentNode, Node *node, int row);
+    void removeNodes(Node *parentNode, int row, int count);
+
     Node *node(const QModelIndex &index) const;
     Node *node(QnId id) const;
     inline Node *node(const QnResourcePtr &resource) const
@@ -92,8 +93,6 @@ public:
     }
 #endif
 
-    void removeRecursive(Node *node);
-
     void _q_addResource(const QnResourcePtr &resource);
     void _q_removeResource(const QnResourcePtr &resource);
     void _q_resourceChanged(const QnResourcePtr &resource);
@@ -108,19 +107,6 @@ private:
 #endif
 };
 
-class ResourceModelConsistencyChecker {
-public:
-    ResourceModelConsistencyChecker(const ResourceModelPrivate *d): d(d) {
-        d->checkConsistency();
-    }
-
-    ~ResourceModelConsistencyChecker() {
-        d->checkConsistency();
-    }
-
-private:
-    const ResourceModelPrivate *d;
-};
 
 class ResourceSortFilterProxyModelPrivate
 {

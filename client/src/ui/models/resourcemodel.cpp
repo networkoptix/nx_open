@@ -16,8 +16,6 @@
 
 #include "file_processor.h"
 
-#include "utils/common/warnings.h"
-
 enum IconKey {
     IconTypeUnknown = 0,
     IconTypeServer = 0x0001,
@@ -174,8 +172,6 @@ void ResourceModelPrivate::init()
 {
     Q_Q(ResourceModel);
 
-    ResourceModelConsistencyChecker checker(this);
-
     QHash<int, QByteArray> roles = q->roleNames();
     roles.insert(Qt::UserRole + 1, "id");
     roles.insert(Qt::UserRole + 2, "searchString");
@@ -198,30 +194,25 @@ void ResourceModelPrivate::init()
     }
 }
 
-void ResourceModelPrivate::checkConsistency() const {
-#ifdef _DEBUG
-    {
-        /* Check that tree and node set are in sync. */
-        QSet<int> ids1;
-        foreach(Node *node, nodes)
-            ids1.insert(node->id());
-        ids1.insert(root.id());
-
-        QSet<int> ids2;
-        foreach(Node *node, nodeTree.keys())
-            ids2.insert(node->id());
-        foreach(QVector<Node *> nodes, nodeTree)
-            foreach(Node *node, nodes)
-                ids2.insert(node->id());
-
-        if(!ids1.contains(ids2)) {
-            qnCritical("Resource model contains inconsistent data.");
-        }
-    }
-#endif
+#ifndef USE_OLD_RESOURCEMODEL
+void ResourceModelPrivate::insertNode(Node *parentNode, Node *node, int row)
+{
+    nodes[node->id()] = node;
+    nodeTree[parentNode].insert(row, 1, node);
 }
 
-#ifndef USE_OLD_RESOURCEMODEL
+void ResourceModelPrivate::removeNodes(Node *parentNode, int row, int count)
+{
+    for (int i = row + count - 1; i >= row; --i) {
+        Node *node = nodeTree[parentNode].at(i);
+        removeNodes(node, 0, nodeTree[node].size());
+        nodeTree.remove(node);
+        nodes.remove(node->id());
+        delete node;
+    }
+    nodeTree[parentNode].remove(row, count);
+}
+
 Node *ResourceModelPrivate::node(const QModelIndex &index) const
 {
     if (!index.isValid())
@@ -260,7 +251,6 @@ QModelIndex ResourceModelPrivate::index(Node *node, int column) const
     Q_ASSERT(parentNode);
 
     const int row = nodeTree.value(parentNode).indexOf(node);
-
     Q_ASSERT(row >= 0);
     return q_func()->createIndex(row, column, node);
 }
@@ -273,8 +263,6 @@ QModelIndex ResourceModelPrivate::index(QnId id, int column) const
 void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
-
-    ResourceModelConsistencyChecker checker(this);
 
     Q_ASSERT(resource && resource->getId().isValid());
 
@@ -294,37 +282,14 @@ void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
     const int row = q->rowCount(parentIndex); // ### optimize for dynamic sort
     q->beginInsertRows(parentIndex, row, row);
 
-    nodes[node->id()] = node;
-    nodeTree[this->node(parentIndex)].insert(row, 1, node);
+    insertNode(this->node(parentIndex), node, row);
 
     q->endInsertRows();
 }
 
-void ResourceModelPrivate::removeRecursive(Node *node) 
-{
-    Q_Q(ResourceModel);
-
-    foreach(Node *node, nodeTree[node])
-        this->removeRecursive(node);
-
-    const QModelIndex parentIndex = this->index(node->parentId());
-
-    const QModelIndex index = this->index(node);
-    const int row = index.row();
-    q->beginRemoveRows(parentIndex, row, row);
-
-    nodes.remove(node->id());
-    nodeTree[this->node(parentIndex)].remove(row, 1);
-
-    Q_ASSERT(nodeTree.value(node).isEmpty());
-    nodeTree.remove(node);
-
-    q->endRemoveRows();
-}
-
 void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
 {
-    ResourceModelConsistencyChecker checker(this);
+    Q_Q(ResourceModel);
 
     Q_ASSERT(resource && resource->getId().isValid());
 
@@ -332,14 +297,20 @@ void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
     if (!node || node == &root)
         return; // nothing to remove
 
-    removeRecursive(node);
+    const QModelIndex parentIndex = this->index(node->parentId());
+
+    const QModelIndex index = this->index(node);
+    const int row = index.row();
+    q->beginRemoveRows(parentIndex, row, row);
+
+    removeNodes(this->node(parentIndex), row, 1);
+
+    q->endRemoveRows();
 }
 
 void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
-
-    ResourceModelConsistencyChecker checker(this);
 
     Q_ASSERT(resource && resource->getId().isValid());
 
