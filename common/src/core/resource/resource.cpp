@@ -154,7 +154,7 @@ QnResourcePtr QnResource::toSharedPointer() const
     return res;
 }
 
-QnParamList &QnResource::getResourceParamList() const
+QnParamList QnResource::getResourceParamList() const
 {
     QnId resTypeId;
     {
@@ -266,20 +266,19 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 {
-    const QnParamList &params = getResourceParamList();
-    if (!params.contains(name))
+    QMutexLocker locker(&m_mutex);
+    if (!m_resourceParamList.contains(name))
     {
         cl_log.log("QnResource::getParam(): requested param does not exist!", cl_logWARNING);
         return false;
     }
 
-    const QnParam &param = params.value(name);
+    QnParam &param = m_resourceParamList[name];
+    val = param.value();
     if (domain == QnDomainMemory)
     {
-        QMutexLocker mutexLocker(&m_mutex);
-        val = param.value();
         if (!param.isPhysical())
-            val = property(param.name().toUtf8()).toString();
+            val = property(param.name().toLatin1().constData());
         return true;
     }
     else if (domain == QnDomainPhysical)
@@ -300,15 +299,14 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 
 bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain domain)
 {
-    QnParamList &params = getResourceParamList();
-    if (!params.contains(name))
+    QMutexLocker locker(&m_mutex);
+    if (!m_resourceParamList.contains(name))
     {
         cl_log.log("QnResource::setParam(): requested param does not exist!", cl_logWARNING);
         return false;
     }
 
-    QnParam &param = params.value(name);
-
+    QnParam &param = m_resourceParamList[name];
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
@@ -323,7 +321,6 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
 
     //QnDomainMemory should changed anyway
     {
-        QMutexLocker mutexLocker(&m_mutex);
         if (!param.setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
@@ -332,7 +329,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
         }
 
         if (!param.isPhysical())
-            setProperty(param.name().toUtf8(), val);
+            setProperty(param.name().toLatin1().constData(), val);
     }
 
     Q_EMIT onParameterChanged(param.name(), val);
@@ -353,12 +350,13 @@ public:
 
       void execute()
       {
-            if (isConnectedToTheResource()) {
-                QVariant val;
-                if (m_resource->getParam(m_name, val, m_domain)) {
-                    if (m_domain != QnDomainPhysical)
-                        QMetaObject::invokeMethod(m_resource.data(), "onParameterChanged", Qt::QueuedConnection, Q_ARG(QString, m_name), Q_ARG(QVariant, val));
-                }
+            if (!isConnectedToTheResource())
+                return;
+
+            QVariant val;
+            if (m_resource->getParam(m_name, val, m_domain)) {
+                if (m_domain != QnDomainPhysical)
+                    QMetaObject::invokeMethod(m_resource.data(), "onParameterChanged", Qt::QueuedConnection, Q_ARG(QString, m_name), Q_ARG(QVariant, val));
             }
       }
 
@@ -389,8 +387,10 @@ public:
 
       void execute()
       {
-            if (isConnectedToTheResource())
-                m_resource->setParam(m_name, m_val, m_domain);
+          if (!isConnectedToTheResource())
+              return;
+
+          m_resource->setParam(m_name, m_val, m_domain);
       }
 
 private:
