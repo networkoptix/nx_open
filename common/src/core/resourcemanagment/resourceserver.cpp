@@ -32,6 +32,10 @@ void QnAbstractResourceSearcher::pleaseStop()
     m_shouldStop = true;
 }
 
+void QnAbstractResourceSearcher::pleaseResume() 
+{
+    m_shouldStop = false;
+}
 
 
 bool QnAbstractResourceSearcher::shouldStop() const

@@ -16,6 +16,8 @@ class QnAbstractResourceSearcher;
 // it puts result into resource pool
 class QnResourceDiscoveryManager : public CLLongRunnable, public QnResourceFactory
 {
+    Q_OBJECT;
+
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
 public:

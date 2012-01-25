@@ -85,8 +85,10 @@ void QnResourceDiscoveryManager::run()
         searchersList = m_searchersList;
     }
 
-    foreach (QnAbstractResourceSearcher *searcher, searchersList)
+    foreach (QnAbstractResourceSearcher *searcher, searchersList) {
         searcher->setShouldBeUsed(true);
+        searcher->pleaseResume();
+    }
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     while (!needToStop() && !initResourceTypes(appServerConnection))

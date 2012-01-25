@@ -33,6 +33,8 @@ public:
     //if pleaseStop is called search will be interrupted
     void pleaseStop();
 
+    void pleaseResume();
+
     bool isLocal() const;
     void setLocal(bool l);
 
