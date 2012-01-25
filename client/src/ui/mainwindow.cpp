@@ -75,8 +75,6 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
     connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
     addAction(&cm_preferences);
 
-    addAction(&cm_showNavTree);
-
     connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
     addAction(&cm_open_file);
 

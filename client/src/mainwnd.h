@@ -61,7 +61,6 @@ protected Q_SLOTS:
     void appServerAuthenticationRequired();
 
     void toggleTitleVisibility();
-    void toggleFpsDisplay();
 
     void updateDwmState();
 
