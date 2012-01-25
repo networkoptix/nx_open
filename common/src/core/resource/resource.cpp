@@ -277,14 +277,25 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     val = param.value();
     if (domain == QnDomainMemory)
     {
-        if (!param.isPhysical())
-            val = property(param.name().toLatin1().constData());
+        if (!param.isPhysical()) {
+            QVariant newValue = property(param.name().toLatin1().constData());
+            if (val != newValue) {
+                val = newValue;
+                param.setValue(newValue);
+                QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
+            }
+        }
         return true;
     }
     else if (domain == QnDomainPhysical)
     {
-        if (param.isPhysical() && getParamPhysical(param.name(), val)) {
-            emit onParameterChanged(param.name(), val);
+        QVariant newValue;
+        if (param.isPhysical() && getParamPhysical(param.name(), newValue)) {
+            if (val != newValue) {
+                val = newValue;
+                param.setValue(newValue);
+                QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
+            }
             return true;
         }
     }
@@ -313,6 +324,8 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
         return false;
     }
 
+    QVariant oldValue = param.value();
+
     if (domain == QnDomainPhysical)
     {
         if (!param.isPhysical() || !setParamPhysical(param.name(), val))
@@ -332,7 +345,10 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
             setProperty(param.name().toLatin1().constData(), val);
     }
 
-    Q_EMIT onParameterChanged(param.name(), val);
+    param.setValue(val);
+    QVariant newValue = param.value();
+    if (oldValue != newValue)
+        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
 
     return true;
 }
@@ -354,10 +370,7 @@ public:
                 return;
 
             QVariant val;
-            if (m_resource->getParam(m_name, val, m_domain)) {
-                if (m_domain != QnDomainPhysical)
-                    QMetaObject::invokeMethod(m_resource.data(), "onParameterChanged", Qt::QueuedConnection, Q_ARG(QString, m_name), Q_ARG(QVariant, val));
-            }
+            m_resource->getParam(m_name, val, m_domain);
       }
 
 private:

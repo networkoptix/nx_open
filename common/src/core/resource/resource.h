@@ -129,7 +129,7 @@ public:
     bool getParam(const QString &name, QVariant &val, QnDomain domain);
 
     // same as getParam is invoked in separate thread.
-    // as soon as param changed onParameterChanged signal is emitted
+    // as soon as param changed parameterValueChanged() signal is emitted
     void getParamAsync(const QString &name, QnDomain domain);
 
 
@@ -171,7 +171,7 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
 Q_SIGNALS:
-    void onParameterChanged(const QString &name, const QVariant &value);
+    void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
 public:
