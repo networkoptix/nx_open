@@ -64,6 +64,8 @@ static int ufile_close(URLContext *h)
 
 static int ufile_read(URLContext *h, unsigned char *buf, int size)
 {
+    if (size < 0)
+        return -1;
     QBufferedFile *pFile = reinterpret_cast<QBufferedFile *>(h->priv_data);
 
     return (int) pFile->read((char*)buf, size);
