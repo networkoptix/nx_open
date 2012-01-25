@@ -47,6 +47,7 @@ void QnResource::updateInner(const QnResource& other)
     m_lastDiscoveredTime = other.m_lastDiscoveredTime;
     m_tags = other.m_tags;
     m_url = other.m_url;
+    setStatus(other.m_status);
 }
 
 void QnResource::update(const QnResource& other)
@@ -55,12 +56,9 @@ void QnResource::update(const QnResource& other)
         consumer->beforeUpdate();
 
     {
-        QMutexLocker otherLocker(&other.m_mutex);
-        {
-            QMutexLocker locker(&m_mutex);
-            updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
-        }
-        setStatus(other.m_status);
+        QMutexLocker mutexLocker(&m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        QMutexLocker mutexLocker2(&other.m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
