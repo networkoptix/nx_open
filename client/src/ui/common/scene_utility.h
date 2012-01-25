@@ -25,6 +25,8 @@ public:
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
+    static MarginsF cwiseMul(const QSizeF &l, const MarginsF &r);
+    static MarginsF cwiseDiv(const QSizeF &l, const MarginsF &r);
     static MarginsF cwiseMul(const MarginsF &l, const MarginsF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const MarginsF &r);
     static QMargins cwiseSub(const QMargins &l, const QMargins &r);

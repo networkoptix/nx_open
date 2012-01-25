@@ -41,6 +41,24 @@ MarginsF SceneUtility::cwiseDiv(const MarginsF &l, const QSizeF &r) {
     );
 }
 
+MarginsF SceneUtility::cwiseMul(const QSizeF &l, const MarginsF &r) {
+    return MarginsF(
+        l.width()  * r.left(),
+        l.height() * r.top(),
+        l.width()  * r.right(),
+        l.height() * r.bottom()
+    );
+}
+
+MarginsF SceneUtility::cwiseDiv(const QSizeF &l, const MarginsF &r) {
+    return MarginsF(
+        l.width()  / r.left(),
+        l.height() / r.top(),
+        l.width()  / r.right(),
+        l.height() / r.bottom()
+    );
+}
+
 MarginsF SceneUtility::cwiseMul(const MarginsF &l, const MarginsF &r) {
     return MarginsF(
         l.left()   * r.left(), 

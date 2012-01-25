@@ -82,8 +82,8 @@ void ViewportAnimator::setMarginFlags(Qn::MarginFlags marginFlags) {
 
 int ViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
     QGraphicsView *view = this->view();
-    QRectF startRect = m_accessor->aspectRatioAdjusted(view, from.toRectF());
-    QRectF targetRect = m_accessor->aspectRatioAdjusted(view, to.toRectF());
+    QRectF startRect = m_accessor->adjustedToViewport(view, from.toRectF());
+    QRectF targetRect = m_accessor->adjustedToViewport(view, to.toRectF());
 
     return base_type::estimatedDuration(startRect, targetRect);
 }

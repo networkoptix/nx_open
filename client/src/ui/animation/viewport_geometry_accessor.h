@@ -32,7 +32,7 @@ public:
         m_marginFlags = marginFlags;
     }
 
-    QRectF aspectRatioAdjusted(QGraphicsView *view, const QRectF &sceneRect) const;
+    QRectF adjustedToViewport(QGraphicsView *view, const QRectF &sceneRect) const;
 
 private:
     QMargins m_margins;
