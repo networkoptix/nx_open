@@ -2,7 +2,7 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
-#include "core/resource/resource_command_consumer.h"
+#include "core/resource/resource_command_processor.h"
 
 #include <QtNetwork/QUdpSocket>
 
@@ -318,21 +318,14 @@ int QnPlAreconVisionResource::totalMdZones() const
 }
 
 //===============================================================================================================================
-bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QVariant& val)
+bool QnPlAreconVisionResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
-    //================================================
-    QnParam param = getResourceParamList().value(name);
-    if (param.netHelper().isEmpty()) // check if we have paramNetHelper
-    {
-        //cl_log.log("cannot find http command for such param!", cl_logWARNING);
+    if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
-    }
 
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
-    QString request;
-
-    QTextStream(&request) << "get?" << param.netHelper();
+    QString request = QLatin1String("get?") + param.netHelper();
 
     if (connection.doGET(request)!=CL_HTTP_SUCCESS)
         return false;
@@ -352,18 +345,13 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QVariant& v
 
     QByteArray rarray = response.mid(index+1);
 
-    QMutexLocker mutexLocker(&m_mutex);
-    param.setValue(QString(rarray.data()));
-
-    val = param.value();
+    val = QString(rarray.data());
 
     return true;
 }
 
-bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QVariant& val )
+bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
-    QnParam param = getResourceParamList().value(name);
-
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
 
@@ -392,7 +380,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
     return createResourceByTypeId(rt);
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(const QnId& rt)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 

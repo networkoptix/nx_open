@@ -24,21 +24,24 @@ class AVSettingsDlg : public CLAbstractDeviceSettingsDlg
 public:
     AVSettingsDlg(QnResourcePtr resource, QWidget *parent = 0);
 
-protected Q_SLOTS:
-    virtual void onSuggestions();
-    virtual void setParam(const QString& name, const QVariant& val);
-    virtual void onClose();
+public Q_SLOTS:
+    void accept();
+
+protected:
+    QList<QString> tabsOrder() const;
+
+private Q_SLOTS:
+    void paramValueChanged(const QnParam &param);
+    void correctWgtsState();
+    void onSuggestions();
 
 private:
-    void initTabsOrder();
     void initImageQuality();
     void initExposure();
     void initAI();
     void initDN();
     void initMD();
     void initAdmin();
-    //==========
-    void correctWgtsState();
 };
 
 #endif //arecon_dlg_factory_h1733

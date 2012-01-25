@@ -11,7 +11,7 @@ void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status,
 
 QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *parent):
     QObject(parent),
-    m_sessionManager(new VideoServerSessionManager(url))
+    m_sessionManager(new VideoServerSessionManager(url, this))
 {
     m_sessionManager->setAddEndSlash(false);
 }

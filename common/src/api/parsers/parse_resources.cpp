@@ -1,6 +1,6 @@
 #include "api/parsers/parse_resources.h"
 
-#include "core/resourcemanagment/asynch_seacher.h"
+#include "core/resourcemanagment/resource_discovery_manager.h"
 
 void parseResources(QList<QnResourcePtr>& resources, const QnApiResources& xsdResources, QnResourceFactory& resourceFactory)
 {

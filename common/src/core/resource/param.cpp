@@ -46,30 +46,34 @@ bool QnParamType::setDefVal(const QVariant &val) // safe way to set value
 
 //===================================================================================
 
-void QnParamList::inheritedFrom(const QnParamList& other)
+void QnParamList::unite(const QnParamList &other)
 {
     QnParamMap::const_iterator it = other.m_params.constBegin();
-    for (;it!=other.m_params.constEnd(); ++it)
+    for ( ; it != other.m_params.constEnd(); ++it)
         m_params[it.key()] = it.value();
-
 }
 
-bool QnParamList::contains(const QString& name) const
+bool QnParamList::contains(const QString &name) const
 {
     return m_params.contains(name);
 }
 
-QnParam& QnParamList::value(const QString& name)
+QnParam &QnParamList::operator[](const QString &name)
 {
     return m_params[name];
 }
 
-const QnParam QnParamList::value(const QString& name) const
+const QnParam QnParamList::operator[](const QString &name) const
+{
+    return m_params[name];
+}
+
+const QnParam QnParamList::value(const QString &name) const
 {
     return m_params.value(name);
 }
 
-void QnParamList::append(const QnParam& param)
+void QnParamList::append(const QnParam &param)
 {
     m_params.insert(param.name(), param);
 }
@@ -87,10 +91,10 @@ QList<QnParam> QnParamList::list() const
 QList<QString> QnParamList::groupList() const
 {
     QList<QString> result;
+    result.append(QString(0, QChar()));
 
-    foreach (const QnParam& param, m_params)
-    {
-        const QString group = param.group();
+    foreach (const QnParam &param, m_params) {
+        const QString &group = param.group();
         if (!group.isEmpty() && !result.contains(group))
             result.append(group);
     }
@@ -101,30 +105,28 @@ QList<QString> QnParamList::groupList() const
 QList<QString> QnParamList::subGroupList(const QString &group) const
 {
     QList<QString> result;
+    result.append(QString(0, QChar()));
 
-    foreach (const QnParam& param, m_params)
-    {
-        const QString lgroup = param.group();
-        if (lgroup == group)
-        {
-            const QString subgroup = param.subgroup();
-            if (/*!subgroup.isEmpty() && */!result.contains(subgroup))
-                result.append(subgroup);
+    foreach (const QnParam &param, m_params) {
+        const QString &lgroup = param.group();
+        if (lgroup == group) {
+            const QString &subGroup = param.subGroup();
+            if (!subGroup.isEmpty() && !result.contains(subGroup))
+                result.append(subGroup);
         }
     }
 
     return result;
 }
 
-QnParamList QnParamList::paramList(const QString &group, const QString &subgroup) const
+QnParamList QnParamList::paramList(const QString &group, const QString &subGroup) const
 {
     QnParamList result;
 
-    foreach (const QnParam& param, m_params)
-    {
-        const QString lgroup = param.group();
-        const QString lsubgroup = param.subgroup();
-        if (lgroup == group && lsubgroup == subgroup)
+    foreach (const QnParam &param, m_params) {
+        const QString &lgroup = param.group();
+        const QString &lsubGroup = param.subGroup();
+        if (lgroup == group && lsubGroup == subGroup)
             result.append(param);
     }
 

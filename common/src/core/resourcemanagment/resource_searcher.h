@@ -1,10 +1,8 @@
-#ifndef device_server_h_1658
-#define device_server_h_1658
+#ifndef QN_RESOURCE_SEARCHER_H
+#define QN_RESOURCE_SEARCHER_H
 
 #include <QtNetwork/QHostAddress>
 #include "core/resource/resource.h"
-
-
 
 
 // this is an interface for resource searcher plug in
@@ -27,11 +25,13 @@ public:
     // returns all available devices
     virtual QnResourceList findResources() = 0;
 
-    virtual bool isResourceTypeSupported(const QnId& resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
 
     // is some cases search might take time
     //if pleaseStop is called search will be interrupted
     void pleaseStop();
+
+    void pleaseResume();
 
     bool isLocal() const;
     void setLocal(bool l);
@@ -82,4 +82,4 @@ protected:
     QStringList m_pathListToCheck;
 };
 
-#endif //device_server_h_1658
+#endif //QN_RESOURCE_SEARCHER_H

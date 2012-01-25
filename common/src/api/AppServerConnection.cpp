@@ -184,7 +184,7 @@ int QnAppServerConnection::addStorage(const QnStorage& storageIn, QByteArray& er
     return m_sessionManager->addStorage(storage, errorString);
 }
 
-int QnAppServerConnection::getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId, QByteArray& errorString)
+int QnAppServerConnection::getCameras(QnSecurityCamResourceList& cameras, QnId mediaServerId, QByteArray& errorString)
 {
     QnApiCameraResponsePtr xsdCameras;
 

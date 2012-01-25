@@ -4,7 +4,7 @@
 #include "img_item.h"
 #include "camera/abstractrenderer.h"
 #include "camera/gl_renderer.h"
-#include "core/dataprovider/streamdata_statistics.h"
+#include "core/dataprovider/statistics.h"
 #include "core/resource/resource_media_layout.h"
 
 class QPainter;

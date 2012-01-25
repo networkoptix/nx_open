@@ -1,6 +1,6 @@
 #include "api/parsers/parse_layouts.h"
 
-#include "core/resourcemanagment/asynch_seacher.h"
+#include "core/resourcemanagment/resource_discovery_manager.h"
 
 void parseLayouts(QnLayoutDataList& layouts, const QnApiLayouts& xsdLayouts)
 {

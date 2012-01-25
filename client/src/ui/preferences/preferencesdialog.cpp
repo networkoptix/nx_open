@@ -10,7 +10,7 @@
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
-#include <core/resource/directory_browser.h>
+#include <core/resource/resource_directory_browser.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>
@@ -37,6 +37,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
       connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
 {
     setupUi(this);
+
+    connect(auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+            this, SLOT(auxMediaFolderSelectionChanged()));
+
 
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));

@@ -57,12 +57,12 @@ QnResourceList DesktopDeviceServer::findResources()
     return result;
 }
 
-bool DesktopDeviceServer::isResourceTypeSupported(const QnId& resourceTypeId) const
+bool DesktopDeviceServer::isResourceTypeSupported(QnId resourceTypeId) const
 {
     return false;
 }
 
-QnResourcePtr DesktopDeviceServer::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr DesktopDeviceServer::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     return QnResourcePtr(0);
 }

@@ -7,6 +7,7 @@
 #if defined(Q_OS_DARWIN) || defined(Q_OS_LINUX)
 
 #include <QDebug>
+#include <QFile>
 #include "../file.h"
 
 #include <sstream>
@@ -21,34 +22,42 @@
 
 
 void makeUnixOpenFlags( 
-	unsigned int oflag, 
+    QIODevice::OpenMode& oflag,
 	int* const unixOflag )
 {
 	int sysFlags = 0;
-	if( oflag & QnFile::ofRead )
+    if( oflag & QIODevice::ReadOnly )
 		sysFlags = O_RDONLY;
-	if( oflag & QnFile::ofWrite )
+    if( oflag & QIODevice::WriteOnly )
 	{
-		if( oflag & QnFile::ofRead)
+        if( oflag & QIODevice::ReadOnly)
 			sysFlags = O_RDWR | O_TRUNC;
 		else
 			sysFlags = O_WRONLY | O_TRUNC;
-		if( !(oflag & QnFile::ofOpenExisting) )
-			sysFlags |= O_CREAT;
-		if( oflag & QnFile::ofNoTruncate)
+        if( !(oflag & QIODevice::Append) )
+            sysFlags |= O_CREAT | O_EXCL;
+        if( !(oflag & QIODevice::Truncate))
 		{
 			sysFlags &= ~O_TRUNC;
 		}
-		if( oflag & QnFile::ofAppend )
+        if( oflag & QIODevice::Append )
 		{
 			sysFlags |= O_APPEND;
 			sysFlags &= ~O_TRUNC;
 		}
 
 	}
-	if( oflag & QnFile::ofCreateNew )
-		sysFlags |= O_CREAT | O_EXCL;
 	*unixOflag = sysFlags;
+}
+
+QnFile::QnFile(): m_impl(0)
+{
+
+}
+
+QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(0)
+{
+
 }
 
 QnFile::~QnFile()
@@ -57,27 +66,24 @@ QnFile::~QnFile()
 		close();
 }
 
-bool open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
+bool QnFile::open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
 {
 	if( isOpen() )
 		close();
 
 	int sysFlags = 0;
-	makeUnixOpenFlags( oflag, &sysFlags );
-	m_impl = (void*)::open( fName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
+    makeUnixOpenFlags( mode, &sysFlags );
+    m_impl = (void*)::open( m_fileName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
 
 	return (long)m_impl != -1;
 }
 
-bool QnFile::close()
+void QnFile::close()
 {
 	if( ::close( (long)m_impl ) == 0 )
 	{
 		m_impl = (void*)0xffffffff;
-		return true;
 	}
-
-	return false;
 }
 
 qint64 QnFile::read( char* buffer, qint64 count )
@@ -112,16 +118,16 @@ qint64 QnFile::size() const
 	return -1;
 }
 
-qint64 QnFile::seek( qint64 offset)
+bool QnFile::seek( qint64 offset)
 {
 	if( !isOpen() )
-		return (qint64)-1;
+        return false;
 
 
 #ifdef Q_OS_DARWIN
-	return lseek( (long)m_impl, offset, SEEK_SET);
+    return lseek( (long)m_impl, offset, SEEK_SET) != -1;
 #else
-	return lseek64( (long)m_impl, offset, SEEK_SET);
+    return lseek64( (long)m_impl, offset, SEEK_SET) != -1;
 #endif	
 }
 

@@ -1,5 +1,5 @@
-#ifndef __QNSTORAGE_H__
-#define __QNSTORAGE_H__
+#ifndef QN_STORAGE_H
+#define QN_STORAGE_H
 
 #include "resource.h"
 
@@ -36,4 +36,4 @@ private:
 
 typedef QSharedPointer<QnStorage> QnStoragePtr;
 
-#endif // __QNSTORAGE_H__
+#endif // QN_STORAGE_H

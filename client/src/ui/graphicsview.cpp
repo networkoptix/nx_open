@@ -44,7 +44,7 @@
 #include "device_plugins/desktop/desktop_file_encoder.h"
 #endif
 
-#include "core/resource/directory_browser.h"
+#include "core/resource/resource_directory_browser.h"
 #include "core/resource/network_resource.h"
 
 #include <file_processor.h>

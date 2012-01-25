@@ -35,12 +35,14 @@ public:
 class CLDeviceSettingsDlgFactory
 {
 public:
+    static void initialize();
+
     /**
      * \param dev                       Resource to check.
      * \returns                         Whether this factory can create a
      *                                  settings dialog for the given resource.
      */
-    static bool canCreateDlg(QnResourcePtr resource);
+    static bool canCreateDlg(const QnResourcePtr &resource);
 
     /**
      * \param dev                       Resource to create settings dialog for.
@@ -48,7 +50,7 @@ public:
      *                                  given resource, or NULL if the dialog
      *                                  could not be created.
      */
-    static QDialog *createDlg(QnResourcePtr resource, QWidget *parent = 0);
+    static QDialog *createDlg(const QnResourcePtr &resource, QWidget *parent = 0);
 
     /**
      * Registers a dialog manufacture with this factory.

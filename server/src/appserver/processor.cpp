@@ -3,7 +3,7 @@
 #include "processor.h"
 #include "core/resourcemanagment/resource_pool.h"
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId)
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
     m_appServer = QnAppServerConnectionFactory::createConnection();

@@ -1,7 +1,7 @@
 #ifndef QnMediaStreamDataProvider_514
 #define QnMediaStreamDataProvider_514
 
-#include "core/dataprovider/streamdata_statistics.h"
+#include "core/dataprovider/statistics.h"
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
 #include "../datapacket/mediadatapacket.h"
@@ -57,7 +57,7 @@ protected:
 	QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	//int m_NumaberOfVideoChannels;
-	QnStreamQuality m_qulity;
+	QnStreamQuality m_quality;
 
     float m_fps; //used only for live providers
     unsigned int m_framesSinceLastMetaData; // used only for live providers

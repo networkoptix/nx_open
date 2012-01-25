@@ -46,14 +46,13 @@ public:
 
     bool isFpsVisible() const;
 
-    void setFpsVisible(bool fpsVisible);
-
 public Q_SLOTS:
     void setTitleUsed(bool titleUsed);
     void setTreeVisible(bool visible, bool animate = true);
+    void toggleTreeVisible();
     void setSliderVisible(bool visible, bool animate = true);
     void setTitleVisible(bool visible, bool animate = true);
-    void toggleTreeVisible();
+    void setFpsVisible(bool fpsVisible);
 
 protected:
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);

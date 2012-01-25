@@ -6,7 +6,7 @@
 #include <QFile>
 #include <QMutex>
 #include "device_file_catalog.h"
-#include "core/resource/qnstorage.h"
+#include "core/resource/storage.h"
 
 // This class used for extract chunk sequence from storage
 class QnChunkSequence: public QObject

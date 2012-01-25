@@ -2,10 +2,21 @@
 
 #include "plugins/resources/archive/archive_stream_reader.h"
 
+static const char *property_descriptions[] = {
+    QT_TRANSLATE_NOOP("QnResource", "Camera Scheduling")
+};
+
 QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
       m_dpFactory(0)
 {
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnScheduleTask>();
+        qRegisterMetaType<QnScheduleTaskList>();
+        metaTypesInitialized = true;
+    }
+
     addFlag(live_cam);
 }
 
@@ -98,12 +109,12 @@ void QnSecurityCamResource::setMotionMask(const QRegion& mask)
     emit motionMaskChanged(mask);
 }
 
-void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks)
+void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {
     m_scheduleTasks = scheduleTasks;
 }
 
-const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
+const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 {
     return m_scheduleTasks;
 }

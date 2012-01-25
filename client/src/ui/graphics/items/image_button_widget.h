@@ -15,6 +15,11 @@ class VariantAnimator;
  */
 class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
     Q_OBJECT;
+    Q_FLAGS(StateFlags StateFlag);
+    Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable);
+    Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY toggled USER true);
+    Q_PROPERTY(bool cached READ isCached WRITE setCached);
+    Q_PROPERTY(qreal animationSpeed READ animationSpeed WRITE setAnimationSpeed);
 
     typedef Clickable<QGraphicsWidget> base_type;
 
@@ -45,9 +50,7 @@ public:
 
     bool isHovered() const { return state() & HOVERED; }
 
-    bool isDisabled() const { return state() & DISABLED; }
-
-    bool isEnabled() const { return !isEnabled(); }
+    bool isDisabled() const { return !isEnabled(); }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -66,7 +69,6 @@ public:
 public Q_SLOTS:
     void setCheckable(bool checkable);
     void setChecked(bool checked);
-    void setEnabled(bool enabled = true);
     void setDisabled(bool disabled = false);
     inline void toggle() { setChecked(!isChecked()); }
 

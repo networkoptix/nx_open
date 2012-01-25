@@ -1,4 +1,4 @@
-#include "resourceserver.h"
+#include "resource_searcher.h"
 
 
 
@@ -32,6 +32,10 @@ void QnAbstractResourceSearcher::pleaseStop()
     m_shouldStop = true;
 }
 
+void QnAbstractResourceSearcher::pleaseResume() 
+{
+    m_shouldStop = false;
+}
 
 
 bool QnAbstractResourceSearcher::shouldStop() const
@@ -49,7 +53,7 @@ void QnAbstractResourceSearcher::setLocal(bool l)
     m_localResources = l;
 }
 
-bool QnAbstractResourceSearcher::isResourceTypeSupported(const QnId& resourceTypeId) const
+bool QnAbstractResourceSearcher::isResourceTypeSupported(QnId resourceTypeId) const
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())

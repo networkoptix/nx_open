@@ -3,7 +3,7 @@
 
 
 #include "core/resource/network_resource.h"
-#include "core/resourcemanagment/resourceserver.h"
+#include "core/resourcemanagment/resource_searcher.h"
 
 
 class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher

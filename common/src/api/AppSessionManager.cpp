@@ -88,7 +88,7 @@ int AppSessionManager::getLayouts(QnApiLayoutResponsePtr& xlayouts, QByteArray& 
     return getObjects<xsd::api::layouts::Layouts>("layout", "", xlayouts, xsd::api::layouts::layouts, errorString);
 }
 
-int AppSessionManager::getCameras(QnApiCameraResponsePtr& cameras, const QnId& mediaServerId, QByteArray& errorString)
+int AppSessionManager::getCameras(QnApiCameraResponsePtr& cameras, QnId mediaServerId, QByteArray& errorString)
 {
     return getObjects<xsd::api::cameras::Cameras>("camera", mediaServerId.toString(), cameras, xsd::api::cameras::cameras, errorString);
 }

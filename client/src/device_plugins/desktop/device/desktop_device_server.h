@@ -1,7 +1,7 @@
 #ifndef __DESKTOP_DEVICE_SERVER_H
 #define __DESKTOP_DEVICE_SERVER_H
 
-#include "core/resourcemanagment/resourceserver.h"
+#include "core/resourcemanagment/resource_searcher.h"
 
 
 
@@ -10,8 +10,8 @@ struct IDirect3D9;
 class DesktopDeviceServer : public QnAbstractResourceSearcher
 {
     DesktopDeviceServer();
-public:
 
+public:
     ~DesktopDeviceServer();
 
     static DesktopDeviceServer& instance();
@@ -25,11 +25,13 @@ public:
     // returns all available devices
     virtual QnResourceList findResources();
 
-    virtual bool isResourceTypeSupported(const QnId& resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
+
 protected:
-    virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+
 private:
-    IDirect3D9*			m_pD3D;
+    IDirect3D9 *m_pD3D;
 };
 
 #endif // __DESKTOP_DEVICE_SERVER_H

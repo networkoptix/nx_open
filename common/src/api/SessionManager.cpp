@@ -27,7 +27,9 @@ SessionManager::SessionManager(const QUrl &url, QObject *parent)
     : QObject(parent),
       m_addEndSlash(true)
 {
-    m_httpClient = new SyncHTTP(url, this);
+    /* We don't add http client to the children list of this object so that it 
+     * is not deleted from our destructor. */
+    m_httpClient = new SyncHTTP(url); 
 
     QMetaObject::invokeMethod(this, "setupErrorHandler", Qt::QueuedConnection);
 }

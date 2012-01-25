@@ -2,6 +2,7 @@
 #define QN_WARNINGS_H
 
 #include <QString>
+#include <QTextStream>
 
 #ifndef QT_STRINGIFY
 #  define QT_STRINGIFY2(x) #x
@@ -34,6 +35,12 @@ namespace detail {
             return s.arg(QLatin1String(arg));
         }
 
+        inline QString operator<<(const QString &s, void *arg) {
+            QString text;
+            QTextStream stream(&text, QIODevice::WriteOnly);
+            stream << arg;
+            return s.arg(text);
+        }
 
         inline void invokeInternal(const WarningHandler &handler, const char *functionName, const QString &s) {
             handler(functionName, s);

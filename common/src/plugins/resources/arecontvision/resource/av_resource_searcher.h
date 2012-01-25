@@ -1,23 +1,21 @@
 #ifndef av_device_server_h_2107
 #define av_device_server_h_2107
 
-#include "core/resourcemanagment/resourceserver.h"
+#include "core/resourcemanagment/resource_searcher.h"
 
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-	QnPlArecontResourceSearcher();
+    QnPlArecontResourceSearcher();
+
 public:
+    static QnPlArecontResourceSearcher& instance();
 
-	~QnPlArecontResourceSearcher(){};
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    // return the manufacture of the server
+    virtual QString manufacture() const;
 
-	static QnPlArecontResourceSearcher& instance();
-	
-    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
-	// return the manufacture of the server 
-	virtual QString manufacture() const;
-
-	// returns all available devices 
-	virtual QnResourceList findResources();
+    // returns all available devices
+    virtual QnResourceList findResources();
 
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
 };

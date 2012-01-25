@@ -56,7 +56,7 @@ class QnImageButtonHoverProgressAccessor: public AbstractAccessor {
 QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
     m_pixmapCacheValid(false),
-    m_checkable(false), 
+    m_checkable(false),
     m_cached(false),
     m_state(0),
     m_hoverProgress(0.0),
@@ -88,7 +88,7 @@ const QPixmap &QnImageButtonWidget::cachedPixmap(StateFlags flags) {
         return m_pixmaps[flags];
     } else {
         ensurePixmapCache();
-        
+
         return m_pixmapCache[flags];
     }
 }
@@ -138,18 +138,9 @@ void QnImageButtonWidget::setChecked(bool checked)
     update();
 }
 
-void QnImageButtonWidget::setEnabled(bool enabled)
-{
-    setDisabled(!enabled);
-}
-
 void QnImageButtonWidget::setDisabled(bool disabled)
 {
-    if(isDisabled() == disabled)
-        return;
-
-    updateState(disabled ? (m_state | DISABLED) : (m_state & ~DISABLED));
-    update();
+    setEnabled(!disabled);
 }
 
 qreal QnImageButtonWidget::animationSpeed() const {
@@ -194,11 +185,11 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
     if(isDisabled())
         return;
 
-    toggle();
-    Q_EMIT clicked(isChecked());
-
     if(m_action != NULL)
         m_action->trigger();
+    else
+        toggle();
+    Q_EMIT clicked(isChecked());
 }
 
 void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {
@@ -245,6 +236,9 @@ QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVaria
     case ItemSceneHasChanged:
         m_animator->setTimer(InstrumentManager::animationTimerOf(scene()));
         break;
+    case ItemEnabledHasChanged:
+        updateState(isDisabled() ? (m_state | DISABLED) : (m_state & ~DISABLED));
+        break;
     default:
         break;
     }
@@ -256,6 +250,10 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags fla
     /* Some compilers don't allow expressions in case labels, so we have to
      * precalculate them. */
     enum {
+        CHECKED = QnImageButtonWidget::CHECKED,
+        HOVERED = QnImageButtonWidget::HOVERED,
+        DISABLED = QnImageButtonWidget::DISABLED,
+        PRESSED = QnImageButtonWidget::PRESSED,
         CHECKED_HOVERED_DISABLED_PRESSED = CHECKED | HOVERED | DISABLED | PRESSED,
         CHECKED_HOVERED_DISABLED = CHECKED | HOVERED | DISABLED,
         CHECKED_HOVERED = CHECKED | HOVERED,
@@ -272,7 +270,7 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags fla
     switch(flags) {
 #define TRY(FLAGS)                                                              \
         if(!m_pixmaps[(FLAGS)].isNull())                                        \
-            return (FLAGS);
+            return static_cast<QnImageButtonWidget::StateFlags>(FLAGS);
     case CHECKED_HOVERED_DISABLED_PRESSED:
         TRY(CHECKED | HOVERED | DISABLED | PRESSED);
         /* Fall through. */
@@ -338,12 +336,15 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     StateFlags oldState = m_state;
     m_state = state;
 
-    if((oldState ^ m_state) & CHECKED) {
+    if((oldState ^ m_state) & CHECKED) { /* CHECKED has changed, emit notification signal and sync with action. */
         Q_EMIT toggled(isChecked());
 
         if(m_action != NULL)
-            m_action->toggle();
+            m_action->setChecked(isChecked());
     }
+
+    if((oldState ^ m_state) & DISABLED) /* DISABLED has changed, perform back-sync. */
+        setDisabled(m_state & DISABLED);
 
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED))
         m_action->hover();
@@ -357,11 +358,11 @@ void QnImageButtonWidget::setDefaultAction(QAction *action) {
         return;
 
     if (!this->actions().contains(action))
-        addAction(action);
+        addAction(action); /* This way we will receive action-related events and thus will track changes in action state. */
 
     setIcon(action->icon());
     setToolTip(action->toolTip());
-    
+
     setCheckable(action->isCheckable());
     setChecked(action->isChecked());
     setEnabled(action->isEnabled());

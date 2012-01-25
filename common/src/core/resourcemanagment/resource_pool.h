@@ -14,15 +14,15 @@ class QnResource;
 class QnNetworkResource;
 class CLRecorderDevice;
 
-/** 
- * This class holds all resources in the system that are READY TO BE USED 
+/**
+ * This class holds all resources in the system that are READY TO BE USED
  * (as long as resource is in the pool => shared pointer counter >= 1).
- * 
+ *
  * If resource is in the pool it is guaranteed that it won't be deleted.
- * 
+ *
  * Resource pool can also give a list of resources based on some criteria
  * and helps to administrate resources.
- * 
+ *
  * If resource is conflicting it must not be placed in resource pool.
  */
 class QN_EXPORT QnResourcePool : public QObject
@@ -45,7 +45,7 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(const QnId &id) const;
+    QnResourcePtr getResourceById(QnId id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
 
@@ -59,7 +59,7 @@ public:
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(unsigned long flag) const;
 
-    QnResourceList getResourcesWithParentId(const QnId &id) const;
+    QnResourceList getResourcesWithParentId(QnId id) const;
 
 
     QStringList allTags() const;

@@ -8,7 +8,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "core/resource/video_server.h"
-#include "core/resource/qnstorage.h"
+#include "core/resource/storage.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_data.h"
@@ -59,7 +59,7 @@ public:
 
     int addStorage(const QnStorage&, QByteArray& errorString);
 
-    int getCameras(QnSecurityCamResourceList& cameras, const QnId& mediaServerId, QByteArray& errorString);
+    int getCameras(QnSecurityCamResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
     int getStorages(QnResourceList& storages, QByteArray& errorString);
     int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
 

@@ -1,13 +1,12 @@
 #include <QtCore/QtConcurrentMap>
 #include <QtCore/QThreadPool>
-#include "asynch_seacher.h"
+#include "resource_discovery_manager.h"
 #include "utils/common/sleep.h"
-#include "resourceserver.h"
+#include "resource_searcher.h"
 #include "../resource/network_resource.h"
 #include "resource_pool.h"
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
-
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
 m_server(false)
@@ -48,7 +47,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnResourcePtr result;
 
@@ -86,8 +85,10 @@ void QnResourceDiscoveryManager::run()
         searchersList = m_searchersList;
     }
 
-    foreach (QnAbstractResourceSearcher *searcher, searchersList)
+    foreach (QnAbstractResourceSearcher *searcher, searchersList) {
         searcher->setShouldBeUsed(true);
+        searcher->pleaseResume();
+    }
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     while (!needToStop() && !initResourceTypes(appServerConnection))
@@ -343,7 +344,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
                     if (isServer())
                     {
-                        // not stand alone 
+                        // not stand alone
                         QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
                         if (cameraResource)
                         {

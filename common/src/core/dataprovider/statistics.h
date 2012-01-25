@@ -1,5 +1,5 @@
-#ifndef statistics_h_130
-#define statistics_h_130
+#ifndef QN_STATISTICS_H
+#define QN_STATISTICS_H
 
 #include <QtCore/QDateTime>
 #include <QtCore/QMutex>

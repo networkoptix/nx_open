@@ -1,5 +1,5 @@
-#ifndef resource_commendprocessor_h_2221
-#define resource_commendprocessor_h_2221
+#ifndef QN_RESOURCE_COMMAND_PROCESSOR
+#define QN_RESOURCE_COMMAND_PROCESSOR
 
 #include "core/dataconsumer/dataconsumer.h"
 #include "core/datapacket/datapacket.h"
@@ -40,4 +40,4 @@ private:
     QMap<QnId, unsigned int> mResourceQueue;
 };
 
-#endif //resource_commendprocessor_h_2221
+#endif //QN_RESOURCE_COMMAND_PROCESSOR

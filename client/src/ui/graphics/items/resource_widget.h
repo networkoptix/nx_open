@@ -28,6 +28,7 @@ class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, 
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement);
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry);
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
+    Q_FLAGS(DisplayFlags DisplayFlag);
 
     typedef GraphicsWidget base_type;
 

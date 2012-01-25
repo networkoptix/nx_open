@@ -1,10 +1,10 @@
-#include "directory_browser.h"
+#include "resource_directory_browser.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include "core/resource/file_resource.h"
+#include "core/resource/local_file_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_device.h"
 #include "plugins/resources/archive/avi_files/avi_bluray_device.h"
@@ -14,12 +14,7 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
 }
 
-QnResourceDirectoryBrowser::~QnResourceDirectoryBrowser()
-{
-}
-
-
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     QnResourcePtr result;
 

@@ -6,7 +6,7 @@
 #include "recording/stream_recorder.h"
 #include "decoders/video/abstractdecoder.h"
 #include "core/resource/media_resource.h"
-#include "core/dataprovider/streamdata_statistics.h"
+#include "core/dataprovider/statistics.h"
 #include "utils/media/externaltimesource.h"
 
 
