@@ -37,6 +37,7 @@ void QnResource::updateInner(const QnResource& other)
     m_lastDiscoveredTime = other.m_lastDiscoveredTime;
     m_tags = other.m_tags;
     m_url = other.m_url;
+    setStatus(other.m_status);
 }
 
 void QnResource::update(const QnResource& other)
@@ -45,12 +46,9 @@ void QnResource::update(const QnResource& other)
         consumer->beforeUpdate();
 
     {
-        QMutexLocker mutexLocker(&m_mutex);
-        {
-            QMutexLocker mutexLocker(&m_mutex);
-            updateInner(other);
-        }
-        setStatus(other.m_status, true);
+        QMutexLocker mutexLocker(&m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        QMutexLocker mutexLocker2(&other.m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
@@ -200,6 +198,7 @@ QnParamList &QnResource::getResourceParamList() const
         QnParam newParam(paramType);
         resourceParamList.append(newParam);
     }
+
 
     // 2. read AppServer params
     foreach (QnParamTypePtr paramType, resType->paramTypeList()) {
@@ -439,8 +438,16 @@ void QnResource::setStatus(QnResource::Status newStatus, bool ignoreHandlers)
         m_status = newStatus;
     }
 
-    if (oldStatus != newStatus && !ignoreHandlers)
+    if (oldStatus == newStatus)
+        return;
+
+    if (!ignoreHandlers)
         Q_EMIT statusChanged(oldStatus, newStatus);
+
+
+    if (ignoreHandlers)
+        return;
+
 }
 
 
