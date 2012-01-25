@@ -70,106 +70,60 @@ MJPEGtreamreader::~MJPEGtreamreader()
     stop();
 }
 
+static inline int getIntParam(const char* pos)
+{
+    int rez = 0;
+    for (; *pos >= '0' && *pos <= '9'; pos++)
+        rez = rez*10 + (*pos-'0');
+    return rez;
+}
+
 QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
 {
-
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    m_videoDataBuffer.clear();
-    CLByteArray& img = m_videoDataBuffer;
+    char headerBuffer[512+1];
+    int readed = mHttpClient->read(headerBuffer, sizeof(headerBuffer)-1);
+    if (readed < 1)
+        return QnAbstractMediaDataPtr(0);
+    headerBuffer[readed] = 0;
+    char* contentLenPtr = strstr(headerBuffer, "Content-Length:");
+    if (!contentLenPtr)
+        return QnAbstractMediaDataPtr(0);
+    int contentLen = getIntParam(contentLenPtr + 16);
+    char* jpegFindStart = contentLenPtr+16;
+    char* dataEnd = headerBuffer + readed;
+    int jpegStart = findJPegStartCode(jpegFindStart, dataEnd - jpegFindStart);
 
-    bool getting_image = false;
+    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
+    if (jpegStart != -1)
+        videoData->data.write(jpegFindStart + jpegStart, dataEnd - (jpegFindStart+jpegStart));
 
+    int dataLeft = contentLen - videoData->data.size();
+    char* curPtr = videoData->data.data() + videoData->data.size();
+    videoData->data.done(dataLeft);
 
-
-    while (isStreamOpened() && !needToStop())
+    while (dataLeft > 0)
     {
-        if (mDataRemainedBeginIndex<0)
-        {
-            mReaded = mHttpClient->read(mData, BLOCK_SIZE);
-        }
-        else
-        {
-            mReaded = mReaded - mDataRemainedBeginIndex;
-            memmove(mData, mData + mDataRemainedBeginIndex, mReaded);
-            mDataRemainedBeginIndex = -1;
-        }
-
-
-        if (mReaded < 0 )
-            break;
-
-
-        if (!getting_image)
-        {
-
-            int image_index = findJPegStartCode(mData, mReaded);
-
-            if (image_index >=0 )
-            {
-                getting_image = true;
-                char *to = img.prepareToWrite(mReaded - image_index); // I assume any image is bigger than BLOCK_SIZE
-                memcpy(to, mData + image_index, mReaded - image_index);
-                img.done(mReaded - image_index);
-            }
-            else
-            {
-                // just skip the data
-            }
-        }
-        else // getting the image
-        {
-
-            if (img.size() + BLOCK_SIZE > img.capacity())// too big image
-                break;
-
-
-            int image_end_index = findJPegEndCode(mData, mReaded);
-            if (image_end_index < 0)
-            {
-                img.write(mData, mReaded);
-            }
-            else
-            {
-
-                image_end_index+=2;
-
-                int actualSize = m_videoDataBuffer.size() + image_end_index;
-                QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, actualSize));
-
-                // found the end of image
-                getting_image = false;
-                videoData->data.write(m_videoDataBuffer.data(), m_videoDataBuffer.size());
-                videoData->data.write(mData, image_end_index);
-
-                if (mReaded - image_end_index > 0)
-                    mDataRemainedBeginIndex = image_end_index;
-                else
-                    mDataRemainedBeginIndex = -1;
-
-
-                videoData->compressionType = CODEC_ID_MJPEG;
-                videoData->width = 1920;
-                videoData->height = 1088;
-
-                videoData->flags |= AV_PKT_FLAG_KEY;
-                videoData->channelNumber = 0;
-                videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
-
-                return videoData;
-
-
-            }
-        }
-
-
+        readed = mHttpClient->read(curPtr, dataLeft);
+        if (readed < 1)
+            return QnAbstractMediaDataPtr(0);
+        curPtr += readed;
+        dataLeft -= readed;
     }
+    // sometime 1 more bytes in the buffer end. Looks like it is a DLink bug caused by 16-bit word alignment
+    if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
+        videoData->data.done(-1);
 
+    videoData->compressionType = CODEC_ID_MJPEG;
+    videoData->width = 1920;
+    videoData->height = 1088;
+    videoData->flags |= AV_PKT_FLAG_KEY;
+    videoData->channelNumber = 0;
+    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
 
-    closeStream();
-
-    return QnCompressedVideoDataPtr(0);
+    return videoData;
 }
 
 void MJPEGtreamreader::openStream()
