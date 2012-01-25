@@ -2,6 +2,29 @@
 #include "core/resource/network_resource.h"
 
 
+inline static int findJPegStartCode(const char *data, int datalen)
+{
+    const char* end = data + datalen-1;
+    for(const char* curPtr = data; curPtr < end; ++curPtr)
+    {
+        if (*curPtr == (char)0xff && curPtr[1] == (char)0xd8)
+            return curPtr - data;
+    }
+    return -1;
+}
+
+inline static int findJPegEndCode(const char *data, int datalen)
+{
+    const char* end = data + datalen-1;
+    for(const char* curPtr = data; curPtr < end; ++curPtr)
+    {
+        if (*curPtr == (char)0xff && curPtr[1] == (char)0xd9)
+            return curPtr - data;
+    }
+    return -1;
+}
+
+/*
 char jpeg_start[2] = {0xff, 0xd8};
 char jpeg_end[2] = {0xff, 0xd9};
 
@@ -31,23 +54,13 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
     }
 }
-
-int contain_subst(char *data, int datalen, int start_index ,  char *subdata, int subdatalen)
-{
-    int result = contain_subst(data + start_index, datalen - start_index, subdata, subdatalen);
-
-    if (result<0)
-        return result;
-
-    return result+start_index;
-}
-
-
+*/
 
 MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
 :CLServerPushStreamreader(res),
 mHttpClient(0),
-m_request(requst)
+m_request(requst),
+m_videoDataBuffer(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE)
 {
 
 }
@@ -63,8 +76,8 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE/2) );
-    CLByteArray& img = videoData->data;
+    m_videoDataBuffer.clear();
+    CLByteArray& img = m_videoDataBuffer;
 
     bool getting_image = false;
 
@@ -91,7 +104,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
         if (!getting_image)
         {
 
-            int image_index = contain_subst(mData, mReaded, jpeg_start, 2);
+            int image_index = findJPegStartCode(mData, mReaded);
 
             if (image_index >=0 )
             {
@@ -112,7 +125,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
                 break;
 
 
-            int image_end_index = contain_subst(mData, mReaded, jpeg_end, 2);
+            int image_end_index = findJPegEndCode(mData, mReaded);
             if (image_end_index < 0)
             {
                 img.write(mData, mReaded);
@@ -122,10 +135,13 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
 
                 image_end_index+=2;
 
+                int actualSize = m_videoDataBuffer.size() + image_end_index;
+                QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, actualSize));
 
                 // found the end of image
                 getting_image = false;
-                img.write(mData, image_end_index);
+                videoData->data.write(m_videoDataBuffer.data(), m_videoDataBuffer.size());
+                videoData->data.write(mData, image_end_index);
 
                 if (mReaded - image_end_index > 0)
                     mDataRemainedBeginIndex = image_end_index;

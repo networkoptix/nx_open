@@ -4,16 +4,20 @@
 #include "utils/common/bytearray.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 
+static const int SERVER_TFTP_PORT = 69;
 
 using namespace std;
 
-CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& ip, unsigned int timeout, unsigned int retry):
+CLSimpleTFTPClient::CLSimpleTFTPClient(const QHostAddress& hostAddress, unsigned int timeout, unsigned int retry):
 m_retry(retry),
-m_ip(ip),
+m_hostAddress(hostAddress),
+m_ip(hostAddress.toString().toLatin1().data()),
 m_timeout(timeout)
 {
-	//m_wish_blk_size = double_blk_size;
-	m_wish_blk_size  = blk_size;
+	m_wish_blk_size = double_blk_size;
+	//m_wish_blk_size  = blk_size;
+    m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
+    m_sock.setDestAddr(m_ip, SERVER_TFTP_PORT);
 }
 
 int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
@@ -22,12 +26,11 @@ int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
     {
         m_last_packet_size = 0;
         char buff_send[1000]; int len_send;
-        unsigned char buff_recv[3100]; int len_recv;
+        unsigned char buff_recv[3100]; 
+        int len_recv;
         int i, len = 0;
 
-        UDPSocket m_sock;
-        m_sock.setDestAddr(m_ip,69);
-        m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
+        m_sock.setDestPort(SERVER_TFTP_PORT);
 
         len_send = form_read_request(fn, buff_send);
 
@@ -46,16 +49,13 @@ int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
 
             while(1)
             {
-                try
+                len_recv = m_sock.recvFrom(buff_recv, sizeof(buff_recv),temp_cam_addr, cam_dst_port);
+                if (len_recv < 0)
                 {
-                    len_recv = 0;
-                    len_recv = m_sock.recvFrom(buff_recv, sizeof(buff_recv),temp_cam_addr, cam_dst_port);
-                    m_sock.setDestAddr(m_ip,cam_dst_port);
-
+                    m_status = time_out; 
+                    break;
                 }
-                catch (SocketException &e)	{
-                    m_status = time_out; break;
-                }// did not get anything
+                m_sock.setDestPort(cam_dst_port);
 
                 if (len_recv<13) // unexpected answer
                     continue;
@@ -65,12 +65,12 @@ int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
                     // some times ( do not know why) cam responds with wrong blk size - very very rarely
                     if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
                     {
-                        cl_log.log("unexpected packet size", cl_logWARNING);
+                        //cl_log.log("unexpected packet size", cl_logWARNING);
                         m_curr_blk_size = blk_size;
                     }
                     else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
                     {
-                        cl_log.log("unexpected packet size", cl_logWARNING);
+                        //cl_log.log("unexpected packet size", cl_logWARNING);
                         m_curr_blk_size = double_blk_size;
                     }
 
@@ -112,12 +112,12 @@ int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
 
                 while(1)
                 {
-                    len_recv = 0;
                     len_recv = m_sock.recv(buff_recv, sizeof(buff_recv));
 
-                    if (len_recv<4)// unexpected answer or did not get anything
+                    if (len_recv < 4)// unexpected answer or did not get anything
                     {
-                        m_status = time_out; break;
+                        m_status = time_out; 
+                        break;
                     }
 
                     if (buff_recv[0] == 0 && buff_recv[1] == 3)// data block
@@ -164,12 +164,12 @@ int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
                             // some times ( do not know why) cam responds with wrong blk size - very very rarely
                             if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
                             {
-                                cl_log.log("unexpected packet size", cl_logWARNING);
+                                //cl_log.log("unexpected packet size", cl_logWARNING);
                                 m_curr_blk_size = blk_size;
                             }
                             else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
                             {
-                                cl_log.log("unexpected packet size", cl_logWARNING);
+                                //cl_log.log("unexpected packet size", cl_logWARNING);
                                 m_curr_blk_size = double_blk_size;
                             }
 
