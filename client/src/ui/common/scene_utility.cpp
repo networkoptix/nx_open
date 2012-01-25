@@ -334,6 +334,10 @@ QSizeF SceneUtility::eroded(const QSizeF &size, const MarginsF &amount) {
     return size - sizeDelta(amount);
 }
 
+QSize SceneUtility::eroded(const QSize &size, const QMargins &amount) {
+    return size - sizeDelta(amount);
+}
+
 bool SceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
     return size.width() >= otherSize.width() && size.height() >= otherSize.height();
 }

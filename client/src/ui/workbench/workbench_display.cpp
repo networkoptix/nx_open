@@ -101,7 +101,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_mode(QnWorkbench::VIEWING),
-    m_marginFlags(MARGINS_AFFECT_POSITION | MARGINS_AFFECT_SIZE),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this))
 {
@@ -614,32 +613,30 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         delete widget;
 }
 
+QMargins QnWorkbenchDisplay::viewportMargins() const {
+    return m_viewportAnimator->viewportMargins();
+}
+
 void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins) {
-    if(m_viewportMargins == margins)
+    if(viewportMargins() == margins)
         return;
 
-    m_viewportMargins = margins;
-    
-    if(m_marginFlags & MARGINS_AFFECT_SIZE)
-        m_viewportAnimator->setViewportMargins(margins);
+    m_viewportAnimator->setViewportMargins(margins);
 
     synchronizeSceneBoundsExtension();
 }
 
-QnWorkbenchDisplay::MarginFlags QnWorkbenchDisplay::marginFlags() const {
-    return m_marginFlags;
+Qn::MarginFlags QnWorkbenchDisplay::marginFlags() const {
+    return m_viewportAnimator->marginFlags();
 }
 
-void QnWorkbenchDisplay::setMarginFlags(MarginFlags flags) {
-    if(m_marginFlags == flags)
+void QnWorkbenchDisplay::setMarginFlags(Qn::MarginFlags flags) {
+    if(marginFlags() == flags)
         return;
 
-    QMargins margins = m_viewportMargins;
-    setViewportMargins(QMargins(0, 0, 0, 0));
+    m_viewportAnimator->setMarginFlags(flags);
 
-    m_marginFlags = flags;
-
-    setViewportMargins(margins);
+    synchronizeSceneBoundsExtension();
 }
 
 
@@ -727,7 +724,7 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     if(m_view == NULL) {
         return QRectF();
     } else {
-        return mapRectToScene(m_view, (m_marginFlags & MARGINS_AFFECT_SIZE) ? eroded(m_view->viewport()->rect(), m_viewportMargins) : m_view->viewport()->rect());
+        return m_viewportAnimator->accessor()->get(m_view).toRectF();
     }
 }
 
@@ -882,13 +879,16 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
-    if(m_marginFlags == 0)
-        return;
+    MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
+    if(marginFlags() != 0)
+        marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
 
-    QSizeF viewportSize = m_view->viewport()->size();
-    MarginsF positionExtension = cwiseDiv(m_viewportMargins, viewportSize);
+    /* Sync position extension. */
+    {
+        MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
+        if(marginFlags() & Qn::MARGINS_AFFECT_POSITION)
+            positionExtension = marginsExtension;
 
-    if(m_marginFlags & MARGINS_AFFECT_POSITION) {
         QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
         if(zoomedItem != NULL) {
             m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
@@ -897,8 +897,9 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
         }
     }
 
-    if(m_marginFlags & MARGINS_AFFECT_SIZE) {
-        QSizeF sizeExtension = sizeDelta(positionExtension);
+    /* Sync size extension. */
+    if(marginFlags() & Qn::MARGINS_AFFECT_SIZE) {
+        QSizeF sizeExtension = sizeDelta(marginsExtension);
         sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
 
         m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);

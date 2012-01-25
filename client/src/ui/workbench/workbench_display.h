@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QHash>
 #include <core/resource/resource.h>
-#include <ui/animation/animation_timer.h>
+#include <ui/animation/animation_timer_listener.h>
+#include <ui/animation/viewport_geometry_accessor.h>
 #include <ui/common/scene_utility.h>
 #include <utils/common/rect_set.h>
 #include "workbench.h"
@@ -44,7 +45,6 @@ class CLCamDisplay;
  */
 class QnWorkbenchDisplay: public QObject, protected AnimationTimerListener, protected SceneUtility {
     Q_OBJECT;
-    Q_FLAGS(MarginFlags MarginFlag);
     Q_ENUMS(Layer);
 
 public:
@@ -63,13 +63,6 @@ public:
         EFFECTS_LAYER,              /**< Layer for top-level effects. */
         UI_ELEMENTS_LAYER,          /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
     };
-
-    enum MarginFlag {
-        MARGINS_AFFECT_SIZE = 0x1,      /**< Viewport margins affect how viewport size is bounded. */
-        MARGINS_AFFECT_POSITION = 0x2   /**< Viewport margins affect how viewport position is bounded. */
-    };
-
-    Q_DECLARE_FLAGS(MarginFlags, MarginFlag);
 
     /**
      * Constructor.
@@ -236,9 +229,11 @@ public:
      */
     void setViewportMargins(const QMargins &margins);
 
-    MarginFlags marginFlags() const;
+    QMargins viewportMargins() const;
 
-    void setMarginFlags(MarginFlags flags);
+    Qn::MarginFlags marginFlags() const;
+
+    void setMarginFlags(Qn::MarginFlags flags);
 
     void ensureVisible(QnWorkbenchItem *item);
 
@@ -377,12 +372,6 @@ private:
     /** Current workbench mode. */
     QnWorkbench::Mode m_mode;
 
-    /** Viewport margins. */
-    QMargins m_viewportMargins;
-
-    /** Margin flags. */
-    MarginFlags m_marginFlags;
-
     /** Grid item. */
     QWeakPointer<QnGridItem> m_gridItem;
 
@@ -430,7 +419,5 @@ private:
     /** Stored dummy scene. */
     QGraphicsScene *m_dummyScene;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchDisplay::MarginFlags);
 
 #endif // QN_WORKBENCH_MANAGER_H
