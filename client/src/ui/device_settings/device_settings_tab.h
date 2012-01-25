@@ -1,23 +1,23 @@
 #ifndef device_settings_tab_h_2004
 #define device_settings_tab_h_2004
 
-#include <core/resource/resource.h>
+#include <QtGui/QWidget>
 
 class CLAbstractDeviceSettingsDlg;
+class QnParamList;
 
 class CLDeviceSettingsTab : public QWidget
 {
     Q_OBJECT
 
 public:
-    CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, QnResourcePtr resource, const QString &group);
+    CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, const QnParamList &paramList, const QString &group);
     ~CLDeviceSettingsTab();
 
     QString name() const;
 
 protected:
     CLAbstractDeviceSettingsDlg *const m_dialog;
-    const QnResourcePtr m_resource;
     const QString m_group;
 };
 

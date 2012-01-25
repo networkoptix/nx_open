@@ -13,7 +13,6 @@
 #include "decoders/video/ipp_h264_decoder.h"
 
 #include "ui/device_settings/dlg_factory.h"
-#include "ui/device_settings/plugins/arecontvision/arecont_dlg.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
 #include "ui/skin/skin.h"
@@ -346,7 +345,7 @@ int main(int argc, char *argv[])
 
     QnResourceDiscoveryManager::instance().start();
 
-    CLDeviceSettingsDlgFactory::registerDlgManufacture(new AreconVisionDlgManufacture);
+    CLDeviceSettingsDlgFactory::initialize();
 
     //============================
     /*

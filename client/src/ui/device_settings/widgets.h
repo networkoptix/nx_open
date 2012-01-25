@@ -3,13 +3,11 @@
 
 #include <QtGui/QSlider>
 
-#include <core/resource/resource.h>
+#include <core/resource/param.h>
 
 class QCheckBox;
 class QGroupBox;
 class QRadioButton;
-
-class QnResource;
 
 class SettingsSlider : public QSlider
 {
@@ -27,38 +25,30 @@ protected:
 
 //==============================================
 
-class CLAbstractSettingsWidget : public QObject
+class CLAbstractSettingsWidget : public QWidget
 {
     Q_OBJECT
+    Q_PROPERTY(QVariant paramValue READ paramValue WRITE setParamValue NOTIFY paramValueChanged USER true DESIGNABLE false)
 
 public:
-    CLAbstractSettingsWidget(QnResourcePtr resource, const QnParam &param);
+    CLAbstractSettingsWidget(const QnParam &param, QWidget *parent = 0);
     virtual ~CLAbstractSettingsWidget();
 
-    QnResourcePtr resource() const;
     const QnParam &param() const;
 
-    QString group() const;
-    QString subGroup() const;
-
-    QWidget *widget() const;
-
-Q_SIGNALS:
-    void setParam(const QString &name, const QVariant &value);
-
-protected:
+    QVariant paramValue() const;
     void setParamValue(const QVariant &value);
 
-    virtual QWidget *createWidget() = 0;
+Q_SIGNALS:
+    void paramValueChanged(const QVariant &value);
 
+protected:
     virtual void updateParam(const QVariant &value) = 0;
 
 private:
     Q_DISABLE_COPY(CLAbstractSettingsWidget)
 
-    const QnResourcePtr m_resource;
     QnParam m_param;
-    mutable QWidget *m_widget;
 };
 //==============================================
 
@@ -67,11 +57,9 @@ class SettingsOnOffWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsOnOffWidget(QnResourcePtr dev, const QnParam &param);
+    SettingsOnOffWidget(const QnParam &param, QWidget *parent = 0);
 
 protected:
-    QWidget *createWidget();
-
     void updateParam(const QVariant &value);
 
 private Q_SLOTS:
@@ -87,11 +75,9 @@ class SettingsMinMaxStepWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsMinMaxStepWidget(QnResourcePtr dev, const QnParam &param);
+    SettingsMinMaxStepWidget(const QnParam &param, QWidget *parent = 0);
 
 protected:
-    QWidget *createWidget();
-
     void updateParam(const QVariant &value);
 
 private Q_SLOTS:
@@ -109,19 +95,15 @@ class SettingsEnumerationWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsEnumerationWidget(QnResourcePtr dev, const QnParam &param);
+    SettingsEnumerationWidget(const QnParam &param, QWidget *parent = 0);
 
 protected:
-    QWidget *createWidget();
-
     void updateParam(const QVariant &value);
 
 private Q_SLOTS:
     void onClicked();
 
 private:
-    QRadioButton *getButtonByname(const QString &name) const;
-
     QList<QRadioButton *> m_radioButtons;
 };
 
@@ -131,43 +113,26 @@ class SettingsButtonWidget : public CLAbstractSettingsWidget
     Q_OBJECT
 
 public:
-    SettingsButtonWidget(QnResourcePtr dev, const QnParam &param);
+    SettingsButtonWidget(const QnParam &param, QWidget *parent = 0);
 
 protected:
-    QWidget *createWidget();
-
     void updateParam(const QVariant &value);
 
 private Q_SLOTS:
     void onClicked();
 };
 
-//==============================================
-class SettingsScheduleGridWidget : public CLAbstractSettingsWidget
-{
-    Q_OBJECT
-
-public:
-    SettingsScheduleGridWidget(QnResourcePtr dev, const QnParam &param);
-
-protected:
-    QWidget *createWidget();
-
-    void updateParam(const QVariant &value);
-};
 
 //==============================================
-class SettingsCameraScheduleWidget : public CLAbstractSettingsWidget
+#include <QtGui/QItemEditorFactory>
+
+class SettingsEditorFactory : public QItemEditorFactory
 {
-    Q_OBJECT
-
 public:
-    SettingsCameraScheduleWidget(QnResourcePtr dev, const QnParam &param);
+    SettingsEditorFactory();
 
-protected:
-    QWidget *createWidget();
-
-    void updateParam(const QVariant &value);
+    QWidget *createEditor(const QnParam &param, QWidget *parent) const;
+    QByteArray valuePropertyName(const QnParam &param) const;
 };
 
 #endif //settings_widgets_h_1820

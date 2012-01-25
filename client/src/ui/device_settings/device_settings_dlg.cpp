@@ -6,29 +6,22 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QTabWidget>
 
+#include <api/AppServerConnection.h>
+
 #include "device_settings_tab.h"
-#include "settings.h"
-#include "widgets.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource, QWidget *parent)
-    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint |
-                      Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint),
-      m_resource(resource)
+    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+      m_resource(resource), m_params(resource->getResourceParamList())
 {
-    setWindowTitle(tr("Camera settings: %1").arg(m_resource->toString()));
+    setWindowTitle(tr("Camera settings: %1").arg(m_resource->getName()));
 
-    resize(610, 490);
+    resize(650, 500);
 
     m_tabWidget = new QTabWidget(this);
-
-    foreach (const QString &group, m_resource->getResourceParamList().groupList())
-        m_tabs.append(new CLDeviceSettingsTab(this, m_resource, group));
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
     m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Reset | QDialogButtonBox::Close, Qt::Horizontal, this);
-
-    QPushButton *suggestionsButton = m_buttonBox->addButton(tr("Suggestions..."), QDialogButtonBox::ActionRole);
-    connect(suggestionsButton, SIGNAL(clicked()), this, SLOT(onSuggestions()));
-
     foreach (QAbstractButton *button, m_buttonBox->buttons())
         button->setFocusPolicy(Qt::NoFocus);
 
@@ -42,7 +35,7 @@ CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource,
     mainLayout->addWidget(m_buttonBox);
     setLayout(mainLayout);
 
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onNewtab(int)));
+    QMetaObject::invokeMethod(this, "buildTabs", Qt::QueuedConnection);
 }
 
 CLAbstractDeviceSettingsDlg::~CLAbstractDeviceSettingsDlg()
@@ -56,19 +49,9 @@ QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
 
 void CLAbstractDeviceSettingsDlg::accept()
 {
-    // ### save at once, probably in async way
-    foreach (CLAbstractSettingsWidget *widget, m_widgets.values()) {
-        const QnParam &param = widget->param();
-        if (!m_resource->setParam(param.name(), param.value(), param.isPhysical() ? QnDomainPhysical : QnDomainMemory)) {
-            if (QMessageBox::warning(this, tr("Unable to save changes"), tr("Please try save changes later."),
-                                     QMessageBox::Ok | QMessageBox::Close, QMessageBox::Ok) == QMessageBox::Close) {
-                reject();
-            }
-            return;
-        }
-    }
-
-    QDialog::accept();
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    if (appServerConnection->saveAsync(*m_resource.data(), this, SLOT(saveSuccess())) == 0)
+        saveError();
 }
 
 void CLAbstractDeviceSettingsDlg::reject()
@@ -78,11 +61,78 @@ void CLAbstractDeviceSettingsDlg::reject()
 
 void CLAbstractDeviceSettingsDlg::reset()
 {
+    foreach (const QnParam &param, m_params.list()) {
+        if (QWidget *widget = m_widgets.value(param.name())) {
+            QMetaProperty userProperty = widget->metaObject()->userProperty();
+            if (userProperty.isValid() && userProperty.isWritable())
+                userProperty.write(widget, param.value());
+        }
+    }
 }
 
-void CLAbstractDeviceSettingsDlg::setParam(const QString &name, const QVariant &val)
+void CLAbstractDeviceSettingsDlg::buildTabs()
 {
-    m_resource->setParamAsync(name, val, QnDomainPhysical);
+    QList<QString> groups = tabsOrder();
+
+    const QList<QString> paramsGroupList = m_params.groupList();
+    for (QList<QString>::iterator it = groups.begin(); it != groups.end(); ) {
+        if (!(*it).isEmpty() && !paramsGroupList.contains(*it))
+            it = groups.erase(it);
+        else
+            ++it;
+    }
+    foreach (const QString &group, paramsGroupList) {
+        if (!group.isEmpty() && !groups.contains(group))
+            groups << group;
+    }
+
+    foreach (const QString &group, groups)
+        addTab(new CLDeviceSettingsTab(this, m_params, group));
+
+    reset();
+    currentTabChanged(0); // QTabWidget doesn't emit currentChanged() for the first tab created
+}
+
+void CLAbstractDeviceSettingsDlg::setParam(const QString &paramName, const QVariant &value)
+{
+    const QnParam param = m_params.value(paramName);
+    m_resource->setParamAsync(paramName, value, param.isPhysical() ? QnDomainPhysical : QnDomainMemory);
+}
+
+void CLAbstractDeviceSettingsDlg::saveParam()
+{
+    if (QWidget *widget = qobject_cast<QWidget *>(sender())) {
+        const QString paramName = m_widgets.key(widget);
+        if (!paramName.isEmpty()) {
+            const QnParam param = m_params.value(paramName);
+            QVariant value;
+            QMetaProperty userProperty = widget->metaObject()->userProperty();
+            if (userProperty.isValid()) {
+                value = userProperty.read(widget);
+                m_resource->setParamAsync(paramName, value, param.isPhysical() ? QnDomainPhysical : QnDomainMemory);
+            }
+        }
+    }
+}
+
+void CLAbstractDeviceSettingsDlg::saveSuccess()
+{
+    QDialog::accept();
+}
+
+void CLAbstractDeviceSettingsDlg::saveError()
+{
+    if (QMessageBox::warning(this, tr("Unable to save changes"), tr("Please try save changes later."),
+                             QMessageBox::Ok | QMessageBox::Close, QMessageBox::Ok) == QMessageBox::Close) {
+        reject();
+    }
+}
+
+QList<QString> CLAbstractDeviceSettingsDlg::tabsOrder() const
+{
+    QList<QString> tabsOrder;
+    tabsOrder << QString(); // 'General' tab is a first tab;
+    return tabsOrder;
 }
 
 QList<CLDeviceSettingsTab *> CLAbstractDeviceSettingsDlg::tabs() const
@@ -102,7 +152,8 @@ CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name)
 
 void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
 {
-    m_tabWidget->addTab(tab, tab->name());
+    m_tabs.append(tab);
+    m_tabWidget->addTab(tab, !tab->name().isEmpty() ? tab->name() : tr("General"));
 }
 
 QList<QGroupBox *> CLAbstractDeviceSettingsDlg::groups() const
@@ -120,45 +171,55 @@ void CLAbstractDeviceSettingsDlg::putGroup(const QString &name, QGroupBox *group
     m_groups.insert(name, group);
 }
 
-QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::widgets() const
+QList<QWidget *> CLAbstractDeviceSettingsDlg::widgets() const
 {
     return m_widgets.values();
 }
 
-QList<CLAbstractSettingsWidget *> CLAbstractDeviceSettingsDlg::widgetsByGroup(const QString &group) const
+QList<QWidget *> CLAbstractDeviceSettingsDlg::widgetsByGroup(const QString &group, const QString &subGroup) const
 {
-    QList<CLAbstractSettingsWidget *> result;
-
-    foreach (CLAbstractSettingsWidget *wgt, m_widgets.values()) {
-        if (wgt->group() == group)
-            result.append(wgt);
+    QList<QWidget *> widgets;
+    foreach (const QnParam &param, m_params.paramList(group, subGroup).list()) {
+        if (m_widgets.contains(param.name()))
+            widgets.append(m_widgets[param.name()]);
     }
 
-    return result;
+    return widgets;
 }
 
-CLAbstractSettingsWidget *CLAbstractDeviceSettingsDlg::widgetByName(const QString &name) const
+QWidget *CLAbstractDeviceSettingsDlg::widgetByName(const QString &name) const
 {
     return m_widgets.value(name);
 }
 
-void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget *widget)
+void CLAbstractDeviceSettingsDlg::registerWidget(QWidget *widget, const QnParam &param)
 {
-    m_widgets.insert(widget->param().name(), widget);
+    if (!widget || !param.isValid())
+        return;
+
+    QMetaProperty userProperty = widget->metaObject()->userProperty();
+    if (userProperty.isValid() && userProperty.hasNotifySignal()) {
+        const QMetaMethod mSignal = userProperty.notifySignal();
+        const QByteArray signature = QByteArray("2") + QByteArray(mSignal.signature()); // a bit tricky, see Q_SIGNAL definition
+        connect(widget, signature.constData(), this, SLOT(saveParam()));
+    }
+    m_widgets.insert(param.name(), widget);
 }
 
-void CLAbstractDeviceSettingsDlg::onSuggestions()
+QnParam CLAbstractDeviceSettingsDlg::param(QWidget *widget) const
 {
+    return m_params.value(m_widgets.key(widget));
 }
+
 
 #include "core/resource/resource_command_consumer.h"
 
 class QnDeviceGetParamCommand : public QnResourceCommand
 {
 public:
-    QnDeviceGetParamCommand(CLAbstractSettingsWidget *wgt)
-        : QnResourceCommand(wgt->resource()),
-          m_wgt(wgt)
+    QnDeviceGetParamCommand(const QnResourcePtr &resource, QWidget *widget, const QnParam &param)
+        : QnResourceCommand(resource),
+          m_widget(widget), m_param(param)
     {}
 
     void execute()
@@ -166,22 +227,28 @@ public:
         if (!isConnectedToTheResource())
             return;
 
-        QVariant val;
-        if (m_resource->getParam(m_wgt->param().name(), val, QnDomainPhysical))
-            QMetaObject::invokeMethod(m_wgt, "updateParam", Qt::QueuedConnection, Q_ARG(QVariant, val));
+        QVariant value;
+        if (m_resource->getParam(m_param.name(), value, m_param.isPhysical() ? QnDomainPhysical : QnDomainMemory)) {
+            QMetaProperty userProperty = m_widget->metaObject()->userProperty();
+            if (userProperty.isValid())
+                userProperty.write(m_widget, value);
+        }
     }
 
 private:
-    CLAbstractSettingsWidget *const m_wgt;
+    QWidget *const m_widget;
+    const QnParam m_param;
 };
 
 typedef QSharedPointer<QnDeviceGetParamCommand> QnDeviceGetParamCommandPtr;
 
-void CLAbstractDeviceSettingsDlg::onNewtab(int index)
+void CLAbstractDeviceSettingsDlg::currentTabChanged(int index)
 {
     const QString group = static_cast<CLDeviceSettingsTab *>(m_tabWidget->widget(index))->name();
-    foreach (CLAbstractSettingsWidget *wgt, widgetsByGroup(group)) {
-        QnDeviceGetParamCommandPtr command(new QnDeviceGetParamCommand(wgt));
-        QnResource::addCommandToProc(command);
+    foreach (const QnParam &param, m_params.paramList(group).list()) {
+        if (QWidget *widget = m_widgets.value(param.name())) {
+            QnDeviceGetParamCommandPtr command(new QnDeviceGetParamCommand(m_resource, widget, param));
+            QnResource::addCommandToProc(command);
+        }
     }
 }

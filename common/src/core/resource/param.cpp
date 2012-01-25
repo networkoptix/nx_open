@@ -58,7 +58,12 @@ bool QnParamList::contains(const QString &name) const
     return m_params.contains(name);
 }
 
-QnParam &QnParamList::value(const QString &name)
+QnParam &QnParamList::operator[](const QString &name)
+{
+    return m_params[name];
+}
+
+const QnParam QnParamList::operator[](const QString &name) const
 {
     return m_params[name];
 }
@@ -105,23 +110,23 @@ QList<QString> QnParamList::subGroupList(const QString &group) const
     foreach (const QnParam &param, m_params) {
         const QString &lgroup = param.group();
         if (lgroup == group) {
-            const QString &subgroup = param.subgroup();
-            if (!subgroup.isEmpty() && !result.contains(subgroup))
-                result.append(subgroup);
+            const QString &subGroup = param.subGroup();
+            if (!subGroup.isEmpty() && !result.contains(subGroup))
+                result.append(subGroup);
         }
     }
 
     return result;
 }
 
-QnParamList QnParamList::paramList(const QString &group, const QString &subgroup) const
+QnParamList QnParamList::paramList(const QString &group, const QString &subGroup) const
 {
     QnParamList result;
 
     foreach (const QnParam &param, m_params) {
         const QString &lgroup = param.group();
-        const QString &lsubgroup = param.subgroup();
-        if (lgroup == group && lsubgroup == subgroup)
+        const QString &lsubGroup = param.subGroup();
+        if (lgroup == group && lsubGroup == subGroup)
             result.append(param);
     }
 

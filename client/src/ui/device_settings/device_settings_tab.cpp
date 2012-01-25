@@ -2,16 +2,15 @@
 
 #include <QtGui/QItemEditorFactory>
 
-#include <ui/skin/globals.h>
+#include "ui/skin/globals.h"
 
-#include "widgets.h"
 #include "device_settings_dlg.h"
 #include "settings.h"
+#include "widgets.h"
 
-CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, QnResourcePtr resource, const QString &group)
+CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, const QnParamList &paramList, const QString &group)
     : QWidget(dialog),
       m_dialog(dialog),
-      m_resource(resource),
       m_group(group)
 {
     //QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -19,12 +18,10 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
     int size = 175;
 
     int x = 0;
-    foreach (const QString &sub_group, m_resource->getResourceParamList().subGroupList(m_group))
-    {
+    foreach (const QString &sub_group, paramList.subGroupList(m_group)) {
         QWidget *parent = this;
 
-        if (!sub_group.isEmpty())
-        {
+        if (!sub_group.isEmpty()) {
             QGroupBox *subgroupBox = new QGroupBox(this);
             subgroupBox->setObjectName(group + sub_group);
             subgroupBox->setTitle(sub_group);
@@ -40,49 +37,25 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, Qn
         }
 
         int y = 0;
-        foreach (const QnParam &param, m_resource->getResourceParamList().paramList(group, sub_group).list())
-        {
+
+        QScopedPointer<SettingsEditorFactory> editorFactory(new SettingsEditorFactory);
+        foreach (const QnParam &param, paramList.paramList(group, sub_group).list()) {
             if (!param.isUiParam())
                 continue;
 
-            CLAbstractSettingsWidget *awidget = 0;
-            switch (param.type())
-            {
-            case QnParamType::OnOff:
-                awidget = new SettingsOnOffWidget(m_resource, param);
-                break;
+            QWidget *widget = editorFactory->createEditor(param, parent);
+            if (!widget)
+                continue;
 
-            case QnParamType::MinMaxStep:
-                awidget = new SettingsMinMaxStepWidget(m_resource, param);
-                break;
+            widget->setParent(parent); // ### remove
+            widget->setFont(Globals::settingsFont());
+            widget->setEnabled(!param.isReadOnly());
+            widget->setToolTip(param.description());
 
-            case QnParamType::Enumeration:
-                awidget = new SettingsEnumerationWidget(m_resource, param);
-                break;
+            m_dialog->registerWidget(widget, param);
 
-            case QnParamType::Button:
-                awidget = new SettingsButtonWidget(m_resource, param);
-                break;
-
-            default:
-                //awidget = QItemEditorFactory::defaultFactory()->createEditor(param.defaultValue().userType(), parent); // ###
-                break;
-            }
-            if (awidget) {
-                connect(awidget, SIGNAL(setParam(QString,QVariant)), m_dialog, SLOT(setParam(QString,QVariant)));
-
-                QWidget *widget = awidget->widget();
-                widget->setParent(parent);
-                widget->setFont(Globals::settingsFont());
-
-                if (!param.description().isEmpty())
-                    widget->setToolTip(param.description());
-
-                widget->move(10, 20 + y);
-                y += 80;
-
-                m_dialog->putWidget(awidget);
-            }
+            widget->move(10, 20 + y);
+            y += 80;
         }
         //mainLayout->addWidget(subgroupBox);
     }
