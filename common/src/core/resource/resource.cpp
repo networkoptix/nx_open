@@ -9,8 +9,8 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resourcemanagment/resource_pool.h"
 
-#include "file_resource.h"
-#include "resource_command_consumer.h"
+#include "local_file_resource.h"
+#include "resource_command_processor.h"
 #include "resource_consumer.h"
 
 #include <typeinfo>

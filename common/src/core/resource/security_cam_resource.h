@@ -8,6 +8,8 @@
 class QnDataProviderFactory
 {
 public:
+    virtual ~QnDataProviderFactory() {}
+
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
 };
 

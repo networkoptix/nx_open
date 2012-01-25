@@ -1,10 +1,8 @@
-#ifndef device_server_h_1658
-#define device_server_h_1658
+#ifndef QN_RESOURCE_SEARCHER_H
+#define QN_RESOURCE_SEARCHER_H
 
 #include <QtNetwork/QHostAddress>
 #include "core/resource/resource.h"
-
-
 
 
 // this is an interface for resource searcher plug in
@@ -84,4 +82,4 @@ protected:
     QStringList m_pathListToCheck;
 };
 
-#endif //device_server_h_1658
+#endif //QN_RESOURCE_SEARCHER_H

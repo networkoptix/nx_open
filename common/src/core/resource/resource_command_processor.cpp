@@ -1,4 +1,4 @@
-#include "resource_command_consumer.h"
+#include "resource_command_processor.h"
 #include "resource.h"
 
 QnResourceCommand::QnResourceCommand(QnResourcePtr res):

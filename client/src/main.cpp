@@ -21,7 +21,7 @@
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
-#include "core/resourcemanagment/asynch_seacher.h"
+#include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
@@ -29,18 +29,18 @@
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
 
-#include "core/resource/file_resource.h"
+#include "core/resource/local_file_resource.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
 
 #include "core/resource/video_server.h"
-#include "core/resource/qnstorage.h"
+#include "core/resource/storage.h"
 
 #include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "eventmanager.h"
-#include "core/resource/directory_browser.h"
+#include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"

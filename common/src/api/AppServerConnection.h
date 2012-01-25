@@ -8,7 +8,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "core/resource/video_server.h"
-#include "core/resource/qnstorage.h"
+#include "core/resource/storage.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_data.h"

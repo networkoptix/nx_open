@@ -1,7 +1,7 @@
-#ifndef directory_browser_h_1708
-#define directory_browser_h_1708
+#ifndef QN_RESOURCE_DIRECTORY_BROWSER_H
+#define QN_RESOURCE_DIRECTORY_BROWSER_H
 
-#include "../resourcemanagment/resourceserver.h"
+#include "../resourcemanagment/resource_searcher.h"
 
 class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
 {
@@ -22,4 +22,4 @@ protected:
     QnResourceList findResources(const QString &directory);
 };
 
-#endif //directory_browser_h_1708
+#endif //QN_RESOURCE_DIRECTORY_BROWSER_H

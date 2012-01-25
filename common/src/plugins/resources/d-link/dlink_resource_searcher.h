@@ -1,7 +1,7 @@
 #ifndef dlink_device_server_h_2219
 #define dlink_device_server_h_2219
 
-#include "core/resourcemanagment/resourceserver.h"
+#include "core/resourcemanagment/resource_searcher.h"
 
 
 class QnPlDlinkResourceSearcher : public QnAbstractNetworkResourceSearcher

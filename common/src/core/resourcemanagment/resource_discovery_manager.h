@@ -1,12 +1,11 @@
-#ifndef cl_asynch_device_sarcher_h_423
-#define cl_asynch_device_sarcher_h_423
+#ifndef QN_RESOURCE_DISCOVERY_MANAGER_H
+#define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <QtCore/QThread>
 #include "utils/common/longrunnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
 #include "utils/network/nettools.h"
-
 
 
 class QnAbstractResourceSearcher;
@@ -65,4 +64,4 @@ private:
     bool m_server;
 };
 
-#endif //cl_asynch_device_sarcher_h_423
+#endif //QN_RESOURCE_DISCOVERY_MANAGER_H

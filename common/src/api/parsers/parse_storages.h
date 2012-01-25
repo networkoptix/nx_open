@@ -3,7 +3,7 @@
 
 #include "api/Types.h"
 #include "core/resource/resource.h"
-#include "core/resource/qnstorage.h"
+#include "core/resource/storage.h"
 
 template <class ResourcePtr>
 void parseStorages(QList<ResourcePtr>& storages, const QnApiStorages& xsdStorages, QnResourceFactory& /*resourceFactory*/)

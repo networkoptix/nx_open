@@ -1,6 +1,6 @@
 #include "api/parsers/parse_servers.h"
 
-#include "core/resourcemanagment/asynch_seacher.h"
+#include "core/resourcemanagment/resource_discovery_manager.h"
 
 QnApiServerPtr unparseServer(const QnVideoServer& serverIn)
 {

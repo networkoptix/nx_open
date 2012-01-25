@@ -2,7 +2,7 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
-#include "core/resource/resource_command_consumer.h"
+#include "core/resource/resource_command_processor.h"
 
 #include <QtNetwork/QUdpSocket>
 

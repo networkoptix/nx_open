@@ -17,7 +17,7 @@
 #include "layout_items.h"
 #include "ui/videoitem/unmoved/multipage/page_selector.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "core/resource/directory_browser.h"
+#include "core/resource/resource_directory_browser.h"
 #include "plugins/resources/archive/syncplay_wrapper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"

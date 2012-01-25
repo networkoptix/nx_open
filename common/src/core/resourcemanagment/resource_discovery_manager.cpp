@@ -1,8 +1,8 @@
 #include <QtCore/QtConcurrentMap>
 #include <QtCore/QThreadPool>
-#include "asynch_seacher.h"
+#include "resource_discovery_manager.h"
 #include "utils/common/sleep.h"
-#include "resourceserver.h"
+#include "resource_searcher.h"
 #include "../resource/network_resource.h"
 #include "resource_pool.h"
 #include "utils/common/util.h"

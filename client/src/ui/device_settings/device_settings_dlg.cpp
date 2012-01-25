@@ -212,7 +212,7 @@ QnParam CLAbstractDeviceSettingsDlg::param(QWidget *widget) const
 }
 
 
-#include "core/resource/resource_command_consumer.h"
+#include "core/resource/resource_command_processor.h"
 
 class QnDeviceGetParamCommand : public QnResourceCommand
 {

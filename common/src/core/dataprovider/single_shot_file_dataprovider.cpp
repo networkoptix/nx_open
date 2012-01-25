@@ -1,4 +1,4 @@
-#include "../resource/file_resource.h"
+#include "../resource/local_file_resource.h"
 #include "plugins/resources/archive/filetypesupport.h"
 #include "single_shot_file_dataprovider.h"
 

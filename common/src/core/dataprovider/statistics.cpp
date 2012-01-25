@@ -1,4 +1,4 @@
-#include "streamdata_statistics.h"
+#include "statistics.h"
 
 
 QnStatistics::QnStatistics()

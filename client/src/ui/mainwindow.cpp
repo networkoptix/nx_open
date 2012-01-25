@@ -12,7 +12,7 @@
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
 
-#include <core/resourcemanagment/asynch_seacher.h> // QnResourceDiscoveryManager
+#include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"

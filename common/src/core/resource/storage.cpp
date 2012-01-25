@@ -1,4 +1,4 @@
-#include "qnstorage.h"
+#include "storage.h"
 #include "utils/common/util.h"
 
 QnStorage::QnStorage():

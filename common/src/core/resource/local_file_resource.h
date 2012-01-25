@@ -1,9 +1,9 @@
-#ifndef file_device_h_227
-#define file_device_h_227
+#ifndef QN_LOCAL_FILE_RESOURCE_H
+#define QN_LOCAL_FILE_RESOURCE_H
 
 #include "resource.h"
 
-class QN_EXPORT  QnLocalFileResource : public QnResource
+class QN_EXPORT QnLocalFileResource : public QnResource
 {
 public:
     QnLocalFileResource(const QString &filename);
@@ -21,4 +21,4 @@ protected:
 
 typedef QSharedPointer<QnLocalFileResource> QnLocalFileResourcePtr;
 
-#endif // file_device_h_227
+#endif // QN_LOCAL_FILE_RESOURCE_H

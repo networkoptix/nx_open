@@ -13,7 +13,7 @@
 #include "version.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
-#include "core/resourcemanagment/asynch_seacher.h"
+#include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "utils/common/sleep.h"
 #include "rtsp/rtsp_listener.h"
