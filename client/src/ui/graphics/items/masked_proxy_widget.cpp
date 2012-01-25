@@ -2,8 +2,6 @@
 #include <QStyleOptionGraphicsItem>
 #include <ui/common/scene_utility.h>
 
-#include <QtGui/../../src/gui/graphicsview/qgraphicsproxywidget_p.h>
-
 namespace {
     template<class Base>
     class Object: public Base {
