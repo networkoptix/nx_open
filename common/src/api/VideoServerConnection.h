@@ -2,7 +2,6 @@
 #define __VIDEO_SERVER_CONNECTION_H_
 
 #include <QRegion>
-#include <QScopedPointer>
 #include <QSharedPointer>
 #include <QAuthenticator>
 #include "core/resource/network_resource.h"
@@ -27,7 +26,7 @@ protected:
     QnRequestParamList createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QRegion& motionRegion);
 
 private:
-    QScopedPointer<VideoServerSessionManager> m_sessionManager;
+    VideoServerSessionManager *m_sessionManager;
 };
 
 typedef QSharedPointer<QnVideoServerConnection> QnVideoServerConnectionPtr;

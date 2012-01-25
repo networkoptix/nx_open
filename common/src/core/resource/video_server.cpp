@@ -1,6 +1,7 @@
 #include "video_server.h"
 
 #include <QtCore/QUrl>
+#include "utils/common/delete_later.h"
 
 QnLocalVideoServer::QnLocalVideoServer()
     : QnResource()
@@ -41,7 +42,10 @@ QString QnVideoServer::getUniqueId() const
 void QnVideoServer::setApiUrl(const QString& restUrl)
 {
     m_apiUrl = restUrl;
-    m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(restUrl));
+
+    /* We want the video server connection to be deleted in its associated thread, 
+     * no matter where the reference count reached zero. Hence the custom deleter. */
+    m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(restUrl), &qnDeleteLater);
 }
 
 QString QnVideoServer::getApiUrl() const
