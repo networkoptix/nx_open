@@ -35,7 +35,6 @@ CLSimpleHTTPClient::~CLSimpleHTTPClient()
 CLHttpStatus CLSimpleHTTPClient::getNextLine()
 {
     m_line.clear();
-    QTextStream response(&m_line);
     char prev = 0 , curr = 0;
 
     int readed = 0;
@@ -51,7 +50,8 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
         if (prev==0 && curr == 0 && readed>1)
             break;
 
-        response << curr;
+        //response << curr;
+        m_line.append(curr);
         prev = curr;
         ++readed;
 
@@ -80,30 +80,35 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             }
         }
 
-        QString request;
-        QTextStream os(&request);
-
-        os << "POST /" << requestStr<<" HTTP/1.1\r\n"
-            << "Host: "<< m_host.toString() << "\r\n"
-            << "User-Agent: Simple HTTP Client 1.0\r\n"
-            << "Accept: */*\r\n"
-            << "Content-Type: application/x-www-form-urlencoded\r\n";
+        QByteArray request;
+        request.append("POST /");
+        request.append(requestStr);
+        request.append(" HTTP/1.1\r\n");
+        request.append("Host: ");
+        request.append(m_host.toString().toUtf8());
+        request.append("\r\n");
+        request.append("User-Agent: Simple HTTP Client 1.0\r\n");
+        request.append("Accept: */*\r\n");
+        request.append("Content-Type: application/x-www-form-urlencoded\r\n");
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
         {
-            os << basicAuth() << "\r\n";
+            request.append(basicAuth());
+            request.append("\r\n");
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            os << digestAccess(request);
+            request.append(digestAccess(request));
         }
 
-        os << "Content-Length: " << body.length() << "\r\n";
-        os << "\r\n";
+        request.append("Content-Length: ");
+        request.append(QByteArray::number(body.length()));
+        request.append("\r\n");
+        request.append("\r\n");
 
-        os << body;
+        request.append(body);
 
-        if (!m_sock->send(request.toLatin1().data(), request.toLatin1().size()))
+        if (!m_sock->send(request.data(), request.size()))
         {
             return CL_TRANSPORT_ERROR;
         }
@@ -113,7 +118,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             return CL_TRANSPORT_ERROR;
         }
 
-        QStringList strings = m_line.split(" ");
+        QList<QByteArray> strings = m_line.split(' ');
         if (strings.size() < 2)
         {
             close();
@@ -180,14 +185,14 @@ int CLSimpleHTTPClient::readHeaders()
         //Content-Type
         //ContentLength
 
-        pos  = m_line.indexOf(QLatin1Char(':'));
+        pos  = m_line.indexOf(':');
 
         if (pos>=0)
         {
-            QString name = m_line.left(pos).trimmed();
-            QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
+            QByteArray name = m_line.left(pos).trimmed();
+            QByteArray val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) ).trimmed();
             m_header.insert(name, val );
-            if (name == QLatin1String("Content-Length"))
+            if (name == "Content-Length")
             {
                 m_contentLen = val.toInt();
                 m_readed = 0;
@@ -216,24 +221,28 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             }
         }
 
-        QString request;
-        QTextStream os(&request);
+        QByteArray request;
 
-        os << "GET /" << requestStr<<" HTTP/1.1\r\n"
-            << "Host: "<< m_host.toString() << "\r\n";
+        request.append("GET /");
+        request.append(requestStr);
+        request.append(" HTTP/1.1\r\n");
+        request.append("Host: ");
+        request.append(m_host.toString().toUtf8());
+        request.append("\r\n");
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
         {
-            os << basicAuth() << "\r\n";
+            request.append(basicAuth());
+            request.append("\r\n");
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            os << digestAccess(request);
+            request.append(digestAccess(request));
         }
 
-        os<< "\r\n";
+        request.append("\r\n");
 
-        if (!m_sock->send(request.toLatin1().data(), request.toLatin1().size()))
+        if (!m_sock->send(request.data(), request.size()))
         {
             qDebug() << "OpenStream1";
 
@@ -246,16 +255,16 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         }
 
 
-        if (!m_line.contains(QLatin1String("200 OK")))// not ok
+        if (!m_line.contains("200 OK"))// not ok
         {
             close();
 
-            if (m_line.contains(QLatin1String("401 Unauthorized")))
+            if (m_line.contains("401 Unauthorized"))
             {
                 getAuthInfo();
 
                 if (recursive)
-                    return doGET(request, false);
+                    return doGET(requestStr, false);
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
@@ -334,32 +343,34 @@ void CLSimpleHTTPClient::getAuthInfo()
         if (m_line.length()<3)// last line before data
             break;
 
-        if (m_line.contains(QLatin1String("realm")))
+        if (m_line.contains("realm"))
         {
-            mRealm = getParamFromString(m_line, QLatin1String("realm"));
+            mRealm = getParamFromString(m_line, "realm");
         }
 
-        if (m_line.contains(QLatin1String("nonce")))
+        if (m_line.contains("nonce"))
         {
-            mNonce = getParamFromString(m_line, QLatin1String("nonce"));
+            mNonce = getParamFromString(m_line, "nonce");
         }
 
-        if (m_line.contains(QLatin1String("qop")))
+        if (m_line.contains("qop"))
         {
-            mQop = getParamFromString(m_line, QLatin1String("qop"));
+            mQop = getParamFromString(m_line, "qop");
         }
 
     }
 
 }
 
-QString CLSimpleHTTPClient::basicAuth() const
+QByteArray CLSimpleHTTPClient::basicAuth() const
 {
-    QString lp = m_auth.user() + QLatin1Char(':') + m_auth.password();
+    QByteArray lp;
+    lp.append(m_auth.user().toUtf8());
+    lp.append(':');
+    lp.append(m_auth.password().toUtf8());
 
-    QString base64 = QLatin1String("Authorization: Basic ");
-    base64 += QString::fromAscii(lp.toLatin1().toBase64().constData());
-
+    QByteArray base64("Authorization: Basic ");
+    base64.append(lp.toBase64());
     return base64;
 }
 
