@@ -454,8 +454,13 @@ void TCPServerSocket::setListen(int queueLen)  {
 UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     IPPROTO_UDP)
 {
-  setBroadcast();
+    setBroadcast();
     m_destAddr = new sockaddr_in();
+    int buff_size = 1024*512;
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
+    {
+        //error
+    }
  }
 
 UDPSocket::UDPSocket(unsigned short localPort)   :
@@ -464,19 +469,24 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
   setBroadcast();
   m_destAddr = new sockaddr_in();
 
-  int buff_size = 1024*1024;
+  int buff_size = 1024*512;
   if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
   {
       //error
-      buff_size = buff_size;
   }
 }
 
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-      : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
+      : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) 
+{
   setLocalAddressAndPort(localAddress, localPort);
   setBroadcast();
   m_destAddr = new sockaddr_in();
+  int buff_size = 1024*512;
+  if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
+  {
+      //error
+  }
 }
 
 UDPSocket::~UDPSocket()

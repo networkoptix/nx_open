@@ -11,6 +11,7 @@ QnAbstractMediaStreamDataProvider(dev)
 
 void CLServerPushStreamreader::run()
 {
+    setPriority(QThread::HighPriority);
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
     beforeRun();
