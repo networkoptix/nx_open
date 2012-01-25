@@ -431,7 +431,7 @@ public:
             QnStoragePtr storage(new QnStorage());
             storage->setParentId(videoServer->getId());
             storage->setName("Initial");
-            storage->setUrl(settings.value("mediaDir", "c:/records").toString().replace("\\", "/"));
+            storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
             storage->setSpaceLimit(5ll * 1024 * 1024 * 1024);
 
             QByteArray errorString;

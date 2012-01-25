@@ -2,6 +2,7 @@
 #define QN_BOUNDING_INSTRUMENT_H
 
 #include <QRect>
+#include <QSet>
 #include <QTransform>
 #include <ui/animation/animation_timer.h>
 #include <ui/common/margins.h>
@@ -85,6 +86,8 @@ public:
      * \param sizeEnforced              Whether size boundary is enforced with animation.
      */
     void setSizeEnforced(QGraphicsView *view, bool sizeEnforced = true);
+
+    void stickScale(QGraphicsView *view);
 
 public slots:
     void enforcePosition(QGraphicsView *view);

@@ -91,7 +91,19 @@ const QMargins &ViewportAnimator::viewportMargins() const {
 }
 
 void ViewportAnimator::setViewportMargins(const QMargins &margins) {
+    if(margins == m_accessor->margins())
+        return;
+
+    QRectF targetValue = this->targetValue().toRectF();
+
     m_accessor->setMargins(margins);
+
+    if(isRunning()) {
+        /* Margins were changed, restart needed to avoid jitter. */
+        pause();
+        setTargetValue(targetValue);
+        start();
+    }
 }
 
 int ViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {

@@ -9,12 +9,15 @@ class CLVideoCamera;
 
 class InstrumentManager;
 class UiElementsInstrument;
+class ActivityListenerInstrument;
+class FpsCountingInstrument;
 class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
 class NavigationItem;
 class NavigationTreeWidget;
+class GraphicsLabel;
 
 class QnWorkbenchDisplay;
 class QnImageButtonWidget;
@@ -37,19 +40,35 @@ public:
         return m_treeWidget;
     }
 
+    bool isTitleUsed() const {
+        return m_titleUsed;
+    }
+
+    bool isFpsVisible() const;
+
+    void setFpsVisible(bool fpsVisible);
+
 public Q_SLOTS:
+    void setTitleUsed(bool titleUsed);
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
+    void setTitleVisible(bool visible, bool animate = true);
     void toggleTreeVisible();
 
 protected:
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);
     void updateViewportMargins();
 
     void updateTreeGeometry();
+    void updateFpsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
 
 protected Q_SLOTS:
+    void at_activityStopped();
+    void at_activityStarted();
+    void at_fpsChanged(qreal fps);
+
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
@@ -70,7 +89,26 @@ protected Q_SLOTS:
     void at_treeShowButton_toggled(bool checked);
     void at_treePinButton_toggled(bool checked);
 
+    void at_titleItem_geometryChanged();
+    void at_titleOpacityProcessor_hoverEntered();
+    void at_titleOpacityProcessor_hoverLeft();
+
+    void at_fpsItem_geometryChanged();
+
 private:
+    struct VisibilityState {
+        VisibilityState(): treeVisible(false), sliderVisible(false), titleVisible(false) {}
+
+        /** Whether the tree is visible. */
+        bool treeVisible;
+
+        /** Whether navigation slider is visible. */
+        bool sliderVisible;
+
+        /** Whether title bar is visible. */
+        bool titleVisible;
+    };
+
     /* Global state. */
 
     /** Workbench display. */
@@ -82,6 +120,12 @@ private:
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;
 
+    /** Fps counting instrument. */
+    FpsCountingInstrument *m_fpsCountingInstrument;
+
+    /** Activity listener instrument. */
+    ActivityListenerInstrument *m_controlsActivityInstrument;
+
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
@@ -91,14 +135,19 @@ private:
     /** Stored size of ui controls widget. */
     QSizeF m_controlsWidgetSize;
 
+    VisibilityState m_visibility;
+
+    VisibilityState m_storedVisibility;
+
+    bool m_inactive;
+
+    GraphicsLabel *m_fpsItem;
+
 
     /* Slider-related state. */
 
     /** Navigation item. */
     NavigationItem *m_sliderItem;
-
-    /** Whether navigation slider is visible. */
-    bool m_sliderVisible;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
@@ -124,9 +173,6 @@ private:
     /** Button to pin the tree. */
     QnImageButtonWidget *m_treePinButton;
 
-    /** Whether the tree is visible. */
-    bool m_treeVisible;
-
     /** Whether the tree is pinned. */
     bool m_treePinned;
 
@@ -148,10 +194,19 @@ private:
 
     /* Title-related state. */
 
-    /** Background widget for the title bar. */
+    /** Title bar widget. */
     QGraphicsWidget *m_titleItem;
 
+    /** Background widget for the title bar. */
+    QGraphicsWidget *m_titleBackgroundItem;
+
+    /** Animator for title's position. */
     VariantAnimator *m_titleYAnimator;
+
+    HoverFocusProcessor *m_titleOpacityProcessor;
+
+    bool m_titleUsed;
+
 };
 
 #endif // QN_WORKBENCH_UI_H

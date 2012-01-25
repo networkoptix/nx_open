@@ -63,7 +63,6 @@ protected:
     virtual void pleaseStop();
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
 	void beforeJumpInternal(qint64 mksec);
-    bool usePlaybackMask() const;
 protected:
     qint64 m_currentTime;
     qint64 m_topIFrameTime;

@@ -541,6 +541,7 @@ int QnWorkbenchController::isMotionGridDisplayed()
 {
     bool allDisplayed = true;
     bool allNonDisplayed = true;
+    bool isCameraSelected = false;
     foreach(QGraphicsItem *item, display()->scene()->selectedItems())
     {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -548,7 +549,10 @@ int QnWorkbenchController::isMotionGridDisplayed()
             continue;
         allDisplayed &= widget->isMotionGridDisplayed();
         allNonDisplayed &= !widget->isMotionGridDisplayed();
+        isCameraSelected |= qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()) != 0;
     }
+    if (!isCameraSelected)
+        return -2;
     if (allDisplayed)
         return 1;
     else if (allNonDisplayed)
@@ -1008,7 +1012,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         m_itemContextMenu->addAction(m_hideMotionAction);
     else if (gridnowDisplayed == 0)
         m_itemContextMenu->addAction(m_showMotionAction);
-    else {
+    else if (gridnowDisplayed == -1) {
         m_itemContextMenu->addAction(m_hideMotionAction);
         m_itemContextMenu->addAction(m_showMotionAction);
     }
@@ -1039,7 +1043,10 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
         QRectF viewportGeometry = m_display->viewportGeometry();
         QRectF zoomedItemGeometry = m_display->itemGeometry(zoomedItem);
 
-        if(contains(zoomedItemGeometry.size(), viewportGeometry.size()) && !qFuzzyCompare(viewportGeometry, zoomedItemGeometry)) {
+        if(
+            (viewportGeometry.width() < zoomedItemGeometry.width() && !qFuzzyCompare(viewportGeometry.width(), zoomedItemGeometry.width())) ||
+            (viewportGeometry.height() < zoomedItemGeometry.height() && !qFuzzyCompare(viewportGeometry.height(), zoomedItemGeometry.height()))
+        ) {
             workbench()->setItem(QnWorkbench::ZOOMED, NULL);
             workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
         } else {
@@ -1061,6 +1068,11 @@ void QnWorkbenchController::at_scene_clicked(QGraphicsView *view, const ClickInf
 void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInfo &) {
     if(workbench() == NULL)
         return;
+
+#if 0
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+        qDebug() << resource->getName();
+#endif
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
 }
@@ -1125,7 +1137,15 @@ void QnWorkbenchController::at_hideMotionAction_triggered() {
 
 void QnWorkbenchController::at_showMotionAction_triggered()
 {
-    displayMotionGrid(display()->scene()->selectedItems(), true);
+    QList<QGraphicsItem*> items;
+    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
+    {
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+        if (widget && qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()))
+            items << item;
+    }
+
+    displayMotionGrid(items, true);
     //m_motionSelectionInstrument->recursiveEnable();
 
 #if 0

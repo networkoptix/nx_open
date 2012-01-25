@@ -55,10 +55,10 @@ void QnResource::update(const QnResource& other)
         consumer->beforeUpdate();
 
     {
-        QMutexLocker mutexLocker(&m_mutex);
+        QMutexLocker otherLocker(&other.m_mutex);
         {
-            QMutexLocker mutexLocker(&m_mutex);
-            updateInner(other);
+            QMutexLocker locker(&m_mutex);
+            updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
         }
         setStatus(other.m_status);
     }
@@ -249,12 +249,12 @@ bool QnResource::hasSuchParam(const QString &name) const
     return getResourceParamList().contains(name);
 }
 
-bool QnResource::getParamPhysical(const QString& /*name*/, QVariant& /*val*/)
+bool QnResource::getParamPhysical(const QnParam &/*param*/, QVariant &/*val*/)
 {
     return false;
 }
 
-bool QnResource::setParamPhysical(const QString& /*name*/, const QVariant& /*val*/)
+bool QnResource::setParamPhysical(const QnParam &/*param*/, const QVariant &/*val*/)
 {
     return false;
 }
@@ -290,7 +290,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     else if (domain == QnDomainPhysical)
     {
         QVariant newValue;
-        if (param.isPhysical() && getParamPhysical(param.name(), newValue)) {
+        if (param.isPhysical() && getParamPhysical(param, newValue)) {
             if (val != newValue) {
                 val = newValue;
                 param.setValue(newValue);
@@ -308,8 +308,11 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     return false;
 }
 
-bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain domain)
+bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain domain)
 {
+    if (setSpecialParam(name, val, domain))
+        return true;
+
     QMutexLocker locker(&m_mutex);
     if (!m_resourceParamList.contains(name))
     {
@@ -328,7 +331,7 @@ bool QnResource::setParam(const QString& name, const QVariant& val, QnDomain dom
 
     if (domain == QnDomainPhysical)
     {
-        if (!param.isPhysical() || !setParamPhysical(param.name(), val))
+        if (!param.isPhysical() || !setParamPhysical(param, val))
             return false;
     }
 

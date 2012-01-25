@@ -12,7 +12,6 @@ static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
-static const quint32 LONG_NAL_PREFIX = 16777216; // htonl(1);
 
 //================================================
 
@@ -336,22 +335,28 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     if (m_context->pix_fmt == -1)
         m_context->pix_fmt = PixelFormat(0);
 
+    
+    bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
     // workaround ffmpeg crush
-    if (m_checkH264ResolutionChange && avpkt.size > 4 && *((quint32*)avpkt.data) == LONG_NAL_PREFIX && (avpkt.data[4]&0x1f) == nuSPS)
+    if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
     {
-        SPSUnit sps;
-        const quint8* end = NALUnit::findNALWithStartCode(avpkt.data+4, avpkt.data + avpkt.size, true);
-        sps.decodeBuffer(avpkt.data, end);
-        sps.deserialize();
-        if (m_currentWidth == -1) {
-            m_currentWidth = sps.getWidth();
-            m_currentHeight = sps.getHeight();
-        }
-        else if (sps.getWidth() != m_currentWidth || sps.getHeight() != m_currentHeight)
+        int nalLen = avpkt.data[2] == 0x01 ? 3 : 4;
+        if ((avpkt.data[nalLen]&0x1f) == nuSPS)
         {
-            m_currentWidth = sps.getWidth();
-            m_currentHeight = sps.getHeight();
-            resetDecoder(data);
+            SPSUnit sps;
+            const quint8* end = NALUnit::findNALWithStartCode(avpkt.data+nalLen, avpkt.data + avpkt.size, true);
+            sps.decodeBuffer(avpkt.data + nalLen, end);
+            sps.deserialize();
+            if (m_currentWidth == -1) {
+                m_currentWidth = sps.getWidth();
+                m_currentHeight = sps.getHeight();
+            }
+            else if (sps.getWidth() != m_currentWidth || sps.getHeight() != m_currentHeight)
+            {
+                m_currentWidth = sps.getWidth();
+                m_currentHeight = sps.getHeight();
+                resetDecoder(data);
+            }
         }
     }
     if (data->motion) {

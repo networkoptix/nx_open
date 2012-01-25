@@ -16,6 +16,8 @@
 
 #include "file_processor.h"
 
+#include "utils/common/warnings.h"
+
 enum IconKey {
     IconTypeUnknown = 0,
     IconTypeServer = 0x0001,
@@ -172,6 +174,8 @@ void ResourceModelPrivate::init()
 {
     Q_Q(ResourceModel);
 
+    ResourceModelConsistencyChecker checker(this);
+
     QHash<int, QByteArray> roles = q->roleNames();
     roles.insert(Qt::UserRole + 1, "id");
     roles.insert(Qt::UserRole + 2, "searchString");
@@ -192,6 +196,29 @@ void ResourceModelPrivate::init()
             }
         }
     }
+}
+
+void ResourceModelPrivate::checkConsistency() const {
+#ifdef _DEBUG
+    {
+        /* Check that tree and node set are in sync. */
+        QSet<int> ids1;
+        foreach(Node *node, nodes)
+            ids1.insert(node->id());
+        ids1.insert(root.id());
+
+        QSet<int> ids2;
+        foreach(Node *node, nodeTree.keys())
+            ids2.insert(node->id());
+        foreach(QVector<Node *> nodes, nodeTree)
+            foreach(Node *node, nodes)
+                ids2.insert(node->id());
+
+        if(!ids1.contains(ids2)) {
+            qnCritical("Resource model contains inconsistent data.");
+        }
+    }
+#endif
 }
 
 #ifndef USE_OLD_RESOURCEMODEL
@@ -233,6 +260,7 @@ QModelIndex ResourceModelPrivate::index(Node *node, int column) const
     Q_ASSERT(parentNode);
 
     const int row = nodeTree.value(parentNode).indexOf(node);
+
     Q_ASSERT(row >= 0);
     return q_func()->createIndex(row, column, node);
 }
@@ -245,6 +273,8 @@ QModelIndex ResourceModelPrivate::index(QnId id, int column) const
 void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
+
+    ResourceModelConsistencyChecker checker(this);
 
     Q_ASSERT(resource && resource->getId().isValid());
 
@@ -270,15 +300,12 @@ void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
     q->endInsertRows();
 }
 
-void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
+void ResourceModelPrivate::removeRecursive(Node *node) 
 {
     Q_Q(ResourceModel);
 
-    Q_ASSERT(resource && resource->getId().isValid());
-
-    Node *node = this->node(resource);
-    if (!node || node == &root)
-        return; // nothing to remove
+    foreach(Node *node, nodeTree[node])
+        this->removeRecursive(node);
 
     const QModelIndex parentIndex = this->index(node->parentId());
 
@@ -289,12 +316,30 @@ void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
     nodes.remove(node->id());
     nodeTree[this->node(parentIndex)].remove(row, 1);
 
+    Q_ASSERT(nodeTree.value(node).isEmpty());
+    nodeTree.remove(node);
+
     q->endRemoveRows();
+}
+
+void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
+{
+    ResourceModelConsistencyChecker checker(this);
+
+    Q_ASSERT(resource && resource->getId().isValid());
+
+    Node *node = this->node(resource);
+    if (!node || node == &root)
+        return; // nothing to remove
+
+    removeRecursive(node);
 }
 
 void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
+
+    ResourceModelConsistencyChecker checker(this);
 
     Q_ASSERT(resource && resource->getId().isValid());
 

@@ -150,8 +150,13 @@ public:
         setScalingSpeed(1.0);
         setPositionEnforced(false);
         setSizeEnforced(false);
-
         setView(view);
+
+        m_isSizeCorrected = false;
+        m_isPositionCorrected = true;
+
+        m_stickyLogScaleHi = 1.0;
+        m_stickyLogScaleLo = -1.0;
     }
 
     void update() {
@@ -245,14 +250,21 @@ public:
         qint64 dtMSec = time - m_lastTickTime;
         qreal dt = dtMSec / 1000.0;
 
+        /** Whether sticky scale values need to be adjusted. */
+        bool stickyScaleDirty = false;
+
         /* Scene viewport center at the end of the last tick. */
         QPointF oldCenter = m_sceneViewportCenter;
+        
+        /* Scene to viewport transform at the end of the last tick. */
+        QTransform oldSceneToViewport = m_sceneToViewport;
 
-        /* Correct motion. */
+        /* Correct. */
         if(!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {
             /* Calculate old scale. */
             qreal logOldScale;
-            calculateRelativeScale(&logOldScale);
+            if(m_isSizeCorrected)
+                calculateRelativeScale(&logOldScale);
 
             /* Calculate fixed point. */
             bool fixedPointExists;
@@ -263,18 +275,22 @@ public:
             updateParameters();
 
             /* Apply zoom correction. */
-            qreal logScale, powFactor;
-            calculateRelativeScale(&logScale, &powFactor);
-            if(!qnFuzzyBetween(logScale, -1.0, 1.0) && !qFuzzyCompare(logScale, logOldScale)) {
-                qreal logFactor = calculateCorrection(logOldScale, logScale, -1.0, 1.0);
+            if(m_isSizeCorrected) {
+                qreal logScale, powFactor;
+                calculateRelativeScale(&logScale, &powFactor);
+                if(!qnFuzzyBetween(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
+                    qreal logFactor = calculateCorrection(logOldScale, logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
 
-                SceneUtility::scaleViewport(m_view, std::exp(logFactor * powFactor));
+                    SceneUtility::scaleViewport(m_view, std::exp(logFactor * powFactor));
 
-                /* Calculate relative correction and move viewport. */
-                qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
-                SceneUtility::moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
+                    /* Calculate relative correction and move viewport. */
+                    qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
+                    SceneUtility::moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
 
-                updateParameters();
+                    updateParameters();
+                } else {
+                    stickyScaleDirty = true;
+                }
             }
 
             /* Apply center correction. */
@@ -286,44 +302,69 @@ public:
 
                 updateParameters();
             }
+        } else {
+            m_fixedPoint = m_viewportRect.center();
         }
 
-        /* Enforce position */
-        if((m_isPositionEnforced || m_isSizeEnforced) && dtMSec != 0) {
+        /* Enforce. */
+        if(dtMSec != 0) {
             /* Apply zoom correction. */
-            qreal logScale, powFactor;
-            calculateRelativeScale(&logScale, &powFactor);
-            qreal logDirection = calculateDistance(logScale, -1.0, 1.0);
-            if(!qFuzzyIsNull(logDirection) && m_isSizeEnforced) {
-                qreal logDelta = dt * (m_logScaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
-                if(std::abs(logDelta) > std::abs(logDirection))
-                    logDelta = logDirection;
+            if(m_isSizeEnforced) {
+                qreal logScale, powFactor;
+                calculateRelativeScale(&logScale, &powFactor);
+                qreal logDirection = calculateDistance(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
+                if(!qFuzzyIsNull(logDirection)) {
+                    qreal logDelta = dt * (m_logScaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
+                    if(std::abs(logDelta) > std::abs(logDirection))
+                        logDelta = logDirection;
 
-                SceneUtility::scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
+                    SceneUtility::scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
 
-                updateParameters();
+                    updateParameters();
+                } else {
+                    stickyScaleDirty = true;
+                }
             }
 
             /* Apply move correction. */
-            QRectF centerPositionBounds = calculateCenterPositionBounds();
-            if(m_isPositionEnforced && !centerPositionBounds.contains(m_sceneViewportCenter)) {
-                QPointF direction = calculateDistance(m_sceneViewportCenter, centerPositionBounds);
-                if(!qFuzzyIsNull(direction)) {
-                    qreal viewportSize = (m_sceneViewportRect.width() + m_sceneViewportRect.height()) / 2;
-                    qreal speed = m_movementSpeed * viewportSize;
-                    qreal directionLength = length(direction);
-                    qreal deltaLength = dt * speed * speedMultiplier(directionLength, viewportSize);
-                    if(deltaLength > directionLength)
-                        deltaLength = directionLength;
+            if(m_isPositionEnforced) {
+                QRectF centerPositionBounds = calculateCenterPositionBounds();
+                if(!centerPositionBounds.contains(m_sceneViewportCenter)) {
+                    QPointF direction = calculateDistance(m_sceneViewportCenter, centerPositionBounds);
+                    if(!qFuzzyIsNull(direction)) {
+                        qreal viewportSize = (m_sceneViewportRect.width() + m_sceneViewportRect.height()) / 2;
+                        qreal speed = m_movementSpeed * viewportSize;
+                        qreal directionLength = length(direction);
+                        qreal deltaLength = dt * speed * speedMultiplier(directionLength, viewportSize);
+                        if(deltaLength > directionLength)
+                            deltaLength = directionLength;
 
-                    SceneUtility::moveViewportScene(m_view, direction / directionLength * deltaLength);
+                        SceneUtility::moveViewportScene(m_view, direction / directionLength * deltaLength);
+                    }
                 }
             }
 
             updateParameters();
         }
 
+        /* Adjust sticky scale if needed. */
+        if(stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0))) {
+            qreal logScale, powFactor;
+            calculateRelativeScale(&logScale, &powFactor);
+
+            m_stickyLogScaleLo = qMin(-1.0, qMax(logScale, m_stickyLogScaleLo));
+            m_stickyLogScaleHi = qMax( 1.0, qMin(logScale, m_stickyLogScaleHi));
+        }
+
         m_lastTickTime = time;
+    }
+
+    void stickScale() {
+        qreal logScale, powFactor;
+        calculateRelativeScale(&logScale, &powFactor);
+
+        m_stickyLogScaleLo = qMin(-1.0, logScale);
+        m_stickyLogScaleHi = qMax(1.0, logScale);
     }
 
 protected:
@@ -429,6 +470,12 @@ public:
     /** Whether position boundary is enforced with animation. */
     bool m_isPositionEnforced;
 
+    /** Whether zooming outsize size boundary is corrected. */
+    bool m_isSizeCorrected;
+
+    /** Whether motion outside position boundary is corrected. */
+    bool m_isPositionCorrected;
+
 
     /* 'Derived' state. */
 
@@ -459,8 +506,14 @@ public:
     /** Viewport rectangle, in scene coordinates. */
     QRectF m_sceneViewportRect;
 
-    /* Position of viewport center, in scene coordinates. */
+    /** Position of viewport center, in scene coordinates. */
     QPointF m_sceneViewportCenter;
+
+    /** Sticky log scale upper bound. */
+    qreal m_stickyLogScaleHi;
+
+    /** Sticky log scale lower bound. */
+    qreal m_stickyLogScaleLo;
 };
 
 
@@ -473,8 +526,7 @@ BoundingInstrument::BoundingInstrument(QObject *parent):
 BoundingInstrument::~BoundingInstrument() {
     ensureUninstalled();
 
-    foreach(ViewData *data, m_data)
-        delete data;
+    qDeleteAll(m_data);
 }
 
 void BoundingInstrument::enabledNotify() {
@@ -540,8 +592,6 @@ QRectF BoundingInstrument::positionBounds(QGraphicsView *view) const {
     if(ViewData *d = checkView(view)) {
         return d->positionBounds();
     } else {
-        qnWarning("Given graphics view is not registered with this bounding instrument.");
-
         return QRectF();
     }
 }
@@ -559,12 +609,9 @@ MarginsF BoundingInstrument::positionBoundsExtension(QGraphicsView *view) const 
     if(ViewData *d = checkView(view)) {
         return d->positionBoundsExtension();
     } else {
-        qnWarning("Given graphics view is not registered with this bounding instrument.");
-
         return MarginsF();
     }
 }
-
 
 void BoundingInstrument::setSizeBounds(QGraphicsView *view, const QSizeF &sizeLowerBound, Qt::AspectRatioMode lowerMode, const QSizeF &sizeUpperBound, Qt::AspectRatioMode upperMode) {
     if(view == NULL) {
@@ -636,4 +683,7 @@ void BoundingInstrument::dontEnforceSize(QGraphicsView *view) {
     setSizeEnforced(view, false);
 }
 
-
+void BoundingInstrument::stickScale(QGraphicsView *view) {
+    if(ViewData *d = checkView(view))
+        d->stickScale();
+}

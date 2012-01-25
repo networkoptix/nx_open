@@ -10,12 +10,14 @@
 QAction cm_new_item(QObject::tr("New Item..."), 0);
 QAction cm_about(QObject::tr("About..."), 0);
 QAction cm_exit(QObject::tr("Exit"), 0);
+QAction cm_reconnect(QObject::tr("Reconnect"), 0);
 QAction cm_fitinview(QObject::tr("Fit in View"), 0);
 QAction cm_open_file(QObject::tr("Open file(s)..."), 0);
 QAction cm_screen_recording(QObject::tr("Screen Recording"), 0);
 QAction cm_toggle_recording(QObject::tr("Start Screen Recording"), 0);
 QAction cm_recording_settings(QObject::tr("Screen Recording Settings"), 0);
 QAction cm_toggle_fullscreen(QObject::tr("Toggle fullscreen"), 0);
+QAction cm_toggle_fps(QObject::tr("Toggle FPS display"), 0);
 QAction cm_arrange(QObject::tr("Arrange"), 0);
 QAction cm_add_layout(QObject::tr("Add new layout..."), 0);
 QAction cm_restore_layout(QObject::tr("Restore layout"), 0);
@@ -59,6 +61,8 @@ void initContextMenu()
     cm_exit.setShortcut(QObject::tr("Alt+F4"));
     cm_exit.setShortcutContext(Qt::ApplicationShortcut);
     cm_exit.setMenuRole(QAction::QuitRole);
+
+    cm_reconnect.setIcon(Skin::icon(QLatin1String("connect.png")));
 
     cm_preferences.setIcon(Skin::icon(QLatin1String("decorations/settings.png")));
     cm_preferences.setShortcut(QObject::tr("Ctrl+P"));
@@ -112,6 +116,9 @@ void initContextMenu()
     cm_toggle_fullscreen.setShortcuts(shortcuts);
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
     cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/fullscreen.png")));
+
+    cm_toggle_fps.setShortcut(QObject::tr("Ctrl+Alt+F"));
+    cm_toggle_fps.setShortcutContext(Qt::ApplicationShortcut);
 
     QMenu *itemDistanceMenu = new QMenu();
     itemDistanceMenu->setTitle(QObject::tr("Item distance"));

@@ -141,7 +141,7 @@ static inline void bs_rbsp_trailing( bs_t *s )
 static inline void bs_write_startcode( bs_t *s)
 {
 	bs_align(s);
-	bs_write(s,24,0x000001);// 0x000001 - start code.
+	bs_write(s,32,0x00000001);// 0x000001 - start code.
 }
 
 //==============================================================================

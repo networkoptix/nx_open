@@ -76,15 +76,15 @@ static QString getValue(const QString& line)
     return line.mid(index+1);
 }
 
+static bool sizeCompare(const QSize &s1, const QSize &s2)
+{
+    return s1.width() > s2.width();
+}
+
 void QnPlDlinkResource::updateCamInfo()
 {
-    QHostAddress addr = getHostAddress();
-    QAuthenticator auth = getAuth();
-
-
     QMutexLocker mutexLocker(&m_mutex);
-
-    QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  addr, 80, 1000, auth);
+    QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
 
     if (cam_info_file.size()==0)
         return;
@@ -122,6 +122,7 @@ void QnPlDlinkResource::updateCamInfo()
             foreach(const QString& val,  vals)
             {
                 m_camInfo.possibleFps.push_back( val.toInt() );
+
             }
         }
         else if (line.contains("vprofilenum="))
@@ -148,6 +149,9 @@ void QnPlDlinkResource::updateCamInfo()
 
     }
 
+    qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
+    qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
+
 }
 
 void QnPlDlinkResource::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
@@ -155,18 +159,9 @@ void QnPlDlinkResource::onStatusChanged(QnResource::Status oldStatus, QnResource
     if (!(oldStatus == Offline && newStatus == Online))
         return;
 
-    bool inited ;
-    
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-        inited = m_camInfo.inited();
-    }
-    
-
-    if (inited)
+    QMutexLocker mutexLocker(&m_mutex);
+    if (!m_camInfo.inited())
     {
         updateCamInfo();
     }
-    
-
 }

@@ -129,11 +129,11 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
     addAction(&cm_open_file);
 
-    connect(&cm_hide_decorations, SIGNAL(triggered()), this, SLOT(toggleTitleVisibility()));
-    addAction(&cm_hide_decorations);
+    connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    addAction(&cm_reconnect);
 
-    QAction *reconnectAction = new QAction(Skin::icon(QLatin1String("connect.png")), tr("Reconnect"), this);
-    connect(reconnectAction, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    connect(&cm_toggle_fps, SIGNAL(triggered()), this, SLOT(toggleFpsDisplay()));
+    addAction(&cm_toggle_fps);
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
 
@@ -165,6 +165,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_display = new QnWorkbenchDisplay(m_workbench, this);
     m_display->setScene(scene);
     m_display->setView(m_view);
+    m_display->setMarginFlags(QnWorkbenchDisplay::MARGINS_AFFECT_POSITION);
 
     m_controller = new QnWorkbenchController(m_display, this);
     m_ui = new QnWorkbenchUi(m_display, this);
@@ -212,7 +213,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newTabButton);
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(reconnectAction));
+    m_titleLayout->addWidget(newActionButton(&cm_reconnect));
     m_titleLayout->addWidget(newActionButton(&cm_preferences));
     m_titleLayout->addWidget(newActionButton(&cm_toggle_fullscreen));
     m_titleLayout->addWidget(newActionButton(&cm_exit));
@@ -422,10 +423,16 @@ void MainWnd::activate()
 
 void MainWnd::toggleFullScreen()
 {
+    toggleTitleVisibility();
+
     if (isFullScreen()) {
         showNormal();
+
+        m_ui->setTitleUsed(false);
     } else {
         showFullScreen();
+
+        m_ui->setTitleUsed(true);
     }
 }
 
@@ -509,6 +516,11 @@ void MainWnd::toggleTitleVisibility()
     }
 
     updateDwmState();
+}
+
+void MainWnd::toggleFpsDisplay() 
+{
+    m_ui->setFpsVisible(!m_ui->isFpsVisible());
 }
 
 bool MainWnd::isTitleVisible() const

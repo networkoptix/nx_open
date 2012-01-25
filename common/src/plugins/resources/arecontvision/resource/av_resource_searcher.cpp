@@ -11,7 +11,7 @@
 #include "core/resource/network_resource.h"
 
 
-#define CL_BROAD_CAST_RETRY 3
+#define CL_BROAD_CAST_RETRY 1
 
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 {

@@ -20,8 +20,23 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
-        QByteArray errorString;
+        
         cameraResource->setParentId(m_serverId);
+    }
+
+    QnResourcePool::instance()->addResources(resources);
+
+    // we've got two loops to avoid double call of double sending addCamera
+
+    foreach (QnResourcePtr resource, resources)
+    {
+        QnCameraResourcePtr cameraResource = resource.dynamicCast<QnCameraResource>();
+        if (cameraResource.isNull())
+            continue;
+
+        resource->setStatus(QnResource::Online); // camera MUST be in the pool already;
+
+        QByteArray errorString;
         if (m_appServer->addCamera(*cameraResource, cameras, errorString) != 0)
         {
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
@@ -29,10 +44,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         qDebug() << "Connecting resource: " << resource->getName();
         QObject::connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-                         this, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
+            this, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
     }
-
-    QnResourcePool::instance()->addResources(resources);
 }
 
 void QnAppserverResourceProcessor::requestFinished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources)

@@ -41,10 +41,10 @@ private:
 
 private:
     QColor m_curtainColor;
-    QColor m_frameColor;
+    qreal m_frameOpacity;
     bool m_curtained;
     VariantAnimator *m_curtainColorAnimator;
-    VariantAnimator *m_frameColorAnimator;
+    VariantAnimator *m_frameOpacityAnimator;
 };
 
 

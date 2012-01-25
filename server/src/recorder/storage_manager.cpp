@@ -3,6 +3,8 @@
 #include "utils/common/util.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/resource.h"
+#include "server_stream_recorder.h"
+#include "recording_manager.h"
 
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
@@ -125,8 +127,20 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
         if (camera) 
         {
             DeviceFileCatalogPtr catalog = getFileCatalog(camera->getMAC().toString());
-            if (catalog) 
+            if (catalog) {
                 cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
+                if (!cameras.last().isEmpty())
+                {
+                    QnTimePeriod& lastPeriod = cameras.last().last();
+                    if (lastPeriod.durationMs == -1 && camera->getStatus() != QnResource::Online)
+                    {
+                        lastPeriod.durationMs = 0;
+                        QnStreamRecorder* recorder = QnRecordingManager::instance()->findRecorder(camera);
+                        if(recorder)
+                            lastPeriod.durationMs = recorder->duration()/1000;
+                    }
+                }
+            }
         }
     }
 

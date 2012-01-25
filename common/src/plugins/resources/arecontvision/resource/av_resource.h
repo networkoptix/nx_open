@@ -55,11 +55,9 @@ public:
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    // should change value in memory domain
-    virtual bool getParamPhysical(const QString& name, QVariant& val);
-
-    // should just do physical job( network or so ) do not care about memory domain
-    virtual bool setParamPhysical(const QString& name, const QVariant& val);
+    // should just do physical job ( network or so ) do not care about memory domain
+    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
+    virtual bool setParamPhysical(const QnParam &param, const QVariant &val);
 
 public:
     static QnPlAreconVisionResource* createResourceByName(const QString &name);

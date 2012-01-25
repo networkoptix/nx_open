@@ -45,6 +45,13 @@ void QnRecordingManager::stop()
     m_recordMap.clear();
 }
 
+QnServerStreamRecorder* QnRecordingManager::findRecorder(QnResourcePtr res) const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_recordMap.value(res);
+
+}
+
 void QnRecordingManager::onNewResource(QnResourcePtr res)
 {
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
@@ -59,9 +66,11 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
         reader->addDataProcessor(recorder);
         reader->setNeedKeyData();
         recorder->start();
-        m_recordMap.insert(res, recorder);
 
         QMutexLocker lock(&m_mutex);
+
+        m_recordMap.insert(res, recorder);
+
         QMap<QnId, QnScheduleTaskList>::iterator scheduleItr = m_scheduleByCamera.find(res->getId());
         if (scheduleItr != m_scheduleByCamera.end())
             recorder->updateSchedule(scheduleItr.value());
@@ -109,6 +118,7 @@ void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 
 bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 {
+    QMutexLocker lock(&m_mutex);
     return m_recordMap.contains(camera);
 }
 

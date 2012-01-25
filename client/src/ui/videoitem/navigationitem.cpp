@@ -386,7 +386,7 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
 
 void NavigationItem::updateActualCamera()
 {
-    if (m_forcedCamera != NULL) {
+    if (m_forcedCamera != NULL || !m_syncButton->isChecked()) {
         setActualCamera(m_forcedCamera);
         return;
     }
@@ -425,8 +425,11 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
             setPlaying(!reader->isMediaPaused());
         else
             setPlaying(true);
-        if (!m_syncButton->isChecked())
+        if (!m_syncButton->isChecked()) {
             updateRecPeriodList(true);
+            repaintMotionPeriods();
+        }
+        m_timeSlider->setLiveMode(reader->isRealTimeSource());
     }
     else
     {
@@ -479,7 +482,7 @@ void NavigationItem::updateSlider()
         if (time != AV_NOPTS_VALUE)
         {
             m_currentTime = time != DATETIME_NOW ? time/1000 : time;
-            m_timeSlider->setCurrentValue(m_currentTime);
+            m_timeSlider->setCurrentValue(m_currentTime, true);
         }
 
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
@@ -694,35 +697,41 @@ void NavigationItem::repaintMotionPeriods()
     bool useSync = m_syncButton->isChecked();
 
     QVector<QnTimePeriodList> allPeriods;
+    bool isMotionExist = false;
+    bool isMotionFound = false;
     for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
     {
         const MotionPeriodLoader& info = itr.value();
         CLVideoCamera* camera = findCameraByResource(info.reader->getResource());
         if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.region.isEmpty())
             allPeriods << info.periods;
+        QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
+        isMotionExist |= !tp.isEmpty();
         if (!useSync) 
         {
-            QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
             info.reader->setPlaybackMask(tp);
-            if (info.reader == currentReader) {
+            if (info.reader == currentReader)
+            {
+                isMotionFound = true;
                 m_timeSlider->setMotionTimePeriodList(tp);
-                m_mrsButton->setVisible(!info.periods.isEmpty());
-                //emit playbackMaskChanged(info.periods);
             }
         }
     }
+    if (!useSync && !isMotionFound) 
+        m_timeSlider->setMotionTimePeriodList(QnTimePeriodList()); // // not motion for selected item
+
     if (useSync)
     {
         m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
-        for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
+        foreach(CLVideoCamera* camera, m_reserveCameras)
         {
-            const MotionPeriodLoader& info = itr.value();
-            info.reader->setPlaybackMask(m_mergedMotionPeriods);
+            QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*> (camera->getStreamreader());
+            if (reader)
+                reader->setPlaybackMask(m_mergedMotionPeriods);
         }
         m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
-        m_mrsButton->setVisible(!m_mergedMotionPeriods.isEmpty());
-        //emit playbackMaskChanged(m_mergedMotionPeriods);
     }
+    m_mrsButton->setVisible(isMotionExist);
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
@@ -1044,6 +1053,7 @@ void NavigationItem::setPlaying(bool playing)
         m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
 
         pause();
+        m_timeSlider->setLiveMode(false);
     }
 }
 
@@ -1074,11 +1084,17 @@ void NavigationItem::onSyncButtonToggled(bool value)
 {
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     qint64 currentTime = m_camera->getCurrentTime();
+    if (reader->isRealTimeSource())
+        currentTime = DATETIME_NOW;
 
     emit enableItemSync(value);
     repaintMotionPeriods();
     updateRecPeriodList(true);
-    reader->jumpTo(currentTime, 0);
-    reader->setSpeed(1.0);
+    if (value) {
+        reader->jumpTo(currentTime, 0);
+        reader->setSpeed(1.0);
+    }
     m_speedSlider->resetSpeed();
+    if (!value)
+        updateActualCamera();
 }

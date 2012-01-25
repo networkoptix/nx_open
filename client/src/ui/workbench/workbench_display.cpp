@@ -33,6 +33,7 @@
 #include <ui/graphics/items/grid_item.h>
 
 #include "ui/skin/skin.h"
+#include "ui/skin/globals.h"
 
 #include "workbench_layout.h"
 #include "workbench_item.h"
@@ -100,6 +101,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_mode(QnWorkbench::VIEWING),
+    m_marginFlags(MARGINS_AFFECT_POSITION | MARGINS_AFFECT_SIZE),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this))
 {
@@ -542,6 +544,13 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
+    {
+        QPalette palette = widget->palette();
+        palette.setColor(QPalette::Active, QPalette::Shadow, Globals::selectedFrameColor());
+        palette.setColor(QPalette::Inactive, QPalette::Shadow, Globals::frameColor());
+        widget->setPalette(palette);
+    }
+
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
     togglePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("pin.png")));
     togglePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("unpin.png")));
@@ -610,9 +619,27 @@ void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins) {
         return;
 
     m_viewportMargins = margins;
-    m_viewportAnimator->setViewportMargins(margins);
+    
+    if(m_marginFlags & MARGINS_AFFECT_SIZE)
+        m_viewportAnimator->setViewportMargins(margins);
 
     synchronizeSceneBoundsExtension();
+}
+
+QnWorkbenchDisplay::MarginFlags QnWorkbenchDisplay::marginFlags() const {
+    return m_marginFlags;
+}
+
+void QnWorkbenchDisplay::setMarginFlags(MarginFlags flags) {
+    if(m_marginFlags == flags)
+        return;
+
+    QMargins margins = m_viewportMargins;
+    setViewportMargins(QMargins(0, 0, 0, 0));
+
+    m_marginFlags = flags;
+
+    setViewportMargins(margins);
 }
 
 
@@ -700,7 +727,7 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     if(m_view == NULL) {
         return QRectF();
     } else {
-        return mapRectToScene(m_view, eroded(m_view->viewport()->rect(), m_viewportMargins));
+        return mapRectToScene(m_view, (m_marginFlags & MARGINS_AFFECT_SIZE) ? eroded(m_view->viewport()->rect(), m_viewportMargins) : m_view->viewport()->rect());
     }
 }
 
@@ -789,7 +816,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         calculateExpansionValues(enclosingGeometry.top(),  enclosingGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
 
         enclosingGeometry = enclosingGeometry.adjusted(xp1, yp1, xp2, yp2);
-
     }
 
     /* Update Z value. */
@@ -856,20 +882,29 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
+    if(m_marginFlags == 0)
+        return;
+
     QSizeF viewportSize = m_view->viewport()->size();
     MarginsF positionExtension = cwiseDiv(m_viewportMargins, viewportSize);
 
-    QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
-    if(zoomedItem != NULL) {
-        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
-    } else {
-        m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.5, 0.5, 0.5, 0.5));
+    if(m_marginFlags & MARGINS_AFFECT_POSITION) {
+        QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+        if(zoomedItem != NULL) {
+            m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
+        } else {
+            m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.5, 0.5, 0.5, 0.5));
+        }
     }
 
-    QSizeF sizeExtension = sizeDelta(positionExtension);
-    sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
+    if(m_marginFlags & MARGINS_AFFECT_SIZE) {
+        QSizeF sizeExtension = sizeDelta(positionExtension);
+        sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
 
-    m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
+        m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
+        if(m_itemByRole[QnWorkbench::ZOOMED] == NULL)
+            m_boundingInstrument->stickScale(m_view);
+    }
 }
 
 void QnWorkbenchDisplay::synchronizeRaisedGeometry() {

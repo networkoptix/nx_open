@@ -8,28 +8,10 @@
 #include "utils/common/buffered_file.h"
 
 static const int IO_BLOCK_SIZE = 1024*1024*4;
-static const int FFMPEG_BUFFER_SIZE = 1024*1024;
-
-Q_GLOBAL_STATIC_WITH_ARGS(QSemaphore, semaphore, (4))
-
-class SemaphoreLocker
-{
-public:
-    inline SemaphoreLocker(QSemaphore *sem) : m_sem(sem)
-    { if (m_sem) m_sem->acquire(); }
-    inline ~SemaphoreLocker()
-    { if (m_sem) m_sem->release(); }
-
-private:
-    QSemaphore *m_sem;
-};
-
+static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
 
 static int ufile_open(URLContext *h, const char *filename, int flags)
 {
-
-    SemaphoreLocker locker(semaphore());
-
     av_strstart(filename, "ufile:", &filename);
 
     QFile::OpenMode mode;
@@ -72,8 +54,6 @@ static int ufile_open(URLContext *h, const char *filename, int flags)
 
 static int ufile_close(URLContext *h)
 {
-    SemaphoreLocker locker(semaphore());
-
     QBufferedFile *pFile = reinterpret_cast<QBufferedFile *>(h->priv_data);
 
     pFile->close();
@@ -84,8 +64,6 @@ static int ufile_close(URLContext *h)
 
 static int ufile_read(URLContext *h, unsigned char *buf, int size)
 {
-    SemaphoreLocker locker(semaphore());
-
     QBufferedFile *pFile = reinterpret_cast<QBufferedFile *>(h->priv_data);
 
     return (int) pFile->read((char*)buf, size);
@@ -93,8 +71,6 @@ static int ufile_read(URLContext *h, unsigned char *buf, int size)
 
 static int ufile_write(URLContext *h, const unsigned char *buf, int size)
 {
-    SemaphoreLocker locker(semaphore());
-
     QBufferedFile *pFile = reinterpret_cast<QBufferedFile *>(h->priv_data);
 
     return (int) pFile->write((const char*)buf, size);
@@ -102,8 +78,6 @@ static int ufile_write(URLContext *h, const unsigned char *buf, int size)
 
 static int64_t ufile_seek(URLContext *h, int64_t pos, int whence)
 {
-    SemaphoreLocker locker(semaphore());
-
     QBufferedFile *pFile = reinterpret_cast<QBufferedFile *>(h->priv_data);
 
     if (whence == AVSEEK_SIZE)

@@ -69,7 +69,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_totalFrames(0),
       m_iFrames(0),
       m_lastVideoPacketTime(0),
-      m_lastDisplayedVideoTime(0),
+      m_lastDisplayedVideoTime(AV_NOPTS_VALUE),
       m_previousVideoTime(0),
       m_lastNonZerroDuration(0),
       m_lastSleepInterval(0),
@@ -219,23 +219,29 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
+                Q_ASSERT(!vd->ignore);
                 //QTime t;
                 //t.start();
                 int sign = speed >= 0 ? 1 : -1;
-
+                //bool firstWait = true;
                 while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed && useSync(vd))
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
                     {
-					/*
-                        QString s;
-                        QTextStream str(&s);
-                        str << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz") <<
-                            " currentTime=" << QDateTime::fromMSecsSinceEpoch(ct/1000).toString("hh:mm:ss.zzz");
-                        str.flush();
-                        cl_log.log(s, cl_logALWAYS);
-					*/
+						/*
+					    if (firstWait)
+                        {
+                            QString s;
+                            QTextStream str(&s);
+                            str << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz") <<
+                                " currentTime=" << QDateTime::fromMSecsSinceEpoch(ct/1000).toString("hh:mm:ss.zzz");
+                            str << " wait=" << (displayedTime - ct)/1000.0;
+                            str.flush();
+                            cl_log.log(s, cl_logALWAYS);
+                            firstWait = false;
+                        }
+						*/					
                         QnSleep::msleep(1);
                     }
                     else {
@@ -730,7 +736,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             vd = nextInOutVideodata(vd, channel);
             if (!vd)
                 return result; // impossible? incoming vd!=0
-            m_lastDisplayedVideoTime = vd->timestamp;
+            if (!vd->ignore)
+                m_lastDisplayedVideoTime = vd->timestamp;
 
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
@@ -769,7 +776,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             vd = nextInOutVideodata(incoming, channel);
             incoming = QnCompressedVideoDataPtr();
             if (vd) {
-                m_lastDisplayedVideoTime = vd->timestamp;
+                if (!vd->ignore)
+                    m_lastDisplayedVideoTime = vd->timestamp;
                 if (m_lastAudioPacketTime != m_syncAudioTime) {
                     qint64 currentAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
                     if(m_display[channel])

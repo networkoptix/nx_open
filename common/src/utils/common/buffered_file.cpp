@@ -73,7 +73,7 @@ QBufferedFile::~QBufferedFile()
 }
 qint64	QBufferedFile::size () const
 {
-    if (isWritable())
+    if (isWritable() && m_bufferSize > 0)
         return m_totalWrited + m_bufferLen;
     else
         return QnFile::size(); 
@@ -122,6 +122,10 @@ void QBufferedFile::flushBuffer()
     }
     m_bufferLen = 0;
     m_bufferPos = 0;
+
+    qFreeAligned(m_buffer);
+    m_buffer = 0;
+    m_bufferSize = 0;
 }
 
 void QBufferedFile::close()
@@ -141,7 +145,7 @@ qint64	QBufferedFile::read (char * data, qint64 len )
 qint64	QBufferedFile::write ( const char * data, qint64 len )
 {
     if (m_bufferSize == 0)
-        return QnFile::write((char*) m_buffer, m_bufferSize - m_minBufferSize);
+        return QnFile::write((char*) data, len);
 
     int rez = len;
     while (len > 0)
@@ -173,17 +177,23 @@ qint64	QBufferedFile::write ( const char * data, qint64 len )
 
 bool QBufferedFile::seek(qint64 pos)
 {
-    qint64 bufferOffset = pos - (size() - m_bufferLen);
-
-    if (bufferOffset < 0 || bufferOffset > m_bufferLen)
-    {
-        flushBuffer();
+    if (m_bufferSize == 0) {
         m_filePos = pos;
         return QnFile::seek(pos);
     }
-    else {
-        m_bufferPos = bufferOffset;
-        return true;
+    else 
+    {
+        qint64 bufferOffset = pos - (size() - m_bufferLen);
+        if (bufferOffset < 0 || bufferOffset > m_bufferLen)
+        {
+            flushBuffer();
+            m_filePos = pos;
+            return QnFile::seek(pos);
+        }
+        else {
+            m_bufferPos = bufferOffset;
+            return true;
+        }
     }
 }
 

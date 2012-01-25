@@ -55,6 +55,16 @@ namespace detail {
         }
     };
 
+    struct PainterOpacityAccessor {
+        void operator()(QPainter *painter, qreal opacity) const {
+            painter->setOpacity(opacity);
+        }
+
+        qreal operator()(QPainter *painter) const {
+            return painter->opacity();
+        }
+    };
+
     template<QPainter::RenderHint renderHint>
     struct PainterRenderHintAccessor {
         void operator()(QPainter *painter, bool antialiasing) const {
@@ -72,6 +82,7 @@ typedef QnGenericScopedPainterRollback<QPen,        detail::PainterPenAccessor> 
 typedef QnGenericScopedPainterRollback<QBrush,      detail::PainterBrushAccessor>                                           QnScopedPainterBrushRollback;
 typedef QnGenericScopedPainterRollback<QTransform,  detail::PainterTransformAccessor>                                       QnScopedPainterTransformRollback;
 typedef QnGenericScopedPainterRollback<QFont,       detail::PainterFontAccessor>                                            QnScopedPainterFontRollback;
+typedef QnGenericScopedPainterRollback<qreal,       detail::PainterOpacityAccessor>                                         QnScopedPainterOpacityRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::Antialiasing> >             QnScopedPainterAntialiasingRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen> >    QnScopedPainterNonCosmeticDefaultPenRollback;
 

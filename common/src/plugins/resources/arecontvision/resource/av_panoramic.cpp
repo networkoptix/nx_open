@@ -135,10 +135,8 @@ QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider
 }
 
 
-bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QVariant& val )
+bool CLArecontPanoramicResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
-    QnParam param = getResourceParamList().value(name);
-
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
 
@@ -171,9 +169,6 @@ bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QVa
 
 bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
 {
-    if (QnPlAreconVisionResource::setSpecialParam(name, val, domain))
-        return true;
-
     if (name == QLatin1String("resolution"))
     {
         if (val.toString() == QLatin1String("half"))

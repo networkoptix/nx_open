@@ -160,7 +160,7 @@ public:
     inline bool associatedWithFile() const { return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0; }
 
     QString getUrl() const;
-    void setUrl(const QString& value);
+    virtual void setUrl(const QString& value);
 
     void addTag(const QString& tag);
     void setTags(const QStringList& tags);
@@ -187,11 +187,10 @@ public:
 protected:
     virtual void updateInner(const QnResource& other);
 
-    // should change value in memory domain
-    virtual bool getParamPhysical(const QString& name, QVariant& val);
+    // should just do physical job ( network or so ) do not care about memory domain
+    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
+    virtual bool setParamPhysical(const QnParam &param, const QVariant &val);
 
-    // should just do physical job( network or so ) do not care about memory domain
-    virtual bool setParamPhysical(const QString& name, const QVariant& val);
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
@@ -241,6 +240,8 @@ private:
 class QnResourceFactory
 {
 public:
+    virtual ~QnResourceFactory() {}
+
     virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) = 0;
 };
 
@@ -248,6 +249,8 @@ public:
 class QnResourceProcessor
 {
 public:
+    virtual ~QnResourceProcessor() {}
+
     virtual void processResources(const QnResourceList &resources) = 0;
 };
 
