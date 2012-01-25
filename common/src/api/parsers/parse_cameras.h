@@ -75,7 +75,7 @@ void parseCameras(QList<ResourcePtr>& cameras, const QnApiCameras& xsdCameras, Q
             camera->setMotionMask(region);
         }
 
-        QnParamList& paramList = camera->getResourceParamList();
+        const QnParamList& paramList = camera->getResourceParamList();
 
         if (i->properties().present())
         {

@@ -256,6 +256,10 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags fla
     /* Some compilers don't allow expressions in case labels, so we have to
      * precalculate them. */
     enum {
+        CHECKED = QnImageButtonWidget::CHECKED,
+        HOVERED = QnImageButtonWidget::HOVERED,
+        DISABLED = QnImageButtonWidget::DISABLED,
+        PRESSED = QnImageButtonWidget::PRESSED,
         CHECKED_HOVERED_DISABLED_PRESSED = CHECKED | HOVERED | DISABLED | PRESSED,
         CHECKED_HOVERED_DISABLED = CHECKED | HOVERED | DISABLED,
         CHECKED_HOVERED = CHECKED | HOVERED,
@@ -272,7 +276,7 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags fla
     switch(flags) {
 #define TRY(FLAGS)                                                              \
         if(!m_pixmaps[(FLAGS)].isNull())                                        \
-            return (FLAGS);
+            return static_cast<QnImageButtonWidget::StateFlags>(FLAGS);
     case CHECKED_HOVERED_DISABLED_PRESSED:
         TRY(CHECKED | HOVERED | DISABLED | PRESSED);
         /* Fall through. */
