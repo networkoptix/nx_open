@@ -59,8 +59,7 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
 :CLServerPushStreamreader(res),
 mHttpClient(0),
-m_request(requst),
-m_videoDataBuffer(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE)
+m_request(requst)
 {
 
 }
@@ -136,9 +135,6 @@ void MJPEGtreamreader::openStream()
 
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), 80, 2000, nres->getAuth());
     mHttpClient->doGET(m_request);
-    //mHttpClient->openStream();
-
-    mDataRemainedBeginIndex = -1;
 }
 
 void MJPEGtreamreader::closeStream()
