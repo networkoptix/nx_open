@@ -16,6 +16,9 @@ public:
 class QnSecurityCamResource : virtual public QnMediaResource
 {
     Q_OBJECT
+    Q_PROPERTY(QRegion motionMask READ getMotionMask WRITE setMotionMask)
+    Q_CLASSINFO("motionMask", "Motion Mask")
+    Q_CLASSINFO("motionMask_group", "Motion detection")
     Q_PROPERTY(QnScheduleTaskList scheduleTasks READ getScheduleTasks WRITE setScheduleTasks)
     Q_CLASSINFO("scheduleTasks", "Camera Scheduling")
     Q_CLASSINFO("scheduleTasks_group", "Camera Scheduling")
@@ -64,5 +67,7 @@ private:
 
 typedef QSharedPointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
 typedef QList<QnSecurityCamResourcePtr> QnSecurityCamResourceList;
+
+Q_DECLARE_METATYPE(QRegion)
 
 #endif //sequrity_cam_resource_h_1239
