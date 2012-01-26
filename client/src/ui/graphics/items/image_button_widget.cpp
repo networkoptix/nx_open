@@ -349,7 +349,12 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED))
         m_action->hover();
 
-    m_animator->animateTo(isHovered() ? 1.0 : 0.0);
+    qreal hoverProgress = isHovered() ? 1.0 : 0.0;
+    if(scene() == NULL) {
+        m_hoverProgress = hoverProgress;
+    } else {
+        m_animator->animateTo(hoverProgress);
+    }
 }
 
 void QnImageButtonWidget::setDefaultAction(QAction *action) {

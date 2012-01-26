@@ -123,11 +123,6 @@ QnResourceWidget::~QnResourceWidget() {
     }
 
     qFreeAligned(m_motionMaskBinData);
-
-    if (m_item) {
-        m_item.data()->deleteLater();
-        m_item.clear();
-    }
 }
 
 const QnResourcePtr &QnResourceWidget::resource() const {

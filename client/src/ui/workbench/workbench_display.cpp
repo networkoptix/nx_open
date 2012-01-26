@@ -8,6 +8,7 @@
 #include <QtAlgorithms>
 
 #include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
 
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -235,7 +236,7 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     disconnect(m_workbench, NULL, this, NULL);
 
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
-        removeItemInternal(item, true);
+        removeItemInternal(item, true, false);
 
     for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
         changeItem(static_cast<QnWorkbench::ItemRole>(i), NULL);
@@ -603,13 +604,13 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     emit widgetAdded(widget);
 }
 
-void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget) {
+void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem) {
     disconnect(item, NULL, this, NULL);
 
     QnResourceWidget *widget = m_widgetByItem.value(item);
     if(widget == NULL) {
-        // already cleaned-up
-        return;
+        assert(!destroyItem);
+        return; /* Already cleaned up. */
     }
 
     disconnect(widget, NULL, this, NULL);
@@ -623,6 +624,9 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     if(destroyWidget)
         delete widget;
+
+    if(destroyItem)
+        delete item;
 }
 
 QMargins QnWorkbenchDisplay::viewportMargins() const {
@@ -950,7 +954,7 @@ void QnWorkbenchDisplay::at_workbench_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
-    removeItemInternal(item, true);
+    removeItemInternal(item, true, false);
     synchronizeSceneBounds();
     fitInView();
 }
@@ -1100,9 +1104,13 @@ void QnWorkbenchDisplay::at_uncurtained() {
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
-    QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(sender());
-    if (widget && widget->item())
-        removeItemInternal(widget->item(), false);
+    QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
+    if (widget && widget->item()) {
+        /* We can get here only when the widget is destroyed directly 
+         * (not by destroying or removing its corresponding item). 
+         * Therefore the widget's item must be destroyed. */
+        removeItemInternal(widget->item(), false, true);
+    }
 }
 
 void QnWorkbenchDisplay::at_scene_destroyed() {

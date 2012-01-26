@@ -299,7 +299,7 @@ protected:
     Layer synchronizedLayer(QnWorkbenchItem *item) const;
 
     void addItemInternal(QnWorkbenchItem *item);
-    void removeItemInternal(QnWorkbenchItem *item, bool destroyWidget);
+    void removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
     void deinitSceneWorkbench();
     void initSceneWorkbench();
