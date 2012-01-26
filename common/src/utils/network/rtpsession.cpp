@@ -154,6 +154,7 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
 bool RTPSession::open(const QString& url)
 {
     mUrl = url;
+    m_responseBufferLen = 0;
 
     //unsigned int port = DEFAULT_RTP_PORT;
 
@@ -216,7 +217,6 @@ bool RTPSession::stop()
     //delete m_tcpSock;
     //m_tcpSock = 0;
     m_tcpSock.close();
-    m_responseBufferLen = 0;
     return true;
 }
 
