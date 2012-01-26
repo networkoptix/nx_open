@@ -790,7 +790,7 @@ void NavigationItem::smartSeek(qint64 timeMSec)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    if (m_timeSlider->isAtEnd()) {
+    if (timeMSec == DATETIME_NOW || m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW);
 
         m_liveButton->setChecked(true);

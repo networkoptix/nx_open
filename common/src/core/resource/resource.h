@@ -35,10 +35,10 @@ typedef QMap<QString, QString> QnResourceParameters;
 class QN_EXPORT QnResource : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show in GUI
-    Q_PROPERTY(QString url READ getUrl WRITE setUrl)
     Q_FLAGS(Flags Flag)
     Q_ENUMS(ConnectionRole Status)
+    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show in GUI
+    Q_PROPERTY(QString url READ getUrl WRITE setUrl)
     Q_CLASSINFO("url", "URL")
 
 public:
@@ -184,10 +184,10 @@ public:
     static int commandProcQueueSize();
     static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 
-    void update(const QnResource& other);
+    void update(QnResourcePtr other);
 
 protected:
-    virtual void updateInner(const QnResource& other);
+    virtual void updateInner(QnResourcePtr other);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
