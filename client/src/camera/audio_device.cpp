@@ -15,7 +15,6 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format) :
     m_audioBuffer(0),
     m_downmixing(false),
     m_convertingFloat(false)
-    
 {
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
 

@@ -32,7 +32,7 @@ class SessionManager : public QObject
     Q_OBJECT
 
 public:
-    SessionManager(const QUrl &url, QObject *parent = 0);
+    SessionManager(const QUrl &url = QUrl(), QObject *parent = 0);
     virtual ~SessionManager();
 
     static SessionManager *instance();
