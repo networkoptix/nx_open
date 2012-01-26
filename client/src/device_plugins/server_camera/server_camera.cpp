@@ -66,6 +66,7 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 QString QnServerCamera::getUniqueId() const
 {
+    //getUniqueId should never be changed 
     return getMAC().toString() + getParentId().toString();
 }
 

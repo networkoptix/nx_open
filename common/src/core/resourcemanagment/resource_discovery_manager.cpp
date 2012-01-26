@@ -143,8 +143,15 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         if (searcher->shouldBeUsed() && !needToStop())
         {
             QnResourceList lst = searcher->search();
+
+            // resources can be searched by client in or server.
+            // if this client in stand alone => lets add QnResource::local 
+            // server does not care about flags 
             foreach (const QnResourcePtr &res, lst)
-                res->addFlag(searcher->isLocal() ? QnResource::local : QnResource::remote);
+            {
+                if (searcher->isLocal())
+                    res->addFlag(QnResource::local);
+            }
 
             resources.append(lst);
         }
