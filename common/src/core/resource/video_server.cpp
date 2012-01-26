@@ -33,6 +33,7 @@ QnVideoServer::~QnVideoServer()
 
 QString QnVideoServer::getUniqueId() const
 {
+    QMutexLocker mutexLocker(&m_mutex); // needed here !!!
     QnVideoServer* nonConstThis = const_cast<QnVideoServer*> (this);
     if (!getId().isValid())
         nonConstThis->setId(QnId::generateSpecialId());

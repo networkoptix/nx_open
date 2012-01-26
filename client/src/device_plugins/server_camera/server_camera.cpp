@@ -66,11 +66,7 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 QString QnServerCamera::getUniqueId() const
 {
-    QnResourcePtr server = qnResPool->getResourceById(getParentId());
-    if (server)
-        return server->getUniqueId() + QString('-') + getMAC().toString();
-    else
-        return QString("Server camera ") + getUrl();
+    return getMAC().toString() + getParentId().toString();
 }
 
 // --------------------------- QnServerCameraFactory -----------------------------
