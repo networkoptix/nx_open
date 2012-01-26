@@ -472,6 +472,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
 		    outFrame->linesize[2] = copyFromFrame->linesize[2];
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
+        Q_ASSERT(outFrame->pict_type != AV_PICTURE_TYPE_NONE);
         outFrame->format = GetPixelFormat();
 		return m_context->pix_fmt != PIX_FMT_NONE;
 	}
