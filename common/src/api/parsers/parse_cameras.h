@@ -33,7 +33,7 @@ namespace
 }
 
 
-QnApiCameraPtr unparseCamera(const QnCameraResource& cameraIn);
+QnApiCameraPtr unparseCamera(const QnVirtualCameraResource& cameraIn);
 
 template <class ResourcePtr>
 void parseCameras(QList<ResourcePtr>& cameras, const QnApiCameras& xsdCameras, QnResourceFactory& resourceFactory)

@@ -345,7 +345,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                     if (isServer())
                     {
                         // not stand alone
-                        QnCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnCameraResource>();
+                        QnVirtualCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnVirtualCameraResource>();
                         if (cameraResource)
                         {
                             QByteArray errorString;

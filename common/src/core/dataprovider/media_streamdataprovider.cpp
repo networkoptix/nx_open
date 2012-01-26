@@ -3,7 +3,8 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/common/sleep.h"
 #include "core/resource/resource_media_layout.h"
-
+#include "utils/common/util.h"
+#include "../resource/camera_resource.h"
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
@@ -15,6 +16,7 @@ m_numberOfchannels(0)
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
     Q_ASSERT(m_mediaResource);
     m_channel_number = 1;
+    memset(m_lastVideoTime, 0, sizeof(m_lastVideoTime));
 
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
     //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
@@ -181,4 +183,24 @@ bool QnAbstractMediaStreamDataProvider::needMetaData() const
 {
     return (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
         m_framesSinceLastMetaData > 0; // got at least one frame
+}
+
+void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
+{
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (getResource());
+    if (camera)
+    {
+        // correct packets timestamp if we have got several packets very fast
+        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        if (video)
+        {
+            qint64 timeDiff = video->timestamp - m_lastVideoTime[video->channelNumber];
+            // if timeDiff < -N it may be time correction or dayling time change
+            if (timeDiff >= -1000ll*1000 && timeDiff < MIN_FRAME_DURATION*1000)
+            {
+                video->timestamp = m_lastVideoTime[video->channelNumber] + MIN_FRAME_DURATION*1000ll;
+            }
+            m_lastVideoTime[video->channelNumber] = video->timestamp;
+        }
+    }
 }

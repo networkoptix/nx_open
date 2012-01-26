@@ -1,13 +1,14 @@
 
 #include "utils/common/sleep.h"
 #include "spush_media_stream_provider.h"
+#include "../resource/camera_resource.h"
+#include "utils/common/util.h"
 
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
 QnAbstractMediaStreamDataProvider(dev)
 {
 }
-
 
 void CLServerPushStreamreader::run()
 {
@@ -67,6 +68,7 @@ void CLServerPushStreamreader::run()
         if (getResource()->checkFlag(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
+        checkTime(data);
 
         getResource()->setStatus(QnResource::Online);
 

@@ -71,7 +71,10 @@ void QnClientPullMediaStreamProvider::run()
         
         
         if (getResource()->checkFlag(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+        {
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+        }
+        checkTime(data);
 
 
         getResource()->setStatus(QnResource::Online);

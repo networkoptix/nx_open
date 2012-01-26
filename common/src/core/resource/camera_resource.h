@@ -4,12 +4,18 @@
 #include "network_resource.h"
 #include "security_cam_resource.h"
 
-class QnCameraResource;
-typedef QSharedPointer<QnCameraResource> QnCameraResourcePtr;
-typedef QList<QnCameraResourcePtr> QnCameraResourceList;
-
-class QN_EXPORT QnCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
+class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
 {
 };
+
+typedef QSharedPointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
+typedef QList<QnVirtualCameraResourcePtr> QnVirtualCameraResourceList;
+
+class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource
+{
+};
+
+typedef QSharedPointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
+typedef QList<QnPhysicalCameraResourcePtr> QnPhysicalCameraResourceList;
 
 #endif // _camera_resource

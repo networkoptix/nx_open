@@ -50,7 +50,7 @@ protected:
     virtual void updateStreamParamsBasedOnFps(){};
 
     bool needMetaData() const; // used for live only 
-
+    void checkTime(QnAbstractMediaDataPtr data);
 protected:
     int m_channel_number;
 
@@ -68,6 +68,7 @@ protected:
 
 private:
     mutable int m_numberOfchannels;
+    qint64 m_lastVideoTime[CL_MAX_CHANNELS];
 };
 
 

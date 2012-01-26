@@ -33,7 +33,7 @@ struct QnDlink_cam_info
 
 };
 
-class QnPlDlinkResource : public QnCameraResource
+class QnPlDlinkResource : public QnPhysicalCameraResource
 {
     Q_OBJECT
 

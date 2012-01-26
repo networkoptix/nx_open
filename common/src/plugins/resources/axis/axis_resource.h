@@ -6,7 +6,7 @@
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 
-class QnPlAxisResource : public QnCameraResource
+class QnPlAxisResource : public QnPhysicalCameraResource
 {
 public:
     static const char* MANUFACTURE;

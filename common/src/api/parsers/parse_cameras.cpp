@@ -1,6 +1,6 @@
 #include "parse_cameras.h"
 
-QnApiCameraPtr unparseCamera(const QnCameraResource& cameraIn)
+QnApiCameraPtr unparseCamera(const QnVirtualCameraResource& cameraIn)
 {
     QnApiCameraPtr camera(new xsd::api::cameras::Camera(cameraIn.getId().toString().toStdString(),
                                      cameraIn.getName().toStdString(),

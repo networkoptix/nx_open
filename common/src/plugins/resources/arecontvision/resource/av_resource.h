@@ -9,7 +9,7 @@
 class QDomElement;
 
 // this class and inherited must be very light to create
-class QnPlAreconVisionResource : public QnCameraResource
+class QnPlAreconVisionResource : public QnPhysicalCameraResource
 {
     Q_OBJECT
 
