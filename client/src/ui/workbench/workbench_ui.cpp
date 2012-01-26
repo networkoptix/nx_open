@@ -40,6 +40,7 @@
 #include <ui/context_menu_helper.h>
 #include <ui/skin/skin.h>
 #include <ui/context_menu_helper.h>
+#include <ui/mixins/render_watch_mixin.h>
 
 #include "workbench.h"
 #include "workbench_display.h"
@@ -251,7 +252,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(at_navigationItem_actualCameraChanged(CLVideoCamera *)));
     //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
     connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
-    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_sliderItem,                   SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
 
 
     /* Title bar. */
@@ -308,7 +308,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-
+    connect(m_display->renderWatcher(), SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)),                                 this,                           SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
 
     /* Init fields. */
     setFlags(HIDE_CONTROLS_WHEN_NORMAL | HIDE_CONTROLS_WHEN_ZOOMED);
