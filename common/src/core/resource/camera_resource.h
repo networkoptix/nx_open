@@ -9,7 +9,7 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
     Q_OBJECT;
 
 public:
-    QnCameraResource() {}
+    QnVirtualCameraResource() {}
 
 };
 
