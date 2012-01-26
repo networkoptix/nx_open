@@ -48,6 +48,7 @@ QString QnResourceDirectoryBrowser::manufacture() const
 
 QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance()
 {
+    // TODO: this causes heap corruption, investigate
     //return *qnResourceDirectoryBrowserInstance();
     static QnResourceDirectoryBrowser inst;
     return inst;
