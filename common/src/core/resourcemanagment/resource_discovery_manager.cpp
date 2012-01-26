@@ -26,7 +26,11 @@ QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
 
 QnResourceDiscoveryManager& QnResourceDiscoveryManager::instance()
 {
-    return *qnResourceDiscoveryManagerInstance();
+    //return *qnResourceDiscoveryManagerInstance();
+
+    static QnResourceDiscoveryManager instance;
+
+    return instance;
 }
 
 void QnResourceDiscoveryManager::setServer(bool serv)

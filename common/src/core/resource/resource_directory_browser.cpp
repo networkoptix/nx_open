@@ -48,7 +48,9 @@ QString QnResourceDirectoryBrowser::manufacture() const
 
 QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance()
 {
-    return *qnResourceDirectoryBrowserInstance();
+    //return *qnResourceDirectoryBrowserInstance();
+    static QnResourceDirectoryBrowser inst;
+    return inst;
 }
 
 QnResourceList QnResourceDirectoryBrowser::findResources()
