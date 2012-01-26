@@ -46,14 +46,14 @@ void QnEventManager::eventReceived(QnEvent event)
         {
             QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
 
-            foreach(const QnResourcePtr& resource, resources)
+            foreach(QnResourcePtr resource, resources)
             {
                 if (resource->getId() == event.resourceId)
                 {
                     if (ownResource.isNull())
                         qnResPool->addResource(resource);
                     else
-                        ownResource->update(*resource);
+                        ownResource->update(resource);
                 }
             }
         } else

@@ -24,12 +24,13 @@ QnSecurityCamResource::~QnSecurityCamResource()
 {
 }
 
-void QnSecurityCamResource::updateInner(const QnResource& other)
+void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
     QnMediaResource::updateInner(other);
 
-    const QnSecurityCamResource* other_casted = dynamic_cast<const QnSecurityCamResource*>(&other);
-    if (other_casted) {
+    QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other); 
+    if (other_casted) 
+    {
         m_motionMask = other_casted->m_motionMask;
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }

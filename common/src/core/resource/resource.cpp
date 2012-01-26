@@ -37,27 +37,29 @@ QnResource::~QnResource()
     disconnectAllConsumers();
 }
 
-void QnResource::updateInner(const QnResource& other)
+void QnResource::updateInner(QnResourcePtr other)
 {
-    m_id = other.m_id;
-    m_parentId = other.m_parentId;
-    m_typeId = other.m_typeId;
-    m_flags = other.m_flags;
-    m_name = other.m_name;
-    m_lastDiscoveredTime = other.m_lastDiscoveredTime;
-    m_tags = other.m_tags;
-    m_url = other.m_url;
-    setStatus(other.m_status);
+    Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+
+    m_id = other->m_id;
+    m_parentId = other->m_parentId;
+    m_typeId = other->m_typeId;
+    m_flags = other->m_flags;
+    m_name = other->m_name;
+    m_lastDiscoveredTime = other->m_lastDiscoveredTime;
+    m_tags = other->m_tags;
+    m_url = other->m_url;
+    setStatus(other->m_status);
 }
 
-void QnResource::update(const QnResource& other)
+void QnResource::update(QnResourcePtr other)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
 
     {
         QMutexLocker mutexLocker(&m_mutex); // this is virtual atomic operation; so mutexes shold be outside
-        QMutexLocker mutexLocker2(&other.m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        QMutexLocker mutexLocker2(&other->m_mutex); // this is virtual atomic operation; so mutexes shold be outside
         updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
 
