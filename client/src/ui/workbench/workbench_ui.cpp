@@ -89,7 +89,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_manager(display->instrumentManager()),
     m_treePinned(false),
     m_inactive(false),
-    m_titleUsed(false)
+    m_titleUsed(false),
+    m_flags(0)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -101,8 +102,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_controlsActivityInstrument);
-
-    m_controlsActivityInstrument->recursiveDisable();
 
     connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
     connect(m_controlsActivityInstrument, SIGNAL(activityResumed()),                                                                this,                           SLOT(at_activityStarted()));
@@ -304,10 +303,15 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_titleOpacityProcessor_hoverLeft()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
 
+
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+
+
+    /* Init fields. */
+    setFlags(HIDE_CONTROLS_WHEN_NORMAL | HIDE_CONTROLS_WHEN_ZOOMED);
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -485,6 +489,25 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
     cm_toggle_fps.setChecked(fpsVisible);
 }
 
+void QnWorkbenchUi::setFlags(Flags flags) {
+    if(flags == m_flags)
+        return;
+
+    m_flags = flags;
+
+    updateActivityInstrumentState();
+}
+
+void QnWorkbenchUi::updateActivityInstrumentState() {
+    bool zoomed = m_widgetByRole[QnWorkbench::ZOOMED] != NULL;
+
+    if(zoomed) {
+        m_controlsActivityInstrument->setEnabled(m_flags & HIDE_CONTROLS_WHEN_ZOOMED);
+    } else {
+        m_controlsActivityInstrument->setEnabled(m_flags & HIDE_CONTROLS_WHEN_NORMAL);
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -527,12 +550,8 @@ void QnWorkbenchUi::at_display_widgetChanged(QnWorkbench::ItemRole role) {
     m_widgetByRole[role] = widget;
 
     /* Tune activity listener instrument. */
-    if(role == QnWorkbench::ZOOMED) {
-        if(oldWidget == NULL)
-            m_controlsActivityInstrument->recursiveEnable();
-        if(widget == NULL)
-            m_controlsActivityInstrument->recursiveDisable();
-    }
+    if(role == QnWorkbench::ZOOMED)
+        updateActivityInstrumentState();
 
     /* Update navigation item's target. */
     QnResourceWidget *targetWidget = m_widgetByRole[QnWorkbench::ZOOMED];
