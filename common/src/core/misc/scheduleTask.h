@@ -89,6 +89,7 @@ inline bool operator<(const QnScheduleTask &other, qint64 first)
 //typedef QSharedPointer<QnScheduleTask> QnScheduleTaskPtr;
 typedef QList<QnScheduleTask> QnScheduleTaskList;
 
+Q_DECLARE_TYPEINFO(QnScheduleTask, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnScheduleTask)
 Q_DECLARE_METATYPE(QnScheduleTaskList)
 

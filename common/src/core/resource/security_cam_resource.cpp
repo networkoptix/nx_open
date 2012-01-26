@@ -3,6 +3,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 static const char *property_descriptions[] = {
+    QT_TRANSLATE_NOOP("QnResource", "Motion Mask"),
     QT_TRANSLATE_NOOP("QnResource", "Camera Scheduling")
 };
 
@@ -12,6 +13,7 @@ QnSecurityCamResource::QnSecurityCamResource()
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
+        qRegisterMetaType<QRegion>();
         qRegisterMetaType<QnScheduleTask>();
         qRegisterMetaType<QnScheduleTaskList>();
         metaTypesInitialized = true;
@@ -24,12 +26,13 @@ QnSecurityCamResource::~QnSecurityCamResource()
 {
 }
 
-void QnSecurityCamResource::updateInner(const QnResource& other)
+void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
     QnMediaResource::updateInner(other);
 
-    const QnSecurityCamResource* other_casted = dynamic_cast<const QnSecurityCamResource*>(&other);
-    if (other_casted) {
+    QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
+    if (other_casted)
+    {
         m_motionMask = other_casted->m_motionMask;
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }

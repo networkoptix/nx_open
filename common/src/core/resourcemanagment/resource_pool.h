@@ -35,7 +35,10 @@ public:
 
     static QnResourcePool *instance();
 
+    // this function will add or update existing resources
+    // keeps database ID ( if possible )
     void addResources(const QnResourceList &resources);
+
     inline void addResource(const QnResourcePtr &resource)
     { addResources(QnResourceList() << resource); }
 
@@ -81,7 +84,7 @@ private:
 private:
     mutable QMutex m_resourcesMtx;
     QnResourcePtr localServer;
-    QHash<QnId, QnResourcePtr> m_resources;
+    QHash<QString, QnResourcePtr> m_resources;
     QHash<QnId, QnResourceList> m_resourceTree;
 };
 
