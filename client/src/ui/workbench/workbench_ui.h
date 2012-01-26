@@ -60,7 +60,10 @@ public:
 
     bool isFpsVisible() const;
 
-public Q_SLOTS:
+signals:
+    void titleBarDoubleClicked();
+
+public slots:
     void setTitleUsed(bool titleUsed);
     void setTreeVisible(bool visible, bool animate = true);
     void toggleTreeVisible();
@@ -106,6 +109,7 @@ protected Q_SLOTS:
     void at_treePinButton_toggled(bool checked);
 
     void at_titleItem_geometryChanged();
+    void at_titleItem_doubleClicked(QObject *item, QEvent *event);
     void at_titleOpacityProcessor_hoverEntered();
     void at_titleOpacityProcessor_hoverLeft();
 

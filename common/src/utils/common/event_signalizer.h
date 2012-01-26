@@ -1,14 +1,14 @@
-#ifndef QN_EVENT_SIGNALIZATOR_H
-#define QN_EVENT_SIGNALIZATOR_H
+#ifndef QN_EVENT_SIGNALIZER_H
+#define QN_EVENT_SIGNALIZER_H
 
 #include <QObject>
 #include <QEvent>
 
-class QnEventSignalizator: public QObject {
+class QnEventSignalizer: public QObject {
     Q_OBJECT;
 
 public:
-    QnEventSignalizator(QObject *parent = NULL): QObject(parent) {}
+    QnEventSignalizer(QObject *parent = NULL): QObject(parent) {}
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override {
         if(isActivating(event))
@@ -25,11 +25,11 @@ protected:
 };
 
 
-class QnSingleEventSignalizator: public QnEventSignalizator {
+class QnSingleEventSignalizer: public QnEventSignalizer {
     Q_OBJECT;
 
 public:
-    QnSingleEventSignalizator(QObject *parent = NULL): QnEventSignalizator(parent), m_type(QEvent::None) {}
+    QnSingleEventSignalizer(QObject *parent = NULL): QnEventSignalizer(parent), m_type(QEvent::None) {}
 
     void setEventType(QEvent::Type type) {
         m_type = type;
@@ -49,4 +49,4 @@ private:
 };
 
 
-#endif // QN_EVENT_SIGNALIZATOR_H
+#endif // QN_EVENT_SIGNALIZER_H

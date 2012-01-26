@@ -9,7 +9,7 @@
 #include <QStyle>
 #include <QApplication>
 
-#include <utils/common/event_signalizator.h>
+#include <utils/common/event_signalizer.h>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
@@ -113,11 +113,11 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_controlsWidget->setFlag(QGraphicsItem::ItemIsPanel);
     m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
-    QnSingleEventSignalizator *deactivationSignalizator = new QnSingleEventSignalizator(this);
-    deactivationSignalizator->setEventType(QEvent::WindowDeactivate);
-    m_controlsWidget->installEventFilter(deactivationSignalizator);
+    QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
+    deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
+    m_controlsWidget->installEventFilter(deactivationSignalizer);
 
-    connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
+    connect(deactivationSignalizer,     SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
     connect(m_controlsWidget,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
 
 
@@ -135,10 +135,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     setFpsVisible(false);
 
+    m_display->view()->addAction(&cm_toggle_fps);
+    connect(&cm_toggle_fps,             SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
 
-    connect(&cm_toggle_fps, SIGNAL(toggled(bool)), this, SLOT(setFpsVisible(bool)));
-    m_display->view()->addAction(&cm_toggle_fps);
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
@@ -275,6 +275,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleItem = new QGraphicsWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
 
+    QnSingleEventSignalizer *titleDoubleClickSignalizer = new QnSingleEventSignalizer(this);
+    titleDoubleClickSignalizer->setEventType(QEvent::GraphicsSceneMouseDoubleClick);
+    m_titleItem->installEventFilter(titleDoubleClickSignalizer);
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -299,6 +303,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setTitleVisible(true, false);
     setTitleUsed(false);
 
+    connect(titleDoubleClickSignalizer, SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_doubleClicked(QObject *, QEvent *)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_titleOpacityProcessor_hoverEntered()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_titleOpacityProcessor_hoverLeft()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
@@ -712,6 +717,16 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     updateTreeGeometry();
 
     m_titleBackgroundItem->setGeometry(m_titleItem->geometry());
+}
+
+void QnWorkbenchUi::at_titleItem_doubleClicked(QObject *, QEvent *event) {
+    assert(event->type() == QEvent::GraphicsSceneMouseDoubleClick);
+
+    QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
+    if(e->button() == Qt::LeftButton) {
+        e->accept();
+        emit titleBarDoubleClicked();
+    }
 }
 
 void QnWorkbenchUi::at_fpsItem_geometryChanged() {
