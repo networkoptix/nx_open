@@ -30,16 +30,9 @@ public:
 
     virtual void putData(QnAbstractDataPacketPtr data);
 
-    virtual void clearUnprocessedData();
-
-    bool hasSuchResourceInQueue(QnResourcePtr res) const;
-
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
-private:
-    mutable QMutex m_cs;
-    QMap<QnId, unsigned int> mResourceQueue;
 };
 
 #endif //QN_RESOURCE_COMMAND_PROCESSOR

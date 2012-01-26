@@ -171,6 +171,7 @@ public:
     QStringList tagList() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
+    bool hasUnprocessedCommands() const;
 
 Q_SIGNALS:
     void parameterValueChanged(const QnParam &param);
@@ -182,7 +183,6 @@ public:
     static void stopCommandProc();
     static void addCommandToProc(QnAbstractDataPacketPtr data);
     static int commandProcQueueSize();
-    static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 
     void update(QnResourcePtr other);
 
