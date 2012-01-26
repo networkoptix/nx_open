@@ -11,6 +11,9 @@
 
 #include <utils/common/event_signalizator.h>
 
+#include <core/dataprovider/abstract_streamdataprovider.h>
+#include <core/resource/security_cam_resource.h>
+
 #include <camera/resource_display.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -40,7 +43,6 @@
 
 #include "workbench.h"
 #include "workbench_display.h"
-#include "core/resource/security_cam_resource.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *)
 
@@ -250,7 +252,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(at_navigationItem_actualCameraChanged(CLVideoCamera *)));
     //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
     connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
-    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_sliderItem,               SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
+    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_sliderItem,                   SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
 
 
     /* Title bar. */
@@ -513,6 +515,12 @@ void QnWorkbenchUi::at_activityStarted() {
     m_treeShowButton->show();
 }
 
+void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
+    QnResourceWidget *widget = m_display->widget(renderer);
+    if(widget != NULL)
+        m_sliderItem->onDisplayingStateChanged(widget->display()->dataProvider()->getResource(), displaying);
+}
+
 void QnWorkbenchUi::at_display_widgetChanged(QnWorkbench::ItemRole role) {
     QnResourceWidget *widget = m_display->widget(role);
     QnResourceWidget *oldWidget = m_widgetByRole[role];
@@ -690,3 +698,4 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
 void QnWorkbenchUi::at_fpsItem_geometryChanged() {
     updateFpsGeometry();
 }
+
