@@ -32,6 +32,9 @@
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
+#include <ui/mixins/sync_play_mixin.h>
+#include <ui/mixins/render_watch_mixin.h>
+
 #include "ui/skin/skin.h"
 #include "ui/skin/globals.h"
 
@@ -163,6 +166,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     /* Set up defaults. */
     initWorkbench(workbench);
     setScene(m_dummyScene);
+
+    /* Set up syncplay and render watcher. */
+    m_renderWatcher = new QnRenderWatchMixin(this, this);
+    new QnSyncPlayMixin(this, m_renderWatcher, this);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -376,6 +383,11 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
 QnGridItem *QnWorkbenchDisplay::gridItem() {
     return m_gridItem.data();
 }
+
+QnRenderWatchMixin *QnWorkbenchDisplay::renderWatcher() const {
+    return m_renderWatcher;
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -1113,9 +1125,3 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged() {
     synchronizeAllGeometries(true);
 }
 
-void QnWorkbenchDisplay::onDisplayingStateChanged(QnAbstractRenderer* renderer, bool displaying)
-{
-    QnResourceWidget *w = widget(renderer);
-    if(w)
-        emit displayingStateChanged(w->display()->dataProvider()->getResource(), displaying);
-}

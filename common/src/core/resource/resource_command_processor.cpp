@@ -4,12 +4,12 @@
 QnResourceCommand::QnResourceCommand(QnResourcePtr res):
 QnResourceConsumer(res)
 {
-    disconnectFromResource();
+    
 }
 
 QnResourceCommand::~QnResourceCommand()
 {
-
+    disconnectFromResource();
 };
 
 void QnResourceCommand::beforeDisconnectFromResource()

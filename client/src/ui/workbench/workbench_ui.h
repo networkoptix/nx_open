@@ -23,6 +23,7 @@ class QnWorkbenchDisplay;
 class QnImageButtonWidget;
 class QnResourceWidget;
 class QnMaskedProxyWidget;
+class QnAbstractRenderer;
 
 
 class QnWorkbenchUi: public QObject, protected SceneUtility {
@@ -67,6 +68,8 @@ protected Q_SLOTS:
     void at_activityStopped();
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
+
+    void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
 
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);

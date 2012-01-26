@@ -42,6 +42,9 @@ public Q_SLOTS:
     void setPlaying(bool playing);
     void loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region);
     void onSyncButtonToggled(bool value);
+    void onDisplayingStateChanged(QnResourcePtr, bool);
+
+
 Q_SIGNALS:
     void exportRange(qint64 begin, qint64 end);
     //void playbackMaskChanged(const QnTimePeriodList& playbackMask);
@@ -88,7 +91,6 @@ private Q_SLOTS:
     void onMotionPeriodLoadFailed(int status, int handle);
 
     void updateMotionPeriods(const QnTimePeriod& period);
-    void onDisplayingStateChanged(QnResourcePtr, bool);
 
     void at_liveButton_clicked(bool checked);
 

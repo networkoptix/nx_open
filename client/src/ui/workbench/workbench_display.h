@@ -34,6 +34,7 @@ class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
+class QnRenderWatchMixin;
 
 class CLVideoCamera;
 class CLCamDisplay;
@@ -266,10 +267,11 @@ public:
 
     QPointF mapGlobalToGridF(const QPoint &globalPoint) const;
 
+    QnRenderWatchMixin *renderWatcher() const;
 
 public slots:
     void fitInView(bool animate = true);
-    void onDisplayingStateChanged(QnAbstractRenderer*, bool);
+
 signals:
     void viewportGrabbed();
     void viewportUngrabbed();
@@ -277,9 +279,10 @@ signals:
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(QnWorkbench::ItemRole role);
+    
     //void playbackMaskChanged(const QnTimePeriodList&);
-    void displayingStateChanged(QnResourcePtr, bool);
     void enableItemSync(bool value);
+
 protected:
     virtual void tick(int deltaTime) override;
     
@@ -351,6 +354,9 @@ private:
     /** Current view. */
     QGraphicsView *m_view;
 
+    /** Render watcher. */
+    QnRenderWatchMixin *m_renderWatcher;
+
 
     /* Internal state. */
 
@@ -401,6 +407,7 @@ private:
 
     /** Selection overlay hack instrument. */
     SelectionOverlayHackInstrument *m_selectionOverlayHackInstrument;
+
 
     /* Animation-related stuff. */
 

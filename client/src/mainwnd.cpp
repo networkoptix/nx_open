@@ -123,16 +123,16 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_about, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     addAction(&cm_about);
 
-    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(editPreferences()));
+    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(showPreferencesDialog()));
     addAction(&cm_preferences);
 
-    connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(showOpenFileDialog()));
     addAction(&cm_open_file);
 
-    connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(appServerAuthenticationRequired()));
+    connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
     addAction(&cm_reconnect);
 
-    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(appServerError(int)));
+    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(handleSessionManagerError(int)));
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
@@ -169,12 +169,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
     connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(newLayout()));
-    connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(treeWidgetItemActivated(uint)));
-
-    QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(m_display, this);
-    new QnSyncPlayMixin(m_display, renderWatcher, this);
-    connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), m_display, SLOT(onDisplayingStateChanged(QnAbstractRenderer *, bool)));
-
+    connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(at_treeWidget_activated(uint)));
 
     /* Tab bar. */
     m_tabBar = new QTabBar();
@@ -184,7 +179,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_tabBar->setDrawBase(false);
     m_tabBar->setShape(QTabBar::TriangularNorth);
 
-    connect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(changeCurrentLayout(int)));
+    connect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(setCurrentLayout(int)));
     connect(m_tabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(removeLayout(int)));
 
     /* New tab button. */
@@ -246,34 +241,44 @@ MainWnd::~MainWnd()
     return;
 }
 
-void MainWnd::closeEvent(QCloseEvent *event)
+void MainWnd::setTitleVisible(bool visible) 
 {
-    base_type::closeEvent(event);
+    if(m_titleVisible == visible)
+        return;
 
-    if (event->isAccepted())
-        Q_EMIT mainWindowClosed();
-}
-
-void MainWnd::changeEvent(QEvent *event) {
-    if(event->type() == QEvent::WindowStateChange)
-        updateDwmState();
-
-    base_type::changeEvent(event);
-}
-
-void MainWnd::paintEvent(QPaintEvent *) {
-    /* Draw frame if needed. */
-    if(m_drawCustomFrame) {
-        QPainter painter(this);
-
-        painter.setPen(QPen(Globals::frameColor(), 3));
-        painter.drawRect(QRect(
-            0,
-            0,
-            width() - 1,
-            height() - 1
-        ));
+    m_titleVisible = visible;
+    if(visible) {
+        m_globalLayout->insertLayout(0, m_titleLayout);
+        setVisibleRecursively(m_titleLayout, true);
+    } else {
+        m_globalLayout->takeAt(0);
+        m_titleLayout->setParent(NULL);
+        setVisibleRecursively(m_titleLayout, false);
     }
+
+    updateDwmState();
+}
+
+void MainWnd::setFullScreen(bool fullScreen) 
+{
+    if(fullScreen == isFullScreen())
+        return;
+
+    if(fullScreen) {
+        showFullScreen();
+    } else {
+        showNormal();
+    }
+}
+
+void MainWnd::toggleFullScreen() 
+{
+    setFullScreen(!isFullScreen());
+}
+
+void MainWnd::toggleTitleVisibility() 
+{
+    setTitleVisible(!isTitleVisible());
 }
 
 void MainWnd::newLayout()
@@ -286,7 +291,7 @@ void MainWnd::newLayout()
     m_tabBar->setCurrentIndex(index);
 }
 
-void MainWnd::changeCurrentLayout(int index)
+void MainWnd::setCurrentLayout(int index)
 {
     if(index < 0 || index >= m_tabBar->count()) {
         qnWarning("Layout index out of bounds: %1 not in [%2, %3).", index, 0, m_tabBar->count());
@@ -322,78 +327,20 @@ void MainWnd::removeLayout(int index)
     m_tabBar->removeTab(index);
 }
 
-#if 0
-void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
-{
-    if (files.isEmpty())
-        return;
-
-    cl_log.log(QLatin1String("Entering addFilesToCurrentOrNewLayout"), cl_logALWAYS);
-
-    QnFileProcessor::createResourcesForFiles(files);
-
-    // If current content created by opening files or DND, use it. Otherwise create new one.
-    LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
-
-    if (!forceNewLayout && content != CLSceneLayoutManager::instance().getSearchLayout()
-        && content != CLSceneLayoutManager::instance().startScreenLayoutContent())
-    {
-        cl_log.log(QLatin1String("Using old layout, content ") + content->getName(), cl_logALWAYS);
-        foreach (const QString &file, files)
-        {
-            m_normalView->getView().getCamLayOut().addDevice(file, true);
-            content->addDevice(file);
-        }
-
-        m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
-    }
-    else
-    {
-        cl_log.log(QLatin1String("Creating new layout, content ") + content->getName(), cl_logALWAYS);
-        content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
-
-        foreach (const QString &file, files)
-            content->addDevice(file);
-
-        m_normalView->goToNewLayoutContent(content);
-    }
-}
-
-void MainWnd::goToNewLayoutContent(LayoutContent* newl)
-{
-    m_normalView->goToNewLayoutContent(newl);
-}
-
-void MainWnd::destroyNavigator(CLLayoutNavigator *&nav)
-{
-    if (nav)
-    {
-        nav->destroy();
-        delete nav;
-        nav = 0;
-    }
-}
-#endif
-
 void MainWnd::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-#if 0
-    addFilesToCurrentOrNewLayout(files);
-#else
+    
     m_controller->drop(files);
-#endif
-
-    activate();
 }
 
-void MainWnd::treeWidgetItemActivated(uint resourceId)
+void MainWnd::at_treeWidget_activated(uint resourceId)
 {
     QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
     m_controller->drop(resource);
 }
 
-void MainWnd::openFile()
+void MainWnd::showOpenFileDialog()
 {
     QFileDialog dialog(this, tr("Open file"));
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
@@ -408,31 +355,6 @@ void MainWnd::openFile()
         m_controller->drop(dialog.selectedFiles());
 }
 
-void MainWnd::activate()
-{
-    /*if (isFullScreen())
-        showFullScreen();
-    else
-        showNormal();
-    raise();
-    activateWindow();*/
-}
-
-void MainWnd::toggleFullScreen()
-{
-    toggleTitleVisibility();
-
-    if (isFullScreen()) {
-        showNormal();
-
-        m_ui->setTitleUsed(false);
-    } else {
-        showFullScreen();
-
-        m_ui->setTitleUsed(true);
-    }
-}
-
 void MainWnd::showAboutDialog()
 {
     AboutDialog dialog(this);
@@ -440,14 +362,14 @@ void MainWnd::showAboutDialog()
     dialog.exec();
 }
 
-void MainWnd::editPreferences()
+void MainWnd::showPreferencesDialog()
 {
     PreferencesDialog dialog(this);
     dialog.setWindowModality(Qt::ApplicationModal);
     dialog.exec();
 }
 
-void MainWnd::appServerError(int error)
+void MainWnd::handleSessionManagerError(int error)
 {
     switch (error) {
     case QNetworkReply::ConnectionRefusedError:
@@ -458,7 +380,7 @@ void MainWnd::appServerError(int error)
     case QNetworkReply::UnknownNetworkError:
         // Do not show popup box! It's annoying!
         // Show something like color label in the main window.
-        // appServerAuthenticationRequired();
+        // showAuthenticationDialog();
         break;
 
     default:
@@ -466,7 +388,7 @@ void MainWnd::appServerError(int error)
     }
 }
 
-void MainWnd::appServerAuthenticationRequired()
+void MainWnd::showAuthenticationDialog()
 {
     static LoginDialog *dialog = 0;
     if (dialog)
@@ -499,25 +421,13 @@ void MainWnd::appServerAuthenticationRequired()
     dialog = 0;
 }
 
-void MainWnd::toggleTitleVisibility()
-{
-    if(isTitleVisible()) {
-        m_globalLayout->takeAt(0);
-        m_titleLayout->setParent(NULL);
-        setVisibleRecursively(m_titleLayout, false);
-        m_titleVisible = false;
-    } else {
-        m_globalLayout->insertLayout(0, m_titleLayout);
-        setVisibleRecursively(m_titleLayout, true);
-        m_titleVisible = true;
-    }
+void MainWnd::updateFullScreenState() {
+    bool fullScreen = isFullScreen();
+
+    setTitleVisible(!fullScreen);
+    m_ui->setTitleUsed(fullScreen);
 
     updateDwmState();
-}
-
-bool MainWnd::isTitleVisible() const
-{
-    return m_titleVisible;
 }
 
 void MainWnd::updateDwmState()
@@ -632,6 +542,44 @@ void MainWnd::updateDwmState()
             frameMargins.right(),
             frameMargins.bottom() - 1
         );
+    }
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void MainWnd::closeEvent(QCloseEvent *event)
+{
+    base_type::closeEvent(event);
+
+    if (event->isAccepted())
+        Q_EMIT mainWindowClosed();
+}
+
+void MainWnd::changeEvent(QEvent *event) 
+{
+    if(event->type() == QEvent::WindowStateChange)
+        updateFullScreenState();
+
+    base_type::changeEvent(event);
+}
+
+void MainWnd::paintEvent(QPaintEvent *event) 
+{
+    base_type::paintEvent(event);
+
+    /* Draw frame if needed. */
+    if(m_drawCustomFrame) {
+        QPainter painter(this);
+
+        painter.setPen(QPen(Globals::frameColor(), 3));
+        painter.drawRect(QRect(
+            0,
+            0,
+            width() - 1,
+            height() - 1
+        ));
     }
 }
 
