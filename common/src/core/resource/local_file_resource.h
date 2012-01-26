@@ -5,7 +5,7 @@
 
 class QN_EXPORT QnLocalFileResource : public QnResource
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     QnLocalFileResource(const QString &filename);
