@@ -10,6 +10,8 @@ struct QnAbstractMediaData;
 
 class QnClientPullMediaStreamProvider : public QnAbstractMediaStreamDataProvider
 {
+    Q_OBJECT;
+
 public:
     QnClientPullMediaStreamProvider(QnResourcePtr dev);
     virtual ~QnClientPullMediaStreamProvider() {stop();}

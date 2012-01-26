@@ -28,6 +28,10 @@ public:
 
     virtual ~MainWnd();
 
+    bool isTitleVisible() const {
+        return m_titleVisible;
+    }
+
 Q_SIGNALS:
     void mainWindowClosed();
 
@@ -41,31 +45,29 @@ protected:
 #endif
 
 protected Q_SLOTS:
+    void setTitleVisible(bool visible);
+    void setFullScreen(bool fullScreen);
+
+    void toggleFullScreen();
+    void toggleTitleVisibility();
+
     void newLayout();
-    void changeCurrentLayout(int index);
+    void setCurrentLayout(int index);
     void removeLayout(int index);
 
     void handleMessage(const QString &message);
 
-    void treeWidgetItemActivated(uint resourceId);
-
-    void openFile();
-
-    void activate();
-    void toggleFullScreen();
-
+    void showOpenFileDialog();
     void showAboutDialog();
-    void editPreferences();
+    void showPreferencesDialog();
+    void showAuthenticationDialog();
 
-    void appServerError(int error);
-    void appServerAuthenticationRequired();
+    void handleSessionManagerError(int error);
 
-    void toggleTitleVisibility();
-
+    void updateFullScreenState();
     void updateDwmState();
 
-protected:
-    bool isTitleVisible() const;
+    void at_treeWidget_activated(uint resourceId);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;

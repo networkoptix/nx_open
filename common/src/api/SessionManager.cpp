@@ -2,6 +2,7 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
+#include <QtCore/QCoreApplication>
 
 #include <QtNetwork/QNetworkReply>
 
@@ -9,7 +10,6 @@
 #include "utils/common/warnings.h"
 
 QAtomicInt SessionManager::m_handle(1);
-
 
 void detail::SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
 {
@@ -20,8 +20,11 @@ void detail::SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply
     deleteLater();
 }
 
-
-Q_GLOBAL_STATIC_WITH_ARGS(SessionManager, globalSessionManager, (QUrl()))
+Q_GLOBAL_STATIC_WITH_INITIALIZER(SessionManager, globalSessionManager, {
+    /* Make sure the global instance resides in main thread. */
+    if(x->thread() != qApp->thread())
+        x->moveToThread(qApp->thread());
+});
 
 SessionManager::SessionManager(const QUrl &url, QObject *parent)
     : QObject(parent),

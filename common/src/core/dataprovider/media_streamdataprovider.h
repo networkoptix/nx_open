@@ -14,6 +14,8 @@ class QnResourceAudioLayout;
 
 class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
 {
+    Q_OBJECT;
+
 public:
 	explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
 	virtual ~QnAbstractMediaStreamDataProvider();

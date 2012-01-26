@@ -8,6 +8,12 @@
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
 
+namespace {
+    class QnResourceDiscoveryManagerInstance: public QnResourceDiscoveryManager {};
+
+    Q_GLOBAL_STATIC(QnResourceDiscoveryManagerInstance, qnResourceDiscoveryManagerInstance);
+}
+
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
 m_server(false)
 {
@@ -20,9 +26,7 @@ QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
 
 QnResourceDiscoveryManager& QnResourceDiscoveryManager::instance()
 {
-    static QnResourceDiscoveryManager instance;
-
-    return instance;
+    return *qnResourceDiscoveryManagerInstance();
 }
 
 void QnResourceDiscoveryManager::setServer(bool serv)
@@ -85,10 +89,8 @@ void QnResourceDiscoveryManager::run()
         searchersList = m_searchersList;
     }
 
-    foreach (QnAbstractResourceSearcher *searcher, searchersList) {
+    foreach (QnAbstractResourceSearcher *searcher, searchersList)
         searcher->setShouldBeUsed(true);
-        searcher->pleaseResume();
-    }
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     while (!needToStop() && !initResourceTypes(appServerConnection))
@@ -140,7 +142,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     {
         if (searcher->shouldBeUsed() && !needToStop())
         {
-            QnResourceList lst = searcher->findResources();
+            QnResourceList lst = searcher->search();
             foreach (const QnResourcePtr &res, lst)
                 res->addFlag(searcher->isLocal() ? QnResource::local : QnResource::remote);
 

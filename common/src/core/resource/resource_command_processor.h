@@ -22,6 +22,8 @@ public:
 
 class QN_EXPORT QnResourceCommandProcessor : public QnAbstractDataConsumer
 {
+    Q_OBJECT;
+
 public:
     QnResourceCommandProcessor();
     ~QnResourceCommandProcessor();

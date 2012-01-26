@@ -12,7 +12,9 @@ typedef QList<QnNetworkResourcePtr> QnNetworkResourceList;
 
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
-/*    Q_OBJECT
+    Q_OBJECT;
+
+/*    
     Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
     Q_CLASSINFO("hostAddress", "IP Address")
     Q_CLASSINFO("hostAddress_group", "Network")
