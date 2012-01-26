@@ -50,7 +50,7 @@ Q_SIGNALS:
     void motionMaskChanged(QRegion region);
 
 protected:
-    void updateInner(const QnResource& other) override;
+    void updateInner(QnResourcePtr other) override;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
 
