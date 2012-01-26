@@ -1,5 +1,5 @@
 #include "axis_resource_searcher.h"
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 #include "axis_resource.h"
 
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
@@ -32,7 +32,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
         return result;
     }
 
-    result = QnNetworkResourcePtr( new QnPlAxisResource() );
+    result = QnCameraResourcePtr( new QnPlAxisResource() );
     result->setTypeId(resourceTypeId);
 
     qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;

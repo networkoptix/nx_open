@@ -1,5 +1,5 @@
 #include "dlink_resource_searcher.h"
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 #include "dlink_resource.h"
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
@@ -42,7 +42,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, con
         return result;
     }
 
-    result = QnNetworkResourcePtr( new QnPlDlinkResource() );
+    result = QnCameraResourcePtr( new QnPlDlinkResource() );
     result->setTypeId(resourceTypeId);
 
     qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;

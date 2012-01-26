@@ -347,9 +347,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                         if (cameraResource)
                         {
                             QByteArray errorString;
-                            QnResourceList cameras;
+                            QnCameraResourceList cameras;
                             QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                            if (connect->addCamera(*cameraResource, cameras, errorString) != 0)
+                            if (connect->addCamera(cameraResource, cameras, errorString) != 0)
                             {
                                 qDebug() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << errorString;
                             }
