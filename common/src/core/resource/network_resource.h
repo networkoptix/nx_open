@@ -12,9 +12,7 @@ typedef QList<QnNetworkResourcePtr> QnNetworkResourceList;
 
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
-    Q_OBJECT;
-
-/*    
+/*    Q_OBJECT
     Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
     Q_CLASSINFO("hostAddress", "IP Address")
     Q_CLASSINFO("hostAddress_group", "Network")
@@ -23,8 +21,8 @@ class QN_EXPORT QnNetworkResource : virtual public QnResource
     Q_CLASSINFO("macAddress_group", "Network")
     Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
     Q_CLASSINFO("auth", "Authentication")
-    Q_CLASSINFO("auth_group", "Network")
-*/
+    Q_CLASSINFO("auth_group", "Network")*/
+
 public:
     enum QnNetworkStatus
     {
@@ -42,7 +40,7 @@ public:
     QString getUniqueId() const;
 
     QHostAddress getHostAddress() const;
-    virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain );
+    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);
 
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);
@@ -111,6 +109,6 @@ private:
 
 /*Q_DECLARE_METATYPE(QHostAddress)
 Q_DECLARE_METATYPE(QnMacAddress)
-Q_DECLARE_METATYPE(QnMacAddress)*/
+Q_DECLARE_METATYPE(QAuthenticator)*/
 
 #endif // network_device_h_1249

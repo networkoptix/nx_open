@@ -285,10 +285,17 @@ void MainWnd::newLayout()
 {
     int index = m_tabBar->addTab(Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
 
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-    m_tabBar->setTabData(index, QVariant::fromValue<QnWorkbenchLayout *>(layout));
-
     m_tabBar->setCurrentIndex(index);
+}
+
+QnWorkbenchLayout *MainWnd::layoutForIndex(int index) {
+    QnWorkbenchLayout *result = m_tabBar->tabData(index).value<QnWorkbenchLayout *>();
+    if(result == NULL) {
+        result = new QnWorkbenchLayout(this);
+        m_tabBar->setTabData(index, QVariant::fromValue<QnWorkbenchLayout *>(result));
+    }
+
+    return result;
 }
 
 void MainWnd::setCurrentLayout(int index)
@@ -301,7 +308,7 @@ void MainWnd::setCurrentLayout(int index)
     if(m_tabBar->currentIndex() != index)
         m_tabBar->setCurrentIndex(index);
 
-    m_workbench->setLayout(m_tabBar->tabData(index).value<QnWorkbenchLayout *>());
+    m_workbench->setLayout(layoutForIndex(index));
     m_display->fitInView(false);
 
     /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */

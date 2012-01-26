@@ -28,14 +28,27 @@ class QnAbstractRenderer;
 
 class QnWorkbenchUi: public QObject, protected SceneUtility {
     Q_OBJECT;
+    Q_ENUMS(Flags Flag);
 
 public:
     QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent = NULL);
     virtual ~QnWorkbenchUi();
 
+    enum Flag {
+        HIDE_CONTROLS_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */
+        HIDE_CONTROLS_WHEN_NORMAL = 0x2, /**< Whether controls should be hidden after a period without activity in normal mode. */
+    };
+    Q_DECLARE_FLAGS(Flags, Flag)
+
     QnWorkbenchDisplay *display() const;
 
     QnWorkbench *workbench() const;
+
+    Flags flags() const {
+        return m_flags;
+    }
+
+    void setFlags(Flags flags);
 
     NavigationTreeWidget *treeWidget() const {
         return m_treeWidget;
@@ -63,6 +76,7 @@ protected:
     void updateFpsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
+    void updateActivityInstrumentState();
 
 protected Q_SLOTS:
     void at_activityStopped();
@@ -111,6 +125,7 @@ private:
         bool titleVisible;
     };
 
+
     /* Global state. */
 
     /** Workbench display. */
@@ -127,6 +142,9 @@ private:
 
     /** Activity listener instrument. */
     ActivityListenerInstrument *m_controlsActivityInstrument;
+
+    /** Current flags. */
+    Flags m_flags;
 
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
@@ -210,5 +228,7 @@ private:
     bool m_titleUsed;
 
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);
 
 #endif // QN_WORKBENCH_UI_H

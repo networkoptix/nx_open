@@ -6,11 +6,10 @@
 
 class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     QnVirtualCameraResource() {}
-
 };
 
 typedef QSharedPointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
@@ -18,6 +17,7 @@ typedef QList<QnVirtualCameraResourcePtr> QnVirtualCameraResourceList;
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource
 {
+    Q_OBJECT
 };
 
 typedef QSharedPointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
