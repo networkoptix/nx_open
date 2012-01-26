@@ -138,6 +138,7 @@ int CLSimpleHTTPClient::readHeaders()
     char* curPtr = m_headerBuffer;
     int left = sizeof(m_headerBuffer)-1;
     m_header.clear();
+    m_responseLine.clear();
     
     char* eofPos = 0;
     while (eofPos == 0)
@@ -146,10 +147,10 @@ int CLSimpleHTTPClient::readHeaders()
         if (readed < 1)
             return CL_TRANSPORT_ERROR;
         curPtr += readed;
+        left -= readed;
         *curPtr = 0; // end of text
         eofPos = strstr(m_headerBuffer, "\r\n\r\n");
     }
-    *eofPos = 0;
     QList<QByteArray> lines = QByteArray(m_headerBuffer, eofPos-m_headerBuffer).split('\n');
     m_responseLine = lines[0];
     for (int i = 1; i < lines.size(); ++i)
