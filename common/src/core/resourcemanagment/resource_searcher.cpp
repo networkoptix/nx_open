@@ -1,26 +1,26 @@
 #include "resource_searcher.h"
 
-
-
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
-m_shouldStop(false),
-m_shouldbeUsed(true),
-m_localResources(false)
-{
-
-}
+    m_shouldStop(false),
+    m_shouldbeUsed(true),
+    m_localResources(false)
+{}
 
 QnAbstractResourceSearcher::~QnAbstractResourceSearcher()
 {
-
+    return;
 }
 
+QnResourceList QnAbstractResourceSearcher::search() {
+    m_shouldStop = false;
+
+    return findResources();
+}
 
 void QnAbstractResourceSearcher::setShouldBeUsed(bool use)
 {
     m_shouldbeUsed = use;
 }
-
 
 bool QnAbstractResourceSearcher::shouldBeUsed() const
 {
@@ -31,12 +31,6 @@ void QnAbstractResourceSearcher::pleaseStop()
 {
     m_shouldStop = true;
 }
-
-void QnAbstractResourceSearcher::pleaseResume() 
-{
-    m_shouldStop = false;
-}
-
 
 bool QnAbstractResourceSearcher::shouldStop() const
 {

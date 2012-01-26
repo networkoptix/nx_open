@@ -5,48 +5,84 @@
 #include "core/resource/resource.h"
 
 
-// this is an interface for resource searcher plug in
+/**
+ * Interface for resource searcher plugins.
+ */
 class QnAbstractResourceSearcher : public QnResourceFactory
 {
 protected:
     QnAbstractResourceSearcher();
+
 public:
     virtual ~QnAbstractResourceSearcher();
 
-    // return the manufacture of the server; normaly this is manufacture manufacture; like AreconVision or IQInVision
+    /**
+     * \returns                         Name of the manufacturer for the resources this searcher adds. 
+     *                                  For example, 'AreconVision' or 'IQInVision'.
+     */ 
     virtual QString manufacture() const = 0;
 
-    // some searchers might be enabled or disabled
+    /**
+     * Enables or disables this searcher.
+     * 
+     * \param use                       Whether this searcher should be used.
+     */
     void setShouldBeUsed(bool use);
 
-    // returns true if should be used;
+    /**
+     * \returns                         Whether this searcher should be used.
+     */
     bool shouldBeUsed() const;
 
-    // returns all available devices
-    virtual QnResourceList findResources() = 0;
-
+    /**
+     * \param resourceTypeId
+     * \returns                         Whether this searcher supports the given
+     *                                  resource type id.
+     */
     virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
 
-    // is some cases search might take time
-    //if pleaseStop is called search will be interrupted
+    /**
+     * Searches for resources.
+     * 
+     * \returns                         List of resources found.
+     */
+    QnResourceList search();
+
+    /**
+     * Search for resources may take time. This function can be used to
+     * stop resource search prematurely. 
+     */
     void pleaseStop();
 
-    void pleaseResume();
-
     bool isLocal() const;
+
     void setLocal(bool l);
 
 protected:
+    /**
+     * This is the actual function that searches for resources. 
+     * To be implemented in derived classes.
+     *
+     * \returns                         List of resources found.
+     */
+    virtual QnResourceList findResources() = 0;
 
+    /**
+     * This function is to be used in derived classes. If this function returns
+     * true, then <tt>findResources</tt> should return as soon as possible.
+     * Its results will most probably be discarded.
+     *
+     * \returns                         Whether this resource searcher should
+     *                                  stop searching as soon as possible.
+     */
     bool shouldStop() const;
 
-protected:
+private:
     bool m_shouldbeUsed;
     volatile bool m_shouldStop;
-
-private:
     bool m_localResources;
 };
+
 
 //=====================================================================
 class QnAbstractNetworkResourceSearcher : virtual public QnAbstractResourceSearcher
