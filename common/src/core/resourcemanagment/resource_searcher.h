@@ -35,13 +35,6 @@ public:
     bool shouldBeUsed() const;
 
     /**
-     * \param resourceTypeId
-     * \returns                         Whether this searcher supports the given
-     *                                  resource type id.
-     */
-    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
-
-    /**
      * Searches for resources.
      * 
      * \returns                         List of resources found.
@@ -57,6 +50,12 @@ public:
     bool isLocal() const;
 
     void setLocal(bool l);
+
+    /**
+     * \param resourceTypeId            Identifier of the type to check.
+     * \returns                         Whether this factory can be used to create resources of the given type.
+     */
+    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
 
 protected:
     /**

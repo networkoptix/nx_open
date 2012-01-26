@@ -10,6 +10,14 @@
 #include "plugins/resources/archive/avi_files/avi_bluray_device.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
+namespace {
+    class QnResourceDirectoryBrowserInstance: public QnResourceDirectoryBrowser {};
+
+    Q_GLOBAL_STATIC(QnResourceDirectoryBrowserInstance, qnResourceDirectoryBrowserInstance);
+}
+
+
+
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
 }
@@ -40,8 +48,7 @@ QString QnResourceDirectoryBrowser::manufacture() const
 
 QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance()
 {
-    static QnResourceDirectoryBrowser inst;
-    return inst;
+    return *qnResourceDirectoryBrowserInstance();
 }
 
 QnResourceList QnResourceDirectoryBrowser::findResources()
