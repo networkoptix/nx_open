@@ -36,8 +36,10 @@ public:
     virtual ~QnWorkbenchUi();
 
     enum Flag {
-        HIDE_CONTROLS_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */
-        HIDE_CONTROLS_WHEN_NORMAL = 0x2, /**< Whether controls should be hidden after a period without activity in normal mode. */
+        HIDE_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */
+        HIDE_WHEN_NORMAL = 0x2, /**< Whether controls should be hidden after a period without activity in normal mode. */
+        AFFECT_MARGINS_WHEN_ZOOMED = 0x4,
+        AFFECT_MARGINS_WHEN_NORMAL = 0x8
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
@@ -61,16 +63,40 @@ public:
 
     bool isFpsVisible() const;
 
+    bool isTreeVisible() const {
+        return m_visibility.treeVisible;
+    }
+
+    bool isTitleVisible() const {
+        return m_titleUsed && m_visibility.titleVisible;
+    }
+
+    bool isSliderVisible() const {
+        return m_visibility.sliderVisible;
+    }
+
 signals:
     void titleBarDoubleClicked();
 
 public slots:
     void setTitleUsed(bool titleUsed);
     void setTreeVisible(bool visible, bool animate = true);
-    void toggleTreeVisible();
     void setSliderVisible(bool visible, bool animate = true);
     void setTitleVisible(bool visible, bool animate = true);
     void setFpsVisible(bool fpsVisible);
+
+    void toggleTreeVisible() {
+        setTreeVisible(!isTreeVisible());
+    }
+
+    void toggleSliderVisible() {
+        setSliderVisible(!isSliderVisible());
+    }
+
+    void toggleTitleVisible() {
+        setTitleVisible(!isTitleVisible());
+    }
+
 
 protected:
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);
@@ -96,10 +122,11 @@ protected Q_SLOTS:
     void at_controlsWidget_deactivated();
     void at_controlsWidget_geometryChanged();
 
-    void at_navigationItem_geometryChanged();
-    void at_navigationItem_actualCameraChanged(CLVideoCamera *camera);
+    void at_sliderItem_geometryChanged();
+    void at_sliderItem_actualCameraChanged(CLVideoCamera *camera);
     void at_sliderOpacityProcessor_hoverEntered();
     void at_sliderOpacityProcessor_hoverLeft();
+    void at_sliderShowButton_toggled(bool checked);
 
     void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
@@ -112,6 +139,7 @@ protected Q_SLOTS:
     void at_titleItem_geometryChanged();
     void at_titleOpacityProcessor_hoverEntered();
     void at_titleOpacityProcessor_hoverLeft();
+    void at_titleShowButton_toggled(bool checked);
 
     void at_fpsItem_geometryChanged();
 
@@ -167,6 +195,8 @@ private:
 
     GraphicsLabel *m_fpsItem;
 
+    bool m_ignoreClickEvent;
+
 
     /* Slider-related state. */
 
@@ -178,6 +208,10 @@ private:
 
     /** Animator for slider position. */
     VariantAnimator *m_sliderYAnimator;
+
+    QnImageButtonWidget *m_sliderShowButton;
+
+    AnimatorGroup *m_sliderOpacityAnimatorGroup;
 
 
     /* Tree-related state. */
@@ -220,6 +254,10 @@ private:
 
     /** Title bar widget. */
     QnClickableWidget *m_titleItem;
+
+    QnImageButtonWidget *m_titleShowButton;
+
+    AnimatorGroup *m_titleOpacityAnimatorGroup;
 
     /** Background widget for the title bar. */
     QGraphicsWidget *m_titleBackgroundItem;
