@@ -42,7 +42,6 @@ public:
     Chunk chunkAt(int index) const;
     qint64 minTime() const;
     qint64 maxTime() const;
-    bool fileExists(const Chunk& chunk);
     bool lastFileDuplicateName() const;
     qint64 firstTime() const;
 
@@ -52,6 +51,7 @@ public:
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
+    bool fileExists(const Chunk& chunk);
     void addChunk(const Chunk& chunk, qint64 lastStartTime);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs);
     QList<QDate> recordedMonthList();
