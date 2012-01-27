@@ -9,7 +9,7 @@
 #include <QStyle>
 #include <QApplication>
 
-#include <utils/common/event_signalizator.h>
+#include <utils/common/event_signalizer.h>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
@@ -40,6 +40,7 @@
 #include <ui/context_menu_helper.h>
 #include <ui/skin/skin.h>
 #include <ui/context_menu_helper.h>
+#include <ui/mixins/render_watch_mixin.h>
 
 #include "workbench.h"
 #include "workbench_display.h"
@@ -89,7 +90,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_manager(display->instrumentManager()),
     m_treePinned(false),
     m_inactive(false),
-    m_titleUsed(false)
+    m_titleUsed(false),
+    m_flags(0)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -102,8 +104,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_controlsActivityInstrument);
 
-    m_controlsActivityInstrument->recursiveDisable();
-
     connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
     connect(m_controlsActivityInstrument, SIGNAL(activityResumed()),                                                                this,                           SLOT(at_activityStarted()));
     connect(m_fpsCountingInstrument,    SIGNAL(fpsChanged(qreal)),                                                                  this,                           SLOT(at_fpsChanged(qreal)));
@@ -113,11 +113,11 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_controlsWidget->setFlag(QGraphicsItem::ItemIsPanel);
     m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
-    QnSingleEventSignalizator *deactivationSignalizator = new QnSingleEventSignalizator(this);
-    deactivationSignalizator->setEventType(QEvent::WindowDeactivate);
-    m_controlsWidget->installEventFilter(deactivationSignalizator);
+    QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
+    deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
+    m_controlsWidget->installEventFilter(deactivationSignalizer);
 
-    connect(deactivationSignalizator,   SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
+    connect(deactivationSignalizer,     SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
     connect(m_controlsWidget,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
 
 
@@ -135,10 +135,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     setFpsVisible(false);
 
+    m_display->view()->addAction(&cm_toggle_fps);
+    connect(&cm_toggle_fps,             SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
 
-    connect(&cm_toggle_fps, SIGNAL(toggled(bool)), this, SLOT(setFpsVisible(bool)));
-    m_display->view()->addAction(&cm_toggle_fps);
 
     /* Tree widget. */
     m_treeWidget = new NavigationTreeWidget();
@@ -252,7 +252,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(at_navigationItem_actualCameraChanged(CLVideoCamera *)));
     //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
     connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
-    connect(m_display,                  SIGNAL(displayingStateChanged(QnResourcePtr, bool)),                                        m_sliderItem,                   SLOT(onDisplayingStateChanged(QnResourcePtr, bool)));
 
 
     /* Title bar. */
@@ -275,6 +274,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     m_titleItem = new QGraphicsWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
+
+    QnSingleEventSignalizer *titleDoubleClickSignalizer = new QnSingleEventSignalizer(this);
+    titleDoubleClickSignalizer->setEventType(QEvent::GraphicsSceneMouseDoubleClick);
+    m_titleItem->installEventFilter(titleDoubleClickSignalizer);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
@@ -300,14 +303,20 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setTitleVisible(true, false);
     setTitleUsed(false);
 
+    connect(titleDoubleClickSignalizer, SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_doubleClicked(QObject *, QEvent *)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_titleOpacityProcessor_hoverEntered()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_titleOpacityProcessor_hoverLeft()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
+
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(m_display->renderWatcher(), SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)),                                 this,                           SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
+
+    /* Init fields. */
+    setFlags(HIDE_CONTROLS_WHEN_NORMAL | HIDE_CONTROLS_WHEN_ZOOMED);
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -485,6 +494,25 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
     cm_toggle_fps.setChecked(fpsVisible);
 }
 
+void QnWorkbenchUi::setFlags(Flags flags) {
+    if(flags == m_flags)
+        return;
+
+    m_flags = flags;
+
+    updateActivityInstrumentState();
+}
+
+void QnWorkbenchUi::updateActivityInstrumentState() {
+    bool zoomed = m_widgetByRole[QnWorkbench::ZOOMED] != NULL;
+
+    if(zoomed) {
+        m_controlsActivityInstrument->setEnabled(m_flags & HIDE_CONTROLS_WHEN_ZOOMED);
+    } else {
+        m_controlsActivityInstrument->setEnabled(m_flags & HIDE_CONTROLS_WHEN_NORMAL);
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -527,12 +555,8 @@ void QnWorkbenchUi::at_display_widgetChanged(QnWorkbench::ItemRole role) {
     m_widgetByRole[role] = widget;
 
     /* Tune activity listener instrument. */
-    if(role == QnWorkbench::ZOOMED) {
-        if(oldWidget == NULL)
-            m_controlsActivityInstrument->recursiveEnable();
-        if(widget == NULL)
-            m_controlsActivityInstrument->recursiveDisable();
-    }
+    if(role == QnWorkbench::ZOOMED)
+        updateActivityInstrumentState();
 
     /* Update navigation item's target. */
     QnResourceWidget *targetWidget = m_widgetByRole[QnWorkbench::ZOOMED];
@@ -693,6 +717,16 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     updateTreeGeometry();
 
     m_titleBackgroundItem->setGeometry(m_titleItem->geometry());
+}
+
+void QnWorkbenchUi::at_titleItem_doubleClicked(QObject *, QEvent *event) {
+    assert(event->type() == QEvent::GraphicsSceneMouseDoubleClick);
+
+    QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
+    if(e->button() == Qt::LeftButton) {
+        e->accept();
+        emit titleBarDoubleClicked();
+    }
 }
 
 void QnWorkbenchUi::at_fpsItem_geometryChanged() {

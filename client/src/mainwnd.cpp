@@ -87,11 +87,7 @@ namespace {
 }
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
-#ifdef Q_OS_WIN
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
-#else
-    : QWidget(parent),
-#endif
       m_controller(0),
       m_drawCustomFrame(false),
       m_titleVisible(true)
@@ -170,6 +166,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
     connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(newLayout()));
     connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(at_treeWidget_activated(uint)));
+    connect(m_ui,               SIGNAL(titleBarDoubleClicked()), this, SLOT(toggleFullScreen()));
 
     /* Tab bar. */
     m_tabBar = new QTabBar();
@@ -285,10 +282,17 @@ void MainWnd::newLayout()
 {
     int index = m_tabBar->addTab(Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
 
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-    m_tabBar->setTabData(index, QVariant::fromValue<QnWorkbenchLayout *>(layout));
-
     m_tabBar->setCurrentIndex(index);
+}
+
+QnWorkbenchLayout *MainWnd::layoutForIndex(int index) {
+    QnWorkbenchLayout *result = m_tabBar->tabData(index).value<QnWorkbenchLayout *>();
+    if(result == NULL) {
+        result = new QnWorkbenchLayout(this);
+        m_tabBar->setTabData(index, QVariant::fromValue<QnWorkbenchLayout *>(result));
+    }
+
+    return result;
 }
 
 void MainWnd::setCurrentLayout(int index)
@@ -301,7 +305,7 @@ void MainWnd::setCurrentLayout(int index)
     if(m_tabBar->currentIndex() != index)
         m_tabBar->setCurrentIndex(index);
 
-    m_workbench->setLayout(m_tabBar->tabData(index).value<QnWorkbenchLayout *>());
+    m_workbench->setLayout(layoutForIndex(index));
     m_display->fitInView(false);
 
     /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
@@ -426,18 +430,13 @@ void MainWnd::updateFullScreenState() {
 
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);
+    m_view->setLineWidth(isFullScreen() ? 0 : 1);
 
     updateDwmState();
 }
 
 void MainWnd::updateDwmState()
 {
-    if(isFullScreen()) {
-        m_view->setLineWidth(0);
-    } else {
-        m_view->setLineWidth(1);
-    }
-
     if(!m_dwm->isSupported()) {
         m_drawCustomFrame = false;
 

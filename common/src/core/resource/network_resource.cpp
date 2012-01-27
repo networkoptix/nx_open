@@ -3,8 +3,8 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
-
-/*static const char *property_descriptions[] = {
+/*
+static const char *property_descriptions[] = {
     QT_TRANSLATE_NOOP("QnResource", "IP Address"),
     QT_TRANSLATE_NOOP("QnResource", "MAC Address"),
     QT_TRANSLATE_NOOP("QnResource", "Authentication")
@@ -68,7 +68,7 @@ QHostAddress QnNetworkResource::getHostAddress() const
     return QHostAddress(getUrl());
 }
 
-bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain /*domain*/ )
+bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain /*domain*/)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;

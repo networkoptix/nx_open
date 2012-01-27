@@ -50,7 +50,7 @@ void QnResource::updateInner(QnResourcePtr other)
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     m_tags = other->m_tags;
     m_url = other->m_url;
-    setStatus(other->m_status);
+    
 }
 
 void QnResource::update(QnResourcePtr other)
@@ -63,6 +63,7 @@ void QnResource::update(QnResourcePtr other)
         QMutexLocker mutexLocker2(&other->m_mutex); // this is virtual atomic operation; so mutexes shold be outside
         updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
+    setStatus(other->m_status);
 
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
@@ -554,6 +555,19 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
     return m_consumers.contains(consumer);
 }
 
+bool QnResource::hasUnprocessedCommands() const
+{
+    QMutexLocker locker(&m_consumersMtx);
+    foreach(QnResourceConsumer* consumer, m_consumers)
+    {
+        if (dynamic_cast<QnResourceCommand*>(consumer))
+            return true;
+    }
+
+    return false;
+}
+
+
 void QnResource::disconnectAllConsumers()
 {
     QMutexLocker locker(&m_consumersMtx);
@@ -607,7 +621,3 @@ int QnResource::commandProcQueueSize()
     return commandProcessor()->queueSize();
 }
 
-bool QnResource::commandProcHasSuchResourceInQueue(QnResourcePtr res)
-{
-    return commandProcessor()->hasSuchResourceInQueue(res);
-}

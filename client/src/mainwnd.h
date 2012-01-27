@@ -54,6 +54,7 @@ protected Q_SLOTS:
     void newLayout();
     void setCurrentLayout(int index);
     void removeLayout(int index);
+    QnWorkbenchLayout *layoutForIndex(int index);
 
     void handleMessage(const QString &message);
 

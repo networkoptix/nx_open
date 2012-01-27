@@ -201,7 +201,16 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     winMargins.cyTopHeight      = margins.top();
     
     status = d->dwmExtendFrameIntoClientArea(d->widget->winId(), &winMargins);
-        
+    
+    if(SUCCEEDED(status)) {
+        /* Make sure that the extended frame is visible by setting the WNDCLASS's
+         * background brush to transparent black. 
+         * This also eliminates artifacts with white (default background color) 
+         * fields appearing in client area when the window is resized. */
+        HGDIOBJ blackBrush = GetStockObject(BLACK_BRUSH);
+        SetClassLongPtr(d->widget->winId(), GCLP_HBRBACKGROUND, reinterpret_cast<LONG_PTR>(blackBrush));
+    }
+
     return SUCCEEDED(status);
 #else
     return false;

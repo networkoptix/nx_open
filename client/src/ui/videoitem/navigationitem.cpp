@@ -684,7 +684,7 @@ void NavigationItem::onDisplayingStateChanged(QnResourcePtr resource, bool visib
     if (!netRes)
         return;
 
-    CLVideoCamera* camera = findCameraByResource(resource);
+    CLVideoCamera *camera = findCameraByResource(resource);
     if (camera && camera->isVisible() != visible)
     {
         camera->setVisible(visible);
@@ -706,7 +706,7 @@ void NavigationItem::repaintMotionPeriods()
     for (MotionPeriods::iterator itr = m_motionPeriodLoader.begin(); itr != m_motionPeriodLoader.end(); ++itr)
     {
         const MotionPeriodLoader& info = itr.value();
-        CLVideoCamera* camera = findCameraByResource(info.reader->getResource());
+        CLVideoCamera *camera = findCameraByResource(info.reader->getResource());
         if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.region.isEmpty())
             allPeriods << info.periods;
         QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
@@ -727,9 +727,9 @@ void NavigationItem::repaintMotionPeriods()
     if (useSync)
     {
         m_mergedMotionPeriods = QnTimePeriod::mergeTimePeriods(allPeriods);
-        foreach(CLVideoCamera* camera, m_reserveCameras)
+        foreach(CLVideoCamera *camera, m_reserveCameras)
         {
-            QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*> (camera->getStreamreader());
+            QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*> (camera->getStreamreader());
             if (reader)
                 reader->setPlaybackMask(m_mergedMotionPeriods);
         }
