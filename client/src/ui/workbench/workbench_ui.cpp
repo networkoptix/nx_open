@@ -524,21 +524,21 @@ void QnWorkbenchUi::at_activityStopped() {
     m_inactive = true;
     m_storedVisibility = m_visibility;
 
-    setSliderVisible(false);
+    /*setSliderVisible(false);
     setTreeVisible(false);
     setTitleVisible(false);
 
-    m_treeShowButton->hide();
+    m_treeShowButton->hide();*/
 }
 
 void QnWorkbenchUi::at_activityStarted() {
     m_inactive = false;
 
-    setSliderVisible(m_storedVisibility.sliderVisible);
+    /*setSliderVisible(m_storedVisibility.sliderVisible);
     setTreeVisible(m_storedVisibility.treeVisible);
     setTitleVisible(m_storedVisibility.titleVisible);
 
-    m_treeShowButton->show();
+    m_treeShowButton->show();*/
 }
 
 void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
