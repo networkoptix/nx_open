@@ -728,14 +728,15 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             QPointF imagePos(xpos - textPixmap->width()/2, (r.height() - m_maxHeight) * lineLen + (curLevel == 0 ? 2 : 0) );
             if (imagePos.x() < 0 && pos == 0)
                 imagePos.setX(0);
-            painter->setOpacity(opacity[arrayIndex]);
+            qreal o = painter->opacity();
+            painter->setOpacity(o * opacity[arrayIndex]);
             painter->drawPixmap(imagePos, *textPixmap);
+            painter->setOpacity(o);
         }
 
         xpos += intervals[level].interval * pixelPerTime;
     }
 
-    painter->setOpacity(1.0);
     for (int arrayIndex = 0; arrayIndex < linesList.size(); ++arrayIndex)
     {
         color.setAlphaF(opacity[arrayIndex]);

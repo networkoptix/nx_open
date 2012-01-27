@@ -63,16 +63,28 @@ public:
 
     bool isFpsVisible() const;
 
-    bool isTreeVisible() const {
-        return m_visibility.treeVisible;
+    bool isTreeOpened() const {
+        return m_treeOpened;
     }
 
-    bool isTitleVisible() const {
-        return m_titleUsed && m_visibility.titleVisible;
+    bool isSliderOpened() const {
+        return m_sliderOpened;
+    }
+
+    bool isTitleOpened() const {
+        return m_titleUsed && m_titleOpened;
+    }
+
+    bool isTreeVisible() const {
+        return m_treeVisible;
     }
 
     bool isSliderVisible() const {
-        return m_visibility.sliderVisible;
+        return m_sliderVisible;
+    }
+
+    bool isTitleVisible() const {
+        return m_titleVisible;
     }
 
 signals:
@@ -80,23 +92,27 @@ signals:
 
 public slots:
     void setTitleUsed(bool titleUsed);
+    void setFpsVisible(bool fpsVisible);
+
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
     void setTitleVisible(bool visible, bool animate = true);
-    void setFpsVisible(bool fpsVisible);
 
-    void toggleTreeVisible() {
-        setTreeVisible(!isTreeVisible());
+    void setTreeOpened(bool opened, bool animate = true);
+    void setSliderOpened(bool opened, bool animate = true);
+    void setTitleOpened(bool opened, bool animate = true);
+
+    void toggleTreeOpened() {
+        setTreeOpened(!isTreeOpened());
     }
 
-    void toggleSliderVisible() {
-        setSliderVisible(!isSliderVisible());
+    void toggleSliderOpened() {
+        setSliderOpened(!isSliderOpened());
     }
 
-    void toggleTitleVisible() {
-        setTitleVisible(!isTitleVisible());
+    void toggleTitleOpened() {
+        setTitleOpened(!isTitleOpened());
     }
-
 
 protected:
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);
@@ -108,7 +124,18 @@ protected:
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     void updateActivityInstrumentState();
 
+    void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+    void setSliderOpacity(qreal opacity, bool animate);
+    void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+
 protected Q_SLOTS:
+    void updateTreeOpacity(bool animate = true);
+    void updateSliderOpacity(bool animate = true);
+    void updateTitleOpacity(bool animate = true);
+    void updateSliderVisibility(bool animate = true);
+
+    void setTreeShowButtonUsed(bool enabled = true);
+
     void at_activityStopped();
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
@@ -123,41 +150,20 @@ protected Q_SLOTS:
     void at_controlsWidget_geometryChanged();
 
     void at_sliderItem_geometryChanged();
-    void at_sliderItem_actualCameraChanged(CLVideoCamera *camera);
-    void at_sliderOpacityProcessor_hoverEntered();
-    void at_sliderOpacityProcessor_hoverLeft();
     void at_sliderShowButton_toggled(bool checked);
 
     void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
-    void at_treeOpacityProcessor_hoverLeft();
-    void at_treeOpacityProcessor_hoverEntered();
     void at_treeShowButton_toggled(bool checked);
     void at_treePinButton_toggled(bool checked);
 
     void at_titleItem_geometryChanged();
-    void at_titleOpacityProcessor_hoverEntered();
-    void at_titleOpacityProcessor_hoverLeft();
     void at_titleShowButton_toggled(bool checked);
 
     void at_fpsItem_geometryChanged();
 
 private:
-    struct VisibilityState {
-        VisibilityState(): treeVisible(false), sliderVisible(false), titleVisible(false) {}
-
-        /** Whether the tree is visible. */
-        bool treeVisible;
-
-        /** Whether navigation slider is visible. */
-        bool sliderVisible;
-
-        /** Whether title bar is visible. */
-        bool titleVisible;
-    };
-
-
     /* Global state. */
 
     /** Workbench display. */
@@ -185,11 +191,22 @@ private:
     QGraphicsWidget *m_controlsWidget;
 
     /** Stored size of ui controls widget. */
-    QSizeF m_controlsWidgetSize;
+    QRectF m_controlsWidgetRect;
 
-    VisibilityState m_visibility;
+    /** Whether the tree is opened. */
+    bool m_treeOpened;
 
-    VisibilityState m_storedVisibility;
+    /** Whether navigation slider is opened. */
+    bool m_sliderOpened;
+
+    /** Whether title bar is opened. */
+    bool m_titleOpened;
+
+    bool m_treeVisible;
+
+    bool m_sliderVisible;
+
+    bool m_titleVisible;
 
     bool m_inactive;
 

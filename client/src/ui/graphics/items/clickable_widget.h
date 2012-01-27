@@ -26,7 +26,7 @@ protected:
         m_isDoubleClick = event->type() == QEvent::GraphicsSceneMouseDoubleClick;
     };
 
-    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override {
+    virtual void clickedNotify(QGraphicsSceneMouseEvent *) override {
         if(m_isDoubleClick) {
             emit doubleClicked();
         } else {
