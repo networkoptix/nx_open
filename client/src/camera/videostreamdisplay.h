@@ -45,6 +45,7 @@ public:
     void waitForFramesDisplaed();
     void onNoVideo();
     void canUseBufferedFrameDisplayer(bool value);
+    qint64 nextReverseTime() const;
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
