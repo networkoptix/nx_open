@@ -182,7 +182,7 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSe
     return timeMs*1000;
 }
 
-qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
+qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool recursive)
 {
     QTime t;
     t.start();
@@ -197,6 +197,22 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
     cl_log.log(s, cl_logALWAYS);
 	*/
 
+    qint64 chunkOffset = 0;
+    if (newChunk.durationMs == -1) // last live chunk
+    {
+        // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
+        chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, BACKWARD_SEEK_STEP);
+
+        // New condition: Also, last file may has zerro size (because of file write buffering), and read operation will return fail
+        // It is contains some troubles for REF from live. So avoid seek to last file at all.
+        if (m_reverseMode && recursive)
+            return seekInternal(newChunk.startTimeMs*1000 - BACKWARD_SEEK_STEP, findIFrame, false);
+
+    }
+    else {
+        chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, newChunk.durationMs*1000 - BACKWARD_SEEK_STEP);
+    }
+
     if (newChunk.startTimeMs != m_currentChunk.startTimeMs)
     {
         bool isStreamsFound = m_aviDelegate->isStreamsFound();
@@ -206,16 +222,6 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
             m_aviDelegate->doNotFindStreamInfo(); // optimization
     }
 
-    //int duration = m_currentChunk.duration;
-    qint64 chunkOffset = 0;
-    if (m_currentChunk.durationMs == -1) // last live chunk
-    {
-        // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
-        chunkOffset = qBound(0ll, time - m_currentChunk.startTimeMs*1000, BACKWARD_SEEK_STEP);
-    }
-    else {
-        chunkOffset = qBound(0ll, time - m_currentChunk.startTimeMs*1000, m_currentChunk.durationMs*1000 - BACKWARD_SEEK_STEP);
-    }
     qint64 seekRez = m_aviDelegate->seek(chunkOffset, findIFrame);
     if (seekRez == -1)
         return seekRez;
@@ -245,7 +251,7 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
         if (m_eof)
             return -1; 
     }
-    return seekInternal(time, findIFrame);
+    return seekInternal(time, findIFrame, true);
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
@@ -308,7 +314,7 @@ begin_label:
                     if (waitMotionCnt > 1)
                         QnSleep::msleep(10);
 
-                    seekInternal(newTime, true);
+                    seekInternal(newTime, true, true);
                     waitMotionCnt++;
                     goto begin_label;
                 }

@@ -99,8 +99,12 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         if (info.fileName() == fName)
         {
             found = true;
-            if (info.size() == 0)
-                return false;
+            if (info.size() < 1024) 
+            {
+                // file is absent or empty media file
+                qnFileDeletor->deleteFile(info.absoluteFilePath()); // // delete broken file
+                return false; 
+            }
             break;
         }
     }

@@ -166,6 +166,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
     connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(newLayout()));
     connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(at_treeWidget_activated(uint)));
+    connect(m_ui,               SIGNAL(titleBarDoubleClicked()), this, SLOT(toggleFullScreen()));
 
     /* Tab bar. */
     m_tabBar = new QTabBar();
