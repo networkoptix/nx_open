@@ -34,11 +34,35 @@ struct _MARGINS {
     int cyBottomHeight;
 };
 
+typedef enum _DWMWINDOWATTRIBUTE {
+    DWMWA_NCRENDERING_ENABLED = 1,
+    DWMWA_NCRENDERING_POLICY,
+    DWMWA_TRANSITIONS_FORCEDISABLED,
+    DWMWA_ALLOW_NCPAINT,
+    DWMWA_CAPTION_BUTTON_BOUNDS,
+    DWMWA_NONCLIENT_RTL_LAYOUT,
+    DWMWA_FORCE_ICONIC_REPRESENTATION,
+    DWMWA_FLIP3D_POLICY,
+    DWMWA_EXTENDED_FRAME_BOUNDS,
+    DWMWA_HAS_ICONIC_BITMAP,
+    DWMWA_DISALLOW_PEEK,
+    DWMWA_EXCLUDED_FROM_PEEK,
+    DWMWA_LAST 
+} DWMWINDOWATTRIBUTE;
+
+typedef enum _DWMNCRENDERINGPOLICY {
+    DWMNCRP_USEWINDOWSTYLE,
+    DWMNCRP_DISABLED,
+    DWMNCRP_ENABLED,
+    DWMNCRP_LAST 
+} DWMNCRENDERINGPOLICY;
+
 typedef HRESULT (WINAPI *PtrDwmIsCompositionEnabled)(BOOL* pfEnabled);
 typedef HRESULT (WINAPI *PtrDwmExtendFrameIntoClientArea)(HWND hWnd, const _MARGINS *pMarInset);
 typedef HRESULT (WINAPI *PtrDwmEnableBlurBehindWindow)(HWND hWnd, const _DWM_BLURBEHIND *pBlurBehind);
 typedef HRESULT (WINAPI *PtrDwmGetColorizationColor)(DWORD *pcrColorization, BOOL *pfOpaqueBlend);
 typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *plResult);
+typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 
 #endif
 
@@ -65,12 +89,16 @@ public:
     PtrDwmExtendFrameIntoClientArea dwmExtendFrameIntoClientArea;
     PtrDwmGetColorizationColor dwmGetColorizationColor;
     PtrDwmDefWindowProc dwmDefWindowProc;
+    PtrDwmSetWindowAttribute dwmSetWindowAttribute;
     
     /** Widget frame margins specified by the user. */
     QMargins userFrameMargins;
 
+    QMargins nonErasableContentMargins;
+
     bool overrideFrameMargins;
-    bool systemPaintFrame;
+    bool systemPaintWindow;
+    bool transparentErasing;
     bool processDoubleClicks;
     bool titleBarDrag;
 #endif
@@ -90,16 +118,19 @@ void QnDwmPrivate::init(QWidget *widget) {
     dwmEnableBlurBehindWindow       = (PtrDwmEnableBlurBehindWindow)    dwmLib.resolve("DwmEnableBlurBehindWindow");
     dwmGetColorizationColor         = (PtrDwmGetColorizationColor)      dwmLib.resolve("DwmGetColorizationColor");
     dwmDefWindowProc                = (PtrDwmDefWindowProc)             dwmLib.resolve("DwmDefWindowProc");
+    dwmSetWindowAttribute           = (PtrDwmSetWindowAttribute)        dwmLib.resolve("DwmSetWindowAttribute");
 
     hasDwm = 
         dwmIsCompositionEnabled != NULL && 
         dwmExtendFrameIntoClientArea != NULL &&
         dwmEnableBlurBehindWindow != NULL &&
         dwmGetColorizationColor != NULL &&
-        dwmDefWindowProc != NULL;
+        dwmDefWindowProc != NULL &&
+        dwmSetWindowAttribute != NULL;
 
     overrideFrameMargins = false;
-    systemPaintFrame = true;
+    systemPaintWindow = true;
+    transparentErasing = false;
     processDoubleClicks = false;
     titleBarDrag = true;
 #endif
@@ -131,12 +162,36 @@ bool QnDwm::isSupported() const {
 #endif
 }
 
-bool QnDwm::enableSystemFramePainting(bool enable) {
+bool QnDwm::enableSystemWindowPainting(bool enable) {
     if(d->widget == NULL)
         return false;
 
 #ifdef Q_OS_WIN
-    d->systemPaintFrame = enable;
+    d->systemPaintWindow = enable;
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool QnDwm::enableTransparentErasing(bool enable) {
+    if(d->widget == NULL)
+        return false;
+
+#ifdef Q_OS_WIN
+    d->transparentErasing = enable;
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool QnDwm::setNonErasableContentMargins(const QMargins &margins) {
+    if(d->widget == NULL)
+        return false;
+
+#ifdef Q_OS_WIN
+    d->nonErasableContentMargins = margins;
     return true;
 #else
     return false;
@@ -208,7 +263,12 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
          * This also eliminates artifacts with white (default background color) 
          * fields appearing in client area when the window is resized. */
         HGDIOBJ blackBrush = GetStockObject(BLACK_BRUSH);
-        SetClassLongPtr(d->widget->winId(), GCLP_HBRBACKGROUND, reinterpret_cast<LONG_PTR>(blackBrush));
+        DWORD result = SetClassLongPtr(d->widget->winId(), GCLP_HBRBACKGROUND, (LONG_PTR) blackBrush);
+        if(result == 0) {
+            DWORD error = GetLastError();
+            if(error != 0)
+                qnWarning("Failed to set window background brush to transparent, error code '%1'.", error);
+        }
     }
 
     return SUCCEEDED(status);
@@ -397,6 +457,7 @@ bool QnDwm::winEvent(MSG *message, long *result) {
     case WM_NCPAINT:                return ncPaintEvent(message, result);
     case WM_NCLBUTTONDBLCLK:        return ncLeftButtonDoubleClickEvent(message, result);
     case WM_SYSCOMMAND:             return sysCommandEvent(message, result);
+    case WM_ERASEBKGND:             return eraseBackground(message, result);
     default:                        return false;
     }
 }
@@ -422,6 +483,19 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
     RECT sourceGeometry = params->rgrc[1];
     /* RECT sourceClientGeometry = params->rgrc[2]; */
 
+#if 0
+    /* Calculate valid area. */
+    SIZE validSize;
+    validSize.cx = qMin(sourceGeometry.right - sourceGeometry.left, targetGeometry.right - targetGeometry.left);
+    validSize.cy = qMin(sourceGeometry.bottom - sourceGeometry.top, targetGeometry.bottom - targetGeometry.top);
+
+    RECT validRect;
+    validRect.left = targetGeometry.left;
+    validRect.top = targetGeometry.top;
+    validRect.right = validRect.left + validSize.cx;
+    validRect.bottom = validRect.top + validSize.cy;
+#endif
+
     /* Prepare output.
      * 
      * 0 - the coordinates of the new client rectangle resulting from the move or resize.
@@ -436,7 +510,9 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
     params->rgrc[0].left     += d->userFrameMargins.left();
     params->rgrc[0].right    -= d->userFrameMargins.right();
 
-    //*result = WVR_VALIDRECTS;
+#if 0
+    *result = WVR_VALIDRECTS;
+#endif
     *result = WVR_REDRAW;
     return true;
 }
@@ -541,7 +617,7 @@ bool QnDwm::compositionChangedEvent(MSG *message, long *result) {
 }
 
 bool QnDwm::activateEvent(MSG *message, long *result) {
-    if(!d->systemPaintFrame)
+    if(!d->systemPaintWindow)
         message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
 
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
@@ -549,9 +625,105 @@ bool QnDwm::activateEvent(MSG *message, long *result) {
 }
 
 bool QnDwm::ncPaintEvent(MSG *message, long *result) {
-    if(!d->systemPaintFrame) {
+    if(!d->systemPaintWindow) {
+
+        if(d->transparentErasing) {
+            HDC hdc = GetWindowDC(message->hwnd);
+
+            bool deleteHrgn = false;
+            HRGN hrgn = 0;
+            if(message->wParam == 1) {
+                RECT rect;
+                GetClipBox(hdc, &rect);
+                hrgn = CreateRectRgnIndirect(&rect);
+                deleteHrgn = true;
+            } else {
+                hrgn = (HRGN) message->wParam;
+                deleteHrgn = false;
+            }
+
+            if(!d->nonErasableContentMargins.isNull()) {
+                HRGN rectHrgn;
+                RECT rect;
+
+                /* Calculate client rect delta relative to window rect. */
+                POINT clientTopLeft;
+                clientTopLeft.x = 0;
+                clientTopLeft.y = 0;
+                ClientToScreen(message->hwnd, &clientTopLeft);
+
+                RECT windowRect;
+                GetWindowRect(message->hwnd, &windowRect);
+
+                POINT clientDelta;
+                clientDelta.x = clientTopLeft.x - windowRect.left;
+                clientDelta.y = clientTopLeft.y - windowRect.top;
+
+                /* Construct client rect in window coordinates. */
+                GetClientRect(message->hwnd, &rect);
+                rect.left   += clientDelta.x;
+                rect.top    += clientDelta.y;
+                rect.right  += clientDelta.x;
+                rect.bottom += clientDelta.y;
+
+                /* Adjust for non-erasable margins. */
+                rect.left   += d->nonErasableContentMargins.left();
+                rect.top    += d->nonErasableContentMargins.top();
+                rect.right  -= d->nonErasableContentMargins.right();
+                rect.bottom -= d->nonErasableContentMargins.bottom();
+
+                /* Combine with region. */
+                rectHrgn = CreateRectRgnIndirect(&rect);
+
+                HRGN resultHrgn = CreateRectRgn(0, 0, 0, 0);
+                int status = CombineRgn(resultHrgn, hrgn, rectHrgn, RGN_DIFF);
+
+                DeleteObject(rectHrgn);
+                if(deleteHrgn)
+                    DeleteObject(hrgn);
+                
+                hrgn = resultHrgn;
+                deleteHrgn = true;
+            }
+
+            HBRUSH hbr = (HBRUSH) GetStockObject(BLACK_BRUSH);
+            SelectBrush(hdc, hbr);
+            PaintRgn(hdc, hrgn);
+            DeleteObject(hbr);
+
+            if(deleteHrgn)
+                DeleteObject(hrgn);
+
+            ReleaseDC(message->hwnd, hdc);
+        }
+
         /* An application should return zero if it processes this message. */
         *result = 0;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool QnDwm::eraseBackground(MSG *message, long *result) {
+    if(!d->systemPaintWindow) {
+        if(d->transparentErasing) {
+            HDC hdc = (HDC) message->wParam;
+            // HBRUSH hbr = (HBRUSH) GetClassLongPtrW(message->hwnd, GCLP_HBRBACKGROUND);
+            HBRUSH hbr = (HBRUSH) GetStockObject(BLACK_BRUSH);
+            if(!hbr) {
+                *result = 0;
+                return true;
+            }
+
+            RECT rect;
+            GetClientRect(message->hwnd, &rect);
+            DPtoLP(hdc, (LPPOINT) &rect, 2);
+            FillRect(hdc, &rect, hbr);
+        }
+
+        /* An application should return non-zero if it processes this message. */
+        *result = 1;
         return true;
     } else {
         return false;

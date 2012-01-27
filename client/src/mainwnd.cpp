@@ -457,7 +457,8 @@ void MainWnd::updateDwmState()
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
-        m_dwm->disableSystemFramePainting();
+        m_dwm->disableSystemWindowPainting();
+        m_dwm->disableTransparentErasing();
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
@@ -491,7 +492,8 @@ void MainWnd::updateDwmState()
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
 
-        m_dwm->disableSystemFramePainting();
+        m_dwm->disableSystemWindowPainting();
+        m_dwm->enableTransparentErasing();
         m_dwm->extendFrameIntoClientArea();
         m_dwm->setCurrentFrameMargins(QMargins(1, 0, 1, 1)); /* Can't set (0, 0, 0, 0) here as it will cause awful display artifacts. */
         m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is also needed to prevent display artifacts. */
@@ -521,7 +523,8 @@ void MainWnd::updateDwmState()
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
-        m_dwm->disableSystemFramePainting();
+        m_dwm->disableSystemWindowPainting();
+        m_dwm->disableTransparentErasing();
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
@@ -580,6 +583,20 @@ void MainWnd::paintEvent(QPaintEvent *event)
             height() - 1
         ));
     }
+}
+
+void MainWnd::resizeEvent(QResizeEvent *event) {
+    QRect rect = this->rect();
+    QRect viewGeometry = m_view->geometry();
+
+    m_dwm->setNonErasableContentMargins(QMargins(
+        viewGeometry.left(),
+        viewGeometry.top(),
+        rect.right() - viewGeometry.right(),
+        rect.bottom() - viewGeometry.bottom()
+    ));
+
+    base_type::resizeEvent(event);
 }
 
 #ifdef Q_OS_WIN
