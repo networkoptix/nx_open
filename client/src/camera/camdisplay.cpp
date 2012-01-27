@@ -336,12 +336,15 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
             if (m_extTimeSrc)
             {
-                QMutexLocker lock(&m_timeMutex);
+                m_timeMutex.lock();
                 if (m_buffering && m_executingJump == 0) 
                 {
-                    m_extTimeSrc->onBufferingFinished(this);
                     m_buffering = false;
+                    m_timeMutex.unlock();
+                    m_extTimeSrc->onBufferingFinished(this);
                 }
+                else
+                    m_timeMutex.unlock();
             }
         }
 
@@ -627,13 +630,17 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
             m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
         }
+
+        m_timeMutex.lock();
         if (m_buffering && m_executingJump == 0) 
         {
-            QMutexLocker lock(&m_timeMutex);
+            m_buffering = false;
+            m_timeMutex.unlock();
             if (m_extTimeSrc)
                 m_extTimeSrc->onBufferingFinished(this);
-            m_buffering = false;
         }
+        else 
+            m_timeMutex.unlock();
         msleep(50);
         return true;
     }
