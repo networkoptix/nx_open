@@ -24,6 +24,7 @@ class QnImageButtonWidget;
 class QnResourceWidget;
 class QnMaskedProxyWidget;
 class QnAbstractRenderer;
+class QnClickableWidget;
 
 
 class QnWorkbenchUi: public QObject, protected SceneUtility {
@@ -109,7 +110,6 @@ protected Q_SLOTS:
     void at_treePinButton_toggled(bool checked);
 
     void at_titleItem_geometryChanged();
-    void at_titleItem_doubleClicked(QObject *item, QEvent *event);
     void at_titleOpacityProcessor_hoverEntered();
     void at_titleOpacityProcessor_hoverLeft();
 
@@ -219,7 +219,7 @@ private:
     /* Title-related state. */
 
     /** Title bar widget. */
-    QGraphicsWidget *m_titleItem;
+    QnClickableWidget *m_titleItem;
 
     /** Background widget for the title bar. */
     QGraphicsWidget *m_titleBackgroundItem;

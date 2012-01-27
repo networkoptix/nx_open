@@ -16,6 +16,9 @@ public:
     template<class T0>
     Clickable(const T0 &arg0): Base(arg0), m_clickableButtons(0) {}
 
+    template<class T0, class T1>
+    Clickable(const T0 &arg0, const T1 &arg1): Base(arg0, arg1), m_clickableButtons(0) {}
+
 protected:
     Qt::MouseButtons clickableButtons() const {
         return m_clickableButtons;
@@ -48,6 +51,7 @@ protected:
         if(!this->boundingRect().contains(event->pos()))
             return; /* If the button was released outside the item boundaries, then it is not a click. */
 
+        event->accept();
         clickedNotify(event);
     }
 

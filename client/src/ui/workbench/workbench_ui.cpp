@@ -30,6 +30,7 @@
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
+#include <ui/graphics/items/clickable_widget.h>
 
 #include <ui/widgets2/graphicslabel.h>
 
@@ -272,12 +273,9 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
     m_titleBackgroundItem->setOpacity(normalTitleBackgroundOpacity);
 
-    m_titleItem = new QGraphicsWidget(m_controlsWidget);
+    m_titleItem = new QnClickableWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
-
-    QnSingleEventSignalizer *titleDoubleClickSignalizer = new QnSingleEventSignalizer(this);
-    titleDoubleClickSignalizer->setEventType(QEvent::GraphicsSceneMouseDoubleClick);
-    m_titleItem->installEventFilter(titleDoubleClickSignalizer);
+    m_titleItem->setClickableButtons(Qt::LeftButton);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
@@ -303,10 +301,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setTitleVisible(true, false);
     setTitleUsed(false);
 
-    connect(titleDoubleClickSignalizer, SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_doubleClicked(QObject *, QEvent *)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_titleOpacityProcessor_hoverEntered()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_titleOpacityProcessor_hoverLeft()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    this,                           SIGNAL(titleBarDoubleClicked()));
 
 
     /* Connect to display. */
@@ -717,16 +715,6 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     updateTreeGeometry();
 
     m_titleBackgroundItem->setGeometry(m_titleItem->geometry());
-}
-
-void QnWorkbenchUi::at_titleItem_doubleClicked(QObject *, QEvent *event) {
-    assert(event->type() == QEvent::GraphicsSceneMouseDoubleClick);
-
-    QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
-    if(e->button() == Qt::LeftButton) {
-        e->accept();
-        emit titleBarDoubleClicked();
-    }
 }
 
 void QnWorkbenchUi::at_fpsItem_geometryChanged() {
