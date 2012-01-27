@@ -24,10 +24,19 @@ public:
      */
     bool isCompositionEnabled() const;
 
-    bool enableSystemFramePainting(bool enable = true);
+    bool enableTransparentErasing(bool enable = true);
 
-    bool disableSystemFramePainting(bool disable = true) {
-        return enableSystemFramePainting(!disable);
+    bool disableTransparentErasing(bool disable = true) {
+        return enableTransparentErasing(!disable);
+    }
+
+    bool setNonErasableContentMargins(const QMargins &margins);
+
+
+    bool enableSystemWindowPainting(bool enable = true);
+
+    bool disableSystemWindowPainting(bool disable = true) {
+        return enableSystemWindowPainting(!disable);
     }
 
     /**
@@ -192,6 +201,7 @@ protected:
     bool ncPaintEvent(MSG *message, long *result);
     bool ncLeftButtonDoubleClickEvent(MSG *message, long *result);
     bool sysCommandEvent(MSG *message, long *result);
+    bool eraseBackground(MSG *message, long *result);
 #endif
 
 private:

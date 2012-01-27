@@ -27,8 +27,8 @@ public:
 public Q_SLOTS:
     void accept();
 
-protected:
-    QList<QString> tabsOrder() const;
+protected Q_SLOTS:
+    void buildTabs();
 
 private Q_SLOTS:
     void paramValueChanged(const QnParam &param);

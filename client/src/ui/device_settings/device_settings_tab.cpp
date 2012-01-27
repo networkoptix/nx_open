@@ -9,16 +9,14 @@
 #include "widgets.h"
 
 CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, const QnParamList &paramList, const QString &group)
-    : QWidget(dialog),
-      m_dialog(dialog),
-      m_group(group)
+    : QWidget(dialog)
 {
     //QVBoxLayout *mainLayout = new QVBoxLayout;
 
     int size = 175;
 
     int x = 0;
-    foreach (const QString &sub_group, paramList.subGroupList(m_group)) {
+    foreach (const QString &sub_group, paramList.subGroupList(group)) {
         QWidget *parent = this;
 
         if (!sub_group.isEmpty()) {
@@ -29,7 +27,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, co
             subgroupBox->setFixedSize(size, 420);
             subgroupBox->move(10+x, 10);
 
-            m_dialog->putGroup(sub_group, subgroupBox);
+            dialog->putGroup(sub_group, subgroupBox);
 
             parent = subgroupBox;
 
@@ -52,7 +50,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, co
             widget->setEnabled(!param.isReadOnly());
             widget->setToolTip(param.description());
 
-            m_dialog->registerWidget(widget, param);
+            dialog->registerWidget(widget, param);
 
             widget->move(10, 20 + y);
             y += 80;
@@ -61,13 +59,4 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, co
     }
 
     //setLayout(mainLayout);
-}
-
-CLDeviceSettingsTab::~CLDeviceSettingsTab()
-{
-}
-
-QString CLDeviceSettingsTab::name() const
-{
-    return m_group;
 }
