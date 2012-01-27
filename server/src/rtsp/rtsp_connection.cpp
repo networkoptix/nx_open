@@ -381,8 +381,11 @@ int QnRtspConnectionProcessor::composePlay()
     currentDP->addDataProcessor(d->dataProcessor);
     
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
-    if (d->liveMode) {
-        d->dataProcessor->copyLastGopFromCamera();
+    if (d->liveMode) 
+    {
+        if (getResource()->getStatus() == QnResource::Online)
+            d->dataProcessor->copyLastGopFromCamera();
+
         d->dataProcessor->unlockDataQueue();
         d->dataProcessor->setWaitCSeq(d->startTime, 0); // ignore rest packets before new position
     }

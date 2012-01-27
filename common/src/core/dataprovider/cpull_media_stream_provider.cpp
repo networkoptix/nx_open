@@ -1,5 +1,6 @@
 #include "utils/common/sleep.h"
 #include "cpull_media_stream_provider.h"
+#include "../resource/camera_resource.h"
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
     QnAbstractMediaStreamDataProvider(dev),
@@ -49,9 +50,11 @@ void QnClientPullMediaStreamProvider::run()
 			m_stat[0].onData(0);
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-			if (mFramesLost % 4 == 0) // if we lost 4 frames => connection is lost for sure (4)
+			if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
             {
-                getResource()->setStatus(QnResource::Offline);
+                if (getResource().dynamicCast<QnPhysicalCameraResource>())
+                    getResource()->setStatus(QnResource::Offline);
+
 				m_stat[0].onLostConnection();
             }
 
@@ -76,15 +79,15 @@ void QnClientPullMediaStreamProvider::run()
         }
         checkTime(data);
 
-
-        getResource()->setStatus(QnResource::Online);
+        if (getResource().dynamicCast<QnPhysicalCameraResource>())
+            getResource()->setStatus(QnResource::Online);
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
         
 
 		if (mFramesLost>0) // we are alive again
 		{
-			if (mFramesLost>=4)
+			if (mFramesLost >= MAX_LOST_FRAME)
 			{
 				m_stat[0].onEvent(CL_STAT_CAMRESETED);
 			}

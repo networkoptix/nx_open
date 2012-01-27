@@ -11,6 +11,7 @@ class QnResourceAudioLayout;
 
 #define MAX_LIVE_FPS 10000000.0
 #define META_DATA_DURATION_MS 300
+#define MAX_LOST_FRAME 2
 
 class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
 {
