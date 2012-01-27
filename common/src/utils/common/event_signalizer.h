@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QEvent>
+#include "warnings.h"
 
 class QnEventSignalizer: public QObject {
     Q_OBJECT;
@@ -46,6 +47,41 @@ protected:
 
 private:
     QEvent::Type m_type;
+};
+
+
+class QnMultiEventSignalizer: public QnEventSignalizer {
+    Q_OBJECT;
+
+public:
+    QnMultiEventSignalizer(QObject *parent = NULL): QnEventSignalizer(parent) {}
+
+    void addEventType(QEvent::Type type) {
+        if(type < 0) {
+            qnWarning("Invalid event type '%1'.", static_cast<int>(type));
+            return;
+        }
+
+        while(m_typeMask.size() <= type)
+            m_typeMask.push_back(false);
+
+        m_typeMask[type] = true;
+    }
+
+    void clearEventTypes() {
+        m_typeMask.resize(0);
+    }
+
+protected:
+    virtual bool isActivating(QEvent *event) const override {
+        if(event->type() < 0 || event->type() >= m_typeMask.size())
+            return false;
+
+        return m_typeMask[event->type()];
+    }
+
+private:
+    QVector<bool> m_typeMask;
 };
 
 
