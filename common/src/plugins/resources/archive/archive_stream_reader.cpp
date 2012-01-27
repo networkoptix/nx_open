@@ -560,6 +560,8 @@ begin_label:
         }
     }
 
+    QMutexLocker mutex(&m_jumpMtx);
+    m_lastJumpTime = AV_NOPTS_VALUE;
     return m_currentData;
 }
 
@@ -646,8 +648,10 @@ bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
 void QnArchiveStreamReader::setReverseMode(bool value)
 {
     if (value != m_reverseMode) {
+        m_jumpMtx.lock();
         m_lastJumpTime = AV_NOPTS_VALUE;
         m_reverseMode = value;
+        m_jumpMtx.unlock();
         m_delegate->beforeChangeReverseMode(m_reverseMode);
     }
 }
@@ -745,14 +749,17 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         skipTime = 0;
 
 
+    m_jumpMtx.lock();
     bool needJump = newTime != m_lastJumpTime;
+    m_lastJumpTime = newTime;
+    m_jumpMtx.unlock();
+
     if (needJump)
     {
 		beforeJumpInternal(newTime);
         QMutexLocker mutex(&m_jumpMtx);
         channeljumpToUnsync(newTime, 0, skipTime);
     }
-    m_lastJumpTime = newTime;
 
     if (isSingleShotMode())
         CLLongRunnable::resume();
