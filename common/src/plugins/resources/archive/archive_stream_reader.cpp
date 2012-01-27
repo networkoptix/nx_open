@@ -246,6 +246,9 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     bool singleShotMode = m_singleShot;
 
 begin_label:
+    if (!m_runing)
+        return QnAbstractMediaDataPtr();
+
     if (mFirstTime)
     {
         // this is here instead if constructor to unload ui thread
@@ -402,8 +405,17 @@ begin_label:
             //if (m_topIFrameTime == DATETIME_NOW)
             if (m_BOFTime != AV_NOPTS_VALUE && m_topIFrameTime > m_BOFTime + MAX_FIRST_GOP_DURATION)
             {
-                m_topIFrameTime = m_currentTime + MAX_FIRST_GOP_DURATION;
-                m_BOFTime = AV_NOPTS_VALUE;
+                if (m_currentTime == INT64_MAX) 
+                {
+                    // no any packet yet readed from archive and eof reached. So, current time still unknown
+                    QnSleep::msleep(10);
+                    intChanneljumpTo(QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP, 0);
+                    goto begin_label;
+                }
+                else {
+                    m_topIFrameTime = m_currentTime + MAX_FIRST_GOP_DURATION;
+                    m_BOFTime = AV_NOPTS_VALUE;
+                }
             }
 
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
@@ -445,10 +457,7 @@ begin_label:
                         //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
                         //return getNextData();
-                        if (m_runing)
-                            goto begin_label;
-                        else
-                            return QnAbstractMediaDataPtr();
+                        goto begin_label;
                     }
                     else {
                         m_bottomIFrameTime = m_currentTime;
@@ -460,10 +469,7 @@ begin_label:
                 // invalid seek. must be key frame
                 m_currentData = QnAbstractMediaDataPtr();
                 //return getNextData();
-                if (m_runing)
-                    goto begin_label;
-                else
-                    return QnAbstractMediaDataPtr();
+                goto begin_label;
             }
             videoData->flags |= AV_REVERSE_PACKET;
         }

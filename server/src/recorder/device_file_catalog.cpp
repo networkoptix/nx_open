@@ -99,8 +99,12 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         if (info.fileName() == fName)
         {
             found = true;
-            if (info.size() == 0)
-                return false;
+            if (info.size() < 1024) 
+            {
+                // file is absent or empty media file
+                qnFileDeletor->deleteFile(info.absoluteFilePath()); // // delete broken file
+                return false; 
+            }
             break;
         }
     }
@@ -398,7 +402,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     for (int i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
         QnTimePeriod& last = result.last();
-        qint64 ggC = m_chunks[i].startTimeMs;
+        
         if (qAbs(last.startTimeMs + last.durationMs - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
             last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {

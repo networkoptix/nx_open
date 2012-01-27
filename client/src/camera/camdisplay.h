@@ -115,7 +115,7 @@ private:
     int m_totalFrames;
     int m_iFrames;
     qint64 m_lastVideoPacketTime;
-    qint64 m_lastDisplayedVideoTime;
+    qint64 m_lastDecodedTime;
 
     qint64 m_previousVideoTime;
     quint64 m_lastNonZerroDuration;
@@ -156,6 +156,7 @@ private:
     int m_processedPackets;
     QnMetaDataV1Ptr m_lastMetadata;
     bool m_bofReceived;
+    qint64 m_nextReverseTime;
 };
 
 #endif //clcam_display_h_1211

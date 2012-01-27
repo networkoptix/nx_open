@@ -125,7 +125,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         m_stat[0].onData(0);
         m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-        if (mFramesLost == 4) // if we lost 2 frames => connection is lost for sure (2)
+        if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             m_stat[0].onLostConnection();
 
         QnSleep::msleep(10);
@@ -137,7 +137,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
     if (mFramesLost > 0) // we are alive again
     {
-        if (mFramesLost >= 4)
+        if (mFramesLost >= MAX_LOST_FRAME)
         {
             m_stat[0].onEvent(CL_STAT_CAMRESETED);
         }
