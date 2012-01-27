@@ -50,7 +50,6 @@ void QnResource::updateInner(QnResourcePtr other)
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     m_tags = other->m_tags;
     m_url = other->m_url;
-    
 }
 
 void QnResource::update(QnResourcePtr other)

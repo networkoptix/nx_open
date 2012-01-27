@@ -19,7 +19,6 @@ CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(QnResourcePtr resource,
     resize(650, 500);
 
     m_tabWidget = new QTabWidget(this);
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
     m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Reset | QDialogButtonBox::Close, Qt::Horizontal, this);
     foreach (QAbstractButton *button, m_buttonBox->buttons())
@@ -72,7 +71,15 @@ void CLAbstractDeviceSettingsDlg::reset()
 
 void CLAbstractDeviceSettingsDlg::buildTabs()
 {
-    QList<QString> groups = tabsOrder();
+    buildTabs(m_tabWidget, QList<QString>() << QString());
+}
+
+void CLAbstractDeviceSettingsDlg::buildTabs(QTabWidget *tabWidget, const QList<QString> &tabsOrder)
+{
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
+    int fakeTabIndex = tabWidget->count() == 0 ? tabWidget->addTab(new QWidget(tabWidget), QString()) : -1;
+
+    QList<QString> groups = tabsOrder;
 
     const QList<QString> paramsGroupList = m_params.groupList();
     for (QList<QString>::iterator it = groups.begin(); it != groups.end(); ) {
@@ -86,11 +93,16 @@ void CLAbstractDeviceSettingsDlg::buildTabs()
             groups << group;
     }
 
-    foreach (const QString &group, groups)
-        addTab(new CLDeviceSettingsTab(this, m_params, group));
+    foreach (const QString &group, groups) {
+        CLDeviceSettingsTab *tab = new CLDeviceSettingsTab(this, m_params, group);
+        tabWidget->addTab(tab, !group.isEmpty() ? group : tr("General"));
+        addTab(tab, group);
+    }
 
     reset();
-    currentTabChanged(0); // QTabWidget doesn't emit currentChanged() for the first tab created
+
+    if (fakeTabIndex != -1)
+        tabWidget->removeTab(fakeTabIndex); // QTabWidget doesn't emit currentChanged() for the first tab created
 }
 
 void CLAbstractDeviceSettingsDlg::setParam(const QString &paramName, const QVariant &value)
@@ -128,32 +140,19 @@ void CLAbstractDeviceSettingsDlg::saveError()
     }
 }
 
-QList<QString> CLAbstractDeviceSettingsDlg::tabsOrder() const
-{
-    QList<QString> tabsOrder;
-    tabsOrder << QString(); // 'General' tab is a first tab;
-    return tabsOrder;
-}
-
 QList<CLDeviceSettingsTab *> CLAbstractDeviceSettingsDlg::tabs() const
 {
-    return m_tabs;
+    return m_tabs.values();
 }
 
 CLDeviceSettingsTab *CLAbstractDeviceSettingsDlg::tabByName(const QString &name) const
 {
-    foreach (CLDeviceSettingsTab *tab, m_tabs) {
-        if (name == tab->name())
-            return tab;
-    }
-
-    return 0;
+    return m_tabs.value(name.toLower());
 }
 
-void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab)
+void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab *tab, const QString &name)
 {
-    m_tabs.append(tab);
-    m_tabWidget->addTab(tab, !tab->name().isEmpty() ? tab->name() : tr("General"));
+    m_tabs.insert(name.toLower(), tab);
 }
 
 QList<QGroupBox *> CLAbstractDeviceSettingsDlg::groups() const
@@ -163,12 +162,12 @@ QList<QGroupBox *> CLAbstractDeviceSettingsDlg::groups() const
 
 QGroupBox *CLAbstractDeviceSettingsDlg::groupByName(const QString &name) const
 {
-    return m_groups.value(name);
+    return m_groups.value(name.toLower());
 }
 
 void CLAbstractDeviceSettingsDlg::putGroup(const QString &name, QGroupBox *group)
 {
-    m_groups.insert(name, group);
+    m_groups.insert(name.toLower(), group);
 }
 
 QList<QWidget *> CLAbstractDeviceSettingsDlg::widgets() const
@@ -244,7 +243,15 @@ typedef QSharedPointer<QnDeviceGetParamCommand> QnDeviceGetParamCommandPtr;
 
 void CLAbstractDeviceSettingsDlg::currentTabChanged(int index)
 {
-    const QString group = static_cast<CLDeviceSettingsTab *>(m_tabWidget->widget(index))->name();
+    QTabWidget *tabWidget = qobject_cast<QTabWidget *>(sender());
+    if (!tabWidget)
+        return;
+
+    CLDeviceSettingsTab *tab = qobject_cast<CLDeviceSettingsTab *>(tabWidget->widget(index));
+    if (!tab)
+        return;
+
+    const QString group = m_tabs.key(tab);
     foreach (const QnParam &param, m_params.paramList(group).list()) {
         if (QWidget *widget = m_widgets.value(param.name())) {
             QnDeviceGetParamCommandPtr command(new QnDeviceGetParamCommand(m_resource, widget, param));
