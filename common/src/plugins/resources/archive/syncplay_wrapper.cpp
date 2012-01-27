@@ -492,6 +492,22 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     }
 }
 
+void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* src)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    bool allReady = true;
+    for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
+    {
+        bool readyForLive = i->cam->getDisplayedTime() == DATETIME_NOW || i->reader->isRealTimeSource();
+        allReady &= readyForLive;
+    }
+    if (allReady)
+    {
+        jumpTo(DATETIME_NOW, 0);
+    }
+}
+
 qint64 QnArchiveSyncPlayWrapper::expectedTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);

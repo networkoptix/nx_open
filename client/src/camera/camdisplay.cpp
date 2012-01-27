@@ -641,10 +641,12 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         }
         else 
             m_timeMutex.unlock();
-        msleep(50);
+
+        if (m_extTimeSrc)
+            m_extTimeSrc->onEofReached(this);
+
         return true;
     }
-
 
 
     bool flushCurrentBuffer = false;
