@@ -132,7 +132,7 @@ protected Q_SLOTS:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
-    void updateSliderVisibility(bool animate = true);
+    void updateControlsVisibility(bool animate = true);
 
     void setTreeShowButtonUsed(bool enabled = true);
 

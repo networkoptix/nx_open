@@ -30,4 +30,4 @@ protected:
 };
 
 
-#endif QN_INSTALLATION_MODE_H
+#endif // QN_INSTALLATION_MODE_H
