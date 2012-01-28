@@ -67,6 +67,7 @@ QList<QnId> QnResourceType::allParentList() const
 
 void QnResourceType::addParamType(QnParamTypePtr param)
 {
+    QMutexLocker _lock(&m_allParamTypeListCacheMutex); // in case of connect to anther app server 
     m_paramTypeList.append(param);
 }
 

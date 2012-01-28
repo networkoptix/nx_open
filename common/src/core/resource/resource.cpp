@@ -231,8 +231,12 @@ QnParamList QnResource::getResourceParamList() const
     }
 
     // 2. read AppServer params
-    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) {
-        foreach (const QnParamTypePtr &paramType, resType->paramTypeList()) {
+    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) 
+    {
+        Q_ASSERT(resType);
+
+        foreach (const QnParamTypePtr &paramType, resType->paramTypeList()) 
+        {
             QnParam newParam(paramType, paramType->default_value);
             resourceParamList.append(newParam);
         }
