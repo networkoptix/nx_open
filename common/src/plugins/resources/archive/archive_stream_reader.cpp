@@ -726,16 +726,16 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
         return m_navDelegate->directJumpToNonKeyFrame(mksec);
     }
 
-	beforeJumpInternal(mksec);
     QMutexLocker mutex(&m_jumpMtx);
+    beforeJumpInternal(mksec);
     m_exactJumpToSpecifiedFrame = true;
     channeljumpToUnsync(mksec, 0, mksec);
 }
 
 void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int marker)
 {
-	beforeJumpInternal(mksec);
     QMutexLocker mutex(&m_jumpMtx);
+    beforeJumpInternal(mksec);
     m_newDataMarker = marker;
     m_exactJumpToSpecifiedFrame = !findIFrame;
     channeljumpToUnsync(mksec, 0, 0);
@@ -762,8 +762,8 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 
     if (needJump)
     {
-		beforeJumpInternal(newTime);
         QMutexLocker mutex(&m_jumpMtx);
+		beforeJumpInternal(newTime);
         channeljumpToUnsync(newTime, 0, skipTime);
     }
 
