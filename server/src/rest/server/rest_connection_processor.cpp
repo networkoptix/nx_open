@@ -44,7 +44,7 @@ void QnRestConnectionProcessor::run()
             {
                 globalTimeout.restart();
                 d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-                if (isFullMessage())
+                if (isFullMessage(d->clientRequest))
                 {
                     ready = true;
                     break;

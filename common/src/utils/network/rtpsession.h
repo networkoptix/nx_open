@@ -110,7 +110,7 @@ private:
     void parseRangeHeader(const QString& rangeStr);
     void addAdditionAttrs(QByteArray& request);
 private:
-    enum { RTSP_BUFFER_LEN = 1024 * 64 * 10 };
+    enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
     quint8* m_responseBuffer;

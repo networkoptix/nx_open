@@ -30,15 +30,14 @@ QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
     delete d_ptr;
 }
 
-bool QnTCPConnectionProcessor::isFullMessage()
+bool QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 {
-    Q_D(QnTCPConnectionProcessor);
-    QByteArray lRequest = d->clientRequest.toLower();
+    QByteArray lRequest = message.toLower();
     QByteArray delimiter = "\n";
     int pos = lRequest.indexOf(delimiter);
     if (pos == -1)
         return false;
-    if (pos > 0 && d->clientRequest[pos-1] == '\r')
+    if (pos > 0 && lRequest[pos-1] == '\r')
         delimiter = "\r\n";
     int contentLen = 0;
     int contentLenPos = lRequest.indexOf("content-length") >= 0;
@@ -61,7 +60,7 @@ bool QnTCPConnectionProcessor::isFullMessage()
             contentLen = lRequest.mid(posStart, posEnd - posStart+1).toInt();
     }
     QByteArray dblDelim = delimiter + delimiter;
-    return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());;
+    return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());
 }
 
 void QnTCPConnectionProcessor::parseRequest()
@@ -138,6 +137,7 @@ void QnTCPConnectionProcessor::clearBuffer()
 
 void QnTCPConnectionProcessor::setNoDelay()
 {
+    return;
     Q_D(QnTCPConnectionProcessor);
     int flag = 1;
     int result = setsockopt(d->socket->handle(),            /* socket affected */
@@ -151,6 +151,7 @@ void QnTCPConnectionProcessor::setNoDelay()
 void QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
+    QMutexLocker lock(&d->sockMutex);
     while (!m_needStop && size > 0 && d->socket->isConnected())
     {
         int sended = d->socket->send(data, size);
@@ -162,12 +163,6 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
             size -= sended;
         }
     }
-}
-
-QMutex& QnTCPConnectionProcessor::getSockMutex()
-{
-    Q_D(QnTCPConnectionProcessor);
-    return d->sockMutex;
 }
 
 QString QnTCPConnectionProcessor::extractPath() const
