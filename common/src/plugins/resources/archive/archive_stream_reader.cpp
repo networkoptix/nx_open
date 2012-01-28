@@ -227,6 +227,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
     if (isReverseMode)
         rez->flags |= AV_REVERSE_PACKET;
     rez->opaque = m_dataMarker;
+    QnSleep::msleep(50);
     return rez;
 }
 
@@ -561,7 +562,8 @@ begin_label:
     }
 
     QMutexLocker mutex(&m_jumpMtx);
-    m_lastJumpTime = AV_NOPTS_VALUE;
+    if (m_lastJumpTime == DATETIME_NOW)
+        m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to live
     return m_currentData;
 }
 
@@ -720,6 +722,10 @@ void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, q
 
 void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
 {
+    if (m_navDelegate) {
+        return m_navDelegate->directJumpToNonKeyFrame(mksec);
+    }
+
 	beforeJumpInternal(mksec);
     QMutexLocker mutex(&m_jumpMtx);
     m_exactJumpToSpecifiedFrame = true;

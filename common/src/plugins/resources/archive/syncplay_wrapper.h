@@ -28,6 +28,7 @@ public:
 
     // nav delegate
     virtual void directJumpToNonKeyFrame(qint64 mksec);
+
     virtual bool jumpTo(qint64 mksec,  qint64 skipTime);
     virtual void previousFrame(qint64 mksec);
     virtual void nextFrame();
@@ -45,6 +46,7 @@ public:
     //
 
 public slots:
+    void onEofReached(QnlTimeSource* src);
     void onBufferingStarted(QnlTimeSource* source);
     void onBufferingFinished(QnlTimeSource* source);
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);

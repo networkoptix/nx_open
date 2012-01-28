@@ -162,6 +162,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     m_controller = new QnWorkbenchController(m_display, this);
     m_ui = new QnWorkbenchUi(m_display, this);
+    m_ui->setFlags(QnWorkbenchUi::HIDE_WHEN_ZOOMED | QnWorkbenchUi::AFFECT_MARGINS_WHEN_NORMAL);
 
     m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
     connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(newLayout()));
