@@ -401,12 +401,12 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         m_flushedBeforeReverseStart = false;
     }
 
+    pixFmt = dec->GetPixelFormat();
     if (!data->context) {
         // for stiil images decoder parameters are not know before decoding, so recalculate parameters
         // It is got one more data copy from tmpFrame, but for movies we have got valid dst pointer (tmp or not) immediate before decoding
         // It is necessary for new logic with display queue
         scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
-        pixFmt = dec->GetPixelFormat();
     }
 
 	if (!draw || !m_drawer)
