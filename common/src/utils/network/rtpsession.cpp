@@ -683,7 +683,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
 {
-    int retry_count = 4;
+    int retry_count = 40;
     for (int i = 0; i < retry_count; ++i)
     {
         bool readMoreData = false; // try to process existing buffer at first
