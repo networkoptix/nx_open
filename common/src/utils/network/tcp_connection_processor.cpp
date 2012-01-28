@@ -137,7 +137,6 @@ void QnTCPConnectionProcessor::clearBuffer()
 
 void QnTCPConnectionProcessor::setNoDelay()
 {
-    return;
     Q_D(QnTCPConnectionProcessor);
     int flag = 1;
     int result = setsockopt(d->socket->handle(),            /* socket affected */
