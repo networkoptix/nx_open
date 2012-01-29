@@ -169,6 +169,8 @@ bool RTPSession::open(const QString& url)
     m_tcpSock.setReadTimeOut(TCP_TIMEOUT);
     m_tcpSock.setWriteTimeOut(TCP_TIMEOUT);
 
+    m_tcpSock.setNoDelay(true);
+
     if (!sendDescribe())
         return false;
 
