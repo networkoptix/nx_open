@@ -14,7 +14,7 @@
 
 #include <utils/common/util.h>
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "ui/proxystyle.h"
 
 #include "ui/widgets2/graphicsframe.h"

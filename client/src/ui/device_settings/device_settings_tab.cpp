@@ -2,7 +2,7 @@
 
 #include <QtGui/QItemEditorFactory>
 
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 
 #include "device_settings_dlg.h"
 #include "settings.h"

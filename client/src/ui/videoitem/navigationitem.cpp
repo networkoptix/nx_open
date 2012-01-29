@@ -13,7 +13,7 @@
 
 #include "camera/camera.h"
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "ui/videoitem/video_wnd_item.h"
 #include "ui/widgets/imagebutton.h"
 #include "ui/widgets/speedslider.h"

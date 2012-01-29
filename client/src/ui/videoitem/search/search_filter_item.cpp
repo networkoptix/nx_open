@@ -6,7 +6,7 @@
 
 #include <core/resourcemanagment/resource_pool.h>
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "ui/video_cam_layout/layout_content.h"
 #include "ui/graphicsview.h"
 

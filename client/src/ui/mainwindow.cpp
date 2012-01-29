@@ -38,8 +38,8 @@
 
 #include "ui/widgets3/tabbar.h"
 
-#include "ui/skin/skin.h"
-#include "ui/skin/globals.h"
+#include "ui/style/skin.h"
+#include "ui/style/globals.h"
 
 #include "file_processor.h"
 #include "settings.h"

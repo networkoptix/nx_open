@@ -1,6 +1,6 @@
 #include "start_screen_content.h"
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 
 QString start_screen = QLatin1String("start screen");
 

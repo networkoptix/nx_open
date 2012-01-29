@@ -7,7 +7,7 @@
 
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "connectiontestingdialog.h"
 
 #include "settings.h"

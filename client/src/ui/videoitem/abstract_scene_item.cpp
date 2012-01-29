@@ -6,7 +6,7 @@
 #include "subitem/abstract_image_sub_item.h"
 #include "subitem/recording_sign_item.h"
 #include "ui/graphicsview.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 #include "ui/animation/property_animation.h"
 
 

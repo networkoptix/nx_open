@@ -5,7 +5,7 @@
 #include "settings.h"
 #include "ui/videoitem/abstract_scene_item.h"
 #include "ui/animation/property_animation.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 
 
 static const qreal max_zoom = 4.0;

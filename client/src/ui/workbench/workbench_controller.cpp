@@ -28,7 +28,7 @@
 
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/preferences/preferencesdialog.h>
-#include <ui/skin/globals.h>
+#include <ui/style/globals.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -71,7 +71,7 @@
 
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motionmask_widget.h"
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *)
 

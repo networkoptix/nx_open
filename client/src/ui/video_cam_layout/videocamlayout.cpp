@@ -25,7 +25,7 @@
 #include "ui/mixins/render_watch_mixin.h"
 #include "core/resource/security_cam_resource.h"
 #include "file_processor.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 
 int  SLOT_WIDTH = 640*10;
 int  SLOT_HEIGHT = SLOT_WIDTH*3/4;

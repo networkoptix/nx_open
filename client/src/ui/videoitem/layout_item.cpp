@@ -1,7 +1,7 @@
 #include "layout_item.h"
 
-#include "ui/skin/skin.h"
-#include "ui/skin/globals.h"
+#include "ui/style/skin.h"
+#include "ui/style/globals.h"
 #include "ui/ui_common.h"
 
 #include "settings.h"

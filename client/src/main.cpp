@@ -15,7 +15,7 @@
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"

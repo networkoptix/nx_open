@@ -38,8 +38,8 @@
 
 #include "ui/widgets3/tabwidget.h"
 
-#include "ui/skin/skin.h"
-#include "ui/skin/globals.h"
+#include "ui/style/skin.h"
+#include "ui/style/globals.h"
 #include "ui/proxystyle.h"
 
 #include <utils/common/warnings.h>

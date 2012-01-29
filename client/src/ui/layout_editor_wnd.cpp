@@ -3,7 +3,7 @@
 #include "settings.h"
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 #include "ui_common.h"
 
 

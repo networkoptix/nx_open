@@ -40,7 +40,7 @@
 #include <ui/videoitem/navigationitem.h>
 #include <ui/navigationtreewidget.h>
 #include <ui/context_menu_helper.h>
-#include <ui/skin/skin.h>
+#include <ui/style/skin.h>
 #include <ui/context_menu_helper.h>
 #include <ui/mixins/render_watch_mixin.h>
 

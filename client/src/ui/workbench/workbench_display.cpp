@@ -36,8 +36,8 @@
 #include <ui/mixins/sync_play_mixin.h>
 #include <ui/mixins/render_watch_mixin.h>
 
-#include "ui/skin/skin.h"
-#include "ui/skin/globals.h"
+#include "ui/style/skin.h"
+#include "ui/style/globals.h"
 
 #include "workbench_layout.h"
 #include "workbench_item.h"

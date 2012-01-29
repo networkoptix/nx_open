@@ -8,7 +8,7 @@
 #include <utils/common/warnings.h>
 #include <client_util.h>
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "video_recorder_settings.h"
 
 #ifdef Q_OS_WIN
