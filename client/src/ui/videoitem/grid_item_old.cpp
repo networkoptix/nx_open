@@ -1,7 +1,7 @@
 #include "grid_item_old.h"
 
 #include "ui/video_cam_layout/grid_engine.h"
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 #include "ui/animation/property_animation.h"
 
 static const int base_line_width = 40;

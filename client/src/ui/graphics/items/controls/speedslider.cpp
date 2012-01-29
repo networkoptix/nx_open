@@ -2,9 +2,9 @@
 
 #include <QtCore/QPropertyAnimation>
 
-#include "ui/proxystyle.h"
+#include "ui/style/proxystyle.h"
 
-#include "tooltipitem.h"
+#include "ui/graphics/items/tooltipitem.h"
 
 class SpeedSliderProxyStyle : public ProxyStyle
 {

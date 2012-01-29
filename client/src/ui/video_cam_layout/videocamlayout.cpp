@@ -1,7 +1,7 @@
 #include "videocamlayout.h"
 #include "camera/camera.h"
 
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 #include "ui/videoitem/video_wnd_item.h"
 #include "settings.h"
 #include "ui/videoitem/custom_draw_button.h"
@@ -13,7 +13,7 @@
 #include "ui/videoitem/video_wnd_archive_item.h"
 #include "ui/videoitem/picture_image_item.h"
 #include "ui/videoitem/intro_video_wnd.h"
-#include "ui/videoitem/navigationitem.h"
+#include "ui/graphics/items/controls/navigationitem.h"
 #include "layout_items.h"
 #include "ui/videoitem/unmoved/multipage/page_selector.h"
 #include "core/resourcemanagment/resource_pool.h"

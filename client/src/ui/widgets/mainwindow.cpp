@@ -16,7 +16,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"
-#include "ui/navigationtreewidget.h"
+#include "ui/widgets/navigationtreewidget.h"
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
@@ -36,7 +36,7 @@
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_ui.h"
 
-#include "ui/widgets3/tabbar.h"
+#include "ui/widgets/tabbar.h"
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"

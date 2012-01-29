@@ -1,8 +1,8 @@
 #include "volumeslider.h"
 
-#include "ui/proxystyle.h"
+#include "ui/style/proxystyle.h"
 
-#include "tooltipitem.h"
+#include "ui/graphics/items/tooltipitem.h"
 
 #include "openal/qtvaudiodevice.h"
 

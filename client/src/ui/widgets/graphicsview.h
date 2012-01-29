@@ -3,15 +3,15 @@
 
 #include <QtGui/QGraphicsView>
 
-#include "animation/scene_movement.h"
-#include "animation/scene_zoom.h"
-#include "animation/mouse_state.h"
-#include "animation/animated_show.h"
-#include "video_cam_layout/videocamlayout.h"
-#include "ui_common.h"
-#include "animation/animation_manager.h"
-#include "animation/steady_mouse_animation.h"
-#include "mouse_ignore_helper.h"
+#include <ui/animation/scene_movement.h>
+#include <ui/animation/scene_zoom.h>
+#include <ui/animation/mouse_state.h>
+#include <ui/animation/animated_show.h>
+#include <ui/animation/animation_manager.h>
+#include <ui/animation/steady_mouse_animation.h>
+#include <ui/video_cam_layout/videocamlayout.h>
+#include <ui/ui_common.h>
+#include <ui/mouse_ignore_helper.h>
 
 class NavigationItem;
 class CLAbstractSceneItem;

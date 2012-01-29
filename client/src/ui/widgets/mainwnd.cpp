@@ -18,7 +18,6 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include "ui/context_menu_helper.h"
-#include "ui/navigationtreewidget.h"
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
@@ -36,18 +35,19 @@
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_ui.h"
 
-#include "ui/widgets3/tabwidget.h"
+#include "ui/widgets/tabwidget.h"
+#include "ui/widgets/navigationtreewidget.h"
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
-#include "ui/proxystyle.h"
+#include "ui/style/proxystyle.h"
 
 #include <utils/common/warnings.h>
 
 #include "file_processor.h"
 #include "settings.h"
 
-#include "ui/dwm.h"
+#include "dwm.h"
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 

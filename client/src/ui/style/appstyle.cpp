@@ -1,4 +1,4 @@
-#include "appstyle_p.h"
+#include "appstyle.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>

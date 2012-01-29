@@ -5,7 +5,7 @@
 #include "video_wnd_item.h"
 #include "subitem/abstract_image_sub_item.h"
 #include "subitem/recording_sign_item.h"
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 #include "ui/style/globals.h"
 #include "ui/animation/property_animation.h"
 

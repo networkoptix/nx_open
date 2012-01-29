@@ -1,6 +1,6 @@
 #include "animated_show.h"
 #include "ui/videoitem/abstract_scene_item.h"
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 #include "utils/common/rand.h"
 
 Show_helper::Show_helper(GraphicsView* view) :

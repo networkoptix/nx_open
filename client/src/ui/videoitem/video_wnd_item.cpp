@@ -1,6 +1,6 @@
 #include "video_wnd_item.h"
 #include "camera/camera.h"
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 #include "ui/style/globals.h"
 #include "settings.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"

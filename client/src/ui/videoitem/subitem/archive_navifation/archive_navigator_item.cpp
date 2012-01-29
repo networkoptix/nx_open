@@ -4,7 +4,7 @@
 
 #include "slider_item.h"
 #include "../../video_wnd_archive_item.h"
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 #include "ui/style/skin.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
