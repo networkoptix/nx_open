@@ -16,7 +16,6 @@
 #include "ui/style/skin.h"
 #include "ui/videoitem/video_wnd_item.h"
 #include "ui/graphics/items/standard/graphicslabel.h"
-#include "ui/graphics/items/controls/imagebutton.h"
 #include "ui/graphics/items/controls/speedslider.h"
 #include "ui/graphics/items/controls/volumeslider.h"
 #include "ui/graphics/items/image_button_widget.h"
@@ -119,35 +118,35 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
-    m_backwardButton = new ImageButton(this);
-    m_backwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_backward_grey.png")), ImageButton::Active, ImageButton::Background);
-    m_backwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_backward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+    m_backwardButton = new QnImageButtonWidget(this);
+    m_backwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_backward_grey.png")));
+    m_backwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_backward_blue.png")));
     m_backwardButton->setPreferredSize(32, 18);
-    m_backwardButton->setMaximumSize(m_backwardButton->preferredSize());
+    m_backwardButton->setAnimationSpeed(4.0);
 
-    m_stepBackwardButton = new ImageButton(this);
-    m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_grey.png")), ImageButton::Active, ImageButton::Background);
-    m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+    m_stepBackwardButton = new QnImageButtonWidget(this);
+    m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward_grey.png")));
+    m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_blue.png")));
     m_stepBackwardButton->setPreferredSize(32, 18);
-    m_stepBackwardButton->setMaximumSize(m_stepBackwardButton->preferredSize());
+    m_stepBackwardButton->setAnimationSpeed(4.0);
 
-    m_playButton = new ImageButton(this);
-    m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_grey.png")), ImageButton::Active, ImageButton::Background);
-    m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_blue.png")), ImageButton::Active, ImageButton::Hovered);
+    m_playButton = new QnImageButtonWidget(this);
+    m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play_grey.png")));
+    m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_blue.png")));
     m_playButton->setPreferredSize(32, 30);
-    m_playButton->setMaximumSize(m_playButton->preferredSize());
+    m_playButton->setAnimationSpeed(4.0);
 
-    m_stepForwardButton = new ImageButton(this);
-    m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_grey.png")), ImageButton::Active, ImageButton::Background);
-    m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+    m_stepForwardButton = new QnImageButtonWidget(this);
+    m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward_grey.png")));
+    m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_blue.png")));
     m_stepForwardButton->setPreferredSize(32, 18);
-    m_stepForwardButton->setMaximumSize(m_stepForwardButton->preferredSize());
+    m_stepForwardButton->setAnimationSpeed(4.0);
 
-    m_forwardButton = new ImageButton(this);
-    m_forwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_grey.png")), ImageButton::Active, ImageButton::Background);
-    m_forwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+    m_forwardButton = new QnImageButtonWidget(this);
+    m_forwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_forward_grey.png")));
+    m_forwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_forward_blue.png")));
     m_forwardButton->setPreferredSize(32, 18);
-    m_forwardButton->setMaximumSize(m_forwardButton->preferredSize());
+    m_forwardButton->setAnimationSpeed(4.0);
 
     connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
     connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
@@ -188,12 +187,11 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_timerId = startTimer(33);
 
 
-    m_muteButton = new ImageButton(this);
+    m_muteButton = new QnImageButtonWidget(this);
     m_muteButton->setObjectName("MuteButton");
-    m_muteButton->addPixmap(Skin::pixmap(QLatin1String("unmute.png")), ImageButton::Active, ImageButton::Background);
-    m_muteButton->addPixmap(Skin::pixmap(QLatin1String("mute.png")), ImageButton::Active, ImageButton::Checked);
+    m_muteButton->setPixmap(0, Skin::pixmap(QLatin1String("unmute.png")));
+    m_muteButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("mute.png")));
     m_muteButton->setPreferredSize(20, 20);
-    m_muteButton->setMaximumSize(m_muteButton->preferredSize());
     m_muteButton->setCheckable(true);
     m_muteButton->setChecked(m_volumeSlider->isMute());
 
@@ -205,35 +203,33 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_liveButton->setPixmap(QnImageButtonWidget::DISABLED,  Skin::pixmap(QLatin1String("live_disabled.png")));
     m_liveButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("live_disabled.png")));
     m_liveButton->setPreferredSize(48, 24);
-    m_liveButton->setMaximumSize(m_liveButton->preferredSize());
-    m_liveButton->setMinimumSize(m_liveButton->preferredSize());
     m_liveButton->setCheckable(true);
     m_liveButton->setChecked(m_camera && m_camera->getCamCamDisplay()->isRealTimeSource());
-    m_liveButton->setAnimationSpeed(4.0);
     m_liveButton->setEnabled(false);
+    m_liveButton->setAnimationSpeed(4.0);
 
     connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(at_liveButton_clicked(bool)));
 
-    m_mrsButton = new ImageButton(this);
+    m_mrsButton = new QnImageButtonWidget(this);
     m_mrsButton->setObjectName("MRSButton");
-    m_mrsButton->addPixmap(Skin::pixmap(QLatin1String("mrs.png")), ImageButton::Active, ImageButton::Background);
-    m_mrsButton->addPixmap(Skin::pixmap(QLatin1String("mrs_checked.png")), ImageButton::Active, ImageButton::Checked);
+    m_mrsButton->setPixmap(0, Skin::pixmap(QLatin1String("mrs.png")));
+    m_mrsButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("mrs_checked.png")));
     m_mrsButton->setPreferredSize(48, 24);
-    m_mrsButton->setMaximumSize(m_mrsButton->preferredSize());
     m_mrsButton->setCheckable(true);
     m_mrsButton->setChecked(true);
-    m_mrsButton->hide();
+    //m_mrsButton->hide();
+    m_mrsButton->setAnimationSpeed(4.0);
 
     connect(m_mrsButton, SIGNAL(clicked()), this, SIGNAL(clearMotionSelection()));
 
-    m_syncButton = new ImageButton(this);
+    m_syncButton = new QnImageButtonWidget(this);
     m_syncButton->setObjectName("SyncButton");
-    m_syncButton->addPixmap(Skin::pixmap(QLatin1String("sync.png")), ImageButton::Active, ImageButton::Background);
-    m_syncButton->addPixmap(Skin::pixmap(QLatin1String("sync_checked.png")), ImageButton::Active, ImageButton::Checked);
+    m_syncButton->setPixmap(0, Skin::pixmap(QLatin1String("sync.png")));
+    m_syncButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("sync_checked.png")));
     m_syncButton->setPreferredSize(48, 24);
-    m_syncButton->setMaximumSize(m_syncButton->preferredSize());
     m_syncButton->setCheckable(true);
     m_syncButton->setChecked(true);
+    m_syncButton->setAnimationSpeed(4.0);
 
     //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
     connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
@@ -1031,27 +1027,27 @@ void NavigationItem::setPlaying(bool playing)
     m_playing = playing;
 
     if (m_playing) {
-        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("backward_grey.png")), ImageButton::Active, ImageButton::Background);
-        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("backward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("backward_grey.png")));
+        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("backward_blue.png")));
 
-        m_playButton->addPixmap(Skin::pixmap(QLatin1String("pause_grey.png")), ImageButton::Active, ImageButton::Background);
-        m_playButton->addPixmap(Skin::pixmap(QLatin1String("pause_blue.png")), ImageButton::Active, ImageButton::Hovered);
+        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("pause_grey.png")));
+        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("pause_blue.png")));
 
-        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("forward_grey.png")), ImageButton::Active, ImageButton::Background);
-        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("forward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("forward_grey.png")));
+        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("forward_blue.png")));
 
         m_speedSlider->setPrecision(SpeedSlider::LowPrecision);
 
         play();
     } else {
-        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_grey.png")), ImageButton::Active, ImageButton::Background);
-        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward_grey.png")));
+        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_blue.png")));
 
-        m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_grey.png")), ImageButton::Active, ImageButton::Background);
-        m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_blue.png")), ImageButton::Active, ImageButton::Hovered);
+        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play_grey.png")));
+        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_blue.png")));
 
-        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_grey.png")), ImageButton::Active, ImageButton::Background);
-        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward_grey.png")));
+        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_blue.png")));
 
         m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
 

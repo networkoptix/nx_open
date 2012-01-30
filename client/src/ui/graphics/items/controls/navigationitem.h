@@ -12,7 +12,6 @@
 class QTimerEvent;
 
 class CLVideoCamera;
-class ImageButton;
 class SpeedSlider;
 class TimeSlider;
 class VolumeSlider;
@@ -109,16 +108,16 @@ private:
     MotionPeriodLoader* getMotionLoader(QnAbstractArchiveReader* reader);
 
     TimeSlider *m_timeSlider;
-    ImageButton *m_backwardButton;
-    ImageButton *m_stepBackwardButton;
-    ImageButton *m_playButton;
-    ImageButton *m_stepForwardButton;
-    ImageButton *m_forwardButton;
+    QnImageButtonWidget *m_backwardButton;
+    QnImageButtonWidget *m_stepBackwardButton;
+    QnImageButtonWidget *m_playButton;
+    QnImageButtonWidget *m_stepForwardButton;
+    QnImageButtonWidget *m_forwardButton;
     QnImageButtonWidget *m_liveButton;
-    ImageButton *m_mrsButton;
-    ImageButton *m_syncButton;
+    QnImageButtonWidget *m_mrsButton;
+    QnImageButtonWidget *m_syncButton;
     SpeedSlider *m_speedSlider;
-    ImageButton *m_muteButton;
+    QnImageButtonWidget *m_muteButton;
     VolumeSlider *m_volumeSlider;
     GraphicsLabel *m_timeLabel;
 
