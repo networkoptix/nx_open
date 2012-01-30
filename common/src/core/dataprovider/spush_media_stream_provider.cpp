@@ -114,12 +114,6 @@ void CLServerPushStreamreader::run()
         if (videoData)
         {
             m_stat[videoData->channelNumber].onData(data->data.size());
-            ++m_framesSinceLastMetaData;
-        }
-        else if (qSharedPointerDynamicCast<QnMetaDataV1>(data))
-        {
-            m_framesSinceLastMetaData = 0;
-            m_timeSinceLastMetaData.restart();
         }
 
 

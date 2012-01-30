@@ -118,20 +118,13 @@ void QnClientPullMediaStreamProvider::run()
 		data->dataProvider = this;
 
         if (videoData)
-        {
             m_stat[videoData->channelNumber].onData(videoData->data.size());
-            ++m_framesSinceLastMetaData;
-        }
-        else if (qSharedPointerDynamicCast<QnMetaDataV1>(data))
-        {
-            m_framesSinceLastMetaData = 0;
-            m_timeSinceLastMetaData.restart();
-        }
+
 
 		putData(data);
 
-        if (videoData && !isMaxFps())
-            m_fpsSleep.sleep(1000*1000/getFps());
+        //if (videoData && !isMaxFps())
+        //    m_fpsSleep.sleep(1000*1000/getFps());
 
 	}
 

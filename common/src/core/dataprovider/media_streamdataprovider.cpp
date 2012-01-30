@@ -8,8 +8,6 @@
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
-m_quality(QnQualityNormal),
-m_fps(MAX_LIVE_FPS),
 m_numberOfchannels(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
@@ -29,39 +27,6 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 
 
 
-void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
-{
-    QMutexLocker mtx(&m_mutex);
-    m_quality = q;
-    updateStreamParamsBasedOnQuality();
-    //setNeedKeyData();
-}
-
-QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
-{
-    QMutexLocker mtx(&m_mutex);
-    return m_quality;
-}
-
-// for live providers only
-void QnAbstractMediaStreamDataProvider::setFps(float f)
-{
-    QMutexLocker mtx(&m_mutex);
-    m_fps = f;
-    updateStreamParamsBasedOnFps();
-}
-
-float QnAbstractMediaStreamDataProvider::getFps() const
-{
-    QMutexLocker mtx(&m_mutex);
-    return m_fps;
-}
-
-bool QnAbstractMediaStreamDataProvider::isMaxFps() const
-{
-    QMutexLocker mtx(&m_mutex);
-    return abs( m_fps - MAX_LIVE_FPS)< .1;
-}
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
@@ -101,10 +66,6 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
     mFramesLost = 0;
-
-    m_framesSinceLastMetaData = 0;
-    m_timeSinceLastMetaData.restart();
-
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()
@@ -179,11 +140,6 @@ const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel
     return &m_stat[channel];
 }
 
-bool QnAbstractMediaStreamDataProvider::needMetaData() const
-{
-    return (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
-        m_framesSinceLastMetaData > 0; // got at least one frame
-}
 
 void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
 {

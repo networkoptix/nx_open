@@ -19,7 +19,7 @@ public:
 
 
 protected:
-	virtual void updateStreamParamsBasedOnQuality(); 
+	virtual void updateStreamParamsBasedOnQuality() override; 
 
 	int getBitrate() const;
 	bool isH264() const;

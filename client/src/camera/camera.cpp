@@ -101,7 +101,7 @@ void CLVideoCamera::beforeStopDisplay()
 
 void CLVideoCamera::startRecording()
 {
-	m_reader->setQuality(QnQualityHighest);
+	//m_reader->setQuality(QnQualityHighest);
     if (m_recorder == 0) {
         m_recorder = new QnStreamRecorder(m_device);
         QFileInfo fi(m_device->getUniqueId());
@@ -124,7 +124,7 @@ void CLVideoCamera::stopRecording()
 	    m_recorder->stop();
 	    m_reader->removeDataProcessor(m_recorder);
     }
-	m_reader->setQuality(QnQualityNormal);
+	//m_reader->setQuality(QnQualityNormal);
 
     if(m_videoWindow != NULL)
 	    m_videoWindow->removeSubItem(RecordingSubItem);
@@ -177,6 +177,7 @@ void CLVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 
 void CLVideoCamera::setQuality(QnStreamQuality q, bool increase)
 {
+    /*
 	if (increase && m_reader->getQuality() >= q)
 		return;
 
@@ -187,6 +188,7 @@ void CLVideoCamera::setQuality(QnStreamQuality q, bool increase)
 		m_reader->setQuality(QnQualityHighest);
 	else
 		m_reader->setQuality(q);
+        /**/
 }
 
 
