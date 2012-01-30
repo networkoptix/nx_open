@@ -617,8 +617,11 @@ void QnApiXmlSerializer::serializeCamera(const QnCameraResourcePtr& cameraPtr, Q
     camera.scheduleTasks(scheduleTasks);
     camera.parentID(cameraPtr->getParentId().toString().toStdString());
     camera.status((cameraPtr->getStatus() == QnResource::Online) ? "A" : "I");
-    camera.login(camerPtr->getLogin());
-    camera.password(cameraPtr->getPassword());
+
+    const QAuthenticator& auth = cameraPtr->getAuth();
+
+    camera.login(auth.user().toStdString());
+    camera.password(auth.user().toStdString());
 
     std::ostringstream os;
 

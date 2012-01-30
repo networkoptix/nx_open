@@ -406,6 +406,7 @@ public:
 
         // Get storages sample code.
         QnStorageList storages;
+        QByteArray errorString;
         while (appServerConnection->getStorages(storages, errorString) != 0)
         {
             qDebug() << "QnMain::run(): Can't get storages. Reason: " << errorString;
