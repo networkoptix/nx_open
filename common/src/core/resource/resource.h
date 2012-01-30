@@ -42,7 +42,7 @@ class QN_EXPORT QnResource : public QObject
     Q_CLASSINFO("url", "URL")
 
 public:
-    enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
+    enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
     enum Status { Offline, Unauthorized, Online };
 
