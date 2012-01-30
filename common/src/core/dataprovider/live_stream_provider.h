@@ -4,7 +4,7 @@
 #include "../resource/media_resource.h"
 
 #define META_DATA_DURATION_MS 300
-#define MAX_LIVE_FPS 10000000.0
+
 
 class QnLiveStreamProvider 
 {
@@ -20,12 +20,12 @@ public:
     float getFps() const;
     bool isMaxFps() const;
 
-    bool needMetaData() const; // used for live only 
+    bool needMetaData(); // used for live only 
 
 protected:
 
-    virtual void updateStreamParamsBasedOnQuality(){};
-    virtual void updateStreamParamsBasedOnFps(){};
+    virtual void updateStreamParamsBasedOnQuality() = 0;
+    virtual void updateStreamParamsBasedOnFps() = 0;
 
 protected:
 

@@ -1,13 +1,20 @@
 #include "live_stream_provider.h"
+#include "media_streamdataprovider.h"
 
 
 QnLiveStreamProvider::QnLiveStreamProvider():
 m_quality(QnQualityNormal),
 m_fps(MAX_LIVE_FPS),
-m_framesSinceLastMetaData(0)
+m_framesSinceLastMetaData(0),
+m_livemutex(QMutex::Recursive)
 
 {
     m_timeSinceLastMetaData.restart();
+}
+
+QnLiveStreamProvider::~QnLiveStreamProvider()
+{
+
 }
 
 void QnLiveStreamProvider::setQuality(QnStreamQuality q)
@@ -44,8 +51,16 @@ bool QnLiveStreamProvider::isMaxFps() const
     return abs( m_fps - MAX_LIVE_FPS)< .1;
 }
 
-bool QnLiveStreamProvider::needMetaData() const
+bool QnLiveStreamProvider::needMetaData() 
 {
-    return (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
+    bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
         m_framesSinceLastMetaData > 0; // got at least one frame
+
+    if (result)
+    {
+        m_framesSinceLastMetaData = 0;
+        m_timeSinceLastMetaData.elapsed();
+    }
+
+    return result;
 }
