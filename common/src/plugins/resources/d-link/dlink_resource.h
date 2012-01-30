@@ -55,7 +55,7 @@ public:
     void updateCamInfo(); // does a lot of physical work 
 
 protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 
 

@@ -89,10 +89,9 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
     {
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
-        if (role == QnResource::Role_SecondaryLiveVideo)
+        if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
         {
-            if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
-                lsp->setQuality(QnQualityLowest);
+                lsp->setRole(role);
         }
         return result;
 
