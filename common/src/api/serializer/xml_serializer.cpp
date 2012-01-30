@@ -132,6 +132,8 @@ namespace {
             if (camera.isNull())
                 continue;
 
+            camera->setAuth(i->login().c_str(), i->password().c_str());
+
             if (i->region().present())
             {
                 QRegion region;
@@ -615,6 +617,8 @@ void QnApiXmlSerializer::serializeCamera(const QnCameraResourcePtr& cameraPtr, Q
     camera.scheduleTasks(scheduleTasks);
     camera.parentID(cameraPtr->getParentId().toString().toStdString());
     camera.status((cameraPtr->getStatus() == QnResource::Online) ? "A" : "I");
+    camera.login(camerPtr->getLogin());
+    camera.password(cameraPtr->getPassword());
 
     std::ostringstream os;
 
