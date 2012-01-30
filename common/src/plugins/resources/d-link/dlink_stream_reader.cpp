@@ -1,5 +1,5 @@
 #include "dlink_stream_reader.h"
-
+#include <QTextStream>
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res)
@@ -35,17 +35,17 @@ QString PlDlinkStreamReader::composeVideoProfile(const DlinkStreamParams& stream
     QString result;
     QTextStream t(&result);
 
-    t << "profileid=" << streamParams.profileNum; << "\r\n";
+    t << "profileid=" << streamParams.profileNum << "\r\n";
     t << "resolution=" << streamParams.resolution.width() << "x" << streamParams.resolution.height() << "\r\n";
     t << "codec=";
 
     switch (streamParams.codec)
     {
-    case h264:
+    case DlinkStreamParams::h264:
         t << "H264";
     	break;
 
-    case mpeg4:
+    case DlinkStreamParams::mpeg4:
         t << "MPEG4";
             break;
 

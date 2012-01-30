@@ -3,9 +3,10 @@
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 
-class PlDlinkStreamReader: public CLServerPushStreamreader
+class PlDlinkStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 protected:
     struct DlinkStreamParams
