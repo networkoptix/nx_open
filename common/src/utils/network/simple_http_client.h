@@ -85,5 +85,8 @@ private:
 
 QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
 
+bool uploadFile(const QString& fileName, const QByteArray&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+
+
 
 #endif //__SIMPLE_HTTP_CLIENT__
