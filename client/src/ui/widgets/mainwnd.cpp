@@ -35,7 +35,6 @@
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_ui.h"
 
-#include "ui/widgets/tabwidget.h"
 #include "ui/widgets/navigationtreewidget.h"
 
 #include "ui/style/skin.h"
@@ -48,6 +47,7 @@
 #include "settings.h"
 
 #include "dwm.h"
+#include "layout_tab_bar.h"
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
@@ -128,7 +128,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
     addAction(&cm_reconnect);
 
-    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(handleSessionManagerError(int)));
+    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
@@ -165,20 +165,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_ui->setFlags(QnWorkbenchUi::HIDE_WHEN_ZOOMED | QnWorkbenchUi::AFFECT_MARGINS_WHEN_NORMAL);
 
     m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
-    connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(newLayout()));
+    connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(at_newLayoutRequested()));
     connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(at_treeWidget_activated(uint)));
     connect(m_ui,               SIGNAL(titleBarDoubleClicked()), this, SLOT(toggleFullScreen()));
 
     /* Tab bar. */
-    m_tabBar = new QTabBar();
-    m_tabBar->setMovable(true);
-    m_tabBar->setTabsClosable(true);
-    m_tabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-    m_tabBar->setDrawBase(false);
-    m_tabBar->setShape(QTabBar::TriangularNorth);
-
-    connect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(setCurrentLayout(int)));
-    connect(m_tabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(removeLayout(int)));
+    m_tabBar = new QnLayoutTabBar(this);
+    connect(m_tabBar, SIGNAL(currentChanged(QnWorkbenchLayout *)), this, SLOT(at_tabBar_currentChanged(QnWorkbenchLayout *)));
+    connect(m_tabBar, SIGNAL(layoutRemoved(QnWorkbenchLayout *)), this, SLOT(at_tabBar_layoutRemoved(QnWorkbenchLayout *)));
 
     /* New tab button. */
     QToolButton *newTabButton = new QToolButton();
@@ -186,7 +180,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     newTabButton->setShortcut(QKeySequence::New);
     newTabButton->setIcon(Skin::icon(QLatin1String("plus.png")));
     newTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    connect(newTabButton, SIGNAL(clicked()), this, SLOT(newLayout()));
+    connect(newTabButton, SIGNAL(clicked()), this, SLOT(at_newLayoutRequested()));
 
     /* Tab bar layout. To snap tab bar to graphics view. */
     QVBoxLayout *tabBarLayout = new QVBoxLayout();
@@ -224,7 +218,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     setLayout(m_globalLayout);
 
     /* Add single tab. */
-    newLayout();
+    at_newLayoutRequested();
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -279,70 +273,11 @@ void MainWnd::toggleTitleVisibility()
     setTitleVisible(!isTitleVisible());
 }
 
-void MainWnd::newLayout()
-{
-    int index = m_tabBar->addTab(Skin::icon(QLatin1String("decorations/square-view.png")), tr("Scene"));
-
-    m_tabBar->setCurrentIndex(index);
-}
-
-QnWorkbenchLayout *MainWnd::layoutForIndex(int index) {
-    QnWorkbenchLayout *result = m_tabBar->tabData(index).value<QnWorkbenchLayout *>();
-    if(result == NULL) {
-        result = new QnWorkbenchLayout(this);
-        m_tabBar->setTabData(index, QVariant::fromValue<QnWorkbenchLayout *>(result));
-    }
-
-    return result;
-}
-
-void MainWnd::setCurrentLayout(int index)
-{
-    if(index < 0 || index >= m_tabBar->count()) {
-        qnWarning("Layout index out of bounds: %1 not in [%2, %3).", index, 0, m_tabBar->count());
-        return;
-    }
-
-    if(m_tabBar->currentIndex() != index)
-        m_tabBar->setCurrentIndex(index);
-
-    m_workbench->setLayout(layoutForIndex(index));
-    m_display->fitInView(false);
-
-    /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
-    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
-}
-
-void MainWnd::removeLayout(int index)
-{
-    if(index < 0 || index >= m_tabBar->count()) {
-        qnWarning("Layout index out of bounds: %1 not in [%2, %3).", index, 0, m_tabBar->count());
-        return;
-    }
-
-    if (m_tabBar->count() <= 1)
-        return; /* Don't remove the last layout. */
-
-    if(m_tabBar->currentIndex() == index)
-        m_workbench->setLayout(NULL);
-
-    QnWorkbenchLayout *layout = m_tabBar->tabData(index).value<QnWorkbenchLayout *>();
-    delete layout;
-
-    m_tabBar->removeTab(index);
-}
-
 void MainWnd::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     m_controller->drop(files);
-}
-
-void MainWnd::at_treeWidget_activated(uint resourceId)
-{
-    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
-    m_controller->drop(resource);
 }
 
 void MainWnd::showOpenFileDialog()
@@ -372,25 +307,6 @@ void MainWnd::showPreferencesDialog()
     PreferencesDialog dialog(this);
     dialog.setWindowModality(Qt::ApplicationModal);
     dialog.exec();
-}
-
-void MainWnd::handleSessionManagerError(int error)
-{
-    switch (error) {
-    case QNetworkReply::ConnectionRefusedError:
-    case QNetworkReply::HostNotFoundError:
-    case QNetworkReply::TimeoutError: // ### remove ?
-    case QNetworkReply::ContentAccessDenied:
-    case QNetworkReply::AuthenticationRequiredError:
-    case QNetworkReply::UnknownNetworkError:
-        // Do not show popup box! It's annoying!
-        // Show something like color label in the main window.
-        // showAuthenticationDialog();
-        break;
-
-    default:
-        break;
-    }
 }
 
 void MainWnd::showAuthenticationDialog()
@@ -426,7 +342,8 @@ void MainWnd::showAuthenticationDialog()
     dialog = 0;
 }
 
-void MainWnd::updateFullScreenState() {
+void MainWnd::updateFullScreenState() 
+{
     bool fullScreen = isFullScreen();
 
     setTitleVisible(!fullScreen);
@@ -552,6 +469,53 @@ void MainWnd::updateDwmState()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void MainWnd::at_sessionManager_error(int error)
+{
+    switch (error) {
+    case QNetworkReply::ConnectionRefusedError:
+    case QNetworkReply::HostNotFoundError:
+    case QNetworkReply::TimeoutError: // ### remove ?
+    case QNetworkReply::ContentAccessDenied:
+    case QNetworkReply::AuthenticationRequiredError:
+    case QNetworkReply::UnknownNetworkError:
+        // Do not show popup box! It's annoying!
+        // Show something like color label in the main window.
+        // showAuthenticationDialog();
+        break;
+
+    default:
+        break;
+    }
+}
+
+void MainWnd::at_newLayoutRequested()
+{
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+
+    m_tabBar->addLayout(layout);
+    m_tabBar->setCurrentLayout(layout);
+}
+
+void MainWnd::at_tabBar_currentChanged(QnWorkbenchLayout *layout)
+{
+    m_workbench->setLayout(layout);
+    m_display->fitInView(false);
+
+    /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
+    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
+}
+
+void MainWnd::at_tabBar_layoutRemoved(QnWorkbenchLayout *layout) 
+{
+    delete layout;
+}
+
+void MainWnd::at_treeWidget_activated(uint resourceId)
+{
+    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
+    m_controller->drop(resource);
+}
+
 void MainWnd::closeEvent(QCloseEvent *event)
 {
     base_type::closeEvent(event);
@@ -609,3 +573,4 @@ bool MainWnd::winEvent(MSG *message, long *result)
     return base_type::winEvent(message, result);
 }
 #endif
+

@@ -131,7 +131,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags 
 
 
     // Prepare UI
-    m_tabBar = new TabBar(this);
+    m_tabBar = new QTabBar(this);
     m_tabBar->setDocumentMode(true);
     m_tabBar->setExpanding(false);
     m_tabBar->setMovable(true);

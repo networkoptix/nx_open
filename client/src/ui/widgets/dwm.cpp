@@ -677,6 +677,7 @@ bool QnDwm::ncPaintEvent(MSG *message, long *result) {
 
                 HRGN resultHrgn = CreateRectRgn(0, 0, 0, 0);
                 int status = CombineRgn(resultHrgn, hrgn, rectHrgn, RGN_DIFF);
+                Q_UNUSED(status);
 
                 DeleteObject(rectHrgn);
                 if(deleteHrgn)
@@ -731,11 +732,14 @@ bool QnDwm::eraseBackground(MSG *message, long *result) {
 }
 
 bool QnDwm::ncLeftButtonDoubleClickEvent(MSG *message, long *result) {
+    Q_UNUSED(result)
+
     if(!d->processDoubleClicks)    
         return false;
 
     if(message->wParam == HTCAPTION) {
         emit titleBarDoubleClicked();
+        *result = 0; /* If an application processes this message, it should return zero. */
         return true;
     }
 

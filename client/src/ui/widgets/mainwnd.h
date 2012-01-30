@@ -9,13 +9,14 @@ class QBoxLayout;
 class QSpacerItem;
 
 class QnBlueBackgroundPainter;
+class QnLayoutTabBar;
 class QnGraphicsView;
+class QnDwm;
 class QnWorkbench;
 class QnWorkbenchController;
 class QnWorkbenchUi;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
-class QnDwm;
 
 class MainWnd : public QWidget
 {
@@ -52,11 +53,6 @@ protected Q_SLOTS:
     void toggleFullScreen();
     void toggleTitleVisibility();
 
-    void newLayout();
-    void setCurrentLayout(int index);
-    void removeLayout(int index);
-    QnWorkbenchLayout *layoutForIndex(int index);
-
     void handleMessage(const QString &message);
 
     void showOpenFileDialog();
@@ -64,12 +60,16 @@ protected Q_SLOTS:
     void showPreferencesDialog();
     void showAuthenticationDialog();
 
-    void handleSessionManagerError(int error);
+    void at_sessionManager_error(int error);
 
     void updateFullScreenState();
     void updateDwmState();
 
+    void at_newLayoutRequested();
+    void at_tabBar_layoutRemoved(QnWorkbenchLayout *layout);
+    void at_tabBar_currentChanged(QnWorkbenchLayout *layout);
     void at_treeWidget_activated(uint resourceId);
+
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
@@ -79,7 +79,7 @@ private:
     QnWorkbench *m_workbench;
 
     QnGraphicsView *m_view;
-    QTabBar *m_tabBar;
+    QnLayoutTabBar *m_tabBar;
 
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_viewLayout;
