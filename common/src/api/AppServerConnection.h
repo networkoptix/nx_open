@@ -13,6 +13,7 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_data.h"
 #include "core/misc/scheduleTask.h"
+#include "core/resource/user.h"
 
 #include "api/serializer/xml_serializer.h"
 
@@ -69,10 +70,12 @@ public:
     int getCameras(QnCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
     int getStorages(QnStorageList& storages, QByteArray& errorString);
     int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
+    int getUsers(QnUserResourceList& users, QByteArray& errorString);
 
     // Returns request id
     int saveAsync(const QnVideoServerPtr&, QObject*, const char*);
     int saveAsync(const QnCameraResourcePtr&, QObject*, const char*);
+    int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 

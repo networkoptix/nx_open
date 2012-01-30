@@ -51,6 +51,26 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnResourceList resources;
         qCopy(cameras.begin(), cameras.end(), std::back_inserter(resources));
         emit finished(handle, status, errorString, resources);
+    } else if (m_objectName == "user")
+    {
+        QnUserResourceList users;
+
+        QByteArray errorString;
+        if (status == 0)
+        {
+            try {
+                m_serializer.deserializeUsers(users, result);
+            } catch (const QnSerializeException& e) {
+                errorString += e.errorString();
+            }
+        } else
+        {
+            errorString += SessionManager::formatNetworkError(status);
+        }
+
+        QnResourceList resources;
+        qCopy(users.begin(), users.end(), std::back_inserter(resources));
+        emit finished(handle, status, errorString, resources);
     }
 }
 
@@ -155,9 +175,23 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resourcePtr, QObject* 
 {
     if (resourcePtr.dynamicCast<QnVideoServer>())
         return saveAsync(resourcePtr.dynamicCast<QnVideoServer>(), target, slot);
-
-    if (resourcePtr.dynamicCast<QnCameraResource>())
+    else if (resourcePtr.dynamicCast<QnCameraResource>())
         return saveAsync(resourcePtr.dynamicCast<QnCameraResource>(), target, slot);
+    else if (resourcePtr.dynamicCast<QnUserResource>())
+        return saveAsync(resourcePtr.dynamicCast<QnUserResource>(), target, slot);
+
+    return 0;
+}
+
+int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "user");
+    QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
+
+    QByteArray data;
+    m_serializer.serialize(userPtr, data);
+
+    m_sessionManager->addObjectAsync("user", data, processor, SLOT(finished(int, const QByteArray&, int)));
 
     return 0;
 }
@@ -233,6 +267,21 @@ int QnAppServerConnection::getLayouts(QnLayoutDataList& layouts, QByteArray& err
 
     try {
         m_serializer.deserializeLayouts(layouts, data);
+    } catch (const QnSerializeException& e) {
+        errorString += e.errorString();
+    }
+
+    return status;
+}
+
+int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& errorString)
+{
+    QByteArray data;
+
+    int status = m_sessionManager->getObjects("user", "", data, errorString);
+
+    try {
+        m_serializer.deserializeUsers(users, data);
     } catch (const QnSerializeException& e) {
         errorString += e.errorString();
     }

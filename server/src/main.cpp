@@ -368,6 +368,7 @@ public:
             QnSleep::msleep(1000);
         }
 
+
         if (needToStop())
             return;
 
@@ -405,7 +406,6 @@ public:
 
         // Get storages sample code.
         QnStorageList storages;
-        QByteArray errorString;
         while (appServerConnection->getStorages(storages, errorString) != 0)
         {
             qDebug() << "QnMain::run(): Can't get storages. Reason: " << errorString;
@@ -463,7 +463,7 @@ public:
         QnScheduleTaskList scheduleTasks;
 
         errorString.clear();
-        QnSecurityCamResourceList cameras;
+        QnCameraResourceList cameras;
         while (appServerConnection->getCameras(cameras, videoServer->getId(), errorString) != 0)
         {
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;

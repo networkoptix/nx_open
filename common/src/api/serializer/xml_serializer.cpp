@@ -194,13 +194,20 @@ namespace {
 
         for (Layouts::layout_const_iterator i (xsdLayouts.begin()); i != xsdLayouts.end(); ++i)
         {
-            QnResourceParameters parameters;
-            parameters["id"] = i->id().c_str();
-            parameters["name"] = i->name().c_str();
-
             QnLayoutDataPtr layout(new QnLayoutData());
-            layout->setId(i->id().c_str());
+
+            QnResourceParameters parameters;
+            if (i->id().present())
+            {
+                layout->setId((*(i->id())).c_str());
+                parameters["id"] = (*(i->id())).c_str();
+            }
+
+            layout->setParentId(i->parentId().c_str());
+            parameters["parentId"] = i->parentId().c_str();
+
             layout->setName(i->name().c_str());
+            parameters["name"] = i->name().c_str();
 
             if (i->items().present())
             {
@@ -210,6 +217,7 @@ namespace {
                 for (Items::item_const_iterator ci(xsdItems.begin()); ci != xsdItems.end(); ++ci)
                 {
                     QnLayoutItemData itemData;
+                    itemData.resourceId = ci->resourceId().c_str();
                     itemData.flags = ci->flags();
                     itemData.combinedGeometry.setLeft(ci->left());
                     itemData.combinedGeometry.setTop(ci->top());
@@ -225,6 +233,44 @@ namespace {
 
 
             layouts.append(layout);
+        }
+    }
+
+    template<class T>
+    void parseUsers(QList<T>& users, const QnApiUsers& xsdUsers)
+    {
+        using xsd::api::users::Users;
+        using xsd::api::layouts::Layouts;
+
+        using xsd::api::resourceTypes::ParentIDs;
+        using xsd::api::resourceTypes::PropertyTypes;
+        using xsd::api::resourceTypes::ParamType;
+
+        for (Users::user_const_iterator i (xsdUsers.begin()); i != xsdUsers.end(); ++i)
+        {
+            QnUserResourcePtr user(new QnUserResource());
+            QnResourceParameters parameters;
+
+            if (i->id().present())
+            {
+                user->setId((*i->id()).c_str());
+                parameters["id"] = (*i->id()).c_str();
+            }
+
+            parameters["name"] = i->name().c_str();
+
+            user->setName(i->name().c_str());
+
+            if (i->layouts().present())
+            {
+                const Layouts::layout_sequence& xsdLayouts = (*(i->layouts())).layout();
+
+                QnLayoutDataList layouts;
+                parseLayouts(layouts, xsdLayouts);
+                user->setLayouts(layouts);
+            }
+
+            users.append(user);
         }
     }
 
@@ -333,8 +379,7 @@ void QnApiXmlSerializer::deserializeStorages(QnStorageList& storages, const QByt
 {
     QByteArray errorString;
 
-    try
-    {
+    try {
         QTextStream stream(data);
         QStdIStream is(stream.device());
 
@@ -342,8 +387,7 @@ void QnApiXmlSerializer::deserializeStorages(QnStorageList& storages, const QByt
 
         parseStorages(storages, xsdStorages->storage());
     }
-    catch (const xml_schema::exception& e)
-    {
+    catch (const xml_schema::exception& e) {
         errorString += "\nAppSessionManager::loadObjects(): ";
         errorString += e.what();
 
@@ -356,16 +400,14 @@ void QnApiXmlSerializer::deserializeCameras(QnCameraResourceList& cameras, const
 {
     QByteArray errorString;
 
-    try
-    {
+    try {
         QTextStream stream(data);
         QStdIStream is(stream.device());
         std::auto_ptr<xsd::api::cameras::Cameras> xsdCameras = xsd::api::cameras::cameras (is, XSD_FLAGS, xml_schema::properties ());
 
         parseCameras(cameras, xsdCameras->camera(), resourceFactory);
     }
-    catch (const xml_schema::exception& e)
-    {
+    catch (const xml_schema::exception& e) {
         errorString += "\nAppSessionManager::loadObjects(): ";
         errorString += e.what();
 
@@ -378,16 +420,34 @@ void QnApiXmlSerializer::deserializeLayouts(QnLayoutDataList& layouts, const QBy
 {
     QByteArray errorString;
 
-    try
-    {
+    try {
         QTextStream stream(data);
         QStdIStream is(stream.device());
         std::auto_ptr<xsd::api::layouts::Layouts> xsdLayouts = xsd::api::layouts::layouts (is, XSD_FLAGS, xml_schema::properties ());
 
         parseLayouts(layouts, xsdLayouts->layout());
     }
-    catch (const xml_schema::exception& e)
-    {
+    catch (const xml_schema::exception& e) {
+        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += e.what();
+
+        qDebug(e.what());
+        throw QnSerializeException(errorString);
+    }
+}
+
+void QnApiXmlSerializer::deserializeUsers(QnUserResourceList& users, const QByteArray& data)
+{
+    QByteArray errorString;
+
+    try {
+        QTextStream stream(data);
+        QStdIStream is(stream.device());
+        std::auto_ptr<xsd::api::users::Users> xsdUsers = xsd::api::users::users (is, XSD_FLAGS, xml_schema::properties ());
+
+        parseUsers(users, xsdUsers->user());
+    }
+    catch (const xml_schema::exception& e) {
         errorString += "\nAppSessionManager::loadObjects(): ";
         errorString += e.what();
 
@@ -400,8 +460,7 @@ void QnApiXmlSerializer::deserializeServers(QnVideoServerList& servers, const QB
 {
     QByteArray errorString;
 
-    try
-    {
+    try {
         QTextStream stream(data);
         QStdIStream is(stream.device());
         std::auto_ptr<xsd::api::servers::Servers> xsdServers = xsd::api::servers::servers (is, XSD_FLAGS, xml_schema::properties ());
@@ -422,8 +481,7 @@ void QnApiXmlSerializer::deserializeResources(QnResourceList& resources, const Q
 {
     QByteArray errorString;
 
-    try
-    {
+    try {
         QTextStream stream(data);
         QStdIStream is(stream.device());
         std::auto_ptr<xsd::api::resourcesEx::Resources> xsdResources = xsd::api::resourcesEx::resourcesEx(is, XSD_FLAGS, xml_schema::properties ());
@@ -433,8 +491,7 @@ void QnApiXmlSerializer::deserializeResources(QnResourceList& resources, const Q
         parseLayouts(resources, xsdResources->layouts().layout());
         // parseUsers(resources, xsdResources->users().user());
     }
-    catch (const xml_schema::exception& e)
-    {
+    catch (const xml_schema::exception& e) {
         errorString += "\nAppSessionManager::loadObjects(): ";
         errorString += e.what();
 
@@ -447,16 +504,14 @@ void QnApiXmlSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTy
 {
     QByteArray errorString;
 
-    try
-    {
+    try {
         QTextStream stream(data);
         QStdIStream is(stream.device());
         std::auto_ptr<xsd::api::resourceTypes::ResourceTypes> xsdResourceTypes = xsd::api::resourceTypes::resourceTypes (is, XSD_FLAGS, xml_schema::properties ());
 
         parseResourceTypes(resourceTypes, xsdResourceTypes->resourceType());
     }
-    catch (const xml_schema::exception& e)
-    {
+    catch (const xml_schema::exception& e) {
         errorString += "\nAppSessionManager::loadObjects(): ";
         errorString += e.what();
 
@@ -484,6 +539,53 @@ void QnApiXmlSerializer::serializeServer(const QnVideoServerPtr& serverPtr, QByt
     data = os.str().c_str();
 }
 
+void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArray& data)
+{
+    xsd::api::users::User user(
+                   userPtr->getName().toStdString(),
+                   userPtr->getTypeId().toString().toStdString());
+
+    if (userPtr->getId().isValid())
+        user.id(userPtr->getId().toString().toStdString());
+
+    user.status("A");
+    user.password(userPtr->getPassword().toStdString());
+
+    xsd::api::layouts::Layouts layouts;
+    foreach(const QnLayoutDataPtr& layoutIn, userPtr->getLayouts()) {
+        xsd::api::layouts::Layout layout(layoutIn->getName().toStdString(), layoutIn->getParentId().toString().toStdString());
+
+        if (!layoutIn->getItems().isEmpty()) {
+            xsd::api::layouts::Items items;
+
+            foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
+                xsd::api::layouts::Item item(itemIn.resourceId.toString().toStdString(),
+                                             itemIn.flags,
+                                             itemIn.combinedGeometry.left(),
+                                             itemIn.combinedGeometry.top(),
+                                             itemIn.combinedGeometry.right(),
+                                             itemIn.combinedGeometry.bottom(),
+                                             itemIn.rotation);
+                items.item().push_back(item);
+            }
+
+            layout.items(items);
+        }
+
+        layouts.layout().push_back(layout);
+    }
+
+    user.layouts(layouts);
+
+    std::ostringstream os;
+    ::xsd::api::users::Users users;
+    users.user().push_back(user);
+
+    ::xsd::api::users::users(os, users, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
+
+    data = os.str().c_str();
+}
+
 void QnApiXmlSerializer::serializeCamera(const QnCameraResourcePtr& cameraPtr, QByteArray& data)
 {
     xsd::api::cameras::Camera camera(cameraPtr->getId().toString().toStdString(),
@@ -495,8 +597,7 @@ void QnApiXmlSerializer::serializeCamera(const QnCameraResourcePtr& cameraPtr, Q
                                      cameraPtr->getAuth().password().toStdString());
 
     xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
-    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks())
-    {
+    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
         xsd::api::scheduleTasks::ScheduleTask scheduleTask(
                                                 scheduleTaskIn.getStartTime(),
                                                 scheduleTaskIn.getEndTime(),
@@ -545,15 +646,14 @@ void QnApiXmlSerializer::serializeStorage(const QnStoragePtr& storagePtr, QByteA
 
 void QnApiXmlSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
 {
-    if (resource.dynamicCast<QnStorage>())
-    {
+    if (resource.dynamicCast<QnStorage>()) {
         serializeStorage(resource.dynamicCast<QnStorage>(), data);
-    } else if (resource.dynamicCast<QnCameraResource>())
-    {
+    } else if (resource.dynamicCast<QnCameraResource>()) {
         serializeCamera(resource.dynamicCast<QnCameraResource>(), data);
-    } else if (resource.dynamicCast<QnVideoServer>())
-    {
+    } else if (resource.dynamicCast<QnVideoServer>()) {
         serializeServer(resource.dynamicCast<QnVideoServer>(), data);
+    } else if (resource.dynamicCast<QnUserResource>()) {
+        serializeUser(resource.dynamicCast<QnUserResource>(), data);
     }
 }
 

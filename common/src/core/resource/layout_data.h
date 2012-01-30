@@ -3,11 +3,12 @@
 
 #include <QSharedPointer>
 #include <QRectF>
-
+#include "utils/common/qnid.h"
 #include "core/resource/resource.h"
 
 struct QnLayoutItemData
 {
+    QnId resourceId;
     int flags;
     QRectF combinedGeometry;
     qreal rotation;

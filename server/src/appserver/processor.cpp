@@ -11,7 +11,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    QnResourceList cameras;
+    QnCameraResourceList cameras;
 
     foreach (QnResourcePtr resource, resources)
     {
