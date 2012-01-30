@@ -1,6 +1,7 @@
 #include "security_cam_resource.h"
 
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "../dataprovider/live_stream_provider.h"
 
 static const char *property_descriptions[] = {
     QT_TRANSLATE_NOOP("QnResource", "Motion Mask"),
@@ -85,8 +86,16 @@ void QnSecurityCamResource::setCroping(QRect croping, QnDomain /*domain*/)
 
 QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role)
 {
-    if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default)
-        return createLiveDataProvider();
+    if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
+    {
+        QnAbstractStreamDataProvider* result = createLiveDataProvider();
+        if (role == QnResource::Role_SecondaryLiveVideo)
+        {
+            if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
+                lsp->setQuality(QnQualityLow);
+        }
+
+    }
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;
