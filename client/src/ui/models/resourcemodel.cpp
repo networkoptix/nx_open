@@ -11,7 +11,7 @@
 
 #include <core/resourcemanagment/resource_pool.h>
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "ui/view_drag_and_drop.h"
 
 #include "file_processor.h"

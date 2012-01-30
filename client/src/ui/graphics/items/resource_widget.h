@@ -4,7 +4,7 @@
 #include <QWeakPointer>
 #include <QVector>
 #include <camera/render_status.h>
-#include <ui/widgets2/graphicswidget.h>
+#include <ui/graphics/items/standard/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>

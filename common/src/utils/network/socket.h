@@ -215,6 +215,7 @@ public:
 
   bool reopen();
 
+  int setNoDelay(bool value);
 private:
   // Access for TCPServerSocket::accept() connection creation
   friend class TCPServerSocket;

@@ -4,13 +4,13 @@
 class CLLayoutNavigator;
 class LayoutContent;
 
-class CLLayoutEditorWnd : public QDialog
+class CLLayoutEditorDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    CLLayoutEditorWnd(LayoutContent* contexttoEdit, QWidget *parent = 0);
-    ~CLLayoutEditorWnd();
+    CLLayoutEditorDialog(LayoutContent* contexttoEdit, QWidget *parent = 0);
+    ~CLLayoutEditorDialog();
 private:
 
 private slots:

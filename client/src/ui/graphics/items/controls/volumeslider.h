@@ -1,7 +1,7 @@
 #ifndef VOLUMESLIDER_H
 #define VOLUMESLIDER_H
 
-#include "ui/widgets2/graphicsslider.h"
+#include "ui/graphics/items/standard/graphicsslider.h"
 
 class ToolTipItem;
 

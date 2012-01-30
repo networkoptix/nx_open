@@ -6,7 +6,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
-#include <ui/skin/globals.h>
+#include <ui/style/globals.h>
 #include <core/resource/security_cam_resource.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>

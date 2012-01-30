@@ -1,7 +1,7 @@
 #include "custom_draw_button.h"
 
 #include "settings.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 
 QFont buttonFont()
 {

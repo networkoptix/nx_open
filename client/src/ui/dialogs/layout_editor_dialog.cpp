@@ -1,15 +1,15 @@
-#include "layout_editor_wnd.h"
+#include "layout_editor_dialog.h"
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "settings.h"
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
-#include "ui/skin/globals.h"
-#include "ui_common.h"
+#include "ui/style/globals.h"
+#include "ui/ui_common.h"
 
 
 
 
-CLLayoutEditorWnd::CLLayoutEditorWnd(LayoutContent* contexttoEdit, QWidget *parent) :
+CLLayoutEditorDialog::CLLayoutEditorDialog(LayoutContent* contexttoEdit, QWidget *parent) :
 QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
 m_topView(0),
 m_bottomView(0),
@@ -67,14 +67,14 @@ m_editedView(0)
 
 }
 
-CLLayoutEditorWnd::~CLLayoutEditorWnd()
+CLLayoutEditorDialog::~CLLayoutEditorDialog()
 {
     destroyNavigator(m_topView);
     destroyNavigator(m_bottomView);
     destroyNavigator(m_editedView);
 }
 
-void CLLayoutEditorWnd::closeEvent(QCloseEvent *event)
+void CLLayoutEditorDialog::closeEvent(QCloseEvent *event)
 {
 
     QMessageBox::StandardButton result = YesNoCancel(this, tr("Layout Editor"), tr("Save changes?"));
@@ -91,7 +91,7 @@ void CLLayoutEditorWnd::closeEvent(QCloseEvent *event)
     destroyNavigator(m_editedView);
 }
 
-void CLLayoutEditorWnd::resizeEvent ( QResizeEvent * /*event*/)
+void CLLayoutEditorDialog::resizeEvent ( QResizeEvent * /*event*/)
 {
     QSize sz = this->size();
     m_topView->getView().setMaximumWidth(sz.width()/3);
@@ -101,7 +101,7 @@ void CLLayoutEditorWnd::resizeEvent ( QResizeEvent * /*event*/)
     m_bottomView->getView().setMaximumHeight(sz.height()/2);
 }
 
-void CLLayoutEditorWnd::destroyNavigator(CLLayoutNavigator*& nav)
+void CLLayoutEditorDialog::destroyNavigator(CLLayoutNavigator*& nav)
 {
     if (nav)
     {
@@ -112,7 +112,7 @@ void CLLayoutEditorWnd::destroyNavigator(CLLayoutNavigator*& nav)
 
 }
 
-void CLLayoutEditorWnd::onNewLayoutItemSelected(CLLayoutNavigator* ln, LayoutContent* newl)
+void CLLayoutEditorDialog::onNewLayoutItemSelected(CLLayoutNavigator* ln, LayoutContent* newl)
 {
     if (ln==m_topView)
     {

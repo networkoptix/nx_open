@@ -19,7 +19,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    setNoDelay();
+    //d->socket->setNoDelay(true);
     d->owner = _owner;
 }
 
@@ -133,18 +133,6 @@ void QnTCPConnectionProcessor::clearBuffer()
 {
     Q_D(QnTCPConnectionProcessor);
     d->sendBuffer.clear();
-}
-
-void QnTCPConnectionProcessor::setNoDelay()
-{
-    Q_D(QnTCPConnectionProcessor);
-    int flag = 1;
-    int result = setsockopt(d->socket->handle(),            /* socket affected */
-        IPPROTO_TCP,     /* set option at TCP level */
-        TCP_NODELAY,     /* name of option */
-        (char *) &flag,  /* the cast is historical
-                             cruft */
-        sizeof(int));    /* length of option value */
 }
 
 void QnTCPConnectionProcessor::sendData(const char* data, int size)

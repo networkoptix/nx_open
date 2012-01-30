@@ -2,8 +2,7 @@
 #define APPSTYLE_P_H
 
 #include <QtGui/QProxyStyle>
-
-#include "ui/proxystyle.h"
+#include "proxystyle.h"
 
 class AppStyle : public ProxyStyle
 {

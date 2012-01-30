@@ -31,7 +31,6 @@ protected:
     inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     void sendBuffer();
     void clearBuffer();
-    void setNoDelay();
 
     void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType);
     QString codeToMessage(int code);

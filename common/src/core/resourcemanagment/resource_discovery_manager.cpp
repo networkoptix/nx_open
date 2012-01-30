@@ -7,6 +7,7 @@
 #include "resource_pool.h"
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
+#include "core/resource/resource_directory_browser.h"
 
 namespace {
     class QnResourceDiscoveryManagerInstance: public QnResourceDiscoveryManager {};
@@ -90,7 +91,16 @@ void QnResourceDiscoveryManager::run()
     }
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
+    {
         searcher->setShouldBeUsed(true);
+
+        if (QnResourceDirectoryBrowser* ds = dynamic_cast<QnResourceDirectoryBrowser*>(searcher))
+        {
+            QnResourceList lst = searcher->search();
+            m_resourceProcessor->processResources(lst);
+        }
+
+    }
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     while (!needToStop() && !initResourceTypes(appServerConnection))

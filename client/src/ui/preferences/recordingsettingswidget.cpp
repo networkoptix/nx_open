@@ -9,7 +9,7 @@
 
 #include <QtMultimedia/QAudioDeviceInfo>
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 
 #ifdef Q_OS_WIN32
 #include "device_plugins/desktop/win_audio_helper.h"

@@ -1,8 +1,8 @@
 #ifndef layout_navigator_h_1340
 #define layout_navigator_h_1340
 
-#include "graphicsview.h"
-#include "mainwnd.h"
+#include <ui/widgets/graphicsview.h>
+#include <ui/widgets/mainwnd.h>
 
 class QGraphicsScene;
 

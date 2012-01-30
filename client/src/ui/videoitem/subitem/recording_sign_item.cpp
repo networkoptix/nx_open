@@ -1,6 +1,6 @@
 #include "recording_sign_item.h"
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 
 QTimer CLRecordingSignItem::mTimer;
 

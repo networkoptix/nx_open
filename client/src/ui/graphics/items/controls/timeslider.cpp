@@ -14,12 +14,12 @@
 
 #include <utils/common/util.h>
 
-#include "ui/skin/skin.h"
-#include "ui/proxystyle.h"
+#include "ui/style/skin.h"
+#include "ui/style/proxystyle.h"
 
-#include "ui/widgets2/graphicsframe.h"
-#include "ui/widgets2/graphicsslider.h"
-#include "ui/widgets/tooltipitem.h"
+#include "ui/graphics/items/standard/graphicsframe.h"
+#include "ui/graphics/items/standard/graphicsslider.h"
+#include "ui/graphics/items/tooltipitem.h"
 
 #include "ui/context_menu/menu_wrapper.h"
 

@@ -402,6 +402,15 @@ bool TCPSocket::reopen()
     }
 }
 
+int TCPSocket::setNoDelay(bool value)
+{
+    int flag = value ? 1 : 0;
+    return setsockopt(sockDesc,            // socket affected 
+        IPPROTO_TCP,     // set option at TCP level 
+        TCP_NODELAY,     // name of option 
+        (char *) &flag,  // the cast is historical cruft 
+        sizeof(int));    // length of option value 
+}
 
 TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 }

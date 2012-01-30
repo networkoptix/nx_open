@@ -1,7 +1,7 @@
 #include "recorder_item.h"
 #include "settings.h"
 #include "ui/ui_common.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 #include "recorder/recorder_display.h"
 
 CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip)
