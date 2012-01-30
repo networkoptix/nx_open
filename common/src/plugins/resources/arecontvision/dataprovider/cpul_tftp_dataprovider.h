@@ -19,6 +19,10 @@ public:
 protected:
 
     virtual QnAbstractMediaDataPtr getNextData();
+
+
+    void updateStreamParamsBasedOnFps() override{};
+
 	
 private:
 

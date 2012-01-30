@@ -340,7 +340,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (!d->liveDP) {
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
         if (camera)
-            d->liveDP = camera->getLiveReader();
+            d->liveDP = camera->getLiveReader(QnResource::Role_LiveVideo);
     }
     if (!d->archiveDP) {
         d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));

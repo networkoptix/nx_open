@@ -8,6 +8,17 @@
 #include "core/misc/scheduleTask.h"
 
 class QnServerStreamRecorder;
+class QnVideoCamera;
+
+struct Recorders
+{
+    Recorders(): recorderHiRes(0), recorderLowRes(0) {}
+    Recorders(QnServerStreamRecorder* _recorderHiRes, QnServerStreamRecorder* _recorderLowRes):
+    recorderHiRes(_recorderHiRes), recorderLowRes(_recorderLowRes) {}
+    QnServerStreamRecorder* recorderHiRes;
+    QnServerStreamRecorder* recorderLowRes;
+};
+
 class QnRecordingManager: public QObject
 {
     Q_OBJECT
@@ -22,15 +33,15 @@ public:
 
     void updateSchedule(QnSecurityCamResourcePtr camera);
 
-    QnServerStreamRecorder* findRecorder(QnResourcePtr res) const;
+    Recorders findRecorders(QnResourcePtr res) const;
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
-    void recordingFailed(QString errMessage);
+private:
+    QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
 private:
     mutable QMutex m_mutex;
-
-    QMap<QnResourcePtr, QnServerStreamRecorder*> m_recordMap;
+    QMap<QnResourcePtr, Recorders> m_recordMap;
     QMap<QnId, QnScheduleTaskList> m_scheduleByCamera;
 };
 

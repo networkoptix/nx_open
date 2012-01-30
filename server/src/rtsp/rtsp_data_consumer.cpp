@@ -303,7 +303,7 @@ void QnRtspDataConsumer::copyLastGopFromCamera()
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(m_owner->getResource());
     if (camera)
     {
-        camera->copyLastGop(m_dataQueue);
+        camera->copyLastGop(QnResource::Role_LiveVideo, m_dataQueue);
     }
 }
 

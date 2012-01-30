@@ -4,10 +4,28 @@
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
     QnAbstractMediaStreamDataProvider(dev),
-    m_fpsSleep(100*1000)
+    m_fpsSleep(100*1000),
+    m_fps(MAX_LIVE_FPS)
 {
 }
 
+void QnClientPullMediaStreamProvider::setFps(float f)
+{
+    QMutexLocker mtx(&m_mutex);
+    m_fps = f;
+}
+
+float QnClientPullMediaStreamProvider::getFps() const
+{
+    QMutexLocker mtx(&m_mutex);
+    return m_fps;
+}
+
+bool QnClientPullMediaStreamProvider::isMaxFps() const
+{
+    QMutexLocker mtx(&m_mutex);
+    return abs( m_fps - MAX_LIVE_FPS)< .1;
+}
 
 void QnClientPullMediaStreamProvider::run()
 {
@@ -123,8 +141,8 @@ void QnClientPullMediaStreamProvider::run()
 
 		putData(data);
 
-        //if (videoData && !isMaxFps())
-        //    m_fpsSleep.sleep(1000*1000/getFps());
+        if (videoData && !isMaxFps())
+            m_fpsSleep.sleep(1000*1000/getFps());
 
 	}
 
