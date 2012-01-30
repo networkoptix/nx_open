@@ -7,7 +7,6 @@ m_quality(QnQualityNormal),
 m_fps(MAX_LIVE_FPS),
 m_framesSinceLastMetaData(0),
 m_livemutex(QMutex::Recursive)
-
 {
     m_timeSinceLastMetaData.restart();
 }

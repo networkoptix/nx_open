@@ -135,9 +135,9 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
                     if (lastPeriod.durationMs == -1 && camera->getStatus() != QnResource::Online)
                     {
                         lastPeriod.durationMs = 0;
-                        QnStreamRecorder* recorder = QnRecordingManager::instance()->findRecorder(camera);
-                        if(recorder)
-                            lastPeriod.durationMs = recorder->duration()/1000;
+                        Recorders recorders = QnRecordingManager::instance()->findRecorders(camera);
+                        if(recorders.recorderHiRes)
+                            lastPeriod.durationMs = recorders.recorderHiRes->duration()/1000;
                     }
                 }
             }
@@ -199,13 +199,18 @@ QnStoragePtr QnStorageManager::getOptimalStorageRoot()
     return result;
 }
 
-QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera)
+QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix)
 {
     QnStoragePtr storage = getOptimalStorageRoot();
     Q_ASSERT(camera != 0);
     QString base = closeDirPath(storage->getUrl());
-    
-    QString text = base + camera->getMAC().toString() + QString("/") + dateTimeStr(dateTime);
+
+    if (!prefix.isEmpty())
+        base += prefix + "/";
+
+    QString text = base + camera->getMAC().toString();
+    Q_ASSERT(!camera->getMAC().toString().isEmpty());
+    text += QString("/") + dateTimeStr(dateTime);
     QDir dir(text);
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files, QDir::Name);
     int fileNum = 0;

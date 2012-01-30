@@ -43,7 +43,7 @@ public:
     void addStorage(QnStoragePtr storage);
 
 
-    QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource);
+    QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource, const QString& prefix);
     bool fileStarted(const qint64& startDateMs, const QString& fileName);
     bool fileFinished(int durationMs, const QString& fileName);
 
