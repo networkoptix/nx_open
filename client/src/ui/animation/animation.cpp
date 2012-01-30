@@ -1,5 +1,5 @@
 #include "animation.h"
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 
 
 CLAnimation::CLAnimation(GraphicsView* gview):

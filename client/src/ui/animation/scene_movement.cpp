@@ -1,6 +1,6 @@
 #include "scene_movement.h"
 
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 #include "ui/videoitem/video_wnd_item.h"
 #include "ui/animation/property_animation.h"
 

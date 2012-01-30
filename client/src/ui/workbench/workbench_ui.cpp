@@ -33,14 +33,14 @@
 #include <ui/graphics/items/masked_proxy_widget.h>
 #include <ui/graphics/items/clickable_widget.h>
 
-#include <ui/widgets2/graphicslabel.h>
+#include <ui/graphics/items/standard/graphicslabel.h>
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/videoitem/navigationitem.h>
-#include <ui/navigationtreewidget.h>
+#include <ui/graphics/items/controls/navigationitem.h>
+#include <ui/widgets/navigationtreewidget.h>
 #include <ui/context_menu_helper.h>
-#include <ui/skin/skin.h>
+#include <ui/style/skin.h>
 #include <ui/context_menu_helper.h>
 #include <ui/mixins/render_watch_mixin.h>
 

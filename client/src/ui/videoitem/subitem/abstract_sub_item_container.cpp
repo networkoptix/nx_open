@@ -2,8 +2,8 @@
 #include "abstract_image_sub_item.h"
 #include "settings.h"
 #include "recording_sign_item.h"
-#include "ui/skin/skin.h"
-#include "ui/skin/globals.h"
+#include "ui/style/skin.h"
+#include "ui/style/globals.h"
 
 CLAbstractSubItemContainer::CLAbstractSubItemContainer(QGraphicsItem* parent):
 QGraphicsItem(parent)

@@ -13,15 +13,14 @@
 
 #include "camera/camera.h"
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "ui/videoitem/video_wnd_item.h"
-#include "ui/widgets/imagebutton.h"
-#include "ui/widgets/speedslider.h"
-#include "ui/widgets/volumeslider.h"
-#include "ui/widgets/tooltipitem.h"
+#include "ui/graphics/items/standard/graphicslabel.h"
+#include "ui/graphics/items/controls/imagebutton.h"
+#include "ui/graphics/items/controls/speedslider.h"
+#include "ui/graphics/items/controls/volumeslider.h"
 #include "ui/graphics/items/image_button_widget.h"
-
-#include "ui/widgets2/graphicslabel.h"
+#include "ui/graphics/items/tooltipitem.h"
 
 #include "timeslider.h"
 

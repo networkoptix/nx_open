@@ -3,11 +3,11 @@
 
 //#define CL_CUSOM_MAINWINDOW
 #ifdef CL_CUSOM_MAINWINDOW
-#include "ui/mainwindow.h"
+#include "ui/widgets/mainwindow.h"
 #endif
 
 #include "version.h"
-#include "mainwnd.h"
+#include "ui/widgets/mainwnd.h"
 #include "settings.h"
 
 #include "decoders/video/ipp_h264_decoder.h"
@@ -15,7 +15,7 @@
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
@@ -68,8 +68,6 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 }
 
 #ifndef UNICLIENT_TESTS
-
-#include "ui/videoitem/timeslider.h"
 
 void ffmpegInit()
 {

@@ -2,7 +2,7 @@
 
 #include <QtGui/QApplication>
 
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 #include "settings.h"
 
 static const QColor NORMAL_LABEL_COLOR(255,255,255);

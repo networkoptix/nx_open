@@ -1,7 +1,7 @@
 #include "video_wnd_archive_item.h"
 #include "subitem/archive_navifation/archive_navigator_item.h"
 #include "camera/camera.h"
-#include "navigationitem.h"
+#include "ui/graphics/items/controls/navigationitem.h"
 
 CLVideoWindowArchiveItem::CLVideoWindowArchiveItem (GraphicsView* view, const QnVideoResourceLayout* layout, 
                                                     int max_width, int max_height, const QString &name) :

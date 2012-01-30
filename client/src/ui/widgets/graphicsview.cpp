@@ -1,31 +1,31 @@
 #include "graphicsview.h"
 
-#include "video_cam_layout/videocamlayout.h"
+#include "ui/video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
 #include "ui/mixins/render_watch_mixin.h"
 #include "mainwnd.h"
-#include "graphics/view/blue_background_painter.h"
+#include "ui/graphics/view/blue_background_painter.h"
 #include "settings.h"
-#include "device_settings/dlg_factory.h"
-#include "device_settings/device_settings_dlg.h"
-#include "videoitem/video_wnd_item.h"
-#include "video_cam_layout/layout_content.h"
-#include "context_menu_helper.h"
-#include "video_cam_layout/layout_manager.h"
-#include "view_drag_and_drop.h"
-#include "layout_editor_wnd.h"
-#include "videoitem/layout_item.h"
-#include "videoitem/unmoved/unmoved_pixture_button.h"
-#include "videoitem/search/search_filter_item.h"
-#include "videoitem/web_item.h"
-#include "animation/group_animation.h"
-#include "videoitem/grid_item_old.h"
+#include "ui/device_settings/dlg_factory.h"
+#include "ui/device_settings/device_settings_dlg.h"
+#include "ui/videoitem/video_wnd_item.h"
+#include "ui/video_cam_layout/layout_content.h"
+#include "ui/context_menu_helper.h"
+#include "ui/video_cam_layout/layout_manager.h"
+#include "ui/view_drag_and_drop.h"
+#include "ui/dialogs/layout_editor_dialog.h"
+#include "ui/videoitem/layout_item.h"
+#include "ui/videoitem/unmoved/unmoved_pixture_button.h"
+#include "ui/videoitem/search/search_filter_item.h"
+#include "ui/videoitem/web_item.h"
+#include "ui/animation/group_animation.h"
+#include "ui/videoitem/grid_item_old.h"
 #include "client_util.h"
 #include "utils/common/util.h"
-#include "videoitem/unmoved/multipage/page_selector.h"
+#include "ui/videoitem/unmoved/multipage/page_selector.h"
 #include "ui/ui_common.h"
-#include "ui/skin/skin.h"
-#include "ui/skin/globals.h"
+#include "ui/style/skin.h"
+#include "ui/style/globals.h"
 #include "ui/animation/property_animation.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/preferences/recordingsettingswidget.h"
@@ -96,8 +96,8 @@ extern qreal long_ratio;
 extern int limit_val(int val, int min_val, int max_val, bool mirror);
 //==============================================================================
 
-#include "ui/videoitem/navigationitem.h"
-#include "ui/videoitem/timeslider.h"
+#include "ui/graphics/items/controls/navigationitem.h"
+#include "ui/graphics/items/controls/timeslider.h"
 
 static const int NAVIGATIONITEM_HEIGHT = 60;
 
@@ -3200,7 +3200,7 @@ void GraphicsView::contextMenuHelper_addNewLayout()
         else if (m_viewMode==NormalView)
         {
             //=======
-            CLLayoutEditorWnd *editor = new CLLayoutEditorWnd(lc, this);
+            CLLayoutEditorDialog *editor = new CLLayoutEditorDialog(lc, this);
             editor->setWindowModality(Qt::ApplicationModal);
             editor->exec();
             int result = editor->result();
@@ -3281,7 +3281,7 @@ void GraphicsView::contextMenuHelper_editLayout(CLAbstractSceneItem* wnd)
 
     LayoutContent* content_copy = LayoutContent::coppyLayoutContent(content);
 
-    CLLayoutEditorWnd* editor = new CLLayoutEditorWnd(content, this);
+    CLLayoutEditorDialog* editor = new CLLayoutEditorDialog(content, this);
     editor->setWindowModality(Qt::ApplicationModal);
     editor->exec();
     int result = editor->result();

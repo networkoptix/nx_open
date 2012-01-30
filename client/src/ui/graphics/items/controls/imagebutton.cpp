@@ -1,8 +1,6 @@
 #include "imagebutton.h"
-
 #include <QtGui/QPainter>
-
-#include "ui/widgets2/abstractgraphicsbutton_p.h"
+#include <ui/graphics/items/standard/abstractgraphicsbutton_p.h>
 
 class ImageButtonPrivate : public AbstractGraphicsButtonPrivate
 {

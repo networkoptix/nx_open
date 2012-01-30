@@ -1,7 +1,7 @@
 #ifndef IMAGEBUTTON_H
 #define IMAGEBUTTON_H
 
-#include "ui/widgets2/abstractgraphicsbutton.h"
+#include <ui/graphics/items/standard/abstractgraphicsbutton.h>
 
 class ImageButtonPrivate;
 class ImageButton : public AbstractGraphicsButton

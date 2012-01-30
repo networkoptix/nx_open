@@ -3,7 +3,7 @@
 #include <QtGui/QKeySequence>
 #include <QtGui/QMenu>
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 
 #include "ui/context_menu/menu_wrapper.h"
 

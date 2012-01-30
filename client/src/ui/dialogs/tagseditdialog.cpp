@@ -9,7 +9,7 @@
 #include "core/resource/resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 
 TagsEditDialog::TagsEditDialog(const QStringList &objectIds, QWidget *parent) :
     QDialog(parent),
