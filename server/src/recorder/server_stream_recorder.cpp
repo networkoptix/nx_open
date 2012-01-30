@@ -175,7 +175,7 @@ QString QnServerStreamRecorder::fillFileName()
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, m_role == QnResource::Role_LiveVideo ? "hiQuality" : "lowQuality");
+        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role));
     }
     else {
         return m_fixedFileName;

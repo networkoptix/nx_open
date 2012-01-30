@@ -80,7 +80,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_displayLasts(0),
       m_ignoringVideo(false),
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
-      m_isRealTimeSource(false),
+      m_isRealTimeSource(true),
       m_videoBufferOverflow(false),
       m_singleShotMode(false),
       m_singleShotQuantProcessed(false),

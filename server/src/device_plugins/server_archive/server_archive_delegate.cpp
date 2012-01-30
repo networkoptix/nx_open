@@ -49,8 +49,8 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     m_resource = resource;
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     Q_ASSERT(netResource != 0);
-    m_catalog = qnStorageMan->getFileCatalog(netResource->getMAC().toString());
-    m_chunkSequence = new QnChunkSequence(netResource, 0);
+    m_catalog = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
+    m_chunkSequence = new QnChunkSequence(netResource, QnResource::Role_LiveVideo, 0);
 
     return true;
 }

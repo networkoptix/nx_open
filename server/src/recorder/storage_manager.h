@@ -13,8 +13,8 @@ class QnChunkSequence: public QObject
 {
     Q_OBJECT
 public:
-    QnChunkSequence(const QnNetworkResourcePtr res, qint64 startTime);
-    QnChunkSequence(const QnNetworkResourceList& resList, qint64 startTime);
+    QnChunkSequence(const QnNetworkResourcePtr res, QnResource::ConnectionRole role, qint64 startTime);
+    QnChunkSequence(const QnNetworkResourceList& resList, QnResource::ConnectionRole role,  qint64 startTime);
     DeviceFileCatalog::Chunk findChunk(QnResourcePtr res, qint64 time, DeviceFileCatalog::FindMethod findMethod);
     DeviceFileCatalog::Chunk getNextChunk(QnResourcePtr res);
     //qint64 nextChunkStartTime(QnResourcePtr res);
@@ -32,6 +32,7 @@ private:
     };
     QMap<QnResourcePtr, CacheInfo> m_cache;
     qint64 m_startTime;
+    QnResource::ConnectionRole m_role;
 };
 
 class QnStorageManager
@@ -54,7 +55,9 @@ public:
         QnStoragePtr storage = storageRoot(storage_index);
         return storage && storage->getStatus() == QnResource::Online; 
     }
-    DeviceFileCatalogPtr getFileCatalog(const QString& mac);
+    DeviceFileCatalogPtr getFileCatalog(const QString& mac, QnResource::ConnectionRole role);
+    DeviceFileCatalogPtr getFileCatalog(const QString& mac, const QString& qualityPrefix);
+
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
     void loadFullFileCatalog();
 private:
@@ -63,11 +66,14 @@ private:
     int detectStorageIndex(const QString& path);
     bool deserializeStorageFile();
     bool serializeStorageFile();
+    void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
+    void extractFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality);
 private:
     typedef QMap<int, QnStoragePtr> StorageMap;
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
-    FileCatalogMap m_devFileCatalog;
+    FileCatalogMap m_devFileCatalogHi;
+    FileCatalogMap m_devFileCatalogLow;
     mutable QMutex m_mutex;
 
     QMap<QString, int> m_storageIndexes;

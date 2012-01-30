@@ -120,7 +120,6 @@ QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::Conn
             m_secondaryGopKeeper = gopKeeper;
         reader->addDataProcessor(gopKeeper);
         reader->start();
-        gopKeeper->start();
     }
     return reader;
 }

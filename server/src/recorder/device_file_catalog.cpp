@@ -10,13 +10,31 @@
 #include "motion/motion_helper.h"
 #include <QDebug>
 
-DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
+QString DeviceFileCatalog::prefixForRole(QnResource::ConnectionRole role)
+{
+    return role == QnResource::Role_LiveVideo ? "hi_quality" : "low_quality";
+}
+
+QnResource::ConnectionRole DeviceFileCatalog::roleForPrefix(const QString& prefix)
+{
+    if (prefix == "hi_quality")
+        return QnResource::Role_LiveVideo;
+    else
+        return QnResource::Role_SecondaryLiveVideo;
+}
+
+
+DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
     m_mutex(QMutex::Recursive),
-    m_duplicateName(false)
+    m_duplicateName(false),
+    m_role(role)
 {
-    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + m_macAddress + QString("/title.csv");
+    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
+    devTitleFile += prefixForRole(role) + "/";
+    devTitleFile += m_macAddress + "/";
+    devTitleFile += QString("title.csv");
     m_file.setFileName(devTitleFile);
     QDir dir;
     dir.mkpath(QFileInfo(devTitleFile).absolutePath());
@@ -47,7 +65,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     QnResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
         return false;
-    QString prefix = closeDirPath(storage->getUrl()) + m_macAddress + QString('/');
+    QString prefix = closeDirPath(storage->getUrl()) + prefixForRole(m_role) + QString('/') + m_macAddress + QString('/');
 
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
@@ -344,6 +362,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
     if (!storage)
         return QString();
     return closeDirPath(storage->getUrl()) + 
+                prefixForRole(m_role) + QString('/') +
                 m_macAddress + QString('/') +
                 QnStorageManager::dateTimeStr(chunk.startTimeMs) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
