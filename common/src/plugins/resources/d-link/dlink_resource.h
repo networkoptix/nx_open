@@ -42,6 +42,8 @@ public:
 
     QnPlDlinkResource();
 
+    virtual int getMaxFps() override; 
+
     virtual bool isResourceAccessible();
 
     virtual bool updateMACAddress();
@@ -67,5 +69,7 @@ protected:
     
     QnDlink_cam_info  m_camInfo;
 };
+
+typedef QSharedPointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
 #endif //dlink_resource_h_2215

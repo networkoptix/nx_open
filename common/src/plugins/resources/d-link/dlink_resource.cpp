@@ -13,6 +13,19 @@ QnPlDlinkResource::QnPlDlinkResource()
 
 }
 
+int QnPlDlinkResource::getMaxFps()
+{
+    QMutexLocker mutexLocker(&m_mutex);
+
+    if (m_camInfo.possibleFps.size()==0)
+    {
+        Q_ASSERT(false);
+        return 15;
+    }
+
+    return m_camInfo.possibleFps.at(0);
+}
+
 bool QnPlDlinkResource::isResourceAccessible()
 {
     return updateMACAddress();
