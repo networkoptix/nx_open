@@ -231,7 +231,7 @@ void QnPlAreconVisionResource::onStatusChanged(QnResource::Status oldStatus, QnR
     //if (!getDescription())
     //    return;
 
-    setRegister(3, 21, 5); // sets I frame frequency to 1/20
+    setRegister(3, 21, 20); // sets I frame frequency to 1/20
 
 
     if (!setParam("Enable motion detection", "on", QnDomainPhysical)) // enables motion detection;
