@@ -35,6 +35,9 @@ QnResource::ConnectionRole QnLiveStreamProvider::getRole() const
 void QnLiveStreamProvider::setQuality(QnStreamQuality q)
 {
     QMutexLocker mtx(&m_livemutex);
+    if (m_quality == q)
+        return; // same quality
+
     m_quality = q;
     updateStreamParamsBasedOnQuality();
     //setNeedKeyData();
@@ -50,6 +53,10 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
 void QnLiveStreamProvider::setFps(float f)
 {
     QMutexLocker mtx(&m_livemutex);
+
+    if (abs(m_fps - f) < 0.1)
+        return; // same fps?
+
     m_fps = f;
     
     if (getRole() != QnResource::Role_SecondaryLiveVideo)
