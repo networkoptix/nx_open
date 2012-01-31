@@ -129,6 +129,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
     addAction(&cm_reconnect);
 
+    connect(&cm_new_tab, SIGNAL(triggered()), this, SLOT(at_newLayoutRequested()));
+    addAction(&cm_new_tab);
+
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
     /* Set up scene & view. */
@@ -172,31 +175,24 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
+    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     connect(m_tabBar, SIGNAL(currentChanged(QnWorkbenchLayout *)), this, SLOT(at_tabBar_currentChanged(QnWorkbenchLayout *)));
     connect(m_tabBar, SIGNAL(layoutRemoved(QnWorkbenchLayout *)), this, SLOT(at_tabBar_layoutRemoved(QnWorkbenchLayout *)));
 
-    /* New tab button. */
-    QToolButton *newTabButton = new QToolButton();
-    newTabButton->setToolTip(tr("New Tab"));
-    newTabButton->setShortcut(QKeySequence::New);
-    newTabButton->setIcon(Skin::icon(QLatin1String("plus.png")));
-    newTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    connect(newTabButton, SIGNAL(clicked()), this, SLOT(at_newLayoutRequested()));
-
     /* Tab bar layout. To snap tab bar to graphics view. */
-    QVBoxLayout *tabBarLayout = new QVBoxLayout();
-    tabBarLayout->setContentsMargins(0, 0, 0, 0);
-    tabBarLayout->setSpacing(0);
-    tabBarLayout->addStretch(0x1000);
-    tabBarLayout->addWidget(m_tabBar);
+    m_tabBarLayout = new QVBoxLayout();
+    m_tabBarLayout->setContentsMargins(0, 0, 0, 0);
+    m_tabBarLayout->setSpacing(0);
+    m_tabBarLayout->addStretch(0x1000);
+    m_tabBarLayout->addWidget(m_tabBar);
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
-    m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newTabButton);
+    m_titleLayout->addLayout(m_tabBarLayout);
+    m_titleLayout->addWidget(newActionButton(&cm_new_tab));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(&cm_reconnect));
     m_titleLayout->addWidget(newActionButton(&cm_preferences));
@@ -348,6 +344,15 @@ void MainWnd::updateFullScreenState()
 
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);
+    if(fullScreen) {
+        m_tabBar->setParent(NULL);
+        m_ui->setTabBar(m_tabBar);
+        m_tabBar->show();
+    } else {
+        m_ui->setTabBar(NULL);
+        m_tabBarLayout->addWidget(m_tabBar);
+        m_tabBar->show();
+    }
     m_view->setLineWidth(isFullScreen() ? 0 : 1);
 
     updateDwmState();

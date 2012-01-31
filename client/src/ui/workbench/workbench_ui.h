@@ -5,6 +5,8 @@
 #include <ui/common/scene_utility.h>
 #include "workbench.h"
 
+class QGraphicsProxyWidget;
+
 class CLVideoCamera;
 
 class InstrumentManager;
@@ -25,6 +27,7 @@ class QnResourceWidget;
 class QnMaskedProxyWidget;
 class QnAbstractRenderer;
 class QnClickableWidget;
+class QnLayoutTabBar;
 
 
 class QnWorkbenchUi: public QObject, protected SceneUtility {
@@ -92,6 +95,7 @@ signals:
 
 public slots:
     void setTitleUsed(bool titleUsed);
+    void setTabBar(QWidget *tabBar);
     void setFpsVisible(bool fpsVisible);
 
     void setTreeVisible(bool visible, bool animate = true);
@@ -273,6 +277,8 @@ private:
     QnClickableWidget *m_titleItem;
 
     QnImageButtonWidget *m_titleShowButton;
+
+    QGraphicsProxyWidget *m_tabBarItem;
 
     AnimatorGroup *m_titleOpacityAnimatorGroup;
 
