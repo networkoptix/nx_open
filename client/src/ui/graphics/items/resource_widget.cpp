@@ -20,7 +20,7 @@
 
 namespace {
     /** Default frame width. */
-    const qreal defaultFrameWidth = 0.5;
+    const qreal defaultFrameWidth = 5;
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
