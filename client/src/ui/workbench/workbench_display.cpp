@@ -77,7 +77,7 @@ namespace {
     const qreal maxExpandedSize = 0.5;
 
     /** Viewport lower size boundary, in scene coordinates. */
-    const QSizeF viewportLowerSizeBound = QSizeF(80.0, 80.0);
+    const QSizeF viewportLowerSizeBound = QSizeF(800.0, 800.0);
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
@@ -275,6 +275,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_gridItem.data()->setAnimationTimeLimit(300);
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
     m_gridItem.data()->setOpacity(0.0);
+    m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(m_workbench->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
@@ -568,14 +569,14 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     togglePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("unpin.png")));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
-    togglePinButton->setPreferredSize(QSizeF(100.0, 100.0));
+    togglePinButton->setPreferredSize(QSizeF(1000.0, 1000.0));
     connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
     widget->addButton(togglePinButton);
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("close.png")));
     closeButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("close_hover.png")));
-    closeButton->setPreferredSize(QSizeF(100.0, 100.0));
+    closeButton->setPreferredSize(QSizeF(1000.0, 1000.0));
     closeButton->setAnimationSpeed(4.0);
     connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
     widget->addButton(closeButton);

@@ -20,7 +20,7 @@ Q_DECLARE_METATYPE(VariantAnimator *);
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_color(QColor(0, 0, 0, 0)),
-    m_lineWidth(1.0),
+    m_lineWidth(0.0),
     m_opacityAnimator(new VariantAnimator(this))
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;

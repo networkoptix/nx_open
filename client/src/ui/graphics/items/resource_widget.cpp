@@ -20,7 +20,7 @@
 
 namespace {
     /** Default frame width. */
-    const qreal defaultFrameWidth = 5;
+    const qreal defaultFrameWidth = 50.0;
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -30,7 +30,7 @@ namespace {
     const qreal frameExtensionMultiplier = 1.0;
 
     /** Default shadow displacement, in scene coordinates. */
-    const QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
+    const QPointF defaultShadowDisplacement = QPointF(500.0, 500.0);
 
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
     const qint64 defaultLoadingTimeoutMSec = 2000;

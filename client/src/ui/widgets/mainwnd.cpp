@@ -150,8 +150,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-    const QSizeF defaultCellSize = QSizeF(1500.0, 1000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
-    const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
+    const QSizeF defaultCellSize = QSizeF(15000.0, 10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
+    const QSizeF defaultSpacing = QSizeF(2500.0, 2500.0);
     m_workbench = new QnWorkbench(this);
     m_workbench->mapper()->setCellSize(defaultCellSize);
     m_workbench->mapper()->setSpacing(defaultSpacing);
