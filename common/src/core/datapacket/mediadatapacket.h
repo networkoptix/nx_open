@@ -35,7 +35,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
                      MediaFlags_AfterEOF = 2,
                      MediaFlags_BOF = 4,
                      MediaFlags_LIVE = 8,
-                     MediaFlags_SingleShot = 16,
+                     //MediaFlags_SingleShot = 16,
+                     MediaFlags_Ignore = 16
                     };
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)
@@ -94,7 +95,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 		dataType = VIDEO;
 		//useTwice = false;
 		context = ctx;
-		ignore = false;
+		//ignore = false;
         flags = 0;
         width = height = -1;
 	}
@@ -104,7 +105,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 	int height;
 	//bool keyFrame;
     //int flags;
-	bool ignore;
+	//bool ignore;
     QnMetaDataV1Ptr motion;
     
 };

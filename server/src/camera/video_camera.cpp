@@ -75,7 +75,7 @@ void QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
         {
             QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
             if (video && video->timestamp <= skipTime)
-                video->ignore = true;
+                video->flags |= QnAbstractMediaData::MediaFlags_Ignore;
         }
         dstQueue.push(data);
     }

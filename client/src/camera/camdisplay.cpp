@@ -220,7 +220,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
-                Q_ASSERT(!vd->ignore);
+                Q_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
                 //QTime t;
                 //t.start();
                 int sign = speed >= 0 ? 1 : -1;
@@ -299,7 +299,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         QTime displayTime;
         displayTime.restart();
 
-        bool draw = !vd->ignore && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
+        bool draw = !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore) && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
         // If there are multiple channels for this timestamp use only one of them
         //if (channel == 0 && draw)
@@ -307,7 +307,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
         CL_LOG(cl_logDEBUG2)
         {
-            if (vd->ignore)
+            if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
                 cl_log.log(QLatin1String("Ignoring frame "), (int)vd->timestamp, cl_logDEBUG2);
             else
                 cl_log.log(QLatin1String("Playing frame "), (int)vd->timestamp, cl_logDEBUG2);
@@ -435,7 +435,7 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_iFrames = 0;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i]) {
-            if (vd && !vd->ignore)
+            if (vd && !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
                 m_display[i]->blockTimeValue(media->timestamp);
             m_display[i]->unblockTimeValue();
         }
@@ -572,7 +572,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     if (vd)
     {
-        m_ignoringVideo = vd->ignore;
+        m_ignoringVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
         if (m_lastMetadata && m_lastMetadata->containTime(vd->timestamp))
             vd->motion = m_lastMetadata;
         else {
@@ -753,13 +753,13 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             vd = nextInOutVideodata(vd, channel);
             if (!vd)
                 return result; // impossible? incoming vd!=0
-            if (!vd->ignore)
+            if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
                 m_lastDecodedTime = vd->timestamp;
 
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
 
-            display(vd, !vd->ignore, speed);
+            display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed);
             m_singleShotQuantProcessed = true;
             return result;
         }
@@ -793,7 +793,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             vd = nextInOutVideodata(incoming, channel);
             incoming = QnCompressedVideoDataPtr();
             if (vd) {
-                if (!vd->ignore)
+                bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
+                if (!ignoreVideo)
                     m_lastDecodedTime = vd->timestamp;
                 if (m_lastAudioPacketTime != m_syncAudioTime) {
                     qint64 currentAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
@@ -801,7 +802,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                         m_display[channel]->setCurrentTime(currentAudioTime);
                     m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
                 }                
-                display(vd, !vd->ignore, speed);
+                display(vd, !ignoreVideo, speed);
                 m_singleShotQuantProcessed = true;
             }
 

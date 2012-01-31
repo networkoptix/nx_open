@@ -506,19 +506,19 @@ begin_label:
                 if (m_nextData->flags & QnAbstractMediaData::MediaFlags_LIVE)
                     setSkipFramesToTime(0);
                 else if (!reverseMode && m_nextData->timestamp < m_skipFramesToTime)
-                    videoData->ignore = true;
+                    videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
                 else if (reverseMode && m_nextData->timestamp > m_skipFramesToTime)
-                    videoData->ignore = true;
+                    videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
                 else {
                     setSkipFramesToTime(0);
                     if (m_ignoreSkippingFrame)
-                        videoData->ignore = true; // do not repeat last frame in such mode
+                        videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore; // do not repeat last frame in such mode
                 }
             }
         }
     }
 
-    if (videoData && videoData->ignore && m_ignoreSkippingFrame)
+    if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
 
 
@@ -544,7 +544,7 @@ begin_label:
 
     if (m_currentData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
+        //m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
     if (m_currentData)
         m_currentData->opaque = m_dataMarker;
@@ -554,7 +554,7 @@ begin_label:
 
 
     // ensure Pos At playback mask
-    if (m_runing && videoData && !videoData->ignore && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (m_runing && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();
