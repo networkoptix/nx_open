@@ -15,7 +15,7 @@ public:
     virtual ~QnVideoCameraGopKeeper();
     QnAbstractMediaStreamDataProvider* getLiveReader();
 
-    void copyLastGop(CLDataQueue& dstQueue);
+    void copyLastGop(qint64 skipTime, CLDataQueue& dstQueue);
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
@@ -65,11 +65,20 @@ bool QnVideoCameraGopKeeper::processData(QnAbstractDataPacketPtr /*data*/)
     return true;
 }
 
-void QnVideoCameraGopKeeper::copyLastGop(CLDataQueue& dstQueue)
+void QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
 {
     QMutexLocker lock(&m_queueMtx);
     for (int i = 0; i < m_dataQueue.size(); ++i)
-        dstQueue.push(m_dataQueue.at(i));
+    {
+        QnAbstractDataPacketPtr data = m_dataQueue.at(i);
+        if (skipTime)
+        {
+            QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+            if (video && video->timestamp <= skipTime)
+                video->ignore = true;
+        }
+        dstQueue.push(data);
+    }
 }
 
 // --------------- QnVideoCamera ----------------------------
@@ -132,12 +141,12 @@ QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::Conn
     return reader;
 }
 
-void QnVideoCamera::copyLastGop(bool primaryLiveStream, CLDataQueue& dstQueue)
+void QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue)
 {
     if (primaryLiveStream)
-        m_primaryGopKeeper->copyLastGop(dstQueue);
+        m_primaryGopKeeper->copyLastGop(skipTime, dstQueue);
     else
-        m_secondaryGopKeeper->copyLastGop(dstQueue);
+        m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
 }
 
 void QnVideoCamera::onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value)

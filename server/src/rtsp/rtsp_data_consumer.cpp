@@ -20,6 +20,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   QnAbstractDataConsumer(MAX_QUEUE_SIZE),
   m_owner(owner),
   m_lastSendTime(0),
+  m_lastMediaTime(0),
   m_waitSCeq(0),
   m_liveMode(false),
   m_pauseNetwork(false),
@@ -50,13 +51,13 @@ void QnRtspDataConsumer::resumeNetwork()
 //qint64 lastSendTime() const { return m_lastSendTime; }
 void QnRtspDataConsumer::setLastSendTime(qint64 time) 
 { 
-    m_lastSendTime = time; 
+    m_lastMediaTime = m_lastSendTime = time; 
 }
 void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
 { 
     QMutexLocker lock(&m_mutex);
     m_waitSCeq = sceq; 
-    m_lastSendTime = newTime;
+    m_lastMediaTime = m_lastSendTime = newTime;
     m_ctxSended.clear();
     m_gotLivePacket = false;
 }
@@ -157,37 +158,6 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true;
 
-    {
-        // swithing between dataProviders in live mode
-        QMutexLocker lock(&m_dataQueueMtx);
-        if (m_prefferedProvider)
-        {
-            if (m_currentDP != m_prefferedProvider)
-            {
-                // dont switched yet
-                if (data->dataProvider == m_prefferedProvider)
-                {
-                    // try to switch
-                    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-                    if (video && (video->flags & AV_PKT_FLAG_KEY))
-                    {
-                        m_currentDP->removeDataProcessor(this);
-                        m_currentDP = m_prefferedProvider;
-                    }
-                    else {
-                        // Ignore data. It is preffered provider, but we can't switch right now because looking for key data
-                        return true;
-                    }
-                }
-            }
-            else if (data->dataProvider != m_prefferedProvider)
-            {
-                // ignore data from not preffered dataProvider. Some data still in the queue althought we already unsubscribed from this provider
-                return true; 
-            }
-        }
-        m_currentDP = data->dataProvider;
-    }
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
 
@@ -259,6 +229,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     if (m_lastSendTime != DATETIME_NOW)
         m_lastSendTime = media->timestamp;
+    m_lastMediaTime = media->timestamp;
 
     m_mutex.unlock();
 
@@ -318,14 +289,12 @@ void QnRtspDataConsumer::unlockDataQueue()
     m_dataQueueMtx.unlock();
 }
 
-void QnRtspDataConsumer::copyLastGopFromCamera()
+void QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime)
 {
     // Fast channel zapping
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(m_owner->getResource());
     if (camera)
-    {
-        camera->copyLastGop(QnResource::Role_LiveVideo, m_dataQueue);
-    }
+        camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
 }
 
 void QnRtspDataConsumer::setSingleShotMode(bool value)
@@ -334,7 +303,15 @@ void QnRtspDataConsumer::setSingleShotMode(bool value)
     m_packetSended = 0;
 }
 
-void QnRtspDataConsumer::setPrefferedDataProcessor(QnAbstractStreamDataProvider* prefferedProvider)
+qint64 QnRtspDataConsumer::lastQueuedTime()
 {
-    m_prefferedProvider = prefferedProvider;
+    if (m_dataQueue.size() == 0)
+        return m_lastMediaTime;
+    else {
+        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.last());
+        if (media)
+            return media->timestamp;
+        else
+            return m_lastMediaTime;
+    }
 }

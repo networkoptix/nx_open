@@ -401,7 +401,6 @@ int QnRtspConnectionProcessor::composePlay()
     d->dataProcessor->setLiveMode(d->liveMode);
     if (d->liveMode) {
         d->dataProcessor->lockDataQueue();
-        d->dataProcessor->setPrefferedDataProcessor(0);
 
     }
     currentDP->addDataProcessor(d->dataProcessor);
@@ -410,7 +409,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->liveMode) 
     {
         if (getResource()->getStatus() == QnResource::Online)
-            d->dataProcessor->copyLastGopFromCamera();
+            d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, 0);
 
         d->dataProcessor->unlockDataQueue();
         d->dataProcessor->setWaitCSeq(d->startTime, 0); // ignore rest packets before new position
@@ -498,13 +497,19 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
                 // subscribe to both Hi and Low live providers.
                 // Swith will occured in future then required live provider will send I-frame
-                d->liveDpHi->addDataProcessor(d->dataProcessor);
-                d->liveDpLow->addDataProcessor(d->dataProcessor);
+                if (d->quality == MEDIA_Quality_High) 
+                    d->liveDpLow->removeDataProcessor(d->dataProcessor);
+                else 
+                    d->liveDpHi->removeDataProcessor(d->dataProcessor);
+                QnAbstractMediaStreamDataProvider* prefferedDP = getLiveDp();
+                prefferedDP->addDataProcessor(d->dataProcessor);
+
+                qint64 time = d->dataProcessor->lastQueuedTime();
+                d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, time);
+
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)
-                QnAbstractMediaStreamDataProvider* prefferedDP = d->quality == MEDIA_Quality_High ? d->liveDpHi : d->liveDpLow;
-                d->dataProcessor->setPrefferedDataProcessor(prefferedDP);
 
                 d->dataProcessor->unlockDataQueue();
             }
