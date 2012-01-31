@@ -1,12 +1,12 @@
 #include "dwm.h"
 #include <QLibrary>
 #include <QWidget>
+#include <QtGui/private/qwidget_p.h>
 #include <utils/common/warnings.h>
 
 #ifdef Q_OS_WIN
 
 #include <qt_windows.h>
-
 #define NOMINMAX
 #include <Windows.h>
 #include <WindowsX.h>
@@ -65,7 +65,6 @@ typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, L
 typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 
 #endif
-
 
 class QnDwmPrivate {
 public:
@@ -431,23 +430,59 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
     if(!SUCCEEDED(status))
         return false;
 
+    updateFrameStrut();
+
     return true;
 #else
     return false;
 #endif
 }
 
-#ifdef Q_OS_WIN
-bool QnDwm::winEvent(MSG *message, long *result) {
+bool QnDwm::widgetEvent(QEvent *event) {
+    Q_UNUSED(event);
+
     if(d->widget == NULL)
         return false;
 
-    if(!d->hasDwm)
+#ifdef Q_OS_WIN
+    if(d->overrideFrameMargins) {
+        /* Qt calculates frame margins based on window's style, 
+         * not on actual margins specified by WM_NCCALCSIZE. We fix that. */
+        QWidgetData *data = qt_qwidget_data(d->widget);
+        if(data->fstrut_dirty)
+            updateFrameStrut();
+    }
+#endif
+
+    return false;
+}
+
+void QnDwm::updateFrameStrut() {
+    QWidgetPrivate *wd = qt_widget_private(d->widget);
+    QTLWExtra *tlwExtra = wd->maybeTopData();
+    if(tlwExtra != NULL) {
+        QMargins margins = currentFrameMargins();
+        tlwExtra->frameStrut = QRect(
+            margins.left(),
+            margins.top(),
+            margins.right(),
+            margins.bottom()
+        );
+
+        qt_qwidget_data(d->widget)->fstrut_dirty = false;
+    }
+}
+
+#ifdef Q_OS_WIN
+bool QnDwm::widgetWinEvent(MSG *message, long *result) {
+    if(d->widget == NULL)
         return false;
 
-    BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
-    if (handled)
-        return true;
+    if(d->hasDwm) {
+        BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
+        if (handled)
+            return true;
+    }
 
     switch(message->message) {
     case WM_NCCALCSIZE:             return calcSizeEvent(message, result);
@@ -549,7 +584,9 @@ namespace {
 } // anonymous namespace
 
 bool QnDwm::hitTestEvent(MSG *message, long *result) {
-    BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
+    BOOL handled = FALSE;
+    if(d->hasDwm)
+        handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
     if(!handled)
         *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
 

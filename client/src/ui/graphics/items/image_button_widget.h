@@ -71,6 +71,7 @@ public Q_SLOTS:
     void setChecked(bool checked);
     void setDisabled(bool disabled = false);
     inline void toggle() { setChecked(!isChecked()); }
+    void click();
 
 Q_SIGNALS:
     void clicked(bool checked = false);

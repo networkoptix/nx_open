@@ -90,7 +90,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
       m_controller(0),
       m_drawCustomFrame(false),
-      m_titleVisible(true)
+      m_titleVisible(true),
+      m_dwm(NULL)
 {
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
@@ -149,7 +150,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-    const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
+    const QSizeF defaultCellSize = QSizeF(1500.0, 1000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
     m_workbench = new QnWorkbench(this);
     m_workbench->mapper()->setCellSize(defaultCellSize);
@@ -214,7 +215,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_globalLayout->addLayout(m_titleLayout);
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
-
     setLayout(m_globalLayout);
 
     /* Add single tab. */
@@ -413,7 +413,7 @@ void MainWnd::updateDwmState()
         m_dwm->disableSystemWindowPainting();
         m_dwm->enableTransparentErasing();
         m_dwm->extendFrameIntoClientArea();
-        m_dwm->setCurrentFrameMargins(QMargins(1, 0, 1, 1)); /* Can't set (0, 0, 0, 0) here as it will cause awful display artifacts. */
+        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is also needed to prevent display artifacts. */
         m_dwm->enableDoubleClickProcessing();
         m_dwm->enableTitleBarDrag();
@@ -424,12 +424,12 @@ void MainWnd::updateDwmState()
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(frameMargins.left() - 1, 2, 2, 0);
+        m_titleLayout->setContentsMargins(frameMargins.left(), 2, 2, 0);
         m_viewLayout->setContentsMargins(
-            frameMargins.left() - 1,
+            frameMargins.left(),
             isTitleVisible() ? 0 : frameMargins.top(),
-            frameMargins.right() - 1,
-            frameMargins.bottom() - 1
+            frameMargins.right(),
+            frameMargins.bottom()
         );
     } else {
         /* Windowed without aero glass. */
@@ -455,12 +455,12 @@ void MainWnd::updateDwmState()
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(frameMargins.left() - 1, 2, 2, 0);
+        m_titleLayout->setContentsMargins(frameMargins.left(), 2, 2, 0);
         m_viewLayout->setContentsMargins(
             frameMargins.left(),
             isTitleVisible() ? 0 : frameMargins.top(),
             frameMargins.right(),
-            frameMargins.bottom() - 1
+            frameMargins.bottom()
         );
     }
 }
@@ -516,6 +516,15 @@ void MainWnd::at_treeWidget_activated(uint resourceId)
     m_controller->drop(resource);
 }
 
+bool MainWnd::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(m_dwm != NULL)
+        result |= m_dwm->widgetEvent(event);
+
+    return result;
+}
+
 void MainWnd::closeEvent(QCloseEvent *event)
 {
     base_type::closeEvent(event);
@@ -567,7 +576,7 @@ void MainWnd::resizeEvent(QResizeEvent *event) {
 #ifdef Q_OS_WIN
 bool MainWnd::winEvent(MSG *message, long *result)
 {
-    if(m_dwm->winEvent(message, result))
+    if(m_dwm->widgetWinEvent(message, result))
         return true;
 
     return base_type::winEvent(message, result);

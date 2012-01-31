@@ -123,8 +123,7 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     setPixmap(CHECKED | PRESSED,    bestPixmap(icon, QIcon::Selected, QIcon::On));
 }
 
-void QnImageButtonWidget::setCheckable(bool checkable)
-{
+void QnImageButtonWidget::setCheckable(bool checkable) {
     if (m_checkable == checkable)
         return;
 
@@ -134,8 +133,7 @@ void QnImageButtonWidget::setCheckable(bool checkable)
     update();
 }
 
-void QnImageButtonWidget::setChecked(bool checked)
-{
+void QnImageButtonWidget::setChecked(bool checked) {
     if (!m_checkable || checked == isChecked())
         return;
 
@@ -143,8 +141,7 @@ void QnImageButtonWidget::setChecked(bool checked)
     update();
 }
 
-void QnImageButtonWidget::setDisabled(bool disabled)
-{
+void QnImageButtonWidget::setDisabled(bool disabled) {
     setEnabled(!disabled);
 }
 
@@ -154,6 +151,14 @@ qreal QnImageButtonWidget::animationSpeed() const {
 
 void QnImageButtonWidget::setAnimationSpeed(qreal animationSpeed) {
     m_animator->setSpeed(animationSpeed);
+}
+
+void QnImageButtonWidget::click() {
+    if(m_action != NULL)
+        m_action->trigger();
+    else
+        toggle();
+    emit clicked(isChecked());
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -190,11 +195,7 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
     if(isDisabled())
         return;
 
-    if(m_action != NULL)
-        m_action->trigger();
-    else
-        toggle();
-    Q_EMIT clicked(isChecked());
+    click();
 }
 
 void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {

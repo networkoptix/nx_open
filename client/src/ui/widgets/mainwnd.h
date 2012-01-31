@@ -37,6 +37,7 @@ Q_SIGNALS:
     void mainWindowClosed();
 
 protected:
+    virtual bool event(QEvent *event) override;
     virtual void closeEvent(QCloseEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;

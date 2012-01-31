@@ -167,6 +167,14 @@ public:
         return enableTitleBarDrag(!disable);
     }
 
+    /**
+     * This function is to be called at the end of widget's <tt>event</tt> handler.
+     * 
+     * \param event                     Event.
+     * \returns                         Whether the event was processed.
+     */
+    bool widgetEvent(QEvent *event);
+
 #ifdef Q_OS_WIN
     /**
      * This function is to be called from widget's <tt>winEvent</tt> handler.
@@ -175,7 +183,7 @@ public:
      * \param[out] result               Result of message processing.
      * \returns                         Whether the message was processsed.
      */
-    bool winEvent(MSG *message, long *result);
+    bool widgetWinEvent(MSG *message, long *result);
 #endif
 
 signals:
@@ -203,6 +211,9 @@ protected:
     bool sysCommandEvent(MSG *message, long *result);
     bool eraseBackground(MSG *message, long *result);
 #endif
+
+private:
+    void updateFrameStrut();
 
 private:
     QnDwmPrivate *d;
