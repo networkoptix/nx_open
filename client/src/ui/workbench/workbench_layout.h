@@ -39,37 +39,20 @@ public:
     virtual ~QnWorkbenchLayout();
 
     /**
-      * Load from QnLayoutData
-      */
-    void load(const QnLayoutData&);
-
-public Q_SLOTS:
-    /**
-     * Adds the given item to this layout. This layout takes ownership of the
-     * given item. If the given item already belongs to some other layout,
-     * it will first be removed from that layout.
-     *
-     * If the position where the item is to be placed is occupied, the item
-     * will be placed unpinned.
-     *
-     * \param item                      Item to add.
+     * \returns                         Name of this layout. 
      */
-    void addItem(QnWorkbenchItem *item);
+    const QString &name() const;
 
     /**
-     * Removes the given item from this layout. Item's ownership is passed
-     * to the caller.
-     *
-     * \param item                      Item to remove
+     * \param name                      New name for this layout. 
      */
-    void removeItem(QnWorkbenchItem *item);
-
+    void setName(const QString &name);
+    
     /**
-     * Clears this layout by removing all its items.
+     * \param layoutData                Data to load layout from.
      */
-    void clear();
+    void load(const QnLayoutData &layoutData);
 
-public:
     /**
      * \param item                      Item to check.
      * \param geometry                  New position.
@@ -177,7 +160,33 @@ public:
      */
     QRect closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric = NULL) const;
 
-Q_SIGNALS:
+public slots:
+    /**
+     * Adds the given item to this layout. This layout takes ownership of the
+     * given item. If the given item already belongs to some other layout,
+     * it will first be removed from that layout.
+     *
+     * If the position where the item is to be placed is occupied, the item
+     * will be placed unpinned.
+     *
+     * \param item                      Item to add.
+     */
+    void addItem(QnWorkbenchItem *item);
+
+    /**
+     * Removes the given item from this layout. Item's ownership is passed
+     * to the caller.
+     *
+     * \param item                      Item to remove
+     */
+    void removeItem(QnWorkbenchItem *item);
+
+    /**
+     * Clears this layout by removing all its items.
+     */
+    void clear();
+    
+signals:
     /**
      * This signal is emitted when this layout is about to be destroyed
      * (i.e. its destructor has started).
@@ -208,8 +217,13 @@ Q_SIGNALS:
      */
     void boundingRectChanged();
 
-private Q_SLOTS:
-    void resourceRemoved(const QnResourcePtr &resource);
+    /**
+     * This signal is emitted whenever name of this layout changes. 
+     */
+    void nameChanged();
+
+private slots:
+    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
     template<bool returnEarly>
@@ -219,6 +233,9 @@ private:
     void updateBoundingRectInternal();
 
 private:
+    /** Name of this layout. */
+    QString m_name;
+
     /** Matrix map from coordinate to item. */
     QnMatrixMap<QnWorkbenchItem *> m_itemMap;
 
