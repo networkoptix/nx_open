@@ -11,9 +11,12 @@
 
 struct AVCodecContext;
 
+enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low };
+
 class QnMediaContext
 {
 public:
+
     QnMediaContext(AVCodecContext* ctx);
     QnMediaContext(CodecID codecId);
     QnMediaContext(const quint8* payload, int dataSize);

@@ -41,8 +41,8 @@ void QnLiveStreamProvider::setQuality(QnStreamQuality q)
     if (m_quality == q)
         return; // same quality
 
-    if (m_quality != QnQualityLowest && m_role == QnResource::Role_SecondaryLiveVideo)
-        Q_ASSERT(false); // trying to play with quality for second stream by yourself 
+    
+    Q_ASSERT(m_role != QnResource::Role_SecondaryLiveVideo || q == QnQualityLowest); // trying to play with quality for second stream by yourself 
 
     m_quality = q;
     updateStreamParamsBasedOnQuality();

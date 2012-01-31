@@ -7,14 +7,17 @@
 class QnAbstractMediaStreamDataProvider;
 class QnVideoCameraGopKeeper;
 
-class QnVideoCamera
+class QnVideoCamera: public QObject
 {
+    Q_OBJECT
 public:
     QnVideoCamera(QnResourcePtr resource);
     virtual ~QnVideoCamera();
     QnAbstractMediaStreamDataProvider* getLiveReader(QnResource::ConnectionRole role);
     void copyLastGop(bool primaryLiveStream, CLDataQueue& dstQueue);
     void beforeStop();
+private slots:
+    void onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
 private:
     //QMutex m_queueMtx;
     QnResourcePtr m_resource;

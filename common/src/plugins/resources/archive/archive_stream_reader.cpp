@@ -42,7 +42,9 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_skipFramesToTime(0),
     m_ignoreSkippingFrame(false),
     m_lastJumpTime(AV_NOPTS_VALUE),
-    m_exactJumpToSpecifiedFrame(false)
+    m_exactJumpToSpecifiedFrame(false),
+    m_quality(MEDIA_Quality_High),
+    m_oldQuality(MEDIA_Quality_High)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -249,6 +251,12 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 begin_label:
     if (!m_runing)
         return QnAbstractMediaDataPtr();
+
+    if (m_oldQuality != m_quality)
+    {
+        m_oldQuality = m_quality;
+        m_delegate->setQuality(m_quality);
+    }
 
     if (mFirstTime)
     {
@@ -822,4 +830,9 @@ void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask
 {
     QMutexLocker lock(&m_playbackMaskSync);
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
+}
+
+void QnArchiveStreamReader::setQuality(MediaQuality quality)
+{
+    m_quality = quality;
 }

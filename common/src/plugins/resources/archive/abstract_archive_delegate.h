@@ -51,6 +51,9 @@ public:
     // for optimization. Inform delegate to pause after sending 1 frame
     virtual void setSingleshotMode(bool /*value*/) {}
 
+    // MediaStreamQuality. By default, this function is not implemented
+    virtual void setQuality(MediaQuality quality) {}
+
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }
     virtual void beforeClose() {}

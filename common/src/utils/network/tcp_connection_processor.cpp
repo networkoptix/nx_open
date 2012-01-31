@@ -40,8 +40,8 @@ bool QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
     if (pos > 0 && lRequest[pos-1] == '\r')
         delimiter = "\r\n";
     int contentLen = 0;
-    int contentLenPos = lRequest.indexOf("content-length") >= 0;
-    if (contentLenPos)
+    int contentLenPos = lRequest.indexOf("content-length");
+    if (contentLenPos >= 0)
     {
         int posStart = -1;
         int posEnd = -1;

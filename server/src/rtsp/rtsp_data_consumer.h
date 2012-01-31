@@ -38,6 +38,8 @@ public:
     virtual qint64 getCurrentTime() const;
     virtual qint64 getNextTime() const;
     virtual qint64 getExternalTime() const;
+
+    void setPrefferedDataProcessor(QnAbstractStreamDataProvider* prefferedProvider);
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
@@ -61,6 +63,8 @@ private:
     QMutex m_dataQueueMtx;
     bool m_singleShotMode;
     int m_packetSended;
+    QnAbstractStreamDataProvider* m_prefferedProvider;
+    QnAbstractStreamDataProvider* m_currentDP;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

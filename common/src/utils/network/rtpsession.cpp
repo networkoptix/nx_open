@@ -377,9 +377,61 @@ void RTPSession::addAdditionAttrs(QByteArray& request)
     }
 }
 
+bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue)
+{
+    QByteArray request;
+    QByteArray requestBody;
+    QByteArray responce;
+
+    requestBody.append(paramName);
+    requestBody.append(": ");
+    requestBody.append(paramValue);
+    requestBody.append("\r\n");
+
+    request += "SET_PARAMETER ";
+    request += mUrl.toString();
+    request += " RTSP/1.0\r\n";
+    request += "CSeq: ";
+    request += QByteArray::number(m_csec++);
+    request += "\r\n";
+    request += "Session: ";
+    request += m_SessionId;
+    request += "\r\n";
+    if (!requestBody.isEmpty())
+    {
+        request += "Content-Length: ";
+        request += QByteArray::number(requestBody.size());
+        request += "\r\n";
+    }
+    addAdditionAttrs(request);
+
+    request += "\r\n";
+
+    if (!requestBody.isEmpty())
+    {
+        request += requestBody;
+        request += "\r\n";
+    }
+
+    if (!m_tcpSock.send(request.data(), request.size()))
+        return false;
+
+
+    if (!readTextResponce(responce))
+        return false;
+
+
+    if (responce.startsWith("RTSP/1.0 200"))
+    {
+        m_keepAliveTime.restart();
+        return true;
+    }
+
+    return false;
+}
+
 bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
 {
-
     QByteArray request;
     QByteArray responce;
 

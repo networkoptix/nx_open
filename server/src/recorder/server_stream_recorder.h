@@ -8,11 +8,14 @@
 
 class QnServerStreamRecorder: public QnStreamRecorder
 {
+    Q_OBJECT
 public:
     QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role);
     ~QnServerStreamRecorder();
 
     void updateSchedule(const QnScheduleTaskList& schedule);
+signals:
+    void fpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 

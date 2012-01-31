@@ -8,13 +8,13 @@
 #include "camera/camera_pool.h"
 #include "utils/common/sleep.h"
 #include "utils/network/rtpsession.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
 
 static const int MAX_QUEUE_SIZE = 15;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
-
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   QnAbstractDataConsumer(MAX_QUEUE_SIZE),
@@ -25,7 +25,9 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_pauseNetwork(false),
   m_gotLivePacket(false),
   m_singleShotMode(false),
-  m_packetSended(false)
+  m_packetSended(false),
+  m_prefferedProvider(0),
+  m_currentDP(0)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     m_timer.start();
@@ -155,20 +157,39 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true;
 
-    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
-    if (metadata) {
-        //return true;
-        metadata = metadata;
+    {
+        // swithing between dataProviders in live mode
+        QMutexLocker lock(&m_dataQueueMtx);
+        if (m_prefferedProvider)
+        {
+            if (m_currentDP != m_prefferedProvider)
+            {
+                // dont switched yet
+                if (data->dataProvider == m_prefferedProvider)
+                {
+                    // try to switch
+                    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+                    if (video && (video->flags & AV_PKT_FLAG_KEY))
+                    {
+                        m_currentDP->removeDataProcessor(this);
+                        m_currentDP = m_prefferedProvider;
+                    }
+                    else {
+                        // Ignore data. It is preffered provider, but we can't switch right now because looking for key data
+                        return true;
+                    }
+                }
+            }
+            else if (data->dataProvider != m_prefferedProvider)
+            {
+                // ignore data from not preffered dataProvider. Some data still in the queue althought we already unsubscribed from this provider
+                return true; 
+            }
+        }
+        m_currentDP = data->dataProvider;
     }
 
-    /*
-    if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-    {
-        m_dataQueue.clear();
-        m_owner->switchToLive(); // it is archive EOF
-        return true;
-    }
-    */
+    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
 
     if (m_owner->isLiveDP(media->dataProvider)) {
         media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -311,4 +332,9 @@ void QnRtspDataConsumer::setSingleShotMode(bool value)
 {
     m_singleShotMode = value;
     m_packetSended = 0;
+}
+
+void QnRtspDataConsumer::setPrefferedDataProcessor(QnAbstractStreamDataProvider* prefferedProvider)
+{
+    m_prefferedProvider = prefferedProvider;
 }

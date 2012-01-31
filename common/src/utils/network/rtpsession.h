@@ -83,6 +83,7 @@ public:
 
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
+    bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
 
     int lastSendedCSeq() const { return m_csec-1; }
 

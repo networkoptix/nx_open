@@ -754,8 +754,9 @@ void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(QnWorkbench::ItemRole role) {
-    QnResourceWidget *widget = m_display->widget(role);
-    m_widgetByRole[role] = widget;
+    QnResourceWidget *oldWidget = m_widgetByRole[role];
+    QnResourceWidget *newWidget = m_display->widget(role);
+    m_widgetByRole[role] = newWidget;
 
     /* Tune activity listener instrument. */
     if(role == QnWorkbench::ZOOMED) {

@@ -41,6 +41,7 @@ public:
 
     void setEnabled(bool value);
     virtual bool isEnabled() const;
+
     //virtual bool setMotionRegion(const QRegion& region);
     //virtual bool setSendMotion(bool value);
     //

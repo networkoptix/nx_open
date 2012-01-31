@@ -44,6 +44,7 @@
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+#include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
@@ -1010,6 +1011,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
             newCamDisplay->playAudio(true);
     }
 
+    /* Sync geometry. */
     switch(role) {
     case QnWorkbench::RAISED: {
         /* Sync new & old items. */
@@ -1049,6 +1051,16 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
     default:
         qnWarning("Unreachable code executed.");
         return;
+    }
+
+    /* Update media quality. */
+    if(role == QnWorkbench::ZOOMED) {
+        QnResourceWidget *oldWidget = this->widget(oldItem);
+        if(oldWidget)
+            oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
+        QnResourceWidget *newWidget = this->widget(item);
+        if(newWidget)
+            newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High);
     }
 
     emit widgetChanged(role);
