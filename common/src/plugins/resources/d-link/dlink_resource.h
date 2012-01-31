@@ -42,6 +42,8 @@ public:
 
     QnPlDlinkResource();
 
+    virtual int getMaxFps() override; 
+
     virtual bool isResourceAccessible();
 
     virtual bool updateMACAddress();
@@ -55,7 +57,7 @@ public:
     void updateCamInfo(); // does a lot of physical work 
 
 protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 
 
@@ -67,5 +69,7 @@ protected:
     
     QnDlink_cam_info  m_camInfo;
 };
+
+typedef QSharedPointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
 #endif //dlink_resource_h_2215

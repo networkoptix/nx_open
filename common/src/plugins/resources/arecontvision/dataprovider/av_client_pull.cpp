@@ -31,7 +31,7 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res)
 
     /**/
 
-    setQuality(m_quality);
+    setQuality(getQuality());  // to update stream params
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
