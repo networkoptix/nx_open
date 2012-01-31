@@ -300,9 +300,14 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleItem->setPos(0.0, 0.0);
     m_titleItem->setClickableButtons(Qt::LeftButton);
 
+    m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
+    m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
+    titleLayout->addItem(m_tabBarItem);
+    titleLayout->addItem(newActionButton(&cm_new_tab));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(&cm_reconnect));
     titleLayout->addItem(newActionButton(&cm_preferences));
@@ -476,6 +481,10 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
     }
 }
 
+void QnWorkbenchUi::setTabBar(QWidget *tabBar) {
+    m_tabBarItem->setWidget(tabBar);
+}
+
 void QnWorkbenchUi::setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
     if(animate) {
         m_treeOpacityAnimatorGroup->pause();
@@ -573,7 +582,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         treeGeometry.x(),
-        (!m_titleVisible && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0)
     );
     QSizeF size(
         treeGeometry.width(),
@@ -606,7 +615,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
 
     /* Calculate title target position. */
     QPointF titlePos;
-    if(!m_titleVisible && m_treeVisible) {
+    if((!m_titleVisible || !m_titleUsed) && m_treeVisible) {
         titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
     } else if(m_titleYAnimator->isRunning()) {
         titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
