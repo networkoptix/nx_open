@@ -19,6 +19,7 @@ public:
 
 
 protected:
+    void updateStreamParamsBasedOnFps() override{};
 	virtual void updateStreamParamsBasedOnQuality() override; 
 
 	int getBitrate() const;

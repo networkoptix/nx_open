@@ -204,6 +204,10 @@ protected:
 protected:
     mutable QMutex m_mutex;
 
+    mutable QMutex m_consumersMtx;
+    QSet<QnResourceConsumer*> m_consumers;
+
+
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -234,8 +238,6 @@ private:
     mutable QnParamList m_resourceParamList;
 
 
-    mutable QMutex m_consumersMtx;
-    QSet<QnResourceConsumer*> m_consumers;
 };
 
 

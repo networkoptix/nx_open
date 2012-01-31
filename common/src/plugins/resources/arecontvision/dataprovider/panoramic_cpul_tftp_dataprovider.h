@@ -18,9 +18,6 @@ public:
 protected:
 	virtual QnAbstractMediaDataPtr getNextData();
     
-    void updateStreamParamsBasedOnQuality() override {};
-    void updateStreamParamsBasedOnFps() override {};
-
 
 	virtual bool needKeyData() const;
 

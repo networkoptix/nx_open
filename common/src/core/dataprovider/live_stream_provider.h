@@ -12,6 +12,10 @@ public:
     QnLiveStreamProvider();
     virtual ~QnLiveStreamProvider();
 
+    void setRole(QnResource::ConnectionRole role);
+    QnResource::ConnectionRole getRole() const;
+
+
     virtual void setQuality(QnStreamQuality q);
     QnStreamQuality getQuality() const;
 
@@ -20,17 +24,25 @@ public:
     float getFps() const;
     bool isMaxFps() const;
 
-    bool needMetaData(); // used for live only 
+    void onPrimaryFpsUpdated(int newFps);
+
+    // I assume this function is called once per video frame 
+    bool needMetaData(); 
 
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
     virtual void updateStreamParamsBasedOnFps() = 0;
 
-protected:
 
+
+
+    
+protected:
     mutable QMutex m_livemutex;
 
+
+private:
     //int m_NumaberOfVideoChannels;
     QnStreamQuality m_quality;
 
@@ -38,7 +50,7 @@ protected:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
-
+    QnResource::ConnectionRole m_role;
 
 };
 
