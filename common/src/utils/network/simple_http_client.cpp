@@ -380,8 +380,8 @@ QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int p
     return file;
 }
 
-bool uploadFile(const QString& fileName, const QByteArray&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth)
+bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth)
 {
     CLSimpleHTTPClient http (host, port, timeout, auth);
-    return http.doPOST(fileName, QString(content)) == CL_HTTP_SUCCESS;
+    return http.doPOST(fileName, content) == CL_HTTP_SUCCESS;
 }

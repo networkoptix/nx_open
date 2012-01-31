@@ -3,7 +3,8 @@
 #include "dlink_resource.h"
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
-CLServerPushStreamreader(res)
+CLServerPushStreamreader(res),
+mHttpClient(0)
 {
 
 }
@@ -27,18 +28,51 @@ void PlDlinkStreamReader::openStream()
     else
         params.codec = DlinkStreamParams::mjpeg;
 
-    params.frameRate = getFps();
-    
+    if (info.possibleFps.size()==0)
+    {
+        Q_ASSERT(false);
+        return;
+    }
+
+
+    if (info.resolutions.size()==0)
+    {
+        Q_ASSERT(false);
+        return;
+    }
+
+
+    params.frameRate = qMin((int)getFps(), info.possibleFps.at(0));
+
+
 
     QnResource::ConnectionRole role = getRole();
 
     if (role == QnResource::Role_SecondaryLiveVideo)
     {
-
+        params.profileNum = 2;
+        params.resolution = info.resolutionCloseTo(320);
+    }
+    else
+    {
+        params.profileNum = 1;
+        params.resolution = info.resolutions.at(0);
     }
 
+    QString prifileStr = composeVideoProfile(params);
 
 
+    QString fileneme = "config/video.cgi?profileid=";
+    if (params.profileNum==1)
+        fileneme += "1";
+    else
+        fileneme += "2";
+
+
+
+    bool uploaded = uploadFile(fileneme,  prifileStr, res->getHostAddress(), 80, 1000, res->getAuth());
+    if (!uploaded)
+        return;
 
 }
 
@@ -51,6 +85,11 @@ void PlDlinkStreamReader::closeStream()
 bool PlDlinkStreamReader::isStreamOpened() const
 {
     return ( mHttpClient && mHttpClient->isOpened() );
+}
+
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
+{
+    return QnAbstractMediaDataPtr(0);
 }
 
 //===============================================
@@ -83,4 +122,14 @@ QString PlDlinkStreamReader::composeVideoProfile(const DlinkStreamParams& stream
 
     t.flush();
     return result;
+}
+
+void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
+{
+
+}
+
+void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
+{
+
 }

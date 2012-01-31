@@ -12,7 +12,8 @@ struct QnDlink_cam_info
     QnDlink_cam_info():
     hasH264(false),
     hasMPEG4(false),
-    numberOfVideoProfiles(0)
+    numberOfVideoProfiles(0),
+    hasCBR(false)
     {
 
     }
@@ -22,12 +23,33 @@ struct QnDlink_cam_info
         return numberOfVideoProfiles > 0;
     }
 
+    QSize resolutionCloseTo(int width)
+    {
+        if (resolutions.size()==0)
+            return QSize(0,0);
+
+        QSize result = resolutions.at(0);
+
+        
+        foreach(const QSize& size, resolutions)
+        {
+            if (size.width() < width)
+                return result;
+            else
+                result = size;
+        }
+
+        return result;
+    }
+
     bool hasH264;
     bool hasMPEG4;
+    bool hasCBR;
     int numberOfVideoProfiles;
     QMap<int, QString> videoProfileUrls;
     QList<QSize> resolutions;
 
+    QList<int> possibleBitrates;
     QList<int> possibleFps;
     QString possibleQualities;
 

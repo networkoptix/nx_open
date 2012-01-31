@@ -23,6 +23,9 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
 {
     QMutexLocker mtx(&m_livemutex);
     m_role = role;
+
+    if (m_role == QnResource::Role_SecondaryLiveVideo)
+        setQuality(QnQualityLowest);
 }
 
 QnResource::ConnectionRole QnLiveStreamProvider::getRole() const
@@ -37,6 +40,9 @@ void QnLiveStreamProvider::setQuality(QnStreamQuality q)
     QMutexLocker mtx(&m_livemutex);
     if (m_quality == q)
         return; // same quality
+
+    if (m_quality != QnQualityLowest && m_role == QnResource::Role_SecondaryLiveVideo)
+        Q_ASSERT(false); // trying to play with quality for second stream by yourself 
 
     m_quality = q;
     updateStreamParamsBasedOnQuality();

@@ -32,6 +32,9 @@ protected:
     virtual QString composeVideoProfile(const DlinkStreamParams& streamParams) const;
 
 
+    virtual void updateStreamParamsBasedOnQuality() override;
+    virtual void updateStreamParamsBasedOnFps() override;
+
 
 private:
     CLSimpleHTTPClient* mHttpClient;
