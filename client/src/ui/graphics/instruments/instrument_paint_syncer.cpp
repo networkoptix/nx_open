@@ -14,7 +14,7 @@ InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
 }
 
 bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {
-    if(event->type() != QEvent::Paint)
+    if(event->type() != QEvent::UpdateRequest)
         return false;
 
     if(currentWatched() != watched) {
