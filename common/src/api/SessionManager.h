@@ -3,28 +3,54 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QNetworkAccessManager>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 #include "utils/common/base.h"
+#include "utils/common/longrunnable.h"
+
 
 class QNetworkReply;
 
-class SyncHTTP;
+class SyncRequestProcessor : public QObject
+{
+    Q_OBJECT
 
-namespace detail {
-    class SessionManagerReplyProcessor : public QObject
+public:
+    SyncRequestProcessor(QObject* parent = 0)
+        : QObject(parent),
+          m_finished(false)
     {
-        Q_OBJECT
+    }
 
-    public:
-        SessionManagerReplyProcessor(QObject *parent = 0) : QObject(parent) {}
+public slots:
+    void finished(int status, const QByteArray& data);
 
-    Q_SIGNALS:
-        void finished(int status, const QByteArray &result, int handle);
+public:
+    int wait(QByteArray& reply, QByteArray& errorString);
 
-    private Q_SLOTS:
-        void at_replyReceived(QNetworkReply *reply);
-    };
-}
+private:
+    bool m_finished;
+
+    int m_status;
+    QByteArray m_reply;
+    QByteArray m_errorString;
+
+    QMutex m_mutex;
+    QWaitCondition m_condition;
+};
+
+class SessionManagerReplyProcessor : public QObject
+{
+    Q_OBJECT
+
+public:
+    SessionManagerReplyProcessor(QObject *parent = 0) : QObject(parent) {}
+
+private slots:
+    void at_replyReceived(QNetworkReply *reply);
+};
 
 
 class SessionManager : public QObject
@@ -32,41 +58,51 @@ class SessionManager : public QObject
     Q_OBJECT
 
 public:
-    SessionManager(const QUrl &url, QObject *parent = 0);
-    virtual ~SessionManager();
-
     static SessionManager *instance();
 
-    void testConnectionAsync(QObject* receiver, const char *slot);
-
     QByteArray lastError() const;
-
-    void setAddEndSlash(bool value);
 
     static QByteArray formatNetworkError(int error);
 
 Q_SIGNALS:
     void error(int error);
 
-protected Q_SLOTS:
-    void setupErrorHandler();
+private:
+    static SessionManager* m_instance;
 
-protected:
-    int sendGetRequest(const QString &objectName, QByteArray &reply, QByteArray& errorString);
-    int sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray &reply, QByteArray& errorString);
+private slots:
+    void doSendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
+    void doSendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
 
-    int sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot);
-    int sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
+public:
+    SessionManager();
+    virtual ~SessionManager();
 
-    int sendAsyncPostRequest(const QString &objectName, const QByteArray& data, QObject *target, const char *slot);
-    int sendAsyncPostRequest(const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
+    int sendGetRequest(const QUrl& url, const QString &objectName, QByteArray &reply, QByteArray& errorString);
+    int sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray &reply, QByteArray& errorString);
 
-    QUrl createApiUrl(const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
+    int sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QByteArray &reply, QByteArray& errorString);
+    int sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QByteArray &reply, QByteArray& errorString);
 
-protected:
-    SyncHTTP *m_httpClient;
-    bool m_addEndSlash;
-    static QAtomicInt m_handle;
+    void sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot);
+    void sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
+
+    void sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot);
+    void sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
+
+    void testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot);
+
+signals:
+    void asyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
+    void asyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
+
+private:
+    QNetworkAccessManager m_accessManager;
+    SessionManagerReplyProcessor m_replyProcessor;
+
+private:
+    QUrl createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
+
 private:
     Q_DISABLE_COPY(SessionManager)
 };

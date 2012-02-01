@@ -12,10 +12,10 @@ namespace detail {
         QnVideoServerConnectionReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QnTimePeriodList &result, int handle);
+        void at_replyReceived(int status, const QnTimePeriodList &result);
 
     signals:
-        void finished(int, const QnTimePeriodList &timePeriods, int handle);
+        void finished(int, const QnTimePeriodList &timePeriods);
     };
 
 }

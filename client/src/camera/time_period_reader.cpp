@@ -122,9 +122,9 @@ void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &ti
     }
 }
 
-int QnTimePeriodReader::sendRequest(const QnTimePeriod& periodToLoad)
+void QnTimePeriodReader::sendRequest(const QnTimePeriod& periodToLoad)
 {
-    return m_connection->asyncRecordedTimePeriods(
+    m_connection->asyncRecordedTimePeriods(
         QnNetworkResourceList() << m_resource, 
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 

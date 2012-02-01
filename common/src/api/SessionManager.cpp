@@ -5,65 +5,60 @@
 
 #include <QtNetwork/QNetworkReply>
 
-#include "utils/network/synchttp.h"
 #include "utils/common/warnings.h"
 
-QAtomicInt SessionManager::m_handle(1);
+SessionManager* SessionManager::m_instance = 0;
 
-
-void detail::SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
+void SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
 {
-    int handle = reply->property("handle").toInt();
-    emit finished(reply->error(), reply->readAll(), handle);
+    QObject * target =reply->property("target").value<QObject*>();
+    QByteArray slot = reply->property("slot").toByteArray();
+
+    QMetaObject::invokeMethod(target, slot, Qt::QueuedConnection, Q_ARG(int, reply->error()), Q_ARG(const QByteArray&, reply->readAll()));
 
     reply->deleteLater();
-    deleteLater();
 }
 
 
-Q_GLOBAL_STATIC_WITH_ARGS(SessionManager, globalSessionManager, (QUrl()))
+// Q_GLOBAL_STATIC_WITH_ARGS(SessionManager, globalSessionManager, (QUrl()))
 
-SessionManager::SessionManager(const QUrl &url, QObject *parent)
-    : QObject(parent),
-      m_addEndSlash(true)
+SessionManager::SessionManager()
+    : m_accessManager(this),
+    m_replyProcessor(this)
+
 {
-    m_httpClient = new SyncHTTP(url, this);
+    qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
 
-    QMetaObject::invokeMethod(this, "setupErrorHandler", Qt::QueuedConnection);
+    connect(&m_accessManager, SIGNAL(finished(QNetworkReply*)), &m_replyProcessor, SLOT(at_replyReceived(QNetworkReply*)));
+    connect(this, SIGNAL(asyncGetRequest(QUrl, QString,QnRequestParamList,QObject*,const char*)), this, SLOT(doSendAsyncGetRequest(QUrl, QString,QnRequestParamList,QObject*,const char*)));
+    connect(this, SIGNAL(asyncPostRequest(QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*)), this, SLOT(doSendAsyncPostRequest(QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*)));
 }
 
 SessionManager::~SessionManager()
 {
     if(QThread::currentThread() != this->thread())
         qnWarning("Deleting session manager from another thread is dangerous and may lead to unexpected crashes.");
-
-    m_httpClient->deleteLater();
 }
 
 SessionManager *SessionManager::instance()
 {
-    return globalSessionManager();
+    if (m_instance)
+        return m_instance;
+
+    m_instance = new SessionManager();
+    return m_instance; // globalSessionManager();
 }
 
-void SessionManager::testConnectionAsync(QObject* receiver, const char *slot)
+void SessionManager::testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot)
 {
-    sendAsyncGetRequest("ping", receiver, slot);
+    sendAsyncGetRequest(url, "ping", receiver, slot);
 }
 
-void SessionManager::setupErrorHandler()
+QUrl SessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const
 {
-    disconnect(m_httpClient, 0, SessionManager::instance(), 0);
+    QUrl url(baseUrl);
 
-    connect(m_httpClient, SIGNAL(error(int)), SessionManager::instance(), SIGNAL(error(int)));
-}
-
-QUrl SessionManager::createApiUrl(const QString &objectName, const QnRequestParamList &params) const
-{
-    QUrl url;
-
-    QString path = QLatin1String("api/") + objectName;
-    if (m_addEndSlash)
-        path += QLatin1Char('/');
+    QString path = QLatin1String("api/") + objectName + QLatin1Char('/');
     url.setPath(path);
 
     foreach (const QnRequestParam &param, params)
@@ -72,61 +67,98 @@ QUrl SessionManager::createApiUrl(const QString &objectName, const QnRequestPara
     return url;
 }
 
-int SessionManager::sendGetRequest(const QString &objectName, QByteArray& reply, QByteArray& errorString)
+int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
 {
-    return sendGetRequest(objectName, QnRequestParamList(), reply, errorString);
+    return sendPostRequest(url, objectName, QnRequestParamList(), data, reply, errorString);
 }
 
-int SessionManager::sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray& reply, QByteArray& errorString)
+void SyncRequestProcessor::finished(int status, const QByteArray& reply)
 {
-    QBuffer buffer(&reply);
-    buffer.open(QIODevice::WriteOnly);
+    m_status = status;
+    m_reply = reply;
 
-    int status = m_httpClient->syncGet(createApiUrl(objectName, params), &buffer);
-    if (status != 0)
-    {
-        errorString += "\nSessionManager::sendGetRequest(): ";
-        errorString += formatNetworkError(status) + reply;
+    m_finished = true;
+
+    QMutexLocker locker(&m_mutex);
+    m_condition.wakeOne();
+}
+
+int SyncRequestProcessor::wait(QByteArray& reply, QByteArray& errorString)
+{
+    QMutexLocker locker(&m_mutex);
+    while (!m_finished) {
+        m_condition.wait(&m_mutex);
     }
 
-    return status;
+    reply = m_reply;
+    return m_status;
 }
 
-int SessionManager::sendAsyncGetRequest(const QString &objectName, QObject *target, const char *slot)
+int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
 {
-    return sendAsyncGetRequest(objectName, QnRequestParamList(), target, slot);
+    SyncRequestProcessor syncProcessor(this);
+    syncProcessor.moveToThread(this->thread());
+    sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, "finished");
+    return syncProcessor.wait(reply, errorString);
 }
 
-int SessionManager::sendAsyncGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
+int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QByteArray& reply, QByteArray& errorString)
 {
-    /* We set parent to 'this' so that destroying session manager would stop all requests. */
-    detail::SessionManagerReplyProcessor *processor = new detail::SessionManagerReplyProcessor();
-    connect(processor, SIGNAL(finished(int, const QByteArray &, int)), target, slot);
-    QNetworkReply* reply = m_httpClient->asyncGet(createApiUrl(objectName, params), processor, SLOT(at_replyReceived(QNetworkReply *)));
-    int handle = m_handle.fetchAndAddAcquire(1);
-    reply->setProperty("handle", handle);
-    return handle;
+    return sendGetRequest(url, objectName, QnRequestParamList(), reply, errorString);
 }
 
-int SessionManager::sendAsyncPostRequest(const QString &objectName, const QByteArray& data, QObject *target, const char *slot)
+int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray& reply, QByteArray& errorString)
 {
-    return sendAsyncPostRequest(objectName, QnRequestParamList(), data, target, slot);
+    SyncRequestProcessor syncProcessor(this);
+    syncProcessor.moveToThread(this->thread());
+    sendAsyncGetRequest(url, objectName, params, &syncProcessor, "finished");
+    return syncProcessor.wait(reply, errorString);
 }
 
-int SessionManager::sendAsyncPostRequest(const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
+void SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot)
 {
-    /* We set parent to 'this' so that destroying session manager would stop all requests. */
-    detail::SessionManagerReplyProcessor *processor = new detail::SessionManagerReplyProcessor();
-    connect(processor, SIGNAL(finished(int, const QByteArray &, int)), target, slot);
-    QNetworkReply* reply = m_httpClient->asyncPost(createApiUrl(objectName, params), data, processor, SLOT(at_replyReceived(QNetworkReply *)));
-    int handle = m_handle.fetchAndAddAcquire(1);
-    reply->setProperty("handle", handle);
-    return handle;
+    sendAsyncGetRequest(url, objectName, QnRequestParamList(), target, slot);
 }
 
-void SessionManager::setAddEndSlash(bool value)
+void SessionManager::doSendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
 {
-    m_addEndSlash = value;
+    QNetworkRequest request;
+    request.setUrl(createApiUrl(url, objectName, params));
+    request.setRawHeader("Connection", "close");
+    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+
+    QNetworkReply* reply = m_accessManager.get(request);
+    reply->setProperty("target", QVariant::fromValue<QObject*>(target));
+    reply->setProperty("slot", QVariant(QByteArray(slot)));
+}
+
+void SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
+{
+    emit asyncGetRequest(url, objectName, params, target, slot);
+}
+
+void SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot)
+{
+    sendAsyncPostRequest(url, objectName, QnRequestParamList(), data, target, slot);
+}
+
+void SessionManager::doSendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
+{
+    QNetworkRequest request;
+    request.setUrl(createApiUrl(url, objectName, params));
+    request.setRawHeader("Connection", "close");
+    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+
+    QNetworkReply* reply = m_accessManager.post(request, data);
+    reply->setProperty("target", QVariant(QMetaType::QObjectStar, target));
+    reply->setProperty("slot", QVariant(QByteArray(slot)));
+}
+
+void SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
+{
+    emit asyncGetRequest(url, objectName, params, target, slot);
 }
 
 QByteArray SessionManager::formatNetworkError(int error)

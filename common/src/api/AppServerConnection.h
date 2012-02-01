@@ -37,10 +37,10 @@ namespace conn_detail
         }
 
     public slots:
-        void finished(int status, const QByteArray &result, int handle);
+        void finished(int status, const QByteArray &result);
 
     signals:
-        void finished(int handle, int status, const QByteArray& errorString, QnResourceList cameras);
+        void finished(int status, const QByteArray& errorString, QnResourceList resources);
 
     private:
         QnResourceFactory& m_resourceFactory;
@@ -79,10 +79,18 @@ public:
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
+    void stop();
+
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 
+    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
+    void addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
+
+    int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
+
 private:
+    QUrl m_url;
     QScopedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
     QnVideoServerFactory m_serverFactory;
@@ -106,7 +114,7 @@ public:
 
 private:
     QMutex m_mutex;
-    QUrl m_url;
+    QUrl m_defaultUrl;
     QnResourceFactory* m_resourceFactory;
 };
 

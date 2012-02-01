@@ -131,7 +131,7 @@ QnWorkbenchLayout::~QnWorkbenchLayout()
 void QnWorkbenchLayout::load(const QnLayoutData& layoutData)
 {
     // TODO: need to set id and name here
-    foreach (const QnLayoutItemData& itemData, layoutData.items)
+    foreach (const QnLayoutItemData& itemData, layoutData.getItems())
     {
         // TODO: need to create layout items here
     }
