@@ -4,8 +4,6 @@
 #include <QWidget>
 #include <QMargins>
 
-class QnDwmPrivate;
-
 class QnDwm: public QObject {
     Q_OBJECT;
 
@@ -17,7 +15,7 @@ public:
     /**
      * \returns                         Whether this API is supported. 
      */
-    bool isSupported() const;
+    static bool isSupported();
 
     /**
      * \returns                         Whether Windows DWM composition is currently enabled on the system.
@@ -200,22 +198,9 @@ signals:
      */
     void titleBarDoubleClicked();
 
-protected:
-#ifdef Q_OS_WIN
-    bool hitTestEvent(MSG *message, long *result);
-    bool calcSizeEvent(MSG *message, long *result);
-    bool compositionChangedEvent(MSG *message, long *result);
-    bool activateEvent(MSG *message, long *result);
-    bool ncPaintEvent(MSG *message, long *result);
-    bool ncLeftButtonDoubleClickEvent(MSG *message, long *result);
-    bool sysCommandEvent(MSG *message, long *result);
-    bool eraseBackground(MSG *message, long *result);
-#endif
-
 private:
-    void updateFrameStrut();
+    friend class QnDwmPrivate;
 
-private:
     QnDwmPrivate *d;
 };
 

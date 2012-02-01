@@ -1,11 +1,10 @@
 #include "dwm.h"
 #include <QLibrary>
 #include <QWidget>
-#include <QtGui/private/qwidget_p.h>
 #include <utils/common/warnings.h>
 
 #ifdef Q_OS_WIN
-
+#include <QtGui/private/qwidget_p.h>
 #include <qt_windows.h>
 #define NOMINMAX
 #include <Windows.h>
@@ -63,20 +62,39 @@ typedef HRESULT (WINAPI *PtrDwmEnableBlurBehindWindow)(HWND hWnd, const _DWM_BLU
 typedef HRESULT (WINAPI *PtrDwmGetColorizationColor)(DWORD *pcrColorization, BOOL *pfOpaqueBlend);
 typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *plResult);
 typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
-
-#endif
+#endif // Q_OS_WIN
 
 class QnDwmPrivate {
 public:
-    QnDwmPrivate() {}
+    QnDwmPrivate(QnDwm *qq): q(qq) {}
 
     virtual ~QnDwmPrivate() {}
 
     void init(QWidget *widget);
 
+#ifdef Q_OS_WIN
+    void updateFrameStrut();
+    bool hitTestEvent(MSG *message, long *result);
+    bool calcSizeEvent(MSG *message, long *result);
+    bool compositionChangedEvent(MSG *message, long *result);
+    bool activateEvent(MSG *message, long *result);
+    bool ncPaintEvent(MSG *message, long *result);
+    bool ncLeftButtonDoubleClickEvent(MSG *message, long *result);
+    bool sysCommandEvent(MSG *message, long *result);
+    bool eraseBackground(MSG *message, long *result);
+#endif
+
+    static bool isSupported();
+
 public:
+    /** Public counterpart. */
+    QnDwm *q;
+
     /** Widget that we're working on. */
     QWidget *widget;
+
+    /** Whether this api instance is functional. */
+    bool hasApi;
 
 #ifdef Q_OS_WIN
     /** Whether DWM is available. */
@@ -107,8 +125,28 @@ public:
     int emulatedTitleBarHeight;
 };
 
+bool QnDwmPrivate::isSupported() {
+    bool result;
+
+#ifdef Q_OS_WIN
+    /* We're using private Qt functions, so we have to check that the right runtime is used. */
+    result = !qstrcmp(qVersion(), QT_VERSION_STR);
+    if(!result)
+        qnWarning("Compile-time and run-time Qt versions differ (%1 != %2), DWM will be disabled.", qVersion(), QT_VERSION_STR);
+#else
+    result = false;
+#endif
+
+    return result;
+}
+
+Q_GLOBAL_STATIC_WITH_INITIALIZER(bool, qn_dwm_isSupported, {
+    *x = QnDwmPrivate::isSupported();
+});
+
 void QnDwmPrivate::init(QWidget *widget) {
     this->widget = widget;
+    hasApi = widget != NULL && qn_dwm_isSupported();
 
 #ifdef Q_OS_WIN
     QLibrary dwmLib(QString::fromAscii("dwmapi"));
@@ -120,6 +158,7 @@ void QnDwmPrivate::init(QWidget *widget) {
     dwmSetWindowAttribute           = (PtrDwmSetWindowAttribute)        dwmLib.resolve("DwmSetWindowAttribute");
 
     hasDwm = 
+        hasApi &&
         dwmIsCompositionEnabled != NULL && 
         dwmExtendFrameIntoClientArea != NULL &&
         dwmEnableBlurBehindWindow != NULL &&
@@ -138,9 +177,27 @@ void QnDwmPrivate::init(QWidget *widget) {
     emulatedTitleBarHeight = 0;
 }
 
+#ifdef Q_OS_WIN
+void QnDwmPrivate::updateFrameStrut() {
+    QWidgetPrivate *wd = qt_widget_private(widget);
+    QTLWExtra *tlwExtra = wd->maybeTopData();
+    if(tlwExtra != NULL) {
+        QMargins margins = q->currentFrameMargins();
+        tlwExtra->frameStrut = QRect(
+            margins.left(),
+            margins.top(),
+            margins.right(),
+            margins.bottom()
+        );
+
+        qt_qwidget_data(widget)->fstrut_dirty = false;
+    }
+}
+#endif
+
 QnDwm::QnDwm(QWidget *widget):
     QObject(widget),
-    d(new QnDwmPrivate())
+    d(new QnDwmPrivate(this))
 {
     if(widget == NULL)
         qnNullWarning(widget);
@@ -153,16 +210,12 @@ QnDwm::~QnDwm() {
     d = NULL;
 }
 
-bool QnDwm::isSupported() const {
-#ifdef Q_OS_WIN
-    return true;
-#else
-    return false;
-#endif
+bool QnDwm::isSupported() {
+    return qn_dwm_isSupported();
 }
 
 bool QnDwm::enableSystemWindowPainting(bool enable) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -174,7 +227,7 @@ bool QnDwm::enableSystemWindowPainting(bool enable) {
 }
 
 bool QnDwm::enableTransparentErasing(bool enable) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -186,7 +239,7 @@ bool QnDwm::enableTransparentErasing(bool enable) {
 }
 
 bool QnDwm::setNonErasableContentMargins(const QMargins &margins) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -198,7 +251,7 @@ bool QnDwm::setNonErasableContentMargins(const QMargins &margins) {
 }
 
 bool QnDwm::enableBlurBehindWindow(bool enable) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -220,6 +273,9 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
 }
 
 bool QnDwm::isCompositionEnabled() const {
+    if(!d->hasApi)
+        return false;
+
 #ifdef Q_OS_WIN
     if (!d->hasDwm)
         return false;
@@ -240,7 +296,7 @@ bool QnDwm::isCompositionEnabled() const {
 }
 
 bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -277,7 +333,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
 }
 
 QMargins QnDwm::themeFrameMargins() const {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return QMargins(-1, -1, -1, -1);
 
 #ifdef Q_OS_WIN
@@ -300,7 +356,7 @@ QMargins QnDwm::themeFrameMargins() const {
 }
 
 int QnDwm::themeTitleBarHeight() const {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return -1;
 
 #ifdef Q_OS_WIN
@@ -317,7 +373,7 @@ int QnDwm::themeTitleBarHeight() const {
 }
 
 bool QnDwm::enableFrameEmulation(bool enable) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
     if(d->emulateFrame == enable)
@@ -352,7 +408,7 @@ int QnDwm::emulatedTitleBarHeight() const {
 }
 
 bool QnDwm::enableDoubleClickProcessing(bool enable) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
     if(d->emulateFrame == enable)
@@ -367,7 +423,7 @@ bool QnDwm::enableDoubleClickProcessing(bool enable) {
 }
 
 bool QnDwm::enableTitleBarDrag(bool enable) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -381,7 +437,7 @@ bool QnDwm::enableTitleBarDrag(bool enable) {
 QMargins QnDwm::currentFrameMargins() const {
     QMargins errorValue(-1, -1, -1, -1);
 
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return errorValue;
 
 #ifdef Q_OS_WIN
@@ -415,7 +471,7 @@ QMargins QnDwm::currentFrameMargins() const {
 }
 
 bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -430,7 +486,7 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
     if(!SUCCEEDED(status))
         return false;
 
-    updateFrameStrut();
+    d->updateFrameStrut();
 
     return true;
 #else
@@ -441,7 +497,7 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
 bool QnDwm::widgetEvent(QEvent *event) {
     Q_UNUSED(event);
 
-    if(d->widget == NULL)
+    if(!d->hasApi)
         return false;
 
 #ifdef Q_OS_WIN
@@ -450,27 +506,11 @@ bool QnDwm::widgetEvent(QEvent *event) {
          * not on actual margins specified by WM_NCCALCSIZE. We fix that. */
         QWidgetData *data = qt_qwidget_data(d->widget);
         if(data->fstrut_dirty)
-            updateFrameStrut();
+            d->updateFrameStrut();
     }
 #endif
 
     return false;
-}
-
-void QnDwm::updateFrameStrut() {
-    QWidgetPrivate *wd = qt_widget_private(d->widget);
-    QTLWExtra *tlwExtra = wd->maybeTopData();
-    if(tlwExtra != NULL) {
-        QMargins margins = currentFrameMargins();
-        tlwExtra->frameStrut = QRect(
-            margins.left(),
-            margins.top(),
-            margins.right(),
-            margins.bottom()
-        );
-
-        qt_qwidget_data(d->widget)->fstrut_dirty = false;
-    }
 }
 
 #ifdef Q_OS_WIN
@@ -485,20 +525,20 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
     }
 
     switch(message->message) {
-    case WM_NCCALCSIZE:             return calcSizeEvent(message, result);
-    case WM_NCHITTEST:              return hitTestEvent(message, result);
-    case WM_DWMCOMPOSITIONCHANGED:  return compositionChangedEvent(message, result);
-    case WM_NCACTIVATE:             return activateEvent(message, result);
-    case WM_NCPAINT:                return ncPaintEvent(message, result);
-    case WM_NCLBUTTONDBLCLK:        return ncLeftButtonDoubleClickEvent(message, result);
-    case WM_SYSCOMMAND:             return sysCommandEvent(message, result);
-    case WM_ERASEBKGND:             return eraseBackground(message, result);
+    case WM_NCCALCSIZE:             return d->calcSizeEvent(message, result);
+    case WM_NCHITTEST:              return d->hitTestEvent(message, result);
+    case WM_DWMCOMPOSITIONCHANGED:  return d->compositionChangedEvent(message, result);
+    case WM_NCACTIVATE:             return d->activateEvent(message, result);
+    case WM_NCPAINT:                return d->ncPaintEvent(message, result);
+    case WM_NCLBUTTONDBLCLK:        return d->ncLeftButtonDoubleClickEvent(message, result);
+    case WM_SYSCOMMAND:             return d->sysCommandEvent(message, result);
+    case WM_ERASEBKGND:             return d->eraseBackground(message, result);
     default:                        return false;
     }
 }
 
-bool QnDwm::calcSizeEvent(MSG *message, long *result) {
-    if(!d->overrideFrameMargins)
+bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
+    if(!overrideFrameMargins)
         return false;
 
     /* From WM_NCCALCSIZE docs:
@@ -540,10 +580,10 @@ bool QnDwm::calcSizeEvent(MSG *message, long *result) {
     params->rgrc[2] = sourceGeometry;
 
     /* New client geometry. */
-    params->rgrc[0].top      += d->userFrameMargins.top();
-    params->rgrc[0].bottom   -= d->userFrameMargins.bottom();
-    params->rgrc[0].left     += d->userFrameMargins.left();
-    params->rgrc[0].right    -= d->userFrameMargins.right();
+    params->rgrc[0].top      += userFrameMargins.top();
+    params->rgrc[0].bottom   -= userFrameMargins.bottom();
+    params->rgrc[0].left     += userFrameMargins.left();
+    params->rgrc[0].right    -= userFrameMargins.right();
 
 #if 0
     *result = WVR_VALIDRECTS;
@@ -583,14 +623,14 @@ namespace {
 
 } // anonymous namespace
 
-bool QnDwm::hitTestEvent(MSG *message, long *result) {
+bool QnDwmPrivate::hitTestEvent(MSG *message, long *result) {
     BOOL handled = FALSE;
-    if(d->hasDwm)
-        handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
+    if(hasDwm)
+        handled = dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
     if(!handled)
         *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
 
-    if(!d->emulateFrame)    
+    if(!emulateFrame)    
         return true;
 
     /* Leave buttons as is. */
@@ -623,12 +663,12 @@ bool QnDwm::hitTestEvent(MSG *message, long *result) {
     /* Calculate emulated client rect, title bar excluded. */
     QRect clientRect = QRect(
         QPoint(
-            frameRect.left() + d->emulatedFrameMargins.left(),
-            frameRect.top() + d->emulatedFrameMargins.top()
+            frameRect.left() + emulatedFrameMargins.left(),
+            frameRect.top() + emulatedFrameMargins.top()
         ),
         QPoint(
-            frameRect.right() - d->emulatedFrameMargins.right(),
-            frameRect.bottom() - d->emulatedFrameMargins.bottom()
+            frameRect.right() - emulatedFrameMargins.right(),
+            frameRect.bottom() - emulatedFrameMargins.bottom()
         )
     );
 
@@ -638,33 +678,33 @@ bool QnDwm::hitTestEvent(MSG *message, long *result) {
     *result = frameSectionMap[col][row];
 
     /* Handle title bar. */
-    if(*result == HTCLIENT && pos.y() <= clientRect.top() + d->emulatedTitleBarHeight)
+    if(*result == HTCLIENT && pos.y() <= clientRect.top() + emulatedTitleBarHeight)
         *result = HTCAPTION;
 
     return true;
 }
 
-bool QnDwm::compositionChangedEvent(MSG *message, long *result) {
+bool QnDwmPrivate::compositionChangedEvent(MSG *message, long *result) {
     Q_UNUSED(message);
 
-    emit compositionChanged(isCompositionEnabled());
+    emit q->compositionChanged(q->isCompositionEnabled());
 
     *result = 0;
     return false; /* It's OK to let it fall through. */
 }
 
-bool QnDwm::activateEvent(MSG *message, long *result) {
-    if(!d->systemPaintWindow)
+bool QnDwmPrivate::activateEvent(MSG *message, long *result) {
+    if(!systemPaintWindow)
         message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
 
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
     return true;
 }
 
-bool QnDwm::ncPaintEvent(MSG *message, long *result) {
-    if(!d->systemPaintWindow) {
+bool QnDwmPrivate::ncPaintEvent(MSG *message, long *result) {
+    if(!systemPaintWindow) {
 
-        if(d->transparentErasing) {
+        if(transparentErasing) {
             HDC hdc = GetWindowDC(message->hwnd);
 
             bool deleteHrgn = false;
@@ -679,7 +719,7 @@ bool QnDwm::ncPaintEvent(MSG *message, long *result) {
                 deleteHrgn = false;
             }
 
-            if(!d->nonErasableContentMargins.isNull()) {
+            if(!nonErasableContentMargins.isNull()) {
                 HRGN rectHrgn;
                 RECT rect;
 
@@ -704,10 +744,10 @@ bool QnDwm::ncPaintEvent(MSG *message, long *result) {
                 rect.bottom += clientDelta.y;
 
                 /* Adjust for non-erasable margins. */
-                rect.left   += d->nonErasableContentMargins.left();
-                rect.top    += d->nonErasableContentMargins.top();
-                rect.right  -= d->nonErasableContentMargins.right();
-                rect.bottom -= d->nonErasableContentMargins.bottom();
+                rect.left   += nonErasableContentMargins.left();
+                rect.top    += nonErasableContentMargins.top();
+                rect.right  -= nonErasableContentMargins.right();
+                rect.bottom -= nonErasableContentMargins.bottom();
 
                 /* Combine with region. */
                 rectHrgn = CreateRectRgnIndirect(&rect);
@@ -743,9 +783,9 @@ bool QnDwm::ncPaintEvent(MSG *message, long *result) {
     }
 }
 
-bool QnDwm::eraseBackground(MSG *message, long *result) {
-    if(!d->systemPaintWindow) {
-        if(d->transparentErasing) {
+bool QnDwmPrivate::eraseBackground(MSG *message, long *result) {
+    if(!systemPaintWindow) {
+        if(transparentErasing) {
             HDC hdc = (HDC) message->wParam;
             // HBRUSH hbr = (HBRUSH) GetClassLongPtrW(message->hwnd, GCLP_HBRBACKGROUND);
             HBRUSH hbr = (HBRUSH) GetStockObject(BLACK_BRUSH);
@@ -768,14 +808,14 @@ bool QnDwm::eraseBackground(MSG *message, long *result) {
     }
 }
 
-bool QnDwm::ncLeftButtonDoubleClickEvent(MSG *message, long *result) {
+bool QnDwmPrivate::ncLeftButtonDoubleClickEvent(MSG *message, long *result) {
     Q_UNUSED(result)
 
-    if(!d->processDoubleClicks)    
+    if(!processDoubleClicks)    
         return false;
 
     if(message->wParam == HTCAPTION) {
-        emit titleBarDoubleClicked();
+        emit q->titleBarDoubleClicked();
         *result = 0; /* If an application processes this message, it should return zero. */
         return true;
     }
@@ -783,10 +823,10 @@ bool QnDwm::ncLeftButtonDoubleClickEvent(MSG *message, long *result) {
     return false;
 }
 
-bool QnDwm::sysCommandEvent(MSG *message, long *result) {
+bool QnDwmPrivate::sysCommandEvent(MSG *message, long *result) {
     switch(message->wParam & 0xFFF0) {
     case SC_MOVE:
-        if(d->titleBarDrag) {
+        if(titleBarDrag) {
             return false;
         } else {
             *result = 0; 
