@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#ifndef QN_NO_DELETE_LATER_DEBUG
+#ifdef QN_DELETE_LATER_DEBUG
 #   include <QThread>
 #   include <QtCore/private/qthread_p.h>
 #   include "warnings.h"
@@ -16,7 +16,7 @@ inline void qnDeleteLater(QObject *object) {
     } else {
         object->deleteLater();
 
-#ifndef QN_NO_DELETE_LATER_DEBUG
+#ifdef QN_DELETE_LATER_DEBUG
         int loopLevel = QThreadData::get2(thread)->loopLevel;
         if(loopLevel == 0) {
             qnCritical(

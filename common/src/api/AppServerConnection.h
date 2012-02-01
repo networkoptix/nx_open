@@ -12,9 +12,15 @@
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_data.h"
+#include "core/misc/scheduleTask.h"
+#include "core/resource/user.h"
+
+#include "api/serializer/xml_serializer.h"
 
 class AppSessionManager;
 class QnAppServerConnectionFactory;
+
+class QnApiSerializer;
 
 namespace conn_detail
 {
@@ -23,8 +29,9 @@ namespace conn_detail
         Q_OBJECT
 
     public:
-        ReplyProcessor(QnResourceFactory& resourceFactory, const QString& objectName)
+        ReplyProcessor(QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& objectName)
               : m_resourceFactory(resourceFactory),
+                m_serializer(serializer),
                 m_objectName(objectName)
         {
         }
@@ -33,10 +40,11 @@ namespace conn_detail
         void finished(int status, const QByteArray &result, int handle);
 
     signals:
-        void finished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources);
+        void finished(int handle, int status, const QByteArray& errorString, QnResourceList cameras);
 
     private:
         QnResourceFactory& m_resourceFactory;
+        QnApiSerializer& m_serializer;
         QString m_objectName;
     };
 }
@@ -50,24 +58,26 @@ public:
 
     bool isConnected() const;
 
-    int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes, QByteArray& errorString);
+    int getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString);
 
     int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
-    int registerServer(const QnVideoServer&, QnVideoServerList& servers, QByteArray& errorString);
-    int addCamera(const QnVirtualCameraResource&, QList<QnResourcePtr>& cameras, QByteArray& errorString);
+    int registerServer(const QnVideoServerPtr&, QnVideoServerList& servers, QByteArray& errorString);
+    int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
-    int addStorage(const QnStorage&, QByteArray& errorString);
+    int addStorage(const QnStoragePtr&, QByteArray& errorString);
 
-    int getCameras(QnSecurityCamResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
-    int getStorages(QnResourceList& storages, QByteArray& errorString);
+    int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
+    int getStorages(QnStorageList& storages, QByteArray& errorString);
     int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
+    int getUsers(QnUserResourceList& users, QByteArray& errorString);
 
     // Returns request id
-    int saveAsync(const QnVideoServer&, QObject*, const char*);
-    int saveAsync(const QnVirtualCameraResource&, QObject*, const char*);
+    int saveAsync(const QnVideoServerPtr&, QObject*, const char*);
+    int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
+    int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
 
-    int saveAsync(const QnResource& resource, QObject* target, const char* slot);
+    int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
@@ -76,6 +86,8 @@ private:
     QScopedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
     QnVideoServerFactory m_serverFactory;
+
+    QnApiXmlSerializer m_serializer;
 
     friend class QnAppServerConnectionFactory;
 };

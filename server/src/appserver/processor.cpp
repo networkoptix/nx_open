@@ -11,7 +11,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    QnResourceList cameras;
+    QnVirtualCameraResourceList cameras;
 
     foreach (QnResourcePtr resource, resources)
     {
@@ -37,7 +37,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         resource->setStatus(QnResource::Online); // camera MUST be in the pool already;
 
         QByteArray errorString;
-        if (m_appServer->addCamera(*cameraResource, cameras, errorString) != 0)
+        if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
         {
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
         }
@@ -77,5 +77,5 @@ void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status ol
         return;
     }
 
-    m_appServer->saveAsync(*resource, this, SLOT(requestFinished(int, int, const QByteArray&, const QnResourceList&)));
+    m_appServer->saveAsync(resource->toSharedPointer(), this, SLOT(requestFinished(int, int, const QByteArray&, const QnResourceList&)));
 }

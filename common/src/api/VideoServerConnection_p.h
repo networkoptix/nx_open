@@ -2,7 +2,6 @@
 #define __VIDEO_SERVER_CONNECTION_P_H_
 
 #include "VideoServerConnection.h"
-#include "api/Types.h"
 
 class VideoServerSessionManager;
 

@@ -8,8 +8,13 @@
 #include "AppSessionManager.h"
 #include "utils/common/util.h"
 
+#include "xsd_recordedTimePeriods.h"
+
 namespace {
     const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;
+
+    // for video server methods
+    typedef QSharedPointer<xsd::api::recordedTimePeriods::RecordedTimePeriods>           QnApiRecordedTimePeriodsResponsePtr;
 
     QnTimePeriodList parseBinaryTimePeriods(const QByteArray &reply)
     {

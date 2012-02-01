@@ -168,18 +168,18 @@ QnVideoServerPtr registerServer(QnAppServerConnectionPtr appServerConnection, co
 {
     QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
-    QnVideoServer server;
+    QnVideoServerPtr serverPtr(new QnVideoServer());
 
     // If there is already stored server with this guid, other parameters will be ignored
-    server.setGuid(serverGuid());
+    serverPtr->setGuid(serverGuid());
 
-    server.setName(QString("Server ") + myAddress);
-    server.setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server.setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
+    serverPtr->setName(QString("Server ") + myAddress);
+    serverPtr->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    serverPtr->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 
     QnVideoServerList servers;
     QByteArray errorString;
-    if (appServerConnection->registerServer(server, servers, errorString) != 0)
+    if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
 
@@ -368,6 +368,7 @@ public:
             QnSleep::msleep(1000);
         }
 
+
         if (needToStop())
             return;
 
@@ -404,7 +405,7 @@ public:
         m_restServer->registerHandler("xsd/*", new QnXsdHelperHandler());
 
         // Get storages sample code.
-        QnResourceList storages;
+        QnStorageList storages;
         QByteArray errorString;
         while (appServerConnection->getStorages(storages, errorString) != 0)
         {
@@ -413,9 +414,8 @@ public:
         }
 
         bool storageAdded = false;
-        foreach (QnResourcePtr resource, storages)
+        foreach (QnStoragePtr storage, storages)
         {
-            QnStoragePtr storage = resource.dynamicCast<QnStorage>();
             if (storage->getParentId() == videoServer->getId())
             {
                 storageAdded = true;
@@ -435,7 +435,7 @@ public:
             storage->setSpaceLimit(5ll * 1024 * 1024 * 1024);
 
             QByteArray errorString;
-            if (appServerConnection->addStorage(*storage, errorString))
+            if (appServerConnection->addStorage(storage, errorString))
                 qDebug() << "Couldn't add storage: " << errorString;
 
             qnResPool->addResource(storage);
@@ -464,7 +464,7 @@ public:
         QnScheduleTaskList scheduleTasks;
 
         errorString.clear();
-        QnSecurityCamResourceList cameras;
+        QnVirtualCameraResourceList cameras;
         while (appServerConnection->getCameras(cameras, videoServer->getId(), errorString) != 0)
         {
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;

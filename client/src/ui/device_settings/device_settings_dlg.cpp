@@ -49,7 +49,7 @@ QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
 void CLAbstractDeviceSettingsDlg::accept()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if (appServerConnection->saveAsync(*m_resource.data(), this, SLOT(saveSuccess())) == 0)
+    if (appServerConnection->saveAsync(m_resource, this, SLOT(saveSuccess())) == 0)
         saveError();
 }
 

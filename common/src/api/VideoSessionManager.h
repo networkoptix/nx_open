@@ -2,7 +2,6 @@
 #define __VIDEO_SERVER_SESSION_MANAGER_H__
 
 #include "SessionManager.h"
-#include "Types.h"
 #include "recording/time_period.h"
 
 namespace detail {
