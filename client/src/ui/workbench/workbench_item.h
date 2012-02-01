@@ -66,13 +66,13 @@ public:
     /**
      * Note that this function may fail if the following conditions are met:
      * <ul>
-     * <li>This item belongs to a model.</li>
+     * <li>This item does not belong to a layout.</li>
      * <li>This item is pinned.</li>
      * <li>Given geometry is already occupied by some other item.</li>
      * </ul>
      *
      * If you want to have more control on how items are moved, use the
-     * function provided by the layout.
+     * functions provided by the layout.
      *
      * \param geometry                  New geometry for this item.
      * \returns                         Whether the geometry was successfully changed.
@@ -148,6 +148,7 @@ public:
 public Q_SLOTS:
     inline void setPinned(bool value)
     { setFlag(Pinned, value); }
+
     inline void togglePinned()
     { setPinned(!isPinned()); }
 
@@ -156,7 +157,7 @@ public Q_SLOTS:
      */
     void setRotation(qreal rotation);
 
-Q_SIGNALS:
+signals:
     void geometryChanged();
     void geometryDeltaChanged();
     void flagsChanged();

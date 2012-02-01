@@ -73,6 +73,14 @@
 #include "ui/device_settings/camera_motionmask_widget.h"
 #include "ui/style/skin.h"
 
+#define QN_WORKBENCH_CONTROLLER_DEBUG
+
+#ifdef QN_WORKBENCH_CONTROLLER_DEBUG
+#   define TRACE(...) qDebug() << __VA_ARGS__;
+#else
+#   define TRACE(...)
+#endif
+
 Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
@@ -729,6 +737,8 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
+    TRACE("RESIZING STARTED");
+
     m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
     if(m_resizedWidget == NULL)
         return;
@@ -777,6 +787,8 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 }
 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
+    TRACE("RESIZING FINISHED");
+
     if(m_resizedWidget != item)
         return;
 
@@ -807,6 +819,8 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 }
 
 void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
+    TRACE("DRAG STARTED");
+
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
     m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
@@ -912,6 +926,8 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
 }
 
 void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
+    TRACE("DRAG FINISHED");
+
     if(m_draggedWorkbenchItems.empty())
         return;
 
@@ -952,10 +968,14 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphi
 }
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QnResourceWidget *widget) {
+    TRACE("ROTATION STARTED");
+
     m_display->bringToFront(widget);
 }
 
 void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidget *widget) {
+    TRACE("ROTATION FINISHED");
+
     if(widget == NULL)
         return; /* We may get NULL if the widget being rotated gets deleted. */
 
@@ -979,6 +999,8 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *
 }
 
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+    TRACE("ITEM LCLICKED");
+
     if(info.modifiers() != 0)
         return;
 
@@ -995,6 +1017,8 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+    TRACE("ITEM RCLICKED");
+
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
@@ -1024,6 +1048,8 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
 }
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
+    TRACE("ITEM MCLICKED");
+
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
@@ -1032,6 +1058,8 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
+    TRACE("ITEM DOUBLECLICKED");
+
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
@@ -1068,18 +1096,17 @@ void QnWorkbenchController::at_scene_clicked(QGraphicsView *view, const ClickInf
 }
 
 void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInfo &) {
+    TRACE("SCENE LCLICKED");
+
     if(workbench() == NULL)
         return;
-
-#if 0
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
-        qDebug() << resource->getName();
-#endif
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
 }
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
+    TRACE("SCENE RCLICKED");
+
     QScopedPointer<QMenu> menu(new QMenu(display()->view()));
     menu->addAction(&cm_open_file);
     menu->addAction(&cm_screen_recording);
@@ -1090,6 +1117,8 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
+    TRACE("SCENE DOUBLECLICKED");
+
     if(workbench() == NULL)
         return;
 

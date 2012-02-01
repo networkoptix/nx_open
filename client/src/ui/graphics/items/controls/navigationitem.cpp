@@ -186,7 +186,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_timerId = startTimer(33);
 
-
     m_muteButton = new QnImageButtonWidget(this);
     m_muteButton->setObjectName("MuteButton");
     m_muteButton->setPixmap(0, Skin::pixmap(QLatin1String("unmute.png")));

@@ -143,10 +143,13 @@ void QnWorkbenchLayout::setName(const QString &name) {
 
 void QnWorkbenchLayout::load(const QnLayoutData &layoutData)
 {
+    clear();
+
     // TODO: need to set id and name here
     foreach (const QnLayoutItemData& itemData, layoutData.getItems())
+
     {
-        // TODO: need to create layout items here
+        // QnWorkbenchItem *item = new QnWorkbenchItem();
     }
 }
 
