@@ -83,6 +83,7 @@ public:
 
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
+    bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
 
     int lastSendedCSeq() const { return m_csec-1; }
 
@@ -110,7 +111,7 @@ private:
     void parseRangeHeader(const QString& rangeStr);
     void addAdditionAttrs(QByteArray& request);
 private:
-    enum { RTSP_BUFFER_LEN = 1024 * 64 * 10 };
+    enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
     quint8* m_responseBuffer;

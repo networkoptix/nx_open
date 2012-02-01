@@ -1,5 +1,6 @@
 #include "dlink_resource.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
+#include "dlink_stream_reader.h"
 
 const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 
@@ -11,6 +12,19 @@ QnPlDlinkResource::QnPlDlinkResource()
     connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
         this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
 
+}
+
+int QnPlDlinkResource::getMaxFps()
+{
+    QMutexLocker mutexLocker(&m_mutex);
+
+    if (m_camInfo.possibleFps.size()==0)
+    {
+        Q_ASSERT(false);
+        return 15;
+    }
+
+    return m_camInfo.possibleFps.at(0);
 }
 
 bool QnPlDlinkResource::isResourceAccessible()
@@ -37,7 +51,8 @@ QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
 {
     //return new MJPEGtreamreader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
     //return new MJPEGtreamreader(toSharedPointer(), "video/mjpg.cgi");
-    return new MJPEGtreamreader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
+    //return new MJPEGtreamreader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
+    return new PlDlinkStreamReader(toSharedPointer());
 }
 
 void QnPlDlinkResource::setCropingPhysical(QRect croping)
@@ -125,6 +140,26 @@ void QnPlDlinkResource::updateCamInfo()
 
             }
         }
+        else if (line.contains("vbitrates="))
+        {
+            QStringList vals = getValues(line);
+            foreach(QString bs, vals)
+            {
+                bool m = bs.toLower().contains("m");
+                bool k = bs.toLower().contains("k");
+
+                if (m || k)
+                    bs = bs.left(bs.length()-1);
+                
+                int val = bs.toInt();
+                if(m)
+                    val *= 1024;
+
+                m_camInfo.possibleBitrates.push_back(val);
+            }
+
+            
+        }
         else if (line.contains("vprofilenum="))
         {
             m_camInfo.numberOfVideoProfiles = getValue(line).toInt();
@@ -132,6 +167,9 @@ void QnPlDlinkResource::updateCamInfo()
         else if (line.contains("qualities="))
         {
             m_camInfo.possibleQualities = getValue(line);
+
+            if (m_camInfo.possibleQualities.toLower().contains("good"))
+                m_camInfo.hasCBR = true;
         }
         else if (line.contains("vprofileurl"))
         {
@@ -149,6 +187,7 @@ void QnPlDlinkResource::updateCamInfo()
 
     }
 
+    qSort(m_camInfo.possibleBitrates.begin(), m_camInfo.possibleBitrates.end(), qGreater<int>());
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 

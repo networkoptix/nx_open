@@ -11,9 +11,12 @@
 
 struct AVCodecContext;
 
+enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low };
+
 class QnMediaContext
 {
 public:
+
     QnMediaContext(AVCodecContext* ctx);
     QnMediaContext(CodecID codecId);
     QnMediaContext(const quint8* payload, int dataSize);
@@ -32,7 +35,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
                      MediaFlags_AfterEOF = 2,
                      MediaFlags_BOF = 4,
                      MediaFlags_LIVE = 8,
-                     MediaFlags_SingleShot = 16,
+                     //MediaFlags_SingleShot = 16,
+                     MediaFlags_Ignore = 16
                     };
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)
@@ -91,7 +95,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 		dataType = VIDEO;
 		//useTwice = false;
 		context = ctx;
-		ignore = false;
+		//ignore = false;
         flags = 0;
         width = height = -1;
 	}
@@ -101,7 +105,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 	int height;
 	//bool keyFrame;
     //int flags;
-	bool ignore;
+	//bool ignore;
     QnMetaDataV1Ptr motion;
     
 };

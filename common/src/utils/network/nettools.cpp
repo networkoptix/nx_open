@@ -5,6 +5,17 @@
 
 QList<QHostAddress> getAllIPv4Addresses()
 {
+    static QList<QHostAddress> lastResult;
+    static QTime timer;
+    static QMutex mutex;
+
+    {
+        // speed optimization
+        QMutexLocker lock(&mutex);
+        if (!lastResult.isEmpty() & timer.elapsed() < 5000)
+            return lastResult;
+    }
+
     QList<QHostAddress> ipaddrs = QNetworkInterface::allAddresses();
     QList<QHostAddress> result;
 
@@ -34,6 +45,10 @@ QList<QHostAddress> getAllIPv4Addresses()
                 result.push_back(ipaddrs.at(i));
         }
     }
+
+    QMutexLocker lock(&mutex);
+    timer.restart();
+    lastResult = result;
 
     return result;
 }

@@ -38,8 +38,8 @@ public:
     virtual ~QnWorkbenchItem();
 
     /**
-      * Load from QnLayoutData
-      */
+     * Load from QnLayoutData
+     */
     void load(const QnLayoutItemData &data);
 
     /**

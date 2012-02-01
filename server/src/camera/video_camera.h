@@ -5,25 +5,27 @@
 #include <core/resource/resource_consumer.h>
 
 class QnAbstractMediaStreamDataProvider;
+class QnVideoCameraGopKeeper;
 
-class QnVideoCamera: public QnResourceConsumer, public QnAbstractDataConsumer
+class QnVideoCamera: public QObject
 {
+    Q_OBJECT
 public:
-    virtual void beforeDisconnectFromResource();
     QnVideoCamera(QnResourcePtr resource);
     virtual ~QnVideoCamera();
-    QnAbstractMediaStreamDataProvider* getLiveReader();
-
-    void copyLastGop(CLDataQueue& dstQueue);
-
-    // QnAbstractDataConsumer
-    virtual bool canAcceptData() const;
-    virtual void putData(QnAbstractDataPacketPtr data);
-    virtual bool processData(QnAbstractDataPacketPtr data);
-
+    QnAbstractMediaStreamDataProvider* getLiveReader(QnResource::ConnectionRole role);
+    void copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
+    void beforeStop();
+private slots:
+    void onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
 private:
-    QnAbstractMediaStreamDataProvider* m_reader;
-    QMutex m_queueMtx;
+    //QMutex m_queueMtx;
+    QnResourcePtr m_resource;
+    QnAbstractMediaStreamDataProvider* m_primaryReader;
+    QnAbstractMediaStreamDataProvider* m_secondaryReader;
+
+    QnVideoCameraGopKeeper* m_primaryGopKeeper;
+    QnVideoCameraGopKeeper* m_secondaryGopKeeper;
 };
 
 #endif // __VIDEO_CAMERA_H__

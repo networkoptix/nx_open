@@ -1,7 +1,7 @@
 #ifndef __DESKTOP_DEVICE_SERVER_H
 #define __DESKTOP_DEVICE_SERVER_H
 
-#include "core/resourcemanagment/resourceserver.h"
+#include "core/resourcemanagment/resource_searcher.h"
 
 
 

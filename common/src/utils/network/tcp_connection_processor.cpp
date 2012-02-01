@@ -19,7 +19,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    setNoDelay();
+    //d->socket->setNoDelay(true);
     d->owner = _owner;
 }
 
@@ -30,19 +30,18 @@ QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
     delete d_ptr;
 }
 
-bool QnTCPConnectionProcessor::isFullMessage()
+bool QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 {
-    Q_D(QnTCPConnectionProcessor);
-    QByteArray lRequest = d->clientRequest.toLower();
+    QByteArray lRequest = message.toLower();
     QByteArray delimiter = "\n";
     int pos = lRequest.indexOf(delimiter);
     if (pos == -1)
         return false;
-    if (pos > 0 && d->clientRequest[pos-1] == '\r')
+    if (pos > 0 && lRequest[pos-1] == '\r')
         delimiter = "\r\n";
     int contentLen = 0;
-    int contentLenPos = lRequest.indexOf("content-length") >= 0;
-    if (contentLenPos)
+    int contentLenPos = lRequest.indexOf("content-length");
+    if (contentLenPos >= 0)
     {
         int posStart = -1;
         int posEnd = -1;
@@ -61,7 +60,7 @@ bool QnTCPConnectionProcessor::isFullMessage()
             contentLen = lRequest.mid(posStart, posEnd - posStart+1).toInt();
     }
     QByteArray dblDelim = delimiter + delimiter;
-    return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());;
+    return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());
 }
 
 void QnTCPConnectionProcessor::parseRequest()
@@ -136,21 +135,10 @@ void QnTCPConnectionProcessor::clearBuffer()
     d->sendBuffer.clear();
 }
 
-void QnTCPConnectionProcessor::setNoDelay()
-{
-    Q_D(QnTCPConnectionProcessor);
-    int flag = 1;
-    int result = setsockopt(d->socket->handle(),            /* socket affected */
-        IPPROTO_TCP,     /* set option at TCP level */
-        TCP_NODELAY,     /* name of option */
-        (char *) &flag,  /* the cast is historical
-                             cruft */
-        sizeof(int));    /* length of option value */
-}
-
 void QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
+    QMutexLocker lock(&d->sockMutex);
     while (!m_needStop && size > 0 && d->socket->isConnected())
     {
         int sended = d->socket->send(data, size);
@@ -162,12 +150,6 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
             size -= sended;
         }
     }
-}
-
-QMutex& QnTCPConnectionProcessor::getSockMutex()
-{
-    Q_D(QnTCPConnectionProcessor);
-    return d->sockMutex;
 }
 
 QString QnTCPConnectionProcessor::extractPath() const

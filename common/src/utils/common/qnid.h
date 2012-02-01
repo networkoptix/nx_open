@@ -39,4 +39,6 @@ private:
     int m_id;
 };
 
+Q_DECLARE_TYPEINFO(QnId, Q_PRIMITIVE_TYPE);
+
 #endif // QNID_H

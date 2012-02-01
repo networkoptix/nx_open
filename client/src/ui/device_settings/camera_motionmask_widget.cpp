@@ -4,7 +4,7 @@
 
 #include "ui/graphics/items/resource_widget.h"
 #include "ui/workbench/workbench_item.h"
-#include "ui/graphicsview.h"
+#include "ui/widgets/graphicsview.h"
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QnResourcePtr &resource, QWidget *parent)
     : QWidget(parent)

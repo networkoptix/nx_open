@@ -3,7 +3,7 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <utils/common/warnings.h>
-#include <ui/skin/globals.h>
+#include <ui/style/globals.h>
 
 namespace {
     const char *opacityAnimatorPropertyName = "_qn_opacityAnimator";

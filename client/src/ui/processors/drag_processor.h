@@ -36,6 +36,9 @@ class DragProcessHandler;
  */
 class DragProcessor: public QObject, protected SceneUtility {
     Q_OBJECT;
+    Q_FLAGS(Flags Flag);
+    Q_ENUMS(State);
+
 public:
     enum State {
         WAITING,    /**< Waiting for the drag process to start. */

@@ -33,6 +33,7 @@ public:
     virtual void setSendMotion(bool value);
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeReverseMode(bool reverseMode);
+    virtual void setQuality(MediaQuality quality) override;
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

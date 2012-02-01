@@ -41,6 +41,24 @@ MarginsF SceneUtility::cwiseDiv(const MarginsF &l, const QSizeF &r) {
     );
 }
 
+MarginsF SceneUtility::cwiseMul(const QSizeF &l, const MarginsF &r) {
+    return MarginsF(
+        l.width()  * r.left(),
+        l.height() * r.top(),
+        l.width()  * r.right(),
+        l.height() * r.bottom()
+    );
+}
+
+MarginsF SceneUtility::cwiseDiv(const QSizeF &l, const MarginsF &r) {
+    return MarginsF(
+        l.width()  / r.left(),
+        l.height() / r.top(),
+        l.width()  / r.right(),
+        l.height() / r.bottom()
+    );
+}
+
 MarginsF SceneUtility::cwiseMul(const MarginsF &l, const MarginsF &r) {
     return MarginsF(
         l.left()   * r.left(), 
@@ -331,6 +349,10 @@ QRect SceneUtility::eroded(const QRect &rect, const QMargins &amount) {
 }
 
 QSizeF SceneUtility::eroded(const QSizeF &size, const MarginsF &amount) {
+    return size - sizeDelta(amount);
+}
+
+QSize SceneUtility::eroded(const QSize &size, const QMargins &amount) {
     return size - sizeDelta(amount);
 }
 

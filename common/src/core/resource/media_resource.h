@@ -16,6 +16,8 @@ enum QnStreamQuality {QnQualityLowest, QnQualityLow, QnQualityNormal, QnQualityH
 
 class QnMediaResource : virtual public QnResource
 {
+    Q_OBJECT
+
 public:
     QnMediaResource();
     virtual ~QnMediaResource();

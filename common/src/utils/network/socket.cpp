@@ -18,6 +18,7 @@
   #include <arpa/inet.h>       // For inet_addr()
   #include <unistd.h>          // For close()
   #include <netinet/in.h>      // For sockaddr_in
+  #include <netinet/tcp.h>      // For TCP_NODELAY
   #include <fcntl.h>
 #include "../common/log.h"
   typedef void raw_type;       // Type used for raw data on this platform
@@ -344,18 +345,17 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
     return sended;
 }
 
-int CommunicatingSocket::recv(void *buffer, int bufferLen)
+int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
 {
-    int rtn;
-  if ((rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, 0)) < 0)
-  {
-      int errCode = getSystemErrCode();
-      if (errCode != ERR_TIMEOUT)
-	    mConnected = false;
-	  return -1;
-  }
-
-  return rtn;
+    int rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, flags);
+    if (rtn < 0)
+    {
+        int errCode = getSystemErrCode();
+        if (errCode != ERR_TIMEOUT)
+        mConnected = false;
+            return -1;
+    }
+    return rtn;
 }
 
 QString CommunicatingSocket::getForeignAddress()
@@ -403,6 +403,15 @@ bool TCPSocket::reopen()
     }
 }
 
+int TCPSocket::setNoDelay(bool value)
+{
+    int flag = value ? 1 : 0;
+    return setsockopt(sockDesc,            // socket affected 
+        IPPROTO_TCP,     // set option at TCP level 
+        TCP_NODELAY,     // name of option 
+        (char *) &flag,  // the cast is historical cruft 
+        sizeof(int));    // length of option value 
+}
 
 TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 }
@@ -455,8 +464,13 @@ void TCPServerSocket::setListen(int queueLen)  {
 UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     IPPROTO_UDP)
 {
-  setBroadcast();
+    setBroadcast();
     m_destAddr = new sockaddr_in();
+    int buff_size = 1024*512;
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
+    {
+        //error
+    }
  }
 
 UDPSocket::UDPSocket(unsigned short localPort)   :
@@ -465,19 +479,24 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
   setBroadcast();
   m_destAddr = new sockaddr_in();
 
-  int buff_size = 1024*1024;
+  int buff_size = 1024*512;
   if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
   {
       //error
-      buff_size = buff_size;
   }
 }
 
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-      : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
+      : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) 
+{
   setLocalAddressAndPort(localAddress, localPort);
   setBroadcast();
   m_destAddr = new sockaddr_in();
+  int buff_size = 1024*512;
+  if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
+  {
+      //error
+  }
 }
 
 UDPSocket::~UDPSocket()
@@ -510,6 +529,11 @@ void UDPSocket::disconnect()  {
   }
 }
 
+void UDPSocket::setDestPort(unsigned short foreignPort)
+{
+    m_destAddr->sin_port = htons(foreignPort);
+}
+
 void UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreignPort)
 {
     fillAddr(foreignAddress, foreignPort, *m_destAddr);
@@ -530,18 +554,16 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 }
 
 int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
-    unsigned short &sourcePort)  {
-  sockaddr_in clntAddr;
-  socklen_t addrLen = sizeof(clntAddr);
-  int rtn;
-  if ((rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0,
-                      (sockaddr *) &clntAddr, (socklen_t *) &addrLen)) < 0) {
-    throw SocketException("Receive failed (recvfrom())", true);
-  }
-  sourceAddress = inet_ntoa(clntAddr.sin_addr);
-  sourcePort = ntohs(clntAddr.sin_port);
-
-  return rtn;
+    unsigned short &sourcePort)  
+{
+    sockaddr_in clntAddr;
+    socklen_t addrLen = sizeof(clntAddr);
+    int rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0, (sockaddr *) &clntAddr, (socklen_t *) &addrLen);
+    if (rtn >= 0) {
+        sourceAddress = inet_ntoa(clntAddr.sin_addr);
+        sourcePort = ntohs(clntAddr.sin_port);
+    }
+    return rtn;
 }
 
 void UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {

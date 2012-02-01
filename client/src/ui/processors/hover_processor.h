@@ -59,6 +59,14 @@ public:
         return;
     }
 
+    bool isHovered() const {
+        return m_hovered;
+    }
+
+    bool isFocused() const {
+        return m_focused;
+    }
+
 public slots:
     void forceHoverLeave();
     void forceHoverEnter();

@@ -3,7 +3,7 @@
 #include <qglobal.h>
 
 #include "api/AppServerConnection.h"
-#include "core/resourcemanagment/asynch_seacher.h"
+#include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "eventmanager.h"
 #include "recorder/recording_manager.h"

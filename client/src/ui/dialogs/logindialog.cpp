@@ -7,7 +7,7 @@
 
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 #include "connectiontestingdialog.h"
 
 #include "api/AppServerConnection.h"
@@ -90,8 +90,10 @@ QUrl LoginDialog::currentUrl()
 
 void LoginDialog::accept()
 {
-    Settings::ConnectionData connection;
+    /* Widget data may not be written out to the model yet. Force it. */
+    m_dataWidgetMapper->submit();
 
+    Settings::ConnectionData connection;
     connection.url = currentUrl();
 
     if (!connection.url.isValid()) {

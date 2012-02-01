@@ -3,7 +3,7 @@
 #include <QtGui/QKeySequence>
 #include <QtGui/QMenu>
 
-#include "ui/skin/skin.h"
+#include "ui/style/skin.h"
 
 #include "ui/context_menu/menu_wrapper.h"
 
@@ -24,6 +24,8 @@ QAction cm_restore_layout(QObject::tr("Restore layout"), 0);
 QAction cm_save_layout(QObject::tr("Save layout"), 0);
 QAction cm_save_layout_as(QObject::tr("Save layout as..."), 0);
 QAction cm_preferences(QObject::tr("Preferences"), 0);
+
+QAction cm_new_tab(QObject::tr("New Tab"), 0);
 
 QAction cm_hide_decorations(QObject::tr("Hide decorations"), 0);
 
@@ -54,6 +56,10 @@ QAction cm_showNavTree(QObject::tr("<=|=>"), 0);
 
 void initContextMenu()
 {
+    cm_new_tab.setToolTip(QObject::tr("New Tab"));
+    cm_new_tab.setShortcut(QKeySequence::New);
+    cm_new_tab.setIcon(Skin::icon(QLatin1String("plus.png")));
+
     cm_about.setIcon(Skin::icon(QLatin1String("info.png")));
     cm_about.setMenuRole(QAction::AboutRole);
     cm_about.setAutoRepeat(false);

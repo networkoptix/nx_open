@@ -1,15 +1,35 @@
 #include "utils/common/sleep.h"
 #include "cpull_media_stream_provider.h"
+#include "../resource/camera_resource.h"
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
     QnAbstractMediaStreamDataProvider(dev),
-    m_fpsSleep(100*1000)
+    m_fpsSleep(100*1000),
+    m_fps(MAX_LIVE_FPS)
 {
 }
 
+void QnClientPullMediaStreamProvider::setFps(float f)
+{
+    QMutexLocker mtx(&m_mutex);
+    m_fps = f;
+}
+
+float QnClientPullMediaStreamProvider::getFps() const
+{
+    QMutexLocker mtx(&m_mutex);
+    return m_fps;
+}
+
+bool QnClientPullMediaStreamProvider::isMaxFps() const
+{
+    QMutexLocker mtx(&m_mutex);
+    return abs( m_fps - MAX_LIVE_FPS)< .1;
+}
 
 void QnClientPullMediaStreamProvider::run()
 {
+    setPriority(QThread::HighPriority);
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
     beforeRun();
@@ -29,7 +49,7 @@ void QnClientPullMediaStreamProvider::run()
 		}
 
 
-		if (QnResource::commandProcHasSuchResourceInQueue(m_resource)) // if command processor has something in the queue for this device let it go first
+		if (getResource()->hasUnprocessedCommands()) // if command processor has something in the queue for this resource let it go first
 		{
 			QnSleep::msleep(5);
 			continue;
@@ -48,9 +68,11 @@ void QnClientPullMediaStreamProvider::run()
 			m_stat[0].onData(0);
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-			if (mFramesLost % 4 == 0) // if we lost 4 frames => connection is lost for sure (4)
+			if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
             {
-                getResource()->setStatus(QnResource::Offline);
+                if (getResource().dynamicCast<QnPhysicalCameraResource>())
+                    getResource()->setStatus(QnResource::Offline);
+
 				m_stat[0].onLostConnection();
             }
 
@@ -70,17 +92,20 @@ void QnClientPullMediaStreamProvider::run()
         
         
         if (getResource()->checkFlag(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+        {
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+        }
+        checkTime(data);
 
-
-        getResource()->setStatus(QnResource::Online);
+        if (getResource().dynamicCast<QnPhysicalCameraResource>())
+            getResource()->setStatus(QnResource::Online);
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
         
 
 		if (mFramesLost>0) // we are alive again
 		{
-			if (mFramesLost>=4)
+			if (mFramesLost >= MAX_LOST_FRAME)
 			{
 				m_stat[0].onEvent(CL_STAT_CAMRESETED);
 			}
@@ -111,15 +136,8 @@ void QnClientPullMediaStreamProvider::run()
 		data->dataProvider = this;
 
         if (videoData)
-        {
             m_stat[videoData->channelNumber].onData(videoData->data.size());
-            ++m_framesSinceLastMetaData;
-        }
-        else if (qSharedPointerDynamicCast<QnMetaDataV1>(data))
-        {
-            m_framesSinceLastMetaData = 0;
-            m_timeSinceLastMetaData.restart();
-        }
+
 
 		putData(data);
 

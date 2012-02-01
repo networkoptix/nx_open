@@ -68,18 +68,19 @@ void AVSettingsDlg::accept()
     CLAbstractDeviceSettingsDlg::accept();
 }
 
-QList<QString> AVSettingsDlg::tabsOrder() const
+void AVSettingsDlg::buildTabs()
 {
-    QList<QString> tabsOrder = CLAbstractDeviceSettingsDlg::tabsOrder();
-    tabsOrder << QLatin1String("Image quality")
+    QList<QString> tabsOrder;
+    tabsOrder << QString()
+              << QLatin1String("Image quality")
               << QLatin1String("Exposure")
               << QLatin1String("AutoIris")
               << QLatin1String("Day/Night")
               << QLatin1String("Binning")
               << QLatin1String("Motion detection")
-              << QLatin1String("Network")
               << QLatin1String("Administration/Info");
-    return tabsOrder;
+
+    CLAbstractDeviceSettingsDlg::buildTabs(tabsOrder);
 }
 
 void AVSettingsDlg::initImageQuality()

@@ -122,3 +122,8 @@ void QnSyncPlayArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
 {
     m_ownerDelegate->beforeChangeReverseMode(reverseMode);
 }
+
+void QnSyncPlayArchiveDelegate::setQuality(MediaQuality quality)
+{
+    m_ownerDelegate->setQuality(quality);
+}

@@ -10,7 +10,7 @@
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
-#include <core/resource/directory_browser.h>
+#include <core/resource/resource_directory_browser.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>

@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QIcon>
 #include <QAction>
+#include <QStyle>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/animation/accessor.h>
@@ -65,6 +66,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
     setAcceptsHoverEvents(true);
+    setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton));
 
     m_animator = new VariantAnimator(this);
     m_animator->setTargetObject(this);
@@ -73,8 +75,11 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     /* When hovering over a button, a cursor should always change to arrow pointer. */
     setCursor(Qt::ArrowCursor);
 
-    /* Init animator timer. */
+    /* Perform handler-based initialization. */
     itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
+
+    QEvent styleChange(QEvent::StyleChange);
+    event(&styleChange);
 }
 
 const QPixmap &QnImageButtonWidget::pixmap(StateFlags flags) const {
@@ -118,8 +123,7 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     setPixmap(CHECKED | PRESSED,    bestPixmap(icon, QIcon::Selected, QIcon::On));
 }
 
-void QnImageButtonWidget::setCheckable(bool checkable)
-{
+void QnImageButtonWidget::setCheckable(bool checkable) {
     if (m_checkable == checkable)
         return;
 
@@ -129,8 +133,7 @@ void QnImageButtonWidget::setCheckable(bool checkable)
     update();
 }
 
-void QnImageButtonWidget::setChecked(bool checked)
-{
+void QnImageButtonWidget::setChecked(bool checked) {
     if (!m_checkable || checked == isChecked())
         return;
 
@@ -138,18 +141,8 @@ void QnImageButtonWidget::setChecked(bool checked)
     update();
 }
 
-void QnImageButtonWidget::setEnabled(bool enabled)
-{
-    setDisabled(!enabled);
-}
-
-void QnImageButtonWidget::setDisabled(bool disabled)
-{
-    if(isDisabled() == disabled)
-        return;
-
-    updateState(disabled ? (m_state | DISABLED) : (m_state & ~DISABLED));
-    update();
+void QnImageButtonWidget::setDisabled(bool disabled) {
+    setEnabled(!disabled);
 }
 
 qreal QnImageButtonWidget::animationSpeed() const {
@@ -158,6 +151,14 @@ qreal QnImageButtonWidget::animationSpeed() const {
 
 void QnImageButtonWidget::setAnimationSpeed(qreal animationSpeed) {
     m_animator->setSpeed(animationSpeed);
+}
+
+void QnImageButtonWidget::click() {
+    if(m_action != NULL)
+        m_action->trigger();
+    else
+        toggle();
+    emit clicked(isChecked());
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -194,11 +195,7 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
     if(isDisabled())
         return;
 
-    if(m_action != NULL)
-        m_action->trigger();
-    else
-        toggle();
-    Q_EMIT clicked(isChecked());
+    click();
 }
 
 void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {
@@ -240,10 +237,46 @@ void QnImageButtonWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
     base_type::resizeEvent(event);
 }
 
+void QnImageButtonWidget::changeEvent(QEvent *event) {
+    switch(event->type()) {
+    case QEvent::StyleChange:
+        setFocusPolicy(Qt::FocusPolicy(style()->styleHint(QStyle::SH_Button_FocusPolicy)));
+        break;
+    default:
+        break;
+    }
+
+    base_type::changeEvent(event);
+}
+
+bool QnImageButtonWidget::event(QEvent *event) {
+    QActionEvent *actionEvent = static_cast<QActionEvent *>(event);
+
+    switch (event->type()) {
+    case QEvent::ActionChanged:
+        if (actionEvent->action() == m_action)
+            setDefaultAction(actionEvent->action()); /** Update button state. */
+        break;
+    case QEvent::ActionAdded:
+        break;
+    case QEvent::ActionRemoved:
+        if (actionEvent->action() == m_action)
+            m_action = NULL;
+        break;
+    default:
+        break;
+    }
+
+    return base_type::event(event);
+}
+
 QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     switch(change) {
     case ItemSceneHasChanged:
         m_animator->setTimer(InstrumentManager::animationTimerOf(scene()));
+        break;
+    case ItemEnabledHasChanged:
+        updateState(isDisabled() ? (m_state | DISABLED) : (m_state & ~DISABLED));
         break;
     default:
         break;
@@ -342,17 +375,25 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     StateFlags oldState = m_state;
     m_state = state;
 
-    if((oldState ^ m_state) & CHECKED) {
+    if((oldState ^ m_state) & CHECKED) { /* CHECKED has changed, emit notification signal and sync with action. */
         Q_EMIT toggled(isChecked());
 
         if(m_action != NULL)
             m_action->setChecked(isChecked());
     }
 
+    if((oldState ^ m_state) & DISABLED) /* DISABLED has changed, perform back-sync. */
+        setDisabled(m_state & DISABLED);
+
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED))
         m_action->hover();
 
-    m_animator->animateTo(isHovered() ? 1.0 : 0.0);
+    qreal hoverProgress = isHovered() ? 1.0 : 0.0;
+    if(scene() == NULL) {
+        m_hoverProgress = hoverProgress;
+    } else {
+        m_animator->animateTo(hoverProgress);
+    }
 }
 
 void QnImageButtonWidget::setDefaultAction(QAction *action) {
@@ -361,7 +402,7 @@ void QnImageButtonWidget::setDefaultAction(QAction *action) {
         return;
 
     if (!this->actions().contains(action))
-        addAction(action);
+        addAction(action); /* This way we will receive action-related events and thus will track changes in action state. */
 
     setIcon(action->icon());
     setToolTip(action->toolTip());
@@ -369,27 +410,6 @@ void QnImageButtonWidget::setDefaultAction(QAction *action) {
     setCheckable(action->isCheckable());
     setChecked(action->isChecked());
     setEnabled(action->isEnabled());
-}
-
-bool QnImageButtonWidget::event(QEvent *event) {
-    QActionEvent *actionEvent = static_cast<QActionEvent *>(event);
-
-    switch (event->type()) {
-    case QEvent::ActionChanged:
-        if (actionEvent->action() == m_action)
-            setDefaultAction(actionEvent->action()); /** Update button state. */
-        break;
-    case QEvent::ActionAdded:
-        break;
-    case QEvent::ActionRemoved:
-        if (actionEvent->action() == m_action)
-            m_action = NULL;
-        break;
-    default:
-        break;
-    }
-
-    return base_type::event(event);
 }
 
 bool QnImageButtonWidget::isCached() const {

@@ -6,7 +6,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
-#include <ui/skin/globals.h>
+#include <ui/style/globals.h>
 #include <core/resource/security_cam_resource.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
@@ -20,7 +20,7 @@
 
 namespace {
     /** Default frame width. */
-    const qreal defaultFrameWidth = 0.5;
+    const qreal defaultFrameWidth = 50.0;
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -30,7 +30,7 @@ namespace {
     const qreal frameExtensionMultiplier = 1.0;
 
     /** Default shadow displacement, in scene coordinates. */
-    const QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
+    const QPointF defaultShadowDisplacement = QPointF(500.0, 500.0);
 
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
     const qint64 defaultLoadingTimeoutMSec = 2000;
@@ -123,11 +123,6 @@ QnResourceWidget::~QnResourceWidget() {
     }
 
     qFreeAligned(m_motionMaskBinData);
-
-    if (m_item) {
-        m_item.data()->deleteLater();
-        m_item.clear();
-    }
 }
 
 const QnResourcePtr &QnResourceWidget::resource() const {

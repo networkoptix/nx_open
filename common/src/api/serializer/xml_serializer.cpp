@@ -128,7 +128,7 @@ namespace {
             if (cameraBase.isNull())
                 continue;
 
-            QnCameraResourcePtr camera = cameraBase.dynamicCast<QnCameraResource>();
+            QnVirtualCameraResourcePtr camera = cameraBase.dynamicCast<QnVirtualCameraResource>();
             if (camera.isNull())
                 continue;
 
@@ -398,7 +398,7 @@ void QnApiXmlSerializer::deserializeStorages(QnStorageList& storages, const QByt
     }
 }
 
-void QnApiXmlSerializer::deserializeCameras(QnCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
+void QnApiXmlSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     QByteArray errorString;
 
@@ -588,7 +588,7 @@ void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteAr
     data = os.str().c_str();
 }
 
-void QnApiXmlSerializer::serializeCamera(const QnCameraResourcePtr& cameraPtr, QByteArray& data)
+void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& cameraPtr, QByteArray& data)
 {
     xsd::api::cameras::Camera camera(cameraPtr->getId().toString().toStdString(),
                                      cameraPtr->getName().toStdString(),
@@ -655,8 +655,8 @@ void QnApiXmlSerializer::serialize(const QnResourcePtr& resource, QByteArray& da
 {
     if (resource.dynamicCast<QnStorage>()) {
         serializeStorage(resource.dynamicCast<QnStorage>(), data);
-    } else if (resource.dynamicCast<QnCameraResource>()) {
-        serializeCamera(resource.dynamicCast<QnCameraResource>(), data);
+    } else if (resource.dynamicCast<QnVirtualCameraResource>()) {
+        serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
     } else if (resource.dynamicCast<QnVideoServer>()) {
         serializeServer(resource.dynamicCast<QnVideoServer>(), data);
     } else if (resource.dynamicCast<QnUserResource>()) {

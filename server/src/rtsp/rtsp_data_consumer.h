@@ -29,7 +29,7 @@ public:
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
-    void copyLastGopFromCamera();
+    void copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime = 0);
     void lockDataQueue();
     void unlockDataQueue();
     void setSingleShotMode(bool value);
@@ -38,6 +38,8 @@ public:
     virtual qint64 getCurrentTime() const;
     virtual qint64 getNextTime() const;
     virtual qint64 getExternalTime() const;
+
+    qint64 lastQueuedTime();
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
@@ -52,6 +54,7 @@ private:
     quint16 m_sequence[256];
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
+    qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
     char m_rtspTcpHeader[4 + RtpHeader::RTP_HEADER_SIZE];
     quint8* tcpReadBuffer;
     QMutex m_mutex;
@@ -61,6 +64,8 @@ private:
     QMutex m_dataQueueMtx;
     bool m_singleShotMode;
     int m_packetSended;
+    QnAbstractStreamDataProvider* m_prefferedProvider;
+    QnAbstractStreamDataProvider* m_currentDP;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

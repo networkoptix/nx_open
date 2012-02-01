@@ -26,7 +26,7 @@ public:
 
     QList<CLDeviceSettingsTab *> tabs() const;
     CLDeviceSettingsTab *tabByName(const QString &name) const;
-    void addTab(CLDeviceSettingsTab *tab);
+    void addTab(CLDeviceSettingsTab *tab, const QString &name);
 
     QList<QGroupBox *> groups() const;
     QGroupBox *groupByName(const QString &name) const;
@@ -44,13 +44,17 @@ public Q_SLOTS:
     virtual void reject();
     virtual void reset();
 
+protected Q_SLOTS:
+    virtual void buildTabs();
+
 protected:
-    virtual QList<QString> tabsOrder() const;
+    void buildTabs(QTabWidget *tabWidget, const QList<QString> &tabsOrder);
+    inline void buildTabs(const QList<QString> &tabsOrder)
+    { buildTabs(m_tabWidget, tabsOrder); }
 
     void setParam(const QString &paramName, const QVariant &value);
 
 private Q_SLOTS:
-    void buildTabs();
     void saveParam();
 
     void saveSuccess();
@@ -68,7 +72,7 @@ private:
 
     QHash<QString, QWidget *> m_widgets;
     QHash<QString, QGroupBox *> m_groups;
-    QList<CLDeviceSettingsTab *> m_tabs;
+    QHash<QString, CLDeviceSettingsTab *> m_tabs;
 };
 
 #endif //abstract_device_settings_dlg_h_1652

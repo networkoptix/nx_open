@@ -17,6 +17,7 @@ extern QAction cm_toggle_fullscreen;
 extern QAction cm_toggle_fps;
 extern QAction cm_fitinview;
 extern QAction cm_arrange;
+extern QAction cm_new_tab;
 
 extern QAction cm_hide_decorations;
 

@@ -1,7 +1,7 @@
 #ifndef av_device_server_h_2107
 #define av_device_server_h_2107
 
-#include "core/resourcemanagment/resourceserver.h"
+#include "core/resourcemanagment/resource_searcher.h"
 
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 {

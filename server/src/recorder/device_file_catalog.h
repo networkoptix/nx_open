@@ -32,7 +32,7 @@ public:
 
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
-    DeviceFileCatalog(const QString& macAddress);
+    DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role);
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     void updateDuration(int durationMs);
@@ -42,7 +42,6 @@ public:
     Chunk chunkAt(int index) const;
     qint64 minTime() const;
     qint64 maxTime() const;
-    bool fileExists(const Chunk& chunk);
     bool lastFileDuplicateName() const;
     qint64 firstTime() const;
 
@@ -51,7 +50,12 @@ public:
     typedef QVector<Chunk> ChunkMap;
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
+
+    static QString prefixForRole(QnResource::ConnectionRole role);
+    static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
+
 private:
+    bool fileExists(const Chunk& chunk);
     void addChunk(const Chunk& chunk, qint64 lastStartTime);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs);
     QList<QDate> recordedMonthList();
@@ -66,6 +70,7 @@ private:
     QFileInfoList m_existFileList;
     bool m_duplicateName;
     QString m_prevFileName;
+    QnResource::ConnectionRole m_role;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

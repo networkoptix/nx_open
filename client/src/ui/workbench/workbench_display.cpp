@@ -8,6 +8,7 @@
 #include <QtAlgorithms>
 
 #include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
 
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -32,14 +33,18 @@
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
-#include "ui/skin/skin.h"
-#include "ui/skin/globals.h"
+#include <ui/mixins/sync_play_mixin.h>
+#include <ui/mixins/render_watch_mixin.h>
+
+#include "ui/style/skin.h"
+#include "ui/style/globals.h"
 
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+#include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
@@ -73,7 +78,7 @@ namespace {
     const qreal maxExpandedSize = 0.5;
 
     /** Viewport lower size boundary, in scene coordinates. */
-    const QSizeF viewportLowerSizeBound = QSizeF(8.0, 8.0);
+    const QSizeF viewportLowerSizeBound = QSizeF(800.0, 800.0);
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
@@ -101,7 +106,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_mode(QnWorkbench::VIEWING),
-    m_marginFlags(MARGINS_AFFECT_POSITION | MARGINS_AFFECT_SIZE),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this))
 {
@@ -164,6 +168,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     /* Set up defaults. */
     initWorkbench(workbench);
     setScene(m_dummyScene);
+
+    /* Set up syncplay and render watcher. */
+    m_renderWatcher = new QnRenderWatchMixin(this, this);
+    new QnSyncPlayMixin(this, m_renderWatcher, this);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -229,7 +237,7 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     disconnect(m_workbench, NULL, this, NULL);
 
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
-        removeItemInternal(item, true);
+        removeItemInternal(item, true, false);
 
     for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
         changeItem(static_cast<QnWorkbench::ItemRole>(i), NULL);
@@ -268,6 +276,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_gridItem.data()->setAnimationTimeLimit(300);
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
     m_gridItem.data()->setOpacity(0.0);
+    m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(m_workbench->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
@@ -377,6 +386,11 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
 QnGridItem *QnWorkbenchDisplay::gridItem() {
     return m_gridItem.data();
 }
+
+QnRenderWatchMixin *QnWorkbenchDisplay::renderWatcher() const {
+    return m_renderWatcher;
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -556,16 +570,14 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     togglePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("unpin.png")));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
-    togglePinButton->setMinimumSize(QSizeF(10.0, 10.0));
-    togglePinButton->setMaximumSize(QSizeF(10.0, 10.0));
+    togglePinButton->setPreferredSize(QSizeF(1000.0, 1000.0));
     connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
     widget->addButton(togglePinButton);
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("close.png")));
     closeButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("close_hover.png")));
-    closeButton->setMinimumSize(QSizeF(10.0, 10.0));
-    closeButton->setMaximumSize(QSizeF(10.0, 10.0));
+    closeButton->setPreferredSize(QSizeF(1000.0, 1000.0));
     closeButton->setAnimationSpeed(4.0);
     connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
     widget->addButton(closeButton);
@@ -592,13 +604,13 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     emit widgetAdded(widget);
 }
 
-void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget) {
+void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem) {
     disconnect(item, NULL, this, NULL);
 
     QnResourceWidget *widget = m_widgetByItem.value(item);
     if(widget == NULL) {
-        // already cleaned-up
-        return;
+        assert(!destroyItem);
+        return; /* Already cleaned up. */
     }
 
     disconnect(widget, NULL, this, NULL);
@@ -612,34 +624,35 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     if(destroyWidget)
         delete widget;
+
+    if(destroyItem)
+        delete item;
+}
+
+QMargins QnWorkbenchDisplay::viewportMargins() const {
+    return m_viewportAnimator->viewportMargins();
 }
 
 void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins) {
-    if(m_viewportMargins == margins)
+    if(viewportMargins() == margins)
         return;
 
-    m_viewportMargins = margins;
-    
-    if(m_marginFlags & MARGINS_AFFECT_SIZE)
-        m_viewportAnimator->setViewportMargins(margins);
+    m_viewportAnimator->setViewportMargins(margins);
 
     synchronizeSceneBoundsExtension();
 }
 
-QnWorkbenchDisplay::MarginFlags QnWorkbenchDisplay::marginFlags() const {
-    return m_marginFlags;
+Qn::MarginFlags QnWorkbenchDisplay::marginFlags() const {
+    return m_viewportAnimator->marginFlags();
 }
 
-void QnWorkbenchDisplay::setMarginFlags(MarginFlags flags) {
-    if(m_marginFlags == flags)
+void QnWorkbenchDisplay::setMarginFlags(Qn::MarginFlags flags) {
+    if(marginFlags() == flags)
         return;
 
-    QMargins margins = m_viewportMargins;
-    setViewportMargins(QMargins(0, 0, 0, 0));
+    m_viewportAnimator->setMarginFlags(flags);
 
-    m_marginFlags = flags;
-
-    setViewportMargins(margins);
+    synchronizeSceneBoundsExtension();
 }
 
 
@@ -727,7 +740,7 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     if(m_view == NULL) {
         return QRectF();
     } else {
-        return mapRectToScene(m_view, (m_marginFlags & MARGINS_AFFECT_SIZE) ? eroded(m_view->viewport()->rect(), m_viewportMargins) : m_view->viewport()->rect());
+        return m_viewportAnimator->accessor()->get(m_view).toRectF();
     }
 }
 
@@ -882,13 +895,16 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
-    if(m_marginFlags == 0)
-        return;
+    MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
+    if(marginFlags() != 0)
+        marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
 
-    QSizeF viewportSize = m_view->viewport()->size();
-    MarginsF positionExtension = cwiseDiv(m_viewportMargins, viewportSize);
+    /* Sync position extension. */
+    {
+        MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
+        if(marginFlags() & Qn::MARGINS_AFFECT_POSITION)
+            positionExtension = marginsExtension;
 
-    if(m_marginFlags & MARGINS_AFFECT_POSITION) {
         QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
         if(zoomedItem != NULL) {
             m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
@@ -897,8 +913,9 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
         }
     }
 
-    if(m_marginFlags & MARGINS_AFFECT_SIZE) {
-        QSizeF sizeExtension = sizeDelta(positionExtension);
+    /* Sync size extension. */
+    if(marginFlags() & Qn::MARGINS_AFFECT_SIZE) {
+        QSizeF sizeExtension = sizeDelta(marginsExtension);
         sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
 
         m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
@@ -937,7 +954,7 @@ void QnWorkbenchDisplay::at_workbench_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
-    removeItemInternal(item, true);
+    removeItemInternal(item, true, false);
     synchronizeSceneBounds();
     fitInView();
 }
@@ -994,6 +1011,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
             newCamDisplay->playAudio(true);
     }
 
+    /* Sync geometry. */
     switch(role) {
     case QnWorkbench::RAISED: {
         /* Sync new & old items. */
@@ -1033,6 +1051,16 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
     default:
         qnWarning("Unreachable code executed.");
         return;
+    }
+
+    /* Update media quality. */
+    if(role == QnWorkbench::ZOOMED) {
+        QnResourceWidget *oldWidget = this->widget(oldItem);
+        if(oldWidget)
+            oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
+        QnResourceWidget *newWidget = this->widget(item);
+        if(newWidget)
+            newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High);
     }
 
     emit widgetChanged(role);
@@ -1087,9 +1115,13 @@ void QnWorkbenchDisplay::at_uncurtained() {
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
-    QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(sender());
-    if (widget && widget->item())
-        removeItemInternal(widget->item(), false);
+    QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
+    if (widget && widget->item()) {
+        /* We can get here only when the widget is destroyed directly 
+         * (not by destroying or removing its corresponding item). 
+         * Therefore the widget's item must be destroyed. */
+        removeItemInternal(widget->item(), false, true);
+    }
 }
 
 void QnWorkbenchDisplay::at_scene_destroyed() {
@@ -1112,9 +1144,3 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged() {
     synchronizeAllGeometries(true);
 }
 
-void QnWorkbenchDisplay::onDisplayingStateChanged(QnAbstractRenderer* renderer, bool displaying)
-{
-    QnResourceWidget *w = widget(renderer);
-    if(w)
-        emit displayingStateChanged(w->display()->dataProvider()->getResource(), displaying);
-}

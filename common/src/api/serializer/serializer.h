@@ -7,7 +7,7 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource/video_server.h"
 #include "core/resource/layout_data.h"
-#include "core/resource/qnstorage.h"
+#include "core/resource/storage.h"
 #include "core/resource/user.h"
 
 class QnSerializeException : public std::exception
@@ -35,7 +35,7 @@ public:
     virtual void serialize(const QnResourcePtr& resource, QByteArray& data) = 0;
 
     virtual void deserializeStorages(QnStorageList& storages, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
-    virtual void deserializeCameras(QnCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
+    virtual void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeServers(QnVideoServerList& servers, const QByteArray& data) = 0;
     virtual void deserializeLayouts(QnLayoutDataList& layouts, const QByteArray& data) = 0;
     virtual void deserializeUsers(QnUserResourceList& users, const QByteArray& data) = 0;

@@ -7,7 +7,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMessageBox>
 
-#include <core/resource/directory_browser.h>
+#include <core/resource/resource_directory_browser.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <plugins/resources/archive/avi_files/avi_dvd_device.h>
 #include <plugins/resources/archive/avi_files/avi_bluray_device.h>

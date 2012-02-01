@@ -7,6 +7,7 @@
 #endif
 #include "utils/common/util.h"
 #include "../common/sleep.h"
+#include "tcp_connection_processor.h"
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -154,6 +155,7 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
 bool RTPSession::open(const QString& url)
 {
     mUrl = url;
+    m_responseBufferLen = 0;
 
     //unsigned int port = DEFAULT_RTP_PORT;
 
@@ -166,6 +168,8 @@ bool RTPSession::open(const QString& url)
 
     m_tcpSock.setReadTimeOut(TCP_TIMEOUT);
     m_tcpSock.setWriteTimeOut(TCP_TIMEOUT);
+
+    m_tcpSock.setNoDelay(true);
 
     if (!sendDescribe())
         return false;
@@ -216,7 +220,6 @@ bool RTPSession::stop()
     //delete m_tcpSock;
     //m_tcpSock = 0;
     m_tcpSock.close();
-    m_responseBufferLen = 0;
     return true;
 }
 
@@ -374,11 +377,65 @@ void RTPSession::addAdditionAttrs(QByteArray& request)
     }
 }
 
+bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue)
+{
+    QByteArray request;
+    QByteArray requestBody;
+    QByteArray responce;
+
+    requestBody.append(paramName);
+    requestBody.append(": ");
+    requestBody.append(paramValue);
+    requestBody.append("\r\n");
+
+    request += "SET_PARAMETER ";
+    request += mUrl.toString();
+    request += " RTSP/1.0\r\n";
+    request += "CSeq: ";
+    request += QByteArray::number(m_csec++);
+    request += "\r\n";
+    request += "Session: ";
+    request += m_SessionId;
+    request += "\r\n";
+    if (!requestBody.isEmpty())
+    {
+        request += "Content-Length: ";
+        request += QByteArray::number(requestBody.size());
+        request += "\r\n";
+    }
+    addAdditionAttrs(request);
+
+    request += "\r\n";
+
+    if (!requestBody.isEmpty())
+    {
+        request += requestBody;
+        request += "\r\n";
+    }
+
+    if (!m_tcpSock.send(request.data(), request.size()))
+        return false;
+
+
+    if (!readTextResponce(responce))
+        return false;
+
+
+    if (responce.startsWith("RTSP/1.0 200"))
+    {
+        m_keepAliveTime.restart();
+        return true;
+    }
+
+    return false;
+}
+
 bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
 {
-
     QByteArray request;
     QByteArray responce;
+
+    m_scale = scale;
 
     request += "PLAY ";
     request += mUrl.toString();
@@ -423,7 +480,6 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     {
         updateTransportHeader(responce);
         m_keepAliveTime.restart();
-        m_scale = scale;
         return true;
     }
 
@@ -681,62 +737,71 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
 {
-
-    bool readMoreData = false; // try to process existing buffer at first
-    //for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
-    while (m_responseBufferLen < RTSP_BUFFER_LEN)
+    int retry_count = 40;
+    for (int i = 0; i < retry_count; ++i)
     {
-        if (readMoreData && readRAWData() == -1)
-            return false;
-
-        quint8* startPtr = m_responseBuffer;
-        quint8* curPtr = m_responseBuffer;
-        for(; curPtr < m_responseBuffer + m_responseBufferLen;)
+        bool readMoreData = false; // try to process existing buffer at first
+        //for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
+        while (m_responseBufferLen < RTSP_BUFFER_LEN)
         {
-            if (*curPtr == '$') // start of binary data, skip it
+            if (readMoreData && readRAWData() == -1)
+                return false;
+
+            quint8* startPtr = m_responseBuffer;
+            quint8* curPtr = m_responseBuffer;
+            for(; curPtr < m_responseBuffer + m_responseBufferLen;)
+            {
+                if (*curPtr == '$') // start of binary data, skip it
+                {
+                    response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
+
+                    memmove(startPtr, curPtr, (m_responseBuffer+m_responseBufferLen) - curPtr);
+                    m_responseBufferLen -= curPtr - startPtr;
+                    if (QnTCPConnectionProcessor::isFullMessage(response))
+                        return true;
+
+                    int dataRest = m_responseBuffer + m_responseBufferLen - startPtr;
+                    if (dataRest < 4)
+                    {
+                        readMoreData = true;
+                        startPtr = 0;
+                        break;
+                    }
+                    quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
+                    if (dataRest < dataLen)
+                    {
+                        readMoreData = true;
+                        startPtr = 0;
+                        break;
+                    }
+                    startPtr += dataLen;
+                    curPtr = startPtr;
+                }
+                else {
+                    curPtr++;
+                }
+            }
+            if (startPtr)
             {
                 response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
+
                 memmove(startPtr, curPtr, (m_responseBuffer+m_responseBufferLen) - curPtr);
+
                 m_responseBufferLen -= curPtr - startPtr;
-                if (!response.isEmpty())
-                {
+                if (QnTCPConnectionProcessor::isFullMessage(response))
                     return true;
-                }
-
-                int dataRest = m_responseBuffer + m_responseBufferLen - startPtr;
-                if (dataRest < 4)
-                {
-                    readMoreData = true;
-                    startPtr = 0;
-                    break;
-                }
-                quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
-                if (dataRest < dataLen)
-                {
-                    readMoreData = true;
-                    startPtr = 0;
-                    break;
-                }
-                startPtr += dataLen;
-                curPtr = startPtr;
             }
-            else {
-                curPtr++;
-            }
+            readMoreData = true;
+            QnSleep::msleep(1);
         }
-        if (startPtr)
-        {
-            response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
-            memmove(startPtr, curPtr, (m_responseBuffer+m_responseBufferLen) - curPtr);
 
-            m_responseBufferLen -= curPtr - startPtr;
-            if (!response.isEmpty()) {
-                return true;
-            }
-        }
-        readMoreData = true;
-        QnSleep::msleep(1);
+        // buffer is full and we does not find text data (buffer is filled by binary data). Clear buffer (and drop some video frames) and try to find data again
+        qWarning() << "Can't find RTSP text response because of buffer is full! Drop some media data and find againg";
+        quint8 tmpBuffer[1024*64];
+        if (readBinaryResponce(tmpBuffer, sizeof(tmpBuffer)) == -1)
+            break;
     }
+    qWarning() << "RTSP Text response not found! RTSP command is failed!";
     return false;
 }
 

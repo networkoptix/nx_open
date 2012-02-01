@@ -8,7 +8,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "core/resource/video_server.h"
-#include "core/resource/qnstorage.h"
+#include "core/resource/storage.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_data.h"
@@ -63,18 +63,18 @@ public:
     int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
     int registerServer(const QnVideoServerPtr&, QnVideoServerList& servers, QByteArray& errorString);
-    int addCamera(const QnCameraResourcePtr&, QnCameraResourceList& cameras, QByteArray& errorString);
+    int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
     int addStorage(const QnStoragePtr&, QByteArray& errorString);
 
-    int getCameras(QnCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
+    int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
     int getStorages(QnStorageList& storages, QByteArray& errorString);
     int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
 
     // Returns request id
     int saveAsync(const QnVideoServerPtr&, QObject*, const char*);
-    int saveAsync(const QnCameraResourcePtr&, QObject*, const char*);
+    int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);

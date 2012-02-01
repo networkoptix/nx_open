@@ -8,6 +8,7 @@
 #include "camera/camera_pool.h"
 #include "utils/common/sleep.h"
 #include "utils/network/rtpsession.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
 
 static const int MAX_QUEUE_SIZE = 15;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
@@ -15,17 +16,19 @@ static const int MAX_QUEUE_SIZE = 15;
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
 
-
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   QnAbstractDataConsumer(MAX_QUEUE_SIZE),
   m_owner(owner),
   m_lastSendTime(0),
+  m_lastMediaTime(0),
   m_waitSCeq(0),
   m_liveMode(false),
   m_pauseNetwork(false),
   m_gotLivePacket(false),
   m_singleShotMode(false),
-  m_packetSended(false)
+  m_packetSended(false),
+  m_prefferedProvider(0),
+  m_currentDP(0)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     m_timer.start();
@@ -48,13 +51,13 @@ void QnRtspDataConsumer::resumeNetwork()
 //qint64 lastSendTime() const { return m_lastSendTime; }
 void QnRtspDataConsumer::setLastSendTime(qint64 time) 
 { 
-    m_lastSendTime = time; 
+    m_lastMediaTime = m_lastSendTime = time; 
 }
 void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
 { 
     QMutexLocker lock(&m_mutex);
     m_waitSCeq = sceq; 
-    m_lastSendTime = newTime;
+    m_lastMediaTime = m_lastSendTime = newTime;
     m_ctxSended.clear();
     m_gotLivePacket = false;
 }
@@ -155,20 +158,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true;
 
-    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
-    if (metadata) {
-        //return true;
-        metadata = metadata;
-    }
 
-    /*
-    if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-    {
-        m_dataQueue.clear();
-        m_owner->switchToLive(); // it is archive EOF
-        return true;
-    }
-    */
+    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
 
     if (m_owner->isLiveDP(media->dataProvider)) {
         media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -220,7 +211,6 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             QByteArray codecCtxData;
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
             buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
-            QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->bufferData(m_rtspTcpHeader, rtpHeaderSize);
             Q_ASSERT(!codecCtxData.isEmpty());
             m_owner->bufferData(codecCtxData);
@@ -239,6 +229,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     if (m_lastSendTime != DATETIME_NOW)
         m_lastSendTime = media->timestamp;
+    m_lastMediaTime = media->timestamp;
 
     m_mutex.unlock();
 
@@ -251,7 +242,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
         sendLen = qMin(MAX_RTSP_DATA_LEN - ffHeaderSize, dataRest);
         buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp);
-        QMutexLocker lock(&m_owner->getSockMutex());
+        //QMutexLocker lock(&m_owner->getSockMutex());
         m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         if (ffHeaderSize) 
         {
@@ -279,8 +270,10 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             m_owner->bufferData(curData, sendLen);
         curData += sendLen;
 
+        m_owner->sendBuffer();
+        m_owner->clearBuffer();
     }
-    m_owner->sendBuffer();
+
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
     return true;
@@ -296,18 +289,29 @@ void QnRtspDataConsumer::unlockDataQueue()
     m_dataQueueMtx.unlock();
 }
 
-void QnRtspDataConsumer::copyLastGopFromCamera()
+void QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime)
 {
     // Fast channel zapping
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(m_owner->getResource());
     if (camera)
-    {
-        camera->copyLastGop(m_dataQueue);
-    }
+        camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
 }
 
 void QnRtspDataConsumer::setSingleShotMode(bool value)
 {
     m_singleShotMode = value;
     m_packetSended = 0;
+}
+
+qint64 QnRtspDataConsumer::lastQueuedTime()
+{
+    if (m_dataQueue.size() == 0)
+        return m_lastMediaTime;
+    else {
+        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.last());
+        if (media)
+            return media->timestamp;
+        else
+            return m_lastMediaTime;
+    }
 }

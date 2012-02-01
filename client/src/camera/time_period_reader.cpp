@@ -54,7 +54,7 @@ int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& regi
         if (qnBetween(periodToLoad.startTimeMs, itr->startTimeMs, itr->startTimeMs + itr->durationMs))
         {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
-            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs;
+            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - 20*1000; // add addition 20 sec (may server does not flush data e.t.c)
             periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
             ++itr;
             if (itr != m_loadedPeriods.end()) {

@@ -32,7 +32,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
         return result;
     }
 
-    result = QnCameraResourcePtr( new QnPlAxisResource() );
+    result = QnVirtualCameraResourcePtr( new QnPlAxisResource() );
     result->setTypeId(resourceTypeId);
 
     qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;

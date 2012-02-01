@@ -10,6 +10,8 @@ class QnAbstractRenderer;
 class BufferedFrameDisplayer;
 
 static const int MAX_FRAME_QUEUE_SIZE = 12;
+static const int MAX_QUEUE_TIME = 1000 * 200;
+
 
 /**
   * Display one video stream. Decode the video and pass it to video window.
@@ -43,6 +45,7 @@ public:
     void waitForFramesDisplaed();
     void onNoVideo();
     void canUseBufferedFrameDisplayer(bool value);
+    qint64 nextReverseTime() const;
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;

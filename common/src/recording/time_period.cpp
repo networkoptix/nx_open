@@ -98,12 +98,18 @@ QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> period
             }
             else {
                 QnTimePeriod& last = result.last();
-                if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime && periods[minIndex][0].durationMs != -1)
+                if (periods[minIndex][0].durationMs == -1) 
+                {
+                    if (periods[minIndex][0].startTimeMs > last.startTimeMs+last.durationMs)
+                        result << periods[minIndex][0];
+                    else 
+                        last.durationMs = -1;
+                    break;
+                }
+                else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime)
                     last.durationMs = qMax(last.durationMs, minStartTime + periods[minIndex][0].durationMs - last.startTimeMs);
                 else {
                     result << periods[minIndex][0];
-                    if (periods[minIndex][0].durationMs == -1)
-                        break;
                 }
             } 
             periods[minIndex].pop_front();

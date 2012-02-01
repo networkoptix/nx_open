@@ -32,18 +32,13 @@ public:
 
     void readAll(QByteArray& data);
 
-    long read(char* data, unsigned long max_len);
+    int read(char* data, int max_len);
 
     void close();
 
-    QHash<QString, QString> header() const
+    QHash<QByteArray, QByteArray> header() const
     {
         return m_header;
-    }
-
-    QString getContentType() const
-    {
-        return m_contentType;
     }
 
     unsigned int getContentLen() const
@@ -59,22 +54,19 @@ public:
 private:
     void initSocket();
 
-    CLHttpStatus getNextLine();
     void getAuthInfo();
 
-    QString basicAuth() const;
+    QByteArray basicAuth() const;
     QString digestAccess(const QString&) const;
 
     int readHeaders();
 
 private:
-    QString m_line;
 
     QHostAddress m_host;
     int m_port;
 
-    QHash<QString, QString> m_header;
-    QString m_contentType;
+    QHash<QByteArray, QByteArray> m_header;
     unsigned int m_contentLen;
     unsigned int m_readed;
 
@@ -85,9 +77,16 @@ private:
 
     unsigned int m_timeout;
     QAuthenticator m_auth;
+    char m_headerBuffer[1024*16];
+    QByteArray m_responseLine;
+    char* m_dataRestPtr;
+    int m_dataRestLen;
 };
 
 QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
+
+bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+
 
 
 #endif //__SIMPLE_HTTP_CLIENT__

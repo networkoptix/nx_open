@@ -1,15 +1,30 @@
 #include "network_resource.h"
+
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
-
+/*
+static const char *property_descriptions[] = {
+    QT_TRANSLATE_NOOP("QnResource", "IP Address"),
+    QT_TRANSLATE_NOOP("QnResource", "MAC Address"),
+    QT_TRANSLATE_NOOP("QnResource", "Authentication")
+};
+*/
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
       m_networkStatus(0),
       m_networkTimeout(2000),
       m_authenticated(true)
 {
-    addFlag(QnResource::network);
+/*    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QHostAddress>();
+        qRegisterMetaType<QnMacAddress>();
+        qRegisterMetaType<QAuthenticator>();
+        metaTypesInitialized = true;
+    }
+*/
+    addFlag(network);
 }
 
 QnNetworkResource::~QnNetworkResource()
@@ -53,7 +68,7 @@ QHostAddress QnNetworkResource::getHostAddress() const
     return QHostAddress(getUrl());
 }
 
-bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain /*domain*/ )
+bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain /*domain*/)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
@@ -67,17 +82,16 @@ QnMacAddress QnNetworkResource::getMAC() const
     return m_macAddress;
 }
 
-void  QnNetworkResource::setMAC(QnMacAddress mac)
+void  QnNetworkResource::setMAC(const QnMacAddress &mac)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
 }
 
-void QnNetworkResource::setAuth(const QString& user, QString password)
+void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_auth.setUser(user);
-    m_auth.setPassword(password);
+    m_auth = auth;
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
@@ -191,7 +205,7 @@ bool QnNetworkResource::conflicting()
         //addNetworkStatus(QnNetworkResource::BadHostAddr);
         //return true;
 
-        // some times ping does not work but cam is still is not conflicting 
+        // some times ping does not work but cam is still is not conflicting
     }
 
     mac = getMacByIP(getHostAddress(), false); // just in case if ARP response from some else have delayed

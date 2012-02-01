@@ -11,11 +11,11 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    QnCameraResourceList cameras;
+    QnVirtualCameraResourceList cameras;
 
     foreach (QnResourcePtr resource, resources)
     {
-        QnCameraResourcePtr cameraResource = resource.dynamicCast<QnCameraResource>();
+        QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
 
         if (cameraResource.isNull())
             continue;
@@ -30,7 +30,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
     foreach (QnResourcePtr resource, resources)
     {
-        QnCameraResourcePtr cameraResource = resource.dynamicCast<QnCameraResource>();
+        QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
         if (cameraResource.isNull())
             continue;
 

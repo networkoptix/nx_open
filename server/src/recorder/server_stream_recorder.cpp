@@ -2,15 +2,18 @@
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "core/dataprovider/live_stream_provider.h"
 
-QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev):
-    QnStreamRecorder(dev)
+QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role):
+    QnStreamRecorder(dev),
+    m_role(role)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     m_lastMotionContainData = false;
     m_needUpdateStreamParams = false;
-    m_lastWarningTime = AV_NOPTS_VALUE;
+    m_lastWarningTime = 0;
+    m_stopOnWriteError = false;
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
@@ -47,8 +50,13 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (media->dataProvider);
         if (mediaProvider)
         {
-            mediaProvider->setFps(m_currentScheduleTask.getFps());
-            mediaProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+            if (m_role == QnResource::Role_LiveVideo)
+            {
+                QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(mediaProvider);
+                liveProvider->setFps(m_currentScheduleTask.getFps());
+                liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+                emit fpsChanged(mediaProvider, m_currentScheduleTask.getFps());
+            }
             m_needUpdateStreamParams = false;
         }
     }
@@ -168,7 +176,7 @@ QString QnServerStreamRecorder::fillFileName()
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        return qnStorageMan->getFileName(m_startDateTime/1000, netResource);
+        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role));
     }
     else {
         return m_fixedFileName;

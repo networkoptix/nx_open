@@ -1,8 +1,10 @@
 #include "security_cam_resource.h"
 
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "../dataprovider/live_stream_provider.h"
 
 static const char *property_descriptions[] = {
+    QT_TRANSLATE_NOOP("QnResource", "Motion Mask"),
     QT_TRANSLATE_NOOP("QnResource", "Camera Scheduling")
 };
 
@@ -12,6 +14,7 @@ QnSecurityCamResource::QnSecurityCamResource()
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
+        qRegisterMetaType<QRegion>();
         qRegisterMetaType<QnScheduleTask>();
         qRegisterMetaType<QnScheduleTaskList>();
         metaTypesInitialized = true;
@@ -24,12 +27,13 @@ QnSecurityCamResource::~QnSecurityCamResource()
 {
 }
 
-void QnSecurityCamResource::updateInner(const QnResource& other)
+void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
     QnMediaResource::updateInner(other);
 
-    const QnSecurityCamResource* other_casted = dynamic_cast<const QnSecurityCamResource*>(&other);
-    if (other_casted) {
+    QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
+    if (other_casted)
+    {
         m_motionMask = other_casted->m_motionMask;
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }
@@ -82,8 +86,16 @@ void QnSecurityCamResource::setCroping(QRect croping, QnDomain /*domain*/)
 
 QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role)
 {
-    if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default)
-        return createLiveDataProvider();
+    if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
+    {
+        QnAbstractStreamDataProvider* result = createLiveDataProvider();
+        if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
+        {
+                lsp->setRole(role);
+        }
+        return result;
+
+    }
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;

@@ -17,9 +17,11 @@ public:
     void setRtspTime(qint64 time);
     void switchToLive();
     QnMediaResourcePtr getResource() const;
+    bool isLiveDP(QnAbstractStreamDataProvider* dp);
 protected:
     virtual void run();
 private:
+
     void processRequest();
     void parseRequest();
     void initResponse(int code = 200, const QString& message = "OK");
@@ -39,8 +41,8 @@ private:
     int composeSetParameter();
     int composeGetParameter();
     void createDataProvider();
-    bool isLiveDP(QnAbstractStreamDataProvider* dp);
     void putLastIFrameToQueue();
+    QnAbstractMediaStreamDataProvider* getLiveDp();
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

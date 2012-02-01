@@ -3,18 +3,18 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/common/sleep.h"
 #include "core/resource/resource_media_layout.h"
-
+#include "utils/common/util.h"
+#include "../resource/camera_resource.h"
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
-m_quality(QnQualityNormal),
-m_fps(MAX_LIVE_FPS),
 m_numberOfchannels(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
     Q_ASSERT(m_mediaResource);
     m_channel_number = 1;
+    memset(m_lastVideoTime, 0, sizeof(m_lastVideoTime));
 
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
     //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
@@ -27,39 +27,6 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 
 
 
-void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
-{
-    QMutexLocker mtx(&m_mutex);
-    m_quality = q;
-    updateStreamParamsBasedOnQuality();
-    //setNeedKeyData();
-}
-
-QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
-{
-    QMutexLocker mtx(&m_mutex);
-    return m_quality;
-}
-
-// for live providers only
-void QnAbstractMediaStreamDataProvider::setFps(float f)
-{
-    QMutexLocker mtx(&m_mutex);
-    m_fps = f;
-    updateStreamParamsBasedOnFps();
-}
-
-float QnAbstractMediaStreamDataProvider::getFps() const
-{
-    QMutexLocker mtx(&m_mutex);
-    return m_fps;
-}
-
-bool QnAbstractMediaStreamDataProvider::isMaxFps() const
-{
-    QMutexLocker mtx(&m_mutex);
-    return abs( m_fps - MAX_LIVE_FPS)< .1;
-}
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
@@ -99,10 +66,6 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
     mFramesLost = 0;
-
-    m_framesSinceLastMetaData = 0;
-    m_timeSinceLastMetaData.restart();
-
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()
@@ -123,7 +86,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         m_stat[0].onData(0);
         m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-        if (mFramesLost == 4) // if we lost 2 frames => connection is lost for sure (2)
+        if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             m_stat[0].onLostConnection();
 
         QnSleep::msleep(10);
@@ -135,7 +98,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
     if (mFramesLost > 0) // we are alive again
     {
-        if (mFramesLost >= 4)
+        if (mFramesLost >= MAX_LOST_FRAME)
         {
             m_stat[0].onEvent(CL_STAT_CAMRESETED);
         }
@@ -177,8 +140,23 @@ const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel
     return &m_stat[channel];
 }
 
-bool QnAbstractMediaStreamDataProvider::needMetaData() const
+
+void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
 {
-    return (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
-        m_framesSinceLastMetaData > 0; // got at least one frame
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (getResource());
+    if (camera)
+    {
+        // correct packets timestamp if we have got several packets very fast
+        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        if (video)
+        {
+            qint64 timeDiff = video->timestamp - m_lastVideoTime[video->channelNumber];
+            // if timeDiff < -N it may be time correction or dayling time change
+            if (timeDiff >= -1000ll*1000 && timeDiff < MIN_FRAME_DURATION*1000)
+            {
+                video->timestamp = m_lastVideoTime[video->channelNumber] + MIN_FRAME_DURATION*1000ll;
+            }
+            m_lastVideoTime[video->channelNumber] = video->timestamp;
+        }
+    }
 }

@@ -59,6 +59,7 @@ protected:
     QString m_fixedFileName;
     qint64 m_endDateTime;
     qint64 m_startDateTime;
+    bool m_stopOnWriteError;
 private:
     bool m_forceDefaultCtx;
     AVFormatContext* m_formatCtx;

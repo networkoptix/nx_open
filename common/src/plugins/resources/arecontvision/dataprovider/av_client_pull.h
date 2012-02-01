@@ -2,6 +2,7 @@
 #define cl_av_clien_pull1529
 
 #include "core/dataprovider/cpull_media_stream_provider.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 
 
@@ -10,7 +11,7 @@ struct AVLastPacketSize
 	int x0, y0, width, height;
 };
 
-class QnPlAVClinetPullStreamReader : public QnClientPullMediaStreamProvider
+class QnPlAVClinetPullStreamReader : public QnClientPullMediaStreamProvider, public QnLiveStreamProvider
 {
 public:
 	QnPlAVClinetPullStreamReader(QnResourcePtr res);
@@ -18,7 +19,8 @@ public:
 
 
 protected:
-	virtual void updateStreamParamsBasedOnQuality(); 
+    void updateStreamParamsBasedOnFps() override{};
+	virtual void updateStreamParamsBasedOnQuality() override; 
 
 	int getBitrate() const;
 	bool isH264() const;

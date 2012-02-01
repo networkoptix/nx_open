@@ -42,7 +42,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, con
         return result;
     }
 
-    result = QnCameraResourcePtr( new QnPlDlinkResource() );
+    result = QnVirtualCameraResourcePtr( new QnPlDlinkResource() );
     result->setTypeId(resourceTypeId);
 
     qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;

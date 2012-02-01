@@ -48,6 +48,7 @@ private:
  */
 class QnGraphicsView: public QGraphicsView {
     Q_OBJECT;
+    Q_FLAGS(PaintFlags PaintFlag);
 
     typedef QGraphicsView base_type;
 

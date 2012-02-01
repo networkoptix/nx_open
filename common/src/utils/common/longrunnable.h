@@ -26,7 +26,7 @@ public:
     virtual ~CLLongRunnable() 
     {
         if(m_runing)
-            qnWarning("Runnable instance was destroyed without a call to stop().");
+            qnCritical("Runnable instance was destroyed without a call to stop().");
     }
 
     virtual void pleaseStop()
@@ -84,6 +84,7 @@ public:
     }
 protected:
     bool onPause() const { return m_onPause; }
+
 protected:
     bool m_runing;
     volatile bool m_needStop;

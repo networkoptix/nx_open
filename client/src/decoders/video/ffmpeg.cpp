@@ -269,7 +269,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
 		m_lightModeFrameCounter = 0;
 	}
 
-	if ((m_decodeMode > DecodeMode_Full || data->ignore) && data->data.data())
+	if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data.data())
 	{
 
 		if (data->compressionType == CODEC_ID_MJPEG)

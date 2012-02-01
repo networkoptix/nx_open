@@ -3,7 +3,7 @@
 #include <qglobal.h>
 
 #include "api/AppServerConnection.h"
-#include "core/resourcemanagment/asynch_seacher.h"
+#include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "eventmanager.h"
@@ -46,14 +46,14 @@ void QnEventManager::eventReceived(QnEvent event)
         {
             QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
 
-            foreach(const QnResourcePtr& resource, resources)
+            foreach(QnResourcePtr resource, resources)
             {
                 if (resource->getId() == event.resourceId)
                 {
                     if (ownResource.isNull())
                         qnResPool->addResource(resource);
                     else
-                        ownResource->update(*resource);
+                        ownResource->update(resource);
                 }
             }
         } else

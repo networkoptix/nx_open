@@ -35,12 +35,14 @@ typedef QMap<QString, QString> QnResourceParameters;
 class QN_EXPORT QnResource : public QObject
 {
     Q_OBJECT
+    Q_FLAGS(Flags Flag)
+    Q_ENUMS(ConnectionRole Status)
     Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show in GUI
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
     Q_CLASSINFO("url", "URL")
 
 public:
-    enum ConnectionRole { Role_Default, Role_LiveVideo, Role_Archive };
+    enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
     enum Status { Offline, Unauthorized, Online };
 
@@ -169,6 +171,7 @@ public:
     QStringList tagList() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
+    bool hasUnprocessedCommands() const;
 
 Q_SIGNALS:
     void parameterValueChanged(const QnParam &param);
@@ -180,12 +183,11 @@ public:
     static void stopCommandProc();
     static void addCommandToProc(QnAbstractDataPacketPtr data);
     static int commandProcQueueSize();
-    static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 
-    void update(const QnResource& other);
+    void update(QnResourcePtr other);
 
 protected:
-    virtual void updateInner(const QnResource& other);
+    virtual void updateInner(QnResourcePtr other);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
@@ -201,6 +203,10 @@ protected:
 
 protected:
     mutable QMutex m_mutex;
+
+    mutable QMutex m_consumersMtx;
+    QSet<QnResourceConsumer*> m_consumers;
+
 
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
@@ -232,8 +238,6 @@ private:
     mutable QnParamList m_resourceParamList;
 
 
-    mutable QMutex m_consumersMtx;
-    QSet<QnResourceConsumer*> m_consumers;
 };
 
 

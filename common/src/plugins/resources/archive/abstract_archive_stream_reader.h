@@ -23,6 +23,7 @@ public:
 
     virtual bool isEnabled() const { return true; }
 
+
     // playback filter by motion detection mask
     //virtual bool setMotionRegion(const QRegion& region) = 0;
 
@@ -79,6 +80,7 @@ public:
     virtual bool setMotionRegion(const QRegion& region) = 0;
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
+    virtual void setQuality(MediaQuality quality) = 0;
 
 Q_SIGNALS:
     void beforeJump(qint64 mksec);

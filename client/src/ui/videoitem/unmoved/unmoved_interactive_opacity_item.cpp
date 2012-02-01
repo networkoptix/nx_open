@@ -1,5 +1,5 @@
 #include "unmoved_interactive_opacity_item.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 
 
 CLUnMovedInteractiveOpacityItem::CLUnMovedInteractiveOpacityItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity):

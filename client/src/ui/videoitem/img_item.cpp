@@ -4,7 +4,7 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 
 CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height, QString name)
     : CLAbstractSceneItem(view, max_width, max_height,name),

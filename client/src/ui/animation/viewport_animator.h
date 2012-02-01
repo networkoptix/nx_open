@@ -4,11 +4,10 @@
 #include <QObject>
 #include <ui/common/scene_utility.h>
 #include "rect_animator.h"
+#include "viewport_geometry_accessor.h"
 
 class QGraphicsView;
 class QMargins;
-
-class ViewportRectAccessor;
 
 class ViewportAnimator: public RectAnimator {
     Q_OBJECT;
@@ -16,6 +15,7 @@ class ViewportAnimator: public RectAnimator {
     typedef RectAnimator base_type;
 
 public:
+
     /**
      * Constructor.
      * 
@@ -37,6 +37,10 @@ public:
 
     void setViewportMargins(const QMargins &margins);
 
+    Qn::MarginFlags marginFlags() const;
+
+    void setMarginFlags(Qn::MarginFlags marginFlags);
+
     /**
      * Starts animated move of a viewport to the given rect. When animation
      * finishes, viewport's bounding rect will include the given rect.
@@ -55,7 +59,7 @@ protected:
 
 private:
     /** Accessor for viewport rect. */
-    ViewportRectAccessor *m_accessor;
+    ViewportGeometryAccessor *m_accessor;
 
     qreal m_relativeSpeed;
 };

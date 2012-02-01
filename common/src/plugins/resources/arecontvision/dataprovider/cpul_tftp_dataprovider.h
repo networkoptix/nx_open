@@ -2,7 +2,7 @@
 #define cpull_httpreader_1119
 
 #include "av_client_pull.h"
-
+#include "../tools/simple_tftp_client.h"
 
 class QnAbstractMediaDataPacket;
 
@@ -14,14 +14,12 @@ class AVClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 public:
 	explicit AVClientPullSSTFTPStreamreader(QnResourcePtr res);
 
-	~AVClientPullSSTFTPStreamreader()
-	{
-		stop();
-	}
+	~AVClientPullSSTFTPStreamreader();
 
 protected:
 
     virtual QnAbstractMediaDataPtr getNextData();
+
 	
 private:
 
@@ -40,8 +38,7 @@ protected:
     bool m_panoramic;
     bool m_dualsensor;
     QString m_name;
-
-
+    CLSimpleTFTPClient* m_tftp_client;
 };
 
 #endif //cpull_httpreader_1119

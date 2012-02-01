@@ -9,8 +9,8 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resourcemanagment/resource_pool.h"
 
-#include "file_resource.h"
-#include "resource_command_consumer.h"
+#include "local_file_resource.h"
+#include "resource_command_processor.h"
 #include "resource_consumer.h"
 
 #include <typeinfo>
@@ -38,31 +38,31 @@ QnResource::~QnResource()
     disconnectAllConsumers();
 }
 
-void QnResource::updateInner(const QnResource& other)
+void QnResource::updateInner(QnResourcePtr other)
 {
-    m_id = other.m_id;
-    m_parentId = other.m_parentId;
-    m_typeId = other.m_typeId;
-    m_flags = other.m_flags;
-    m_name = other.m_name;
-    m_lastDiscoveredTime = other.m_lastDiscoveredTime;
-    m_tags = other.m_tags;
-    m_url = other.m_url;
+    Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+
+    m_id = other->m_id;
+    m_parentId = other->m_parentId;
+    m_typeId = other->m_typeId;
+    m_flags = other->m_flags;
+    m_name = other->m_name;
+    m_lastDiscoveredTime = other->m_lastDiscoveredTime;
+    m_tags = other->m_tags;
+    m_url = other->m_url;
 }
 
-void QnResource::update(const QnResource& other)
+void QnResource::update(QnResourcePtr other)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
 
     {
-        QMutexLocker otherLocker(&other.m_mutex);
-        {
-            QMutexLocker locker(&m_mutex);
-            updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
-        }
-        setStatus(other.m_status);
+        QMutexLocker mutexLocker(&m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        QMutexLocker mutexLocker2(&other->m_mutex); // this is virtual atomic operation; so mutexes shold be outside
+        updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
+    setStatus(other->m_status);
 
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
@@ -231,8 +231,12 @@ QnParamList QnResource::getResourceParamList() const
     }
 
     // 2. read AppServer params
-    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) {
-        foreach (const QnParamTypePtr &paramType, resType->paramTypeList()) {
+    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) 
+    {
+        Q_ASSERT(resType);
+
+        foreach (const QnParamTypePtr &paramType, resType->paramTypeList()) 
+        {
             QnParam newParam(paramType, paramType->default_value);
             resourceParamList.append(newParam);
         }
@@ -554,6 +558,19 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
     return m_consumers.contains(consumer);
 }
 
+bool QnResource::hasUnprocessedCommands() const
+{
+    QMutexLocker locker(&m_consumersMtx);
+    foreach(QnResourceConsumer* consumer, m_consumers)
+    {
+        if (dynamic_cast<QnResourceCommand*>(consumer))
+            return true;
+    }
+
+    return false;
+}
+
+
 void QnResource::disconnectAllConsumers()
 {
     QMutexLocker locker(&m_consumersMtx);
@@ -607,7 +624,3 @@ int QnResource::commandProcQueueSize()
     return commandProcessor()->queueSize();
 }
 
-bool QnResource::commandProcHasSuchResourceInQueue(QnResourcePtr res)
-{
-    return commandProcessor()->hasSuchResourceInQueue(res);
-}

@@ -27,7 +27,8 @@ m_endDateTime(-1),
 m_lastPacketTime(AV_NOPTS_VALUE),
 m_startOffset(0),
 m_forceDefaultCtx(true),
-m_prebufferingUsec(0)
+m_prebufferingUsec(0),
+m_stopOnWriteError(true)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -130,8 +131,14 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         if (!initFfmpegContainer(vd))
         {
             emit recordingFailed(m_lastErrMessage);
-            m_needStop = true;
-            return false;
+            if (m_stopOnWriteError)
+            {
+                m_needStop = true;
+                return false;
+            }
+            else {
+                return true; // ignore data
+            }
         }
 
         m_firstTime = false;

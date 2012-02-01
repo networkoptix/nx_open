@@ -3,14 +3,13 @@
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 
 
 
-class MJPEGtreamreader: public CLServerPushStreamreader
+class MJPEGtreamreader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
-private:
-    enum {BLOCK_SIZE = 1460};
 public:
 	MJPEGtreamreader(QnResourcePtr res, const QString& requst);
 	virtual ~MJPEGtreamreader();
@@ -20,16 +19,14 @@ protected:
     virtual void openStream();
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;
+
+    void updateStreamParamsBasedOnQuality() override {};
+    void updateStreamParamsBasedOnFps() override {};
+
 private:
     CLSimpleHTTPClient* mHttpClient;
 
-    char mData[BLOCK_SIZE];
-    int mDataRemainedBeginIndex;
-    int mReaded;
-
     QString m_request;
-
-
 };
 
 #endif //cl_mjpeg_dataprovider_h_1140

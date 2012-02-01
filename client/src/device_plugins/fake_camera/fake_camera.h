@@ -7,7 +7,7 @@
 
 
 
-class QnFakeCamera: public QnCameraResource
+class QnFakeCamera: public QnVirtualCameraResource
 {
 public:
     QnFakeCamera();

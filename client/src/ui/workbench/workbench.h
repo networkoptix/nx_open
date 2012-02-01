@@ -25,7 +25,6 @@ class QnWorkbenchItem;
  *     surface coordinates.</li>
  * <li>Currently raised item - an item that is enlarged and is shown on top of other items.</li>
  * <li>Currently zoomed item - an item that is shown in full screen.</li>
- * <li>Currently focused item - an item that is manipulated by ui controls, such as play/pause buttons.</li>
  * </ul>
  */
 class QnWorkbench: public QObject {

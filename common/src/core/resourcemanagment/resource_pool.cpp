@@ -33,44 +33,64 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 {
     QMutexLocker locker(&m_resourcesMtx);
 
-    foreach (const QnResourcePtr &resource, resources) {
-        if (!resource->getParentId().isValid()) {
+    foreach (const QnResourcePtr &resource, resources) 
+    {
+        // if resources are local assign localserver as parent
+        if (!resource->getParentId().isValid()) 
+        {
             if (resource->checkFlag(QnResource::local))
                 resource->setParentId(localServer->getId());
         }
-        if (!resource->getId().isValid()) {
-            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId())) {
+
+        if (!resource->getId().isValid()) 
+        {
+            // must be just found local resource; => shold not be in the pool already 
+
+            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId())) 
+            {
                 qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.",
                           resource->getUniqueId().toLocal8Bit().constData());
 
                 resource->setId(existing->getId());
-            } else {
+
+                //Q_ASSERT(false); //new resource in the pool already? strange case; please pay attantion
+            } 
+            else 
+            {
                 resource->setId(QnId::generateSpecialId());
             }
         }
+
     }
 
     QMap<QnId, QnResourcePtr> newResources; // sort by id
 
-    foreach (const QnResourcePtr &resource, resources) {
-        /*if ((resource->flags() & (QnResource::local | QnResource::remote | QnResource::server)) == 0) {
-            qWarning("QnResourcePool::addResources(): invalid resource has been detected (nor local neither remote)");
-            continue; // ignore
-        }*/
-
+    foreach (const QnResourcePtr &resource, resources) 
+    {
         const QnId resId = resource->getId();
-        if (!m_resources.contains(resId)) {
-            m_resources[resId] = resource;
+        QString uniqueId = resource->getUniqueId();
+
+        if (m_resources.contains(uniqueId)) 
+        {
+            // if we already have such resource in the pool
+            m_resources[uniqueId]->update(resource);
+        }
+        else
+        {
+            // new resource 
+            m_resources[uniqueId] = resource;
             m_resourceTree[resource->getParentId()].append(resource); // unsorted
             newResources.insert(resId, resource);
         }
+
     }
 
-    foreach (const QnResourcePtr &resource, newResources.values()) {
+    foreach (const QnResourcePtr &resource, newResources.values()) 
+    {
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
-
         QMetaObject::invokeMethod(this, "resourceAdded", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
     }
+
 }
 
 void QnResourcePool::removeResources(const QnResourceList &resources)
@@ -79,12 +99,15 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
     QMutexLocker locker(&m_resourcesMtx);
 
-    foreach (const QnResourcePtr &resource, resources) {
+    foreach (const QnResourcePtr &resource, resources) 
+    {
         if (resource == localServer) // special case
             continue;
 
-        const QnId resId = resource->getId();
-        if (m_resources.remove(resId) != 0) {
+        QString uniqueId = resource->getUniqueId();
+
+        if (m_resources.remove(uniqueId) != 0) 
+        {
             m_resourceTree[resource->getParentId()].removeOne(resource);
             removedResources.append(resource);
         }
@@ -112,7 +135,14 @@ QnResourceList QnResourcePool::getResources() const
 
 QnResourcePtr QnResourcePool::getResourceById(QnId id) const
 {
-    return m_resources.value(id, QnResourcePtr(0));
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach(const QnResourcePtr& res, m_resources)
+    {
+        if (res->getId() == id)
+            return res;
+    }
+
+    return QnResourcePtr(0);
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const

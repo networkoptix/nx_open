@@ -31,7 +31,7 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res)
 
     /**/
 
-    setQuality(m_quality);
+    setQuality(getQuality());  // to update stream params
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
@@ -103,9 +103,9 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync("Quality", "6", QnDomainPhysical); // panoramic
+            avRes->setParamAsync("Quality", "1", QnDomainPhysical); // panoramic
         else
-            m_streamParam.insert("Quality", 6);
+            m_streamParam.insert("Quality", 1);
         break;
 
     default:

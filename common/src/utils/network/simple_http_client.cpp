@@ -15,7 +15,9 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
     m_port(port),
     m_connected(false),
     m_timeout(timeout),
-    m_auth(auth)
+    m_auth(auth),
+    m_dataRestPtr(0),
+    m_dataRestLen(0)
 {
     initSocket();
 }
@@ -30,37 +32,6 @@ void CLSimpleHTTPClient::initSocket()
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
 {
-}
-
-CLHttpStatus CLSimpleHTTPClient::getNextLine()
-{
-    m_line.clear();
-    QTextStream response(&m_line);
-    char prev = 0 , curr = 0;
-
-    int readed = 0;
-
-    while(1)
-    {
-        if (m_sock->recv(&curr,1)<0)
-            return CL_TRANSPORT_ERROR;
-
-        if (prev=='\r' && curr == '\n')
-            break;
-
-        if (prev==0 && curr == 0 && readed>1)
-            break;
-
-        response << curr;
-        prev = curr;
-        ++readed;
-
-        if (readed > MAX_LINE_LENGTH)
-            break;
-    }
-
-    return CL_HTTP_SUCCESS;
-
 }
 
 CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body)
@@ -80,40 +51,43 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             }
         }
 
-        QString request;
-        QTextStream os(&request);
-
-        os << "POST /" << requestStr<<" HTTP/1.1\r\n"
-            << "Host: "<< m_host.toString() << "\r\n"
-            << "User-Agent: Simple HTTP Client 1.0\r\n"
-            << "Accept: */*\r\n"
-            << "Content-Type: application/x-www-form-urlencoded\r\n";
+        QByteArray request;
+        request.append("POST /");
+        request.append(requestStr);
+        request.append(" HTTP/1.1\r\n");
+        request.append("Host: ");
+        request.append(m_host.toString().toUtf8());
+        request.append("\r\n");
+        request.append("User-Agent: Simple HTTP Client 1.0\r\n");
+        request.append("Accept: */*\r\n");
+        request.append("Content-Type: application/x-www-form-urlencoded\r\n");
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
         {
-            os << basicAuth() << "\r\n";
+            request.append(basicAuth());
+            request.append("\r\n");
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            os << digestAccess(request);
+            request.append(digestAccess(request));
         }
 
-        os << "Content-Length: " << body.length() << "\r\n";
-        os << "\r\n";
+        request.append("Content-Length: ");
+        request.append(QByteArray::number(body.length()));
+        request.append("\r\n");
+        request.append("\r\n");
 
-        os << body;
+        request.append(body);
 
-        if (!m_sock->send(request.toLatin1().data(), request.toLatin1().size()))
+        if (!m_sock->send(request.data(), request.size()))
         {
             return CL_TRANSPORT_ERROR;
         }
 
-        if (CL_TRANSPORT_ERROR==getNextLine())
-        {
+        if (CL_TRANSPORT_ERROR==readHeaders())
             return CL_TRANSPORT_ERROR;
-        }
 
-        QStringList strings = m_line.split(" ");
+        QList<QByteArray> strings = m_responseLine.split(' ');
         if (strings.size() < 2)
         {
             close();
@@ -143,9 +117,6 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             }
         }
 
-        if (readHeaders() == CL_TRANSPORT_ERROR)
-            return CL_TRANSPORT_ERROR;
-
         m_connected = true;
 
         // Http statuses: OK or BAD_REQUEST
@@ -161,42 +132,48 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
 
 int CLSimpleHTTPClient::readHeaders()
 {
-    m_contentType.clear();
     m_contentLen = 0;
-
-    int pos;
-
-    while(1)
+    m_readed = 0;
+    m_dataRestLen = 0;
+    char* curPtr = m_headerBuffer;
+    int left = sizeof(m_headerBuffer)-1;
+    m_header.clear();
+    m_responseLine.clear();
+    
+    char* eofPos = 0;
+    while (eofPos == 0)
     {
-
-        pos = -1;
-
-        if (CL_TRANSPORT_ERROR==getNextLine())
+        int readed = m_sock->recv(curPtr, left);
+        if (readed < 1)
             return CL_TRANSPORT_ERROR;
-
-        if (m_line.length()<3)// last line before data
-            break;
-
-        //Content-Type
-        //ContentLength
-
-        pos  = m_line.indexOf(QLatin1Char(':'));
-
-        if (pos>=0)
+        curPtr += readed;
+        left -= readed;
+        *curPtr = 0; // end of text
+        eofPos = strstr(m_headerBuffer, "\r\n\r\n");
+    }
+    QList<QByteArray> lines = QByteArray(m_headerBuffer, eofPos-m_headerBuffer).split('\n');
+    m_responseLine = lines[0];
+    for (int i = 1; i < lines.size(); ++i)
+    {
+        QByteArray& line = lines[i];
+        int delimPos = line.indexOf('=');
+        if (delimPos == -1)
+            m_header.insert(line.trimmed(), QByteArray());
+        else 
         {
-            QString name = m_line.left(pos).trimmed();
-            QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
-            m_header.insert(name, val );
-            if (name == QLatin1String("Content-Length"))
-            {
-                m_contentLen = val.toInt();
-                m_readed = 0;
-            }
+            QByteArray paramName = line.left(delimPos).trimmed();
+            QByteArray paramValue = line.mid(delimPos+1).trimmed();
+            m_header.insert(paramName, paramValue);
+            if (paramName == "Content-Length")
+                m_contentLen = paramValue.toInt();
         }
-
+    }
+    if (eofPos+4 < curPtr) {
+        m_dataRestPtr = eofPos+4;
+        m_dataRestLen = curPtr - m_dataRestPtr;
     }
 
-    return 0;
+    return CL_HTTP_SUCCESS;
 }
 
 CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive)
@@ -216,56 +193,52 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             }
         }
 
-        QString request;
-        QTextStream os(&request);
+        QByteArray request;
 
-        os << "GET /" << requestStr<<" HTTP/1.1\r\n"
-            << "Host: "<< m_host.toString() << "\r\n";
+        request.append("GET /");
+        request.append(requestStr);
+        request.append(" HTTP/1.1\r\n");
+        request.append("Host: ");
+        request.append(m_host.toString().toUtf8());
+        request.append("\r\n");
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
         {
-            os << basicAuth() << "\r\n";
+            request.append(basicAuth());
+            request.append("\r\n");
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            os << digestAccess(request);
+            request.append(digestAccess(request));
         }
 
-        os<< "\r\n";
+        request.append("\r\n");
 
-        if (!m_sock->send(request.toLatin1().data(), request.toLatin1().size()))
-        {
-            qDebug() << "OpenStream1";
-
-            return CL_TRANSPORT_ERROR;
-        }
-
-        if (CL_TRANSPORT_ERROR==getNextLine())
+        if (!m_sock->send(request.data(), request.size()))
         {
             return CL_TRANSPORT_ERROR;
         }
 
+        if (CL_TRANSPORT_ERROR==readHeaders())
+            return CL_TRANSPORT_ERROR;
 
-        if (!m_line.contains(QLatin1String("200 OK")))// not ok
+
+        if (!m_responseLine.contains("200 OK"))// not ok
         {
             close();
 
-            if (m_line.contains(QLatin1String("401 Unauthorized")))
+            if (m_responseLine.contains("401 Unauthorized"))
             {
                 getAuthInfo();
 
                 if (recursive)
-                    return doGET(request, false);
+                    return doGET(requestStr, false);
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
 
             return CL_TRANSPORT_ERROR;
         }
-
-        if (readHeaders() == CL_TRANSPORT_ERROR)
-            return CL_TRANSPORT_ERROR;
-
 
         m_connected = true;
 
@@ -287,10 +260,14 @@ void CLSimpleHTTPClient::close()
 
 void CLSimpleHTTPClient::readAll(QByteArray& data)
 {
+    if (m_dataRestLen)
+    {
+        data.append(m_dataRestPtr, m_dataRestLen);
+        m_dataRestLen = 0;
+    }
+
     static const unsigned long BUFSIZE = 1024;
-
     int nRead;
-
     char buf[BUFSIZE];
     while ((nRead = read(buf, BUFSIZE)) > 0)
     {
@@ -298,68 +275,61 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
     }
 }
 
-long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
+int CLSimpleHTTPClient::read(char* data, int max_len)
 {
     if (!m_connected) return -1;
+    
+    int bufferRestLen = 0;
+    if (m_dataRestLen)
+    {
+        bufferRestLen = qMin(m_dataRestLen, max_len);
+        memcpy(data, m_dataRestPtr, bufferRestLen);
+        data += bufferRestLen;
+        m_dataRestPtr += bufferRestLen;
+        m_dataRestLen -= bufferRestLen;
+        max_len -= bufferRestLen;
+        m_readed += bufferRestLen;
+    }
+    if (max_len == 0) {
+        if (m_readed == m_contentLen)
+            m_connected = false;
+        return bufferRestLen;
+    }
 
-    int readed = 0;
-    readed = m_sock->recv(data, max_len);
-
-
-    if (readed<=0)
+    int readed = m_sock->recv(data, max_len);
+    if (readed<=0) 
         close();
 
-    m_readed+=readed;
+    if (readed > 0)
+        m_readed+=readed;
 
     if (m_readed == m_contentLen)
         m_connected = false;
 
-
-    return readed;
+    if (bufferRestLen > 0)
+        return bufferRestLen + qMax(readed, 0);
+    else
+        return readed;
 }
 
 //===================================================================================
 //===================================================================================
 void CLSimpleHTTPClient::getAuthInfo()
 {
-    int pos;
-    while(1)
-    {
-
-        pos = -1;
-
-        if (CL_TRANSPORT_ERROR==getNextLine())
-            return;
-
-        if (m_line.length()<3)// last line before data
-            break;
-
-        if (m_line.contains(QLatin1String("realm")))
-        {
-            mRealm = getParamFromString(m_line, QLatin1String("realm"));
-        }
-
-        if (m_line.contains(QLatin1String("nonce")))
-        {
-            mNonce = getParamFromString(m_line, QLatin1String("nonce"));
-        }
-
-        if (m_line.contains(QLatin1String("qop")))
-        {
-            mQop = getParamFromString(m_line, QLatin1String("qop"));
-        }
-
-    }
-
+    mRealm = m_header.value("realm");
+    mNonce = m_header.value("nonce");
+    mQop = m_header.value("qop");
 }
 
-QString CLSimpleHTTPClient::basicAuth() const
+QByteArray CLSimpleHTTPClient::basicAuth() const
 {
-    QString lp = m_auth.user() + QLatin1Char(':') + m_auth.password();
+    QByteArray lp;
+    lp.append(m_auth.user().toUtf8());
+    lp.append(':');
+    lp.append(m_auth.password().toUtf8());
 
-    QString base64 = QLatin1String("Authorization: Basic ");
-    base64 += QString::fromAscii(lp.toLatin1().toBase64().constData());
-
+    QByteArray base64("Authorization: Basic ");
+    base64.append(lp.toBase64());
     return base64;
 }
 
@@ -391,7 +361,6 @@ QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int p
     http.doGET(fileName);
 
     
-
     QByteArray file;
     file.reserve(capacity);
 
@@ -409,4 +378,10 @@ QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int p
     }
 
     return file;
+}
+
+bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth)
+{
+    CLSimpleHTTPClient http (host, port, timeout, auth);
+    return http.doPOST(fileName, content) == CL_HTTP_SUCCESS;
 }

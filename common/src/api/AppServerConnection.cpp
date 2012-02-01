@@ -33,7 +33,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result)
         emit finished(status, errorString, resources);
     } else if (m_objectName == "camera")
     {
-        QnCameraResourceList cameras;
+        QnVirtualCameraResourceList cameras;
 
         QByteArray errorString;
         if (status == 0)
@@ -179,7 +179,7 @@ int QnAppServerConnection::registerServer(const QnVideoServerPtr& serverPtr, QnV
     return status;
 }
 
-int QnAppServerConnection::addCamera(const QnCameraResourcePtr& cameraPtr, QnCameraResourceList& cameras, QByteArray& errorString)
+int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr, QnVirtualCameraResourceList& cameras, QByteArray& errorString)
 {
     QByteArray data;
 
@@ -204,8 +204,8 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resourcePtr, QObject* 
 {
     if (resourcePtr.dynamicCast<QnVideoServer>())
         return saveAsync(resourcePtr.dynamicCast<QnVideoServer>(), target, slot);
-    else if (resourcePtr.dynamicCast<QnCameraResource>())
-        return saveAsync(resourcePtr.dynamicCast<QnCameraResource>(), target, slot);
+    else if (resourcePtr.dynamicCast<QnVirtualCameraResource>())
+        return saveAsync(resourcePtr.dynamicCast<QnVirtualCameraResource>(), target, slot);
     else if (resourcePtr.dynamicCast<QnUserResource>())
         return saveAsync(resourcePtr.dynamicCast<QnUserResource>(), target, slot);
 
@@ -238,7 +238,7 @@ int QnAppServerConnection::saveAsync(const QnVideoServerPtr& serverPtr, QObject*
     return 0;
 }
 
-int QnAppServerConnection::saveAsync(const QnCameraResourcePtr& cameraPtr, QObject* target, const char* slot)
+int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "camera");
     QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
@@ -260,7 +260,7 @@ int QnAppServerConnection::addStorage(const QnStoragePtr& storagePtr, QByteArray
     return addObject("storage", data, reply, errorString);
 }
 
-int QnAppServerConnection::getCameras(QnCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString)
+int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString)
 {
     QByteArray data;
     int status = getObjects("camera", mediaServerId.toString(), data, errorString);

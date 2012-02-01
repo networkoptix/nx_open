@@ -15,10 +15,14 @@ public:
     QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
 
+    /*
+    * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
+    */
+    static bool isFullMessage(const QByteArray& message);
+
 protected:
     virtual void pleaseStop();
     virtual void parseRequest();
-    QMutex& getSockMutex();
     QString extractPath() const;
     void sendData(const char* data, int size);
     inline void sendData(const QByteArray& data) { sendData(data.constData(), data.size()); }
@@ -27,10 +31,8 @@ protected:
     inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     void sendBuffer();
     void clearBuffer();
-    void setNoDelay();
 
     void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType);
-    bool isFullMessage();
     QString codeToMessage(int code);
 
     QN_DECLARE_PRIVATE(QnTCPConnectionProcessor);

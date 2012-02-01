@@ -4,7 +4,7 @@
 #include <QWeakPointer>
 #include <QVector>
 #include <camera/render_status.h>
-#include <ui/widgets2/graphicswidget.h>
+#include <ui/graphics/items/standard/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>
@@ -28,14 +28,15 @@ class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, 
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement);
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry);
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
+    Q_FLAGS(DisplayFlags DisplayFlag);
 
     typedef GraphicsWidget base_type;
 
 public:
     enum DisplayFlag {
-        DISPLAY_ACTIVITY_OVERLAY,  /**< Whether the paused overlay icon should be displayed. */
-        DISPLAY_SELECTION_OVERLAY, /**< Whether selected / not selected state should be displayed. */
-        DISPLAY_MOTION_GRID,       /**< Whether a grid with motion detection is to be displayed. */
+        DISPLAY_ACTIVITY_OVERLAY  = 0x1, /**< Whether the paused overlay icon should be displayed. */
+        DISPLAY_SELECTION_OVERLAY = 0x2, /**< Whether selected / not selected state should be displayed. */
+        DISPLAY_MOTION_GRID       = 0x4, /**< Whether a grid with motion detection is to be displayed. */
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 

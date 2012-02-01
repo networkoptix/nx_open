@@ -214,7 +214,7 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
         return result;
     }
 
-    result = QnCameraResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(resourceTypeId));
+    result = QnVirtualCameraResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(resourceTypeId));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;

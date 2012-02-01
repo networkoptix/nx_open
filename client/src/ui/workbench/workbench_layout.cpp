@@ -116,7 +116,7 @@ namespace {
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent)
     : QObject(parent)
 {
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(resourceRemoved(QnResourcePtr)));
+    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resourcePool_resourceRemoved(QnResourcePtr)));
 }
 
 QnWorkbenchLayout::~QnWorkbenchLayout()
@@ -128,7 +128,20 @@ QnWorkbenchLayout::~QnWorkbenchLayout()
     blockSignals(signalsBlocked);
 }
 
-void QnWorkbenchLayout::load(const QnLayoutData& layoutData)
+const QString &QnWorkbenchLayout::name() const {
+    return m_name;
+}
+
+void QnWorkbenchLayout::setName(const QString &name) {
+    if(m_name == name)
+        return;
+
+    m_name = name;
+
+    emit nameChanged();
+}
+
+void QnWorkbenchLayout::load(const QnLayoutData &layoutData)
 {
     // TODO: need to set id and name here
     foreach (const QnLayoutItemData& itemData, layoutData.getItems())
@@ -196,7 +209,7 @@ void QnWorkbenchLayout::clear()
     m_items.clear();
 }
 
-void QnWorkbenchLayout::resourceRemoved(const QnResourcePtr &resource)
+void QnWorkbenchLayout::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
 {
     delete item(resource);
 }

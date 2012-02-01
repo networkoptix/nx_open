@@ -52,6 +52,13 @@ public:
         return m_queue[i];  
     }
 
+    T last()
+    {
+        QMutexLocker mutex(&m_cs);
+        return m_queue.last();
+    }
+
+
     bool pop(T& val, quint32 time = INFINITE)
     {
         if (!m_sem.tryAcquire(1,time)) // in case of INFINITE wait the value passed to tryAcquire will be negative ( it will wait forever )

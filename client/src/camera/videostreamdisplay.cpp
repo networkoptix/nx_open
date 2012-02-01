@@ -1,178 +1,15 @@
 #include "videostreamdisplay.h"
 #include "decoders/video/abstractdecoder.h"
-#include "abstractrenderer.h"
-#include "gl_renderer.h"
 #include "utils/common/util.h"
 #include "utils/common/longrunnable.h"
 #include "utils/common/adaptivesleep.h"
+#include "abstractrenderer.h"
+#include "gl_renderer.h"
+#include "buffered_frame_displayer.h"
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
-static const int MAX_QUEUE_TIME = 1000 * 200;
 
-
-class BufferedFrameDisplayer: public CLLongRunnable 
-{
-public:
-    BufferedFrameDisplayer(QnAbstractRenderer* drawer): m_queue(MAX_FRAME_QUEUE_SIZE-1), m_drawer(drawer)
-    {
-        m_currentTime = AV_NOPTS_VALUE;
-        m_expectedTime = AV_NOPTS_VALUE;
-        m_lastDisplayedTime = AV_NOPTS_VALUE;
-        start();
-    }
-    ~BufferedFrameDisplayer() {
-        stop();
-    }
-
-    void waitForFramesDisplayed()
-    {
-        while (m_queue.size() > 0)
-            msleep(1);
-    }
-
-    qint64 bufferedDuration() {
-        QMutexLocker lock(&m_sync);
-        if (m_queue.size() == 0)
-            return 0;
-        else
-            return m_lastQueuedTime - m_queue.front()->pkt_dts;
-    }
-
-    bool addFrame(CLVideoDecoderOutput* outFrame) 
-    {
-        bool wasWaiting = false;
-        bool needWait;
-        do {
-            m_sync.lock();
-            m_lastQueuedTime = outFrame->pkt_dts;
-            needWait = !m_needStop && (m_queue.size() == m_queue.maxSize() 
-                        || m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME);
-            m_sync.unlock();
-            if (needWait) {
-                wasWaiting = true;
-            msleep(1);
-            }
-        } while (needWait);
-        m_queue.push(outFrame);
-        return wasWaiting;
-    }
-
-    void setCurrentTime(qint64 time) {
-        QMutexLocker lock(&m_sync);
-        m_currentTime = time;
-        m_timer.restart();
-    }
-
-    void clear() {
-        stop();
-        m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
-        start();
-    }
-
-    qint64 getLastDisplayedTime() 
-    {
-        QMutexLocker lock(&m_sync);
-        return m_lastDisplayedTime;
-    }
-
-    void setLastDisplayedTime(qint64 value)
-    {
-        QMutexLocker lock(&m_sync);
-        m_lastDisplayedTime = value;
-    }
-
-protected:
-    virtual void run() 
-    {
-        CLVideoDecoderOutput* frame;
-        while (!m_needStop)
-        {
-            if (m_queue.size() > 0)
-            {
-                frame = m_queue.front();
-
-                if (m_expectedTime == AV_NOPTS_VALUE) {
-                    m_alignedTimer.restart();
-                    m_expectedTime = frame->pkt_dts;
-                }
-
-                m_sync.lock();
-                qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
-                qint64 currentTime = m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
-                
-                //cl_log.log("djitter:", qAbs(expectedTime - currentTime), cl_logALWAYS);
-                // align to grid
-                if (qAbs(expectedTime - currentTime) < 60000) {
-                    currentTime = expectedTime;
-                }
-                else {
-                    m_alignedTimer.restart();
-                    m_expectedTime = currentTime;
-                }
-                if (frame->pkt_dts - currentTime >  MAX_VALID_SLEEP_TIME) {
-                    currentTime = m_currentTime = m_expectedTime = frame->pkt_dts;
-                    m_alignedTimer.restart();
-                    m_timer.restart();
-                }
-                qint64 sleepTime = frame->pkt_dts - currentTime;
-
-                m_sync.unlock();
-
-                if (sleepTime > 0) {
-                    msleep(sleepTime/1000);
-                }
-                else if (sleepTime < -1000000) {
-                    m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
-                }
-                /*
-                else if (sleepTime < -15000)
-                {
-                    if (m_queue.size() > 1 && sleepTime + (m_queue.at(1)->pkt_dts - frame->pkt_dts) <= 0) 
-                    {
-                        cl_log.log("Late picture skipped at ", frame->pkt_dts/1000000.0, cl_logWARNING);
-                        m_sync.lock();
-                        m_queue.pop(frame);
-                        m_sync.unlock();
-                        continue;
-                    }
-                    if (sleepTime < -1000000) {
-                    m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
-                }
-                }
-                */
-
-                m_sync.lock();
-                m_lastDisplayedTime = frame->pkt_dts;
-                m_sync.unlock();
-
-                m_drawer->draw(frame);
-                //m_drawer->waitForFrameDisplayed(0);
-                m_sync.lock();
-                m_queue.pop(frame);
-                m_sync.unlock();
-                //cl_log.log("queue size:", m_queue.size(), cl_logALWAYS);
-            }
-            else {
-                msleep(1);
-            }
-        }
-        while (m_queue.size() > 0)
-            m_queue.pop(frame);
-    }
-private:
-    qint64 m_lastQueuedTime;
-    qint64 m_expectedTime;
-    QTime m_timer;
-    QTime m_alignedTimer;
-    QnAbstractRenderer* m_drawer;
-    qint64 m_currentTime;
-    QMutex m_sync;
-    qint64 m_lastDisplayedTime;
-    CLThreadQueue<CLVideoDecoderOutput*> m_queue;
-};
-
-// ------------------- CLVideoStreamDisplay --------------------------
 
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_lightCPUmode(QnAbstractVideoDecoder::DecodeMode_Full),
@@ -391,6 +228,21 @@ void CLVideoStreamDisplay::waitForFramesDisplaed()
     m_queueWasFilled = false;
 }
 
+qint64 CLVideoStreamDisplay::nextReverseTime() const
+{
+    for (int i = 0; i < m_reverseQueue.size(); ++i)
+    {
+        if (m_reverseQueue[i]->pkt_dts != AV_NOPTS_VALUE)
+        {
+            if (m_reverseQueue[i]->flags & AV_REVERSE_REORDERED)
+                return m_reverseQueue[i]->pkt_dts;
+            else
+                return AV_NOPTS_VALUE;
+        }
+    }
+    return AV_NOPTS_VALUE;
+}
+
 CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
     // use only 1 frame for non selected video
@@ -496,7 +348,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
             {
-                tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
+                tmpOutFrame->flags |= AV_REVERSE_PACKET;
+                //tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
                 m_reverseQueue.enqueue(tmpOutFrame);
                 m_realReverseSize++;
                 checkQueueOverflow(dec);
@@ -548,12 +401,12 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         m_flushedBeforeReverseStart = false;
     }
 
+    pixFmt = dec->GetPixelFormat();
     if (!data->context) {
         // for stiil images decoder parameters are not know before decoding, so recalculate parameters
         // It is got one more data copy from tmpFrame, but for movies we have got valid dst pointer (tmp or not) immediate before decoding
         // It is necessary for new logic with display queue
         scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
-        pixFmt = dec->GetPixelFormat();
     }
 
 	if (!draw || !m_drawer)

@@ -6,11 +6,11 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QRadioButton>
 
+#include "camera_motionmask_widget.h"
 #include "camera_schedule_widget.h"
-#include "qnschedulegridwidget.h"
 
 #include "settings.h"
-#include "ui/skin/globals.h"
+#include "ui/style/globals.h"
 
 SettingsSlider::SettingsSlider(Qt::Orientation orientation, QWidget *parent)
     : QSlider(orientation, parent)
@@ -196,8 +196,8 @@ void SettingsButtonWidget::updateParam(const QVariant &/*value*/)
 //==================================================
 SettingsEditorFactory::SettingsEditorFactory() : QItemEditorFactory()
 {
-    registerEditor(static_cast<QVariant::Type>(qMetaTypeId<QnScheduleTaskList>()),
-                   new QStandardItemEditorCreator<CameraScheduleWidget>());
+    //registerEditor(QVariant::Type(qMetaTypeId<QRegion>()), new QStandardItemEditorCreator<QnCameraMotionMaskWidget>());
+    registerEditor(QVariant::Type(qMetaTypeId<QnScheduleTaskList>()), new QStandardItemEditorCreator<CameraScheduleWidget>());
 }
 
 QWidget *SettingsEditorFactory::createEditor(const QnParam &param, QWidget *parent) const
