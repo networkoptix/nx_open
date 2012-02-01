@@ -1,5 +1,10 @@
 #include "graphics_view.h"
 #include <utils/common/warnings.h>
+#include <utils/common/performance.h>
+
+#ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
+#   include <QDateTime>
+#endif
 
 QnLayerPainter::QnLayerPainter(): m_view(NULL), m_layer(static_cast<QGraphicsScene::SceneLayer>(0)) {}
 
@@ -60,6 +65,25 @@ void QnGraphicsView::uninstallLayerPainter(QnLayerPainter *painter) {
     (painter->layer() == QGraphicsScene::ForegroundLayer ? m_foregroundPainters : m_backgroundPainters).removeOne(painter);
     painter->m_layer = static_cast<QGraphicsScene::SceneLayer>(0);
     painter->m_view = NULL;
+}
+
+void QnGraphicsView::paintEvent(QPaintEvent *event) {
+#ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
+    qint64 frequency = QnPerformance::currentCpuFrequency();
+    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 startCycles = QnPerformance::currentThreadCycles();
+#endif
+
+    base_type::paintEvent(event);
+
+#ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
+    qint64 deltaTime = QDateTime::currentMSecsSinceEpoch() - startTime;
+    qint64 deltaCycles = QnPerformance::currentThreadCycles() - startCycles;
+
+    qreal deltaCpuTime = deltaCycles / (frequency / 1000.0);
+    if(deltaCpuTime > 1.0)
+        qDebug() << QString("VIEWPORT PAINT: %1ms real time; %2ms cpu time (%3 cycles)").arg(deltaTime, 5).arg(deltaCpuTime, 8, 'g', 5).arg(deltaCycles, 8);
+#endif
 }
 
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {

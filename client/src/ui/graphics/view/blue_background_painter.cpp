@@ -1,10 +1,9 @@
+#include "blue_background_painter.h"
 #include <cmath> /* For std::fmod. */
 #include <QRect>
 #include <QRadialGradient>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <utils/common/qt_opengl.h>
-#include "blue_background_painter.h"
-#include "../painters/paused_painter.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnRadialGradientPainter, radialGradientPainter, (32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0)));
 
@@ -45,8 +44,7 @@ void QnBlueBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
 {
     qreal pos = position();
 
-    QColor color(10, 10, 110 + 50 * pos, 255); // NO
-    //QColor color(0, 100 + 50 * rpos, 160, 255); // trinity
+    QColor color(10, 10, 110 + 50 * pos, 255);
 
     QPointF center1(rect.center().x() - pos * rect.width() / 2, rect.center().y());
     QPointF center2(rect.center().x() + pos * rect.width() / 2, rect.center().y());
