@@ -1,12 +1,10 @@
 
-#include "VideoSessionManager.h"
 #include <QDebug>
 #include <QNetworkReply>
 #include <QDomDocument>
 #include <QXmlInputSource>
 #include <QSharedPointer>
 #include "QStdIStream.h"
-#include "AppSessionManager.h"
 #include "utils/common/util.h"
 
 #include "xsd_recordedTimePeriods.h"
@@ -14,7 +12,7 @@
 #include "VideoServerConnection.h"
 #include "VideoServerConnection_p.h"
 #include "xsd_recordedTimePeriods.h"
-#include "VideoSessionManager.h"
+#include "SessionManager.h"
 
 namespace {
     const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;
@@ -137,11 +135,11 @@ QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkRes
     return result;
 }
 
-void QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot) {
+int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot) {
     detail::QnVideoServerConnectionReplyProcessor *processor = new detail::QnVideoServerConnectionReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList &, int)), target, slot);
 
-    asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&)));
+    return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&)));
 }
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply)
@@ -187,11 +185,11 @@ int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList& param
     return 0;
 }
 
-void QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot)
+int QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot)
 {
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList&, int)), target, slot);
 
-    SessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &)));
+    return SessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &)));
 }
 

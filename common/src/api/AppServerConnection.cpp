@@ -3,9 +3,8 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 
-#include "api/AppSessionManager.h"
-
 #include "utils/common/sleep.h"
+#include "SessionManager.h"
 
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result)
 {
@@ -92,9 +91,9 @@ int QnAppServerConnection::addObject(const QString& objectName, const QByteArray
     return status;
 }
 
-void QnAppServerConnection::addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot)
+int QnAppServerConnection::addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot)
 {
-    SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, data, target, slot);
+    return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, data, target, slot);
 }
 
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
@@ -109,18 +108,13 @@ int QnAppServerConnection::getObjects(const QString& objectName, const QString& 
     return SessionManager::instance()->sendGetRequest(m_url, request, data, errorString);
 }
 
-void QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
+int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
 {
-    SessionManager::instance()->testConnectionAsync(m_url, target, slot);
+    return SessionManager::instance()->testConnectionAsync(m_url, target, slot);
 }
 
 QnAppServerConnection::~QnAppServerConnection()
 {
-}
-
-bool QnAppServerConnection::isConnected() const
-{
-    return true;
 }
 
 int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString)
@@ -220,9 +214,7 @@ int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* 
     QByteArray data;
     m_serializer.serialize(userPtr, data);
 
-    addObjectAsync("user", data, processor, SLOT(finished(int, const QByteArray&, int)));
-
-    return 0;
+    return addObjectAsync("user", data, processor, SLOT(finished(int, const QByteArray&, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnVideoServerPtr& serverPtr, QObject* target, const char* slot)
@@ -233,9 +225,7 @@ int QnAppServerConnection::saveAsync(const QnVideoServerPtr& serverPtr, QObject*
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
 
-    addObjectAsync("server", data, processor, SLOT(finished(int, const QByteArray&, int)));
-
-    return 0;
+    return addObjectAsync("server", data, processor, SLOT(finished(int, const QByteArray&, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr, QObject* target, const char* slot)
@@ -246,9 +236,7 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr
     QByteArray data;
     m_serializer.serialize(cameraPtr, data);
 
-    addObjectAsync("camera", data, processor, SLOT(finished(int, const QByteArray&, int)));
-
-    return 0;
+    return addObjectAsync("camera", data, processor, SLOT(finished(int, const QByteArray&, int)));
 }
 
 int QnAppServerConnection::addStorage(const QnStoragePtr& storagePtr, QByteArray& errorString)

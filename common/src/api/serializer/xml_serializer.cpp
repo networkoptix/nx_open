@@ -390,7 +390,7 @@ void QnApiXmlSerializer::deserializeStorages(QnStorageList& storages, const QByt
         parseStorages(storages, xsdStorages->storage());
     }
     catch (const xml_schema::exception& e) {
-        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += "\nQnApiXmlSerializer::deserializeStorages(): ";
         errorString += e.what();
 
         qDebug(e.what());
@@ -410,7 +410,7 @@ void QnApiXmlSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras
         parseCameras(cameras, xsdCameras->camera(), resourceFactory);
     }
     catch (const xml_schema::exception& e) {
-        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += "\nQnApiXmlSerializer::deserializeCameras(): ";
         errorString += e.what();
 
         qDebug(e.what());
@@ -430,7 +430,7 @@ void QnApiXmlSerializer::deserializeLayouts(QnLayoutDataList& layouts, const QBy
         parseLayouts(layouts, xsdLayouts->layout());
     }
     catch (const xml_schema::exception& e) {
-        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += "\nQnApiXmlSerializer::deserializeLayouts(): ";
         errorString += e.what();
 
         qDebug(e.what());
@@ -450,7 +450,7 @@ void QnApiXmlSerializer::deserializeUsers(QnUserResourceList& users, const QByte
         parseUsers(users, xsdUsers->user());
     }
     catch (const xml_schema::exception& e) {
-        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += "\nQnApiXmlSerializer::deserializeUsers(): ";
         errorString += e.what();
 
         qDebug(e.what());
@@ -471,7 +471,7 @@ void QnApiXmlSerializer::deserializeServers(QnVideoServerList& servers, const QB
     }
     catch (const xml_schema::exception& e)
     {
-        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += "\nQnApiXmlSerializer::deserializeServers(): ";
         errorString += e.what();
 
         qDebug(e.what());
@@ -494,7 +494,7 @@ void QnApiXmlSerializer::deserializeResources(QnResourceList& resources, const Q
         // parseUsers(resources, xsdResources->users().user());
     }
     catch (const xml_schema::exception& e) {
-        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += "\nQnApiXmlSerializer::deserializeResources(): ";
         errorString += e.what();
 
         qDebug(e.what());
@@ -514,7 +514,7 @@ void QnApiXmlSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTy
         parseResourceTypes(resourceTypes, xsdResourceTypes->resourceType());
     }
     catch (const xml_schema::exception& e) {
-        errorString += "\nAppSessionManager::loadObjects(): ";
+        errorString += "\nQnApiXmlSerializer::deserializeResourceTypes(): ";
         errorString += e.what();
 
         qDebug(e.what());

@@ -68,7 +68,10 @@ int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& regi
         }
     }
 
-    int handle = sendRequest(periodToLoad);
+    sendRequest(periodToLoad);
+
+// XXX there is no handle anymore. fix this code.
+    int handle = 0; 
     m_loading << LoadingInfo(periodToLoad, handle);
     return handle;
 }
@@ -122,9 +125,9 @@ void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &ti
     }
 }
 
-void QnTimePeriodReader::sendRequest(const QnTimePeriod& periodToLoad)
+int QnTimePeriodReader::sendRequest(const QnTimePeriod& periodToLoad)
 {
-    m_connection->asyncRecordedTimePeriods(
+    return m_connection->asyncRecordedTimePeriods(
         QnNetworkResourceList() << m_resource, 
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 

@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QMargins>
 
+class QnDwmPrivate;
+
 class QnDwm: public QObject {
     Q_OBJECT;
 

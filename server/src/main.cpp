@@ -26,6 +26,7 @@
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
 #include "core/resource/video_server.h"
+#include "api/SessionManager.h"
 #include <signal.h>
 #include <xercesc/util/PlatformUtils.hpp>
 #include "core/misc/scheduleTask.h"

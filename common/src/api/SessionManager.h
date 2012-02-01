@@ -25,7 +25,7 @@ public:
     }
 
 public slots:
-    void finished(int status, const QByteArray& data);
+    void finished(int status, const QByteArray& data, int handle);
 
 public:
     int wait(QByteArray& reply, QByteArray& errorString);
@@ -71,34 +71,37 @@ private:
     static SessionManager* m_instance;
 
 private slots:
-    void doSendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
-    void doSendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
+    void doSendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
+    void doSendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
 
 public:
     SessionManager();
     virtual ~SessionManager();
 
+    // Synchronous requests return status
     int sendGetRequest(const QUrl& url, const QString &objectName, QByteArray &reply, QByteArray& errorString);
     int sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray &reply, QByteArray& errorString);
 
     int sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QByteArray &reply, QByteArray& errorString);
     int sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QByteArray &reply, QByteArray& errorString);
 
-    void sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot);
-    void sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
+    // Asynchronous requests return request handle
+    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot);
+    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
 
-    void sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot);
-    void sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
+    int sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot);
+    int sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
 
-    void testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot);
+    int testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot);
 
 signals:
-    void asyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot);
-    void asyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
+    void asyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
+    void asyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
 
 private:
     QNetworkAccessManager m_accessManager;
     SessionManagerReplyProcessor m_replyProcessor;
+    static QAtomicInt m_handle;
 
 private:
     QUrl createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;

@@ -17,7 +17,6 @@
 
 #include "api/serializer/xml_serializer.h"
 
-class AppSessionManager;
 class QnAppServerConnectionFactory;
 
 class QnApiSerializer;
@@ -54,9 +53,7 @@ class QN_EXPORT QnAppServerConnection
 public:
     ~QnAppServerConnection();
 
-    void testConnectionAsync(QObject* target, const char* slot);
-
-    bool isConnected() const;
+    int testConnectionAsync(QObject* target, const char* slot);
 
     int getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString);
 
@@ -85,13 +82,12 @@ private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 
     int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
-    void addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
+    int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
 
     int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
 
 private:
     QUrl m_url;
-    QScopedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
     QnVideoServerFactory m_serverFactory;
 
