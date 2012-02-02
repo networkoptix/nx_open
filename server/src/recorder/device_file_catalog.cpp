@@ -24,6 +24,16 @@ QnResource::ConnectionRole DeviceFileCatalog::roleForPrefix(const QString& prefi
 }
 
 
+
+qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs)
+{
+    if (timeMs >= startTimeMs) 
+        return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
+    else 
+        return startTimeMs - timeMs;
+}
+
+
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):
     m_firstDeleteCount(0),
     m_macAddress(macAddress),

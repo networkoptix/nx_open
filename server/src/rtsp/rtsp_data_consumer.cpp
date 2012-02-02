@@ -10,7 +10,7 @@
 #include "utils/network/rtpsession.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 
-static const int MAX_QUEUE_SIZE = 15;
+static const int MAX_QUEUE_SIZE = 3;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;

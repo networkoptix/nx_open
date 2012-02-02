@@ -16,6 +16,7 @@
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
+static qint64 MAX_QUEUE_LENGTH = 1000000ll * 1;
 
 static void updateActivity()
 {
@@ -224,13 +225,13 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 //QTime t;
                 //t.start();
                 int sign = speed >= 0 ? 1 : -1;
-                //bool firstWait = true;
+                bool firstWait = true;
                 while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed && useSync(vd))
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
                     {
-						/*
+						
 					    if (firstWait)
                         {
                             QString s;
@@ -242,7 +243,6 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                             cl_log.log(s, cl_logALWAYS);
                             firstWait = false;
                         }
-						*/					
                         QnSleep::msleep(1);
                     }
                     else {
@@ -361,12 +361,12 @@ void CLCamDisplay::onBeforeJump(qint64 time)
 {
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
-   /*
+   
     if (time < 1000000ll * 100000)
         cl_log.log("before jump to ", time, cl_logWARNING);
     else
         cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
-    */
+    
     QMutexLocker lock(&m_timeMutex);
 
     m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
@@ -389,12 +389,12 @@ void CLCamDisplay::onBeforeJump(qint64 time)
 
 void CLCamDisplay::onJumpOccured(qint64 time)
 {
-    /*
+    
     if (time < 1000000ll * 100000)
         cl_log.log("after jump to ", time, cl_logWARNING);
     else
         cl_log.log("after jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
-    */
+    
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this);
 
@@ -420,7 +420,7 @@ void CLCamDisplay::onJumpCanceled(qint64 /*time*/)
 void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
 {
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
-    //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(newTime/1000).toString(), cl_logWARNING);
+    cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString(), cl_logWARNING);
 
     clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
@@ -528,8 +528,8 @@ bool CLCamDisplay::canAcceptData() const
 {
     if (m_processedPackets < m_dataQueue.maxSize())
         return m_dataQueue.size() <= m_processedPackets;
-    else
-        return QnAbstractDataConsumer::canAcceptData();
+    else 
+        return m_dataQueue.mediaLength() < MAX_QUEUE_LENGTH;
 }
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)

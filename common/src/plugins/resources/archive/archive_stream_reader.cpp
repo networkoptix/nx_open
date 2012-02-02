@@ -256,6 +256,18 @@ begin_label:
     {
         m_oldQuality = m_quality;
         m_delegate->setQuality(m_quality);
+        if (m_requiredJumpTime == AV_NOPTS_VALUE)
+        {
+            qint64 displayTime = determineDisplayTime();
+            m_jumpMtx.lock();
+            beforeJumpInternal(displayTime);
+            m_jumpMtx.unlock();
+            if (displayTime != AV_NOPTS_VALUE) {
+                intChanneljumpTo(displayTime, 0);
+                setSkipFramesToTime(displayTime);
+                emit jumpOccured(displayTime);
+            }
+        }
     }
 
     if (mFirstTime)

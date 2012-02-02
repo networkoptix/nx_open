@@ -1,5 +1,5 @@
-#ifndef _DEVICE_FILE_CATALOG_H__
-#define _DEVICE_FILE_CATALOG_H__
+#ifndef _DEVICE_FILE_CATALOG_H___
+#define _DEVICE_FILE_CATALOG_H___
 
 #include <QSharedPointer>
 #include <QFile>
@@ -22,6 +22,8 @@ public:
         Chunk(): startTimeMs(-1), storageIndex(0), fileIndex(0), durationMs(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration) : 
             startTimeMs(_startTime), storageIndex(_storageIndex), fileIndex(_fileIndex), durationMs(_duration) {}
+
+        qint64 distanceToTime(qint64 timeMs);
 
         qint64 startTimeMs; // chunk startTime at ms
         int durationMs; // chunk duration at ms

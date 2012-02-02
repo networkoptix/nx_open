@@ -6,10 +6,12 @@
 #include "utils/common/sleep.h"
 
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
+static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
-    m_chunkSequence(0),
+    m_chunkSequenceHi(0),
+    m_chunkSequenceLow(0),
     m_aviDelegate(0),
     m_reverseMode(false),
     m_selectedAudioChannel(0),
@@ -19,27 +21,31 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     m_sendMotion(false),
-    m_eof(false)
+    m_eof(false),
+    m_quality(MEDIA_Quality_High),
+    m_skipFramesToTime(0),
+    m_lastPacketTime(0)
 {
     m_aviDelegate = new QnAviArchiveDelegate();
 }
 
 QnServerArchiveDelegate::~QnServerArchiveDelegate()
 {
-    delete m_chunkSequence;
+    delete m_chunkSequenceHi;
+    delete m_chunkSequenceLow;
     delete m_aviDelegate;
 }
 
 qint64 QnServerArchiveDelegate::startTime()
 {
-	if (!m_catalog || m_catalog->minTime() == AV_NOPTS_VALUE)
+	if (!m_catalogHi || m_catalogHi->minTime() == AV_NOPTS_VALUE)
 		return AV_NOPTS_VALUE;
-    return m_catalog->minTime()*1000;
+    return m_catalogHi->minTime()*1000;
 }
 
 qint64 QnServerArchiveDelegate::endTime()
 {
-    return m_catalog  ? m_catalog->maxTime()*1000 : 0;
+    return m_catalogHi  ? m_catalogHi->maxTime()*1000 : 0;
 }
 
 bool QnServerArchiveDelegate::open(QnResourcePtr resource)
@@ -49,22 +55,32 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     m_resource = resource;
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     Q_ASSERT(netResource != 0);
-    m_catalog = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
-    m_chunkSequence = new QnChunkSequence(netResource, QnResource::Role_LiveVideo, 0);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_SecondaryLiveVideo);
+    m_chunkSequenceHi = new QnChunkSequence(netResource, QnResource::Role_LiveVideo, 0);
+    m_chunkSequenceLow = new QnChunkSequence(netResource, QnResource::Role_SecondaryLiveVideo, 0);
+
+    m_currentChunkCatalog = m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
 
     return true;
 }
 
 void QnServerArchiveDelegate::close()
 {
+    m_currentChunkCatalog.clear();
     m_aviDelegate->close();
-    m_catalog = DeviceFileCatalogPtr();
-    delete m_chunkSequence;
-    m_chunkSequence = 0;
+    m_catalogHi.clear();
+    m_catalogLow.clear();
+    delete m_chunkSequenceHi;
+    delete m_chunkSequenceLow;
+    m_chunkSequenceHi = 0;
+    m_chunkSequenceLow = 0;
     m_reverseMode = false;
     m_opened = false;
     m_lastSeekTime = AV_NOPTS_VALUE;
     m_afterSeek = false;
+    m_skipFramesToTime = 0;
+    m_lastPacketTime = 0;
 }
 
 void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime, bool useReverseSearch)
@@ -184,11 +200,34 @@ qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSe
 
 qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool recursive)
 {
-    QTime t;
-    t.start();
+    //QTime t;
+    //t.start();
+    qint64 timeMs = time/1000;
+    DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
+    DeviceFileCatalog::Chunk newChunk;
+    DeviceFileCatalogPtr newChunkCatalog;
+    if (m_quality == MEDIA_Quality_Low)
+    {
+        newChunk = m_chunkSequenceLow->findChunk(m_resource, timeMs, findMethod);
+        newChunkCatalog = m_catalogLow;
+        int distanceLow = newChunk.distanceToTime(timeMs);
+        if (distanceLow > 0) 
+        {
+            // Low quality chunk not found exactly for requested time. So, find chunk in high quality sequence
+            DeviceFileCatalog::Chunk newChunkPrimary = m_chunkSequenceHi->findChunk(m_resource, timeMs, findMethod);
+            int distanceHi = newChunkPrimary.distanceToTime(timeMs);
+            if (distanceLow - distanceHi > SECOND_STREAM_FIND_EPS)
+            {
+                newChunk = newChunkPrimary;
+                newChunkCatalog = m_catalogHi;
+            }
+        }
+    }
+    else {
+        newChunk = m_chunkSequenceHi->findChunk(m_resource, timeMs, findMethod);
+        newChunkCatalog = m_catalogHi;
+    }
 
-    DeviceFileCatalog::Chunk newChunk = m_chunkSequence->findChunk(m_resource, time, 
-        m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk);
 	/*
     QString s;
     QTextStream str(&s);
@@ -216,7 +255,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     if (newChunk.startTimeMs != m_currentChunk.startTimeMs)
     {
         bool isStreamsFound = m_aviDelegate->isStreamsFound();
-        if (!switchToChunk(newChunk))
+        if (!switchToChunk(newChunk, newChunkCatalog))
             return -1;
         if (isStreamsFound)
             m_aviDelegate->doNotFindStreamInfo(); // optimization
@@ -254,6 +293,57 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
     return seekInternal(time, findIFrame, true);
 }
 
+void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog)
+{
+    m_skipFramesToTime = 0;
+    bool isCatalogEqualQuality = (m_quality == MEDIA_Quality_High && m_currentChunkCatalog == m_catalogHi) ||
+                                 (m_quality == MEDIA_Quality_Low && m_currentChunkCatalog == m_catalogLow);
+
+    qint64 prevEndTimeMs = m_currentChunk.startTimeMs + m_currentChunk.durationMs;
+    QnChunkSequence* currentSequence = m_currentChunkCatalog == m_catalogHi ? m_chunkSequenceHi : m_chunkSequenceLow;
+
+    //chunk = currentSequence->getNextChunk(m_resource);
+    // todo: getNextChunk is faster, but need more logic because of 2 chunk sequence now. So, speed may be improved
+    chunk = currentSequence->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+    chunkCatalog = m_currentChunkCatalog;
+    if (isCatalogEqualQuality) 
+    {
+        if (m_currentChunkCatalog == m_catalogLow)
+        {
+            qint64 lowDistance = chunk.distanceToTime(prevEndTimeMs);
+            if (lowDistance > SECOND_STREAM_FIND_EPS)
+            {
+                // Hole in a low quality chunks. Try to find chunk in a high quality
+                DeviceFileCatalog::Chunk& chunkHi =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+                qint64 hiDistance = chunkHi.distanceToTime(prevEndTimeMs);
+                if (hiDistance < lowDistance && lowDistance - hiDistance > SECOND_STREAM_FIND_EPS)
+                {
+                    // data found in high quality chunks. Switching
+                    chunk = chunkHi;
+                    chunkCatalog = m_catalogHi;
+                }
+            }
+        }
+    }
+    else 
+    {
+        Q_ASSERT(m_currentChunkCatalog == m_catalogHi);
+        // Quality is Low, but current catalog is High because not low data for current period.
+        // Checing for switching to a low quality
+        DeviceFileCatalog::Chunk& chunkLow =  m_chunkSequenceLow->findChunk(m_resource, chunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+        qint64 lowDistance = chunkLow.distanceToTime(chunk.startTimeMs);
+        qint64 hiDistance = chunk.distanceToTime(prevEndTimeMs);
+        if (hiDistance < lowDistance && lowDistance - hiDistance > SECOND_STREAM_FIND_EPS)
+            return; // no low quality data appear
+
+        // low quality data found. Switching
+        if (chunk.startTimeMs > chunkLow.startTimeMs)
+            m_skipFramesToTime = chunk.startTimeMs;
+        chunk = chunkLow;
+        chunkCatalog = m_catalogLow;
+    }
+}
+
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
 {
     if (m_eof)
@@ -272,8 +362,9 @@ begin_label:
     if (!data)
     {
         DeviceFileCatalog::Chunk chunk;
+        DeviceFileCatalogPtr chunkCatalog;
         do {
-            chunk = m_chunkSequence->getNextChunk(m_resource);
+            getNextChunk(chunk, chunkCatalog);
             if (chunk.startTimeMs == -1) 
             {
                 if (m_reverseMode) {
@@ -282,14 +373,28 @@ begin_label:
                 }
                 return data;
             }
-        } while (!switchToChunk(chunk));
+        } while (!switchToChunk(chunk, chunkCatalog));
+
+        if (m_skipFramesToTime != 0)
+        {
+            m_aviDelegate->seek(m_skipFramesToTime, true);
+        }
+
         data = m_aviDelegate->getNextData();
-        if (data)
+        if (data) 
             data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
     }
     if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) 
     {
         data->timestamp +=m_currentChunk.startTimeMs*1000;
+        m_lastPacketTime = data->timestamp;
+
+        if (m_skipFramesToTime) {
+            if (data->timestamp < m_skipFramesToTime)
+                data->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            else
+                m_skipFramesToTime = 0;
+        }
 
         if (!m_playbackMask.isEmpty()) 
         {
@@ -366,12 +471,13 @@ AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
     return m_aviDelegate->setAudioChannel(num);
 }
 
-bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newChunk)
+bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog)
 {
     if (newChunk.startTimeMs == -1)
         return false;
     m_currentChunk = newChunk;
-    QString url = m_catalog->fullFileName(m_currentChunk);
+    m_currentChunkCatalog = newCatalog;
+    QString url = m_currentChunkCatalog->fullFileName(m_currentChunk);
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
     bool rez = m_aviDelegate->open(m_fileRes);
@@ -392,4 +498,15 @@ void QnServerArchiveDelegate::setMotionRegion(const QRegion& region)
 void QnServerArchiveDelegate::setSendMotion(bool value)
 {
     m_sendMotion = value;
+}
+
+void QnServerArchiveDelegate::setQuality(MediaQuality quality)
+{
+    m_quality = quality;
+    /*
+    if (m_lastPacketTime != 0) {
+        seekInternal(m_lastPacketTime + 1, true, true);
+        m_skipFramesToTime = m_lastPacketTime + 1;
+    }
+    */
 }

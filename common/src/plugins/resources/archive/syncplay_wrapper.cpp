@@ -359,13 +359,13 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
         d->lastJumpTime = newTime;
     else
         d->lastJumpTime = getCurrentTime();
-		/*
+		
     QString s;
     QTextStream str(&s);
     str << "reinitTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString("hh:mm:ss.zzz");
     str.flush();
     cl_log.log(s, cl_logALWAYS);
-	*/
+	
 
     d->timer.restart();
 }

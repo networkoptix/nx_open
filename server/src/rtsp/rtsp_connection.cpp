@@ -416,6 +416,7 @@ int QnRtspConnectionProcessor::composePlay()
     }
     else if (d->archiveDP) 
     {
+        d->archiveDP->setQuality(d->quality);
         d->archiveDP->setReverseMode(d->rtspScale < 0);
         QnServerArchiveDelegate* serverArchive = dynamic_cast<QnServerArchiveDelegate*>(d->archiveDP->getArchiveDelegate());
         if (serverArchive) 
@@ -513,6 +514,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
                 d->dataProcessor->unlockDataQueue();
             }
+            d->archiveDP->setQuality(d->quality);
             return CODE_OK;
         }
     }

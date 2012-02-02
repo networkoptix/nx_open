@@ -15,7 +15,7 @@ class QnChunkSequence: public QObject
 public:
     QnChunkSequence(const QnNetworkResourcePtr res, QnResource::ConnectionRole role, qint64 startTime);
     QnChunkSequence(const QnNetworkResourceList& resList, QnResource::ConnectionRole role,  qint64 startTime);
-    DeviceFileCatalog::Chunk findChunk(QnResourcePtr res, qint64 time, DeviceFileCatalog::FindMethod findMethod);
+    DeviceFileCatalog::Chunk findChunk(QnResourcePtr res, qint64 timeMs, DeviceFileCatalog::FindMethod findMethod);
     DeviceFileCatalog::Chunk getNextChunk(QnResourcePtr res);
     //qint64 nextChunkStartTime(QnResourcePtr res);
     //DeviceFileCatalog::Chunk getPrevChunk(QnResourcePtr res);

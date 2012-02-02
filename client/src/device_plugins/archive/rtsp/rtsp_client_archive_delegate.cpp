@@ -456,8 +456,12 @@ void QnRtspClientArchiveDelegate::setQuality(MediaQuality quality)
     QByteArray value = quality == MEDIA_Quality_High ? "high" : "low";
     QByteArray paramName = "x-media-quality";
     m_rtspSession.setAdditionAttribute(paramName, value);
-    if (m_rtspSession.isOpened())
+
+    /*
+    if (m_rtspSession.isOpened()) {
         m_rtspSession.sendSetParameter(paramName, value);
+    }
+    */
 }
 
 void QnRtspClientArchiveDelegate::setSendMotion(bool value)
