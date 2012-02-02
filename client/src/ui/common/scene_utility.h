@@ -139,6 +139,13 @@ public:
 
     /**
      * \param view                      Graphics view. Must not be NULL.
+     * \param rect                      Rectangle to map to scene.
+     * \returns                         Bounding rectangle of the mapped polygon.
+     */
+    static QRectF mapRectToScene(const QGraphicsView *view, const QRectF &rect);
+
+    /**
+     * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map from scene.
      * \returns                         Bounding rectangle of the mapped polygon.
      */

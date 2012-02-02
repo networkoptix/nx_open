@@ -494,18 +494,10 @@ void QnWorkbenchDisplay::fitInView(bool animate) {
     if(animate) {
         m_viewportAnimator->moveTo(targetGeometry);
     } else {
-        m_viewportAnimator->stop();
         m_boundingInstrument->recursiveDisable();
-        m_viewportAnimator->accessor()->set(m_viewportAnimator->targetObject(), targetGeometry);
+        m_viewportAnimator->moveTo(targetGeometry, false);
         m_boundingInstrument->recursiveEnable(); /* So that caches are updated. */
     }
-}
-
-void QnWorkbenchDisplay::ensureVisible(QnWorkbenchItem *item) {
-    QRectF targetGeometry = m_viewportAnimator->isRunning() ? m_viewportAnimator->targetRect() : viewportGeometry();
-    targetGeometry = targetGeometry.united(itemGeometry(item));
-
-    m_viewportAnimator->moveTo(targetGeometry);
 }
 
 void QnWorkbenchDisplay::bringToFront(const QList<QGraphicsItem *> &items) {
