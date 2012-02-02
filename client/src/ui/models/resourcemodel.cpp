@@ -902,4 +902,4 @@ bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModel
     return false;
 }
 
-// #include "moc_resourcemodel.cpp"
+#include "moc_resourcemodel.cpp"
