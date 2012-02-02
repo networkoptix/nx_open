@@ -273,7 +273,7 @@ begin_label:
     {
         m_oldQuality = m_quality;
         m_delegate->setQuality(m_quality);
-        if (m_requiredJumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
+        if (!m_delegate->isRealTimeSource() && m_requiredJumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime();
             m_jumpMtx.lock();
