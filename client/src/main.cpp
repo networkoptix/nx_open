@@ -44,6 +44,7 @@
 
 #include "tests/auto_tester.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "api/SessionManager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -296,6 +297,18 @@ int main(int argc, char *argv[])
     cl_log.log(QLatin1String("Using ") + settings.mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
     //qApp->exit();
+
+    // Create and start SessionManager
+    SessionManager* sm = SessionManager::instance();
+
+    QThread *thread = new QThread();
+    sm->moveToThread(thread);
+
+    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
+    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+    thread->start();
+    //
 
     QnResource::startCommandProc();
 

@@ -12,7 +12,7 @@ QAtomicInt SessionManager::m_handle(1);
 
 void SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
 {
-    QObject * target =reply->property("target").value<QObject*>();
+    QObject *target = reply->property("target").value<QObject*>();
     QByteArray slot = reply->property("slot").toByteArray();
     int handle = reply->property("handle").toInt();
 
@@ -20,9 +20,6 @@ void SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
 
     reply->deleteLater();
 }
-
-
-// Q_GLOBAL_STATIC_WITH_ARGS(SessionManager, globalSessionManager, (QUrl()))
 
 SessionManager::SessionManager()
     : m_accessManager(this),
@@ -48,7 +45,7 @@ SessionManager *SessionManager::instance()
         return m_instance;
 
     m_instance = new SessionManager();
-    return m_instance; // globalSessionManager();
+    return m_instance;
 }
 
 int SessionManager::testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot)

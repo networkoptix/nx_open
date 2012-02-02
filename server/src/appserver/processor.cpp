@@ -77,5 +77,5 @@ void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status ol
         return;
     }
 
-    m_appServer->saveAsync(resource->toSharedPointer(), this, SLOT(requestFinished(int, int, const QByteArray&, const QnResourceList&)));
+    m_appServer->saveAsync(resource->toSharedPointer(), this, "requestFinished");
 }
