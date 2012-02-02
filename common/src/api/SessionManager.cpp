@@ -24,8 +24,39 @@ void SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
     reply->deleteLater();
 }
 
+void SyncRequestProcessor::finished(int status, const QByteArray& reply, int handle)
+{
+    Q_UNUSED(handle)
+
+    m_status = status;
+    m_reply = reply;
+
+    m_finished = true;
+
+    QMutexLocker locker(&m_mutex);
+    m_condition.wakeOne();
+}
+
+int SyncRequestProcessor::wait(QByteArray& reply, QByteArray& errorString)
+{
+    QMutexLocker locker(&m_mutex);
+    while (!m_finished) {
+        m_condition.wait(&m_mutex);
+    }
+
+    reply = m_reply;
+    return m_status;
+}
+
+void SyncRequestProcessor::at_destroy()
+{
+    QMutexLocker locker(&m_mutex);
+    m_finished = true;
+    m_condition.wakeOne();
+}
+
 SessionManager::SessionManager()
-    : m_accessManager(new QNetworkAccessManager(this)),
+    : m_accessManager(0),
     m_replyProcessor(this)
 
 {
@@ -33,6 +64,8 @@ SessionManager::SessionManager()
 
     connect(this, SIGNAL(asyncGetRequest(QUrl, QString,QnRequestParamList,QObject*,const char*, int)), this, SLOT(doSendAsyncGetRequest(QUrl, QString,QnRequestParamList,QObject*,const char*, int)));
     connect(this, SIGNAL(asyncPostRequest(QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)), this, SLOT(doSendAsyncPostRequest(QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)));
+    connect(this, SIGNAL(stopSignal()), this, SLOT(doStop()));
+    connect(this, SIGNAL(startSignal()), this, SLOT(doStart()));
 }
 
 SessionManager::~SessionManager()
@@ -43,6 +76,16 @@ SessionManager::~SessionManager()
 
 void SessionManager::start()
 {
+    emit startSignal();
+}
+
+void SessionManager::stop()
+{
+    emit stopSignal();
+}
+
+void SessionManager::doStart()
+{
     if (m_accessManager)
         return;
 
@@ -51,7 +94,7 @@ void SessionManager::start()
     connect(m_accessManager, SIGNAL(finished(QNetworkReply*)), &m_replyProcessor, SLOT(at_replyReceived(QNetworkReply*)));
 }
 
-void SessionManager::stop()
+void SessionManager::doStop()
 {
     if (m_accessManager)
     {
@@ -92,34 +135,11 @@ int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, 
     return sendPostRequest(url, objectName, QnRequestParamList(), data, reply, errorString);
 }
 
-void SyncRequestProcessor::finished(int status, const QByteArray& reply, int handle)
-{
-    Q_UNUSED(handle)
-
-    m_status = status;
-    m_reply = reply;
-
-    m_finished = true;
-
-    QMutexLocker locker(&m_mutex);
-    m_condition.wakeOne();
-}
-
-int SyncRequestProcessor::wait(QByteArray& reply, QByteArray& errorString)
-{
-    QMutexLocker locker(&m_mutex);
-    while (!m_finished) {
-        m_condition.wait(&m_mutex);
-    }
-
-    reply = m_reply;
-    return m_status;
-}
-
 int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
 {
     SyncRequestProcessor syncProcessor(this);
     syncProcessor.moveToThread(this->thread());
+    connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(finished(int,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
@@ -133,6 +153,7 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, c
 {
     SyncRequestProcessor syncProcessor(this);
     syncProcessor.moveToThread(this->thread());
+    connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(finished(int,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }

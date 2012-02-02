@@ -24,8 +24,9 @@ public:
     {
     }
 
-public slots:
+private slots:
     void finished(int status, const QByteArray& data, int handle);
+    void at_destroy();
 
 public:
     int wait(QByteArray& reply, QByteArray& errorString);
@@ -74,6 +75,9 @@ private:
     static SessionManager* m_instance;
 
 private slots:
+    void doStop();
+    void doStart();
+
     void doSendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
     void doSendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
 
@@ -101,6 +105,9 @@ public:
     int testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot);
 
 signals:
+    void stopSignal();
+    void startSignal();
+
     void asyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
     void asyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
 
