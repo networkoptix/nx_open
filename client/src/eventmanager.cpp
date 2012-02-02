@@ -32,6 +32,11 @@ void QnEventManager::run()
     m_source->startRequest();
 }
 
+void QnEventManager::stop()
+{
+    m_source->stop();
+}
+
 void QnEventManager::eventReceived(QnEvent event)
 {
     qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;

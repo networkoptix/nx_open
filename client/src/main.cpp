@@ -308,6 +308,7 @@ int main(int argc, char *argv[])
     QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
 
     thread->start();
+    sm->start();
     //
 
     QnResource::startCommandProc();

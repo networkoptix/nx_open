@@ -81,6 +81,9 @@ public:
     SessionManager();
     virtual ~SessionManager();
 
+    void stop();
+    void start();
+
     // Synchronous requests return status
     int sendGetRequest(const QUrl& url, const QString &objectName, QByteArray &reply, QByteArray& errorString);
     int sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray &reply, QByteArray& errorString);
@@ -102,7 +105,7 @@ signals:
     void asyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
 
 private:
-    QNetworkAccessManager m_accessManager;
+    QNetworkAccessManager* m_accessManager;
     SessionManagerReplyProcessor m_replyProcessor;
     static QAtomicInt m_handle;
 

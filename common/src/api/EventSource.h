@@ -50,11 +50,15 @@ Q_OBJECT
 public:
     QnEventSource(QUrl url, int retryTimeout = 3000);
 
+    void stop();
+
 signals:
+    void stopSignal();
     void eventReceived(QnEvent event);
     void connectionClosed(QString errorString);
 
 public slots:
+    void doStop();
     void startRequest();
 
 private slots:

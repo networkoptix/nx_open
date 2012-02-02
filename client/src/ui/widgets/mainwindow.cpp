@@ -43,6 +43,7 @@
 
 #include "file_processor.h"
 #include "settings.h"
+#include "eventmanager.h"
 
 MainWindow::MainWindow(int argc, char *argv[], QWidget *parent, Qt::WindowFlags flags)
     : FancyMainWindow(parent, flags | Qt::WindowShadeButtonHint),
@@ -348,6 +349,9 @@ void MainWindow::appServerAuthenticationRequired()
     if (dialog->exec()) {
         const Settings::ConnectionData connection = Settings::lastUsedConnection();
         if (connection.url.isValid()) {
+            QnEventManager::instance()->stop();
+            SessionManager::instance()->stop();
+
             QnAppServerConnectionFactory::setDefaultUrl(connection.url);
 
             // repopulate the resource pool
@@ -357,6 +361,9 @@ void MainWindow::appServerAuthenticationRequired()
             // don't remove local resources
             const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
             qnResPool->removeResources(remoteResources);
+
+            SessionManager::instance()->start();
+            QnEventManager::instance()->run();
 
             QnResourceDiscoveryManager::instance().start();
             QnResource::startCommandProc();
