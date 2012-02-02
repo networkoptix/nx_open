@@ -3,6 +3,8 @@
 
 #include <QGraphicsView>
 
+//#define QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
+
 class QnGraphicsView;
 
 /**
@@ -74,6 +76,7 @@ public:
     void uninstallLayerPainter(QnLayerPainter *painter);
 
 protected:
+    virtual void paintEvent(QPaintEvent *event) override;
     virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
     virtual void drawForeground(QPainter *painter, const QRectF &rect) override;
 
