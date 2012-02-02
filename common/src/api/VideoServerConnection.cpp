@@ -85,9 +85,9 @@ namespace {
     }
 } // anonymous namespace
 
-void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status, const QnTimePeriodList &result)
+void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status, const QnTimePeriodList &result, int handle)
 {
-    emit finished(status, result);
+    emit finished(status, result, handle);
     deleteLater();
 }
 
@@ -139,10 +139,10 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceLis
     detail::QnVideoServerConnectionReplyProcessor *processor = new detail::QnVideoServerConnectionReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList &, int)), target, slot);
 
-    return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&)));
+    return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
-void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply)
+void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, int handle)
 {
     QnTimePeriodList result;
     if(status == 0)
@@ -159,7 +159,7 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
         }
     }
 
-    emit finished(status, result);
+    emit finished(status, result, handle);
 
     deleteLater();
 }
@@ -190,6 +190,6 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList& 
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList&, int)), target, slot);
 
-    return SessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &)));
+    return SessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &, int)));
 }
 

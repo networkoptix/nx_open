@@ -6,7 +6,7 @@
 #include "utils/common/sleep.h"
 #include "SessionManager.h"
 
-void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result)
+void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, int handle)
 {
     if (m_objectName == "server")
     {
@@ -29,7 +29,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result)
 
         QnResourceList resources;
         qCopy(servers.begin(), servers.end(), std::back_inserter(resources));
-        emit finished(status, errorString, resources);
+        emit finished(status, errorString, resources, handle);
     } else if (m_objectName == "camera")
     {
         QnVirtualCameraResourceList cameras;
@@ -49,7 +49,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result)
 
         QnResourceList resources;
         qCopy(cameras.begin(), cameras.end(), std::back_inserter(resources));
-        emit finished(status, errorString, resources);
+        emit finished(status, errorString, resources, handle);
     } else if (m_objectName == "user")
     {
         QnUserResourceList users;
@@ -69,7 +69,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result)
 
         QnResourceList resources;
         qCopy(users.begin(), users.end(), std::back_inserter(resources));
-        emit finished(status, errorString, resources);
+        emit finished(status, errorString, resources, handle);
     }
 }
 
@@ -220,7 +220,7 @@ int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* 
 int QnAppServerConnection::saveAsync(const QnVideoServerPtr& serverPtr, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "server");
-    QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
@@ -231,7 +231,7 @@ int QnAppServerConnection::saveAsync(const QnVideoServerPtr& serverPtr, QObject*
 int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "camera");
-    QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serialize(cameraPtr, data);

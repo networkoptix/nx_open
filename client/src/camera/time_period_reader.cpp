@@ -68,10 +68,8 @@ int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& regi
         }
     }
 
-    sendRequest(periodToLoad);
+    int handle = sendRequest(periodToLoad);
 
-// XXX there is no handle anymore. fix this code.
-    int handle = 0; 
     m_loading << LoadingInfo(periodToLoad, handle);
     return handle;
 }

@@ -137,7 +137,7 @@ int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, 
 
 int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
 {
-    SyncRequestProcessor syncProcessor(this);
+    SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
     connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(finished(int,QByteArray,int)));
@@ -151,7 +151,7 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, Q
 
 int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray& reply, QByteArray& errorString)
 {
-    SyncRequestProcessor syncProcessor(this);
+    SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
     connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(finished(int,QByteArray,int)));

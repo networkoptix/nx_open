@@ -48,7 +48,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
     }
 }
 
-void QnAppserverResourceProcessor::requestFinished(int handle, int status, const QByteArray& errorString, const QnResourceList& resources)
+void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray& errorString, const QnResourceList& resources, int handle)
 {
     if (status == 0 && !resources.isEmpty())
     {
@@ -77,5 +77,5 @@ void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status ol
         return;
     }
 
-    m_appServer->saveAsync(resource->toSharedPointer(), this, "requestFinished");
+    m_appServer->saveAsync(resource->toSharedPointer(), this, SLOT(requestFinished(int,const QByteArray&,const QnResourceList&, int)));
 }
