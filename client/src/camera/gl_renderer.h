@@ -1,69 +1,56 @@
 #ifndef QN_GL_RENDERER_H
 #define QN_GL_RENDERER_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
-#include <QtGui/QColor>
-
-#include <QtOpenGL/qgl.h>
-
-#include "abstractrenderer.h"
+#include <QMutex>
+#include <QWaitCondition>
+#include <QtOpenGL>
+#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "render_status.h"
 
-class CLVideoWindowItem;
+class CLVideoDecoderOutput;
 
-class QnGLRenderer : public QnAbstractRenderer, public QnRenderStatus
+class QnGLRenderer : public QnRenderStatus
 {
 public:
-    enum CLGLDrawHardwareStatus
-    {
-        CL_GL_NOT_TESTED,
-        CL_GL_SUPPORTED,
-        CL_GL_NOT_SUPPORTED
+    enum HardwareStatus {
+        NOT_TESTED,
+        SUPPORTED,
+        NOT_SUPPORTED
     };
 
-    static void clearGarbage();
-
-    QnGLRenderer(CLVideoWindowItem *vw);
     QnGLRenderer();
     ~QnGLRenderer();
+    void beforeDestroy();
 
+    static void clearGarbage();
     static int getMaxTextureSize();
+    static bool isPixelFormatSupported(PixelFormat pixfmt);
 
-    virtual void draw(CLVideoDecoderOutput* image) override;
-    virtual void waitForFrameDisplayed(int channel) override;
-
+    void draw(CLVideoDecoderOutput *image);
+    void waitForFrameDisplayed(int channel);
     RenderStatus paintEvent(const QRectF &r);
-
-    virtual void beforeDestroy();
-
-    QSize sizeOnScreen(unsigned int channel) const;
-    bool constantDownscaleFactor() const;
 
     qreal opacity() const;
     void setOpacity(qreal opacity);
 
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 
-    static bool isPixelFormatSupported(PixelFormat pixfmt);
-
-    virtual qint64 lastDisplayedTime() const;
+    qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata() const; 
 
-    bool isNoVideo() const;
-
-    void onNoVideo();
 private:
-    void construct();
-    void init(bool msgbox);
-    static int gl_status;
+    void ensureInitialized();
+    int checkOpenGLError() const;
+    void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
+    void updateTexture();
+    void setForceSoftYUV(bool value);
+    bool isYuvFormat() const;
+    int glRGBFormat() const;
 
 private:
 #ifndef Q_OS_WIN
-    #define APIENTRY
+#   define APIENTRY
 #endif
-
-    // ARB_fragment_program
     typedef void (APIENTRY *_glProgramStringARB) (GLenum, GLenum, GLsizei, const GLvoid *);
     typedef void (APIENTRY *_glBindProgramARB) (GLenum, GLuint);
     typedef void (APIENTRY *_glDeleteProgramsARB) (GLsizei, const GLuint *);
@@ -77,31 +64,7 @@ private:
     _glProgramLocalParameter4fARB glProgramLocalParameter4fARB;
     _glActiveTexture glActiveTexture;
 
-    int checkOpenGLError() const;
-
-    unsigned int getMinPow2(unsigned int value) const
-    {
-        unsigned int result = 1;
-        while (value > result)
-            result<<=1;
-
-        return result;
-    }
-
-    void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
-    void updateTexture();
-    void setForceSoftYUV(bool value);
-    bool isYuvFormat() const;
-    int glRGBFormat() const;
-
 private:
-    mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
-    QWaitCondition m_waitCon;
-
-    GLint clampConstant;
-    bool isNonPower2;
-    bool isSoftYuv2Rgb;
-
     enum Program
     {
         YV12toRGB = 0,
@@ -112,22 +75,29 @@ private:
     static QMutex m_programMutex;
     static bool m_programInited;
     static GLuint m_program[ProgramCount];
+    static int gl_status;
+    static QVector<uchar> m_staticYFiller;
+    static QVector<uchar> m_staticUVFiller;
+    static QList<GLuint *> m_garbage;
+
+private:
+    mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
+    QWaitCondition m_waitCon;
+
+    GLint m_clampConstant;
+    bool m_isNonPower2;
+    bool m_isSoftYuv2Rgb;
+
     GLuint m_texture[3];
     bool m_forceSoftYUV;
 
-    QVector<uchar> yuv2rgbBuffer;
+    uchar* m_yuv2rgbBuffer;
+    size_t m_yuv2rgbBufferLen;
 
     bool m_textureUploaded;
 
-    //int m_stride, // in memorry
-    //    m_width, // visible width
-    //    m_height,
-
     int m_stride_old;
     int m_height_old;
-
-    //unsigned char *m_arrayPixels[3];
-
     PixelFormat m_color_old;
 
     float m_videoCoeffL[4];
@@ -143,29 +113,17 @@ private:
     qreal m_painterOpacity;
 
     bool m_gotnewimage;
-
     bool m_needwait;
 
-    CLVideoWindowItem *const m_videowindow;
-
-    //CLVideoDecoderOutput m_image;
-    //QQueue<CLVideoDecoderOutput*> m_imageList;
-
-    CLVideoDecoderOutput* m_curImg;
+    CLVideoDecoderOutput *m_curImg;
+    
     int m_format;
-    //bool m_abort_drawing;
-
-    //bool m_do_not_need_to_wait_any_more;
 
     bool m_inited;
     int m_videoWidth;
     int m_videoHeight;
     qint64 m_lastDisplayedTime;
     QnMetaDataV1Ptr m_lastDisplayedMetadata;
-
-    static QVector<uchar> m_staticYFiller;
-    static QVector<uchar> m_staticUVFiller;
-    bool m_noVideo;
 };
 
 #endif //QN_GL_RENDERER_H

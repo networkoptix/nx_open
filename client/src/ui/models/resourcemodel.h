@@ -4,6 +4,7 @@
 //#define USE_OLD_RESOURCEMODEL
 
 #include <QtCore/QAbstractItemModel>
+#include "resourcemodel.h"
 
 #include "core/resource/resource.h"
 

@@ -8,7 +8,7 @@
 #define AV_REVERSE_BLOCK_START 64
 #define AV_REVERSE_REORDERED   32
 
-struct CLVideoDecoderOutput: public AVFrame
+class CLVideoDecoderOutput: public AVFrame
 {
 public:
     CLVideoDecoderOutput();

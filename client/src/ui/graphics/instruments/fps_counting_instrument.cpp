@@ -51,3 +51,4 @@ void FpsCountingInstrument::updateFps(qreal fps) {
     m_fps = fps;
     emit fpsChanged(m_fps);
 }
+

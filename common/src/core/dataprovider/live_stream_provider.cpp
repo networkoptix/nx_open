@@ -1,7 +1,7 @@
 #include "live_stream_provider.h"
 #include "media_streamdataprovider.h"
 #include "cpull_media_stream_provider.h"
-#include "..\resource\camera_resource.h"
+#include "core/resource/camera_resource.h"
 
 
 QnLiveStreamProvider::QnLiveStreamProvider():

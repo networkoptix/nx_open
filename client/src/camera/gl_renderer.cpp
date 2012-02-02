@@ -10,47 +10,61 @@
 #include "camera.h"
 #include "utils/common/util.h"
 #include "utils/media/sse_helper.h"
+#include "utils/common/performance.h"
 
 #ifndef GL_FRAGMENT_PROGRAM_ARB
-#define GL_FRAGMENT_PROGRAM_ARB           0x8804
-#define GL_PROGRAM_FORMAT_ASCII_ARB       0x8875
+#   define GL_FRAGMENT_PROGRAM_ARB           0x8804
+#   define GL_PROGRAM_FORMAT_ASCII_ARB       0x8875
 #endif
 
 #ifndef GL_CLAMP_TO_EDGE
-#define GL_CLAMP_TO_EDGE    0x812F
+#   define GL_CLAMP_TO_EDGE    0x812F
 #endif
 
 #ifndef GL_CLAMP_TO_EDGE_SGIS
-#define GL_CLAMP_TO_EDGE_SGIS 0x812F
+#   define GL_CLAMP_TO_EDGE_SGIS 0x812F
 #endif
 
 #ifndef GL_CLAMP_TO_EDGE_EXT
-#define GL_CLAMP_TO_EDGE_EXT 0x812F
+#   define GL_CLAMP_TO_EDGE_EXT 0x812F
 #endif
 
-// support old OpenGL installations (1.2)
-// assume that if TEXTURE0 isn't defined, none are
-
+/* Support old OpenGL installations (1.2).
+ * assume that if TEXTURE0 isn't defined, none are */
 #ifndef GL_TEXTURE0
-# define GL_TEXTURE0    0x84C0
-# define GL_TEXTURE1    0x84C1
-# define GL_TEXTURE2    0x84C2
+#   define GL_TEXTURE0    0x84C0
+#   define GL_TEXTURE1    0x84C1
+#   define GL_TEXTURE2    0x84C2
 #endif
 
-static const unsigned int MAX_SHADER_SIZE = 1024*3;
-static const unsigned int ROUND_COEFF = 8;
+namespace {
+    const unsigned int MAX_SHADER_SIZE = 1024 * 3;
+    const unsigned int ROUND_COEFF = 8;
+
+    unsigned int minPow2(unsigned int value)
+    {
+        unsigned int result = 1;
+        while (value > result)
+            result<<=1;
+
+        return result;
+    }
+
+} // anonymous namespace
 
 QVector<uchar> QnGLRenderer::m_staticYFiller;
 QVector<uchar> QnGLRenderer::m_staticUVFiller;
-
 QMutex QnGLRenderer::m_programMutex;
 bool QnGLRenderer::m_programInited = false;
 GLuint QnGLRenderer::m_program[2];
-
+int QnGLRenderer::gl_status = QnGLRenderer::NOT_TESTED;
+QList<GLuint *> QnGLRenderer::m_garbage;
 
 #define OGL_CHECK_ERROR(str) //if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
 
-// arbfp1 fragment program for converting yuv (YV12) to rgb
+/** 
+ * ARBfp1 fragment program for converting yuv (YV12) to rgb 
+ */
 static const char yv12ToRgb[] =
 "!!ARBfp1.0"
 "PARAM c[5] = { program.local[0..1],"
@@ -124,26 +138,11 @@ static const char yuy2ToRgb[] =
 "MOV result.color.w, c[1].y;"
 "END";
 
-int QnGLRenderer::gl_status = QnGLRenderer::CL_GL_NOT_TESTED;
-
-static QList<GLuint *> mGarbage;
-
-QnGLRenderer::QnGLRenderer(CLVideoWindowItem *vw):
-    m_videowindow(vw)
+QnGLRenderer::QnGLRenderer()
 {
-    construct();
-}
-
-QnGLRenderer::QnGLRenderer():
-    m_videowindow(NULL)
-{
-    construct();
-}
-
-void QnGLRenderer::construct() {
-    clampConstant = GL_CLAMP;
-    isNonPower2 = false;
-    isSoftYuv2Rgb = false;
+    m_clampConstant = GL_CLAMP;
+    m_isNonPower2 = false;
+    m_isSoftYuv2Rgb = false;
     m_forceSoftYUV = false;
     m_textureUploaded = false;
     m_stride_old = 0;
@@ -160,12 +159,41 @@ void QnGLRenderer::construct() {
     m_curImg = 0;
     m_videoWidth = 0;
     m_videoHeight = 0;
-    m_noVideo = false;
+
+    m_yuv2rgbBuffer = 0;
+    m_yuv2rgbBufferLen = 0;
 
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
     (void)QnGLRenderer::getMaxTextureSize();
 }
+
+QnGLRenderer::~QnGLRenderer()
+{
+    qFreeAligned(m_yuv2rgbBuffer);
+
+    if (m_textureUploaded)
+    {
+        //glDeleteTextures(3, m_texture);
+
+        // I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
+        // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
+
+        GLuint *heap = new GLuint[3];
+        memcpy(heap, m_texture, sizeof(m_texture));
+        m_garbage.append(heap); // to delete later
+    }
+}
+
+void QnGLRenderer::beforeDestroy()
+{
+    QMutexLocker lock(&m_displaySync);
+    m_needwait = false;
+    if (m_curImg)
+        m_curImg->setDisplaying(false);
+    m_waitCon.wakeAll();
+}
+
 
 int QnGLRenderer::checkOpenGLError() const
 {
@@ -179,36 +207,23 @@ int QnGLRenderer::checkOpenGLError() const
     return err;
 }
 
-QnGLRenderer::~QnGLRenderer()
-{
-    if (m_textureUploaded)
-    {
-        //glDeleteTextures(3, m_texture);
-
-        // I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
-        // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
-
-        GLuint *heap = new GLuint[3];
-        memcpy(heap, m_texture, sizeof(m_texture));
-        mGarbage.append(heap); // to delete later
-    }
-}
-
 void QnGLRenderer::clearGarbage()
 {
-    foreach (GLuint *heap, mGarbage)
+    foreach (GLuint *heap, m_garbage)
     {
         glDeleteTextures(3, heap);
         delete [] heap;
     }
 
-    mGarbage.clear();
+    m_garbage.clear();
 }
 
-void QnGLRenderer::init(bool msgbox)
+void QnGLRenderer::ensureInitialized()
 {
     if (m_inited)
         return;
+
+    bool msgbox = gl_status == NOT_TESTED;
 
 //    makeCurrent();
 
@@ -244,18 +259,18 @@ void QnGLRenderer::init(bool msgbox)
     QByteArray ver(version);
 
     //ver = "1.0.7 Microsoft";
-    clampConstant = GL_CLAMP;
+    m_clampConstant = GL_CLAMP;
     if (ext.contains("GL_EXT_texture_edge_clamp"))
     {
-        clampConstant = GL_CLAMP_TO_EDGE_EXT;
+        m_clampConstant = GL_CLAMP_TO_EDGE_EXT;
     }
     else if (ext.contains("GL_SGIS_texture_edge_clamp"))
     {
-        clampConstant = GL_CLAMP_TO_EDGE_SGIS;
+        m_clampConstant = GL_CLAMP_TO_EDGE_SGIS;
     }
     else if (ver >= QByteArray("1.2.0"))
     {
-        clampConstant = GL_CLAMP_TO_EDGE;
+        m_clampConstant = GL_CLAMP_TO_EDGE;
     }
 
     if (ver <= QByteArray("1.1.0"))
@@ -270,7 +285,7 @@ void QnGLRenderer::init(bool msgbox)
     bool error = false;
     if (extensions)
     {
-        isNonPower2 = ext.contains("GL_ARB_texture_non_power_of_two");
+        m_isNonPower2 = ext.contains("GL_ARB_texture_non_power_of_two");
 
         if (!ext.contains("GL_ARB_fragment_program"))
         {
@@ -316,15 +331,15 @@ void QnGLRenderer::init(bool msgbox)
         }
     }
 
-    //isSoftYuv2Rgb = true;
+    //m_isSoftYuv2Rgb = true;
 
     if (error)
     {
         CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("OpenGL shader support init failed, use soft yuv->rgb converter!!!"), cl_logWARNING);
-        isSoftYuv2Rgb = true;
+        m_isSoftYuv2Rgb = true;
 
         // in this first revision we do not support software color transform
-        gl_status = CL_GL_NOT_SUPPORTED;
+        gl_status = NOT_SUPPORTED;
 
         if (msgbox)
         {
@@ -337,25 +352,17 @@ void QnGLRenderer::init(bool msgbox)
 
     if (m_forceSoftYUV)
     {
-        isSoftYuv2Rgb = true;
+        m_isSoftYuv2Rgb = true;
     }
-#if 0
-    // force CPU yuv->rgb for large textures (due to ATI bug). Only for still images.
-    else if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) &&
-                (m_width >= MAX_SHADER_SIZE || m_height >= MAX_SHADER_SIZE))
-    {
-        isSoftYuv2Rgb = true;
-    }
-#endif
 
-    //if (mGarbage.size() < 80)
+    //if (m_garbage.size() < 80)
     {
         glGenTextures(3, m_texture);
     }
     /*
     else
     {
-        GLuint *heap = mGarbage.takeFirst();
+        GLuint *heap = m_garbage.takeFirst();
         memcpy(m_texture, heap, sizeof(m_texture));
         delete [] heap;
     }
@@ -366,7 +373,7 @@ void QnGLRenderer::init(bool msgbox)
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
 
-    gl_status = CL_GL_SUPPORTED;
+    gl_status = SUPPORTED;
 
 }
 
@@ -389,15 +396,6 @@ int QnGLRenderer::getMaxTextureSize()
     return maxTextureSize;
 }
 
-void QnGLRenderer::beforeDestroy()
-{
-    QMutexLocker lock(&m_displaySync);
-    m_needwait = false;
-    if (m_curImg)
-        m_curImg->setDisplaying(false);
-    m_waitCon.wakeAll();
-}
-
 void QnGLRenderer::draw(CLVideoDecoderOutput* img)
 {
     QMutexLocker locker(&m_displaySync);
@@ -408,8 +406,6 @@ void QnGLRenderer::draw(CLVideoDecoderOutput* img)
         m_curImg->setDisplaying(false);
     m_curImg = img;
     m_format = m_curImg->format;
-    if (m_curImg)
-        m_noVideo = false;
 
 
     m_curImg->setDisplaying(true);
@@ -422,13 +418,6 @@ void QnGLRenderer::draw(CLVideoDecoderOutput* img)
     }
 
     m_gotnewimage = true;
-
-    if(m_videowindow != NULL) {
-        if (!m_videowindow->isVisible())
-            return;
-
-        m_videowindow->needUpdate(true); // sending paint event
-    }
 }
 
 void QnGLRenderer::waitForFrameDisplayed(int channel)
@@ -527,7 +516,7 @@ void QnGLRenderer::updateTexture()
 
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
-    if (!isSoftYuv2Rgb && isYuvFormat())
+    if (!m_isSoftYuv2Rgb && isYuvFormat())
     {
         // using pixel shader to yuv-> rgb conversion
         for (int i = 0; i < 3; ++i)
@@ -539,8 +528,8 @@ void QnGLRenderer::updateTexture()
             {
                 // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
                 // else nearest power of two
-                unsigned int wPow = isNonPower2 ? roundUp(w[i],ROUND_COEFF) : getMinPow2(w[i]);
-                unsigned int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
+                unsigned int wPow = m_isNonPower2 ? roundUp(w[i],ROUND_COEFF) : minPow2(w[i]);
+                unsigned int hPow = m_isNonPower2 ? h[i] : minPow2(h[i]);
                 // support GL_ARB_texture_non_power_of_two ?
 
                 m_videoCoeffL[i] = 0;
@@ -553,8 +542,8 @@ void QnGLRenderer::updateTexture()
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_clampConstant);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_clampConstant);
 
                 // by default uninitialized YUV texture has green color. Fill right and bottom black bars
                 // due to GL_LINEAR filtering, openGL uses some "unvisible" pixels, so it is unvisible pixels MUST be black
@@ -600,11 +589,21 @@ void QnGLRenderer::updateTexture()
             }
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
+
+            qint64 frequency = QnPerformance::currentCpuFrequency();
+            qint64 startCycles = QnPerformance::currentThreadCycles();
+
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             roundUp(r_w[i],ROUND_COEFF),
                             h[i],
                             GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+
+            qint64 deltaCycles = QnPerformance::currentThreadCycles() - startCycles;
+
+            qDebug() << "UpdateTexture" << deltaCycles / (frequency / 1000.0) << "ms" << deltaCycles;
+
+
             OGL_CHECK_ERROR("glTexSubImage2D");
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             OGL_CHECK_ERROR("glPixelStorei");
@@ -616,8 +615,8 @@ void QnGLRenderer::updateTexture()
     {
         glBindTexture(GL_TEXTURE_2D, m_texture[0]);
 
-        //const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
-        //const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
+        //const int wPow = m_isNonPower2 ? roundUp(w[0]) : minPow2(w[0]);
+        //const int hPow = m_isNonPower2 ? h[0] : minPow2(h[0]);
 
         if (!m_videoTextureReady)
         {
@@ -630,8 +629,8 @@ void QnGLRenderer::updateTexture()
                 else
                     bytesPerPixel = 4;
             }
-            const int wPow = isNonPower2 ? roundUp(w[0]/bytesPerPixel,ROUND_COEFF) : getMinPow2(w[0]/bytesPerPixel);
-            const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
+            const int wPow = m_isNonPower2 ? roundUp(w[0]/bytesPerPixel,ROUND_COEFF) : minPow2(w[0]/bytesPerPixel);
+            const int hPow = m_isNonPower2 ? h[0] : minPow2(h[0]);
             // support GL_ARB_texture_non_power_of_two ?
             m_videoCoeffL[0] = 0;
             m_videoCoeffW[0] = roundUp(r_w[0],ROUND_COEFF) / float(wPow);
@@ -643,9 +642,9 @@ void QnGLRenderer::updateTexture()
             OGL_CHECK_ERROR("glTexParameteri");
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             OGL_CHECK_ERROR("glTexParameteri");
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_clampConstant);
             OGL_CHECK_ERROR("glTexParameteri");
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_clampConstant);
             OGL_CHECK_ERROR("glTexParameteri");
         }
 
@@ -653,9 +652,13 @@ void QnGLRenderer::updateTexture()
         if (isYuvFormat())
         {
             int size = 4 * m_curImg->linesize[0] * h[0];
-            if (yuv2rgbBuffer.size() < size)
-                yuv2rgbBuffer.resize(size);
-            pixels = yuv2rgbBuffer.data();
+            if (m_yuv2rgbBufferLen < size)
+            {
+                m_yuv2rgbBufferLen = size;
+                qFreeAligned(m_yuv2rgbBuffer);
+                m_yuv2rgbBuffer = (uchar*)qMallocAligned(size, CL_MEDIA_ALIGNMENT);
+            }
+            pixels = m_yuv2rgbBuffer;
         }
 
         int lineInPixelsSize = m_curImg->linesize[0];
@@ -725,11 +728,7 @@ void QnGLRenderer::updateTexture()
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         OGL_CHECK_ERROR("glPixelStorei");
 
-        if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkFlag(QnResource::SINGLE_SHOT))
-        {
-            // free memory immediately for still images
-            yuv2rgbBuffer.clear();
-        }
+        // TODO: free memory immediately for still images
     }
 
     //glDisable(GL_TEXTURE_2D);
@@ -737,7 +736,7 @@ void QnGLRenderer::updateTexture()
     m_gotnewimage = false;
 
     /*
-    if (!isSoftYuv2Rgb)
+    if (!m_isSoftYuv2Rgb)
     {
         glActiveTexture(GL_TEXTURE0);glDisable (GL_TEXTURE_2D);
         glActiveTexture(GL_TEXTURE1);glDisable (GL_TEXTURE_2D);
@@ -763,7 +762,7 @@ void QnGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
 
-    if (!isSoftYuv2Rgb && isYuvFormat())
+    if (!m_isSoftYuv2Rgb && isYuvFormat())
     {
         const Program prog = YV12toRGB;
 
@@ -821,7 +820,7 @@ void QnGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
     OGL_CHECK_ERROR("glDisableClientState");
     /**/
 
-    if (!isSoftYuv2Rgb)
+    if (!m_isSoftYuv2Rgb)
     {
         glDisable(GL_FRAGMENT_PROGRAM_ARB);
         OGL_CHECK_ERROR("glDisable");
@@ -843,13 +842,15 @@ static inline QRect getTextureRect(float textureWidth, float textureHeight,
 }
 #endif
 
+
+
 QnGLRenderer::RenderStatus QnGLRenderer::paintEvent(const QRectF &r)
 {
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     if (!m_inited)
     {
-        init(gl_status == CL_GL_NOT_TESTED);
+        ensureInitialized();
         m_inited = true;
     }
 
@@ -904,29 +905,8 @@ QnGLRenderer::RenderStatus QnGLRenderer::paintEvent(const QRectF &r)
     }
 
     glPopAttrib();
-    frameDisplayed();
 
     return result;
-}
-
-QSize QnGLRenderer::sizeOnScreen(unsigned int channel) const
-{
-    qnWarning("Unreachable code executed.");
-
-    if(m_videowindow != NULL)
-        return m_videowindow->sizeOnScreen(channel);
-    else
-        return QSize();
-}
-
-bool QnGLRenderer::constantDownscaleFactor() const
-{
-    qnWarning("Unreachable code executed.");
-
-    if(m_videowindow != NULL)
-        return m_videowindow->constantDownscaleFactor();
-    else
-        return false;
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const
@@ -941,14 +921,3 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
     return m_lastDisplayedMetadata;
 }
 
-bool QnGLRenderer::isNoVideo() const
-{
-    QMutexLocker locker(&m_displaySync);
-    return m_noVideo;
-}
-
-void QnGLRenderer::onNoVideo()
-{
-    QMutexLocker locker(&m_displaySync);
-    m_noVideo = true;
-}

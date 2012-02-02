@@ -26,6 +26,7 @@
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
 #include "core/resource/video_server.h"
+#include "api/SessionManager.h"
 #include <signal.h>
 #include <xercesc/util/PlatformUtils.hpp>
 #include "core/misc/scheduleTask.h"
@@ -168,18 +169,18 @@ QnVideoServerPtr registerServer(QnAppServerConnectionPtr appServerConnection, co
 {
     QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
-    QnVideoServer server;
+    QnVideoServerPtr serverPtr(new QnVideoServer());
 
     // If there is already stored server with this guid, other parameters will be ignored
-    server.setGuid(serverGuid());
+    serverPtr->setGuid(serverGuid());
 
-    server.setName(QString("Server ") + myAddress);
-    server.setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server.setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
+    serverPtr->setName(QString("Server ") + myAddress);
+    serverPtr->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    serverPtr->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 
     QnVideoServerList servers;
     QByteArray errorString;
-    if (appServerConnection->registerServer(server, servers, errorString) != 0)
+    if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
 
@@ -260,6 +261,18 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
+    // Create and start SessionManager
+    SessionManager* sm = SessionManager::instance();
+
+    QThread *thread = new QThread();
+    sm->moveToThread(thread);
+
+    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
+    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+    thread->start();
+    //
+
     QnResource::startCommandProc();
 
     QnResourcePool::instance(); // to initialize net state;
@@ -289,6 +302,7 @@ void initAppServerConnection(const QSettings &settings)
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
+    qDebug() << appServerUrl;
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
 }
@@ -357,6 +371,18 @@ public:
         // Use system scope
         QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
+        // Create SessionManager
+        SessionManager* sm = SessionManager::instance();
+
+        QThread *thread = new QThread();
+        sm->moveToThread(thread);
+
+        QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
+        QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+        thread->start();
+        sm->start();
+
         initAppServerConnection(settings);
         initAppServerEventConnection(settings);
         QnEventManager* eventManager = QnEventManager::instance();
@@ -367,6 +393,7 @@ public:
         {
             QnSleep::msleep(1000);
         }
+
 
         if (needToStop())
             return;
@@ -390,7 +417,6 @@ public:
 
         eventManager->run();
 
-
         m_processor = new QnAppserverResourceProcessor(videoServer->getId());
 
         QUrl rtspUrl(videoServer->getUrl());
@@ -404,7 +430,7 @@ public:
         m_restServer->registerHandler("xsd/*", new QnXsdHelperHandler());
 
         // Get storages sample code.
-        QnResourceList storages;
+        QnStorageList storages;
         QByteArray errorString;
         while (appServerConnection->getStorages(storages, errorString) != 0)
         {
@@ -413,9 +439,8 @@ public:
         }
 
         bool storageAdded = false;
-        foreach (QnResourcePtr resource, storages)
+        foreach (QnStoragePtr storage, storages)
         {
-            QnStoragePtr storage = resource.dynamicCast<QnStorage>();
             if (storage->getParentId() == videoServer->getId())
             {
                 storageAdded = true;
@@ -435,7 +460,7 @@ public:
             storage->setSpaceLimit(5ll * 1024 * 1024 * 1024);
 
             QByteArray errorString;
-            if (appServerConnection->addStorage(*storage, errorString))
+            if (appServerConnection->addStorage(storage, errorString))
                 qDebug() << "Couldn't add storage: " << errorString;
 
             qnResPool->addResource(storage);
@@ -464,7 +489,7 @@ public:
         QnScheduleTaskList scheduleTasks;
 
         errorString.clear();
-        QnSecurityCamResourceList cameras;
+        QnVirtualCameraResourceList cameras;
         while (appServerConnection->getCameras(cameras, videoServer->getId(), errorString) != 0)
         {
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
@@ -562,8 +587,59 @@ void stopServer(int signal)
     qApp->quit();
 }
 
+#include "api/SessionManager.h"
+
 int main(int argc, char* argv[])
 {
+#if 0 // http refactoring test code. Remove it if things is stable.
+    xercesc::XMLPlatformUtils::Initialize();
+
+    QCoreApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
+    QCoreApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
+    QCoreApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
+
+    QCoreApplication app(argc, argv);
+
+    // Use system scope
+    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
+
+    // Create SessionManager
+    SessionManager* sm = SessionManager::instance();
+
+    QThread *thread = new QThread();
+    sm->moveToThread(thread);
+
+    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
+    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+    thread->start();
+
+    initAppServerConnection(settings);
+
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection(QUrl("http://appserver:123@physic:8000"));
+
+    QnResourceDiscoveryManager::instance().setServer(true);
+    // QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+
+    QnResourceTypeList resourceTypes;
+    QByteArray errorString;
+    initResourceTypes(conn);
+
+    QnVideoServerConnection vc(QUrl("http://physic:8080")); // /api/RecordedTimePeriods?mac=00-40-8C-BF-92-CE&startTime=123&detail=12);
+    QnCameraResourceList cameras;
+    conn->getCameras(cameras, QnId(2), errorString);
+    qDebug() << errorString;
+
+    QnNetworkResourceList nrl;
+    nrl.append(cameras[1]);
+    QnTimePeriodList tpl = vc.recordedTimePeriods(nrl);
+    app.exec();
+    return 0;
+ #endif   
+
     QnVideoService service(argc, argv);
 
     int result = service.exec();

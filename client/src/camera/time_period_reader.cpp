@@ -69,6 +69,7 @@ int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& regi
     }
 
     int handle = sendRequest(periodToLoad);
+
     m_loading << LoadingInfo(periodToLoad, handle);
     return handle;
 }

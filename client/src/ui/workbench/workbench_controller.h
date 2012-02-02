@@ -36,7 +36,6 @@ class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
 
-
 /**
  * This class implements default scene manipulation logic.
  *

@@ -35,5 +35,6 @@ private:
 };
 
 typedef QSharedPointer<QnStorage> QnStoragePtr;
+typedef QList<QnStoragePtr> QnStorageList;
 
 #endif // QN_STORAGE_H

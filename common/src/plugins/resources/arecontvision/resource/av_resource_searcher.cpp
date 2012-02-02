@@ -8,7 +8,7 @@
 #include "../tools/AVJpegHeader.h"
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 
 
 #define CL_BROAD_CAST_RETRY 1
@@ -214,7 +214,7 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
         return result;
     }
 
-    result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(resourceTypeId));
+    result = QnVirtualCameraResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(resourceTypeId));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;

@@ -7,6 +7,17 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
 
+namespace {
+    void debugViewportRect(QGraphicsView *view) {
+#ifdef QN_SCENE_UTILITY_DEBUG
+        QRectF rect = SceneUtility::mapRectToScene(view, view->viewport()->rect());
+        qDebug() << "SCENE VIEWPORT RECT:" << rect;
+#endif
+    }
+
+} // anonymous namespace
+
+
 QPointF SceneUtility::cwiseMul(const QPointF &l, const QPointF &r) {
     return QPointF(l.x() * r.x(), l.y() * r.y());
 }
@@ -389,6 +400,8 @@ void SceneUtility::moveViewportScene(QGraphicsView *view, const QPointF &scenePo
 
     view->setTransformationAnchor(oldAnchor);
     view->setInteractive(oldInteractive);
+
+    debugViewportRect(view);
 }
 
 void SceneUtility::moveViewportSceneTo(QGraphicsView *view, const QPointF &sceneCenter) {
@@ -431,6 +444,8 @@ void SceneUtility::scaleViewport(QGraphicsView *view, qreal factor, const QPoint
 
     view->setTransformationAnchor(oldAnchor);
     view->setInteractive(oldInteractive);
+    
+    debugViewportRect(view);
 }
 
 void SceneUtility::scaleViewport(QGraphicsView *view, qreal factor, QGraphicsView::ViewportAnchor anchor) {

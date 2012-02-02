@@ -36,7 +36,7 @@ CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const QnVideoResourceLa
     //setFlag(QGraphicsItem::ItemIsMovable);
 
     for (unsigned i = 0; i  < m_videonum; ++i)
-        m_gldraw[i] = new QnGLRenderer(this);
+        m_gldraw[i] = new QnGLRenderer();
 
     connect( this, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onResize()));
 }
@@ -258,7 +258,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
                 painter->setFont(font);
                 painter->drawText(width() - size.width() - 8, height() - size.height() - 8, timeText);
             }
-            if (m_gldraw[i]->isNoVideo())
+            if (false)//(m_gldraw[i]->isNoVideo())
             {
                 QString text = "No video";
                 QFont font;
@@ -446,7 +446,7 @@ QImage CLVideoWindowItem::getScreenshot()
     return rez;
 }
 
-bool CLVideoWindowItem::contains(QnAbstractRenderer* renderer)  const
+/*bool CLVideoWindowItem::contains(QnAbstractRenderer* renderer)  const
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -454,4 +454,4 @@ bool CLVideoWindowItem::contains(QnAbstractRenderer* renderer)  const
             return true;
     }
     return false;
-}
+}*/

@@ -8,16 +8,18 @@ ViewportGeometryAccessor::ViewportGeometryAccessor():
     m_marginFlags(Qn::MARGINS_AFFECT_POSITION | Qn::MARGINS_AFFECT_SIZE)
 {}
 
-    // XXX mapRectToScene(m_view, (m_marginFlags & MARGINS_AFFECT_SIZE) ? eroded(m_view->viewport()->rect(), m_viewportMargins) : m_view->viewport()->rect());
-
 QVariant ViewportGeometryAccessor::get(const QObject *object) const {
     const QGraphicsView *view = checked_cast<const QGraphicsView *>(object);
 
-    QRect viewportRect = view->viewport()->rect();
+    QSize size = view->viewport()->size();
     if(m_marginFlags & Qn::MARGINS_AFFECT_SIZE)
-        viewportRect = SceneUtility::eroded(viewportRect, m_margins);
+        size = SceneUtility::eroded(size, m_margins);
 
-    return SceneUtility::mapRectToScene(view, viewportRect);
+    QPoint center = view->viewport()->rect().center(); // TODO: check whether rounding causes issues.
+    if(m_marginFlags & Qn::MARGINS_AFFECT_POSITION)
+        center = SceneUtility::eroded(view->viewport()->rect(), m_margins).center();
+
+    return SceneUtility::mapRectToScene(view, QRect(center - SceneUtility::toPoint(size) / 2, size));
 }
 
 void ViewportGeometryAccessor::set(QObject *object, const QVariant &value) const {
