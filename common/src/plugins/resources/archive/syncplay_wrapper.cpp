@@ -389,7 +389,7 @@ void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
     }
 }
 
-void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 /*mksec*/)
+void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 
@@ -399,6 +399,7 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 /*mksec*/)
     if (d->inJumpCount == 0) 
     {
         d->processingJump = false;
+        d->lastJumpTime = mksec;
         d->timer.restart();
     }
 }
