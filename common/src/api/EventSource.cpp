@@ -157,7 +157,6 @@ void QnEventSource::httpReadyRead()
         QnEvent event;
         event.load(parsed);
 
-        qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
         emit eventReceived(event);
     }
 }

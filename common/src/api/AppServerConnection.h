@@ -36,10 +36,10 @@ namespace conn_detail
         }
 
     public slots:
-        void finished(int status, const QByteArray &result);
+        void finished(int status, const QByteArray &result, int handle);
 
     signals:
-        void finished(int status, const QByteArray& errorString, QnResourceList resources);
+        void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
 
     private:
         QnResourceFactory& m_resourceFactory;

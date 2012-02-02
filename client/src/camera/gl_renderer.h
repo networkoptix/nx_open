@@ -91,7 +91,8 @@ private:
     GLuint m_texture[3];
     bool m_forceSoftYUV;
 
-    QVector<uchar> m_yuv2rgbBuffer;
+    uchar* m_yuv2rgbBuffer;
+    size_t m_yuv2rgbBufferLen;
 
     bool m_textureUploaded;
 

@@ -19,10 +19,10 @@ namespace detail {
         VideoServerSessionManagerReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply);
+        void at_replyReceived(int status, const QByteArray &reply, int handle);
 
     signals:
-        void finished(int status, const QnTimePeriodList& timePeriods);
+        void finished(int status, const QnTimePeriodList& timePeriods, int handle);
     };
 }
 
