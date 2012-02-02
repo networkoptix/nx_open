@@ -53,6 +53,8 @@ public:
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
     virtual void setQuality(MediaQuality quality) override;
 
+    /* For atomic changing several params: quality and position for example */
+    QMutex& getJumpMutex();
 protected:
     virtual bool init();
 
@@ -108,6 +110,7 @@ private:
     bool m_ignoreSkippingFrame;
     qint64 m_lastJumpTime;
     qint64 m_skipFramesToTime;
+    bool m_keepLastSkkipingFrame;
     bool m_singleShot;
     bool m_singleQuantProcessed;
     mutable QMutex m_jumpMtx;
@@ -127,7 +130,7 @@ private:
     void addAudioChannel(QnCompressedAudioDataPtr audio);
     QnAbstractMediaDataPtr getNextPacket();
     void channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime);
-    virtual void setSkipFramesToTime(qint64 skipFramesToTime);
+    void setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast);
 };
 
 #endif //avi_stream_reader_h1901
