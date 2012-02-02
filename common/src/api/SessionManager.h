@@ -48,6 +48,9 @@ class SessionManagerReplyProcessor : public QObject
 public:
     SessionManagerReplyProcessor(QObject *parent = 0) : QObject(parent) {}
 
+signals:
+    void finished(int status, const QByteArray& data, int handle);
+
 private slots:
     void at_replyReceived(QNetworkReply *reply);
 };

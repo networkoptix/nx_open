@@ -16,7 +16,10 @@ void SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
     QByteArray slot = reply->property("slot").toByteArray();
     int handle = reply->property("handle").toInt();
 
-    QMetaObject::invokeMethod(target, slot, Qt::QueuedConnection, Q_ARG(int, reply->error()), Q_ARG(const QByteArray&, reply->readAll()), Q_ARG(int, handle));
+    connect(this, SIGNAL(finished(int,QByteArray,int)), target, slot);
+    emit finished(reply->error(), reply->readAll(), handle);
+
+    // QMetaObject::invokeMethod(target, slot, Qt::QueuedConnection, Q_ARG(int, reply->error()), Q_ARG(const QByteArray&, reply->readAll()), Q_ARG(int, handle));
 
     reply->deleteLater();
 }
@@ -99,7 +102,7 @@ int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, 
 {
     SyncRequestProcessor syncProcessor(this);
     syncProcessor.moveToThread(this->thread());
-    sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, "finished");
+    sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(finished(int,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
 
@@ -112,7 +115,7 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, c
 {
     SyncRequestProcessor syncProcessor(this);
     syncProcessor.moveToThread(this->thread());
-    sendAsyncGetRequest(url, objectName, params, &syncProcessor, "finished");
+    sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(finished(int,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
 
@@ -156,7 +159,7 @@ void SessionManager::doSendAsyncPostRequest(const QUrl& url, const QString &obje
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
     QNetworkReply* reply = m_accessManager.post(request, data);
-    reply->setProperty("target", QVariant(QMetaType::QObjectStar, target));
+    reply->setProperty("target", QVariant::fromValue<QObject*>(target));
     reply->setProperty("slot", QVariant(QByteArray(slot)));
     reply->setProperty("handle", handle);
 }
@@ -164,7 +167,7 @@ void SessionManager::doSendAsyncPostRequest(const QUrl& url, const QString &obje
 int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
 {
     int handle = m_handle.fetchAndAddAcquire(1);
-    emit asyncGetRequest(url, objectName, params, target, slot, handle);
+    emit asyncPostRequest(url, objectName, params, data, target, slot, handle);
     return handle;
 }
 

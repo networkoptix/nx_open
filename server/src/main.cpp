@@ -371,6 +371,17 @@ public:
         // Use system scope
         QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
+        // Create SessionManager
+        SessionManager* sm = SessionManager::instance();
+
+        QThread *thread = new QThread();
+        sm->moveToThread(thread);
+
+        QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
+        QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+        thread->start();
+
         initAppServerConnection(settings);
         initAppServerEventConnection(settings);
         QnEventManager* eventManager = QnEventManager::instance();
