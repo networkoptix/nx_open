@@ -2,6 +2,7 @@
 #include <QMutexLocker>
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
+#include <utils/common/performance.h>
 
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(int channelCount, QObject *parent):
     QObject(parent)
