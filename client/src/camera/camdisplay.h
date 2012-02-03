@@ -91,6 +91,10 @@ private:
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
 private:
+    void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
+    void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
+    void hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
+
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
 	CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];

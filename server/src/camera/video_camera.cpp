@@ -2,6 +2,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/camera_resource.h"
+#include "core/dataprovider/cpull_media_stream_provider.h"
 
 const float MIN_SECONDARY_FPS = 2.0;
 
@@ -119,11 +120,19 @@ QnVideoCamera::~QnVideoCamera()
 QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     bool primaryLiveStream = role ==  QnResource::Role_LiveVideo;
+
+    //if (!primaryLiveStream)
+    //    return false; // disable second stream
+
     QnAbstractMediaStreamDataProvider* &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (!reader) 
     {
         QnAbstractStreamDataProvider* p = m_resource->createDataProvider(role);
         reader = dynamic_cast<QnAbstractMediaStreamDataProvider*> (p);
+        QnClientPullMediaStreamProvider* clientPullReader = dynamic_cast<QnClientPullMediaStreamProvider*> (p);
+        if (clientPullReader)
+            clientPullReader->setExtSync(&m_readersMutex);
+
         QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(m_resource);
         if (primaryLiveStream)
             m_primaryGopKeeper = gopKeeper;

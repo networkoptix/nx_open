@@ -19,7 +19,7 @@ public:
     void setFps(float f);
     float getFps() const;
     bool isMaxFps() const;
-
+    void setExtSync(QMutex* extSyncMutex);
 
 protected:
 
@@ -30,6 +30,7 @@ private:
     CLAdaptiveSleep m_fpsSleep;
 
     float m_fps; //used only for live providers
+    QMutex* m_extSyncMutex;
 };
 
 #endif // client_pull_stream_reader_h1226

@@ -32,21 +32,26 @@ void QnRecordingManager::stop()
     foreach(const Recorders& recorders, m_recordMap.values())
     {
         recorders.recorderHiRes->pleaseStop();
-        recorders.recorderLowRes->pleaseStop();
+        if (recorders.recorderLowRes)
+            recorders.recorderLowRes->pleaseStop();
     }
     foreach(const Recorders& recorders, m_recordMap.values()) 
     {
         recorders.recorderHiRes->stop();
-        recorders.recorderLowRes->stop();
+        if (recorders.recorderLowRes)
+            recorders.recorderLowRes->stop();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
         if (camera)
         {
             QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (reader)
                 reader->removeDataProcessor(recorders.recorderHiRes);
-            reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
-            if (reader)
-                reader->removeDataProcessor(recorders.recorderLowRes);
+
+            if (recorders.recorderLowRes) {
+                reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+                if (reader)
+                    reader->removeDataProcessor(recorders.recorderLowRes);
+            }
         }
         delete recorders.recorderHiRes;
         delete recorders.recorderLowRes;
@@ -63,6 +68,8 @@ Recorders QnRecordingManager::findRecorders(QnResourcePtr res) const
 QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader(role);
+    if (reader == 0)
+        return 0;
     QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role);
     recorder->setTruncateInterval(TRUNCATE_INTERVAL);
     reader->addDataProcessor(recorder);
@@ -89,7 +96,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
         QMap<QnId, QnScheduleTaskList>::iterator scheduleItr = m_scheduleByCamera.find(res->getId());
         if (scheduleItr != m_scheduleByCamera.end())
             recorderHiRes->updateSchedule(scheduleItr.value());
-        if (scheduleItr != m_scheduleByCamera.end())
+        if (recorderLowRes && scheduleItr != m_scheduleByCamera.end())
             recorderLowRes->updateSchedule(scheduleItr.value());
     }
 }
@@ -103,7 +110,8 @@ void QnRecordingManager::updateSchedule(QnSecurityCamResourcePtr camera)
     {
         const Recorders& recorders = itrRec.value();
         recorders.recorderHiRes->updateSchedule(camera->getScheduleTasks());
-        recorders.recorderLowRes->updateSchedule(camera->getScheduleTasks());
+        if (recorders.recorderLowRes)
+            recorders.recorderLowRes->updateSchedule(camera->getScheduleTasks());
     }
 }
 

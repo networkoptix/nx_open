@@ -242,7 +242,7 @@ int QnRtspConnectionProcessor::extractTrackId(const QString& path)
 QnAbstractMediaStreamDataProvider* QnRtspConnectionProcessor::getLiveDp()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->quality == MEDIA_Quality_High)
+    if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0)
         return d->liveDpHi;
     else
         return d->liveDpLow;
@@ -368,8 +368,9 @@ void QnRtspConnectionProcessor::createDataProvider()
 void QnRtspConnectionProcessor::connectToLiveDataProviders()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->quality == MEDIA_Quality_High) {
-        d->liveDpLow->removeDataProcessor(d->dataProcessor);
+    if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0) {
+        if (d->liveDpLow)
+            d->liveDpLow->removeDataProcessor(d->dataProcessor);
         d->liveDpHi->addDataProcessor(d->dataProcessor);
         d->dataProcessor->setSecondaryDataProvider(0);
     }
@@ -387,6 +388,11 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
     createDataProvider();
+    if (d->liveDpLow == 0 && d->quality == MEDIA_Quality_Low)
+    {
+        d->quality = MEDIA_Quality_High;
+        qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
+    }
 
     d->lastPlayCSeq = d->requestHeaders.value("CSeq").toInt();
 
@@ -495,6 +501,8 @@ int QnRtspConnectionProcessor::composeTeardown()
 int QnRtspConnectionProcessor::composeSetParameter()
 {
     Q_D(QnRtspConnectionProcessor);
+
+    createDataProvider();
 
     QList<QByteArray> parameters = d->requestBody.split('\n');
     foreach(const QByteArray& parameter, parameters)
