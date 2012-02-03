@@ -9,9 +9,9 @@
 
 class CLVideoDecoderOutput;
 class QnGLRendererSharedData;
+class QnGlRendererTexture;
 
-
-class QnGLRenderer : public QnRenderStatus
+class QnGLRenderer: public QnRenderStatus
 {
 public:
     enum HardwareStatus {
@@ -41,30 +41,31 @@ public:
     QnMetaDataV1Ptr lastFrameMetadata() const; 
 
 private:
-    void ensureInitialized();
-    void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
+    void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
     void updateTexture();
     void setForceSoftYUV(bool value);
     bool isYuvFormat() const;
     int glRGBFormat() const;
+    QnGlRendererTexture *texture(int index);
 
 private:
     static QList<GLuint> m_garbage;
 
+    friend class QnGlRendererTexture;
+
 private:
     QnGLRendererSharedData *m_shared;
-
-    bool m_initialized;
 
     mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;
 
-    GLint m_clampConstant;
-    bool m_isNonPower2;
-    bool m_isSoftYuv2Rgb;
+    enum {
+        TEXTURE_COUNT = 6
+    };
 
     int m_textureStep;
-    GLuint m_texture[6];
+    QScopedPointer<QnGlRendererTexture> m_textures[TEXTURE_COUNT];
+
     bool m_forceSoftYUV;
 
     uchar* m_yuv2rgbBuffer;
@@ -75,12 +76,6 @@ private:
     int m_stride_old;
     int m_height_old;
     PixelFormat m_color_old;
-
-    float m_videoCoeffL[4];
-    float m_videoCoeffW[4];
-    float m_videoCoeffH[4];
-
-    bool m_videoTextureReady;
 
     qreal m_brightness;
     qreal m_contrast;
