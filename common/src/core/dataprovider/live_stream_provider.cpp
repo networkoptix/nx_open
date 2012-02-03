@@ -108,7 +108,6 @@ bool QnLiveStreamProvider::needMetaData()
     if (getRole() == QnResource::Role_SecondaryLiveVideo)
         return false;
 
-
     bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
         m_framesSinceLastMetaData > 0; // got at least one frame
 

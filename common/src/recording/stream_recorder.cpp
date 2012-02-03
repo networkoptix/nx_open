@@ -28,7 +28,8 @@ m_lastPacketTime(AV_NOPTS_VALUE),
 m_startOffset(0),
 m_forceDefaultCtx(true),
 m_prebufferingUsec(0),
-m_stopOnWriteError(true)
+m_stopOnWriteError(true),
+m_waitEOF(false)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -93,6 +94,7 @@ void QnStreamRecorder::flushPrebuffer()
 
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 {
+    QMutexLocker lock(&m_closeAsyncMutex);
     QnAbstractMediaDataPtr md = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!md)
         return true; // skip unknown data
@@ -106,6 +108,12 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         else
             markNeedKeyData();
     }
+
+    if (m_waitEOF && m_dataQueue.size() == 0) {
+        close();
+        m_waitEOF = false;
+    }
+
     return true;
 }
 
@@ -362,4 +370,13 @@ bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 QString QnStreamRecorder::fillFileName()
 {
     return m_fixedFileName;
+}
+
+void QnStreamRecorder::closeOnEOF()
+{
+    QMutexLocker lock(&m_closeAsyncMutex);
+    if (m_dataQueue.size() == 0)
+        close();
+    else
+        m_waitEOF = true;
 }

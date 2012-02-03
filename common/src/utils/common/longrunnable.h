@@ -8,7 +8,8 @@
 class QN_EXPORT CLLongRunnable : public QThread
 {
     Q_OBJECT
-
+signals:
+    void threadPaused();
 public slots:
     void start ( Priority priority = InheritPriority )
     {
@@ -63,6 +64,8 @@ public:
 
     void pauseDelay()
     {
+        if (m_onPause)
+            emit threadPaused();
         while(m_onPause && !needToStop())
             m_semaphore.tryAcquire(1,50);
     }
@@ -82,8 +85,8 @@ public:
             msleep(ms%100);
         }
     }
-protected:
     bool onPause() const { return m_onPause; }
+protected:
 
 protected:
     bool m_runing;

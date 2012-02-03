@@ -37,12 +37,12 @@ public:
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
+    void onFpsChanged(float value);
 private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
 private:
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
-    QMap<QnId, QnScheduleTaskList> m_scheduleByCamera;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory

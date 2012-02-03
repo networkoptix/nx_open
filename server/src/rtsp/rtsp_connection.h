@@ -21,7 +21,7 @@ public:
 protected:
     virtual void run();
 private:
-
+    void checkQuality();
     void processRequest();
     void parseRequest();
     void initResponse(int code = 200, const QString& message = "OK");

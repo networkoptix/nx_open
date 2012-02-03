@@ -599,22 +599,26 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
                                      cameraPtr->getAuth().password().toStdString());
 
     xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
-    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
-        xsd::api::scheduleTasks::ScheduleTask scheduleTask(
-                                                scheduleTaskIn.getStartTime(),
-                                                scheduleTaskIn.getEndTime(),
-                                                scheduleTaskIn.getDoRecordAudio(),
-                                                scheduleTaskIn.getRecordingType(),
-                                                scheduleTaskIn.getDayOfWeek(),
-                                                scheduleTaskIn.getBeforeThreshold(),
-                                                scheduleTaskIn.getAfterThreshold(),
-                                                scheduleTaskIn.getStreamQuality(),
-                                                scheduleTaskIn.getFps());
+    if (!cameraPtr->getScheduleTasks().isEmpty())
+    {
+        foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
+            xsd::api::scheduleTasks::ScheduleTask scheduleTask(
+                                                    scheduleTaskIn.getStartTime(),
+                                                    scheduleTaskIn.getEndTime(),
+                                                    scheduleTaskIn.getDoRecordAudio(),
+                                                    scheduleTaskIn.getRecordingType(),
+                                                    scheduleTaskIn.getDayOfWeek(),
+                                                    scheduleTaskIn.getBeforeThreshold(),
+                                                    scheduleTaskIn.getAfterThreshold(),
+                                                    scheduleTaskIn.getStreamQuality(),
+                                                    scheduleTaskIn.getFps());
 
-        scheduleTasks.scheduleTask().push_back(scheduleTask);
+            scheduleTasks.scheduleTask().push_back(scheduleTask);
+        }
+
+        camera.scheduleTasks(scheduleTasks);
     }
 
-    camera.scheduleTasks(scheduleTasks);
     camera.parentID(cameraPtr->getParentId().toString().toStdString());
     camera.status((cameraPtr->getStatus() == QnResource::Online) ? "A" : "I");
 

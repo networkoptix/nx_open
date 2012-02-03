@@ -48,7 +48,7 @@ int QnSecurityCamResource::getMaxFps()
 {
     if (hasSuchParam("MaxFPS"))
     {
-        Q_ASSERT(false);
+        //Q_ASSERT(false);
         return 15;
     }
 

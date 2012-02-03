@@ -14,6 +14,7 @@
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
@@ -147,6 +148,47 @@ QImage CLCamDisplay::getScreenshot(int channel)
     return m_display[channel]->getScreenshot();
 }
 
+void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
+{
+    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
+    if (isVideoCamera)
+        hurryUpCheckForCamera(vd, speed, needToSleep, realSleepTime);
+    else
+        hurryUpCheckForLocalFile(vd, speed, needToSleep, realSleepTime);
+}
+
+void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
+{
+
+}
+
+void CLCamDisplay::hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
+{
+    if (qAbs(speed) > 1.0 + FPS_EPS)
+    {
+        if (realSleepTime < 0)
+        {
+            if (realSleepTime > -200*1000 && m_lightCpuMode == QnAbstractVideoDecoder::DecodeMode_Full)
+            {
+                setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+            }
+
+            else if (m_iFrames > 1) {
+                qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
+                if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
+                {
+                    ; //setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fastest);
+                }
+                else if (vd->flags & AV_PKT_FLAG_KEY)
+                    setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+            }
+        }
+        else if (vd->flags & AV_PKT_FLAG_KEY) {
+            if (m_lightCpuMode == QnAbstractVideoDecoder::DecodeMode_Fastest)
+                setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+        }
+    }
+}
 
 void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
@@ -261,30 +303,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
         //cl_log.log("real sleepTime=", realSleepTime, cl_logALWAYS);
         //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
-        if (qAbs(speed) > 1.0 + FPS_EPS)
-        {
-            if (realSleepTime < 0)
-            {
-                if (realSleepTime > -200*1000 && m_lightCpuMode == QnAbstractVideoDecoder::DecodeMode_Full)
-                {
-                    setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
-                }
-
-                else if (m_iFrames > 1) {
-                    qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
-                    if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
-                    {
-                        ; //setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fastest);
-                    }
-                    else if (vd->flags & AV_PKT_FLAG_KEY)
-                        setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
-                }
-            }
-            else if (vd->flags & AV_PKT_FLAG_KEY) {
-                if (m_lightCpuMode == QnAbstractVideoDecoder::DecodeMode_Fastest)
-                    setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
-            }
-        }
+        hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
     int channel = vd->channelNumber;
 

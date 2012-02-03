@@ -57,8 +57,8 @@ void QnPhysicalCameraResource::onPrimaryFpsUpdated(int newFps)
 #ifdef _DEBUG
 void QnPhysicalCameraResource::debugCheck() const
 {
-    int countLp = 0;
-    int countPLp = 0;
+    int countTotal = 0;
+    int countPrimary = 0;
 
     QMutexLocker mutex(&m_consumersMtx);
     foreach(QnResourceConsumer* consumer, m_consumers)
@@ -67,17 +67,17 @@ void QnPhysicalCameraResource::debugCheck() const
         if (!lp)
             continue;
 
-        ++countLp;
+        ++countTotal;
 
         if (lp->getRole() != QnResource::Role_SecondaryLiveVideo)
         {
             // must be a primary source 
-            ++countPLp;
+            ++countPrimary;
         }
     }
 
-    Q_ASSERT(countLp<=2); // more than 2 stream readers connected ?
-    Q_ASSERT(countLp<=1); // more than 1 primary source ? 
+    Q_ASSERT(countTotal<=2); // more than 2 stream readers connected ?
+    Q_ASSERT(countPrimary<=1); // more than 1 primary source ? 
 
 }
 #endif

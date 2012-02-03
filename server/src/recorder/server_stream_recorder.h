@@ -15,7 +15,7 @@ public:
 
     void updateSchedule(const QnScheduleTaskList& schedule);
 signals:
-    void fpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
+    void fpsChanged(float value);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 

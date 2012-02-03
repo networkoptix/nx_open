@@ -1,12 +1,13 @@
 #ifndef live_strem_provider_h_1508
 #define live_strem_provider_h_1508
 
+#include <QObject>
 #include "../resource/media_resource.h"
 
 #define META_DATA_DURATION_MS 300
 
 
-class QnLiveStreamProvider 
+class QnLiveStreamProvider
 {
 public:
     QnLiveStreamProvider();

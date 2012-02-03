@@ -2,8 +2,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/camera_resource.h"
-
-const float MIN_SECONDARY_FPS = 2.0;
+#include "core/dataprovider/cpull_media_stream_provider.h"
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -119,11 +118,19 @@ QnVideoCamera::~QnVideoCamera()
 QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     bool primaryLiveStream = role ==  QnResource::Role_LiveVideo;
+
+    //if (!primaryLiveStream)
+    //    return false; // disable second stream
+
     QnAbstractMediaStreamDataProvider* &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (!reader) 
     {
         QnAbstractStreamDataProvider* p = m_resource->createDataProvider(role);
         reader = dynamic_cast<QnAbstractMediaStreamDataProvider*> (p);
+        QnClientPullMediaStreamProvider* clientPullReader = dynamic_cast<QnClientPullMediaStreamProvider*> (p);
+        if (clientPullReader)
+            clientPullReader->setExtSync(&m_readersMutex);
+
         QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(m_resource);
         if (primaryLiveStream)
             m_primaryGopKeeper = gopKeeper;
@@ -132,11 +139,6 @@ QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::Conn
         reader->addDataProcessor(gopKeeper);
         reader->start();
 
-        if (primaryLiveStream) 
-        {
-            connect(reader, SIGNAL(onFpsChanged(QnAbstractMediaStreamDataProvider*, float)), this, SLOT(onFpsChanged(QnAbstractMediaStreamDataProvider*, float)));
-            void onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
-        }
     }
     return reader;
 }
@@ -147,14 +149,4 @@ void QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQ
         m_primaryGopKeeper->copyLastGop(skipTime, dstQueue);
     else
         m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
-}
-
-void QnVideoCamera::onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value)
-{
-    QnPhysicalCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_resource);
-    Q_ASSERT(cameraRes != 0);
-    if (provider == m_primaryReader && cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS)
-    {
-        m_secondaryReader->stop();
-    }
 }

@@ -16,10 +16,9 @@ public:
     QnAbstractMediaStreamDataProvider* getLiveReader(QnResource::ConnectionRole role);
     void copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
     void beforeStop();
-private slots:
-    void onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
 private:
     //QMutex m_queueMtx;
+    QMutex m_readersMutex;
     QnResourcePtr m_resource;
     QnAbstractMediaStreamDataProvider* m_primaryReader;
     QnAbstractMediaStreamDataProvider* m_secondaryReader;
