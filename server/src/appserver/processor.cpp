@@ -52,7 +52,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray& errorString, const QnResourceList& resources, int handle)
 {
-    qDebug() << "handle2=" << handle;
 
     if (status == 0 && !resources.isEmpty())
     {
@@ -82,5 +81,4 @@ void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status ol
     }
 
     int handle = m_appServer->saveAsync(resource->toSharedPointer(), this, SLOT(requestFinished(int,const QByteArray&,const QnResourceList&, int)));
-    qDebug() << "handle1=" << handle;
 }
