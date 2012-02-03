@@ -117,9 +117,14 @@ bool QnLiveStreamProvider::needMetaData()
         m_framesSinceLastMetaData = 0;
         m_timeSinceLastMetaData.restart();
     }
-
     return result;
 }
+
+void QnLiveStreamProvider::onGotFrame()
+{
+    m_framesSinceLastMetaData++;
+}
+
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 {

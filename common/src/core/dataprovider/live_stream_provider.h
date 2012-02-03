@@ -33,7 +33,7 @@ protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
     virtual void updateStreamParamsBasedOnFps() = 0;
-
+    void onGotFrame();
 
 
 
