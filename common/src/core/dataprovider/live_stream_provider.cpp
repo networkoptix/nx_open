@@ -88,8 +88,6 @@ void QnLiveStreamProvider::setFps(float f)
     }
     else
         updateStreamParamsBasedOnFps();
-
-    emit fpsChanged();
 }
 
 float QnLiveStreamProvider::getFps() const

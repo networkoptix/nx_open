@@ -4,8 +4,6 @@
 #include "core/resource/camera_resource.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 
-const float MIN_SECONDARY_FPS = 2.0;
-
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
 class QnVideoCameraGopKeeper: public QnResourceConsumer, public QnAbstractDataConsumer
@@ -141,11 +139,6 @@ QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::Conn
         reader->addDataProcessor(gopKeeper);
         reader->start();
 
-        if (!primaryLiveStream) 
-        {
-            connect(reader, SIGNAL(fpsChanged(QnAbstractMediaStreamDataProvider*, float)), this, SLOT(onFpsChanged(QnAbstractMediaStreamDataProvider*, float)));
-            void onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
-        }
     }
     return reader;
 }
@@ -156,19 +149,4 @@ void QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQ
         m_primaryGopKeeper->copyLastGop(skipTime, dstQueue);
     else
         m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
-}
-
-void QnVideoCamera::onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value)
-{
-    QnPhysicalCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_resource);
-    Q_ASSERT(cameraRes != 0);
-    if (provider == m_primaryReader && m_secondaryReader)
-    {
-        if (cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS) {
-            m_secondaryReader->pause();
-        }
-        else {
-            m_secondaryReader->resume();
-        }
-    }
 }

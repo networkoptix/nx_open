@@ -7,11 +7,8 @@
 #define META_DATA_DURATION_MS 300
 
 
-class QnLiveStreamProvider: public QObject
+class QnLiveStreamProvider
 {
-    Q_OBJECT
-signals:
-    void fpsChanged();
 public:
     QnLiveStreamProvider();
     virtual ~QnLiveStreamProvider();

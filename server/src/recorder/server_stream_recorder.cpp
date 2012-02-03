@@ -55,7 +55,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
                 QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(mediaProvider);
                 liveProvider->setFps(m_currentScheduleTask.getFps());
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
-                emit fpsChanged(mediaProvider, m_currentScheduleTask.getFps());
+                emit fpsChanged(m_currentScheduleTask.getFps());
             }
             m_needUpdateStreamParams = false;
         }
