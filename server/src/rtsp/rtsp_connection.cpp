@@ -518,6 +518,12 @@ int QnRtspConnectionProcessor::composeSetParameter()
             else
                 d->quality = MEDIA_Quality_High;
 
+            if (d->liveDpLow == 0 && d->quality == MEDIA_Quality_Low)
+            {
+                d->quality = MEDIA_Quality_High;
+                qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
+            }
+
             if (d->liveMode)
             {
                 d->dataProcessor->lockDataQueue();
