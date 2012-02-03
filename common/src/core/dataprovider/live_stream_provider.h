@@ -29,11 +29,13 @@ public:
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
+    void onGotVideoFrame();
+
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
     virtual void updateStreamParamsBasedOnFps() = 0;
-    void onGotFrame();
+    
 
 
 
