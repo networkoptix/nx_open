@@ -42,6 +42,7 @@ private:
     int composeGetParameter();
     void createDataProvider();
     void putLastIFrameToQueue();
+    void connectToLiveDataProviders();
     QnAbstractMediaStreamDataProvider* getLiveDp();
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);

@@ -40,11 +40,13 @@ public:
     virtual qint64 getExternalTime() const;
 
     qint64 lastQueuedTime();
+    void setSecondaryDataProvider(QnAbstractStreamDataProvider* value);
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
 private:
+    QnAbstractStreamDataProvider* m_secondaryProvider;
     QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;

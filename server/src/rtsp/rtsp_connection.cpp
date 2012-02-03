@@ -365,6 +365,21 @@ void QnRtspConnectionProcessor::createDataProvider()
         d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
 }
 
+void QnRtspConnectionProcessor::connectToLiveDataProviders()
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (d->quality == MEDIA_Quality_High) {
+        d->liveDpLow->removeDataProcessor(d->dataProcessor);
+        d->liveDpHi->addDataProcessor(d->dataProcessor);
+        d->dataProcessor->setSecondaryDataProvider(0);
+    }
+    else {
+        d->liveDpHi->addDataProcessor(d->dataProcessor);
+        d->liveDpLow->addDataProcessor(d->dataProcessor);
+        d->dataProcessor->setSecondaryDataProvider(d->liveDpHi); // got data from Hi provider, but skip all data instead of motion
+    }
+}
+
 int QnRtspConnectionProcessor::composePlay()
 {
 
@@ -382,16 +397,17 @@ int QnRtspConnectionProcessor::composePlay()
     else 
         d->dataProcessor->clearUnprocessedData();
 
-    if (d->liveMode && d->archiveDP)
-        d->archiveDP->stop();
-    else if (!d->liveMode)
+    if (d->liveMode) {
+        if (d->archiveDP)
+            d->archiveDP->stop();
+    }
+    else
     {
         if (d->liveDpHi)
             d->liveDpHi->removeDataProcessor(d->dataProcessor);
         if (d->liveDpLow)
             d->liveDpLow->removeDataProcessor(d->dataProcessor);
     }
-
 
     QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? getLiveDp() : d->archiveDP;
     if (!currentDP)
@@ -401,9 +417,11 @@ int QnRtspConnectionProcessor::composePlay()
     d->dataProcessor->setLiveMode(d->liveMode);
     if (d->liveMode) {
         d->dataProcessor->lockDataQueue();
-
+        connectToLiveDataProviders();
     }
-    currentDP->addDataProcessor(d->dataProcessor);
+    else {
+        d->archiveDP->addDataProcessor(d->dataProcessor);
+    }
     
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode) 
@@ -496,14 +514,8 @@ int QnRtspConnectionProcessor::composeSetParameter()
             {
                 d->dataProcessor->lockDataQueue();
 
-                // subscribe to both Hi and Low live providers.
-                // Swith will occured in future then required live provider will send I-frame
-                if (d->quality == MEDIA_Quality_High) 
-                    d->liveDpLow->removeDataProcessor(d->dataProcessor);
-                else 
-                    d->liveDpHi->removeDataProcessor(d->dataProcessor);
-                QnAbstractMediaStreamDataProvider* prefferedDP = getLiveDp();
-                prefferedDP->addDataProcessor(d->dataProcessor);
+                connectToLiveDataProviders();
+
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
                 d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, time);

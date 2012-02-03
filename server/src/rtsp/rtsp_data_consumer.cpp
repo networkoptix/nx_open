@@ -28,7 +28,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_singleShotMode(false),
   m_packetSended(false),
   m_prefferedProvider(0),
-  m_currentDP(0)
+  m_currentDP(0),
+  m_secondaryProvider(0)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     m_timer.start();
@@ -160,6 +161,9 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+
+    if (data->dataProvider == m_secondaryProvider && metadata == 0)
+        return true; // secondary provider used for motion data only
 
     if (m_owner->isLiveDP(media->dataProvider)) {
         media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -314,4 +318,9 @@ qint64 QnRtspDataConsumer::lastQueuedTime()
         else
             return m_lastMediaTime;
     }
+}
+
+void QnRtspDataConsumer::setSecondaryDataProvider(QnAbstractStreamDataProvider* value)
+{
+    m_secondaryProvider = value;
 }
