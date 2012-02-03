@@ -13,7 +13,7 @@ class CLAbstractVideoHolder;
 class QnVideoResourceLayout;
 class NavigationItem;
 class CLVideoCamera;
-struct CLVideoDecoderOutput;
+class CLVideoDecoderOutput;
 
 class CLVideoWindowItem : public CLImageItem, public QnAbstractRenderer
 {

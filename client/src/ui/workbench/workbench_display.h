@@ -5,8 +5,8 @@
 #include <QHash>
 #include <core/resource/resource.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/animation/viewport_geometry_accessor.h>
 #include <ui/common/scene_utility.h>
+#include <ui/common/margin_flags.h>
 #include <utils/common/rect_set.h>
 #include "workbench.h"
 #include "recording/time_period.h"
@@ -235,8 +235,6 @@ public:
     Qn::MarginFlags marginFlags() const;
 
     void setMarginFlags(Qn::MarginFlags flags);
-
-    void ensureVisible(QnWorkbenchItem *item);
 
 
     void bringToFront(const QList<QGraphicsItem *> &items);

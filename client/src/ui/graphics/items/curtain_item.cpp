@@ -1,6 +1,6 @@
 #include "curtain_item.h"
 #include <limits>
-#include <utils/common/qt_opengl.h>
+#include <ui/common/opengl.h>
 
 QnCurtainItem::QnCurtainItem(QGraphicsItem *parent):
     QGraphicsObject(parent)

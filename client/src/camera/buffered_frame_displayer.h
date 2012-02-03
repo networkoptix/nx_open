@@ -7,7 +7,7 @@
 #include <utils/common/threadqueue.h>
 
 class QnAbstractRenderer;
-struct CLVideoDecoderOutput;
+class CLVideoDecoderOutput;
 
 class BufferedFrameDisplayer: public CLLongRunnable 
 {

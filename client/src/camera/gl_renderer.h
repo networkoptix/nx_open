@@ -8,6 +8,8 @@
 #include "render_status.h"
 
 class CLVideoDecoderOutput;
+class QnGLRendererSharedData;
+
 
 class QnGLRenderer : public QnRenderStatus
 {
@@ -23,7 +25,7 @@ public:
     void beforeDestroy();
 
     static void clearGarbage();
-    static int getMaxTextureSize();
+    static int maxTextureSize();
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
     void draw(CLVideoDecoderOutput *image);
@@ -40,7 +42,6 @@ public:
 
 private:
     void ensureInitialized();
-    int checkOpenGLError() const;
     void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
     void updateTexture();
     void setForceSoftYUV(bool value);
@@ -48,39 +49,13 @@ private:
     int glRGBFormat() const;
 
 private:
-#ifndef Q_OS_WIN
-#   define APIENTRY
-#endif
-    typedef void (APIENTRY *_glProgramStringARB) (GLenum, GLenum, GLsizei, const GLvoid *);
-    typedef void (APIENTRY *_glBindProgramARB) (GLenum, GLuint);
-    typedef void (APIENTRY *_glDeleteProgramsARB) (GLsizei, const GLuint *);
-    typedef void (APIENTRY *_glGenProgramsARB) (GLsizei, GLuint *);
-    typedef void (APIENTRY *_glProgramLocalParameter4fARB) (GLenum, GLuint, GLfloat, GLfloat, GLfloat, GLfloat);
-    typedef void (APIENTRY *_glActiveTexture) (GLenum);
-    _glProgramStringARB glProgramStringARB;
-    _glBindProgramARB glBindProgramARB;
-    _glDeleteProgramsARB glDeleteProgramsARB;
-    _glGenProgramsARB glGenProgramsARB;
-    _glProgramLocalParameter4fARB glProgramLocalParameter4fARB;
-    _glActiveTexture glActiveTexture;
+    static QList<GLuint> m_garbage;
 
 private:
-    enum Program
-    {
-        YV12toRGB = 0,
-        YUY2toRGB = 1,
-        ProgramCount = 2
-    };
+    QnGLRendererSharedData *m_shared;
 
-    static QMutex m_programMutex;
-    static bool m_programInited;
-    static GLuint m_program[ProgramCount];
-    static int gl_status;
-    static QVector<uchar> m_staticYFiller;
-    static QVector<uchar> m_staticUVFiller;
-    static QList<GLuint *> m_garbage;
+    bool m_initialized;
 
-private:
     mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;
 
@@ -88,7 +63,8 @@ private:
     bool m_isNonPower2;
     bool m_isSoftYuv2Rgb;
 
-    GLuint m_texture[3];
+    int m_textureStep;
+    GLuint m_texture[6];
     bool m_forceSoftYUV;
 
     uchar* m_yuv2rgbBuffer;
@@ -119,7 +95,6 @@ private:
     
     int m_format;
 
-    bool m_inited;
     int m_videoWidth;
     int m_videoHeight;
     qint64 m_lastDisplayedTime;

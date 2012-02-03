@@ -2,7 +2,7 @@
 #define clabstract_draw_h_20_57
 #include "utils/media/frame_info.h"
 
-struct CLVideoDecoderOutput;
+class CLVideoDecoderOutput;
 
 /**
  * This class is supposed to be used from two threads &mdash; a <i>rendering</i> thread

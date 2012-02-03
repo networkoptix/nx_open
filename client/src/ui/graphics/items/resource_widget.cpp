@@ -11,7 +11,7 @@
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/warnings.h>
-#include <utils/common/qt_opengl.h>
+#include <ui/common/opengl.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include "polygonal_shadow_item.h"

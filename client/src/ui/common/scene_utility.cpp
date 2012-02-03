@@ -8,12 +8,14 @@
 #include <utils/common/warnings.h>
 
 namespace {
-    void debugViewportRect(QGraphicsView *view) {
 #ifdef QN_SCENE_UTILITY_DEBUG
+    void debugViewportRect(QGraphicsView *view) {
         QRectF rect = SceneUtility::mapRectToScene(view, view->viewport()->rect());
         qDebug() << "SCENE VIEWPORT RECT:" << rect;
-#endif
     }
+#else
+#   define debugViewportRect(...)
+#endif
 
 } // anonymous namespace
 
@@ -252,7 +254,11 @@ QPointF SceneUtility::pointCentroid(const QPolygonF &polygon) {
 }
 
 QRectF SceneUtility::mapRectToScene(const QGraphicsView *view, const QRect &rect) {
-    return view->viewportTransform().inverted().mapRect(QRectF(rect));
+    return mapRectToScene(view, QRectF(rect));
+}
+
+QRectF SceneUtility::mapRectToScene(const QGraphicsView *view, const QRectF &rect) {
+    return view->viewportTransform().inverted().mapRect(rect);
 }
 
 QRect SceneUtility::mapRectFromScene(const QGraphicsView *view, const QRectF &rect) {
