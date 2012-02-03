@@ -314,7 +314,7 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
             if (lowDistance > SECOND_STREAM_FIND_EPS)
             {
                 // Hole in a low quality chunks. Try to find chunk in a high quality
-                DeviceFileCatalog::Chunk& chunkHi =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+                const DeviceFileCatalog::Chunk& chunkHi =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
                 qint64 hiDistance = chunkHi.distanceToTime(prevEndTimeMs);
                 if (hiDistance < lowDistance && lowDistance - hiDistance > SECOND_STREAM_FIND_EPS)
                 {
@@ -330,7 +330,7 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
         Q_ASSERT(m_currentChunkCatalog == m_catalogHi);
         // Quality is Low, but current catalog is High because not low data for current period.
         // Checing for switching to a low quality
-        DeviceFileCatalog::Chunk& chunkLow =  m_chunkSequenceLow->findChunk(m_resource, chunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+        const DeviceFileCatalog::Chunk& chunkLow =  m_chunkSequenceLow->findChunk(m_resource, chunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
         qint64 lowDistance = chunkLow.distanceToTime(chunk.startTimeMs);
         qint64 hiDistance = chunk.distanceToTime(prevEndTimeMs);
         if (hiDistance < lowDistance && lowDistance - hiDistance > SECOND_STREAM_FIND_EPS)
