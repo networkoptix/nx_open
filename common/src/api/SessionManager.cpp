@@ -10,13 +10,32 @@
 SessionManager* SessionManager::m_instance = 0;
 QAtomicInt SessionManager::m_handle(1);
 
+void SessionManagerReplyProcessor::addTarget(QObject* target)
+{
+    QMutexLocker locker(&m_targetsMutex);
+    m_targets.insert(target);
+}
+
+void SessionManagerReplyProcessor::targetDestroyed(QObject* target)
+{
+    QMutexLocker locker(&m_targetsMutex);
+    m_targets.remove(target);
+}
+
 void SessionManagerReplyProcessor::at_replyReceived(QNetworkReply *reply)
 {
     QObject *target = reply->property("target").value<QObject*>();
     QByteArray slot = reply->property("slot").toByteArray();
     int handle = reply->property("handle").toInt();
 
-    connect(this, SIGNAL(finished(int,QByteArray,int)), target, slot);
+    {
+        QMutexLocker locker(&m_targetsMutex);
+        if (m_targets.contains(target))
+        {
+            connect(this, SIGNAL(finished(int,QByteArray,int)), target, slot, Qt::QueuedConnection);
+            m_targets.remove(target);
+        }
+    }
     emit finished(reply->error(), reply->readAll(), handle);
 
     // QMetaObject::invokeMethod(target, slot, Qt::QueuedConnection, Q_ARG(int, reply->error()), Q_ARG(const QByteArray&, reply->readAll()), Q_ARG(int, handle));
@@ -186,6 +205,8 @@ void SessionManager::doSendAsyncGetRequest(const QUrl& url, const QString &objec
 int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
 {
     int handle = m_handle.fetchAndAddAcquire(1);
+    m_replyProcessor.addTarget(target);
+    connect(target, SIGNAL(destroyed(QObject*)), &m_replyProcessor, SLOT(targetDestroyed(QObject*)));
     emit asyncGetRequest(url, objectName, params, target, slot, handle);
     return handle;
 }

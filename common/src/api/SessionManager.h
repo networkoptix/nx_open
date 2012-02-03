@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
+#include <QtCore/QSet>
 
 #include "utils/common/base.h"
 #include "utils/common/longrunnable.h"
@@ -49,11 +50,18 @@ class SessionManagerReplyProcessor : public QObject
 public:
     SessionManagerReplyProcessor(QObject *parent = 0) : QObject(parent) {}
 
+    void addTarget(QObject* target);
+
 signals:
     void finished(int status, const QByteArray& data, int handle);
 
 private slots:
+    void targetDestroyed(QObject* target);
     void at_replyReceived(QNetworkReply *reply);
+
+private:
+    QMutex m_targetsMutex;
+    QSet<QObject*> m_targets;
 };
 
 

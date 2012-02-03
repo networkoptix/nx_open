@@ -17,10 +17,6 @@ cd server
 @start /B /WAIT convert.py
 cd %~dp0
 
-cd appserver\setup
-@start /B /WAIT setup.py build
-cd %~dp0
-
 set CONFIG=%1
 
 if [%1] == [] set CONFIG=Debug
