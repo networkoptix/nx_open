@@ -141,9 +141,9 @@ QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::Conn
         reader->addDataProcessor(gopKeeper);
         reader->start();
 
-        if (primaryLiveStream) 
+        if (!primaryLiveStream) 
         {
-            connect(reader, SIGNAL(onFpsChanged(QnAbstractMediaStreamDataProvider*, float)), this, SLOT(onFpsChanged(QnAbstractMediaStreamDataProvider*, float)));
+            connect(reader, SIGNAL(fpsChanged(QnAbstractMediaStreamDataProvider*, float)), this, SLOT(onFpsChanged(QnAbstractMediaStreamDataProvider*, float)));
             void onFpsChanged(QnAbstractMediaStreamDataProvider* provider, float value);
         }
     }
@@ -162,8 +162,13 @@ void QnVideoCamera::onFpsChanged(QnAbstractMediaStreamDataProvider* provider, fl
 {
     QnPhysicalCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_resource);
     Q_ASSERT(cameraRes != 0);
-    if (provider == m_primaryReader && cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS)
+    if (provider == m_primaryReader && m_secondaryReader)
     {
-        m_secondaryReader->stop();
+        if (cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS) {
+            m_secondaryReader->pause();
+        }
+        else {
+            m_secondaryReader->resume();
+        }
     }
 }

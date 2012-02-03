@@ -29,8 +29,9 @@ public:
     void setStartOffset(qint64 value);
 
     QnResourcePtr getResource() const { return m_device; }
-
-Q_SIGNALS:
+public slots:
+    void closeOnEOF(); // close recording then EOF will bereaced
+signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
 
@@ -61,6 +62,9 @@ protected:
     qint64 m_startDateTime;
     bool m_stopOnWriteError;
 private:
+    bool m_waitEOF;
+    QMutex m_closeAsyncMutex;
+
     bool m_forceDefaultCtx;
     AVFormatContext* m_formatCtx;
     bool m_packetWrited;

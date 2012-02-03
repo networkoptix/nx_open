@@ -88,6 +88,9 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
 
         QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
         QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
+        if (recorderLowRes) 
+            connect(camera->getLiveReader(QnResource::Role_SecondaryLiveVideo), SIGNAL(threadPaused()), recorderLowRes, SLOT(closeOnEOF()), Qt::DirectConnection);
+        
 
         QMutexLocker lock(&m_mutex);
 

@@ -242,7 +242,7 @@ int QnRtspConnectionProcessor::extractTrackId(const QString& path)
 QnAbstractMediaStreamDataProvider* QnRtspConnectionProcessor::getLiveDp()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0)
+    if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0 || d->liveDpLow->onPause())
         return d->liveDpHi;
     else
         return d->liveDpLow;
@@ -381,6 +381,22 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
     }
 }
 
+void QnRtspConnectionProcessor::checkQuality()
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (d->quality == MEDIA_Quality_Low)
+    {
+        if (d->liveDpLow == 0) {
+            d->quality = MEDIA_Quality_High;
+            qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
+        }
+        else if (d->liveDpLow->onPause()) {
+            d->quality = MEDIA_Quality_High;
+            qWarning() << "Primary stream has big fps for camera" << d->mediaRes->getUniqueId() << ". Secondary stream is disabled.";
+        }
+    }
+}
+
 int QnRtspConnectionProcessor::composePlay()
 {
 
@@ -388,11 +404,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
     createDataProvider();
-    if (d->liveDpLow == 0 && d->quality == MEDIA_Quality_Low)
-    {
-        d->quality = MEDIA_Quality_High;
-        qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
-    }
+    checkQuality();
 
     d->lastPlayCSeq = d->requestHeaders.value("CSeq").toInt();
 
@@ -518,11 +530,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             else
                 d->quality = MEDIA_Quality_High;
 
-            if (d->liveDpLow == 0 && d->quality == MEDIA_Quality_Low)
-            {
-                d->quality = MEDIA_Quality_High;
-                qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
-            }
+            checkQuality();
 
             if (d->liveMode)
             {

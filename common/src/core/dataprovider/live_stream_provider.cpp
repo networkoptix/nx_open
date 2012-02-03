@@ -88,6 +88,8 @@ void QnLiveStreamProvider::setFps(float f)
     }
     else
         updateStreamParamsBasedOnFps();
+
+    emit fpsChanged();
 }
 
 float QnLiveStreamProvider::getFps() const
@@ -107,7 +109,6 @@ bool QnLiveStreamProvider::needMetaData()
     // I assume this function is called once per video frame 
     if (getRole() == QnResource::Role_SecondaryLiveVideo)
         return false;
-
 
     bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
         m_framesSinceLastMetaData > 0; // got at least one frame
