@@ -101,11 +101,8 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
 
         m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
-        QMap<QnId, QnScheduleTaskList>::iterator scheduleItr = m_scheduleByCamera.find(res->getId());
-        if (scheduleItr != m_scheduleByCamera.end())
-            recorderHiRes->updateSchedule(scheduleItr.value());
-        if (recorderLowRes && scheduleItr != m_scheduleByCamera.end())
-            recorderLowRes->updateSchedule(scheduleItr.value());
+        recorderHiRes->updateSchedule(cameraRes->getScheduleTasks());
+        recorderLowRes->updateSchedule(cameraRes->getScheduleTasks());
     }
 }
 

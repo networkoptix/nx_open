@@ -43,7 +43,6 @@ private:
 private:
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
-    QMap<QnId, QnScheduleTaskList> m_scheduleByCamera;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory
