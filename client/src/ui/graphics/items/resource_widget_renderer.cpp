@@ -23,6 +23,11 @@ QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
     m_channelRenderers.clear();
 }
 
+void QnResourceWidgetRenderer::update() {
+    foreach(QnGLRenderer *renderer, m_channelRenderers)
+        renderer->update();
+}
+
 qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const { 
     return m_channelRenderers[channel]->lastDisplayedTime();
 }
@@ -37,7 +42,7 @@ QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int chann
 
     QnGLRenderer *renderer = m_channelRenderers[channel];
     renderer->setOpacity(opacity);
-    return renderer->paintEvent(rect);
+    return renderer->paint(rect);
 }
 
 void QnResourceWidgetRenderer::draw(CLVideoDecoderOutput *image) {

@@ -30,7 +30,10 @@ public:
 
     void draw(CLVideoDecoderOutput *image);
     void waitForFrameDisplayed(int channel);
-    RenderStatus paintEvent(const QRectF &r);
+    
+    
+    void QnGLRenderer::update();
+    RenderStatus paint(const QRectF &r);
 
     qreal opacity() const;
     void setOpacity(qreal opacity);
@@ -60,10 +63,9 @@ private:
     QWaitCondition m_waitCon;
 
     enum {
-        TEXTURE_COUNT = 6
+        TEXTURE_COUNT = 3
     };
 
-    int m_textureStep;
     QScopedPointer<QnGlRendererTexture> m_textures[TEXTURE_COUNT];
 
     bool m_forceSoftYUV;
@@ -85,8 +87,11 @@ private:
 
     bool m_gotnewimage;
     bool m_needwait;
+    bool m_newtexture;
+    bool m_updated;
 
     CLVideoDecoderOutput *m_curImg;
+    CLVideoDecoderOutput *m_textureImg;
     
     int m_format;
 

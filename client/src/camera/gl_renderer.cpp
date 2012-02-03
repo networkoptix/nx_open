@@ -375,8 +375,8 @@ QnGLRenderer::QnGLRenderer():
     m_curImg = 0;
     m_videoWidth = 0;
     m_videoHeight = 0;
-
-    m_textureStep = 0;
+    m_newtexture = false;
+    m_updated = false;
 
     m_yuv2rgbBuffer = 0;
     m_yuv2rgbBufferLen = 0;
@@ -482,8 +482,6 @@ bool QnGLRenderer::isYuvFormat() const
 
 void QnGLRenderer::updateTexture()
 {
-    m_textureStep = (m_textureStep + 1) % (TEXTURE_COUNT / 3);
-
     unsigned int w[3] = { m_curImg->linesize[0], m_curImg->linesize[1], m_curImg->linesize[2] };
     unsigned int r_w[3] = { m_curImg->width, m_curImg->width / 2, m_curImg->width / 2 }; // real_width / visible
     unsigned int h[3] = { m_curImg->height, m_curImg->height / 2, m_curImg->height / 2 };
@@ -500,7 +498,7 @@ void QnGLRenderer::updateTexture()
         break;
     }
 
-    glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
     if ((m_shared->supportsArbShaders && !m_forceSoftYUV) && isYuvFormat())
     {
@@ -622,18 +620,11 @@ void QnGLRenderer::updateTexture()
         glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
         OGL_CHECK_ERROR("glPixelStorei");
 
-        qint64 frequency = QnPerformance::currentCpuFrequency();
-        qint64 startCycles = QnPerformance::currentThreadCycles();
-
         glTexSubImage2D(GL_TEXTURE_2D, 0,
             0, 0,
             roundUp(r_w[0],ROUND_COEFF),
             h[0],
             glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
-
-        qint64 deltaCycles = QnPerformance::currentThreadCycles() - startCycles;
-
-        qDebug() << "UpdateTexture" << deltaCycles / (frequency / 1000.0) << "ms" << deltaCycles << texture->id();
 
         OGL_CHECK_ERROR("glTexSubImage2D");
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -705,17 +696,8 @@ void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTextu
         prog->release();
 }
 
-QnGLRenderer::RenderStatus QnGLRenderer::paintEvent(const QRectF &r)
+void QnGLRenderer::update()
 {
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-    if (m_painterOpacity < 1.0) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    RenderStatus result;
-
     CLVideoDecoderOutput *curImg;
     {
         QMutexLocker locker(&m_displaySync);
@@ -727,14 +709,36 @@ QnGLRenderer::RenderStatus QnGLRenderer::paintEvent(const QRectF &r)
             if (curImg->pkt_dts != AV_NOPTS_VALUE)
                 m_lastDisplayedTime = curImg->pkt_dts;
             m_lastDisplayedMetadata = curImg->metadata;
-
-            result = RENDERED_NEW_FRAME;
+            m_newtexture = true;
+            m_textureImg = curImg;
         } 
-        else 
-        {
-            result = RENDERED_OLD_FRAME;
-        }
     }
+
+    m_updated = true;
+}
+
+QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
+{
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    if (m_painterOpacity < 1.0) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    RenderStatus result;
+
+    if(!m_updated)
+        update();
+    m_updated = false;
+
+    CLVideoDecoderOutput *curImg = m_textureImg;
+    if(m_newtexture) {
+        result = RENDERED_NEW_FRAME;
+    } else {
+        result = RENDERED_NEW_FRAME;
+    }
+    m_newtexture = false;
 
     bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
     if(!draw) 
@@ -765,7 +769,7 @@ QnGLRenderer::RenderStatus QnGLRenderer::paintEvent(const QRectF &r)
 }
 
 QnGlRendererTexture *QnGLRenderer::texture(int index) {
-    return m_textures[3 * m_textureStep + index].data();
+    return m_textures[index].data();
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const
