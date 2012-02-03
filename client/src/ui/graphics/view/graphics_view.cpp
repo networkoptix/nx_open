@@ -1,13 +1,11 @@
 #include "graphics_view.h"
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
+#include <QtOpenGL>
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
 #   include <QDateTime>
 #endif
-
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/resource_widget_renderer.h>
 
 QnLayerPainter::QnLayerPainter(): m_view(NULL), m_layer(static_cast<QGraphicsScene::SceneLayer>(0)) {}
 
@@ -77,16 +75,6 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
     qint64 startCycles = QnPerformance::currentThreadCycles();
 #endif
 
-    /*if(scene() != NULL) {
-        foreach(QGraphicsItem *item, scene()->items()) {
-            QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
-            if(widget == NULL)
-                continue;
-
-            widget->renderer()->update();
-        }
-    }*/
-
     base_type::paintEvent(event);
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
@@ -98,7 +86,7 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
         qDebug() << QString("VIEWPORT PAINT: %1ms real time; %2ms cpu time (%3 cycles)").arg(deltaTime, 5).arg(deltaCpuTime, 8, 'g', 5).arg(deltaCycles, 8);
 #endif
 
-    //glFinish();
+    glFinish();
 }
 
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {

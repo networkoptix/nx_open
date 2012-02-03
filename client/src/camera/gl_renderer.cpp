@@ -7,12 +7,15 @@
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
-#include <utils/common/performance.h>
+#include <ui/common/opengl.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include "yuvconvert.h"
 #include "camera.h"
-#include "ui/common/opengl.h"
+
+#ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
+#   include <utils/common/performance.h>
+#endif
 
 #ifndef GL_CLAMP_TO_EDGE
 #   define GL_CLAMP_TO_EDGE    0x812F
@@ -513,8 +516,10 @@ void QnGLRenderer::updateTexture()
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
 
+#ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
             qint64 frequency = QnPerformance::currentCpuFrequency();
             qint64 startCycles = QnPerformance::currentThreadCycles();
+#endif 
 
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
@@ -522,10 +527,10 @@ void QnGLRenderer::updateTexture()
                             h[i],
                             GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
 
+#ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
             qint64 deltaCycles = QnPerformance::currentThreadCycles() - startCycles;
-
-            qDebug() << "UpdateTexture" << deltaCycles / (frequency / 1000.0) << "ms" << deltaCycles << texture->id();
-
+            qDebug() << "glTexSubImage2D" << deltaCycles / (frequency / 1000.0) << "ms" << deltaCycles;
+#endif 
 
             OGL_CHECK_ERROR("glTexSubImage2D");
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
