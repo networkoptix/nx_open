@@ -450,7 +450,7 @@ void CLCamDisplay::onJumpCanceled(qint64 /*time*/)
 void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
 {
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
-    cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString(), cl_logWARNING);
+    //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString(), cl_logWARNING);
 
     clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
