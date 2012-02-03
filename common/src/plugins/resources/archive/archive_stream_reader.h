@@ -54,7 +54,8 @@ public:
     virtual void setQuality(MediaQuality quality) override;
 
     /* For atomic changing several params: quality and position for example */
-    QMutex& getJumpMutex();
+    void lock();
+    void unlock();
 protected:
     virtual bool init();
 
@@ -106,6 +107,7 @@ private:
     int m_newDataMarker;
 
 private:
+    bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
     bool m_ignoreSkippingFrame;
     qint64 m_lastJumpTime;

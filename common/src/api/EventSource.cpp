@@ -101,7 +101,8 @@ void QnEventSource::stop()
 
 void QnEventSource::doStop()
 {
-    reply->abort();
+    if (reply)
+        reply->abort();
 }
 
 void QnEventSource::startRequest()

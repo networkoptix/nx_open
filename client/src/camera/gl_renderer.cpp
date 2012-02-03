@@ -601,7 +601,7 @@ void QnGLRenderer::updateTexture()
 
             qint64 deltaCycles = QnPerformance::currentThreadCycles() - startCycles;
 
-            qDebug() << "UpdateTexture" << deltaCycles / (frequency / 1000.0) << "ms" << deltaCycles;
+            //qDebug() << "UpdateTexture" << deltaCycles / (frequency / 1000.0) << "ms" << deltaCycles;
 
 
             OGL_CHECK_ERROR("glTexSubImage2D");
