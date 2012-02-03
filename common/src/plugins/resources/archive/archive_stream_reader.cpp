@@ -45,8 +45,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastJumpTime(AV_NOPTS_VALUE),
     m_exactJumpToSpecifiedFrame(false),
     m_quality(MEDIA_Quality_High),
-    m_oldQuality(MEDIA_Quality_High),
-    m_jumpMtx(QMutex::Recursive)
+    m_oldQuality(MEDIA_Quality_High)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -722,7 +721,7 @@ void QnArchiveStreamReader::pleaseStop()
 
 void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast)
 {
-    QMutexLocker mutex(&m_jumpMtx);
+    //QMutexLocker mutex(&m_jumpMtx);
     m_skipFramesToTime = skipFramesToTime;
     m_keepLastSkkipingFrame = keepLast;
 }
