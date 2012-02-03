@@ -46,7 +46,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_exactJumpToSpecifiedFrame(false),
     m_quality(MEDIA_Quality_High),
     m_oldQuality(MEDIA_Quality_High),
-    m_externalLocked(false)
+    m_externalLocked(false),
+    m_canChangeQuality(true)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -857,9 +858,21 @@ void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
+void QnArchiveStreamReader::disableQualityChange()
+{
+    m_canChangeQuality = false;
+}
+
+void QnArchiveStreamReader::enableQualityChange()
+{
+    m_canChangeQuality = true;
+}
+
+
 void QnArchiveStreamReader::setQuality(MediaQuality quality)
 {
-    m_quality = quality;
+    if (m_canChangeQuality)
+        m_quality = quality;
 }
 
 void QnArchiveStreamReader::lock()

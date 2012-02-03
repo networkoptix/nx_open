@@ -81,6 +81,8 @@ public:
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
     virtual void setQuality(MediaQuality quality) = 0;
+    virtual void disableQualityChange() = 0;
+    virtual void enableQualityChange() = 0;
 
 Q_SIGNALS:
     void beforeJump(qint64 mksec);

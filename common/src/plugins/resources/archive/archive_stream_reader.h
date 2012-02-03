@@ -53,6 +53,8 @@ public:
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
     virtual void setQuality(MediaQuality quality) override;
+    virtual void disableQualityChange() override;
+    virtual void enableQualityChange() override;
 
     /* For atomic changing several params: quality and position for example */
     void lock();
@@ -108,6 +110,7 @@ private:
     int m_newDataMarker;
 
 private:
+    bool m_canChangeQuality;
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
     bool m_ignoreSkippingFrame;
