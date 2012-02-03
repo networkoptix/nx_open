@@ -81,6 +81,13 @@ void QnArchiveStreamReader::nextFrame()
     m_singleShowWaitCond.wakeAll();
 }
 
+void QnArchiveStreamReader::needMoreData()
+{
+    QMutexLocker lock(&m_jumpMtx);
+    m_singleQuantProcessed = false;
+    m_singleShowWaitCond.wakeAll();
+}
+
 void QnArchiveStreamReader::previousFrame(qint64 mksec)
 {
     if (m_navDelegate) {
@@ -733,8 +740,7 @@ bool QnArchiveStreamReader::isSkippingFrames() const
 
 void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, qint64 skipTime)
 {
-    //cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
-    //cl_log.log("skipTime=", skipTime, cl_logALWAYS);
+    //qDebug() << "jumpTime=" << QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz") << "skipTime=" << skipTime;
     m_singleQuantProcessed=false;
     //if (m_requiredJumpTime != AV_NOPTS_VALUE)
     //    emit jumpCanceled(m_requiredJumpTime);

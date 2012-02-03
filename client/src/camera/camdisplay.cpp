@@ -13,6 +13,7 @@
 #include <qt_windows.h>
 #endif
 #include "utils/common/util.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
@@ -300,7 +301,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         QTime displayTime;
         displayTime.restart();
 
-        bool draw = !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore) && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
+        bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
+        bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
         // If there are multiple channels for this timestamp use only one of them
         //if (channel == 0 && draw)
@@ -347,6 +349,13 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 else
                     m_timeMutex.unlock();
             }
+        }
+        else if (!ignoreVideo)
+        {
+            // Frame does not displayed for some reason (and it is not ignored frames)
+            QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(vd->dataProvider);
+            if (archive->isSingleShotMode())
+                archive->needMoreData();
         }
 
         if (!sleep)
@@ -537,7 +546,7 @@ bool CLCamDisplay::canAcceptData() const
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
-    //cl_log.log("ProcessData 1", cl_logALWAYS);
+
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;

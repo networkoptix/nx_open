@@ -41,6 +41,7 @@ public:
 
     virtual bool jumpTo(qint64 mksec, qint64 skipTime);
     virtual void nextFrame();
+    void needMoreData();
     virtual void previousFrame(qint64 mksec);
     virtual void pauseMedia();
     virtual bool isMediaPaused() const;
