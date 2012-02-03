@@ -239,6 +239,7 @@ void SessionManager::doSendAsyncPostRequest(const QUrl& url, const QString &obje
 int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
 {
     int handle = m_handle.fetchAndAddAcquire(1);
+    m_replyProcessor.addTarget(target);
     emit asyncPostRequest(url, objectName, params, data, target, slot, handle);
     return handle;
 }
