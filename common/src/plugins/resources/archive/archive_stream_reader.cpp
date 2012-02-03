@@ -45,7 +45,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastJumpTime(AV_NOPTS_VALUE),
     m_exactJumpToSpecifiedFrame(false),
     m_quality(MEDIA_Quality_High),
-    m_oldQuality(MEDIA_Quality_High)
+    m_oldQuality(MEDIA_Quality_High),
+    m_externalLocked(false)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -268,6 +269,8 @@ begin_label:
 
     bool reverseMode = m_reverseMode;
 
+    // change quality checking
+    m_jumpMtx.lock();
     if (m_oldQuality != m_quality)
     {
         m_oldQuality = m_quality;
@@ -275,7 +278,6 @@ begin_label:
         if (!m_delegate->isRealTimeSource() && m_requiredJumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime();
-            m_jumpMtx.lock();
             beforeJumpInternal(displayTime);
             m_jumpMtx.unlock();
             if (displayTime != AV_NOPTS_VALUE) {
@@ -285,9 +287,16 @@ begin_label:
                 m_BOF = true;
             }
         }
+        else {
+            m_jumpMtx.unlock();
+        }
+    }
+    else {
+        m_jumpMtx.unlock();
     }
 
 
+    // jump command
     m_jumpMtx.lock();
     if (m_requiredJumpTime != AV_NOPTS_VALUE
         && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
@@ -318,6 +327,7 @@ begin_label:
         m_jumpMtx.unlock();
     }
 
+    // reverse mode changing
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
@@ -758,11 +768,15 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
 
 void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int marker)
 {
-    QMutexLocker mutex(&m_jumpMtx);
+    bool useMutex = !m_externalLocked;
+    if (useMutex)
+        m_jumpMtx.lock();
     beforeJumpInternal(mksec);
     m_newDataMarker = marker;
     m_exactJumpToSpecifiedFrame = !findIFrame;
     channeljumpToUnsync(mksec, 0, 0);
+    if (useMutex)
+        m_jumpMtx.unlock();
 }
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
@@ -853,7 +867,14 @@ void QnArchiveStreamReader::setQuality(MediaQuality quality)
     m_quality = quality;
 }
 
-QMutex& QnArchiveStreamReader::getJumpMutex()
+void QnArchiveStreamReader::lock()
 {
-    return m_jumpMtx;
+    m_jumpMtx.lock();
+    m_externalLocked = true; // external class locks mutex to perform atomic several params changing
+}
+
+void QnArchiveStreamReader::unlock()
+{
+    m_externalLocked = false;
+    m_jumpMtx.unlock();
 }
