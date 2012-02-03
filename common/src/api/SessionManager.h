@@ -48,7 +48,12 @@ class SessionManagerReplyProcessor : public QObject
     Q_OBJECT
 
 public:
-    SessionManagerReplyProcessor(QObject *parent = 0) : QObject(parent) {}
+    SessionManagerReplyProcessor(QObject *parent, QObject* target, const char* slot, int handle)
+        : QObject(parent),
+          m_target(target),
+          m_slot(slot),
+          m_handle(handle)
+    {}
 
     void addTarget(QObject* target);
 
@@ -57,11 +62,12 @@ signals:
 
 private slots:
     void targetDestroyed(QObject* target);
-    void at_replyReceived(QNetworkReply *reply);
+    void at_replyReceived();
 
 private:
-    QMutex m_targetsMutex;
-    QSet<QObject*> m_targets;
+    QObject* m_target;
+    const char* m_slot;
+    int m_handle;
 };
 
 
@@ -86,8 +92,8 @@ private slots:
     void doStop();
     void doStart();
 
-    void doSendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
-    void doSendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
+    void doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
+    void doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
 
 public:
     SessionManager();
@@ -116,12 +122,11 @@ signals:
     void stopSignal();
     void startSignal();
 
-    void asyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
-    void asyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
+    void asyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
+    void asyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
 
 private:
     QNetworkAccessManager* m_accessManager;
-    SessionManagerReplyProcessor m_replyProcessor;
     static QAtomicInt m_handle;
 
 private:
