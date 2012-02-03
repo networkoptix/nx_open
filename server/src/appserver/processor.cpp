@@ -43,6 +43,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         }
 
         qDebug() << "Connecting resource: " << resource->getName();
+        QObject::disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+            this, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
         QObject::connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
             this, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
     }
@@ -50,6 +52,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray& errorString, const QnResourceList& resources, int handle)
 {
+    qDebug() << "handle2=" << handle;
+
     if (status == 0 && !resources.isEmpty())
     {
         qDebug() << "Successfully updated resource" << resources[0]->getName();
@@ -77,5 +81,6 @@ void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status ol
         return;
     }
 
-    m_appServer->saveAsync(resource->toSharedPointer(), this, SLOT(requestFinished(int,const QByteArray&,const QnResourceList&, int)));
+    int handle = m_appServer->saveAsync(resource->toSharedPointer(), this, SLOT(requestFinished(int,const QByteArray&,const QnResourceList&, int)));
+    qDebug() << "handle1=" << handle;
 }
