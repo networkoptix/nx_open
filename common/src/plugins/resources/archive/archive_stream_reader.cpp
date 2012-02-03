@@ -668,11 +668,15 @@ bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
 
 void QnArchiveStreamReader::setReverseMode(bool value)
 {
-    if (value != m_reverseMode) {
-        m_jumpMtx.lock();
+    if (value != m_reverseMode) 
+    {
+        bool useMutex = !m_externalLocked;
+        if (useMutex)
+            m_jumpMtx.lock();
         m_lastJumpTime = AV_NOPTS_VALUE;
         m_reverseMode = value;
-        m_jumpMtx.unlock();
+        if (useMutex)
+            m_jumpMtx.unlock();
         m_delegate->beforeChangeReverseMode(m_reverseMode);
     }
 }
