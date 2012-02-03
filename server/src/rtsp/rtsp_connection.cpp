@@ -416,7 +416,6 @@ int QnRtspConnectionProcessor::composePlay()
     }
     else if (d->archiveDP) 
     {
-        d->archiveDP->setReverseMode(d->rtspScale < 0);
         QnServerArchiveDelegate* serverArchive = dynamic_cast<QnServerArchiveDelegate*>(d->archiveDP->getArchiveDelegate());
         if (serverArchive) 
         {
@@ -440,23 +439,18 @@ int QnRtspConnectionProcessor::composePlay()
             }
         }
 
+        d->archiveDP->lock();
+        d->archiveDP->setReverseMode(d->rtspScale < 0);
+        d->archiveDP->setQuality(d->quality);
         if (!d->requestHeaders.value("Range").isNull())
         {
             d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
+            d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
+            bool findIFrame = d->requestHeaders.value("x-no-find-iframe").isNull();
+            d->archiveDP->jumpWithMarker(d->startTime, findIFrame, d->lastPlayCSeq);
+        }
+        d->archiveDP->unlock();
 
-            {
-                d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
-                bool findIFrame = d->requestHeaders.value("x-no-find-iframe").isNull();
-                //QMutexLocker lock(&d->archiveDP->getJumpMutex());
-                d->archiveDP->lock();
-                d->archiveDP->setQuality(d->quality);
-                d->archiveDP->jumpWithMarker(d->startTime, findIFrame, d->lastPlayCSeq);
-                d->archiveDP->unlock();
-            }
-        }
-        else {
-            d->archiveDP->setQuality(d->quality);
-        }
     }
     currentDP->start();
     d->dataProcessor->start();

@@ -267,19 +267,25 @@ begin_label:
         }
     }
 
+    m_jumpMtx.lock();
     bool reverseMode = m_reverseMode;
+    qint64 jumpTime = m_requiredJumpTime;
+    m_requiredJumpTime = AV_NOPTS_VALUE;
+    MediaQuality quality = m_quality;
+    qint64 tmpSkipFramesToTime = m_tmpSkipFramesToTime;
+    m_tmpSkipFramesToTime = 0;
+    bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
+    m_jumpMtx.unlock();
 
     // change quality checking
-    m_jumpMtx.lock();
-    if (m_oldQuality != m_quality)
+    if (m_oldQuality != quality)
     {
-        m_oldQuality = m_quality;
-        m_delegate->setQuality(m_quality);
-        if (!m_delegate->isRealTimeSource() && m_requiredJumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
+        m_oldQuality = quality;
+        m_delegate->setQuality(quality);
+        if (!m_delegate->isRealTimeSource() && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime();
             beforeJumpInternal(displayTime);
-            m_jumpMtx.unlock();
             if (displayTime != AV_NOPTS_VALUE) {
                 intChanneljumpTo(displayTime, 0);
                 setSkipFramesToTime(displayTime, false);
@@ -287,19 +293,11 @@ begin_label:
                 m_BOF = true;
             }
         }
-        else {
-            m_jumpMtx.unlock();
-        }
-    }
-    else {
-        m_jumpMtx.unlock();
     }
 
 
     // jump command
-    m_jumpMtx.lock();
-    if (m_requiredJumpTime != AV_NOPTS_VALUE
-        && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
+    if (jumpTime != AV_NOPTS_VALUE && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
     {
         /*
         if (m_newDataMarker) {
@@ -311,30 +309,17 @@ begin_label:
             cl_log.log(s, cl_logALWAYS);
         }
         */
-        qint64 jumpTime = m_requiredJumpTime;
-        setSkipFramesToTime(m_tmpSkipFramesToTime, !m_exactJumpToSpecifiedFrame);
-        m_ignoreSkippingFrame = m_exactJumpToSpecifiedFrame;
-        m_tmpSkipFramesToTime = 0;
-        m_requiredJumpTime = AV_NOPTS_VALUE;
-        m_jumpMtx.unlock();
-
+        setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
+        m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
         intChanneljumpTo(jumpTime, 0);
-
         emit jumpOccured(jumpTime);
         m_BOF = true;
-    }
-    else {
-        m_jumpMtx.unlock();
     }
 
     // reverse mode changing
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
-        m_jumpMtx.lock();
-        qint64 jumpTime = m_requiredJumpTime;
-        m_requiredJumpTime = AV_NOPTS_VALUE;
-        m_jumpMtx.unlock();
         qint64 displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime();
 
         m_delegate->onReverseMode(displayTime, reverseMode);
