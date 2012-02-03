@@ -1,6 +1,6 @@
 #include "radial_gradient_painter.h"
-#include <utils/common/qt_opengl.h>
-#include "color_shader_program.h"
+#include <ui/common/opengl.h>
+#include <ui/graphics/shaders/color_shader_program.h>
 
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor):
     m_program(new QnColorShaderProgram()) 

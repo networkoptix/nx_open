@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QTextStream>
+#include <QDebug>
 
 #ifndef QT_STRINGIFY
 #  define QT_STRINGIFY2(x) #x
@@ -10,6 +11,10 @@
 #endif
 
 namespace detail {
+    inline void debugInternal(const char *functionName, const QString &s) {
+        qDebug("%s: %s", functionName, qPrintable(s));
+    }
+
     inline void warningInternal(const char *functionName, const QString &s) {
         qWarning("%s: %s", functionName, qPrintable(s));
     }
@@ -35,11 +40,52 @@ namespace detail {
             return s.arg(QLatin1String(arg));
         }
 
-        inline QString operator<<(const QString &s, void *arg) {
+        inline QString operator<<(const QString &s, const QByteArray &arg) {
+            return s.arg(QLatin1String(arg.data()));
+        }
+
+        template<class T>
+        inline QString textstream_operator_lshift(const QString &s, const T &arg) {
             QString text;
             QTextStream stream(&text, QIODevice::WriteOnly);
             stream << arg;
             return s.arg(text);
+        }
+
+        inline QString operator<<(const QString &s, const void *arg) {
+            return textstream_operator_lshift(s, arg);
+        }
+
+        template<class T>
+        inline QString debug_operator_lshift(const QString &s, const T &arg) {
+            QString text;
+            QDebug stream(&text);
+            stream << arg;
+            return s.arg(text);
+        }
+
+        inline QString operator<<(const QString &s, const QObject *arg) {
+            return debug_operator_lshift(s, arg);
+        }
+
+        template<class T>
+        inline QString operator<<(const QString &s, const QList<T> &arg) {
+            return debug_operator_lshift(s, arg);
+        }
+
+        template<class T>
+        inline QString operator<<(const QString &s, const QVector<T> &arg) {
+            return debug_operator_lshift(s, arg);
+        }
+
+        template<class Key, class T>
+        inline QString operator<<(const QString &s, const QHash<Key, T> &arg) {
+            return debug_operator_lshift(s, arg);
+        }
+
+        template<class T>
+        inline QString operator<<(const QString &s, const QSet<T> &arg) {
+            return debug_operator_lshift(s, arg);
         }
 
         inline void invokeInternal(const WarningHandler &handler, const char *functionName, const QString &s) {
@@ -82,6 +128,9 @@ namespace detail {
 } // namespace detail
 
 
+
+#define qnDebug(MSG, ...)                                                       \
+    ::detail::operators::invokeInternal(&::detail::debugInternal,    Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)
 
 #define qnWarning(MSG, ...)                                                     \
     ::detail::operators::invokeInternal(&::detail::warningInternal,  Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)

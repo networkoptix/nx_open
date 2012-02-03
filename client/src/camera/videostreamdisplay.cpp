@@ -128,7 +128,7 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
     int newWidth = srcWidth / rez;
     int newHeight = srcHeight / rez;
-    int maxTextureSize = QnGLRenderer::getMaxTextureSize();
+    int maxTextureSize = QnGLRenderer::maxTextureSize();
     while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
     {
         rez = CLVideoDecoderOutput::downscale_factor ((int)rez * 2);

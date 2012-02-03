@@ -1,8 +1,8 @@
 #include "loading_progress_painter.h"
 #include <cmath> /* For std::fmod. */
-#include <utils/common/qt_opengl.h>
+#include <ui/common/opengl.h>
 #include <ui/common/linear_combination.h>
-#include "color_shader_program.h"
+#include <ui/graphics/shaders/color_shader_program.h>
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
     m_sectorCount(sectorCount),

@@ -1,5 +1,5 @@
-#ifndef QN_QT_OPENGL_H
-#define QN_QT_OPENGL_H
+#ifndef QN_OPENGL_H
+#define QN_OPENGL_H
 
 #include <QtOpenGL>
 #include <cmath> /* For std::sin & std::cos. */
@@ -100,5 +100,15 @@ inline void glRotate(double angle, double x, double y, double z) {
     glRotated(angle, x, y, z);
 }
 
+/**
+ * This function checks for OpenGL errors, and if the error did occur, writes
+ * it out to log.
+ * 
+ * \param context                       Context where the error may have occured, e.g.
+ *                                      OpenGL function name.
+ * \returns                             OpenGL error code. 
+ */
+int glCheckError(const char *context);
 
-#endif // QN_QT_OPENGL_H
+
+#endif // QN_OPENGL_H

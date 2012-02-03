@@ -2,7 +2,7 @@
 #include <cassert>
 #include <QEvent>
 #include <QSysInfo>
-#include <utils/common/qt_opengl.h>
+#include <ui/common/opengl.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/common/scene_utility.h>

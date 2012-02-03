@@ -3,7 +3,7 @@
 #include <QRect>
 #include <QRadialGradient>
 #include <ui/graphics/painters/radial_gradient_painter.h>
-#include <utils/common/qt_opengl.h>
+#include <ui/common/opengl.h>
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnRadialGradientPainter, radialGradientPainter, (32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0)));
 

@@ -1,6 +1,6 @@
 #include "paused_painter.h"
-#include <utils/common/qt_opengl.h>
-#include "color_shader_program.h"
+#include <ui/common/opengl.h>
+#include <ui/graphics/shaders/color_shader_program.h>
 
 QnPausedPainter::QnPausedPainter():
     m_program(new QnColorShaderProgram()) 
