@@ -40,19 +40,19 @@ public:
         return true;
     }
 
-    T front()
+    T front() const
     {
         QMutexLocker mutex(&m_cs);
         return m_queue.front();  
     }
 
-    T at(int i)
+    T at(int i) const
     {
         QMutexLocker mutex(&m_cs);
         return m_queue[i];  
     }
 
-    T last()
+    T last() const
     {
         QMutexLocker mutex(&m_cs);
         return m_queue.last();

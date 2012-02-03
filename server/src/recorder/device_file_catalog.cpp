@@ -24,6 +24,16 @@ QnResource::ConnectionRole DeviceFileCatalog::roleForPrefix(const QString& prefi
 }
 
 
+
+qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
+{
+    if (timeMs >= startTimeMs) 
+        return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
+    else 
+        return startTimeMs - timeMs;
+}
+
+
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
@@ -349,7 +359,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     if (itr > m_chunks.begin())
     {
         --itr;
-         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs < startTimeMs && itr < m_chunks.end()-1)
+         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs && itr < m_chunks.end()-1)
              ++itr;
     }
     return itr - m_chunks.begin();

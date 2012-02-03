@@ -15,6 +15,7 @@ public:
     QnEventManager();
 
     void init(const QUrl& url, int reconnectTimeout);
+    void stop();
 
 public slots:
     void run();

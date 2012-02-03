@@ -41,7 +41,6 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)
         : data(alignment, capacity),
-        timestamp(AV_NOPTS_VALUE),
         flags(MediaFlags_None),
         channelNumber(0),
         subChannelNumber(0),
@@ -61,7 +60,6 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 	DataType dataType;
 	CodecID compressionType;
     //quint8 containerFormat[5]; // used for container dataType only instead compressionType;
-	qint64 timestamp; // mksec // 10^-6
     unsigned flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more that one sensor.
     quint32 subChannelNumber; // video camera can provide combination of different context at single channel (H.264 hi-res and low-res for example)
@@ -243,6 +241,6 @@ struct QnCompressedAudioData : public QnAbstractMediaData
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
 
-typedef CLThreadQueue<QnAbstractDataPacketPtr> CLDataQueue;
+//typedef CLThreadQueue<QnAbstractDataPacketPtr> CLDataQueue;
 
 #endif //abstract_media_data_h_112

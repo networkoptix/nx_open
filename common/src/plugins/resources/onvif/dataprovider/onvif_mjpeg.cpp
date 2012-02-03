@@ -1,7 +1,7 @@
 #include "onvif_mjpeg.h"
 #include "core/resource/network_resource.h"
 
-
+/*
 inline static int findJPegStartCode(const char *data, int datalen)
 {
     const char* end = data + datalen-1;
@@ -23,6 +23,7 @@ inline static int findJPegEndCode(const char *data, int datalen)
     }
     return -1;
 }
+*/
 
 /*
 char jpeg_start[2] = {0xff, 0xd8};
@@ -83,21 +84,30 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
         return QnAbstractMediaDataPtr(0);
 
     char headerBuffer[512+1];
-    int readed = mHttpClient->read(headerBuffer, sizeof(headerBuffer)-1);
-    if (readed < 1)
+    int headerSize = 0;
+    char* headerBufferEnd = 0;
+    char* realHeaderEnd = 0;
+    while (headerSize < sizeof(headerBuffer)-1)
+    {
+        int readed = mHttpClient->read(headerBuffer+headerSize, sizeof(headerBuffer)-1 - headerSize);
+        if (readed < 1)
+            return QnAbstractMediaDataPtr(0);
+        headerSize += readed;
+        headerBufferEnd = headerBuffer + headerSize;
+        *headerBufferEnd = 0;
+        realHeaderEnd = strstr(headerBuffer, "\r\n\r\n");
+        if (realHeaderEnd)
+            break;
+    }
+    if (!realHeaderEnd)
         return QnAbstractMediaDataPtr(0);
-    headerBuffer[readed] = 0;
     char* contentLenPtr = strstr(headerBuffer, "Content-Length:");
     if (!contentLenPtr)
         return QnAbstractMediaDataPtr(0);
     int contentLen = getIntParam(contentLenPtr + 16);
-    char* jpegFindStart = contentLenPtr+16;
-    char* dataEnd = headerBuffer + readed;
-    int jpegStart = findJPegStartCode(jpegFindStart, dataEnd - jpegFindStart);
 
     QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
-    if (jpegStart != -1)
-        videoData->data.write(jpegFindStart + jpegStart, dataEnd - (jpegFindStart+jpegStart));
+    videoData->data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
 
     int dataLeft = contentLen - videoData->data.size();
     char* curPtr = videoData->data.data() + videoData->data.size();
@@ -105,7 +115,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
 
     while (dataLeft > 0)
     {
-        readed = mHttpClient->read(curPtr, dataLeft);
+        int readed = mHttpClient->read(curPtr, dataLeft);
         if (readed < 1)
             return QnAbstractMediaDataPtr(0);
         curPtr += readed;

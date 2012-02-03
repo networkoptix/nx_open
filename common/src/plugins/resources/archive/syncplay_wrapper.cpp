@@ -174,14 +174,20 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
     }
 }
 
+void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    d->lastJumpTime = mksec;
+    if (d->speed < 0 && d->lastJumpTime == DATETIME_NOW)
+        d->lastJumpTime = QDateTime::currentMSecsSinceEpoch()*1000ll; // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
+    d->timer.restart();
+}
+
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    d->lastJumpTime = skipTime ? skipTime : mksec;
-    if (d->speed < 0 && d->lastJumpTime == DATETIME_NOW)
-        d->lastJumpTime = QDateTime::currentMSecsSinceEpoch()*1000ll; // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
-    d->timer.restart();
+    setJumpTime(skipTime ? skipTime : mksec);
     bool rez = false;
     foreach(ReaderInfo info, d->readers)
     {
@@ -359,13 +365,13 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
         d->lastJumpTime = newTime;
     else
         d->lastJumpTime = getCurrentTime();
-		/*
+		
     QString s;
     QTextStream str(&s);
     str << "reinitTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString("hh:mm:ss.zzz");
     str.flush();
     cl_log.log(s, cl_logALWAYS);
-	*/
+	
 
     d->timer.restart();
 }
@@ -389,7 +395,7 @@ void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
     }
 }
 
-void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 /*mksec*/)
+void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 
@@ -399,7 +405,7 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 /*mksec*/)
     if (d->inJumpCount == 0) 
     {
         d->processingJump = false;
-        d->timer.restart();
+        setJumpTime(mksec);
     }
 }
 

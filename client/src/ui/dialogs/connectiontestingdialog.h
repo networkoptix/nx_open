@@ -21,7 +21,7 @@ public:
     explicit ConnectionTestingDialog(QWidget *parent, QUrl url);
     ~ConnectionTestingDialog();
 
-public Q_SLOTS:
+public slots:
     virtual void accept();
     virtual void reject();
 

@@ -223,11 +223,16 @@ QnGLRenderer::QnGLRenderer():
 
     m_textureStep = 0;
 
+    m_yuv2rgbBuffer = 0;
+    m_yuv2rgbBufferLen = 0;
+    
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 }
 
 QnGLRenderer::~QnGLRenderer()
 {
+    qFreeAligned(m_yuv2rgbBuffer);
+
     if (m_textureUploaded)
     {
         //glDeleteTextures(3, m_texture);
@@ -361,7 +366,7 @@ void QnGLRenderer::updateTexture()
 
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
-    if (!m_isSoftYuv2Rgb && isYuvFormat())
+    if ((!m_isSoftYuv2Rgb && !m_forceSoftYUV) && isYuvFormat())
     {
         // using pixel shader to yuv-> rgb conversion
         for (int i = 0; i < 3; ++i)
@@ -485,9 +490,13 @@ void QnGLRenderer::updateTexture()
         if (isYuvFormat())
         {
             int size = 4 * m_curImg->linesize[0] * h[0];
-            if (m_yuv2rgbBuffer.size() < size)
-                m_yuv2rgbBuffer.resize(size);
-            pixels = m_yuv2rgbBuffer.data();
+            if (m_yuv2rgbBufferLen < size)
+            {
+                m_yuv2rgbBufferLen = size;
+                qFreeAligned(m_yuv2rgbBuffer);
+                m_yuv2rgbBuffer = (uchar*)qMallocAligned(size, CL_MEDIA_ALIGNMENT);
+            }
+            pixels = m_yuv2rgbBuffer;
         }
 
         int lineInPixelsSize = m_curImg->linesize[0];

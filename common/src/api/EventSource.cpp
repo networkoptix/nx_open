@@ -84,6 +84,7 @@ QnEventSource::QnEventSource(QUrl url, int retryTimeout)
     : m_url(url),
       m_retryTimeout(retryTimeout)
 {
+    connect(this, SIGNAL(stopSignal()), this, SLOT(doStop()));
     connect(&qnam, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(slotAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
 #ifndef QT_NO_OPENSSL
@@ -91,6 +92,17 @@ QnEventSource::QnEventSource(QUrl url, int retryTimeout)
             this, SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
 #endif
 
+}
+
+void QnEventSource::stop()
+{
+    emit stopSignal();
+}
+
+void QnEventSource::doStop()
+{
+    if (reply)
+        reply->abort();
 }
 
 void QnEventSource::startRequest()
@@ -146,7 +158,6 @@ void QnEventSource::httpReadyRead()
         QnEvent event;
         event.load(parsed);
 
-        qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
         emit eventReceived(event);
     }
 }

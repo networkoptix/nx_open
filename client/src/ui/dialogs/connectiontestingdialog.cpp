@@ -53,6 +53,9 @@ void ConnectionTestingDialog::timeout()
 
 void ConnectionTestingDialog::testResults(int status, const QByteArray &data, int requestHandle)
 {
+    Q_UNUSED(data)
+    Q_UNUSED(requestHandle)
+
     if (m_timeoutTimer.isActive())
         m_timeoutTimer.stop();
     else
@@ -73,8 +76,7 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, in
 void ConnectionTestingDialog::testSettings()
 {
     connection = QnAppServerConnectionFactory::createConnection(m_url);
-
-    connection->testConnectionAsync(this, SLOT(testResults(int, const QByteArray&, int)));
+    connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,int)));
 }
 
 void ConnectionTestingDialog::accept()

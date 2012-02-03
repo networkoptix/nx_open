@@ -13,9 +13,11 @@
 #include <qt_windows.h>
 #endif
 #include "utils/common/util.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
+//static qint64 MAX_QUEUE_LENGTH = 1000000ll * 1;
 
 static void updateActivity()
 {
@@ -242,7 +244,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                             cl_log.log(s, cl_logALWAYS);
                             firstWait = false;
                         }
-						*/					
+                        */
                         QnSleep::msleep(1);
                     }
                     else {
@@ -299,7 +301,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         QTime displayTime;
         displayTime.restart();
 
-        bool draw = !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore) && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
+        bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
+        bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
         // If there are multiple channels for this timestamp use only one of them
         //if (channel == 0 && draw)
@@ -347,6 +350,13 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     m_timeMutex.unlock();
             }
         }
+        else if (!ignoreVideo)
+        {
+            // Frame does not displayed for some reason (and it is not ignored frames)
+            QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(vd->dataProvider);
+            if (archive->isSingleShotMode())
+                archive->needMoreData();
+        }
 
         if (!sleep)
             m_displayLasts = displayTime.elapsed(); // this is how long would i take to draw frame.
@@ -361,12 +371,13 @@ void CLCamDisplay::onBeforeJump(qint64 time)
 {
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
-   /*
+    /*
     if (time < 1000000ll * 100000)
         cl_log.log("before jump to ", time, cl_logWARNING);
     else
         cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     */
+    
     QMutexLocker lock(&m_timeMutex);
 
     m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
@@ -394,7 +405,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
         cl_log.log("after jump to ", time, cl_logWARNING);
     else
         cl_log.log("after jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
-    */
+    */       
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this);
 
@@ -420,7 +431,7 @@ void CLCamDisplay::onJumpCanceled(qint64 /*time*/)
 void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
 {
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
-    //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(newTime/1000).toString(), cl_logWARNING);
+    cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString(), cl_logWARNING);
 
     clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
@@ -528,13 +539,14 @@ bool CLCamDisplay::canAcceptData() const
 {
     if (m_processedPackets < m_dataQueue.maxSize())
         return m_dataQueue.size() <= m_processedPackets;
-    else
+    else 
         return QnAbstractDataConsumer::canAcceptData();
+        //return m_dataQueue.mediaLength() < MAX_QUEUE_LENGTH;
 }
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
-    //cl_log.log("ProcessData 1", cl_logALWAYS);
+
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;

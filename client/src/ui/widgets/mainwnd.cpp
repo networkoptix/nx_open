@@ -49,6 +49,8 @@
 #include "dwm.h"
 #include "layout_tab_bar.h"
 
+#include "eventmanager.h"
+
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 namespace {
@@ -320,6 +322,9 @@ void MainWnd::showAuthenticationDialog()
     if (dialog->exec()) {
         const Settings::ConnectionData connection = Settings::lastUsedConnection();
         if (connection.url.isValid()) {
+            QnEventManager::instance()->stop();
+            SessionManager::instance()->stop();
+
             QnAppServerConnectionFactory::setDefaultUrl(connection.url);
 
             // repopulate the resource pool
@@ -329,6 +334,9 @@ void MainWnd::showAuthenticationDialog()
             // don't remove local resources
             const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
             qnResPool->removeResources(remoteResources);
+
+            SessionManager::instance()->start();
+            QnEventManager::instance()->run();
 
             QnResourceDiscoveryManager::instance().start();
             QnResource::startCommandProc();

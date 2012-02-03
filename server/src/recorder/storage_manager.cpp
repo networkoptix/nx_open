@@ -345,7 +345,7 @@ void QnChunkSequence::onFirstDataRemoved(int n)
     }
 }
 
-DeviceFileCatalog::Chunk QnChunkSequence::findChunk(QnResourcePtr res, qint64 timeUsec, DeviceFileCatalog::FindMethod findMethod)
+DeviceFileCatalog::Chunk QnChunkSequence::findChunk(QnResourcePtr res, qint64 timeMs, DeviceFileCatalog::FindMethod findMethod)
 {
     QMap<QnResourcePtr, CacheInfo>::iterator resourceItr = m_cache.find(res);
     if (resourceItr == m_cache.end())
@@ -353,9 +353,9 @@ DeviceFileCatalog::Chunk QnChunkSequence::findChunk(QnResourcePtr res, qint64 ti
 
     CacheInfo& info = resourceItr.value();
 
-    if (timeUsec != -1) {
+    if (timeMs != -1) {
         info.m_index = -1;
-        info.m_startTimeMs = timeUsec/1000;
+        info.m_startTimeMs = timeMs;
     }
     // we can reset index in any time if we are going to search from begin again
     if (info.m_index == -1) {
