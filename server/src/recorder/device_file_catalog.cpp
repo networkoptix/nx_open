@@ -356,11 +356,16 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
         return -1;
 
     ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTimeMs);
-    if (itr > m_chunks.begin())
+    if (itr > m_chunks.begin()+m_firstDeleteCount)
     {
         --itr;
-         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs && itr < m_chunks.end()-1)
-             ++itr;
+         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs)
+         {
+             if (itr < m_chunks.end()-1)
+                ++itr;
+             else
+                 return -1;
+         }
     }
     return itr - m_chunks.begin();
 }

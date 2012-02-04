@@ -119,7 +119,7 @@ bool QnLiveStreamProvider::needMetaData()
     return result;
 }
 
-void QnLiveStreamProvider::onGotFrame()
+void QnLiveStreamProvider::onGotVideoFrame()
 {
     m_framesSinceLastMetaData++;
 }

@@ -403,7 +403,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         {
             // Frame does not displayed for some reason (and it is not ignored frames)
             QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(vd->dataProvider);
-            if (archive->isSingleShotMode())
+            if (archive && archive->isSingleShotMode())
                 archive->needMoreData();
         }
 

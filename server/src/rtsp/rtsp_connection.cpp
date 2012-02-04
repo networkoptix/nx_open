@@ -132,6 +132,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->quality = MEDIA_Quality_Low;
     else
         d->quality = MEDIA_Quality_High;
+    d->qualityFastSwitch = true;
     d->clientRequest.clear();
 }
 
@@ -533,6 +534,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
                 d->quality = MEDIA_Quality_High;
 
             checkQuality();
+            d->qualityFastSwitch = false;
 
             if (d->liveMode)
             {

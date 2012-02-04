@@ -291,8 +291,9 @@ begin_label:
     if (m_oldQuality != quality)
     {
         m_oldQuality = quality;
-        m_delegate->setQuality(quality, qualityFastSwitch);
-        if (!m_delegate->isRealTimeSource() && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
+        // !m_delegate->isRealTimeSource()
+        bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch);
+        if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime();
             beforeJumpInternal(displayTime);
@@ -873,7 +874,7 @@ void QnArchiveStreamReader::enableQualityChange()
 
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
 {
-    if (m_canChangeQuality) {
+    if (m_canChangeQuality && m_quality != quality) {
         m_quality = quality;
         m_qualityFastSwitch = fastSwitch;
     }

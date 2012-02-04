@@ -39,7 +39,7 @@ public:
     // Send motion data to client
     virtual void setSendMotion(bool value);
 
-    virtual void setQuality(MediaQuality quality, bool fastSwitch);
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch);
 
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeReverseMode(bool reverseMode);
