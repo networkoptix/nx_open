@@ -35,7 +35,6 @@ private:
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)
 
-    CameraScheduleWidget* m_cameraScheduleWidget;
     QnVirtualCameraResourcePtr m_camera;
     QScopedPointer<Ui::CameraSettingsDialog> ui;
 

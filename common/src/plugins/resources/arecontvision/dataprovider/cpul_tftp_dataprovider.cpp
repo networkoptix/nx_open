@@ -386,7 +386,6 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     videoData->channelNumber = 0;
 
     videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
-    onGotFrame();
     return videoData;
 
 }
