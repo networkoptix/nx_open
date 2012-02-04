@@ -54,6 +54,7 @@ void QnScheduleGridWidget::initMetrics()
     do
     {
         m_gridLeftOffset = 0;
+        m_gridTopOffset = 0;
         m_weekDaysSize.clear();
         m_labelsFont.setPointSizeF(fontSize);
         QFontMetrics metric(m_labelsFont);
@@ -195,7 +196,6 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
 void QnScheduleGridWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-
     initMetrics();
 }
 

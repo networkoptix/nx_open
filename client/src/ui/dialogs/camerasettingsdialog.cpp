@@ -16,16 +16,10 @@
 CameraSettingsDialog::CameraSettingsDialog(QWidget *parent, QnVirtualCameraResourcePtr camera) :
     QDialog(parent),
     ui(new Ui::CameraSettingsDialog),
-    m_cameraScheduleWidget(new CameraScheduleWidget(this)),
     m_camera(camera),
     m_connection (QnAppServerConnectionFactory::createConnection())
 {
     ui->setupUi(this);
-    ui->tabRecording->setLayout(new QVBoxLayout(this));
-    ui->tabRecording->layout()->addWidget(m_cameraScheduleWidget);
-
-//    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
-
     updateView();
 }
 
@@ -62,7 +56,7 @@ void CameraSettingsDialog::saveToModel()
     m_camera->setName(ui->nameEdit->text());
     m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
-    m_camera->setScheduleTasks(m_cameraScheduleWidget->scheduleTasks());
+    m_camera->setScheduleTasks(ui->cameraScheduleWidget->scheduleTasks());
 }
 
 void CameraSettingsDialog::updateView()
@@ -73,7 +67,7 @@ void CameraSettingsDialog::updateView()
     ui->loginEdit->setText(m_camera->getAuth().user());
     ui->passwordEdit->setText(m_camera->getAuth().password());
 
-    m_cameraScheduleWidget->setScheduleTasks(m_camera->getScheduleTasks());
+    ui->cameraScheduleWidget->setScheduleTasks(m_camera->getScheduleTasks());
 }
 
 void CameraSettingsDialog::buttonClicked(QAbstractButton *button)
