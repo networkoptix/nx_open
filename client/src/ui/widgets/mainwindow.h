@@ -46,6 +46,7 @@ private Q_SLOTS:
     void showAboutDialog();
     void editPreferences();
 
+
     void appServerError(int error);
     void appServerAuthenticationRequired();
 

@@ -21,6 +21,7 @@
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
+#include "ui/dialogs/camerasettingsdialog.h"
 #include "ui/preferences/preferencesdialog.h"
 
 #include "ui/mixins/sync_play_mixin.h"
@@ -127,6 +128,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(showOpenFileDialog()));
     addAction(&cm_open_file);
+
+    connect(&cm_camera_settings, SIGNAL(triggered()), this, SLOT(editCameraSettings()));
+    addAction(&cm_camera_settings);
 
     connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
     addAction(&cm_reconnect);
@@ -292,6 +296,14 @@ void MainWnd::showOpenFileDialog()
     if (dialog.exec())
         m_controller->drop(dialog.selectedFiles());
 }
+
+void MainWnd::editCameraSettings()
+{
+    CameraSettingsDialog dialog(this, qnResPool->getResourceById(4).dynamicCast<QnVirtualCameraResource>());
+    dialog.setWindowModality(Qt::ApplicationModal);
+    dialog.exec();
+}
+
 
 void MainWnd::showAboutDialog()
 {

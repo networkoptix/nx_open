@@ -34,7 +34,7 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
         QnScheduleTask task;
 
-        for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
+        for (int col = 0; col < ui->gridWidget->columnCount();) {
             const QPoint cell(col, row);
 
             QnScheduleTask::RecordingType recordType = QnScheduleTask::RecordingType_Run;
@@ -64,7 +64,7 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
                     qWarning("SecondParam wasn't acknowledged. fallback to 'Highest'");
             }
             int fps = fps = ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
-            if (fps == 0)
+            if (fps == 0 && recordType != QnScheduleTask::RecordingType_Never)
                 fps = 10;
 
             if (task.m_startTime == task.m_endTime) {
@@ -77,11 +77,12 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
                 task.m_afterThreshold = ui->spinBoxRecordAfter->value();
                 task.m_streamQuality = streamQuality;
                 task.m_fps = fps;
+                ++col;
             } else if (task.m_recordType == recordType && task.m_streamQuality == streamQuality && task.m_fps == fps) {
                 task.m_endTime = (col + 1) * 3600; // in secs from start of day
+                ++col;
             } else {
                 tasks.append(task);
-
                 task = QnScheduleTask();
             }
         }
@@ -98,6 +99,13 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasks)
     for (int y = 0; y < ui->gridWidget->rowCount(); ++y) {
         for (int x = 0; x < ui->gridWidget->columnCount(); ++x)
             ui->gridWidget->resetCellValues(QPoint(x, y));
+    }
+
+    if (!tasks.isEmpty()) {
+        const QnScheduleTask &task = tasks.first();
+
+        ui->spinBoxRecordBefore->setValue(task.getBeforeThreshold());
+        ui->spinBoxRecordAfter->setValue(task.getAfterThreshold());
     }
 
     foreach (const QnScheduleTask &task, tasks) {
