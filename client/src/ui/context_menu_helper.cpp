@@ -14,9 +14,6 @@ QAction cm_reconnect(QObject::tr("Reconnect"), 0);
 QAction cm_fitinview(QObject::tr("Fit in View"), 0);
 QAction cm_open_file(QObject::tr("Open file(s)..."), 0);
 QAction cm_screen_recording(QObject::tr("Screen Recording"), 0);
-// XXX
-QAction cm_camera_settings(QObject::tr("Camera settings"), 0);
-
 QAction cm_toggle_recording(QObject::tr("Start Screen Recording"), 0);
 QAction cm_recording_settings(QObject::tr("Screen Recording Settings"), 0);
 QAction cm_toggle_fullscreen(QObject::tr("Toggle fullscreen"), 0);

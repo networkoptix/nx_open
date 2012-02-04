@@ -11,7 +11,6 @@ extern QAction cm_exit;
 extern QAction cm_reconnect;
 extern QAction cm_open_file;
 extern QAction cm_screen_recording;
-extern QAction cm_camera_settings;
 extern QAction cm_toggle_recording;
 extern QAction cm_recording_settings;
 extern QAction cm_toggle_fullscreen;

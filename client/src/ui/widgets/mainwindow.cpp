@@ -20,7 +20,6 @@
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
-#include "ui/dialogs/camerasettingsdialog.h"
 #include "ui/preferences/preferencesdialog.h"
 
 #include "ui/mixins/sync_play_mixin.h"

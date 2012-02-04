@@ -21,6 +21,7 @@
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
@@ -57,6 +58,8 @@
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
+
+#include "ui/dialogs/camerasettingsdialog.h"
 
 #include <ui/context_menu/menu_wrapper.h>
 #include <ui/context_menu_helper.h>
@@ -364,9 +367,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 #endif
     m_randomGridAction                  = newAction(tr("Randomize grid"), tr(""),                   this);
     m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
+    m_cameraSettingsAction              = newAction(tr("Camera settings"),          tr(""),             this);
     m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
 
     connect(m_showMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(m_cameraSettingsAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_cameraSettingsAction_triggered()));
+
     connect(m_hideMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
 
     connect(&cm_toggle_recording,       SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
@@ -1032,6 +1038,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
 
     m_itemContextMenu->removeAction(m_hideMotionAction);
     m_itemContextMenu->removeAction(m_showMotionAction);
+    m_itemContextMenu->removeAction(m_cameraSettingsAction);
 
     int gridnowDisplayed = isMotionGridDisplayed();
     if (gridnowDisplayed == 1)
@@ -1043,6 +1050,10 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         m_itemContextMenu->addAction(m_showMotionAction);
     }
 
+    if (widget->scene()->selectedItems().size() == 1 && widget->resource().dynamicCast<QnVirtualCameraResource>())
+    {
+        m_itemContextMenu->addAction(m_cameraSettingsAction);
+    }
 
     m_itemContextMenu->exec(info.screenPos());
 }
@@ -1110,7 +1121,6 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
     QScopedPointer<QMenu> menu(new QMenu(display()->view()));
     menu->addAction(&cm_open_file);
     menu->addAction(&cm_screen_recording);
-    menu->addAction(&cm_camera_settings);
 
     //menu->addAction(m_randomGridAction);
 
@@ -1165,6 +1175,19 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 void QnWorkbenchController::at_hideMotionAction_triggered() {
     displayMotionGrid(display()->scene()->selectedItems(), false);
     //m_motionSelectionInstrument->recursiveDisable();
+}
+
+void QnWorkbenchController::at_cameraSettingsAction_triggered()
+{
+    QGraphicsItem* item = display()->scene()->selectedItems().first();
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+
+    if (widget && widget->resource())
+    {
+        CameraSettingsDialog dialog(display()->view(), widget->resource().dynamicCast<QnVirtualCameraResource>());
+        dialog.setWindowModality(Qt::ApplicationModal);
+        dialog.exec();
+    }
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered()

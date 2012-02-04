@@ -58,7 +58,6 @@ protected Q_SLOTS:
 
     void showOpenFileDialog();
     void showAboutDialog();
-    void editCameraSettings();
     void showPreferencesDialog();
     void showAuthenticationDialog();
 

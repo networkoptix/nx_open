@@ -106,6 +106,7 @@ protected Q_SLOTS:
 
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
+    void at_cameraSettingsAction_triggered();
 
     void at_toggleRecordingAction_triggered();
     void at_recordingSettingsAction_triggered();
@@ -207,6 +208,7 @@ private:
     QMenu *m_itemContextMenu;
 
     QAction *m_showMotionAction;
+    QAction *m_cameraSettingsAction;
     QAction *m_hideMotionAction;
     QAction *m_randomGridAction;
 };
