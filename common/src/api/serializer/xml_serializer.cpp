@@ -625,7 +625,7 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
     const QAuthenticator& auth = cameraPtr->getAuth();
 
     camera.login(auth.user().toStdString());
-    camera.password(auth.user().toStdString());
+    camera.password(auth.password().toStdString());
 
     std::ostringstream os;
 
