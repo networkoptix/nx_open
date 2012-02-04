@@ -353,7 +353,7 @@ void MainWnd::updateFullScreenState()
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);
     if(fullScreen) {
-        m_globalLayout->setContentsMargins(8, 8, 8, 8);
+        m_globalLayout->setContentsMargins(0, 0, 0, 0);
         m_tabBar->setParent(NULL);
         m_ui->setTabBar(m_tabBar);
         m_tabBar->show();

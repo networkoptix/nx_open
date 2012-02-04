@@ -448,17 +448,17 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
         return; // TODO: item limit must be changeable.
 
     if (!resource->checkFlag(QnResource::media))
-        return; // ### upsupported for now
+        return; // TODO: unsupported for now
 
-    if (!layout()->items(resource->getUniqueId()).isEmpty())
-        return; // avoid duplicates
+    //if (!layout()->items(resource->getUniqueId()).isEmpty())
+    //    return; /** Avoid duplicates. */
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
 
     const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
 
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource);
+    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
     item->setFlag(QnWorkbenchItem::Pinned, false);
     item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
     layout()->addItem(item);
@@ -490,14 +490,14 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
 
 void QnWorkbenchController::remove(const QnResourcePtr &resource)
 {
-    delete layout()->item(resource);
+    foreach(QnWorkbenchItem *item, layout()->items(resource->getUniqueId()))
+        delete item;
 }
 
 void QnWorkbenchController::remove(const QnResourceList &resources)
 {
-    QnWorkbenchLayout *layout = this->layout();
     foreach (const QnResourcePtr &resource, resources)
-        delete layout->item(resource);
+        remove(resource);
 }
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)

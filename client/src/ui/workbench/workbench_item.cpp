@@ -4,14 +4,13 @@
 
 #include "workbench_layout.h"
 
-QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr &resource, QObject *parent):
+QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, QObject *parent):
     QObject(parent),
-    m_resource(resource),
+    m_resourceUid(resourceUid),
     m_layout(NULL),
     m_flags(Pinned),
     m_rotation(0.0)
-{
-}
+{}
 
 QnWorkbenchItem::~QnWorkbenchItem()
 {
@@ -19,12 +18,15 @@ QnWorkbenchItem::~QnWorkbenchItem()
         m_layout->removeItem(this);
 }
 
-void QnWorkbenchItem::load(const QnLayoutItemData& itemData)
+void QnWorkbenchItem::load(const QnLayoutItemData &itemData)
 {
+    // TODO: check for resource id
+
     // TODO: set flags here
     setCombinedGeometry(itemData.combinedGeometry);
     setRotation(itemData.rotation);
 }
+
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {
     if(m_layout != NULL)
         return m_layout->moveItem(this, geometry);

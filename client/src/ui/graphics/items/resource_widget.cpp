@@ -3,15 +3,16 @@
 #include <QPainter>
 #include <QGraphicsLinearLayout>
 #include <core/resource/resource_media_layout.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include <ui/common/opengl.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/style/globals.h>
-#include <core/resource/security_cam_resource.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/warnings.h>
-#include <ui/common/opengl.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include "polygonal_shadow_item.h"
@@ -92,7 +93,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     memset(m_motionMaskBinData, 0, MD_WIDTH * MD_HEIGHT/8);
 
     /* Set up video rendering. */
-    m_resource = item->resource();
+    m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(at_display_resourceUpdated()));
 

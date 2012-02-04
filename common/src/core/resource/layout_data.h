@@ -6,8 +6,9 @@
 #include "utils/common/qnid.h"
 #include "core/resource/resource.h"
 
-struct QnLayoutItemData
+class QnLayoutItemData
 {
+public:
     QnId resourceId;
     int flags;
     QRectF combinedGeometry;
