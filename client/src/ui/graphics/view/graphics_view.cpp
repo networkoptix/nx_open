@@ -69,6 +69,8 @@ void QnGraphicsView::uninstallLayerPainter(QnLayerPainter *painter) {
 }
 
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
+    glFinish(); /* Finish previous frame, so that we don't get spurious delays in glTexSubImage2d. */
+
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
     qint64 frequency = QnPerformance::currentCpuFrequency();
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();
@@ -85,8 +87,6 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
     if(deltaCpuTime > 1.0)
         qDebug() << QString("VIEWPORT PAINT: %1ms real time; %2ms cpu time (%3 cycles)").arg(deltaTime, 5).arg(deltaCpuTime, 8, 'g', 5).arg(deltaCycles, 8);
 #endif
-
-    glFinish();
 }
 
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {
