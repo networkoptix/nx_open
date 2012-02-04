@@ -1050,14 +1050,14 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
     {
 
         QnResourceWidget *oldWidget = this->widget(oldItem);
-        if(oldWidget) {
+        if(oldWidget) 
         {
             if (dynamic_cast<QnAbstractArchiveReader*>(oldWidget->display()->archiveReader()))
             //oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
             	oldWidget->display()->archiveReader()->enableQualityChange();
         }
         QnResourceWidget *newWidget = this->widget(item);
-        if(newWidget) {
+        if(newWidget) 
         {
             if (dynamic_cast<QnAbstractArchiveReader*>(newWidget->display()->archiveReader()))
 			{
