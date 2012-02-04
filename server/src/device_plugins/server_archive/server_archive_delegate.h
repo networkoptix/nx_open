@@ -32,7 +32,7 @@ public:
     virtual AVCodecContext* setAudioChannel(int num);
     virtual void onReverseMode(qint64 displayTime, bool value);
 
-    virtual void setQuality(MediaQuality quality);
+    virtual void setQuality(MediaQuality quality, bool fastSwitch);
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
     qint64 correctTimeByMask(qint64 time, bool useReverseSearch);

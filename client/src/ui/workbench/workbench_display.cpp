@@ -1054,7 +1054,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
         }
         QnResourceWidget *newWidget = this->widget(item);
         if(newWidget) {
-            newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High);
+            newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
             newWidget->display()->archiveReader()->disableQualityChange();
         }
     }

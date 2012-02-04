@@ -169,7 +169,7 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         {
             m_delayedFrameCnt++;
             if (m_delayedFrameCnt > 10) {
-                reader->setQuality(MEDIA_Quality_Low);
+                reader->setQuality(MEDIA_Quality_Low, false);
                 m_toLowQSpeed = speed;
                 m_toLowQTimer.restart();
             }
@@ -179,9 +179,9 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             if (realSleepTime > 10*1000)
             {
                 if (qAbs(speed) < m_toLowQSpeed)
-                    reader->setQuality(MEDIA_Quality_High); // speed decreased, try to Hi quality again
+                    reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality again
                 else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
-                    reader->setQuality(MEDIA_Quality_High); // speed decreased, try to Hi quality now
+                    reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
             }
         }
     }
@@ -294,6 +294,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 //t.start();
                 int sign = speed >= 0 ? 1 : -1;
                 //bool firstWait = true;
+                QTime sleepTimer;
+                sleepTimer.start();
                 while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed && useSync(vd))
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();

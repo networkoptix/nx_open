@@ -47,7 +47,8 @@ public:
         liveMode(false),
         gotLivePacket(false),
         lastPlayCSeq(0),
-        quality(MEDIA_Quality_High)
+        quality(MEDIA_Quality_High),
+        qualityFastSwitch(true)
     {
     }
     void deleteDP()
@@ -92,6 +93,7 @@ public:
     bool gotLivePacket;
     int lastPlayCSeq;
     MediaQuality quality;
+    bool qualityFastSwitch;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -477,7 +479,7 @@ int QnRtspConnectionProcessor::composePlay()
 
         d->archiveDP->lock();
         d->archiveDP->setReverseMode(d->rtspScale < 0);
-        d->archiveDP->setQuality(d->quality);
+        d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
         if (!d->requestHeaders.value("Range").isNull())
         {
             d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
@@ -548,7 +550,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
                 d->dataProcessor->unlockDataQueue();
             }
-            d->archiveDP->setQuality(d->quality);
+            d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return CODE_OK;
         }
     }

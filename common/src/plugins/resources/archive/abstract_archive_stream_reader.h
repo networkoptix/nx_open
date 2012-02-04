@@ -80,7 +80,7 @@ public:
     virtual bool setMotionRegion(const QRegion& region) = 0;
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
-    virtual void setQuality(MediaQuality quality) = 0;
+    virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;
     virtual void disableQualityChange() = 0;
     virtual void enableQualityChange() = 0;
 

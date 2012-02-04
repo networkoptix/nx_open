@@ -52,7 +52,7 @@ public:
     bool setSendMotion(bool value);
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
-    virtual void setQuality(MediaQuality quality) override;
+    virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
 
@@ -128,6 +128,7 @@ private:
     QMutex m_playbackMaskSync;
     QnPlaybackMaskHelper m_playbackMaskHelper;
     MediaQuality m_quality;
+    bool m_qualityFastSwitch;
     MediaQuality m_oldQuality;
 
     qint64 determineDisplayTime();

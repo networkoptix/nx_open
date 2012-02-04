@@ -451,7 +451,7 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
         return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
 
-void QnRtspClientArchiveDelegate::setQuality(MediaQuality quality)
+void QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
     QByteArray value = quality == MEDIA_Quality_High ? "high" : "low";
     QByteArray paramName = "x-media-quality";

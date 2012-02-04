@@ -500,7 +500,7 @@ void QnServerArchiveDelegate::setSendMotion(bool value)
     m_sendMotion = value;
 }
 
-void QnServerArchiveDelegate::setQuality(MediaQuality quality)
+void QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
     m_quality = quality;
     /*

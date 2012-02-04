@@ -52,7 +52,7 @@ public:
     virtual void setSingleshotMode(bool /*value*/) {}
 
     // MediaStreamQuality. By default, this function is not implemented
-    virtual void setQuality(MediaQuality quality) {}
+    virtual void setQuality(MediaQuality quality, bool fastSwitch) {}
 
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }

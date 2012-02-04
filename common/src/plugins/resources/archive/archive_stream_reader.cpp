@@ -45,6 +45,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastJumpTime(AV_NOPTS_VALUE),
     m_exactJumpToSpecifiedFrame(false),
     m_quality(MEDIA_Quality_High),
+    m_qualityFastSwitch(true),
     m_oldQuality(MEDIA_Quality_High),
     m_externalLocked(false),
     m_canChangeQuality(true)
@@ -280,6 +281,7 @@ begin_label:
     qint64 jumpTime = m_requiredJumpTime;
     m_requiredJumpTime = AV_NOPTS_VALUE;
     MediaQuality quality = m_quality;
+    bool qualityFastSwitch = m_qualityFastSwitch;
     qint64 tmpSkipFramesToTime = m_tmpSkipFramesToTime;
     m_tmpSkipFramesToTime = 0;
     bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
@@ -289,7 +291,7 @@ begin_label:
     if (m_oldQuality != quality)
     {
         m_oldQuality = quality;
-        m_delegate->setQuality(quality);
+        m_delegate->setQuality(quality, qualityFastSwitch);
         if (!m_delegate->isRealTimeSource() && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime();
@@ -869,10 +871,12 @@ void QnArchiveStreamReader::enableQualityChange()
 }
 
 
-void QnArchiveStreamReader::setQuality(MediaQuality quality)
+void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
 {
-    if (m_canChangeQuality)
+    if (m_canChangeQuality) {
         m_quality = quality;
+        m_qualityFastSwitch = fastSwitch;
+    }
 }
 
 void QnArchiveStreamReader::lock()
