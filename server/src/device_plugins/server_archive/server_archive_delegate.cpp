@@ -309,7 +309,8 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     chunk = currentSequence->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
     chunkCatalog = m_currentChunkCatalog;
 
-
+    if (chunk.startTimeMs == -1)
+        return; // EOF reached. do not switch quality
     if (isCatalogEqualQuality) 
     {
         if (m_currentChunkCatalog == m_catalogLow)
