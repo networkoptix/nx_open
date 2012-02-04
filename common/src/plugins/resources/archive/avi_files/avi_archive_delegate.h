@@ -1,8 +1,8 @@
 #ifndef __AVI_ARCHIVE_DELEGATE_H
 #define __AVI_ARCHIVE_DELEGATE_H
 
+#include <QSharedPointer>
 #include "../abstract_archive_delegate.h"
-
 
 struct AVFormatContext;
 class CLCustomDeviceVideoLayout;
@@ -55,5 +55,7 @@ private:
 
     friend class QnAviAudioLayout;
 };
+
+typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;
 
 #endif

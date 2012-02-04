@@ -32,7 +32,7 @@ public:
     virtual AVCodecContext* setAudioChannel(int num);
     virtual void onReverseMode(qint64 displayTime, bool value);
 
-    virtual void setQuality(MediaQuality quality, bool fastSwitch);
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch);
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
     qint64 correctTimeByMask(qint64 time, bool useReverseSearch);
@@ -52,7 +52,7 @@ private:
     DeviceFileCatalog::Chunk m_currentChunk;
     DeviceFileCatalogPtr m_currentChunkCatalog;
 
-    QnAviArchiveDelegate* m_aviDelegate;
+    QnAviArchiveDelegatePtr m_aviDelegate;
     QnAviResourcePtr m_fileRes;
     bool m_reverseMode;
     int m_selectedAudioChannel;
@@ -67,6 +67,14 @@ private:
     bool m_afterSeek;
     QnMotionArchiveConnectionPtr m_motionConnection;
     QnAbstractMediaDataPtr m_tmpData;
+
+    DeviceFileCatalog::Chunk m_newQualityChunk;
+    DeviceFileCatalogPtr m_newQualityCatalog;
+    QnAbstractMediaDataPtr m_newQualityTmpData;
+    QnAviResourcePtr m_newQualityFileRes;
+    QnAviArchiveDelegatePtr m_newQualityAviDelegate;
+    
+
     bool m_sendMotion;
     bool m_eof;
     MediaQuality m_quality;

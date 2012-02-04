@@ -451,16 +451,22 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
         return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
 
-void QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
+bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
     QByteArray value = quality == MEDIA_Quality_High ? "high" : "low";
     QByteArray paramName = "x-media-quality";
     m_rtspSession.setAdditionAttribute(paramName, value);
 
-    if (m_rtspSession.isOpened() && isRealTimeSource()) {
-        // in live mode I have swiching quality without seek for improving smooth quality
+    if (!m_rtspSession.isOpened())
+        return false;
+
+    // in live mode I have swiching quality without seek for improving smooth quality
+    if (isRealTimeSource() || !fastSwitch) {
         m_rtspSession.sendSetParameter(paramName, value);
+        return false;
     }
+    else 
+        return true;
 }
 
 void QnRtspClientArchiveDelegate::setSendMotion(bool value)
