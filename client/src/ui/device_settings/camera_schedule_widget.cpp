@@ -94,8 +94,10 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
     return tasks;
 }
 
-void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasks)
+void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasksFrom)
 {
+    QnScheduleTaskList tasks = tasksFrom;
+
     for (int y = 0; y < ui->gridWidget->rowCount(); ++y) {
         for (int x = 0; x < ui->gridWidget->columnCount(); ++x)
             ui->gridWidget->resetCellValues(QPoint(x, y));
@@ -106,6 +108,9 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasks)
 
         ui->spinBoxRecordBefore->setValue(task.getBeforeThreshold());
         ui->spinBoxRecordAfter->setValue(task.getAfterThreshold());
+    } else {
+        for (int nDay = 1; nDay <= 7; ++nDay)
+            tasks.append(QnScheduleTask(0, 0, nDay, 0, 86400, QnScheduleTask::RecordingType_Run, 10, 10));
     }
 
     foreach (const QnScheduleTask &task, tasks) {
