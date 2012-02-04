@@ -451,7 +451,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
         return; // TODO: unsupported for now
 
     //if (!layout()->items(resource->getUniqueId()).isEmpty())
-    //    return; /** Avoid duplicates. */
+    //    return; /* Avoid duplicates. */
 
     workbench()->setItem(QnWorkbench::RAISED, NULL);
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);

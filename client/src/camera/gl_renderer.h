@@ -50,6 +50,8 @@ private:
     bool isYuvFormat() const;
     int glRGBFormat() const;
     QnGlRendererTexture *texture(int index);
+    
+    bool usingShaderYuvToRgb() const;
 
 private:
     static QList<GLuint> m_garbage;
