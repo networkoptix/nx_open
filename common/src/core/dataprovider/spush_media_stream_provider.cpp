@@ -3,6 +3,7 @@
 #include "spush_media_stream_provider.h"
 #include "../resource/camera_resource.h"
 #include "utils/common/util.h"
+#include "live_stream_provider.h"
 
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
@@ -114,6 +115,10 @@ void CLServerPushStreamreader::run()
         if (videoData)
         {
             m_stat[videoData->channelNumber].onData(data->data.size());
+
+            if (QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this))
+                lp->onGotVideoFrame();
+
         }
 
 

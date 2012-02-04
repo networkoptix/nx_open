@@ -9,6 +9,8 @@ namespace Ui {
     class CameraSettingsDialog;
 }
 
+class CameraScheduleWidget;
+
 class CameraSettingsDialog : public QDialog
 {
     Q_OBJECT
@@ -20,11 +22,15 @@ public:
 public slots:
     virtual void accept();
     virtual void reject();
+    virtual void buttonClicked(QAbstractButton *button);
 
     void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
 
 private:
-    void saveCamera();
+    void updateView();
+    void saveToModel();
+
+    void save();
 
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)
@@ -32,7 +38,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     QScopedPointer<Ui::CameraSettingsDialog> ui;
 
-    QnAppServerConnectionPtr connection;
+    QnAppServerConnectionPtr m_connection;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H
