@@ -149,6 +149,7 @@ private:
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     CLVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
     int m_realTimeHurryUp;
+    int m_delayedFrameCnt;
     QnlTimeSource* m_extTimeSrc;
     
     //qint64 m_nextTime;

@@ -101,7 +101,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_executingJump(0),
       skipPrevJumpSignal(0),
       m_processedPackets(0),
-      m_toLowQSpeed(1000.0)
+      m_toLowQSpeed(1000.0),
+      m_delayedFrameCnt(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -164,17 +165,24 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
     if (reader)
     {
-        if (realSleepTime < -500*1000) {
-            reader->setQuality(MEDIA_Quality_Low);
-            m_toLowQSpeed = speed;
-            m_toLowQTimer.restart();
-        }
-        else if (realSleepTime > 10)
+        if (realSleepTime < -500*1000) 
         {
-            if (qAbs(speed) < m_toLowQSpeed)
-                reader->setQuality(MEDIA_Quality_High); // speed decreased, try to Hi quality again
-            else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
-                reader->setQuality(MEDIA_Quality_High); // speed decreased, try to Hi quality now
+            m_delayedFrameCnt++;
+            if (m_delayedFrameCnt > 10) {
+                reader->setQuality(MEDIA_Quality_Low);
+                m_toLowQSpeed = speed;
+                m_toLowQTimer.restart();
+            }
+        }
+        else {
+            m_delayedFrameCnt = 0;
+            if (realSleepTime > 10*1000)
+            {
+                if (qAbs(speed) < m_toLowQSpeed)
+                    reader->setQuality(MEDIA_Quality_High); // speed decreased, try to Hi quality again
+                else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
+                    reader->setQuality(MEDIA_Quality_High); // speed decreased, try to Hi quality now
+            }
         }
     }
 }
@@ -310,7 +318,11 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         break;
                     }
                 }
-                realSleepTime = displayedTime - m_extTimeSrc->expectedTime();
+                if (sleepTimer.elapsed() > 0)
+                    realSleepTime = sleepTimer.elapsed()*1000;
+                else {
+                    realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
+                }
 
             }
         }
@@ -318,8 +330,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
         }
 
-        //cl_log.log("real sleepTime=", realSleepTime, cl_logALWAYS);
-        //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
+        //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
         hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
     int channel = vd->channelNumber;
@@ -457,6 +468,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
 
     m_executingJump--;
     m_processedPackets = 0;
+    m_delayedFrameCnt = 0;
 }
 
 void CLCamDisplay::onJumpCanceled(qint64 /*time*/)
