@@ -21,6 +21,7 @@
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"
+#include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench_layout.h"
 #include "youtube/youtubeuploaddialog.h"
@@ -212,7 +213,7 @@ void NavigationTreeWidget::workbenchLayoutChanged()
         QnResourceSearchProxyModel *proxyModel = new QnResourceSearchProxyModel(layout);
         proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
         proxyModel->setFilterKeyColumn(0);
-        proxyModel->setFilterRole(Qt::UserRole + 2);
+        proxyModel->setFilterRole(QnResourceModel::SearchStringRole);
         proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         proxyModel->setDynamicSortFilter(true);
         m_searchProxyModel = proxyModel;
@@ -283,7 +284,9 @@ void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first
     for (int row = first; row <= last; ++row) {
         const QModelIndex index = m_searchProxyModel->index(row, 0, parent);
         QnResourcePtr resource = m_searchProxyModel->resourceFromIndex(index);
-        m_controller->drop(resource);
+
+        if(m_controller->display()->widget(resource) == NULL)
+            m_controller->drop(resource);
     }
 }
 

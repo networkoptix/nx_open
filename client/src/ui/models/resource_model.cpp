@@ -164,8 +164,10 @@ void QnResourceModelPrivate::init()
     Q_Q(QnResourceModel);
 
     QHash<int, QByteArray> roles = q->roleNames();
-    roles.insert(Qt::UserRole + 1, "id");
-    roles.insert(Qt::UserRole + 2, "searchString");
+    roles.insert(QnResourceModel::ResourceRole,     "resource");
+    roles.insert(QnResourceModel::IdRole,           "id");
+    roles.insert(QnResourceModel::SearchStringRole, "searchString");
+    roles.insert(QnResourceModel::StatusRole,       "status");
     q->setRoleNames(roles);
 
     q->connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), q, SLOT(at_resPool_resourceAdded(QnResourcePtr)));
@@ -326,12 +328,6 @@ QnResourceModel::~QnResourceModel()
 {
 }
 
-QnResourcePtr QnResourceModel::resource(const QModelIndex &index) const
-{
-    Node *node = d_func()->node(index);
-    return node ? node->resource() : QnResourcePtr(0);
-}
-
 QModelIndex QnResourceModel::index(const QnResourcePtr &resource) const
 {
     return d_func()->index(resource, 0);
@@ -456,11 +452,13 @@ QVariant QnResourceModel::data(const QModelIndex &index, int role) const
     case Qt::AccessibleTextRole: // ###
     case Qt::AccessibleDescriptionRole: // ###
         return node->name();
-    case Qt::UserRole + 1:
+    case ResourceRole:
+        return QVariant::fromValue<QnResourcePtr>(node->resource());
+    case IdRole: //Qt::UserRole + 1:
         return node->id();
-    case Qt::UserRole + 2:
+    case SearchStringRole: //Qt::UserRole + 2:
         return node->searchString();
-    case Qt::UserRole + 3:
+    case StatusRole: //Qt::UserRole + 3:
         return int(node->status());
     default:
         break;

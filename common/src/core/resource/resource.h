@@ -206,7 +206,7 @@ protected:
     mutable QMutex m_mutex;
 
     mutable QMutex m_consumersMtx;
-    QSet<QnResourceConsumer*> m_consumers;
+    QSet<QnResourceConsumer *> m_consumers;
 
 
 private:
@@ -264,5 +264,8 @@ public:
 class QnRecorder : public QnResource
 {
 };
+
+
+Q_DECLARE_METATYPE(QnResourcePtr);
 
 #endif // __RESOURCE_H__
