@@ -102,7 +102,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       skipPrevJumpSignal(0),
       m_processedPackets(0),
       m_toLowQSpeed(1000.0),
-      m_delayedFrameCnt(0)
+      m_delayedFrameCnt(0),
+      m_emptyPacketCounter(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -686,30 +687,34 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
     if (emptyData)
     {
-        // One camera from several sync cameras may reach BOF/EOF
-		// move current time position to the edge to prevent other cameras blocking
-        m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
-        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-            m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
-        }
-
-        m_timeMutex.lock();
-        if (m_buffering && m_executingJump == 0) 
+        m_emptyPacketCounter++;
+        // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
+        if (m_emptyPacketCounter >= 3)
         {
-            m_buffering = false;
-            m_timeMutex.unlock();
+            // One camera from several sync cameras may reach BOF/EOF
+		    // move current time position to the edge to prevent other cameras blocking
+            m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
+            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+                m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
+            }
+
+            m_timeMutex.lock();
+            if (m_buffering && m_executingJump == 0) 
+            {
+                m_buffering = false;
+                m_timeMutex.unlock();
+                if (m_extTimeSrc)
+                    m_extTimeSrc->onBufferingFinished(this);
+            }
+            else 
+                m_timeMutex.unlock();
+
             if (m_extTimeSrc)
-                m_extTimeSrc->onBufferingFinished(this);
+                m_extTimeSrc->onEofReached(this);
         }
-        else 
-            m_timeMutex.unlock();
-
-        if (m_extTimeSrc)
-            m_extTimeSrc->onEofReached(this);
-
         return true;
     }
-
+    m_emptyPacketCounter = 0;
 
     bool flushCurrentBuffer = false;
     bool audioParamsChanged = ad && m_playingFormat != ad->format;

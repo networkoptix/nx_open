@@ -201,6 +201,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 {
     //QTime t;
     //t.start();
+    m_skipFramesToTime = 0;
     qint64 timeMs = time/1000;
     m_newQualityTmpData.clear();
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
@@ -311,6 +312,10 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
 
     if (chunk.startTimeMs == -1)
         return; // EOF reached. do not switch quality
+    else if (m_currentChunk.durationMs == -1 && chunk.durationMs == -1) {
+        chunk.startTimeMs = -1;
+        return; // EOF reached. do not switch quality
+    }
     if (isCatalogEqualQuality) 
     {
         if (m_currentChunkCatalog == m_catalogLow)

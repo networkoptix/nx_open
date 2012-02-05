@@ -164,6 +164,7 @@ private:
     qint64 m_nextReverseTime;
     float m_toLowQSpeed; // speed then switching to low quality for camera
     QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
+    int m_emptyPacketCounter;
 };
 
 #endif //clcam_display_h_1211

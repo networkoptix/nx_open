@@ -17,6 +17,8 @@ public:
     void copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
     void beforeStop();
 private:
+    void createReader(QnResource::ConnectionRole role);
+private:
     //QMutex m_queueMtx;
     QMutex m_readersMutex;
     QnResourcePtr m_resource;

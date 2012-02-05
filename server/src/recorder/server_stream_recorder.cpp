@@ -86,7 +86,10 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Run)
         return true;
     else if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Never)
+    {
+        close();
         return false;
+    }
 
     // if prebuffering mode and all buffer is full - drop data
 
@@ -131,7 +134,7 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
                 QDateTime weekStartDateTime = QDateTime(packetDateTime.addDays(1 - packetDateTime.date().dayOfWeek()).date());
                 int scheduleTimeMs = weekStartDateTime.msecsTo(packetDateTime);
 
-                QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs/1000);
+                QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
                 if (itr > m_schedule.begin())
                     --itr;
 
@@ -152,7 +155,6 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
                     qint64 curTime = packetDateTime.toMSecsSinceEpoch();
                     m_lastSchedulePeriod = QnTimePeriod(curTime, absoluteScheduleTime - curTime);
                     updateRecordingType(noRecordTask);
-                    //close();
                 }
             }
         }

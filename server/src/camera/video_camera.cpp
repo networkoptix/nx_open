@@ -115,13 +115,9 @@ QnVideoCamera::~QnVideoCamera()
     delete m_secondaryReader;
 }
 
-QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
+void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 {
     bool primaryLiveStream = role ==  QnResource::Role_LiveVideo;
-
-    //if (!primaryLiveStream)
-    //    return false; // disable second stream
-
     QnAbstractMediaStreamDataProvider* &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (!reader) 
     {
@@ -137,10 +133,22 @@ QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::Conn
         else
             m_secondaryGopKeeper = gopKeeper;
         reader->addDataProcessor(gopKeeper);
-        reader->start();
 
     }
-    return reader;
+}
+
+QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
+{
+    if (!m_primaryReader)
+    {
+        createReader(QnResource::Role_LiveVideo);
+        createReader(QnResource::Role_SecondaryLiveVideo);
+        if (m_primaryReader)
+            m_primaryReader->start();
+        if (m_secondaryReader)
+            m_secondaryReader->start();
+    }
+    return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 
 void QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue)
