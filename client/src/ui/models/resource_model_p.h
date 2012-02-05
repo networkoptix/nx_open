@@ -1,7 +1,7 @@
 #ifndef RESOURCEMODEL_P_H
 #define RESOURCEMODEL_P_H
 
-#include "resourcemodel.h"
+#include "resource_model.h"
 
 #ifndef USE_OLD_RESOURCEMODEL
 #include <QtCore/QHash>

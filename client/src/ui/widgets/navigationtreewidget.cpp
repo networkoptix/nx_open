@@ -16,7 +16,7 @@
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/dialogs/tagseditdialog.h"
 #include "ui/dialogs/camerasettingsdialog.h"
-#include "ui/models/resourcemodel.h"
+#include "ui/models/resource_model.h"
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"

@@ -1,5 +1,5 @@
-#include "resourcemodel.h"
-#include "resourcemodel_p.h"
+#include "resource_model.h"
+#include "resource_model_p.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/qtconcurrentrun.h>
