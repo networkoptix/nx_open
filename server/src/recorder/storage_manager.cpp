@@ -181,11 +181,15 @@ void QnStorageManager::clearSpace(QnStoragePtr storage)
             if (!mac.isEmpty())
                 catalog = getFileCatalog(mac, QnResource::Role_LiveVideo);
         }
-        if (catalog != 0) {
+        if (catalog != 0) 
+        {
             catalog->deleteFirstRecord();
             DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
-            if (catalogLowRes != 0)
-                catalogLowRes->deleteFirstRecord();
+            if (catalogLowRes != 0) {
+                int idx = catalogLowRes->findFileIndex(catalog->minTime(), DeviceFileCatalog::OnRecordHole_NextChunk);
+                if (idx != -1)
+                    catalogLowRes->deleteRecordsBefore(idx);
+            }
         }
         else
             break; // nothing to delete

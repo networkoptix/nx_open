@@ -302,6 +302,13 @@ void DeviceFileCatalog::updateDuration(int durationMs)
     str.flush();
 }
 
+void DeviceFileCatalog::deleteRecordsBefore(int idx)
+{
+    int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
+    for (int i = 0; i < count; ++i)
+        deleteFirstRecord();
+}
+
 bool DeviceFileCatalog::deleteFirstRecord()
 {
     QMutexLocker lock(&m_mutex);
