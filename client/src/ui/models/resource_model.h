@@ -5,15 +5,15 @@
 #include <QtGui/QSortFilterProxyModel>
 #include <core/resource/resource.h>
 
-class ResourceModelPrivate;
+class QnResourceModelPrivate;
 
-class ResourceModel : public QAbstractItemModel
+class QnResourceModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 public:
-    explicit ResourceModel(QObject *parent = 0);
-    virtual ~ResourceModel();
+    explicit QnResourceModel(QObject *parent = 0);
+    virtual ~QnResourceModel();
 
     QnResourcePtr resource(const QModelIndex &index) const;
     QModelIndex index(const QnResourcePtr &resource) const;
@@ -44,33 +44,13 @@ private slots:
     void at_resPool_resourceChanged(const QnResourcePtr &resource);
 
 private:
-    friend class ResourceSortFilterProxyModel;
+    friend class QnResourceSearchProxyModel;
 
-    Q_DISABLE_COPY(ResourceModel)
-    Q_DECLARE_PRIVATE(ResourceModel)
+    Q_DISABLE_COPY(QnResourceModel)
+    Q_DECLARE_PRIVATE(QnResourceModel)
     
-    const QScopedPointer<ResourceModelPrivate> d_ptr;
+    const QScopedPointer<QnResourceModelPrivate> d_ptr;
 };
 
-
-class ResourceSortFilterProxyModelPrivate;
-class ResourceSortFilterProxyModel : public QSortFilterProxyModel
-{
-    Q_OBJECT
-
-public:
-    explicit ResourceSortFilterProxyModel(QObject *parent = 0);
-
-    QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
-    QModelIndex indexFromResource(const QnResourcePtr &resource) const;
-
-protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
-
-private:
-    Q_DISABLE_COPY(ResourceSortFilterProxyModel)
-    Q_DECLARE_PRIVATE(ResourceSortFilterProxyModel)
-    const QScopedPointer<ResourceSortFilterProxyModelPrivate> d_ptr;
-};
 
 #endif // RESOURCEMODEL_H

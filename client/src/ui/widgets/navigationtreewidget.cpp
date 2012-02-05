@@ -17,6 +17,7 @@
 #include "ui/dialogs/tagseditdialog.h"
 #include "ui/dialogs/camerasettingsdialog.h"
 #include "ui/models/resource_model.h"
+#include "ui/models/resource_search_proxy_model.h"
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_controller.h"
@@ -45,7 +46,7 @@ protected:
 
         NavigationTreeWidget *navTree = static_cast<NavigationTreeWidget *>(parent());
         if (navTree->m_controller && navTree->m_controller->layout()) {
-            if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model())) {
+            if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model())) {
                 if (!navTree->m_controller->layout()->items(model->resource(index)->getUniqueId()).isEmpty())
                     option->font.setBold(true);
             }
@@ -94,7 +95,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
 
 
-    m_resourcesModel = new ResourceModel(this);
+    m_resourcesModel = new QnResourceModel(this);
 
     m_resourcesTreeView = new QTreeView(this);
     m_resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -194,7 +195,7 @@ void NavigationTreeWidget::workbenchLayoutAboutToBeChanged()
     disconnect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
 }
 
-Q_DECLARE_METATYPE(ResourceSortFilterProxyModel *) // ###
+Q_DECLARE_METATYPE(QnResourceSearchProxyModel *) // ###
 
 void NavigationTreeWidget::workbenchLayoutChanged()
 {
@@ -206,9 +207,9 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     connect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
     connect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
 
-    m_searchProxyModel = layout->property("model").value<ResourceSortFilterProxyModel *>(); // ###
+    m_searchProxyModel = layout->property("model").value<QnResourceSearchProxyModel *>(); // ###
     if (!m_searchProxyModel) {
-        ResourceSortFilterProxyModel *proxyModel = new ResourceSortFilterProxyModel(layout);
+        QnResourceSearchProxyModel *proxyModel = new QnResourceSearchProxyModel(layout);
         proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
         proxyModel->setFilterKeyColumn(0);
         proxyModel->setFilterRole(Qt::UserRole + 2);
@@ -439,9 +440,9 @@ void NavigationTreeWidget::at_filterLineEdit_textChanged(const QString &filter)
 void NavigationTreeWidget::at_treeView_activated(const QModelIndex &index)
 {
     QnResourcePtr resource;
-    if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model()))
+    if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model()))
         resource = model->resource(index);
-    else if (const ResourceSortFilterProxyModel *model = qobject_cast<const ResourceSortFilterProxyModel *>(index.model()))
+    else if (const QnResourceSearchProxyModel *model = qobject_cast<const QnResourceSearchProxyModel *>(index.model()))
         resource = model->resourceFromIndex(index);
     if (resource)
         Q_EMIT activated(resource->getId());

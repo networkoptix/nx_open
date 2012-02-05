@@ -14,8 +14,8 @@ class QModelIndex;
 class QnWorkbenchController;
 class QnWorkbenchItem;
 
-class ResourceModel;
-class ResourceSortFilterProxyModel;
+class QnResourceModel;
+class QnResourceSearchProxyModel;
 
 class NavigationTreeWidget : public QWidget
 {
@@ -61,9 +61,9 @@ private:
     int m_filterTimerId;
     bool m_dontSyncWithLayout;
 
-    ResourceModel *m_resourcesModel;
+    QnResourceModel *m_resourcesModel;
     QTreeView *m_resourcesTreeView;
-    QPointer<ResourceSortFilterProxyModel> m_searchProxyModel;
+    QPointer<QnResourceSearchProxyModel> m_searchProxyModel;
     QTreeView *m_searchTreeView;
 
     QPointer<QnWorkbenchController> m_controller;

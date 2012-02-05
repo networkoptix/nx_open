@@ -3,7 +3,6 @@
 
 #include "resource_model.h"
 
-#ifndef USE_OLD_RESOURCEMODEL
 #include <QtCore/QHash>
 #include <QtCore/QVector>
 
@@ -48,27 +47,18 @@ bool Node::operator==(const Node &other) const
     return m_id == other.m_id && m_parentId == other.m_parentId && m_flags == other.m_flags
            && m_status == other.m_status && m_name == other.m_name/* && m_searchString == other.m_searchString*/;
 }
-#endif
 
 
-class ResourceModelPrivate
+class QnResourceModelPrivate
 {
-    Q_DECLARE_PUBLIC(ResourceModel)
+    Q_DECLARE_PUBLIC(QnResourceModel)
 
 public:
-    ResourceModelPrivate();
-    ~ResourceModelPrivate();
+    QnResourceModelPrivate();
+    ~QnResourceModelPrivate();
 
     void init();
 
-#ifdef USE_OLD_RESOURCEMODEL
-    inline QStandardItem *item(QnId id) const
-    { Q_Q(const ResourceModel); return q->itemFromIndex(index(id)); }
-    inline QStandardItem *item(const QnResourcePtr &resource) const
-    { Q_Q(const ResourceModel); return q->itemFromIndex(q->index(resource)); }
-    inline QnResourcePtr resource(QStandardItem *item) const
-    { Q_Q(const ResourceModel); return q->resource(item->index()); }
-#else
     void insertNode(Node *parentNode, Node *node, int row);
     void removeNodes(Node *parentNode, int row, int count);
 
@@ -78,61 +68,29 @@ public:
     { return node(resource->getId()); }
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex index(Node *node, int column = 0) const;
-#endif
     QModelIndex index(QnId id, int column = 0) const;
     inline QModelIndex index(const QnResourcePtr &resource, int column = 0) const
     { return index(resource->getId(), column); }
 
-#ifndef USE_OLD_RESOURCEMODEL
     inline bool isIndexValid(const QModelIndex &index) const
     {
-        Q_Q(const ResourceModel);
+        Q_Q(const QnResourceModel);
         return (index.isValid() && index.model() == q
                 && index.row() < q->rowCount(index.parent())
                 && index.column() < q->columnCount(index.parent()));
     }
-#endif
 
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
     void at_resPool_resourceChanged(const QnResourcePtr &resource);
 
 private:
-    ResourceModel *q_ptr;
-#ifndef USE_OLD_RESOURCEMODEL
+    QnResourceModel *q_ptr;
 
     Node root;
     QHash<uint, Node *> nodes;
     QHash<Node *, QVector<Node *> > nodeTree;
-#endif
 };
 
-
-class ResourceSortFilterProxyModelPrivate
-{
-    Q_DECLARE_PUBLIC(ResourceSortFilterProxyModel)
-
-public:
-    ResourceSortFilterProxyModelPrivate();
-
-    bool matchesFilters(const QRegExp filters[], Node *node, int source_row, const QModelIndex &source_parent) const;
-
-    static QString normalizedFilterString(const QString &str);
-    static void buildFilters(const QSet<QString> parts[], QRegExp *filters);
-    void parseFilterString();
-
-private:
-    ResourceSortFilterProxyModel *q_ptr;
-
-    QString parsedFilterString;
-    uint flagsFilter;
-
-    enum FilterCategory {
-        Text, Name, Tags, Id,
-        NumFilterCategories
-    };
-    QRegExp negfilters[NumFilterCategories];
-    QRegExp filters[NumFilterCategories];
-};
 
 #endif // RESOURCEMODEL_P_H
