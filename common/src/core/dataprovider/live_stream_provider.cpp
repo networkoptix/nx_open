@@ -177,7 +177,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     int newSecFps = qMin(5, maxFps - newFps);
 
-    Q_ASSERT(newSecFps>=1);
+    Q_ASSERT(newSecFps>=0);
 
-    setFps(newSecFps);
+    setFps(qMax(1,newSecFps));
 }
