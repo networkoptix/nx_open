@@ -13,7 +13,7 @@ struct QnDlink_cam_info
     hasH264(false),
     hasMPEG4(false),
     numberOfVideoProfiles(0),
-    hasCBR(false)
+    hasFixedQuality(false)
     {
 
     }
@@ -44,7 +44,7 @@ struct QnDlink_cam_info
 
     bool hasH264;
     bool hasMPEG4;
-    bool hasCBR;
+    bool hasFixedQuality;
     int numberOfVideoProfiles;
     QMap<int, QString> videoProfileUrls;
     QList<QSize> resolutions;
@@ -76,7 +76,7 @@ public:
 
     QnDlink_cam_info getCamInfo() const;
 
-    void updateCamInfo(); // does a lot of physical work 
+    bool updateCamInfo(); // does a lot of physical work 
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

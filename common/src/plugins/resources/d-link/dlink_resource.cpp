@@ -29,7 +29,7 @@ int QnPlDlinkResource::getMaxFps()
 
 bool QnPlDlinkResource::isResourceAccessible()
 {
-    return updateMACAddress();
+    return updateCamInfo();
 }
 
 bool QnPlDlinkResource::updateMACAddress()
@@ -96,13 +96,13 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-void QnPlDlinkResource::updateCamInfo()
+bool QnPlDlinkResource::updateCamInfo()
 {
     QMutexLocker mutexLocker(&m_mutex);
     QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
 
     if (cam_info_file.size()==0)
-        return;
+        return false;
 
     QString file_s(cam_info_file);
     QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
@@ -169,7 +169,7 @@ void QnPlDlinkResource::updateCamInfo()
             m_camInfo.possibleQualities = getValue(line);
 
             if (m_camInfo.possibleQualities.toLower().contains("good"))
-                m_camInfo.hasCBR = true;
+                m_camInfo.hasFixedQuality = true;
         }
         else if (line.contains("vprofileurl"))
         {
@@ -190,6 +190,8 @@ void QnPlDlinkResource::updateCamInfo()
     qSort(m_camInfo.possibleBitrates.begin(), m_camInfo.possibleBitrates.end(), qGreater<int>());
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
+
+    return true;
 
 }
 

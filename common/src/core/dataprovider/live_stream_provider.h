@@ -6,6 +6,7 @@
 
 #define META_DATA_DURATION_MS 300
 
+int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 
 class QnLiveStreamProvider
 {
