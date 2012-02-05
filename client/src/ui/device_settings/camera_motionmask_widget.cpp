@@ -9,7 +9,7 @@
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QnResourcePtr &resource, QWidget *parent)
     : QWidget(parent)
 {
-    m_widget = new QnResourceWidget(new QnWorkbenchItem(resource), 0);
+    m_widget = new QnResourceWidget(new QnWorkbenchItem(resource->getUniqueId()), 0);
     m_widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
 
     m_widget->setEnclosingGeometry(geometry());

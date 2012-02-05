@@ -45,7 +45,7 @@ protected:
         NavigationTreeWidget *navTree = static_cast<NavigationTreeWidget *>(parent());
         if (navTree->m_controller && navTree->m_controller->layout()) {
             if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model())) {
-                if (navTree->m_controller->layout()->item(model->resource(index)))
+                if (!navTree->m_controller->layout()->items(model->resource(index)->getUniqueId()).isEmpty())
                     option->font.setBold(true);
             }
         }
@@ -89,7 +89,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_clearFilterButton->setIconSize(QSize(16, 16));
     m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
 
-    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
+    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
     connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
 
 
@@ -107,7 +107,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_resourcesTreeView->setDragDropMode(QAbstractItemView::DragDrop);
     m_resourcesTreeView->setItemDelegate(new NavigationTreeItemDelegate(this));
 
-    connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
+    connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(at_treeView_activated(QModelIndex)));
 
     m_searchTreeView = new QTreeView(this);
     m_searchTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -120,7 +120,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_searchTreeView->setWordWrap(false);
     m_searchTreeView->setDragDropMode(QAbstractItemView::DragOnly); // ###
 
-    connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(itemActivated(QModelIndex)));
+    connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(at_treeView_activated(QModelIndex)));
 
 
     QHBoxLayout *topLayout = new QHBoxLayout;
@@ -223,15 +223,15 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     m_searchTreeView->setModel(m_searchProxyModel);
     m_searchTreeView->expandAll();
 
-    disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
+    disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
     m_filterLineEdit->setText(m_searchProxyModel->filterRegExp().pattern()); // ###
     m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
-    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
+    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
 }
 
 void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 {
-    const QnResourcePtr &resource = item->resource();
+    const QnResourcePtr &resource = qnResPool->getResourceByUniqId(item->resourceUid());
 
     m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
@@ -254,7 +254,7 @@ void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 
 void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
 {
-    const QnResourcePtr &resource = item->resource();
+    const QnResourcePtr &resource = qnResPool->getResourceByUniqId(item->resourceUid());
 
     m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
@@ -410,7 +410,7 @@ void NavigationTreeWidget::timerEvent(QTimerEvent *event)
     QWidget::timerEvent(event);
 }
 
-void NavigationTreeWidget::filterChanged(const QString &filter)
+void NavigationTreeWidget::at_filterLineEdit_textChanged(const QString &filter)
 {
     if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
         m_filterLineEdit->clear();
@@ -436,7 +436,7 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
     m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 0) : 0);
 }
 
-void NavigationTreeWidget::itemActivated(const QModelIndex &index)
+void NavigationTreeWidget::at_treeView_activated(const QModelIndex &index)
 {
     QnResourcePtr resource;
     if (const ResourceModel *model = qobject_cast<const ResourceModel *>(index.model()))
@@ -451,5 +451,5 @@ void NavigationTreeWidget::open()
 {
     QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
-        itemActivated(index);
+        at_treeView_activated(index);
 }

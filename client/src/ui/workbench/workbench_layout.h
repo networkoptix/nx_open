@@ -103,7 +103,7 @@ public:
      * \param resource                  Resource to get item for.
      * \returns                         Item associated with the given resource, or NULL if there is no such item.
      */
-    QnWorkbenchItem *item(const QnResourcePtr &resource) const;
+    //QnWorkbenchItem *item(const QnResourcePtr &resource) const;
 
     /**
      * \param position                  Position to get item at.

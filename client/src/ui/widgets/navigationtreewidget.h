@@ -27,21 +27,21 @@ public:
 
     void setWorkbenchController(QnWorkbenchController *controller);
 
+signals:
+    void activated(uint resourceId);
+    void newTabRequested();
+
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void timerEvent(QTimerEvent *event);
 
-Q_SIGNALS:
-    void activated(uint resourceId);
-
-    void newTabRequested();
-
-private Q_SLOTS:
-    void filterChanged(const QString &filter);
-    void itemActivated(const QModelIndex &index);
+private slots:
     void open();
+
+    void at_filterLineEdit_textChanged(const QString &filter);
+    void at_treeView_activated(const QModelIndex &index);
 
     void workbenchLayoutAboutToBeChanged();
     void workbenchLayoutChanged();
