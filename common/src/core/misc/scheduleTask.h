@@ -37,8 +37,6 @@ public:
           m_doRecordAudio(doRecordAudio)
     {}
 
-    bool operator<(const QnScheduleTask &other) const;
-
     QnId getId() const { return m_id; }
     QnId getResourceId() const { return m_resourceId; }
     int getDayOfWeek() const { return m_dayOfWeek; }

@@ -131,7 +131,7 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
                 QDateTime weekStartDateTime = QDateTime(packetDateTime.addDays(1 - packetDateTime.date().dayOfWeek()).date());
                 int scheduleTimeMs = weekStartDateTime.msecsTo(packetDateTime);
 
-                QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs/1000);
+                QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
                 if (itr > m_schedule.begin())
                     --itr;
 
