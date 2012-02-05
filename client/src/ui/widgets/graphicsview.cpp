@@ -5,6 +5,7 @@
 #include "ui/mixins/render_watch_mixin.h"
 #include "mainwnd.h"
 #include "ui/graphics/view/blue_background_painter.h"
+#include "core/resource/camera_resource.h"
 #include "settings.h"
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/device_settings/device_settings_dlg.h"
@@ -37,7 +38,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_device.h"
 #include "utils/common/rand.h"
-
+#include "ui/dialogs/camerasettingsdialog.h"
 #ifdef Q_OS_WIN
 #include "d3d9.h"
 #include "device_plugins/desktop/screen_grabber.h"
@@ -1480,7 +1481,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
             if (dev->getUniqueId().contains(getTempRecordingDir()))
                 menu.addAction(&cm_save_recorded_as);
 
-            if (CLDeviceSettingsDlgFactory::canCreateDlg(dev))
+            if (CLDeviceSettingsDlgFactory::canCreateDlg(dev) && dev.dynamicCast<QnVirtualCameraResource>())
                 menu.addAction(&cm_settings);
         }
         else if (aitem->getType() == CLAbstractSceneItem::LAYOUT )
@@ -1691,7 +1692,11 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
             }
             else if (act == &cm_settings && dev)
             {
-                show_device_settings_helper(dev);
+                CameraSettingsDialog dialog(this, dev.dynamicCast<QnVirtualCameraResource>());
+                dialog.setWindowModality(Qt::ApplicationModal);
+                dialog.exec();
+
+//                show_device_settings_helper(dev);
             }
             else if (act == &cm_toggle_recording && cam)
             {

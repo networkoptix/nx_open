@@ -242,3 +242,8 @@ void CameraScheduleWidget::onDisplayFPSChanged(int state)
 {
     ui->gridWidget->setShowFirstParam(state);
 }
+
+void CameraScheduleWidget::setMaxFps(int value)
+{
+    ui->fpsSpinBox->setMaximum(value);
+}

@@ -63,6 +63,7 @@ void QnResource::update(QnResourcePtr other)
         updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
     setStatus(other->m_status);
+    Q_EMIT resourceChanged();
 
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();

@@ -11,10 +11,11 @@
 #include <QtGui/QTreeView>
 
 #include <core/resourcemanagment/resource_pool.h>
-
+#include <core/resource/camera_resource.h>
 #include "ui/context_menu_helper.h"
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/dialogs/tagseditdialog.h"
+#include "ui/dialogs/camerasettingsdialog.h"
 #include "ui/models/resourcemodel.h"
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench.h"
@@ -338,7 +339,7 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
         }
         // ### handle layouts
 
-        if (CLDeviceSettingsDlgFactory::canCreateDlg(resource))
+        if (CLDeviceSettingsDlgFactory::canCreateDlg(resource) && resource.dynamicCast<QnVirtualCameraResource>())
             menu->addAction(&cm_settings);
     } else if (resources.size() > 1) {
         // ###
@@ -362,10 +363,9 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
         if (action == &cm_remove_from_disk) {
             QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
         } else if (action == &cm_settings) { // ### move to app-global scope ?
-            if (QDialog *dialog = CLDeviceSettingsDlgFactory::createDlg(resource, QApplication::activeWindow())) {
-                dialog->exec();
-                delete dialog;
-            }
+            CameraSettingsDialog dialog(QApplication::activeWindow(), resource.dynamicCast<QnVirtualCameraResource>());
+            dialog.setWindowModality(Qt::ApplicationModal);
+            dialog.exec();
         } else if (action == &cm_editTags) { // ### move to app-global scope ?
             TagsEditDialog dialog(QStringList() << resource->getUniqueId(), QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);

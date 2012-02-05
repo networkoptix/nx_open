@@ -201,6 +201,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 {
     //QTime t;
     //t.start();
+    m_skipFramesToTime = 0;
     qint64 timeMs = time/1000;
     m_newQualityTmpData.clear();
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
@@ -304,9 +305,21 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     qint64 prevEndTimeMs = m_currentChunk.startTimeMs + m_currentChunk.durationMs;
     QnChunkSequence* currentSequence = m_currentChunkCatalog == m_catalogHi ? m_chunkSequenceHi : m_chunkSequenceLow;
 
+    if (m_currentChunk.durationMs == -1)
+    {
+        // last chunk. Find same chunk again (possible it chunk already finished)
+        chunk = currentSequence->findChunk(m_resource, m_currentChunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+        if (chunk.durationMs == -1) {
+            chunk.startTimeMs = -1;
+            return;
+        }
+        prevEndTimeMs = chunk.startTimeMs + chunk.durationMs;
+    }
+
     //chunk = currentSequence->getNextChunk(m_resource);
     // todo: getNextChunk is faster, but need more logic because of 2 chunk sequence now. So, speed may be improved
     chunk = currentSequence->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+    
     chunkCatalog = m_currentChunkCatalog;
 
     if (chunk.startTimeMs == -1)

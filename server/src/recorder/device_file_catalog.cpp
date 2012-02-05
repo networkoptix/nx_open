@@ -366,12 +366,9 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     if (itr > m_chunks.begin()+m_firstDeleteCount)
     {
         --itr;
-         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs)
+         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs && itr < m_chunks.end()-1)
          {
-             if (itr < m_chunks.end()-1)
-                ++itr;
-             else
-                 return -1;
+            ++itr;
          }
     }
     return itr - m_chunks.begin();

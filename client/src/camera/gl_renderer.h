@@ -32,7 +32,7 @@ public:
     void waitForFrameDisplayed(int channel);
     
     
-    void QnGLRenderer::update();
+    void update();
     RenderStatus paint(const QRectF &r);
 
     qreal opacity() const;

@@ -176,6 +176,7 @@ public:
 Q_SIGNALS:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
+    void resourceChanged();
 
 public:
     // this is thread to process commands like setparam

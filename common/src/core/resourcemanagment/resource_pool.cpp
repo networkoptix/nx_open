@@ -88,6 +88,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, newResources.values()) 
     {
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
+        connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()));
         QMetaObject::invokeMethod(this, "resourceAdded", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
     }
 
