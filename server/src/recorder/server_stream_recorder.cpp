@@ -86,7 +86,10 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Run)
         return true;
     else if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Never)
+    {
+        close();
         return false;
+    }
 
     // if prebuffering mode and all buffer is full - drop data
 
@@ -152,7 +155,6 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
                     qint64 curTime = packetDateTime.toMSecsSinceEpoch();
                     m_lastSchedulePeriod = QnTimePeriod(curTime, absoluteScheduleTime - curTime);
                     updateRecordingType(noRecordTask);
-                    //close();
                 }
             }
         }
