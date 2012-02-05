@@ -1,14 +1,12 @@
 #ifndef QN_WORKBENCH_ITEM_H
 #define QN_WORKBENCH_ITEM_H
 
-#include <QtCore/QObject>
-#include <QtCore/QRect>
-#include <QtCore/QScopedPointer>
-
-#include <core/resource/resource.h>
-#include "core/resource/layout_data.h"
+#include <QObject>
+#include <QRect>
+#include <QScopedPointer>
 
 class QnWorkbenchLayout;
+class QnLayoutItemData;
 
 /**
  * Layout item model. Video, image, folder, or anything else.
@@ -27,10 +25,10 @@ public:
     /**
      * Constructor.
      *
-     * \param resource                  Resource associated with this item.
+     * \param resource                  Unique identifier of the resource associated with this item.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnWorkbenchItem(const QString &resourceUid, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -50,10 +48,10 @@ public:
     }
 
     /**
-     * \returns                         Resource associated with this item.
+     * \returns                         Unique identifier of the resource associated with this item.
      */
-    const QnResourcePtr &resource() const {
-        return m_resource;
+    const QString &resourceUid() const {
+        return m_resourceUid;
     }
 
     /**
@@ -174,8 +172,8 @@ private:
     /** Layout that this item belongs to. */
     QnWorkbenchLayout *m_layout;
 
-    /** Resource associated with this item. */
-    QnResourcePtr m_resource;
+    /** Unique identifier of the resource associated with this item. */
+    QString m_resourceUid;
 
     /** Grid-relative geometry of an item, in grid cells. */
     QRect m_geometry;

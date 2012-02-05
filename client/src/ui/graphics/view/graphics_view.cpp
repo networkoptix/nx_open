@@ -1,6 +1,7 @@
 #include "graphics_view.h"
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
+#include <QtOpenGL>
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
 #   include <QDateTime>
@@ -68,6 +69,8 @@ void QnGraphicsView::uninstallLayerPainter(QnLayerPainter *painter) {
 }
 
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
+    glFinish(); /* Finish previous frame, so that we don't get spurious delays in glTexSubImage2d. */
+
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
     qint64 frequency = QnPerformance::currentCpuFrequency();
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();

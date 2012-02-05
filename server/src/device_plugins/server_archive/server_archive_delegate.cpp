@@ -319,13 +319,17 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
             if (lowDistance > SECOND_STREAM_FIND_EPS)
             {
                 // Hole in a low quality chunks. Try to find chunk in a high quality
-                const DeviceFileCatalog::Chunk& chunkHi =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+                // Find Hi chunk slightly in a future because of Hi/Low chunks endians not full sync 
+                // (if chunk start will be found in the past, so at least SECOND_STREAM_FIND_EPS data can be used)
+                const DeviceFileCatalog::Chunk& chunkHi =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs+SECOND_STREAM_FIND_EPS, DeviceFileCatalog::OnRecordHole_NextChunk);
                 qint64 hiDistance = chunkHi.distanceToTime(prevEndTimeMs);
                 if (hiDistance < lowDistance && lowDistance - hiDistance > SECOND_STREAM_FIND_EPS)
                 {
                     // data found in high quality chunks. Switching
                     chunk = chunkHi;
                     chunkCatalog = m_catalogHi;
+                    if (chunk.startTimeMs < prevEndTimeMs)
+                        m_skipFramesToTime = prevEndTimeMs*1000;
                 }
             }
         }
