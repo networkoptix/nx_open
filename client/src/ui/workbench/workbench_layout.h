@@ -8,9 +8,9 @@
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <ui/common/magnitude.h>
-#include "core/resource/layout_data.h"
 
 class QnWorkbenchItem;
+class QnLayoutData;
 
 /**
  * Layout of a workbench.

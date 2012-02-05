@@ -18,7 +18,7 @@ class QnWorkbenchItem : public QObject
 
 public:
     enum ItemFlag {
-        Pinned = 0x1  /**< Item is pinned to the grid. Items are pinned by default. */
+        Pinned = 0x1  /**< Item is pinned to the grid. Items are not pinned by default. */
     };
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
@@ -36,9 +36,15 @@ public:
     virtual ~QnWorkbenchItem();
 
     /**
-     * Load from QnLayoutData
+     * Load from QnLayoutData.
+     *
+     * Note that this function may partially fail. It does not roll back the
+     * changes that were made before the failure.
+     *
+     * \param itemData                  Data to load from.
+     * \returns                         Whether all fields were successfully loaded.
      */
-    void load(const QnLayoutItemData &data);
+    bool load(const QnLayoutItemData &itemData);
 
     /**
      * \returns                         Layout that this item belongs to, if any.
@@ -110,6 +116,15 @@ public:
     ItemFlags flags() const {
         return m_flags;
     }
+
+    /**
+     * Note that this function may partially fail. It does not roll back
+     * the changes that were made before the failure.
+     *
+     * \param flags                     New flags for this item.
+     * \returns                         Whether the flags were successfully set.
+     */
+    bool setFlags(ItemFlags flags);
 
     /**
      * \param flag                      Flag to check.

@@ -37,6 +37,7 @@ public:
     {
         return m_items;
     }
+
 private:
     QList<QnLayoutItemData> m_items;
 };

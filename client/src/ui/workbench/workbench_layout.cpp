@@ -1,14 +1,10 @@
 #include "workbench_layout.h"
-
 #include <limits>
-
 #include <core/resourcemanagment/resource_pool.h>
-
+#include <core/resource/layout_data.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
-
-#include "ui/common/scene_utility.h"
-
+#include <ui/common/scene_utility.h>
 #include "workbench_item.h"
 
 namespace {
@@ -143,13 +139,45 @@ void QnWorkbenchLayout::setName(const QString &name) {
 
 void QnWorkbenchLayout::load(const QnLayoutData &layoutData)
 {
-    clear();
+    setName(layoutData.getName());
 
-    // TODO: need to set id and name here
-    foreach (const QnLayoutItemData& itemData, layoutData.getItems())
+    /* Unpin all items so that pinned state does not interfere with 
+     * incrementally moving the items. */
+    foreach(QnWorkbenchItem *item, m_items)
+        item->setPinned(false);
 
-    {
-        // QnWorkbenchItem *item = new QnWorkbenchItem();
+    /* Construct items-by-id mapping. */
+    QHash<QnId, QList<QnLayoutItemData> > itemDatasById;
+    foreach(const QnLayoutItemData &itemData, layoutData.getItems())
+        itemDatasById[itemData.resourceId].push_back(itemData);
+
+    foreach(const QList<QnLayoutItemData> &itemDatas, itemDatasById) {
+        QnId id = itemDatas[0].resourceId;
+        QnResourcePtr resource = qnResPool->getResourceById(id);
+        if(resource.isNull()) {
+            qnWarning("No resource in resource pool for id '%1'.", id.toString());
+            continue;
+        }
+        QString uid = resource->getUniqueId();
+
+        /* Make sure we have the same number of items and item datas. */
+        QList<QnWorkbenchItem *> items = this->items(uid).toList();
+        while(items.size() < itemDatas.size()) {
+            QnWorkbenchItem *item = new QnWorkbenchItem(uid);
+            addItem(item);
+            items.push_back(item);
+        }
+        while(items.size() > itemDatas.size()) {
+            delete items.back();
+            items.pop_back();
+        }
+
+        /* In case of several continuous updates, we want to have at least some
+         * consistency in how items are mapped to datas. Sort by address. */
+        qSort(items);
+
+        for(int i = 0; i < items.size(); i++)
+            items[i]->load(itemDatas[i]);
     }
 }
 

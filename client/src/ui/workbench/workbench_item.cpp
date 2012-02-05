@@ -1,14 +1,13 @@
 #include "workbench_item.h"
-
 #include <ui/common/scene_utility.h>
-
+#include <core/resource/layout_data.h>
 #include "workbench_layout.h"
 
 QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, QObject *parent):
     QObject(parent),
     m_resourceUid(resourceUid),
     m_layout(NULL),
-    m_flags(Pinned),
+    m_flags(0),
     m_rotation(0.0)
 {}
 
@@ -18,13 +17,19 @@ QnWorkbenchItem::~QnWorkbenchItem()
         m_layout->removeItem(this);
 }
 
-void QnWorkbenchItem::load(const QnLayoutItemData &itemData)
+bool QnWorkbenchItem::load(const QnLayoutItemData &itemData)
 {
     // TODO: check for resource id
 
-    // TODO: set flags here
-    setCombinedGeometry(itemData.combinedGeometry);
+    bool result = true;
+
+    /* Note that the order of these calls is important. */
+    result &= setFlag(Pinned, false);
+    result &= setCombinedGeometry(itemData.combinedGeometry);
     setRotation(itemData.rotation);
+    result &= setFlags(static_cast<ItemFlags>(itemData.flags));
+
+    return result;
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {
@@ -99,6 +104,17 @@ bool QnWorkbenchItem::setFlag(ItemFlag flag, bool value) {
 
     setFlagInternal(flag, value);
     return true;
+}
+
+bool QnWorkbenchItem::setFlags(ItemFlags flags) {
+    if(m_flags == flags)
+        return true;
+
+    bool result = true;
+    if((m_flags ^ flags) & Pinned)
+        result &= setFlag(Pinned, flags & Pinned);
+
+    return result;
 }
 
 void QnWorkbenchItem::setFlagInternal(ItemFlag flag, bool value) {
