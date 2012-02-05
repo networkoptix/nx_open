@@ -33,7 +33,7 @@ QList<QHostAddress> getAllIPv4Addresses()
                     arg = arg.toLower();
                     while (arg.startsWith('-'))
                         arg = arg.mid(1);
-                    if (arg.startsWith("allowedinterfaces=")) {
+                    if (arg.startsWith("if=")) {
                         QStringList tmp = arg.split('=')[1].split(';');
                         foreach(QString s, tmp)
                             allowedInterfaces << QHostAddress(s);
