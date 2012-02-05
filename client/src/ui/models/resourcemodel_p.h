@@ -93,9 +93,9 @@ public:
     }
 #endif
 
-    void _q_addResource(const QnResourcePtr &resource);
-    void _q_removeResource(const QnResourcePtr &resource);
-    void _q_resourceChanged(const QnResourcePtr &resource);
+    void at_resPool_resourceAdded(const QnResourcePtr &resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resPool_resourceChanged(const QnResourcePtr &resource);
 
 private:
     ResourceModel *q_ptr;

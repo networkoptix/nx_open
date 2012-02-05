@@ -222,7 +222,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     for (int i = 1; i < argc; ++i)
         m_controller->drop(QFile::decodeName(argv[i]));
 
-    //showFullScreen();
+    showFullScreen();
     updateDwmState();
 }
 

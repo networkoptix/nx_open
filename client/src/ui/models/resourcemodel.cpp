@@ -1,11 +1,8 @@
 #include "resourcemodel.h"
 #include "resourcemodel_p.h"
 
-#ifndef USE_OLD_RESOURCEMODEL
 #include <QtCore/QCoreApplication>
 #include <QtCore/qtconcurrentrun.h>
-#endif
-
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
 
@@ -99,9 +96,6 @@ static QIcon iconForKey(quint32 key)
     return cache->value(key);
 }
 
-#ifdef USE_OLD_RESOURCEMODEL
-static inline QIcon iconForResource(quint32 m_flags, QnResource::Status m_status)
-#else
 
 Node::Node(const QnResourcePtr &resource)
 {
@@ -126,7 +120,6 @@ QnResourcePtr Node::resource() const
 }
 
 QIcon Node::icon() const
-#endif
 {
     quint32 key = IconTypeUnknown;
 
@@ -162,10 +155,8 @@ ResourceModelPrivate::ResourceModelPrivate()
 
 ResourceModelPrivate::~ResourceModelPrivate()
 {
-#ifndef USE_OLD_RESOURCEMODEL
     Q_ASSERT(!nodes.values().contains(&root));
     qDeleteAll(nodes);
-#endif
 }
 
 void ResourceModelPrivate::init()
@@ -177,24 +168,23 @@ void ResourceModelPrivate::init()
     roles.insert(Qt::UserRole + 2, "searchString");
     q->setRoleNames(roles);
 
-    q->connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), q, SLOT(_q_addResource(QnResourcePtr)));
-    q->connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), q, SLOT(_q_removeResource(QnResourcePtr)));
-    q->connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), q, SLOT(_q_resourceChanged(QnResourcePtr)));
+    q->connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), q, SLOT(at_resPool_resourceAdded(QnResourcePtr)));
+    q->connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), q, SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
+    q->connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), q, SLOT(at_resPool_resourceChanged(QnResourcePtr)));
 
     const QnResourceList resources = qnResPool->getResources(); // make a snapshot
     foreach (const QnResourcePtr &server, resources) {
         if (server->checkFlag(QnResource::server)) {
-            _q_addResource(server);
+            at_resPool_resourceAdded(server);
             const QnId serverId = server->getId();
             foreach (const QnResourcePtr &resource, resources) {
                 if (resource->getParentId() == serverId && !resource->checkFlag(QnResource::server))
-                    _q_addResource(resource);
+                    at_resPool_resourceAdded(resource);
             }
         }
     }
 }
 
-#ifndef USE_OLD_RESOURCEMODEL
 void ResourceModelPrivate::insertNode(Node *parentNode, Node *node, int row)
 {
     nodes[node->id()] = node;
@@ -260,7 +250,7 @@ QModelIndex ResourceModelPrivate::index(QnId id, int column) const
     return index(node(id), column);
 }
 
-void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
+void ResourceModelPrivate::at_resPool_resourceAdded(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
 
@@ -287,7 +277,7 @@ void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
     q->endInsertRows();
 }
 
-void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
+void ResourceModelPrivate::at_resPool_resourceRemoved(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
 
@@ -308,7 +298,7 @@ void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
     q->endRemoveRows();
 }
 
-void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
+void ResourceModelPrivate::at_resPool_resourceChanged(const QnResourcePtr &resource)
 {
     Q_Q(ResourceModel);
 
@@ -323,99 +313,19 @@ void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
     const QModelIndex index = this->index(node);
     Q_EMIT q->dataChanged(index, index);
 }
-#else
-QModelIndex ResourceModelPrivate::index(QnId id, int column) const
-{
-    Q_Q(const ResourceModel);
-    QModelIndex index;
-    if (QStandardItem *item = q->item(0, 0)) {
-        const QModelIndexList indexList = q->match(item->index(), Qt::UserRole + 1, id, 1, Qt::MatchExactly | Qt::MatchRecursive);
-        index = indexList.value(0);
-    }
-    return index.isValid() ? index.sibling(index.row(), column) : index;
-}
-
-void ResourceModelPrivate::_q_addResource(const QnResourcePtr &resource)
-{
-    QStandardItem *item = this->item(resource);
-    if (item)
-        return; // avoid duplicates
-
-    if (resource->checkFlag(QnResource::server)) {
-        item = new QStandardItem;
-        item->setSelectable(false);
-        q_func()->appendRow(item);
-    } else if (QStandardItem *root = this->item(resource->getParentId())) {
-        item = new QStandardItem;
-        root->appendRow(item);
-    } else {
-        qWarning("ResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
-                 resource->getParentId(), resource->getId());
-        return;
-    }
-
-    item->setText(resource->getName());
-    item->setToolTip(resource->getName());
-    item->setData(resource->getId(), Qt::UserRole + 1);
-    item->setData(resource->toSearchString(), Qt::UserRole + 2);
-    item->setIcon(iconForResource(resource->flags(), resource->getStatus()));
-    item->setEditable(false);
-}
-
-void ResourceModelPrivate::_q_removeResource(const QnResourcePtr &resource)
-{
-    if (QStandardItem *item = this->item(resource)) {
-        if (item->parent())
-            item->parent()->removeRow(item->row());
-        else
-            q_func()->removeRow(item->row());
-    }
-}
-
-void ResourceModelPrivate::_q_resourceChanged(const QnResourcePtr &resource)
-{
-    if (QStandardItem *item = this->item(resource)) {
-        item->setText(resource->getName());
-        item->setToolTip(resource->getName());
-        item->setData(resource->getId(), Qt::UserRole + 1);
-        item->setData(resource->toSearchString(), Qt::UserRole + 2);
-        item->setIcon(iconForResource(resource->flags(), resource->getStatus()));
-    }
-}
-#endif
-
 
 ResourceModel::ResourceModel(QObject *parent)
-#ifdef USE_OLD_RESOURCEMODEL
-    : QStandardItemModel(parent), d_ptr(new ResourceModelPrivate)
-#else
     : QAbstractItemModel(parent), d_ptr(new ResourceModelPrivate)
-#endif
 {
     Q_D(ResourceModel);
     d->q_ptr = this;
     d->init();
-
-#ifndef USE_OLD_RESOURCEMODEL
-    //refresh();
-#endif
 }
 
 ResourceModel::~ResourceModel()
 {
 }
 
-#ifdef USE_OLD_RESOURCEMODEL
-QnResourcePtr ResourceModel::resource(const QModelIndex &index) const
-{
-    return index.column() == 0 ? qnResPool->getResourceById(index.data(Qt::UserRole + 1)) : QnResourcePtr(0);
-}
-
-QModelIndex ResourceModel::index(const QnResourcePtr &resource) const
-{
-    return d_func()->index(resource->getId());
-}
-#else
 QnResourcePtr ResourceModel::resource(const QModelIndex &index) const
 {
     Node *node = d_func()->node(index);
@@ -498,7 +408,7 @@ Qt::ItemFlags ResourceModel::flags(const QModelIndex &index) const
         Node *node = d->node(index);
         if (node->parentId() != 0)
             flags |= Qt::ItemIsSelectable;
-        if ((node->flags() & QnResource::local))
+        if ((node->flags() & QnResource::media))
             flags |= Qt::ItemIsDragEnabled;
     }
 
@@ -592,7 +502,6 @@ QVariant ResourceModel::headerData(int section, Qt::Orientation orientation, int
 
     return QVariant();
 }
-#endif
 
 void ResourceModel::addResource(const QnResourcePtr &resource)
 {
@@ -601,7 +510,7 @@ void ResourceModel::addResource(const QnResourcePtr &resource)
         return;
     }
 
-    d_func()->_q_addResource(resource);
+    d_func()->at_resPool_resourceAdded(resource);
 }
 
 void ResourceModel::removeResource(const QnResourcePtr &resource)
@@ -611,7 +520,7 @@ void ResourceModel::removeResource(const QnResourcePtr &resource)
         return;
     }
 
-    d_func()->_q_removeResource(resource);
+    d_func()->at_resPool_resourceRemoved(resource);
 }
 
 /*!
@@ -619,11 +528,7 @@ void ResourceModel::removeResource(const QnResourcePtr &resource)
 */
 QStringList ResourceModel::mimeTypes() const
 {
-#ifdef USE_OLD_RESOURCEMODEL
-    QStringList mimeTypes = QStandardItemModel::mimeTypes();
-#else
     QStringList mimeTypes = QAbstractItemModel::mimeTypes();
-#endif
     mimeTypes.append(QLatin1String("text/uri-list"));
     mimeTypes.append(resourcesMime());
 
@@ -635,11 +540,7 @@ QStringList ResourceModel::mimeTypes() const
 */
 QMimeData *ResourceModel::mimeData(const QModelIndexList &indexes) const
 {
-#ifdef USE_OLD_RESOURCEMODEL
-    QMimeData *mimeData = QStandardItemModel::mimeData(indexes);
-#else
     QMimeData *mimeData = QAbstractItemModel::mimeData(indexes);
-#endif
     if (mimeData) {
         const QStringList types = mimeTypes();
         const QString resourceFormat = resourcesMime();
@@ -678,11 +579,7 @@ bool ResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction actio
     // check if the format is supported
     const QString format = resourcesMime();
     if (!mimeData->hasFormat(format) && !mimeData->hasUrls())
-#ifdef USE_OLD_RESOURCEMODEL
-        return QStandardItemModel::dropMimeData(mimeData, action, row, column, parent);
-#else
         return QAbstractItemModel::dropMimeData(mimeData, action, row, column, parent);
-#endif
 
     // decode and insert
     QnResourceList resources;
@@ -705,6 +602,19 @@ Qt::DropActions ResourceModel::supportedDropActions() const
 {
     return Qt::CopyAction | Qt::MoveAction;
 }
+
+void ResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
+    d_func()->at_resPool_resourceAdded(resource);
+}
+
+void ResourceModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
+    d_func()->at_resPool_resourceRemoved(resource);
+}
+
+void ResourceModel::at_resPool_resourceChanged(const QnResourcePtr &resource) {
+    d_func()->at_resPool_resourceChanged(resource);
+}
+
 
 
 ResourceSortFilterProxyModelPrivate::ResourceSortFilterProxyModelPrivate()
@@ -902,6 +812,3 @@ bool ResourceSortFilterProxyModel::filterAcceptsRow(int source_row, const QModel
     return false;
 }
 
-#ifdef Q_OS_WIN
-#include "moc_resourcemodel.cpp"
-#endif

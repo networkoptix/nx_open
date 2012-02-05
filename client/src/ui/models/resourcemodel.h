@@ -1,22 +1,13 @@
 #ifndef RESOURCEMODEL_H
 #define RESOURCEMODEL_H
 
-//#define USE_OLD_RESOURCEMODEL
-
 #include <QtCore/QAbstractItemModel>
-#include "resourcemodel.h"
-
-#include "core/resource/resource.h"
-
-#ifdef USE_OLD_RESOURCEMODEL
-#include <QtGui/QStandardItemModel>
+#include <QtGui/QSortFilterProxyModel>
+#include <core/resource/resource.h>
 
 class ResourceModelPrivate;
-class ResourceModel : public QStandardItemModel
-#else
-class ResourceModelPrivate;
+
 class ResourceModel : public QAbstractItemModel
-#endif
 {
     Q_OBJECT
 
@@ -27,7 +18,6 @@ public:
     QnResourcePtr resource(const QModelIndex &index) const;
     QModelIndex index(const QnResourcePtr &resource) const;
 
-#ifndef USE_OLD_RESOURCEMODEL
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     QModelIndex buddy(const QModelIndex &index) const;
     QModelIndex parent(const QModelIndex &index) const;
@@ -38,30 +28,30 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-#endif
 
     QStringList mimeTypes() const;
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     bool dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent);
     Qt::DropActions supportedDropActions() const;
 
-public Q_SLOTS:
+public slots:
     void addResource(const QnResourcePtr &resource);
     void removeResource(const QnResourcePtr &resource);
 
+private slots:
+    void at_resPool_resourceAdded(const QnResourcePtr &resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resPool_resourceChanged(const QnResourcePtr &resource);
+
 private:
+    friend class ResourceSortFilterProxyModel;
+
     Q_DISABLE_COPY(ResourceModel)
     Q_DECLARE_PRIVATE(ResourceModel)
+    
     const QScopedPointer<ResourceModelPrivate> d_ptr;
-    Q_PRIVATE_SLOT(d_func(), void _q_addResource(const QnResourcePtr &resource))
-    Q_PRIVATE_SLOT(d_func(), void _q_removeResource(const QnResourcePtr &resource))
-    Q_PRIVATE_SLOT(d_func(), void _q_resourceChanged(const QnResourcePtr &resource))
-
-    friend class ResourceSortFilterProxyModel;
 };
 
-
-#include <QtGui/QSortFilterProxyModel>
 
 class ResourceSortFilterProxyModelPrivate;
 class ResourceSortFilterProxyModel : public QSortFilterProxyModel
