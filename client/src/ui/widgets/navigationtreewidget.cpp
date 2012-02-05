@@ -259,6 +259,9 @@ void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
 {
     const QnResourcePtr &resource = qnResPool->getResourceByUniqId(item->resourceUid());
 
+    if(!m_controller->layout()->items(resource->getUniqueId()).isEmpty())
+        return;
+
     m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
     if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
