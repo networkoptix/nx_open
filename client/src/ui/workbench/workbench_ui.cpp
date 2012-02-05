@@ -162,7 +162,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Tree widget. */
-    m_treeWidget = new NavigationTreeWidget();
+    m_treeWidget = new QnResourceTreeWidget();
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_treeWidget->palette();
@@ -876,7 +876,7 @@ void QnWorkbenchUi::at_treeShowingProcessor_hoverEntered() {
 
         /* So that the click that may follow won't hide it. */
         setTreeShowButtonUsed(false);
-        QTimer::singleShot(100, this, SLOT(setTreeShowButtonUsed()));
+        QTimer::singleShot(200, this, SLOT(setTreeShowButtonUsed()));
     }
 
     m_treeHidingProcessor->forceHoverEnter();
