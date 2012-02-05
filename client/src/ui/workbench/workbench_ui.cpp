@@ -38,7 +38,7 @@
 #include <ui/processors/hover_processor.h>
 
 #include <ui/graphics/items/controls/navigationitem.h>
-#include <ui/widgets/navigationtreewidget.h>
+#include <ui/widgets/resource_tree_widget.h>
 #include <ui/context_menu_helper.h>
 #include <ui/style/skin.h>
 #include <ui/context_menu_helper.h>

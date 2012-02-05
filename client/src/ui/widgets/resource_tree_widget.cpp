@@ -1,4 +1,4 @@
-#include "navigationtreewidget.h"
+#include "resource_tree_widget.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
