@@ -3,6 +3,7 @@
 #include "dlink_resource.h"
 
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
+extern inline int getIntParam(const char* pos);
 
 #pragma pack(push,1)
 struct ACS_VideoHeader
@@ -26,9 +27,10 @@ struct ACS_VideoHeader
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
-mHttpClient(0)
+mHttpClient(0),
+m_h264(false),
+m_mpeg4(false)
 {
-
 }
 
 PlDlinkStreamReader::~PlDlinkStreamReader()
@@ -55,9 +57,20 @@ void PlDlinkStreamReader::openStream()
     if (!res->updateCamInfo()) // after we changed profile some videoprofile url might be changed
         return;
     
-
     // ok, now lets open a stream
 
+    QnDlink_cam_info info = res->getCamInfo();
+    if (info.videoProfileUrls.size() < 2)
+    {
+        Q_ASSERT(false);
+        return;
+    }
+
+
+    QString url = (getRole() == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[1] : info.videoProfileUrls[1];
+
+    mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
+    mHttpClient->doGET(url);
 }
 
 void PlDlinkStreamReader::closeStream()
@@ -73,7 +86,17 @@ bool PlDlinkStreamReader::isStreamOpened() const
 
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 {
-    return QnAbstractMediaDataPtr(0);
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
+
+    if (m_h264)
+        return getNextDataH264();
+
+    if (m_mpeg4)
+        return getNextDataMPEG4();
+
+    return getNextDataMJPEG();
+
 }
 
 void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
@@ -106,7 +129,7 @@ void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
 
 //=====================================================================================
 
-QString PlDlinkStreamReader::composeVideoProfile() const
+QString PlDlinkStreamReader::composeVideoProfile() 
 {
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     QnDlink_cam_info info = res->getCamInfo();
@@ -142,17 +165,20 @@ QString PlDlinkStreamReader::composeVideoProfile() const
     t << "codec=";
 
 
-    bool mpeg = false;
+    
+    m_mpeg4 = false;
+    m_h264 = false;
 
-    if (info.hasH264!="")
+    if (info.hasH264!="" && false)
     {
         t << info.hasH264 << "&";
-        mpeg = true;
+        m_h264 = true;
+        
     }
-    else if (info.hasMPEG4)
+    else if (info.hasMPEG4 && false)
     {
         t << "MPEG4&";
-        mpeg = true;
+        m_mpeg4 = true;
     }
     else
     {
@@ -161,7 +187,7 @@ QString PlDlinkStreamReader::composeVideoProfile() const
 
 
 
-    if (mpeg)
+    if (m_mpeg4 || m_h264)
     {
         // just CBR fo mpeg so far
         t << "qualitymode=CBR" << "&";
@@ -200,4 +226,70 @@ QString PlDlinkStreamReader::composeVideoProfile() const
 
     t.flush();
     return result;
+}
+
+
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataH264()
+{
+    return QnAbstractMediaDataPtr(0);
+}
+
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG4()
+{
+    return QnAbstractMediaDataPtr(0);
+}
+
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
+{
+    char headerBuffer[512+1];
+    int headerSize = 0;
+    char* headerBufferEnd = 0;
+    char* realHeaderEnd = 0;
+    while (headerSize < sizeof(headerBuffer)-1)
+    {
+        int readed = mHttpClient->read(headerBuffer+headerSize, sizeof(headerBuffer)-1 - headerSize);
+        if (readed < 1)
+            return QnAbstractMediaDataPtr(0);
+        headerSize += readed;
+        headerBufferEnd = headerBuffer + headerSize;
+        *headerBufferEnd = 0;
+        realHeaderEnd = strstr(headerBuffer, "\r\n\r\n");
+        if (realHeaderEnd)
+            break;
+    }
+    if (!realHeaderEnd)
+        return QnAbstractMediaDataPtr(0);
+    char* contentLenPtr = strstr(headerBuffer, "Content-Length:");
+    if (!contentLenPtr)
+        return QnAbstractMediaDataPtr(0);
+    int contentLen = getIntParam(contentLenPtr + 16);
+
+    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
+    videoData->data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
+
+    int dataLeft = contentLen - videoData->data.size();
+    char* curPtr = videoData->data.data() + videoData->data.size();
+    videoData->data.done(dataLeft);
+
+    while (dataLeft > 0)
+    {
+        int readed = mHttpClient->read(curPtr, dataLeft);
+        if (readed < 1)
+            return QnAbstractMediaDataPtr(0);
+        curPtr += readed;
+        dataLeft -= readed;
+    }
+    // sometime 1 more bytes in the buffer end. Looks like it is a DLink bug caused by 16-bit word alignment
+    if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
+        videoData->data.done(-1);
+
+    videoData->compressionType = CODEC_ID_MJPEG;
+    videoData->width = 1920;
+    videoData->height = 1088;
+    videoData->flags |= AV_PKT_FLAG_KEY;
+    videoData->channelNumber = 0;
+    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+
+    return videoData;
+
 }

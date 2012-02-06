@@ -18,7 +18,7 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-    virtual QString composeVideoProfile() const;
+    virtual QString composeVideoProfile();
 
 
     virtual void updateStreamParamsBasedOnQuality() override;
@@ -26,7 +26,17 @@ protected:
 
 
 private:
+
+    QnAbstractMediaDataPtr getNextDataH264();
+    QnAbstractMediaDataPtr getNextDataMPEG4();
+    QnAbstractMediaDataPtr getNextDataMJPEG();
+
+private:
+
     CLSimpleHTTPClient* mHttpClient;
+
+    bool m_h264;
+    bool m_mpeg4;
 
 };
 
