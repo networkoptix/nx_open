@@ -111,8 +111,12 @@ bool QnPlDlinkResource::updateCamInfo()
     {
         if (line.contains("videos="))
         {
-            if (line.contains("H.264") || line.contains("H264"))
-                m_camInfo.hasH264 = true;
+            if (line.contains("H.264"))
+                m_camInfo.hasH264 = "H.264";
+            else
+                if (line.contains("H264"))
+                    m_camInfo.hasH264 = "H264";
+
 
             if (line.contains("MPEG4"))
                 m_camInfo.hasMPEG4 = true;
@@ -148,14 +152,16 @@ bool QnPlDlinkResource::updateCamInfo()
                 bool m = bs.toLower().contains("m");
                 bool k = bs.toLower().contains("k");
 
+                QString t = bs;
+
                 if (m || k)
-                    bs = bs.left(bs.length()-1);
+                    t = t.left(t.length()-1);
                 
-                int val = bs.toInt();
+                int val = t.toInt();
                 if(m)
                     val *= 1024;
 
-                m_camInfo.possibleBitrates.push_back(val);
+                m_camInfo.possibleBitrates[val] = bs;
             }
 
             
@@ -187,7 +193,7 @@ bool QnPlDlinkResource::updateCamInfo()
 
     }
 
-    qSort(m_camInfo.possibleBitrates.begin(), m_camInfo.possibleBitrates.end(), qGreater<int>());
+
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 
