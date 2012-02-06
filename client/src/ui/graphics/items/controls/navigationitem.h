@@ -45,7 +45,7 @@ public Q_SLOTS:
 
 
 Q_SIGNALS:
-    void exportRange(qint64 begin, qint64 end);
+    void exportRange(CLVideoCamera* camera, qint64 begin, qint64 end);
     //void playbackMaskChanged(const QnTimePeriodList& playbackMask);
     void enableItemSync(bool value);
     void clearMotionSelection();
@@ -92,7 +92,8 @@ private Q_SLOTS:
     void updateMotionPeriods(const QnTimePeriod& period);
 
     void at_liveButton_clicked(bool checked);
-
+    
+    void onExportRange(qint64 startTimeMs,qint64 endTimeMs);
 protected:
     void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
     CLVideoCamera* findCameraByResource(QnResourcePtr resource);

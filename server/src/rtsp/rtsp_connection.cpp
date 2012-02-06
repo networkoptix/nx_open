@@ -382,6 +382,7 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
         d->liveDpLow->addDataProcessor(d->dataProcessor);
         d->dataProcessor->setSecondaryDataProvider(d->liveDpHi); // got data from Hi provider, but skip all data instead of motion
     }
+    d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
 }
 
 void QnRtspConnectionProcessor::checkQuality()

@@ -183,7 +183,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
 
-        if (result && m_sendedCSec != result->opaque && !(result->flags & QnAbstractMediaData::MediaFlags_LIVE))
+        if (result && m_sendedCSec != result->opaque)
             result.clear(); // ignore old archive data
         /*
         if (result && m_waitBOF)

@@ -114,10 +114,17 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_videoLayout(0),
     m_firstVideoIndex(0),
     m_audioStreamIndex(-1),
-    m_selectedAudioChannel(0)
+    m_selectedAudioChannel(0),
+    m_startTime(0),
+    m_useAbsolutePos(true)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
+}
+
+void QnAviArchiveDelegate::setUseAbsolutePos(bool value)
+{
+    m_useAbsolutePos = value;
 }
 
 QnAviArchiveDelegate::~QnAviArchiveDelegate()
@@ -129,14 +136,14 @@ QnAviArchiveDelegate::~QnAviArchiveDelegate()
 
 qint64 QnAviArchiveDelegate::startTime()
 {
-    return 0;
+    return m_startTime;
 }
 
 qint64 QnAviArchiveDelegate::endTime()
 {
     if (!m_streamsFound && !findStreams())
         return 0;
-    return contentLength();
+    return contentLength()+m_startTime;
 }
 
 QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
@@ -215,6 +222,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+    time -= m_startTime;
     if (!findStreams())
         return -1;
     avformat_seek_file(m_formatContext, -1, 0, time + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
@@ -263,6 +271,13 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
         AVMetadataTag* layoutInfo = av_metadata_get(m_formatContext->metadata,"video_layout", 0, 0);
         if (layoutInfo)
             deserializeLayout(m_videoLayout, layoutInfo->value);
+
+        if (m_useAbsolutePos)
+        {
+            AVMetadataTag* start_time = av_metadata_get(m_formatContext->metadata,"start_time", 0, 0);
+            if (start_time)
+                m_startTime = QString(start_time->value).toLongLong()*1000ll;
+        }
     }
     return m_videoLayout;
 }
@@ -366,7 +381,7 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
     qint64 packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
     if (packetTime == AV_NOPTS_VALUE)
         return AV_NOPTS_VALUE;
-    return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts)));
+    return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
 }
 
 bool QnAviArchiveDelegate::deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr)

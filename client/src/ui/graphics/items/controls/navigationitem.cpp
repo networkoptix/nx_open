@@ -182,7 +182,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     connect(m_timeSlider, SIGNAL(currentValueChanged(qint64)), this, SLOT(onValueChanged(qint64)));
     connect(m_timeSlider, SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
     connect(m_timeSlider, SIGNAL(sliderReleased()), this, SLOT(onSliderReleased()));
-    connect(m_timeSlider, SIGNAL(exportRange(qint64,qint64)), this, SIGNAL(exportRange(qint64,qint64)));
+    connect(m_timeSlider, SIGNAL(exportRange(qint64,qint64)), this, SLOT(onExportRange(qint64,qint64)));
 
     m_timerId = startTimer(33);
 
@@ -1095,4 +1095,9 @@ void NavigationItem::onSyncButtonToggled(bool value)
     m_speedSlider->resetSpeed();
     if (!value)
         updateActualCamera();
+}
+
+void NavigationItem::onExportRange(qint64 startTimeMs,qint64 endTimeMs)
+{
+    emit exportRange(videoCamera(), startTimeMs, endTimeMs);
 }

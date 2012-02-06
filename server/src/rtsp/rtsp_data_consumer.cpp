@@ -169,6 +169,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         if (!m_gotLivePacket)
             media->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        media->opaque = m_liveMarker;
         m_gotLivePacket = true;
     }
 
@@ -323,4 +324,9 @@ qint64 QnRtspDataConsumer::lastQueuedTime()
 void QnRtspDataConsumer::setSecondaryDataProvider(QnAbstractStreamDataProvider* value)
 {
     m_secondaryProvider = value;
+}
+
+void QnRtspDataConsumer::setLiveMarker(int marker)
+{
+    m_liveMarker = marker;
 }

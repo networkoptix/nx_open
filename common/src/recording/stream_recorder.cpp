@@ -29,7 +29,10 @@ m_startOffset(0),
 m_forceDefaultCtx(true),
 m_prebufferingUsec(0),
 m_stopOnWriteError(true),
-m_waitEOF(false)
+m_waitEOF(false),
+m_endOfData(false),
+m_lastProgress(-1),
+m_EofDateTime(AV_NOPTS_VALUE)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -46,8 +49,6 @@ void QnStreamRecorder::close()
     {
         if (m_startDateTime != AV_NOPTS_VALUE)
         {
-            av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+m_startDateTime/1000).toAscii().data(), 0);
-            av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_startOffset+m_endDateTime/1000).toAscii().data(), 0);
             fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
             m_startDateTime = AV_NOPTS_VALUE;
         }
@@ -99,6 +100,14 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     if (!md)
         return true; // skip unknown data
 
+    if (m_EofDateTime != AV_NOPTS_VALUE && md->timestamp > m_EofDateTime)
+    {
+        if (!m_endOfData)
+            emit recordingFinished();
+        m_endOfData = true;
+        return true;
+    }
+
     m_prebuffer << md;
     while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.first()->timestamp >= m_prebufferingUsec)
     {
@@ -112,6 +121,15 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     if (m_waitEOF && m_dataQueue.size() == 0) {
         close();
         m_waitEOF = false;
+    }
+
+    if (m_EofDateTime != AV_NOPTS_VALUE && m_EofDateTime > m_startDateTime)
+    {
+        int progress = ((md->timestamp - m_startDateTime)*100) /(m_EofDateTime - m_startDateTime);
+        if (progress != m_lastProgress) {
+            emit recordingProgress(progress);
+            m_lastProgress = progress;
+        }
     }
 
     return true;
@@ -254,6 +272,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
     const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(mediaProvider);
 
+    av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+mediaData->timestamp/1000).toAscii().data(), 0);
+
     m_formatCtx->start_time = mediaData->timestamp;
 
     const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(mediaProvider);
@@ -372,6 +392,12 @@ QString QnStreamRecorder::fillFileName()
     return m_fixedFileName;
 }
 
+QString QnStreamRecorder::fixedFileName() const
+{
+    return m_fixedFileName;
+}
+
+
 void QnStreamRecorder::closeOnEOF()
 {
     QMutexLocker lock(&m_closeAsyncMutex);
@@ -379,4 +405,12 @@ void QnStreamRecorder::closeOnEOF()
         close();
     else
         m_waitEOF = true;
+}
+
+
+void QnStreamRecorder::setEofDateTime(qint64 value)
+{
+    m_endOfData = false;
+    m_EofDateTime = value;
+    m_lastProgress = -1;
 }

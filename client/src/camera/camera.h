@@ -9,12 +9,11 @@
 #include "core/dataprovider/statistics.h"
 #include "utils/media/externaltimesource.h"
 
-
-
 class QnResource;
 class CLVideoWindowItem;
 class CLAbstractSceneItem;
-
+class QnStreamRecorder;
+class QnAbstractArchiveReader;
 
 class CLVideoCamera : public QObject, public CLAbstractComplicatedItem
 {
@@ -56,13 +55,19 @@ public:
 
     bool isVisible() const { return m_isVisible; }
     void setVisible(bool value) { m_isVisible = value; }
+
+    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName);
 signals:
     void reachedTheEnd();
     void recordingFailed(QString errMessage);
-
+    void exportProgress(int progress);
+    void exportFailed(const QString &errMessage);
+    void exportFinished(const QString &fileName);
+public slots:
+    void stopExport();
+    void onExportFinished();
 protected slots:
     void onReachedTheEnd();
-
 private:
     bool m_isVisible;
     QnMediaResourcePtr m_device;
@@ -76,6 +81,8 @@ private:
     bool m_GenerateEndOfStreamSignal;
     QnlTimeSource* m_extTimeSrc;
 
+    QnStreamRecorder* m_exportRecorder;
+    QnAbstractArchiveReader* m_exportReader;
 };
 
 #endif //clcamera_h_1451

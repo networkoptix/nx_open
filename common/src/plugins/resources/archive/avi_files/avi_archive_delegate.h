@@ -28,6 +28,7 @@ public:
     // for optimization       
     void doNotFindStreamInfo();
     bool isStreamsFound() const;
+    void setUseAbsolutePos(bool value);
 protected:
     virtual qint64 contentLength() const;
     virtual qint64 packetTimestamp(const AVPacket& packet);
@@ -50,8 +51,10 @@ private:
     CLCustomDeviceVideoLayout* m_videoLayout;
     QnResourceAudioLayout* m_audioLayout;
     QVector<int> m_indexToChannel;
-
     QList<QnMediaContextPtr> m_contexts;
+
+    qint64 m_startTime;
+    bool m_useAbsolutePos;
 
     friend class QnAviAudioLayout;
 };

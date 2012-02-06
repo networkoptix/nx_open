@@ -167,6 +167,11 @@ protected Q_SLOTS:
 
     void at_fpsItem_geometryChanged();
 
+    void at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeMs, qint64 endTimeMs);
+
+private:
+    void at_exportFailed(const QString &errMessage);
+    void at_exportFinished(const QString &fileName);
 private:
     /* Global state. */
 
