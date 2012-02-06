@@ -4,6 +4,26 @@
 
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 
+#pragma pack(1)
+static struct ACS_VideoHeader
+{
+    quint32  ulHdrID; //Header ID
+    quint32 ulHdrLength;
+    quint32 ulDataLength;
+    quint32 ulSequenceNumber;
+    quint32 ulTimeSec;
+    quint32 ulTimeUSec;
+    quint32 ulDataCheckSum;
+    quint16 usCodingType;
+    quint16 usFrameRate;
+    quint16 usWidth;
+    quint16 usHeight;
+    quint8 ucMDBitmap;
+    quint8 ucMDPowers[3];
+};
+
+#pragma pack()
+
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
 mHttpClient(0)
@@ -19,6 +39,10 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 
 void PlDlinkStreamReader::openStream()
 {
+    if (isStreamOpened())
+        return;
+
+
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     
     QString prifileStr = composeVideoProfile();
