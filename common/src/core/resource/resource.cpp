@@ -321,20 +321,23 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     if (setSpecialParam(name, val, domain))
         return true;
 
-    QMutexLocker locker(&m_mutex);
-    if (m_resourceParamList.isEmpty())
-        getResourceParamList();
-    if (!m_resourceParamList.contains(name))
+    QnParam param;
     {
-        cl_log.log("QnResource::setParam(): requested param does not exist!", cl_logWARNING);
-        return false;
-    }
+        QMutexLocker locker(&m_mutex);
+        if (m_resourceParamList.isEmpty())
+            getResourceParamList();
+        if (!m_resourceParamList.contains(name))
+        {
+            cl_log.log("QnResource::setParam(): requested param does not exist!", cl_logWARNING);
+            return false;
+        }
 
-    QnParam &param = m_resourceParamList[name];
-    if (param.isReadOnly())
-    {
-        cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
-        return false;
+        param = m_resourceParamList[name];
+        if (param.isReadOnly())
+        {
+            cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+            return false;
+        }
     }
 
     QVariant oldValue = param.value();
