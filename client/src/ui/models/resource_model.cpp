@@ -20,6 +20,7 @@ enum IconKey {
     IconTypeCamera = 0x0004,
     IconTypeImage = 0x0008,
     IconTypeMedia = 0x0010,
+    IconTypeUser = 0x0020,
     IconTypeMask = 0x0fff,
 
     IconStateLocal = 0x1000,
@@ -46,6 +47,7 @@ static void invalidateIconCache()
     cache->insert(IconTypeCamera, Skin::icon(QLatin1String("webcam.png")));
     cache->insert(IconTypeImage, Skin::icon(QLatin1String("snapshot.png")));
     cache->insert(IconTypeMedia, Skin::icon(QLatin1String("media.png")));
+    cache->insert(IconTypeUser, Skin::icon(QLatin1String("unauthorized.png")));
 
     cache->insert(IconStateOffline, Skin::icon(QLatin1String("offline.png")));
     cache->insert(IconStateUnauthorized, Skin::icon(QLatin1String("unauthorized.png")));
@@ -135,6 +137,9 @@ QIcon Node::icon() const
         key |= IconTypeMedia;
     else if ((m_flags & QnResource::server_archive) == QnResource::server_archive)
         key |= IconTypeMedia;
+    else if ((m_flags & QnResource::user) == QnResource::user) {
+        key |= IconTypeUser;
+    }
 
     if ((m_flags & QnResource::local) == QnResource::local)
         key |= IconStateLocal;

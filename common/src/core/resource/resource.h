@@ -47,28 +47,29 @@ public:
     enum Status { Offline, Unauthorized, Online };
 
     enum Flag {
-        network = 0x01, // resource has ip and mac
-        url = 0x02,  // has url, like file name
+        network = 0x01,         /**< Has ip and mac. */
+        url = 0x02,             /**< Has url, e.g. file name. */
         streamprovider = 0x04,
         media = 0x08,
-        playback = 0x10, // something playable (not real time and not a single shot)
+        playback = 0x10,        /**< Something playable (not real time and not a single shot). */
         video = 0x20,
         audio = 0x40,
         live = 0x80,
-        still_image = 0x100, // still image device
+        still_image = 0x100,    /**< Still image device. */
 
-        local = 0x200,    // local client resource
-        server = 0x400,   // server resource
-        remote = 0x800,   // remote (on-server) resource
+        local = 0x200,          /**< Local client resource. */
+        server = 0x400,         /**< Server resource. */
+        remote = 0x800,         /**< Remote (on-server) resource. */
 
-        layout = 0x1000,   // layout resource
+        layout = 0x1000,        /**< Layout resource. */
+        user = 0x2000,          /**< User resource. */
 
         live_cam = live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        ARCHIVE = url | local | media | video | audio | streamprovider,     // local media file
-        SINGLE_SHOT = url | local | media | still_image | streamprovider    // local still image file
+        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
+        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
