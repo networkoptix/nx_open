@@ -31,6 +31,11 @@ public:
         m_committed = true;
     }
 
+    void rollback() {
+        m_committed = true;
+        m_setter(m_object, m_rollbackValue);
+    }
+
 private:
     Q_DISABLE_COPY(QnGenericScopedValueRollback);
 

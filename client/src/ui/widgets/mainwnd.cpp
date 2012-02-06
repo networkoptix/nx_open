@@ -181,18 +181,18 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     m_tabBar->setWorkbench(m_workbench);
 
     /* Tab bar layout. To snap tab bar to graphics view. */
-    m_tabBarLayout = new QVBoxLayout();
-    m_tabBarLayout->setContentsMargins(0, 0, 0, 0);
-    m_tabBarLayout->setSpacing(0);
-    m_tabBarLayout->addStretch(0x1000);
-    m_tabBarLayout->addWidget(m_tabBar);
+    QVBoxLayout *tabBarLayout = new QVBoxLayout();
+    tabBarLayout->setContentsMargins(0, 0, 0, 0);
+    tabBarLayout->setSpacing(0);
+    tabBarLayout->addStretch(0x1000);
+    tabBarLayout->addWidget(m_tabBar);
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
-    m_titleLayout->addLayout(m_tabBarLayout);
+    m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(&cm_new_tab));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(&cm_reconnect));
@@ -351,17 +351,6 @@ void MainWnd::updateFullScreenState()
 
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);
-    if(fullScreen) {
-        m_globalLayout->setContentsMargins(0, 0, 0, 0);
-        m_tabBar->setParent(NULL);
-        m_ui->setTabBar(m_tabBar);
-        m_tabBar->show();
-    } else {
-        m_globalLayout->setContentsMargins(0, 0, 0, 0);
-        m_ui->setTabBar(NULL);
-        m_tabBarLayout->addWidget(m_tabBar);
-        m_tabBar->show();
-    }
     m_view->setLineWidth(isFullScreen() ? 0 : 1);
 
     updateDwmState();

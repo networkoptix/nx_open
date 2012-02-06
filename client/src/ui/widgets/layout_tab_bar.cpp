@@ -35,9 +35,9 @@ QnLayoutTabBar::~QnLayoutTabBar() {
 void QnLayoutTabBar::checkInvariants() const {
     assert(m_layouts.size() == count());
 
-    if(m_workbench) {
+    if(m_workbench && m_submit && m_update) {
         assert(m_workbench->layouts() == m_layouts);
-        assert(m_workbench->layoutIndex(m_workbench->currentLayout()) == currentIndex());
+        assert(m_workbench->layoutIndex(m_workbench->currentLayout()) == currentIndex() || m_workbench->layoutIndex(m_workbench->currentLayout()) == -1);
     }
 }
 
@@ -80,8 +80,10 @@ void QnLayoutTabBar::submitCurrentLayout() {
         return;
     
     QnScopedValueRollback<bool> guard(&m_update, false);
-
     m_workbench->setCurrentLayout(currentIndex() == -1 ? NULL : m_layouts[currentIndex()]);
+
+    guard.rollback();
+    checkInvariants();
 }
 
 
@@ -113,8 +115,12 @@ void QnLayoutTabBar::at_workbench_layoutsChanged() {
     }
 
     while(count() > layouts.size())
-        removeTab(count());
+        removeTab(count() - 1);
 
+    /* Current layout may have changed. Sync. */
+    at_workbench_currentLayoutChanged();
+
+    guard.rollback();
     checkInvariants();
 }
 
@@ -131,6 +137,7 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged() {
     QnScopedValueRollback<bool> guard(&m_submit, false);
     setCurrentIndex(newCurrentIndex);
 
+    guard.rollback();
     checkInvariants();
 }
 
@@ -141,6 +148,8 @@ void QnLayoutTabBar::at_layout_nameChanged() {
 }
 
 void QnLayoutTabBar::tabInserted(int index) {
+    QnScopedValueRollback<bool> guard(&m_update, false);
+
     QString name;
     if(m_layouts.size() != count()) { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
         QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
@@ -171,6 +180,7 @@ void QnLayoutTabBar::tabInserted(int index) {
     if(m_submit)
         m_workbench->insertLayout(layout, index);
 
+    guard.rollback();
     checkInvariants();
 }
 
@@ -187,6 +197,7 @@ void QnLayoutTabBar::tabRemoved(int index) {
     if(m_submit)
         m_workbench->removeLayout(layout);
 
+    guard.rollback();
     checkInvariants();
 }
 
@@ -199,6 +210,7 @@ void QnLayoutTabBar::at_tabMoved(int from, int to) {
     if(m_submit)
         m_workbench->moveLayout(layout, to);
 
+    guard.rollback();
     checkInvariants();
 }
 
