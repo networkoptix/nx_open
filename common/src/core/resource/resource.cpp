@@ -156,7 +156,7 @@ QnResourcePtr QnResource::toSharedPointer() const
     return res;
 }
 
-QnParamList QnResource::getResourceParamList() const
+const QnParamList& QnResource::getResourceParamList() const
 {
     QnId resTypeId;
     {
