@@ -178,8 +178,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-    connect(m_tabBar, SIGNAL(currentChanged(QnWorkbenchLayout *)), this, SLOT(at_tabBar_currentChanged(QnWorkbenchLayout *)));
-    connect(m_tabBar, SIGNAL(layoutRemoved(QnWorkbenchLayout *)), this, SLOT(at_tabBar_layoutRemoved(QnWorkbenchLayout *)));
+    m_tabBar->setWorkbench(m_workbench);
 
     /* Tab bar layout. To snap tab bar to graphics view. */
     m_tabBarLayout = new QVBoxLayout();
@@ -505,24 +504,7 @@ void MainWnd::at_sessionManager_error(int error)
 
 void MainWnd::at_newLayoutRequested()
 {
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-
-    m_tabBar->addLayout(layout);
-    m_tabBar->setCurrentLayout(layout);
-}
-
-void MainWnd::at_tabBar_currentChanged(QnWorkbenchLayout *layout)
-{
-    m_workbench->setCurrentLayout(layout);
-    m_display->fitInView(false);
-
-    /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */
-    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
-}
-
-void MainWnd::at_tabBar_layoutRemoved(QnWorkbenchLayout *layout) 
-{
-    delete layout;
+    m_tabBar->addTab(QString());
 }
 
 void MainWnd::at_treeWidget_activated(uint resourceId)

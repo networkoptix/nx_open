@@ -33,6 +33,9 @@ QnWorkbench::~QnWorkbench() {
 void QnWorkbench::clear() {
     setMode(VIEWING);
     setCurrentLayout(NULL);
+    
+    while(!m_layouts.empty())
+        removeLayout(m_layouts.back());
 }
 
 void QnWorkbench::addLayout(QnWorkbenchLayout *layout) {

@@ -287,6 +287,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
+    connect(m_workbench,            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
 
     /* Connect to grid mapper. */
     QnWorkbenchGridMapper *mapper = m_workbench->mapper();
@@ -1076,6 +1077,10 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
     changeItem(role, m_workbench->item(role));
+}
+
+void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
+    fitInView(false);
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {
