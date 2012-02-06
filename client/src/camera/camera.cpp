@@ -1,12 +1,10 @@
 #include "camera.h"
-#include "ui/videoitem/video_wnd_item.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "client_util.h"
 
-CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
+CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
     m_device(device),
-    m_videoWindow(videovindow),
     m_camdispay(generateEndOfStreamSignal),
     m_recorder(0),
     m_GenerateEndOfStreamSignal(generateEndOfStreamSignal),
@@ -22,13 +20,6 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* video
 
     //m_stat = new QnStatistics[videonum]; // array of statistics
 
-    if(m_videoWindow != NULL) {
-	    for (int i = 0; i < videonum; ++i) {
-		    m_camdispay.addVideoChannel(i, m_videoWindow, !m_device->checkFlag(QnResource::SINGLE_SHOT));
-		    //m_videoWindow->setStatistics(&m_stat[i], i);
-        }
-	}
-
 	m_reader->addDataProcessor(&m_camdispay);
     //connect(m_reader, SIGNAL(jumpOccured(qint64, bool)), &m_camdispay, SLOT(jump(qint64)), Qt::DirectConnection);
     connect(m_reader, SIGNAL(streamPaused()), &m_camdispay, SLOT(onReaderPaused()), Qt::DirectConnection);
@@ -36,11 +27,6 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* video
     connect(m_reader, SIGNAL(prevFrameOccured()), &m_camdispay, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
     connect(m_reader, SIGNAL(nextFrameOccured()), &m_camdispay, SLOT(onNextFrameOccured()), Qt::DirectConnection);
 	//m_reader->setStatistics(m_stat);
-
-    if(m_videoWindow != NULL) {
-	    m_videoWindow->setComplicatedItem(this);
-	    m_videoWindow->setInfoText(m_device->toString());
-    }
 
     if (m_GenerateEndOfStreamSignal)
         connect(&m_camdispay, SIGNAL( reachedTheEnd() ), this, SLOT( onReachedTheEnd() ));
@@ -98,8 +84,6 @@ void CLVideoCamera::beforeStopDisplay()
     if (m_recorder)
 	    m_recorder->pleaseStop();
 
-    if(m_videoWindow != NULL)
-	    m_videoWindow->beforeDestroy();
 }
 
 void CLVideoCamera::startRecording()
@@ -115,9 +99,6 @@ void CLVideoCamera::startRecording()
 	m_reader->addDataProcessor(m_recorder);
 	m_reader->setNeedKeyData();
 	m_recorder->start();
-
-    if(m_videoWindow != NULL)
-	    m_videoWindow->addSubItem(RecordingSubItem);
 }
 
 void CLVideoCamera::stopRecording()
@@ -128,9 +109,6 @@ void CLVideoCamera::stopRecording()
 	    m_reader->removeDataProcessor(m_recorder);
     }
 	//m_reader->setQuality(QnQualityNormal);
-
-    if(m_videoWindow != NULL)
-	    m_videoWindow->removeSubItem(RecordingSubItem);
 }
 
 bool CLVideoCamera::isRecording()
@@ -151,21 +129,6 @@ QnAbstractStreamDataProvider* CLVideoCamera::getStreamreader()
 CLCamDisplay* CLVideoCamera::getCamCamDisplay()
 {
 	return &m_camdispay;
-}
-
-CLVideoWindowItem* CLVideoCamera::getVideoWindow()
-{
-	return m_videoWindow;
-}
-
-CLAbstractSceneItem* CLVideoCamera::getSceneItem() const
-{
-	return m_videoWindow;
-}
-
-const CLVideoWindowItem* CLVideoCamera::getVideoWindow() const
-{
-	return m_videoWindow;
 }
 
 const QnStatistics* CLVideoCamera::getStatistics(int channel)

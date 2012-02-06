@@ -67,6 +67,7 @@ void CameraSettingsDialog::updateView()
     ui->loginEdit->setText(m_camera->getAuth().user());
     ui->passwordEdit->setText(m_camera->getAuth().password());
 
+    ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
     ui->cameraScheduleWidget->setScheduleTasks(m_camera->getScheduleTasks());
 }
 

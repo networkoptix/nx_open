@@ -10,7 +10,6 @@
 struct QnDlink_cam_info
 {
     QnDlink_cam_info():
-    hasH264(false),
     hasMPEG4(false),
     numberOfVideoProfiles(0),
     hasFixedQuality(false)
@@ -23,17 +22,21 @@ struct QnDlink_cam_info
         return numberOfVideoProfiles > 0;
     }
 
+    // returns resolution with width not less than width
     QSize resolutionCloseTo(int width)
     {
         if (resolutions.size()==0)
+        {
+            Q_ASSERT(false);
             return QSize(0,0);
+        }
 
         QSize result = resolutions.at(0);
 
         
         foreach(const QSize& size, resolutions)
         {
-            if (size.width() < width)
+            if (size.width() <= width)
                 return result;
             else
                 result = size;
@@ -42,14 +45,53 @@ struct QnDlink_cam_info
         return result;
     }
 
-    bool hasH264;
+    // returns next up bitrate 
+    QString bitrateCloseTo(int val)
+    {
+
+        QSize result;
+
+        if (possibleBitrates.size()==0)
+        {
+            Q_ASSERT(false);
+            return "";
+        }
+
+        QMap<int, QString>::iterator it = possibleBitrates.lowerBound(val);
+        if (it == possibleBitrates.end())
+            it--;
+
+        return it.value();
+
+    }
+
+    // returns next up frame rate 
+    int frameRateCloseTo(int fr)
+    {
+        Q_ASSERT(possibleFps.size()>0);
+
+        int result = possibleFps.at(0);
+
+        foreach(int fps, possibleFps)
+        {
+            if (result <= fr)
+                return result;
+            else
+                result = fps;
+        }
+
+        return result;
+    }
+
+
+    QString hasH264;// some cams have H.264, some H264
     bool hasMPEG4;
     bool hasFixedQuality;
     int numberOfVideoProfiles;
     QMap<int, QString> videoProfileUrls;
     QList<QSize> resolutions;
 
-    QList<int> possibleBitrates;
+    QMap<int, QString> possibleBitrates;
     QList<int> possibleFps;
     QString possibleQualities;
 

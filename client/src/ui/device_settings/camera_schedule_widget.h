@@ -20,6 +20,7 @@ public:
     QnScheduleTaskList scheduleTasks() const;
     void setScheduleTasks(const QnScheduleTaskList &tasks);
 
+    void setMaxFps(int value);
 private Q_SLOTS:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);

@@ -20,6 +20,11 @@ typedef QList<QnLayoutItemData> QnLayoutItemDataList;
 class QnLayoutData : public QnResource
 {
 public:
+    QnLayoutData() 
+    {
+        addFlag(QnResource::layout);
+    }
+
     QString getUniqueId() const
     {
         // Indeed it's not uniqueid, as there is possible situation
@@ -37,6 +42,7 @@ public:
     {
         return m_items;
     }
+
 private:
     QList<QnLayoutItemData> m_items;
 };

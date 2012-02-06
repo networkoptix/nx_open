@@ -34,7 +34,7 @@ QAction cm_editTags(QObject::tr("Edit tags..."), 0);
 QAction cm_fullscreen(QObject::tr("Fullscreen"), 0);
 QAction cm_remove_from_layout(QObject::tr("Remove"), 0);
 QAction cm_remove_from_disk(QObject::tr("Delete file(s)"), 0);
-QAction cm_settings(QObject::tr("Settings..."), 0);
+QAction cm_settings(QObject::tr("Camera Settings"), 0);
 QAction cm_view_recorded(QObject::tr("View recorded video"), 0);
 QAction cm_save_recorded_as(QObject::tr("Save recorded video as..."), 0);
 QAction cm_take_screenshot(QObject::tr("Take screenshot..."), 0);

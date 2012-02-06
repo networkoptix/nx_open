@@ -1,5 +1,10 @@
 #include "user.h"
 
+QnUserResource::QnUserResource() 
+{
+    addFlag(QnResource::user);
+}
+
 void QnUserResource::setLayouts(QnLayoutDataList layouts)
 {
     m_layouts = layouts;

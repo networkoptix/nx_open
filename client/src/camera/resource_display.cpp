@@ -35,7 +35,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
         if(m_mediaProvider != NULL) {
-            m_camera = new CLVideoCamera(m_mediaResource, NULL, false, m_mediaProvider);
+            m_camera = new CLVideoCamera(m_mediaResource, false, m_mediaProvider);
             
             QnCounter *counter = new QnCounter(2);
             connect(m_camera->getCamCamDisplay(),   SIGNAL(finished()),         counter,        SLOT(increment()));

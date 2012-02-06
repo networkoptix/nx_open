@@ -10,6 +10,8 @@
 class QnUserResource : public QnResource
 {
 public:
+    QnUserResource();
+
     QString getUniqueId() const
     {
         return getName();

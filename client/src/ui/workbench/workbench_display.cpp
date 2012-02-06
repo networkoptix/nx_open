@@ -872,6 +872,9 @@ void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget) {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBounds() {
+    if(m_instrumentManager->scene() == NULL)
+        return; /* Do nothing if scene is being destroyed. */
+
     QRectF sizeRect, moveRect;
 
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];

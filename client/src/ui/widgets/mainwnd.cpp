@@ -35,7 +35,7 @@
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_ui.h"
 
-#include "ui/widgets/navigationtreewidget.h"
+#include "ui/widgets/resource_tree_widget.h"
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
@@ -222,7 +222,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     for (int i = 1; i < argc; ++i)
         m_controller->drop(QFile::decodeName(argv[i]));
 
-    //showFullScreen();
+    showFullScreen();
     updateDwmState();
 }
 

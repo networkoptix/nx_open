@@ -80,9 +80,6 @@ private Q_SLOTS:
 
     void onVolumeLevelChanged(int);
 
-    void setInfoText(const QString &infoText);
-    void restoreInfoText();
-
     void onTimePeriodLoaded(const QnTimePeriodList &timePeriods, int handle);
     void onTimePeriodLoadFailed(int status, int handle);
 
@@ -140,12 +137,6 @@ private:
     QnTimePeriodList m_mergedMotionPeriods;
 
     //QnTimePeriodUpdater *m_fullTimePeriodUpdater;
-
-    struct RestoreInfoTextData {
-        QString extraInfoText;
-        QTimer timer;
-    } *restoreInfoTextData;
-
 };
 
 #endif // NAVIGATIONITEM_H
