@@ -18,7 +18,7 @@ class AnimatorGroup;
 class HoverFocusProcessor;
 
 class NavigationItem;
-class NavigationTreeWidget;
+class QnResourceTreeWidget;
 class GraphicsLabel;
 
 class QnWorkbenchDisplay;
@@ -56,7 +56,7 @@ public:
 
     void setFlags(Flags flags);
 
-    NavigationTreeWidget *treeWidget() const {
+    QnResourceTreeWidget *treeWidget() const {
         return m_treeWidget;
     }
 
@@ -238,7 +238,7 @@ private:
     /* Tree-related state. */
 
     /** Navigation tree widget. */
-    NavigationTreeWidget *m_treeWidget;
+    QnResourceTreeWidget *m_treeWidget;
 
     /** Proxy widget for navigation tree widget. */
     QnMaskedProxyWidget *m_treeItem;

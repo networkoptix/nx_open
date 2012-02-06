@@ -1,4 +1,4 @@
-#include "navigationtreewidget.h"
+#include "resource_tree_widget.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -31,10 +31,10 @@
 
 #include <QtGui/QStyledItemDelegate>
 
-class NavigationTreeItemDelegate : public QStyledItemDelegate
+class QnResourceTreeItemDelegate : public QStyledItemDelegate
 {
 public:
-    explicit NavigationTreeItemDelegate(NavigationTreeWidget *parent)
+    explicit QnResourceTreeItemDelegate(QnResourceTreeWidget *parent)
         : QStyledItemDelegate(parent)
     {
         Q_ASSERT(parent);
@@ -45,7 +45,7 @@ protected:
     {
         QStyledItemDelegate::initStyleOption(option, index);
 
-        NavigationTreeWidget *navTree = static_cast<NavigationTreeWidget *>(parent());
+        QnResourceTreeWidget *navTree = static_cast<QnResourceTreeWidget *>(parent());
         if (navTree->m_controller && navTree->m_controller->layout()) {
             if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model())) {
                 if (!navTree->m_controller->layout()->items(model->resource(index)->getUniqueId()).isEmpty())
@@ -61,7 +61,7 @@ protected:
 };
 
 
-NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
+QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent)
     : QWidget(parent),
       m_filterTimerId(0),
       m_dontSyncWithLayout(false)
@@ -108,7 +108,7 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     m_resourcesTreeView->setUniformRowHeights(true);
     m_resourcesTreeView->setWordWrap(false);
     m_resourcesTreeView->setDragDropMode(QAbstractItemView::DragDrop);
-    m_resourcesTreeView->setItemDelegate(new NavigationTreeItemDelegate(this));
+    m_resourcesTreeView->setItemDelegate(new QnResourceTreeItemDelegate(this));
 
     connect(m_resourcesTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(at_treeView_activated(QModelIndex)));
 
@@ -158,11 +158,11 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     //QMetaObject::invokeMethod(m_resourcesTreeView, "expandAll", Qt::QueuedConnection); // ###
 }
 
-NavigationTreeWidget::~NavigationTreeWidget()
+QnResourceTreeWidget::~QnResourceTreeWidget()
 {
 }
 
-void NavigationTreeWidget::setWorkbenchController(QnWorkbenchController *controller)
+void QnResourceTreeWidget::setWorkbenchController(QnWorkbenchController *controller)
 {
     if (m_controller) {
         disconnect(m_controller->workbench(), SIGNAL(layoutAboutToBeChanged()), this, SLOT(workbenchLayoutAboutToBeChanged()));
@@ -180,7 +180,7 @@ void NavigationTreeWidget::setWorkbenchController(QnWorkbenchController *control
     }
 }
 
-void NavigationTreeWidget::workbenchLayoutAboutToBeChanged()
+void QnResourceTreeWidget::workbenchLayoutAboutToBeChanged()
 {
     if (!m_controller || !m_controller->layout())
         return;
@@ -198,7 +198,7 @@ void NavigationTreeWidget::workbenchLayoutAboutToBeChanged()
 
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel *) // ###
 
-void NavigationTreeWidget::workbenchLayoutChanged()
+void QnResourceTreeWidget::workbenchLayoutChanged()
 {
     if (!m_controller || !m_controller->layout())
         return;
@@ -232,7 +232,7 @@ void NavigationTreeWidget::workbenchLayoutChanged()
     connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
 }
 
-void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
+void QnResourceTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 {
     const QnResourcePtr &resource = qnResPool->getResourceByUniqId(item->resourceUid());
 
@@ -255,7 +255,7 @@ void NavigationTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
     }
 }
 
-void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
+void QnResourceTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
 {
     const QnResourcePtr &resource = qnResPool->getResourceByUniqId(item->resourceUid());
 
@@ -279,7 +279,7 @@ void NavigationTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
     }
 }
 
-void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first, int last)
+void QnResourceTreeWidget::handleInsertRows(const QModelIndex &parent, int first, int last)
 {
     if (!m_controller || !m_searchProxyModel)
         return;
@@ -293,7 +293,7 @@ void NavigationTreeWidget::handleInsertRows(const QModelIndex &parent, int first
     }
 }
 
-void NavigationTreeWidget::handleRemoveRows(const QModelIndex &parent, int first, int last)
+void QnResourceTreeWidget::handleRemoveRows(const QModelIndex &parent, int first, int last)
 {
     if (!m_controller || !m_searchProxyModel)
         return;
@@ -305,7 +305,7 @@ void NavigationTreeWidget::handleRemoveRows(const QModelIndex &parent, int first
     }
 }
 
-void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
+void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *)
 {
     QnResourceList resources;
     if (m_tabWidget->currentIndex() == 0) {
@@ -385,17 +385,17 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *)
     }
 }
 
-void NavigationTreeWidget::wheelEvent(QWheelEvent *event)
+void QnResourceTreeWidget::wheelEvent(QWheelEvent *event)
 {
     event->accept(); /* Do not propagate wheel events past the tree widget. */
 }
 
-void NavigationTreeWidget::mousePressEvent(QMouseEvent *event)
+void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event)
 {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
-void NavigationTreeWidget::timerEvent(QTimerEvent *event)
+void QnResourceTreeWidget::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_filterTimerId) {
         killTimer(m_filterTimerId);
@@ -417,7 +417,7 @@ void NavigationTreeWidget::timerEvent(QTimerEvent *event)
     QWidget::timerEvent(event);
 }
 
-void NavigationTreeWidget::at_filterLineEdit_textChanged(const QString &filter)
+void QnResourceTreeWidget::at_filterLineEdit_textChanged(const QString &filter)
 {
     if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
         m_filterLineEdit->clear();
@@ -443,7 +443,7 @@ void NavigationTreeWidget::at_filterLineEdit_textChanged(const QString &filter)
     m_filterTimerId = startTimer(!filter.isEmpty() ? qMax(1000 - filter.size() * 100, 0) : 0);
 }
 
-void NavigationTreeWidget::at_treeView_activated(const QModelIndex &index)
+void QnResourceTreeWidget::at_treeView_activated(const QModelIndex &index)
 {
     QnResourcePtr resource;
     if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model()))
@@ -454,7 +454,7 @@ void NavigationTreeWidget::at_treeView_activated(const QModelIndex &index)
         Q_EMIT activated(resource->getId());
 }
 
-void NavigationTreeWidget::open()
+void QnResourceTreeWidget::open()
 {
     QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourcesTreeView : m_searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())

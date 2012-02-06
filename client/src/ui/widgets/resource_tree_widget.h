@@ -1,5 +1,5 @@
-#ifndef NAVIGATIONTREEWIDGET_H
-#define NAVIGATIONTREEWIDGET_H
+#ifndef QN_RESOURCE_TREE_WIDGET_H
+#define QN_RESOURCE_TREE_WIDGET_H
 
 #include <QtCore/QPointer>
 
@@ -17,13 +17,13 @@ class QnWorkbenchItem;
 class QnResourceModel;
 class QnResourceSearchProxyModel;
 
-class NavigationTreeWidget : public QWidget
+class QnResourceTreeWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    NavigationTreeWidget(QWidget *parent = 0);
-    ~NavigationTreeWidget();
+    QnResourceTreeWidget(QWidget *parent = 0);
+    ~QnResourceTreeWidget();
 
     void setWorkbenchController(QnWorkbenchController *controller);
 
@@ -68,7 +68,7 @@ private:
 
     QPointer<QnWorkbenchController> m_controller;
 
-    friend class NavigationTreeItemDelegate;
+    friend class QnResourceTreeItemDelegate;
 };
 
-#endif // NAVIGATIONTREEWIDGET_H
+#endif // QN_RESOURCE_TREE_WIDGET_H
