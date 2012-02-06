@@ -1,7 +1,5 @@
 #include "preferencesdialog.h"
 
-#include "ui/video_cam_layout/start_screen_content.h"
-#include "ui/video_cam_layout/layout_manager.h"
 #include "ui/ui_common.h"
 #include "ui/context_menu_helper.h"
 

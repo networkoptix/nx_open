@@ -6,7 +6,6 @@
 
 /**
  * This processor translates graphics item's hover events into hover signals.
- * It can be used with only one graphics item at a time.
  * 
  * This processor is not as generic as others as there is no real need in
  * generic hover processor.
@@ -74,11 +73,36 @@ public slots:
     void forceFocusEnter();
 
 signals:
+    /**
+     * This signal is emitted whenever mouse enters one of the target items.
+     */
     void hoverEntered();
+
+    /**
+     * This signal is emitted whenever mouse leaves one of the target items. 
+     */
     void hoverLeft();
+
+    /**
+     * This signal is emitted whenever one of the target items gets input focus.
+     */
     void focusEntered();
+
+    /**
+     * This signal is emitted whenever one of the target items loses input focus.
+     */
     void focusLeft();
+
+    /**
+     * This signal is emitted whenever target items get both input focus and
+     * mouse hover.
+     */
     void hoverFocusEntered();
+
+    /**
+     * This signal is emitted whenever target items lose both input focus and
+     * mouse hover.
+     */
     void hoverFocusLeft();
 
 protected:

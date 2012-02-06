@@ -2,7 +2,6 @@
 #define clcamera_h_1451
 
 #include "camdisplay.h"
-#include "videodisplay/complicated_item.h"
 #include "recording/stream_recorder.h"
 #include "decoders/video/abstractdecoder.h"
 #include "core/resource/media_resource.h"
@@ -12,21 +11,19 @@
 
 
 class QnResource;
-class CLVideoWindowItem;
-class CLAbstractSceneItem;
 
 
-class CLVideoCamera : public QObject, public CLAbstractComplicatedItem
+class CLVideoCamera : public QObject
 {
     Q_OBJECT
 public:
     // number of videovindows in array must be the same as device->getNumberOfVideoChannels
-    CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader);
+    CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader);
     virtual ~CLVideoCamera();
 
-    virtual void startDisplay() override;
-    virtual void beforeStopDisplay() override;
-    virtual void stopDisplay() override;
+    virtual void startDisplay();
+    virtual void beforeStopDisplay();
+    virtual void stopDisplay();
 
     void startRecording();
     void stopRecording();
@@ -38,13 +35,9 @@ public:
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
-    virtual QnResourcePtr getDevice() const override;
+    virtual QnResourcePtr getDevice() const;
 
     QnAbstractStreamDataProvider* getStreamreader();
-    CLVideoWindowItem* getVideoWindow();
-    const CLVideoWindowItem* getVideoWindow() const;
-
-    virtual CLAbstractSceneItem* getSceneItem() const override;
 
     const QnStatistics* getStatistics(int channel = 0);
     CLCamDisplay* getCamCamDisplay();
@@ -66,7 +59,6 @@ protected slots:
 private:
     bool m_isVisible;
     QnMediaResourcePtr m_device;
-    CLVideoWindowItem* m_videoWindow;
     CLCamDisplay m_camdispay;
     QnStreamRecorder* m_recorder;
 

@@ -14,7 +14,6 @@
 #include "camera/camera.h"
 
 #include "ui/style/skin.h"
-#include "ui/videoitem/video_wnd_item.h"
 #include "ui/graphics/items/standard/graphicslabel.h"
 #include "ui/graphics/items/controls/speedslider.h"
 #include "ui/graphics/items/controls/volumeslider.h"
@@ -96,8 +95,7 @@ private:
 NavigationItem::NavigationItem(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     m_camera(0), m_forcedCamera(0), m_currentTime(0),
-    m_playing(false),
-    restoreInfoTextData(0)
+    m_playing(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
@@ -403,7 +401,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
     m_speedSlider->resetSpeed();
     m_timeSlider->resetSelectionRange();
-    restoreInfoText();
+    //restoreInfoText();
 
     if (m_camera)
         disconnect(m_camera->getCamCamDisplay(), 0, this, 0);
@@ -964,7 +962,7 @@ void NavigationItem::onSpeedChanged(float newSpeed)
             else
                 pause();
 
-            setInfoText(!qFuzzyIsNull(newSpeed) ? tr("[ Speed: %1 ]").arg(tr("%1x").arg(newSpeed)) : tr("Paused"));
+            //setInfoText(!qFuzzyIsNull(newSpeed) ? tr("[ Speed: %1 ]").arg(tr("%1x").arg(newSpeed)) : tr("Paused"));
         }
         else
         {
@@ -977,38 +975,7 @@ void NavigationItem::onVolumeLevelChanged(int newVolumeLevel)
 {
     setMute(m_volumeSlider->isMute());
 
-    setInfoText(tr("[ Volume: %1 ]").arg(!m_volumeSlider->isMute() ? tr("%1%").arg(newVolumeLevel) : tr("Muted")));
-}
-
-void NavigationItem::setInfoText(const QString &infoText)
-{
-    if (CLVideoWindowItem *vwi = m_camera ? m_camera->getVideoWindow() : 0) {
-        if (restoreInfoTextData) {
-            restoreInfoTextData->timer.stop();
-        } else {
-            restoreInfoTextData = new RestoreInfoTextData;
-            restoreInfoTextData->extraInfoText = vwi->extraInfoText();
-            restoreInfoTextData->timer.setSingleShot(true);
-            connect(&restoreInfoTextData->timer, SIGNAL(timeout()), this, SLOT(restoreInfoText()));
-        }
-        restoreInfoTextData->timer.start(3000);
-
-        vwi->setExtraInfoText(infoText);
-    }
-}
-
-void NavigationItem::restoreInfoText()
-{
-    if (!restoreInfoTextData)
-        return;
-
-    if (CLVideoWindowItem *vwi = m_camera ? m_camera->getVideoWindow() : 0) {
-        restoreInfoTextData->timer.stop();
-        vwi->setExtraInfoText(restoreInfoTextData->extraInfoText);
-    }
-
-    delete restoreInfoTextData;
-    restoreInfoTextData = 0;
+    //setInfoText(tr("[ Volume: %1 ]").arg(!m_volumeSlider->isMute() ? tr("%1%").arg(newVolumeLevel) : tr("Muted")));
 }
 
 void NavigationItem::setMute(bool mute)

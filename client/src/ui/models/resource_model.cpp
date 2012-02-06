@@ -333,9 +333,6 @@ QModelIndex QnResourceModel::index(const QnResourcePtr &resource) const
     return d_func()->index(resource, 0);
 }
 
-/*!
-    \reimp
-*/
 QModelIndex QnResourceModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_D(const QnResourceModel);
@@ -344,17 +341,11 @@ QModelIndex QnResourceModel::index(int row, int column, const QModelIndex &paren
     return d->index(row, column, parent);
 }
 
-/*!
-    \reimp
-*/
 QModelIndex QnResourceModel::buddy(const QModelIndex &index) const
 {
     return index.sibling(index.row(), 0);
 }
 
-/*!
-    \reimp
-*/
 QModelIndex QnResourceModel::parent(const QModelIndex &index) const
 {
     Q_D(const QnResourceModel);
@@ -362,17 +353,11 @@ QModelIndex QnResourceModel::parent(const QModelIndex &index) const
     return d->index(node->parentId());
 }
 
-/*!
-    \reimp
-*/
 bool QnResourceModel::hasChildren(const QModelIndex &parent) const
 {
     return rowCount(parent) > 0;
 }
 
-/*!
-    \reimp
-*/
 int QnResourceModel::rowCount(const QModelIndex &parent) const
 {
     Q_D(const QnResourceModel);
@@ -382,9 +367,6 @@ int QnResourceModel::rowCount(const QModelIndex &parent) const
     return d->nodeTree.value(node).size();
 }
 
-/*!
-    \reimp
-*/
 int QnResourceModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.model() == this || !parent.isValid())
@@ -392,9 +374,6 @@ int QnResourceModel::columnCount(const QModelIndex &parent) const
     return 0;
 }
 
-/*!
-    \reimp
-*/
 Qt::ItemFlags QnResourceModel::flags(const QModelIndex &index) const
 {
     Q_D(const QnResourceModel);
@@ -411,9 +390,6 @@ Qt::ItemFlags QnResourceModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-/*!
-    \reimp
-*/
 QVariant QnResourceModel::data(const QModelIndex &index, int role) const
 {
     Q_D(const QnResourceModel);
@@ -467,9 +443,6 @@ QVariant QnResourceModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-/*!
-    \reimp
-*/
 bool QnResourceModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
 /* if (role != Qt::EditRole)
@@ -485,9 +458,6 @@ bool QnResourceModel::setData(const QModelIndex &index, const QVariant &value, i
     return false;
 }
 
-/*!
-    \reimp
-*/
 QVariant QnResourceModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal) {
@@ -521,9 +491,6 @@ void QnResourceModel::removeResource(const QnResourcePtr &resource)
     d_func()->at_resPool_resourceRemoved(resource);
 }
 
-/*!
-    \reimp
-*/
 QStringList QnResourceModel::mimeTypes() const
 {
     QStringList mimeTypes = QAbstractItemModel::mimeTypes();
@@ -533,9 +500,6 @@ QStringList QnResourceModel::mimeTypes() const
     return mimeTypes;
 }
 
-/*!
-    \reimp
-*/
 QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const
 {
     QMimeData *mimeData = QAbstractItemModel::mimeData(indexes);
@@ -565,9 +529,6 @@ QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const
     return mimeData;
 }
 
-/*!
-    \reimp
-*/
 bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
     // check if the action is supported
@@ -593,9 +554,6 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
     return true;
 }
 
-/*!
-    \reimp
-*/
 Qt::DropActions QnResourceModel::supportedDropActions() const
 {
     return Qt::CopyAction | Qt::MoveAction;
