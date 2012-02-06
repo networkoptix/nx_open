@@ -494,6 +494,7 @@ void MainWnd::at_sessionManager_error(int error)
 void MainWnd::at_newLayoutRequested()
 {
     m_tabBar->addTab(QString());
+    m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
 }
 
 void MainWnd::at_treeWidget_activated(uint resourceId)
