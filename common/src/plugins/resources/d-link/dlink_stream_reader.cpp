@@ -4,8 +4,8 @@
 
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 
-#pragma pack(1)
-static struct ACS_VideoHeader
+#pragma pack(push,1)
+struct ACS_VideoHeader
 {
     quint32  ulHdrID; //Header ID
     quint32 ulHdrLength;
@@ -22,7 +22,7 @@ static struct ACS_VideoHeader
     quint8 ucMDPowers[3];
 };
 
-#pragma pack()
+#pragma pack(pop)
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),

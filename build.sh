@@ -29,12 +29,13 @@ sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" ser
 sed $SED_ARGS "s%\.\.\/build\/debug%debug%g" client/build/Makefile.debug
 sed $SED_ARGS "s%\.\.\/build\/release%release%g" client/build/Makefile.release
 
-cd client/build
-make -f Makefile.debug debug/generated/moc_resourcemodel.cpp
-sed $SED_ARGS "s%resourcemodel\.h%resourcemodel_p.h%g" debug/generated/moc_resourcemodel.cpp
-cd ../..
+#cd client/build
+#make -f Makefile.debug debug/generated/moc_resource_model.cpp
+#sed $SED_ARGS "s%resource_model\.h%resource_model_p.h%g" debug/generated/moc_resource_model.cpp
+#cd ../..
 
-rm server/build/Makefile.debug.bak server/build/Makefile.release.bak client/build/Makefile.debug.bak client/build/Makefile.release.bak client/build/debug/generated/moc_resourcemodel.cpp.bak
+rm server/build/Makefile.debug.bak server/build/Makefile.release.bak client/build/Makefile.debug.bak client/build/Makefile.release.bak
+# client/build/debug/generated/moc_resource_model.cpp.bak
 
 
 for i in common server client
