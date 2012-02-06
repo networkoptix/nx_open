@@ -393,7 +393,7 @@ void QnApiXmlSerializer::deserializeStorages(QnStorageList& storages, const QByt
         errorString += "\nQnApiXmlSerializer::deserializeStorages(): ";
         errorString += e.what();
 
-        qDebug(e.what());
+        qDebug() << e.what();
         throw QnSerializeException(errorString);
     }
 }
@@ -413,7 +413,7 @@ void QnApiXmlSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras
         errorString += "\nQnApiXmlSerializer::deserializeCameras(): ";
         errorString += e.what();
 
-        qDebug(e.what());
+        qDebug() << e.what();
         throw QnSerializeException(errorString);
     }
 }
@@ -433,7 +433,7 @@ void QnApiXmlSerializer::deserializeLayouts(QnLayoutDataList& layouts, const QBy
         errorString += "\nQnApiXmlSerializer::deserializeLayouts(): ";
         errorString += e.what();
 
-        qDebug(e.what());
+        qDebug() << e.what();
         throw QnSerializeException(errorString);
     }
 }
@@ -453,7 +453,7 @@ void QnApiXmlSerializer::deserializeUsers(QnUserResourceList& users, const QByte
         errorString += "\nQnApiXmlSerializer::deserializeUsers(): ";
         errorString += e.what();
 
-        qDebug(e.what());
+        qDebug() << e.what();
         throw QnSerializeException(errorString);
     }
 }
@@ -474,7 +474,7 @@ void QnApiXmlSerializer::deserializeServers(QnVideoServerList& servers, const QB
         errorString += "\nQnApiXmlSerializer::deserializeServers(): ";
         errorString += e.what();
 
-        qDebug(e.what());
+        qDebug() << e.what();
         throw QnSerializeException(errorString);
     }
 }
@@ -490,14 +490,22 @@ void QnApiXmlSerializer::deserializeResources(QnResourceList& resources, const Q
 
         parseCameras(resources, xsdResources->cameras().camera(), resourceFactory);
         parseServers(resources, xsdResources->servers().server());
-        parseLayouts(resources, xsdResources->layouts().layout());
-        // parseUsers(resources, xsdResources->users().user());
+
+        QnUserResourceList users;
+        parseUsers(users, xsdResources->users().user());
+        qCopy(users.begin(), users.end(), std::back_inserter(resources));
+
+        foreach(const QnUserResourcePtr& user, users)
+        {
+            const QnLayoutDataList& layouts = user->getLayouts();
+            qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
+        }
     }
     catch (const xml_schema::exception& e) {
         errorString += "\nQnApiXmlSerializer::deserializeResources(): ";
         errorString += e.what();
 
-        qDebug(e.what());
+        qDebug() << e.what();
         throw QnSerializeException(errorString);
     }
 }
@@ -517,7 +525,7 @@ void QnApiXmlSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTy
         errorString += "\nQnApiXmlSerializer::deserializeResourceTypes(): ";
         errorString += e.what();
 
-        qDebug(e.what());
+        qDebug() << e.what();
         throw QnSerializeException(errorString);
     }
 }
