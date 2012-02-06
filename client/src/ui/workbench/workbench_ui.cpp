@@ -8,6 +8,7 @@
 #include <QGraphicsLinearLayout>
 #include <QStyle>
 #include <QApplication>
+#include <QSettings>
 
 #include <utils/common/event_signalizer.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -47,6 +48,11 @@
 
 #include "workbench.h"
 #include "workbench_display.h"
+#include "camera/camera.h"
+#include "openal/qtvaudiodevice.h"
+#include "core/resource/local_file_resource.h"
+#include "core/resourcemanagment/resource_pool.h"
+#include "ui/ui_common.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *)
 
@@ -278,6 +284,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
     //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
     connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
+    connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
 
 
     /* Title bar. */
@@ -802,6 +809,86 @@ void QnWorkbenchUi::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) 
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
     if(cameraResource != NULL)
         m_sliderItem->removeReserveCamera(widget->display()->camera());
+}
+
+void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeMs, qint64 endTimeMs)
+{
+    QSettings settings;
+    settings.beginGroup(QLatin1String("export"));
+    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString dateFormat = startTimeMs < 1000ll * 100000 ? QLatin1String("hh-mm-ss") : QLatin1String("dd-mmm-yyyy hh-mm-ss");
+    QString suggetion = camera->getDevice()->getUniqueId();
+
+    QString fileName;
+    while (1)
+    {
+        fileName = QFileDialog::getSaveFileName(m_display->view(), tr("Export Video As..."),
+            previousDir + QLatin1Char('/') + suggetion,
+            tr("Matroska(*.mkv)"),
+            0,
+            QFileDialog::DontUseNativeDialog);
+        if (fileName.isEmpty())
+            return;
+        QString fullName = fileName;
+        if (!fullName.toLower().endsWith(QLatin1String(".mkv")))
+            fullName += QLatin1String(".mkv");
+        if (QFile::exists(fullName))
+        {
+            QString shortName = QFileInfo(fullName).baseName();
+            QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), QString("File '%1' already exists. Overwrite?").arg(shortName),
+                               QMessageBox::Yes | QMessageBox::No, m_display->view());
+            if (msgBox.exec() == QMessageBox::Yes)
+            {
+                if (!QFile::remove(fullName))
+                {
+                    UIOKMessage(m_display->view(), "Can't overwrite file", QString("File '%1' is used by another process. Try another name.").arg(shortName));
+                    continue;
+                }
+                break;
+            }
+        }
+        else 
+            break;
+    }
+
+    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
+
+    QProgressDialog *exportProgressDialog = new QProgressDialog(m_display->view());
+    exportProgressDialog->setAttribute(Qt::WA_DeleteOnClose);
+    exportProgressDialog->setAttribute(Qt::WA_QuitOnClose);
+    exportProgressDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
+    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
+    exportProgressDialog->setRange(0, 100);
+    exportProgressDialog->setMinimumDuration(1000);
+    connect(exportProgressDialog, SIGNAL(canceled()), camera, SLOT(stopExport()));
+    connect(exportProgressDialog, SIGNAL(canceled()), exportProgressDialog, SLOT(reject()));
+    connect(exportProgressDialog, SIGNAL(finished(int)), exportProgressDialog, SLOT(deleteLater()));
+    connect(camera, SIGNAL(exportProgress(int)), exportProgressDialog, SLOT(setValue(int)));
+    connect(camera, SIGNAL(exportFailed(QString)), exportProgressDialog, SLOT(reject()));
+    connect(camera, SIGNAL(exportFinished(QString)), exportProgressDialog, SLOT(accept()));
+
+    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(onExportFailed(QString)), Qt::UniqueConnection);
+    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(onExportFinished(QString)), Qt::UniqueConnection);
+
+    camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName);
+}
+
+void QnWorkbenchUi::at_exportFinished(const QString &fileName)
+{
+    QnLocalFileResourcePtr file(new QnLocalFileResource(fileName));
+    qnResPool->addResource(file);
+
+    QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));
+
+}
+
+void QnWorkbenchUi::at_exportFailed(const QString &errMessage)
+{
+    CLVideoCamera *cam = dynamic_cast<CLVideoCamera *>(sender()); // ### qobject_cast ?
+    if (cam)
+        cam->stopExport();
+    QMessageBox::warning(0, tr("Can not export video"), errMessage, QMessageBox::Ok, QMessageBox::NoButton);
 }
 
 void QnWorkbenchUi::at_controlsWidget_deactivated() {

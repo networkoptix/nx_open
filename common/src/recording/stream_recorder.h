@@ -29,12 +29,17 @@ public:
     void setStartOffset(qint64 value);
 
     QnResourcePtr getResource() const { return m_device; }
+
+    QString fixedFileName() const;
+    void setEofDateTime(qint64 value);
 public slots:
     void closeOnEOF(); // close recording then EOF will bereaced
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
 
+    void recordingFinished();
+    void recordingProgress(int progress);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(QnCompressedVideoDataPtr mediaData);
@@ -77,6 +82,10 @@ private:
     qint64 m_startOffset;
     int m_prebufferingUsec;
     QQueue<QnAbstractMediaDataPtr> m_prebuffer;
+
+    qint64 m_EofDateTime;
+    bool m_endOfData;
+    int m_lastProgress;
 };
 
 #endif // _STREAM_RECORDER_H__

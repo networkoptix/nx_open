@@ -41,6 +41,9 @@ public:
 
     qint64 lastQueuedTime();
     void setSecondaryDataProvider(QnAbstractStreamDataProvider* value);
+
+    // Marker increased after play/seek operation
+    void setLiveMarker(int marker);
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
@@ -68,6 +71,7 @@ private:
     int m_packetSended;
     QnAbstractStreamDataProvider* m_prefferedProvider;
     QnAbstractStreamDataProvider* m_currentDP;
+    int m_liveMarker;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

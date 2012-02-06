@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "client_util.h"
 
 CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
@@ -9,7 +10,9 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStream
     m_GenerateEndOfStreamSignal(generateEndOfStreamSignal),
     m_reader(reader),
     m_extTimeSrc(0),
-    m_isVisible(true)
+    m_isVisible(true),
+    m_exportRecorder(0),
+    m_exportReader(0)
 {
     cl_log.log(QLatin1String("Creating camera for "), m_device->toString(), cl_logDEBUG1);
 
@@ -159,4 +162,56 @@ void CLVideoCamera::onReachedTheEnd()
 {
     if (m_GenerateEndOfStreamSignal)
         emit reachedTheEnd();
+}
+
+void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName)
+{
+    if (startTime > endTime)
+        qSwap(startTime, endTime);
+
+    if (m_exportRecorder == 0)
+    {
+        QnAbstractStreamDataProvider* tmpReader = m_device->createDataProvider(QnResource::Role_Default);
+        m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
+        if (m_exportReader == 0)
+        {
+            delete tmpReader;
+            emit recordingFailed("Invalid device type for export data");
+            return;
+        }
+
+        m_exportRecorder = new QnStreamRecorder(m_device);
+        m_exportRecorder->disconnect(this);
+        connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(exportFailed(QString)));
+        connect(m_exportRecorder, SIGNAL(recordingFinished()), this, SLOT(onExportFinished()));
+        connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SIGNAL(exportProgress(int)));
+    }
+
+    m_exportRecorder->clearUnprocessedData();
+    m_exportRecorder->setEofDateTime(endTime);
+    m_exportRecorder->setFileName(fileName);
+    m_exportReader->addDataProcessor(m_exportRecorder);
+    m_exportReader->jumpTo(startTime, startTime);
+
+    m_exportReader->start();
+    m_exportRecorder->start();
+}
+
+void CLVideoCamera::onExportFinished()
+{
+    QString fileName = m_exportRecorder->fixedFileName();
+    stopExport();
+    emit exportFinished(fileName);
+}
+
+void CLVideoCamera::stopExport()
+{
+    if (m_exportReader)
+        m_exportReader->stop();
+    if (m_exportRecorder)
+        m_exportRecorder->stop();
+    delete m_exportReader;
+    delete m_exportRecorder;
+    m_exportReader = 0;
+    m_exportRecorder = 0;
 }

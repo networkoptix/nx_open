@@ -124,7 +124,7 @@ public:
 
     // ==================================================
 
-    QnParamList getResourceParamList() const; // returns params that can be changed on device level
+    const QnParamList& getResourceParamList() const; // returns params that can be changed on device level
 
     bool hasSuchParam(const QString &name) const;
 

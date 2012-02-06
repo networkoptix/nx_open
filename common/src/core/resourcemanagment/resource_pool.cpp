@@ -172,12 +172,8 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString &mac) con
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources) {
-        if (resource->getUniqueId() == id)
-            return resource;
-    }
-
-    return QnResourcePtr(0);
+    QHash<QString, QnResourcePtr>::const_iterator itr = m_resources.find(id);
+    return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
 bool QnResourcePool::hasSuchResouce(const QString &uniqid) const

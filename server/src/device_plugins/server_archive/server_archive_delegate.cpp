@@ -26,6 +26,8 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_lastPacketTime(0)
 {
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
+    m_aviDelegate->setUseAbsolutePos(false);
+
     m_newQualityAviDelegate = QnAviArchiveDelegatePtr(0);
 }
 
@@ -561,6 +563,8 @@ bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
         QString url = m_newQualityCatalog->fullFileName(m_newQualityChunk);
         m_newQualityFileRes = QnAviResourcePtr(new QnAviResource(url));
         m_newQualityAviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
+        m_newQualityAviDelegate->setUseAbsolutePos(false);
+
         if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
             return false;
         qint64 chunkOffset = (timeMs - m_newQualityChunk.startTimeMs)*1000;
