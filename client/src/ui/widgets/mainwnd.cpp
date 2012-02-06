@@ -513,7 +513,7 @@ void MainWnd::at_newLayoutRequested()
 
 void MainWnd::at_tabBar_currentChanged(QnWorkbenchLayout *layout)
 {
-    m_workbench->setLayout(layout);
+    m_workbench->setCurrentLayout(layout);
     m_display->fitInView(false);
 
     /* This one is important. If we don't unset the transformation anchor, viewport position will be messed up when show event is delivered. */

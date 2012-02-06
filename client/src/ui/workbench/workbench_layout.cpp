@@ -425,15 +425,6 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem *item) {
     return true;
 }
 
-/*QnWorkbenchItem *QnWorkbenchLayout::item(const QnResourcePtr &resource) const {
-    foreach (QnWorkbenchItem *item, m_items) {
-        if (item->resource() == resource)
-            return item;
-    }
-
-    return NULL;
-}*/
-
 QnWorkbenchItem *QnWorkbenchLayout::item(const QPoint &position) const {
     return m_itemMap.value(position, NULL);
 }

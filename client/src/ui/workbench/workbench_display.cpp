@@ -236,7 +236,7 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     /* Deinit workbench. */
     disconnect(m_workbench, NULL, this, NULL);
 
-    foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
+    foreach(QnWorkbenchItem *item, m_workbench->currentLayout()->items())
         removeItemInternal(item, true, false);
 
     for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
@@ -295,7 +295,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(mapper,                 SIGNAL(spacingChanged()),                       this,                   SLOT(at_mapper_spacingChanged()));
 
     /* Create items. */
-    foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
+    foreach(QnWorkbenchItem *item, m_workbench->currentLayout()->items())
         addItemInternal(item);
 
     /* Fire signals if needed. */
@@ -721,7 +721,7 @@ QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
 }
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
-    QRect layoutBoundingRect = m_workbench->layout()->boundingRect();
+    QRect layoutBoundingRect = m_workbench->currentLayout()->boundingRect();
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
