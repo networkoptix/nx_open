@@ -150,6 +150,10 @@ QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent)
     d->parseFilterString();
 }
 
+QnResourceSearchProxyModel::~QnResourceSearchProxyModel()
+{
+}
+
 QnResourcePtr QnResourceSearchProxyModel::resourceFromIndex(const QModelIndex &index) const
 {
     QnResourceModel *resourceModel = qobject_cast<QnResourceModel *>(sourceModel());

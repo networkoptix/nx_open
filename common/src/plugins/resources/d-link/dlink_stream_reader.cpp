@@ -4,6 +4,26 @@
 
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 
+#pragma pack(push,1)
+struct ACS_VideoHeader
+{
+    quint32  ulHdrID; //Header ID
+    quint32 ulHdrLength;
+    quint32 ulDataLength;
+    quint32 ulSequenceNumber;
+    quint32 ulTimeSec;
+    quint32 ulTimeUSec;
+    quint32 ulDataCheckSum;
+    quint16 usCodingType;
+    quint16 usFrameRate;
+    quint16 usWidth;
+    quint16 usHeight;
+    quint8 ucMDBitmap;
+    quint8 ucMDPowers[3];
+};
+
+#pragma pack(pop)
+
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
 mHttpClient(0)
@@ -19,27 +39,24 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 
 void PlDlinkStreamReader::openStream()
 {
+    if (isStreamOpened())
+        return;
+
+
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     
     QString prifileStr = composeVideoProfile();
 
     QByteArray cam_info_file = downloadFile(prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth());
 
-    
-    /*QString fileneme = "config/video.cgi?profileid=";
-    if (getRole() == QnResource::Role_SecondaryLiveVideo)
-        fileneme += "2";
-    else
-        fileneme += "1";
-        
-
-
-
-    bool uploaded = uploadFile(fileneme,  prifileStr, res->getHostAddress(), 80, 1000, res->getAuth());
-    if (!uploaded)
+    if (cam_info_file.length()==0)
         return;
 
-        /**/
+    if (!res->updateCamInfo()) // after we changed profile some videoprofile url might be changed
+        return;
+    
+
+    // ok, now lets open a stream
 
 }
 
@@ -59,115 +76,35 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
     return QnAbstractMediaDataPtr(0);
 }
 
-//===============================================
-/*
-QString PlDlinkStreamReader::composeVideoProfile() const
+void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
 {
-    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-    QnDlink_cam_info info = res->getCamInfo();
-
-    if (!info.inited())
-        return "";
-
-    QnResource::ConnectionRole role = getRole();
-
-    int profileNum;
-    QSize resolution;
-
-    if (info.resolutions.size()==0)
-    {
-        Q_ASSERT(false);
-        return "";
-    }
-
-    if (info.possibleFps.size()==0)
-    {
-        Q_ASSERT(false);
-        return "";
-    }
-
-
-
-    if (role == QnResource::Role_SecondaryLiveVideo)
-    {
-        profileNum = 2;
-        resolution = info.resolutionCloseTo(320);
-    }
-    else
-    {
-        profileNum = 1;
-        resolution = info.resolutions.at(0);
-    }
-
-
-    QString result;
-    QTextStream t(&result);
-
-    t << "profileid=" << profileNum << "\r\n";
-    //t << "resolution=" << resolution.width() << "x" << resolution.height() << "\r\n";
-    t << "resolution=" << 320 << "x" << 240 << "\r\n";
-    t << "codec=";
-
-    if (info.hasH264)
-    {
-        t << "H264\r\n";
-    }
-    else if (info.hasMPEG4)
-    {
-        t << "MPEG4\r\n";
-    }
-    else
-    {
-        t << "MJPEG\r\n";
-    }
+    bool runing = isRunning();
+    pleaseStop();
+    stop();
+    closeStream();
     
-    int fps = 27;//qMin((int)getFps(), info.possibleFps.at(0));
-    t << "framerate=" << fps << "\r\n";
-
-    if (info.hasFixedQuality)
+    if (runing)
     {
-        t << "qualitymode=Fixquality" << "\r\n";
-
-        int q = 60;
-        switch (getQuality())
-        {
-        case QnQualityHighest:
-            q = 90;
-            break;
-
-        case QnQualityHigh:
-            q = 80;
-            break;
-
-        case QnQualityNormal:
-            q = 70;
-            break;
-
-        case QnQualityLow:
-            q = 50;
-            break;
-
-        case QnQualityLowest:
-            q = 40;
-            break;
-        }
-
-        t << "quality=" << q << "\r\n";
+        start(); // it will call openstream by itself
     }
-    else
-    {
-        t << "qualitymode=CBR" << "\r\n";
-        t << "bitrate=" << bestBitrateKbps(getQuality(), resolution, fps) << "\r\n";
-    }
-
-   
-
-    t.flush();
-    return result;
 
 }
-/**/
 
+void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
+{
+    bool runing = isRunning();
+    pleaseStop();
+    stop();
+    closeStream();
+
+    if (runing)
+    {
+        start(); // it will call openstream by itself
+    }
+
+}
+
+//=====================================================================================
 
 QString PlDlinkStreamReader::composeVideoProfile() const
 {
@@ -181,20 +118,6 @@ QString PlDlinkStreamReader::composeVideoProfile() const
 
     int profileNum;
     QSize resolution;
-
-    if (info.resolutions.size()==0)
-    {
-        Q_ASSERT(false);
-        return "";
-    }
-
-    if (info.possibleFps.size()==0)
-    {
-        Q_ASSERT(false);
-        return "";
-    }
-
-
 
     if (role == QnResource::Role_SecondaryLiveVideo)
     {
@@ -212,27 +135,39 @@ QString PlDlinkStreamReader::composeVideoProfile() const
     QTextStream t(&result);
 
     t << "config/video.cgi?profileid=" << profileNum << "&";
-    //t << "resolution=" << resolution.width() << "x" << resolution.height() << "?";
-    t << "resolution=" << 800 << "x" << 600 << "&";
+    t << "resolution=" << resolution.width() << "x" << resolution.height() << "&";
+
+    int fps = info.frameRateCloseTo(getFps());
+    t << "framerate=" << fps << "&";
     t << "codec=";
 
-    if (info.hasH264)
+
+    bool mpeg = false;
+
+    if (info.hasH264!="")
     {
-        t << "H.264&";
+        t << info.hasH264 << "&";
+        mpeg = true;
     }
     else if (info.hasMPEG4)
     {
         t << "MPEG4&";
+        mpeg = true;
     }
     else
     {
         t << "MJPEG&";
     }
 
-    int fps = 7;//qMin((int)getFps(), info.possibleFps.at(0));
-    t << "framerate=" << fps << "&";
 
-    if (info.hasFixedQuality && false)
+
+    if (mpeg)
+    {
+        // just CBR fo mpeg so far
+        t << "qualitymode=CBR" << "&";
+        t << "bitrate=" <<  info.bitrateCloseTo(bestBitrateKbps(getQuality(), resolution, fps));
+    }
+    else
     {
         t << "qualitymode=Fixquality" << "&";
 
@@ -260,28 +195,9 @@ QString PlDlinkStreamReader::composeVideoProfile() const
             break;
         }
 
-        t << "quality=" << q;
+        t << "quality=" << 1;
     }
-    else
-    {
-        t << "qualitymode=CBR" << "&";
-        t << "bitrate=128K";// << bestBitrateKbps(getQuality(), resolution, fps) << "";
-    }
-
-
 
     t.flush();
     return result;
-
-}
-
-
-void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
-{
-
-}
-
-void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
-{
-
 }

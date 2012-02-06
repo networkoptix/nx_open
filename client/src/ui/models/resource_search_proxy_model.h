@@ -12,6 +12,7 @@ class QnResourceSearchProxyModel : public QSortFilterProxyModel
 
 public:
     explicit QnResourceSearchProxyModel(QObject *parent = 0);
+    virtual ~QnResourceSearchProxyModel();
 
     QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
     QModelIndex indexFromResource(const QnResourcePtr &resource) const;
