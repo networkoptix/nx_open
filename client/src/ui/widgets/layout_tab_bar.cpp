@@ -175,10 +175,9 @@ void QnLayoutTabBar::tabInserted(int index) {
         layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */
 
     updateTabsClosable();
-    submitCurrentLayout();
-
     if(m_submit)
         m_workbench->insertLayout(layout, index);
+    submitCurrentLayout();
 
     guard.rollback();
     checkInvariants();
