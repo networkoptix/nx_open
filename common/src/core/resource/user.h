@@ -21,10 +21,16 @@ public:
         return getName();
     }
 
-    void setLayouts(QnLayoutDataList layouts);
-    QnLayoutDataList getLayouts() const;
+    void setLayouts(const QnLayoutDataList &layouts);
+    
+    const QnLayoutDataList &getLayouts() const;
+
+    void addLayout(const QnLayoutDataPtr &layout);
+
+    void removeLayout(const QnLayoutDataPtr &layout);
 
     QString getPassword() const;
+    
     void setPassword(const QString& password);
 
 protected:

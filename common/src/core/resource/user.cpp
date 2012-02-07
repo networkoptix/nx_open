@@ -1,18 +1,34 @@
 #include "user.h"
+#include <utils/common/warnings.h>
 
 QnUserResource::QnUserResource(): base_type()
 {
     addFlag(QnResource::user);
 }
 
-void QnUserResource::setLayouts(QnLayoutDataList layouts)
+void QnUserResource::setLayouts(const QnLayoutDataList &layouts)
 {
     m_layouts = layouts;
 }
 
-QnLayoutDataList QnUserResource::getLayouts() const
+const QnLayoutDataList &QnUserResource::getLayouts() const
 {
     return m_layouts;
+}
+
+void QnUserResource::addLayout(const QnLayoutDataPtr &layout) 
+{
+    if(m_layouts.contains(layout)) {
+        qnWarning("Given layout '%1' is already in %2's layouts list.", layout->getName(), getName());
+        return;
+    }
+
+    m_layouts.push_back(layout);
+}
+
+void QnUserResource::removeLayout(const QnLayoutDataPtr &layout) 
+{
+    m_layouts.removeOne(layout); /* Removing a layout that is not there is not an error. */
 }
 
 QString QnUserResource::getPassword() const

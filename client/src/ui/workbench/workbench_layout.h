@@ -5,13 +5,13 @@
 #include <QSet>
 #include <QHash>
 #include <core/resource/resource.h>
+#include <core/resource/layout_data.h>
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <utils/common/hash.h> /* For qHash(const QUuid &). */
 #include <ui/common/magnitude.h>
 
 class QnWorkbenchItem;
-class QnLayoutData;
 
 /**
  * Layout of a workbench.
@@ -53,12 +53,12 @@ public:
      * \param layoutData                Data to load layout from.
      * \returns                         Whether there were no errors during loading.
      */
-    bool load(const QnLayoutData &layoutData);
+    bool load(const QnLayoutDataPtr &layoutData);
 
     /**
      * \param[out] layoutData           Data to save layout to.
      */
-    void save(QnLayoutData &layoutData) const; 
+    void save(const QnLayoutDataPtr &layoutData) const; 
 
     /**
      * \param item                      Item to check.
