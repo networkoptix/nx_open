@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
 #ifdef CL_CUSOM_MAINWINDOW
     MainWindow mainWindow(argc, argv);
 #else
-    MainWnd mainWindow(argc, argv);
+    QnMainWindow mainWindow(argc, argv);
 #endif
     mainWindow.setAttribute(Qt::WA_QuitOnClose);
     mainWindow.show();

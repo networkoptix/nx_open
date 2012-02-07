@@ -1,5 +1,5 @@
-#ifndef MAINWND_H
-#define MAINWND_H
+#ifndef QN_MAIN_WINDOW_H
+#define QN_MAIN_WINDOW_H
 
 #include <QWidget>
 #include <QScopedPointer>
@@ -18,16 +18,16 @@ class QnWorkbenchUi;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 
-class MainWnd : public QWidget
+class QnMainWindow : public QWidget
 {
     Q_OBJECT;
 
     typedef QWidget base_type;
 
 public:
-    MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
+    QnMainWindow(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
 
-    virtual ~MainWnd();
+    virtual ~QnMainWindow();
 
     bool isTitleVisible() const {
         return m_titleVisible;
@@ -90,4 +90,4 @@ private:
     bool m_drawCustomFrame;
 };
 
-#endif // MAINWND_H
+#endif // QN_MAIN_WINDOW_H
