@@ -9,6 +9,8 @@
 
 class QnAVIPlaylistArchiveDelegate : public QnAviArchiveDelegate
 {
+    Q_OBJECT;
+
 public:
 	QnAVIPlaylistArchiveDelegate();
 	virtual ~QnAVIPlaylistArchiveDelegate();

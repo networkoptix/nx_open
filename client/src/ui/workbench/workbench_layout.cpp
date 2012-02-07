@@ -38,6 +38,17 @@ namespace {
         TypedMagnitudeCalculator<QPointF> *m_calculator;
     };
 
+    struct WorkbenchItemLess {
+    public:
+        bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
+            if(l->resourceUid() == r->resourceUid()) {
+                return l < r;
+            } else {
+                return l->resourceUid() < r->resourceUid();
+            }
+        }
+    };
+
 } // anonymous namespace
 
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent)
@@ -68,48 +79,77 @@ void QnWorkbenchLayout::setName(const QString &name) {
     emit nameChanged();
 }
 
-void QnWorkbenchLayout::load(const QnLayoutData &layoutData)
-{
+bool QnWorkbenchLayout::load(const QnLayoutData &layoutData) {
     setName(layoutData.getName());
+
+    bool result = true;
 
     /* Unpin all items so that pinned state does not interfere with 
      * incrementally moving the items. */
     foreach(QnWorkbenchItem *item, m_items)
         item->setPinned(false);
 
-    /* Construct items-by-id mapping. */
-    QHash<QnId, QList<QnLayoutItemData> > itemDatasById;
-    foreach(const QnLayoutItemData &itemData, layoutData.getItems())
-        itemDatasById[itemData.resourceId].push_back(itemData);
-
-    foreach(const QList<QnLayoutItemData> &itemDatas, itemDatasById) {
-        QnId id = itemDatas[0].resourceId;
+    foreach(const QnLayoutItemData itemData, layoutData.getItems()) {
+        QnId id = itemData.resourceId;
         QnResourcePtr resource = qnResPool->getResourceById(id);
         if(resource.isNull()) {
             qnWarning("No resource in resource pool for id '%1'.", id.toString());
+            result = false;
             continue;
         }
-        QString uid = resource->getUniqueId();
 
-        /* Make sure we have the same number of items and item datas. */
-        QList<QnWorkbenchItem *> items = this->items(uid).toList();
-        while(items.size() < itemDatas.size()) {
-            QnWorkbenchItem *item = new QnWorkbenchItem(uid);
+        QnWorkbenchItem *item = this->item(itemData.uuid);
+        if(item == NULL) {
+            item = new QnWorkbenchItem(resource->getUniqueId(), itemData.uuid);
             addItem(item);
-            items.push_back(item);
-        }
-        while(items.size() > itemDatas.size()) {
-            delete items.back();
-            items.pop_back();
+        } else if(item->resourceUid() != resource->getUniqueId()) {
+            qnWarning("Resource unique id of an item and corresponding item data do not match (%1 != %2)", item->resourceUid(), resource->getUniqueId());
+            result = false;
         }
 
-        /* In case of several continuous updates, we want to have at least some
-         * consistency in how items are mapped to datas. Sort by address. */
-        qSort(items);
-
-        for(int i = 0; i < items.size(); i++)
-            items[i]->load(itemDatas[i]);
+        result &= item->load(itemData);
     }
+
+    /* Some items may have been removed. */
+    if(items().size() > layoutData.getItems().size()) {
+        QSet<QUuid> removed;
+
+        foreach(QnWorkbenchItem *item, items())
+            removed.insert(item->uuid());
+
+        foreach(const QnLayoutItemData &itemData, layoutData.getItems())
+            removed.remove(itemData.uuid);
+
+        foreach(const QUuid &uuid, removed)
+            delete item(uuid);
+    }
+
+    return result;
+}
+
+void QnWorkbenchLayout::save(QnLayoutData &layoutData) const {
+    layoutData.setName(name());
+
+    QnLayoutItemDataList itemDatas;
+    itemDatas.reserve(items().size());
+
+    foreach(const QnWorkbenchItem *item, items()) {
+        QnLayoutItemData itemData;
+        
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+        if(resource.isNull()) {
+            qnWarning("No resource in resource pool for uid '%1'.", item->resourceUid());
+            continue;
+        }
+
+        itemData.resourceId = resource->getId();
+        itemData.uuid = item->uuid();
+        item->save(itemData);
+
+        itemDatas.push_back(itemData);
+    }
+
+    layoutData.setItems(itemDatas);
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
@@ -134,6 +174,7 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
         m_itemMap.fill(item->geometry(), item);
     m_rectSet.insert(item->geometry());
     m_itemsByUid[item->resourceUid()].insert(item);
+    m_itemByUuid[item->uuid()] = item;
 
     emit itemAdded(item);
 
@@ -155,6 +196,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
         m_itemMap.clear(item->geometry());
     m_rectSet.remove(item->geometry());
     m_itemsByUid[item->resourceUid()].remove(item);
+    m_itemByUuid.remove(item->uuid());
 
     item->m_layout = NULL;
     m_items.remove(item);
@@ -358,6 +400,10 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem *item) {
 
 QnWorkbenchItem *QnWorkbenchLayout::item(const QPoint &position) const {
     return m_itemMap.value(position, NULL);
+}
+
+QnWorkbenchItem *QnWorkbenchLayout::item(const QUuid &uuid) const {
+    return m_itemByUuid.value(uuid, NULL);
 }
 
 QSet<QnWorkbenchItem *> QnWorkbenchLayout::items(const QRect &region) const {

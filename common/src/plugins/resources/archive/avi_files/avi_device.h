@@ -9,6 +9,8 @@ class QnArchiveStreamReader;
 
 class QnAviResource : public QnAbstractArchiveResource
 {
+    Q_OBJECT;
+
 public:
 	QnAviResource(const QString& file);
 	~QnAviResource();

@@ -10,6 +10,8 @@ class QnAbstractArchiveDelegate;
 
 class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate, public QnAbstractFilterPlaybackDelegate
 {
+    Q_OBJECT;
+
 public:
     QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate();

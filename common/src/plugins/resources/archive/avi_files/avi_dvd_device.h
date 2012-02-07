@@ -5,6 +5,8 @@
 
 class CLAviDvdDevice : public QnAviResource
 {
+    Q_OBJECT;
+
 public:
 	CLAviDvdDevice(const QString& file);
 	virtual ~CLAviDvdDevice();

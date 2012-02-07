@@ -1,5 +1,5 @@
-#ifndef _RESOURCE_USER_H
-#define _RESOURCE_USER_H
+#ifndef QN_USER_RESOURCE_H
+#define QN_USER_RESOURCE_H
 
 #include <QSharedPointer>
 #include <QList>
@@ -9,10 +9,14 @@
 
 class QnUserResource : public QnResource
 {
+    Q_OBJECT;
+
+    typedef QnResource base_type;
+
 public:
     QnUserResource();
 
-    QString getUniqueId() const
+    virtual QString getUniqueId() const override
     {
         return getName();
     }
@@ -23,6 +27,9 @@ public:
     QString getPassword() const;
     void setPassword(const QString& password);
 
+protected:
+    virtual void updateInner(QnResourcePtr other) override;
+
 private:
     QString m_password;
     QnLayoutDataList m_layouts;
@@ -31,4 +38,4 @@ private:
 typedef QSharedPointer<QnUserResource> QnUserResourcePtr;
 typedef QList<QnUserResourcePtr> QnUserResourceList;
 
-#endif //_RESOURCE_USER_H
+#endif // QN_USER_RESOURCE_H

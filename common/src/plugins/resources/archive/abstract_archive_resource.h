@@ -7,6 +7,8 @@
 
 class QnAbstractArchiveResource : public QnMediaResource
 {
+    Q_OBJECT;
+
 public:
     QnAbstractArchiveResource();
 	~QnAbstractArchiveResource();

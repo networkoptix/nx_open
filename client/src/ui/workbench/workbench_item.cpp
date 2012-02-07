@@ -2,24 +2,31 @@
 #include <ui/common/scene_utility.h>
 #include <core/resource/layout_data.h>
 #include "workbench_layout.h"
+#include "core/resourcemanagment/resource_pool.h"
 
-QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, QObject *parent):
+QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent):
     QObject(parent),
     m_resourceUid(resourceUid),
+    m_uuid(uuid),
     m_layout(NULL),
     m_flags(0),
     m_rotation(0.0)
 {}
 
-QnWorkbenchItem::~QnWorkbenchItem()
-{
+QnWorkbenchItem::~QnWorkbenchItem() {
     if (m_layout)
         m_layout->removeItem(this);
 }
 
-bool QnWorkbenchItem::load(const QnLayoutItemData &itemData)
-{
-    // TODO: check for resource id
+bool QnWorkbenchItem::load(const QnLayoutItemData &itemData) {
+    if(itemData.uuid != uuid())
+        qnWarning("Loading item '%1' from data with different uuid (%2 != %3).", resourceUid(), itemData.uuid.toString(), uuid().toString());
+
+#ifdef _DEBUG
+    QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
+    if(itemData.resourceId != localId)
+        qnWarning("Loading item '%1' from a data with different id (%2 != %3).", resourceUid(), localId.toString(), itemData.resourceId.toString());
+#endif
 
     bool result = true;
 
@@ -30,6 +37,21 @@ bool QnWorkbenchItem::load(const QnLayoutItemData &itemData)
     result &= setFlags(static_cast<ItemFlags>(itemData.flags));
 
     return result;
+}
+
+void QnWorkbenchItem::save(QnLayoutItemData &itemData) const {
+    if(itemData.uuid != uuid())
+        qnWarning("Saving item '%1' to a data with different uuid (%2 != %3).", resourceUid(), itemData.uuid, uuid());
+
+#ifdef _DEBUG
+    QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
+    if(itemData.resourceId != localId)
+        qnWarning("Saving item '%1' to a data with different id (%2 != %3).", resourceUid(), localId.toString(), itemData.resourceId.toString());
+#endif
+
+    itemData.flags = flags();
+    itemData.rotation = rotation();
+    itemData.combinedGeometry = combinedGeometry();
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {

@@ -1,5 +1,5 @@
-#ifndef __RESOURCE_H__
-#define __RESOURCE_H__
+#ifndef QN_RESOURCE_H
+#define QN_RESOURCE_H
 
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
@@ -37,7 +37,7 @@ class QN_EXPORT QnResource : public QObject
     Q_OBJECT
     Q_FLAGS(Flags Flag)
     Q_ENUMS(ConnectionRole Status)
-    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false) // do not show in GUI
+    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
     Q_CLASSINFO("url", "URL")
 
@@ -174,7 +174,7 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
     bool hasUnprocessedCommands() const;
 
-Q_SIGNALS:
+signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void resourceChanged();
@@ -238,8 +238,6 @@ private:
     Status m_status;
 
     mutable QnParamList m_resourceParamList;
-
-
 };
 
 
@@ -269,4 +267,4 @@ class QnRecorder : public QnResource
 
 Q_DECLARE_METATYPE(QnResourcePtr);
 
-#endif // __RESOURCE_H__
+#endif // QN_RESOURCE_H

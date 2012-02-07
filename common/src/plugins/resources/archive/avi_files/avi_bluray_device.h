@@ -5,6 +5,8 @@
 
 class CLAviBluRayDevice : public QnAviResource
 {
+    Q_OBJECT;
+
 public:
 	CLAviBluRayDevice(const QString& file);
 	virtual ~CLAviBluRayDevice();
