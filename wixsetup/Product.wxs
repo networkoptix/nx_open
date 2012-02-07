@@ -174,7 +174,7 @@
 
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
-                                <File Id="ServerExe" Name="mediaserver.exe" Source="../server/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
+                                <File Id="ServerExe" Name="mediaserver.exe" Source="../mediaserver/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="VMS Media Server" Scope="any" IgnoreFailure="yes"/>                                    
                                 </File>
                                 
@@ -206,12 +206,12 @@
                             </Component>
                             
                             <Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
-                                <File Id="ServerAvcodecDll" Name="avcodec-53.dll" Source="../server/bin/$(env.CONFIG)/avcodec-53.dll"/>
-                                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="../server/bin/$(env.CONFIG)/avdevice-53.dll"/>
-                                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="../server/bin/$(env.CONFIG)/avfilter-2.dll"/>
-                                <File Id="ServerAvformatDll" Name="avformat-53.dll" Source="../server/bin/$(env.CONFIG)/avformat-53.dll"/>
-                                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="../server/bin/$(env.CONFIG)/avutil-51.dll"/>
-                                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="../server/bin/$(env.CONFIG)/swscale-2.dll"/>
+                                <File Id="ServerAvcodecDll" Name="avcodec-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avcodec-53.dll"/>
+                                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avdevice-53.dll"/>
+                                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="../mediaserver/bin/$(env.CONFIG)/avfilter-2.dll"/>
+                                <File Id="ServerAvformatDll" Name="avformat-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avformat-53.dll"/>
+                                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="../mediaserver/bin/$(env.CONFIG)/avutil-51.dll"/>
+                                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="../mediaserver/bin/$(env.CONFIG)/swscale-2.dll"/>
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -226,11 +226,11 @@
                             </Component>
                             
                             <Component Id="ServerXerces" Guid="{B81B02A6-9CC1-4b16-9E03-A4AD91624B5E}">
-                                <File Id="ServerXercescDll" Name="xerces-c_3_1.dll" Source="../server/bin/$(env.CONFIG)/xerces-c_3_1.dll"/>
+                                <File Id="ServerXercescDll" Name="xerces-c_3_1.dll" Source="../mediaserver/bin/$(env.CONFIG)/xerces-c_3_1.dll"/>
                             </Component>
 
                             <Component Id="ServerQjson" Guid="{809F73F7-A313-4190-8DF5-389D6B57064B}">
-                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="../server/bin/$(env.CONFIG)/qjson.dll"/>
+                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="../mediaserver/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
                         </Directory>
                         
