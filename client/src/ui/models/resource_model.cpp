@@ -386,8 +386,7 @@ Qt::ItemFlags QnResourceModel::flags(const QModelIndex &index) const
     if (d->isIndexValid(index)) {
         flags |= Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
         Node *node = d->node(index);
-        if (node->parentId() != 0)
-            flags |= Qt::ItemIsSelectable;
+        flags |= Qt::ItemIsSelectable;
         if ((node->flags() & QnResource::media))
             flags |= Qt::ItemIsDragEnabled;
     }

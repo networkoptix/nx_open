@@ -236,9 +236,11 @@ const QnParamList& QnResource::getResourceParamList() const
     {
         Q_ASSERT(resType);
 
-        foreach (const QnParamTypePtr &paramType, resType->paramTypeList()) 
+        const QList<QnParamTypePtr>& params = resType->paramTypeList();
+        //Q_ASSERT(params.size() != 0);
+        for (int i = 0; i < params.size(); ++i)
         {
-            QnParam newParam(paramType, paramType->default_value);
+            QnParam newParam(params[i], params[i]->default_value);
             resourceParamList.append(newParam);
         }
     }

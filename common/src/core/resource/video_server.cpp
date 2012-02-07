@@ -3,7 +3,7 @@
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
 
-QnLocalVideoServer::QnLocalVideoServer()
+QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
@@ -12,13 +12,13 @@ QnLocalVideoServer::QnLocalVideoServer()
     setStatus(Online);
 }
 
-QString QnLocalVideoServer::getUniqueId() const
+QString QnLocalVideoServerResource::getUniqueId() const
 {
     return QLatin1String("LocalServer");
 }
 
 
-QnVideoServer::QnVideoServer():
+QnVideoServerResource::QnVideoServerResource():
     QnResource()
     //,m_rtspListener(0)
 {
@@ -26,21 +26,21 @@ QnVideoServer::QnVideoServer():
     addFlag(server | remote);
 }
 
-QnVideoServer::~QnVideoServer()
+QnVideoServerResource::~QnVideoServerResource()
 {
     //delete m_rtspListener;
 }
 
-QString QnVideoServer::getUniqueId() const
+QString QnVideoServerResource::getUniqueId() const
 {
     QMutexLocker mutexLocker(&m_mutex); // needed here !!!
-    QnVideoServer* nonConstThis = const_cast<QnVideoServer*> (this);
+    QnVideoServerResource* nonConstThis = const_cast<QnVideoServerResource*> (this);
     if (!getId().isValid())
         nonConstThis->setId(QnId::generateSpecialId());
     return QLatin1String("Server ") + getId().toString();
 }
 
-void QnVideoServer::setApiUrl(const QString& restUrl)
+void QnVideoServerResource::setApiUrl(const QString& restUrl)
 {
     m_apiUrl = restUrl;
 
@@ -49,34 +49,44 @@ void QnVideoServer::setApiUrl(const QString& restUrl)
     m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(restUrl), &qnDeleteLater);
 }
 
-QString QnVideoServer::getApiUrl() const
+QString QnVideoServerResource::getApiUrl() const
 {
     return m_apiUrl;
 }
 
-QnVideoServerConnectionPtr QnVideoServer::apiConnection()
+QnVideoServerConnectionPtr QnVideoServerResource::apiConnection()
 {
     return m_restConnection;
 }
 
-void QnVideoServer::setGuid(const QString& guid)
+void QnVideoServerResource::setGuid(const QString& guid)
 {
     m_guid = guid;
 }
 
-QString QnVideoServer::getGuid() const
+QString QnVideoServerResource::getGuid() const
 {
     return m_guid;
 }
 
-QnResourcePtr QnVideoServerFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnVideoServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     Q_UNUSED(resourceTypeId)
 
-    QnResourcePtr result(new QnVideoServer());
+    QnResourcePtr result(new QnVideoServerResource());
     result->deserialize(parameters);
 
     return result;
+}
+
+QnStorageList QnVideoServerResource::getStorages() const
+{
+    return m_storages;
+}
+
+void QnVideoServerResource::setStorages(const QnStorageList &storages)
+{
+    m_storages = storages;
 }
 
 #if 0

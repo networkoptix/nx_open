@@ -1,5 +1,16 @@
 set -e
 
+case `uname -s` in
+    "Linux")
+        PLATFORM=linux
+        NPROCESSORS=$[$(cat /proc/cpuinfo | grep ^processor | wc -l)]
+        ;;
+    "Darwin")
+        PLATFORM=mac
+        NPROCESSORS=`sysctl hw.ncpu | awk '{print $2}'`
+        ;;
+esac
+
 for i in common mediaserver client appserver
 do
   pushd $i
@@ -34,7 +45,6 @@ rm mediaserver/build/Makefile.debug.bak mediaserver/build/Makefile.release.bak c
 for i in common mediaserver client
 do
   pushd $i/build
-  make -f Makefile.debug -j9
-  make -f Makefile.debug -j9
+  make -f Makefile.debug -j $[NPROCESSORS+1]
   popd
 done

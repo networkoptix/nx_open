@@ -76,7 +76,7 @@ void QnServerArchiveDelegate::close()
     delete m_chunkSequenceLow;
     m_chunkSequenceHi = 0;
     m_chunkSequenceLow = 0;
-    m_reverseMode = false;
+    //m_reverseMode = false;
     m_opened = false;
     m_lastSeekTime = AV_NOPTS_VALUE;
     m_afterSeek = false;

@@ -102,7 +102,8 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
         m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
         recorderHiRes->updateSchedule(cameraRes->getScheduleTasks());
-        recorderLowRes->updateSchedule(cameraRes->getScheduleTasks());
+        if (recorderLowRes)
+            recorderLowRes->updateSchedule(cameraRes->getScheduleTasks());
     }
 }
 

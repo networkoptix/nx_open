@@ -29,7 +29,7 @@
          <item>
           <widget class="QLabel" name="nameLabel">
            <property name="text">
-            <string>Name</string>
+            <string>Name:</string>
            </property>
           </widget>
          </item>
@@ -72,7 +72,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="ipAddressLabel">
               <property name="text">
-               <string>IP Address</string>
+               <string>IP Address:</string>
               </property>
              </widget>
             </item>
@@ -86,7 +86,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="macAddressLabel">
               <property name="text">
-               <string>MAC Address</string>
+               <string>MAC Address:</string>
               </property>
              </widget>
             </item>
@@ -122,7 +122,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="loginLabel">
               <property name="text">
-               <string>Login</string>
+               <string>Login:</string>
               </property>
              </widget>
             </item>
@@ -132,7 +132,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="passwordLabel">
               <property name="text">
-               <string>Password</string>
+               <string>Password:</string>
               </property>
              </widget>
             </item>
@@ -143,6 +143,19 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
