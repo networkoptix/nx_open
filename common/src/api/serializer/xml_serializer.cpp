@@ -141,8 +141,6 @@ namespace {
                 camera->setMotionMask(region);
             }
 
-            const QnParamList& paramList = camera->getResourceParamList();
-
             if (i->properties().present())
             {
                 const Properties& properties = *(i->properties());
