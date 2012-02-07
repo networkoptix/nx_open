@@ -52,17 +52,17 @@ public:
     virtual void setSingleshotMode(bool /*value*/) {}
 
     // MediaStreamQuality. By default, this function is not implemented. Return: true if need seek for change quality
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch) { return false; }
+    virtual bool setQuality(MediaQuality /*quality*/, bool /*fastSwitch*/) { return false; }
 
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }
     virtual void beforeClose() {}
 
     /** This function calls from reader */
-    virtual void beforeSeek(qint64 time) {}
+    virtual void beforeSeek(qint64 /*time*/) {}
 
     /** This function calls from reader */
-    virtual void beforeChangeReverseMode(bool reverseMode) {}
+    virtual void beforeChangeReverseMode(bool /*reverseMode*/) {}
 
 protected:
     Flags m_flags;

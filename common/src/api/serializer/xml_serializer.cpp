@@ -377,6 +377,8 @@ namespace {
 
 void QnApiXmlSerializer::deserializeStorages(QnStorageResourceList& storages, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
+    Q_UNUSED(resourceFactory);
+
     QByteArray errorString;
 
     try {
