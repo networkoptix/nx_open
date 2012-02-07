@@ -19,6 +19,8 @@ typedef QList<QnLayoutItemData> QnLayoutItemDataList;
 
 class QnLayoutData : public QnResource
 {
+    Q_OBJECT;
+
 public:
     QnLayoutData() 
     {

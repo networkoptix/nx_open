@@ -1,5 +1,5 @@
-#ifndef _RESOURCE_USER_H
-#define _RESOURCE_USER_H
+#ifndef QN_USER_RESOURCE_H
+#define QN_USER_RESOURCE_H
 
 #include <QSharedPointer>
 #include <QList>
@@ -9,6 +9,8 @@
 
 class QnUserResource : public QnResource
 {
+    Q_OBJECT;
+
 public:
     QnUserResource();
 
@@ -31,4 +33,4 @@ private:
 typedef QSharedPointer<QnUserResource> QnUserResourcePtr;
 typedef QList<QnUserResourcePtr> QnUserResourceList;
 
-#endif //_RESOURCE_USER_H
+#endif // QN_USER_RESOURCE_H

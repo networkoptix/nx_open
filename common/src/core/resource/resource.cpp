@@ -218,13 +218,13 @@ const QnParamList& QnResource::getResourceParamList() const
         }
         paramType->setDefVal(QVariant(mProperty.userType(), (void *)0));
         for (int j = 0; j < mObject->classInfoCount(); ++j) {
-            QMetaClassInfo mClassInfo = mObject->classInfo(j);
-            if (propertyName == mClassInfo.name())
-                paramType->description = QCoreApplication::translate("QnResource", mClassInfo.value());
-            else if (propertyName + "_group" == mClassInfo.name())
-                paramType->group = QString::fromLatin1(mClassInfo.value());
-            else if (propertyName + "_subgroup" == mClassInfo.name())
-                paramType->subgroup = QString::fromLatin1(mClassInfo.value());
+            QMetaClassInfo classInfo = mObject->classInfo(j);
+            if (propertyName == classInfo.name())
+                paramType->description = QCoreApplication::translate("QnResource", classInfo.value());
+            else if (propertyName + "_group" == classInfo.name())
+                paramType->group = QString::fromLatin1(classInfo.value());
+            else if (propertyName + "_subgroup" == classInfo.name())
+                paramType->subgroup = QString::fromLatin1(classInfo.value());
         }
 
         QnParam newParam(paramType, mProperty.read(this));

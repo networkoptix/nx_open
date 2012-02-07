@@ -14,6 +14,8 @@ struct dvd_reader_t;
 
 class QnAVIDvdArchiveDelegate : public QnAVIPlaylistArchiveDelegate
 {
+    Q_OBJECT;
+
 public:
 	QnAVIDvdArchiveDelegate();
 	virtual ~QnAVIDvdArchiveDelegate();

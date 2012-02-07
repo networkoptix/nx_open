@@ -45,7 +45,17 @@ class QnWorkbenchController: public QObject, protected SceneUtility {
     Q_OBJECT;
 
 public:
+    /**
+     * Constructor.
+     * 
+     * \param display                   Display to be used by this controller. Must not be NULL.
+     * \param parent                    Parent for this object.
+     */
     QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent = NULL);
+
+    /**
+     * Virtual destructor. 
+     */
     virtual ~QnWorkbenchController();
 
     QnWorkbenchDisplay *display() const;

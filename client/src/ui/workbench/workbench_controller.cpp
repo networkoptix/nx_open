@@ -464,7 +464,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
 
     const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
 
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
+    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
     item->setFlag(QnWorkbenchItem::Pinned, false);
     item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
     layout()->addItem(item);

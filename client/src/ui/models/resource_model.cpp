@@ -269,7 +269,7 @@ void QnResourceModelPrivate::at_resPool_resourceAdded(const QnResourcePtr &resou
 
     node = new Node(resource);
     const QModelIndex parentIndex = this->index(node->parentId());
-    if ((node->flags() & QnResource::server) != QnResource::server && !parentIndex.isValid()) {
+    if ((node->flags() & QnResource::server) != QnResource::server && (node->flags() & QnResource::user) != QnResource::user && !parentIndex.isValid()) {
         qWarning("QnResourceModel::addResource(): parent resource (id %d) wasn't found for resource (id %d)",
                  node->parentId(), node->id());
         delete node;

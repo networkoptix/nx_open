@@ -54,6 +54,11 @@ public:
     void load(const QnLayoutData &layoutData);
 
     /**
+     * \param[out] layoutData           Data to save layout to.
+     */
+    void save(QnLayoutData &layoutData) const; 
+
+    /**
      * \param item                      Item to check.
      * \param geometry                  New position.
      * \param[out] disposition          Disposition of free and occupied cells in the target region.

@@ -38,6 +38,17 @@ namespace {
         TypedMagnitudeCalculator<QPointF> *m_calculator;
     };
 
+    struct WorkbenchItemLess {
+    public:
+        bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
+            if(l->resourceUid() == r->resourceUid()) {
+                return l < r;
+            } else {
+                return l->resourceUid() < r->resourceUid();
+            }
+        }
+    };
+
 } // anonymous namespace
 
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent)
@@ -68,8 +79,7 @@ void QnWorkbenchLayout::setName(const QString &name) {
     emit nameChanged();
 }
 
-void QnWorkbenchLayout::load(const QnLayoutData &layoutData)
-{
+void QnWorkbenchLayout::load(const QnLayoutData &layoutData) {
     setName(layoutData.getName());
 
     /* Unpin all items so that pinned state does not interfere with 
@@ -110,6 +120,34 @@ void QnWorkbenchLayout::load(const QnLayoutData &layoutData)
         for(int i = 0; i < items.size(); i++)
             items[i]->load(itemDatas[i]);
     }
+}
+
+void QnWorkbenchLayout::save(QnLayoutData &layoutData) const {
+    layoutData.setName(name());
+
+    QnLayoutItemDataList itemDatas;
+    itemDatas.reserve(items().size());
+
+    /* Provide some consistency in how items are ordered. */
+    QList<QnWorkbenchItem *> sortedItems = items().toList();
+    qSort(sortedItems.begin(), sortedItems.end(), WorkbenchItemLess());
+
+    foreach(const QnWorkbenchItem *item, sortedItems) {
+        QnLayoutItemData itemData;
+        
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+        if(resource.isNull()) {
+            qnWarning("No resource in resource pool for uid '%1'.", item->resourceUid());
+            continue;
+        }
+
+        itemData.resourceId = resource->getId();
+        item->save(itemData);
+
+        itemDatas.push_back(itemData);
+    }
+
+    layoutData.setItems(itemDatas);
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
