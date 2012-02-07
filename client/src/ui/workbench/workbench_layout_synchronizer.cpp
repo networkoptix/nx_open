@@ -28,12 +28,13 @@ void QnWorkbenchLayoutSynchronizer::setUser(const QnUserResourcePtr &user) {
 }
 
 void QnWorkbenchLayoutSynchronizer::initUserWorkbench() {
-    connect(m_user.data(),  SIGNAL(resourceChanged()),              this, SLOT(at_user_resourceChanged()));
+    connect(m_user.data(),  SIGNAL(resourceChanged()),                  this, SLOT(at_user_resourceChanged()));
 
-    connect(m_workbench,    SIGNAL(aboutToBeDestroyed()),           this, SLOT(at_workbench_aboutToBeDestroyed()));
-    connect(m_workbench,    SIGNAL(layoutsChanged()),               this, SLOT(at_workbench_layoutsChanged()));
-    connect(m_workbench,    SIGNAL(itemAdded(QnWorkbenchItem *)),   this, SLOT(at_workbench_layoutsChanged()));
-    connect(m_workbench,    SIGNAL(itemRemoved(QnWorkbenchItem *)), this, SLOT(at_workbench_layoutsChanged()));
+    connect(m_workbench,    SIGNAL(aboutToBeDestroyed()),               this, SLOT(at_workbench_aboutToBeDestroyed()));
+    connect(m_workbench,    SIGNAL(layoutsChanged()),                   this, SLOT(at_workbench_layoutsChanged()));
+    connect(m_workbench,    SIGNAL(currentLayoutAboutToBeChanged()),    this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
+    connect(m_workbench,    SIGNAL(itemAdded(QnWorkbenchItem *)),       this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
+    connect(m_workbench,    SIGNAL(itemRemoved(QnWorkbenchItem *)),     this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 
 }
 
@@ -42,9 +43,29 @@ void QnWorkbenchLayoutSynchronizer::deinitUserWorkbench() {
 }
 
 void QnWorkbenchLayoutSynchronizer::at_user_resourceChanged() {
+    //foreach()
+}
+
+void QnWorkbenchLayoutSynchronizer::at_layout_resourceChanged() {
 
 }
 
 void QnWorkbenchLayoutSynchronizer::at_workbench_aboutToBeDestroyed() {
     setWorkbench(NULL);
+}
+
+void QnWorkbenchLayoutSynchronizer::at_workbench_layoutsChanged() {
+
+}
+
+void QnWorkbenchLayoutSynchronizer::at_workbench_currentLayoutAboutToBeChanged() {
+
+}
+
+void QnWorkbenchLayoutSynchronizer::at_workbench_itemAdded(QnWorkbenchItem *item) {
+
+}
+
+void QnWorkbenchLayoutSynchronizer::at_workbench_itemRemoved(QnWorkbenchItem *item) {
+
 }

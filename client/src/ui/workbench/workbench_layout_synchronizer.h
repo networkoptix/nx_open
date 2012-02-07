@@ -6,6 +6,7 @@
 
 class QnWorkbench;
 class QnWorkbenchItem;
+class QnWorkbenchLayout;
 
 class QnWorkbenchLayoutSynchronizer: public QObject {
     Q_OBJECT;
@@ -33,14 +34,20 @@ protected:
 
 protected slots:
     void at_user_resourceChanged();
+    void at_layout_resourceChanged();
+
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_layoutsChanged();
+    void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
 
 private:
     QnWorkbench *m_workbench;
     QnUserResourcePtr m_user;
+
+    QHash<QnWorkbenchLayout *, QnLayoutDataPtr> m_resourceByLayout;
+    QHash<QnLayoutDataPtr, QnWorkbenchLayout *> m_layoutByResource;
 };
 
 #endif // QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H

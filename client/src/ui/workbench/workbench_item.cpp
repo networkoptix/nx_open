@@ -19,6 +19,9 @@ QnWorkbenchItem::~QnWorkbenchItem() {
 }
 
 bool QnWorkbenchItem::load(const QnLayoutItemData &itemData) {
+    if(itemData.uuid != uuid())
+        qnWarning("Loading item '%1' from data with different uuid (%2 != %3).", resourceUid(), itemData.uuid.toString(), uuid().toString());
+
 #ifdef _DEBUG
     QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
     if(itemData.resourceId != localId)
@@ -37,6 +40,9 @@ bool QnWorkbenchItem::load(const QnLayoutItemData &itemData) {
 }
 
 void QnWorkbenchItem::save(QnLayoutItemData &itemData) const {
+    if(itemData.uuid != uuid())
+        qnWarning("Saving item '%1' to a data with different uuid (%2 != %3).", resourceUid(), itemData.uuid, uuid());
+
 #ifdef _DEBUG
     QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
     if(itemData.resourceId != localId)

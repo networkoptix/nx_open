@@ -11,10 +11,12 @@ class QnUserResource : public QnResource
 {
     Q_OBJECT;
 
+    typedef QnResource base_type;
+
 public:
     QnUserResource();
 
-    QString getUniqueId() const
+    virtual QString getUniqueId() const override
     {
         return getName();
     }
@@ -24,6 +26,9 @@ public:
 
     QString getPassword() const;
     void setPassword(const QString& password);
+
+protected:
+    virtual void updateInner(QnResourcePtr other) override;
 
 private:
     QString m_password;

@@ -3,6 +3,7 @@
 
 #include <QSharedPointer>
 #include <QRectF>
+#include <QUuid>
 #include "utils/common/qnid.h"
 #include "core/resource/resource.h"
 
@@ -10,6 +11,7 @@ class QnLayoutItemData
 {
 public:
     QnId resourceId;
+    QUuid uuid;
     int flags;
     QRectF combinedGeometry;
     qreal rotation;
@@ -21,29 +23,22 @@ class QnLayoutData : public QnResource
 {
     Q_OBJECT;
 
+    typedef QnResource base_type;
+
 public:
-    QnLayoutData() 
-    {
-        addFlag(QnResource::layout);
-    }
+    QnLayoutData();
 
-    QString getUniqueId() const
-    {
-        // Indeed it's not uniqueid, as there is possible situation
-        // when there is no id yet.
-        // But QnResource requires us to define this method.
-        return getId().toString();
-    }
+    virtual QString getUniqueId() const override;
 
-    void setItems(const QnLayoutItemDataList& items)
-    {
-        m_items = items;
-    }
+    void setItems(const QnLayoutItemDataList& items);
 
-    QnLayoutItemDataList getItems() const
+    const QnLayoutItemDataList &getItems() const
     {
         return m_items;
     }
+
+protected:
+    virtual void updateInner(QnResourcePtr other) override;
 
 private:
     QList<QnLayoutItemData> m_items;

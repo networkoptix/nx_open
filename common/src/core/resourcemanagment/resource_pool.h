@@ -69,7 +69,7 @@ public:
 
     QnResourceList findResourcesByCriteria(const CLDeviceCriteria &cr) const;
 
-Q_SIGNALS:
+signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);

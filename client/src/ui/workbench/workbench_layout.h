@@ -7,6 +7,7 @@
 #include <core/resource/resource.h>
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
+#include <utils/common/hash.h> /* For qHash(const QUuid &). */
 #include <ui/common/magnitude.h>
 
 class QnWorkbenchItem;
@@ -50,8 +51,9 @@ public:
     
     /**
      * \param layoutData                Data to load layout from.
+     * \returns                         Whether there were no errors during loading.
      */
-    void load(const QnLayoutData &layoutData);
+    bool load(const QnLayoutData &layoutData);
 
     /**
      * \param[out] layoutData           Data to save layout to.
@@ -109,6 +111,12 @@ public:
      * \returns                         Pinned item at the given position, or NULL if the given position is empty.
      */
     QnWorkbenchItem *item(const QPoint &position) const;
+
+    /**
+     * \param uuid                      Universally unique identifier to get item for.
+     * \returns                         Item for the given universally unique identifier, or NULL if no such item exists in this layout.
+     */
+    QnWorkbenchItem *item(const QUuid &uuid) const;
 
     /**
      * \param region                    Region to get pinned items at.
@@ -249,6 +257,9 @@ private:
 
     /** Map from resource unique id to a set of items. */
     QHash<QString, QSet<QnWorkbenchItem *> > m_itemsByUid;
+
+    /** Map from item's universally unique identifier to item. */
+    QHash<QUuid, QnWorkbenchItem *> m_itemByUuid;
 
     /** Empty item list, to return a reference to. */
     const QSet<QnWorkbenchItem *> m_noItems;
