@@ -20,7 +20,7 @@
     <modules>
 		<module>appserver</module>
 		<module>common</module>
-		<module>server</module>
+		<module>mediaserver</module>
 		<module>client</module>
 		<module>wixsetup</module>
     </modules>
