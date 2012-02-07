@@ -422,9 +422,6 @@ public:
         QUrl rtspUrl(videoServer->getUrl());
         QUrl apiUrl(videoServer->getApiUrl());
 
-        m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-        m_rtspListener->start();
-
         m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
         m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
         m_restServer->registerHandler("xsd/*", new QnXsdHelperHandler());
@@ -526,6 +523,9 @@ public:
         }
 
         QnResourceDiscoveryManager::instance().start();
+
+        m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
+        m_rtspListener->start();
 
         exec();
     }
