@@ -1,17 +1,17 @@
-#ifndef QN_STORAGE_H
-#define QN_STORAGE_H
+#ifndef QN_STORAGE_RESOURCE_H
+#define QN_STORAGE_RESOURCE_H
 
 #include "resource.h"
 
-class QnStorage : public QnResource
+class QnStorageResource : public QnResource
 {
     Q_OBJECT
     Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
 
 public:
-    QnStorage();
-    virtual ~QnStorage();
+    QnStorageResource();
+    virtual ~QnStorageResource();
 
     virtual QString getUniqueId() const;
 
@@ -34,7 +34,4 @@ private:
     quint16 m_index;
 };
 
-typedef QSharedPointer<QnStorage> QnStoragePtr;
-typedef QList<QnStoragePtr> QnStorageList;
-
-#endif // QN_STORAGE_H
+#endif // QN_STORAGE_RESOURCE_H

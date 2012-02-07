@@ -1,7 +1,7 @@
 #include "workbench_layout.h"
 #include <limits>
 #include <core/resourcemanagment/resource_pool.h>
-#include <core/resource/layout_data.h>
+#include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
 #include <ui/common/scene_utility.h>
@@ -79,7 +79,7 @@ void QnWorkbenchLayout::setName(const QString &name) {
     emit nameChanged();
 }
 
-bool QnWorkbenchLayout::load(const QnLayoutData &layoutData) {
+bool QnWorkbenchLayout::load(const QnLayoutResource &layoutData) {
     setName(layoutData.getName());
 
     bool result = true;
@@ -127,7 +127,7 @@ bool QnWorkbenchLayout::load(const QnLayoutData &layoutData) {
     return result;
 }
 
-void QnWorkbenchLayout::save(QnLayoutData &layoutData) const {
+void QnWorkbenchLayout::save(QnLayoutResource &layoutData) const {
     layoutData.setName(name());
 
     QnLayoutItemDataList itemDatas;

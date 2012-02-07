@@ -1,5 +1,5 @@
-#ifndef _camera_resource
-#define _camera_resource
+#ifndef QN_CAMERA_RESOURCE_H
+#define QN_CAMERA_RESOURCE_H
 
 #include "network_resource.h"
 #include "security_cam_resource.h"
@@ -12,8 +12,6 @@ public:
     QnVirtualCameraResource() {}
 };
 
-typedef QSharedPointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
-typedef QList<QnVirtualCameraResourcePtr> QnVirtualCameraResourceList;
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource
 {
@@ -30,11 +28,7 @@ public:
 #ifdef _DEBUG
     void debugCheck() const;
 #endif
-
-
 };
 
-typedef QSharedPointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
-typedef QList<QnPhysicalCameraResourcePtr> QnPhysicalCameraResourceList;
 
-#endif // _camera_resource
+#endif // QN_CAMERA_RESOURCE_H

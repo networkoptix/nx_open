@@ -34,7 +34,7 @@
 //#define STANDALONE_MODE
 
 #include "core/resource/video_server.h"
-#include "core/resource/storage.h"
+#include "core/resource/storage_resource.h"
 
 #include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"

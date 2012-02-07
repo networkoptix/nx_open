@@ -8,12 +8,12 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "core/resource/video_server.h"
-#include "core/resource/storage.h"
+#include "core/resource/storage_resource.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"
-#include "core/resource/layout_data.h"
+#include "core/resource/layout_resource.h"
 #include "core/misc/scheduleTask.h"
-#include "core/resource/user.h"
+#include "core/resource/user_resource.h"
 
 #include "api/serializer/xml_serializer.h"
 
@@ -62,11 +62,11 @@ public:
     int registerServer(const QnVideoServerPtr&, QnVideoServerList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
-    int addStorage(const QnStoragePtr&, QByteArray& errorString);
+    int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
-    int getStorages(QnStorageList& storages, QByteArray& errorString);
-    int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
+    int getStorages(QnStorageResourceList& storages, QByteArray& errorString);
+    int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
 
     // Returns request id

@@ -75,7 +75,7 @@ namespace {
         }
     }
 
-    void parseStorages(QnStorageList& storages, const QnApiStorages& xsdStorages)
+    void parseStorages(QnStorageResourceList& storages, const QnApiStorages& xsdStorages)
     {
         using xsd::api::storages::Storages;
         using xsd::api::resourceTypes::ParentIDs;
@@ -84,7 +84,7 @@ namespace {
 
         for (Storages::storage_const_iterator i (xsdStorages.begin()); i != xsdStorages.end(); ++i)
         {
-            QnStoragePtr storage(new QnStorage());
+            QnStorageResourcePtr storage(new QnStorageResource());
             storage->setId(i->id().c_str());
             storage->setName(i->name().c_str());
             storage->setTypeId(i->typeId().c_str());
@@ -194,7 +194,7 @@ namespace {
 
         for (Layouts::layout_const_iterator i (xsdLayouts.begin()); i != xsdLayouts.end(); ++i)
         {
-            QnLayoutDataPtr layout(new QnLayoutData());
+            QnLayoutResourcePtr layout(new QnLayoutResource());
 
             QnResourceParameters parameters;
             if (i->id().present())
@@ -265,7 +265,7 @@ namespace {
             {
                 const Layouts::layout_sequence& xsdLayouts = (*(i->layouts())).layout();
 
-                QnLayoutDataList layouts;
+                QnLayoutResourceList layouts;
                 parseLayouts(layouts, xsdLayouts);
                 user->setLayouts(layouts);
             }
@@ -375,7 +375,7 @@ namespace {
 
 }
 
-void QnApiXmlSerializer::deserializeStorages(QnStorageList& storages, const QByteArray& data, QnResourceFactory& resourceFactory)
+void QnApiXmlSerializer::deserializeStorages(QnStorageResourceList& storages, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     QByteArray errorString;
 
@@ -416,7 +416,7 @@ void QnApiXmlSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras
     }
 }
 
-void QnApiXmlSerializer::deserializeLayouts(QnLayoutDataList& layouts, const QByteArray& data)
+void QnApiXmlSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data)
 {
     QByteArray errorString;
 
@@ -495,7 +495,7 @@ void QnApiXmlSerializer::deserializeResources(QnResourceList& resources, const Q
 
         foreach(const QnUserResourcePtr& user, users)
         {
-            const QnLayoutDataList& layouts = user->getLayouts();
+            const QnLayoutResourceList& layouts = user->getLayouts();
             qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
         }
     }
@@ -560,7 +560,7 @@ void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteAr
     user.password(userPtr->getPassword().toStdString());
 
     xsd::api::layouts::Layouts layouts;
-    foreach(const QnLayoutDataPtr& layoutIn, userPtr->getLayouts()) {
+    foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
         xsd::api::layouts::Layout layout(layoutIn->getName().toStdString(), layoutIn->getParentId().toString().toStdString());
 
         if (!layoutIn->getItems().isEmpty()) {
@@ -642,7 +642,7 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
     data = os.str().c_str();
 }
 
-void QnApiXmlSerializer::serializeStorage(const QnStoragePtr& storagePtr, QByteArray& data)
+void QnApiXmlSerializer::serializeStorage(const QnStorageResourcePtr& storagePtr, QByteArray& data)
 {
     xsd::api::storages::Storage storage(storagePtr->getId().toString().toStdString(),
                                          storagePtr->getName().toStdString(),
@@ -663,8 +663,8 @@ void QnApiXmlSerializer::serializeStorage(const QnStoragePtr& storagePtr, QByteA
 
 void QnApiXmlSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
 {
-    if (resource.dynamicCast<QnStorage>()) {
-        serializeStorage(resource.dynamicCast<QnStorage>(), data);
+    if (resource.dynamicCast<QnStorageResource>()) {
+        serializeStorage(resource.dynamicCast<QnStorageResource>(), data);
     } else if (resource.dynamicCast<QnVirtualCameraResource>()) {
         serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
     } else if (resource.dynamicCast<QnVideoServer>()) {

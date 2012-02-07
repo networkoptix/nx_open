@@ -5,7 +5,7 @@
 #include <QList>
 
 #include "resource.h"
-#include "layout_data.h"
+#include "layout_resource.h"
 
 class QnUserResource : public QnResource
 {
@@ -21,8 +21,8 @@ public:
         return getName();
     }
 
-    void setLayouts(QnLayoutDataList layouts);
-    QnLayoutDataList getLayouts() const;
+    void setLayouts(QnLayoutResourceList layouts);
+    QnLayoutResourceList getLayouts() const;
 
     QString getPassword() const;
     void setPassword(const QString& password);
@@ -32,10 +32,7 @@ protected:
 
 private:
     QString m_password;
-    QnLayoutDataList m_layouts;
+    QnLayoutResourceList m_layouts;
 };
-
-typedef QSharedPointer<QnUserResource> QnUserResourcePtr;
-typedef QList<QnUserResourcePtr> QnUserResourceList;
 
 #endif // QN_USER_RESOURCE_H

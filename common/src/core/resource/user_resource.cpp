@@ -1,16 +1,16 @@
-#include "user.h"
+#include "user_resource.h"
 
 QnUserResource::QnUserResource(): base_type()
 {
     addFlag(QnResource::user);
 }
 
-void QnUserResource::setLayouts(QnLayoutDataList layouts)
+void QnUserResource::setLayouts(QnLayoutResourceList layouts)
 {
     m_layouts = layouts;
 }
 
-QnLayoutDataList QnUserResource::getLayouts() const
+QnLayoutResourceList QnUserResource::getLayouts() const
 {
     return m_layouts;
 }

@@ -2,7 +2,7 @@
 #define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 
 #include <QObject>
-#include <core/resource/user.h>
+#include <core/resource/user_resource.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -46,8 +46,8 @@ private:
     QnWorkbench *m_workbench;
     QnUserResourcePtr m_user;
 
-    QHash<QnWorkbenchLayout *, QnLayoutDataPtr> m_resourceByLayout;
-    QHash<QnLayoutDataPtr, QnWorkbenchLayout *> m_layoutByResource;
+    QHash<QnWorkbenchLayout *, QnLayoutResourcePtr> m_resourceByLayout;
+    QHash<QnLayoutResourcePtr, QnWorkbenchLayout *> m_layoutByResource;
 };
 
 #endif // QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H

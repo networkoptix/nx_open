@@ -239,7 +239,7 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr
     return addObjectAsync("camera", data, processor, SLOT(finished(int, const QByteArray&, int)));
 }
 
-int QnAppServerConnection::addStorage(const QnStoragePtr& storagePtr, QByteArray& errorString)
+int QnAppServerConnection::addStorage(const QnStorageResourcePtr& storagePtr, QByteArray& errorString)
 {
     QByteArray data;
     m_serializer.serialize(storagePtr, data);
@@ -262,7 +262,7 @@ int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId
     return status;
 }
 
-int QnAppServerConnection::getStorages(QnStorageList& storages, QByteArray& errorString)
+int QnAppServerConnection::getStorages(QnStorageResourceList& storages, QByteArray& errorString)
 {
     QByteArray data;
     int status = getObjects("storage", "", data, errorString);
@@ -276,7 +276,7 @@ int QnAppServerConnection::getStorages(QnStorageList& storages, QByteArray& erro
     return status;
 }
 
-int QnAppServerConnection::getLayouts(QnLayoutDataList& layouts, QByteArray& errorString)
+int QnAppServerConnection::getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString)
 {
     QByteArray data;
 

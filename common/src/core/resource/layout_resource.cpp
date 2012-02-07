@@ -1,16 +1,16 @@
-#include "layout_data.h"
+#include "layout_resource.h"
 
-QnLayoutData::QnLayoutData(): base_type()
+QnLayoutResource::QnLayoutResource(): base_type()
 {
     addFlag(QnResource::layout);
 }
 
-void QnLayoutData::setItems(const QnLayoutItemDataList& items)
+void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
 {
     m_items = items;
 }
 
-QString QnLayoutData::getUniqueId() const
+QString QnLayoutResource::getUniqueId() const
 {
     // Actually it's not a unique id, as situation is possible
     // when there is no id yet.
@@ -18,10 +18,10 @@ QString QnLayoutData::getUniqueId() const
     return getId().toString();
 }
 
-void QnLayoutData::updateInner(QnResourcePtr other) {
+void QnLayoutResource::updateInner(QnResourcePtr other) {
     base_type::updateInner(other);
 
-    QnLayoutDataPtr localOther = other.dynamicCast<QnLayoutData>();
+    QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
     if(localOther) {
         setItems(localOther->getItems());
     }

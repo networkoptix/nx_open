@@ -11,7 +11,7 @@
 #include <ui/common/magnitude.h>
 
 class QnWorkbenchItem;
-class QnLayoutData;
+class QnLayoutResource;
 
 /**
  * Layout of a workbench.
@@ -53,12 +53,12 @@ public:
      * \param layoutData                Data to load layout from.
      * \returns                         Whether there were no errors during loading.
      */
-    bool load(const QnLayoutData &layoutData);
+    bool load(const QnLayoutResource &layoutData);
 
     /**
      * \param[out] layoutData           Data to save layout to.
      */
-    void save(QnLayoutData &layoutData) const; 
+    void save(QnLayoutResource &layoutData) const; 
 
     /**
      * \param item                      Item to check.

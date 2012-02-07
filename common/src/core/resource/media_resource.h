@@ -1,11 +1,9 @@
-#ifndef QnMediaResource_h_227
-#define QnMediaResource_h_227
+#ifndef QN_MEDIA_RESOURCE_H
+#define QN_MEDIA_RESOURCE_H
 
 #include <QMap>
 #include <QSize>
-
-
-#include "core/resource/resource.h"
+#include "resource.h"
 #include "resource_media_layout.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -36,7 +34,4 @@ protected:
     CLCustomDeviceVideoLayout* m_customVideoLayout;
 };
 
-typedef QSharedPointer<QnMediaResource> QnMediaResourcePtr;
-
-
-#endif // QnMediaResource_h_227
+#endif // QN_MEDIA_RESOURCE_H
