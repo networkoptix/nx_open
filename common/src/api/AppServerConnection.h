@@ -59,7 +59,7 @@ public:
 
     int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
-    int registerServer(const QnVideoServerPtr&, QnVideoServerList& servers, QByteArray& errorString);
+    int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
     int addStorage(const QnStoragePtr&, QByteArray& errorString);
@@ -69,8 +69,11 @@ public:
     int getLayouts(QnLayoutDataList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
 
+    int saveSync(const QnVideoServerResourcePtr&, QByteArray& errorString);
+    int saveSync(const QnVirtualCameraResourcePtr&, QByteArray& errorString);
+
     // Returns request id
-    int saveAsync(const QnVideoServerPtr&, QObject*, const char*);
+    int saveAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
 
@@ -89,7 +92,7 @@ private:
 private:
     QUrl m_url;
     QnResourceFactory& m_resourceFactory;
-    QnVideoServerFactory m_serverFactory;
+    QnVideoServerResourceFactory m_serverFactory;
 
     QnApiXmlSerializer m_serializer;
 

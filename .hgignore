@@ -50,10 +50,10 @@ common/src/common.mak*
 scripts/appserver/server.state
 server/src/version.h
 
-server/src/server.pro
-server/src/version.h
-server/src/Makefile
-server/src/server.mak*
+mediaserver/src/server.pro
+mediaserver/src/version.h
+mediaserver/src/Makefile
+mediaserver/src/server.mak*
 
 winbuild/msvc2010/setup.bat
 

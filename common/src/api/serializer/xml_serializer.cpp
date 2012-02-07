@@ -171,12 +171,19 @@ namespace {
 
         for (Servers::server_const_iterator i (xsdServers.begin()); i != xsdServers.end(); ++i)
         {
-            QnVideoServerPtr server(new QnVideoServer());
+            QnVideoServerResourcePtr server(new QnVideoServerResource());
             server->setName(i->name().c_str());
             server->setId(i->id().c_str());
             server->setUrl(i->url().c_str());
             server->setGuid(i->guid().c_str());
             server->setApiUrl(i->apiUrl().c_str());
+
+            if (i->storages().present())
+            {
+                QnStorageList storages;
+                parseStorages(storages, (*(i->storages())).storage());
+                server->setStorages(storages);
+            }
 
             servers.append(server);
         }
@@ -456,7 +463,7 @@ void QnApiXmlSerializer::deserializeUsers(QnUserResourceList& users, const QByte
     }
 }
 
-void QnApiXmlSerializer::deserializeServers(QnVideoServerList& servers, const QByteArray& data)
+void QnApiXmlSerializer::deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data)
 {
     QByteArray errorString;
 
@@ -528,7 +535,7 @@ void QnApiXmlSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTy
     }
 }
 
-void QnApiXmlSerializer::serializeServer(const QnVideoServerPtr& serverPtr, QByteArray& data)
+void QnApiXmlSerializer::serializeServer(const QnVideoServerResourcePtr& serverPtr, QByteArray& data)
 {
     xsd::api::servers::Server server(
                    serverPtr->getId().toString().toStdString(),
@@ -537,6 +544,24 @@ void QnApiXmlSerializer::serializeServer(const QnVideoServerPtr& serverPtr, QByt
                    serverPtr->getUrl().toStdString(),
                    serverPtr->getGuid().toStdString(),
                    serverPtr->getApiUrl().toStdString());
+
+    if (!serverPtr->getStorages().isEmpty()) {
+        ::xsd::api::storages::Storages storages;
+
+        foreach (const QnStoragePtr& storagePtr, serverPtr->getStorages()) {
+            xsd::api::storages::Storage storage(storagePtr->getId().toString().toStdString(),
+                                                 storagePtr->getName().toStdString(),
+                                                 storagePtr->getUrl().toStdString(),
+                                                 storagePtr->getTypeId().toString().toStdString(),
+                                                 storagePtr->getParentId().toString().toStdString(),
+                                                 storagePtr->getSpaceLimit(),
+                                                 storagePtr->getMaxStoreTime());
+
+            storages.storage().push_back(storage);
+        }
+
+        server.storages(storages);
+    }
 
     std::ostringstream os;
     ::xsd::api::servers::Servers servers;
@@ -667,8 +692,8 @@ void QnApiXmlSerializer::serialize(const QnResourcePtr& resource, QByteArray& da
         serializeStorage(resource.dynamicCast<QnStorage>(), data);
     } else if (resource.dynamicCast<QnVirtualCameraResource>()) {
         serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
-    } else if (resource.dynamicCast<QnVideoServer>()) {
-        serializeServer(resource.dynamicCast<QnVideoServer>(), data);
+    } else if (resource.dynamicCast<QnVideoServerResource>()) {
+        serializeServer(resource.dynamicCast<QnVideoServerResource>(), data);
     } else if (resource.dynamicCast<QnUserResource>()) {
         serializeUser(resource.dynamicCast<QnUserResource>(), data);
     }
