@@ -373,6 +373,8 @@ QnGLRenderer::QnGLRenderer():
 
     m_yuv2rgbBuffer = 0;
     m_yuv2rgbBufferLen = 0;
+
+    m_lastDisplayedFlags = 0;
     
     for(int i = 0; i < TEXTURE_COUNT; i++)
         m_textures[i].reset(new QnGlRendererTexture());
@@ -701,6 +703,7 @@ void QnGLRenderer::update()
             if (curImg->pkt_dts != AV_NOPTS_VALUE)
                 m_lastDisplayedTime = curImg->pkt_dts;
             m_lastDisplayedMetadata = curImg->metadata;
+            m_lastDisplayedFlags = curImg->flags;
             m_newtexture = true;
             m_textureImg = curImg;
         } 
@@ -768,6 +771,11 @@ qint64 QnGLRenderer::lastDisplayedTime() const
 {
     QMutexLocker locker(&m_displaySync);
     return m_lastDisplayedTime;
+}
+
+bool QnGLRenderer::isLowQualityImage() const
+{
+    return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_LowQuality;
 }
 
 QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const

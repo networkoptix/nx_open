@@ -50,7 +50,8 @@ protected:
         QnResourceTreeWidget *navTree = static_cast<QnResourceTreeWidget *>(parent());
         if (navTree->m_controller && navTree->m_controller->layout()) {
             if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model())) {
-                if (!navTree->m_controller->layout()->items(model->resource(index)->getUniqueId()).isEmpty())
+                QnResourcePtr resource = model->resource(index);
+                if (resource && !navTree->m_controller->layout()->items(resource->getUniqueId()).isEmpty())
                     option->font.setBold(true);
             }
         }
@@ -260,6 +261,9 @@ void QnResourceTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 void QnResourceTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
 {
     const QnResourcePtr &resource = qnResPool->getResourceByUniqId(item->resourceUid());
+
+    if (!resource)
+        return;
 
     if(!m_controller->layout()->items(resource->getUniqueId()).isEmpty())
         return;

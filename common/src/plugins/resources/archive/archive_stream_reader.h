@@ -12,6 +12,8 @@ struct AVFormatContext;
 
 class QnArchiveStreamReader : public QnAbstractArchiveReader
 {
+    Q_OBJECT;
+
 public:
     QnArchiveStreamReader(QnResourcePtr dev);
     virtual ~QnArchiveStreamReader();

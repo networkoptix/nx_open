@@ -12,16 +12,10 @@ typedef QList<QnNetworkResourcePtr> QnNetworkResourceList;
 
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
-/*    Q_OBJECT
+    Q_OBJECT
     Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
-    Q_CLASSINFO("hostAddress", "IP Address")
-    Q_CLASSINFO("hostAddress_group", "Network")
     Q_PROPERTY(QnMacAddress macAddress READ getMAC WRITE setMAC)
-    Q_CLASSINFO("macAddress", "MAC Address")
-    Q_CLASSINFO("macAddress_group", "Network")
     Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
-    Q_CLASSINFO("auth", "Authentication")
-    Q_CLASSINFO("auth_group", "Network")*/
 
 public:
     enum QnNetworkStatus
@@ -106,9 +100,5 @@ private:
 
     unsigned int m_networkTimeout;
 };
-
-/*Q_DECLARE_METATYPE(QHostAddress)
-Q_DECLARE_METATYPE(QnMacAddress)
-Q_DECLARE_METATYPE(QAuthenticator)*/
 
 #endif // network_device_h_1249

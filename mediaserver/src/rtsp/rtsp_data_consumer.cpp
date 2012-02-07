@@ -257,8 +257,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             m_owner->bufferData((const char*) &timestampHigh, 4);
             quint8 cseq = media->opaque;
             m_owner->bufferData((const char*) &cseq, 1);
-            quint8 flags = media->flags;
-            m_owner->bufferData((const char*) &flags, 1);
+            quint16 flags = htons(media->flags);
+            m_owner->bufferData((const char*) &flags, 2);
             if (video) 
             {
                 quint32 videoHeader = htonl(video->data.size() & 0x00ffffff);

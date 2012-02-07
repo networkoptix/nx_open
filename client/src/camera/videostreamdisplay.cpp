@@ -348,7 +348,9 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
             {
-                tmpOutFrame->flags |= AV_REVERSE_PACKET;
+                tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+                if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
+                    tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
                 //tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
                 m_reverseQueue.enqueue(tmpOutFrame);
                 m_realReverseSize++;

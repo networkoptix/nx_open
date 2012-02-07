@@ -261,23 +261,7 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
-    // Create and start SessionManager
-    SessionManager* sm = SessionManager::instance();
-
-    QThread *thread = new QThread();
-    sm->moveToThread(thread);
-
-    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-
-    thread->start();
-    //
-
-    QnResource::startCommandProc();
-
-    QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
-
 
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER
@@ -398,6 +382,10 @@ public:
         if (needToStop())
             return;
 
+        QnResource::startCommandProc();
+
+        QnResourcePool::instance(); // to initialize net state;
+
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
         QHostAddress appserverHost;
@@ -421,9 +409,6 @@ public:
 
         QUrl rtspUrl(videoServer->getUrl());
         QUrl apiUrl(videoServer->getApiUrl());
-
-        m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-        m_rtspListener->start();
 
         m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
         m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
@@ -518,6 +503,9 @@ public:
         }
 
         QnResourceDiscoveryManager::instance().start();
+
+        m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
+        m_rtspListener->start();
 
         exec();
     }

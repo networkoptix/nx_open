@@ -10,6 +10,8 @@ class QnAviAudioLayout;
 
 class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
 {
+    Q_OBJECT;
+
 public:
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();

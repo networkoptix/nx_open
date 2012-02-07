@@ -238,7 +238,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
     if (m_BOF)
         rez->flags |= QnAbstractMediaData::MediaFlags_BOF;
     if (isReverseMode)
-        rez->flags |= AV_REVERSE_PACKET;
+        rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
     rez->opaque = m_dataMarker;
     QnSleep::msleep(50);
     return rez;
@@ -425,7 +425,7 @@ begin_label:
                 isKeyFrame =  m_currentData->flags  & AV_PKT_FLAG_KEY;
             }
 
-            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime)
+            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > 0 && m_topIFrameTime >= m_bottomIFrameTime)
             {
                 // seek from EOF to BOF occured
                 //Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
@@ -453,7 +453,7 @@ begin_label:
             {
                 if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime) {
                     m_bottomIFrameTime = m_currentTime;
-                    videoData->flags |= AV_REVERSE_BLOCK_START;
+                    videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
                 }
                 if (m_currentTime >= m_topIFrameTime)
                 {
@@ -502,7 +502,7 @@ begin_label:
                 //return getNextData();
                 goto begin_label;
             }
-            videoData->flags |= AV_REVERSE_PACKET;
+            videoData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
         }
 
 

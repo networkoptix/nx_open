@@ -4,9 +4,8 @@
 #include "libavcodec/avcodec.h"
 #include "core/datapacket/mediadatapacket.h"
 
-#define AV_REVERSE_PACKET 128
-#define AV_REVERSE_BLOCK_START 64
-#define AV_REVERSE_REORDERED   32
+#define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
+#define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered
 
 class CLVideoDecoderOutput: public AVFrame
 {

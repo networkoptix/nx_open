@@ -5,6 +5,10 @@ set "CURRENTDIR=%cd%"
 
 cd %~dp0
 
+SET QT_PATH=c:\develop\Qt\4.7.4
+
+SET PATH=%PATH%;%QT_PATH%\bin
+
 cd common
 @start /B /WAIT convert.py
 cd %~dp0

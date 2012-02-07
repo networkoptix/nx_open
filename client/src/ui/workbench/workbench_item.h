@@ -3,18 +3,22 @@
 
 #include <QObject>
 #include <QRect>
+#include <QUuid>
 #include <QScopedPointer>
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;
 
 /**
- * Layout item model. Video, image, folder, or anything else.
+ * Layout item. Video, image, folder, or anything else.
  */
 class QnWorkbenchItem : public QObject
 {
     Q_OBJECT
     Q_FLAGS(ItemFlag ItemFlags)
+    Q_PROPERTY(QString resourceUid READ resourceUid)
+    Q_PROPERTY(QUuid uuid READ uuid)
+    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
 
 public:
     enum ItemFlag {
@@ -26,9 +30,10 @@ public:
      * Constructor.
      *
      * \param resource                  Unique identifier of the resource associated with this item.
+     * \param uuid                      Universally unique identifier of this item.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QString &resourceUid, QObject *parent = NULL);
+    QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -47,6 +52,11 @@ public:
     bool load(const QnLayoutItemData &itemData);
 
     /**
+     * \param[out] itemData             Data to save to.
+     */
+    void save(QnLayoutItemData &itemData) const;
+
+    /**
      * \returns                         Layout that this item belongs to, if any.
      */
     QnWorkbenchLayout *layout() const {
@@ -58,6 +68,13 @@ public:
      */
     const QString &resourceUid() const {
         return m_resourceUid;
+    }
+
+    /**
+     * \returns                         Universally unique identifier of this item. 
+     */
+    const QUuid &uuid() const {
+        return m_uuid;
     }
 
     /**
@@ -158,17 +175,18 @@ public:
         return m_rotation;
     }
 
-public Q_SLOTS:
-    inline void setPinned(bool value)
-    { setFlag(Pinned, value); }
-
-    inline void togglePinned()
-    { setPinned(!isPinned()); }
-
     /**
      * \param degrees                   New rotation value for this item, in degrees.
      */
     void setRotation(qreal rotation);
+
+    bool setPinned(bool value) { 
+        return setFlag(Pinned, value); 
+    }
+
+    bool togglePinned() { 
+        return setPinned(!isPinned()); 
+    }
 
 signals:
     void geometryChanged();
@@ -189,6 +207,9 @@ private:
 
     /** Unique identifier of the resource associated with this item. */
     QString m_resourceUid;
+
+    /** Universal unique identifier of this item. */
+    QUuid m_uuid;
 
     /** Grid-relative geometry of an item, in grid cells. */
     QRect m_geometry;

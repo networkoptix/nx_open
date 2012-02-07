@@ -80,7 +80,7 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
         if (!m_allParamTypeListCache.isNull())
             return *(m_allParamTypeListCache.data());
 
-        m_allParamTypeListCache = QSharedPointer<ParamTypeList>(new ParamTypeList());
+        QSharedPointer<ParamTypeList> allParamTypeListCache(new ParamTypeList());
 
         ParamTypeList paramTypeList = ParamTypeList();
 
@@ -100,10 +100,12 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
 
             if (!paramTypeNames.contains(paramType->name))
             {
-                m_allParamTypeListCache->append(paramType);
+                allParamTypeListCache->append(paramType);
                 paramTypeNames.insert(paramType->name);
             }
         }
+
+        m_allParamTypeListCache = allParamTypeListCache;
     }
 
     return *m_allParamTypeListCache.data();

@@ -218,13 +218,13 @@ const QnParamList& QnResource::getResourceParamList() const
         }
         paramType->setDefVal(QVariant(mProperty.userType(), (void *)0));
         for (int j = 0; j < mObject->classInfoCount(); ++j) {
-            QMetaClassInfo mClassInfo = mObject->classInfo(j);
-            if (propertyName == mClassInfo.name())
-                paramType->description = QCoreApplication::translate("QnResource", mClassInfo.value());
-            else if (propertyName + "_group" == mClassInfo.name())
-                paramType->group = QString::fromLatin1(mClassInfo.value());
-            else if (propertyName + "_subgroup" == mClassInfo.name())
-                paramType->subgroup = QString::fromLatin1(mClassInfo.value());
+            QMetaClassInfo classInfo = mObject->classInfo(j);
+            if (propertyName == classInfo.name())
+                paramType->description = QCoreApplication::translate("QnResource", classInfo.value());
+            else if (propertyName + "_group" == classInfo.name())
+                paramType->group = QString::fromLatin1(classInfo.value());
+            else if (propertyName + "_subgroup" == classInfo.name())
+                paramType->subgroup = QString::fromLatin1(classInfo.value());
         }
 
         QnParam newParam(paramType, mProperty.read(this));
@@ -236,9 +236,11 @@ const QnParamList& QnResource::getResourceParamList() const
     {
         Q_ASSERT(resType);
 
-        foreach (const QnParamTypePtr &paramType, resType->paramTypeList()) 
+        const QList<QnParamTypePtr>& params = resType->paramTypeList();
+        //Q_ASSERT(params.size() != 0);
+        for (int i = 0; i < params.size(); ++i)
         {
-            QnParam newParam(paramType, paramType->default_value);
+            QnParam newParam(params[i], params[i]->default_value);
             resourceParamList.append(newParam);
         }
     }

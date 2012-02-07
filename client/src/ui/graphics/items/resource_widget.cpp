@@ -559,8 +559,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     /* Draw current time. */
     qint64 time = m_renderer->lastDisplayedTime(0);
-    if (time > 1000000ll * 3600 * 24)
+    if (time > 1000000ll * 3600 * 24) {
         drawCurrentTime(painter, rect(), time); /* Do not show time for regular media files. */
+        drawQualityText(painter, rect(), m_renderer->isLowQualityImage(0) ? "Low" : "Hi");
+    }
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -716,6 +718,23 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qi
         QnScopedPainterFontRollback fontRollback(painter, font);
         QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
         painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+2, text);
+    }
+}
+
+void QnResourceWidget::drawQualityText(QPainter *painter, const QRectF &rect, const QString& text)
+{
+    if (!text.isEmpty())
+    {
+        QFont font;
+        //font.setPixelSize(6);
+        font.setPointSizeF(550);
+        font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+        QFontMetrics metric(font);
+        QSize size = metric.size(Qt::TextSingleLine, text);
+
+        QnScopedPainterFontRollback fontRollback(painter, font);
+        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
+        painter->drawText(4, rect.height() - size.height()+2, text);
     }
 }
 

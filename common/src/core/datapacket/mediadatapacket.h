@@ -35,8 +35,13 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
                      MediaFlags_AfterEOF = 2,
                      MediaFlags_BOF = 4,
                      MediaFlags_LIVE = 8,
-                     //MediaFlags_SingleShot = 16,
-                     MediaFlags_Ignore = 16
+                     MediaFlags_Ignore = 16,
+                     
+                     MediaFlags_ReverseReordered = 32,
+                     MediaFlags_ReverseBlockStart = 64,
+                     MediaFlags_Reverse = 128,
+
+                     MediaFlags_LowQuality = 256,
                     };
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)
