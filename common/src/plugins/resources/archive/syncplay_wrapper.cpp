@@ -256,7 +256,8 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     QMutexLocker lock(&d->timeMutex);
 
-    reader->setNavDelegate(this);
+    if (d->enabled)
+        reader->setNavDelegate(this);
 
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     
