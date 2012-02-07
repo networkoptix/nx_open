@@ -558,6 +558,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
         widget->setPalette(palette);
     }
 
+#if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
     togglePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("pin.png")));
     togglePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("unpin.png")));
@@ -566,6 +567,7 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     togglePinButton->setPreferredSize(QSizeF(1000.0, 1000.0));
     connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
     widget->addButton(togglePinButton);
+#endif
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("close.png")));
