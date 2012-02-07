@@ -102,7 +102,7 @@ void QnTimePeriodReaderHelper::onLoadingFailed(int status, int handle)
 
 QnTimePeriodUpdaterPtr QnTimePeriodReaderHelper::createUpdater(QnResourcePtr resource)
 {
-    QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(qnResPool->getResourceById(resource->getParentId()));
+    QnVideoServerResourcePtr serverResource = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(resource->getParentId()));
     if (!serverResource)
         return QnTimePeriodUpdaterPtr();
     QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();

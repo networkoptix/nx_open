@@ -12,10 +12,12 @@
 
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/video_server.h>
 #include "ui/context_menu_helper.h"
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/dialogs/tagseditdialog.h"
 #include "ui/dialogs/camerasettingsdialog.h"
+#include "ui/dialogs/serversettingsdialog.h"
 #include "ui/models/resource_model.h"
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/style/skin.h"
@@ -346,7 +348,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *)
         }
         // ### handle layouts
 
-        if (CLDeviceSettingsDlgFactory::canCreateDlg(resource) && resource.dynamicCast<QnVirtualCameraResource>())
+        if ((CLDeviceSettingsDlgFactory::canCreateDlg(resource) && resource.dynamicCast<QnVirtualCameraResource>()) || resource.dynamicCast<QnVideoServerResource>())
             menu->addAction(&cm_settings);
     } else if (resources.size() > 1) {
         // ###
@@ -370,9 +372,17 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *)
         if (action == &cm_remove_from_disk) {
             QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
         } else if (action == &cm_settings) { // ### move to app-global scope ?
-            CameraSettingsDialog dialog(QApplication::activeWindow(), resource.dynamicCast<QnVirtualCameraResource>());
-            dialog.setWindowModality(Qt::ApplicationModal);
-            dialog.exec();
+            if (resource.dynamicCast<QnVirtualCameraResource>())
+            {
+                CameraSettingsDialog dialog(QApplication::activeWindow(), resource.dynamicCast<QnVirtualCameraResource>());
+                dialog.setWindowModality(Qt::ApplicationModal);
+                dialog.exec();
+            } else if (resource.dynamicCast<QnVideoServerResource>())
+            {
+                ServerSettingsDialog dialog(QApplication::activeWindow(), resource.dynamicCast<QnVideoServerResource>());
+                dialog.setWindowModality(Qt::ApplicationModal);
+                dialog.exec();
+            }
         } else if (action == &cm_editTags) { // ### move to app-global scope ?
             TagsEditDialog dialog(QStringList() << resource->getUniqueId(), QApplication::activeWindow());
             dialog.setWindowModality(Qt::ApplicationModal);

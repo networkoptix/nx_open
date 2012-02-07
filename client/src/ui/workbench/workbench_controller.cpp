@@ -367,7 +367,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 #endif
     m_randomGridAction                  = newAction(tr("Randomize grid"), tr(""),                   this);
     m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
-    m_cameraSettingsAction              = newAction(tr("Camera settings"),          tr(""),             this);
+    m_cameraSettingsAction              = newAction(tr("Settings"),          tr(""),             this);
     m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
 
     connect(m_showMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));

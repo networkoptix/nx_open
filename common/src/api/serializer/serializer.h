@@ -36,7 +36,7 @@ public:
 
     virtual void deserializeStorages(QnStorageList& storages, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
-    virtual void deserializeServers(QnVideoServerList& servers, const QByteArray& data) = 0;
+    virtual void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data) = 0;
     virtual void deserializeLayouts(QnLayoutDataList& layouts, const QByteArray& data) = 0;
     virtual void deserializeUsers(QnUserResourceList& users, const QByteArray& data) = 0;
     virtual void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
