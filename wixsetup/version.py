@@ -2,7 +2,7 @@ import os
 
 ORGANIZATION_NAME    = 'Network Optix'
 APPLICATION_NAME     = 'VMS'
-APPLICATION_VERSION  = '0.9.1'
+APPLICATION_VERSION  = '0.9.2'
 BUILD_NUMBER = os.getenv('BUILD_NUMBER', 'dev')
 
 def set_env():
