@@ -33,12 +33,8 @@ public:
         return m_titleVisible;
     }
 
-Q_SIGNALS:
-    void mainWindowClosed();
-
 protected:
     virtual bool event(QEvent *event) override;
-    virtual void closeEvent(QCloseEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
@@ -47,7 +43,7 @@ protected:
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
 
-protected Q_SLOTS:
+protected slots:
     void setTitleVisible(bool visible);
     void setFullScreen(bool fullScreen);
 

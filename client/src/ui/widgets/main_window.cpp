@@ -1,4 +1,4 @@
-#include "mainwnd.h"
+#include "main_window.h"
 
 #include <QtCore/QFile>
 
@@ -510,14 +510,6 @@ bool QnMainWindow::event(QEvent *event) {
         result |= m_dwm->widgetEvent(event);
 
     return result;
-}
-
-void QnMainWindow::closeEvent(QCloseEvent *event)
-{
-    base_type::closeEvent(event);
-
-    if (event->isAccepted())
-        Q_EMIT mainWindowClosed();
 }
 
 void QnMainWindow::changeEvent(QEvent *event) 
