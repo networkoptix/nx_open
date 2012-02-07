@@ -40,6 +40,7 @@ public:
 
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 
+    bool isLowQualityImage() const;
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata() const; 
 
@@ -101,6 +102,7 @@ private:
     int m_videoHeight;
     qint64 m_lastDisplayedTime;
     QnMetaDataV1Ptr m_lastDisplayedMetadata;
+    unsigned m_lastDisplayedFlags;
 };
 
 #endif //QN_GL_RENDERER_H

@@ -323,7 +323,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             payload  += 4; // deserialize timeStamp high part
 
             quint8 cseq = *payload++;
-            quint8 flags = *payload++;
+            quint16 flags = (payload[0]<<8) + payload[1];
+            payload += 2;
 
             if (dataType == QnAbstractMediaData::EMPTY_DATA)
             {

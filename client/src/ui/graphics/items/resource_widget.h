@@ -325,6 +325,8 @@ private:
 
     void drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time);
 
+    void drawQualityText(QPainter *painter, const QRectF &rect, const QString& text);
+
     void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion);
 
     void drawMotionMask(QPainter *painter, const QRectF& rect);

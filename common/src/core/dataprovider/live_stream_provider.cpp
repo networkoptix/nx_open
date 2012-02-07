@@ -177,7 +177,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     int newSecFps = qMin(5, maxFps - newFps);
 
-    Q_ASSERT(newSecFps>=0);
+    //Q_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and assert is appear
 
     setFps(qMax(1,newSecFps));
 }

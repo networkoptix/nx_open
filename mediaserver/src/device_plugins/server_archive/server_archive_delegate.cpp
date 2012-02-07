@@ -472,10 +472,13 @@ begin_label:
         }
 
     }
-    if (data && m_afterSeek)
+    if (data)
     {
-        data->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        if (m_afterSeek)
+            data->flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_afterSeek = false;
+        if (m_currentChunkCatalog == m_catalogLow)
+            data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
     }
     
     if (data && m_sendMotion) 

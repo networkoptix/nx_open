@@ -8,7 +8,7 @@
 
 class RTPSession;
 
-static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 7;
+static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
 

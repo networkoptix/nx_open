@@ -35,6 +35,8 @@ public:
 
     qint64 lastDisplayedTime(int channel) const;
 
+    qint64 isLowQualityImage(int channel) const;
+
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const;
 
 signals:

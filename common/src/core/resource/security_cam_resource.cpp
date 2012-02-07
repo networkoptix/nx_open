@@ -46,7 +46,7 @@ QString QnSecurityCamResource::oemName() const
 
 int QnSecurityCamResource::getMaxFps()
 {
-    if (hasSuchParam("MaxFPS"))
+    if (!hasSuchParam("MaxFPS"))
     {
         //Q_ASSERT(false);
         return 15;

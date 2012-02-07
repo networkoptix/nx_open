@@ -32,6 +32,10 @@ qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const {
     return m_channelRenderers[channel]->lastDisplayedTime();
 }
 
+qint64 QnResourceWidgetRenderer::isLowQualityImage(int channel) const { 
+    return m_channelRenderers[channel]->isLowQualityImage();
+}
+
 QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const 
 { 
     return m_channelRenderers[channel]->lastFrameMetadata();

@@ -163,11 +163,14 @@ void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 
 void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
+    //qDebug() << "realSleepTime=" << realSleepTime/1000.0;
+
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
     if (reader)
     {
-        if (realSleepTime < -500*1000) 
+        if (realSleepTime <= -500*1000) 
         {
+            m_delayedFrameCnt = qMax(0, m_delayedFrameCnt);
             m_delayedFrameCnt++;
             if (m_delayedFrameCnt > 10) {
                 reader->setQuality(MEDIA_Quality_Low, false);
@@ -175,9 +178,11 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
                 m_toLowQTimer.restart();
             }
         }
-        else {
-            m_delayedFrameCnt = 0;
-            if (realSleepTime > 10*1000)
+        else if (realSleepTime >= 1*1000)
+        {
+            m_delayedFrameCnt = qMin(0, m_delayedFrameCnt);
+            m_delayedFrameCnt--;
+            if (m_delayedFrameCnt < -5)
             {
                 if (qAbs(speed) < m_toLowQSpeed)
                     reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality again
@@ -622,7 +627,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     float speed = m_speed;
     bool speedIsNegative = speed < 0;
-    bool dataIsNegative = media->flags & AV_REVERSE_PACKET;
+    bool dataIsNegative = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
     if (speedIsNegative != dataIsNegative)
         return true; // skip data
 
@@ -652,7 +657,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     //else
     //    return true;
 
-    bool isReversePacket = media->flags & AV_REVERSE_PACKET;
+    bool isReversePacket = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
     bool isReverseMode = speed < 0.0;
     if (isReverseMode != isReversePacket)
         return true;
