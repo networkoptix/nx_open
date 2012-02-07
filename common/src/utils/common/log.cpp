@@ -1,17 +1,19 @@
+#include "log.h"
 #include <QTextStream>
 #include <QThread>
 #include <QDateTime>
 
-#include "log.h"
-
-CLLog cl_log;
+Q_GLOBAL_STATIC(CLLog, qn_logInstance);
 
 char *cl_log_msg[] = { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" };
 
 CLLog::CLLog():
-m_loglistner(0)
+    m_logListener(0)
 {
+}
 
+CLLog *CLLog::instance() {
+    return qn_logInstance();
 }
 
 bool CLLog::create(const QString& base_name,
@@ -37,9 +39,9 @@ void CLLog::setLogLevel(CLLogLevel loglevel)
     m_loglevel = loglevel;
 }
 
-void CLLog::setLoglistner(CLLogListner * loglistner)
+void CLLog::setLogListener(CLLogListener * loglistner)
 {
-    m_loglistner = loglistner;
+    m_logListener = loglistner;
 }
 
 void CLLog::log(const QString& msg, int val, CLLogLevel loglevel)
@@ -118,8 +120,8 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 
     QMutexLocker mutx(&m_mutex);
 
-    if (m_loglistner)
-        m_loglistner->onLogMsg(msg);
+    if (m_logListener)
+        m_logListener->onLogMsg(msg);
 
     if (!m_file.isOpen())
         return;
@@ -152,7 +154,7 @@ void CLLog::log(CLLogLevel loglevel, const char* format, ...)
     vsnprintf(buffer, MAX_MESSAGE_SIZE, format, args);
 #endif
 
-    cl_log.log(QString::fromLocal8Bit(buffer), loglevel);
+    log(QString::fromLocal8Bit(buffer), loglevel);
     va_end(args);
 }
 
