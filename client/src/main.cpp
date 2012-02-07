@@ -1,13 +1,8 @@
 //#include <vld.h>
 #include "eve_app.h"
 
-//#define CL_CUSOM_MAINWINDOW
-#ifdef CL_CUSOM_MAINWINDOW
-#include "ui/widgets/mainwindow.h"
-#endif
-
 #include "version.h"
-#include "ui/widgets/mainwnd.h"
+#include "ui/widgets/main_window.h"
 #include "settings.h"
 
 #include "decoders/video/ipp_h264_decoder.h"
@@ -19,7 +14,7 @@
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
-#include "plugins/resources/archive/avi_files/avi_device.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "client_util.h"
@@ -417,11 +412,7 @@ int main(int argc, char *argv[])
 
     initContextMenu();
 
-#ifdef CL_CUSOM_MAINWINDOW
-    MainWindow mainWindow(argc, argv);
-#else
-    MainWnd mainWindow(argc, argv);
-#endif
+    QnMainWindow mainWindow(argc, argv);
     mainWindow.setAttribute(Qt::WA_QuitOnClose);
     mainWindow.show();
 

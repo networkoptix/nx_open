@@ -9,8 +9,8 @@
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <plugins/resources/archive/avi_files/avi_dvd_device.h>
-#include <plugins/resources/archive/avi_files/avi_bluray_device.h>
+#include <plugins/resources/archive/avi_files/avi_dvd_resource.h>
+#include <plugins/resources/archive/avi_files/avi_bluray_resource.h>
 #include <plugins/resources/archive/avi_files/avi_dvd_archive_delegate.h>
 #include <plugins/resources/archive/filetypesupport.h>
 
@@ -18,7 +18,7 @@ QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
     QStringList acceptedFiles;
     foreach (const QString &path, files) {
-        if (CLAviDvdDevice::isAcceptedUrl(path)) {
+        if (QnAviDvdResource::isAcceptedUrl(path)) {
             if (path.indexOf(QLatin1Char('?')) == -1) {
                 /* Open all titles on a DVD. */
                 QStringList titles = QnAVIDvdArchiveDelegate::getTitleList(path);
@@ -27,7 +27,7 @@ QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
             } else {
                 acceptedFiles.append(path);
             }
-        } else if (CLAviBluRayDevice::isAcceptedUrl(path)) {
+        } else if (QnAviBlurayResource::isAcceptedUrl(path)) {
             acceptedFiles.append(path);
         } else {
             QFileInfo fileInfo(path);

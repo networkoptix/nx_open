@@ -79,8 +79,8 @@ void QnWorkbenchLayout::setName(const QString &name) {
     emit nameChanged();
 }
 
-bool QnWorkbenchLayout::load(const QnLayoutResource &layoutData) {
-    setName(layoutData.getName());
+bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &layoutData) {
+    setName(layoutData->getName());
 
     bool result = true;
 
@@ -89,7 +89,7 @@ bool QnWorkbenchLayout::load(const QnLayoutResource &layoutData) {
     foreach(QnWorkbenchItem *item, m_items)
         item->setPinned(false);
 
-    foreach(const QnLayoutItemData itemData, layoutData.getItems()) {
+    foreach(const QnLayoutItemData itemData, layoutData->getItems()) {
         QnId id = itemData.resourceId;
         QnResourcePtr resource = qnResPool->getResourceById(id);
         if(resource.isNull()) {
@@ -111,13 +111,13 @@ bool QnWorkbenchLayout::load(const QnLayoutResource &layoutData) {
     }
 
     /* Some items may have been removed. */
-    if(items().size() > layoutData.getItems().size()) {
+    if(items().size() > layoutData->getItems().size()) {
         QSet<QUuid> removed;
 
         foreach(QnWorkbenchItem *item, items())
             removed.insert(item->uuid());
 
-        foreach(const QnLayoutItemData &itemData, layoutData.getItems())
+        foreach(const QnLayoutItemData &itemData, layoutData->getItems())
             removed.remove(itemData.uuid);
 
         foreach(const QUuid &uuid, removed)
@@ -127,8 +127,8 @@ bool QnWorkbenchLayout::load(const QnLayoutResource &layoutData) {
     return result;
 }
 
-void QnWorkbenchLayout::save(QnLayoutResource &layoutData) const {
-    layoutData.setName(name());
+void QnWorkbenchLayout::save(const QnLayoutResourcePtr &layoutData) const {
+    layoutData->setName(name());
 
     QnLayoutItemDataList itemDatas;
     itemDatas.reserve(items().size());
@@ -149,7 +149,7 @@ void QnWorkbenchLayout::save(QnLayoutResource &layoutData) const {
         itemDatas.push_back(itemData);
     }
 
-    layoutData.setItems(itemDatas);
+    layoutData->setItems(itemDatas);
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {

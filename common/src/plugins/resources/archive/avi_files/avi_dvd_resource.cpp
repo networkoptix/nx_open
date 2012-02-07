@@ -1,24 +1,24 @@
-#include "avi_dvd_device.h"
+#include "avi_dvd_resource.h"
 #include "../archive_stream_reader.h"
 #include "avi_dvd_archive_delegate.h"
 
-CLAviDvdDevice::CLAviDvdDevice(const QString& file):
+QnAviDvdResource::QnAviDvdResource(const QString& file):
     QnAviResource(file)
 {
 }
 
-CLAviDvdDevice::~CLAviDvdDevice()
+QnAviDvdResource::~QnAviDvdResource()
 {
 }
 
-QnAbstractStreamDataProvider* CLAviDvdDevice::createDataProviderInternal(ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviDvdResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     result->setArchiveDelegate(new QnAVIDvdArchiveDelegate());
     return result;
 }
 
-bool CLAviDvdDevice::isAcceptedUrl(const QString& url)
+bool QnAviDvdResource::isAcceptedUrl(const QString& url)
 {
     QString sourceDir = url;
     int paramsPos = sourceDir.indexOf(QLatin1Char('?'));
@@ -51,7 +51,7 @@ bool CLAviDvdDevice::isAcceptedUrl(const QString& url)
     return videoTsFound && validNameFound && vobFound && ifoFound;
 }
 
-QString CLAviDvdDevice::urlToFirstVTS(const QString& url)
+QString QnAviDvdResource::urlToFirstVTS(const QString& url)
 {
     int titleNum = 1;
     int titlePos = url.indexOf('?');

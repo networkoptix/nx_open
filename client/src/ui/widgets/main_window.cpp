@@ -1,4 +1,4 @@
-#include "mainwnd.h"
+#include "main_window.h"
 
 #include <QtCore/QFile>
 
@@ -88,7 +88,7 @@ namespace {
 
 }
 
-MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
+QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
       m_controller(0),
       m_drawCustomFrame(false),
@@ -225,12 +225,12 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     updateDwmState();
 }
 
-MainWnd::~MainWnd()
+QnMainWindow::~QnMainWindow()
 {
     return;
 }
 
-void MainWnd::setTitleVisible(bool visible) 
+void QnMainWindow::setTitleVisible(bool visible) 
 {
     if(m_titleVisible == visible)
         return;
@@ -248,7 +248,7 @@ void MainWnd::setTitleVisible(bool visible)
     updateDwmState();
 }
 
-void MainWnd::setFullScreen(bool fullScreen) 
+void QnMainWindow::setFullScreen(bool fullScreen) 
 {
     if(fullScreen == isFullScreen())
         return;
@@ -260,24 +260,24 @@ void MainWnd::setFullScreen(bool fullScreen)
     }
 }
 
-void MainWnd::toggleFullScreen() 
+void QnMainWindow::toggleFullScreen() 
 {
     setFullScreen(!isFullScreen());
 }
 
-void MainWnd::toggleTitleVisibility() 
+void QnMainWindow::toggleTitleVisibility() 
 {
     setTitleVisible(!isTitleVisible());
 }
 
-void MainWnd::handleMessage(const QString &message)
+void QnMainWindow::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     m_controller->drop(files);
 }
 
-void MainWnd::showOpenFileDialog()
+void QnMainWindow::showOpenFileDialog()
 {
     QFileDialog dialog(this, tr("Open file"));
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
@@ -292,21 +292,21 @@ void MainWnd::showOpenFileDialog()
         m_controller->drop(dialog.selectedFiles());
 }
 
-void MainWnd::showAboutDialog()
+void QnMainWindow::showAboutDialog()
 {
     AboutDialog dialog(this);
     dialog.setWindowModality(Qt::ApplicationModal);
     dialog.exec();
 }
 
-void MainWnd::showPreferencesDialog()
+void QnMainWindow::showPreferencesDialog()
 {
     PreferencesDialog dialog(this);
     dialog.setWindowModality(Qt::ApplicationModal);
     dialog.exec();
 }
 
-void MainWnd::showAuthenticationDialog()
+void QnMainWindow::showAuthenticationDialog()
 {
     static LoginDialog *dialog = 0;
     if (dialog)
@@ -345,7 +345,7 @@ void MainWnd::showAuthenticationDialog()
     dialog = 0;
 }
 
-void MainWnd::updateFullScreenState() 
+void QnMainWindow::updateFullScreenState() 
 {
     bool fullScreen = isFullScreen();
 
@@ -356,7 +356,7 @@ void MainWnd::updateFullScreenState()
     updateDwmState();
 }
 
-void MainWnd::updateDwmState()
+void QnMainWindow::updateDwmState()
 {
     if(!m_dwm->isSupported()) {
         m_drawCustomFrame = false;
@@ -472,7 +472,7 @@ void MainWnd::updateDwmState()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void MainWnd::at_sessionManager_error(int error)
+void QnMainWindow::at_sessionManager_error(int error)
 {
     switch (error) {
     case QNetworkReply::ConnectionRefusedError:
@@ -491,19 +491,19 @@ void MainWnd::at_sessionManager_error(int error)
     }
 }
 
-void MainWnd::at_newLayoutRequested()
+void QnMainWindow::at_newLayoutRequested()
 {
     m_tabBar->addTab(QString());
     m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
 }
 
-void MainWnd::at_treeWidget_activated(uint resourceId)
+void QnMainWindow::at_treeWidget_activated(uint resourceId)
 {
     QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
     m_controller->drop(resource);
 }
 
-bool MainWnd::event(QEvent *event) {
+bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
     if(m_dwm != NULL)
@@ -512,15 +512,7 @@ bool MainWnd::event(QEvent *event) {
     return result;
 }
 
-void MainWnd::closeEvent(QCloseEvent *event)
-{
-    base_type::closeEvent(event);
-
-    if (event->isAccepted())
-        Q_EMIT mainWindowClosed();
-}
-
-void MainWnd::changeEvent(QEvent *event) 
+void QnMainWindow::changeEvent(QEvent *event) 
 {
     if(event->type() == QEvent::WindowStateChange)
         updateFullScreenState();
@@ -528,7 +520,7 @@ void MainWnd::changeEvent(QEvent *event)
     base_type::changeEvent(event);
 }
 
-void MainWnd::paintEvent(QPaintEvent *event) 
+void QnMainWindow::paintEvent(QPaintEvent *event) 
 {
     base_type::paintEvent(event);
 
@@ -546,7 +538,7 @@ void MainWnd::paintEvent(QPaintEvent *event)
     }
 }
 
-void MainWnd::resizeEvent(QResizeEvent *event) {
+void QnMainWindow::resizeEvent(QResizeEvent *event) {
     QRect rect = this->rect();
     QRect viewGeometry = m_view->geometry();
 
@@ -561,7 +553,7 @@ void MainWnd::resizeEvent(QResizeEvent *event) {
 }
 
 #ifdef Q_OS_WIN
-bool MainWnd::winEvent(MSG *message, long *result)
+bool QnMainWindow::winEvent(MSG *message, long *result)
 {
     if(m_dwm->widgetWinEvent(message, result))
         return true;

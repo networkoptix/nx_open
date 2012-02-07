@@ -221,6 +221,8 @@ void QnLayoutTabBar::at_tabCloseRequested(int index) {
 }
 
 void QnLayoutTabBar::at_currentChanged(int index) {
+    Q_UNUSED(index);
+
     if(m_layouts.size() != count())
         return; /* Was called from add/remove function before our handler was able to sync, current layout will be updated later. */
 

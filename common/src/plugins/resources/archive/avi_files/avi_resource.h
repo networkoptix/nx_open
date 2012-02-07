@@ -1,5 +1,5 @@
-#ifndef avi_device_h_1827
-#define avi_device_h_1827
+#ifndef QN_AVI_RESOURCE_H
+#define QN_AVI_RESOURCE_H
 
 #include "../abstract_archive_resource.h"
 
@@ -26,4 +26,4 @@ public:
 
 typedef QSharedPointer<QnAviResource> QnAviResourcePtr;
 
-#endif //avi_device_h_1827
+#endif // QN_AVI_RESOURCE_H
