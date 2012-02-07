@@ -67,7 +67,10 @@ void PlDlinkStreamReader::openStream()
     }
 
 
-    QString url = (getRole() == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[1] : info.videoProfileUrls[1];
+    QString url = (getRole() == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
+
+    if (url.length() > 1 && url.at(0)=='/')
+        url = url.mid(1);
 
     mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
     mHttpClient->doGET(url);
@@ -90,10 +93,10 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
         return QnAbstractMediaDataPtr(0);
 
     if (m_h264)
-        return getNextDataH264();
+        return getNextDataMPEG(CODEC_ID_H264);
 
     if (m_mpeg4)
-        return getNextDataMPEG4();
+        return getNextDataMPEG(CODEC_ID_MPEG4);
 
     return getNextDataMJPEG();
 
@@ -169,13 +172,15 @@ QString PlDlinkStreamReader::composeVideoProfile()
     m_mpeg4 = false;
     m_h264 = false;
 
-    if (info.hasH264!="" && false)
+    bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains("sdp");
+
+    if (info.hasH264!="" && !hasSdp)
     {
         t << info.hasH264 << "&";
         m_h264 = true;
         
     }
-    else if (info.hasMPEG4 && false)
+    else if (info.hasMPEG4 && !hasSdp)
     {
         t << "MPEG4&";
         m_mpeg4 = true;
@@ -228,16 +233,54 @@ QString PlDlinkStreamReader::composeVideoProfile()
     return result;
 }
 
-
-QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataH264()
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 {
-    return QnAbstractMediaDataPtr(0);
+    char headerBuffer[sizeof(ACS_VideoHeader)];
+    int gotInBuffer = 0;
+    while (gotInBuffer < sizeof(ACS_VideoHeader))
+    {
+        int readed = mHttpClient->read(headerBuffer + gotInBuffer, sizeof(ACS_VideoHeader) - gotInBuffer);
+
+        if (readed < 1)
+            return QnAbstractMediaDataPtr(0);
+
+        gotInBuffer += readed;
+    }
+
+    ACS_VideoHeader *vh = (ACS_VideoHeader*)(headerBuffer);
+
+    int dataLeft = qMin(vh->ulDataLength, (quint32)1024*1024*10); // to avoid crash
+
+
+    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));
+    char* curPtr = videoData->data.data();
+    videoData->data.prepareToWrite(dataLeft); // this call does nothing 
+    videoData->data.done(dataLeft);
+
+    while (dataLeft > 0)
+    {
+        int readed = mHttpClient->read(curPtr, dataLeft);
+        if (readed < 1)
+            return QnAbstractMediaDataPtr(0);
+        curPtr += readed;
+        dataLeft -= readed;
+    }
+
+
+    videoData->compressionType = ci;
+    videoData->width = vh->usWidth;
+    videoData->height = vh->usWidth;
+
+    if (vh->usCodingType==0)
+        videoData->flags |= AV_PKT_FLAG_KEY;
+
+    videoData->channelNumber = 0;
+    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+
+    return videoData;
+
 }
 
-QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG4()
-{
-    return QnAbstractMediaDataPtr(0);
-}
 
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 {

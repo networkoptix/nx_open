@@ -27,8 +27,7 @@ protected:
 
 private:
 
-    QnAbstractMediaDataPtr getNextDataH264();
-    QnAbstractMediaDataPtr getNextDataMPEG4();
+    QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
     QnAbstractMediaDataPtr getNextDataMJPEG();
 
 private:
