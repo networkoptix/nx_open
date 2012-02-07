@@ -2,7 +2,7 @@
 #define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 
 #include <QObject>
-#include <core/resource/user.h>
+#include <core/resource/user_resource.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -32,20 +32,20 @@ protected:
     void initUserWorkbench();
     void deinitUserWorkbench();
 
-    QnWorkbenchLayout *layout(const QnLayoutDataPtr &resource) {
+    QnWorkbenchLayout *layout(const QnLayoutResourcePtr &resource) {
         return m_layoutByResource.value(resource, NULL);
     }
 
-    QnLayoutDataPtr resource(QnWorkbenchLayout *layout) {
-        return m_resourceByLayout.value(layout, QnLayoutDataPtr());
+    QnLayoutResourcePtr resource(QnWorkbenchLayout *layout) {
+        return m_resourceByLayout.value(layout, QnLayoutResourcePtr());
     }
 
-    void addLayoutResource(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource);
-    void removeLayoutResource(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource);
+    void addLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
+    void removeLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
 
 protected slots:
-    void updateLayout(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource);
-    void submitLayout(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource);
+    void updateLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
+    void submitLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
 
     void at_user_resourceChanged();
     void at_layout_resourceChanged();
@@ -66,8 +66,8 @@ private:
     /** Whether changes should be propagated from resources to workbench. */
     bool m_update;
 
-    QHash<QnWorkbenchLayout *, QnLayoutDataPtr> m_resourceByLayout;
-    QHash<QnLayoutDataPtr, QnWorkbenchLayout *> m_layoutByResource;
+    QHash<QnWorkbenchLayout *, QnLayoutResourcePtr> m_resourceByLayout;
+    QHash<QnLayoutResourcePtr, QnWorkbenchLayout *> m_layoutByResource;
 };
 
 #endif // QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H

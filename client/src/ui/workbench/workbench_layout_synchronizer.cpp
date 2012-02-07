@@ -41,7 +41,7 @@ void QnWorkbenchLayoutSynchronizer::setUser(const QnUserResourcePtr &user) {
         initUserWorkbench();
 }
 
-void QnWorkbenchLayoutSynchronizer::addLayoutResource(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource) {
+void QnWorkbenchLayoutSynchronizer::addLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
     assert(layout != NULL && !resource.isNull());
     assert(!m_resourceByLayout.contains(layout));
     assert(!m_layoutByResource.contains(resource));
@@ -55,7 +55,7 @@ void QnWorkbenchLayoutSynchronizer::addLayoutResource(QnWorkbenchLayout *layout,
     connect(resource.data(),    SIGNAL(resourceChanged()),                  this, SLOT(at_layout_resourceChanged()));
 }
 
-void QnWorkbenchLayoutSynchronizer::removeLayoutResource(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource) {
+void QnWorkbenchLayoutSynchronizer::removeLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
     assert(layout != NULL && !resource.isNull());
     assert(m_resourceByLayout.contains(layout));
     assert(m_layoutByResource.contains(resource));
@@ -89,7 +89,7 @@ void QnWorkbenchLayoutSynchronizer::at_user_resourceChanged() {
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
 
-    QSet<QnLayoutDataPtr> resources = m_user->getLayouts().toSet();
+    QSet<QnLayoutResourcePtr> resources = m_user->getLayouts().toSet();
 
     /* New layouts may have been added, but these are not on the workbench, 
      * so we don't need to do anything about them. 
@@ -97,7 +97,7 @@ void QnWorkbenchLayoutSynchronizer::at_user_resourceChanged() {
      * Layouts may have been removed, and in this case we need to remove them
      * from the workbench too. */
     foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutDataPtr resource = this->resource(layout);
+        QnLayoutResourcePtr resource = this->resource(layout);
 
         if(!resources.contains(resource))
             delete layout;
@@ -119,9 +119,9 @@ void QnWorkbenchLayoutSynchronizer::at_workbench_layoutsChanged() {
      * New layout may have been added, and in this case we need to create a new'
      * resource for it. */
     foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutDataPtr resource = this->resource(layout);
+        QnLayoutResourcePtr resource = this->resource(layout);
         if(resource.isNull()) {
-            QnLayoutDataPtr resource(new QnLayoutData());
+            resource = QnLayoutResourcePtr(new QnLayoutResource());
             qnResPool->addResource(resource);
 
             m_user->addLayout(resource);
@@ -136,7 +136,7 @@ void QnWorkbenchLayoutSynchronizer::at_workbench_layoutsChanged() {
 // -------------------------------------------------------------------------- //
 // Layout handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutSynchronizer::updateLayout(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource) {
+void QnWorkbenchLayoutSynchronizer::updateLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
     if(!m_update)
         return;
 
@@ -144,7 +144,7 @@ void QnWorkbenchLayoutSynchronizer::updateLayout(QnWorkbenchLayout *layout, cons
     layout->load(resource);
 }
 
-void QnWorkbenchLayoutSynchronizer::submitLayout(QnWorkbenchLayout *layout, const QnLayoutDataPtr &resource) {
+void QnWorkbenchLayoutSynchronizer::submitLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
     if(!m_submit)
         return;
 

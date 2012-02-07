@@ -21,6 +21,4 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 };
 
-typedef QSharedPointer<QnLocalFileResource> QnLocalFileResourcePtr;
-
 #endif // QN_LOCAL_FILE_RESOURCE_H

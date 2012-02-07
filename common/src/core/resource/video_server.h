@@ -3,27 +3,28 @@
 
 #include <QSharedPointer>
 #include "core/resource/resource.h"
+#include "core/resource/storage.h"
 #include "api/VideoServerConnection.h"
 
-class QnLocalVideoServer : public QnResource
+class QnLocalVideoServerResource : public QnResource
 {
     Q_OBJECT
 
 public:
-    QnLocalVideoServer();
+    QnLocalVideoServerResource();
 
     virtual QString getUniqueId() const;
 };
 
 
-class QnVideoServer : public QnResource
+class QnVideoServerResource : public QnResource
 {
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
 public:
-    QnVideoServer();
-    virtual ~QnVideoServer();
+    QnVideoServerResource();
+    virtual ~QnVideoServerResource();
 
     virtual QString getUniqueId() const;
 
@@ -35,20 +36,24 @@ public:
     void setGuid(const QString& guid);
     QString getGuid() const;
 
+    QnStorageList getStorages() const;
+    void setStorages(const QnStorageList& storages);
+
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
     QString m_guid;
+    QnStorageList m_storages;
 };
 
 
-class QnVideoServerFactory : public QnResourceFactory
+class QnVideoServerResourceFactory : public QnResourceFactory
 {
 public:
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 };
 
-typedef QSharedPointer<QnVideoServer> QnVideoServerPtr;
-typedef QList<QnVideoServerPtr> QnVideoServerList;
+typedef QSharedPointer<QnVideoServerResource> QnVideoServerResourcePtr;
+typedef QList<QnVideoServerResourcePtr> QnVideoServerResourceList;
 
 #endif // __VIDEO_SERVER_H

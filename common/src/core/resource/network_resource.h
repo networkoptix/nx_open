@@ -1,14 +1,10 @@
-#ifndef network_device_h_1249
-#define network_device_h_1249
+#ifndef QN_NETWORK_RESOURCE_H
+#define QN_NETWORK_RESOURCE_H
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 #include "utils/network/mac_address.h"
 #include "resource.h"
-
-class QnNetworkResource;
-typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
-typedef QList<QnNetworkResourcePtr> QnNetworkResourceList;
 
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
@@ -101,4 +97,4 @@ private:
     unsigned int m_networkTimeout;
 };
 
-#endif // network_device_h_1249
+#endif // QN_NETWORK_RESOURCE_H

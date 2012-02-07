@@ -1,11 +1,10 @@
-#ifndef _LAYOUT_DATA_H_
-#define _LAYOUT_DATA_H_
+#ifndef QN_LAYOUT_RESOURCE_H
+#define QN_LAYOUT_RESOURCE_H
 
 #include <QSharedPointer>
 #include <QRectF>
 #include <QUuid>
-#include "utils/common/qnid.h"
-#include "core/resource/resource.h"
+#include "resource.h"
 
 class QnLayoutItemData
 {
@@ -19,14 +18,14 @@ public:
 
 typedef QList<QnLayoutItemData> QnLayoutItemDataList;
 
-class QnLayoutData : public QnResource
+class QnLayoutResource : public QnResource
 {
     Q_OBJECT;
 
     typedef QnResource base_type;
 
 public:
-    QnLayoutData();
+    QnLayoutResource();
 
     virtual QString getUniqueId() const override;
 
@@ -44,7 +43,4 @@ private:
     QList<QnLayoutItemData> m_items;
 };
 
-typedef QSharedPointer<QnLayoutData> QnLayoutDataPtr;
-typedef QList<QnLayoutDataPtr> QnLayoutDataList;
-
-#endif // _LAYOUT_DATA_H_
+#endif // QN_LAYOUT_RESOURCE_H

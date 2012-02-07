@@ -161,6 +161,7 @@ RESOURCES += ../build/skin.qrc
 FORMS += ui/preferences/connectionssettingswidget.ui ui/preferences/licensewidget.ui \
          ui/preferences/preferences.ui ui/preferences/recordingsettingswidget.ui \
          ui/dialogs/logindialog.ui ui/dialogs/tagseditdialog.ui ui/dialogs/camerasettingsdialog.ui \
+         ui/dialogs/serversettingsdialog.ui \
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui \
          ui/device_settings/camera_schedule.ui ui/dialogs/connectiontestingdialog.ui
 

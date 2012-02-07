@@ -46,7 +46,12 @@ void PlDlinkStreamReader::openStream()
 
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-    
+
+    if (!res->getCamInfo().inited())
+    {
+        res->updateCamInfo();
+    }
+
     QString prifileStr = composeVideoProfile();
 
     QByteArray cam_info_file = downloadFile(prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth());

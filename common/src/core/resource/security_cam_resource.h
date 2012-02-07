@@ -65,9 +65,6 @@ private:
     QnScheduleTaskList m_scheduleTasks;
 };
 
-typedef QSharedPointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
-typedef QList<QnSecurityCamResourcePtr> QnSecurityCamResourceList;
-
 Q_DECLARE_METATYPE(QRegion)
 
 #endif //sequrity_cam_resource_h_1239

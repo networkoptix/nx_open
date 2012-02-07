@@ -5,7 +5,7 @@
 #include <QSet>
 #include <QHash>
 #include <core/resource/resource.h>
-#include <core/resource/layout_data.h>
+#include <core/resource/layout_resource.h>
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <utils/common/hash.h> /* For qHash(const QUuid &). */
@@ -53,12 +53,12 @@ public:
      * \param layoutData                Data to load layout from.
      * \returns                         Whether there were no errors during loading.
      */
-    bool load(const QnLayoutDataPtr &layoutData);
+    bool load(const QnLayoutResourcePtr &layoutData);
 
     /**
      * \param[out] layoutData           Data to save layout to.
      */
-    void save(const QnLayoutDataPtr &layoutData) const; 
+    void save(const QnLayoutResourcePtr &layoutData) const; 
 
     /**
      * \param item                      Item to check.

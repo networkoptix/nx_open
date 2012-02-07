@@ -8,7 +8,7 @@
 
 enum CLLogLevel {cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
 
-struct CLLogListner
+struct CLLogListener
 {
     virtual void onLogMsg(const QString& msg)  = 0;
 };
@@ -28,7 +28,7 @@ public:
         return m_loglevel;
     }
 
-    void setLoglistner(CLLogListner* loglistner);
+    void setLogListener(CLLogListener* loglistner);
 
     void log(const QString& msg, CLLogLevel loglevel);
     void log(const QString& msg, int val, CLLogLevel loglevel);
@@ -39,8 +39,9 @@ public:
     void log(const QString& msg1, int val, const QString& msg2, int val2, CLLogLevel loglevel);
     void log(CLLogLevel loglevel, const char* format, ...);
 
-private:
+    static CLLog *instance();
 
+private:
     void openNextFile();
     QString backupFileName(quint8 num) const;
     QString currFileName() const;
@@ -53,16 +54,16 @@ private:
 
     QFile m_file;
 
-    CLLogListner *m_loglistner;
+    CLLogListener *m_logListener;
 
     QMutex m_mutex;
 };
 
-QN_EXPORT extern CLLog cl_log;
-
-#define CL_LOG(level)\
-    if (level > cl_log.getLoglevel());\
+#define CL_LOG(level)                                                           \
+    if (level > cl_log.getLoglevel()) {}                                        \
     else
+
+#define cl_log (*CLLog::instance())
 
 QN_EXPORT void clLogMsgHandler(QtMsgType type, const char *msg);
 

@@ -1,7 +1,7 @@
-#include "storage.h"
+#include "storage_resource.h"
 #include "utils/common/util.h"
 
-QnStorage::QnStorage():
+QnStorageResource::QnStorageResource():
     QnResource(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
@@ -10,47 +10,47 @@ QnStorage::QnStorage():
     setStatus(Offline);
 }
 
-QnStorage::~QnStorage()
+QnStorageResource::~QnStorageResource()
 {
 
 }
 
-void QnStorage::setSpaceLimit(qint64 value)
+void QnStorageResource::setSpaceLimit(qint64 value)
 {
     m_spaceLimit = value;
 }
 
-qint64 QnStorage::getSpaceLimit() const
+qint64 QnStorageResource::getSpaceLimit() const
 {
     return m_spaceLimit;
 }
 
-void QnStorage::setMaxStoreTime(int timeInSeconds)
+void QnStorageResource::setMaxStoreTime(int timeInSeconds)
 {
     m_maxStoreTime = timeInSeconds;
 }
 
-int QnStorage::getMaxStoreTime() const
+int QnStorageResource::getMaxStoreTime() const
 {
     return m_maxStoreTime;
 }
 
-QString QnStorage::getUniqueId() const
+QString QnStorageResource::getUniqueId() const
 {
     return QString("storage://") + getUrl();
 }
 
-void QnStorage::setIndex(quint16 value)
+void QnStorageResource::setIndex(quint16 value)
 {
     m_index = value;
 }
 
-quint16 QnStorage::getIndex() const
+quint16 QnStorageResource::getIndex() const
 {
     return m_index;
 }
 
-void QnStorage::setUrl(const QString& value)
+void QnStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
     QString tmpDir = closeDirPath(value) + QString("tmp") + QString::number(rand());

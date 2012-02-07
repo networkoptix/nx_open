@@ -1,27 +1,21 @@
 #ifndef QN_RESOURCE_H
 #define QN_RESOURCE_H
 
-#include <QtCore/QDateTime>
-#include <QtCore/QMap>
-#include <QtCore/QMetaType>
-#include <QtCore/QSet>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QStringList>
-
+#include <QDateTime>
+#include <QMap>
+#include <QMetaType>
+#include <QSet>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QReadWriteLock>
+#include "utils/common/qnid.h"
+#include "core/datapacket/datapacket.h"
+#include "resource_fwd.h"
 #include "param.h"
 #include "resource_type.h"
-#include "utils/common/qnid.h"
-#include "../datapacket/datapacket.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
-
-// this class and inherited must be very light to create
-class QnResource;
-typedef QSharedPointer<QnResource> QnResourcePtr;
-typedef QList<QnResourcePtr> QnResourceList;
-typedef QMap<QString, QnResourcePtr> QnResourceMap;
 
 enum QN_EXPORT QnDomain
 {
