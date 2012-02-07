@@ -1,24 +1,24 @@
-#include "avi_bluray_device.h"
+#include "avi_bluray_resource.h"
 #include "avi_bluray_archive_delegate.h"
 #include "../archive_stream_reader.h"
 
-CLAviBluRayDevice::CLAviBluRayDevice(const QString& file):
+QnAviBlurayResource::QnAviBlurayResource(const QString& file):
     QnAviResource(file)
 {
 }
 
-CLAviBluRayDevice::~CLAviBluRayDevice()
+QnAviBlurayResource::~QnAviBlurayResource()
 {
 }
 
-QnAbstractStreamDataProvider* CLAviBluRayDevice::createDataProviderInternal(ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviBlurayResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     result->setArchiveDelegate(new QnAVIBlurayArchiveDelegate());
     return result;
 }
 
-bool CLAviBluRayDevice::isAcceptedUrl(const QString& url)
+bool QnAviBlurayResource::isAcceptedUrl(const QString& url)
 {
     QDir sourceDir = url;
     QFileInfoList rootDirList = sourceDir.entryInfoList();

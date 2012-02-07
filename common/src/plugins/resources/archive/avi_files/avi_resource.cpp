@@ -1,4 +1,4 @@
-#include "avi_device.h"
+#include "avi_resource.h"
 #include "avi_archive_delegate.h"
 #include "../archive_stream_reader.h"
 

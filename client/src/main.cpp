@@ -19,7 +19,7 @@
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
-#include "plugins/resources/archive/avi_files/avi_device.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "client_util.h"

@@ -2,7 +2,7 @@
 #include <QFileInfo>
 
 #include "avi_dvd_archive_delegate.h"
-#include "avi_dvd_device.h"
+#include "avi_dvd_resource.h"
 #include "utils/media/dvd_reader/dvd_udf.h"
 #include "utils/media/dvd_reader/ifo_read.h"
 #include "utils/media/dvd_decrypt/dvdcss.h"

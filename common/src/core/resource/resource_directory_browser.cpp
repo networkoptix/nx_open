@@ -6,8 +6,8 @@
 
 #include "core/resource/local_file_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "plugins/resources/archive/avi_files/avi_dvd_device.h"
-#include "plugins/resources/archive/avi_files/avi_bluray_device.h"
+#include "plugins/resources/archive/avi_files/avi_dvd_resource.h"
+#include "plugins/resources/archive/avi_files/avi_bluray_resource.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
 namespace {
@@ -140,10 +140,10 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
 {
     //if (FileTypeSupport::isImageFileExt(xfile))
     //    return QnResourcePtr(new QnLocalFileResource(xfile));
-    if (CLAviDvdDevice::isAcceptedUrl(xfile))
-        return QnResourcePtr(new CLAviDvdDevice(xfile));
-    if (CLAviBluRayDevice::isAcceptedUrl(xfile))
-        return QnResourcePtr(new CLAviBluRayDevice(xfile));
+    if (QnAviDvdResource::isAcceptedUrl(xfile))
+        return QnResourcePtr(new QnAviDvdResource(xfile));
+    if (QnAviBlurayResource::isAcceptedUrl(xfile))
+        return QnResourcePtr(new QnAviBlurayResource(xfile));
     if (FileTypeSupport::isMovieFileExt(xfile))
         return QnResourcePtr(new QnAviResource(xfile));
 
