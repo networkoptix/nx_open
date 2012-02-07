@@ -432,6 +432,8 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         m_timeSlider->setScalingFactor(0);
     }
 
+    m_syncButton->setEnabled(camera != 0);
+
     emit actualCameraChanged(m_camera);
 }
 
@@ -1047,6 +1049,11 @@ void NavigationItem::at_liveButton_clicked(bool checked)
 
 void NavigationItem::onSyncButtonToggled(bool value)
 {
+    if (!m_camera) {
+        qnWarning("Actual camera is NULL, expect troubles.");
+        return;
+    }
+        
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     qint64 currentTime = m_camera->getCurrentTime();
     if (reader->isRealTimeSource())
