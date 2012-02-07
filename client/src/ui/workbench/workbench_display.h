@@ -320,6 +320,7 @@ protected slots:
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_modeChanged();
     void at_workbench_itemChanged(QnWorkbench::ItemRole role);
+    void at_workbench_currentLayoutChanged();
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();

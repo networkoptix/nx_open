@@ -165,8 +165,8 @@ QnResourceTreeWidget::~QnResourceTreeWidget()
 void QnResourceTreeWidget::setWorkbenchController(QnWorkbenchController *controller)
 {
     if (m_controller) {
-        disconnect(m_controller->workbench(), SIGNAL(layoutAboutToBeChanged()), this, SLOT(workbenchLayoutAboutToBeChanged()));
-        disconnect(m_controller->workbench(), SIGNAL(layoutChanged()), this, SLOT(workbenchLayoutChanged()));
+        disconnect(m_controller->workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(workbenchLayoutAboutToBeChanged()));
+        disconnect(m_controller->workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(workbenchLayoutChanged()));
     }
 
     workbenchLayoutAboutToBeChanged();
@@ -175,8 +175,8 @@ void QnResourceTreeWidget::setWorkbenchController(QnWorkbenchController *control
     workbenchLayoutChanged();
 
     if (m_controller) {
-        connect(m_controller->workbench(), SIGNAL(layoutAboutToBeChanged()), this, SLOT(workbenchLayoutAboutToBeChanged()));
-        connect(m_controller->workbench(), SIGNAL(layoutChanged()), this, SLOT(workbenchLayoutChanged()));
+        connect(m_controller->workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(workbenchLayoutAboutToBeChanged()));
+        connect(m_controller->workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(workbenchLayoutChanged()));
     }
 }
 

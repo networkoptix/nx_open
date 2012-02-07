@@ -236,7 +236,7 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     /* Deinit workbench. */
     disconnect(m_workbench, NULL, this, NULL);
 
-    foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
+    foreach(QnWorkbenchItem *item, m_workbench->currentLayout()->items())
         removeItemInternal(item, true, false);
 
     for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
@@ -287,6 +287,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
+    connect(m_workbench,            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
 
     /* Connect to grid mapper. */
     QnWorkbenchGridMapper *mapper = m_workbench->mapper();
@@ -295,7 +296,7 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     connect(mapper,                 SIGNAL(spacingChanged()),                       this,                   SLOT(at_mapper_spacingChanged()));
 
     /* Create items. */
-    foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
+    foreach(QnWorkbenchItem *item, m_workbench->currentLayout()->items())
         addItemInternal(item);
 
     /* Fire signals if needed. */
@@ -721,7 +722,7 @@ QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
 }
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
-    QRect layoutBoundingRect = m_workbench->layout()->boundingRect();
+    QRect layoutBoundingRect = m_workbench->currentLayout()->boundingRect();
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
@@ -1076,6 +1077,10 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
     changeItem(role, m_workbench->item(role));
+}
+
+void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
+    fitInView(false);
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

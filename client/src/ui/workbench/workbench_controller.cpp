@@ -409,7 +409,7 @@ QnWorkbench *QnWorkbenchController::workbench() const {
 }
 
 QnWorkbenchLayout *QnWorkbenchController::layout() const {
-    return m_display->workbench()->layout();
+    return m_display->workbench()->currentLayout();
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -487,7 +487,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     }
 
     /* Pin the item. */
-    AspectRatioMagnitudeCalculator metric(gridPos, size, workbench()->layout()->boundingRect(), aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
+    AspectRatioMagnitudeCalculator metric(gridPos, size, workbench()->currentLayout()->boundingRect(), aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
     QRect geometry = layout()->closestFreeSlot(gridPos, size, &metric);
     layout()->pinItem(item, geometry);
 
@@ -782,7 +782,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
     QRect newResizingWidgetRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
-        workbench()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
+        workbench()->currentLayout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
 
         m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
         m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);

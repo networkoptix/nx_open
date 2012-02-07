@@ -67,8 +67,6 @@ protected Q_SLOTS:
     void updateDwmState();
 
     void at_newLayoutRequested();
-    void at_tabBar_layoutRemoved(QnWorkbenchLayout *layout);
-    void at_tabBar_currentChanged(QnWorkbenchLayout *layout);
     void at_treeWidget_activated(uint resourceId);
 
 
@@ -82,7 +80,6 @@ private:
     QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;
 
-    QBoxLayout *m_tabBarLayout;
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;

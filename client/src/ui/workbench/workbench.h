@@ -20,7 +20,8 @@ class QnWorkbenchItem;
  * Workbench state consists of:
  * <ul>
  * <li>Mode that determines which actions are allowed for workbench users.</>
- * <li>A layout that defines how items are placed.</li>
+ * <li>A list of layouts that are currently loaded.</li>
+ * <li>Current layout that defines how items are placed.</li>
  * <li>A grid mapper that maps integer layout coordinates into floating-point
  *     surface coordinates.</li>
  * <li>Currently raised item - an item that is enlarged and is shown on top of other items.</li>
@@ -66,18 +67,55 @@ public:
      *
      * \returns                         Layout of this workbench.
      */
-    QnWorkbenchLayout *layout() const {
-        return m_layout;
+    QnWorkbenchLayout *currentLayout() const {
+        return m_currentLayout;
     }
 
     /**
+     * \returns                         All layouts of this workbench. May be empty. 
+     */
+    const QList<QnWorkbenchLayout *> &layouts() const {
+        return m_layouts;
+    }
+
+    /**
+     * \param layout                    Layout to add to this workbench. 
+     */
+    void addLayout(QnWorkbenchLayout *layout);
+
+    /**
+     * \param layout                    Layout to insert into the list of this workbench's layouts.
+     * \param index                     Position to insert at.
+     */
+    void insertLayout(QnWorkbenchLayout *layout, int index);
+
+    /**
+     * \param layout                    Layout to remove from the list of this workbench's layouts.
+     */
+    void removeLayout(QnWorkbenchLayout *layout);
+
+    /**
+     * \param layout                    Layout to move to a new position in the list of this workbench's layouts.
+     * \param index                     New position for the given layout.
+     */
+    void moveLayout(QnWorkbenchLayout *layout, int index);
+
+    /**
+     * \param layout                    Layout to find in the list of this workbench's layouts.
+     * \returns                         Index of the given layout in the list of this workbench's layouts, or -1 if it is not there.
+     */
+    int layoutIndex(QnWorkbenchLayout *layout);
+
+    /**
      * Note that workbench does not take ownership of the supplied layout.
+     * If supplied layout is not in this workbench's layout list, 
+     * it will be added to it.
      *
      * \param layout                    New layout for this workbench. If NULL
      *                                  is specified, a new empty layout owned by
      *                                  this workbench will be used.
      */
-    void setLayout(QnWorkbenchLayout *layout);
+    void setCurrentLayout(QnWorkbenchLayout *layout);
 
     /**
      * \returns                         Grid mapper for this workbench.
@@ -125,17 +163,22 @@ Q_SIGNALS:
     /**
      * This signal is emitted whenever the layout of this workbench is about to be changed.
      */
-    void layoutAboutToBeChanged();
+    void currentLayoutAboutToBeChanged();
 
     /**
      * This signal is emitted whenever the layout of this workbench changes.
      *
-     * In most cases there is be no need to listen to this signal as
+     * In most cases there is no need to listen to this signal as
      * workbench emits <tt>itemRemoved</tt> signal for each of the
      * old layout items and <tt>itemAdded</tt> for each of the new
      * layout items when layout is changed.
      */
-    void layoutChanged();
+    void currentLayoutChanged();
+
+    /**
+     * This signal is emitted whenever this workbench's layouts list changes. 
+     */
+    void layoutsChanged();
 
     /**
      * This signal is emitted whenever an item is added to this workbench's
@@ -173,7 +216,10 @@ private slots:
 
 private:
     /** Current layout. */
-    QnWorkbenchLayout *m_layout;
+    QnWorkbenchLayout *m_currentLayout;
+
+    /** List of this workbench's layouts. */
+    QList<QnWorkbenchLayout *> m_layouts;
 
     /** Grid mapper of this workbench. */
     QnWorkbenchGridMapper *m_mapper;

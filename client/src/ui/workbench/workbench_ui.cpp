@@ -40,6 +40,7 @@
 
 #include <ui/graphics/items/controls/navigationitem.h>
 #include <ui/widgets/resource_tree_widget.h>
+#include <ui/widgets/layout_tab_bar.h>
 #include <ui/context_menu_helper.h>
 #include <ui/style/skin.h>
 #include <ui/context_menu_helper.h>
@@ -309,6 +310,11 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    
+    QnLayoutTabBar *tabBarWidget = new QnLayoutTabBar();
+    tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
+    tabBarWidget->setWorkbench(display->workbench());
+    m_tabBarItem->setWidget(tabBarWidget);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
@@ -481,15 +487,18 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
         setTitleOpened(m_titleOpened, false);
 
         at_titleItem_geometryChanged();
+
+        /* For reasons unknown, tab bar's size gets messed up when it is shown 
+         * after new items were added to it. Re-embedding helps, probably there is
+         * a simpler workaround. */
+        QWidget *widget = m_tabBarItem->widget();
+        m_tabBarItem->setWidget(NULL);
+        m_tabBarItem->setWidget(widget);
     } else {
         m_titleItem->setPos(0.0, -m_titleItem->size().height() - 1.0);
 
         m_titleUsed = used;
     }
-}
-
-void QnWorkbenchUi::setTabBar(QWidget *tabBar) {
-    m_tabBarItem->setWidget(tabBar);
 }
 
 void QnWorkbenchUi::setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {

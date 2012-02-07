@@ -100,12 +100,6 @@ public:
     bool unpinItem(QnWorkbenchItem *item);
 
     /**
-     * \param resource                  Resource to get item for.
-     * \returns                         Item associated with the given resource, or NULL if there is no such item.
-     */
-    //QnWorkbenchItem *item(const QnResourcePtr &resource) const;
-
-    /**
      * \param position                  Position to get item at.
      * \returns                         Pinned item at the given position, or NULL if the given position is empty.
      */

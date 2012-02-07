@@ -95,7 +95,6 @@ signals:
 
 public slots:
     void setTitleUsed(bool titleUsed);
-    void setTabBar(QWidget *tabBar);
     void setFpsVisible(bool fpsVisible);
 
     void setTreeVisible(bool visible, bool animate = true);

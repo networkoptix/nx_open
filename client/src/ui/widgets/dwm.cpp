@@ -184,10 +184,14 @@ void QnDwmPrivate::updateFrameStrut() {
     if(tlwExtra != NULL) {
         QMargins margins = q->currentFrameMargins();
         tlwExtra->frameStrut = QRect(
-            margins.left(),
-            margins.top(),
-            margins.right(),
-            margins.bottom()
+            QPoint(
+                margins.left(),
+                margins.top()
+            ),
+            QPoint(
+                margins.right(),
+                margins.bottom()
+            )
         );
 
         qt_qwidget_data(widget)->fstrut_dirty = false;
@@ -507,6 +511,11 @@ bool QnDwm::widgetEvent(QEvent *event) {
         QWidgetData *data = qt_qwidget_data(d->widget);
         if(data->fstrut_dirty)
             d->updateFrameStrut();
+
+        /* This is needed because when going out of full screen, position calculation 
+         * breaks despite the fact that frame struts are set. Moving the widget fixes that. */
+        if(event->type() == QEvent::WindowStateChange && !d->widget->isFullScreen())
+            d->widget->move(d->widget->pos()); 
     }
 #endif
 
