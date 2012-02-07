@@ -90,6 +90,15 @@ bool ServerSettingsDialog::saveToModel()
 
     m_server->setStorages(storages);
     m_server->setName(ui->nameEdit->text());
+
+    QUrl url(m_server->getUrl());
+    url.setPort(ui->rtspPortEdit->text().toInt());
+    m_server->setUrl(url.toString());
+
+    QUrl apiUrl(m_server->getApiUrl());
+    apiUrl.setPort(ui->apiPortEdit->text().toInt());
+    m_server->setApiUrl(apiUrl.toString());
+
     return true;
 }
 
@@ -97,6 +106,8 @@ void ServerSettingsDialog::initView()
 {
     ui->nameEdit->setText(m_server->getName());
     ui->ipAddressEdit->setText(m_server->getUrl());
+    ui->apiPortEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
+    ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
     foreach (const QnStoragePtr& storage, m_server->getStorages())
     {
