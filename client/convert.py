@@ -31,7 +31,7 @@ if platform() == 'win32':
     EXCLUDE_FILES += ('_mac',)
 else:
     EXCLUDE_DIRS += ('desktop',)
-    EXCLUDE_FILES += ('_win',)
+    EXCLUDE_FILES += ()
 
 def is_exclude_file(f):
     for exclude_file in EXCLUDE_FILES:
