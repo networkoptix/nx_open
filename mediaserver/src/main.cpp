@@ -12,7 +12,7 @@
 
 #include "version.h"
 #include "utils/common/util.h"
-#include "plugins/resources/archive/avi_files/avi_device.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "utils/common/sleep.h"
@@ -420,13 +420,13 @@ public:
         {
             cl_log.log("Creating new storage", cl_logINFO);
 
-            QnStoragePtr storage(new QnStorage());
+            QnStorageResourcePtr storage(new QnStorageResource());
             storage->setParentId(videoServer->getId());
             storage->setName("Initial");
             storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
             storage->setSpaceLimit(5ll * 1000000000);
 
-            videoServer->setStorages(QnStorageList() << storage);
+            videoServer->setStorages(QnStorageResourceList() << storage);
 
             if (appServerConnection->saveSync(videoServer, errorString))
             {
@@ -437,7 +437,7 @@ public:
             qnStorageMan->addStorage(storage);
         } else
         {
-            foreach (QnStoragePtr storage, videoServer->getStorages())
+            foreach (QnStorageResourcePtr storage, videoServer->getStorages())
             {
                 qnResPool->addResource(storage);
                 qnStorageMan->addStorage(storage);

@@ -7,6 +7,7 @@
 #include <ui/common/scene_utility.h>
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
+#include "workbench_layout_synchronizer.h"
 
 namespace {
     template<class PointContainer>
@@ -51,12 +52,23 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent)
-    : QObject(parent)
-{
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resourcePool_resourceRemoved(QnResourcePtr)));
-}
+QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
+    QObject(parent)
+{}
 
+QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent):
+    QObject(parent)
+{
+    if(resource.isNull()) {
+        qnNullWarning(resource);
+        return;
+    }
+
+    QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
+    synchronizer->setAutoDeleting(true);
+    synchronizer->update();
+}
+    
 QnWorkbenchLayout::~QnWorkbenchLayout()
 {
     clear();
@@ -79,8 +91,8 @@ void QnWorkbenchLayout::setName(const QString &name) {
     emit nameChanged();
 }
 
-bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &layoutData) {
-    setName(layoutData->getName());
+bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &resource) {
+    setName(resource->getName());
 
     bool result = true;
 
@@ -89,7 +101,7 @@ bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &layoutData) {
     foreach(QnWorkbenchItem *item, m_items)
         item->setPinned(false);
 
-    foreach(const QnLayoutItemData itemData, layoutData->getItems()) {
+    foreach(const QnLayoutItemData itemData, resource->getItems()) {
         QnId id = itemData.resourceId;
         QnResourcePtr resource = qnResPool->getResourceById(id);
         if(resource.isNull()) {
@@ -111,13 +123,13 @@ bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &layoutData) {
     }
 
     /* Some items may have been removed. */
-    if(items().size() > layoutData->getItems().size()) {
+    if(items().size() > resource->getItems().size()) {
         QSet<QUuid> removed;
 
         foreach(QnWorkbenchItem *item, items())
             removed.insert(item->uuid());
 
-        foreach(const QnLayoutItemData &itemData, layoutData->getItems())
+        foreach(const QnLayoutItemData &itemData, resource->getItems())
             removed.remove(itemData.uuid);
 
         foreach(const QUuid &uuid, removed)
@@ -127,11 +139,11 @@ bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &layoutData) {
     return result;
 }
 
-void QnWorkbenchLayout::save(const QnLayoutResourcePtr &layoutData) const {
-    layoutData->setName(name());
+void QnWorkbenchLayout::save(const QnLayoutResourcePtr &resource) const {
+    resource->setName(name());
 
-    QnLayoutItemDataList itemDatas;
-    itemDatas.reserve(items().size());
+    QnLayoutItemDataList resources;
+    resources.reserve(items().size());
 
     foreach(const QnWorkbenchItem *item, items()) {
         QnLayoutItemData itemData;
@@ -146,10 +158,10 @@ void QnWorkbenchLayout::save(const QnLayoutResourcePtr &layoutData) const {
         itemData.uuid = item->uuid();
         item->save(itemData);
 
-        itemDatas.push_back(itemData);
+        resources.push_back(itemData);
     }
 
-    layoutData->setItems(itemDatas);
+    resource->setItems(resources);
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
@@ -211,12 +223,6 @@ void QnWorkbenchLayout::clear()
     foreach (QnWorkbenchItem *item, m_items)
 		delete item;
     m_items.clear();
-}
-
-void QnWorkbenchLayout::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
-{
-    foreach(QnWorkbenchItem *item, items(resource->getUniqueId()))
-        delete item;
 }
 
 bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem *item, const QRect &geometry, Disposition *disposition) {

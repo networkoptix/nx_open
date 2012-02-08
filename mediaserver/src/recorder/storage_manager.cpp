@@ -94,7 +94,7 @@ int QnStorageManager::detectStorageIndex(const QString& path)
     }
 }
 
-void QnStorageManager::addStorage(QnStoragePtr storage)
+void QnStorageManager::addStorage(QnStorageResourcePtr storage)
 {
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
@@ -154,7 +154,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
     return QnTimePeriod::mergeTimePeriods(cameras);
 }
 
-void QnStorageManager::clearSpace(QnStoragePtr storage)
+void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 {
     if (storage->getSpaceLimit() == 0)
         return; // unlimited
@@ -197,10 +197,10 @@ void QnStorageManager::clearSpace(QnStoragePtr storage)
     }
 }
 
-QnStoragePtr QnStorageManager::getOptimalStorageRoot()
+QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
 {
     QMutexLocker lock(&m_mutex);
-    QnStoragePtr result;
+    QnStorageResourcePtr result;
     qint64 minFreeSpace = 0x7fffffffffffffffll;
     for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
@@ -216,7 +216,7 @@ QnStoragePtr QnStorageManager::getOptimalStorageRoot()
 
 QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix)
 {
-    QnStoragePtr storage = getOptimalStorageRoot();
+    QnStorageResourcePtr storage = getOptimalStorageRoot();
     Q_ASSERT(camera != 0);
     QString base = closeDirPath(storage->getUrl());
 
@@ -273,7 +273,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName)
 void QnStorageManager::extractFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
     storageIndex = -1;
-    for(QMap<int, QnStoragePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for(QMap<int, QnStorageResourcePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))

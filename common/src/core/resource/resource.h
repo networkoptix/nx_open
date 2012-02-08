@@ -89,7 +89,7 @@ public:
     void setTypeId(QnId id);
 
     Status getStatus() const;
-    void setStatus(Status newStatus, bool ignoreHandlers = false);
+    void setStatus(Status newStatus);
 
 
     // flags like network media and so on
@@ -172,6 +172,7 @@ signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void resourceChanged();
+    void nameChanged();
 
 public:
     // this is thread to process commands like setparam

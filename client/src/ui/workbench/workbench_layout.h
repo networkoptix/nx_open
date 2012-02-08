@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QSet>
 #include <QHash>
-#include <core/resource/resource.h>
-#include <core/resource/layout_resource.h>
+#include <core/resource/resource_fwd.h>
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <utils/common/hash.h> /* For qHash(const QUuid &). */
@@ -30,9 +29,18 @@ public:
     /**
      * Constructor.
      *
-     * \param parent                    Parent object for this ui layout.
+     * \param parent                    Parent object for this layout.
      */
     QnWorkbenchLayout(QObject *parent = NULL);
+
+    /**
+     * Constructor.
+     * 
+     * \param resource                  Layout resource that this layout will
+     *                                  be in sync with.
+     * \param parent                    Parent object for this layout.
+     */
+    QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -50,15 +58,17 @@ public:
     void setName(const QString &name);
     
     /**
-     * \param layoutData                Data to load layout from.
+     * 
+     *
+     * \param layoutData                Resource to load layout from.
      * \returns                         Whether there were no errors during loading.
      */
-    bool load(const QnLayoutResourcePtr &layoutData);
+    bool load(const QnLayoutResourcePtr &resource);
 
     /**
-     * \param[out] layoutData           Data to save layout to.
+     * \param[out] layoutData           Resource to save layout to.
      */
-    void save(const QnLayoutResourcePtr &layoutData) const; 
+    void save(const QnLayoutResourcePtr &resource) const; 
 
     /**
      * \param item                      Item to check.
@@ -228,9 +238,6 @@ signals:
      * This signal is emitted whenever name of this layout changes. 
      */
     void nameChanged();
-
-private slots:
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
     template<bool returnEarly>

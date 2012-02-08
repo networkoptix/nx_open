@@ -5,7 +5,7 @@
 #include "recording/file_deletor.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
-#include "plugins/resources/archive/avi_files/avi_device.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "motion/motion_helper.h"
 #include <QDebug>

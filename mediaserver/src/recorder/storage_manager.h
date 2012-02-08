@@ -6,7 +6,7 @@
 #include <QFile>
 #include <QMutex>
 #include "device_file_catalog.h"
-#include "core/resource/storage.h"
+#include "core/resource/storage_resource.h"
 
 // This class used for extract chunk sequence from storage
 class QnChunkSequence: public QObject
@@ -41,7 +41,7 @@ public:
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
-    void addStorage(QnStoragePtr storage);
+    void addStorage(QnStorageResourcePtr storage);
 
 
     QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource, const QString& prefix);
@@ -49,10 +49,10 @@ public:
     bool fileFinished(int durationMs, const QString& fileName);
 
     static QString dateTimeStr(qint64 dateTimeMs);
-    QnStoragePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
+    QnStorageResourcePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const 
     {
-        QnStoragePtr storage = storageRoot(storage_index);
+        QnStorageResourcePtr storage = storageRoot(storage_index);
         return storage && storage->getStatus() == QnResource::Online; 
     }
     DeviceFileCatalogPtr getFileCatalog(const QString& mac, QnResource::ConnectionRole role);
@@ -61,15 +61,15 @@ public:
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
     void loadFullFileCatalog();
 private:
-    QnStoragePtr getOptimalStorageRoot();
-    void clearSpace(QnStoragePtr storage);
+    QnStorageResourcePtr getOptimalStorageRoot();
+    void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);
     bool deserializeStorageFile();
     bool serializeStorageFile();
     void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
     void extractFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality);
 private:
-    typedef QMap<int, QnStoragePtr> StorageMap;
+    typedef QMap<int, QnStorageResourcePtr> StorageMap;
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalogHi;
