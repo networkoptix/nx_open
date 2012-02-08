@@ -29,7 +29,7 @@ Target checked_cast(Source &source) {
 template<class Target, class Source>
 QSharedPointer<Target> checked_cast(const QSharedPointer<Source> &source) {
 #ifndef NDEBUG
-    QSharedPointer<Target> result = source.dynamicCast<Target>();
+    QSharedPointer<Target> result = source.template dynamicCast<Target>();
     assert(source.isNull() || !result.isNull());
     return result;
 #else

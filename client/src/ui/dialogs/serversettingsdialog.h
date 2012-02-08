@@ -29,6 +29,7 @@ public slots:
     void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
 
 private:
+    QSpinBox* createSpinCellWidget(QWidget* parent);
     void initView();
     bool saveToModel();
     bool validateStorages(const QnStorageResourceList& storages, QString& errorString);

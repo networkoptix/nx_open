@@ -225,6 +225,7 @@ namespace {
                 {
                     QnLayoutItemData itemData;
                     itemData.resourceId = ci->resourceId().c_str();
+                    itemData.uuid = QUuid(ci->uuid().c_str());
                     itemData.flags = ci->flags();
                     itemData.combinedGeometry.setLeft(ci->left());
                     itemData.combinedGeometry.setTop(ci->top());
@@ -595,6 +596,7 @@ void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteAr
 
             foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
                 xsd::api::layouts::Item item(itemIn.resourceId.toString().toStdString(),
+                                             itemIn.uuid.toString().toStdString(),
                                              itemIn.flags,
                                              itemIn.combinedGeometry.left(),
                                              itemIn.combinedGeometry.top(),

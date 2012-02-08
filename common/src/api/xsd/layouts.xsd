@@ -30,6 +30,7 @@
   <xs:complexType name="Item">
     <xs:all>
       <xs:element name="resourceId" type="xs:string"/>
+      <xs:element name="uuid" type="xs:string"/>
       <xs:element name="flags" type="xs:int"/>
       <xs:element name="left" type="xs:double"/>
       <xs:element name="top" type="xs:double"/>
