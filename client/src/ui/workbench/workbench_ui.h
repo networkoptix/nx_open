@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <ui/common/scene_utility.h>
-#include "workbench.h"
+#include "workbench.h" /* For QnWorkbench::ItemRole. */
 
 class QGraphicsProxyWidget;
 

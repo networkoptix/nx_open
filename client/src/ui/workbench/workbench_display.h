@@ -3,13 +3,13 @@
 
 #include <QObject>
 #include <QHash>
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/margin_flags.h>
 #include <utils/common/rect_set.h>
-#include "workbench.h"
 #include "recording/time_period.h"
+#include "workbench.h"
 
 class QGraphicsScene;
 class QGraphicsView;

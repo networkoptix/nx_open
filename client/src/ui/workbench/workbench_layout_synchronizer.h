@@ -2,7 +2,7 @@
 #define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 
 #include <QObject>
-#include <core/resource/user_resource.h>
+#include <core/resource/resource_fwd.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -12,62 +12,66 @@ class QnWorkbenchLayoutSynchronizer: public QObject {
     Q_OBJECT;
 
 public:
-    QnWorkbenchLayoutSynchronizer(QObject *parent);
+    QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent);
 
     virtual ~QnWorkbenchLayoutSynchronizer();
 
-    QnWorkbench *workbench() {
-        return m_workbench;
+    QnWorkbenchLayout *layout() const {
+        return m_layout;
     }
 
-    void setWorkbench(QnWorkbench *workbench);
-
-    const QnUserResourcePtr &user() const {
-        return m_user;
+    const QnLayoutResourcePtr &resource() const {
+        return m_resource;
     }
 
-    void setUser(const QnUserResourcePtr &user);
+    bool isAutoDeleting() const {
+        return m_autoDeleting;
+    }
+
+    void setAutoDeleting(bool autoDeleting);
+
+    static QnWorkbenchLayoutSynchronizer *instance(QnWorkbenchLayout *layout);
+
+    static QnWorkbenchLayoutSynchronizer *instance(const QnLayoutResourcePtr &resource);
+
+public slots:
+    void update();
+    void submit();
+    void autoDeleteLater();
 
 protected:
-    void initUserWorkbench();
-    void deinitUserWorkbench();
-
-    QnWorkbenchLayout *layout(const QnLayoutResourcePtr &resource) {
-        return m_layoutByResource.value(resource, NULL);
-    }
-
-    QnLayoutResourcePtr resource(QnWorkbenchLayout *layout) {
-        return m_resourceByLayout.value(layout, QnLayoutResourcePtr());
-    }
-
-    void addLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
-    void removeLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
+    void clearLayout();
+    void clearResource();
+    
+    void initialize();
+    void deinitialize();
 
 protected slots:
-    void updateLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
-    void submitLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource);
+    void autoDelete();
 
-    void at_user_resourceChanged();
-    void at_layout_resourceChanged();
+    void at_resource_resourceChanged();
+    void at_resource_nameChanged();
 
-    void at_workbench_aboutToBeDestroyed();
-    void at_workbench_layoutsChanged();
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_nameChanged();
+    void at_layout_aboutToBeDestroyed();
 
 private:
-    QnWorkbench *m_workbench;
-    QnUserResourcePtr m_user;
+    /** Associated workbench layout. */
+    QnWorkbenchLayout *m_layout;
 
-    /** Whether changes should be propagated from workbench to resources. */
-    bool m_submit;
+    /** Associated layout resource. */
+    QnLayoutResourcePtr m_resource;
 
-    /** Whether changes should be propagated from resources to workbench. */
+    /** Whether changes should be propagated from resource to layout. */
     bool m_update;
 
-    QHash<QnWorkbenchLayout *, QnLayoutResourcePtr> m_resourceByLayout;
-    QHash<QnLayoutResourcePtr, QnWorkbenchLayout *> m_layoutByResource;
+    /** Whether changes should be propagated from layout to resource. */
+    bool m_submit;
+
+    /** Whether this layout synchronizer should delete itself once it is not functional anymore. */
+    bool m_autoDeleting;
 };
 
 #endif // QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
