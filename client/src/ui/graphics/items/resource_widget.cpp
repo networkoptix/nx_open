@@ -717,7 +717,7 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qi
 
         QnScopedPainterFontRollback fontRollback(painter, font);
         QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
-        painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+2, text);
+        painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+metric.ascent(), text);
     }
 }
 
@@ -734,7 +734,7 @@ void QnResourceWidget::drawQualityText(QPainter *painter, const QRectF &rect, co
 
         QnScopedPainterFontRollback fontRollback(painter, font);
         QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
-        painter->drawText(4, rect.height() - size.height()+2, text);
+        painter->drawText(4, rect.height() - size.height()+metric.ascent(), text);
     }
 }
 
