@@ -54,7 +54,6 @@ void QnWorkbenchSynchronizer::initialize() {
 
     connect(m_workbench,        SIGNAL(aboutToBeDestroyed()),               this, SLOT(at_workbench_aboutToBeDestroyed()));
     connect(m_workbench,        SIGNAL(layoutsChanged()),                   this, SLOT(at_workbench_layoutsChanged()));
-    connect(m_workbench,        SIGNAL(currentLayoutAboutToBeChanged()),    this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
 
     m_submit = m_update = true;
 }

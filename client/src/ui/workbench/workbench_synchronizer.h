@@ -19,15 +19,13 @@ public:
         return m_workbench;
     }
 
-    void setWorkbench(QnWorkbench *workbench);
-
     const QnUserResourcePtr &user() const {
         return m_user;
     }
 
-    void setUser(const QnUserResourcePtr &user);
-
 public slots:
+    void setWorkbench(QnWorkbench *workbench);
+    void setUser(const QnUserResourcePtr &user);
     void update();
     void submit();
 

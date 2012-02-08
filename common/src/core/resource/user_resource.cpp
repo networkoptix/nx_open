@@ -8,7 +8,11 @@ QnUserResource::QnUserResource(): base_type()
 
 void QnUserResource::setLayouts(const QnLayoutResourceList &layouts)
 {
-    m_layouts = layouts;
+    while(!m_layouts.empty())
+        removeLayout(m_layouts.back());
+
+    foreach(const QnLayoutResourcePtr &layout, layouts)
+        addLayout(layout);
 }
 
 const QnLayoutResourceList &QnUserResource::getLayouts() const
@@ -23,12 +27,19 @@ void QnUserResource::addLayout(const QnLayoutResourcePtr &layout)
         return;
     }
 
+    if(layout->getParentId() != QnId()) {
+        qnWarning("Given layout '%1' is already in other users's layouts list.", layout->getName());
+        return;
+    }
+
     m_layouts.push_back(layout);
+    layout->setParentId(getId());
 }
 
 void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout) 
 {
     m_layouts.removeOne(layout); /* Removing a layout that is not there is not an error. */
+    layout->setParentId(QnId());
 }
 
 QString QnUserResource::getPassword() const

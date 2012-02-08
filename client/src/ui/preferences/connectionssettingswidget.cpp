@@ -80,13 +80,13 @@ void ConnectionsSettingsWidget::retranslateUi()
     m_connectionsRootItem->setText(tr("Connections"));
 }
 
-QList<Settings::ConnectionData> ConnectionsSettingsWidget::connections() const
+QList<QnSettings::ConnectionData> ConnectionsSettingsWidget::connections() const
 {
-    QList<Settings::ConnectionData> connections;
+    QList<QnSettings::ConnectionData> connections;
     
     for (int row = 0; row < m_connectionsRootItem->rowCount(); ++row)
     {
-        Settings::ConnectionData connection;
+        QnSettings::ConnectionData connection;
         connection.name = m_connectionsRootItem->child(row, 0)->text();
 
         QString host = m_connectionsRootItem->child(row, 1)->text();
@@ -107,15 +107,15 @@ QList<Settings::ConnectionData> ConnectionsSettingsWidget::connections() const
     return connections;
 }
 
-void ConnectionsSettingsWidget::setConnections(const QList<Settings::ConnectionData> &connections)
+void ConnectionsSettingsWidget::setConnections(const QList<QnSettings::ConnectionData> &connections)
 {
     m_connectionsRootItem->removeRows(0, m_connectionsRootItem->rowCount());
 
-    foreach (const Settings::ConnectionData &connection, connections)
+    foreach (const QnSettings::ConnectionData &connection, connections)
         addConnection(connection);
 }
 
-void ConnectionsSettingsWidget::addConnection(const Settings::ConnectionData &connection)
+void ConnectionsSettingsWidget::addConnection(const QnSettings::ConnectionData &connection)
 {
     QList<QStandardItem *> row;
     row << new QStandardItem(!connection.name.trimmed().isEmpty() ? connection.name : tr("Unnamed"))
@@ -127,7 +127,7 @@ void ConnectionsSettingsWidget::addConnection(const Settings::ConnectionData &co
     m_connectionsRootItem->appendRow(row);
 }
 
-void ConnectionsSettingsWidget::removeConnection(const Settings::ConnectionData &connection)
+void ConnectionsSettingsWidget::removeConnection(const QnSettings::ConnectionData &connection)
 {
     for (int row = 0; row < m_connectionsRootItem->rowCount(); ++row) {
         if (connection.name == m_connectionsRootItem->child(row, 0)->text()) {
