@@ -355,7 +355,7 @@ int main(int argc, char *argv[])
 
     //============================
     /*
-    QnStorageResourcePtr storage0(new QnStorage());
+    QnStorageResourcePtr storage0(new QnStorageResource());
     storage0->setUrl(getRecordingDir());
     storage0->setIndex(0);
     qnResPool->addResource(storage0);
