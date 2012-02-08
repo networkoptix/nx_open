@@ -57,6 +57,8 @@ private:
     
     bool usingShaderYuvToRgb() const;
 
+    void ensureGlInitialized();
+
 private:
     static QList<GLuint> m_garbage;
 
@@ -64,6 +66,8 @@ private:
 
 private:
     QSharedPointer<QnGLRendererPrivate> d;
+    bool m_glInitialized;
+    const QGLContext *m_context;
 
     mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;

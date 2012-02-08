@@ -1,6 +1,7 @@
 #include "gl_functions.h"
 #include <QMutex>
 #include <utils/common/warnings.h>
+#include "gl_context_data.h"
 
 #ifndef APIENTRY
 #   define APIENTRY
@@ -95,29 +96,7 @@ private:
     QnGlFunctions::Features m_features;
 };
 
-
-// -------------------------------------------------------------------------- //
-// QnGlFunctionsPrivateStorage
-// -------------------------------------------------------------------------- //
-class QnGlFunctionsPrivateStorage {
-public:
-    typedef QMap<const QGLContext *, QSharedPointer<QnGlFunctionsPrivate> > map_type;
-
-    QSharedPointer<QnGlFunctionsPrivate> get(const QGLContext *context) {
-        QMutexLocker locked(&m_mutex);
-
-        map_type::iterator pos = m_map.find(context);
-        if(pos == m_map.end())
-            pos = m_map.insert(context, QSharedPointer<QnGlFunctionsPrivate>(new QnGlFunctionsPrivate(context)));
-
-        return *pos;
-    }
-
-private:
-    QMutex m_mutex;
-    map_type m_map;
-};
-
+typedef QnGlContextData<QnGlFunctionsPrivate, QnGlContextDataForwardingFactory<QnGlFunctionsPrivate> > QnGlFunctionsPrivateStorage;
 Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
 
 

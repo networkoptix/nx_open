@@ -9,6 +9,7 @@
 #include <utils/media/sse_helper.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include "yuvconvert.h"
@@ -151,29 +152,7 @@ private:
 
 int QnGLRendererPrivate::maxTextureSize = 0;
 
-
-// -------------------------------------------------------------------------- //
-// QnGlFunctionsPrivateStorage
-// -------------------------------------------------------------------------- //
-class QnGLRendererPrivateStorage {
-public:
-    typedef QMap<const QGLContext *, QSharedPointer<QnGLRendererPrivate> > map_type;
-
-    QSharedPointer<QnGLRendererPrivate> get(const QGLContext *context) {
-        QMutexLocker lock(&m_mutex);
-
-        map_type::iterator pos = m_map.find(context);
-        if (pos == m_map.end())
-            pos = m_map.insert(context, QSharedPointer<QnGLRendererPrivate>(new QnGLRendererPrivate(context)));
-        
-        return *pos;
-    }
-
-private:
-    map_type m_map;
-    QMutex m_mutex;
-};
-
+typedef QnGlContextData<QnGLRendererPrivate, QnGlContextDataForwardingFactory<QnGLRendererPrivate> > QnGLRendererPrivateStorage;
 Q_GLOBAL_STATIC(QnGLRendererPrivateStorage, qn_glRendererPrivateStorage);
 
 
@@ -367,14 +346,11 @@ bool QnGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 
 QnGLRenderer::QnGLRenderer(const QGLContext *context)
 {
-    if(context == NULL)
-        context = QGLContext::currentContext();
-
-    QnGLRendererPrivateStorage *storage = qn_glRendererPrivateStorage();
-    if(storage)
-        d = qn_glRendererPrivateStorage()->get(context);
-    if(d.isNull()) /* Application is being shut down. */
-        d = QSharedPointer<QnGLRendererPrivate>(new QnGLRendererPrivate(NULL));
+    /* Postpone private initialization until it is actually needed.
+     * This way if context is NULL, then we will pick the right context when
+     * paint event is delivered. */
+    m_context = context;
+    m_glInitialized = false;
 
     m_forceSoftYUV = false;
     m_textureUploaded = false;
@@ -409,6 +385,22 @@ QnGLRenderer::QnGLRenderer(const QGLContext *context)
 QnGLRenderer::~QnGLRenderer()
 {
     qFreeAligned(m_yuv2rgbBuffer);
+}
+
+void QnGLRenderer::ensureGlInitialized() {
+    if(m_glInitialized)
+        return;
+
+    if(m_context == NULL)
+        m_context = QGLContext::currentContext();
+
+    QnGLRendererPrivateStorage *storage = qn_glRendererPrivateStorage();
+    if(storage)
+        d = qn_glRendererPrivateStorage()->get(m_context);
+    if(d.isNull()) /* Application is being shut down. */
+        d = QSharedPointer<QnGLRendererPrivate>(new QnGLRendererPrivate(NULL));
+
+    m_glInitialized = true;
 }
 
 void QnGLRenderer::beforeDestroy()
@@ -736,6 +728,8 @@ void QnGLRenderer::update()
 
 QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
 {
+    ensureGlInitialized();
+
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     if (m_painterOpacity < 1.0) {

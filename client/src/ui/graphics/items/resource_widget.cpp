@@ -6,6 +6,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
@@ -42,12 +43,21 @@ namespace {
     /** Default duration of "fade-in" effect for overlay icons. */
     const qint64 defaultOverlayFadeInDurationMSec = 500;
 
-    /** Default progress painter. */
-    Q_GLOBAL_STATIC_WITH_ARGS(QnLoadingProgressPainter, progressPainter, (0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255)));
+    /** Progress painter storage. */
+    class QnLoadingProgressPainterFactory {
+    public:
+        QnLoadingProgressPainter *operator()(const QGLContext *) {
+            return new QnLoadingProgressPainter(0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255));
+        }
+    };
 
-    /** Default paused painter. */
-    Q_GLOBAL_STATIC(QnPausedPainter, pausedPainter);
+    typedef QnGlContextData<QnLoadingProgressPainter, QnLoadingProgressPainterFactory> QnLoadingProgressPainterStorage;
+    Q_GLOBAL_STATIC(QnLoadingProgressPainterStorage, qn_loadingProgressPainterStorage);
+
+    /** Paused painter storage. */
+    Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 }
+
 
 // -------------------------------------------------------------------------- //
 // Logic
@@ -494,6 +504,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         return;
     }
 
+    if(m_pausedPainter.isNull()) {
+        m_pausedPainter = qn_pausedPainterStorage()->get();
+        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
+    }
+
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterFontRollback fontRollback(painter);
@@ -631,13 +646,13 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     glScalef(iconRect.width() / 2, iconRect.height() / 2, 1.0);
     switch(state.icon) {
     case LOADING:
-        progressPainter()->paint(
+        m_loadingProgressPainter->paint(
             static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
             opacityMultiplier
         );
         break;
     case PAUSED:
-        pausedPainter()->paint(0.5 * opacityMultiplier);
+        m_pausedPainter->paint(0.5 * opacityMultiplier);
         break;
     default:
         break;

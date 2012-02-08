@@ -1207,7 +1207,7 @@ void QnWorkbenchController::at_showMotionAction_triggered()
     CameraScheduleWidget* test1 = new CameraScheduleWidget(0);
     test1->show();
 #endif
-#if 0
+#if 1
     QGraphicsItem *item = display()->scene()->selectedItems().first();
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource());
