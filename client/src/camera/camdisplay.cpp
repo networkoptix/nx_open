@@ -184,7 +184,7 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCnt--;
             if (m_delayedFrameCnt < -5)
             {
-                if (qAbs(speed) < m_toLowQSpeed)
+                if (qAbs(speed) < m_toLowQSpeed || m_toLowQSpeed < 0 && speed > 0)
                     reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality again
                 else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
                     reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
@@ -384,6 +384,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             */
             updateActivity();
         }
+        if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
+            m_lastDecodedTime = vd->timestamp;
 
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
 
@@ -825,8 +827,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             vd = nextInOutVideodata(vd, channel);
             if (!vd)
                 return result; // impossible? incoming vd!=0
-            if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
-                m_lastDecodedTime = vd->timestamp;
 
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);

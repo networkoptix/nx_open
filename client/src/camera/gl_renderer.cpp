@@ -69,15 +69,17 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnGLRendererSharedData
 // -------------------------------------------------------------------------- //
-class QnGLRendererSharedData {
+class QnGLRendererSharedData
+{
     Q_DECLARE_TR_FUNCTIONS(QnGLRendererSharedData);
 
 public:
+    static int getMaxTextureSize() { return maxTextureSize; }
+
     QnGLRendererSharedData():
         supportsArbShaders(false),
         supportsNonPower2Textures(false),
-        status(QnGLRenderer::SUPPORTED),
-        maxTextureSize(0)
+        status(QnGLRenderer::SUPPORTED)
     {
         glActiveTexture = (PFNActiveTexture) QGLContext::currentContext()->getProcAddress(QLatin1String("glActiveTexture"));
         if (!glActiveTexture)
@@ -159,7 +161,7 @@ public:
     GLint clampConstant;
     bool supportsNonPower2Textures;
     bool supportsArbShaders;
-    int maxTextureSize;
+    static int maxTextureSize;
 
     QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
     QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
@@ -169,7 +171,9 @@ private:
     QVector<uchar> fillers[256];
 };
 
-Q_GLOBAL_STATIC(QnGLRendererSharedData, qn_glRendererSharedData);
+int QnGLRendererSharedData::maxTextureSize = 0;
+
+//Q_GLOBAL_STATIC(QnGLRendererSharedData, qn_glRendererSharedData);
 
 
 // -------------------------------------------------------------------------- //
@@ -221,7 +225,7 @@ public:
 
         m_contentSize = contentSize;
 
-        QnGLRendererSharedData *d = qn_glRendererSharedData();
+        QnGLRendererSharedData *d = QnGLRenderer::getShaderData();
 
         QSize textureSize = QSize(
             d->supportsNonPower2Textures ? roundUp(stride / pixelSize, ROUND_COEFF) : minPow2(stride / pixelSize),
@@ -321,9 +325,27 @@ private:
 // QnGLRenderer
 // -------------------------------------------------------------------------- //
 QList<GLuint> QnGLRenderer::m_garbage;
+QnGLRenderer::ShaderContextMap QnGLRenderer::m_shaderContext;
 
-int QnGLRenderer::maxTextureSize() {
-    return qn_glRendererSharedData()->maxTextureSize;
+
+QnGLRendererSharedData* QnGLRenderer::getShaderData()
+{
+    static QMutex shaderAccess;
+    QMutexLocker lock(&shaderAccess);
+
+    ShaderContextMap::iterator itr = m_shaderContext.find(QGLContext::currentContext());
+    if (itr == m_shaderContext.end())
+    {
+        const QGLContext* glContext = QGLContext::currentContext();
+        Q_ASSERT(glContext);
+        itr = m_shaderContext.insert(glContext, QSharedPointer<QnGLRendererSharedData>(new QnGLRendererSharedData()));
+    }
+    return itr.value().data();
+}
+
+int QnGLRenderer::maxTextureSize() 
+{
+    return QnGLRendererSharedData::getMaxTextureSize();
 }
 
 void QnGLRenderer::clearGarbage()
@@ -352,7 +374,7 @@ bool QnGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 }
 
 QnGLRenderer::QnGLRenderer():
-    m_shared(qn_glRendererSharedData())
+    m_shared(getShaderData())
 {
     m_forceSoftYUV = false;
     m_textureUploaded = false;
@@ -787,13 +809,3 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
 bool QnGLRenderer::usingShaderYuvToRgb() const {
     return m_shared->supportsArbShaders && m_shared->glActiveTexture != NULL && !m_forceSoftYUV && isYuvFormat();
 }
-
-
-
-
-
-
-
-
-
-

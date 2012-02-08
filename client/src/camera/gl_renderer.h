@@ -2,8 +2,10 @@
 #define QN_GL_RENDERER_H
 
 #include <QMutex>
+#include <QMap>
 #include <QWaitCondition>
 #include <QtOpenGL>
+#include <QScopedPointer>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "render_status.h"
 
@@ -43,6 +45,8 @@ public:
     bool isLowQualityImage() const;
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata() const; 
+
+    static QnGLRendererSharedData* getShaderData();
 
 private:
     void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
@@ -103,6 +107,9 @@ private:
     qint64 m_lastDisplayedTime;
     QnMetaDataV1Ptr m_lastDisplayedMetadata;
     unsigned m_lastDisplayedFlags;
+
+    typedef QMap<const QGLContext*, QSharedPointer<QnGLRendererSharedData> > ShaderContextMap;
+    static ShaderContextMap m_shaderContext;
 };
 
 #endif //QN_GL_RENDERER_H

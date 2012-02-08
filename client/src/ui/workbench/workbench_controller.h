@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <ui/common/scene_utility.h>
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include "workbench.h"
 
 class QGraphicsScene;
