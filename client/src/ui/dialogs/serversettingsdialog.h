@@ -31,7 +31,7 @@ public slots:
 private:
     void initView();
     bool saveToModel();
-    bool validateStorages(const QnStorageList& storages, QString& errorString);
+    bool validateStorages(const QnStorageResourceList& storages, QString& errorString);
 
     void save();
 

@@ -227,5 +227,10 @@ void clLogMsgHandler(QtMsgType type, const char *msg)
         logLevel = cl_logINFO;
         break;
     }
-    cl_log.log(QString::fromLocal8Bit(msg), logLevel);
+
+    /* Message handler may get called after logger's destruction, 
+     * so we have to check it. */
+    CLLog *logger = CLLog::instance();
+    if(logger)
+        logger->log(QString::fromLocal8Bit(msg), logLevel);
 }

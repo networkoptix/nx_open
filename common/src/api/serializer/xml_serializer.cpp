@@ -180,7 +180,7 @@ namespace {
 
             if (i->storages().present())
             {
-                QnStorageList storages;
+                QnStorageResourceList storages;
                 parseStorages(storages, (*(i->storages())).storage());
                 server->setStorages(storages);
             }
@@ -550,7 +550,7 @@ void QnApiXmlSerializer::serializeServer(const QnVideoServerResourcePtr& serverP
     if (!serverPtr->getStorages().isEmpty()) {
         ::xsd::api::storages::Storages storages;
 
-        foreach (const QnStoragePtr& storagePtr, serverPtr->getStorages()) {
+        foreach (const QnStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
             xsd::api::storages::Storage storage(storagePtr->getId().toString().toStdString(),
                                                  storagePtr->getName().toStdString(),
                                                  storagePtr->getUrl().toStdString(),
