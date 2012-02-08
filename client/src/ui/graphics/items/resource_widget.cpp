@@ -508,6 +508,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
     painter->beginNativePainting();
+    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     for(int i = 0; i < m_channelCount; i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
@@ -515,8 +519,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
         /* Draw black rectangle if nothing was drawn. */
         if(status != QnRenderStatus::RENDERED_OLD_FRAME && status != QnRenderStatus::RENDERED_NEW_FRAME) {
+            glColor4f(0.0, 0.0, 0.0, effectiveOpacity());
             glBegin(GL_QUADS);
-            glColor4f(0.0, 0.0, 0.0, 1.0);
             glVertices(rect);
             glEnd();
         }
@@ -540,6 +544,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         /* Draw selected / not selected overlay. */
         drawSelection(rect);
     }
+    
+    glPopAttrib();
     painter->endNativePainting();
 
     /* Draw motion grid. */
@@ -590,18 +596,12 @@ void QnResourceWidget::drawSelection(const QRectF &rect) {
     if(!(m_displayFlags & DISPLAY_SELECTION_OVERLAY))
         return;
 
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     QColor color = Globals::selectionColor();
     color.setAlpha(color.alpha() * effectiveOpacity());
     glColor(color);
     glBegin(GL_QUADS);
     glVertices(rect);
     glEnd();
-
-    glPopAttrib();
 }
 
 void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
@@ -611,10 +611,6 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
     qreal opacityMultiplier = effectiveOpacity() * (state.iconFadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.iconChangeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0);
-
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glColor4f(0.0, 0.0, 0.0, 0.5 * opacityMultiplier);
     glBegin(GL_QUADS);
@@ -647,8 +643,6 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
         break;
     }
     glPopMatrix();
-
-    glPopAttrib();
 }
 
 void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, const QnMetaDataV1Ptr &motion) {

@@ -1210,7 +1210,7 @@ void QnWorkbenchController::at_showMotionAction_triggered()
 #if 0
     QGraphicsItem *item = display()->scene()->selectedItems().first();
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource()->getUniqueId());
+    QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource());
     test2->show();
 #endif
 }
