@@ -79,12 +79,12 @@ QnResourcePtr QnVideoServerResourceFactory::createResource(QnId resourceTypeId, 
     return result;
 }
 
-QnStorageList QnVideoServerResource::getStorages() const
+QnStorageResourceList QnVideoServerResource::getStorages() const
 {
     return m_storages;
 }
 
-void QnVideoServerResource::setStorages(const QnStorageList &storages)
+void QnVideoServerResource::setStorages(const QnStorageResourceList &storages)
 {
     m_storages = storages;
 }

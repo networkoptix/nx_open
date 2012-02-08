@@ -3,7 +3,7 @@
 
 #include <QSharedPointer>
 #include "core/resource/resource.h"
-#include "core/resource/storage.h"
+#include "core/resource/storage_resource.h"
 #include "api/VideoServerConnection.h"
 
 class QnLocalVideoServerResource : public QnResource
@@ -36,14 +36,14 @@ public:
     void setGuid(const QString& guid);
     QString getGuid() const;
 
-    QnStorageList getStorages() const;
-    void setStorages(const QnStorageList& storages);
+    QnStorageResourceList getStorages() const;
+    void setStorages(const QnStorageResourceList& storages);
 
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
     QString m_guid;
-    QnStorageList m_storages;
+    QnStorageResourceList m_storages;
 };
 
 
