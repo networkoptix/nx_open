@@ -36,7 +36,7 @@ namespace conn_detail
         }
 
     public slots:
-        void finished(int status, const QByteArray &result, int handle);
+        void finished(int status, const QByteArray &result, const QByteArray &errorString, int handle);
 
     signals:
         void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
