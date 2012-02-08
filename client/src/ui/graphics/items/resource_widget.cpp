@@ -5,7 +5,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <ui/common/opengl.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>

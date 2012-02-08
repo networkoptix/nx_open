@@ -1,8 +1,8 @@
 #include "arb_shader_program.h"
 #include <QtOpenGL>
 #include <utils/common/warnings.h>
-#include <ui/common/opengl.h>
-#include <ui/common/gl_functions.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
 
 class QnArbShaderProgramPrivate: public QnGlFunctions {
 public:

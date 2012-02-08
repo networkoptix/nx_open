@@ -7,8 +7,8 @@
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
-#include <ui/common/opengl.h>
-#include <ui/common/gl_functions.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include "yuvconvert.h"
