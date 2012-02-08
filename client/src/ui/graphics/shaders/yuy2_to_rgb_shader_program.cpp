@@ -1,7 +1,7 @@
 #include "yuy2_to_rgb_shader_program.h"
 
-QnYuy2ToRgbShaderProgram::QnYuy2ToRgbShaderProgram(QObject *parent):
-    QnArbShaderProgram(parent) 
+QnYuy2ToRgbShaderProgram::QnYuy2ToRgbShaderProgram(const QGLContext *context, QObject *parent):
+    QnArbShaderProgram(context, parent) 
 {
     addShaderFromSourceCode(QGLShader::Fragment, 
         "!!ARBfp1.0"

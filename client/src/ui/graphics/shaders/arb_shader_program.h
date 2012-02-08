@@ -5,12 +5,12 @@
 #include <QScopedPointer>
 #include <QGLShader>
 
-class QnArbShaderProgramSharedData;
+class QnArbShaderProgramPrivate;
 
 class QnArbShaderProgram: public QObject {
     Q_OBJECT;
 public:
-    QnArbShaderProgram(QObject *parent = NULL);
+    QnArbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
     virtual ~QnArbShaderProgram();
 
@@ -25,9 +25,7 @@ public:
     static bool hasArbShaderPrograms(const QGLContext *context = NULL);
 
 private:
-    bool m_valid;
-    GLuint m_fragmentProgram;
-    const QnArbShaderProgramSharedData *m_shared;
+    QScopedPointer<QnArbShaderProgramPrivate> d;
 };
 
 #endif // QN_ARB_SHADER_H

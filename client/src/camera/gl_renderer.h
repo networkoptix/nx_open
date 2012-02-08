@@ -6,11 +6,12 @@
 #include <QWaitCondition>
 #include <QtOpenGL>
 #include <QScopedPointer>
+#include <QSharedPointer>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "render_status.h"
 
 class CLVideoDecoderOutput;
-class QnGLRendererSharedData;
+class QnGLRendererPrivate;
 class QnGlRendererTexture;
 
 class QnGLRenderer: public QnRenderStatus
@@ -22,7 +23,7 @@ public:
         NOT_SUPPORTED
     };
 
-    QnGLRenderer();
+    QnGLRenderer(const QGLContext *context = NULL);
     ~QnGLRenderer();
     void beforeDestroy();
 
@@ -46,8 +47,6 @@ public:
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata() const; 
 
-    static QnGLRendererSharedData* getShaderData();
-
 private:
     void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
     void updateTexture();
@@ -64,7 +63,7 @@ private:
     friend class QnGlRendererTexture;
 
 private:
-    QnGLRendererSharedData *m_shared;
+    QSharedPointer<QnGLRendererPrivate> d;
 
     mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;
@@ -107,9 +106,6 @@ private:
     qint64 m_lastDisplayedTime;
     QnMetaDataV1Ptr m_lastDisplayedMetadata;
     unsigned m_lastDisplayedFlags;
-
-    typedef QMap<const QGLContext*, QSharedPointer<QnGLRendererSharedData> > ShaderContextMap;
-    static ShaderContextMap m_shaderContext;
 };
 
 #endif //QN_GL_RENDERER_H
