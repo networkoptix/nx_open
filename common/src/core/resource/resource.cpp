@@ -16,10 +16,6 @@
 #include <typeinfo>
 #include <limits.h>
 
-static const char *property_descriptions[] = {
-    QT_TRANSLATE_NOOP("QnResource", "URL")
-};
-
 QnResource::QnResource()
     : QObject(),
       m_mutex(QMutex::Recursive),
@@ -46,10 +42,11 @@ void QnResource::updateInner(QnResourcePtr other)
     m_parentId = other->m_parentId;
     m_typeId = other->m_typeId;
     m_flags = other->m_flags;
-    m_name = other->m_name;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     m_tags = other->m_tags;
     m_url = other->m_url;
+
+    setName(other->m_name);
 }
 
 void QnResource::update(QnResourcePtr other)
@@ -63,7 +60,7 @@ void QnResource::update(QnResourcePtr other)
         updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
     setStatus(other->m_status);
-    Q_EMIT resourceChanged();
+    emit resourceChanged();
 
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
@@ -71,6 +68,8 @@ void QnResource::update(QnResourcePtr other)
 
 void QnResource::deserialize(const QnResourceParameters& parameters)
 {
+    bool signalsBlocked = blockSignals(true);
+
     if (parameters.contains(QLatin1String("id")))
         setId(parameters[QLatin1String("id")]);
 
@@ -87,7 +86,9 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
         setUrl(parameters[QLatin1String("url")]);
 
     if (parameters.contains(QLatin1String("status")))
-        setStatus(parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline, true);
+        setStatus(parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline);
+
+    blockSignals(signalsBlocked);
 }
 
 QnId QnResource::getParentId() const
@@ -112,7 +113,12 @@ QString QnResource::getName() const
 void QnResource::setName(const QString& name)
 {
     QMutexLocker mutexLocker(&m_mutex);
+
+    if(m_name == name)
+        return;
+
     m_name = name;
+    emit nameChanged();
 }
 
 unsigned long QnResource::flags() const
@@ -461,7 +467,7 @@ QnResource::Status QnResource::getStatus() const
     return m_status;
 }
 
-void QnResource::setStatus(QnResource::Status newStatus, bool ignoreHandlers)
+void QnResource::setStatus(QnResource::Status newStatus)
 {
     Status oldStatus;
     {
@@ -470,8 +476,8 @@ void QnResource::setStatus(QnResource::Status newStatus, bool ignoreHandlers)
         m_status = newStatus;
     }
 
-    if (oldStatus != newStatus && !ignoreHandlers)
-        Q_EMIT statusChanged(oldStatus, newStatus);
+    if (oldStatus != newStatus)
+        emit statusChanged(oldStatus, newStatus);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const
