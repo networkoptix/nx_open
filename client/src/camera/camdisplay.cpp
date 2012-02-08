@@ -184,7 +184,7 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCnt--;
             if (m_delayedFrameCnt < -5)
             {
-                if (qAbs(speed) < m_toLowQSpeed)
+                if (qAbs(speed) < m_toLowQSpeed || m_toLowQSpeed < 0 && speed > 0)
                     reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality again
                 else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
                     reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
