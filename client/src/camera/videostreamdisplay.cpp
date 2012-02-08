@@ -35,7 +35,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_bufferedFrameDisplayer(0),
     m_speed(1.0),
     m_queueWasFilled(false),
-    m_canUseBufferedFrameDisplayer(true)
+    m_canUseBufferedFrameDisplayer(true),
+    m_needResetDecoder(false)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -245,6 +246,14 @@ qint64 CLVideoStreamDisplay::nextReverseTime() const
 
 CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
+
+    if (m_needResetDecoder)
+    {
+        foreach(QnAbstractVideoDecoder* dec, m_decoder)
+            dec->resetDecoder(data);
+        m_needResetDecoder = false;
+    }
+
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
 
@@ -610,6 +619,8 @@ void CLVideoStreamDisplay::afterJump()
     clearReverseQueue();
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->clear();
+    m_needResetDecoder = true;
+
     //for (QMap<CodecID, CLAbstractVideoDecoder*>::iterator itr = m_decoder.begin(); itr != m_decoder.end(); ++itr)
     //    (*itr)->resetDecoder();
     m_queueWasFilled = false;

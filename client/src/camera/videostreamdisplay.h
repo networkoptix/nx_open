@@ -47,6 +47,7 @@ public:
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
 private:
+    bool m_needResetDecoder;
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
