@@ -215,7 +215,7 @@ public:
         QSharedPointer<QnGLRendererPrivate> d = m_renderer->d;
 
         QSize textureSize = QSize(
-            d->supportsNonPower2Textures ? roundUp(stride / pixelSize, ROUND_COEFF) : minPow2(stride / pixelSize),
+            d->supportsNonPower2Textures ? roundUp((unsigned)stride / pixelSize, ROUND_COEFF) : minPow2(stride / pixelSize),
             d->supportsNonPower2Textures ? height                                   : minPow2(height)
         );
 
@@ -233,7 +233,7 @@ public:
             textureSize = m_textureSize;
         }
 
-        int roundedWidth = roundUp(width, ROUND_COEFF);
+        int roundedWidth = roundUp((unsigned) width, ROUND_COEFF);
         m_texCoords = QVector2D(
             static_cast<float>(roundedWidth) / textureSize.width(),
             static_cast<float>(height) / textureSize.height()
