@@ -157,8 +157,8 @@ void ServerSettingsDialog::removeClicked()
 {
     std::set<int> rows;
 
-    foreach (QTableWidgetItem * item, ui->storagesTable->selectedItems())
-        rows.insert(item->row());
+    foreach (QModelIndex index, ui->storagesTable->selectionModel()->selectedRows())
+        rows.insert(index.row());
 
     for (std::set<int>::const_reverse_iterator ci = rows.rbegin(); ci != rows.rend(); ++ci)
         ui->storagesTable->removeRow(*ci);

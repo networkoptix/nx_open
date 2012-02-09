@@ -1204,10 +1204,7 @@ void QnWorkbenchController::at_showMotionAction_triggered()
     //m_motionSelectionInstrument->recursiveEnable();
 
 #if 0
-    CameraScheduleWidget* test1 = new CameraScheduleWidget(0);
-    test1->show();
-#endif
-#if 1
+#if 0
     QGraphicsItem *item = display()->scene()->selectedItems().first();
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource());
