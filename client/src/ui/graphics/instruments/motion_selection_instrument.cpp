@@ -3,9 +3,10 @@
 #include <QGraphicsObject>
 #include <QMouseEvent>
 #include <QApplication>
+#include <QStyle>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/warnings.h>
 #include <ui/graphics/items/resource_widget.h>
-#include <ui/style/globals.h>
 #include <settings.h>
 
 class MotionSelectionItem: public QGraphicsObject {
@@ -27,8 +28,8 @@ public:
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        QnScopedPainterPenRollback penRollback(painter, Globals::motionRubberBandBorderColor());
-        QnScopedPainterBrushRollback brushRollback(painter, Globals::motionRubberBandColor());
+        QnScopedPainterPenRollback penRollback(painter, m_colors[MotionSelectionInstrument::Border]);
+        QnScopedPainterBrushRollback brushRollback(painter, m_colors[MotionSelectionInstrument::Base]);
         painter->drawRect(boundingRect());
     }
 
@@ -69,6 +70,12 @@ public:
         return m_corner;
     }
 
+    void setColor(MotionSelectionInstrument::ColorRole role, const QColor &color) {
+        m_colors[role] = color;
+
+        update();
+    }
+
 private:
     /** Viewport that this selection item will be drawn at. */
     QWidget *m_viewport;
@@ -78,12 +85,65 @@ private:
 
     /** Second corner of the selection item, in parent coordinates. */
     QPointF m_corner;
+
+    /** Colors for drawing the selection rect. */
+    QColor m_colors[MotionSelectionInstrument::RoleCount];
 };
 
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
-    m_emptyDrag(false)
-{}
+    m_emptyDrag(false),
+    m_selectionModifiers(0),
+    m_multiSelectionModifiers(Qt::ControlModifier)
+{
+    /* Initialize colors with some sensible defaults. Calculations are taken from XP style. */
+    QPalette palette = QApplication::style()->standardPalette();
+    QColor highlight = palette.color(QPalette::Active, QPalette::Highlight);
+    m_colors[Border] = highlight.darker(120);
+    m_colors[Base] = QColor(
+        qMin(highlight.red() / 2 + 110, 255),
+        qMin(highlight.green() / 2 + 110, 255),
+        qMin(highlight.blue() / 2 + 110, 255),
+        127
+    );
+}
+
+void MotionSelectionInstrument::setColor(ColorRole role, const QColor &color) {
+    if(role < 0 || role >= RoleCount) {
+        qnWarning("Invalid color role '%1'.", static_cast<int>(role));
+        return;
+    }
+
+    m_colors[role] = color;
+
+    if(selectionItem())
+        selectionItem()->setColor(role, color);
+}
+
+QColor MotionSelectionInstrument::color(ColorRole role) const {
+    if(role < 0 || role >= RoleCount) {
+        qnWarning("Invalid color role '%1'.", static_cast<int>(role));
+        return QColor();
+    }
+
+    return m_colors[role];
+}
+
+void MotionSelectionInstrument::setSelectionModifiers(Qt::KeyboardModifiers selectionModifiers) {
+    m_selectionModifiers = selectionModifiers;
+}
+
+Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers() const {
+    return m_selectionModifiers;
+}
+
+void MotionSelectionInstrument::setMultiSelectionModifiers(Qt::KeyboardModifiers multiSelectionModifiers) {
+    m_multiSelectionModifiers = multiSelectionModifiers;
+}
+
+Qt::KeyboardModifiers MotionSelectionInstrument::multiSelectionModifiers() const {
+    return m_multiSelectionModifiers;
+}
 
 MotionSelectionInstrument::~MotionSelectionInstrument() {
     ensureUninstalled();
@@ -110,6 +170,8 @@ void MotionSelectionInstrument::ensureSelectionItem() {
 
     m_selectionItem = new MotionSelectionItem();
     selectionItem()->setVisible(false);
+    selectionItem()->setColor(Base,     m_colors[Base]);
+    selectionItem()->setColor(Border,   m_colors[Border]);
     if(scene() != NULL)
         scene()->addItem(selectionItem());
 }
@@ -118,7 +180,7 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     if(event->button() != Qt::LeftButton)
         return false;
 
-    if(!(event->modifiers() & Qt::ShiftModifier))
+    if((event->modifiers() & m_selectionModifiers) != m_selectionModifiers)
         return false;
 
     QGraphicsView *view = this->view(viewport);
@@ -159,9 +221,8 @@ void MotionSelectionInstrument::startDrag(DragInfo *info)
         return;
     }
 
-    if (!(info->modifiers() & Qt::ControlModifier))
-        target()->clearMotionSelection();
-
+    if ((info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers)
+        emit motionRegionCleared(info->view(), target());
 
     ensureSelectionItem();
     selectionItem()->setParentItem(target());
@@ -203,29 +264,33 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
 }
 
 void MotionSelectionInstrument::finishDrag(DragInfo *info) {
-    if(!m_selectionStartedEmitted)
-        emit selectionFinished(info->view(), target());
-    
     ensureSelectionItem();
     if(target() != NULL) {
         /* Qt handles QRect borders in totally inhuman way, so we have to do everything by hand. */
         QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
         QPoint c = target()->mapToMotionGrid(selectionItem()->corner());
 
-        target()->addToMotionSelection(QRect(
-            QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
-            QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
-        ));
+        emit motionRegionSelected(
+            info->view(), 
+            target(), 
+            QRect(
+                QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
+                QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
+            )
+        );
     }
 
     selectionItem()->setVisible(false);
     selectionItem()->setParentItem(NULL);
+
+    if(m_selectionStartedEmitted)
+        emit selectionFinished(info->view(), target());
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
-    if (m_emptyDrag && (info->modifiers() & Qt::ShiftModifier) && !(info->modifiers() & Qt::ControlModifier))
+    if (m_emptyDrag && (info->modifiers() & m_selectionModifiers) == m_selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers)
     {
-        target()->clearMotionSelection();
+        emit motionRegionCleared(info->view(), target());
         m_emptyDrag = false;
     }
     emit selectionProcessFinished(info->view(), target());

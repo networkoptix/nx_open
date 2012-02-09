@@ -248,6 +248,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
 
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, Globals::motionRubberBandColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, Globals::motionRubberBandBorderColor());
+    m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
+
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_resizingInstrument->setEffectiveDistance(5);
@@ -296,6 +300,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),                               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),                              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
+    connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
+    connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -986,6 +992,14 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidge
         return; /* We may get NULL if the widget being rotated gets deleted. */
 
     widget->item()->setRotation(widget->rotation());
+}
+
+void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnResourceWidget *widget) {
+    widget->clearMotionSelection();
+}
+
+void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnResourceWidget *widget, const QRect &region) {
+    widget->addToMotionSelection(region);
 }
 
 void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {

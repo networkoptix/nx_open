@@ -76,7 +76,7 @@ public:
     void remove(const QnResourcePtr &resource);
     void remove(const QnResourceList &resources);
 
-public Q_SLOTS:
+public slots:
     void startRecording();
     void stopRecording();
 
@@ -87,7 +87,7 @@ protected:
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();
 
-protected Q_SLOTS:
+protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -98,6 +98,9 @@ protected Q_SLOTS:
 
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
+
+    void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
+    void at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &region);
 
     void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
