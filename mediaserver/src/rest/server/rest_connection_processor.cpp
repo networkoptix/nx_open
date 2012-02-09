@@ -55,7 +55,7 @@ void QnRestConnectionProcessor::run()
                     break;
                 }
             }
-            else if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
+            else //if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
             {
                 break;
             }
