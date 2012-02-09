@@ -25,10 +25,10 @@ public:
     explicit ConnectionsSettingsWidget(QWidget *parent = 0);
     ~ConnectionsSettingsWidget();
 
-    QList<Settings::ConnectionData> connections() const;
-    void setConnections(const QList<Settings::ConnectionData> &connections);
-    void addConnection(const Settings::ConnectionData &connection);
-    void removeConnection(const Settings::ConnectionData &connection);
+    QList<QnSettings::ConnectionData> connections() const;
+    void setConnections(const QList<QnSettings::ConnectionData> &connections);
+    void addConnection(const QnSettings::ConnectionData &connection);
+    void removeConnection(const QnSettings::ConnectionData &connection);
 
 protected:
     void changeEvent(QEvent *event);

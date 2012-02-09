@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Server settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -175,7 +175,7 @@
                <number>0</number>
               </property>
               <property name="columnCount">
-               <number>3</number>
+               <number>2</number>
               </property>
               <attribute name="horizontalHeaderVisible">
                <bool>false</bool>
@@ -195,11 +195,6 @@
               <attribute name="verticalHeaderVisible">
                <bool>false</bool>
               </attribute>
-              <column>
-               <property name="text">
-                <string>Name</string>
-               </property>
-              </column>
               <column>
                <property name="text">
                 <string>Path</string>

@@ -8,6 +8,7 @@ class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
 
+class QnResourcePoolUserWatcher;
 class QnBlueBackgroundPainter;
 class QnLayoutTabBar;
 class QnGraphicsView;
@@ -15,6 +16,7 @@ class QnDwm;
 class QnWorkbench;
 class QnWorkbenchController;
 class QnWorkbenchUi;
+class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 
@@ -57,21 +59,28 @@ protected slots:
     void showPreferencesDialog();
     void showAuthenticationDialog();
 
-    void at_sessionManager_error(int error);
-
     void updateFullScreenState();
     void updateDwmState();
 
+    void at_sessionManager_error(int error);
+
     void at_newLayoutRequested();
     void at_treeWidget_activated(uint resourceId);
+
+    void at_settings_lastUsedConnectionChanged();
+
+    void at_synchronizer_started();
 
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
+    QnWorkbenchSynchronizer *m_synchronizer;
     QnWorkbenchUi *m_ui;
     QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
+
+    QnResourcePoolUserWatcher *m_userWatcher;
 
     QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;

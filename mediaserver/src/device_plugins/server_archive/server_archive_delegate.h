@@ -5,7 +5,7 @@
 
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
-#include "plugins/resources/archive/avi_files/avi_device.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 #include "utils/media/sse_helper.h"

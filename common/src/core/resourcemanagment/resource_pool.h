@@ -74,7 +74,7 @@ signals:
     void resourceRemoved(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
 
-private Q_SLOTS:
+private slots:
     void handleResourceChange();
 
 private:

@@ -6,7 +6,7 @@
 class QnYuy2ToRgbShaderProgram: public QnArbShaderProgram {
     Q_OBJECT;
 public:
-    QnYuy2ToRgbShaderProgram(QObject *parent = NULL);
+    QnYuy2ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
 };
 

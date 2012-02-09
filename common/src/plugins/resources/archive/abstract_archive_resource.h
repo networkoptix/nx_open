@@ -3,8 +3,6 @@
 
 #include "core/resource/media_resource.h"
 
-
-
 class QnAbstractArchiveResource : public QnMediaResource
 {
     Q_OBJECT;

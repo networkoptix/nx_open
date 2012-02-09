@@ -89,15 +89,15 @@ public:
     void setTypeId(QnId id);
 
     Status getStatus() const;
-    void setStatus(Status newStatus, bool ignoreHandlers = false);
+    void setStatus(Status newStatus);
 
 
     // flags like network media and so on
-    unsigned long flags() const;
-    inline bool checkFlag(unsigned long flag) const { return (flags() & flag) == flag; }
-    void setFlags(unsigned long flags);
-    void addFlag(unsigned long flag);
-    void removeFlag(unsigned long flag);
+    Flags flags() const;
+    inline bool checkFlag(Flag flag) const { return (flags() & flag) == flag; }
+    void setFlags(Flags flags);
+    void addFlag(Flag flag);
+    void removeFlag(Flag flag);
 
 
     //just a simple resource name
@@ -171,6 +171,8 @@ public:
 signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
+    void nameChanged();
+    
     void resourceChanged();
 
 public:
@@ -193,43 +195,50 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
-protected:
-    //typedef QMap<QnId, QnParamList > QnParamLists; // key - resource type ID
-    //static QnParamLists staticResourcesParamLists; // list of all supported resources params list
-
-protected:
-    mutable QMutex m_mutex;
-
-    mutable QMutex m_consumersMtx;
-    QSet<QnResourceConsumer *> m_consumers;
-
-
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
-
     friend class QnResourceConsumer;
 
     void addConsumer(QnResourceConsumer *consumer);
     void removeConsumer(QnResourceConsumer *consumer);
     void disconnectAllConsumers();
 
+protected:
+    /** Mutex that is to be used when accessing a set of all consumers. */
+    mutable QMutex m_consumersMtx;
+
+    /** Set of consumers for this resource. */
+    QSet<QnResourceConsumer *> m_consumers;
+
+    /** Mutex that is to be used when accessing resource fields. */
+    mutable QMutex m_mutex;
+
 private:
+    /** Identifier of this resource. */
     QnId m_id;
+
+    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
     QnId m_parentId;
 
+    /** Identifier of the type of this resource. */
     QnId m_typeId;
 
-    unsigned long m_flags;
+    /** Flags of this resource that determine its type. */
+    Flags m_flags;
+    
+    /** Name of this resource. */
     QString m_name;
+
+    /** Status of this resource. */
+    Status m_status;
+
+    /** Url of this resource, if any. */
+    QString m_url; 
 
     QDateTime m_lastDiscoveredTime;
 
     QStringList m_tags;
-
-    QString m_url; //-
-
-    Status m_status;
 
     mutable QnParamList m_resourceParamList;
 };

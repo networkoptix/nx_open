@@ -1,18 +1,69 @@
 #include "resource_model.h"
 #include "resource_model_p.h"
-
-#include <QtCore/QCoreApplication>
-#include <QtCore/qtconcurrentrun.h>
-#include <QtCore/QMimeData>
-#include <QtCore/QUrl>
-
+#include <cassert>
+#include <QPainter>
+#include <QCoreApplication>
+#include <QMimeData>
+#include <QUrl>
 #include <core/resourcemanagment/resource_pool.h>
-
-#include "ui/style/skin.h"
-#include "ui/view_drag_and_drop.h"
-
+#include <ui/style/skin.h>
+#include <ui/view_drag_and_drop.h>
 #include "file_processor.h"
 
+
+
+class QnResourceModelPrivate
+{
+    Q_DECLARE_PUBLIC(QnResourceModel)
+
+public:
+    QnResourceModelPrivate();
+    ~QnResourceModelPrivate();
+
+    void init();
+
+    void insertNode(Node *parentNode, Node *node, int row);
+    void removeNodes(Node *parentNode, int row, int count);
+
+    Node *node(const QModelIndex &index) const;
+    Node *node(QnId id) const;
+    inline Node *node(const QnResourcePtr &resource) const
+    { return node(resource->getId()); }
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex index(Node *node, int column = 0) const;
+    QModelIndex index(QnId id, int column = 0) const;
+    inline QModelIndex index(const QnResourcePtr &resource, int column = 0) const
+    { return index(resource->getId(), column); }
+
+    inline bool isIndexValid(const QModelIndex &index) const
+    {
+        Q_Q(const QnResourceModel);
+        return (index.isValid() && index.model() == q
+            && index.row() < q->rowCount(index.parent())
+            && index.column() < q->columnCount(index.parent()));
+    }
+
+    QnResourcePtr resource(const QModelIndex &index) const { 
+        return q_ptr->data(index, QnResourceModel::ResourceRole).value<QnResourcePtr>(); 
+    }
+
+    void start();
+    void stop();
+
+    void at_resPool_resourceAdded(const QnResourcePtr &resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resPool_resourceChanged(const QnResourcePtr &resource);
+
+private:
+    QnResourceModel *q_ptr;
+
+};
+
+
+
+// -------------------------------------------------------------------------- //
+// Icons
+// -------------------------------------------------------------------------- //
 enum IconKey {
     IconTypeUnknown = 0,
     IconTypeServer = 0x0001,
@@ -99,6 +150,54 @@ static QIcon iconForKey(quint32 key)
 }
 
 
+// -------------------------------------------------------------------------- //
+// Node
+// -------------------------------------------------------------------------- //
+
+
+class Node
+{
+public:
+    inline Node() : m_id(0), m_parentId(0), m_flags(0), m_status(QnResource::Offline) {}
+    Node(const QnResourcePtr &resource);
+
+    inline bool operator==(const Node &other) const;
+    inline bool operator!=(const Node &other) const
+    { return !operator==(other); }
+
+    void updateFromResource(const QnResourcePtr &resource);
+
+    QnResourcePtr resource() const;
+
+    inline uint id() const { return m_id; }
+    inline uint parentId() const { return m_parentId; }
+    inline quint32 flags() const { return m_flags; }
+    inline QnResource::Status status() const { return m_status; }
+    inline QString name() const { return m_name; }
+    inline QString searchString() const { return m_searchString; }
+
+    QIcon icon() const;
+
+private:
+    Q_DISABLE_COPY(Node)
+
+        uint m_id;
+    uint m_parentId;
+    quint32 m_flags;
+    QnResource::Status m_status;
+    QString m_name;
+    QString m_searchString;
+};
+
+Q_DECLARE_TYPEINFO(Node, Q_MOVABLE_TYPE);
+
+bool Node::operator==(const Node &other) const
+{
+    return m_id == other.m_id && m_parentId == other.m_parentId && m_flags == other.m_flags
+        && m_status == other.m_status && m_name == other.m_name/* && m_searchString == other.m_searchString*/;
+}
+
+
 Node::Node(const QnResourcePtr &resource)
 {
     m_id = resource->getId();
@@ -153,13 +252,15 @@ QIcon Node::icon() const
 }
 
 
-QnResourceModelPrivate::QnResourceModelPrivate()
-    : q_ptr(0)
-{
-}
+// -------------------------------------------------------------------------- //
+// QnResourceModelPrivate
+// -------------------------------------------------------------------------- //
+QnResourceModelPrivate::QnResourceModelPrivate(): 
+    q_ptr(NULL),
+    resourcePool(NULL)
+{}
 
-QnResourceModelPrivate::~QnResourceModelPrivate()
-{
+QnResourceModelPrivate::~QnResourceModelPrivate() {
     Q_ASSERT(!nodes.values().contains(&root));
     qDeleteAll(nodes);
 }
@@ -175,10 +276,6 @@ void QnResourceModelPrivate::init()
     roles.insert(QnResourceModel::StatusRole,       "status");
     q->setRoleNames(roles);
 
-    q->connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), q, SLOT(at_resPool_resourceAdded(QnResourcePtr)));
-    q->connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), q, SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
-    q->connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), q, SLOT(at_resPool_resourceChanged(QnResourcePtr)));
-
     const QnResourceList resources = qnResPool->getResources(); // make a snapshot
     foreach (const QnResourcePtr &server, resources) {
         if (server->checkFlag(QnResource::server)) {
@@ -191,6 +288,16 @@ void QnResourceModelPrivate::init()
         }
     }
 }
+
+void QnResourceModelPrivate::start() {
+
+}
+
+void QnResourceModelPrivate::stop() {
+    assert(resourcePool != NULL);
+
+}
+
 
 void QnResourceModelPrivate::insertNode(Node *parentNode, Node *node, int row)
 {
@@ -321,21 +428,89 @@ void QnResourceModelPrivate::at_resPool_resourceChanged(const QnResourcePtr &res
     Q_EMIT q->dataChanged(index, index);
 }
 
-QnResourceModel::QnResourceModel(QObject *parent)
-    : QAbstractItemModel(parent), d_ptr(new QnResourceModelPrivate)
+
+// -------------------------------------------------------------------------- //
+// QnResourceModel
+// -------------------------------------------------------------------------- //
+QnResourceModel::QnResourceModel(QObject *parent): 
+    QAbstractItemModel(parent), 
+    m_resourcePool(NULL),
+    m_root(NULL)
 {
-    Q_D(QnResourceModel);
-    d->q_ptr = this;
-    d->init();
+    /* Init role names. */
+    QHash<int, QByteArray> roles = roleNames();
+    roles.insert(QnResourceModel::ResourceRole,     "resource");
+    roles.insert(QnResourceModel::IdRole,           "id");
+    roles.insert(QnResourceModel::SearchStringRole, "searchString");
+    roles.insert(QnResourceModel::StatusRole,       "status");
+    setRoleNames(roles);
+
+    /* Create root. */
+    m_root = new Node();
+
+#if 0
+    const QnResourceList resources = qnResPool->getResources(); // make a snapshot
+    foreach (const QnResourcePtr &server, resources) {
+        if (server->checkFlag(QnResource::server)) {
+            at_resPool_resourceAdded(server);
+            const QnId serverId = server->getId();
+            foreach (const QnResourcePtr &resource, resources) {
+                if (resource->getParentId() == serverId && !resource->checkFlag(QnResource::server))
+                    at_resPool_resourceAdded(resource);
+            }
+        }
+    }
+#endif
+
 }
 
-QnResourceModel::~QnResourceModel()
-{
+QnResourceModel::~QnResourceModel() {
+    setResourcePool(NULL);
+    delete m_root;
 }
 
-QModelIndex QnResourceModel::index(const QnResourcePtr &resource) const
-{
-    return d_func()->index(resource, 0);
+void QnResourceModel::setResourcePool(QnResourcePool *resourcePool) {
+    if(m_resourcePool != NULL)
+        stop();
+
+    m_resourcePool = resourcePool;
+
+    if(m_resourcePool != NULL)
+        start();
+}
+
+QnResourcePool *QnResourceModel::resourcePool() const {
+    return m_resourcePool;
+}
+
+void QnResourceModel::start() {
+    assert(m_resourcePool != NULL);
+
+    foreach(const QnResourcePtr &resource, m_resourcePool->getResources())
+        at_resPool_resourceAdded(resource);
+
+    connect(m_resourcePool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(at_resPool_resourceAdded(QnResourcePtr)));
+    connect(m_resourcePool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
+}
+
+void QnResourceModel::stop() {
+    assert(m_resourcePool != NULL);
+
+    disconnect(m_resourcePool, NULL, this, NULL);
+
+    foreach(const QnResourcePtr &resource, m_resourcePool->getResources())
+        at_resPool_resourceRemoved(resource);
+}
+
+void QnResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
+    Node *node = new Node(resource);
+
+    m_nodeById[resource->getId()] = resource;
+
+}
+
+void QnResourceModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
+
 }
 
 QModelIndex QnResourceModel::index(int row, int column, const QModelIndex &parent) const
@@ -409,36 +584,31 @@ QVariant QnResourceModel::data(const QModelIndex &index, int role) const
             return node->icon();
         break;
     case Qt::EditRole:
-        return node->id();
-    case Qt::ToolTipRole: // ###
-    case Qt::StatusTipRole: // ###
-    case Qt::WhatsThisRole: // ###
+        break;
+    case Qt::ToolTipRole:
+    case Qt::StatusTipRole:
+    case Qt::WhatsThisRole:
         return node->name();
     case Qt::FontRole:
-        // ###
         break;
     case Qt::TextAlignmentRole:
-        // ###
         break;
     case Qt::BackgroundRole:
-        // ###
         break;
     case Qt::ForegroundRole:
-        // ###
         break;
     case Qt::CheckStateRole:
-        // ###
         break;
-    case Qt::AccessibleTextRole: // ###
-    case Qt::AccessibleDescriptionRole: // ###
+    case Qt::AccessibleTextRole:
+    case Qt::AccessibleDescriptionRole:
         return node->name();
     case ResourceRole:
         return QVariant::fromValue<QnResourcePtr>(node->resource());
-    case IdRole: //Qt::UserRole + 1:
+    case IdRole: 
         return node->id();
-    case SearchStringRole: //Qt::UserRole + 2:
+    case SearchStringRole: 
         return node->searchString();
-    case StatusRole: //Qt::UserRole + 3:
+    case StatusRole: 
         return int(node->status());
     default:
         break;
@@ -449,30 +619,12 @@ QVariant QnResourceModel::data(const QModelIndex &index, int role) const
 
 bool QnResourceModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-/* if (role != Qt::EditRole)
-         return false;
-
-    TreeItem *item = getItem(index);
-    bool result = item->setData(index.column(), value);
-
-    if (result)
-         Q_EMIT dataChanged(index, index);
-
-    return result;*/
-    return false;
+    return false; /* Resource model is not editable. */
 }
 
 QVariant QnResourceModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation == Qt::Horizontal) {
-        if (role == Qt::DisplayRole) {
-            // ###
-        }
-
-        return section + 1;
-    }
-
-    return QVariant();
+    return QVariant(); // TODO: implement this?
 }
 
 void QnResourceModel::addResource(const QnResourcePtr &resource)
@@ -514,7 +666,7 @@ QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const
         if (types.contains(resourceFormat) || types.contains(urlFormat)) {
             QnResourceList resources;
             foreach (const QModelIndex &index, indexes) {
-                if (QnResourcePtr resource = this->resource(index))
+                if (QnResourcePtr resource = d_func()->resource(index))
                     resources.append(resource);
             }
             if (types.contains(resourceFormat))

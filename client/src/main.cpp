@@ -150,11 +150,11 @@ void initAppServerConnection()
 
     QUrl appServerUrl;
 
-    Settings::ConnectionData lastUsedConnection = Settings::lastUsedConnection();
+    QnSettings::ConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
 
     bool hasDefaultConnection = false;
-    QList<Settings::ConnectionData> connections = Settings::connections();
-    foreach(const Settings::ConnectionData& connection, connections)
+    QList<QnSettings::ConnectionData> connections = qnSettings->connections();
+    foreach(const QnSettings::ConnectionData& connection, connections)
     {
         if (connection.name == DEFAULT_CONNECTION_NAME)
         {
@@ -178,17 +178,17 @@ void initAppServerConnection()
         appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
         appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
-        Settings::ConnectionData connection;
+        QnSettings::ConnectionData connection;
         connection.name = DEFAULT_CONNECTION_NAME;
         connection.url = appServerUrl;
         connection.readOnly = true;
 
         connections.append(connection);
-        Settings::setConnections(connections);
+        qnSettings->setConnections(connections);
 
         lastUsedConnection.url = appServerUrl;
 
-        Settings::setLastUsedConnection(lastUsedConnection);
+        qnSettings->setLastUsedConnection(lastUsedConnection);
     }
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
@@ -281,15 +281,15 @@ int main(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
-    Settings& settings = Settings::instance();
-    settings.load();
+    QnSettings *settings = qnSettings;
+    settings->load();
 
-    if (!settings.isAfterFirstRun() && !getMoviesDirectory().isEmpty())
-        settings.addAuxMediaRoot(getMoviesDirectory());
+    if (!settings->isAfterFirstRun() && !getMoviesDirectory().isEmpty())
+        settings->addAuxMediaRoot(getMoviesDirectory());
 
-    settings.save();
+    settings->save();
 
-    cl_log.log(QLatin1String("Using ") + settings.mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
+    cl_log.log(QLatin1String("Using ") + settings->mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
     //qApp->exit();
 
@@ -322,8 +322,8 @@ int main(int argc, char *argv[])
     //QnResourceDirectoryBrowser
     QnResourceDirectoryBrowser::instance().setLocal(true);
     QStringList dirs;
-    dirs << Settings::instance().mediaRoot();
-    dirs << Settings::instance().auxMediaRoots();
+    dirs << qnSettings->mediaRoot();
+    dirs << qnSettings->auxMediaRoots();
     QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
 
@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
 
     //============================
     /*
-    QnStorageResourcePtr storage0(new QnStorage());
+    QnStorageResourcePtr storage0(new QnStorageResource());
     storage0->setUrl(getRecordingDir());
     storage0->setIndex(0);
     qnResPool->addResource(storage0);

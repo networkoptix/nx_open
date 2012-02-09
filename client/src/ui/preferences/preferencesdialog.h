@@ -45,7 +45,7 @@ private Q_SLOTS:
 private:
     Q_DISABLE_COPY(PreferencesDialog)
 
-    Settings::Data m_settingsData;
+    QnSettings::Data m_settingsData;
     ConnectionsSettingsWidget *connectionsSettingsWidget;
     RecordingSettingsWidget *videoRecorderWidget;
     YouTubeSettingsWidget *youTubeSettingsWidget;

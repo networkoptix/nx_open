@@ -1,5 +1,5 @@
-#ifndef __SERVER_CAMERA_H__
-#define __SERVER_CAMERA_H__
+#ifndef QN_SERVER_CAMERA_H
+#define QN_SERVER_CAMERA_H
 
 #include "core/resource/camera_resource.h"
 
@@ -37,4 +37,4 @@ public:
 
 typedef QSharedPointer<QnServerCamera> QnServerCameraPtr;
 
-#endif // __SERVER_CAMERA_H__
+#endif // QN_SERVER_CAMERA_H

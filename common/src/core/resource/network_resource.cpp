@@ -3,27 +3,24 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
-/*
-static const char *property_descriptions[] = {
-    QT_TRANSLATE_NOOP("QnResource", "IP Address"),
-    QT_TRANSLATE_NOOP("QnResource", "MAC Address"),
-    QT_TRANSLATE_NOOP("QnResource", "Authentication")
-};
-*/
+
+Q_DECLARE_METATYPE(QHostAddress);
+Q_DECLARE_METATYPE(QAuthenticator);
+
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
       m_networkStatus(0),
       m_networkTimeout(2000),
       m_authenticated(true)
 {
-/*    static volatile bool metaTypesInitialized = false;
+    static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
         qRegisterMetaType<QHostAddress>();
         qRegisterMetaType<QnMacAddress>();
         qRegisterMetaType<QAuthenticator>();
         metaTypesInitialized = true;
     }
-*/
+
     addFlag(network);
 }
 

@@ -1,5 +1,6 @@
-#ifndef clabstract_draw_h_20_57
-#define clabstract_draw_h_20_57
+#ifndef QN_ABSTRACT_RENDERER_H
+#define QN_ABSTRACT_RENDERER_H
+
 #include "utils/media/frame_info.h"
 
 class CLVideoDecoderOutput;
@@ -95,4 +96,4 @@ private:
     int m_displayCounter;
 };
 
-#endif //clgl_draw_h_20_31
+#endif // QN_ABSTRACT_RENDERER_H

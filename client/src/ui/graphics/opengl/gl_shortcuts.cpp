@@ -1,4 +1,4 @@
-#include "opengl.h"
+#include "gl_shortcuts.h"
 #include <utils/common/warnings.h>
 
 int glCheckError(const char *context) {

@@ -2,6 +2,7 @@
 #define QN_CORE_CHECKED_CAST_H
 
 #include <cassert>
+#include <QSharedPointer>
 
 template<class Target, class Source>
 Target checked_cast(Source *source) {
@@ -22,6 +23,17 @@ Target checked_cast(Source &source) {
     return dynamic_cast<Target>(source);
 #else
     return static_cast<Target>(source);
+#endif // NDEBUG
+}
+
+template<class Target, class Source>
+QSharedPointer<Target> checked_cast(const QSharedPointer<Source> &source) {
+#ifndef NDEBUG
+    QSharedPointer<Target> result = source.template dynamicCast<Target>();
+    assert(source.isNull() || !result.isNull());
+    return result;
+#else
+    return source.staticCast<Target>();
 #endif // NDEBUG
 }
 

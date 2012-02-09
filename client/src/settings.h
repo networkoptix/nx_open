@@ -1,14 +1,19 @@
-#ifndef global_settings_h1933
-#define global_settings_h1933
+#ifndef QN_SETTINGS_H
+#define QN_SETTINGS_H
 
+#include <QObject>
 #include <QUrl>
-#include <QColor>
 #include <QSettings>
+#include <QStringList>
+#include <QReadWriteLock>
 
-class Settings
-{
+class QnSettings: public QObject {
+    Q_OBJECT;
+
 public:
-    static Settings& instance();
+    QnSettings();
+
+    static QnSettings *instance();
 
     struct Data
     {
@@ -20,8 +25,8 @@ public:
         QStringList auxMediaRoots;
     };
 
-    void update(const Data& data);
-    void fillData(Data& data) const;
+    void update(const Data &data);
+    void fillData(Data &data) const;
 
     void load();
     void save();
@@ -32,9 +37,8 @@ public:
     bool isAfterFirstRun() const;
     QString mediaRoot() const;
     QStringList auxMediaRoots() const;
-    void addAuxMediaRoot(const QString& root);
+    void addAuxMediaRoot(const QString &root);
 
-    // ### separate out ?
     struct ConnectionData {
         ConnectionData()
             : readOnly(false)
@@ -47,29 +51,36 @@ public:
         QUrl url;
         bool readOnly;
     };
-    static ConnectionData lastUsedConnection();
-    static void setLastUsedConnection(const ConnectionData &connection);
-    static QList<ConnectionData> connections();
-    static void setConnections(const QList<ConnectionData> &connections);
-    // ###
 
-    static bool haveValidLicense();
+    ConnectionData lastUsedConnection();
+    void setLastUsedConnection(const ConnectionData &connection);
+    QList<ConnectionData> connections();
+    void setConnections(const QList<ConnectionData> &connections);
+
+    bool haveValidLicense();
+
+signals:
+    /**
+     * This signal is emitted whenever last used connection changes.
+     * 
+     * Note that due to implementation limitations, this signal may get emitted
+     * even if the actual connection parameters didn't change.
+     */
+    void lastUsedConnectionChanged();
 
 private:
-    Settings();
-    Settings(const Settings&) {}
-
-    void setMediaRoot(const QString& root);
+    void setMediaRoot(const QString &root);
     void setAllowChangeIP(bool allow);
-    void setAuxMediaRoots(const QStringList&);
-    void removeAuxMediaRoot(const QString& root);
+    void setAuxMediaRoots(const QStringList &);
+    void removeAuxMediaRoot(const QString &root);
     void reset();
 
 private:
-    mutable QReadWriteLock m_RWLock;
+    mutable QReadWriteLock m_lock;
     QSettings m_settings;
-
     Data m_data;
 };
 
-#endif //global_settings_h1933
+#define qnSettings QnSettings::instance()
+
+#endif // QN_SETTINGS_H

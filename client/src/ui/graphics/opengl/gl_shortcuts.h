@@ -1,5 +1,5 @@
-#ifndef QN_OPENGL_H
-#define QN_OPENGL_H
+#ifndef QN_GL_SHORTCUTS_H
+#define QN_GL_SHORTCUTS_H
 
 #include <QtOpenGL>
 #include <cmath> /* For std::sin & std::cos. */
@@ -111,4 +111,4 @@ inline void glRotate(double angle, double x, double y, double z) {
 int glCheckError(const char *context);
 
 
-#endif // QN_OPENGL_H
+#endif // QN_GL_SHORTCUTS_H

@@ -7,7 +7,9 @@
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
-#include <ui/common/opengl.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include "yuvconvert.h"
@@ -15,30 +17,6 @@
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
-#endif
-
-#ifndef GL_CLAMP_TO_EDGE
-#   define GL_CLAMP_TO_EDGE    0x812F
-#endif
-
-#ifndef GL_CLAMP_TO_EDGE_SGIS
-#   define GL_CLAMP_TO_EDGE_SGIS 0x812F
-#endif
-
-#ifndef GL_CLAMP_TO_EDGE_EXT
-#   define GL_CLAMP_TO_EDGE_EXT 0x812F
-#endif
-
-/* Support old OpenGL installations (1.2).
- * Assume that if TEXTURE0 isn't defined, none are. */
-#ifndef GL_TEXTURE0
-#   define GL_TEXTURE0    0x84C0
-#   define GL_TEXTURE1    0x84C1
-#   define GL_TEXTURE2    0x84C2
-#endif
-
-#ifndef APIENTRY
-#   define APIENTRY
 #endif
 
 #define QN_GL_RENDERER_DEBUG
@@ -61,46 +39,66 @@ namespace {
         return result;
     }
 
-    typedef void (APIENTRY *PFNActiveTexture) (GLenum);
+    static bool qn_openGlInfoWrittenOut = false;
 
 } // anonymous namespace
 
 
 // -------------------------------------------------------------------------- //
-// QnGLRendererSharedData
+// QnGLRendererPrivate
 // -------------------------------------------------------------------------- //
-class QnGLRendererSharedData {
-    Q_DECLARE_TR_FUNCTIONS(QnGLRendererSharedData);
+class QnGLRendererPrivate: public QnGlFunctions
+{
+    Q_DECLARE_TR_FUNCTIONS(QnGLRendererPrivate);
 
 public:
-    QnGLRendererSharedData():
-        supportsArbShaders(false),
+    static int getMaxTextureSize() { return maxTextureSize; }
+
+    QnGLRendererPrivate(const QGLContext *context):
+        QnGlFunctions(context),
         supportsNonPower2Textures(false),
-        status(QnGLRenderer::SUPPORTED),
-        maxTextureSize(0)
+        status(QnGLRenderer::SUPPORTED)
     {
-        glActiveTexture = (PFNActiveTexture) QGLContext::currentContext()->getProcAddress(QLatin1String("glActiveTexture"));
-        if (!glActiveTexture)
-            CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("GL_ARB_multitexture not supported"), cl_logWARNING);
-
-        /* OpenGL info. */
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
-        qnDebug("OpenGL extensions: %1.", extensions);
-
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-        qnDebug("OpenGL version: %1.", version);
-
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-        qnDebug("OpenGL renderer: %1.", renderer);
-
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-        qnDebug("OpenGL vendor: %1.", vendor);
 
-        if (version <= QByteArray("1.1.0")) {
-            const QString message = tr("OpenGL driver is not installed or outdated. Please update video driver for better perfomance.");
-            qnWarning("%1", message);
-            QMessageBox::warning(0, tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
+        /* Write out OpenGL info. */
+        if(!qn_openGlInfoWrittenOut) {
+            qn_openGlInfoWrittenOut = true;
+
+            qnDebug("OpenGL extensions: %1.", extensions);
+            qnDebug("OpenGL version: %1.", version);
+            qnDebug("OpenGL renderer: %1.", renderer);
+            qnDebug("OpenGL vendor: %1.", vendor);
+
+            bool messageBoxShown = false;
+
+            if (!(features() & QnGlFunctions::OpenGL1_3))
+                qnWarning("Multitexturing is not supported.");
+
+            if (version <= QByteArray("1.1.0") && !messageBoxShown) {
+                qnWarning("OpenGL version %1 is not supported.", version);
+
+                const QString message = tr("OpenGL driver is not installed or outdated. Please update video driver for better perfomance.");
+                QMessageBox::warning(0, tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                messageBoxShown = true;
+            }
+
+            if (!(features() & QnGlFunctions::ArbPrograms) && !messageBoxShown) {
+                qnWarning("OpenGL ARB shaders not supported, using software YUV to RGB conversion.");
+
+                const QString message = tr("We have detected that your video card drivers may be not installed or out of date.\n"
+                    "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
+                    "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
+                QMessageBox::warning(0, tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                messageBoxShown = true;
+            }
         }
+
+        if(!(features() & QnGlFunctions::ArbPrograms))
+            status = QnGLRenderer::NOT_SUPPORTED; /* In this first revision we do not support software color transform. */
 
         /* Maximal texture size. */
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -120,23 +118,8 @@ public:
         supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
 
         /* Prepare shaders. */
-        m_yuy2ToRgbShaderProgram.reset(new QnYuy2ToRgbShaderProgram());
-        m_yv12ToRgbShaderProgram.reset(new QnYv12ToRgbShaderProgram());
-
-        if (QnArbShaderProgram::hasArbShaderPrograms()) {
-            supportsArbShaders = true;
-        } else {
-            supportsArbShaders = false;
-            qnWarning("OpenGL ARB shaders not supported, using software YUV to RGB conversion.");
-
-            /* In this first revision we do not support software color transform. */
-            status = QnGLRenderer::NOT_SUPPORTED;
-
-            const QString message = tr("We have detected that your video card drivers may be not installed or out of date.\n"
-                                       "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
-                                       "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
-            QMessageBox::warning(0, tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
-        }
+        m_yuy2ToRgbShaderProgram.reset(new QnYuy2ToRgbShaderProgram(context));
+        m_yv12ToRgbShaderProgram.reset(new QnYv12ToRgbShaderProgram(context));
     }
 
     uchar *filler(uchar value, int size) {
@@ -155,11 +138,9 @@ public:
 public:
     QnGLRenderer::HardwareStatus status;
 
-    PFNActiveTexture glActiveTexture;
     GLint clampConstant;
     bool supportsNonPower2Textures;
-    bool supportsArbShaders;
-    int maxTextureSize;
+    static int maxTextureSize;
 
     QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
     QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
@@ -169,7 +150,10 @@ private:
     QVector<uchar> fillers[256];
 };
 
-Q_GLOBAL_STATIC(QnGLRendererSharedData, qn_glRendererSharedData);
+int QnGLRendererPrivate::maxTextureSize = 0;
+
+typedef QnGlContextData<QnGLRendererPrivate, QnGlContextDataForwardingFactory<QnGLRendererPrivate> > QnGLRendererPrivateStorage;
+Q_GLOBAL_STATIC(QnGLRendererPrivateStorage, qn_glRendererPrivateStorage);
 
 
 // -------------------------------------------------------------------------- //
@@ -183,7 +167,8 @@ public:
         m_textureSize(QSize(0, 0)),
         m_contentSize(QSize(0, 0)),
         m_id(-1),
-        m_fillValue(-1)
+        m_fillValue(-1),
+        m_renderer(NULL)
     {}
 
     ~QnGlRendererTexture() {
@@ -193,6 +178,10 @@ public:
         // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
         if(m_allocated)
             QnGLRenderer::m_garbage.append(m_id); /* To delete later. */
+    }
+
+    void setRenderer(QnGLRenderer *renderer) {
+        m_renderer = renderer;
     }
 
     const QVector2D &texCoords() const {
@@ -212,6 +201,8 @@ public:
     }
 
     void ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
+        assert(m_renderer != NULL);
+
         ensureAllocated();
 
         QSize contentSize = QSize(width, height);
@@ -221,7 +212,7 @@ public:
 
         m_contentSize = contentSize;
 
-        QnGLRendererSharedData *d = qn_glRendererSharedData();
+        QSharedPointer<QnGLRendererPrivate> d = m_renderer->d;
 
         QSize textureSize = QSize(
             d->supportsNonPower2Textures ? roundUp(stride / pixelSize, ROUND_COEFF) : minPow2(stride / pixelSize),
@@ -314,6 +305,7 @@ private:
     GLubyte m_fillColor;
     GLuint m_id;
     int m_fillValue;
+    QnGLRenderer *m_renderer;
 };
 
 
@@ -322,8 +314,9 @@ private:
 // -------------------------------------------------------------------------- //
 QList<GLuint> QnGLRenderer::m_garbage;
 
-int QnGLRenderer::maxTextureSize() {
-    return qn_glRendererSharedData()->maxTextureSize;
+int QnGLRenderer::maxTextureSize() 
+{
+    return QnGLRendererPrivate::getMaxTextureSize();
 }
 
 void QnGLRenderer::clearGarbage()
@@ -351,9 +344,14 @@ bool QnGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
     return false;
 }
 
-QnGLRenderer::QnGLRenderer():
-    m_shared(qn_glRendererSharedData())
+QnGLRenderer::QnGLRenderer(const QGLContext *context)
 {
+    /* Postpone private initialization until it is actually needed.
+     * This way if context is NULL, then we will pick the right context when
+     * paint event is delivered. */
+    m_context = context;
+    m_glInitialized = false;
+
     m_forceSoftYUV = false;
     m_textureUploaded = false;
     m_stride_old = 0;
@@ -376,8 +374,10 @@ QnGLRenderer::QnGLRenderer():
 
     m_lastDisplayedFlags = 0;
     
-    for(int i = 0; i < TEXTURE_COUNT; i++)
+    for(int i = 0; i < TEXTURE_COUNT; i++) {
         m_textures[i].reset(new QnGlRendererTexture());
+        m_textures[i]->setRenderer(this);
+    }
 
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 }
@@ -385,6 +385,22 @@ QnGLRenderer::QnGLRenderer():
 QnGLRenderer::~QnGLRenderer()
 {
     qFreeAligned(m_yuv2rgbBuffer);
+}
+
+void QnGLRenderer::ensureGlInitialized() {
+    if(m_glInitialized)
+        return;
+
+    if(m_context == NULL)
+        m_context = QGLContext::currentContext();
+
+    QnGLRendererPrivateStorage *storage = qn_glRendererPrivateStorage();
+    if(storage)
+        d = qn_glRendererPrivateStorage()->get(m_context);
+    if(d.isNull()) /* Application is being shut down. */
+        d = QSharedPointer<QnGLRendererPrivate>(new QnGLRendererPrivate(NULL));
+
+    m_glInitialized = true;
 }
 
 void QnGLRenderer::beforeDestroy()
@@ -633,8 +649,6 @@ void QnGLRenderer::updateTexture()
 
 void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float* v_array)
 {
-    PFNActiveTexture glActiveTexture = m_shared->glActiveTexture;
-
     float tx_array[8] = {
         0.0f, 0.0f,
         tex0->texCoords().x(), 0.0f,
@@ -647,22 +661,22 @@ void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTextu
 
     QnYv12ToRgbShaderProgram *prog = NULL;
     if (usingShaderYuvToRgb()) {
-        prog = m_shared->m_yv12ToRgbShaderProgram.data();
+        prog = d->m_yv12ToRgbShaderProgram.data();
 
         prog->bind();
         prog->setParameters(m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_painterOpacity);
 
-        glActiveTexture(GL_TEXTURE2);
+        d->glActiveTexture(GL_TEXTURE2);
         glCheckError("glActiveTexture");
         glBindTexture(GL_TEXTURE_2D, tex2->id());
         glCheckError("glBindTexture");
 
-        glActiveTexture(GL_TEXTURE1);
+        d->glActiveTexture(GL_TEXTURE1);
         glCheckError("glActiveTexture");
         glBindTexture(GL_TEXTURE_2D, tex1->id());
         glCheckError("glBindTexture");
 
-        glActiveTexture(GL_TEXTURE0);
+        d->glActiveTexture(GL_TEXTURE0);
         glCheckError("glActiveTexture");
         glBindTexture(GL_TEXTURE_2D, tex0->id());
         glCheckError("glBindTexture");
@@ -714,6 +728,8 @@ void QnGLRenderer::update()
 
 QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
 {
+    ensureGlInitialized();
+
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     if (m_painterOpacity < 1.0) {
@@ -785,15 +801,5 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
 }
 
 bool QnGLRenderer::usingShaderYuvToRgb() const {
-    return m_shared->supportsArbShaders && m_shared->glActiveTexture != NULL && !m_forceSoftYUV && isYuvFormat();
+    return (d->features() & QnGlFunctions::ArbPrograms) && (d->features() & QnGlFunctions::OpenGL1_3) && !m_forceSoftYUV && isYuvFormat();
 }
-
-
-
-
-
-
-
-
-
-

@@ -1,170 +1,183 @@
 #include "workbench_layout_synchronizer.h"
-#include <core/resourcemanagment/resource_pool.h>
+#include <cassert>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/delete_later.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include "workbench.h"
 #include "workbench_layout.h"
 
-QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QObject *parent):
+namespace {
+    const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
+}
+
+Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
+
+QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent),
+    m_layout(layout),
+    m_resource(resource),
+    m_update(false),
     m_submit(false),
-    m_update(false)
-{}
+    m_autoDeleting(false)
+{
+    if(layout == NULL) {
+        qnNullWarning(layout);
+        return;
+    } else if(!layout->property(layoutSynchronizerPropertyName).isNull()) {
+        qnWarning("Given layout '%1' already has an associated layout synchronizer.", layout->name());
+        return;
+    }
+
+    if(resource.isNull()) {
+        qnNullWarning(resource);
+        return;
+    } else if(!resource->property(layoutSynchronizerPropertyName).isNull()) { 
+        qnWarning("Given resource '%1' already has an associated layout synchronizer.", resource->getName());
+        return;
+    }
+
+    initialize();
+}
 
 QnWorkbenchLayoutSynchronizer::~QnWorkbenchLayoutSynchronizer() {
-    setWorkbench(NULL);
-    setUser(QnUserResourcePtr());
+    clearLayout();
+    clearResource();
 }
 
-void QnWorkbenchLayoutSynchronizer::setWorkbench(QnWorkbench *workbench) {
-    if(m_workbench == workbench)
+void QnWorkbenchLayoutSynchronizer::setAutoDeleting(bool autoDeleting) {
+    if(m_autoDeleting == autoDeleting)
         return;
 
-    if(m_workbench != NULL && !m_user.isNull())
-        deinitUserWorkbench();
+    m_autoDeleting = autoDeleting;
 
-    m_workbench = workbench;
-
-    if(m_workbench != NULL && !m_user.isNull())
-        initUserWorkbench();
+    autoDeleteLater();
 }
 
-void QnWorkbenchLayoutSynchronizer::setUser(const QnUserResourcePtr &user) {
-    if(m_user == user)
+void QnWorkbenchLayoutSynchronizer::clearLayout() {
+    if(m_layout == NULL)
         return;
 
-    if(m_workbench != NULL && !m_user.isNull())
-        deinitUserWorkbench();
+    if(!m_resource.isNull())
+        deinitialize();
 
-    m_user = user;
-
-    if(m_workbench != NULL && !m_user.isNull())
-        initUserWorkbench();
+    m_layout = NULL;
 }
 
-void QnWorkbenchLayoutSynchronizer::addLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
-    assert(layout != NULL && !resource.isNull());
-    assert(!m_resourceByLayout.contains(layout));
-    assert(!m_layoutByResource.contains(resource));
+void QnWorkbenchLayoutSynchronizer::clearResource() {
+    if(m_resource.isNull())
+        return;
 
-    m_layoutByResource[resource] = layout;
-    m_resourceByLayout[layout] = resource;
+    if(m_layout != NULL)
+        deinitialize();
 
-    connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),       this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-    connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),     this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-    connect(layout,             SIGNAL(nameChanged()),                      this, SLOT(at_layout_nameChanged()));
-    connect(resource.data(),    SIGNAL(resourceChanged()),                  this, SLOT(at_layout_resourceChanged()));
+    m_resource.clear();
 }
 
-void QnWorkbenchLayoutSynchronizer::removeLayoutResource(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
-    assert(layout != NULL && !resource.isNull());
-    assert(m_resourceByLayout.contains(layout));
-    assert(m_layoutByResource.contains(resource));
+void QnWorkbenchLayoutSynchronizer::initialize() {
+    assert(m_layout != NULL && !m_resource.isNull());
 
-    m_layoutByResource.remove(resource);
-    m_resourceByLayout.remove(layout);
+    m_resource->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
+    m_layout->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
+
+    connect(m_layout,           SIGNAL(itemAdded(QnWorkbenchItem *)),       this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(m_layout,           SIGNAL(itemRemoved(QnWorkbenchItem *)),     this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
+    connect(m_layout,           SIGNAL(nameChanged()),                      this, SLOT(at_layout_nameChanged()));
+    connect(m_layout,           SIGNAL(aboutToBeDestroyed()),               this, SLOT(at_layout_aboutToBeDestroyed()));
+    connect(m_resource.data(),  SIGNAL(resourceChanged()),                  this, SLOT(at_resource_resourceChanged()));
+    connect(m_resource.data(),  SIGNAL(nameChanged()),                      this, SLOT(at_resource_nameChanged()));
+
+    m_update = m_submit = true;
 }
 
-void QnWorkbenchLayoutSynchronizer::initUserWorkbench() {
-    connect(m_user.data(),      SIGNAL(resourceChanged()),                  this, SLOT(at_user_resourceChanged()));
+void QnWorkbenchLayoutSynchronizer::deinitialize() {
+    assert(m_layout != NULL && !m_resource.isNull());
 
-    connect(m_workbench,        SIGNAL(aboutToBeDestroyed()),               this, SLOT(at_workbench_aboutToBeDestroyed()));
-    connect(m_workbench,        SIGNAL(layoutsChanged()),                   this, SLOT(at_workbench_layoutsChanged()));
-    connect(m_workbench,        SIGNAL(currentLayoutAboutToBeChanged()),    this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
+    m_update = m_submit = false;
 
-    m_submit = m_update = true;
+    disconnect(m_layout, NULL, this, NULL);
+    disconnect(m_resource.data(), NULL, this, NULL);
+
+    m_resource->setProperty(layoutSynchronizerPropertyName, QVariant());
+    m_layout->setProperty(layoutSynchronizerPropertyName, QVariant());
+
+    autoDeleteLater();
 }
 
-void QnWorkbenchLayoutSynchronizer::deinitUserWorkbench() {
-    m_submit = m_update = false;
-    
-
+QnWorkbenchLayoutSynchronizer *QnWorkbenchLayoutSynchronizer::instance(QnWorkbenchLayout *layout) {
+    return layout->property(layoutSynchronizerPropertyName).value<QnWorkbenchLayoutSynchronizer *>();
 }
 
-// -------------------------------------------------------------------------- //
-// User / Workbench handlers
-// -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutSynchronizer::at_user_resourceChanged() {
+QnWorkbenchLayoutSynchronizer *QnWorkbenchLayoutSynchronizer::instance(const QnLayoutResourcePtr &resource) {
+    return resource->property(layoutSynchronizerPropertyName).value<QnWorkbenchLayoutSynchronizer *>();
+}
+
+void QnWorkbenchLayoutSynchronizer::autoDeleteLater() {
+    if(m_autoDeleting)
+        QMetaObject::invokeMethod(this, "autoDelete", Qt::QueuedConnection);
+}
+
+void QnWorkbenchLayoutSynchronizer::autoDelete() {
+    if(m_autoDeleting && (m_resource.isNull() || m_layout == NULL))
+        qnDeleteLater(this);
+}
+
+void QnWorkbenchLayoutSynchronizer::update() {
     if(!m_update)
         return;
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
-
-    QSet<QnLayoutResourcePtr> resources = m_user->getLayouts().toSet();
-
-    /* New layouts may have been added, but these are not on the workbench, 
-     * so we don't need to do anything about them. 
-     * 
-     * Layouts may have been removed, and in this case we need to remove them
-     * from the workbench too. */
-    foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutResourcePtr resource = this->resource(layout);
-
-        if(!resources.contains(resource))
-            delete layout;
-    }
+    m_layout->load(m_resource);
 }
 
-void QnWorkbenchLayoutSynchronizer::at_workbench_aboutToBeDestroyed() {
-    setWorkbench(NULL);
-}
-
-void QnWorkbenchLayoutSynchronizer::at_workbench_layoutsChanged() {
+void QnWorkbenchLayoutSynchronizer::submit() {
     if(!m_submit)
         return;
 
     QnScopedValueRollback<bool> guard(&m_update, false);
-
-    /* Layout may have been closed, but it doesn't mean that we should remove it.
-     *
-     * New layout may have been added, and in this case we need to create a new'
-     * resource for it. */
-    foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutResourcePtr resource = this->resource(layout);
-        if(resource.isNull()) {
-            resource = QnLayoutResourcePtr(new QnLayoutResource());
-            qnResPool->addResource(resource);
-
-            m_user->addLayout(resource);
-
-            addLayoutResource(layout, resource);
-            submitLayout(layout, resource);
-        }
-    }
+    m_layout->save(m_resource);
 }
 
 
 // -------------------------------------------------------------------------- //
-// Layout handlers
+// Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutSynchronizer::updateLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
+void QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged() {
+    update();
+}
+
+void QnWorkbenchLayoutSynchronizer::at_resource_nameChanged() {
     if(!m_update)
         return;
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
-    layout->load(resource);
-}
-
-void QnWorkbenchLayoutSynchronizer::submitLayout(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource) {
-    if(!m_submit)
-        return;
-
-    QnScopedValueRollback<bool> guard(&m_update, false);
-    layout->save(resource);
-}
-
-void QnWorkbenchLayoutSynchronizer::at_layout_resourceChanged() {
-    if(!m_update)
-        return;
+    m_layout->setName(m_resource->getName());
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
+    Q_UNUSED(item);
 
+    submit();
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
+    Q_UNUSED(item);
 
+    submit();
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_nameChanged() {
+    if(!m_submit)
+        return;
 
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    m_resource->setName(m_layout->name());
 }
+
+void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed() {
+    clearLayout();
+}
+
+

@@ -18,14 +18,14 @@ public:
     explicit LoginDialog(QWidget *parent = 0);
     ~LoginDialog();
 
-public Q_SLOTS:
+public slots:
     virtual void accept();
     virtual void reset();
 
 protected:
     void changeEvent(QEvent *event);
 
-private Q_SLOTS:
+private slots:
     void testSettings();
     void updateStoredConnections();
     void currentIndexChanged(int index);

@@ -1,5 +1,8 @@
-#ifndef mac_address_h_2244
-#define mac_address_h_2244
+#ifndef QN_MAC_ADDRESS_H
+#define QN_MAC_ADDRESS_H
+
+#include <QString>
+#include <QMetaType>
 
 class QnMacAddress
 {
@@ -31,6 +34,6 @@ private:
 
 };
 
-
-
-#endif //mac_address_h_2244
+Q_DECLARE_METATYPE(QnMacAddress)
+    
+#endif //QN_MAC_ADDRESS_H

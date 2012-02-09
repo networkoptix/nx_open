@@ -1,8 +1,8 @@
 #include "yv12_to_rgb_shader_program.h"
 #include <cmath> /* For std::sin & std::cos. */
 
-QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(QObject *parent): 
-    QnArbShaderProgram(parent) 
+QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent): 
+    QnArbShaderProgram(context, parent) 
 {
     addShaderFromSourceCode(QGLShader::Fragment, 
         "!!ARBfp1.0"

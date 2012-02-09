@@ -24,6 +24,8 @@ ServerSettingsDialog::ServerSettingsDialog(QWidget *parent, QnVideoServerResourc
 {
     ui->setupUi(this);
     ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->storagesTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    ui->storagesTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
 
     // qt designed do not save this flag (probably because of a bug in qt designer)
     ui->storagesTable->horizontalHeader()->setVisible(true);
@@ -67,12 +69,11 @@ bool ServerSettingsDialog::saveToModel()
     int rowCount = ui->storagesTable->rowCount();
     for (int row = 0; row < rowCount; ++row)
     {
-        QString name = ui->storagesTable->item(row, 0)->text();
-        QString path = ui->storagesTable->item(row, 1)->text();
-        int spaceLimit = ui->storagesTable->item(row, 2)->text().toInt();
+        QString path = ui->storagesTable->item(row, 0) ? ui->storagesTable->item(row, 0)->text() : "";
+        int spaceLimit = static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row, 1))->value();
 
         QnStorageResourcePtr storage(new QnStorageResource());
-        storage->setName(name.trimmed());
+        storage->setName(QUuid::createUuid().toString());
         storage->setParentId(m_server->getId());
         storage->setUrl(path.trimmed());
         storage->setSpaceLimit(spaceLimit * BILLION);
@@ -102,10 +103,21 @@ bool ServerSettingsDialog::saveToModel()
     return true;
 }
 
+QSpinBox* ServerSettingsDialog::createSpinCellWidget(QWidget* parent)
+{
+    QSpinBox* spinBox = new QSpinBox(parent);
+
+    spinBox->setValue(5);
+    spinBox->setMinimum(0);
+    spinBox->setMaximum(100000);
+
+    return spinBox;
+}
+
 void ServerSettingsDialog::initView()
 {
     ui->nameEdit->setText(m_server->getName());
-    ui->ipAddressEdit->setText(m_server->getUrl());
+    ui->ipAddressEdit->setText(QUrl(m_server->getUrl()).host());
     ui->apiPortEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
     ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
@@ -113,9 +125,10 @@ void ServerSettingsDialog::initView()
     {
         int row = ui->storagesTable->rowCount();
         ui->storagesTable->insertRow(row);
-        ui->storagesTable->setItem(row, 0, new QTableWidgetItem(storage->getName(), QTableWidgetItem::Type));
-        ui->storagesTable->setItem(row, 1, new QTableWidgetItem(storage->getUrl(), QTableWidgetItem::Type));
-        ui->storagesTable->setItem(row, 2, new QTableWidgetItem(QString::number(storage->getSpaceLimit() / (BILLION)), QTableWidgetItem::Type));
+        ui->storagesTable->setCellWidget (row, 1, createSpinCellWidget(ui->storagesTable));
+        ui->storagesTable->setItem(row, 0, new QTableWidgetItem(storage->getUrl(), QTableWidgetItem::Type));
+        static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row,1))->setValue(storage->getSpaceLimit() / (BILLION));
+        // setItem(row, 1, new QTableWidgetItem(QString::number(storage->getSpaceLimit() / (BILLION)), QTableWidgetItem::Type));
     }
 }
 
@@ -135,15 +148,17 @@ void ServerSettingsDialog::save()
 
 void ServerSettingsDialog::addClicked()
 {
-    ui->storagesTable->insertRow(ui->storagesTable->rowCount());
+    int row = ui->storagesTable->rowCount();
+    ui->storagesTable->insertRow(row);
+    ui->storagesTable->setCellWidget (row, 1, createSpinCellWidget(ui->storagesTable));
 }
 
 void ServerSettingsDialog::removeClicked()
 {
     std::set<int> rows;
 
-    foreach (QTableWidgetItem * item, ui->storagesTable->selectedItems())
-        rows.insert(item->row());
+    foreach (QModelIndex index, ui->storagesTable->selectionModel()->selectedRows())
+        rows.insert(index.row());
 
     for (std::set<int>::const_reverse_iterator ci = rows.rbegin(); ci != rows.rend(); ++ci)
         ui->storagesTable->removeRow(*ci);
@@ -151,32 +166,17 @@ void ServerSettingsDialog::removeClicked()
 
 bool ServerSettingsDialog::validateStorages(const QnStorageResourceList& storages, QString& errorString)
 {
-    QSet<QString> names;
-
     foreach (const QnStorageResourcePtr& storage, storages)
     {
-        if (storage->getName().isEmpty())
-        {
-            errorString = "Storage name should not be empty. Please select any name you like.";
-            return false;
-        }
-
         if (storage->getUrl().isEmpty())
         {
-            errorString = "Storage name should not be empty. Please select any name you like.";
+            errorString = "Storage path should not be empty.";
             return false;
         }
 
-        if (names.contains(storage->getName()))
+        if (storage->getSpaceLimit() < 0)
         {
-            errorString = "Storage name should be unique";
-            return false;
-        }
-        names.insert(storage->getName());
-
-        if (storage->getSpaceLimit() <= 0)
-        {
-            errorString = "Space Limit should be positive integer";
+            errorString = "Space Limit should be non-negative integer";
             return false;
         }
     }

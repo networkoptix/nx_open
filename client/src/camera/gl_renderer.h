@@ -2,13 +2,16 @@
 #define QN_GL_RENDERER_H
 
 #include <QMutex>
+#include <QMap>
 #include <QWaitCondition>
 #include <QtOpenGL>
+#include <QScopedPointer>
+#include <QSharedPointer>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "render_status.h"
 
 class CLVideoDecoderOutput;
-class QnGLRendererSharedData;
+class QnGLRendererPrivate;
 class QnGlRendererTexture;
 
 class QnGLRenderer: public QnRenderStatus
@@ -20,7 +23,7 @@ public:
         NOT_SUPPORTED
     };
 
-    QnGLRenderer();
+    QnGLRenderer(const QGLContext *context = NULL);
     ~QnGLRenderer();
     void beforeDestroy();
 
@@ -54,13 +57,17 @@ private:
     
     bool usingShaderYuvToRgb() const;
 
+    void ensureGlInitialized();
+
 private:
     static QList<GLuint> m_garbage;
 
     friend class QnGlRendererTexture;
 
 private:
-    QnGLRendererSharedData *m_shared;
+    QSharedPointer<QnGLRendererPrivate> d;
+    bool m_glInitialized;
+    const QGLContext *m_context;
 
     mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;

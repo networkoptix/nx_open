@@ -6,7 +6,7 @@
 class QnYv12ToRgbShaderProgram: public QnArbShaderProgram {
     Q_OBJECT;
 public:
-    QnYv12ToRgbShaderProgram(QObject *parent = NULL);
+    QnYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
     void setParameters(GLfloat brightness, GLfloat contrast, GLfloat hue, GLfloat saturation, GLfloat opacity);
 };
