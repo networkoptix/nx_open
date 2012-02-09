@@ -39,6 +39,7 @@
 #include "tests/auto_tester.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "api/SessionManager.h"
+#include "plugins/resources/droid/droid_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -335,6 +336,10 @@ int main(int argc, char *argv[])
 
     QnPlDlinkResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+
+    QnPlDroidResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
+
 
 #endif
 

@@ -185,11 +185,11 @@ bool QnNetworkResource::conflicting()
 
     QString mac = getMacByIP(getHostAddress());
 
-#ifndef _WIN32
+//#ifndef _WIN32
     // If mac is empty or resolution is not implemented
     if (mac == "")
         return false;
-#endif
+//#endif
 
     if (mac!=m_macAddress.toString())// someone else has this IP
     {
