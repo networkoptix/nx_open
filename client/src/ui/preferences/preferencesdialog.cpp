@@ -1,5 +1,7 @@
 #include "preferencesdialog.h"
 
+#include <QDir>
+
 #include "ui/ui_common.h"
 #include "ui/context_menu_helper.h"
 
@@ -59,8 +61,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     QPushButton *aboutButton = buttonBox->addButton(cm_about.text(), QDialogButtonBox::HelpRole);
     connect(aboutButton, SIGNAL(clicked()), &cm_about, SLOT(trigger()));
 
-
-    Settings::instance().fillData(m_settingsData);
+    qnSettings->fillData(m_settingsData);
 
     updateView();
     updateCameras();
@@ -78,23 +79,23 @@ void PreferencesDialog::accept()
     m_settingsData.maxVideoItems = maxVideoItemsSpinBox->value();
     m_settingsData.downmixAudio = downmixAudioCheckBox->isChecked();
 
-    Settings &settings = Settings::instance();
-    settings.update(m_settingsData);
-    settings.save();
+    QnSettings *settings = qnSettings;
+    settings->update(m_settingsData);
+    settings->save();
 
-    QStringList checkLst(settings.auxMediaRoots());
-    checkLst.push_back(QDir::toNativeSeparators(settings.mediaRoot()));
+    QStringList checkLst(settings->auxMediaRoots());
+    checkLst.push_back(QDir::toNativeSeparators(settings->mediaRoot()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst);
 
     if (connectionsSettingsWidget) {
-        QList<Settings::ConnectionData> connections;
-        foreach (const Settings::ConnectionData &conn, connectionsSettingsWidget->connections()) {
-            Settings::ConnectionData connection = conn;
+        QList<QnSettings::ConnectionData> connections;
+        foreach (const QnSettings::ConnectionData &conn, connectionsSettingsWidget->connections()) {
+            QnSettings::ConnectionData connection = conn;
 
             if (!connection.name.isEmpty() && connection.url.isValid())
                 connections.append(connection);
         }
-        Settings::setConnections(connections);
+        settings->setConnections(connections);
     }
 
     if (videoRecorderWidget)
@@ -139,9 +140,9 @@ void PreferencesDialog::updateView()
 
 void PreferencesDialog::updateStoredConnections()
 {
-    QList<Settings::ConnectionData> connections;
-    foreach (const Settings::ConnectionData &conn, Settings::connections()) {
-        Settings::ConnectionData connection = conn;
+    QList<QnSettings::ConnectionData> connections;
+    foreach (const QnSettings::ConnectionData &conn, qnSettings->connections()) {
+        QnSettings::ConnectionData connection = conn;
 
         if (!connection.name.trimmed().isEmpty()) // the last used one
             connections.append(connection);

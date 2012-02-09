@@ -5,7 +5,8 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <ui/common/opengl.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
@@ -42,12 +43,21 @@ namespace {
     /** Default duration of "fade-in" effect for overlay icons. */
     const qint64 defaultOverlayFadeInDurationMSec = 500;
 
-    /** Default progress painter. */
-    Q_GLOBAL_STATIC_WITH_ARGS(QnLoadingProgressPainter, progressPainter, (0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255)));
+    /** Progress painter storage. */
+    class QnLoadingProgressPainterFactory {
+    public:
+        QnLoadingProgressPainter *operator()(const QGLContext *) {
+            return new QnLoadingProgressPainter(0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255));
+        }
+    };
 
-    /** Default paused painter. */
-    Q_GLOBAL_STATIC(QnPausedPainter, pausedPainter);
+    typedef QnGlContextData<QnLoadingProgressPainter, QnLoadingProgressPainterFactory> QnLoadingProgressPainterStorage;
+    Q_GLOBAL_STATIC(QnLoadingProgressPainterStorage, qn_loadingProgressPainterStorage);
+
+    /** Paused painter storage. */
+    Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 }
+
 
 // -------------------------------------------------------------------------- //
 // Logic
@@ -494,6 +504,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         return;
     }
 
+    if(m_pausedPainter.isNull()) {
+        m_pausedPainter = qn_pausedPainterStorage()->get();
+        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
+    }
+
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterFontRollback fontRollback(painter);
@@ -508,6 +523,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
     painter->beginNativePainting();
+    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     for(int i = 0; i < m_channelCount; i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
@@ -515,8 +534,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
         /* Draw black rectangle if nothing was drawn. */
         if(status != QnRenderStatus::RENDERED_OLD_FRAME && status != QnRenderStatus::RENDERED_NEW_FRAME) {
+            glColor4f(0.0, 0.0, 0.0, effectiveOpacity());
             glBegin(GL_QUADS);
-            glColor4f(0.0, 0.0, 0.0, 1.0);
             glVertices(rect);
             glEnd();
         }
@@ -540,6 +559,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         /* Draw selected / not selected overlay. */
         drawSelection(rect);
     }
+    
+    glPopAttrib();
     painter->endNativePainting();
 
     /* Draw motion grid. */
@@ -590,18 +611,12 @@ void QnResourceWidget::drawSelection(const QRectF &rect) {
     if(!(m_displayFlags & DISPLAY_SELECTION_OVERLAY))
         return;
 
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     QColor color = Globals::selectionColor();
     color.setAlpha(color.alpha() * effectiveOpacity());
     glColor(color);
     glBegin(GL_QUADS);
     glVertices(rect);
     glEnd();
-
-    glPopAttrib();
 }
 
 void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
@@ -611,10 +626,6 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
     qreal opacityMultiplier = effectiveOpacity() * (state.iconFadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.iconChangeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0);
-
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glColor4f(0.0, 0.0, 0.0, 0.5 * opacityMultiplier);
     glBegin(GL_QUADS);
@@ -635,20 +646,18 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     glScalef(iconRect.width() / 2, iconRect.height() / 2, 1.0);
     switch(state.icon) {
     case LOADING:
-        progressPainter()->paint(
+        m_loadingProgressPainter->paint(
             static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
             opacityMultiplier
         );
         break;
     case PAUSED:
-        pausedPainter()->paint(0.5 * opacityMultiplier);
+        m_pausedPainter->paint(0.5 * opacityMultiplier);
         break;
     default:
         break;
     }
     glPopMatrix();
-
-    glPopAttrib();
 }
 
 void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, const QnMetaDataV1Ptr &motion) {

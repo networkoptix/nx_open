@@ -60,7 +60,7 @@ CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs) :
     m_isFormatSupported(true),
     m_audioSound(0),
     m_downmixing(false),
-    m_forceDownmix(Settings::instance().downmixAudio()),
+    m_forceDownmix(qnSettings->downmixAudio()),
     m_sampleConvertMethod(SampleConvert_None),
     m_isConvertMethodInitialized(false)
 {

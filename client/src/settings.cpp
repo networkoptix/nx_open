@@ -1,38 +1,60 @@
 #include "settings.h"
 
-#include <QtCore/QMutex>
-#include <QtCore/QSettings>
+#include <QMutex>
+#include <QSettings>
+#include <QDir>
 
 #include "license.h"
 #include "utils/common/util.h"
 #include "utils/common/log.h"
 
-Settings::Settings()
-    : m_RWLock(QReadWriteLock::Recursive)
+namespace {
+    QnSettings::ConnectionData readConnectionData(QSettings *settings)
+    {
+        QnSettings::ConnectionData connection;
+        connection.name = settings->value(QLatin1String("name")).toString();
+        connection.url = settings->value(QLatin1String("url")).toString();
+        connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == "true");
+
+        return connection;
+    }
+
+    void writeConnectionData(QSettings *settings, const QnSettings::ConnectionData &connection)
+    {
+        settings->setValue(QLatin1String("name"), connection.name);
+        settings->setValue(QLatin1String("url"), connection.url.toString());
+        settings->setValue(QLatin1String("readOnly"), connection.readOnly);
+    }
+
+} // anonymous namespace
+
+
+Q_GLOBAL_STATIC(QnSettings, qn_settings)
+
+QnSettings::QnSettings(): 
+    m_lock(QReadWriteLock::Recursive) 
+{}
+
+QnSettings *QnSettings::instance()
 {
+    return qn_settings();
 }
 
-Settings& Settings::instance()
-{
-    static Settings settings;
-    return settings;
-}
-
-bool Settings::isAfterFirstRun() const
+bool QnSettings::isAfterFirstRun() const
 {
     return m_data.afterFirstRun;
 }
 
-void Settings::fillData(Settings::Data& data) const
+void QnSettings::fillData(QnSettings::Data &data) const
 {
-    QReadLocker _lock(&m_RWLock);
+    QReadLocker locker(&m_lock);
 
     data = m_data;
 }
 
-void Settings::update(const Settings::Data& data)
+void QnSettings::update(const QnSettings::Data &data)
 {
-    QWriteLocker _lock(&m_RWLock);
+    QWriteLocker locker(&m_lock);
 
     setMediaRoot(data.mediaRoot);
     setAuxMediaRoots(data.auxMediaRoots);
@@ -41,9 +63,9 @@ void Settings::update(const Settings::Data& data)
     m_data.downmixAudio = data.downmixAudio;
 }
 
-void Settings::load()
+void QnSettings::load()
 {
-    QWriteLocker _lock(&m_RWLock);
+    QWriteLocker locker(&m_lock);
 
     reset();
 
@@ -65,9 +87,9 @@ void Settings::load()
         m_data.mediaRoot = getMoviesDirectory() + QLatin1String("/EVE Media/");
 }
 
-void Settings::save()
+void QnSettings::save()
 {
-    QWriteLocker _lock(&m_RWLock);
+    QWriteLocker locker(&m_lock);
 
     m_settings.setValue("mediaRoot", QDir::toNativeSeparators(m_data.mediaRoot));
 
@@ -85,51 +107,51 @@ void Settings::save()
     m_settings.setValue("downmixAudio", m_data.downmixAudio ? "true" : "false");
 }
 
-int Settings::maxVideoItems() const
+int QnSettings::maxVideoItems() const
 {
-    QReadLocker _lock(&m_RWLock);
+    QReadLocker _lock(&m_lock);
 
     return m_data.maxVideoItems;
 }
 
-bool Settings::downmixAudio() const
+bool QnSettings::downmixAudio() const
 {
-    QReadLocker _lock(&m_RWLock);
+    QReadLocker _lock(&m_lock);
 
     return m_data.downmixAudio;
 }
 
-bool Settings::isAllowChangeIP() const
+bool QnSettings::isAllowChangeIP() const
 {
-    QReadLocker _lock(&m_RWLock);
+    QReadLocker _lock(&m_lock);
 
     return m_data.allowChangeIP;
 }
 
-QString Settings::mediaRoot() const
+QString QnSettings::mediaRoot() const
 {
-    QReadLocker _lock(&m_RWLock);
+    QReadLocker _lock(&m_lock);
 
     return m_data.mediaRoot;
 }
 
-void Settings::setMediaRoot(const QString& root)
+void QnSettings::setMediaRoot(const QString& root)
 {
-    QWriteLocker _lock(&m_RWLock);
+    QWriteLocker _lock(&m_lock);
 
     m_data.mediaRoot = root;
 }
 
-QStringList Settings::auxMediaRoots() const
+QStringList QnSettings::auxMediaRoots() const
 {
-    QReadLocker _lock(&m_RWLock);
+    QReadLocker _lock(&m_lock);
 
     return m_data.auxMediaRoots;
 }
 
-void Settings::addAuxMediaRoot(const QString& root)
+void QnSettings::addAuxMediaRoot(const QString& root)
 {
-    QWriteLocker _lock(&m_RWLock);
+    QWriteLocker _lock(&m_lock);
 
     // Do not add duplicates
     if (m_data.auxMediaRoots.indexOf(root) != -1)
@@ -138,28 +160,9 @@ void Settings::addAuxMediaRoot(const QString& root)
     m_data.auxMediaRoots.append(fromNativePath(root));
 }
 
-Q_GLOBAL_STATIC_WITH_ARGS(QMutex, globalSettingsMutex, (QMutex::Recursive))
-
-static inline Settings::ConnectionData readConnectionData(QSettings *settings)
+QnSettings::ConnectionData QnSettings::lastUsedConnection()
 {
-    Settings::ConnectionData connection;
-    connection.name = settings->value(QLatin1String("name")).toString();
-    connection.url = settings->value(QLatin1String("url")).toString();
-    connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == "true");
-
-    return connection;
-}
-
-static inline void writeConnectionData(QSettings *settings, const Settings::ConnectionData &connection)
-{
-    settings->setValue(QLatin1String("name"), connection.name);
-    settings->setValue(QLatin1String("url"), connection.url.toString());
-    settings->setValue(QLatin1String("readOnly"), connection.readOnly);
-}
-
-Settings::ConnectionData Settings::lastUsedConnection()
-{
-//    QMutexLocker locker(globalSettingsMutex());
+    QReadLocker locker(&m_lock);
 
     ConnectionData connection;
 
@@ -173,9 +176,9 @@ Settings::ConnectionData Settings::lastUsedConnection()
     return connection;
 }
 
-void Settings::setLastUsedConnection(const Settings::ConnectionData &connection)
+void QnSettings::setLastUsedConnection(const QnSettings::ConnectionData &connection)
 {
-//    QMutexLocker locker(globalSettingsMutex());
+    QWriteLocker locker(&m_lock);
 
     QSettings settings;
     settings.beginGroup(QLatin1String("AppServerConnections"));
@@ -183,11 +186,13 @@ void Settings::setLastUsedConnection(const Settings::ConnectionData &connection)
     writeConnectionData(&settings, connection);
     settings.endGroup();
     settings.endGroup();
+
+    emit lastUsedConnectionChanged();
 }
 
-QList<Settings::ConnectionData> Settings::connections()
+QList<QnSettings::ConnectionData> QnSettings::connections()
 {
-//    QMutexLocker locker(globalSettingsMutex());
+    QReadLocker locker(&m_lock);
 
     QList<ConnectionData> connections;
 
@@ -204,9 +209,9 @@ QList<Settings::ConnectionData> Settings::connections()
     return connections;
 }
 
-void Settings::setConnections(const QList<Settings::ConnectionData> &connections)
+void QnSettings::setConnections(const QList<QnSettings::ConnectionData> &connections)
 {
-//    QMutexLocker locker(globalSettingsMutex());
+    QWriteLocker locker(&m_lock);
 
     ConnectionData lastUsed = lastUsedConnection();
 
@@ -231,23 +236,23 @@ void Settings::setConnections(const QList<Settings::ConnectionData> &connections
     setLastUsedConnection(lastUsed);
 }
 
-bool Settings::haveValidLicense()
+bool QnSettings::haveValidLicense()
 {
     return QnLicense::defaultLicense().isValid();
 }
 
 /// Private methods. No internal synchronization needed.
-void Settings::setAllowChangeIP(bool allow)
+void QnSettings::setAllowChangeIP(bool allow)
 {
     m_data.allowChangeIP = allow;
 }
 
-void Settings::removeAuxMediaRoot(const QString& root)
+void QnSettings::removeAuxMediaRoot(const QString& root)
 {
     m_data.auxMediaRoots.removeAll(root);
 }
 
-void Settings::setAuxMediaRoots(const QStringList& auxMediaRoots)
+void QnSettings::setAuxMediaRoots(const QStringList& auxMediaRoots)
 {
     m_data.auxMediaRoots.clear();
 
@@ -257,7 +262,7 @@ void Settings::setAuxMediaRoots(const QStringList& auxMediaRoots)
     }
 }
 
-void Settings::reset()
+void QnSettings::reset()
 {
     m_data.maxVideoItems = 0;
 #ifdef Q_OS_DARWIN

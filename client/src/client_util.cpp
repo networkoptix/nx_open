@@ -1,10 +1,9 @@
 #include "settings.h"
-
-
+#include <QDir>
 
 QString getTempRecordingDir()
 {
-    QString path = Settings::instance().mediaRoot() + QLatin1String("/_temp/");
+    QString path = qnSettings->mediaRoot() + QLatin1String("/_temp/");
     if (!QDir(path).exists())
         QDir().mkpath(path);
     return path;
@@ -12,5 +11,5 @@ QString getTempRecordingDir()
 
 QString getRecordingDir()
 {
-    return Settings::instance().mediaRoot() + QLatin1String("/_Recorded/");
+    return qnSettings->mediaRoot() + QLatin1String("/_Recorded/");
 }
