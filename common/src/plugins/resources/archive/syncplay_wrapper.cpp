@@ -343,7 +343,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     QMutexLocker lock(&d->timeMutex);
 
     qint64 displayTime = AV_NOPTS_VALUE;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled) {
             qint64 time = info.cam->getCurrentTime();

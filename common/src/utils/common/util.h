@@ -64,6 +64,10 @@ inline unsigned int roundUp(unsigned int value, int step) {
     return ((value-1) & ~(step-1)) + step;
 }
 
+inline quint64 roundUp(quint64 value, int step) {
+    return ((value-1) & ~(step-1)) + step;
+}
+
 QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
 
 QN_EXPORT QString closeDirPath(const QString& value);
