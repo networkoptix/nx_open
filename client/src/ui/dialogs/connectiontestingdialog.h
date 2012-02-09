@@ -26,7 +26,7 @@ public slots:
     virtual void reject();
 
     void timeout();
-    void testResults(int status, const QByteArray &data, int requestHandle);
+    void testResults(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle);
 
 private:
     void testSettings();

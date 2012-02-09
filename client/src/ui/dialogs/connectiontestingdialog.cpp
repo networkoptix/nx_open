@@ -51,7 +51,7 @@ void ConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void ConnectionTestingDialog::testResults(int status, const QByteArray &data, int requestHandle)
+void ConnectionTestingDialog::testResults(int status, const QByteArray &data, const QByteArray& errorString, int requestHandle)
 {
     Q_UNUSED(data)
     Q_UNUSED(requestHandle)
@@ -64,7 +64,7 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, in
     ui->progressBar->setValue(ui->progressBar->maximum());
     if (status)
     {
-        ui->statusLabel->setText("Failed");
+        ui->statusLabel->setText("Failed, " + errorString);
     } else
     {
         ui->statusLabel->setText("Success");
@@ -76,7 +76,7 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, in
 void ConnectionTestingDialog::testSettings()
 {
     connection = QnAppServerConnectionFactory::createConnection(m_url);
-    connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,int)));
+    connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
 }
 
 void ConnectionTestingDialog::accept()
