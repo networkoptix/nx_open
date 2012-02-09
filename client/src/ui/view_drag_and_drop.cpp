@@ -1,4 +1,5 @@
 #include "view_drag_and_drop.h"
+#include <QApplication>
 #include <core/resourcemanagment/resource_pool.h>
 
 namespace {

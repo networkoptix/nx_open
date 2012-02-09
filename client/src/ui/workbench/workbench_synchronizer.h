@@ -42,8 +42,8 @@ public slots:
     void submit();
 
 protected:
-    void initialize();
-    void deinitialize();
+    void start();
+    void stop();
 
     QnLayoutResourcePtr resource(QnWorkbenchLayout *layout) const;
     QnWorkbenchLayout *layout(const QnLayoutResourcePtr &resource) const;

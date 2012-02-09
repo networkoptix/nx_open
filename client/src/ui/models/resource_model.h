@@ -1,32 +1,27 @@
-#ifndef RESOURCEMODEL_H
-#define RESOURCEMODEL_H
+#ifndef QN_RESOURCE_MODEL_H
+#define QN_RESOURCE_MODEL_H
 
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QSortFilterProxyModel>
-#include <core/resource/resource.h>
+#include <QAbstractItemModel>
+#include <QScopedPointer>
+#include <core/resource/resource_fwd.h>
 
 class QnResourceModelPrivate;
+class QnResourcePool;
 
-class QnResourceModel : public QAbstractItemModel
-{
-    Q_OBJECT
+class QnResourceModel : public QAbstractItemModel {
+    Q_OBJECT;
+    Q_ENUMS(ItemDataRole);
 
 public:
     enum ItemDataRole {
-        ResourceRole = Qt::UserRole + 1,        /**< Role for QnResourcePtr. */
-        IdRole = Qt::UserRole + 2,              /**< Role for resource's QnId. */
-        SearchStringRole = Qt::UserRole + 3,    /**< Role for search string. */
-        StatusRole = Qt::UserRole + 4,          /**< Role for resource's status. */
+        ResourceRole        = Qt::UserRole + 1, /**< Role for QnResourcePtr. */
+        IdRole              = Qt::UserRole + 2, /**< Role for resource's QnId. */
+        SearchStringRole    = Qt::UserRole + 3, /**< Role for search string. */
+        StatusRole          = Qt::UserRole + 4, /**< Role for resource's status. */
     };
 
     explicit QnResourceModel(QObject *parent = 0);
     virtual ~QnResourceModel();
-
-    QnResourcePtr resource(const QModelIndex &index) const { 
-        return data(index, ResourceRole).value<QnResourcePtr>(); 
-    }
-
-    QModelIndex index(const QnResourcePtr &resource) const;
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     virtual QModelIndex buddy(const QModelIndex &index) const override;
@@ -44,23 +39,29 @@ public:
     virtual bool dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
     virtual Qt::DropActions supportedDropActions() const override;
 
-public slots:
-    void addResource(const QnResourcePtr &resource);
-    void removeResource(const QnResourcePtr &resource);
+    void setResourcePool(QnResourcePool *resourcePool);
+    QnResourcePool *resourcePool() const;
+
+protected:
+    void start();
+    void stop();
 
 private slots:
+    void addResource(const QnResourcePtr &resource);
+    void removeResource(const QnResourcePtr &resource);
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
     void at_resPool_resourceChanged(const QnResourcePtr &resource);
 
 private:
-    friend class QnResourceSearchProxyModel;
+    QnResourcePool *m_resourcePool;
+    Node *m_root;
+    QHash<QnId, Node *> m_nodeById;
 
-    Q_DISABLE_COPY(QnResourceModel)
-    Q_DECLARE_PRIVATE(QnResourceModel)
-    
-    const QScopedPointer<QnResourceModelPrivate> d_ptr;
+    //Node *m_root;
+    //QHash<uint, Node *> m_nodes;
+    //QHash<Node *, QVector<Node *> > m_childrenByNode;
 };
 
 
-#endif // RESOURCEMODEL_H
+#endif // QN_RESOURCE_MODEL_H
