@@ -21,6 +21,9 @@ class QnResourceDisplay;
 class QnPolygonalShadowItem;
 class QnAbstractArchiveReader;
 
+class QnLoadingProgressPainter;
+class QnPausedPainter;
+
 class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
@@ -354,6 +357,12 @@ private:
 
     /** Associated renderer. */
     QnResourceWidgetRenderer *m_renderer;
+
+    /** Paused painter. */
+    QSharedPointer<QnPausedPainter> m_pausedPainter;
+
+    /** Loading progress painter. */
+    QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;

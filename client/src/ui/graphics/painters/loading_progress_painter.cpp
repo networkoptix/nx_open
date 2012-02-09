@@ -1,6 +1,6 @@
 #include "loading_progress_painter.h"
 #include <cmath> /* For std::fmod. */
-#include <ui/common/opengl.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/linear_combination.h>
 #include <ui/graphics/shaders/color_shader_program.h>
 

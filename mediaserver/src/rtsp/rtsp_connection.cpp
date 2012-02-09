@@ -149,6 +149,18 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
     return dp == d->liveDpHi || dp == d->liveDpLow;
 }
 
+bool QnRtspConnectionProcessor::isSecondaryLiveDP(QnAbstractStreamDataProvider* dp) const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return dp == d->liveDpLow;
+}
+
+bool QnRtspConnectionProcessor::isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return dp == d->liveDpHi;
+}
+
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 {
     Q_D(QnRtspConnectionProcessor);
@@ -242,6 +254,7 @@ int QnRtspConnectionProcessor::extractTrackId(const QString& path)
     return -1;
 }
 
+/*
 QnAbstractMediaStreamDataProvider* QnRtspConnectionProcessor::getLiveDp()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -249,6 +262,13 @@ QnAbstractMediaStreamDataProvider* QnRtspConnectionProcessor::getLiveDp()
         return d->liveDpHi;
     else
         return d->liveDpLow;
+}
+*/
+
+bool QnRtspConnectionProcessor::isSecondaryLiveDPSupported() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->liveDpLow && !d->liveDpLow->onPause();
 }
 
 int QnRtspConnectionProcessor::composeSetup()
@@ -262,7 +282,7 @@ int QnRtspConnectionProcessor::composeSetup()
         return CODE_NOT_IMPLEMETED;
     int trackId = extractTrackId(d->requestHeaders.path());
 
-    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? getLiveDp() : d->archiveDP;
+    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
     const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP);
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
@@ -371,6 +391,10 @@ void QnRtspConnectionProcessor::createDataProvider()
 void QnRtspConnectionProcessor::connectToLiveDataProviders()
 {
     Q_D(QnRtspConnectionProcessor);
+    d->liveDpHi->addDataProcessor(d->dataProcessor);
+    d->liveDpLow->addDataProcessor(d->dataProcessor);
+
+    /*
     if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0) {
         if (d->liveDpLow)
             d->liveDpLow->removeDataProcessor(d->dataProcessor);
@@ -382,6 +406,8 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
         d->liveDpLow->addDataProcessor(d->dataProcessor);
         d->dataProcessor->setSecondaryDataProvider(d->liveDpHi); // got data from Hi provider, but skip all data instead of motion
     }
+    */
+    d->dataProcessor->setLiveQuality(d->quality);
     d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
 }
 
@@ -431,9 +457,9 @@ int QnRtspConnectionProcessor::composePlay()
             d->liveDpLow->removeDataProcessor(d->dataProcessor);
     }
 
-    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? getLiveDp() : d->archiveDP;
-    if (!currentDP)
-        return CODE_NOT_FOUND;
+    //QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? getLiveDp() : d->archiveDP;
+    //if (!currentDP)
+    //    return CODE_NOT_FOUND;
 
 
     d->dataProcessor->setLiveMode(d->liveMode);
@@ -492,7 +518,17 @@ int QnRtspConnectionProcessor::composePlay()
         d->archiveDP->unlock();
 
     }
-    currentDP->start();
+
+    if (d->liveMode) {
+        if (d->liveDpHi)
+            d->liveDpHi->start();
+        if (d->liveDpLow)
+            d->liveDpLow->start();
+    }
+    else {
+        if (d->archiveDP)
+            d->archiveDP->start();
+    }
     d->dataProcessor->start();
     //d->dataProcessor->resume();
 
@@ -528,11 +564,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             QList<QByteArray> vals = parameter.split(':');
             if (vals.size() < 2)
                 return CODE_INVALID_PARAMETER;
-
-            if (vals[1].trimmed() == "low")
-                d->quality = MEDIA_Quality_Low;
-            else
-                d->quality = MEDIA_Quality_High;
+            d->quality = vals[1].trimmed() == "low" ? MEDIA_Quality_Low : MEDIA_Quality_High;
 
             checkQuality();
             d->qualityFastSwitch = false;
@@ -543,10 +575,8 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
                 connectToLiveDataProviders();
 
-
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, time);
-
+                d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, time); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)
@@ -557,7 +587,6 @@ int QnRtspConnectionProcessor::composeSetParameter()
             return CODE_OK;
         }
     }
-
 
     return CODE_INVALID_PARAMETER;
 }

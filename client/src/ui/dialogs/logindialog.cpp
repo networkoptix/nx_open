@@ -93,7 +93,7 @@ void LoginDialog::accept()
     /* Widget data may not be written out to the model yet. Force it. */
     m_dataWidgetMapper->submit();
 
-    Settings::ConnectionData connection;
+    QnSettings::ConnectionData connection;
     connection.url = currentUrl();
 
     if (!connection.url.isValid()) {
@@ -101,7 +101,7 @@ void LoginDialog::accept()
         return;
     }
 
-    Settings::setLastUsedConnection(connection);
+    qnSettings->setLastUsedConnection(connection);
 
     QDialog::accept();
 }
@@ -135,8 +135,8 @@ void LoginDialog::updateStoredConnections()
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     int index = -1;
-    Settings::ConnectionData lastUsedConnection = Settings::lastUsedConnection();
-    foreach (const Settings::ConnectionData &connection, Settings::connections()) {
+    QnSettings::ConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    foreach (const QnSettings::ConnectionData &connection, qnSettings->connections()) {
         if (connection.name.trimmed().isEmpty() || !connection.url.isValid())
             continue;
 
@@ -152,7 +152,7 @@ void LoginDialog::updateStoredConnections()
             index = m_connectionsModel->rowCount() - 1;
     }
     {
-        Settings::ConnectionData connection;
+        QnSettings::ConnectionData connection;
         if (index == -1 || lastUsedConnection.name.trimmed().isEmpty()) {
             connection = lastUsedConnection;
             if (index == -1) {

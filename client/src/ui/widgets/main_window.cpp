@@ -16,6 +16,7 @@
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
+#include <core/resourcemanagment/resource_pool_user_watcher.h>
 
 #include "ui/context_menu_helper.h"
 
@@ -34,6 +35,7 @@
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_ui.h"
+#include "ui/workbench/workbench_synchronizer.h"
 
 #include "ui/widgets/resource_tree_widget.h"
 
@@ -170,10 +172,17 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_ui = new QnWorkbenchUi(m_display, this);
     m_ui->setFlags(QnWorkbenchUi::HIDE_WHEN_ZOOMED | QnWorkbenchUi::AFFECT_MARGINS_WHEN_NORMAL);
 
+    m_synchronizer = new QnWorkbenchSynchronizer(this);
+    m_synchronizer->setWorkbench(m_workbench);
+
+    m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
+
     m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
-    connect(m_ui->treeWidget(), SIGNAL(newTabRequested()), this, SLOT(at_newLayoutRequested()));
-    connect(m_ui->treeWidget(), SIGNAL(activated(uint)), this, SLOT(at_treeWidget_activated(uint)));
-    connect(m_ui,               SIGNAL(titleBarDoubleClicked()), this, SLOT(toggleFullScreen()));
+    connect(m_ui->treeWidget(), SIGNAL(newTabRequested()),                      this,           SLOT(at_newLayoutRequested()));
+    connect(m_ui->treeWidget(), SIGNAL(activated(uint)),                        this,           SLOT(at_treeWidget_activated(uint)));
+    connect(m_ui,               SIGNAL(titleBarDoubleClicked()),                this,           SLOT(toggleFullScreen()));
+    connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer, SLOT(setUser(const QnUserResourcePtr &)));
+    connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,           SLOT(at_settings_lastUsedConnectionChanged()));
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
@@ -214,15 +223,17 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
     setLayout(m_globalLayout);
 
-    /* Add single tab. */
-    at_newLayoutRequested();
-
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         m_controller->drop(QFile::decodeName(argv[i]));
 
+    /* Update state. */
     showFullScreen();
     updateDwmState();
+    at_settings_lastUsedConnectionChanged();
+
+    /* Add single tab. */
+    at_newLayoutRequested();
 }
 
 QnMainWindow::~QnMainWindow()
@@ -312,14 +323,14 @@ void QnMainWindow::showAuthenticationDialog()
     if (dialog)
         return;
 
-    const QUrl lastUsedUrl = Settings::lastUsedConnection().url;
+    const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
 
     dialog = new LoginDialog(this);
     dialog->setModal(true);
     if (dialog->exec()) {
-        const Settings::ConnectionData connection = Settings::lastUsedConnection();
+        const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
         if (connection.url.isValid()) {
             QnEventManager::instance()->stop();
             SessionManager::instance()->stop();
@@ -388,7 +399,7 @@ void QnMainWindow::updateDwmState()
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that window is click-draggable no matter where the user clicked. */
+        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
@@ -417,13 +428,13 @@ void QnMainWindow::updateDwmState()
         m_dwm->enableTransparentErasing();
         m_dwm->extendFrameIntoClientArea();
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is also needed to prevent display artifacts. */
+        m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is needed to prevent display artifacts. */
         m_dwm->enableDoubleClickProcessing();
         m_dwm->enableTitleBarDrag();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
-        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that window is click-draggable no matter where the user clicked. */
+        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
 
         setContentsMargins(0, 0, 0, 0);
 
@@ -503,6 +514,10 @@ void QnMainWindow::at_treeWidget_activated(uint resourceId)
     m_controller->drop(resource);
 }
 
+void QnMainWindow::at_settings_lastUsedConnectionChanged() {
+    m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
+}
+
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
@@ -524,7 +539,6 @@ void QnMainWindow::paintEvent(QPaintEvent *event)
 {
     base_type::paintEvent(event);
 
-    /* Draw frame if needed. */
     if(m_drawCustomFrame) {
         QPainter painter(this);
 

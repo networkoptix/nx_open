@@ -1,0 +1,53 @@
+#ifndef QN_GL_CONTEXT_DATA_H
+#define QN_GL_CONTEXT_DATA_H
+
+#include <QHash>
+#include <QMutex>
+#include <QSharedPointer>
+#include <QGLContext>
+
+template<class T>
+class QnGlContextDataStardardFactory {
+public:
+    T *operator()(const QGLContext *) {
+        return new T();
+    }
+};
+
+template<class T>
+class QnGlContextDataForwardingFactory {
+public:
+    T *operator()(const QGLContext *context) {
+        return new T(context);
+    }
+};
+
+
+template<class T, class Factory = QnGlContextDataStardardFactory<T> >
+class QnGlContextData {
+public:
+    typedef QHash<const QGLContext *, QSharedPointer<T> > map_type;
+
+    QnGlContextData(const Factory &factory = Factory()): m_factory(factory) {}
+
+    QSharedPointer<T> get(const QGLContext *context) {
+        QMutexLocker locked(&m_mutex);
+
+        typename map_type::iterator pos = m_map.find(context);
+        if(pos == m_map.end())
+            pos = m_map.insert(context, QSharedPointer<T>(m_factory(context)));
+
+        return *pos;
+    }
+
+    QSharedPointer<T> get() {
+        return get(QGLContext::currentContext());
+    }
+
+private:
+    QMutex m_mutex;
+    Factory m_factory;
+    map_type m_map;
+};
+
+#endif // QN_GL_CONTEXT_DATA_H

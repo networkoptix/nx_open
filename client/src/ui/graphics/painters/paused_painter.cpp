@@ -1,5 +1,5 @@
 #include "paused_painter.h"
-#include <ui/common/opengl.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/shaders/color_shader_program.h>
 
 QnPausedPainter::QnPausedPainter():
