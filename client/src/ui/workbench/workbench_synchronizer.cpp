@@ -56,10 +56,14 @@ void QnWorkbenchSynchronizer::initialize() {
     connect(m_workbench,        SIGNAL(layoutsChanged()),                   this, SLOT(at_workbench_layoutsChanged()));
 
     m_submit = m_update = true;
+
+    emit started();
 }
 
 void QnWorkbenchSynchronizer::deinitialize() {
     assert(m_workbench != NULL && !m_user.isNull());
+
+    emit stopped();
 
     m_submit = m_update = false;
 

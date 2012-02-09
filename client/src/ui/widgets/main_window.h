@@ -69,6 +69,8 @@ protected slots:
 
     void at_settings_lastUsedConnectionChanged();
 
+    void at_synchronizer_started();
+
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;

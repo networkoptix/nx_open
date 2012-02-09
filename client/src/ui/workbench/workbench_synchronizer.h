@@ -23,6 +23,18 @@ public:
         return m_user;
     }
 
+signals:
+    /**
+     * This signal is emitted whenever synchronization starts. For synchronization
+     * to start, both workbench and user must be set.
+     */
+    void started();
+
+    /**
+     * This signal is emitted whenever synchronization stops.
+     */
+    void stopped();
+
 public slots:
     void setWorkbench(QnWorkbench *workbench);
     void setUser(const QnUserResourcePtr &user);

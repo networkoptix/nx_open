@@ -183,6 +183,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(m_ui,               SIGNAL(titleBarDoubleClicked()),                this,           SLOT(toggleFullScreen()));
     connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer, SLOT(setUser(const QnUserResourcePtr &)));
     connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,           SLOT(at_settings_lastUsedConnectionChanged()));
+    connect(m_synchronizer,     SIGNAL(started()),                              this,           SLOT(at_synchronizer_started()));
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
@@ -516,6 +517,25 @@ void QnMainWindow::at_treeWidget_activated(uint resourceId)
 
 void QnMainWindow::at_settings_lastUsedConnectionChanged() {
     m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
+}
+
+void QnMainWindow::at_synchronizer_started() {
+    /* No layouts are open, so we need to open one. */
+    QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
+    if(resources.isEmpty()) {
+        /* There are no layouts in user's layouts list, just create a new one. */
+        at_newLayoutRequested();
+    } else {
+        /* Open the last layout from the user's layouts list. */
+        struct LayoutIdCmp {
+            bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
+                return l->getId() < r->getId();
+            }
+        };
+
+        qSort(resources.begin(), resources.end(), LayoutIdCmp());
+        m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+    }
 }
 
 bool QnMainWindow::event(QEvent *event) {
