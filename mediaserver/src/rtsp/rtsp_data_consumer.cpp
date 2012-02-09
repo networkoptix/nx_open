@@ -100,7 +100,8 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
 
     // quality control
-    if ((media->flags & QnAbstractMediaData::MediaFlags_LIVE))
+    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (isLive)
     {
         bool isSecondaryProvider = m_owner->isSecondaryLiveDP(data->dataProvider);
         if (isSecondaryProvider)
@@ -127,11 +128,21 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     }
 
     // overflow control
-    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)
+    if (media->flags & AV_PKT_FLAG_KEY)
     {
-        QnAbstractDataPacketPtr tmp;
-        m_dataQueue.pop(tmp);
-        m_dataQueue.removeFrontByCondition(removeItemsCondition);
+        bool isMainStream = true;
+        if (isLive) 
+        {
+            bool isSecondaryDP = m_owner->isSecondaryLiveDP(data->dataProvider);
+            bool isLowQuality = m_liveQuality == MEDIA_Quality_Low;
+            isMainStream = isSecondaryDP == isLowQuality;
+        }
+        if (isMainStream && (m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)) 
+        {
+            QnAbstractDataPacketPtr tmp;
+            m_dataQueue.pop(tmp);
+            m_dataQueue.removeFrontByCondition(removeItemsCondition);
+        }
     }
 }
 
@@ -190,7 +201,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (m_pauseNetwork)
         return false; // does not ready to process data. please wait
 
-    //msleep(500);
+    msleep(500);
 
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)

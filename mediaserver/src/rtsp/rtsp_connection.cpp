@@ -392,7 +392,8 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
 {
     Q_D(QnRtspConnectionProcessor);
     d->liveDpHi->addDataProcessor(d->dataProcessor);
-    d->liveDpLow->addDataProcessor(d->dataProcessor);
+    if (d->liveDpLow)
+        d->liveDpLow->addDataProcessor(d->dataProcessor);
 
     /*
     if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0) {
