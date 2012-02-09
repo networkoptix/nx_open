@@ -29,7 +29,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_packetSended(false),
   m_prefferedProvider(0),
   m_currentDP(0),
-  m_secondaryProvider(0)
+  m_liveQuality(MEDIA_Quality_High),
+  m_newLiveQuality(MEDIA_Quality_None)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     m_timer.start();
@@ -97,6 +98,35 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     m_dataQueue.push(data);
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
+
+    // quality control
+    if ((media->flags & QnAbstractMediaData::MediaFlags_LIVE))
+    {
+        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(data->dataProvider);
+        if (isSecondaryProvider)
+            media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
+
+        if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_owner->isSecondaryLiveDPSupported())
+            m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+        else if (m_dataQueue.size() <= 1)
+            m_newLiveQuality = MEDIA_Quality_High;
+
+        
+        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+        {
+            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+            else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_High;
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+        }
+    }
+
+    // overflow control
     if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)
     {
         QnAbstractDataPacketPtr tmp;
@@ -118,6 +148,11 @@ bool QnRtspDataConsumer::canAcceptData() const
 void QnRtspDataConsumer::setLiveMode(bool value)
 {
     m_liveMode = value;
+}
+
+void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
+{
+    m_liveQuality = liveQuality;
 }
 
 void QnRtspDataConsumer::buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp)
@@ -155,6 +190,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (m_pauseNetwork)
         return false; // does not ready to process data. please wait
 
+    //msleep(500);
+
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;
@@ -162,8 +199,13 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
 
-    if (data->dataProvider == m_secondaryProvider && metadata == 0)
-        return true; // secondary provider used for motion data only
+    if (metadata == 0)
+    {
+        if (m_liveQuality == MEDIA_Quality_High && m_owner->isSecondaryLiveDP(media->dataProvider))
+            return true; // data for other live quality stream
+        else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
+            return true; // data for other live quality stream
+    }
 
     if (m_owner->isLiveDP(media->dataProvider)) {
         media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -297,9 +339,11 @@ void QnRtspDataConsumer::unlockDataQueue()
 void QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime)
 {
     // Fast channel zapping
+    int prevSize = m_dataQueue.size();
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(m_owner->getResource());
     if (camera)
         camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
+    m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
 }
 
 void QnRtspDataConsumer::setSingleShotMode(bool value)
@@ -321,12 +365,14 @@ qint64 QnRtspDataConsumer::lastQueuedTime()
     }
 }
 
-void QnRtspDataConsumer::setSecondaryDataProvider(QnAbstractStreamDataProvider* value)
-{
-    m_secondaryProvider = value;
-}
-
 void QnRtspDataConsumer::setLiveMarker(int marker)
 {
     m_liveMarker = marker;
+}
+
+void QnRtspDataConsumer::clearUnprocessedData()
+{
+    QnAbstractDataConsumer::clearUnprocessedData();
+    m_newLiveQuality = MEDIA_Quality_None;
+    m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
 }

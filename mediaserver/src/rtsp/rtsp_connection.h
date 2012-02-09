@@ -5,6 +5,7 @@
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"
+#include "core/datapacket/mediadatapacket.h"
 
 class QnAbstractStreamDataProvider;
 
@@ -18,6 +19,11 @@ public:
     void switchToLive();
     QnMediaResourcePtr getResource() const;
     bool isLiveDP(QnAbstractStreamDataProvider* dp);
+
+    void setQuality(MediaQuality quality);
+    bool isSecondaryLiveDP(QnAbstractStreamDataProvider* provider) const;
+    bool isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const;
+    bool isSecondaryLiveDPSupported() const;
 protected:
     virtual void run();
 private:
@@ -43,7 +49,8 @@ private:
     void createDataProvider();
     void putLastIFrameToQueue();
     void connectToLiveDataProviders();
-    QnAbstractMediaStreamDataProvider* getLiveDp();
+    //QnAbstractMediaStreamDataProvider* getLiveDp();
+    void setQualityInternal(MediaQuality quality);
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

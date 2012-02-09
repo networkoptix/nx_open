@@ -163,6 +163,9 @@ void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 
 void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
+    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
+        return;
+
     //qDebug() << "realSleepTime=" << realSleepTime/1000.0;
 
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
@@ -255,6 +258,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     else {
         needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
+
+    qDebug() << "needToSleep" << needToSleep/1000.0;
 
     if (m_isRealTimeSource)
     {
