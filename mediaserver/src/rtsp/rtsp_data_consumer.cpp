@@ -201,7 +201,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (m_pauseNetwork)
         return false; // does not ready to process data. please wait
 
-    msleep(500);
+    //msleep(500);
 
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
