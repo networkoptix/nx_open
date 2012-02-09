@@ -82,7 +82,7 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     reinitTime(getDisplayedTime());
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         info.reader->setNavDelegate(0);
         info.reader->resumeMedia();
@@ -125,7 +125,7 @@ bool QnArchiveSyncPlayWrapper::isMediaPaused() const
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     bool rez = true;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
         rez &= info.reader->isMediaPaused();
     return rez;
 }
@@ -134,7 +134,7 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         info.reader->setNavDelegate(0);
         info.reader->pauseMedia();
@@ -162,7 +162,7 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
     QMutexLocker lock(&d->timeMutex);
     d->lastJumpTime = mksec;
     d->timer.restart();
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled)
         {
@@ -189,7 +189,7 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
     QMutexLocker lock(&d->timeMutex);
     setJumpTime(skipTime ? skipTime : mksec);
     bool rez = false;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled)
         {
@@ -288,7 +288,7 @@ void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
     if (!d->enabled || d->blockSetSpeedSignal)
         return;
     d->blockSetSpeedSignal = true;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.reader != sender())
             info.reader->setSpeed(value);
@@ -308,7 +308,7 @@ qint64 QnArchiveSyncPlayWrapper::getNextTime() const
 
     QMutexLocker lock(&d->timeMutex);
     qint64 displayTime = AV_NOPTS_VALUE;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled) {
             qint64 time = info.cam->getNextTime();
@@ -343,7 +343,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     QMutexLocker lock(&d->timeMutex);
 
     qint64 displayTime = AV_NOPTS_VALUE;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled) {
             qint64 time = info.cam->getCurrentTime();
@@ -417,7 +417,7 @@ qint64 QnArchiveSyncPlayWrapper::minTime() const
     
     qint64 result = INT64_MAX;
     bool found = false;
-    foreach(ReaderInfo info, d->readers) 
+    foreach(const ReaderInfo& info, d->readers) 
     {
         qint64 startTime = info.oldDelegate->startTime();
         if(startTime != AV_NOPTS_VALUE) {
@@ -435,7 +435,7 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
 
     qint64 result = 0;
     bool found = false;
-    foreach(ReaderInfo info, d->readers) 
+    foreach(const ReaderInfo& info, d->readers) 
     {
         qint64 endTime = info.oldDelegate->endTime();
         if(endTime != AV_NOPTS_VALUE) {
@@ -532,7 +532,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     if (d->inJumpCount > 0)
         return d->lastJumpTime;
 
-    foreach(ReaderInfo info, d->readers) {
+    foreach(const ReaderInfo& info, d->readers) {
         if (info.enabled && info.buffering) 
             return d->lastJumpTime;
     }
@@ -611,7 +611,7 @@ void QnArchiveSyncPlayWrapper::setEnabled(bool value)
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->enabled = value;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         info.reader->setNavDelegate(value ? this : 0);
     }

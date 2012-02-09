@@ -163,6 +163,11 @@ void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 
 void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
+    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
+        return;
+    if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
+        return;
+
     //qDebug() << "realSleepTime=" << realSleepTime/1000.0;
 
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
@@ -182,10 +187,10 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         {
             m_delayedFrameCnt = qMin(0, m_delayedFrameCnt);
             m_delayedFrameCnt--;
-            if (m_delayedFrameCnt < -5)
+            if (m_delayedFrameCnt < -10)
             {
                 if (qAbs(speed) < m_toLowQSpeed || m_toLowQSpeed < 0 && speed > 0)
-                    reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality again
+                    reader->setQuality(MEDIA_Quality_High, true); // speed decreased, try to Hi quality again
                 else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
                     reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
             }
@@ -255,6 +260,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     else {
         needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
+
+    qDebug() << "needToSleep" << needToSleep/1000.0;
 
     if (m_isRealTimeSource)
     {

@@ -26,7 +26,7 @@ public:
     }
 
 private slots:
-    void finished(int status, const QByteArray& data, int handle);
+    void finished(int status, const QByteArray& data, const QByteArray& errorString, int handle);
     void at_destroy();
 
 public:
@@ -58,7 +58,7 @@ public:
     void addTarget(QObject* target);
 
 signals:
-    void finished(int status, const QByteArray& data, int handle);
+    void finished(int status, const QByteArray& data, const QByteArray& errorString, int handle);
 
 private slots:
     void targetDestroyed(QObject* target);
