@@ -76,7 +76,7 @@ private:
     void reset();
 
 private:
-    mutable QReadWriteLock m_lock;
+    mutable QMutex m_lock;
     QSettings m_settings;
     Data m_data;
 };
