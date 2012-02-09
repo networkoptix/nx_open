@@ -2,6 +2,7 @@
 #include <QLibrary>
 #include <QWidget>
 #include <utils/common/warnings.h>
+#include <utils/common/mpl.h>
 
 #ifdef Q_OS_WIN
 #include <QtGui/private/qwidget_p.h>
@@ -56,6 +57,8 @@ typedef enum _DWMNCRENDERINGPOLICY {
     DWMNCRP_LAST 
 } DWMNCRENDERINGPOLICY;
 
+typedef remove_pointer<LRESULT>::type RESULT;
+
 typedef HRESULT (WINAPI *PtrDwmIsCompositionEnabled)(BOOL* pfEnabled);
 typedef HRESULT (WINAPI *PtrDwmExtendFrameIntoClientArea)(HWND hWnd, const _MARGINS *pMarInset);
 typedef HRESULT (WINAPI *PtrDwmEnableBlurBehindWindow)(HWND hWnd, const _DWM_BLURBEHIND *pBlurBehind);
@@ -63,6 +66,7 @@ typedef HRESULT (WINAPI *PtrDwmGetColorizationColor)(DWORD *pcrColorization, BOO
 typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *plResult);
 typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 #endif // Q_OS_WIN
+
 
 class QnDwmPrivate {
 public:
@@ -528,9 +532,12 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
         return false;
 
     if(d->hasDwm) {
-        BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
-        if (handled)
+        RESULT localResult;
+        BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, &localResult);
+        if (handled) {
+            *result = localResult;
             return true;
+        }
     }
 
     switch(message->message) {
@@ -634,8 +641,12 @@ namespace {
 
 bool QnDwmPrivate::hitTestEvent(MSG *message, long *result) {
     BOOL handled = FALSE;
-    if(hasDwm)
-        handled = dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, result);
+    if(hasDwm) {
+        RESULT localResult;
+        handled = dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, &localResult);
+        if(handled)
+            *result = localResult;
+    }
     if(!handled)
         *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
 
