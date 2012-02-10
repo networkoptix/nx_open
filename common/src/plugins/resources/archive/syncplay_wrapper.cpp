@@ -447,7 +447,6 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
 
 void QnArchiveSyncPlayWrapper::removeArchiveReader(QnAbstractArchiveReader* reader)
 {
-    QMutexLocker lock(&d->timeMutex);
     erase(reader->getArchiveDelegate());
 }
 
