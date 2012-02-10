@@ -44,12 +44,13 @@ public:
 
     // Marker increased after play/seek operation
     void setLiveMarker(int marker);
+    void setLiveQuality(MediaQuality liveQuality);
+    virtual void clearUnprocessedData() override;
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
 private:
-    QnAbstractStreamDataProvider* m_secondaryProvider;
     QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
@@ -72,6 +73,8 @@ private:
     QnAbstractStreamDataProvider* m_prefferedProvider;
     QnAbstractStreamDataProvider* m_currentDP;
     int m_liveMarker;
+    MediaQuality m_liveQuality;
+    MediaQuality m_newLiveQuality;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

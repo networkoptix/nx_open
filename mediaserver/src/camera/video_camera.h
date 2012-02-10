@@ -21,6 +21,7 @@ private:
 private:
     //QMutex m_queueMtx;
     QMutex m_readersMutex;
+    QMutex m_getReaderMutex;
     QnResourcePtr m_resource;
     QnAbstractMediaStreamDataProvider* m_primaryReader;
     QnAbstractMediaStreamDataProvider* m_secondaryReader;

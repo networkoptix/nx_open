@@ -20,26 +20,24 @@ void SessionManagerReplyProcessor::at_replyReceived()
     QNetworkReply *reply = (QNetworkReply *)sender();
 
     if (m_target)
-        connect(this, SIGNAL(finished(int,QByteArray,int)), m_target, m_slot, Qt::QueuedConnection);
+        connect(this, SIGNAL(finished(int,QByteArray,QByteArray, int)), m_target, m_slot, Qt::QueuedConnection);
 
-    emit finished(reply->error(), reply->readAll(), m_handle);
-
-    // QMetaObject::invokeMethod(target, slot, Qt::QueuedConnection, Q_ARG(int, reply->error()), Q_ARG(const QByteArray&, reply->readAll()), Q_ARG(int, handle));
+    emit finished(reply->error(), reply->readAll(), reply->errorString().toAscii(), m_handle);
 
     reply->deleteLater();
     deleteLater();
 }
 
-void SyncRequestProcessor::finished(int status, const QByteArray& reply, int handle)
+void SyncRequestProcessor::finished(int status, const QByteArray& reply, const QByteArray& errorString, int handle)
 {
     Q_UNUSED(handle)
 
     m_status = status;
     m_reply = reply;
-
-    m_finished = true;
+    m_errorString = errorString;
 
     QMutexLocker locker(&m_mutex);
+    m_finished = true;
     m_condition.wakeOne();
 }
 
@@ -51,6 +49,7 @@ int SyncRequestProcessor::wait(QByteArray& reply, QByteArray& errorString)
     }
 
     reply = m_reply;
+    errorString = m_errorString;
     return m_status;
 }
 
@@ -142,7 +141,7 @@ int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, 
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
     connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
-    sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(finished(int,QByteArray,int)));
+    sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(finished(int,QByteArray,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
 
@@ -156,7 +155,7 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, c
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
     connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
-    sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(finished(int,QByteArray,int)));
+    sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(finished(int,QByteArray,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
 
@@ -175,7 +174,7 @@ void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyPr
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
-    request.setRawHeader("Connection", "close");
+    //request.setRawHeader("Connection", "close");
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
@@ -212,7 +211,7 @@ void SessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyP
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
-    request.setRawHeader("Connection", "close");
+    //request.setRawHeader("Connection", "close");
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 

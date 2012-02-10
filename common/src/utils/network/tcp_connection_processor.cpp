@@ -184,8 +184,8 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
         response += ENDL;
     }
 
-    qDebug() << "Server response to " << d->socket->getPeerAddress();
-    qDebug() << "\n" << response;
+    //qDebug() << "Server response to " << d->socket->getPeerAddress();
+    //qDebug() << "\n" << response;
 
     QMutexLocker lock(&d->sockMutex);
     d->socket->send(response.data(), response.size());
@@ -215,4 +215,10 @@ void QnTCPConnectionProcessor::pleaseStop()
     if (d->socket)
         d->socket->close();
     CLLongRunnable::pleaseStop();
+}
+
+int QnTCPConnectionProcessor::getSocketTimeout()
+{
+    Q_D(QnTCPConnectionProcessor);
+    return d->socketTimeout;
 }

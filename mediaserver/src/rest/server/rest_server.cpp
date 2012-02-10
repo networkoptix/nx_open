@@ -17,7 +17,7 @@ QnRestServer::~QnRestServer()
     }
 }
 
-CLLongRunnable* QnRestServer::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnRestServer::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnRestConnectionProcessor(clientSocket, owner);
 }

@@ -293,7 +293,7 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     format = newFormat;
 
     int rc = 32 >> (newFormat == PIX_FMT_RGBA || newFormat == PIX_FMT_ABGR || newFormat == PIX_FMT_BGRA ? 2 : 0);
-    int roundWidth = roundUp(width, rc);
+    int roundWidth = roundUp((unsigned) width, rc);
     int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
     if (numBytes > 0) {
         avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);

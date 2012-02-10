@@ -101,13 +101,13 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
 
         m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
-        recorderHiRes->updateSchedule(cameraRes->getScheduleTasks());
+        recorderHiRes->updateCamera(cameraRes);
         if (recorderLowRes)
-            recorderLowRes->updateSchedule(cameraRes->getScheduleTasks());
+            recorderLowRes->updateCamera(cameraRes);
     }
 }
 
-void QnRecordingManager::updateSchedule(QnSecurityCamResourcePtr camera)
+void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr camera)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -115,9 +115,9 @@ void QnRecordingManager::updateSchedule(QnSecurityCamResourcePtr camera)
     if (itrRec != m_recordMap.end())
     {
         const Recorders& recorders = itrRec.value();
-        recorders.recorderHiRes->updateSchedule(camera->getScheduleTasks());
+        recorders.recorderHiRes->updateCamera(camera);
         if (recorders.recorderLowRes)
-            recorders.recorderLowRes->updateSchedule(camera->getScheduleTasks());
+            recorders.recorderLowRes->updateCamera(camera);
     }
 }
 

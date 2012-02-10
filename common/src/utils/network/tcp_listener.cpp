@@ -1,8 +1,7 @@
 #include "tcp_listener.h"
 #include "socket.h"
 #include "utils/common/log.h"
-
-static const int SOCK_TIMEOUT = 5000 * 1000;
+#include "tcp_connection_processor.h"
 
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
@@ -92,9 +91,10 @@ void QnTcpListener::run()
         TCPSocket* clientSocket = d->serverSocket->accept();
         if (clientSocket) {
             qDebug() << "New client connection from " << clientSocket->getPeerAddress();
-            clientSocket->setReadTimeOut(SOCK_TIMEOUT);
-            clientSocket->setWriteTimeOut(SOCK_TIMEOUT);
-            CLLongRunnable* processor = createRequestProcessor(clientSocket, this);
+            QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
+            clientSocket->setReadTimeOut(processor->getSocketTimeout());
+            clientSocket->setWriteTimeOut(processor->getSocketTimeout());
+
             d->connections[clientSocket] = processor;
             processor->start();
         }

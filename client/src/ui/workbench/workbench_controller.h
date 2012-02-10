@@ -25,6 +25,8 @@ class ResizingInstrument;
 class DropInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
+class ForwardingInstrument;
+class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 
@@ -76,7 +78,31 @@ public:
     void remove(const QnResourcePtr &resource);
     void remove(const QnResourceList &resources);
 
-public Q_SLOTS:
+    MotionSelectionInstrument *motionSelectionInstrument() const {
+	    return m_motionSelectionInstrument;
+    }
+
+    ClickInstrument *itemRightClickInstrument() const {
+        return m_itemRightClickInstrument;
+    }
+
+    DragInstrument *dragInstrument() const {
+        return m_dragInstrument;
+    }
+
+    ForwardingInstrument *itemMouseForwardingInstrument() const {
+        return m_itemMouseForwardingInstrument;
+    }
+
+    ResizingInstrument *resizingInstrument() const {
+        return m_resizingInstrument;
+    }
+
+    RubberBandInstrument *rubberBandInstrument() const {
+        return m_rubberBandInstrument;
+    }
+
+public slots:
     void startRecording();
     void stopRecording();
 
@@ -87,7 +113,7 @@ protected:
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
     int isMotionGridDisplayed();
 
-protected Q_SLOTS:
+protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -98,6 +124,9 @@ protected Q_SLOTS:
 
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
+
+    void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
+    void at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &region);
 
     void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
@@ -168,6 +197,12 @@ private:
 
     /** Motion selection instrument. */
     MotionSelectionInstrument *m_motionSelectionInstrument;
+
+    /** Item right click instrument. */
+    ClickInstrument *m_itemRightClickInstrument;
+
+    /** Item mouse forwarding instrument. */
+    ForwardingInstrument *m_itemMouseForwardingInstrument;
 
 
     /* Resizing-related state. */

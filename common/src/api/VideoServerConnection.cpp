@@ -142,7 +142,7 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceLis
     return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
-void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, int handle)
+void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& errorString, int handle)
 {
     QnTimePeriodList result;
     if(status == 0)
@@ -190,6 +190,6 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList& 
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList&, int)), target, slot);
 
-    return SessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &, int)));
+    return SessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
