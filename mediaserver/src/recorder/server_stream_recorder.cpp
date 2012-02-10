@@ -14,11 +14,14 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
     m_stopOnWriteError = false;
+    m_motionMaskBinData = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
+    memset(m_motionMaskBinData, 0, MD_WIDTH * MD_HEIGHT/8);
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
 {
     stop();
+    qFreeAligned(m_motionMaskBinData);
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -66,6 +69,8 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 
     QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (metaData) {
+        
+        metaData->removeMotion(m_motionMaskBinData);
         bool motionContainData = !metaData->isEmpty();
         if (motionContainData || m_lastMotionContainData) {
             m_lastMotionTimeUsec = metaData->timestamp;
@@ -165,10 +170,11 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
     return QnStreamRecorder::processData(data);
 }
 
-void QnServerStreamRecorder::updateSchedule(const QnScheduleTaskList& schedule)
+void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
 {
     QMutexLocker lock(&m_scheduleMutex);
-    m_schedule = schedule;
+    m_schedule = cameraRes->getScheduleTasks();
+    QnMetaDataV1::createMask(cameraRes->getMotionMask(), m_motionMaskBinData);
     m_lastSchedulePeriod.clear();
 }
 
