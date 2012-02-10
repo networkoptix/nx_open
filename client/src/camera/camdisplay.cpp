@@ -259,7 +259,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
 
-    qDebug() << "needToSleep" << needToSleep/1000.0;
+    //qDebug() << "needToSleep" << needToSleep/1000.0;
 
     if (m_isRealTimeSource)
     {

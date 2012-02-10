@@ -14,6 +14,8 @@ public:
     
 protected:
     void run();
+    virtual void parseRequest() override;
+
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRestConnectionProcessor);
 };

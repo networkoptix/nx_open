@@ -33,6 +33,7 @@ public:
           sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256)
       {
           tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
+          socketTimeout = 5000 * 1000;
       }
 
       ~QnTCPConnectionProcessorPrivate()
@@ -54,4 +55,5 @@ public:
       quint8* tcpReadBuffer;
       QnTcpListener* owner;
       CLByteArray sendBuffer;
+      int socketTimeout;
 };
