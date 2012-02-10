@@ -31,7 +31,7 @@ public:
     void stop();
     bool isCameraRecoring(QnResourcePtr camera);
 
-    void updateSchedule(QnSecurityCamResourcePtr camera);
+    void updateCamera(QnSecurityCamResourcePtr camera);
 
     Recorders findRecorders(QnResourcePtr res) const;
 private slots:
