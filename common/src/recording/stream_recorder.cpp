@@ -105,6 +105,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         if (!m_endOfData)
             emit recordingFinished();
         m_endOfData = true;
+        stop();
         return true;
     }
 

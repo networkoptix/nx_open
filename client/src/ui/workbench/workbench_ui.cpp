@@ -868,13 +868,13 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     connect(camera, SIGNAL(exportFailed(QString)), exportProgressDialog, SLOT(reject()));
     connect(camera, SIGNAL(exportFinished(QString)), exportProgressDialog, SLOT(accept()));
 
-    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(at_exportFailed(QString)), Qt::UniqueConnection);
-    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(at_exportFinished(QString)), Qt::UniqueConnection);
+    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(at_exportFailed(QString)));
+    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(at_exportFinished(QString)));
 
     camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName);
 }
 
-void QnWorkbenchUi::at_exportFinished(const QString &fileName)
+void QnWorkbenchUi::at_exportFinished(QString fileName)
 {
     QnLocalFileResourcePtr file(new QnLocalFileResource(fileName));
     qnResPool->addResource(file);
@@ -883,7 +883,7 @@ void QnWorkbenchUi::at_exportFinished(const QString &fileName)
 
 }
 
-void QnWorkbenchUi::at_exportFailed(const QString &errMessage)
+void QnWorkbenchUi::at_exportFailed(QString errMessage)
 {
     CLVideoCamera *cam = dynamic_cast<CLVideoCamera *>(sender()); // ### qobject_cast ?
     if (cam)
