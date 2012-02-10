@@ -39,6 +39,7 @@
 #include "tests/auto_tester.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "api/SessionManager.h"
+#include "plugins/resources/droid/droid_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -153,21 +154,24 @@ void initAppServerConnection()
 
     bool hasDefaultConnection = false;
     QList<QnSettings::ConnectionData> connections = qnSettings->connections();
-    foreach(const QnSettings::ConnectionData& connection, connections)
+    int defaultConnectionIndex = -1;
+    for (int i = 0; i < connections.size(); i++)
     {
+        const QnSettings::ConnectionData& connection = connections[i];
         if (connection.name == DEFAULT_CONNECTION_NAME)
         {
-            hasDefaultConnection = true;
+            defaultConnectionIndex = i;
             break;
         }
     }
 
     // If there is default connection, use lastUsedConnection even it's invalid
-    if (hasDefaultConnection)
+    if (defaultConnectionIndex != -1 && qnSettings->isAfterFirstRun())
     {
         appServerUrl = lastUsedConnection.url;
     }
     // otherwise load default connection, add it as default and store it as last used
+    // In case we run first time after installation, replace default connection with registry settings
     else
     {
         QSettings settings;
@@ -177,12 +181,19 @@ void initAppServerConnection()
         appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
         appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
-        QnSettings::ConnectionData connection;
-        connection.name = DEFAULT_CONNECTION_NAME;
-        connection.url = appServerUrl;
-        connection.readOnly = true;
+        if (defaultConnectionIndex == -1)
+        {
+            QnSettings::ConnectionData connection;
+            connection.name = DEFAULT_CONNECTION_NAME;
+            connection.url = appServerUrl;
+            connection.readOnly = true;
 
-        connections.append(connection);
+            connections.append(connection);
+        } else
+        {
+            connections[defaultConnectionIndex].url = appServerUrl;
+        }
+
         qnSettings->setConnections(connections);
 
         lastUsedConnection.url = appServerUrl;
@@ -253,9 +264,6 @@ int main(int argc, char *argv[])
             return 0;
     }
 
-    initAppServerConnection();
-    initAppServerEventConnection();
-
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     const QString dataLocation = getDataDirectory();
@@ -283,7 +291,10 @@ int main(int argc, char *argv[])
     QnSettings *settings = qnSettings;
     settings->load();
 
-    if (!settings->isAfterFirstRun() && !getMoviesDirectory().isEmpty())
+	initAppServerConnection();
+    initAppServerEventConnection();
+
+	if (!settings->isAfterFirstRun() && !getMoviesDirectory().isEmpty())
         settings->addAuxMediaRoot(getMoviesDirectory());
 
     settings->save();
@@ -335,6 +346,10 @@ int main(int argc, char *argv[])
 
     QnPlDlinkResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+
+    QnPlDroidResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
+
 
 #endif
 

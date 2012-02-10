@@ -13,13 +13,39 @@ class MotionSelectionInstrument: public DragProcessingInstrument {
     typedef DragProcessingInstrument base_type;
 
 public:
+    enum ColorRole {
+        Base,       /**< Color of the selection rect. */
+        Border,     /**< Color of the selection rect's border. */
+        RoleCount
+    };
+
     MotionSelectionInstrument(QObject *parent = NULL);
     
     virtual ~MotionSelectionInstrument();
 
+    void setColor(ColorRole role, const QColor &color);
+    QColor color(ColorRole role) const;
+
+    /**
+     * \param selectionModifiers        Keyboard modifiers that must be pressed for the 
+     *                                  selection process to start. Defaults to 0.
+     */
+    void setSelectionModifiers(Qt::KeyboardModifiers selectionModifiers);
+    Qt::KeyboardModifiers selectionModifiers() const;
+
+    /**
+     * \param multiSelectionModifiers   Additional keyboard modifiers that must be
+     *                                  pressed for the new selection to be added
+     *                                  to existing selection. Defalts to <tt>Qn::ControlModifier</tt>.
+     */
+    void setMultiSelectionModifiers(Qt::KeyboardModifiers multiSelectionModifiers);
+    Qt::KeyboardModifiers multiSelectionModifiers() const;
+
 signals:
     void selectionProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
     void selectionStarted(QGraphicsView *view, QnResourceWidget *widget);
+    void motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
+    void motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &rect);
     void selectionFinished(QGraphicsView *view, QnResourceWidget *widget);
     void selectionProcessFinished(QGraphicsView *view, QnResourceWidget *widget);
 
@@ -47,10 +73,13 @@ protected:
     void ensureSelectionItem();
 
 private:
+    QColor m_colors[RoleCount];
     QWeakPointer<MotionSelectionItem> m_selectionItem;
     QWeakPointer<QnResourceWidget> m_target;
     bool m_selectionStartedEmitted;
     bool m_emptyDrag;
+    Qt::KeyboardModifiers m_selectionModifiers;
+    Qt::KeyboardModifiers m_multiSelectionModifiers;
 };
 
 

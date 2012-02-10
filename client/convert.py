@@ -46,6 +46,11 @@ def setup_openal():
 
     return openal_path
 
+def setup_openssl():
+    openssl_path = 'contrib/openssl/bin/'
+
+    return openssl_path
+
 def generate_info_plist():
     def gen_association(ext):
         association = """
@@ -120,6 +125,7 @@ if len(sys.argv) == 2 and sys.argv[1] == '-parents':
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 openal_path = setup_openal()
+openssl_path = setup_openssl()
 tools_path = setup_tools()
 qjson_path = setup_qjson()
 
@@ -153,6 +159,9 @@ copy_files(openal_path + '/*.dll', 'bin/release-test')
 copy_files(openal_path + '/*.dll', 'bin/debug-test')
 copy_files(openal_path + '/*.dll', 'bin/release')
 copy_files(openal_path + '/*.dll', 'bin/debug')
+
+copy_files(openssl_path + '/*.dll', 'bin/debug')
+copy_files(openssl_path + '/*.dll', 'bin/release')
 
 copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
 copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
