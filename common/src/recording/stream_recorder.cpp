@@ -105,6 +105,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         if (!m_endOfData)
             emit recordingFinished();
         m_endOfData = true;
+        stop();
         return true;
     }
 
@@ -125,7 +126,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
     if (m_EofDateTime != AV_NOPTS_VALUE && m_EofDateTime > m_startDateTime)
     {
-        int progress = ((md->timestamp - m_startDateTime)*100) /(m_EofDateTime - m_startDateTime);
+        int progress = ((md->timestamp - m_startDateTime)*100ll) /(m_EofDateTime - m_startDateTime);
         if (progress != m_lastProgress) {
             emit recordingProgress(progress);
             m_lastProgress = progress;
@@ -141,7 +142,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 
     if (m_lastPacketTime != AV_NOPTS_VALUE)
     {
-        if (md->timestamp - m_lastPacketTime > MAX_FRAME_DURATION*1000ll) {
+        if (md->timestamp - m_lastPacketTime > MAX_FRAME_DURATION*1000ll && m_currentChunkLen > 0) {
+            // if multifile recording allowed, recreate file if recording hole is detected
             close();
             m_lastPacketTime = md->timestamp;
         }

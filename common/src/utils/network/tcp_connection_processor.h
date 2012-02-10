@@ -20,6 +20,7 @@ public:
     */
     static bool isFullMessage(const QByteArray& message);
 
+    int getSocketTimeout();
 protected:
     virtual void pleaseStop();
     virtual void parseRequest();

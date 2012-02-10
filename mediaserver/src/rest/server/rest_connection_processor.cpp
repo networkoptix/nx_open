@@ -18,6 +18,7 @@ QnRestConnectionProcessor::QnRestConnectionProcessor(TCPSocket* socket, QnTcpLis
     QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner)
 {
     Q_D(QnRestConnectionProcessor);
+    d->socketTimeout = CONNECTION_TIMEOUT;
 }
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
@@ -60,9 +61,17 @@ void QnRestConnectionProcessor::run()
                 break;
             }
         }
+
+        bool isKeepAlive = false;
         if (ready)
         {
             parseRequest();
+            isKeepAlive = d->requestHeaders.value("Connection").toLower() == QString("keep-alive");
+            if (isKeepAlive) {
+                d->responseHeaders.addValue(QString("Connection"), QString("Keep-Alive"));
+                d->responseHeaders.addValue(QString("Keep-Alive"), QString("timeout=%1").arg(d->socketTimeout/1000));
+            }
+
             QByteArray data = d->requestHeaders.path().toUtf8();
             data = data.replace("+", "%20");
             QUrl url = QUrl::fromEncoded(data);
@@ -130,9 +139,15 @@ void QnRestConnectionProcessor::run()
             }
             sendResponse("HTTP", rez, encoding);
         }
-        if (d->requestHeaders.value("Connection") != QString("keep-alive"))
+        if (!isKeepAlive)
             break;
     }
     d->socket->close();
     m_runing = false;
+}
+
+void QnRestConnectionProcessor::parseRequest()
+{
+    Q_D(QnRestConnectionProcessor);
+    QnTCPConnectionProcessor::parseRequest();
 }
