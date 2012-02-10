@@ -170,6 +170,9 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
         return;
     }
 
+    if(m_itemByUuid.contains(item->uuid()))
+        qnWarning("Item with UUID '%1' is already on layout '%2'.", item->uuid().toString(), m_name);
+
     if (item->layout() != NULL) {
         if (item->layout() == this)
             return;

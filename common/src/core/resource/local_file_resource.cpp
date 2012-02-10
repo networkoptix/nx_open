@@ -13,7 +13,7 @@ QnLocalFileResource::QnLocalFileResource(const QString &filename)
     setName(fi.fileName());
     setUrl(fi.absoluteFilePath());
 
-    addFlag(SINGLE_SHOT);
+    addFlags(SINGLE_SHOT);
 }
 
 QString QnLocalFileResource::getUniqueId() const

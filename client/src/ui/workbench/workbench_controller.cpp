@@ -453,7 +453,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     if (layout()->items().size() >= 24)
         return; // TODO: item limit must be changeable.
 
-    if (!resource->checkFlag(QnResource::media))
+    if (!resource->checkFlags(QnResource::media))
         return; // TODO: unsupported for now
 
     //if (!layout()->items(resource->getUniqueId()).isEmpty())

@@ -4,6 +4,7 @@
 #include <QSortFilterProxyModel>
 #include <core/resource/resource.h>
 
+#if 0
 class QnResourceSearchProxyModelPrivate;
 
 class QnResourceSearchProxyModel : public QSortFilterProxyModel
@@ -25,5 +26,6 @@ private:
         Q_DECLARE_PRIVATE(QnResourceSearchProxyModel)
         const QScopedPointer<QnResourceSearchProxyModelPrivate> d_ptr;
 };
+#endif
 
-#endif QN_RESOURCE_SEARCH_PROXY_MODEL_H
+#endif //QN_RESOURCE_SEARCH_PROXY_MODEL_H

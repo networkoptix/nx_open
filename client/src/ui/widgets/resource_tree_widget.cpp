@@ -67,7 +67,8 @@ protected:
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent)
     : QWidget(parent),
       m_filterTimerId(0),
-      m_dontSyncWithLayout(false)
+      m_dontSyncWithLayout(false),
+      m_controller(NULL)
 {
     m_previousItemButton = new QToolButton(this);
     m_previousItemButton->setText(QLatin1String("<"));
@@ -100,6 +101,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent)
 
 
     m_resourcesModel = new QnResourceModel(this);
+    m_resourcesModel->setResourcePool(qnResPool);
 
     m_resourcesTreeView = new QTreeView(this);
     m_resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -174,7 +176,7 @@ void QnResourceTreeWidget::setWorkbenchController(QnWorkbenchController *control
 
     workbenchLayoutAboutToBeChanged();
     m_controller = controller;
-    m_searchProxyModel = 0;
+    //m_searchProxyModel = 0;
     workbenchLayoutChanged();
 
     if (m_controller) {
@@ -190,10 +192,10 @@ void QnResourceTreeWidget::workbenchLayoutAboutToBeChanged()
 
     QnWorkbenchLayout *layout = m_controller->layout();
 
-    if (m_searchProxyModel) {
+    /*if (m_searchProxyModel) {
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(handleRemoveRows(QModelIndex,int,int)));
-    }
+    }*/
 
     disconnect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
     disconnect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
@@ -211,7 +213,7 @@ void QnResourceTreeWidget::workbenchLayoutChanged()
     connect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
     connect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
 
-    m_searchProxyModel = layout->property("model").value<QnResourceSearchProxyModel *>(); // ###
+    /*m_searchProxyModel = layout->property("model").value<QnResourceSearchProxyModel *>(); // ###
     if (!m_searchProxyModel) {
         QnResourceSearchProxyModel *proxyModel = new QnResourceSearchProxyModel(layout);
         proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -232,16 +234,16 @@ void QnResourceTreeWidget::workbenchLayoutChanged()
     disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
     m_filterLineEdit->setText(m_searchProxyModel->filterRegExp().pattern()); // ###
     m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
-    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
+    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));*/
 }
 
 void QnResourceTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 {
     const QnResourcePtr &resource = qnResPool->getResourceByUniqId(item->resourceUid());
 
-    m_resourcesTreeView->update(m_resourcesModel->index(resource));
+    //m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
-    if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
+    /*if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
         const QModelIndex index = m_searchProxyModel->indexFromResource(resource);
         if (!index.isValid()) {
             // ### improve/optimize
@@ -255,7 +257,7 @@ void QnResourceTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
         } else if (m_searchTreeView->isVisible()) {
             m_searchTreeView->update(index);
         }
-    }
+    }*/
 }
 
 void QnResourceTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
@@ -268,9 +270,9 @@ void QnResourceTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
     if(!m_controller->layout()->items(resource->getUniqueId()).isEmpty())
         return;
 
-    m_resourcesTreeView->update(m_resourcesModel->index(resource));
+    //m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
-    if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
+    /*if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
         const QModelIndex index = m_searchProxyModel->indexFromResource(resource);
         if (index.isValid()) {
             // ### improve/optimize
@@ -282,12 +284,12 @@ void QnResourceTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
             m_filterLineEdit->setText(filter);
             // ###
         }
-    }
+    }*/
 }
 
 void QnResourceTreeWidget::handleInsertRows(const QModelIndex &parent, int first, int last)
 {
-    if (!m_controller || !m_searchProxyModel)
+    /*if (!m_controller || !m_searchProxyModel)
         return;
 
     for (int row = first; row <= last; ++row) {
@@ -296,19 +298,19 @@ void QnResourceTreeWidget::handleInsertRows(const QModelIndex &parent, int first
 
         if(m_controller->display()->widget(resource) == NULL)
             m_controller->drop(resource);
-    }
+    }*/
 }
 
 void QnResourceTreeWidget::handleRemoveRows(const QModelIndex &parent, int first, int last)
 {
-    if (!m_controller || !m_searchProxyModel)
+    /*if (!m_controller || !m_searchProxyModel)
         return;
 
     for (int row = first; row <= last; ++row) {
         const QModelIndex index = m_searchProxyModel->index(row, 0, parent);
         QnResourcePtr resource = m_searchProxyModel->resourceFromIndex(index);
         m_controller->remove(resource);
-    }
+    }*/
 }
 
 void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *)
@@ -319,8 +321,8 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *)
             //resources.append(m_resourcesModel->resourceFromIndex(index));
             resources.append(m_resourcesModel->resource(index));
     } else /*if (m_tabWidget->currentIndex() == 1)*/ {
-        foreach (const QModelIndex &index, m_searchTreeView->selectionModel()->selectedRows())
-            resources.append(m_searchProxyModel->resourceFromIndex(index));
+        /*foreach (const QModelIndex &index, m_searchTreeView->selectionModel()->selectedRows())
+            resources.append(m_searchProxyModel->resourceFromIndex(index));*/
     }
 
     QScopedPointer<QMenu> menu(new QMenu);
@@ -331,23 +333,23 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *)
     menu->addSeparator();
     if (resources.size() == 1) {
         const QnResourcePtr &resource = resources.first();
-        if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT)) {
+        if (resource->checkFlags(QnResource::video) || resource->checkFlags(QnResource::SINGLE_SHOT)) {
             menu->addAction(&cm_editTags);
 
             if (resource->associatedWithFile())
                 menu->addAction(&cm_remove_from_disk);
 
-            if (resource->checkFlag(QnResource::ARCHIVE))
+            if (resource->checkFlags(QnResource::ARCHIVE))
                 menu->addAction(&cm_upload_youtube);
 
-            if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::SINGLE_SHOT))
+            if (resource->checkFlags(QnResource::ARCHIVE) || resource->checkFlags(QnResource::SINGLE_SHOT))
                 menu->addAction(&cm_open_containing_folder);
-        } else if (resource->checkFlag(QnResource::live_cam)) {
+        } else if (resource->checkFlags(QnResource::live_cam)) {
             // ### Start/Stop recording (Ctrl+R)
             // ### Delete(if no connection)(Shift+Del)
             menu->addAction(&cm_editTags);
             // ### Export selected... (Ctrl+E)
-        } else if (resource->checkFlag(QnResource::server)) {
+        } else if (resource->checkFlags(QnResource::server)) {
             // ### New camera
         }
         // ### handle layouts
@@ -420,12 +422,12 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event)
                 layout->setProperty("caption", m_filterLineEdit->text()); // ### unescape, normalize, etc.
         }
 
-        if (m_searchProxyModel) {
+        /*if (m_searchProxyModel) {
             m_dontSyncWithLayout = true;
             m_searchProxyModel->setFilterWildcard(m_filterLineEdit->text());
             m_dontSyncWithLayout = false;
             m_searchTreeView->expandAll();
-        }
+        }*/
     }
 
     QWidget::timerEvent(event);
@@ -448,8 +450,8 @@ void QnResourceTreeWidget::at_filterLineEdit_textChanged(const QString &filter)
         }
     }
 
-    if (m_searchProxyModel && m_searchProxyModel->sourceModel() != m_resourcesModel)
-        m_searchProxyModel->setSourceModel(m_resourcesModel);
+    /*if (m_searchProxyModel && m_searchProxyModel->sourceModel() != m_resourcesModel)
+        m_searchProxyModel->setSourceModel(m_resourcesModel);*/
 
     if (m_filterTimerId != 0)
         killTimer(m_filterTimerId);
@@ -462,8 +464,8 @@ void QnResourceTreeWidget::at_treeView_activated(const QModelIndex &index)
     QnResourcePtr resource;
     if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model()))
         resource = model->resource(index);
-    else if (const QnResourceSearchProxyModel *model = qobject_cast<const QnResourceSearchProxyModel *>(index.model()))
-        resource = model->resourceFromIndex(index);
+    /*else if (const QnResourceSearchProxyModel *model = qobject_cast<const QnResourceSearchProxyModel *>(index.model()))
+        resource = model->resourceFromIndex(index);*/
     if (resource)
         Q_EMIT activated(resource->getId());
 }

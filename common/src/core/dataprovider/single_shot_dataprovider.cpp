@@ -5,7 +5,7 @@
 CLSingleShotStreamreader::CLSingleShotStreamreader(QnResourcePtr dev ):
 QnAbstractStreamDataProvider(dev)
 {
-	dev->addFlag(QnResource::SINGLE_SHOT);
+	dev->addFlags(QnResource::SINGLE_SHOT);
 }
 
 void CLSingleShotStreamreader::run()

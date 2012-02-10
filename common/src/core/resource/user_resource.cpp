@@ -3,13 +3,13 @@
 
 QnUserResource::QnUserResource(): base_type()
 {
-    addFlag(QnResource::user);
+    addFlags(QnResource::user);
 }
 
 void QnUserResource::setLayouts(const QnLayoutResourceList &layouts)
 {
     while(!m_layouts.empty())
-        removeLayout(m_layouts.back());
+        removeLayout(m_layouts.front()); /* Removing an item from QList's front is constant time. */
 
     foreach(const QnLayoutResourcePtr &layout, layouts)
         addLayout(layout);

@@ -60,7 +60,7 @@ public:
     QnNetworkResourcePtr getNetResourceByMac(const QString &mac) const;
 
     // returns list of resources with such flag
-    QnResourceList getResourcesWithFlag(unsigned long flag) const;
+    QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
 
     QnResourceList getResourcesWithParentId(QnId id) const;
 
@@ -73,6 +73,7 @@ signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
+    void aboutToBeDestroyed();
 
 private slots:
     void handleResourceChange();

@@ -1,6 +1,7 @@
 #ifndef QN_RESOURCE_H
 #define QN_RESOURCE_H
 
+#include <cassert>
 #include <QDateTime>
 #include <QMap>
 #include <QMetaType>
@@ -13,6 +14,7 @@
 #include "resource_fwd.h"
 #include "param.h"
 #include "resource_type.h"
+#include "shared_resource_pointer.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -32,7 +34,13 @@ class QN_EXPORT QnResource : public QObject
     Q_FLAGS(Flags Flag)
     Q_ENUMS(ConnectionRole Status)
     Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false)
+    Q_PROPERTY(QnId id READ getId WRITE setId)
+    Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
+    Q_PROPERTY(QnId typeId READ getTypeId WRITE setTypeId)
+    Q_PROPERTY(Status status READ getStatus WRITE setStatus)
+    Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
+    Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_CLASSINFO("url", "URL")
 
 public:
@@ -58,6 +66,7 @@ public:
         layout = 0x1000,        /**< Layout resource. */
         user = 0x2000,          /**< User resource. */
 
+        local_server = local | server,
         live_cam = live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
@@ -94,10 +103,10 @@ public:
 
     // flags like network media and so on
     Flags flags() const;
-    inline bool checkFlag(Flag flag) const { return (flags() & flag) == flag; }
+    inline bool checkFlags(Flags flags) const { return (this->flags() & flags) == flags; }
     void setFlags(Flags flags);
-    void addFlag(Flag flag);
-    void removeFlag(Flag flag);
+    void addFlags(Flags flags);
+    void removeFlags(Flags flags);
 
 
     //just a simple resource name
@@ -172,7 +181,8 @@ signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void nameChanged();
-    
+    void parentIdChanged();
+
     void resourceChanged();
 
 public:
@@ -204,6 +214,20 @@ private:
     void removeConsumer(QnResourceConsumer *consumer);
     void disconnectAllConsumers();
 
+private:
+    /* Private API for QnSharedResourcePointer. */
+
+    template<class T>
+    friend class QnSharedResourcePointer;
+
+    template<class T>
+    void initWeakPointer(const QSharedPointer<T> &pointer) {
+        assert(!pointer.isNull());
+        assert(m_weakPointer.toStrongRef().isNull()); /* Error in this line means that you have created two distinct shared pointers to a single resource instance. */
+
+        m_weakPointer = pointer;
+    }
+
 protected:
     /** Mutex that is to be used when accessing a set of all consumers. */
     mutable QMutex m_consumersMtx;
@@ -215,6 +239,9 @@ protected:
     mutable QMutex m_mutex;
 
 private:
+    /** Weak reference to this, to make conversion to shared pointer possible. */
+    QWeakPointer<QnResource> m_weakPointer;
+
     /** Identifier of this resource. */
     QnId m_id;
 
@@ -242,6 +269,18 @@ private:
 
     mutable QnParamList m_resourceParamList;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
+
+template<class Resource>
+QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
+    if(resource == NULL) {
+        return QnSharedResourcePointer<Resource>();
+    } else {
+        return resource->toSharedPointer().staticCast<Resource>();
+    }
+}
+
 
 
 class QnResourceFactory

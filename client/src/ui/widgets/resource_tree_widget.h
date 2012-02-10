@@ -63,10 +63,10 @@ private:
 
     QnResourceModel *m_resourcesModel;
     QTreeView *m_resourcesTreeView;
-    QPointer<QnResourceSearchProxyModel> m_searchProxyModel;
+    //QWeakPointer<QnResourceSearchProxyModel> m_searchProxyModel;
     QTreeView *m_searchTreeView;
 
-    QPointer<QnWorkbenchController> m_controller;
+    QnWorkbenchController *m_controller;
 
     friend class QnResourceTreeItemDelegate;
 };

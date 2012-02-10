@@ -1,7 +1,8 @@
 #ifndef QNID_H
 #define QNID_H
 
-#include <QtCore/QString>
+#include <QString>
+#include <QMetaType>
 
 // This class is going to be exported from our common DLL. So 'QN_EXPORT' MUST be specified after 'class' identifier
 class QN_EXPORT QnId
@@ -40,5 +41,6 @@ private:
 };
 
 Q_DECLARE_TYPEINFO(QnId, Q_PRIMITIVE_TYPE);
+Q_DECLARE_METATYPE(QnId);
 
 #endif // QNID_H

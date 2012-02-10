@@ -9,6 +9,8 @@
 class QnLayoutItemData
 {
 public:
+    QnLayoutItemData(): flags(0), rotation(0) {}
+
     QnId resourceId;
     QUuid uuid;
     int flags;
@@ -29,12 +31,19 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    void setItems(const QnLayoutItemDataList& items);
+    void setItems(const QnLayoutItemDataList &items);
 
-    const QnLayoutItemDataList &getItems() const
-    {
-        return m_items;
-    }
+    const QnLayoutItemDataList &getItems() const;
+
+    void addItem(const QnLayoutItemData &item);
+
+    void removeItem(const QnLayoutItemData &item);
+
+    void removeItem(const QUuid &itemUuid);
+
+signals:
+    void itemAdded(const QnLayoutItemData &item);
+    void itemRemoved(const QnLayoutItemData &item);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;

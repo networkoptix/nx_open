@@ -63,6 +63,9 @@ QnResourceList deserializeResources(const QByteArray &data) {
         QnResourcePtr resource = qnResPool->getResourceById(id);
         if(!resource.isNull())
             result.push_back(resource);
+
+        if(stream.status() != QDataStream::Ok)
+            break;
     }
 
     return result;

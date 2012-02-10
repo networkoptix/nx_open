@@ -25,6 +25,7 @@ QnResource::QnResource()
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
         qRegisterMetaType<QnParam>();
+        qRegisterMetaType<QnId>();
         metaTypesInitialized = true;
     }
 }
@@ -39,7 +40,6 @@ void QnResource::updateInner(QnResourcePtr other)
     Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_id = other->m_id;
-    m_parentId = other->m_parentId;
     m_typeId = other->m_typeId;
     m_flags = other->m_flags;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
@@ -47,6 +47,7 @@ void QnResource::updateInner(QnResourcePtr other)
     m_url = other->m_url;
 
     setName(other->m_name);
+    setParentId(other->m_parentId);
 }
 
 void QnResource::update(QnResourcePtr other)
@@ -93,14 +94,18 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 
 QnId QnResource::getParentId() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    QMutexLocker locker(&m_mutex);
     return m_parentId;
 }
 
 void QnResource::setParentId(QnId parent)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    m_parentId = parent;
+    {
+        QMutexLocker locker(&m_mutex);
+        m_parentId = parent;
+    }
+    
+    emit parentIdChanged();
 }
 
 
@@ -112,37 +117,40 @@ QString QnResource::getName() const
 
 void QnResource::setName(const QString& name)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
 
-    if(m_name == name)
-        return;
+        if(m_name == name)
+            return;
 
-    m_name = name;
+        m_name = name;
+    }
+
     emit nameChanged();
 }
 
-unsigned long QnResource::flags() const
+QnResource::Flags QnResource::flags() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_flags;
 }
 
-void QnResource::setFlags(unsigned long flags)
+void QnResource::setFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_flags = flags;
 }
 
-void QnResource::addFlag(unsigned long flag)
+void QnResource::addFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_flags |= flag;
+    m_flags |= flags;
 }
 
-void QnResource::removeFlag(unsigned long flag)
+void QnResource::removeFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_flags &= ~flag;
+    m_flags &= ~flags;
 }
 
 QString QnResource::toString() const
@@ -157,9 +165,11 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::toSharedPointer() const
 {
-    QnResourcePtr res = qnResPool->getResourceById(getId());
+    return m_weakPointer.toStrongRef();
+
+    /*QnResourcePtr res = qnResPool->getResourceById(getId());
     Q_ASSERT_X(res != 0, Q_FUNC_INFO, "Resource not found");
-    return res;
+    return res;*/
 }
 
 const QnParamList& QnResource::getResourceParamList() const
@@ -372,7 +382,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
+        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
 
     return true;
 }
@@ -472,12 +482,14 @@ void QnResource::setStatus(QnResource::Status newStatus)
     Status oldStatus;
     {
         QMutexLocker mutexLocker(&m_mutex);
+        if(m_status == newStatus)
+            return;
+
         oldStatus = m_status;
         m_status = newStatus;
     }
 
-    if (oldStatus != newStatus)
-        emit statusChanged(oldStatus, newStatus);
+    emit statusChanged(oldStatus, newStatus);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const

@@ -2,8 +2,9 @@
 
 #include <QtCore/QMetaObject>
 
-#include "core/resource/video_server.h"
 #include "utils/common/warnings.h"
+#include "utils/common/checked_cast.h"
+#include "core/resource/video_server.h"
 
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
@@ -20,6 +21,10 @@ QnResourcePool::QnResourcePool() : QObject(),
 
 QnResourcePool::~QnResourcePool()
 {
+    bool signalsBlocked = blockSignals(false);
+    emit aboutToBeDestroyed();
+    blockSignals(signalsBlocked);
+
     QMutexLocker locker(&m_resourcesMtx);
     m_resources.clear();
 }
@@ -35,10 +40,16 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources) 
     {
+        if (!resource->toSharedPointer()) 
+        {
+            qnWarning("Resource '%1' does not have an assiciated shared pointer. Did you forget to use QnSharedResourcePointer?", resource->metaObject()->className());
+            QnSharedResourcePointer<QnResource>::initialize(resource);
+        }
+
         // if resources are local assign localserver as parent
         if (!resource->getParentId().isValid()) 
         {
-            if (resource->checkFlag(QnResource::local))
+            if (resource->checkFlags(QnResource::local))
                 resource->setParentId(localServer->getId());
         }
 
@@ -123,7 +134,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
 void QnResourcePool::handleResourceChange()
 {
-    const QnResourcePtr resource = qobject_cast<QnResource *>(sender())->toSharedPointer();
+    const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
 
     QMetaObject::invokeMethod(this, "resourceChanged", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
 }
@@ -181,13 +192,13 @@ bool QnResourcePool::hasSuchResouce(const QString &uniqid) const
     return !getResourceByUniqId(uniqid).isNull();
 }
 
-QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag) const
+QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
 {
     QnResourceList result;
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
-        if (resource->checkFlag(flag))
+        if (resource->checkFlags(flag))
             result.append(resource);
     }
 

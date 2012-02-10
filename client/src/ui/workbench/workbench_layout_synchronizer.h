@@ -7,6 +7,7 @@
 class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
+class QnLayoutItemData;
 
 class QnWorkbenchLayoutSynchronizer: public QObject {
     Q_OBJECT;
@@ -51,6 +52,8 @@ protected slots:
 
     void at_resource_resourceChanged();
     void at_resource_nameChanged();
+    void at_resource_itemAdded(const QnLayoutItemData &itemData);
+    void at_resource_itemRemoved(const QnLayoutItemData &itemData);
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);

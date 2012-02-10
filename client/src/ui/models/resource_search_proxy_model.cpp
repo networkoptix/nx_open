@@ -1,5 +1,7 @@
 #include "resource_search_proxy_model.h"
-#include "resource_search_proxy_model_p.h"
+//#include "resource_search_proxy_model_p.h"
+
+#if 0
 
 QnResourceSearchProxyModelPrivate::QnResourceSearchProxyModelPrivate()
     : q_ptr(0)
@@ -200,3 +202,5 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
     return false;
 }
 
+
+#endif

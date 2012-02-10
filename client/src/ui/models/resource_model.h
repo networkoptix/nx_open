@@ -3,10 +3,13 @@
 
 #include <QAbstractItemModel>
 #include <QScopedPointer>
+#include <QUuid>
 #include <core/resource/resource_fwd.h>
+#include <utils/common/qnid.h>
 
 class QnResourceModelPrivate;
 class QnResourcePool;
+class QnLayoutItemData;
 
 class QnResourceModel : public QAbstractItemModel {
     Q_OBJECT;
@@ -42,25 +45,45 @@ public:
     void setResourcePool(QnResourcePool *resourcePool);
     QnResourcePool *resourcePool() const;
 
-protected:
+    QnResourcePtr resource(const QModelIndex &index) const;
+
+private:
+    class Node;
+
     void start();
     void stop();
 
+    Node *node(const QnId &id);
+    Node *node(const QUuid &uuid);
+    Node *node(const QModelIndex &index) const;
+
 private slots:
-    void addResource(const QnResourcePtr &resource);
-    void removeResource(const QnResourcePtr &resource);
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
-    void at_resPool_resourceChanged(const QnResourcePtr &resource);
+    void at_resPool_aboutToBeDestroyed();
+    void at_resource_parentIdChanged(const QnResourcePtr &resource);
+    void at_resource_parentIdChanged();
+    void at_resource_resourceChanged();
+    void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
+    void at_resource_itemAdded(const QnLayoutItemData &item);
+    void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
+    void at_resource_itemRemoved(const QnLayoutItemData &item);
 
 private:
+    /** Associated resource pool. */
     QnResourcePool *m_resourcePool;
-    Node *m_root;
-    QHash<QnId, Node *> m_nodeById;
 
-    //Node *m_root;
-    //QHash<uint, Node *> m_nodes;
-    //QHash<Node *, QVector<Node *> > m_childrenByNode;
+    /** Root node. Considered a resource node with id = 0.  */
+    Node *m_root;
+
+    /** Mapping for resource nodes, by resource id. */
+    QHash<QnId, Node *> m_resourceNodeById;
+
+    /** Mapping for item nodes, by item id. */
+    QHash<QUuid, Node *> m_itemNodeByUuid;
+
+    /** Mapping for item nodes, by resource id. Is managed by nodes. */
+    QHash<QnId, QList<Node *> > m_itemNodesById;
 };
 
 
