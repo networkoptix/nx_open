@@ -23,7 +23,6 @@ public:
     virtual ~QnCameraMotionMaskWidget();
 
 	void setCamera(const QnResourcePtr &resource);
-	void displayMotionGrid(bool value);
 
 	const QRegion& motionMask() const;
 
@@ -36,6 +35,10 @@ protected slots:
 private:
 	void init();
 
+    QnResourceWidget *widget() {
+        return m_widget.data();
+    }
+
 private:
 	QnVirtualCameraResourcePtr m_camera;
 	QRegion m_motionMask;
@@ -47,7 +50,7 @@ private:
     QnWorkbenchDisplay *m_display;
     QnWorkbenchController *m_controller;
 
-	QnWorkbenchItem *m_item;
+	QWeakPointer<QnResourceWidget> m_widget;
 };
 
 #endif // __CAMERA_MOTIONMASK_WIDGET_H__

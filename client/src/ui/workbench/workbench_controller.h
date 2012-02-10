@@ -25,6 +25,7 @@ class ResizingInstrument;
 class DropInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
+class ForwardingInstrument;
 class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
@@ -83,6 +84,22 @@ public:
 
     ClickInstrument *itemRightClickInstrument() const {
         return m_itemRightClickInstrument;
+    }
+
+    DragInstrument *dragInstrument() const {
+        return m_dragInstrument;
+    }
+
+    ForwardingInstrument *itemMouseForwardingInstrument() const {
+        return m_itemMouseForwardingInstrument;
+    }
+
+    ResizingInstrument *resizingInstrument() const {
+        return m_resizingInstrument;
+    }
+
+    RubberBandInstrument *rubberBandInstrument() const {
+        return m_rubberBandInstrument;
     }
 
 public slots:
@@ -183,6 +200,9 @@ private:
 
     /** Item right click instrument. */
     ClickInstrument *m_itemRightClickInstrument;
+
+    /** Item mouse forwarding instrument. */
+    ForwardingInstrument *m_itemMouseForwardingInstrument;
 
 
     /* Resizing-related state. */
