@@ -222,11 +222,12 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-QnResourceList QnResourcePool::findResourcesByCriteria(const CLDeviceCriteria& cr) const
+#if 0
+QnResourceList QnResourcePool::findResourcesByCriteria(const QnResourceCriteria& cr) const
 {
     QnResourceList result;
 
-    if (cr.getCriteria() != CLDeviceCriteria::STATIC && cr.getCriteria() != CLDeviceCriteria::NONE)
+    if (cr.getCriteria() != QnResourceCriteria::STATIC && cr.getCriteria() != QnResourceCriteria::NONE)
     {
         QMutexLocker locker(&m_resourcesMtx);
         foreach (const QnResourcePtr &resource, m_resources)
@@ -244,19 +245,19 @@ QnResourceList QnResourcePool::findResourcesByCriteria(const CLDeviceCriteria& c
 //===============================================================================================
 
 
-bool QnResourcePool::isResourceMeetCriteria(const CLDeviceCriteria& cr, QnResourcePtr res) const
+bool QnResourcePool::isResourceMeetCriteria(const QnResourceCriteria& cr, QnResourcePtr res) const
 {
     if (res==0)
         return false;
 
-    if (cr.getCriteria()== CLDeviceCriteria::STATIC)
+    if (cr.getCriteria()== QnResourceCriteria::STATIC)
         return false;
 
-    if (cr.getCriteria()== CLDeviceCriteria::NONE)
+    if (cr.getCriteria()== QnResourceCriteria::NONE)
         return false;
 
 
-    if (cr.getCriteria()== CLDeviceCriteria::ALL)
+    if (cr.getCriteria()== QnResourceCriteria::ALL)
     {
         /*
         if (res->getParentId().isEmpty())
@@ -270,7 +271,7 @@ bool QnResourcePool::isResourceMeetCriteria(const CLDeviceCriteria& cr, QnResour
             /**/
     }
 
-    if (cr.getCriteria()== CLDeviceCriteria::FILTER)
+    if (cr.getCriteria()== QnResourceCriteria::FILTER)
     {
         if (cr.filter().length()==0)
             return false;
@@ -300,3 +301,4 @@ bool QnResourcePool::match_subfilter(QnResourcePtr resource, const QString& fltr
     }
     return !serach_list.isEmpty();
 }
+#endif

@@ -1,12 +1,5 @@
 #include "resource_search_proxy_model.h"
-//#include "resource_search_proxy_model_p.h"
-
-#if 0
-
-QnResourceSearchProxyModelPrivate::QnResourceSearchProxyModelPrivate()
-    : q_ptr(0)
-{
-}
+#include "resource_model.h"
 
 bool QnResourceSearchProxyModelPrivate::matchesFilters(const QRegExp filters[], Node *node, int source_row, const QModelIndex &source_parent) const
 {
@@ -156,47 +149,49 @@ QnResourceSearchProxyModel::~QnResourceSearchProxyModel()
 {
 }
 
-QnResourcePtr QnResourceSearchProxyModel::resourceFromIndex(const QModelIndex &index) const
+/*QnResourcePtr QnResourceSearchProxyModel::resourceFromIndex(const QModelIndex &index) const
 {
     QnResourceModel *resourceModel = qobject_cast<QnResourceModel *>(sourceModel());
     return resourceModel ? resourceModel->resource(mapToSource(index)) : QnResourcePtr(0);
-}
+}*/
 
-QModelIndex QnResourceSearchProxyModel::indexFromResource(const QnResourcePtr &resource) const
+/*QModelIndex QnResourceSearchProxyModel::indexFromResource(const QnResourcePtr &resource) const
 {
     QnResourceModel *resourceModel = qobject_cast<QnResourceModel *>(sourceModel());
     return resourceModel ? mapFromSource(resourceModel->index(resource)) : QModelIndex();
-}
+}*/
 
 bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-    Q_D(const QnResourceSearchProxyModel);
-
-    QnResourceModel *resourceModel = qobject_cast<QnResourceModel *>(sourceModel());
+    /*QnResourceModel *resourceModel = qobject_cast<QnResourceModel *>(sourceModel());
     if (!resourceModel)
-        return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+        return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);*/
 
     if (!source_parent.isValid())
-        return true; // include root nodes
+        return true; /* Include root node. */
 
-    if (d->parsedFilterString != filterRegExp().pattern())
-        const_cast<QnResourceSearchProxyModelPrivate *>(d)->parseFilterString();
-    if (d->parsedFilterString.isEmpty())
+    if (parsedFilterString != filterRegExp().pattern())
+        parseFilterString();
+    if (parsedFilterString.isEmpty())
         return false;
 
-    Node *node = resourceModel->d_func()->node(resourceModel->index(source_row, 0, source_parent));
-    if (!node || node->id() == 0)
+    QModelIndex index = source_parent.child(source_row, 0);
+    if(!index.isValid())
         return false;
 
-    if (d->matchesFilters(d->negfilters, node, source_row, source_parent))
+    //Node *node = resourceModel->d_func()->node(resourceModel->index(source_row, 0, source_parent));
+    //if (!node || node->id() == 0)
+        //return false;
+
+    if (matchesFilters(negfilters, index))
         return false;
 
-    if (d->flagsFilter != 0) {
-        if ((node->flags() & d->flagsFilter) != 0)
+    if (flagsFilter != 0) {
+        if ((index.data(QnResourceModel::ResourceFlagsRole).value<quint32>() & flagsFilter) != 0)
             return true;
     }
 
-    if (d->matchesFilters(d->filters, node, source_row, source_parent))
+    if (matchesFilters(filters, index))
         return true;
 
     return false;

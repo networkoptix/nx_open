@@ -18,9 +18,11 @@ class QnResourceModel : public QAbstractItemModel {
 public:
     enum ItemDataRole {
         ResourceRole        = Qt::UserRole + 1, /**< Role for QnResourcePtr. */
-        IdRole              = Qt::UserRole + 2, /**< Role for resource's QnId. */
-        SearchStringRole    = Qt::UserRole + 3, /**< Role for search string. */
-        StatusRole          = Qt::UserRole + 4, /**< Role for resource's status. */
+        ResourceFlagsRole   = Qt::UserRole + 2, /**< Role for resource flags. */
+        IdRole              = Qt::UserRole + 3, /**< Role for resource's QnId. */
+        UuidRole            = Qt::UserRole + 4, /**< Role for layout item's UUID. */
+        SearchStringRole    = Qt::UserRole + 5, /**< Role for search string. */
+        StatusRole          = Qt::UserRole + 6, /**< Role for resource's status. */
     };
 
     explicit QnResourceModel(QObject *parent = 0);

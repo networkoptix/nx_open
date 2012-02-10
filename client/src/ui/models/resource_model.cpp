@@ -207,35 +207,40 @@ public:
     }
 
     QVariant data(int role, int column) const {
-        switch(m_type) {
-        case Resource:
-        case Item:
-            switch(role) {
-            case Qt::DisplayRole:
-            case Qt::ToolTipRole:
-            case Qt::StatusTipRole:
-            case Qt::WhatsThisRole:
-            case Qt::AccessibleTextRole:
-            case Qt::AccessibleDescriptionRole:
-                return m_name;
-            case Qt::DecorationRole:
-                if (column == 0)
-                    return m_icon;
-                break;
-            case Qt::EditRole:
-                break;
-            case ResourceRole:
-                return QVariant::fromValue<QnResourcePtr>(m_resource);
-            case IdRole: 
-                return QVariant::fromValue<QnId>(m_id);
-            case SearchStringRole: 
-                return m_searchString;
-            case StatusRole: 
-                return m_status;
-            default:
-                break;
-            }
+        switch(role) {
+        case Qt::DisplayRole:
+        case Qt::ToolTipRole:
+        case Qt::StatusTipRole:
+        case Qt::WhatsThisRole:
+        case Qt::AccessibleTextRole:
+        case Qt::AccessibleDescriptionRole:
+            return m_name;
+        case Qt::DecorationRole:
+            if (column == 0)
+                return m_icon;
             break;
+        case Qt::EditRole:
+            break;
+        case ResourceRole:
+            if(!m_resource.isNull())
+                return QVariant::fromValue<QnResourcePtr>(m_resource);
+            break;
+        case ResourceFlagsRole:
+            if(!m_resource.isNull())
+                return static_cast<int>(m_flags);
+            break;
+        case IdRole: 
+            if(m_id.isValid())
+                return QVariant::fromValue<QnId>(m_id);
+            break;
+        case UuidRole:
+            if(m_type == Item)
+                return QVariant::fromValue<QUuid>(m_uuid);
+            break;
+        case SearchStringRole: 
+            return m_searchString;
+        case StatusRole: 
+            return static_cast<int>(m_status);
         default:
             break;
         }

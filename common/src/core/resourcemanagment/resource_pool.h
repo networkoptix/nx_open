@@ -67,7 +67,7 @@ public:
 
     QStringList allTags() const;
 
-    QnResourceList findResourcesByCriteria(const CLDeviceCriteria &cr) const;
+    QnResourceList findResourcesByCriteria(const QnResourceCriteria &cr) const;
 
 signals:
     void resourceAdded(const QnResourcePtr &resource);
@@ -79,7 +79,7 @@ private slots:
     void handleResourceChange();
 
 private:
-    bool isResourceMeetCriteria(const CLDeviceCriteria &cr, QnResourcePtr res) const;
+    bool isResourceMeetCriteria(const QnResourceCriteria &cr, QnResourcePtr res) const;
     bool match_subfilter(QnResourcePtr resource, const QString &fltr) const;
 
 private:
