@@ -883,6 +883,11 @@ void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
     }
 }
 
+bool QnArchiveStreamReader::getQuality() const
+{
+    return m_quality;
+}
+
 void QnArchiveStreamReader::lock()
 {
     m_jumpMtx.lock();

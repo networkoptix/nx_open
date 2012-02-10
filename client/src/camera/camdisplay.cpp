@@ -177,13 +177,16 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         {
             m_delayedFrameCnt = qMax(0, m_delayedFrameCnt);
             m_delayedFrameCnt++;
-            if (m_delayedFrameCnt > 10) {
-                reader->setQuality(MEDIA_Quality_Low, false);
+            if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low)
+            {
+                bool fastSwitch = m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
+                // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
+                reader->setQuality(MEDIA_Quality_Low, fastSwitch);
                 m_toLowQSpeed = speed;
                 m_toLowQTimer.restart();
             }
         }
-        else if (realSleepTime >= 1*1000)
+        else if (realSleepTime >= 0)
         {
             m_delayedFrameCnt = qMin(0, m_delayedFrameCnt);
             m_delayedFrameCnt--;
@@ -333,12 +336,14 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         break;
                     }
                 }
+                /*
                 if (sleepTimer.elapsed() > 0)
                     realSleepTime = sleepTimer.elapsed()*1000;
-                else {
+                else 
                     realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
-                }
-
+                */
+                realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
+                //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }
         else {

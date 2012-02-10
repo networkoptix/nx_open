@@ -55,6 +55,7 @@ public:
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
     virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual bool getQuality() const override;
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
 
