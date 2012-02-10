@@ -231,13 +231,9 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         newChunkCatalog = m_catalogHi;
     }
 
-	/*
-    QString s;
-    QTextStream str(&s);
-    str << "chunk startTime= " << QDateTime::fromMSecsSinceEpoch(newChunk.startTime/1000).toString("hh.mm.ss.zzz") << " duration=" << newChunk.duration/1000000.0;
-    str.flush();
-    cl_log.log(s, cl_logALWAYS);
-	*/
+	
+    qDebug() << "seekTo= " << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh.mm.ss.zzz");
+    qDebug() << "chunk startTime= " << QDateTime::fromMSecsSinceEpoch(newChunk.startTimeMs).toString("hh.mm.ss.zzz") << " duration=" << newChunk.durationMs/1000.0;
 
     qint64 chunkOffset = 0;
     if (newChunk.durationMs == -1) // last live chunk
@@ -328,6 +324,8 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
         return; // EOF reached. do not switch quality
     if (isCatalogEqualQuality) 
     {
+        Q_ASSERT(chunk.startTimeMs > m_currentChunk.startTimeMs);
+
         if (m_currentChunkCatalog == m_catalogLow)
         {
             qint64 lowDistance = chunk.distanceToTime(prevEndTimeMs);

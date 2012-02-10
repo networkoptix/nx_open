@@ -10,8 +10,6 @@
 #include "core/misc/scheduleTask.h"
 #include "server_stream_recorder.h"
 
-static const int TRUNCATE_INTERVAL = 60; // seconds
-
 const float MIN_SECONDARY_FPS = 2.0;
 
 
@@ -74,7 +72,7 @@ QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, Qn
     if (reader == 0)
         return 0;
     QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role);
-    recorder->setTruncateInterval(TRUNCATE_INTERVAL);
+    recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
     reader->addDataProcessor(recorder);
     reader->setNeedKeyData();
     recorder->start();

@@ -9,6 +9,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "motion/motion_helper.h"
 #include <QDebug>
+#include "recording_manager.h"
 
 QString DeviceFileCatalog::prefixForRole(QnResource::ConnectionRole role)
 {
@@ -209,7 +210,7 @@ void DeviceFileCatalog::addChunk(const Chunk& chunk, qint64 lastStartTime)
 void DeviceFileCatalog::deserializeTitleFile()
 {
     QMutexLocker lock(&m_mutex);
-    bool needRewriteFile = false;
+    bool needRewriteCatalog = false;
     QFile newFile(m_file.fileName() + QString(".tmp"));
 
     m_file.readLine(); // read header
@@ -231,7 +232,7 @@ void DeviceFileCatalog::deserializeTitleFile()
         if (fields[3].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
-            needRewriteFile = true;
+            needRewriteCatalog = true;
             chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs);
         }
 
@@ -242,21 +243,32 @@ void DeviceFileCatalog::deserializeTitleFile()
         }
         else if (fileExists(chunk)) 
         {
+            if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2)
+            {
+                const QString fileName = fullFileName(chunk);
+                qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
+                qnFileDeletor->deleteFile(fileName);
+                needRewriteCatalog = true;
+                continue;
+            }
+
             if (lastFileDuplicateName()) {
                 m_chunks.last() = chunk;
-                needRewriteFile = true;
+                needRewriteCatalog = true;
             }       
             else 
+            {
                 addChunk(chunk, lastStartTime);
+            }
         }
         else {
-            needRewriteFile = true;
+            needRewriteCatalog = true;
         }
         lastStartTime = startTime;
 
     } while (!line.isEmpty());
     newFile.close();
-    if (needRewriteFile && newFile.open(QFile::WriteOnly))
+    if (needRewriteCatalog && newFile.open(QFile::WriteOnly))
     {
         QTextStream str(&newFile);
         str << "start; storage; index; duration\n"; // write CSV header

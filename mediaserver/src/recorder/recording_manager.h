@@ -23,6 +23,9 @@ class QnRecordingManager: public QObject
 {
     Q_OBJECT
 public:
+    static const int RECORDING_CHUNK_LEN = 60; // seconds
+
+
     static QnRecordingManager* instance();
     QnRecordingManager();
     virtual ~QnRecordingManager();
