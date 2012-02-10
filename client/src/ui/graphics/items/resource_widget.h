@@ -284,6 +284,11 @@ protected:
 
     void ensureAboutToBeDestroyedEmitted();
 
+    void ensureMotionMask();
+    void invalidateMotionMask();
+    void ensureMotionMaskBinData();
+    void invalidateMotionMaskBinData();
+
 private Q_SLOTS:
     void at_sourceSizeChanged(const QSize &size);
     void at_display_resourceUpdated();
@@ -294,10 +299,6 @@ private:
      * \returns                         Rectangle in local coordinates where given channel is to be drawn.
      */
     QRectF channelRect(int channel) const;
-
-    void ensureMotionMask();
-
-    void invalidateMotionMask();
 
     enum OverlayIcon {
         NO_ICON,
@@ -401,11 +402,14 @@ private:
     /** Image region where motion is currently present, in parrots. */
     QRegion m_motionMask;
 
+    /** Whether the motion mask is valid. */
+    bool m_motionMaskValid;
+
     /** Binary mask for the current motion region. */
     __m128i *m_motionMaskBinData;
 
-    /** Whether the motion mask is valid. */
-    bool m_motionMaskValid;
+    /** Whether motion mask binary data is valid. */
+    bool m_motionMaskBinDataValid;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
