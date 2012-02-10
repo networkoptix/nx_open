@@ -3,6 +3,8 @@
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/dataprovider/live_stream_provider.h"
+#include "core/resource/resource_fwd.h"
+#include "core/resource/camera_resource.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role):
     QnStreamRecorder(dev),
@@ -56,8 +58,16 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
             if (m_role == QnResource::Role_LiveVideo)
             {
                 QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(mediaProvider);
-                liveProvider->setFps(m_currentScheduleTask.getFps());
-                liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+                if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never) {
+                    liveProvider->setFps(m_currentScheduleTask.getFps());
+                    liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+                }
+                else {
+                    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+                    Q_ASSERT(camera);
+                    liveProvider->setFps(camera->getMaxFps()-5);
+                    liveProvider->setQuality(QnQualityHighest);
+                }
                 emit fpsChanged(m_currentScheduleTask.getFps());
             }
             m_needUpdateStreamParams = false;
