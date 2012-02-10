@@ -40,6 +40,7 @@ public:
         DISPLAY_ACTIVITY_OVERLAY  = 0x1, /**< Whether the paused overlay icon should be displayed. */
         DISPLAY_SELECTION_OVERLAY = 0x2, /**< Whether selected / not selected state should be displayed. */
         DISPLAY_MOTION_GRID       = 0x4, /**< Whether a grid with motion detection is to be displayed. */
+        DISPLAY_BUTTONS           = 0x8, /**< Whether item buttons are to be displayed. */
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
@@ -392,6 +393,9 @@ private:
 
     /** Layout for buttons. */
     QGraphicsLinearLayout *m_buttonsLayout;
+
+    /** Widget for buttons. */
+    QGraphicsWidget *m_buttonsWidget;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

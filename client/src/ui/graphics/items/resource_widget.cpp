@@ -73,7 +73,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_frameWidth(0.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_displayFlags(DISPLAY_SELECTION_OVERLAY),
+    m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
     m_motionMaskValid(false),
     m_motionMaskBinDataValid(false)
 {
@@ -94,9 +94,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_buttonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the item to be placed in right end of the layout. */
+
+    m_buttonsWidget = new QGraphicsWidget(this);
+    m_buttonsWidget->setLayout(m_buttonsLayout);
+
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    layout->addItem(m_buttonsLayout);
+    layout->addItem(m_buttonsWidget);
     layout->addStretch(0x1000);
     setLayout(layout);
 
@@ -388,12 +392,14 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-    if(changedFlags & DISPLAY_MOTION_GRID)
-    {
-        QnAbstractArchiveReader* ar = dynamic_cast<QnAbstractArchiveReader*>(m_display->archiveReader());
-        if (ar)
-            ar->setSendMotion(flags & DISPLAY_MOTION_GRID);
+    if(changedFlags & DISPLAY_MOTION_GRID) {
+        QnAbstractArchiveReader *reader = m_display->archiveReader();
+        if (reader)
+            reader->setSendMotion(flags & DISPLAY_MOTION_GRID);
     }
+
+    if(changedFlags & DISPLAY_BUTTONS)
+        m_buttonsWidget->setVisible(flags & DISPLAY_BUTTONS);
 }
 
 // -------------------------------------------------------------------------- //

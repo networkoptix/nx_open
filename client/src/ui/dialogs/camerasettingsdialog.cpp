@@ -23,7 +23,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent, QnVirtualCameraResou
 {
     ui->setupUi(this);
     ui->motionWidget->setCamera(m_camera);
-	ui->motionWidget->displayMotionGrid(QnResourceWidget::DISPLAY_MOTION_GRID);
     updateView();
 }
 
