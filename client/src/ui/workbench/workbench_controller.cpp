@@ -232,7 +232,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Install and configure instruments. */
     ClickInstrument *itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
-    ClickInstrument *itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
+    m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
     ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::ITEM, this);
     ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
@@ -263,7 +263,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(itemMouseForwardingInstrument);
     m_manager->installInstrument(selectionFixupInstrument->preForwardingInstrument());
     m_manager->installInstrument(itemLeftClickInstrument);
-    m_manager->installInstrument(itemRightClickInstrument);
+    m_manager->installInstrument(m_itemRightClickInstrument);
     m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
@@ -288,7 +288,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(m_itemRightClickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
@@ -1188,7 +1188,6 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
     displayMotionGrid(display()->scene()->selectedItems(), false);
-    //m_motionSelectionInstrument->recursiveDisable();
 }
 
 void QnWorkbenchController::at_cameraSettingsAction_triggered()
@@ -1215,7 +1214,6 @@ void QnWorkbenchController::at_showMotionAction_triggered()
     }
 
     displayMotionGrid(items, true);
-    //m_motionSelectionInstrument->recursiveEnable();
 
 #if 0
     QGraphicsItem *item = display()->scene()->selectedItems().first();
@@ -1244,7 +1242,3 @@ void QnWorkbenchController::at_recordingSettingsAction_triggered() {
 	dialog.exec();
 }
 
-MotionSelectionInstrument * QnWorkbenchController::motionSelectionInstrument() const
-{
-	 return m_motionSelectionInstrument;
-}

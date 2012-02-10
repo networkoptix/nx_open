@@ -25,6 +25,7 @@ class ResizingInstrument;
 class DropInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
+class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 
@@ -66,8 +67,6 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-	MotionSelectionInstrument *motionSelectionInstrument() const;
-
     void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QString &file, const QPointF &gridPos = QPointF(), bool findAccepted = true);
@@ -77,6 +76,14 @@ public:
 
     void remove(const QnResourcePtr &resource);
     void remove(const QnResourceList &resources);
+
+    MotionSelectionInstrument *motionSelectionInstrument() const {
+	    return m_motionSelectionInstrument;
+    }
+
+    ClickInstrument *itemRightClickInstrument() const {
+        return m_itemRightClickInstrument;
+    }
 
 public slots:
     void startRecording();
@@ -173,6 +180,9 @@ private:
 
     /** Motion selection instrument. */
     MotionSelectionInstrument *m_motionSelectionInstrument;
+
+    /** Item right click instrument. */
+    ClickInstrument *m_itemRightClickInstrument;
 
 
     /* Resizing-related state. */

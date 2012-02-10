@@ -6,6 +6,7 @@
 #include "ui/graphics/instruments/signaling_instrument.h"
 #include "ui/graphics/instruments/instrument_manager.h"
 #include "ui/graphics/instruments/motion_selection_instrument.h"
+#include "ui/graphics/instruments/click_instrument.h"
 #include "ui/graphics/items/resource_widget.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench.h"
@@ -69,6 +70,7 @@ void QnCameraMotionMaskWidget::init()
 
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();
+    m_controller->itemRightClickInstrument()->disable();
 
     /* Create motion mask selection instrument. */
 	MotionSelectionInstrument *motionSelectionInstrument = new MotionSelectionInstrument(this);
