@@ -243,9 +243,13 @@ public:
      */
     void addToMotionSelection(const QRect &gridRect);
 
+    void addToMotionMask(const QRect &gridRect);
+
+    void clearMotionMask();
+
     using base_type::mapRectToScene;
 
-public Q_SLOTS:
+public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
 
@@ -254,7 +258,7 @@ public Q_SLOTS:
      */
     void clearMotionSelection();
 
-Q_SIGNALS:
+signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
     void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region);

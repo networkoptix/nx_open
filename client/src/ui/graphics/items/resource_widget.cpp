@@ -260,6 +260,18 @@ void QnResourceWidget::invalidateMotionMask() {
     m_motionMaskValid = false;
 }
 
+void QnResourceWidget::addToMotionMask(const QRect &gridRect) {
+    ensureMotionMask();
+
+    m_motionMask += gridRect;
+}
+
+void QnResourceWidget::clearMotionMask() {
+    ensureMotionMask();
+
+    m_motionMask = QRegion();
+}
+
 void QnResourceWidget::ensureMotionMask()
 {
     if(m_motionMaskValid)

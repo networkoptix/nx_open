@@ -67,11 +67,15 @@ void QnCameraMotionMaskWidget::init()
     m_display->instrumentManager()->installInstrument(resizeSignalingInstrument);
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
-	MotionSelectionInstrument* motionSelectionInstrument = m_controller->motionSelectionInstrument();
-	motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
+    /* Disable unused instruments. */
+    m_controller->motionSelectionInstrument()->disable();
 
-	motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, Globals::motionMaskSelectionColor());
-	// motionSelectionInstrument->setColor(MotionSelectionInstrument::Border);
+    /* Create motion mask selection instrument. */
+	MotionSelectionInstrument *motionSelectionInstrument = new MotionSelectionInstrument(this);
+    motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
+	motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, Globals::motionMaskRubberBandColor());
+	motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, Globals::motionMaskRubberBandBorderColor());
+    m_display->instrumentManager()->installInstrument(motionSelectionInstrument);
 
 	connect(motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
 	connect(motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
@@ -119,11 +123,14 @@ void QnCameraMotionMaskWidget::displayMotionGrid(bool display)
 
 void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &rect)
 {
+    widget->addToMotionMask(rect);
 	m_motionMask += rect;
 }
 
-void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *rects)
+void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget)
 {
+    widget->clearMotionMask();
+    
 	m_motionMask = QRegion();
 }
 

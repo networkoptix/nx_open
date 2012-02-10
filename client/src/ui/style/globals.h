@@ -14,22 +14,13 @@ public:
         MOTION_RUBBER_BAND_BORDER_COLOR,
         MOTION_RUBBER_BAND_COLOR,
         MOTION_SELECTION_COLOR,
-		MOTION_MASK_SELECTION_COLOR,
+		MOTION_MASK_COLOR,
+        MOTION_MASK_RUBBER_BAND_BORDER_COLOR,
+        MOTION_MASK_RUBBER_BAND_COLOR,
         FRAME_COLOR,
         SELECTED_FRAME_COLOR,
         OPACITY_CHANGE_PERIOD,
 
-        // DEPRECATED:
-        ROTATION_ANGLE,
-        SHOW_ITEM_TEXT,
-        DEVICE_UPDATE_INTERVAL,
-        BACKGROUND_COLOR,
-        CAN_BE_DROPPED_COLOR,
-        DECORATION_OPACITY,
-        DECORATION_MAX_OPACITY,
-        BASE_SCENE_Z_LEVEL,
-        GRID_APPEARANCE_DELAY,
-        
         VARIABLE_COUNT
     };
 
@@ -53,21 +44,12 @@ public:
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionRubberBandBorderColor,    MOTION_RUBBER_BAND_BORDER_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionRubberBandColor,          MOTION_RUBBER_BAND_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionSelectionColor,           MOTION_SELECTION_COLOR);
-	QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionMaskSelectionColor,       MOTION_SELECTION_COLOR);
+    QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionMaskRubberBandBorderColor,MOTION_MASK_RUBBER_BAND_BORDER_COLOR);
+	QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionMaskRubberBandColor,      MOTION_MASK_RUBBER_BAND_COLOR);
+    QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionMaskColor,                MOTION_MASK_COLOR);
 	QN_DECLARE_GLOBAL_ACCESSOR(QColor,  frameColor,                     FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  selectedFrameColor,             SELECTED_FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(int,     opacityChangePeriod,            OPACITY_CHANGE_PERIOD);
-    
-    // DEPRECATED:
-    QN_DECLARE_GLOBAL_ACCESSOR(qreal,   rotationAngle,                  ROTATION_ANGLE);
-    QN_DECLARE_GLOBAL_ACCESSOR(bool,    showItemText,                   SHOW_ITEM_TEXT);
-    QN_DECLARE_GLOBAL_ACCESSOR(int,     deviceUpdateInterval,           DEVICE_UPDATE_INTERVAL);
-    QN_DECLARE_GLOBAL_ACCESSOR(QColor,  backgroundColor,                BACKGROUND_COLOR);
-    QN_DECLARE_GLOBAL_ACCESSOR(QColor,  canBeDroppedColor,              CAN_BE_DROPPED_COLOR);
-    QN_DECLARE_GLOBAL_ACCESSOR(qreal,   decorationOpacity,              DECORATION_OPACITY);
-    QN_DECLARE_GLOBAL_ACCESSOR(qreal,   decorationMaxOpacity,           DECORATION_MAX_OPACITY);
-    QN_DECLARE_GLOBAL_ACCESSOR(qreal,   baseSceneZ,                     BASE_SCENE_Z_LEVEL);
-    QN_DECLARE_GLOBAL_ACCESSOR(int,     gridAppearanceDelay,            GRID_APPEARANCE_DELAY);
 #undef QN_DECLARE_GLOBAL_ACCESSOR
 
 private:
