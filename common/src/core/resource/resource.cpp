@@ -161,16 +161,14 @@ QnResourcePtr QnResource::toSharedPointer() const
     return res;
 }
 
-const QnParamList& QnResource::getResourceParamList() const
+QnParamList QnResource::getResourceParamList() const
 {
-    QnId resTypeId;
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-        if (!m_resourceParamList.isEmpty())
-            return m_resourceParamList;
-        resTypeId = m_typeId;
-    }
-
+    QMutexLocker mutexLocker(&m_mutex);
+    
+    if (!m_resourceParamList.isEmpty())
+        return m_resourceParamList;
+    QnId resTypeId = m_typeId;
+    
     QnParamList resourceParamList;
 
     // 1. read Q_PROPERTY params
@@ -250,7 +248,7 @@ const QnParamList& QnResource::getResourceParamList() const
         }
     }
 
-    QMutexLocker mutexLocker(&m_mutex);
+    
     if (m_resourceParamList.isEmpty())
         m_resourceParamList = resourceParamList;
 
@@ -286,8 +284,8 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
         return false;
     }
 
-    QnParam &param = m_resourceParamList[name];
     m_mutex.lock();
+    QnParam &param = m_resourceParamList[name];
     val = param.value();
     m_mutex.unlock();
     if (domain == QnDomainMemory)
@@ -339,14 +337,16 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         return false;
     }
 
+    m_mutex.lock();
     QnParam &param = m_resourceParamList[name];
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+        m_mutex.unlock();
         return false;
     }
 
-    m_mutex.lock();
+    
     QVariant oldValue = param.value();
     m_mutex.unlock();
 

@@ -614,9 +614,12 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     /* Draw current time. */
     qint64 time = m_renderer->lastDisplayedTime(0);
-    if (time > 1000000ll * 3600 * 24) {
+    if (time > 1000000ll * 3600 * 24) 
+    {
+#ifdef _DEBUG
         drawCurrentTime(painter, rect(), time); /* Do not show time for regular media files. */
         drawQualityText(painter, rect(), m_renderer->isLowQualityImage(0) ? "Low" : "Hi");
+#endif
     }
 }
 
