@@ -868,8 +868,8 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     connect(camera, SIGNAL(exportFailed(QString)), exportProgressDialog, SLOT(reject()));
     connect(camera, SIGNAL(exportFinished(QString)), exportProgressDialog, SLOT(accept()));
 
-    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(onExportFailed(QString)), Qt::UniqueConnection);
-    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(onExportFinished(QString)), Qt::UniqueConnection);
+    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(at_exportFailed(QString)), Qt::UniqueConnection);
+    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(at_exportFinished(QString)), Qt::UniqueConnection);
 
     camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName);
 }
