@@ -12,7 +12,7 @@ QnRtspListener::~QnRtspListener()
     stop();
 }
 
-CLLongRunnable* QnRtspListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnRtspListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnRtspConnectionProcessor(clientSocket, owner);
 }

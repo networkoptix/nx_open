@@ -23,7 +23,7 @@ public:
     QnRestRequestHandler* findHandler(QString path);
     const Handlers& allHandlers() const;
 protected:
-    virtual CLLongRunnable* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner);
+    virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner);
 private:
      Handlers m_handlers;
 };

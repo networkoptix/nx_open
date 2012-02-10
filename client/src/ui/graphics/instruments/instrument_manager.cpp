@@ -13,6 +13,8 @@
 namespace {
     /** Name of the property to store a list of scene's instrument managers. */
     const char *managersPropertyName = "_qn_instrumentManagers";
+
+    const char *viewportWatcherName = "_qn_viewportWatcher";
 }
 
 /* For QVariant to work with it. */
@@ -231,9 +233,22 @@ void InstrumentManagerPrivate::registerViewportInternal(QGraphicsView *view) {
     QWidget *viewport = view->viewport();
     addSyncedViewport(viewport);
     viewportDispatcher->registerTarget(viewport);
+
+    /* Create a viewport destruction watcher. 
+     * It will be destroyed before the viewport's destructed gets a chance to send some events 
+     * that may get into our handlers and mess everything up. */
+    QObject *viewportWatcher = new QObject(view->viewport());
+    viewportWatcher->setObjectName(QLatin1String(viewportWatcherName));
+    QObject::connect(viewportWatcher, SIGNAL(destroyed(QObject *)), q_func(), SLOT(at_viewportWatcher_destroyed(QObject *)));
 }
 
 void InstrumentManagerPrivate::unregisterViewportInternal(QObject *viewport) {
+    QObject *viewportWatcher = viewport->findChild<QObject *>(QLatin1String(viewportWatcherName));
+    if(viewportWatcher != NULL) {
+        QObject::disconnect(viewportWatcher, NULL, q_func(), NULL);
+        delete viewportWatcher;
+    }
+
     viewport->removeEventFilter(viewportDispatcher);
 
     QObject::disconnect(viewport, NULL, q_func(), NULL);
@@ -282,6 +297,10 @@ void InstrumentManagerPrivate::at_viewport_destroyed(QObject *viewport) {
         /* Viewport is being changed. */
         registerViewportInternal(localView);
     }
+}
+
+void InstrumentManagerPrivate::at_viewportWatcher_destroyed(QObject *viewportWatcher) {
+    at_viewport_destroyed(viewportWatcher->parent());
 }
 
 InstrumentManager::InstrumentManager(QObject *parent):
@@ -497,6 +516,10 @@ void InstrumentManager::at_view_destroyed(QObject *view) {
 
 void InstrumentManager::at_viewport_destroyed(QObject *viewport) {
     d_func()->at_viewport_destroyed(viewport);
+}
+
+void InstrumentManager::at_viewportWatcher_destroyed(QObject *viewportWatcher) {
+    d_func()->at_viewportWatcher_destroyed(viewportWatcher);
 }
 
 QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) {

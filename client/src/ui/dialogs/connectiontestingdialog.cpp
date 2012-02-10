@@ -51,10 +51,11 @@ void ConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void ConnectionTestingDialog::testResults(int status, const QByteArray &data, int requestHandle)
+void ConnectionTestingDialog::testResults(int status, const QByteArray &data, const QByteArray& errorString, int requestHandle)
 {
     Q_UNUSED(data)
     Q_UNUSED(requestHandle)
+	Q_UNUSED(errorString)
 
     if (m_timeoutTimer.isActive())
         m_timeoutTimer.stop();
@@ -76,7 +77,7 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, in
 void ConnectionTestingDialog::testSettings()
 {
     connection = QnAppServerConnectionFactory::createConnection(m_url);
-    connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,int)));
+    connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
 }
 
 void ConnectionTestingDialog::accept()

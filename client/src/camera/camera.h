@@ -58,7 +58,7 @@ signals:
     void exportFinished(const QString &fileName);
 public slots:
     void stopExport();
-    void onExportFinished();
+    void onExportFinished(QString fileName);
 protected slots:
     void onReachedTheEnd();
 private:

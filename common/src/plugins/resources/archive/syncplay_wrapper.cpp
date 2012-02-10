@@ -71,7 +71,6 @@ QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapper():
 
 QnArchiveSyncPlayWrapper::~QnArchiveSyncPlayWrapper()
 {
-
     delete d_ptr;
 }
 

@@ -50,9 +50,9 @@
 #include "workbench_display.h"
 #include "camera/camera.h"
 #include "openal/qtvaudiodevice.h"
-#include "core/resource/local_file_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "ui/ui_common.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *)
 
@@ -864,26 +864,28 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     connect(exportProgressDialog, SIGNAL(canceled()), camera, SLOT(stopExport()));
     connect(exportProgressDialog, SIGNAL(canceled()), exportProgressDialog, SLOT(reject()));
     connect(exportProgressDialog, SIGNAL(finished(int)), exportProgressDialog, SLOT(deleteLater()));
+
     connect(camera, SIGNAL(exportProgress(int)), exportProgressDialog, SLOT(setValue(int)));
     connect(camera, SIGNAL(exportFailed(QString)), exportProgressDialog, SLOT(reject()));
     connect(camera, SIGNAL(exportFinished(QString)), exportProgressDialog, SLOT(accept()));
 
-    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(onExportFailed(QString)), Qt::UniqueConnection);
-    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(onExportFinished(QString)), Qt::UniqueConnection);
+    camera->disconnect(this);
+    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(at_exportFailed(QString)));
+    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(at_exportFinished(QString)));
 
     camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName);
 }
 
-void QnWorkbenchUi::at_exportFinished(const QString &fileName)
+void QnWorkbenchUi::at_exportFinished(QString fileName)
 {
-    QnLocalFileResourcePtr file(new QnLocalFileResource(fileName));
+    QnAviResourcePtr file(new QnAviResource(fileName));
     qnResPool->addResource(file);
 
     QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));
 
 }
 
-void QnWorkbenchUi::at_exportFailed(const QString &errMessage)
+void QnWorkbenchUi::at_exportFailed(QString errMessage)
 {
     CLVideoCamera *cam = dynamic_cast<CLVideoCamera *>(sender()); // ### qobject_cast ?
     if (cam)

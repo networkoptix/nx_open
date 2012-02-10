@@ -61,7 +61,7 @@ void QnEventManager::eventReceived(QnEvent event)
                     QnSecurityCamResourcePtr securityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
                     if (!securityCamera.isNull())
                     {
-                        QnRecordingManager::instance()->updateSchedule(securityCamera);
+                        QnRecordingManager::instance()->updateCamera(securityCamera);
                     }
                 }
             }

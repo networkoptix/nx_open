@@ -8,6 +8,7 @@
 #include "utils/common/base.h"
 
 class TCPSocket;
+class QnTCPConnectionProcessor;
 
 class QnTcpListener: public CLLongRunnable
 {
@@ -21,7 +22,7 @@ public:
 
 protected:
     virtual void run();
-    virtual CLLongRunnable* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;
 private:
     void removeDisconnectedConnections();
 private:

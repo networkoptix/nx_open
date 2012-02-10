@@ -164,6 +164,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_workbench->mapper()->setSpacing(defaultSpacing);
 
     m_display = new QnWorkbenchDisplay(m_workbench, this);
+	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);
     m_display->setMarginFlags(Qn::MARGINS_AFFECT_POSITION);

@@ -4,7 +4,6 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include "core/resource/local_file_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_resource.h"
 #include "plugins/resources/archive/avi_files/avi_bluray_resource.h"

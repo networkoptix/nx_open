@@ -36,6 +36,7 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ../build/debug/generated
   UI_DIR = ../build/debug/generated
   RCC_DIR = ../build/debug/generated
+  PRE_TARGETDEPS += ../../common/bin/debug/common.lib
 }
 
 CONFIG(release, debug|release) {
@@ -44,6 +45,7 @@ CONFIG(release, debug|release) {
   MOC_DIR = ../build/release/generated
   UI_DIR = ../build/release/generated
   RCC_DIR = ../build/release/generated
+  PRE_TARGETDEPS += ../../common/bin/release/common.lib
 }
 
 CONFIG(debug, debug|release) {
@@ -59,6 +61,8 @@ QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
 
 win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
+    QMAKE_CXXFLAGS -= -Zc:wchar_t-
+
     LIBS += -lxerces-c_3
 
     # Define QN_EXPORT only if common build is not static

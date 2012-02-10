@@ -174,7 +174,7 @@ void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyPr
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
-    request.setRawHeader("Connection", "close");
+    //request.setRawHeader("Connection", "close");
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
@@ -211,7 +211,7 @@ void SessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyP
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
-    request.setRawHeader("Connection", "close");
+    //request.setRawHeader("Connection", "close");
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
