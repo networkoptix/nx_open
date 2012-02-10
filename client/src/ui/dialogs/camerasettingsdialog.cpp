@@ -10,6 +10,8 @@
 #include "ui/style/skin.h"
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "camerasettingsdialog.h"
+#include "ui/device_settings/camera_motionmask_widget.h"
+#include "ui/graphics/items/resource_widget.h"
 
 #include "settings.h"
 
@@ -20,6 +22,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent, QnVirtualCameraResou
     m_connection (QnAppServerConnectionFactory::createConnection())
 {
     ui->setupUi(this);
+    ui->motionWidget->setCamera(m_camera);
+	ui->motionWidget->displayMotionGrid(QnResourceWidget::DISPLAY_MOTION_GRID);
     updateView();
 }
 
@@ -57,6 +61,7 @@ void CameraSettingsDialog::saveToModel()
     m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
     m_camera->setScheduleTasks(ui->cameraScheduleWidget->scheduleTasks());
+	m_camera->setMotionMask(ui->motionWidget->motionMask());
 }
 
 void CameraSettingsDialog::updateView()

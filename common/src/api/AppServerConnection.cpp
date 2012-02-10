@@ -120,11 +120,14 @@ int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, Q
     QByteArray data;
     int status = getObjects("resourceType", "", data, errorString);
 
-    try {
-        m_serializer.deserializeResourceTypes(resourceTypes, data);
-    } catch (const QnSerializeException& e) {
-        errorString += e.errorString();
-    }
+	if (status == 0)
+	{
+		try {
+			m_serializer.deserializeResourceTypes(resourceTypes, data);
+		} catch (const QnSerializeException& e) {
+			errorString += e.errorString();
+		}
+	}
 
     return status;
 }

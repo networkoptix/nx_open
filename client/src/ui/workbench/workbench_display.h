@@ -73,6 +73,11 @@ public:
      */
     QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent = NULL);
 
+	/**
+	  * This is method initSyncPlay. Should be called for only main display.
+	*/
+	void initSyncPlay();
+
     /**
      * Virtual destructor.
      */

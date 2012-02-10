@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Camera settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -169,6 +169,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabMotion">
+      <attribute name="title">
+       <string>Motion</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QnCameraMotionMaskWidget" name="motionWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -185,6 +195,12 @@
    <class>CameraScheduleWidget</class>
    <extends>QWidget</extends>
    <header>ui/device_settings/camera_schedule_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnCameraMotionMaskWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/device_settings/camera_motionmask_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

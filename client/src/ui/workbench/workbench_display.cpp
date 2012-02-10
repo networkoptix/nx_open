@@ -107,7 +107,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_curtainAnimator(NULL),
     m_mode(QnWorkbench::VIEWING),
     m_frontZ(0.0),
-    m_dummyScene(new QGraphicsScene(this))
+    m_dummyScene(new QGraphicsScene(this)),
+	m_renderWatcher(NULL)
 {
     std::memset(m_itemByRole, 0, sizeof(m_itemByRole));
 
@@ -168,10 +169,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     /* Set up defaults. */
     initWorkbench(workbench);
     setScene(m_dummyScene);
-
-    /* Set up syncplay and render watcher. */
-    m_renderWatcher = new QnRenderWatchMixin(this, this);
-    new QnSyncPlayMixin(this, m_renderWatcher, this);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -179,6 +176,13 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay() {
 
     initWorkbench(NULL);
     setScene(NULL);
+}
+
+void QnWorkbenchDisplay::initSyncPlay()
+{
+    /* Set up syncplay and render watcher. */
+    m_renderWatcher = new QnRenderWatchMixin(this, this);
+    new QnSyncPlayMixin(this, m_renderWatcher, this);
 }
 
 void QnWorkbenchDisplay::initWorkbench(QnWorkbench *workbench) {

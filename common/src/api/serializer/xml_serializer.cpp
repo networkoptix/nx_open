@@ -49,6 +49,20 @@ namespace {
         }
     }
 
+	QString serializeRegion(const QRegion& region)
+	{
+		QStringList regionList;
+
+		foreach (const QRect& rect, region.rects())
+		{
+			QStringList rectList;
+			rectList << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
+			regionList << rectList.join(",");
+		}
+
+		return regionList.join(";");
+	}
+
     void parseScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnApiScheduleTasks& xsdScheduleTasks)
     {
         using xsd::api::scheduleTasks::ScheduleTasks;
@@ -656,6 +670,7 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
 
     camera.parentID(cameraPtr->getParentId().toString().toStdString());
     camera.status((cameraPtr->getStatus() == QnResource::Online) ? "A" : "I");
+	camera.region(serializeRegion(cameraPtr->getMotionMask()).toStdString());
 
     const QAuthenticator& auth = cameraPtr->getAuth();
 

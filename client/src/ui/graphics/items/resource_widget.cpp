@@ -574,7 +574,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
             /* Selection. */
             if(!m_channelState[i].motionSelection.isEmpty())
-                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, Globals::motionSelectionColor());
+				drawFilledRegion(painter, rect, m_channelState[i].motionSelection, Globals::motionSelectionColor());
         }
     }
 

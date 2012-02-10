@@ -14,6 +14,7 @@ public:
         MOTION_RUBBER_BAND_BORDER_COLOR,
         MOTION_RUBBER_BAND_COLOR,
         MOTION_SELECTION_COLOR,
+		MOTION_MASK_SELECTION_COLOR,
         FRAME_COLOR,
         SELECTED_FRAME_COLOR,
         OPACITY_CHANGE_PERIOD,
@@ -52,7 +53,8 @@ public:
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionRubberBandBorderColor,    MOTION_RUBBER_BAND_BORDER_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionRubberBandColor,          MOTION_RUBBER_BAND_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionSelectionColor,           MOTION_SELECTION_COLOR);
-    QN_DECLARE_GLOBAL_ACCESSOR(QColor,  frameColor,                     FRAME_COLOR);
+	QN_DECLARE_GLOBAL_ACCESSOR(QColor,  motionMaskSelectionColor,       MOTION_SELECTION_COLOR);
+	QN_DECLARE_GLOBAL_ACCESSOR(QColor,  frameColor,                     FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  selectedFrameColor,             SELECTED_FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(int,     opacityChangePeriod,            OPACITY_CHANGE_PERIOD);
     

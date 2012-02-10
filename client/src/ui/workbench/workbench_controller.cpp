@@ -1241,5 +1241,10 @@ void QnWorkbenchController::at_toggleRecordingAction_triggered() {
 void QnWorkbenchController::at_recordingSettingsAction_triggered() {
     PreferencesDialog dialog(display()->view());
     dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
-    dialog.exec();
+	dialog.exec();
+}
+
+MotionSelectionInstrument * QnWorkbenchController::motionSelectionInstrument() const
+{
+	 return m_motionSelectionInstrument;
 }
