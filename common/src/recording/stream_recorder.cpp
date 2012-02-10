@@ -23,7 +23,7 @@ m_formatCtx(0),
 m_truncateInterval(0),
 m_currentChunkLen(0),
 m_startDateTime(AV_NOPTS_VALUE),
-m_endDateTime(-1),
+m_endDateTime(AV_NOPTS_VALUE),
 m_lastPacketTime(AV_NOPTS_VALUE),
 m_startOffset(0),
 m_forceDefaultCtx(true),
@@ -49,7 +49,8 @@ void QnStreamRecorder::close()
     {
         if (m_startDateTime != AV_NOPTS_VALUE)
         {
-            fileFinished((m_endDateTime - m_startDateTime)/1000, m_fileName);
+            qint64 fileLength = m_startDateTime != AV_NOPTS_VALUE  ? (m_endDateTime - m_startDateTime)/1000 : 0;
+            fileFinished(fileLength, m_fileName);
             m_startDateTime = AV_NOPTS_VALUE;
         }
 

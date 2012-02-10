@@ -41,6 +41,7 @@ private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
     void onFpsChanged(float value);
+    void onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
 private:

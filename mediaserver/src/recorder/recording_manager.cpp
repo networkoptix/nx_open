@@ -93,6 +93,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
             connect(recorderHiRes, SIGNAL(fpsChanged(float)), this, SLOT(onFpsChanged(float)));
         if (recorderLowRes) 
             connect(camera->getLiveReader(QnResource::Role_SecondaryLiveVideo), SIGNAL(threadPaused()), recorderLowRes, SLOT(closeOnEOF()), Qt::DirectConnection);
+        connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
         
 
         QMutexLocker lock(&m_mutex);
@@ -157,6 +158,22 @@ void QnRecordingManager::onFpsChanged(float value)
     }
 }
 
+void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+{
+    if (newStatus != QnResource::Offline) 
+        return;
+    QnResource* res = (QnResource*) sender();
+    QnResourcePtr resPtr= res->toSharedPointer();
+    if (!resPtr)
+        return;
+    
+    QMutexLocker lock(&m_mutex);
+    Recorders recorders = m_recordMap.value(resPtr);
+    if (recorders.recorderHiRes)
+        recorders.recorderHiRes->closeOnEOF();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->closeOnEOF();
+}
 
 Q_GLOBAL_STATIC(QnRecordingManager, inst2);
 QnRecordingManager* QnRecordingManager::instance()

@@ -232,8 +232,8 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     }
 
 	
-    qDebug() << "seekTo= " << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh.mm.ss.zzz");
-    qDebug() << "chunk startTime= " << QDateTime::fromMSecsSinceEpoch(newChunk.startTimeMs).toString("hh.mm.ss.zzz") << " duration=" << newChunk.durationMs/1000.0;
+    //qDebug() << "seekTo= " << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh.mm.ss.zzz");
+    //qDebug() << "chunk startTime= " << QDateTime::fromMSecsSinceEpoch(newChunk.startTimeMs).toString("hh.mm.ss.zzz") << " duration=" << newChunk.durationMs/1000.0;
 
     qint64 chunkOffset = 0;
     if (newChunk.durationMs == -1) // last live chunk
