@@ -103,7 +103,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     if (m_EofDateTime != AV_NOPTS_VALUE && md->timestamp > m_EofDateTime)
     {
         if (!m_endOfData)
-            emit recordingFinished();
+            emit recordingFinished(m_fileName);
         m_endOfData = true;
         stop();
         return true;

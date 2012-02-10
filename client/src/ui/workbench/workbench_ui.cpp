@@ -50,9 +50,9 @@
 #include "workbench_display.h"
 #include "camera/camera.h"
 #include "openal/qtvaudiodevice.h"
-#include "core/resource/local_file_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "ui/ui_common.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 Q_DECLARE_METATYPE(VariantAnimator *)
 
@@ -878,7 +878,7 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
 
 void QnWorkbenchUi::at_exportFinished(QString fileName)
 {
-    QnLocalFileResourcePtr file(new QnLocalFileResource(fileName));
+    QnAviResourcePtr file(new QnAviResource(fileName));
     qnResPool->addResource(file);
 
     QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));

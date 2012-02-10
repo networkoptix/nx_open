@@ -38,7 +38,7 @@ signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
 
-    void recordingFinished();
+    void recordingFinished(QString fileName);
     void recordingProgress(int progress);
 protected:
     virtual void endOfRun();

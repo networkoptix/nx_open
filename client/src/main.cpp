@@ -23,8 +23,6 @@
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
 
-#include "core/resource/local_file_resource.h"
-
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
 
