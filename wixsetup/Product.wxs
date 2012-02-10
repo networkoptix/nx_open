@@ -253,6 +253,7 @@
                                 <RegistryKey Root="HKCU"
                                              Key="Software\[Manufacturer]\VMS Client"
                                              Action="createAndRemoveOnUninstall">
+                                	<RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
