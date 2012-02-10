@@ -159,6 +159,7 @@ public:
 private slots:
     void at_view_destroyed(QObject *view);
     void at_viewport_destroyed(QObject *viewport);
+    void at_viewportWatcher_destroyed(QObject *viewportWatcher);
 
 private:
     InstrumentManagerPrivate *const d_ptr;
