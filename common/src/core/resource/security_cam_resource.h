@@ -49,6 +49,8 @@ public:
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     const QnScheduleTaskList &getScheduleTasks() const;
 
+    virtual bool hasDualStreaming() const;
+
 Q_SIGNALS:
     void motionMaskChanged(QRegion region);
 

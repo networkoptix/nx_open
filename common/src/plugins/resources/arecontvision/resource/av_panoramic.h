@@ -10,6 +10,8 @@ public:
     CLArecontPanoramicResource(const QString& name);
     bool getDescription();
 
+    virtual bool hasDualStreaming() const override;
+
     virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
 protected:
 
