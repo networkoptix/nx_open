@@ -118,16 +118,11 @@ public:
 
     QnDlink_cam_info getCamInfo() const;
 
-    bool updateCamInfo(); // does a lot of physical work 
+    void init() override; // does a lot of physical work 
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
-
-
-private Q_SLOTS:
-    void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-
 protected:
     
     

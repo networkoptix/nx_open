@@ -8,10 +8,6 @@ const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setAuth("admin", "1");
-    
-    connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-        this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
-
 }
 
 int QnPlDlinkResource::getMaxFps()
@@ -29,7 +25,7 @@ int QnPlDlinkResource::getMaxFps()
 
 bool QnPlDlinkResource::isResourceAccessible()
 {
-    return updateCamInfo();
+    return true;
 }
 
 bool QnPlDlinkResource::updateMACAddress()
@@ -96,13 +92,13 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-bool QnPlDlinkResource::updateCamInfo()
+void QnPlDlinkResource::init()
 {
-    QMutexLocker mutexLocker(&m_mutex);
     QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
-
     if (cam_info_file.size()==0)
-        return false;
+        return;
+
+    QMutexLocker mutexLocker(&m_mutex);
 
     QString file_s(cam_info_file);
     QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
@@ -197,18 +193,4 @@ bool QnPlDlinkResource::updateCamInfo()
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 
-    return true;
-
-}
-
-void QnPlDlinkResource::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
-{
-    if (!(oldStatus == Offline && newStatus == Online))
-        return;
-
-    QMutexLocker mutexLocker(&m_mutex);
-    if (!m_camInfo.inited())
-    {
-        updateCamInfo();
-    }
 }

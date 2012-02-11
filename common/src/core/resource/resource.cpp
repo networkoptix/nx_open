@@ -475,8 +475,13 @@ void QnResource::setStatus(QnResource::Status newStatus)
         m_status = newStatus;
     }
 
-    if (oldStatus != newStatus)
-        emit statusChanged(oldStatus, newStatus);
+    if (oldStatus == newStatus)
+        return;
+
+    if (oldStatus == Offline && newStatus == Online)
+        init();
+
+    emit statusChanged(oldStatus, newStatus);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const

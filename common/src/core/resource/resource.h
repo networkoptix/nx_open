@@ -91,6 +91,8 @@ public:
     Status getStatus() const;
     void setStatus(Status newStatus);
 
+    // this function is called if resourse changes state from offline to online or so 
+    virtual void init(){};
 
     // flags like network media and so on
     unsigned long flags() const;

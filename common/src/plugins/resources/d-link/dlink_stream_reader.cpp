@@ -44,13 +44,7 @@ void PlDlinkStreamReader::openStream()
     if (isStreamOpened())
         return;
 
-
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-
-    if (!res->getCamInfo().inited())
-    {
-        res->updateCamInfo();
-    }
 
     QString prifileStr = composeVideoProfile();
 
@@ -59,8 +53,7 @@ void PlDlinkStreamReader::openStream()
     if (cam_info_file.length()==0)
         return;
 
-    if (!res->updateCamInfo()) // after we changed profile some videoprofile url might be changed
-        return;
+    res->init(); // after we changed profile some videoprofile url might be changed
     
     // ok, now lets open a stream
 
