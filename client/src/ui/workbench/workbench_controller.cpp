@@ -376,6 +376,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
 
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+    item->setFlag(QnWorkbenchItem::Pinned, false);
     workbench()->currentLayout()->addItem(item);
 
     if(gridPos.isNull()) {

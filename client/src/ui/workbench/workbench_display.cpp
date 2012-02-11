@@ -960,6 +960,21 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
 void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, const QPointF &desiredPosition) {
     QnResourceWidget *widget = this->widget(item);
 
+    /* Calculate target position. */
+    QPointF newPos;
+    if(qnIsFinite(desiredPosition.x()) && qnIsFinite(desiredPosition.y())) {
+        newPos = desiredPosition;
+    } else {
+        newPos = mapViewportToGridF(m_view->viewport()->geometry().center());
+    }
+
+    /* Check if item's geometry is not initialized. */
+    if(item->geometry().isNull() && item->geometryDelta().isNull()) {
+        item->setFlag(QnWorkbenchItem::Pinned, false);
+        item->setCombinedGeometry(QRectF(newPos, QSizeF(0.0, 0.0)));
+        synchronizeGeometry(widget, false);
+    }
+
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
     const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
@@ -972,14 +987,6 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, const QPointF &de
         combinedGeometry.moveTopLeft(combinedGeometry.topLeft() - toPoint(size - combinedGeometry.size()) / 2.0);
         combinedGeometry.setSize(size);
         item->setCombinedGeometry(combinedGeometry);
-    }
-
-    /* Calculate target position. */
-    QPointF newPos;
-    if(qnIsFinite(desiredPosition.x()) && qnIsFinite(desiredPosition.y())) {
-        newPos = desiredPosition;
-    } else {
-        newPos = mapViewportToGridF(m_view->viewport()->geometry().center());
     }
 
     /* Pin the item. */
