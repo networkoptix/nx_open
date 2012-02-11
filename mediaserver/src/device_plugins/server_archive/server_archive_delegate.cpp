@@ -324,8 +324,6 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
         return; // EOF reached. do not switch quality
     if (isCatalogEqualQuality) 
     {
-        Q_ASSERT(chunk.startTimeMs > m_currentChunk.startTimeMs);
-
         if (m_currentChunkCatalog == m_catalogLow)
         {
             qint64 lowDistance = chunk.distanceToTime(prevEndTimeMs);
