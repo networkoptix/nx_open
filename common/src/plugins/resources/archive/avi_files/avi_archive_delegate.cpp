@@ -293,10 +293,11 @@ bool QnAviArchiveDelegate::findStreams()
         return 0;
     if (!m_streamsFound)
     {
-        QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
         if (!m_streamsFound)
         {
+            global_ffmpeg_mutex.lock();
             m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
+            global_ffmpeg_mutex.unlock();
             if (m_streamsFound) {
                 if (m_formatContext->start_time != AV_NOPTS_VALUE)
                     m_startMksec = m_formatContext->start_time;

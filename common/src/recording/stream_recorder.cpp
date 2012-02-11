@@ -248,8 +248,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     m_fileName += QString(".") + fileExt;
     QString url = QString("ufile:") + m_fileName;
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    global_ffmpeg_mutex.lock();
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, url.toUtf8().constData());
+    global_ffmpeg_mutex.unlock();
 
     if (err < 0) {
         m_lastErrMessage = QString("Can't create output file '") + m_fileName + QString("' for video recording.");
@@ -264,6 +265,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     Q_ASSERT(mediaProvider);
 
+    QMutexLocker mutex(&global_ffmpeg_mutex);
     
     if (av_set_parameters(m_formatCtx, NULL) < 0) {
         m_lastErrMessage = "Can't initialize output format parameters for recording video camera";
