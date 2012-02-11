@@ -3,39 +3,35 @@
 
 #include <QSortFilterProxyModel>
 #include <core/resource/resource.h>
+#include <core/resourcemanagment/resource_criterion.h>
 
-class QnResourceSearchProxyModelPrivate;
-
-class QnResourceFilter;
-
-class QnResourceSearchProxyModel : public QSortFilterProxyModel
-{
+/**
+ * A resource filtering model that uses resource criteria for filtering.
+ */
+class QnResourceSearchProxyModel: public QSortFilterProxyModel {
     Q_OBJECT
 
 public:
     explicit QnResourceSearchProxyModel(QObject *parent = 0);
+
     virtual ~QnResourceSearchProxyModel();
 
-    /*QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
-    QModelIndex indexFromResource(const QnResourcePtr &resource) const;*/
+    void addCriterion(const QnResourceCriterion &criterion);
+
+    bool removeCriterion(const QnResourceCriterion &criterion);
+
+    bool replaceCriterion(const QnResourceCriterion &from, const QnResourceCriterion &to);
+
+public slots:
+    void invalidateFilter() {
+        QSortFilterProxyModel::invalidateFilter();
+    }
 
 protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:
-    QString parsedFilterString;
-    uint flagsFilter;
-
-    enum FilterCategory {
-        Text, 
-        Name, 
-        Tags, 
-        Id,
-        NumFilterCategories
-    };
-
-    QRegExp negfilters[NumFilterCategories];
-    QRegExp filters[NumFilterCategories];
+    QnResourceCriterionGroup m_criterionGroup;
 };
 
 #endif // QN_RESOURCE_SEARCH_PROXY_MODEL_H

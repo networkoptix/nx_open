@@ -7,6 +7,10 @@
 class QnWorkbench;
 class QnWorkbenchLayout;
 
+/**
+ * This class performs bidirectional synchronization of instances of 
+ * <tt>QnWorkbench</tt> and <tt>QnUserResource</tt>.
+ */
 class QnWorkbenchSynchronizer: public QObject {
     Q_OBJECT;
 

@@ -6,6 +6,14 @@
 
 class QnResourcePool;
 
+/**
+ * This class can be used for watching the resource pool for a user resource 
+ * that has a specific name. 
+ * 
+ * Once such resource is inserted into the pool, <tt>userChanged</tt> signal 
+ * is emitted. If its name changes, or if it is deleted from the pool, 
+ * <tt>userChanged</tt> signal will be emitted again, passing a null resource.
+ */
 class QN_EXPORT QnResourcePoolUserWatcher: public QObject {
     Q_OBJECT;
 public:

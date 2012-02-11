@@ -88,5 +88,7 @@ private:
     QHash<QnId, QList<Node *> > m_itemNodesById;
 };
 
+Q_DECLARE_METATYPE(QUuid);
+
 
 #endif // QN_RESOURCE_MODEL_H

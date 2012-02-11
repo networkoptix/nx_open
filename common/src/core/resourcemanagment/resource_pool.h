@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 
 #include "core/resource/resource.h"
-#include "core/resourcemanagment/resource_criteria.h"
+#include "core/resourcemanagment/resource_criterion.h"
 #include "core/resource/network_resource.h"
 
 class QnResource;
@@ -67,7 +67,7 @@ public:
 
     QStringList allTags() const;
 
-    QnResourceList findResourcesByCriteria(const QnResourceCriteria &cr) const;
+    QnResourceList findResourcesByCriteria(const QnResourceCriterion &cr) const;
 
 signals:
     void resourceAdded(const QnResourcePtr &resource);
@@ -79,7 +79,7 @@ private slots:
     void handleResourceChange();
 
 private:
-    bool isResourceMeetCriteria(const QnResourceCriteria &cr, QnResourcePtr res) const;
+    bool isResourceMeetCriteria(const QnResourceCriterion &cr, QnResourcePtr res) const;
     bool match_subfilter(QnResourcePtr resource, const QString &fltr) const;
 
 private:

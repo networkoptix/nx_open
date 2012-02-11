@@ -9,6 +9,10 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnLayoutItemData;
 
+/**
+ * This class performs bidirectional synchronization of instances of 
+ * <tt>QnWorkbenchLayout</tt> and <tt>QnLayoutResource</tt>.
+ */
 class QnWorkbenchLayoutSynchronizer: public QObject {
     Q_OBJECT;
 

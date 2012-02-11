@@ -176,7 +176,7 @@ void QnResourceTreeWidget::setWorkbenchController(QnWorkbenchController *control
 
     workbenchLayoutAboutToBeChanged();
     m_controller = controller;
-    //m_searchProxyModel = 0;
+    m_searchProxyModel = 0;
     workbenchLayoutChanged();
 
     if (m_controller) {
@@ -192,10 +192,10 @@ void QnResourceTreeWidget::workbenchLayoutAboutToBeChanged()
 
     QnWorkbenchLayout *layout = m_controller->layout();
 
-    /*if (m_searchProxyModel) {
+    if (m_searchProxyModel) {
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(handleInsertRows(QModelIndex,int,int)));
         disconnect(m_searchProxyModel.data(), SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(handleRemoveRows(QModelIndex,int,int)));
-    }*/
+    }
 
     disconnect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
     disconnect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
@@ -213,7 +213,7 @@ void QnResourceTreeWidget::workbenchLayoutChanged()
     connect(layout, SIGNAL(itemAdded(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemAdded(QnWorkbenchItem*)));
     connect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(workbenchLayoutItemRemoved(QnWorkbenchItem*)));
 
-    /*m_searchProxyModel = layout->property("model").value<QnResourceSearchProxyModel *>(); // ###
+    m_searchProxyModel = layout->property("model").value<QnResourceSearchProxyModel *>(); // ###
     if (!m_searchProxyModel) {
         QnResourceSearchProxyModel *proxyModel = new QnResourceSearchProxyModel(layout);
         proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -234,7 +234,7 @@ void QnResourceTreeWidget::workbenchLayoutChanged()
     disconnect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
     m_filterLineEdit->setText(m_searchProxyModel->filterRegExp().pattern()); // ###
     m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
-    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));*/
+    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
 }
 
 void QnResourceTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
@@ -243,7 +243,7 @@ void QnResourceTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
 
     //m_resourcesTreeView->update(m_resourcesModel->index(resource));
 
-    /*if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
+    if (!m_dontSyncWithLayout && !m_filterLineEdit->text().isEmpty()) {
         const QModelIndex index = m_searchProxyModel->indexFromResource(resource);
         if (!index.isValid()) {
             // ### improve/optimize
@@ -257,7 +257,7 @@ void QnResourceTreeWidget::workbenchLayoutItemAdded(QnWorkbenchItem *item)
         } else if (m_searchTreeView->isVisible()) {
             m_searchTreeView->update(index);
         }
-    }*/
+    }
 }
 
 void QnResourceTreeWidget::workbenchLayoutItemRemoved(QnWorkbenchItem *item)
