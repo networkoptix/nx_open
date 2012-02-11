@@ -760,7 +760,9 @@ void NavigationItem::onValueChanged(qint64 time)
     if (m_camera == 0)
         return;
 
-    if (m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamCamDisplay()->isRealTimeSource())
+    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+
+    if (reader->getSpeed() > 0 &&  m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamCamDisplay()->isRealTimeSource())
     {
         smartSeek(DATETIME_NOW);
         return;
@@ -771,7 +773,6 @@ void NavigationItem::onValueChanged(qint64 time)
         return;
     }
 
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     //if (reader->isSkippingFrames())
     //    return;
 
