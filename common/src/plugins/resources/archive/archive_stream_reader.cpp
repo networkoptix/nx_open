@@ -360,6 +360,8 @@ begin_label:
         return createEmptyPacket(reverseMode);
     }
 
+    if (m_delegate->startTime() == AV_NOPTS_VALUE)
+        return createEmptyPacket(reverseMode); // no data at archive
 
     QnCompressedVideoDataPtr videoData;
 

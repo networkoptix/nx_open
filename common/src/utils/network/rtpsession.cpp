@@ -744,7 +744,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
         //for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
         while (m_responseBufferLen < RTSP_BUFFER_LEN)
         {
-            if (readMoreData && readRAWData() == -1)
+            if (readMoreData && readRAWData() <= 0)
                 return false;
 
             quint8* startPtr = m_responseBuffer;

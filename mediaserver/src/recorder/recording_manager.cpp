@@ -26,6 +26,7 @@ void QnRecordingManager::start()
 {
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)));
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)));
+    QThread::start();
 }
 
 void QnRecordingManager::stop()
@@ -93,7 +94,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
             connect(recorderHiRes, SIGNAL(fpsChanged(float)), this, SLOT(onFpsChanged(float)));
         if (recorderLowRes) 
             connect(camera->getLiveReader(QnResource::Role_SecondaryLiveVideo), SIGNAL(threadPaused()), recorderLowRes, SLOT(closeOnEOF()), Qt::DirectConnection);
-        connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)));
+        connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)), Qt::QueuedConnection);
         
 
         QMutexLocker lock(&m_mutex);

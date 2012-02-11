@@ -48,7 +48,7 @@ static void updateActivity()
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
-#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 20
+#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 15
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
@@ -173,13 +173,13 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
     if (reader)
     {
-        if (realSleepTime <= -500*1000) 
+        if (realSleepTime <= -1000*1000) 
         {
             m_delayedFrameCnt = qMax(0, m_delayedFrameCnt);
             m_delayedFrameCnt++;
             if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low)
             {
-                bool fastSwitch = m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
+                bool fastSwitch = false; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
                 reader->setQuality(MEDIA_Quality_Low, fastSwitch);
                 m_toLowQSpeed = speed;
