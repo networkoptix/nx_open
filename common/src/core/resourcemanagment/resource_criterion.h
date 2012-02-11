@@ -8,7 +8,7 @@
 
 class QRegExp;
 
-struct QN_EXPORT QnResourceCriterion {
+class QN_EXPORT QnResourceCriterion {
 public:
     enum Operation {
         ACCEPT,         /**< Accept the resource. */
@@ -21,8 +21,8 @@ public:
         EQUALITY,       /**< One of the resource's fields must equal provided value. */
         CONTAINMENT,    /**< One of the resource's fields must contain provided value. */
         REGEXP,         /**< One of the resource's fields must match the provided regular expression. */
-        GROUP,          /**< Criterion group. */
-        CUSTOM = 0x10   /**< Use custom matching function that operates on resource. Target is ignored. */
+        GROUP,          /**< Sequential criterion group. Target is ignored. */
+        CUSTOM          /**< Use custom matching function that operates on resource. Target is ignored. */
     };
 
     enum Target {
@@ -40,24 +40,32 @@ public:
 
     typedef Operation (*CriterionFunction)(const QnResourcePtr &, const QVariant &value);
 
-	QnResourceCriterion(const QRegExp &regExp, Target target = SEARCH_STRING, Operation acceptOperation = ACCEPT);
+	QnResourceCriterion(const QRegExp &regExp, Target target = SEARCH_STRING, Operation matchOperation = ACCEPT, Operation mismatchOperation = NEXT);
 
-    QnResourceCriterion(int flags, Target target = FLAGS, Operation acceptOperation = ACCEPT);
+    QnResourceCriterion(int flags, Target target = FLAGS, Operation matchOperation = ACCEPT, Operation mismatchOperation = NEXT);
 
-    QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation acceptOperation = ACCEPT);
+    QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation = ACCEPT, Operation mismatchOperation = NEXT);
 
-    QnResourceCriterion(const QVariant &targetValue, Type type, Target target, Operation acceptOperation = ACCEPT);
+    QnResourceCriterion(const QVariant &targetValue, Type type, Target target, Operation matchOperation = ACCEPT, Operation mismatchOperation = NEXT);
 
     QnResourceCriterion();
 
     ~QnResourceCriterion();
 
-    Operation acceptOperation() const {
-        return m_acceptOperation;
+    Operation matchOperation() const {
+        return m_matchOperation;
     }
 
-    void setAcceptOperation(Operation acceptOperation) {
-        m_acceptOperation = acceptOperation;
+    void setMatchOperation(Operation matchOperation) {
+        m_matchOperation = matchOperation;
+    }
+    
+    Operation mismatchOperation() const {
+        return m_mismatchOperation;
+    }
+
+    void setMismatchOperation(Operation mismatchOperation) {
+        m_mismatchOperation = mismatchOperation;
     }
 
     bool isGroup() const;
@@ -84,46 +92,56 @@ public:
 
     void setCustomType(const CriterionFunction &function);
 
-    Operation match(const QnResourcePtr &resource) const;
-
-    friend bool operator==(const QnResourceCriterion &l, const QnResourceCriterion &r);
-
-    friend bool operator!=(const QnResourceCriterion &l, const QnResourceCriterion &r) {
-        return !(l == r);
-    }
+    Operation check(const QnResourcePtr &resource) const;
 
 protected:
     void *targetValueData();
 
 private:
-    Operation m_acceptOperation;
-    Type m_type;
-    Target m_target;
+    Q_DISABLE_COPY(QnResourceCriterion);
+
+    union {
+        struct {
+            Operation m_matchOperation : 2;
+            Operation m_mismatchOperation : 2;
+            Type m_type : 4;
+            Target m_target : 8;
+        };
+
+        int m_padding;
+    };
     QVariant m_targetValue;
     CriterionFunction m_customCriterion;
 };
 
-typedef QList<QnResourceCriterion> QnResourceCriterionList;
+typedef QList<QnResourceCriterion *> QnResourceCriterionList;
 
 
 class QN_EXPORT QnResourceCriterionGroup: public QnResourceCriterion {
 public:
-    QnResourceCriterionGroup(Operation acceptOperation = ACCEPT);
+    QnResourceCriterionGroup(const QString &pattern, Operation matchOperation = ACCEPT, Operation mismatchOperation = NEXT);
 
-    void addCriterion(const QnResourceCriterion &criterion);
+    QnResourceCriterionGroup(Operation matchOperation = ACCEPT, Operation mismatchOperation = NEXT);
 
-    bool removeCriterion(const QnResourceCriterion &criterion);
+    void addCriterion(QnResourceCriterion *criterion);
 
-    bool replaceCriterion(const QnResourceCriterion &from, const QnResourceCriterion &to);
+    bool removeCriterion(QnResourceCriterion *criterion);
+
+    bool replaceCriterion(QnResourceCriterion *from, QnResourceCriterion *to);
+
+    void clear();
 
     QnResourceCriterionList criteria() const;
 
     void setCriteria(const QnResourceCriterionList &criteria);
+
+    void setPattern(const QString &pattern);
+
+private:
+    Q_DISABLE_COPY(QnResourceCriterionGroup);
 };
 
-Q_DECLARE_METATYPE(QnResourceCriterion);
-Q_DECLARE_TYPEINFO(QnResourceCriterion, Q_MOVABLE_TYPE);
-
+Q_DECLARE_METATYPE(QnResourceCriterion *);
 Q_DECLARE_METATYPE(QnResourceCriterionList);
 
 #endif // QN_RESOURCE_CRITERION_H

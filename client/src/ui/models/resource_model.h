@@ -6,6 +6,7 @@
 #include <QUuid>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
+#include "item_data_role.h"
 
 class QnResourceModelPrivate;
 class QnResourcePool;
@@ -16,15 +17,6 @@ class QnResourceModel : public QAbstractItemModel {
     Q_ENUMS(ItemDataRole);
 
 public:
-    enum ItemDataRole {
-        ResourceRole        = Qt::UserRole + 1, /**< Role for QnResourcePtr. */
-        ResourceFlagsRole   = Qt::UserRole + 2, /**< Role for resource flags. */
-        IdRole              = Qt::UserRole + 3, /**< Role for resource's QnId. */
-        UuidRole            = Qt::UserRole + 4, /**< Role for layout item's UUID. */
-        SearchStringRole    = Qt::UserRole + 5, /**< Role for search string. */
-        StatusRole          = Qt::UserRole + 6, /**< Role for resource's status. */
-    };
-
     explicit QnResourceModel(QObject *parent = 0);
     virtual ~QnResourceModel();
 

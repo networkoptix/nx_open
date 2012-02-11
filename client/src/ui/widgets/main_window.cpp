@@ -178,7 +178,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
 
-    m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
+    m_ui->treeWidget()->setWorkbench(m_workbench);
     connect(m_ui->treeWidget(), SIGNAL(newTabRequested()),                      this,           SLOT(at_newLayoutRequested()));
     connect(m_ui->treeWidget(), SIGNAL(activated(uint)),                        this,           SLOT(at_treeWidget_activated(uint)));
     connect(m_ui,               SIGNAL(titleBarDoubleClicked()),                this,           SLOT(toggleFullScreen()));

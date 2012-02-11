@@ -11,11 +11,14 @@ class QToolButton;
 class QTreeView;
 class QModelIndex;
 
-class QnWorkbenchController;
+class QnWorkbench;
 class QnWorkbenchItem;
+class QnWorkbenchLayout;
 
+class QnResourceCriterion;
 class QnResourceModel;
 class QnResourceSearchProxyModel;
+class QnResourceSearchSynchronizer;
 
 class QnResourceTreeWidget : public QWidget
 {
@@ -25,7 +28,7 @@ public:
     QnResourceTreeWidget(QWidget *parent = 0);
     ~QnResourceTreeWidget();
 
-    void setWorkbenchController(QnWorkbenchController *controller);
+    void setWorkbench(QnWorkbench *workbench);
 
 signals:
     void activated(uint resourceId);
@@ -37,19 +40,25 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void timerEvent(QTimerEvent *event);
 
+    QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
+    QnResourceSearchSynchronizer *layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const;
+    QString layoutSearchString(QnWorkbenchLayout *layout) const;
+    void setLayoutSearchString(QnWorkbenchLayout *layout, const QString &searchString) const;
+    QnResourceCriterion *layoutCriterion(QnWorkbenchLayout *layout) const;
+    void setLayoutCriterion(QnWorkbenchLayout *layout, QnResourceCriterion *criterion) const;
+
+    void killSearchTimer();
+
 private slots:
     void open();
 
     void at_filterLineEdit_textChanged(const QString &filter);
     void at_treeView_activated(const QModelIndex &index);
+    void at_tabWidget_currentChanged(int index);
 
-    void workbenchLayoutAboutToBeChanged();
-    void workbenchLayoutChanged();
-    void workbenchLayoutItemAdded(QnWorkbenchItem *item);
-    void workbenchLayoutItemRemoved(QnWorkbenchItem *item);
-
-    void handleInsertRows(const QModelIndex &parent, int first, int last);
-    void handleRemoveRows(const QModelIndex &parent, int first, int last);
+    void at_workbench_currentLayoutAboutToBeChanged();
+    void at_workbench_currentLayoutChanged();
+    void at_workbench_aboutToBeDestroyed();
 
 private:
     QTabWidget *m_tabWidget;
@@ -57,16 +66,16 @@ private:
     QToolButton *m_nextItemButton;
 
     QLineEdit *m_filterLineEdit;
+    bool m_ignoreFilterChanges;
+
     QToolButton *m_clearFilterButton;
     int m_filterTimerId;
-    bool m_dontSyncWithLayout;
 
-    QnResourceModel *m_resourcesModel;
-    QTreeView *m_resourcesTreeView;
-    QPointer<QnResourceSearchProxyModel> m_searchProxyModel;
+    QnResourceModel *m_resourceModel;
+    QTreeView *m_resourceTreeView;
     QTreeView *m_searchTreeView;
 
-    QnWorkbenchController *m_controller;
+    QnWorkbench *m_workbench;
 
     friend class QnResourceTreeItemDelegate;
 };

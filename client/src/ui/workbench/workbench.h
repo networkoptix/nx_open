@@ -148,7 +148,7 @@ public:
      */
     void setItem(ItemRole role, QnWorkbenchItem *item);
 
-Q_SIGNALS:
+signals:
     /**
      * This signal is emitted while the workbench is still intact, but is about
      * to be destroyed.

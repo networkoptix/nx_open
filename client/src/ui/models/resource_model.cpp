@@ -221,25 +221,25 @@ public:
             break;
         case Qt::EditRole:
             break;
-        case ResourceRole:
+        case Qn::ResourceRole:
             if(!m_resource.isNull())
                 return QVariant::fromValue<QnResourcePtr>(m_resource);
             break;
-        case ResourceFlagsRole:
+        case Qn::ResourceFlagsRole:
             if(!m_resource.isNull())
                 return static_cast<int>(m_flags);
             break;
-        case IdRole: 
+        case Qn::IdRole: 
             if(m_id.isValid())
                 return QVariant::fromValue<QnId>(m_id);
             break;
-        case UuidRole:
+        case Qn::UuidRole:
             if(m_type == Item)
                 return QVariant::fromValue<QUuid>(m_uuid);
             break;
-        case SearchStringRole: 
+        case Qn::SearchStringRole: 
             return m_searchString;
-        case StatusRole: 
+        case Qn::StatusRole: 
             return static_cast<int>(m_status);
         default:
             break;
@@ -347,10 +347,12 @@ QnResourceModel::QnResourceModel(QObject *parent):
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
-    roles.insert(QnResourceModel::ResourceRole,     "resource");
-    roles.insert(QnResourceModel::IdRole,           "id");
-    roles.insert(QnResourceModel::SearchStringRole, "searchString");
-    roles.insert(QnResourceModel::StatusRole,       "status");
+    roles.insert(Qn::ResourceRole,      "resource");
+    roles.insert(Qn::ResourceFlagsRole, "flags");
+    roles.insert(Qn::IdRole,            "id");
+    roles.insert(Qn::UuidRole,          "uuid");
+    roles.insert(Qn::SearchStringRole,  "searchString");
+    roles.insert(Qn::StatusRole,        "status");
     setRoleNames(roles);
 
     /* Create root. */
@@ -378,7 +380,7 @@ QnResourcePool *QnResourceModel::resourcePool() const {
 }
 
 QnResourcePtr QnResourceModel::resource(const QModelIndex &index) const {
-    return data(index, ResourceRole).value<QnResourcePtr>();
+    return data(index, Qn::ResourceRole).value<QnResourcePtr>();
 }
 
 void QnResourceModel::start() {
@@ -502,7 +504,7 @@ QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const {
         if (types.contains(resourceFormat) || types.contains(urlFormat)) {
             QnResourceList resources;
             foreach (const QModelIndex &index, indexes) {
-                if (QnResourcePtr resource = data(index, ResourceRole).value<QnResourcePtr>())
+                if (QnResourcePtr resource = this->resource(index))
                     resources.append(resource);
             }
             if (types.contains(resourceFormat))

@@ -9,7 +9,10 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/float.h>
+#include <utils/common/delete_later.h>
 
+#include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
 
@@ -42,6 +45,7 @@
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
+#include "workbench_utility.h"
 #include "workbench.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
@@ -178,8 +182,7 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     setScene(NULL);
 }
 
-void QnWorkbenchDisplay::initSyncPlay()
-{
+void QnWorkbenchDisplay::initSyncPlay() {
     /* Set up syncplay and render watcher. */
     m_renderWatcher = new QnRenderWatchMixin(this, this);
     new QnSyncPlayMixin(this, m_renderWatcher, this);
@@ -244,7 +247,7 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
         removeItemInternal(item, true, false);
 
     for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
-        changeItem(static_cast<QnWorkbench::ItemRole>(i), NULL);
+        at_workbench_itemChanged(static_cast<QnWorkbench::ItemRole>(i), NULL);
     m_mode = QnWorkbench::VIEWING;
 }
 
@@ -534,7 +537,23 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
     bringToFront(widget(item));
 }
 
-void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
+bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
+    if (m_widgetByResource.size() > 24) { // TODO: item limit must be changeable.
+        qnDeleteLater(item);
+        return false;
+    }
+
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    if(resource.isNull()) {
+        qnDeleteLater(item);
+        return false;
+    }
+
+    if (!resource->checkFlags(QnResource::media)) { // TODO: unsupported for now
+        qnDeleteLater(item);
+        return false;
+    }
+
     QnResourceWidget *widget = new QnResourceWidget(item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
@@ -583,10 +602,11 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
 
     m_scene->addItem(widget);
 
-    connect(item, SIGNAL(geometryChanged()),        this, SLOT(at_item_geometryChanged()));
-    connect(item, SIGNAL(geometryDeltaChanged()),   this, SLOT(at_item_geometryDeltaChanged()));
-    connect(item, SIGNAL(rotationChanged()),        this, SLOT(at_item_rotationChanged()));
-    connect(item, SIGNAL(flagsChanged()),           this, SLOT(at_item_flagsChanged()));
+    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
+    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
+    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
+    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagChanged(QnWorkbenchItem::ItemFlag, bool)));
+    connect(item, SIGNAL(geometryAdjustmentRequested(const QPointF &)), this, SLOT(at_item_geometryAdjustmentRequested(const QPointF &)));
 
     m_widgetByItem.insert(item, widget);
     if(widget->renderer() != NULL)
@@ -601,15 +621,16 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
 
     emit widgetAdded(widget);
+    return true;
 }
 
-void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem) {
+bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem) {
     disconnect(item, NULL, this, NULL);
 
     QnResourceWidget *widget = m_widgetByItem.value(item);
     if(widget == NULL) {
         assert(!destroyItem);
-        return; /* Already cleaned up. */
+        return false; /* Already cleaned up. */
     }
 
     disconnect(widget, NULL, this, NULL);
@@ -626,6 +647,7 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     if(destroyItem)
         delete item;
+    return true;
 }
 
 QMargins QnWorkbenchDisplay::viewportMargins() const {
@@ -935,6 +957,37 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
     synchronizeGeometry(widget, animator(widget)->isRunning());
 }
 
+void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, const QPointF &desiredPosition) {
+    QnResourceWidget *widget = this->widget(item);
+
+    /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
+    const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
+    const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
+    const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
+    const QSize size = bestSingleBoundedSize(m_workbench->mapper(), 1, orientation, estimatedAspectRatio);
+
+    /* Adjust item's geometry for the new size. */
+    if(size != item->geometry().size()) {
+        QRectF combinedGeometry = item->combinedGeometry();
+        combinedGeometry.moveTopLeft(combinedGeometry.topLeft() - toPoint(size - combinedGeometry.size()) / 2.0);
+        combinedGeometry.setSize(size);
+        item->setCombinedGeometry(combinedGeometry);
+    }
+
+    /* Calculate target position. */
+    QPointF newPos;
+    if(qnIsFinite(desiredPosition.x()) && qnIsFinite(desiredPosition.y())) {
+        newPos = desiredPosition;
+    } else {
+        newPos = mapViewportToGridF(m_view->viewport()->geometry().center());
+    }
+
+    /* Pin the item. */
+    QnAspectRatioMagnitudeCalculator metric(newPos, size, item->layout()->boundingRect(), aspectRatio(m_view->viewport()->size()) / aspectRatio(m_workbench->mapper()->step()));
+    QRect geometry = item->layout()->closestFreeSlot(newPos, size, &metric);
+    item->layout()->pinItem(item, geometry);
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
@@ -950,15 +1003,17 @@ void QnWorkbenchDisplay::at_viewportAnimator_finished() {
 }
 
 void QnWorkbenchDisplay::at_workbench_itemAdded(QnWorkbenchItem *item) {
-    addItemInternal(item);
-    synchronizeSceneBounds();
-    fitInView();
+    if(addItemInternal(item)) {
+        synchronizeSceneBounds();
+        fitInView();
+    }
 }
 
 void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
-    removeItemInternal(item, true, false);
-    synchronizeSceneBounds();
-    fitInView();
+    if(removeItemInternal(item, true, false)) {
+        synchronizeSceneBounds();
+        fitInView();
+    }
 }
 
 void QnWorkbenchDisplay::at_workbench_aboutToBeDestroyed() {
@@ -993,7 +1048,7 @@ namespace {
 
 }
 
-void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item) {
+void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, QnWorkbenchItem *item) {
     if(item == m_itemByRole[role])
         return;
 
@@ -1082,7 +1137,7 @@ void QnWorkbenchDisplay::changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem 
 
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
-    changeItem(role, m_workbench->item(role));
+    at_workbench_itemChanged(role, m_workbench->item(role));
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
@@ -1102,8 +1157,19 @@ void QnWorkbenchDisplay::at_item_rotationChanged() {
     synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), true);
 }
 
-void QnWorkbenchDisplay::at_item_flagsChanged() {
-    synchronizeLayer(static_cast<QnWorkbenchItem *>(sender()));
+void QnWorkbenchDisplay::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value) {
+    switch(flag) {
+    case QnWorkbenchItem::Pinned:
+        synchronizeLayer(static_cast<QnWorkbenchItem *>(sender()));
+        break;
+    default:
+        qnWarning("Invalid item flag '%1'.", static_cast<int>(flag));
+        break;
+    }
+}
+
+void QnWorkbenchDisplay::at_item_geometryAdjustmentRequested(const QPointF &desiredPosition) {
+    adjustGeometry(static_cast<QnWorkbenchItem *>(sender()), desiredPosition);
 }
 
 void QnWorkbenchDisplay::at_activityStopped() {

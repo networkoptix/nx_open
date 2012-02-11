@@ -2,9 +2,14 @@
 #define QN_RESOURCE_SEARCH_SYNCHRONIZER_H
 
 #include <QObject>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <QHash>
+#include <QModelIndex>
+#include <core/resource/resource_fwd.h>
 
+class QnWorkbenchItem;
 class QnWorkbenchLayout;
+
+class QnResourceCriterion;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizerCriterion;
 
@@ -13,6 +18,8 @@ class QnResourceSearchSynchronizerCriterion;
  * <tt>QnWorkbenchLayout</tt> and <tt>QnResourceSearchProxyModel</tt> instances.
  */
 class QnResourceSearchSynchronizer: public QObject {
+    Q_OBJECT;
+
 public:
     QnResourceSearchSynchronizer(QObject *parent = NULL);
 
@@ -30,13 +37,32 @@ public:
         return m_layout;
     }
 
+    void enableUpdates(bool enable = true);
+
+    void disableUpdates(bool disable = true) {
+        enableUpdates(!disable);
+    }
+
+public slots:
+    void update();
+    void updateLater();
+
 protected:
     void start();
     void stop();
 
+    void addModelResource(const QnResourcePtr &resource);
+    void removeModelResource(const QnResourcePtr &resource);
+
 protected slots:
     void at_layout_aboutToBeDestroyed();
+    void at_layout_itemAdded(QnWorkbenchItem *item);
+    void at_layout_itemRemoved(QnWorkbenchItem *item);
+    
     void at_model_destroyed();
+    void at_model_rowsInserted(const QModelIndex &parent, int start, int end);
+    void at_model_rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
+    void at_model_criteriaChanged();
 
 private:
     friend class QnResourceSearchSynchronizerCriterion;
@@ -53,8 +79,32 @@ private:
     /** Whether changes should be propagated from model to layout. */
     bool m_update;
 
-    /** Set of resource unique identifiers that were manually added to the current layout. */
-    QSet<QString> m_manuallyAdded;
+    /** Whether updates are enabled. */
+    bool m_updatesEnabled;
+
+    /** Whether there were update requests while updates were disabled. */
+    bool m_hasPendingUpdates;
+
+    /** Whether the associated resource criterion should perform the checks. */
+    bool m_criterionFunctional;
+
+    /** Number of items in the model by resource. */
+    QHash<QnResourcePtr, int> m_modelItemCountByResource;
+
+    /** Result of last search operation. */
+    QSet<QnResourcePtr> m_searchResult;
+
+    /** Mapping from resource to an item that was added to layout as a result of search operation. */
+    QHash<QnResourcePtr, QnWorkbenchItem *> m_layoutItemByResource;
+
+    /** Mapping from an item that was added to layout as a result of search operation to resource. */
+    QHash<QnWorkbenchItem *, QnResourcePtr> m_resourceByLayoutItem;
+
+    /** Temporary object used for postponed updates. */
+    QObject *m_updateListener;
+
+    /** Resource criterion that is used to accept additional resources. */
+    QScopedPointer<QnResourceCriterion> m_criterion;
 };
 
 #endif // QN_RESOURCE_SEARCH_SYNCHRONIZER_H

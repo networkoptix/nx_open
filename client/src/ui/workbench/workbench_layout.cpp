@@ -8,6 +8,7 @@
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
 #include "workbench_layout_synchronizer.h"
+#include "workbench_utility.h"
 
 namespace {
     template<class PointContainer>
@@ -19,36 +20,6 @@ namespace {
             for (int c = region.left(); c <= region.right(); c++)
                 qnInsert(*points, points->end(), QPoint(c, r));
     }
-
-    class DistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
-    public:
-        DistanceMagnitudeCalculator(const QPointF &origin):
-            m_origin(origin),
-            m_calculator(MagnitudeCalculator::forType<QPointF>())
-        {}
-
-    protected:
-        virtual qreal calculateInternal(const void *value) const override {
-            const QPoint &p = *static_cast<const QPoint *>(value);
-
-            return m_calculator->calculate(p - m_origin);
-        }
-
-    private:
-        QPointF m_origin;
-        TypedMagnitudeCalculator<QPointF> *m_calculator;
-    };
-
-    struct WorkbenchItemLess {
-    public:
-        bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
-            if(l->resourceUid() == r->resourceUid()) {
-                return l < r;
-            } else {
-                return l->resourceUid() < r->resourceUid();
-            }
-        }
-    };
 
 } // anonymous namespace
 
@@ -69,13 +40,12 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
     synchronizer->update();
 }
     
-QnWorkbenchLayout::~QnWorkbenchLayout()
-{
-    clear();
-
+QnWorkbenchLayout::~QnWorkbenchLayout() {
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
+
+    clear();
 }
 
 const QString &QnWorkbenchLayout::name() const {

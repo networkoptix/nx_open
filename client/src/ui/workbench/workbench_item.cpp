@@ -1,4 +1,5 @@
 #include "workbench_item.h"
+#include <limits>
 #include <ui/common/scene_utility.h>
 #include <core/resource/layout_resource.h>
 #include "workbench_layout.h"
@@ -148,7 +149,7 @@ void QnWorkbenchItem::setFlagInternal(ItemFlag flag, bool value) {
 
     m_flags = value ? (m_flags | flag) : (m_flags & ~flag);
 
-    emit flagsChanged();
+    emit flagChanged(flag, value);
 }
 
 void QnWorkbenchItem::setRotation(qreal rotation) {
@@ -158,4 +159,14 @@ void QnWorkbenchItem::setRotation(qreal rotation) {
     m_rotation = rotation;
 
     emit rotationChanged();
+}
+
+void QnWorkbenchItem::adjustGeometry() {
+    qreal nan = std::numeric_limits<qreal>::quiet_NaN();
+
+    adjustGeometry(QPointF(nan, nan));
+}
+
+void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
+    emit geometryAdjustmentRequested(desiredPosition);
 }
