@@ -161,6 +161,9 @@ void QnRecordingManager::onFpsChanged(float value)
 
 void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
+    // Close file if resource is offline
+    // todo: Code is not thread safe now. So, while commented
+#if 0
     if (newStatus != QnResource::Offline) 
         return;
     QnResource* res = (QnResource*) sender();
@@ -174,6 +177,7 @@ void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, Q
         recorders.recorderHiRes->closeOnEOF();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->closeOnEOF();
+#endif
 }
 
 Q_GLOBAL_STATIC(QnRecordingManager, inst2);
