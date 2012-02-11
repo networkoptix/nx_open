@@ -19,7 +19,7 @@ struct Recorders
     QnServerStreamRecorder* recorderLowRes;
 };
 
-class QnRecordingManager: public QObject
+class QnRecordingManager: public QThread
 {
     Q_OBJECT
 public:
