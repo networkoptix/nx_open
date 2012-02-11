@@ -31,9 +31,6 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping) override;
 
-
-private Q_SLOTS:
-        void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 private:
     int m_videoPort;
     int m_dataPort;

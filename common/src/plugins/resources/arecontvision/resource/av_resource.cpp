@@ -21,8 +21,6 @@ const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64)
 {
-    connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-            this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -210,11 +208,8 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     return result;
 }
 
-void QnPlAreconVisionResource::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+void QnPlAreconVisionResource::init()
 {
-    if (!(oldStatus == Offline && newStatus == Online))
-        return;
-
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
 
@@ -262,6 +257,7 @@ void QnPlAreconVisionResource::onStatusChanged(QnResource::Status oldStatus, QnR
         zone_size = 1;
 
     setParam("Zone size", zone_size, QnDomainPhysical);
+
 }
 
 QString QnPlAreconVisionResource::manufacture() const
