@@ -747,7 +747,7 @@ QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
     if(m_newtexture) {
         result = RENDERED_NEW_FRAME;
     } else {
-        result = RENDERED_NEW_FRAME;
+        result = RENDERED_OLD_FRAME;
     }
     m_newtexture = false;
 
