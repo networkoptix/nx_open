@@ -28,9 +28,9 @@ class QnActionBuilder {
 public:
     QnActionBuilder(QnContextMenu *menu, QnContextMenu::ActionData &data): m_menu(menu), m_data(data) {}
 
-    QnActionBuilder shortcut(const QString &shortcut, Qt::ShortcutContext context = Qt::ApplicationShortcut) {
+    QnActionBuilder shortcut(const QKeySequence &shortcut, Qt::ShortcutContext context = Qt::ApplicationShortcut) {
         QList<QKeySequence> shortcuts = m_data.action->shortcuts();
-        shortcuts.push_back(QKeySequence(shortcut));
+        shortcuts.push_back(shortcut);
         m_data.action->setShortcuts(shortcuts);
         m_data.action->setShortcutContext(context);
 
@@ -89,7 +89,7 @@ public:
     }
 
     QnActionBuilder flags(QnContextMenu::ActionFlags flags) {
-        m_data.flags = flags;
+        m_data.flags |= flags;
 
         return *this;
     }
@@ -105,33 +105,36 @@ public:
     QnActionFactory(QnContextMenu *menu): 
         m_menu(menu)
     {
-        m_parentStack.push_back(Qn::NoAction);
+        m_menuStack.push_back(Qn::NoAction);
     }
 
-    void pushParent(Qn::ActionId parentId) {
-        m_parentStack.push_back(parentId);
+    void enterSubMenu() {
+        m_menuStack.push_back(m_lastId);
     }
 
-    void popParent() {
-        m_parentStack.pop_back();
+    void leaveSubMenu() {
+        m_menuStack.pop_back();
     }
 
     QnActionBuilder operator()(Qn::ActionId id) {
         QnContextMenu::ActionData &data = m_menu->m_infoById[id];
         data.id = id;
-        data.parentId = m_parentStack.back();
+        data.parentId = m_menuStack.back();
 
         if(data.action == NULL) {
             data.action = new QAction(m_menu);
             setActionId(data.action, id);
         }
 
+        m_lastId = id;
+
         return QnActionBuilder(m_menu, data);
     }
 
 private:
+    Qn::ActionId m_lastId;
     QnContextMenu *m_menu;
-    QVector<Qn::ActionId> m_parentStack;
+    QVector<Qn::ActionId> m_menuStack;
 };
 
 
@@ -192,16 +195,34 @@ QnContextMenu::QnContextMenu(QObject *parent):
         icon(Skin::icon(QLatin1String("plus.png")));
 
     factory(Qn::CloseTabAction).
-        text(tr("Close layout")).
+        text(tr("Close Layout")).
         shortcut(tr("Ctrl+W")).
         autoRepeat(true);
 
     factory(Qn::OpenFileAction).
-        text(tr("Open file(s)...")).
+        text(tr("Open File(s)...")).
         shortcut(tr("Ctrl+O")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("folder.png")));
 
+    factory(Qn::ScreenRecordingMenu).
+        text(tr("Screen Recording")).
+        flags(Menu);
+
+    factory.enterSubMenu();
+
+    factory(Qn::ScreenRecordingAction).
+        text(tr("Start Screen Recording")).
+        toggledText(tr("Stop Screen Recording")).
+        shortcut(tr("Alt+R")).
+        shortcut(Qt::Key_MediaRecord).
+        autoRepeat(false);
+
+    factory(Qn::ScreenRecordingSettingsAction).
+        text(tr("Screen Recording Settings")).
+        autoRepeat(false);
+
+    factory.leaveSubMenu();
 
 
 #if 0

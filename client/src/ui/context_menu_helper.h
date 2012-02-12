@@ -5,9 +5,9 @@
 
 void initContextMenu();
 
-extern QAction cm_screen_recording;
+/*extern QAction cm_screen_recording;
 extern QAction cm_toggle_recording;
-extern QAction cm_recording_settings;
+extern QAction cm_recording_settings;*/
 extern QAction cm_arrange;
 
 extern QAction cm_add_layout;

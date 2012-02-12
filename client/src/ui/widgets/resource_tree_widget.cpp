@@ -312,7 +312,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     }
     menu->addSeparator();
     //menu->addAction(&cm_toggle_fullscreen);
-    menu->addAction(&cm_screen_recording);
+    //menu->addAction(&cm_screen_recording);
     //menu->addAction(&cm_preferences);
     /*menu->addSeparator();
     menu->addAction(&cm_exit);*/

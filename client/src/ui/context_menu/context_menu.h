@@ -64,6 +64,20 @@ namespace Qn {
          */
         OpenFileAction,
 
+        /**
+         * Submenu for screen recording.
+         */
+        ScreenRecordingMenu,
+
+        /**
+         * Starts / stops screen recording.
+         */
+        ScreenRecordingAction,
+
+        /**
+         * Opens screen recording dialog.
+         */
+        ScreenRecordingSettingsAction,
 
 #if 0
         /** 

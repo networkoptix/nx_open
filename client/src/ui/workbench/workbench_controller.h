@@ -142,7 +142,7 @@ protected slots:
     void at_hideMotionAction_triggered();
     void at_cameraSettingsAction_triggered();
 
-    void at_toggleRecordingAction_triggered();
+    void at_recordingAction_triggered(bool checked);
     void at_recordingSettingsAction_triggered();
 
     void at_screenRecorder_error(const QString &errorMessage);

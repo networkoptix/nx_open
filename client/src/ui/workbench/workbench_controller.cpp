@@ -301,9 +301,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(m_hideMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
 
-    connect(&cm_toggle_recording,       SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
-    connect(&cm_recording_settings,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsAction_triggered()));
-    m_display->view()->addAction(&cm_screen_recording);
+    connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                           this,                           SLOT(at_recordingAction_triggered(bool)));
+    connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered(bool)),                                   this,                           SLOT(at_recordingSettingsAction_triggered()));
+    m_display->view()->addAction(qnAction(Qn::ScreenRecordingAction));
 
     connect(m_randomGridAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_randomGridAction_triggered()));
 
@@ -475,7 +475,14 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
 // -------------------------------------------------------------------------- //
 void QnWorkbenchController::startRecording()
 {
-    if (!m_screenRecorder->isSupported() || m_screenRecorder->isRecording())
+    if (!m_screenRecorder->isSupported()) {
+        stopRecording();
+        return;
+    }
+
+    qnAction(Qn::ScreenRecordingAction)->setChecked(true);
+
+    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running))
         return;
 
     m_countdownCanceled = false;
@@ -512,12 +519,12 @@ void QnWorkbenchController::startRecording()
     connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
     connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
     m_recordingAnimation->start();
-
-    cm_toggle_recording.setText(tr("Stop Screen Recording"));
 }
 
 void QnWorkbenchController::stopRecording()
 {
+    qnAction(Qn::ScreenRecordingAction)->setChecked(false);
+
     if (!m_screenRecorder->isSupported())
         return;
 
@@ -570,14 +577,12 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 }
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    cm_toggle_recording.setText(tr("Start Screen Recording"));
+    qnAction(Qn::ScreenRecordingAction)->setChecked(false);
 
     QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
-    cm_toggle_recording.setText(tr("Start Screen Recording"));
-
     QString suggetion = QFileInfo(recordedFileName).fileName();
     if (suggetion.isEmpty())
         suggetion = tr("recorded_video");
@@ -1014,7 +1019,8 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
 
     QScopedPointer<QMenu> menu(new QMenu(display()->view()));
     //menu->addAction(qnAction(Qn::OpenFileAction));
-    menu->addAction(&cm_screen_recording);
+    menu->addAction(qnAction(Qn::ScreenRecordingMenu));
+    
 
     //menu->addAction(m_randomGridAction);
 
@@ -1108,12 +1114,16 @@ void QnWorkbenchController::at_randomGridAction_triggered() {
     display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
 }
 
-void QnWorkbenchController::at_toggleRecordingAction_triggered() {
-    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
-        stopRecording();
-    } else {
+void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
+    if(checked) {
         startRecording();
+    } else {
+        stopRecording();
     }
+
+    /*if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
+    } else {
+    }*/
 }
 
 void QnWorkbenchController::at_recordingSettingsAction_triggered() {
