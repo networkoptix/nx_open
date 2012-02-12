@@ -41,7 +41,7 @@
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
-#include "ui/style/proxystyle.h"
+#include "ui/style/proxy_style.h"
 
 #include <utils/common/warnings.h>
 
@@ -553,7 +553,7 @@ void QnMainWindow::paintEvent(QPaintEvent *event)
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(Globals::frameColor(), 3));
+        painter.setPen(QPen(qnGlobals->frameColor(), 3));
         painter.drawRect(QRect(
             0,
             0,

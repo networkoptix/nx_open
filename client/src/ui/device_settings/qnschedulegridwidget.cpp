@@ -187,8 +187,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
 
 
     // draw selection
-    p.setPen(Globals::motionRubberBandBorderColor());
-    p.setBrush(Globals::motionRubberBandColor());
+    p.setPen(qnGlobals->motionRubberBandBorderColor());
+    p.setBrush(qnGlobals->motionRubberBandColor());
     if (!m_selectedRect.isEmpty())
         p.drawRect(m_selectedRect);
 }

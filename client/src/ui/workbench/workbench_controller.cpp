@@ -168,8 +168,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
 
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, Globals::motionRubberBandColor());
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, Globals::motionRubberBandBorderColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));

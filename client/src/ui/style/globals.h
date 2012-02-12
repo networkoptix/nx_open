@@ -1,10 +1,10 @@
-#ifndef QN_SKIN_GLOBALS_H
-#define QN_SKIN_GLOBALS_H
+#ifndef QN_GLOBALS_H
+#define QN_GLOBALS_H
 
 #include <QObject>
 #include <QVariant>
 
-class Globals: public QObject {
+class QnGlobals: public QObject {
     Q_OBJECT;
 public:
     enum Variable {
@@ -24,19 +24,19 @@ public:
         VARIABLE_COUNT
     };
 
-    Globals(QObject *parent = NULL);
+    QnGlobals(QObject *parent = NULL);
 
-    virtual ~Globals();
+    virtual ~QnGlobals();
 
     QVariant value(Variable variable);
 
     void setValue(Variable variable, const QVariant &value);
 
-    static Globals *instance();
+    static QnGlobals *instance();
 
 #define QN_DECLARE_GLOBAL_ACCESSOR(TYPE, ACCESSOR, VARIABLE)                    \
-    static inline TYPE ACCESSOR() { return instance()->value(VARIABLE).value<TYPE>(); } \
-    static inline void ACCESSOR(const TYPE &value) { instance()->setValue(VARIABLE, value); } \
+    inline TYPE ACCESSOR() { return value(VARIABLE).value<TYPE>(); }            \
+    inline void ACCESSOR(const TYPE &value) { setValue(VARIABLE, value); }      \
 
     QN_DECLARE_GLOBAL_ACCESSOR(QFont,   settingsFont,                   SETTINGS_FONT);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  shadowColor,                    SHADOW_COLOR);
@@ -56,4 +56,6 @@ private:
     QVariant m_globals[VARIABLE_COUNT];
 };
 
-#endif // QN_SKIN_GLOBALS_H
+#define qnGlobals (QnGlobals::instance())
+
+#endif // QN_GLOBALS_H

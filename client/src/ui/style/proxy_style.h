@@ -1,17 +1,26 @@
-#ifndef PROXYSTYLE_H
-#define PROXYSTYLE_H
+#ifndef QN_PROXY_STYLE_H
+#define QN_PROXY_STYLE_H
 
 #include <QtCore/QPointer>
 
 #include <QtGui/QStyle>
 
-class ProxyStyle : public QStyle
+/**
+ * This class implements a proxy style that doesn't affect its base style in any way,
+ * unlike the <tt>QProxyStyle</tt>. 
+ * 
+ * In case of <tt>QProxyStyle</tt>, only one proxy style can be constructed for
+ * any given style instance. This class doesn't have this limitation.
+ * 
+ * The downside is that the style that is being proxied cannot call back into the proxy.
+ */
+class QnProxyStyle : public QStyle
 {
     Q_OBJECT
 
 public:
-    explicit ProxyStyle(QStyle *baseStyle);
-    explicit ProxyStyle(const QString &baseStyle, QObject *parent = 0);
+    explicit QnProxyStyle(QStyle *baseStyle);
+    explicit QnProxyStyle(const QString &baseStyle, QObject *parent = 0);
 
     QStyle *baseStyle() const;
     void setBaseStyle(QStyle *style);
@@ -70,7 +79,7 @@ protected:
     virtual bool eventFilter(QObject *o, QEvent *e)
     { return baseStyle()->eventFilter(o, e); }
 
-protected Q_SLOTS:
+protected slots:
     QIcon standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option = 0, const QWidget *widget = 0) const
     { return baseStyle()->standardIcon(standardIcon, option, widget); }
 
@@ -79,9 +88,9 @@ protected Q_SLOTS:
     { return baseStyle()->layoutSpacing(control1, control2, orientation, option, widget); }
 
 private:
-    Q_DISABLE_COPY(ProxyStyle)
+    Q_DISABLE_COPY(QnProxyStyle)
 
-    QPointer<QStyle> m_style;
+    QWeakPointer<QStyle> m_style;
 };
 
-#endif // PROXYSTYLE_H
+#endif // QN_PROXY_STYLE_H

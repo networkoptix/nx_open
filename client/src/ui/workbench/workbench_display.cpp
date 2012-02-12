@@ -576,8 +576,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
 
     {
         QPalette palette = widget->palette();
-        palette.setColor(QPalette::Active, QPalette::Shadow, Globals::selectedFrameColor());
-        palette.setColor(QPalette::Inactive, QPalette::Shadow, Globals::frameColor());
+        palette.setColor(QPalette::Active, QPalette::Shadow, qnGlobals->selectedFrameColor());
+        palette.setColor(QPalette::Inactive, QPalette::Shadow, qnGlobals->frameColor());
         widget->setPalette(palette);
     }
 

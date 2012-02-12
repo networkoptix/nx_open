@@ -44,7 +44,17 @@ public:
     }
 
 public slots:
+    /**
+     * Forces layout update from the proxy model. 
+     */
     void update();
+
+    /**
+     * Performs delayed update of the layout from the proxy model.
+     * 
+     * Layout will be update only once even if this function was 
+     * called several times.
+     */
     void updateLater();
 
 protected:
