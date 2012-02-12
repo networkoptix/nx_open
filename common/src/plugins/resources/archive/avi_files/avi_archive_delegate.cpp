@@ -151,7 +151,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
     while (m_contexts.size() <= stream->index)
         m_contexts << QnMediaContextPtr(0);
 
-    if (m_contexts[stream->index] == 0)
+    if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
         m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
 
     return m_contexts[stream->index];
@@ -251,6 +251,7 @@ void QnAviArchiveDelegate::close()
 {
     if (m_formatContext)
         av_close_input_file(m_formatContext);
+    m_contexts.clear();
     m_formatContext = 0;
     m_initialized = false;
     m_streamsFound = false;
