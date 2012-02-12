@@ -15,6 +15,7 @@
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <camera/resource_display.h>
 
@@ -33,12 +34,13 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
 #include <ui/graphics/items/clickable_widget.h>
-
 #include <ui/graphics/items/standard/graphicslabel.h>
+#include <ui/graphics/items/controls/navigationitem.h>
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/graphics/items/controls/navigationitem.h>
+
+#include <ui/context_menu/context_menu.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/context_menu_helper.h>
@@ -46,13 +48,16 @@
 #include <ui/context_menu_helper.h>
 #include <ui/mixins/render_watch_mixin.h>
 
-#include "workbench.h"
-#include "workbench_display.h"
 #include "camera/camera.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "ui/ui_common.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
+
+#include "workbench.h"
+#include "workbench_display.h"
+#include "workbench_layout.h"
+
 
 Q_DECLARE_METATYPE(VariantAnimator *)
 
@@ -177,8 +182,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setColor(QPalette::Base, Qt::transparent);
         m_treeWidget->setPalette(palette);
     }
-
-    connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeOpened()));
+    m_treeWidget->setWorkbench(display->workbench());
     m_treeWidget->addAction(&cm_showNavTree);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
@@ -237,6 +241,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treePinButton));
 
+    connect(&cm_showNavTree,            SIGNAL(triggered()),                                                                        this,                           SLOT(toggleTreeOpened()));
+    connect(m_treeWidget,               SIGNAL(activated(const QnResourcePtr &)),                                                   this,                           SLOT(at_treeWidget_activated(const QnResourcePtr &)));
     connect(m_treePinButton,            SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treePinButton_toggled(bool)));
     connect(m_treeShowButton,           SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treeShowButton_toggled(bool)));
     connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateTreeOpacity()));
@@ -322,10 +328,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->addItem(m_tabBarItem);
     titleLayout->addItem(newActionButton(&cm_new_tab));
     titleLayout->addStretch(0x1000);
-    titleLayout->addItem(newActionButton(&cm_reconnect));
-    titleLayout->addItem(newActionButton(&cm_preferences));
-    titleLayout->addItem(newActionButton(&cm_toggle_fullscreen));
-    titleLayout->addItem(newActionButton(&cm_exit));
+    titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::FullscreenAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::ExitAction)));
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
@@ -360,7 +366,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
-    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    this,                           SIGNAL(titleBarDoubleClicked()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    qnAction(Qn::FullscreenAction), SLOT(toggle()));
 
 
     /* Connect to display. */
@@ -942,6 +948,29 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
         (geometry.left() + geometry.right() - m_titleShowButton->size().height()) / 2,
         qMin(m_controlsWidgetRect.bottom(), geometry.top())
     ));
+}
+
+void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
+    if(resource.isNull())
+        return;
+
+    if(resource->checkFlags(QnResource::layout)) {
+        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+        if(layoutResource) {
+            QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
+            if(layout == NULL) {
+                layout = new QnWorkbenchLayout(layoutResource, workbench());
+                workbench()->addLayout(layout);
+            }
+
+            workbench()->setCurrentLayout(layout);
+        }
+    } else if(resource->checkFlags(QnResource::media)) {
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        item->setFlag(QnWorkbenchItem::Pinned, false);
+        display()->workbench()->currentLayout()->addItem(item);
+        item->adjustGeometry();
+    }
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {

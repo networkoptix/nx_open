@@ -2,8 +2,9 @@
 
 #include <QtCore/QMetaObject>
 
-#include "core/resource/video_server.h"
 #include "utils/common/warnings.h"
+#include "utils/common/checked_cast.h"
+#include "core/resource/video_server.h"
 
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
@@ -20,6 +21,10 @@ QnResourcePool::QnResourcePool() : QObject(),
 
 QnResourcePool::~QnResourcePool()
 {
+    bool signalsBlocked = blockSignals(false);
+    emit aboutToBeDestroyed();
+    blockSignals(signalsBlocked);
+
     QMutexLocker locker(&m_resourcesMtx);
     m_resources.clear();
 }
@@ -35,10 +40,16 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources) 
     {
+        if (!resource->toSharedPointer()) 
+        {
+            qnWarning("Resource '%1' does not have an associated shared pointer. Did you forget to use QnSharedResourcePointer?", resource->metaObject()->className());
+            QnSharedResourcePointer<QnResource>::initialize(resource);
+        }
+
         // if resources are local assign localserver as parent
         if (!resource->getParentId().isValid()) 
         {
-            if (resource->checkFlag(QnResource::local))
+            if (resource->checkFlags(QnResource::local))
                 resource->setParentId(localServer->getId());
         }
 
@@ -123,7 +134,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
 void QnResourcePool::handleResourceChange()
 {
-    const QnResourcePtr resource = qobject_cast<QnResource *>(sender())->toSharedPointer();
+    const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
 
     QMetaObject::invokeMethod(this, "resourceChanged", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
 }
@@ -181,13 +192,13 @@ bool QnResourcePool::hasSuchResouce(const QString &uniqid) const
     return !getResourceByUniqId(uniqid).isNull();
 }
 
-QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag) const
+QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
 {
     QnResourceList result;
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
-        if (resource->checkFlag(flag))
+        if (resource->checkFlags(flag))
             result.append(resource);
     }
 
@@ -211,81 +222,3 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-QnResourceList QnResourcePool::findResourcesByCriteria(const CLDeviceCriteria& cr) const
-{
-    QnResourceList result;
-
-    if (cr.getCriteria() != CLDeviceCriteria::STATIC && cr.getCriteria() != CLDeviceCriteria::NONE)
-    {
-        QMutexLocker locker(&m_resourcesMtx);
-        foreach (const QnResourcePtr &resource, m_resources)
-        {
-            if (isResourceMeetCriteria(cr, resource))
-                result.push_back(resource);
-        }
-
-    }
-
-    return result;
-}
-
-
-//===============================================================================================
-
-
-bool QnResourcePool::isResourceMeetCriteria(const CLDeviceCriteria& cr, QnResourcePtr res) const
-{
-    if (res==0)
-        return false;
-
-    if (cr.getCriteria()== CLDeviceCriteria::STATIC)
-        return false;
-
-    if (cr.getCriteria()== CLDeviceCriteria::NONE)
-        return false;
-
-
-    if (cr.getCriteria()== CLDeviceCriteria::ALL)
-    {
-        /*
-        if (res->getParentId().isEmpty())
-            return false;
-
-        if (cr.getRecorderId() == QLatin1String("*"))
-            return true;
-
-        if (res->getParentId() != cr.getRecorderId())
-            return false;
-            /**/
-    }
-
-    if (cr.getCriteria()== CLDeviceCriteria::FILTER)
-    {
-        if (cr.filter().length()==0)
-            return false;
-
-        bool matches = false;
-
-        QStringList serach_list = cr.filter().split(QLatin1Char('+'), QString::SkipEmptyParts);
-        foreach (const QString &sub_filter, serach_list)
-        {
-            if (serach_list.count()<2 || sub_filter.length()>2)
-                matches |= match_subfilter(res, sub_filter);
-        }
-
-        return matches;
-    }
-
-    return true;
-}
-
-bool QnResourcePool::match_subfilter(QnResourcePtr resource, const QString& fltr) const
-{
-    QStringList serach_list = fltr.split(QLatin1Char(' '), QString::SkipEmptyParts);
-    foreach(const QString &str, serach_list)
-    {
-        if (!resource->toString().contains(str, Qt::CaseInsensitive) && !resource->hasTag(str))
-            return false;
-    }
-    return !serach_list.isEmpty();
-}

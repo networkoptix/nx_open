@@ -1,5 +1,5 @@
-#ifndef QN_MENU_WRAPPER_H
-#define QN_MENU_WRAPPER_H
+#ifndef QN_CONTEXT_MENU_H
+#define QN_CONTEXT_MENU_H
 
 #include <QObject>
 #include <QHash>
@@ -7,20 +7,10 @@
 class QAction;
 class QMenu;
 
-namespace detail {
-    class ActionFactory;
-}
+class QnActionFactory;
+class QnActionBuilder;
 
-class QnMenuWrapper: public QObject {
-    Q_OBJECT;
-public:
-    QnMenuWrapper(QObject *parent = NULL);
-
-    virtual ~QnMenuWrapper();
-
-    static QnMenuWrapper *instance();
-
-    QMenu *newMenu(QWidget *parent = NULL);
+namespace Qn {
 
     /**
      * Enum of all menu actions.
@@ -29,6 +19,32 @@ public:
      * resulting menu.
      */
     enum ActionId {
+        /**
+         * Closes the client.
+         */
+        ExitAction,
+
+        /**
+         * Opens about dialog.
+         */
+        AboutAction,
+
+        /**
+         * Opens connection setting dialog.
+         */
+        ConnectionSettingsAction,
+
+        /**
+         * Toggles client's fullscreen state.
+         */
+        FullscreenAction,
+
+        /**
+         * Opens preferences dialog.
+         */
+        PreferencesAction,
+
+#if 0
         /** 
          * Opens the selected layout in the scene. Current layout is closed.
          */
@@ -237,51 +253,76 @@ public:
          */
         APP_EXIT,
 
-        ACTION_COUNT,
+#endif
 
-        INVALID_ACTION = -1
+        ActionCount,
+
+        NoAction = -1
     };
 
-    enum ActionFlag {
-        SCENE_SCOPE         = 0x00000001,   /**< Action appears in scene menu. */
-        TREE_SCOPE          = 0x00000002,   /**< Action appears in tree menu. */
-        NAVIGATION_SCOPE    = 0x00000004,   /**< Action appears in navigation item's menu. */
-        GLOBAL_SCOPE        = NAVIGATION_SCOPE | SCENE_SCOPE | TREE_SCOPE,
-        
-        IMAGE_TARGET        = 0x00000100,   /**< Action is applicable to still images. */
-        VIDEO_TARGET        = 0x00000200,   /**< Action is applicable to videos. */
-        CAMERA_TARGET       = 0x00000400,   /**< Action is applicable to cameras. */
-        SERVER_TARGET       = 0x00000800,   /**< Action is applicable to servers. */
-        LAYOUT_TARGET       = 0x00001000,   /**< Action is applicable to layouts. */
-        FOLDER_TARGET       = 0x00002000,   /**< Action is applicable to folders. */
-        EMPTY_TARGET        = 0x00004000,   /**< Action is applicable even when there are no targets. */
-        MEDIA_TARGET        = VIDEO_TARGET | IMAGE_TARGET,
-        
-        NO_MULTI_TARGET     = 0x00010000,   /**< Action cannot be applied to multiple targets. */
-        //NO_REMOTE_TARGET    = 0x00020000,   /**< Action cannot be applied to non-local targets. */
+    enum ActionScope {
+        SceneScope          = 0x1,              /**< Scene menu requested. */
+        TreeScope           = 0x2,              /**< Tree menu requested. */
+        SliderScope         = 0x4,              /**< Slider menu requested. */
+    };
 
-        IS_MENU             = 0x01000000,   /**< Action is actually a menu with sub-actions. */
-        IS_SEPARATOR        = 0x02000000,   /**< Action is actually a menu separator. */
+} // namespace Qn
+
+
+class QnContextMenu: public QObject {
+    Q_OBJECT;
+public:
+    enum ActionFlag {
+        Invisible           = 0,                /**< Action cannot appear in any menu. */
+        Scene               = Qn::SceneScope,   /**< Action can appear in scene menu. */
+        Tree                = Qn::TreeScope,    /**< Action can appear in tree menu. */
+        Slider              = Qn::SliderScope,  /**< Action can appears in slider menu. */
+        Global              = Scene | Tree | Slider, 
+
+        MultiTarget         = 0x00000010,       /**< Action can be applied to multiple targets. */
+
+        ToggledText         = 0x01000000,       /**< Action has different text for toggled state. */
+        Menu                = 0x10000000,       /**< Action is actually a menu with sub-actions. */
+        Separator           = 0x20000000,       /**< Action is actually a menu separator. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
 
+    QnContextMenu(QObject *parent = NULL);
+
+    virtual ~QnContextMenu();
+
+    static QnContextMenu *instance();
+
+    QAction *action(Qn::ActionId id) const;
+
+    //QMenu *newMenu(QWidget *parent = NULL);
+
 protected:
-    friend class detail::ActionFactory;
+    friend class QnActionFactory;
+    friend class QnActionBuilder;
 
     struct ActionData {
-        ActionId id;
+        ActionData(): id(Qn::NoAction), parentId(Qn::NoAction), flags(0), action(NULL) {}
+
+        Qn::ActionId id;
+        Qn::ActionId parentId;
         ActionFlags flags;
-        ActionId parentId;
         QAction *action;
+        QString normalText, toggledText;
     };
 
-private:
-    QHash<ActionId, ActionData> m_infoByAction;
+private slots:
+    void at_action_toggled();
 
-    QFont m_menuFont;
+private:
+    QHash<Qn::ActionId, ActionData> m_infoById;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnMenuWrapper::ActionFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnContextMenu::ActionFlags);
 
-#endif // QN_MENU_WRAPPER_H
+
+#define qnMenu          (QnContextMenu::instance())
+#define qnAction(id)    (QnContextMenu::instance()->action(id))
+
+#endif // QN_CONTEXT_MENU_H

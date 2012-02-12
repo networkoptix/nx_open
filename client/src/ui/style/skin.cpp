@@ -3,7 +3,7 @@
 #include <QtGui/QImage>
 #include <QtGui/QPixmapCache>
 
-#include "appstyle.h"
+#include "app_style.h"
 
 #ifndef CL_SKIN_PATH
 #  ifdef CL_CUSTOMIZATION_PRESET

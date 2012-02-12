@@ -74,6 +74,6 @@ private:
     int m_totalMdZones;
 };
 
-typedef QSharedPointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
+typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
 
 #endif // QnPlAreconVisionResource_h_1252

@@ -38,6 +38,7 @@
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "api/SessionManager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
+#include "ui/context_menu/context_menu.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -427,6 +428,7 @@ int main(int argc, char *argv[])
 
     QnMainWindow mainWindow(argc, argv);
     mainWindow.setAttribute(Qt::WA_QuitOnClose);
+    mainWindow.showFullScreen();
     mainWindow.show();
 
 #ifdef TEST_RTSP_SERVER

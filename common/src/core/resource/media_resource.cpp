@@ -8,7 +8,7 @@
 QnMediaResource::QnMediaResource():
     QnResource()
 {
-    addFlag(QnResource::media);
+    addFlags(QnResource::media);
     m_customVideoLayout = 0;
 }
 

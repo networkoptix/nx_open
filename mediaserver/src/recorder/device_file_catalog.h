@@ -5,7 +5,6 @@
 #include <QFile>
 #include <QVector>
 #include <QMap>
-#include <QSharedPointer>
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period.h"

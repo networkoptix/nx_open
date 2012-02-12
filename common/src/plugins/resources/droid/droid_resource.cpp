@@ -43,7 +43,10 @@ void QnDroidResource::setCropingPhysical(QRect croping)
 
 }
 
-
+bool QnDroidResource::hasDualStreaming() const
+{
+    return false;
+}
 
 void QnDroidResource::setDataPort(int port)
 {

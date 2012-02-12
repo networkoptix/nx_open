@@ -64,8 +64,6 @@ public:
 
     QnWorkbench *workbench() const;
 
-    QnWorkbenchLayout *layout() const;
-
     QnWorkbenchGridMapper *mapper() const;
 
     void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
@@ -74,9 +72,6 @@ public:
     void drop(const QList<QString> &files, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QnResourcePtr &resource, const QPointF &gridPos = QPointF());
     void drop(const QnResourceList &resources, const QPointF &gridPos = QPointF());
-
-    void remove(const QnResourcePtr &resource);
-    void remove(const QnResourceList &resources);
 
     MotionSelectionInstrument *motionSelectionInstrument() const {
 	    return m_motionSelectionInstrument;

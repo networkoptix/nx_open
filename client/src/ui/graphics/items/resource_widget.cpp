@@ -81,7 +81,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_shadow = new QnPolygonalShadowItem();
     QnPolygonalShadowItem *shadow = m_shadow.data();
     shadow->setParent(this);
-    shadow->setColor(Globals::shadowColor());
+    shadow->setColor(qnGlobals->shadowColor());
     shadow->setShapeProvider(this);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setShadowDisplacement(defaultShadowDisplacement);
@@ -608,7 +608,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
             /* Selection. */
             if(!m_channelState[i].motionSelection.isEmpty())
-				drawFilledRegion(painter, rect, m_channelState[i].motionSelection, Globals::motionSelectionColor());
+				drawFilledRegion(painter, rect, m_channelState[i].motionSelection, qnGlobals->motionSelectionColor());
         }
     }
 
@@ -648,7 +648,7 @@ void QnResourceWidget::drawSelection(const QRectF &rect) {
     if(!(m_displayFlags & DISPLAY_SELECTION_OVERLAY))
         return;
 
-    QColor color = Globals::selectionColor();
+    QColor color = qnGlobals->selectionColor();
     color.setAlpha(color.alpha() * effectiveOpacity());
     glColor(color);
     glBegin(GL_QUADS);
@@ -803,5 +803,5 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
 void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect)
 {
     ensureMotionMask();
-    drawFilledRegion(painter, rect, m_motionMask, Globals::motionMaskColor());
+    drawFilledRegion(painter, rect, m_motionMask, qnGlobals->motionMaskColor());
 }

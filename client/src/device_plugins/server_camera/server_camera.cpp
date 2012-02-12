@@ -16,7 +16,7 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
 
 QnServerCamera::QnServerCamera()
 {
-    addFlag(server_live_cam);
+    addFlags(server_live_cam);
 }
 
 bool QnServerCamera::isResourceAccessible()

@@ -21,12 +21,12 @@ void QnWorkbenchSynchronizer::setWorkbench(QnWorkbench *workbench) {
         return;
 
     if(m_workbench != NULL && !m_user.isNull())
-        deinitialize();
+        stop();
 
     m_workbench = workbench;
 
     if(m_workbench != NULL && !m_user.isNull())
-        initialize();
+        start();
 }
 
 void QnWorkbenchSynchronizer::setUser(const QnUserResourcePtr &user) {
@@ -34,15 +34,15 @@ void QnWorkbenchSynchronizer::setUser(const QnUserResourcePtr &user) {
         return;
 
     if(m_workbench != NULL && !m_user.isNull())
-        deinitialize();
+        stop();
 
     m_user = user;
 
     if(m_workbench != NULL && !m_user.isNull())
-        initialize();
+        start();
 }
 
-void QnWorkbenchSynchronizer::initialize() {
+void QnWorkbenchSynchronizer::start() {
     assert(m_workbench != NULL && !m_user.isNull());
 
     /* Clean workbench's layouts. */
@@ -56,10 +56,14 @@ void QnWorkbenchSynchronizer::initialize() {
     connect(m_workbench,        SIGNAL(layoutsChanged()),                   this, SLOT(at_workbench_layoutsChanged()));
 
     m_submit = m_update = true;
+
+    emit started();
 }
 
-void QnWorkbenchSynchronizer::deinitialize() {
+void QnWorkbenchSynchronizer::stop() {
     assert(m_workbench != NULL && !m_user.isNull());
+
+    emit stopped();
 
     m_submit = m_update = false;
 
@@ -70,22 +74,6 @@ void QnWorkbenchSynchronizer::deinitialize() {
     /* Clean workbench's layouts. */
     while(!m_workbench->layouts().isEmpty())
         delete m_workbench->layouts().back();
-}
-
-QnLayoutResourcePtr QnWorkbenchSynchronizer::resource(QnWorkbenchLayout *layout) const {
-    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout);
-    if(synchronizer == NULL)
-        return QnLayoutResourcePtr();
-
-    return synchronizer->resource();
-}
-
-QnWorkbenchLayout *QnWorkbenchSynchronizer::layout(const QnLayoutResourcePtr &resource) const {
-    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
-    if(synchronizer == NULL)
-        return NULL;
-
-    return synchronizer->layout();
 }
 
 void QnWorkbenchSynchronizer::update() {
@@ -102,7 +90,7 @@ void QnWorkbenchSynchronizer::update() {
      * Layouts may have been removed, and in this case we need to remove them
      * from the workbench too. */
     foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutResourcePtr resource = this->resource(layout);
+        QnLayoutResourcePtr resource = layout->resource();
 
         if(!resources.contains(resource)) /* Corresponding layout resource was removed, remove layout. */
             delete layout;
@@ -120,7 +108,7 @@ void QnWorkbenchSynchronizer::submit() {
      * New layout may have been added, and in this case we need to create a new
      * resource for it. */
     foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutResourcePtr resource = this->resource(layout);
+        QnLayoutResourcePtr resource = layout->resource();
 
         if(resource.isNull()) { 
             /* This actually is a newly created layout. */

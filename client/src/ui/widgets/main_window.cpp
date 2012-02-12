@@ -19,6 +19,7 @@
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 
 #include "ui/context_menu_helper.h"
+#include "ui/context_menu/context_menu.h"
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
@@ -41,7 +42,7 @@
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
-#include "ui/style/proxystyle.h"
+#include "ui/style/proxy_style.h"
 
 #include <utils/common/warnings.h>
 
@@ -115,25 +116,25 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     }
 
     /* Set up actions. */
-    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
-    addAction(&cm_exit);
+    connect(qnAction(Qn::ExitAction), SIGNAL(triggered()), this, SLOT(close()));
+    addAction(qnAction(Qn::ExitAction));
 
-    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
-    addAction(&cm_toggle_fullscreen);
+    connect(qnAction(Qn::FullscreenAction), SIGNAL(toggled(bool)), this, SLOT(setFullScreen(bool)));
+    addAction(qnAction(Qn::FullscreenAction));
 
-    connect(&cm_about, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
-    addAction(&cm_about);
+    connect(qnAction(Qn::AboutAction), SIGNAL(triggered()), this, SLOT(showAboutDialog()));
+    addAction(qnAction(Qn::AboutAction));
 
-    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(showPreferencesDialog()));
-    addAction(&cm_preferences);
+    connect(qnAction(Qn::PreferencesAction), SIGNAL(triggered()), this, SLOT(showPreferencesDialog()));
+    addAction(qnAction(Qn::PreferencesAction));
 
     connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(showOpenFileDialog()));
     addAction(&cm_open_file);
 
-    connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
-    addAction(&cm_reconnect);
+    connect(qnAction(Qn::ConnectionSettingsAction), SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
+    addAction(qnAction(Qn::ConnectionSettingsAction));
 
-    connect(&cm_new_tab, SIGNAL(triggered()), this, SLOT(at_newLayoutRequested()));
+    connect(&cm_new_tab, SIGNAL(triggered()), this, SLOT(openNewLayout()));
     addAction(&cm_new_tab);
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
@@ -178,12 +179,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
 
-    m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
-    connect(m_ui->treeWidget(), SIGNAL(newTabRequested()),                      this,           SLOT(at_newLayoutRequested()));
-    connect(m_ui->treeWidget(), SIGNAL(activated(uint)),                        this,           SLOT(at_treeWidget_activated(uint)));
-    connect(m_ui,               SIGNAL(titleBarDoubleClicked()),                this,           SLOT(toggleFullScreen()));
-    connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer, SLOT(setUser(const QnUserResourcePtr &)));
-    connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,           SLOT(at_settings_lastUsedConnectionChanged()));
+    connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
+    connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
+    connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
@@ -205,10 +203,10 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(&cm_new_tab));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(&cm_reconnect));
-    m_titleLayout->addWidget(newActionButton(&cm_preferences));
-    m_titleLayout->addWidget(newActionButton(&cm_toggle_fullscreen));
-    m_titleLayout->addWidget(newActionButton(&cm_exit));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::PreferencesAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::FullscreenAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::ExitAction)));
 
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();
@@ -229,12 +227,11 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
         m_controller->drop(QFile::decodeName(argv[i]));
 
     /* Update state. */
-    showFullScreen();
     updateDwmState();
     at_settings_lastUsedConnectionChanged();
 
     /* Add single tab. */
-    at_newLayoutRequested();
+    openNewLayout();
 }
 
 QnMainWindow::~QnMainWindow()
@@ -361,6 +358,8 @@ void QnMainWindow::updateFullScreenState()
 {
     bool fullScreen = isFullScreen();
 
+    qnAction(Qn::FullscreenAction)->setChecked(fullScreen);
+
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);
     m_view->setLineWidth(isFullScreen() ? 0 : 1);
@@ -480,6 +479,11 @@ void QnMainWindow::updateDwmState()
     }
 }
 
+void QnMainWindow::openNewLayout() {
+    m_tabBar->addTab(QString());
+    m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -503,20 +507,27 @@ void QnMainWindow::at_sessionManager_error(int error)
     }
 }
 
-void QnMainWindow::at_newLayoutRequested()
-{
-    m_tabBar->addTab(QString());
-    m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
-}
-
-void QnMainWindow::at_treeWidget_activated(uint resourceId)
-{
-    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
-    m_controller->drop(resource);
-}
-
 void QnMainWindow::at_settings_lastUsedConnectionChanged() {
     m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
+}
+
+void QnMainWindow::at_synchronizer_started() {
+    /* No layouts are open, so we need to open one. */
+    QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
+    if(resources.isEmpty()) {
+        /* There are no layouts in user's layouts list, just create a new one. */
+        openNewLayout();
+    } else {
+        /* Open the last layout from the user's layouts list. */
+        struct LayoutIdCmp {
+            bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
+                return l->getId() < r->getId();
+            }
+        };
+
+        qSort(resources.begin(), resources.end(), LayoutIdCmp());
+        m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+    }
 }
 
 bool QnMainWindow::event(QEvent *event) {
@@ -543,7 +554,7 @@ void QnMainWindow::paintEvent(QPaintEvent *event)
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(Globals::frameColor(), 3));
+        painter.setPen(QPen(qnGlobals->frameColor(), 3));
         painter.drawRect(QRect(
             0,
             0,

@@ -7,7 +7,7 @@ QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
-    addFlag(server | local);
+    addFlags(server | local);
     setName(QLatin1String("Local"));
     setStatus(Online);
 }
@@ -23,7 +23,7 @@ QnVideoServerResource::QnVideoServerResource():
     //,m_rtspListener(0)
 {
     setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("Server")));
-    addFlag(server | remote);
+    addFlags(server | remote);
 }
 
 QnVideoServerResource::~QnVideoServerResource()

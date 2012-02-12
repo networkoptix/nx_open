@@ -20,6 +20,8 @@ public:
     virtual QString manufacture() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
+    virtual bool hasDualStreaming() const override;
+
     void setDataPort(int port);
     int getDataPort() const;
 
@@ -36,6 +38,6 @@ private:
     int m_dataPort;
 };
 
-typedef QSharedPointer<QnDroidResource> QnDroidResourcePtr;
+typedef QnSharedResourcePointer<QnDroidResource> QnDroidResourcePtr;
 
 #endif //droid_resource_h_18_04

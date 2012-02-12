@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_FWD_H
 #define QN_RESOURCE_FWD_H
 
-#include <QSharedPointer>
+#include "shared_resource_pointer.h"
 #include <QList>
 
 /**
@@ -14,43 +14,43 @@
  */
 
 class QnResource;
-typedef QSharedPointer<QnResource> QnResourcePtr;
+typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
 typedef QList<QnResourcePtr> QnResourceList;
 
 class QnVirtualCameraResource;
-typedef QSharedPointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
+typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
 typedef QList<QnVirtualCameraResourcePtr> QnVirtualCameraResourceList;
 
 class QnPhysicalCameraResource;
-typedef QSharedPointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
+typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
 typedef QList<QnPhysicalCameraResourcePtr> QnPhysicalCameraResourceList;
 
 class QnLayoutResource;
-typedef QSharedPointer<QnLayoutResource> QnLayoutResourcePtr;
+typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
 typedef QList<QnLayoutResourcePtr> QnLayoutResourceList;
 
 class QnLocalFileResource;
-typedef QSharedPointer<QnLocalFileResource> QnLocalFileResourcePtr;
+typedef QnSharedResourcePointer<QnLocalFileResource> QnLocalFileResourcePtr;
 typedef QList<QnLocalFileResourcePtr> QnLocalFileResourceList;
 
 class QnMediaResource;
-typedef QSharedPointer<QnMediaResource> QnMediaResourcePtr;
+typedef QnSharedResourcePointer<QnMediaResource> QnMediaResourcePtr;
 typedef QList<QnMediaResourcePtr> QnMediaResourceList;
 
 class QnNetworkResource;
-typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
+typedef QnSharedResourcePointer<QnNetworkResource> QnNetworkResourcePtr;
 typedef QList<QnNetworkResourcePtr> QnNetworkResourceList;
 
 class QnSecurityCamResource;
-typedef QSharedPointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
+typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
 typedef QList<QnSecurityCamResourcePtr> QnSecurityCamResourceList;
 
 class QnStorageResource;
-typedef QSharedPointer<QnStorageResource> QnStorageResourcePtr;
+typedef QnSharedResourcePointer<QnStorageResource> QnStorageResourcePtr;
 typedef QList<QnStorageResourcePtr> QnStorageResourceList;
 
 class QnUserResource;
-typedef QSharedPointer<QnUserResource> QnUserResourcePtr;
+typedef QnSharedResourcePointer<QnUserResource> QnUserResourcePtr;
 typedef QList<QnUserResourcePtr> QnUserResourceList;
 
 

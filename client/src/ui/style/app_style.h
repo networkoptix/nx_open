@@ -1,10 +1,10 @@
-#ifndef APPSTYLE_P_H
-#define APPSTYLE_P_H
+#ifndef QN_APP_STYLE_H
+#define QN_APP_STYLE_H
 
-#include <QtGui/QProxyStyle>
-#include "proxystyle.h"
+#include <QProxyStyle>
+#include "proxy_style.h"
 
-class AppStyle : public ProxyStyle
+class AppStyle : public QnProxyStyle
 {
     Q_OBJECT
 
@@ -37,4 +37,4 @@ protected Q_SLOTS:
     QIcon standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const;
 };
 
-#endif // APPSTYLE_P_H
+#endif // QN_APP_STYLE_H

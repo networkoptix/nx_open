@@ -3,9 +3,9 @@
 #include <QFont>
 #include <QColor>
 
-Q_GLOBAL_STATIC(Globals, globalsInstance);
+Q_GLOBAL_STATIC(QnGlobals, globalsInstance);
 
-Globals::Globals(QObject *parent):
+QnGlobals::QnGlobals(QObject *parent):
     QObject(parent) 
 {
     setValue(SETTINGS_FONT,                         QFont()/*("Bodoni MT", 12)*/);
@@ -22,22 +22,22 @@ Globals::Globals(QObject *parent):
     setValue(OPACITY_CHANGE_PERIOD,                 500);
 }
 
-Globals::~Globals() {
+QnGlobals::~QnGlobals() {
     return;
 }
 
-QVariant Globals::value(Variable variable) {
+QVariant QnGlobals::value(Variable variable) {
     assert(variable >= 0 && variable < VARIABLE_COUNT);
 
     return m_globals[variable];
 }
 
-void Globals::setValue(Variable variable, const QVariant &value) {
+void QnGlobals::setValue(Variable variable, const QVariant &value) {
     assert(variable >= 0 && variable < VARIABLE_COUNT);
 
     m_globals[variable] = value;
 }
 
-Globals *Globals::instance() {
+QnGlobals *QnGlobals::instance() {
     return globalsInstance();
 }

@@ -39,7 +39,7 @@ void QnSyncPlayMixin::at_enable_sync(bool value)
 }
 
 void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(!widget->resource()->checkFlag(QnResource::live_cam))
+    if(!widget->resource()->checkFlags(QnResource::live_cam))
         return;
 
     if(widget->display()->archiveReader() == NULL) 
@@ -52,7 +52,7 @@ void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
 }
 
 void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(!widget->resource()->checkFlag(QnResource::live_cam))
+    if(!widget->resource()->checkFlags(QnResource::live_cam))
         return;
 
     if(widget->display()->archiveReader() == NULL) 

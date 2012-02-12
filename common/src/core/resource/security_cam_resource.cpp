@@ -20,7 +20,7 @@ QnSecurityCamResource::QnSecurityCamResource()
         metaTypesInitialized = true;
     }
 
-    addFlag(live_cam);
+    addFlags(live_cam);
 }
 
 QnSecurityCamResource::~QnSecurityCamResource()
@@ -88,6 +88,10 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 {
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
     {
+
+        if (role == QnResource::Role_SecondaryLiveVideo && !hasDualStreaming())
+            return 0;
+
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
         if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
         {
@@ -129,4 +133,9 @@ void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleT
 const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 {
     return m_scheduleTasks;
+}
+
+bool QnSecurityCamResource::hasDualStreaming() const
+{
+    return true;
 }
