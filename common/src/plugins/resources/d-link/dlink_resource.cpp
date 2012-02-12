@@ -5,23 +5,88 @@
 const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 
 
+QnDlink_cam_info::QnDlink_cam_info():
+hasMPEG4(false),
+numberOfVideoProfiles(0),
+hasFixedQuality(false)
+{
+
+}
+
+bool QnDlink_cam_info::inited() const
+{
+    return numberOfVideoProfiles > 0;
+}
+
+// returns resolution with width not less than width
+QSize QnDlink_cam_info::resolutionCloseTo(int width)
+{
+    if (resolutions.size()==0)
+    {
+        Q_ASSERT(false);
+        return QSize(0,0);
+    }
+
+    QSize result = resolutions.at(0);
+
+
+    foreach(const QSize& size, resolutions)
+    {
+        if (size.width() <= width)
+            return result;
+        else
+            result = size;
+    }
+
+    return result;
+}
+
+// returns next up bitrate 
+QString QnDlink_cam_info::bitrateCloseTo(int val)
+{
+
+    QSize result;
+
+    if (possibleBitrates.size()==0)
+    {
+        Q_ASSERT(false);
+        return "";
+    }
+
+    QMap<int, QString>::iterator it = possibleBitrates.lowerBound(val);
+    if (it == possibleBitrates.end())
+        it--;
+
+    return it.value();
+
+}
+
+// returns next up frame rate 
+int QnDlink_cam_info::frameRateCloseTo(int fr)
+{
+    Q_ASSERT(possibleFps.size()>0);
+
+    int result = possibleFps.at(0);
+
+    foreach(int fps, possibleFps)
+    {
+        if (result <= fr)
+            return result;
+        else
+            result = fps;
+    }
+
+    return result;
+}
+
+
+//=======================================================================================
+
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setAuth("admin", "1");
 }
 
-int QnPlDlinkResource::getMaxFps()
-{
-    QMutexLocker mutexLocker(&m_mutex);
-
-    if (m_camInfo.possibleFps.size()==0)
-    {
-        Q_ASSERT(false);
-        return 15;
-    }
-
-    return m_camInfo.possibleFps.at(0);
-}
 
 bool QnPlDlinkResource::isResourceAccessible()
 {

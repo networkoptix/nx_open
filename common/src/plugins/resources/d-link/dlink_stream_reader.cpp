@@ -161,7 +161,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     t << "config/video.cgi?profileid=" << profileNum << "&";
     t << "resolution=" << resolution.width() << "x" << resolution.height() << "&";
 
-    int fps = info.frameRateCloseTo(getFps());
+    int fps = info.frameRateCloseTo( qMin((int)getFps(), res->getMaxFps()) );
     t << "framerate=" << fps << "&";
     t << "codec=";
 
