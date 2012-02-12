@@ -1,9 +1,6 @@
 #ifndef QN_USER_RESOURCE_H
 #define QN_USER_RESOURCE_H
 
-#include <QSharedPointer>
-#include <QList>
-
 #include "resource.h"
 #include "layout_resource.h"
 

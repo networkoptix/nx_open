@@ -1,7 +1,6 @@
 #ifndef QN_LAYOUT_RESOURCE_H
 #define QN_LAYOUT_RESOURCE_H
 
-#include <QSharedPointer>
 #include <QRectF>
 #include <QUuid>
 #include "resource.h"
@@ -51,5 +50,6 @@ protected:
 private:
     QList<QnLayoutItemData> m_items;
 };
+
 
 #endif // QN_LAYOUT_RESOURCE_H

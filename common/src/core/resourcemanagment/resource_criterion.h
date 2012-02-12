@@ -94,6 +94,8 @@ public:
 
     Operation check(const QnResourcePtr &resource) const;
 
+    QnResourceList filter(const QnResourceList &resources, Operation nextOperation = REJECT);
+
 protected:
     void *targetValueData();
 

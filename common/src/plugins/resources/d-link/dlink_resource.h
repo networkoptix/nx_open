@@ -123,12 +123,11 @@ public:
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
+
 protected:
-    
-    
     QnDlink_cam_info  m_camInfo;
 };
 
-typedef QSharedPointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
+typedef QnSharedResourcePointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
 #endif //dlink_resource_h_2215

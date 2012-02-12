@@ -1,11 +1,8 @@
-#ifndef _FAKE_CAMERA_H__
-#define _FAKE_CAMERA_H__
+#ifndef QN_FAKE_CAMERA_H
+#define QN_FAKE_CAMERA_H
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_resource.h"
-
-
-
 
 class QnFakeCamera: public QnVirtualCameraResource
 {
@@ -17,6 +14,8 @@ public:
 
     virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
 };
-typedef QSharedPointer<QnFakeCamera> QnFakeCameraPtr;
 
-#endif // _FAKE_CAMERA_H__
+typedef QnSharedResourcePointer<QnFakeCamera> QnFakeCameraPtr;
+typedef QList<QnFakeCameraPtr> QnFakeCameraList;
+
+#endif // QN_FAKE_CAMERA_H

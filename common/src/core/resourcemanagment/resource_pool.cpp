@@ -42,7 +42,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     {
         if (!resource->toSharedPointer()) 
         {
-            qnWarning("Resource '%1' does not have an assiciated shared pointer. Did you forget to use QnSharedResourcePointer?", resource->metaObject()->className());
+            qnWarning("Resource '%1' does not have an associated shared pointer. Did you forget to use QnSharedResourcePointer?", resource->metaObject()->className());
             QnSharedResourcePointer<QnResource>::initialize(resource);
         }
 
@@ -222,83 +222,3 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-#if 0
-QnResourceList QnResourcePool::findResourcesByCriteria(const QnResourceCriteria& cr) const
-{
-    QnResourceList result;
-
-    if (cr.getCriteria() != QnResourceCriteria::STATIC && cr.getCriteria() != QnResourceCriteria::NONE)
-    {
-        QMutexLocker locker(&m_resourcesMtx);
-        foreach (const QnResourcePtr &resource, m_resources)
-        {
-            if (isResourceMeetCriteria(cr, resource))
-                result.push_back(resource);
-        }
-
-    }
-
-    return result;
-}
-
-
-//===============================================================================================
-
-
-bool QnResourcePool::isResourceMeetCriteria(const QnResourceCriteria& cr, QnResourcePtr res) const
-{
-    if (res==0)
-        return false;
-
-    if (cr.getCriteria()== QnResourceCriteria::STATIC)
-        return false;
-
-    if (cr.getCriteria()== QnResourceCriteria::NONE)
-        return false;
-
-
-    if (cr.getCriteria()== QnResourceCriteria::ALL)
-    {
-        /*
-        if (res->getParentId().isEmpty())
-            return false;
-
-        if (cr.getRecorderId() == QLatin1String("*"))
-            return true;
-
-        if (res->getParentId() != cr.getRecorderId())
-            return false;
-            /**/
-    }
-
-    if (cr.getCriteria()== QnResourceCriteria::FILTER)
-    {
-        if (cr.filter().length()==0)
-            return false;
-
-        bool matches = false;
-
-        QStringList serach_list = cr.filter().split(QLatin1Char('+'), QString::SkipEmptyParts);
-        foreach (const QString &sub_filter, serach_list)
-        {
-            if (serach_list.count()<2 || sub_filter.length()>2)
-                matches |= match_subfilter(res, sub_filter);
-        }
-
-        return matches;
-    }
-
-    return true;
-}
-
-bool QnResourcePool::match_subfilter(QnResourcePtr resource, const QString& fltr) const
-{
-    QStringList serach_list = fltr.split(QLatin1Char(' '), QString::SkipEmptyParts);
-    foreach(const QString &str, serach_list)
-    {
-        if (!resource->toString().contains(str, Qt::CaseInsensitive) && !resource->hasTag(str))
-            return false;
-    }
-    return !serach_list.isEmpty();
-}
-#endif

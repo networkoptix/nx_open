@@ -6,7 +6,6 @@
 #include <QMap>
 #include <QMetaType>
 #include <QSet>
-#include <QSharedPointer>
 #include <QStringList>
 #include <QReadWriteLock>
 #include "utils/common/qnid.h"

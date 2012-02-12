@@ -64,10 +64,7 @@ public:
 
     QnResourceList getResourcesWithParentId(QnId id) const;
 
-
     QStringList allTags() const;
-
-    QnResourceList findResourcesByCriteria(const QnResourceCriterion &cr) const;
 
 signals:
     void resourceAdded(const QnResourcePtr &resource);
@@ -77,10 +74,6 @@ signals:
 
 private slots:
     void handleResourceChange();
-
-private:
-    bool isResourceMeetCriteria(const QnResourceCriterion &cr, QnResourcePtr res) const;
-    bool match_subfilter(QnResourcePtr resource, const QString &fltr) const;
 
 private:
     mutable QMutex m_resourcesMtx;

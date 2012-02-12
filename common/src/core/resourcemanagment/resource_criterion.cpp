@@ -26,6 +26,9 @@ namespace {
         }
     }
 
+    /**
+     * This function is currently unused, but it may come in handy later. Don't delete. 
+     */
     QRegExp buildFilter(const QList<QString> &parts) {
         QString pattern;
         foreach (const QString &part, parts) {
@@ -238,6 +241,18 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
     }
 }
 
+QnResourceList QnResourceCriterion::filter(const QnResourceList &resources, Operation nextOperation) {
+    QnResourceList result;
+    foreach(const QnResourcePtr &resource, resources) {
+        Operation operation = check(resource);
+        if(operation == NEXT)
+            operation = nextOperation;
+        if(operation == ACCEPT)
+            result.push_back(resource);
+    }
+    return result;
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnResourceCriterionGroup
@@ -319,9 +334,6 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
     /* Accept by default. */
     addCriterion(new QnResourceCriterion(QVariant(), NOTHING, ID, NEXT, ACCEPT));
 
-    /* All strings that are to be searched for in SEARCH_STRING are placed here. */
-    QList<QString> acceptSubstrings, rejectSubstrings;
-
     /* Parse pattern string. */
     QRegExp regExp(QLatin1String("(\\W?)(\\w+:)?(\\w*)"), Qt::CaseSensitive, QRegExp::RegExp2);
     int pos = 0;
@@ -356,18 +368,8 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
         if (sign == QLatin1String("-"))
             positive = false;
 
-        if(target == SEARCH_STRING && type == CONTAINMENT) {
-            (positive ? acceptSubstrings : rejectSubstrings).push_back(pattern);
-        } else {
-            addCriterion(new QnResourceCriterion(targetValue, type, target, positive ? NEXT : REJECT, positive ? REJECT : NEXT));
-        }
+        addCriterion(new QnResourceCriterion(targetValue, type, target, positive ? NEXT : REJECT, positive ? REJECT : NEXT));
     }
-    
-    if(!acceptSubstrings.empty())
-        addCriterion(new QnResourceCriterion(buildFilter(acceptSubstrings), SEARCH_STRING, NEXT, REJECT));
-
-    if(!rejectSubstrings.empty())
-        addCriterion(new QnResourceCriterion(buildFilter(rejectSubstrings), SEARCH_STRING, REJECT, NEXT));
 }
 
 

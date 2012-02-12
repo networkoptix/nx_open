@@ -1,7 +1,6 @@
 #ifndef __VIDEO_SERVER_H
 #define __VIDEO_SERVER_H
 
-#include <QSharedPointer>
 #include "core/resource/resource.h"
 #include "core/resource/storage_resource.h"
 #include "api/VideoServerConnection.h"
@@ -46,14 +45,13 @@ private:
     QnStorageResourceList m_storages;
 };
 
+typedef QnSharedResourcePointer<QnVideoServerResource> QnVideoServerResourcePtr;
+typedef QList<QnVideoServerResourcePtr> QnVideoServerResourceList;
 
 class QnVideoServerResourceFactory : public QnResourceFactory
 {
 public:
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 };
-
-typedef QSharedPointer<QnVideoServerResource> QnVideoServerResourcePtr;
-typedef QList<QnVideoServerResourcePtr> QnVideoServerResourceList;
 
 #endif // __VIDEO_SERVER_H
