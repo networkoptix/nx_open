@@ -69,6 +69,7 @@
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
+#include "workbench_utility.h"
 #include "workbench.h"
 #include "workbench_display.h"
 
@@ -87,47 +88,6 @@
 Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
-    class AspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
-    public:
-        AspectRatioMagnitudeCalculator(const QPointF &origin, const QSize &size, const QRect &boundary, qreal aspectRatio):
-            m_origin(origin),
-            m_size(SceneUtility::toPoint(size)),
-            m_boundary(boundary),
-            m_aspectRatio(aspectRatio)
-        {}
-
-    protected:
-        virtual qreal calculateInternal(const void *value) const override {
-            const QPoint &p = *static_cast<const QPoint *>(value);
-
-            QPointF delta = p + QPointF(m_size) / 2.0 - m_origin;
-            qreal spaceDistance = qMax(qAbs(delta.x() / m_aspectRatio), qAbs(delta.y()));
-
-            QRect extendedRect = QRect(
-                QPoint(
-                    qMin(m_boundary.left(), p.x()),
-                    qMin(m_boundary.top(), p.y())
-                ),
-                QPoint(
-                    qMax(m_boundary.right(), p.x() + m_size.x() - 1),
-                    qMax(m_boundary.bottom(), p.y() + m_size.y() - 1)
-                )
-            );
-            qreal aspectDistance = qAbs(std::log(SceneUtility::aspectRatio(extendedRect) / m_aspectRatio));
-
-            qreal extensionDistance = qAbs(m_boundary.width() - extendedRect.width()) + qAbs(m_boundary.height() - extendedRect.height());
-
-            qreal k = (m_boundary.width() + m_boundary.height());
-            return k * k * extensionDistance + k * aspectDistance + spaceDistance;
-        }
-
-    private:
-        QPointF m_origin;
-        QPoint m_size;
-        QRect m_boundary;
-        qreal m_aspectRatio;
-    };
-
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
         QAction *result = new QAction(text, parent);
         result->setShortcut(shortcut);
@@ -157,46 +117,6 @@ namespace {
             region += QRect(x,y, rect.width()-x*2,1);
         }
         return region;
-    }
-
-    QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
-        QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
-        if(boundOrientation == Qt::Horizontal) {
-            sceneSize.setHeight(sceneSize.width() / aspectRatio);
-        } else {
-            sceneSize.setWidth(sceneSize.height() * aspectRatio);
-        }
-
-        QSize gridSize0 = mapper->mapToGrid(sceneSize);
-        QSize gridSize1 = gridSize0;
-        if(boundOrientation == Qt::Horizontal) {
-            gridSize1.setHeight(qMax(gridSize1.height() - 1, 1));
-        } else {
-            gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
-        }
-
-        qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
-        qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
-        return distance0 < distance1 ? gridSize0 : gridSize1;
-    }
-
-    QSize bestDoubleBoundedSize(QnWorkbenchGridMapper *mapper, const QSize &bound, qreal aspectRatio) {
-        qreal boundAspectRatio = SceneUtility::aspectRatio(mapper->mapFromGrid(bound));
-
-        if(aspectRatio < boundAspectRatio) {
-            return bestSingleBoundedSize(mapper, bound.height(), Qt::Vertical, aspectRatio);
-        } else {
-            return bestSingleBoundedSize(mapper, bound.width(), Qt::Horizontal, aspectRatio);
-        }
-    }
-
-    QRect bestDoubleBoundedGeometry(QnWorkbenchGridMapper *mapper, const QRect &bound, qreal aspectRatio) {
-        QSize size = bestDoubleBoundedSize(mapper, bound.size(), aspectRatio);
-
-        return QRect(
-            bound.topLeft() + SceneUtility::toPoint(bound.size() - size) / 2,
-            size
-        );
     }
 
     QPoint invalidDragDelta() {
@@ -414,10 +334,6 @@ QnWorkbench *QnWorkbenchController::workbench() const {
     return m_display->workbench();
 }
 
-QnWorkbenchLayout *QnWorkbenchController::layout() const {
-    return m_display->workbench()->currentLayout();
-}
-
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
 }
@@ -456,60 +372,20 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
         return;
     }
 
-    if (layout()->items().size() >= 24)
-        return; // TODO: item limit must be changeable.
-
-    if (!resource->checkFlag(QnResource::media))
-        return; // TODO: unsupported for now
-
-    //if (!layout()->items(resource->getUniqueId()).isEmpty())
-    //    return; /* Avoid duplicates. */
-
     workbench()->setItem(QnWorkbench::RAISED, NULL);
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
 
-    const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
-
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
     item->setFlag(QnWorkbenchItem::Pinned, false);
-    item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
-    layout()->addItem(item);
+    workbench()->currentLayout()->addItem(item);
 
-    QnResourceWidget *widget = display()->widget(item);
-    Q_ASSERT(widget);
-
-    /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
-    const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
-    const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
-    const QSize size = bestSingleBoundedSize(mapper(), 1, orientation, estimatedAspectRatio);
-
-    /* Adjust item's geometry for the new size. */
-    if(size != item->geometry().size()) {
-        QRectF combinedGeometry = item->combinedGeometry();
-        combinedGeometry.moveTopLeft(combinedGeometry.topLeft() - toPoint(size - combinedGeometry.size()) / 2.0);
-        combinedGeometry.setSize(size);
-        item->setCombinedGeometry(combinedGeometry);
+    if(gridPos.isNull()) {
+        item->adjustGeometry();
+    } else {
+        item->adjustGeometry(gridPos);
     }
 
-    /* Pin the item. */
-    AspectRatioMagnitudeCalculator metric(gridPos, size, workbench()->currentLayout()->boundingRect(), aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
-    QRect geometry = layout()->closestFreeSlot(gridPos, size, &metric);
-    layout()->pinItem(item, geometry);
-
     display()->fitInView();
-}
-
-void QnWorkbenchController::remove(const QnResourcePtr &resource)
-{
-    foreach(QnWorkbenchItem *item, layout()->items(resource->getUniqueId()))
-        delete item;
-}
-
-void QnWorkbenchController::remove(const QnResourceList &resources)
-{
-    foreach (const QnResourcePtr &resource, resources)
-        remove(resource);
 }
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
@@ -788,7 +664,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
     QRect newResizingWidgetRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
-        workbench()->currentLayout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
+        widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
 
         m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
         m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
@@ -810,7 +686,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     /* Resize if possible. */
-    QSet<QnWorkbenchItem *> entities = layout()->items(m_resizedWidgetRect);
+    QSet<QnWorkbenchItem *> entities = widget->item()->layout()->items(m_resizedWidgetRect);
     entities.remove(widget->item());
     if (entities.empty()) {
         widget->item()->setGeometry(m_resizedWidgetRect);
@@ -862,6 +738,8 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
     if(m_draggedWorkbenchItems.empty())
         return;
 
+    QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
+
     QPoint newDragDelta = mapper()->mapToGrid(display()->widget(m_draggedWorkbenchItems[0])->geometry()).topLeft() - m_draggedWorkbenchItems[0]->geometry().topLeft();
     if(newDragDelta != m_dragDelta) {
         m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
@@ -877,7 +755,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
 
             /* Find item that dragged item was dropped on. */
             QPoint cursorPos = QCursor::pos();
-            QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout()->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
+            QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
             if(replacedWorkbenchItems.size() == 1) {
                 QnWorkbenchItem *replacedWorkbenchItem = *replacedWorkbenchItems.begin();
 
@@ -919,7 +797,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
                     replacedGeometries.push_back(geometry);
             }
 
-            m_replacedWorkbenchItems = layout()->items(replacedGeometries).subtract(m_draggedWorkbenchItems.toSet()).toList();
+            m_replacedWorkbenchItems = layout->items(replacedGeometries).subtract(m_draggedWorkbenchItems.toSet()).toList();
 
             replacedGeometries.clear();
             foreach (QnWorkbenchItem *workbenchItem, m_replacedWorkbenchItems)
@@ -930,7 +808,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
         }
 
         QnWorkbenchLayout::Disposition disposition;
-        layout()->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
+        layout->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
 
         m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
         m_display->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
@@ -943,12 +821,14 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphi
     if(m_draggedWorkbenchItems.empty())
         return;
 
+    QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
+
     /* Hide grid. */
     m_display->gridItem()->animatedHide();
 
     /* Do drag. */
     QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
-    bool success = layout()->moveItems(workbenchItems, m_dragGeometries);
+    bool success = layout->moveItems(workbenchItems, m_dragGeometries);
 
     foreach(QnWorkbenchItem *item, workbenchItems) {
         QnResourceWidget *widget = display()->widget(item);

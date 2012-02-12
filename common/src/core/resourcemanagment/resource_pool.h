@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 
 #include "core/resource/resource.h"
-#include "core/resourcemanagment/resource_criteria.h"
+#include "core/resourcemanagment/resource_criterion.h"
 #include "core/resource/network_resource.h"
 
 class QnResource;
@@ -60,25 +60,26 @@ public:
     QnNetworkResourcePtr getNetResourceByMac(const QString &mac) const;
 
     // returns list of resources with such flag
-    QnResourceList getResourcesWithFlag(unsigned long flag) const;
+    QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
 
     QnResourceList getResourcesWithParentId(QnId id) const;
 
 
     QStringList allTags() const;
 
-    QnResourceList findResourcesByCriteria(const CLDeviceCriteria &cr) const;
+    QnResourceList findResourcesByCriteria(const QnResourceCriterion &cr) const;
 
 signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
+    void aboutToBeDestroyed();
 
-private Q_SLOTS:
+private slots:
     void handleResourceChange();
 
 private:
-    bool isResourceMeetCriteria(const CLDeviceCriteria &cr, QnResourcePtr res) const;
+    bool isResourceMeetCriteria(const QnResourceCriterion &cr, QnResourcePtr res) const;
     bool match_subfilter(QnResourcePtr resource, const QString &fltr) const;
 
 private:

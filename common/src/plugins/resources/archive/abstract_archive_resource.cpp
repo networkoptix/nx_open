@@ -3,7 +3,7 @@
 
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
-	addFlag(QnResource::ARCHIVE);
+	addFlags(QnResource::ARCHIVE);
 }
 
 QnAbstractArchiveResource::~QnAbstractArchiveResource()

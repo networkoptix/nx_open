@@ -20,7 +20,7 @@ QnSecurityCamResource::QnSecurityCamResource()
         metaTypesInitialized = true;
     }
 
-    addFlag(live_cam);
+    addFlags(live_cam);
 }
 
 QnSecurityCamResource::~QnSecurityCamResource()

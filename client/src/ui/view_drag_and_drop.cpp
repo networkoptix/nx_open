@@ -1,4 +1,5 @@
 #include "view_drag_and_drop.h"
+#include <QApplication>
 #include <core/resourcemanagment/resource_pool.h>
 
 namespace {
@@ -62,6 +63,9 @@ QnResourceList deserializeResources(const QByteArray &data) {
         QnResourcePtr resource = qnResPool->getResourceById(id);
         if(!resource.isNull())
             result.push_back(resource);
+
+        if(stream.status() != QDataStream::Ok)
+            break;
     }
 
     return result;

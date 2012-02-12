@@ -2,28 +2,55 @@
 #define QN_RESOURCE_SEARCH_PROXY_MODEL_H
 
 #include <QSortFilterProxyModel>
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
+#include "item_data_role.h"
 
-class QnResourceSearchProxyModelPrivate;
+class QnResourceCriterionGroup;
+class QnResourceCriterion;
 
-class QnResourceSearchProxyModel : public QSortFilterProxyModel
-{
-    Q_OBJECT
+/**
+ * A resource filtering model that uses resource criteria for filtering.
+ */
+class QnResourceSearchProxyModel: public QSortFilterProxyModel {
+    Q_OBJECT;
 
 public:
     explicit QnResourceSearchProxyModel(QObject *parent = 0);
+
     virtual ~QnResourceSearchProxyModel();
 
-    QnResourcePtr resourceFromIndex(const QModelIndex &index) const;
-    QModelIndex indexFromResource(const QnResourcePtr &resource) const;
+    void addCriterion(QnResourceCriterion *criterion);
+
+    bool removeCriterion(QnResourceCriterion *criterion);
+
+    bool replaceCriterion(QnResourceCriterion *from, QnResourceCriterion *to);
+
+    const QnResourceCriterionGroup *criteria() {
+        return m_criterionGroup.data();
+    }
+
+    QnResourcePtr resource(const QModelIndex &index) const;
+
+signals:
+    void criteriaChanged();
+
+public slots:
+    void invalidateFilter();
+
+    /**
+     * Performs delayed invalidation of the filter. 
+     * 
+     * The filter will be invalidated only once even if this function was 
+     * called several times.
+     */
+    void invalidateFilterLater();
 
 protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:
-    Q_DISABLE_COPY(QnResourceSearchProxyModel)
-        Q_DECLARE_PRIVATE(QnResourceSearchProxyModel)
-        const QScopedPointer<QnResourceSearchProxyModelPrivate> d_ptr;
+    QScopedPointer<QnResourceCriterionGroup> m_criterionGroup;
+    QObject *m_invalidateListener;
 };
 
-#endif QN_RESOURCE_SEARCH_PROXY_MODEL_H
+#endif // QN_RESOURCE_SEARCH_PROXY_MODEL_H
