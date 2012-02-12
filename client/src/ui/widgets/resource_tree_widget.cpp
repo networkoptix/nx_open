@@ -307,8 +307,8 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     } else if (resources.size() > 1) {
         // ###
     } else {
-        menu->addAction(&cm_open_file);
-        menu->addAction(&cm_new_item);
+        //menu->addAction(&cm_open_file);
+        //menu->addAction(&cm_new_item);
     }
     menu->addSeparator();
     //menu->addAction(&cm_toggle_fullscreen);

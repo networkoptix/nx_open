@@ -1013,7 +1013,7 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
     TRACE("SCENE RCLICKED");
 
     QScopedPointer<QMenu> menu(new QMenu(display()->view()));
-    menu->addAction(&cm_open_file);
+    //menu->addAction(qnAction(Qn::OpenFileAction));
     menu->addAction(&cm_screen_recording);
 
     //menu->addAction(m_randomGridAction);

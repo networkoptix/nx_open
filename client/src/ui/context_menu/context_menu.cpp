@@ -179,6 +179,30 @@ QnContextMenu::QnContextMenu(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/settings.png")));
 
+    factory(Qn::ShowFpsAction).
+        text(tr("Show FPS")).
+        toggledText(tr("Hide FPS")).
+        shortcut(tr("Ctrl+Alt+F")).
+        autoRepeat(false);
+
+    factory(Qn::NewTabAction).
+        text(tr("New Layout")).
+        shortcut(tr("Ctrl+T")).
+        autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
+        icon(Skin::icon(QLatin1String("plus.png")));
+
+    factory(Qn::CloseTabAction).
+        text(tr("Close layout")).
+        shortcut(tr("Ctrl+W")).
+        autoRepeat(true);
+
+    factory(Qn::OpenFileAction).
+        text(tr("Open file(s)...")).
+        shortcut(tr("Ctrl+O")).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("folder.png")));
+
+
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);

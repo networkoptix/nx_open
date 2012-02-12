@@ -44,6 +44,27 @@ namespace Qn {
          */
         PreferencesAction,
 
+        /**
+         * Shows / hides FPS display.
+         */
+        ShowFpsAction,
+
+        /**
+         * Opens a new tab (layout).
+         */
+        NewTabAction,
+
+        /**
+         * Closes current tab (layout).
+         */
+        CloseTabAction,
+
+        /**
+         * Opens a file dialog and adds selected files to the current layout.
+         */
+        OpenFileAction,
+
+
 #if 0
         /** 
          * Opens the selected layout in the scene. Current layout is closed.

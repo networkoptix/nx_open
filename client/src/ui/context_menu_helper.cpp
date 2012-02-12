@@ -6,20 +6,15 @@
 #include "ui/style/skin.h"
 
 
-QAction cm_new_item(QObject::tr("New Item..."), 0);
-QAction cm_fitinview(QObject::tr("Fit in View"), 0);
 QAction cm_open_file(QObject::tr("Open file(s)..."), 0);
 QAction cm_screen_recording(QObject::tr("Screen Recording"), 0);
 QAction cm_toggle_recording(QObject::tr("Start Screen Recording"), 0);
 QAction cm_recording_settings(QObject::tr("Screen Recording Settings"), 0);
-QAction cm_toggle_fps(QObject::tr("Toggle FPS display"), 0);
 QAction cm_arrange(QObject::tr("Arrange"), 0);
 QAction cm_add_layout(QObject::tr("Add new layout..."), 0);
 QAction cm_restore_layout(QObject::tr("Restore layout"), 0);
 QAction cm_save_layout(QObject::tr("Save layout"), 0);
 QAction cm_save_layout_as(QObject::tr("Save layout as..."), 0);
-
-QAction cm_new_tab(QObject::tr("New Tab"), 0);
 
 QAction cm_hide_decorations(QObject::tr("Hide decorations"), 0);
 
@@ -46,40 +41,8 @@ QAction cm_rotate(QObject::tr("Rotation"), 0);
 
 QAction cm_open_containing_folder(QObject::tr("Open in containing folder..."), 0);
 
-QAction cm_showNavTree(QObject::tr("<=|=>"), 0);
-
 void initContextMenu()
 {
-    cm_new_tab.setToolTip(QObject::tr("New Tab"));
-    cm_new_tab.setShortcut(QKeySequence::New);
-    cm_new_tab.setIcon(Skin::icon(QLatin1String("plus.png")));
-
-    /*cm_about.setIcon(Skin::icon(QLatin1String("info.png")));
-    cm_about.setMenuRole(QAction::AboutRole);
-    cm_about.setAutoRepeat(false);*/
-
-    /*cm_exit.setIcon(Skin::icon(QLatin1String("decorations/exit-application.png")));
-    cm_exit.setShortcut(QObject::tr("Alt+F4"));
-    cm_exit.setShortcutContext(Qt::ApplicationShortcut);
-    cm_exit.setMenuRole(QAction::QuitRole);
-    cm_exit.setAutoRepeat(false);*/
-
-/*
-    cm_reconnect.setIcon(Skin::icon(QLatin1String("connect.png")));
-    cm_reconnect.setAutoRepeat(false);
-*/
-
-//     cm_preferences.setIcon(Skin::icon(QLatin1String("decorations/settings.png")));
-//     cm_preferences.setShortcut(QObject::tr("Ctrl+P"));
-//     cm_preferences.setShortcutContext(Qt::ApplicationShortcut);
-//     cm_preferences.setMenuRole(QAction::PreferencesRole);
-//     cm_preferences.setAutoRepeat(false);
-
-    cm_open_file.setIcon(Skin::icon(QLatin1String("folder.png")));
-    cm_open_file.setShortcut(QObject::tr("Ctrl+O"));
-    cm_open_file.setShortcutContext(Qt::ApplicationShortcut);
-    cm_open_file.setAutoRepeat(false);
-
     cm_remove_from_disk.setShortcut(QObject::tr("Shift+Del"));
     cm_remove_from_disk.setShortcutContext(Qt::ApplicationShortcut);
     cm_remove_from_disk.setAutoRepeat(false);
@@ -96,18 +59,14 @@ void initContextMenu()
     cm_editTags.setShortcutContext(Qt::ApplicationShortcut);
     cm_editTags.setAutoRepeat(false);
 
-    cm_hide_decorations.setShortcut(QObject::tr("F11"));
-    cm_hide_decorations.setShortcutContext(Qt::ApplicationShortcut);
-    cm_hide_decorations.setAutoRepeat(false);
-
-    QMenu *newItemMenu = new QMenu();
+    /*QMenu *newItemMenu = new QMenu();
     newItemMenu->setTitle(QObject::tr("New Item"));
     newItemMenu->addAction(new QAction(QObject::tr("Camera"), &cm_new_item));
     newItemMenu->addAction(new QAction(QObject::tr("Media Folder"), &cm_new_item));
     newItemMenu->addAction(new QAction(QObject::tr("Layout"), &cm_new_item));
     cm_new_item.setMenu(newItemMenu);
     cm_new_item.setIcon(Skin::icon(QLatin1String("plus.png")));
-    cm_new_item.setToolTip(QObject::tr("New Item"));
+    cm_new_item.setToolTip(QObject::tr("New Item"));*/
 
     cm_toggle_recording.setShortcuts(QList<QKeySequence>() << QObject::tr("Alt+R") << Qt::Key_MediaRecord);
     cm_toggle_recording.setShortcutContext(Qt::ApplicationShortcut);
@@ -122,23 +81,7 @@ void initContextMenu()
     cm_screen_recording.setMenu(screenRecordingMenu);
     cm_screen_recording.setToolTip(QObject::tr("Screen Recording"));
 
-/*
-    cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/fullscreen.png")));
-    QList<QKeySequence> shortcuts;
-#ifdef Q_OS_MAC
-    shortcuts << QObject::tr("Ctrl+F");
-#else
-    shortcuts << QObject::tr("Alt+Return") << QObject::tr("Esc");
-#endif
-    cm_toggle_fullscreen.setShortcuts(shortcuts);
-    cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
-    cm_toggle_fullscreen.setAutoRepeat(false);
-*/
 
-    cm_toggle_fps.setShortcut(QObject::tr("Ctrl+Alt+F"));
-    cm_toggle_fps.setShortcutContext(Qt::ApplicationShortcut);
-    cm_toggle_fps.setCheckable(true);
-    cm_toggle_fps.setAutoRepeat(false);
 
     QMenu *itemDistanceMenu = new QMenu();
     itemDistanceMenu->setTitle(QObject::tr("Item distance"));
@@ -177,6 +120,4 @@ void initContextMenu()
     cm_rotate.setToolTip(QObject::tr("Rotation"));
 
 
-    cm_showNavTree.setAutoRepeat(false);
-    cm_showNavTree.setToolTip(QObject::tr("Toggle navigation tree show/hide"));
 }

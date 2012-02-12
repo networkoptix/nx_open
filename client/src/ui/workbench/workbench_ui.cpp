@@ -166,11 +166,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_fpsItem->setPalette(palette);
     }
 
-    setFpsVisible(false);
-
-    m_display->view()->addAction(&cm_toggle_fps);
-    connect(&cm_toggle_fps,             SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
+    m_display->view()->addAction(qnAction(Qn::ShowFpsAction));
+    connect(qnAction(Qn::ShowFpsAction),SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
+    setFpsVisible(false);
 
 
     /* Tree widget. */
@@ -183,7 +182,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_treeWidget->setPalette(palette);
     }
     m_treeWidget->setWorkbench(display->workbench());
-    m_treeWidget->addAction(&cm_showNavTree);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
@@ -241,7 +239,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treePinButton));
 
-    connect(&cm_showNavTree,            SIGNAL(triggered()),                                                                        this,                           SLOT(toggleTreeOpened()));
     connect(m_treeWidget,               SIGNAL(activated(const QnResourcePtr &)),                                                   this,                           SLOT(at_treeWidget_activated(const QnResourcePtr &)));
     connect(m_treePinButton,            SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treePinButton_toggled(bool)));
     connect(m_treeShowButton,           SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treeShowButton_toggled(bool)));
@@ -326,7 +323,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(&cm_new_tab));
+    titleLayout->addItem(newActionButton(qnAction(Qn::NewTabAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
@@ -696,7 +693,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
 
     m_fpsItem->setText(QString());
 
-    cm_toggle_fps.setChecked(fpsVisible);
+    qnAction(Qn::ShowFpsAction)->setChecked(fpsVisible);
 }
 
 void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {

@@ -5,17 +5,10 @@
 
 void initContextMenu();
 
-extern QAction cm_new_item;
-extern QAction cm_open_file;
 extern QAction cm_screen_recording;
 extern QAction cm_toggle_recording;
 extern QAction cm_recording_settings;
-extern QAction cm_toggle_fps;
-extern QAction cm_fitinview;
 extern QAction cm_arrange;
-extern QAction cm_new_tab;
-
-extern QAction cm_hide_decorations;
 
 extern QAction cm_add_layout;
 extern QAction cm_restore_layout;
@@ -45,6 +38,5 @@ extern QAction cm_rotate;
 
 extern QAction cm_open_containing_folder;
 
-extern QAction cm_showNavTree;
 
 #endif //context_menu_helper_h_1250

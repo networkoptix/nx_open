@@ -63,6 +63,7 @@ protected slots:
     void updateDwmState();
 
     void openNewLayout();
+    void closeCurrentLayout();
 
     void at_sessionManager_error(int error);
 

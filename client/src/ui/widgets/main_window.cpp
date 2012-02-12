@@ -128,14 +128,17 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(qnAction(Qn::PreferencesAction), SIGNAL(triggered()), this, SLOT(showPreferencesDialog()));
     addAction(qnAction(Qn::PreferencesAction));
 
-    connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(showOpenFileDialog()));
-    addAction(&cm_open_file);
+    connect(qnAction(Qn::OpenFileAction), SIGNAL(triggered()), this, SLOT(showOpenFileDialog()));
+    addAction(qnAction(Qn::OpenFileAction));
 
     connect(qnAction(Qn::ConnectionSettingsAction), SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
     addAction(qnAction(Qn::ConnectionSettingsAction));
 
-    connect(&cm_new_tab, SIGNAL(triggered()), this, SLOT(openNewLayout()));
-    addAction(&cm_new_tab);
+    connect(qnAction(Qn::NewTabAction), SIGNAL(triggered()), this, SLOT(openNewLayout()));
+    addAction(qnAction(Qn::NewTabAction));
+
+    connect(qnAction(Qn::CloseTabAction), SIGNAL(triggered()), this, SLOT(closeCurrentLayout()));
+    addAction(qnAction(Qn::CloseTabAction));
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
@@ -201,7 +204,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(&cm_new_tab));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewTabAction)));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::PreferencesAction)));
@@ -482,6 +485,11 @@ void QnMainWindow::updateDwmState()
 void QnMainWindow::openNewLayout() {
     m_tabBar->addTab(QString());
     m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
+}
+
+void QnMainWindow::closeCurrentLayout() {
+    if(m_tabBar->tabsClosable())
+        m_tabBar->removeTab(m_tabBar->currentIndex());
 }
 
 
