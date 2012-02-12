@@ -48,6 +48,22 @@ QnWorkbenchLayout::~QnWorkbenchLayout() {
     clear();
 }
 
+QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
+    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(const_cast<QnWorkbenchLayout *>(this));
+    if(synchronizer == NULL)
+        return QnLayoutResourcePtr();
+
+    return synchronizer->resource();
+}
+
+QnWorkbenchLayout *QnWorkbenchLayout::layout(const QnLayoutResourcePtr &resource) {
+    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
+    if(synchronizer == NULL)
+        return NULL;
+
+    return synchronizer->layout();
+}
+
 const QString &QnWorkbenchLayout::name() const {
     return m_name;
 }

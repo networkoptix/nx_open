@@ -15,6 +15,7 @@
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <camera/resource_display.h>
 
@@ -952,10 +953,23 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(resource.isNull())
         return;
 
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-    item->setFlag(QnWorkbenchItem::Pinned, false);
-    display()->workbench()->currentLayout()->addItem(item);
-    item->adjustGeometry();
+    if(resource->checkFlags(QnResource::layout)) {
+        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+        if(layoutResource) {
+            QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
+            if(layout == NULL) {
+                layout = new QnWorkbenchLayout(layoutResource, workbench());
+                workbench()->addLayout(layout);
+            }
+
+            workbench()->setCurrentLayout(layout);
+        }
+    } else if(resource->checkFlags(QnResource::media)) {
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        item->setFlag(QnWorkbenchItem::Pinned, false);
+        display()->workbench()->currentLayout()->addItem(item);
+        item->adjustGeometry();
+    }
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {

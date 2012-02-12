@@ -187,8 +187,6 @@ public:
      */
     QnResourceWidget *widget(QnAbstractRenderer *renderer) const;
 
-    QnResourceWidget *widget(const QnResourcePtr &resource) const;
-
     QnResourceWidget *widget(QnWorkbench::ItemRole role) const;
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
@@ -365,9 +363,6 @@ private:
 
 
     /* Internal state. */
-
-    /** Resource to widget mapping. */
-    QHash<QnResourcePtr, QnResourceWidget *> m_widgetByResource;
 
     /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
