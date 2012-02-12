@@ -31,7 +31,7 @@ public:
     //virtual bool setSendMotion(bool value) = 0;
 };
 
-class QnAbstractArchiveReader : public QnClientPullMediaStreamProvider, public QnAbstractNavigator
+class QnAbstractArchiveReader : public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
 {
     Q_OBJECT
 public:
@@ -85,6 +85,7 @@ public:
     virtual void disableQualityChange() = 0;
     virtual void enableQualityChange() = 0;
 
+    virtual void run() override;
 Q_SIGNALS:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);
