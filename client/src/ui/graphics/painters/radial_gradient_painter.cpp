@@ -3,7 +3,7 @@
 #include <ui/graphics/shaders/color_shader_program.h>
 
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor):
-    m_program(new QnColorShaderProgram()) 
+    m_shader(new QnColorShaderProgram()) 
 {
     /* Create display list. */
     m_list = glGenLists(1);
@@ -29,10 +29,10 @@ QnRadialGradientPainter::~QnRadialGradientPainter() {
 }
 
 void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
-    m_program->bind();
-    m_program->setColorMultiplier(colorMultiplier);
+    m_shader->bind();
+    m_shader->setColorMultiplier(colorMultiplier);
     glCallList(m_list);
-    m_program->release();
+    m_shader->release();
 }
 
 void QnRadialGradientPainter::paint() {

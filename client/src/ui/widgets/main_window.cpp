@@ -203,6 +203,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::MainMenuAction)));
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewTabAction)));
     m_titleLayout->addStretch(0x1000);

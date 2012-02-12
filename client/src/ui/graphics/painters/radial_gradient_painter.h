@@ -17,7 +17,7 @@ public:
 
 private:
     unsigned m_list;
-    QScopedPointer<QnColorShaderProgram> m_program;
+    QScopedPointer<QnColorShaderProgram> m_shader;
 };
 
 

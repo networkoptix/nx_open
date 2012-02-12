@@ -322,6 +322,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
+    titleLayout->addItem(newActionButton(qnAction(Qn::MainMenuAction)));
     titleLayout->addItem(m_tabBarItem);
     titleLayout->addItem(newActionButton(qnAction(Qn::NewTabAction)));
     titleLayout->addStretch(0x1000);

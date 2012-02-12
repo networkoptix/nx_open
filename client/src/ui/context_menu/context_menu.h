@@ -20,6 +20,11 @@ namespace Qn {
      */
     enum ActionId {
         /**
+         * Opens the main menu.
+         */
+        MainMenuAction,
+
+        /**
          * Closes the client.
          */
         ExitAction,

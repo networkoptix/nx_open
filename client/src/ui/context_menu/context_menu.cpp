@@ -143,9 +143,13 @@ QnContextMenu::QnContextMenu(QObject *parent):
 {
     QnActionFactory factory(this);
 
+    factory(Qn::MainMenuAction).
+        text(tr("Main Menu")).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("logo_icon.png")));
+
     factory(Qn::ExitAction).
         text(tr("Exit")).
-        flags(Invisible).
         shortcut(tr("Alt+F4")).
         role(QAction::QuitRole).
         autoRepeat(false).
