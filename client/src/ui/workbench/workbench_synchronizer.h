@@ -7,6 +7,10 @@
 class QnWorkbench;
 class QnWorkbenchLayout;
 
+/**
+ * This class performs bidirectional synchronization of instances of 
+ * <tt>QnWorkbench</tt> and <tt>QnUserResource</tt>.
+ */
 class QnWorkbenchSynchronizer: public QObject {
     Q_OBJECT;
 
@@ -23,6 +27,18 @@ public:
         return m_user;
     }
 
+signals:
+    /**
+     * This signal is emitted whenever synchronization starts. For synchronization
+     * to start, both workbench and user must be set.
+     */
+    void started();
+
+    /**
+     * This signal is emitted whenever synchronization stops.
+     */
+    void stopped();
+
 public slots:
     void setWorkbench(QnWorkbench *workbench);
     void setUser(const QnUserResourcePtr &user);
@@ -30,8 +46,8 @@ public slots:
     void submit();
 
 protected:
-    void initialize();
-    void deinitialize();
+    void start();
+    void stop();
 
     QnLayoutResourcePtr resource(QnWorkbenchLayout *layout) const;
     QnWorkbenchLayout *layout(const QnLayoutResourcePtr &resource) const;

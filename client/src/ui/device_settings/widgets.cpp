@@ -136,7 +136,7 @@ SettingsEnumerationWidget::SettingsEnumerationWidget(const QnParam &param, QWidg
 
         QRadioButton *button = new QRadioButton(name, groupBox);
         button->setObjectName(name);
-        button->setFont(Globals::settingsFont());
+        button->setFont(qnGlobals->settingsFont());
         button->setChecked(name == param.value().toString());
 
         connect(button, SIGNAL(clicked()), this, SLOT(onClicked()));

@@ -1,4 +1,4 @@
-#include "appstyle.h"
+#include "app_style.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>
@@ -10,7 +10,7 @@ static const float global_dialog_opacity = 0.9f;
 static const float global_menu_opacity = 0.8f;
 
 AppStyle::AppStyle(const QString &baseStyle, QObject *parent)
-    : ProxyStyle(baseStyle, parent)
+    : QnProxyStyle(baseStyle, parent)
 {
 }
 
@@ -20,7 +20,7 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
 #ifndef QT_NO_SLIDER
     case CC_Slider:
         if (widget && widget->inherits("QAbstractSlider")) { // for old good widgets
-            ProxyStyle::drawComplexControl(control, option, painter, widget);
+            QnProxyStyle::drawComplexControl(control, option, painter, widget);
             break;
         }
 
@@ -28,7 +28,7 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
         if (const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
             if (sliderOption->orientation != Qt::Horizontal) {
                 qWarning("AppStyle: Non-horizontal sliders are not implemented. Falling back to the default painting.");
-                ProxyStyle::drawComplexControl(control, option, painter, widget);
+                QnProxyStyle::drawComplexControl(control, option, painter, widget);
                 break;
             }
 
@@ -69,7 +69,7 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
         // fall through
 
     default:
-        ProxyStyle::drawComplexControl(control, option, painter, widget);
+        QnProxyStyle::drawComplexControl(control, option, painter, widget);
     }
 }
 
@@ -78,12 +78,12 @@ int AppStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidge
     if (hint == QStyle::SH_ToolTipLabel_Opacity)
         return 255;
 
-    return ProxyStyle::styleHint(hint, option, widget, returnData);
+    return QnProxyStyle::styleHint(hint, option, widget, returnData);
 }
 
 void AppStyle::polish(QApplication *application)
 {
-    ProxyStyle::polish(application);
+    QnProxyStyle::polish(application);
 
     QFont menuFont;
     menuFont.setFamily(QLatin1String("Bodoni MT"));
@@ -95,27 +95,17 @@ void AppStyle::unpolish(QApplication *application)
 {
     application->setFont(QFont(), "QMenu");
 
-    ProxyStyle::unpolish(application);
+    QnProxyStyle::unpolish(application);
 }
 
 void AppStyle::polish(QWidget *widget)
 {
-    ProxyStyle::polish(widget);
-
-/*    if (widget->inherits("QDialog"))
-        widget->setWindowOpacity(global_dialog_opacity);
-    else if (widget->inherits("QMenu"))
-        widget->setWindowOpacity(global_menu_opacity);*/
+    QnProxyStyle::polish(widget);
 }
 
 void AppStyle::unpolish(QWidget *widget)
 {
-/*    if (widget->inherits("QDialog"))
-        widget->setWindowOpacity(1.0);
-    else if (widget->inherits("QMenu"))
-        widget->setWindowOpacity(1.0);*/
-
-    ProxyStyle::unpolish(widget);
+    QnProxyStyle::unpolish(widget);
 }
 
 
@@ -132,16 +122,16 @@ static inline bool buttonVisible(const QStyle::SubControl sc, const QStyleOption
     const uint flags = tb->titleBarFlags;
 
     switch (sc) {
-    case QStyle::SC_TitleBarSysMenu: return (flags & Qt::WindowSystemMenuHint);
-    case QStyle::SC_TitleBarMinButton: return (!isMinimized && (flags & Qt::WindowMinimizeButtonHint));
-    case QStyle::SC_TitleBarMaxButton: return (!isMaximized && (flags & Qt::WindowMaximizeButtonHint));
-    case QStyle::SC_TitleBarCloseButton: return (flags & Qt::WindowSystemMenuHint);
-    case QStyle::SC_TitleBarNormalButton: return (isMinimized && (flags & Qt::WindowMinimizeButtonHint)) ||
-                                                 (isMaximized && (flags & Qt::WindowMaximizeButtonHint));
-    case QStyle::SC_TitleBarShadeButton: return (!isFullScreen && (flags & Qt::WindowShadeButtonHint));
-    case QStyle::SC_TitleBarUnshadeButton: return (isFullScreen && (flags & Qt::WindowShadeButtonHint));
-    case QStyle::SC_TitleBarContextHelpButton: return (flags & Qt::WindowContextHelpButtonHint);
-    case QStyle::SC_TitleBarLabel: return true;
+    case QStyle::SC_TitleBarSysMenu:            return (flags & Qt::WindowSystemMenuHint);
+    case QStyle::SC_TitleBarMinButton:          return (!isMinimized && (flags & Qt::WindowMinimizeButtonHint));
+    case QStyle::SC_TitleBarMaxButton:          return (!isMaximized && (flags & Qt::WindowMaximizeButtonHint));
+    case QStyle::SC_TitleBarCloseButton:        return (flags & Qt::WindowSystemMenuHint);
+    case QStyle::SC_TitleBarNormalButton:       return (isMinimized && (flags & Qt::WindowMinimizeButtonHint)) ||
+                                                        (isMaximized && (flags & Qt::WindowMaximizeButtonHint));
+    case QStyle::SC_TitleBarShadeButton:        return (!isFullScreen && (flags & Qt::WindowShadeButtonHint));
+    case QStyle::SC_TitleBarUnshadeButton:      return (isFullScreen && (flags & Qt::WindowShadeButtonHint));
+    case QStyle::SC_TitleBarContextHelpButton:  return (flags & Qt::WindowContextHelpButtonHint);
+    case QStyle::SC_TitleBarLabel:              return true;
     default: break;
     }
 

@@ -80,8 +80,8 @@ void QnCameraMotionMaskWidget::init()
     /* Create motion mask selection instrument. */
 	MotionSelectionInstrument *motionSelectionInstrument = new MotionSelectionInstrument(this);
     motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
-	motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, Globals::motionMaskRubberBandColor());
-	motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, Globals::motionMaskRubberBandBorderColor());
+	motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
+	motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
     m_display->instrumentManager()->installInstrument(motionSelectionInstrument);
 
     ForwardingInstrument *itemMouseForwardingInstrument = m_controller->itemMouseForwardingInstrument();

@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_UI_H
 
 #include <QObject>
+#include <core/resource/resource_fwd.h>
 #include <ui/common/scene_utility.h>
 #include "workbench.h" /* For QnWorkbench::ItemRole. */
 
@@ -55,10 +56,6 @@ public:
     }
 
     void setFlags(Flags flags);
-
-    QnResourceTreeWidget *treeWidget() const {
-        return m_treeWidget;
-    }
 
     bool isTitleUsed() const {
         return m_titleUsed;
@@ -155,6 +152,7 @@ protected Q_SLOTS:
     void at_sliderItem_geometryChanged();
     void at_sliderShowButton_toggled(bool checked);
 
+    void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();

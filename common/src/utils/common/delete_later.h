@@ -11,8 +11,8 @@
 
 inline void qnDeleteLater(QObject *object) {
     QThread *thread = object->thread();
-    if(thread == NULL) { /* Application is being terminated. */
-        delete object;
+    if(thread == NULL) { 
+        return; /* Application is being terminated. It's OK not to delete it. */
     } else {
         object->deleteLater();
 

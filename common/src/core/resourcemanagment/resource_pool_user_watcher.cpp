@@ -75,6 +75,6 @@ void QnResourcePoolUserWatcher::at_userResource_nameChanged(const QnUserResource
 }
 
 void QnResourcePoolUserWatcher::at_userResource_nameChanged() {
-    at_userResource_nameChanged(checked_cast<QnUserResource *>(sender())->toSharedPointer().staticCast<QnUserResource>());
+    at_userResource_nameChanged(toSharedPointer(checked_cast<QnUserResource *>(sender())));
 }
 

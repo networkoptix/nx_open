@@ -38,6 +38,6 @@ private:
     int m_dataPort;
 };
 
-typedef QSharedPointer<QnDroidResource> QnDroidResourcePtr;
+typedef QnSharedResourcePointer<QnDroidResource> QnDroidResourcePtr;
 
 #endif //droid_resource_h_18_04

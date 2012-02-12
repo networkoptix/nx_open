@@ -35,6 +35,7 @@ public:
     static QnServerCameraFactory& instance();
 };
 
-typedef QSharedPointer<QnServerCamera> QnServerCameraPtr;
+typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
+typedef QList<QnServerCameraPtr> QnServerCameraList;
 
 #endif // QN_SERVER_CAMERA_H

@@ -50,7 +50,7 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {
     animator->setTimer(animationTimer);
     animator->setAccessor(new OpacityAccessor());
     animator->setTargetObject(item);
-    animator->setTimeLimit(Globals::opacityChangePeriod());
+    animator->setTimeLimit(qnGlobals->opacityChangePeriod());
     animator->setSpeed(speed);
 
     item->setProperty(opacityAnimatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));

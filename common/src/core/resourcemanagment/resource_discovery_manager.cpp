@@ -160,7 +160,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             foreach (const QnResourcePtr &res, lst)
             {
                 if (searcher->isLocal())
-                    res->addFlag(QnResource::local);
+                    res->addFlags(QnResource::local);
             }
 
             resources.append(lst);
@@ -202,7 +202,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     QMap<quint32, int> ipsList;
     foreach (const QnResourcePtr &res, qnResPool->getResourcesWithFlag(QnResource::network))
     {
-        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
 
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
@@ -222,7 +222,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         //if (qnResPool->hasSuchResouce(res->getUniqueId()))
         //    continue; // this ip is already taken into account
 
-        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
 
 
@@ -241,7 +241,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     // in pool could not be 2 resources with same ip
     foreach (const QnResourcePtr &res, resources)
     {
-        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
 
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
@@ -437,7 +437,7 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
 
     foreach (const QnResourcePtr &res, justfoundList)
     {
-        if (res->checkFlag(QnResource::server_live_cam)) // if this is camera from mediaserver
+        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
 
         QnNetworkResourcePtr nr = res.dynamicCast<QnNetworkResource>();

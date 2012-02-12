@@ -7,7 +7,7 @@
 CLDesktopDevice::CLDesktopDevice(int index)
     : QnResource()
 {
-    addFlag(local_live_cam);
+    addFlags(local_live_cam);
 
     const QString name = QLatin1String("Desktop") + QString::number(index + 1);
     setName(name);

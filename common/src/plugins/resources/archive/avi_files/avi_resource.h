@@ -3,8 +3,6 @@
 
 #include "../abstract_archive_resource.h"
 
-
-
 class QnArchiveStreamReader;
 
 class QnAviResource : public QnAbstractArchiveResource
@@ -24,6 +22,6 @@ public:
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
 };
 
-typedef QSharedPointer<QnAviResource> QnAviResourcePtr;
+typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
 
 #endif // QN_AVI_RESOURCE_H

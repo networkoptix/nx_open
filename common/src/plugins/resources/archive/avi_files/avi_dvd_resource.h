@@ -17,6 +17,6 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 };
 
-typedef QSharedPointer<QnAviDvdResource> CLAviDvdDevicePtr;
+typedef QnSharedResourcePointer<QnAviDvdResource> QnAviDvdResourcePtr;
 
 #endif // QN_AVI_DVD_RESOURCE_H

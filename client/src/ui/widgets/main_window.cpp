@@ -41,7 +41,7 @@
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
-#include "ui/style/proxystyle.h"
+#include "ui/style/proxy_style.h"
 
 #include <utils/common/warnings.h>
 
@@ -133,7 +133,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
     addAction(&cm_reconnect);
 
-    connect(&cm_new_tab, SIGNAL(triggered()), this, SLOT(at_newLayoutRequested()));
+    connect(&cm_new_tab, SIGNAL(triggered()), this, SLOT(openNewLayout()));
     addAction(&cm_new_tab);
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
@@ -178,12 +178,10 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
 
-    m_ui->treeWidget()->setWorkbenchController(m_controller); // TODO: smells bad.
-    connect(m_ui->treeWidget(), SIGNAL(newTabRequested()),                      this,           SLOT(at_newLayoutRequested()));
-    connect(m_ui->treeWidget(), SIGNAL(activated(uint)),                        this,           SLOT(at_treeWidget_activated(uint)));
     connect(m_ui,               SIGNAL(titleBarDoubleClicked()),                this,           SLOT(toggleFullScreen()));
     connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer, SLOT(setUser(const QnUserResourcePtr &)));
     connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,           SLOT(at_settings_lastUsedConnectionChanged()));
+    connect(m_synchronizer,     SIGNAL(started()),                              this,           SLOT(at_synchronizer_started()));
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
@@ -234,7 +232,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     at_settings_lastUsedConnectionChanged();
 
     /* Add single tab. */
-    at_newLayoutRequested();
+    openNewLayout();
 }
 
 QnMainWindow::~QnMainWindow()
@@ -480,6 +478,11 @@ void QnMainWindow::updateDwmState()
     }
 }
 
+void QnMainWindow::openNewLayout() {
+    m_tabBar->addTab(QString());
+    m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -503,20 +506,27 @@ void QnMainWindow::at_sessionManager_error(int error)
     }
 }
 
-void QnMainWindow::at_newLayoutRequested()
-{
-    m_tabBar->addTab(QString());
-    m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
-}
-
-void QnMainWindow::at_treeWidget_activated(uint resourceId)
-{
-    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId))); // TODO: bad, makes assumptions on QnId internals.
-    m_controller->drop(resource);
-}
-
 void QnMainWindow::at_settings_lastUsedConnectionChanged() {
     m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
+}
+
+void QnMainWindow::at_synchronizer_started() {
+    /* No layouts are open, so we need to open one. */
+    QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
+    if(resources.isEmpty()) {
+        /* There are no layouts in user's layouts list, just create a new one. */
+        openNewLayout();
+    } else {
+        /* Open the last layout from the user's layouts list. */
+        struct LayoutIdCmp {
+            bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
+                return l->getId() < r->getId();
+            }
+        };
+
+        qSort(resources.begin(), resources.end(), LayoutIdCmp());
+        m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+    }
 }
 
 bool QnMainWindow::event(QEvent *event) {
@@ -543,7 +553,7 @@ void QnMainWindow::paintEvent(QPaintEvent *event)
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(Globals::frameColor(), 3));
+        painter.setPen(QPen(qnGlobals->frameColor(), 3));
         painter.drawRect(QRect(
             0,
             0,
