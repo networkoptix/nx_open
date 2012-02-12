@@ -2,6 +2,7 @@
 #include <cassert>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/delete_later.h>
+#include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <ui/workbench/workbench_layout.h>
@@ -11,8 +12,15 @@
 
 Q_DECLARE_METATYPE(QWeakPointer<QnResourceSearchSynchronizer>);
 
-class QnResourceSearchSynchronizerCriterion {
+class QnResourceSearchSynchronizerCriterion: public QObject, public QnResourceCriterion {
 public:
+    QnResourceSearchSynchronizerCriterion(QnResourceSearchSynchronizer *synchronizer):
+        QObject(NULL),
+        QnResourceCriterion(&QnResourceSearchSynchronizerCriterion::check, QVariant())
+    {
+        setTargetValue(QVariant::fromValue<QWeakPointer<QnResourceSearchSynchronizer> >(QWeakPointer<QnResourceSearchSynchronizer>(synchronizer)));
+    }
+
     static QnResourceCriterion::Operation check(const QnResourcePtr &resource, const QVariant &targetValue) {
         QWeakPointer<QnResourceSearchSynchronizer> synchronizerPointer = targetValue.value<QWeakPointer<QnResourceSearchSynchronizer> >();
         if(synchronizerPointer.isNull())
@@ -41,11 +49,8 @@ QnResourceSearchSynchronizer::QnResourceSearchSynchronizer(QObject *parent):
     m_updatesEnabled(true),
     m_hasPendingUpdates(false),
     m_criterionFunctional(true),
-    m_updateListener(NULL),
-    m_criterion(new QnResourceCriterion(&QnResourceSearchSynchronizerCriterion::check, QVariant()))
-{
-    m_criterion->setTargetValue(QVariant::fromValue<QWeakPointer<QnResourceSearchSynchronizer> >(QWeakPointer<QnResourceSearchSynchronizer>(this)));
-}
+    m_updateListener(NULL)
+{}
 
 QnResourceSearchSynchronizer::~QnResourceSearchSynchronizer() {
     setModel(NULL);
@@ -81,7 +86,7 @@ void QnResourceSearchSynchronizer::setLayout(QnWorkbenchLayout *layout) {
 void QnResourceSearchSynchronizer::start() {
     assert(m_model != NULL && m_layout != NULL);
 
-    m_model->addCriterion(m_criterion.data());
+    m_criterion = new QnResourceSearchSynchronizerCriterion(this);
 
     connect(m_layout,   SIGNAL(aboutToBeDestroyed()),                                   this, SLOT(at_layout_aboutToBeDestroyed()));
     connect(m_layout,   SIGNAL(itemAdded(QnWorkbenchItem *)),                           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
@@ -114,6 +119,12 @@ void QnResourceSearchSynchronizer::stop() {
 
     disconnect(m_layout, NULL, this, NULL);
     disconnect(m_model, NULL, this, NULL);
+
+    /* Model may be already destroyed, together with our criterion... */
+    if(m_criterion.data() != NULL) {
+        m_model->removeCriterion(m_criterion.data());
+        delete m_criterion.data();
+    }
 
     m_submit = m_update = false;
 }
@@ -244,8 +255,10 @@ void QnResourceSearchSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) 
     if(!resource.isNull()) {
         m_resourceByLayoutItem.remove(item);
         m_layoutItemByResource.remove(resource);
-    } else if(item->layout()->items(item->resourceUid()).size() == 0) {
-        m_model->invalidateFilterLater();
+    } else {
+        QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
+        if(layout->items(item->resourceUid()).size() == 0)
+            m_model->invalidateFilterLater();
     }
 }
 

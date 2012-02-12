@@ -33,7 +33,7 @@ namespace {
                 pattern += QLatin1Char('|');
             pattern += QRegExp::escape(part);
         }
-        pattern = QLatin1Char('.*(') + pattern + QLatin1Char(').*');
+        pattern = QLatin1String(".*(") + pattern + QLatin1String(").*");
         return QRegExp(pattern, Qt::CaseInsensitive, QRegExp::RegExp2);
     }
 
@@ -260,21 +260,21 @@ QnResourceCriterionGroup::QnResourceCriterionGroup(Operation matchOperation, Ope
 }
 
 void QnResourceCriterionGroup::addCriterion(QnResourceCriterion *criterion) {
-    assert(targetValue().type() == qn_criterionListMetaTypeId);
+    assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     d->push_front(criterion);
 }
 
 bool QnResourceCriterionGroup::removeCriterion(QnResourceCriterion *criterion) {
-    assert(targetValue().type() == qn_criterionListMetaTypeId);
+    assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     return d->removeOne(criterion);
 }
 
 bool QnResourceCriterionGroup::replaceCriterion(QnResourceCriterion *from, QnResourceCriterion *to) {
-    assert(targetValue().type() == qn_criterionListMetaTypeId);
+    assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     int index = d->indexOf(from);
@@ -290,13 +290,13 @@ void QnResourceCriterionGroup::clear() {
 }
 
 QnResourceCriterionList QnResourceCriterionGroup::criteria() const {
-    assert(targetValue().type() == qn_criterionListMetaTypeId);
+    assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
     return targetValue().value<QnResourceCriterionList>();
 }
 
 void QnResourceCriterionGroup::setCriteria(const QnResourceCriterionList &criteria) {
-    assert(targetValue().type() == qn_criterionListMetaTypeId);
+    assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
     setTargetValue(QVariant::fromValue<QnResourceCriterionList>(criteria));
 }

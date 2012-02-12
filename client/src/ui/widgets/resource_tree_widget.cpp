@@ -150,6 +150,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_tabWidget->addTab(m_resourceTreeView, tr("Resources"));
     m_tabWidget->addTab(searchTab, tr("Search"));
 
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged(int)));
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(m_tabWidget);
@@ -398,6 +400,9 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
         synchronizer->enableUpdates();
 
     at_tabWidget_currentChanged(m_tabWidget->currentIndex());
+
+    QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
+    m_filterLineEdit->setText(layoutSearchString(layout));
 }
 
 void QnResourceTreeWidget::at_workbench_aboutToBeDestroyed() {
@@ -415,9 +420,6 @@ void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
 
     m_searchTreeView->setModel(model);
     m_searchTreeView->expandAll();
-
-    QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
-    m_filterLineEdit->setText(layoutSearchString(layout));
 }
 
 void QnResourceTreeWidget::at_filterLineEdit_textChanged(const QString &filter) {
@@ -443,11 +445,7 @@ void QnResourceTreeWidget::at_filterLineEdit_textChanged(const QString &filter) 
 }
 
 void QnResourceTreeWidget::at_treeView_activated(const QModelIndex &index) {
-    QnResourcePtr resource;
-    if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model()))
-        resource = model->resource(index);
-    /*else if (const QnResourceSearchProxyModel *model = qobject_cast<const QnResourceSearchProxyModel *>(index.model()))
-        resource = model->resourceFromIndex(index);*/
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
-        Q_EMIT activated(resource->getId());
+        emit activated(resource);
 }

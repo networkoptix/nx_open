@@ -104,7 +104,7 @@ private:
     QObject *m_updateListener;
 
     /** Resource criterion that is used to accept additional resources. */
-    QScopedPointer<QnResourceCriterion> m_criterion;
+    QWeakPointer<QnResourceSearchSynchronizerCriterion> m_criterion;
 };
 
 #endif // QN_RESOURCE_SEARCH_SYNCHRONIZER_H

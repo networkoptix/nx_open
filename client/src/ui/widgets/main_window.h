@@ -62,10 +62,9 @@ protected slots:
     void updateFullScreenState();
     void updateDwmState();
 
-    void at_sessionManager_error(int error);
+    void openNewLayout();
 
-    void at_newLayoutRequested();
-    void at_treeWidget_activated(uint resourceId);
+    void at_sessionManager_error(int error);
 
     void at_settings_lastUsedConnectionChanged();
 

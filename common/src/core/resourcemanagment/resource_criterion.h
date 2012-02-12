@@ -50,7 +50,7 @@ public:
 
     QnResourceCriterion();
 
-    ~QnResourceCriterion();
+    virtual ~QnResourceCriterion();
 
     Operation matchOperation() const {
         return m_matchOperation;
@@ -102,10 +102,10 @@ private:
 
     union {
         struct {
-            Operation m_matchOperation : 2;
-            Operation m_mismatchOperation : 2;
-            Type m_type : 4;
-            Target m_target : 8;
+            Operation m_matchOperation : 4;
+            Operation m_mismatchOperation : 4;
+            Type m_type : 8;
+            Target m_target : 16;
         };
 
         int m_padding;

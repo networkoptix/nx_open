@@ -1,9 +1,8 @@
 #ifndef QN_RESOURCE_TREE_WIDGET_H
 #define QN_RESOURCE_TREE_WIDGET_H
 
-#include <QtCore/QPointer>
-
-#include <QtGui/QWidget>
+#include <QWidget>
+#include <core/resource/resource_fwd.h>
 
 class QLineEdit;
 class QTabWidget;
@@ -20,8 +19,7 @@ class QnResourceModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 
-class QnResourceTreeWidget : public QWidget
-{
+class QnResourceTreeWidget: public QWidget {
     Q_OBJECT
 
 public:
@@ -31,7 +29,7 @@ public:
     void setWorkbench(QnWorkbench *workbench);
 
 signals:
-    void activated(uint resourceId);
+    void activated(const QnResourcePtr &resource);
     void newTabRequested();
 
 protected:
