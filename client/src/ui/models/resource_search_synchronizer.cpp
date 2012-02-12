@@ -180,6 +180,9 @@ void QnResourceSearchSynchronizer::update() {
 
         delete item;
     }
+
+    /* Store current search result for further use. */
+    m_searchResult = searchResult;
 }
 
 void QnResourceSearchSynchronizer::updateLater() {
@@ -275,7 +278,7 @@ void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &pare
     for (int row = start; row <= end; ++row) {
         const QModelIndex index = parent.child(row, 0);
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(!resource.isNull())
+        if(resource.isNull())
             continue;
 
         addModelResource(resource);
@@ -291,7 +294,7 @@ void QnResourceSearchSynchronizer::at_model_rowsAboutToBeRemoved(const QModelInd
     for (int row = start; row <= end; ++row) {
         const QModelIndex index = parent.child(row, 0);
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(!resource.isNull())
+        if(resource.isNull())
             continue;
 
         removeModelResource(resource);

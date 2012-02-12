@@ -215,6 +215,9 @@ QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout 
         QnResourceCriterion *criterion = new QnResourceCriterion();
         result->addCriterion(criterion);
         setLayoutCriterion(layout, criterion);
+
+        /* Add default criteria. */
+        result->addCriterion(new QnResourceCriterion(QnResource::server)); /* Always accept servers. */
     }
     return result;
 }

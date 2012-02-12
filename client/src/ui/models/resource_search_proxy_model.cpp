@@ -60,10 +60,7 @@ void QnResourceSearchProxyModel::invalidateFilterLater() {
 }
 
 bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const {
-    if (!source_parent.isValid())
-        return true; /* Include root node. */
-
-    QModelIndex index = source_parent.child(source_row, 0);
+    QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
     if(!index.isValid())
         return true;
 
