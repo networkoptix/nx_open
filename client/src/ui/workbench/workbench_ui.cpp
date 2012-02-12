@@ -34,12 +34,13 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
 #include <ui/graphics/items/clickable_widget.h>
-
 #include <ui/graphics/items/standard/graphicslabel.h>
+#include <ui/graphics/items/controls/navigationitem.h>
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/graphics/items/controls/navigationitem.h>
+
+#include <ui/context_menu/context_menu.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/context_menu_helper.h>
@@ -327,10 +328,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->addItem(m_tabBarItem);
     titleLayout->addItem(newActionButton(&cm_new_tab));
     titleLayout->addStretch(0x1000);
-    titleLayout->addItem(newActionButton(&cm_reconnect));
-    titleLayout->addItem(newActionButton(&cm_preferences));
-    titleLayout->addItem(newActionButton(&cm_toggle_fullscreen));
-    titleLayout->addItem(newActionButton(&cm_exit));
+    titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::FullscreenAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::ExitAction)));
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
@@ -365,7 +366,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
-    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    this,                           SIGNAL(titleBarDoubleClicked()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    qnAction(Qn::FullscreenAction), SLOT(toggle()));
 
 
     /* Connect to display. */

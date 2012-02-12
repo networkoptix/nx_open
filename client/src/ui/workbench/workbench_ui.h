@@ -87,9 +87,6 @@ public:
         return m_titleVisible;
     }
 
-signals:
-    void titleBarDoubleClicked();
-
 public slots:
     void setTitleUsed(bool titleUsed);
     void setFpsVisible(bool fpsVisible);

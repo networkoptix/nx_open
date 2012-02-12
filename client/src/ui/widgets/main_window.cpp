@@ -19,6 +19,7 @@
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 
 #include "ui/context_menu_helper.h"
+#include "ui/context_menu/context_menu.h"
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
@@ -115,23 +116,23 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     }
 
     /* Set up actions. */
-    connect(&cm_exit, SIGNAL(triggered()), this, SLOT(close()));
-    addAction(&cm_exit);
+    connect(qnAction(Qn::ExitAction), SIGNAL(triggered()), this, SLOT(close()));
+    addAction(qnAction(Qn::ExitAction));
 
-    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
-    addAction(&cm_toggle_fullscreen);
+    connect(qnAction(Qn::FullscreenAction), SIGNAL(toggled(bool)), this, SLOT(setFullScreen(bool)));
+    addAction(qnAction(Qn::FullscreenAction));
 
-    connect(&cm_about, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
-    addAction(&cm_about);
+    connect(qnAction(Qn::AboutAction), SIGNAL(triggered()), this, SLOT(showAboutDialog()));
+    addAction(qnAction(Qn::AboutAction));
 
-    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(showPreferencesDialog()));
-    addAction(&cm_preferences);
+    connect(qnAction(Qn::PreferencesAction), SIGNAL(triggered()), this, SLOT(showPreferencesDialog()));
+    addAction(qnAction(Qn::PreferencesAction));
 
     connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(showOpenFileDialog()));
     addAction(&cm_open_file);
 
-    connect(&cm_reconnect, SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
-    addAction(&cm_reconnect);
+    connect(qnAction(Qn::ConnectionSettingsAction), SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
+    addAction(qnAction(Qn::ConnectionSettingsAction));
 
     connect(&cm_new_tab, SIGNAL(triggered()), this, SLOT(openNewLayout()));
     addAction(&cm_new_tab);
@@ -178,10 +179,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
 
-    connect(m_ui,               SIGNAL(titleBarDoubleClicked()),                this,           SLOT(toggleFullScreen()));
-    connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer, SLOT(setUser(const QnUserResourcePtr &)));
-    connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,           SLOT(at_settings_lastUsedConnectionChanged()));
-    connect(m_synchronizer,     SIGNAL(started()),                              this,           SLOT(at_synchronizer_started()));
+    connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
+    connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
+    connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
@@ -203,10 +203,10 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(&cm_new_tab));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(&cm_reconnect));
-    m_titleLayout->addWidget(newActionButton(&cm_preferences));
-    m_titleLayout->addWidget(newActionButton(&cm_toggle_fullscreen));
-    m_titleLayout->addWidget(newActionButton(&cm_exit));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::PreferencesAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::FullscreenAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::ExitAction)));
 
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();
@@ -227,7 +227,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
         m_controller->drop(QFile::decodeName(argv[i]));
 
     /* Update state. */
-    showFullScreen();
     updateDwmState();
     at_settings_lastUsedConnectionChanged();
 
@@ -358,6 +357,8 @@ void QnMainWindow::showAuthenticationDialog()
 void QnMainWindow::updateFullScreenState() 
 {
     bool fullScreen = isFullScreen();
+
+    qnAction(Qn::FullscreenAction)->setChecked(fullScreen);
 
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);

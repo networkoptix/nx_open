@@ -311,11 +311,11 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
         menu->addAction(&cm_new_item);
     }
     menu->addSeparator();
-    menu->addAction(&cm_toggle_fullscreen);
+    //menu->addAction(&cm_toggle_fullscreen);
     menu->addAction(&cm_screen_recording);
-    menu->addAction(&cm_preferences);
-    menu->addSeparator();
-    menu->addAction(&cm_exit);
+    //menu->addAction(&cm_preferences);
+    /*menu->addSeparator();
+    menu->addAction(&cm_exit);*/
 
     QAction *action = menu->exec(QCursor::pos());
     if (!action)

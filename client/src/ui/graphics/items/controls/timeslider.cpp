@@ -21,8 +21,6 @@
 #include "ui/graphics/items/standard/graphicsslider.h"
 #include "ui/graphics/items/tooltipitem.h"
 
-#include "ui/context_menu/menu_wrapper.h"
-
 #include <qmath.h>
 
 //#define TIMESLIDER_ANIMATED_DRAG
