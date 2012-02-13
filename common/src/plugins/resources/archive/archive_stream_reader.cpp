@@ -446,6 +446,7 @@ begin_label:
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
                     intChanneljumpTo(QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP, 0);
+                    m_afterBOFCounter = 0;
                     goto begin_label;
                 }
 
