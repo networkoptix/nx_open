@@ -3,12 +3,15 @@
 #include <QAction>
 #include <QMenu>
 #include <QGraphicsItem>
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <core/resource/resource.h>
 #include <ui/style/skin.h>
 #include <ui/style/app_style.h>
-#include "utils/common/checked_cast.h"
 #include "action_conditions.h"
+
+Q_DECLARE_METATYPE(QList<QGraphicsItem *>);
 
 namespace {
     const char *actionIdPropertyName = "_qn_actionId";
@@ -270,6 +273,7 @@ QnContextMenu::QnContextMenu(QObject *parent):
 
 
     /* Resource actions. */
+
     factory(Qn::ShowMotionAction).
         flags(Scene | SingleTarget | MultiTarget).
         text(tr("Show Motion Grid")).
@@ -281,11 +285,14 @@ QnContextMenu::QnContextMenu(QObject *parent):
         condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasShownGrid));
 
     factory(Qn::CameraSettingsAction).
-        flags(Scene | SingleTarget).
+        flags(Scene | Tree | SingleTarget).
         text(tr("Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
-
+    factory(Qn::ServerSettingsDialog).
+        flags(Scene | Tree | SingleTarget).
+        text(tr("Server Settings")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::remote_server)));
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);
@@ -360,24 +367,43 @@ void QnContextMenu::at_action_toggled() {
         action->setText(action->isChecked() ? data->toggledText : data->normalText);
 }
 
+void QnContextMenu::at_menu_destroyed(QObject *menu) {
+    m_menus.remove(menu);
+}
+
 QAction *QnContextMenu::action(Qn::ActionId id) const {
     return m_dataById[id]->action;
 }
 
-QMenu *QnContextMenu::newMenu(Qn::ActionScope scope) const {
+QMenu *QnContextMenu::newMenu(Qn::ActionScope scope) {
     return newMenuInternal(m_root, scope, QnResourceList());
 }
 
-QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QnResourceList &resources) const {
+QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QnResourceList &resources) {
     return newMenuInternal(m_root, scope, resources);
 }
 
-QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) const {
+QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) {
     return newMenuInternal(m_root, scope, items);
 }
 
 template<class ItemSequence>
-QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) const {
+QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
+    if(!m_menus.isEmpty())
+        qnWarning("New menu was requested even though the previous one wasn't destroyed. Getting action cause will fail.");
+
+    m_lastQuery = QVariant::fromValue<ItemSequence>(items);
+
+    QMenu *result = newMenuRecursive(parent, scope, items);
+    
+    m_menus.insert(result);
+    connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
+    
+    return result;
+}
+
+template<class ItemSequence>
+QMenu *QnContextMenu::newMenuRecursive(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
     QMenu *result = new QMenu();
 
     foreach(const ActionData *data, parent->children) {
@@ -399,10 +425,11 @@ QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope 
             continue;
 
         if(data->children.size() > 0) {
-            QMenu *menu = newMenuInternal(data, scope, items);
+            QMenu *menu = newMenuRecursive(data, scope, items);
             if(menu->isEmpty()) {
                 delete menu;
             } else {
+                connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
                 action = new QAction(result);
                 action->setMenu(menu);
                 action->setText(data->action->text());
@@ -418,3 +445,29 @@ QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope 
 
     return result;
 }
+
+QnResourceList QnContextMenu::cause(QObject *sender) {
+    QAction *action = qobject_cast<QAction *>(sender);
+    if(action == NULL) {
+        qnWarning("Cause cannot be determined for non-QAction senders.");
+        return QnResourceList();
+    }
+    
+    if(actionId(action) == Qn::NoAction) {
+        qnWarning("Cause can be determined only for QActions that were created inside this instance.");
+        return QnResourceList();
+    }
+
+    if(m_menus.size() != 1) {
+        qnWarning("For cause to be determined, there must exist exactly one menu created by this instance.");
+        return QnResourceList();
+    }
+
+    if(m_lastQuery.userType() == qMetaTypeId<QnResourceList>()) {
+        return m_lastQuery.value<QnResourceList>();
+    } else {
+        return QnActionCondition::resources(m_lastQuery.value<QList<QGraphicsItem *> >());
+    }
+}
+
+

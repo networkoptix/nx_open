@@ -24,8 +24,9 @@ public:
         return false;
     };
 
-protected:
-    QnResourcePtr resource(QGraphicsItem *item) const;
+    static QnResourcePtr resource(QGraphicsItem *item);
+
+    static QnResourceList resources(const QList<QGraphicsItem *> &items);
 };
 
 

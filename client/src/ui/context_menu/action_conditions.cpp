@@ -2,7 +2,7 @@
 #include <core/resourcemanagment/resource_criterion.h>
 #include <ui/graphics/items/resource_widget.h>
 
-QnResourcePtr QnActionCondition::resource(QGraphicsItem *item) const {
+QnResourcePtr QnActionCondition::resource(QGraphicsItem *item) {
     if(item == NULL)
         return QnResourcePtr();
 
@@ -11,6 +11,20 @@ QnResourcePtr QnActionCondition::resource(QGraphicsItem *item) const {
         return QnResourcePtr();
 
     return widget->resource();
+}
+
+QnResourceList QnActionCondition::resources(const QList<QGraphicsItem *> &items) {
+    QnResourceList result;
+
+    foreach(QGraphicsItem *item, items) {
+        QnResourcePtr resource = QnActionCondition::resource(item);
+        if(!resource)
+            continue;
+
+        result.push_back(resource);
+    }
+
+    return result;
 }
 
 

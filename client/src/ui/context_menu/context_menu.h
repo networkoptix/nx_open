@@ -115,7 +115,10 @@ namespace Qn {
          */
         CameraSettingsAction,
 
-
+        /**
+         * Opens server settings dialog.
+         */
+        ServerSettingsDialog,
 
 
 #if 0
@@ -374,11 +377,13 @@ public:
 
     QAction *action(Qn::ActionId id) const;
 
-    QMenu *newMenu(Qn::ActionScope scope) const;
+    QMenu *newMenu(Qn::ActionScope scope);
 
-    QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources) const;
+    QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources);
 
-    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) const;
+    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
+
+    QnResourceList cause(QObject *sender);
 
 protected:
     friend class QnActionFactory;
@@ -397,14 +402,27 @@ protected:
     };
 
     template<class ItemSequence>
-    QMenu *newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) const;
+    QMenu *newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
+
+    template<class ItemSequence>
+    QMenu *newMenuRecursive(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
 
 private slots:
     void at_action_toggled();
+    void at_menu_destroyed(QObject *menu);
 
 private:
+    /** Mapping from action id to action data. */ 
     QHash<Qn::ActionId, ActionData *> m_dataById;
+
+    /** Root action data. Also contained in the map above. */
     ActionData *m_root;
+
+    /** Set of all menus created by this object that are not yet destroyed. */
+    QSet<QObject *> m_menus;
+
+    /** List of items supplied to the last call to <tt>newMenu</tt>. */
+    QVariant m_lastQuery;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnContextMenu::ActionFlags);
