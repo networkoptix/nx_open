@@ -773,8 +773,10 @@ void QnWorkbenchUi::at_mainMenuAction_triggered() {
         return;
 
     QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
-    pos.rx() = qMax(pos.x(), 0);
-    pos.ry() = qMax(pos.y(), 0);
+    /* On multi-monitor setups where monitor sizes differ,
+     * these coordinates can be negative, so we shouldn't adjust them. */
+    //pos.rx() = qMax(pos.x(), 0);
+    //pos.ry() = qMax(pos.y(), 0);
 
     QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
     menu->move(pos);
