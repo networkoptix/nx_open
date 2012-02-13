@@ -62,6 +62,12 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 namespace {
 
+    struct LayoutIdCmp {
+        bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
+            return l->getId() < r->getId();
+        }
+    };
+
     QToolButton *newActionButton(QAction *action)
     {
         QToolButton *button = new QToolButton();
@@ -607,12 +613,6 @@ void QnMainWindow::at_sessionManager_error(int error)
 void QnMainWindow::at_settings_lastUsedConnectionChanged() {
     m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
 }
-
-struct LayoutIdCmp {
-    bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
-        return l->getId() < r->getId();
-    }
-};
 
 void QnMainWindow::at_synchronizer_started() {
     /* No layouts are open, so we need to open one. */

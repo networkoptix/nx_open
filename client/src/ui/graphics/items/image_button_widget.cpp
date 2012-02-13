@@ -14,6 +14,7 @@
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/scene_utility.h>
 
 namespace {
@@ -89,6 +90,10 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
 
     QEvent styleChange(QEvent::StyleChange);
     event(&styleChange);
+}
+
+QnImageButtonWidget::~QnImageButtonWidget() {
+    return;
 }
 
 const QPixmap &QnImageButtonWidget::pixmap(StateFlags flags) const {

@@ -4,13 +4,13 @@
 #include <QGraphicsWidget>
 #include <QPixmap>
 #include <ui/processors/clickable.h>
-#include <ui/graphics/opengl/gl_functions.h>
 
 class QAction;
 class QIcon;
 
 class VariantAnimator;
 class QnTextureTransitionShaderProgram;
+class QnGlFunctions;
 
 /**
  * A lightweight button widget that does not use style for painting. 
@@ -37,6 +37,8 @@ public:
     Q_DECLARE_FLAGS(StateFlags, StateFlag);
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL);
+
+    virtual ~QnImageButtonWidget();
 
     const QPixmap &pixmap(StateFlags flags) const;
 
