@@ -4,13 +4,13 @@
 #include <QGraphicsWidget>
 #include <QPixmap>
 #include <ui/processors/clickable.h>
-#include <ui/graphics/opengl/gl_functions.h>
 
 class QAction;
 class QIcon;
 
 class VariantAnimator;
 class QnTextureTransitionShaderProgram;
+class QnGlFunctions;
 
 /**
  * A lightweight button widget that does not use style for painting. 
@@ -37,6 +37,8 @@ public:
     Q_DECLARE_FLAGS(StateFlags, StateFlag);
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL);
+
+    virtual ~QnImageButtonWidget();
 
     const QPixmap &pixmap(StateFlags flags) const;
 
@@ -103,6 +105,8 @@ protected:
     void invalidatePixmapCache();
     StateFlags displayState(StateFlags flags) const;
 
+    bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
+
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
@@ -113,6 +117,8 @@ private:
     StateFlags m_state;
     bool m_checkable;
     bool m_cached;
+    int m_skipNextHoverEvents;
+    QPoint m_nextHoverEventPos;
 
     VariantAnimator *m_animator;
     qreal m_hoverProgress;

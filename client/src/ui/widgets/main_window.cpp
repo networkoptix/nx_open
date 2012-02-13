@@ -45,6 +45,7 @@
 #include "ui/style/proxy_style.h"
 
 #include <utils/common/warnings.h>
+#include <utils/common/event_signalizer.h>
 
 #include "file_processor.h"
 #include "settings.h"
@@ -61,18 +62,27 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 namespace {
 
+    struct LayoutIdCmp {
+        bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
+            return l->getId() < r->getId();
+        }
+    };
+
     QToolButton *newActionButton(QAction *action)
     {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
-        int iconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
-        button->setIconSize(QSize(iconSize, iconSize));
+        qreal aspectRatio = SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
+        int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
+        int iconWidth = iconHeight * aspectRatio;
+        button->setIconSize(QSize(iconWidth, iconHeight));
 
-        /* Tool buttons may end up being non-square o_O. We don't allow that. */
+        /* Tool buttons may end up having wrong aspect ratio. We don't allow that. */
         QSize sizeHint = button->sizeHint();
-        int buttonSize = qMin(sizeHint.width(), sizeHint.height());
-        button->setFixedSize(buttonSize, buttonSize);
+        int buttonHeight = sizeHint.height();
+        int buttonWidth = buttonHeight * aspectRatio;
+        button->setFixedSize(buttonWidth, buttonHeight);
 
         return button;
     }
@@ -103,6 +113,12 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 {
     /* We want to receive system menu event on Windows. */
     QnSystemMenuEvent::initialize();
+
+    /* And file open events on Mac. */
+    QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
+    fileOpenSignalizer->setEventType(QEvent::FileOpen);
+    qApp->installEventFilter(fileOpenSignalizer);
+    connect(fileOpenSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_fileOpenSignalizer_activated(QObject *, QEvent *)));
 
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
@@ -208,6 +224,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
+    m_mainMenuButton->setIcon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
@@ -520,6 +537,16 @@ if (action == &cm_remove_from_disk) {
     QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
 */
 
+void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
+{
+    if(event->type() != QEvent::FileOpen) {
+        qnWarning("Expected event of type %1, received an event of type %2.", static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
+        return;
+    }
+
+    handleMessage(static_cast<QFileOpenEvent*>(event)->file());
+}
+
 void QnMainWindow::at_editTagsAction_triggred() 
 {
     QnResourceList resources = qnMenu->cause(sender());
@@ -586,12 +613,6 @@ void QnMainWindow::at_sessionManager_error(int error)
 void QnMainWindow::at_settings_lastUsedConnectionChanged() {
     m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
 }
-
-struct LayoutIdCmp {
-    bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
-        return l->getId() < r->getId();
-    }
-};
 
 void QnMainWindow::at_synchronizer_started() {
     /* No layouts are open, so we need to open one. */

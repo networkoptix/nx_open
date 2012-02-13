@@ -13,6 +13,21 @@ hasFixedQuality(false)
 
 }
 
+void QnDlink_cam_info::clear()
+{
+    numberOfVideoProfiles = 0;
+    hasMPEG4 = false;
+    hasH264 = "";
+    hasFixedQuality = false;
+
+    videoProfileUrls.clear();
+    resolutions.clear();
+    possibleBitrates.clear();
+    possibleFps.clear();
+
+    possibleQualities = "";
+}
+
 bool QnDlink_cam_info::inited() const
 {
     return numberOfVideoProfiles > 0;
@@ -159,6 +174,9 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 
 void QnPlDlinkResource::init()
 {
+    downloadFile("config/motion.cgi?enable=yes",  getHostAddress(), 80, 1000, getAuth()); // to enable md 
+
+    
     QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
     if (cam_info_file.size()==0)
         return;
@@ -167,6 +185,8 @@ void QnPlDlinkResource::init()
 
     QString file_s(cam_info_file);
     QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
+
+    m_camInfo.clear();
 
     foreach(QString line, lines)
     {
@@ -257,5 +277,26 @@ void QnPlDlinkResource::init()
 
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
+
+
+    //=======remove elements with diff aspect ratio
+    int w = m_camInfo.resolutions.at(0).width();
+    int h = m_camInfo.resolutions.at(0).height();
+    float apectRatio = ((float)w/h);
+
+    QList<QSize>::iterator it = m_camInfo.resolutions.begin();
+
+    while (it != m_camInfo.resolutions.end()) 
+    {
+        QSize s = *it;
+
+        float apectRatioL = (float)s.width() / s.height();
+
+        if ( qAbs(apectRatioL - apectRatio) > 1e-4 )
+            it = m_camInfo.resolutions.erase(it);
+        else
+            ++it;
+    }
+
 
 }

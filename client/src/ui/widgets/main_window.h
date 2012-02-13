@@ -67,6 +67,8 @@ protected slots:
     void openNewLayout();
     void closeCurrentLayout();
 
+    void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
+
     void at_sessionManager_error(int error);
 
     void at_settings_lastUsedConnectionChanged();
