@@ -13,7 +13,6 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/scene_utility.h>
 

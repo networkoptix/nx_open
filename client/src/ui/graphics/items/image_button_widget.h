@@ -4,13 +4,13 @@
 #include <QGraphicsWidget>
 #include <QPixmap>
 #include <ui/processors/clickable.h>
+#include <ui/graphics/opengl/gl_functions.h>
 
 class QAction;
 class QIcon;
 
 class VariantAnimator;
 class QnTextureTransitionShaderProgram;
-class QnGlFunctions;
 
 /**
  * A lightweight button widget that does not use style for painting. 

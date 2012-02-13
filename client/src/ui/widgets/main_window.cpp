@@ -587,6 +587,12 @@ void QnMainWindow::at_settings_lastUsedConnectionChanged() {
     m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
 }
 
+struct LayoutIdCmp {
+    bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
+        return l->getId() < r->getId();
+    }
+};
+
 void QnMainWindow::at_synchronizer_started() {
     /* No layouts are open, so we need to open one. */
     QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
@@ -595,12 +601,6 @@ void QnMainWindow::at_synchronizer_started() {
         openNewLayout();
     } else {
         /* Open the last layout from the user's layouts list. */
-        struct LayoutIdCmp {
-            bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
-                return l->getId() < r->getId();
-            }
-        };
-
         qSort(resources.begin(), resources.end(), LayoutIdCmp());
         m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
     }

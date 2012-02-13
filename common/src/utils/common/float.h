@@ -20,7 +20,7 @@ bool qnIsFinite(double value) {
 #   include <cmath>
 
 bool qnIsFinite(double value) {
-    switch(fpclassify(value)) {
+    switch(std::fpclassify(value)) {
     case FP_NAN:
     case FP_INFINITE:
         return false;
