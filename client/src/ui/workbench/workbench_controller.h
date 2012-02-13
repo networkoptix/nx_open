@@ -138,7 +138,6 @@ protected slots:
 
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
-    void at_cameraSettingsAction_triggered();
 
     void at_recordingAction_triggered(bool checked);
     void at_recordingSettingsAction_triggered();

@@ -276,7 +276,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Set up context menu. */
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
-    connect(qnAction(Qn::CameraSettingsAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_cameraSettingsAction_triggered()));
     connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered()),                                                       this,                           SLOT(at_recordingSettingsAction_triggered()));
 
@@ -979,19 +978,6 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
         return;
 
     widget->removeEventFilter(this);
-}
-
-void QnWorkbenchController::at_cameraSettingsAction_triggered()
-{
-    QGraphicsItem* item = display()->scene()->selectedItems().first();
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-
-    if (widget && widget->resource())
-    {
-        CameraSettingsDialog dialog(display()->view(), widget->resource().dynamicCast<QnVirtualCameraResource>());
-        dialog.setWindowModality(Qt::ApplicationModal);
-        dialog.exec();
-    }
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {

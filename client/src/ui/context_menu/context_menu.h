@@ -118,7 +118,17 @@ namespace Qn {
         /**
          * Opens server settings dialog.
          */
-        ServerSettingsDialog,
+        ServerSettingsAction,
+
+        /**
+         * Opens a YouTube upload dialog.
+         */
+        YouTubeUploadAction,
+
+        /**
+         * Opens tags editing dialog.
+         */
+        EditTagsAction,
 
 
 #if 0

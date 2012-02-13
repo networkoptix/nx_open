@@ -284,15 +284,34 @@ QnContextMenu::QnContextMenu(QObject *parent):
         text(tr("Hide Motion Grid")).
         condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasShownGrid));
 
+    // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
     factory(Qn::CameraSettingsAction).
         flags(Scene | Tree | SingleTarget).
         text(tr("Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
-    factory(Qn::ServerSettingsDialog).
+    factory(Qn::ServerSettingsAction).
         flags(Scene | Tree | SingleTarget).
         text(tr("Server Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::remote_server)));
+
+    factory(Qn::YouTubeUploadAction).
+        flags(Scene | Tree | SingleTarget).
+        text(tr("Upload to YouTube...")).
+        // shortcut(tr("Ctrl+Y")).
+        autoRepeat(false).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::ARCHIVE)));
+
+    factory(Qn::EditTagsAction).
+        flags(Scene | Tree | SingleTarget).
+        text(tr("Edit tags...")).
+        // shortcut(tr("Alt+T")).
+        autoRepeat(false).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::media)));
+
+
+
+
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);
