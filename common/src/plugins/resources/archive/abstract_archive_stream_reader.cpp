@@ -145,7 +145,8 @@ void QnAbstractArchiveReader::run()
                 continue; // need key data but got not key data
         }
 
-        data->dataProvider = this;
+        if(data)
+            data->dataProvider = this;
 
         if (videoData)
             m_stat[videoData->channelNumber].onData(videoData->data.size());

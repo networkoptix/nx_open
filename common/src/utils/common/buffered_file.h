@@ -10,6 +10,8 @@ class QBufferedFile;
 
 class QueueFileWriter: public CLLongRunnable
 {
+    Q_OBJECT;
+
 public:
     QueueFileWriter();
     virtual ~QueueFileWriter();
