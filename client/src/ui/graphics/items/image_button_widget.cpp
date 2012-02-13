@@ -68,6 +68,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     m_pixmapCacheValid(false),
     m_checkable(false),
     m_cached(false),
+    m_skipNextHoverEvents(false),
     m_state(0),
     m_hoverProgress(0.0),
     m_action(NULL)
@@ -222,12 +223,34 @@ void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *) {
     updateState(m_state & ~HOVERED);
 }
 
-void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *) {
+void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *event) {
     updateState(m_state & ~PRESSED);
+
+    /* Next hover events that we will receive are enter and move converted from 
+     * release event, skip them. */ 
+    m_skipNextHoverEvents = 2;
+    m_nextHoverEventPos = event->screenPos();
+}
+
+bool QnImageButtonWidget::skipHoverEvent(QGraphicsSceneHoverEvent *event) {
+    if(m_skipNextHoverEvents) {
+        if(event->screenPos() == m_nextHoverEventPos) {
+            m_skipNextHoverEvents--;
+            return true;
+        } else {
+            m_skipNextHoverEvents = 0;
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
 
 void QnImageButtonWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     event->accept(); /* Buttons are opaque to hover events. */
+
+    if(skipHoverEvent(event))
+        return;
 
     updateState(m_state | HOVERED);
 
@@ -236,6 +259,9 @@ void QnImageButtonWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
 void QnImageButtonWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     event->accept(); /* Buttons are opaque to hover events. */
+
+    if(skipHoverEvent(event))
+        return;
 
     updateState(m_state | HOVERED); /* In case we didn't receive the hover enter event. */
 
@@ -404,8 +430,11 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     if((oldState ^ m_state) & DISABLED) /* DISABLED has changed, perform back-sync. */
         setDisabled(m_state & DISABLED);
 
-    if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED))
+    if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED)) /* !HOVERED -> HOVERED transition */
         m_action->hover();
+
+    if((oldState & PRESSED) && !(m_state & PRESSED)) /* PRESSED -> !PRESSED */
+        m_hoverProgress = 0.0; /* No animation here as it looks crappy. */
 
     qreal hoverProgress = isHovered() ? 1.0 : 0.0;
     if(scene() == NULL) {

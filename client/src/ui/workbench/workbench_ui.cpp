@@ -65,13 +65,14 @@ namespace {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal scaleFactor = 0.85;
-        qreal size = baseSize / scaleFactor;
+        qreal height = baseSize / scaleFactor;
+        qreal width = height * SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
         QnZoomingImageButtonWidget *button = new QnZoomingImageButtonWidget(parent);
         button->setScaleFactor(scaleFactor);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
-        button->setMaximumSize(size, size);
-        button->setMinimumSize(size, size);
+        button->setMaximumSize(width, height);
+        button->setMinimumSize(width, height);
         button->setDefaultAction(action);
         button->setAnimationSpeed(4.0);
         button->setCached(true);
