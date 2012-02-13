@@ -189,8 +189,9 @@ os.mkdir('bin/release/arecontvision')
 copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
 copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 
-gen_env_sh('bin/debug/env.sh', ldpath_debug)
-gen_env_sh('bin/release/env.sh', ldpath_release)
+if platform() == 'mac':
+    gen_env_sh('bin/debug/env.sh', ldpath_debug)
+    gen_env_sh('bin/release/env.sh', ldpath_release)
 
 gen_version_h()
 

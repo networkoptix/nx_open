@@ -74,8 +74,9 @@ os.mkdir('bin/release-test')
 
 os.mkdir('build')
 
-ldpath_debug = ''
-ldpath_release = ''
+if platform() == 'mac':
+    ldpath_debug = ''
+    ldpath_release = ''
 
 if platform() == 'win32':
     copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
