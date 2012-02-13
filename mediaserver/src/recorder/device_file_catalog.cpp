@@ -418,6 +418,15 @@ qint64 DeviceFileCatalog::maxTime() const
         return m_chunks.last().startTimeMs + qMax(0, m_chunks.last().durationMs);
 }
 
+bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_chunks.isEmpty())    
+        return true;
+    else
+        return m_chunks.last().startTimeMs == startTimeMs;
+}
+
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     QMutexLocker lock(&m_mutex);
