@@ -143,31 +143,29 @@ os.mkdir('bin/release-test')
 
 os.mkdir('build')
 
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
+if platform() == 'win32':
+    copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
+    copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
+    copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
+    copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
+elif platform() == 'mac':
+    copy_files(ffmpeg_path_debug + '/lib/lib*[A-Za-z].[0-9].dylib', 'bin/debug')
+    copy_files(ffmpeg_path_debug + '/lib/lib*[A-Za-z].[0-9][0-9].dylib', 'bin/debug')
+    copy_files(ffmpeg_path_release + '/lib/lib*[A-Za-z].[0-9].dylib', 'bin/release')
+    copy_files(ffmpeg_path_release + '/lib/lib*[A-Za-z].[0-9][0-9].dylib', 'bin/release')
 
-copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
-copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
-
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug-test')
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug-test')
-
-copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release-test')
-copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release-test')
-
-copy_files(openal_path + '/*.dll', 'bin/release-test')
-copy_files(openal_path + '/*.dll', 'bin/debug-test')
 copy_files(openal_path + '/*.dll', 'bin/release')
 copy_files(openal_path + '/*.dll', 'bin/debug')
 
-copy_files(openssl_path + '/*.dll', 'bin/debug')
-copy_files(openssl_path + '/*.dll', 'bin/release')
+if platform() == 'win32':
+    copy_files(openssl_path + '/*.dll', 'bin/debug')
+    copy_files(openssl_path + '/*.dll', 'bin/release')
 
-copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
-copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
-
-copy_files(tools_path + '/bin/*.dll', 'bin/release')
-copy_files(tools_path + '/bin/*.dll', 'bin/debug')
+    copy_files(tools_path + '/bin/*.dll', 'bin/release')
+    copy_files(tools_path + '/bin/*.dll', 'bin/debug')
+elif platform() == 'mac':
+    copy_files(tools_path + '/lib/libxerces-c-3.1.dylib', 'bin/release')
+    copy_files(tools_path + '/lib/libxerces-c-3.1.dylib', 'bin/debug')
 
 if platform() == 'win32':
     copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
@@ -178,6 +176,10 @@ elif platform() == 'mac':
 elif platform() == 'linux':
     copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
     copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
+
+if platform() == 'mac':
+    copy_files('../common/bin/debug/libcommon.1.dylib', 'bin/debug')
+    copy_files('../common/bin/release/libcommon.1.dylib', 'bin/debug')
 
 os.mkdir('bin/debug/arecontvision')
 os.mkdir('bin/release/arecontvision')

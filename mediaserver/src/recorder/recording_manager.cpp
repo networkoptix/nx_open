@@ -163,7 +163,7 @@ void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, Q
 {
     // Close file if resource is offline
     // todo: Code is not thread safe now. So, while commented
-#if 0
+#if 1
     if (newStatus != QnResource::Offline) 
         return;
     QnResource* res = (QnResource*) sender();

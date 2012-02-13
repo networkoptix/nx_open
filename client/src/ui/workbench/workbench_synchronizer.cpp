@@ -76,22 +76,6 @@ void QnWorkbenchSynchronizer::stop() {
         delete m_workbench->layouts().back();
 }
 
-QnLayoutResourcePtr QnWorkbenchSynchronizer::resource(QnWorkbenchLayout *layout) const {
-    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout);
-    if(synchronizer == NULL)
-        return QnLayoutResourcePtr();
-
-    return synchronizer->resource();
-}
-
-QnWorkbenchLayout *QnWorkbenchSynchronizer::layout(const QnLayoutResourcePtr &resource) const {
-    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
-    if(synchronizer == NULL)
-        return NULL;
-
-    return synchronizer->layout();
-}
-
 void QnWorkbenchSynchronizer::update() {
     if(!m_update)
         return;
@@ -106,7 +90,7 @@ void QnWorkbenchSynchronizer::update() {
      * Layouts may have been removed, and in this case we need to remove them
      * from the workbench too. */
     foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutResourcePtr resource = this->resource(layout);
+        QnLayoutResourcePtr resource = layout->resource();
 
         if(!resources.contains(resource)) /* Corresponding layout resource was removed, remove layout. */
             delete layout;
@@ -124,7 +108,7 @@ void QnWorkbenchSynchronizer::submit() {
      * New layout may have been added, and in this case we need to create a new
      * resource for it. */
     foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
-        QnLayoutResourcePtr resource = this->resource(layout);
+        QnLayoutResourcePtr resource = layout->resource();
 
         if(resource.isNull()) { 
             /* This actually is a newly created layout. */

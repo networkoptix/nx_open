@@ -144,7 +144,8 @@ void QnClientPullMediaStreamProvider::run()
 			}
 		}
 
-		data->dataProvider = this;
+        if(data)
+		    data->dataProvider = this;
 
         if (videoData)
         {

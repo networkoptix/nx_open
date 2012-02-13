@@ -110,7 +110,8 @@ void CLServerPushStreamreader::run()
 			}
 		}
 
-		data->dataProvider = this;
+        if(data)
+		    data->dataProvider = this;
 
         if (videoData)
         {

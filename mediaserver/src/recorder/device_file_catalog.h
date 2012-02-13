@@ -42,6 +42,8 @@ public:
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;
+    bool isLastChunk(qint64 startTimeMs) const;
+
     qint64 minTime() const;
     qint64 maxTime() const;
     bool lastFileDuplicateName() const;

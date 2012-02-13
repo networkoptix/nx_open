@@ -87,9 +87,6 @@ public:
         return m_titleVisible;
     }
 
-signals:
-    void titleBarDoubleClicked();
-
 public slots:
     void setTitleUsed(bool titleUsed);
     void setFpsVisible(bool fpsVisible);
@@ -140,6 +137,8 @@ protected Q_SLOTS:
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
 
+    void at_mainMenuAction_triggered();
+
     void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
 
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
@@ -168,6 +167,7 @@ protected Q_SLOTS:
 
     void at_exportFailed(QString errMessage);
     void at_exportFinished(QString fileName);
+
 private:
     /* Global state. */
 
@@ -212,6 +212,8 @@ private:
     bool m_sliderVisible;
 
     bool m_titleVisible;
+
+    bool m_titleUsed;
 
     bool m_inactive;
 
@@ -279,6 +281,8 @@ private:
 
     QnImageButtonWidget *m_titleShowButton;
 
+    QnImageButtonWidget *m_mainMenuButton;
+
     QGraphicsProxyWidget *m_tabBarItem;
 
     AnimatorGroup *m_titleOpacityAnimatorGroup;
@@ -290,8 +294,6 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
-
-    bool m_titleUsed;
 
 };
 

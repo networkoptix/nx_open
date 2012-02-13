@@ -15,7 +15,7 @@ QnPlDroidResourceSearcher& QnPlDroidResourceSearcher::instance()
     return inst;
 }
 
-static struct DroidSearcherHelper
+struct DroidSearcherHelper
 {
     int videoPort;
     int dataPort;

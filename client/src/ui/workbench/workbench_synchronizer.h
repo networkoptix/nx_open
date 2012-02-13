@@ -49,9 +49,6 @@ protected:
     void start();
     void stop();
 
-    QnLayoutResourcePtr resource(QnWorkbenchLayout *layout) const;
-    QnWorkbenchLayout *layout(const QnLayoutResourcePtr &resource) const;
-
 protected slots:
     void at_user_resourceChanged();
     void at_workbench_aboutToBeDestroyed();

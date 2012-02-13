@@ -33,7 +33,10 @@ public:
         if(!synchronizer->m_criterionFunctional)
             return QnResourceCriterion::NEXT; 
 
-        if(synchronizer->m_layout->items(resource->getUniqueId()).size() > 0)
+        int count = synchronizer->m_layout->items(resource->getUniqueId()).size();
+        if(synchronizer->m_layoutItemByResource.value(resource, NULL) != NULL)
+            count--;
+        if(count > 0)
             return QnResourceCriterion::ACCEPT;
 
         return QnResourceCriterion::NEXT;
@@ -87,6 +90,7 @@ void QnResourceSearchSynchronizer::start() {
     assert(m_model != NULL && m_layout != NULL);
 
     m_criterion = new QnResourceSearchSynchronizerCriterion(this);
+    m_model->addCriterion(m_criterion.data());
 
     connect(m_layout,   SIGNAL(aboutToBeDestroyed()),                                   this, SLOT(at_layout_aboutToBeDestroyed()));
     connect(m_layout,   SIGNAL(itemAdded(QnWorkbenchItem *)),                           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));

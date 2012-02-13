@@ -127,7 +127,8 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         }
     }
 
-    data->dataProvider = this;
+    if(data)
+        data->dataProvider = this;
 
     if (videoData)
         m_stat[videoData->channelNumber].onData(data->data.size());

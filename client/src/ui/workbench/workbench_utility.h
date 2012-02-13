@@ -3,6 +3,7 @@
 
 #include <ui/common/scene_utility.h>
 #include <ui/common/magnitude.h>
+#include <cmath>
 #include "workbench_grid_mapper.h"
 
 /**

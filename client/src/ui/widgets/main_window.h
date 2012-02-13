@@ -7,6 +7,7 @@
 class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
+class QToolButton;
 
 class QnResourcePoolUserWatcher;
 class QnBlueBackgroundPainter;
@@ -58,11 +59,15 @@ protected slots:
     void showAboutDialog();
     void showPreferencesDialog();
     void showAuthenticationDialog();
+    void showMainMenu();
 
     void updateFullScreenState();
     void updateDwmState();
 
     void openNewLayout();
+    void closeCurrentLayout();
+
+    void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
 
     void at_sessionManager_error(int error);
 
@@ -70,6 +75,10 @@ protected slots:
 
     void at_synchronizer_started();
 
+    void at_cameraSettingsAction_triggered();
+    void at_serverSettingsAction_triggered();
+    void at_youtubeUploadAction_triggered();
+    void at_editTagsAction_triggred();
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
@@ -83,6 +92,7 @@ private:
 
     QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;
+    QToolButton *m_mainMenuButton;
 
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_viewLayout;

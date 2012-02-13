@@ -287,6 +287,9 @@ void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
     if (!d->enabled || d->blockSetSpeedSignal)
         return;
     d->blockSetSpeedSignal = true;
+
+    QMutexLocker lock(&d->timeMutex);
+
     foreach(const ReaderInfo& info, d->readers)
     {
         if (info.reader != sender())
@@ -589,6 +592,8 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+
     for (int i = 0; i < d->readers.size(); ++i)
     {
         if (d->readers[i].reader == reader) 

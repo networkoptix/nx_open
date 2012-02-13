@@ -81,6 +81,6 @@ QnResourceIconCache::Key QnResourceIconCache::key(QnResource::Flags flags, QnRes
         key = User;
     }
 
-    return key | ((status + 1) << 8);
+    return Key(key | ((status + 1) << 8));
 }
 
