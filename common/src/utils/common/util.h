@@ -88,7 +88,12 @@ static const int MAX_RTSP_DATA_LEN = 65535 - 16;
 
 //static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
 static const qint64 BACKWARD_SEEK_STEP =  1000 * 1000; 
-static const qint64 MAX_FIRST_GOP_DURATION = 1000 * 1000 * 10;
+
+// This constant limit duration of a first GOP. So, if jump to position X, and first I-frame has position X-N, data will be transfer for range
+// [X-N..X-N+MAX_FIRST_GOP_DURATION]. It prevent long preparing then reverse mode is activate.
+// I have increased constant because of camera with very low FPS may have long gop (30-60 seconds).
+//static const qint64 MAX_FIRST_GOP_DURATION = 1000 * 1000 * 10;
+static const qint64 MAX_FIRST_GOP_FRAMES = 250;
 
 static const qint64 MAX_FRAME_DURATION = 5 * 1000;
 static const qint64 MIN_FRAME_DURATION = 15;

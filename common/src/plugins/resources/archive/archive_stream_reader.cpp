@@ -34,7 +34,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_selectedAudioChannel(0),
     m_BOF(false),
     m_tmpSkipFramesToTime(AV_NOPTS_VALUE),
-    m_BOFTime(AV_NOPTS_VALUE),
+    m_afterBOFCounter(-1),
     m_singleShot(false),
     m_singleQuantProcessed(false),
     m_dataMarker(0),
@@ -348,6 +348,7 @@ begin_label:
         }
         m_lastGopSeekTime = -1;
         m_BOF = true;
+        m_afterBOFCounter = 0;
         if (jumpTime != AV_NOPTS_VALUE)
             emit jumpOccured(displayTime);
     }
@@ -437,19 +438,21 @@ begin_label:
                 m_eof = false;
             }
 
-            //if (m_topIFrameTime == DATETIME_NOW)
-            if (m_BOFTime != AV_NOPTS_VALUE && m_topIFrameTime > m_BOFTime + MAX_FIRST_GOP_DURATION)
+			// Limitation for duration of the first GOP after reverse mode activation
+            if (m_afterBOFCounter != -1)
             {
-                if (m_currentTime == INT64_MAX) 
+                if (m_afterBOFCounter == 0 && m_currentTime == INT64_MAX) 
                 {
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
                     intChanneljumpTo(QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP, 0);
                     goto begin_label;
                 }
-                else {
-                    m_topIFrameTime = m_currentTime + MAX_FIRST_GOP_DURATION;
-                    m_BOFTime = AV_NOPTS_VALUE;
+
+                m_afterBOFCounter++;
+                if (m_afterBOFCounter >= MAX_FIRST_GOP_FRAMES) {
+                    m_topIFrameTime = m_currentTime;
+                    m_afterBOFCounter = -1;
                 }
             }
 
@@ -557,7 +560,7 @@ begin_label:
     if (m_BOF) {
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_BOF = false;
-        m_BOFTime = m_currentData->timestamp;
+        //m_BOFTime = m_currentData->timestamp;
         /*
         QString msg;
         QTextStream str(&msg);
@@ -576,7 +579,7 @@ begin_label:
         m_currentData->opaque = m_dataMarker;
 
     //if (m_currentData)
-    //    cl_log.log("timestamp=", QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+    //    qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << "flags=" << m_currentData->flags;
 
 
     // ensure Pos At playback mask
@@ -623,6 +626,7 @@ void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
     m_topIFrameTime = seekRez != -1 ? seekRez : mksec;
     m_IFrameAfterJumpFound = false;
     m_eof = false;
+    m_afterBOFCounter = -1;
 }
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
