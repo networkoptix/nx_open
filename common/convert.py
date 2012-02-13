@@ -30,6 +30,11 @@ def platform():
     elif sys.platform == 'linux2':
         return 'linux'
 
+def gen_env_sh(path, ldpath):
+    f = open(path, 'w')
+    print >> f, 'export DYLD_LIBRARY_PATH=%s' % ldpath
+    f.close()
+
 def link_or_copy(src, dst):
     try:
         import win32file

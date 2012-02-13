@@ -14,6 +14,7 @@ from string import Template
 sys.path.insert(0, '../common')
 
 from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
+from convert import gen_env_sh
 from convert import convert as convert_common
 
 FFMPEG_VERSION = '2011-08-29'
@@ -73,30 +74,42 @@ os.mkdir('bin/release-test')
 
 os.mkdir('build')
 
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
+ldpath_debug = ''
+ldpath_release = ''
 
-copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
-copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
+if platform() == 'win32':
+    copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
+    copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
+    copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
+    copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
+elif platform() == 'mac':
+    ldpath_debug += ffmpeg_path_debug + '/lib'
+    ldpath_release += ffmpeg_path_release + '/lib'
 
-os.mkdir('bin/debug/arecontvision')
-os.mkdir('bin/release/arecontvision')
-
-copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
-copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
-
-copy_files(tools_path + '/bin/*.dll', 'bin/release')
-copy_files(tools_path + '/bin/*.dll', 'bin/debug')
+if platform() == 'win32':
+    copy_files(tools_path + '/bin/*.dll', 'bin/release')
+    copy_files(tools_path + '/bin/*.dll', 'bin/debug')
+elif platform() == 'mac':
+    ldpath_debug += ':' + tools_path + '/lib'
+    ldpath_release += ':' + tools_path + '/lib'
 
 if platform() == 'win32':
     copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
     copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
 elif platform() == 'mac':
-    copy_files(qjson_path + '/libqjson.0.dylib', 'bin/release')
-    copy_files(qjson_path + '/libqjson.0.dylib', 'bin/debug')
+    ldpath_debug += ':' + os.path.abspath(qjson_path)
+    ldpath_release += ':' + os.path.abspath(qjson_path)
 elif platform() == 'linux':
     copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
     copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
+
+if platform() == 'mac':
+    ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
+    ldpath_release += ':' + os.path.abspath('../common/bin/release')
+
+if platform() == 'mac':
+    gen_env_sh('bin/debug/env.sh', ldpath_debug)
+    gen_env_sh('bin/release/env.sh', ldpath_release)
 
 gen_version_h()
 

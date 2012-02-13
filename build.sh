@@ -10,7 +10,6 @@ case `uname -s` in
         NPROCESSORS=`sysctl hw.ncpu | awk '{print $2}'`
         FFMPEG_VERSION=`grep ^FFMPEG_VERSION common/convert.py | sed "s/FFMPEG_VERSION = \'\(.*\)\'/\1/g"`
         export DYLD_LIBRARY_PATH=$PWD/../ffmpeg/ffmpeg-git-$FFMPEG_VERSION-mac-release/lib:$DYLD_LIBRARY_PATH
-        echo $DYLD_LIBRARY_PATH
         ;;
 esac
 
