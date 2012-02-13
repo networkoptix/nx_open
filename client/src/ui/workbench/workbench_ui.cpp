@@ -206,8 +206,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("pin.png"));
     m_treePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("unpin.png"));
     m_treePinButton->setCheckable(true);
+    m_treePinButton->setFocusProxy(m_treeItem);
 
     m_treeShowButton = newShowHideButton(m_controlsWidget);
+    m_treeShowButton->setFocusProxy(m_treeItem);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -259,6 +261,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
 
     m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderShowButton->setFocusProxy(m_sliderItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -340,6 +343,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         transform.scale(-1, 1);
         m_titleShowButton->setTransform(transform);
     }
+    m_titleShowButton->setFocusProxy(m_titleItem);
 
     m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_titleOpacityProcessor->addTargetItem(m_titleItem);
@@ -758,6 +762,8 @@ void QnWorkbenchUi::at_fpsChanged(qreal fps) {
 
 void QnWorkbenchUi::at_activityStopped() {
     m_inactive = true;
+
+    qDebug() << display()->scene()->focusItem();
 
     updateControlsVisibility(true);
 }
