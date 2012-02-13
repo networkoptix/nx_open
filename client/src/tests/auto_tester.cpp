@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <core/resourcemanagment/resource_pool.h>
 #include <utils/common/warnings.h>
-#include "command_line_parser.h"
+#include <utils/common/command_line_parser.h>
 
 namespace {
     qint64 defaultAutoTesterTimeout = 20 * 1000; 

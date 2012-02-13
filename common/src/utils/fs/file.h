@@ -16,7 +16,7 @@
 #endif
 
 
-class  QnFile
+class QN_EXPORT QnFile
 {
 public:
     QnFile();

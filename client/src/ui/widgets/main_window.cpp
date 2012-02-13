@@ -45,6 +45,7 @@
 #include "ui/style/proxy_style.h"
 
 #include <utils/common/warnings.h>
+#include <utils/common/event_signalizer.h>
 
 #include "file_processor.h"
 #include "settings.h"
@@ -106,6 +107,12 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 {
     /* We want to receive system menu event on Windows. */
     QnSystemMenuEvent::initialize();
+
+    /* And file open events on Mac. */
+    QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
+    fileOpenSignalizer->setEventType(QEvent::FileOpen);
+    qApp->installEventFilter(fileOpenSignalizer);
+    connect(fileOpenSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_fileOpenSignalizer_activated(QObject *, QEvent *)));
 
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
@@ -523,6 +530,16 @@ void QnMainWindow::closeCurrentLayout() {
 if (action == &cm_remove_from_disk) {
     QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
 */
+
+void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
+{
+    if(event->type() != QEvent::FileOpen) {
+        qnWarning("Expected event of type %1, received an event of type %2.", static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
+        return;
+    }
+
+    handleMessage(static_cast<QFileOpenEvent*>(event)->file());
+}
 
 void QnMainWindow::at_editTagsAction_triggred() 
 {
