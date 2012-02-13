@@ -106,7 +106,6 @@ protected:
 
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
-    int isMotionGridDisplayed();
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -123,7 +122,6 @@ protected slots:
     void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &region);
 
-    void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
@@ -151,8 +149,6 @@ protected slots:
 
     void at_recordingAnimation_valueChanged(const QVariant &value);
     void at_recordingAnimation_finished();
-
-    void at_randomGridAction_triggered();
 
 private:
     /* Global state. */
@@ -241,16 +237,6 @@ private:
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
 
-
-    /* Context menu-related state. */
-
-    /** Layout item context menu. */
-    QMenu *m_itemContextMenu;
-
-    QAction *m_showMotionAction;
-    QAction *m_cameraSettingsAction;
-    QAction *m_hideMotionAction;
-    QAction *m_randomGridAction;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

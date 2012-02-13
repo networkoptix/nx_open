@@ -146,6 +146,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(qnAction(Qn::MainMenuAction), SIGNAL(triggered()), this, SLOT(showMainMenu()));
     addAction(qnAction(Qn::MainMenuAction));
 
+    addAction(qnAction(Qn::ScreenRecordingAction));
+
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
     /* Set up scene & view. */

@@ -1,10 +1,14 @@
 #include "context_menu.h"
+#include <cassert>
 #include <QAction>
 #include <QMenu>
-#include <cassert>
+#include <QGraphicsItem>
+#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource/resource.h>
 #include <ui/style/skin.h>
 #include <ui/style/app_style.h>
 #include "utils/common/checked_cast.h"
+#include "action_conditions.h"
 
 namespace {
     const char *actionIdPropertyName = "_qn_actionId";
@@ -22,7 +26,6 @@ namespace {
     }
 
 } // anonymous namespace
-
 
 
 class QnActionBuilder {
@@ -102,6 +105,13 @@ public:
 
     void showCheckBoxInMenu(bool show) {
         m_data->action->setProperty(hideCheckBoxInMenuPropertyName, !show);
+    }
+
+    void condition(QnActionCondition *condition) {
+        assert(m_data->condition == NULL);
+
+        condition->setParent(m_menu);
+        m_data->condition = condition;
     }
 
 private:
@@ -259,18 +269,21 @@ QnContextMenu::QnContextMenu(QObject *parent):
         icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
 
 
+    /* Resource actions. */
+    factory(Qn::ShowMotionAction).
+        flags(Scene | SingleTarget | MultiTarget).
+        text(tr("Show Motion Grid")).
+        condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasHiddenGrid));
 
+    factory(Qn::HideMotionAction).
+        flags(Scene | SingleTarget | MultiTarget).
+        text(tr("Hide Motion Grid")).
+        condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasShownGrid));
 
-
-
-
-
-
-
-
-
-
-
+    factory(Qn::CameraSettingsAction).
+        flags(Scene | SingleTarget).
+        text(tr("Camera Settings")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
 
 
@@ -352,10 +365,19 @@ QAction *QnContextMenu::action(Qn::ActionId id) const {
 }
 
 QMenu *QnContextMenu::newMenu(Qn::ActionScope scope) const {
-    return newMenu(m_root, scope);
+    return newMenuInternal(m_root, scope, QnResourceList());
 }
-    
-QMenu *QnContextMenu::newMenu(const ActionData *parent, Qn::ActionScope scope) const {
+
+QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QnResourceList &resources) const {
+    return newMenuInternal(m_root, scope, resources);
+}
+
+QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) const {
+    return newMenuInternal(m_root, scope, items);
+}
+
+template<class ItemSequence>
+QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) const {
     QMenu *result = new QMenu();
 
     foreach(const ActionData *data, parent->children) {
@@ -364,8 +386,20 @@ QMenu *QnContextMenu::newMenu(const ActionData *parent, Qn::ActionScope scope) c
         if(!(data->flags & scope))
             continue;
 
+        if(items.size() == 0 && !(data->flags & NoTarget))
+            continue;
+
+        if(items.size() == 1 && !(data->flags & SingleTarget))
+            continue;
+
+        if(items.size() > 1 && !(data->flags & MultiTarget))
+            continue;
+
+        if(data->condition != NULL && !data->condition->check(items))
+            continue;
+
         if(data->children.size() > 0) {
-            QMenu *menu = newMenu(data, scope);
+            QMenu *menu = newMenuInternal(data, scope, items);
             if(menu->isEmpty()) {
                 delete menu;
             } else {

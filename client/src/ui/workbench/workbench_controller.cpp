@@ -274,47 +274,18 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
     /* Set up context menu. */
-#if 0
-    QAction *addFilesAction             = newAction(tr("Add file(s)"),          tr("Ins"),          this);
-    QAction *addFolderAction            = newAction(tr("Add folder"),           tr("Shift+Ins"),    this);
-    QAction *addCameraAction            = newAction(tr("Add camera"),           tr("Ctrl+Ins"),     this);
-    QAction *newCameraAction            = newAction(tr("New camera"),           tr("Ctrl+C"),       this);
-    QAction *newLayoutAction            = newAction(tr("New layout"),           tr("Ctrl+L"),       this);
-    QAction *undoAction                 = newAction(tr("Undo"),                 tr("Ctrl+Z"),       this);
-    QAction *redoAction                 = newAction(tr("Redo"),                 tr("Ctrl+Shift+Z"), this);
-    QAction *fitInViewAction            = newAction(tr("Fit in view"),          tr("Ctrl+V"),       this);
-    QAction *fullscreenAction           = newAction(tr("Toggle fullscreen"),    tr("Ctrl+Enter"),   this);
-    QAction *startStopRecordingAction   = newAction(tr("Start/stop"),           tr("Alt+R"),        this);
-    QAction *recordingSettingsAction    = newAction(tr("Settings"),             QString(),          this);
-    QAction *saveLayoutAction           = newAction(tr("Save layout"),          tr("Ctrl+S"),       this);
-    QAction *saveLayoutAsAction         = newAction(tr("Save layout as..."),    tr("Ctrl+Shift+S"), this);
-    QAction *preferencesAction          = newAction(tr("Preferences"),          tr("Ctrl+P"),       this);
-    QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
-#endif
-    m_randomGridAction                  = newAction(tr("Randomize grid"), tr(""),                   this);
-    m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
-    m_cameraSettingsAction              = newAction(tr("Settings"),          tr(""),             this);
-    m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
-
-    connect(m_showMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
-    connect(m_cameraSettingsAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_cameraSettingsAction_triggered()));
-
-    connect(m_hideMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
-
-    connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                           this,                           SLOT(at_recordingAction_triggered(bool)));
-    connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered(bool)),                                   this,                           SLOT(at_recordingSettingsAction_triggered()));
-    m_display->view()->addAction(qnAction(Qn::ScreenRecordingAction));
-
-    connect(m_randomGridAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_randomGridAction_triggered()));
-
-    m_itemContextMenu = new QMenu(display->view());
+    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(qnAction(Qn::CameraSettingsAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_cameraSettingsAction_triggered()));
+    connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
+    connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered()),                                                       this,                           SLOT(at_recordingSettingsAction_triggered()));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
     if (m_screenRecorder->isSupported()) {
-        connect(m_screenRecorder,           SIGNAL(recordingStarted()),                                             this,                           SLOT(at_screenRecorder_recordingStarted()));
-        connect(m_screenRecorder,           SIGNAL(recordingFinished(QString)),                                     this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
-        connect(m_screenRecorder,           SIGNAL(error(QString)),                                                 this,                           SLOT(at_screenRecorder_error(QString)));
+        connect(m_screenRecorder,       SIGNAL(recordingStarted()),                                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
+        connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
+        connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
     m_countdownCanceled = false;
     m_recordingLabel = 0;
@@ -433,30 +404,6 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     );
 
     widget->item()->setGeometryDelta(geometryDelta);
-}
-
-int QnWorkbenchController::isMotionGridDisplayed()
-{
-    bool allDisplayed = true;
-    bool allNonDisplayed = true;
-    bool isCameraSelected = false;
-    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
-    {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
-            continue;
-        allDisplayed &= widget->isMotionGridDisplayed();
-        allNonDisplayed &= !widget->isMotionGridDisplayed();
-        isCameraSelected |= qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()) != 0;
-    }
-    if (!isCameraSelected)
-        return -2;
-    if (allDisplayed)
-        return 1;
-    else if (allNonDisplayed)
-        return 0;
-    else
-        return -1;
 }
 
 void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
@@ -592,7 +539,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     QString selectedFilter;
-    while (1) {
+    while (true) {
         QString filePath = QFileDialog::getSaveFileName(
             display()->view(),
             tr("Save Recording As..."),
@@ -887,22 +834,6 @@ void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnResourceW
     widget->addToMotionSelection(region);
 }
 
-void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
-    switch(info.button()) {
-    case Qt::LeftButton:
-        at_item_leftClicked(view, item, info);
-        break;
-    case Qt::RightButton:
-        at_item_rightClicked(view, item, info);
-        break;
-    case Qt::MiddleButton:
-        at_item_middleClicked(view, item, info);
-        break;
-    default:
-        break;
-    }
-}
-
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
     TRACE("ITEM LCLICKED");
 
@@ -935,26 +866,11 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         widget->setSelected(true);
     }
 
-    m_itemContextMenu->removeAction(m_hideMotionAction);
-    m_itemContextMenu->removeAction(m_showMotionAction);
-    m_itemContextMenu->removeAction(m_cameraSettingsAction);
-
-    int gridnowDisplayed = isMotionGridDisplayed();
-    if (gridnowDisplayed == 1)
-        m_itemContextMenu->addAction(m_hideMotionAction);
-    else if (gridnowDisplayed == 0)
-        m_itemContextMenu->addAction(m_showMotionAction);
-    else if (gridnowDisplayed == -1) {
-        m_itemContextMenu->addAction(m_hideMotionAction);
-        m_itemContextMenu->addAction(m_showMotionAction);
-    }
-
-    if (widget->scene()->selectedItems().size() == 1 && widget->resource().dynamicCast<QnVirtualCameraResource>())
-    {
-        m_itemContextMenu->addAction(m_cameraSettingsAction);
-    }
-
-    m_itemContextMenu->exec(info.screenPos());
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    if(menu->isEmpty())
+        return;
+    
+    menu->exec(info.screenPos());
 }
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
@@ -1017,14 +933,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
     TRACE("SCENE RCLICKED");
 
-    QScopedPointer<QMenu> menu(new QMenu(display()->view()));
-    //menu->addAction(qnAction(Qn::OpenFileAction));
-    menu->addAction(qnAction(Qn::ScreenRecordingMenu));
-    
-
-    //menu->addAction(m_randomGridAction);
-
-    menu->exec(info.screenPos());
+    /* No scene context menu, haha! */
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
@@ -1072,10 +981,6 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
     widget->removeEventFilter(this);
 }
 
-void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(display()->scene()->selectedItems(), false);
-}
-
 void QnWorkbenchController::at_cameraSettingsAction_triggered()
 {
     QGraphicsItem* item = display()->scene()->selectedItems().first();
@@ -1089,29 +994,12 @@ void QnWorkbenchController::at_cameraSettingsAction_triggered()
     }
 }
 
-void QnWorkbenchController::at_showMotionAction_triggered()
-{
-    QList<QGraphicsItem*> items;
-    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
-    {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if (widget && qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()))
-            items << item;
-    }
-
-    displayMotionGrid(items, true);
-
-#if 0
-    QGraphicsItem *item = display()->scene()->selectedItems().first();
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource());
-    test2->show();
-#endif
+void QnWorkbenchController::at_hideMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), false);
 }
 
-void QnWorkbenchController::at_randomGridAction_triggered() {
-    display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
-    display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
+void QnWorkbenchController::at_showMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), true);
 }
 
 void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
@@ -1120,10 +1008,6 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
     } else {
         stopRecording();
     }
-
-    /*if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
-    } else {
-    }*/
 }
 
 void QnWorkbenchController::at_recordingSettingsAction_triggered() {

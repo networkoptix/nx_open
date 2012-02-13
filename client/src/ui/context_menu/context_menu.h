@@ -3,12 +3,16 @@
 
 #include <QObject>
 #include <QHash>
+#include <QVariant>
+#include <core/resource/resource_fwd.h>
 
 class QAction;
 class QMenu;
+class QGraphicsItem;
 
 class QnActionFactory;
 class QnActionBuilder;
+class QnActionCondition;
 
 namespace Qn {
 
@@ -92,6 +96,24 @@ namespace Qn {
          */
         ExitAction,
 
+
+
+        /* Resource actions. */
+
+        /**
+         * Shows motion search grid on an item.
+         */
+        ShowMotionAction,
+
+        /**
+         * Hides motion search grid on an item.
+         */
+        HideMotionAction,
+
+        /**
+         * Opens camera settings dialog.
+         */
+        CameraSettingsAction,
 
 
 
@@ -326,14 +348,17 @@ class QnContextMenu: public QObject {
     Q_OBJECT;
 public:
     enum ActionFlag {
-        Invisible           = 0,                /**< Action cannot appear in any menu. */
-        Main                = Qn::MainScope,    /**< Action can appear in main menu. */
-        Scene               = Qn::SceneScope,   /**< Action can appear in scene context menu. */
-        Tree                = Qn::TreeScope,    /**< Action can appear in tree context menu. */
-        Slider              = Qn::SliderScope,  /**< Action can appears in slider context menu. */
-        Global              = Scene | Tree | Slider, 
+        NoTarget            = 0x00000010,       /**< Action can be applied when there are no targets. */
+        SingleTarget        = 0x00000020,       /**< Action can be applied to a single target. */
+        MultiTarget         = 0x00000040,       /**< Action can be applied to multiple targets. */
+        TargetMask          = 0x00000070,
 
-        MultiTarget         = 0x00000010,       /**< Action can be applied to multiple targets. */
+        Invisible           = 0,                                /**< Action cannot appear in any menu. */
+        Main                = Qn::MainScope | NoTarget,         /**< Action can appear in main menu. */
+        Scene               = Qn::SceneScope,                   /**< Action can appear in scene context menu. */
+        Tree                = Qn::TreeScope,                    /**< Action can appear in tree context menu. */
+        Slider              = Qn::SliderScope | SingleTarget,   /**< Action can appears in slider context menu. */
+        Global              = Scene | Tree | Slider, 
 
         ToggledText         = 0x01000000,       /**< Action has different text for toggled state. */
         Separator           = 0x10000000,       /**< Action is actually a menu separator. */
@@ -351,23 +376,28 @@ public:
 
     QMenu *newMenu(Qn::ActionScope scope) const;
 
+    QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources) const;
+
+    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) const;
+
 protected:
     friend class QnActionFactory;
     friend class QnActionBuilder;
 
     struct ActionData {
-        ActionData(): id(Qn::NoAction), flags(0), action(NULL) {}
+        ActionData(): id(Qn::NoAction), flags(0), action(NULL), condition(NULL) {}
 
         Qn::ActionId id;
         ActionFlags flags;
         QAction *action;
-        QAction *proxyAction;
         QString normalText, toggledText;
+        QnActionCondition *condition;
 
         QList<ActionData *> children;
     };
 
-    QMenu *newMenu(const ActionData *parent, Qn::ActionScope scope) const;
+    template<class ItemSequence>
+    QMenu *newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) const;
 
 private slots:
     void at_action_toggled();
