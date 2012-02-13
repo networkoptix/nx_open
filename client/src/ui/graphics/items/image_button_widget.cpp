@@ -4,11 +4,17 @@
 #include <QIcon>
 #include <QAction>
 #include <QStyle>
+#include <QGLContext>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/checked_cast.h>
 #include <ui/animation/accessor.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/shaders/texture_transition_shader_program.h>
+#include <ui/graphics/opengl/gl_context_data.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/scene_utility.h>
 
 namespace {
@@ -36,6 +42,9 @@ namespace {
 
         return icon.pixmap(bestSize, mode, state);
     }
+
+    typedef QnGlContextData<QnTextureTransitionShaderProgram> QnTextureTransitionShaderProgramStorage;
+    Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage);
 
 } // anonymous namespace
 
@@ -83,18 +92,12 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
 }
 
 const QPixmap &QnImageButtonWidget::pixmap(StateFlags flags) const {
-    checkPixmapGroupRole(&flags);
-
-    return m_pixmaps[flags];
-}
-
-const QPixmap &QnImageButtonWidget::cachedPixmap(StateFlags flags) {
     if(!m_cached) {
-        return m_pixmaps[flags];
+        return m_pixmaps[displayState(flags)];
     } else {
         ensurePixmapCache();
 
-        return m_pixmapCache[flags];
+        return m_pixmapCache[displayState(flags)];
     }
 }
 
@@ -161,34 +164,50 @@ void QnImageButtonWidget::click() {
     emit clicked(isChecked());
 }
 
-void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
-    StateFlags hoverState = displayState(m_state | HOVERED);
-    StateFlags normalState = displayState(m_state & ~HOVERED);
-
-    qreal o = painter->opacity();
-    qreal k = m_hoverProgress;
-
-    /* Calculate layer opacities so that total opacity is 'o'. */
-    qreal o1 = (o - k * o) / (1 - k * o);
-    qreal o2 = k * o;
-
-    if(!qFuzzyIsNull(o1)) {
-        painter->setOpacity(o1);
-        paintPixmap(painter, normalState, m_state & ~HOVERED);
-    }
-    if(!qFuzzyIsNull(o2)) {
-        painter->setOpacity(o2);
-        paintPixmap(painter, hoverState, m_state | HOVERED);
+void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
+    if(m_shader.isNull()) {
+        m_shader = qn_textureTransitionShaderProgramStorage()->get();
+        m_gl.reset(new QnGlFunctions());
     }
 
-    painter->setOpacity(o);
+    StateFlags hoverState = m_state | HOVERED;
+    StateFlags normalState = m_state & ~HOVERED;
+    paint(painter, hoverState, normalState, m_hoverProgress, checked_cast<QGLWidget *>(widget));
 }
 
-void QnImageButtonWidget::paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState) {
-    Q_UNUSED(actualState);
+void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+    painter->beginNativePainting();
+    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    const QPixmap pixmap = cachedPixmap(displayState);
-    painter->drawPixmap(rect(), pixmap, pixmap.rect());
+    m_gl->glActiveTexture(GL_TEXTURE1);
+    widget->bindTexture(pixmap(endState));
+    m_gl->glActiveTexture(GL_TEXTURE0);
+    widget->bindTexture(pixmap(startState));
+    m_shader->bind();
+    m_shader->setProgress(progress);
+    m_shader->setTexture0(0);
+    m_shader->setTexture1(1);
+
+    QRectF rect = this->rect();
+
+    glBegin(GL_QUADS);
+    glColor(1.0, 1.0, 1.0, painter->opacity());
+    glTexCoord(0.0, 1.0);
+    glVertex(rect.topLeft());
+    glTexCoord(1.0, 1.0);
+    glVertex(rect.topRight());
+    glTexCoord(1.0, 0.0);
+    glVertex(rect.bottomRight());
+    glTexCoord(0.0, 0.0);
+    glVertex(rect.bottomLeft());
+    glEnd();
+
+    m_shader->release();
+
+    glPopAttrib();
+    painter->endNativePainting();
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
@@ -198,12 +217,12 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
     click();
 }
 
-void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {
+void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *) {
     updateState(m_state | PRESSED);
     updateState(m_state & ~HOVERED);
 }
 
-void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *event) {
+void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *) {
     updateState(m_state & ~PRESSED);
 }
 
@@ -285,7 +304,7 @@ QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVaria
     return base_type::itemChange(change, value);
 }
 
-QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags flags) {
+QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags flags) const {
     /* Some compilers don't allow expressions in case labels, so we have to
      * precalculate them. */
     enum {
@@ -423,7 +442,7 @@ void QnImageButtonWidget::setCached(bool cached) {
     m_cached = cached;
 }
 
-void QnImageButtonWidget::ensurePixmapCache() {
+void QnImageButtonWidget::ensurePixmapCache() const {
     if(m_pixmapCacheValid)
         return;
 
@@ -451,20 +470,23 @@ QnZoomingImageButtonWidget::QnZoomingImageButtonWidget(QGraphicsItem *parent):
     m_scaleFactor(1.0)
 {}
 
-void QnZoomingImageButtonWidget::paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState) {
-    QRectF rect;
-    if((actualState & HOVERED) && !(actualState & PRESSED)) {
-        rect = this->rect();
+bool QnZoomingImageButtonWidget::isScaledState(StateFlags state) {
+    return !(state & HOVERED) || (state & PRESSED);
+}
+
+void QnZoomingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+
+    qreal startScale = isScaledState(startState) ? m_scaleFactor : 1.0;
+    qreal endScale = isScaledState(endState) ? m_scaleFactor : 1.0;
+    qreal scale = startScale * progress + endScale * (1.0 - progress);
+
+    if(!qFuzzyCompare(scale, 1.0)) {
+        QnScopedPainterTransformRollback guard(painter);
+        painter->translate(rect().center());
+        painter->scale(scale, scale);
+        painter->translate(-rect().center());
+        QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
     } else {
-        rect = this->rect();
-
-        QPointF d = SceneUtility::toPoint(rect.size()) * (1.0 - m_scaleFactor) / 2.0;
-        rect = QRectF(
-            rect.topLeft() + d,
-            rect.bottomRight() - d
-        );
+        QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
     }
-
-    const QPixmap pixmap = cachedPixmap(displayState);
-    painter->drawPixmap(rect, pixmap, pixmap.rect());
 }

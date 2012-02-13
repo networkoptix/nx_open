@@ -66,6 +66,7 @@ public:
         user = 0x2000,          /**< User resource. */
 
         local_server = local | server,
+        remote_server = remote | server,
         live_cam = live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
@@ -309,5 +310,6 @@ class QnRecorder : public QnResource
 
 
 Q_DECLARE_METATYPE(QnResourcePtr);
+Q_DECLARE_METATYPE(QnResourceList);
 
 #endif // QN_RESOURCE_H

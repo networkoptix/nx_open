@@ -1,15 +1,12 @@
 #include "main_window.h"
 
-#include <QtCore/QFile>
-
-#include <QtGui/QApplication>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QFileDialog>
-#include <QtGui/QToolBar>
-#include <QtGui/QToolButton>
-#include <QtGui/QCloseEvent>
-
-#include <QtNetwork/QNetworkReply>
+#include <QApplication>
+#include <QBoxLayout>
+#include <QFileDialog>
+#include <QToolButton>
+#include <QMenu>
+#include <QFile>
+#include <QNetworkReply>
 
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
@@ -18,12 +15,15 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 
-#include "ui/context_menu_helper.h"
 #include "ui/context_menu/context_menu.h"
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"
+#include "ui/dialogs/camerasettingsdialog.h"
+#include "ui/dialogs/serversettingsdialog.h"
+#include "ui/dialogs/tagseditdialog.h"
 #include "ui/preferences/preferencesdialog.h"
+#include "youtube/youtubeuploaddialog.h"
 
 #include "ui/mixins/sync_play_mixin.h"
 #include "ui/mixins/render_watch_mixin.h"
@@ -51,8 +51,11 @@
 
 #include "dwm.h"
 #include "layout_tab_bar.h"
+#include "system_menu_event.h"
 
 #include "eventmanager.h"
+
+#include <QAbstractEventDispatcher>
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
@@ -98,6 +101,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
       m_titleVisible(true),
       m_dwm(NULL)
 {
+    /* We want to receive system menu event on Windows. */
+    QnSystemMenuEvent::initialize();
+
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
@@ -116,29 +122,30 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     }
 
     /* Set up actions. */
-    connect(qnAction(Qn::ExitAction), SIGNAL(triggered()), this, SLOT(close()));
     addAction(qnAction(Qn::ExitAction));
-
-    connect(qnAction(Qn::FullscreenAction), SIGNAL(toggled(bool)), this, SLOT(setFullScreen(bool)));
     addAction(qnAction(Qn::FullscreenAction));
-
-    connect(qnAction(Qn::AboutAction), SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     addAction(qnAction(Qn::AboutAction));
-
-    connect(qnAction(Qn::PreferencesAction), SIGNAL(triggered()), this, SLOT(showPreferencesDialog()));
     addAction(qnAction(Qn::PreferencesAction));
-
-    connect(qnAction(Qn::OpenFileAction), SIGNAL(triggered()), this, SLOT(showOpenFileDialog()));
     addAction(qnAction(Qn::OpenFileAction));
-
-    connect(qnAction(Qn::ConnectionSettingsAction), SIGNAL(triggered()), this, SLOT(showAuthenticationDialog()));
     addAction(qnAction(Qn::ConnectionSettingsAction));
-
-    connect(qnAction(Qn::NewTabAction), SIGNAL(triggered()), this, SLOT(openNewLayout()));
     addAction(qnAction(Qn::NewTabAction));
-
-    connect(qnAction(Qn::CloseTabAction), SIGNAL(triggered()), this, SLOT(closeCurrentLayout()));
     addAction(qnAction(Qn::CloseTabAction));
+    addAction(qnAction(Qn::MainMenuAction));
+    addAction(qnAction(Qn::ScreenRecordingAction));
+
+    connect(qnAction(Qn::ExitAction),               SIGNAL(triggered()),    this,   SLOT(close()));
+    connect(qnAction(Qn::FullscreenAction),         SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
+    connect(qnAction(Qn::AboutAction),              SIGNAL(triggered()),    this,   SLOT(showAboutDialog()));
+    connect(qnAction(Qn::PreferencesAction),        SIGNAL(triggered()),    this,   SLOT(showPreferencesDialog()));
+    connect(qnAction(Qn::OpenFileAction),           SIGNAL(triggered()),    this,   SLOT(showOpenFileDialog()));
+    connect(qnAction(Qn::ConnectionSettingsAction), SIGNAL(triggered()),    this,   SLOT(showAuthenticationDialog()));
+    connect(qnAction(Qn::NewTabAction),             SIGNAL(triggered()),    this,   SLOT(openNewLayout()));
+    connect(qnAction(Qn::CloseTabAction),           SIGNAL(triggered()),    this,   SLOT(closeCurrentLayout()));
+    connect(qnAction(Qn::MainMenuAction),           SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
+    connect(qnAction(Qn::CameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(qnAction(Qn::ServerSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
+    connect(qnAction(Qn::YouTubeUploadAction),      SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
+    connect(qnAction(Qn::EditTagsAction),           SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
@@ -200,9 +207,11 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
+    m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
+    m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewTabAction)));
     m_titleLayout->addStretch(0x1000);
@@ -287,6 +296,16 @@ void QnMainWindow::handleMessage(const QString &message)
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     m_controller->drop(files);
+}
+
+void QnMainWindow::showMainMenu() 
+{
+    if(!m_titleVisible)
+        return;
+
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
+    menu->move(mapToGlobal(m_mainMenuButton->geometry().bottomLeft()));
+    menu->exec();
 }
 
 void QnMainWindow::showOpenFileDialog()
@@ -496,6 +515,55 @@ void QnMainWindow::closeCurrentLayout() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+/* // TODO
+if (action == &cm_remove_from_disk) {
+    QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
+*/
+
+void QnMainWindow::at_editTagsAction_triggred() 
+{
+    QnResourceList resources = qnMenu->cause(sender());
+    if(resources.empty() || !resources[0])
+        return;
+
+    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resources[0]->getUniqueId(), this));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnMainWindow::at_cameraSettingsAction_triggered()
+{
+    QnResourceList resources = qnMenu->cause(sender());
+    if(resources.empty() || !resources[0])
+        return;
+
+    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(this, resources[0].dynamicCast<QnVirtualCameraResource>()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnMainWindow::at_serverSettingsAction_triggered() 
+{
+    QnResourceList resources = qnMenu->cause(sender());
+    if(resources.empty() || !resources[0])
+        return;
+
+    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(this, resources[0].dynamicCast<QnVideoServerResource>()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnMainWindow::at_youtubeUploadAction_triggered() 
+{
+    QnResourceList resources = qnMenu->cause(sender());
+    if(resources.empty() || !resources[0])
+        return;
+
+    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resources[0], this));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
 void QnMainWindow::at_sessionManager_error(int error)
 {
     switch (error) {
@@ -540,6 +608,11 @@ void QnMainWindow::at_synchronizer_started() {
 
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
+
+    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+        qnAction(Qn::MainMenuAction)->trigger();
+        return true;
+    }
 
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);

@@ -4,7 +4,6 @@
 #include <QToolButton>
 
 #include "ui/ui_common.h"
-#include "ui/context_menu_helper.h"
 #include "ui/context_menu/context_menu.h"
 
 #include "connectionssettingswidget.h"

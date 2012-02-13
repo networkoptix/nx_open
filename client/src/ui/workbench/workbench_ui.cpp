@@ -9,6 +9,7 @@
 #include <QStyle>
 #include <QApplication>
 #include <QSettings>
+#include <QMenu>
 
 #include <utils/common/event_signalizer.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -39,13 +40,10 @@
 
 #include <ui/processors/hover_processor.h>
 
-
 #include <ui/context_menu/context_menu.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/context_menu_helper.h>
 #include <ui/style/skin.h>
-#include <ui/context_menu_helper.h>
 #include <ui/mixins/render_watch_mixin.h>
 
 #include "camera/camera.h"
@@ -319,9 +317,12 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     tabBarWidget->setWorkbench(display->workbench());
     m_tabBarItem->setWidget(tabBarWidget);
 
+    m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
+    titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
     titleLayout->addItem(newActionButton(qnAction(Qn::NewTabAction)));
     titleLayout->addStretch(0x1000);
@@ -364,6 +365,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    qnAction(Qn::FullscreenAction), SLOT(toggle()));
+    connect(qnAction(Qn::MainMenuAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_mainMenuAction_triggered()));
 
 
     /* Connect to display. */
@@ -764,6 +766,19 @@ void QnWorkbenchUi::at_activityStarted() {
     m_inactive = false;
 
     updateControlsVisibility(true);
+}
+
+void QnWorkbenchUi::at_mainMenuAction_triggered() {
+    if(!m_mainMenuButton->isVisible())
+        return;
+
+    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
+    pos.rx() = qMax(pos.x(), 0);
+    pos.ry() = qMax(pos.y(), 0);
+
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
+    menu->move(pos);
+    menu->exec();
 }
 
 void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {

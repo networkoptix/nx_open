@@ -9,6 +9,8 @@ class QAction;
 class QIcon;
 
 class VariantAnimator;
+class QnTextureTransitionShaderProgram;
+class QnGlFunctions;
 
 /**
  * A lightweight button widget that does not use style for painting. 
@@ -92,15 +94,14 @@ protected:
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    virtual void paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState);
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget);
 
 protected:
-    StateFlags displayState(StateFlags flags);
-    const QPixmap &cachedPixmap(StateFlags flags);
     void updateState(StateFlags state);
 
-    void ensurePixmapCache();
+    void ensurePixmapCache() const;
     void invalidatePixmapCache();
+    StateFlags displayState(StateFlags flags) const;
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
@@ -117,6 +118,8 @@ private:
     qreal m_hoverProgress;
 
     QAction *m_action;
+    QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
+    QScopedPointer<QnGlFunctions> m_gl;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags);
@@ -139,7 +142,9 @@ public:
     }
 
 protected:
-    virtual void paintPixmap(QPainter *painter, StateFlags displayState, StateFlags actualState) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) override;
+
+    bool isScaledState(StateFlags state);
 
 private:
     qreal m_scaleFactor;

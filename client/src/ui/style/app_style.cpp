@@ -1,34 +1,35 @@
 #include "app_style.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QPainter>
-#include <QtGui/QStyleOption>
+#include <QApplication>
+#include <QPainter>
+#include <QStyleOption>
+#include <QMenu>
+#include <QAction>
 
 #include "skin.h"
 
 static const float global_dialog_opacity = 0.9f;
 static const float global_menu_opacity = 0.8f;
 
-AppStyle::AppStyle(const QString &baseStyle, QObject *parent)
-    : QnProxyStyle(baseStyle, parent)
-{
-}
+AppStyle::AppStyle(const QString &baseStyle, QObject *parent): 
+    base_type(baseStyle, parent)
+{}
 
 void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     switch (control) {
 #ifndef QT_NO_SLIDER
     case CC_Slider:
-        if (widget && widget->inherits("QAbstractSlider")) { // for old good widgets
-            QnProxyStyle::drawComplexControl(control, option, painter, widget);
+        if (widget && widget->inherits("QAbstractSlider")) { /* For old good widgets. */
+            base_type::drawComplexControl(control, option, painter, widget);
             break;
         }
 
-        // ### optimize in Bespin & remove
+        /* Bespin's slider painting is way to slow, so we do it our way. */
         if (const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
             if (sliderOption->orientation != Qt::Horizontal) {
                 qWarning("AppStyle: Non-horizontal sliders are not implemented. Falling back to the default painting.");
-                QnProxyStyle::drawComplexControl(control, option, painter, widget);
+                base_type::drawComplexControl(control, option, painter, widget);
                 break;
             }
 
@@ -59,17 +60,44 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
 #endif // QT_NO_SLIDER
     case CC_TitleBar:
         {
-            // draw background in order to avoid painting artifacts
+            /* Draw background in order to avoid painting artifacts. */
             QColor bgColor = option->palette.color(widget ? widget->backgroundRole() : QPalette::Window);
             if (bgColor != Qt::transparent) {
                 bgColor.setAlpha(255);
                 painter->fillRect(option->rect, bgColor);
             }
         }
-        // fall through
-
+        /* FALL THROUGH. */
     default:
-        QnProxyStyle::drawComplexControl(control, option, painter, widget);
+        base_type::drawComplexControl(control, option, painter, widget);
+    }
+}
+
+void AppStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+    switch(element) {
+    case CE_MenuItem:
+        /* There are cases when we want an action to be checkable, but do not want the checkbox displayed in the menu. 
+         * So we introduce an internal property for this. */
+        if(const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
+            const QMenu *menu = qobject_cast<const QMenu *>(widget);
+            if(!menu) {
+                base_type::drawControl(element, option, painter, widget);
+            } else {
+                QAction *action = menu->actionAt(option->rect.center());
+                if(action && action->property(hideCheckBoxInMenuPropertyName).value<bool>()) {
+                    QStyleOptionMenuItem::CheckType checkType = itemOption->checkType;
+                    QStyleOptionMenuItem *localOption = const_cast<QStyleOptionMenuItem *>(itemOption);
+                    localOption->checkType = QStyleOptionMenuItem::NotCheckable;
+                    base_type::drawControl(element, option, painter, widget);
+                    localOption->checkType = checkType;
+                } else {
+                    base_type::drawControl(element, option, painter, widget);
+                }
+            }
+        }
+        break;
+    default:
+        base_type::drawControl(element, option, painter, widget);
     }
 }
 
@@ -78,12 +106,12 @@ int AppStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidge
     if (hint == QStyle::SH_ToolTipLabel_Opacity)
         return 255;
 
-    return QnProxyStyle::styleHint(hint, option, widget, returnData);
+    return base_type::styleHint(hint, option, widget, returnData);
 }
 
 void AppStyle::polish(QApplication *application)
 {
-    QnProxyStyle::polish(application);
+    base_type::polish(application);
 
     QFont menuFont;
     menuFont.setFamily(QLatin1String("Bodoni MT"));
@@ -95,24 +123,23 @@ void AppStyle::unpolish(QApplication *application)
 {
     application->setFont(QFont(), "QMenu");
 
-    QnProxyStyle::unpolish(application);
+    base_type::unpolish(application);
 }
 
 void AppStyle::polish(QWidget *widget)
 {
-    QnProxyStyle::polish(widget);
+    base_type::polish(widget);
 }
 
 void AppStyle::unpolish(QWidget *widget)
 {
-    QnProxyStyle::unpolish(widget);
+    base_type::unpolish(widget);
 }
 
 
-AppProxyStyle::AppProxyStyle(QStyle *style)
-    : QProxyStyle(style)
-{
-}
+AppProxyStyle::AppProxyStyle(QStyle *style): 
+    QProxyStyle(style)
+{}
 
 static inline bool buttonVisible(const QStyle::SubControl sc, const QStyleOptionTitleBar *tb)
 {

@@ -131,7 +131,9 @@ bool qnBetween(const T &value, const T &min, const T &max) {
  * \returns                             Whether the given value lies in [min, max] interval, 
  */
 inline bool qnFuzzyBetween(double value, double min, double max, double precision = 0.000000000001) {
-    return min * (1.0 - precision) <= value && value <= max * (1.0 + precision);
+    double localPrecision = precision * qMax(qAbs(min), qAbs(max));
+
+    return min - localPrecision <= value && value <= max + localPrecision;
 }
 
 quint64 QN_EXPORT getUsecTimer();

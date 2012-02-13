@@ -384,5 +384,6 @@ float qFuzzyCeil(float value);
 
 double qFuzzyCeil(double value);
 
+bool qFuzzyContains(const QRectF &rect, const QPointF &point);
 
 #endif // QN_SCENE_UTILITY_H

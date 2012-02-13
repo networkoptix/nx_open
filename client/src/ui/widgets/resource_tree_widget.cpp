@@ -16,22 +16,13 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
-#include "ui/context_menu_helper.h"
-#include "ui/device_settings/dlg_factory.h"
-#include "ui/dialogs/tagseditdialog.h"
-#include "ui/dialogs/camerasettingsdialog.h"
-#include "ui/dialogs/serversettingsdialog.h"
+#include "ui/context_menu/context_menu.h"
 #include "ui/models/resource_model.h"
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/models/resource_search_synchronizer.h"
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench.h"
-#include "ui/workbench/workbench_controller.h"
-#include "ui/workbench/workbench_display.h"
-#include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench_layout.h"
-#include "youtube/youtubeuploaddialog.h"
-#include "file_processor.h"
 
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
 Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
@@ -273,80 +264,11 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     foreach (const QModelIndex &index, selectionModel->selectedRows())
         resources.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
 
-    QScopedPointer<QMenu> menu(new QMenu);
-
-    QAction *openAction = new QAction(tr("Open"), menu.data());
-    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
-    menu->addAction(openAction);
-    menu->addSeparator();
-    if (resources.size() == 1) {
-        const QnResourcePtr &resource = resources.first();
-        if (resource->checkFlags(QnResource::video) || resource->checkFlags(QnResource::SINGLE_SHOT)) {
-            menu->addAction(&cm_editTags);
-
-            if (resource->associatedWithFile())
-                menu->addAction(&cm_remove_from_disk);
-
-            if (resource->checkFlags(QnResource::ARCHIVE))
-                menu->addAction(&cm_upload_youtube);
-
-            if (resource->checkFlags(QnResource::ARCHIVE) || resource->checkFlags(QnResource::SINGLE_SHOT))
-                menu->addAction(&cm_open_containing_folder);
-        } else if (resource->checkFlags(QnResource::live_cam)) {
-            // ### Start/Stop recording (Ctrl+R)
-            // ### Delete(if no connection)(Shift+Del)
-            menu->addAction(&cm_editTags);
-            // ### Export selected... (Ctrl+E)
-        } else if (resource->checkFlags(QnResource::server)) {
-            // ### New camera
-        }
-        // ### handle layouts
-
-        if ((CLDeviceSettingsDlgFactory::canCreateDlg(resource) && resource.dynamicCast<QnVirtualCameraResource>()) || resource.dynamicCast<QnVideoServerResource>())
-            menu->addAction(&cm_settings);
-    } else if (resources.size() > 1) {
-        // ###
-    } else {
-        //menu->addAction(&cm_open_file);
-        //menu->addAction(&cm_new_item);
-    }
-    menu->addSeparator();
-    //menu->addAction(&cm_toggle_fullscreen);
-    menu->addAction(&cm_screen_recording);
-    //menu->addAction(&cm_preferences);
-    /*menu->addSeparator();
-    menu->addAction(&cm_exit);*/
-
-    QAction *action = menu->exec(QCursor::pos());
-    if (!action)
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, resources));
+    if(menu->isEmpty())
         return;
 
-    if (resources.size() == 1) {
-        const QnResourcePtr &resource = resources.first();
-        if (action == &cm_remove_from_disk) {
-            QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
-        } else if (action == &cm_settings) { // ### move to app-global scope ?
-            if (resource.dynamicCast<QnVirtualCameraResource>())
-            {
-                CameraSettingsDialog dialog(QApplication::activeWindow(), resource.dynamicCast<QnVirtualCameraResource>());
-                dialog.setWindowModality(Qt::ApplicationModal);
-                dialog.exec();
-            } else if (resource.dynamicCast<QnVideoServerResource>())
-            {
-                ServerSettingsDialog dialog(QApplication::activeWindow(), resource.dynamicCast<QnVideoServerResource>());
-                dialog.setWindowModality(Qt::ApplicationModal);
-                dialog.exec();
-            }
-        } else if (action == &cm_editTags) { // ### move to app-global scope ?
-            TagsEditDialog dialog(QStringList() << resource->getUniqueId(), QApplication::activeWindow());
-            dialog.setWindowModality(Qt::ApplicationModal);
-            dialog.exec();
-        } else if (action == &cm_upload_youtube) { // ### move to app-global scope ?
-            YouTubeUploadDialog dialog(resource, QApplication::activeWindow());
-            dialog.setWindowModality(Qt::ApplicationModal);
-            dialog.exec();
-        }
-    }
+    menu->exec(QCursor::pos());
 }
 
 void QnResourceTreeWidget::wheelEvent(QWheelEvent *event) {

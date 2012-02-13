@@ -3,26 +3,27 @@
 
 #include <QObject>
 #include <QHash>
+#include <QVariant>
+#include <core/resource/resource_fwd.h>
 
 class QAction;
 class QMenu;
+class QGraphicsItem;
 
 class QnActionFactory;
 class QnActionBuilder;
+class QnActionCondition;
 
 namespace Qn {
 
     /**
      * Enum of all menu actions.
      * 
-     * Note that item order is important. It defines item ordering in the
-     * resulting menu.
+     * ACHTUNG! Item order is important. 
+     * It defines item ordering in the resulting menu.
      */
     enum ActionId {
-        /**
-         * Closes the client.
-         */
-        ExitAction,
+        /* Actions that are not assigned to any menu. */
 
         /**
          * Opens about dialog.
@@ -33,16 +34,6 @@ namespace Qn {
          * Opens connection setting dialog.
          */
         ConnectionSettingsAction,
-
-        /**
-         * Toggles client's fullscreen state.
-         */
-        FullscreenAction,
-
-        /**
-         * Opens preferences dialog.
-         */
-        PreferencesAction,
 
         /**
          * Shows / hides FPS display.
@@ -59,10 +50,85 @@ namespace Qn {
          */
         CloseTabAction,
 
+
+
+        /* Main menu actions. */
+
+        /**
+         * Opens the main menu.
+         */
+        MainMenuAction,
+
         /**
          * Opens a file dialog and adds selected files to the current layout.
          */
         OpenFileAction,
+
+        /**
+         * Submenu for screen recording.
+         */
+        ScreenRecordingMenu,
+
+            /**
+             * Starts / stops screen recording.
+             */
+            ScreenRecordingAction,
+
+            /**
+             * Opens screen recording dialog.
+             */
+            ScreenRecordingSettingsAction,
+
+        /**
+         * Toggles client's fullscreen state.
+         */
+        FullscreenAction,
+
+        /**
+         * Opens preferences dialog.
+         */
+        PreferencesAction,
+
+        ExitSeparator,
+
+        /**
+         * Closes the client.
+         */
+        ExitAction,
+
+
+
+        /* Resource actions. */
+
+        /**
+         * Shows motion search grid on an item.
+         */
+        ShowMotionAction,
+
+        /**
+         * Hides motion search grid on an item.
+         */
+        HideMotionAction,
+
+        /**
+         * Opens camera settings dialog.
+         */
+        CameraSettingsAction,
+
+        /**
+         * Opens server settings dialog.
+         */
+        ServerSettingsAction,
+
+        /**
+         * Opens a YouTube upload dialog.
+         */
+        YouTubeUploadAction,
+
+        /**
+         * Opens tags editing dialog.
+         */
+        EditTagsAction,
 
 
 #if 0
@@ -282,9 +348,10 @@ namespace Qn {
     };
 
     enum ActionScope {
-        SceneScope          = 0x1,              /**< Scene menu requested. */
-        TreeScope           = 0x2,              /**< Tree menu requested. */
-        SliderScope         = 0x4,              /**< Slider menu requested. */
+        MainScope           = 0x1,              /**< Application's main menu requested. */
+        SceneScope          = 0x2,              /**< Scene context menu requested. */
+        TreeScope           = 0x4,              /**< Tree context menu requested. */
+        SliderScope         = 0x8,              /**< Slider context menu requested. */
     };
 
 } // namespace Qn
@@ -294,17 +361,20 @@ class QnContextMenu: public QObject {
     Q_OBJECT;
 public:
     enum ActionFlag {
-        Invisible           = 0,                /**< Action cannot appear in any menu. */
-        Scene               = Qn::SceneScope,   /**< Action can appear in scene menu. */
-        Tree                = Qn::TreeScope,    /**< Action can appear in tree menu. */
-        Slider              = Qn::SliderScope,  /**< Action can appears in slider menu. */
+        NoTarget            = 0x00000010,       /**< Action can be applied when there are no targets. */
+        SingleTarget        = 0x00000020,       /**< Action can be applied to a single target. */
+        MultiTarget         = 0x00000040,       /**< Action can be applied to multiple targets. */
+        TargetMask          = 0x00000070,
+
+        Invisible           = 0,                                /**< Action cannot appear in any menu. */
+        Main                = Qn::MainScope | NoTarget,         /**< Action can appear in main menu. */
+        Scene               = Qn::SceneScope,                   /**< Action can appear in scene context menu. */
+        Tree                = Qn::TreeScope,                    /**< Action can appear in tree context menu. */
+        Slider              = Qn::SliderScope | SingleTarget,   /**< Action can appears in slider context menu. */
         Global              = Scene | Tree | Slider, 
 
-        MultiTarget         = 0x00000010,       /**< Action can be applied to multiple targets. */
-
         ToggledText         = 0x01000000,       /**< Action has different text for toggled state. */
-        Menu                = 0x10000000,       /**< Action is actually a menu with sub-actions. */
-        Separator           = 0x20000000,       /**< Action is actually a menu separator. */
+        Separator           = 0x10000000,       /**< Action is actually a menu separator. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
@@ -317,27 +387,52 @@ public:
 
     QAction *action(Qn::ActionId id) const;
 
-    //QMenu *newMenu(QWidget *parent = NULL);
+    QMenu *newMenu(Qn::ActionScope scope);
+
+    QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources);
+
+    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
+
+    QnResourceList cause(QObject *sender);
 
 protected:
     friend class QnActionFactory;
     friend class QnActionBuilder;
 
     struct ActionData {
-        ActionData(): id(Qn::NoAction), parentId(Qn::NoAction), flags(0), action(NULL) {}
+        ActionData(): id(Qn::NoAction), flags(0), action(NULL), condition(NULL) {}
 
         Qn::ActionId id;
-        Qn::ActionId parentId;
         ActionFlags flags;
         QAction *action;
         QString normalText, toggledText;
+        QnActionCondition *condition;
+
+        QList<ActionData *> children;
     };
+
+    template<class ItemSequence>
+    QMenu *newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
+
+    template<class ItemSequence>
+    QMenu *newMenuRecursive(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
 
 private slots:
     void at_action_toggled();
+    void at_menu_destroyed(QObject *menu);
 
 private:
-    QHash<Qn::ActionId, ActionData> m_infoById;
+    /** Mapping from action id to action data. */ 
+    QHash<Qn::ActionId, ActionData *> m_dataById;
+
+    /** Root action data. Also contained in the map above. */
+    ActionData *m_root;
+
+    /** Set of all menus created by this object that are not yet destroyed. */
+    QSet<QObject *> m_menus;
+
+    /** List of items supplied to the last call to <tt>newMenu</tt>. */
+    QVariant m_lastQuery;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnContextMenu::ActionFlags);

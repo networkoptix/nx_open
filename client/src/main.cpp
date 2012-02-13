@@ -8,7 +8,6 @@
 #include "decoders/video/ipp_h264_decoder.h"
 
 #include "ui/device_settings/dlg_factory.h"
-#include "ui/context_menu_helper.h"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
@@ -423,8 +422,6 @@ int main(int argc, char *argv[])
     */
 
     //=========================================================
-
-    initContextMenu();
 
     QnMainWindow mainWindow(argc, argv);
     mainWindow.setAttribute(Qt::WA_QuitOnClose);

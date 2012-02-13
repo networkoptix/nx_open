@@ -6,6 +6,7 @@
 #include <QCursor>
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
+#include <utils/common/util.h>
 
 namespace {
 #ifdef QN_SCENE_UTILITY_DEBUG
@@ -510,4 +511,10 @@ double qFuzzyCeil(double value) {
     } else {
         return result;
     }
+}
+
+bool qFuzzyContains(const QRectF &rect, const QPointF &point) {
+    return 
+        qnFuzzyBetween(point.x(), rect.left(), rect.right()) &&
+        qnFuzzyBetween(point.y(), rect.top(), rect.bottom());
 }
