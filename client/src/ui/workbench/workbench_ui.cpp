@@ -43,9 +43,7 @@
 #include <ui/context_menu/context_menu.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/context_menu_helper.h>
 #include <ui/style/skin.h>
-#include <ui/context_menu_helper.h>
 #include <ui/mixins/render_watch_mixin.h>
 
 #include "camera/camera.h"

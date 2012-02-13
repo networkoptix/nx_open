@@ -16,23 +16,13 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
-#include "ui/context_menu_helper.h"
 #include "ui/context_menu/context_menu.h"
-#include "ui/device_settings/dlg_factory.h"
-#include "ui/dialogs/tagseditdialog.h"
-#include "ui/dialogs/camerasettingsdialog.h"
-#include "ui/dialogs/serversettingsdialog.h"
 #include "ui/models/resource_model.h"
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/models/resource_search_synchronizer.h"
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench.h"
-#include "ui/workbench/workbench_controller.h"
-#include "ui/workbench/workbench_display.h"
-#include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench_layout.h"
-#include "youtube/youtubeuploaddialog.h"
-#include "file_processor.h"
 
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
 Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
