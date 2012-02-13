@@ -1,15 +1,12 @@
 #include "main_window.h"
 
-#include <QtCore/QFile>
-
-#include <QtGui/QApplication>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QFileDialog>
-#include <QtGui/QToolBar>
-#include <QtGui/QToolButton>
-#include <QtGui/QCloseEvent>
-
-#include <QtNetwork/QNetworkReply>
+#include <QApplication>
+#include <QBoxLayout>
+#include <QFileDialog>
+#include <QToolButton>
+#include <QMenu>
+#include <QFile>
+#include <QNetworkReply>
 
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
@@ -51,8 +48,11 @@
 
 #include "dwm.h"
 #include "layout_tab_bar.h"
+#include "system_menu_event.h"
 
 #include "eventmanager.h"
+
+#include <QAbstractEventDispatcher>
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
@@ -98,6 +98,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
       m_titleVisible(true),
       m_dwm(NULL)
 {
+    /* We want to receive system menu event on Windows. */
+    QnSystemMenuEvent::initialize();
+
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
@@ -139,6 +142,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     connect(qnAction(Qn::CloseTabAction), SIGNAL(triggered()), this, SLOT(closeCurrentLayout()));
     addAction(qnAction(Qn::CloseTabAction));
+
+    connect(qnAction(Qn::MainMenuAction), SIGNAL(triggered()), this, SLOT(showMainMenu()));
+    addAction(qnAction(Qn::MainMenuAction));
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
@@ -200,10 +206,11 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
+    m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::MainMenuAction)));
+    m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewTabAction)));
     m_titleLayout->addStretch(0x1000);
@@ -288,6 +295,16 @@ void QnMainWindow::handleMessage(const QString &message)
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     m_controller->drop(files);
+}
+
+void QnMainWindow::showMainMenu() 
+{
+    if(!m_titleVisible)
+        return;
+
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
+    menu->move(mapToGlobal(m_mainMenuButton->geometry().bottomLeft()));
+    menu->exec();
 }
 
 void QnMainWindow::showOpenFileDialog()
@@ -541,6 +558,11 @@ void QnMainWindow::at_synchronizer_started() {
 
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
+
+    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+        qnAction(Qn::MainMenuAction)->trigger();
+        return true;
+    }
 
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);

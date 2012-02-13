@@ -7,6 +7,7 @@
 class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
+class QToolButton;
 
 class QnResourcePoolUserWatcher;
 class QnBlueBackgroundPainter;
@@ -58,6 +59,7 @@ protected slots:
     void showAboutDialog();
     void showPreferencesDialog();
     void showAuthenticationDialog();
+    void showMainMenu();
 
     void updateFullScreenState();
     void updateDwmState();
@@ -84,6 +86,7 @@ private:
 
     QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;
+    QToolButton *m_mainMenuButton;
 
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_viewLayout;

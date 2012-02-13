@@ -15,19 +15,11 @@ namespace Qn {
     /**
      * Enum of all menu actions.
      * 
-     * Note that item order is important. It defines item ordering in the
-     * resulting menu.
+     * ACHTUNG! Item order is important. 
+     * It defines item ordering in the resulting menu.
      */
     enum ActionId {
-        /**
-         * Opens the main menu.
-         */
-        MainMenuAction,
-
-        /**
-         * Closes the client.
-         */
-        ExitAction,
+        /* Actions that are not assigned to any menu. */
 
         /**
          * Opens about dialog.
@@ -38,16 +30,6 @@ namespace Qn {
          * Opens connection setting dialog.
          */
         ConnectionSettingsAction,
-
-        /**
-         * Toggles client's fullscreen state.
-         */
-        FullscreenAction,
-
-        /**
-         * Opens preferences dialog.
-         */
-        PreferencesAction,
 
         /**
          * Shows / hides FPS display.
@@ -64,6 +46,15 @@ namespace Qn {
          */
         CloseTabAction,
 
+
+
+        /* Main menu actions. */
+
+        /**
+         * Opens the main menu.
+         */
+        MainMenuAction,
+
         /**
          * Opens a file dialog and adds selected files to the current layout.
          */
@@ -74,15 +65,36 @@ namespace Qn {
          */
         ScreenRecordingMenu,
 
-        /**
-         * Starts / stops screen recording.
-         */
-        ScreenRecordingAction,
+            /**
+             * Starts / stops screen recording.
+             */
+            ScreenRecordingAction,
+
+            /**
+             * Opens screen recording dialog.
+             */
+            ScreenRecordingSettingsAction,
 
         /**
-         * Opens screen recording dialog.
+         * Toggles client's fullscreen state.
          */
-        ScreenRecordingSettingsAction,
+        FullscreenAction,
+
+        /**
+         * Opens preferences dialog.
+         */
+        PreferencesAction,
+
+        ExitSeparator,
+
+        /**
+         * Closes the client.
+         */
+        ExitAction,
+
+
+
+
 
 #if 0
         /** 
@@ -301,9 +313,10 @@ namespace Qn {
     };
 
     enum ActionScope {
-        SceneScope          = 0x1,              /**< Scene menu requested. */
-        TreeScope           = 0x2,              /**< Tree menu requested. */
-        SliderScope         = 0x4,              /**< Slider menu requested. */
+        MainScope           = 0x1,              /**< Application's main menu requested. */
+        SceneScope          = 0x2,              /**< Scene context menu requested. */
+        TreeScope           = 0x4,              /**< Tree context menu requested. */
+        SliderScope         = 0x8,              /**< Slider context menu requested. */
     };
 
 } // namespace Qn
@@ -314,16 +327,16 @@ class QnContextMenu: public QObject {
 public:
     enum ActionFlag {
         Invisible           = 0,                /**< Action cannot appear in any menu. */
-        Scene               = Qn::SceneScope,   /**< Action can appear in scene menu. */
-        Tree                = Qn::TreeScope,    /**< Action can appear in tree menu. */
-        Slider              = Qn::SliderScope,  /**< Action can appears in slider menu. */
+        Main                = Qn::MainScope,    /**< Action can appear in main menu. */
+        Scene               = Qn::SceneScope,   /**< Action can appear in scene context menu. */
+        Tree                = Qn::TreeScope,    /**< Action can appear in tree context menu. */
+        Slider              = Qn::SliderScope,  /**< Action can appears in slider context menu. */
         Global              = Scene | Tree | Slider, 
 
         MultiTarget         = 0x00000010,       /**< Action can be applied to multiple targets. */
 
         ToggledText         = 0x01000000,       /**< Action has different text for toggled state. */
-        Menu                = 0x10000000,       /**< Action is actually a menu with sub-actions. */
-        Separator           = 0x20000000,       /**< Action is actually a menu separator. */
+        Separator           = 0x10000000,       /**< Action is actually a menu separator. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
@@ -336,27 +349,32 @@ public:
 
     QAction *action(Qn::ActionId id) const;
 
-    //QMenu *newMenu(QWidget *parent = NULL);
+    QMenu *newMenu(Qn::ActionScope scope) const;
 
 protected:
     friend class QnActionFactory;
     friend class QnActionBuilder;
 
     struct ActionData {
-        ActionData(): id(Qn::NoAction), parentId(Qn::NoAction), flags(0), action(NULL) {}
+        ActionData(): id(Qn::NoAction), flags(0), action(NULL) {}
 
         Qn::ActionId id;
-        Qn::ActionId parentId;
         ActionFlags flags;
         QAction *action;
+        QAction *proxyAction;
         QString normalText, toggledText;
+
+        QList<ActionData *> children;
     };
+
+    QMenu *newMenu(const ActionData *parent, Qn::ActionScope scope) const;
 
 private slots:
     void at_action_toggled();
 
 private:
-    QHash<Qn::ActionId, ActionData> m_infoById;
+    QHash<Qn::ActionId, ActionData *> m_dataById;
+    ActionData *m_root;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnContextMenu::ActionFlags);

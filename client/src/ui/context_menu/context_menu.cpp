@@ -3,6 +3,7 @@
 #include <QMenu>
 #include <cassert>
 #include <ui/style/skin.h>
+#include <ui/style/app_style.h>
 #include "utils/common/checked_cast.h"
 
 namespace {
@@ -26,25 +27,25 @@ namespace {
 
 class QnActionBuilder {
 public:
-    QnActionBuilder(QnContextMenu *menu, QnContextMenu::ActionData &data): m_menu(menu), m_data(data) {}
+    QnActionBuilder(QnContextMenu *menu, QnContextMenu::ActionData *data): m_menu(menu), m_data(data) {}
 
     QnActionBuilder shortcut(const QKeySequence &shortcut, Qt::ShortcutContext context = Qt::ApplicationShortcut) {
-        QList<QKeySequence> shortcuts = m_data.action->shortcuts();
+        QList<QKeySequence> shortcuts = m_data->action->shortcuts();
         shortcuts.push_back(shortcut);
-        m_data.action->setShortcuts(shortcuts);
-        m_data.action->setShortcutContext(context);
+        m_data->action->setShortcuts(shortcuts);
+        m_data->action->setShortcutContext(context);
 
         return *this;
     }
 
     QnActionBuilder icon(const QIcon &icon) {
-        m_data.action->setIcon(icon);
+        m_data->action->setIcon(icon);
 
         return *this;
     }
 
     QnActionBuilder toggledIcon(const QIcon &toggledIcon) {
-        QIcon icon = m_data.action->icon();
+        QIcon icon = m_data->action->icon();
         
         for(int i = 0; i <= QIcon::Selected; i++) {
             QIcon::Mode mode = static_cast<QIcon::Mode>(i);
@@ -53,108 +54,113 @@ public:
             icon.addPixmap(toggledIcon.pixmap(toggledIcon.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
         }
 
-        m_data.action->setIcon(icon);
-        m_data.action->setCheckable(true);
+        m_data->action->setIcon(icon);
+        m_data->action->setCheckable(true);
 
         return *this;
     }
 
     QnActionBuilder role(QAction::MenuRole role) {
-        m_data.action->setMenuRole(role);
+        m_data->action->setMenuRole(role);
 
         return *this;
     }
 
     QnActionBuilder autoRepeat(bool autoRepeat) {
-        m_data.action->setAutoRepeat(autoRepeat);
+        m_data->action->setAutoRepeat(autoRepeat);
 
         return *this;
     }
 
     QnActionBuilder text(const QString &text) {
-        m_data.action->setText(text);
-        m_data.normalText = text;
+        m_data->action->setText(text);
+        m_data->normalText = text;
 
         return *this;
     }
 
     QnActionBuilder toggledText(const QString &text) {
-        m_data.flags |= QnContextMenu::ToggledText;
-        m_data.toggledText = text;
-        m_data.action->setCheckable(true);
+        m_data->flags |= QnContextMenu::ToggledText;
+        m_data->toggledText = text;
+        m_data->action->setCheckable(true);
 
-        QObject::connect(m_data.action, SIGNAL(toggled(bool)), m_menu, SLOT(at_action_toggled()), Qt::UniqueConnection);
+        QObject::connect(m_data->action, SIGNAL(toggled(bool)), m_menu, SLOT(at_action_toggled()), Qt::UniqueConnection);
+
+        showCheckBoxInMenu(false);
 
         return *this;
     }
 
     QnActionBuilder flags(QnContextMenu::ActionFlags flags) {
-        m_data.flags |= flags;
+        m_data->flags |= flags;
+
+        if(flags & QnContextMenu::Separator)
+            m_data->action->setSeparator(true);
 
         return *this;
     }
 
+    void showCheckBoxInMenu(bool show) {
+        m_data->action->setProperty(hideCheckBoxInMenuPropertyName, !show);
+    }
+
 private:
-    QnContextMenu::ActionData &m_data;
+    QnContextMenu::ActionData *m_data;
     QnContextMenu *m_menu;
 };
 
 
 class QnActionFactory {
 public:
-    QnActionFactory(QnContextMenu *menu): 
+    QnActionFactory(QnContextMenu *menu, QnContextMenu::ActionData *parent): 
         m_menu(menu)
     {
-        m_menuStack.push_back(Qn::NoAction);
+        m_dataStack.push_back(parent);
+        m_lastData = parent;
     }
 
     void enterSubMenu() {
-        m_menuStack.push_back(m_lastId);
+        m_dataStack.push_back(m_lastData);
     }
 
     void leaveSubMenu() {
-        m_menuStack.pop_back();
+        m_dataStack.pop_back();
     }
 
     QnActionBuilder operator()(Qn::ActionId id) {
-        QnContextMenu::ActionData &data = m_menu->m_infoById[id];
-        data.id = id;
-        data.parentId = m_menuStack.back();
+        QnContextMenu::ActionData *data = m_menu->m_dataById.value(id);
+        if(data == NULL) {
+            data = new QnContextMenu::ActionData();
 
-        if(data.action == NULL) {
-            data.action = new QAction(m_menu);
-            setActionId(data.action, id);
+            data->id = id;
+            data->action = new QAction(m_menu);
+            data->action->setIconVisibleInMenu(true);
+            setActionId(data->action, id);
+            m_menu->m_dataById[id] = data;
         }
 
-        m_lastId = id;
+        m_dataStack.back()->children.push_back(data);
+        m_lastData = data;
 
         return QnActionBuilder(m_menu, data);
     }
 
 private:
-    Qn::ActionId m_lastId;
     QnContextMenu *m_menu;
-    QVector<Qn::ActionId> m_menuStack;
+    QnContextMenu::ActionData *m_lastData;
+    QList<QnContextMenu::ActionData *> m_dataStack;
 };
 
 
 QnContextMenu::QnContextMenu(QObject *parent): 
     QObject(parent)
 {
-    QnActionFactory factory(this);
+    m_root = new ActionData();
+    m_dataById[Qn::NoAction] = m_root;
 
-    factory(Qn::MainMenuAction).
-        text(tr("Main Menu")).
-        autoRepeat(false).
-        icon(Skin::icon(QLatin1String("logo_icon.png")));
+    QnActionFactory factory(this, m_root);
 
-    factory(Qn::ExitAction).
-        text(tr("Exit")).
-        shortcut(tr("Alt+F4")).
-        role(QAction::QuitRole).
-        autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
-
+    /* Actions that are not assigned to any menu. */
     factory(Qn::AboutAction).
         text(tr("About...")).
         role(QAction::AboutRole).
@@ -165,26 +171,6 @@ QnContextMenu::QnContextMenu(QObject *parent):
         text(tr("Connection Settings")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("connect.png")));
-
-    factory(Qn::FullscreenAction).
-        text(tr("Go to Fullscreen")).
-        toggledText(tr("Restore Down")).
-        autoRepeat(false).
-#ifdef Q_OS_MAC
-        shortcut(tr("Ctrl+F")).
-#else
-        shortcut(tr("Alt+Return")).
-        shortcut(tr("Esc")).
-#endif
-        icon(Skin::icon(QLatin1String("decorations/fullscreen.png"))).
-        toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png")));
-
-    factory(Qn::PreferencesAction).
-        text(tr("Preferences")).
-        shortcut(tr("Ctrl+P")).
-        role(QAction::PreferencesRole).
-        autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/settings.png")));
 
     factory(Qn::ShowFpsAction).
         text(tr("Show FPS")).
@@ -203,30 +189,89 @@ QnContextMenu::QnContextMenu(QObject *parent):
         shortcut(tr("Ctrl+W")).
         autoRepeat(true);
 
+
+
+    /* Main menu actions. */
+
+    factory(Qn::MainMenuAction).
+        text(tr("Main Menu")).
+        shortcut(tr("Alt+Space")).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("logo_icon.png")));
+
     factory(Qn::OpenFileAction).
+        flags(Main).
         text(tr("Open File(s)...")).
         shortcut(tr("Ctrl+O")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("folder.png")));
 
     factory(Qn::ScreenRecordingMenu).
-        text(tr("Screen Recording")).
-        flags(Menu);
+        flags(Main).
+        text(tr("Screen Recording"));
 
-    factory.enterSubMenu();
+    factory.enterSubMenu(); {
+        factory(Qn::ScreenRecordingAction).
+            flags(Main).
+            text(tr("Start Screen Recording")).
+            toggledText(tr("Stop Screen Recording")).
+            shortcut(tr("Alt+R")).
+            shortcut(Qt::Key_MediaRecord).
+            autoRepeat(false);
 
-    factory(Qn::ScreenRecordingAction).
-        text(tr("Start Screen Recording")).
-        toggledText(tr("Stop Screen Recording")).
-        shortcut(tr("Alt+R")).
-        shortcut(Qt::Key_MediaRecord).
-        autoRepeat(false);
+        factory(Qn::ScreenRecordingSettingsAction).
+            flags(Main).
+            text(tr("Screen Recording Settings")).
+            autoRepeat(false);
+    } factory.leaveSubMenu();
 
-    factory(Qn::ScreenRecordingSettingsAction).
-        text(tr("Screen Recording Settings")).
-        autoRepeat(false);
+    factory(Qn::FullscreenAction).
+        flags(Main).
+        text(tr("Go to Fullscreen")).
+        toggledText(tr("Restore Down")).
+        autoRepeat(false).
+#ifdef Q_OS_MAC
+        shortcut(tr("Ctrl+F")).
+#else
+        shortcut(tr("Alt+Return")).
+        shortcut(tr("Esc")).
+#endif
+        icon(Skin::icon(QLatin1String("decorations/fullscreen.png"))).
+        toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png")));
 
-    factory.leaveSubMenu();
+    factory(Qn::PreferencesAction).
+        flags(Main).
+        text(tr("Preferences")).
+        shortcut(tr("Ctrl+P")).
+        role(QAction::PreferencesRole).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("decorations/settings.png")));
+
+    factory(Qn::ExitSeparator).
+        flags(Main | Separator);
+
+    factory(Qn::ExitAction).
+        flags(Main).
+        text(tr("Exit")).
+        shortcut(tr("Alt+F4")).
+        role(QAction::QuitRole).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #if 0
@@ -281,37 +326,61 @@ QnContextMenu::QnContextMenu(QObject *parent):
     factory.popParent();
     factory(APP_EXIT,                       tr("Exit"),                         tr("Alt+F4"),           GLOBAL_SCOPE);
 #endif
-
-    assert(m_infoById.size() == Qn::ActionCount);
 }
 
 QnContextMenu::~QnContextMenu() {
-    return;
+    qDeleteAll(m_dataById);
 }
 
-Q_GLOBAL_STATIC(QnContextMenu, menuWrapperInstance);
+Q_GLOBAL_STATIC(QnContextMenu, qn_contextMenu);
 
 QnContextMenu *QnContextMenu::instance() {
-    return menuWrapperInstance();
+    return qn_contextMenu();
 }
 
 void QnContextMenu::at_action_toggled() {
     QAction *action = checked_cast<QAction *>(sender());
     Qn::ActionId id = actionId(action);
-    const ActionData &data = m_infoById[id];
+    const ActionData *data = m_dataById[id];
 
-    if(data.flags & ToggledText)
-        action->setText(action->isChecked() ? data.toggledText : data.normalText);
+    if(data->flags & ToggledText)
+        action->setText(action->isChecked() ? data->toggledText : data->normalText);
 }
 
 QAction *QnContextMenu::action(Qn::ActionId id) const {
-    return m_infoById[id].action;
+    return m_dataById[id]->action;
 }
 
-/*QMenu *QnContextMenu::newMenu(QWidget *parent) {
-    QMenu *result = new QMenu(parent);
+QMenu *QnContextMenu::newMenu(Qn::ActionScope scope) const {
+    return newMenu(m_root, scope);
+}
+    
+QMenu *QnContextMenu::newMenu(const ActionData *parent, Qn::ActionScope scope) const {
+    QMenu *result = new QMenu();
 
-    result->setFont(m_menuFont);
+    foreach(const ActionData *data, parent->children) {
+        QAction *action = NULL;
+
+        if(!(data->flags & scope))
+            continue;
+
+        if(data->children.size() > 0) {
+            QMenu *menu = newMenu(data, scope);
+            if(menu->isEmpty()) {
+                delete menu;
+            } else {
+                action = new QAction(result);
+                action->setMenu(menu);
+                action->setText(data->action->text());
+                action->setIcon(data->action->icon());
+            }
+        }
+
+        if(action == NULL)
+            action = data->action;
+
+        result->addAction(action);
+    }
 
     return result;
-}*/
+}
