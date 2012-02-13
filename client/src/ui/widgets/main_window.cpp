@@ -66,13 +66,16 @@ namespace {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
-        int iconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
-        button->setIconSize(QSize(iconSize, iconSize));
+        qreal aspectRatio = SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
+        int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
+        int iconWidth = iconHeight * aspectRatio;
+        button->setIconSize(QSize(iconWidth, iconHeight));
 
-        /* Tool buttons may end up being non-square o_O. We don't allow that. */
+        /* Tool buttons may end up having wrong aspect ratio. We don't allow that. */
         QSize sizeHint = button->sizeHint();
-        int buttonSize = qMin(sizeHint.width(), sizeHint.height());
-        button->setFixedSize(buttonSize, buttonSize);
+        int buttonHeight = sizeHint.height();
+        int buttonWidth = buttonHeight * aspectRatio;
+        button->setFixedSize(buttonWidth, buttonHeight);
 
         return button;
     }
