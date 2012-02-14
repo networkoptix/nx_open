@@ -16,6 +16,9 @@ namespace {
 
 Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
 
+typedef QHash<QnLayoutResource *, QnWorkbenchLayoutSynchronizer *> LayoutResourceSynchronizerHash;
+Q_GLOBAL_STATIC(LayoutResourceSynchronizerHash, qn_synchronizerByLayoutResource)
+
 QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent),
     m_running(false),
@@ -82,7 +85,7 @@ void QnWorkbenchLayoutSynchronizer::clearResource() {
 void QnWorkbenchLayoutSynchronizer::initialize() {
     assert(m_layout != NULL && !m_resource.isNull());
 
-    m_resource->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
+    qn_synchronizerByLayoutResource()->insert(m_resource.data(), this);
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
 
     connect(m_layout,           SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
@@ -106,7 +109,7 @@ void QnWorkbenchLayoutSynchronizer::deinitialize() {
     disconnect(m_layout, NULL, this, NULL);
     disconnect(m_resource.data(), NULL, this, NULL);
 
-    m_resource->setProperty(layoutSynchronizerPropertyName, QVariant());
+    qn_synchronizerByLayoutResource()->remove(m_resource.data());
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant());
 
     m_running = false;
@@ -119,7 +122,7 @@ QnWorkbenchLayoutSynchronizer *QnWorkbenchLayoutSynchronizer::instance(QnWorkben
 }
 
 QnWorkbenchLayoutSynchronizer *QnWorkbenchLayoutSynchronizer::instance(const QnLayoutResourcePtr &resource) {
-    return resource->property(layoutSynchronizerPropertyName).value<QnWorkbenchLayoutSynchronizer *>();
+    return qn_synchronizerByLayoutResource()->value(resource.data());
 }
 
 void QnWorkbenchLayoutSynchronizer::autoDeleteLater() {

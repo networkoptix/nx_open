@@ -3,6 +3,7 @@
 
 #include <QRectF>
 #include <QUuid>
+#include <QMetaType>
 #include <utils/common/fuzzy.h>
 #include "resource.h"
 
@@ -27,7 +28,8 @@ public:
     }
 };
 
-
+Q_DECLARE_METATYPE(QnLayoutItemData);
+Q_DECLARE_TYPEINFO(QnLayoutItemData, Q_MOVABLE_TYPE);
 
 typedef QList<QnLayoutItemData> QnLayoutItemDataList;
 typedef QHash<QUuid, QnLayoutItemData> QnLayoutItemDataMap;
@@ -70,6 +72,8 @@ protected:
 private:
     QnLayoutItemDataMap m_itemByUuid;
 };
+
+
 
 
 #endif // QN_LAYOUT_RESOURCE_H

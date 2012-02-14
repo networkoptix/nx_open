@@ -1,7 +1,15 @@
 #include "layout_resource.h"
 #include <utils/common/warnings.h>
 
-QnLayoutResource::QnLayoutResource(): base_type() {
+QnLayoutResource::QnLayoutResource(): 
+    base_type() 
+{
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnLayoutItemData>();
+        metaTypesInitialized = true;
+    }
+    
     addFlags(QnResource::layout);
 }
 

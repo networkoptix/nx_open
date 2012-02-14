@@ -3,17 +3,20 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/layout_resource.h>
 #include <api/AppServerConnection.h>
 
 class QnWorkbench;
 class QnWorkbenchLayout;
+class QnWorkbenchSynchronizer;
 
 namespace detail {
     class WorkbenchSynchronizerReplyProcessor : public QObject {
         Q_OBJECT
 
     public:
-        WorkbenchSynchronizerReplyProcessor(const QnLayoutResourcePtr &resource): 
+        WorkbenchSynchronizerReplyProcessor(QnWorkbenchSynchronizer *synchronizer, const QnLayoutResourcePtr &resource): 
+            m_synchronizer(synchronizer),
             m_resource(resource)
         {}
 
@@ -24,6 +27,7 @@ namespace detail {
         void finished(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
 
     private:
+        QWeakPointer<QnWorkbenchSynchronizer> m_synchronizer;
         QnLayoutResourcePtr m_resource;
     };
 
@@ -90,6 +94,8 @@ protected slots:
     void at_workbench_layoutsChanged();
 
 private:
+    friend class detail::WorkbenchSynchronizerReplyProcessor;
+
     /** Whether this synchronizer is running. */
     bool m_running;
 
@@ -107,6 +113,9 @@ private:
 
     /** Appserver connection. */
     QnAppServerConnectionPtr m_connection;
+
+    /** Mapping from layout resource to its saved state. */
+    QHash<QnLayoutResourcePtr, QnLayoutItemDataMap> m_savedItemsByResource;
 };
 
 
