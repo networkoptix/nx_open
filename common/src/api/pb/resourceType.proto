@@ -1,0 +1,46 @@
+package proto.pb;
+
+enum ParamType {
+    None        = 0;
+    Value       = 1;
+    OnOff       = 2;
+    Boolen      = 3;
+    MinMaxStep  = 4;
+    Enumeration = 5;
+    Button      = 6;
+}
+
+
+message PropertyType {
+    required string name;
+    required ParamType type;
+
+    // MinMaxStep
+    optional int32 min;
+    optional int32 max;
+    optional int32 step;
+
+    // Enumaration
+    optional string values;
+    optional string ui_values;
+
+    // Value
+    optional string default_value;
+
+    optional string group;
+    optional string sub_group;
+    optional string description;
+
+    optional bool ui;
+    optional bool readonly;
+
+    optional string netHelper;
+}
+
+message ResourceType {
+    required int32 id;
+    required string name;
+    optional string manufacture;
+    repeated int32 parentIDs;
+    repeated PropertyType propertyTypes;
+}

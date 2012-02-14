@@ -1,0 +1,11 @@
+package proto.pb;
+
+import "camera.proto";
+import "server.proto";
+import "user.proto";
+
+message Resource {
+    repeated Camera cameras;
+    repeated Server servers;
+    repeated User users;
+}

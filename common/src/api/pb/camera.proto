@@ -1,0 +1,51 @@
+package proto.pb;
+
+message Camera {
+    enum Status {
+       Active   = 0;
+       Inactive = 1;
+    }
+
+    enum Quality {
+        Lowest  = 0;
+        Low     = 1;
+        Normal  = 2;
+        High    = 3;
+        Highest = 4;
+        Preset  = 5;
+    }
+
+    message Property {
+      required int32  id     = 1;
+      required int32  typeId = 2;
+      required string value  = 3;
+    }
+
+    message ScheduleTask {
+        required int32   id              = 1;         
+        required int32   sourceId        = 2;
+        required int32   startTime       = 3;
+        required int32   endTime         = 4;
+        required bool    doRecordAudio   = 5; 
+        required int32   recordType      = 6;
+        required int32   dayOfWeek       = 7;
+        required int32   beforeThreshold = 8;
+        required int32   afterThreshold  = 9;
+        required Quality streamQuality   = 10;
+        required int32   fps             = 11;
+    }
+
+    optional int32        id            = 1;
+    required int32        typeId        = 2;
+    required int32        parentId      = 3;
+    required string       name          = 4;
+    required string       url           = 5;
+    required Status       status        = 6;
+
+    optional string       region        = 7;
+    optional string       mac           = 8;
+    optional string       login         = 9;
+    optional string       password      = 10;
+    repeated Property     properties    = 11;
+    repeated ScheduleTask scheduleTasks = 12;
+}

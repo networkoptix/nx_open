@@ -1,0 +1,27 @@
+package proto.pb;
+
+message Layout {
+    message Item {
+        required int32 resourceId;
+        required string uuid;
+        required int32 flags;
+        required double left;
+        required double top;
+        required double right;
+        required double bottom;
+        required double rotation;
+    }
+
+    optional int32 id;
+    required string name;
+    required int32 parentId;
+    repeated Item items;
+}
+
+message User {
+    required int32 id;
+    required int32 typeId;
+    required string name;
+    optional string password;
+    repeated Layout layouts;
+}
