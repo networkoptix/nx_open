@@ -49,8 +49,10 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_oldQualityFastSwitch(true),
     m_oldQuality(MEDIA_Quality_High),
     m_externalLocked(false),
-    m_canChangeQuality(true)
+    m_canChangeQuality(true),
+    m_isStillImage(false)
 {
+    m_isStillImage = dev->checkFlags(QnResource::still_image);
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
 
@@ -599,9 +601,13 @@ begin_label:
         }
     }
 
+    if (m_isStillImage)
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_StillImage;
+
     QMutexLocker mutex(&m_jumpMtx);
     if (m_lastJumpTime == DATETIME_NOW)
         m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to live
+
     return m_currentData;
 }
 

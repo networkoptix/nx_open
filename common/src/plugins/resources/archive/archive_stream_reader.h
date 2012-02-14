@@ -134,6 +134,7 @@ private:
     bool m_qualityFastSwitch;
     MediaQuality m_oldQuality;
     bool m_oldQualityFastSwitch;
+    bool m_isStillImage;
 
     qint64 determineDisplayTime();
     void intChanneljumpTo(qint64 mksec, int channel);

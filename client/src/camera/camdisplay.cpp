@@ -103,7 +103,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_processedPackets(0),
       m_toLowQSpeed(1000.0),
       m_delayedFrameCnt(0),
-      m_emptyPacketCounter(0)
+      m_emptyPacketCounter(0),
+      m_isEOFReached(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -361,6 +362,9 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         // this here to avoid situation where different channels have different down scale factor; it might lead to diffrent size
         scaleFactor = m_display[0]->getCurrentDownscaleFactor(); // [0] - master channel
     }
+    if (vd->flags & QnAbstractMediaData::MediaFlags_StillImage)
+        scaleFactor = CLVideoDecoderOutput::factor_1; // do not downscale still images
+
 
     if (m_display[channel])
     {
@@ -704,6 +708,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
+    m_isEOFReached = emptyData != 0;
     if (emptyData)
     {
         m_emptyPacketCounter++;
@@ -1066,4 +1071,9 @@ void CLCamDisplay::setExternalTimeSource(QnlTimeSource* value)
 bool CLCamDisplay::isRealTimeSource() const 
 { 
     return m_isRealTimeSource; 
+}
+
+bool CLCamDisplay::isEOFReached() const
+{
+    return m_isEOFReached;
 }
