@@ -1,7 +1,7 @@
 #include "avi_resource.h"
 #include "avi_archive_delegate.h"
 #include "../archive_stream_reader.h"
-
+#include "../filetypesupport.h"
 
 QnAviResource::QnAviResource(const QString& file)
 {
@@ -34,6 +34,8 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     result->setArchiveDelegate(new QnAviArchiveDelegate());
+    if (checkFlags(still_image))
+        result->setCycleMode(false);
 
     return result;
 }

@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include <QPoint>
 #include <QSize>
+#include <utils/common/fuzzy.h>
 #include "margins.h"
 
 class QRect;
@@ -351,39 +352,5 @@ public:
     static QGraphicsView *view(QWidget *viewport);
 
 };
-
-inline bool qFuzzyIsNull(const QPointF &p) {
-    return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
-}
-
-inline bool qFuzzyIsNull(const QSizeF &s) {
-    return ::qFuzzyIsNull(s.width()) && ::qFuzzyIsNull(s.height());
-}
-
-inline bool qFuzzyCompare(const QPointF &l, const QPointF &r) {
-    return ::qFuzzyCompare(l.x(), r.x()) && ::qFuzzyCompare(l.y(), r.y());
-}
-
-inline bool qFuzzyCompare(const QSizeF &l, const QSizeF &r) {
-    return ::qFuzzyCompare(l.width(), r.width()) && ::qFuzzyCompare(l.height(), r.height());
-}
-
-inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
-    return 
-        ::qFuzzyCompare(l.x(), r.x()) && 
-        ::qFuzzyCompare(l.y(), r.y()) && 
-        ::qFuzzyCompare(l.width(), r.width()) &&
-        ::qFuzzyCompare(l.height(), r.height());
-}
-
-float qFuzzyFloor(float value);
-
-double qFuzzyFloor(double value);
-
-float qFuzzyCeil(float value);
-
-double qFuzzyCeil(double value);
-
-bool qFuzzyContains(const QRectF &rect, const QPointF &point);
 
 #endif // QN_SCENE_UTILITY_H

@@ -69,7 +69,7 @@ void QnGraphicsView::uninstallLayerPainter(QnLayerPainter *painter) {
 }
 
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
-    glFinish(); /* Finish previous frame, so that we don't get spurious delays in glTexSubImage2d. */
+    //glFinish(); /* Finish previous frame, so that we don't get spurious delays in glTexSubImage2d. */
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
     qint64 frequency = QnPerformance::currentCpuFrequency();

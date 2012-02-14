@@ -19,6 +19,7 @@
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "settings.h"
+#include "camera/camdisplay.h"
 
 namespace {
     /** Default frame width. */
@@ -291,18 +292,6 @@ void QnResourceWidget::ensureMotionMask()
     {
         m_motionMask = camera->getMotionMask();
 
-        if (!m_motionMask.rects().isEmpty())
-        {
-            QVector<QRect> rects = m_motionMask.rects();
-            for (int i = 0; i < rects.size(); ++i) {
-                if (rects[i].x())
-                    rects[i].setX(rects[i].x()+1);
-                if (rects[i].y())
-                    rects[i].setY(rects[i].y()+1);
-            }
-            m_motionMask.setRects(&rects[0], rects.size());
-        }
-
     }
     m_motionMaskValid = true;
 }
@@ -553,6 +542,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(channelScreenSize != m_channelScreenSize) {
         m_channelScreenSize = channelScreenSize;
         m_renderer->setChannelScreenSize(m_channelScreenSize);
+
+
     }
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
@@ -579,6 +570,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
 
         /* Set overlay icon. */
+        if (m_display->camDisplay()->isEOFReached())
+        {
+            setOverlayIcon(i, NO_ICON);
+        }
         if(m_display->isPaused() && (m_displayFlags & DISPLAY_ACTIVITY_OVERLAY)) {
             setOverlayIcon(i, PAUSED);
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
@@ -716,10 +711,11 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, r.bottom()*yStep);
+                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, (r.top()+r.height())*yStep);
             }
         }
     }
+
     for (int y = 0; y < MD_HEIGHT; ++y) {
         if (m_motionMask.isEmpty()) {
             gridLines << QPointF(0.0, y*yStep) << QPointF(rect.width(), y*yStep);
@@ -729,7 +725,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF(r.right()*xStep, y*yStep);
+                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF((r.left()+r.width())*xStep, y*yStep);
             }
         }
     }

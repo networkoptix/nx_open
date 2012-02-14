@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QScopedPointer>
+#include <core/resource/resource_fwd.h>
 
 class QTabBar;
 class QBoxLayout;
@@ -79,6 +80,8 @@ protected slots:
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggred();
+    void at_layout_closeRequested(QnWorkbenchLayout *layout);
+    void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;

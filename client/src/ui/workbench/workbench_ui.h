@@ -87,6 +87,9 @@ public:
         return m_titleVisible;
     }
 
+signals:
+    void closeRequested(QnWorkbenchLayout *layout);
+
 public slots:
     void setTitleUsed(bool titleUsed);
     void setFpsVisible(bool fpsVisible);
@@ -125,7 +128,7 @@ protected:
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
-protected Q_SLOTS:
+protected slots:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);

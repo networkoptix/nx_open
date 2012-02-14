@@ -61,6 +61,7 @@ public:
     void setExternalTimeSource(QnlTimeSource* value);
 
     bool canAcceptData() const;
+    bool isEOFReached() const;
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -165,6 +166,7 @@ private:
     float m_toLowQSpeed; // speed then switching to low quality for camera
     QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
+    bool m_isEOFReached;
 };
 
 #endif //clcam_display_h_1211

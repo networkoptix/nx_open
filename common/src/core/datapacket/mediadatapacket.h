@@ -42,6 +42,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
                      MediaFlags_Reverse = 128,
 
                      MediaFlags_LowQuality = 256,
+                     MediaFlags_StillImage = 512
                     };
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)

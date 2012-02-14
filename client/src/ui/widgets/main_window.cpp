@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QToolButton>
 #include <QMenu>
+#include <QMessageBox>
 #include <QFile>
 #include <QNetworkReply>
 
@@ -137,6 +138,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
         setPalette(palette);
     }
 
+
     /* Set up actions. */
     addAction(qnAction(Qn::ExitAction));
     addAction(qnAction(Qn::FullscreenAction));
@@ -165,6 +167,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
+
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene);
@@ -182,6 +185,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+
 
     /* Set up model & control machinery. */
     const QSizeF defaultCellSize = QSizeF(15000.0, 10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
@@ -205,14 +209,18 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
 
+    connect(m_ui,               SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
     connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
     connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
     connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
+
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBar->setWorkbench(m_workbench);
+
+    connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
 
     /* Tab bar layout. To snap tab bar to graphics view. */
     QVBoxLayout *tabBarLayout = new QVBoxLayout();
@@ -625,6 +633,39 @@ void QnMainWindow::at_synchronizer_started() {
         qSort(resources.begin(), resources.end(), LayoutIdCmp());
         m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
     }
+}
+
+void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
+    QnLayoutResourcePtr resource = layout->resource();
+    bool isChanged = m_synchronizer->isChanged(layout);
+    bool isLocal = m_synchronizer->isLocal(layout);
+
+    bool wasClosed = true;
+    if(isChanged) {
+        QMessageBox::StandardButton button = QMessageBox::question(this, tr(""), tr("Save changes to layout '%1'?").arg(layout->name()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+        if(button == QMessageBox::Cancel) {
+            wasClosed = false;
+            return;
+        } else if(button == QMessageBox::No) {
+            m_synchronizer->restore(layout);
+            delete layout;
+        } else {
+            m_synchronizer->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+            delete layout;
+        }
+    } else {
+        delete layout;
+    }
+
+    if(wasClosed && isLocal)
+        qnResPool->removeResource(resource);
+}
+
+void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
+    if(status == 0)   
+        return;
+
+    QMessageBox::critical(this, tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
 }
 
 bool QnMainWindow::event(QEvent *event) {
