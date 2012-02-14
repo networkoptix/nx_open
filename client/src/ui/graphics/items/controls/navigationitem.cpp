@@ -34,21 +34,7 @@ public:
         setAcceptHoverEvents(true);
         setOpacity(0.75);
     }
-#if 0
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event)
-    {
-        m_pos = mapToScene(event->pos());
-    }
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-    {
-        QPointF pos = mapToScene(event->pos());
-        qreal shift = qreal(m_slider->maximum() - m_slider->minimum()) / m_slider->rect().width() * (pos - m_pos).x();
-        m_slider->setValue(m_slider->value() + shift);
-        m_pos = pos;
-    }
-#endif
 private:
     AbstractGraphicsSlider *const m_slider;
     QPointF m_pos;
@@ -68,13 +54,13 @@ public:
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
-        m_pos = mapToScene(event->pos());
+        m_pos = mapToItem(m_slider, event->pos());
         m_slider->setMoving(true);
     }
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
-        QPointF pos = mapToScene(event->pos());
+        QPointF pos = mapToItem(m_slider, event->pos());
         qint64 shift = qreal(m_slider->sliderRange()) / m_slider->rect().width() * (pos - m_pos).x();
         m_slider->setCurrentValue(m_slider->currentValue() + shift);
         m_pos = pos;
