@@ -23,7 +23,6 @@ protected:
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
 
-    void updateTabsClosable();
     void updateCurrentLayout();
 
 private slots:

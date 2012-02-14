@@ -636,19 +636,15 @@ void QnMainWindow::at_synchronizer_started() {
 }
 
 void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
-    bool isLocal = m_synchronizer->isLocal(layout);
+    QnLayoutResourcePtr resource = layout->resource();
     bool isChanged = m_synchronizer->isChanged(layout);
+    bool isLocal = m_synchronizer->isLocal(layout);
 
-    if(isLocal && !isChanged) {
-        QnLayoutResourcePtr resource = layout->resource();
-        delete layout;
-        qnResPool->removeResource(resource);
-        return;
-    }
-
+    bool wasClosed = true;
     if(isChanged) {
         QMessageBox::StandardButton button = QMessageBox::question(this, tr(""), tr("Save changes to layout '%1'?").arg(layout->name()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
         if(button == QMessageBox::Cancel) {
+            wasClosed = false;
             return;
         } else if(button == QMessageBox::No) {
             m_synchronizer->restore(layout);
@@ -660,6 +656,9 @@ void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
     } else {
         delete layout;
     }
+
+    if(wasClosed && isLocal)
+        qnResPool->removeResource(resource);
 }
 
 void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
