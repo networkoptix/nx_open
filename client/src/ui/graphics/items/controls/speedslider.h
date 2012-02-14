@@ -24,6 +24,7 @@ public:
 
 public Q_SLOTS:
     void resetSpeed();
+    void setSpeed(int value);
 
     void stepBackward();
     void stepForward();

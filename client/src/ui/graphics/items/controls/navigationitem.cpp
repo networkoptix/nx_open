@@ -399,7 +399,6 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     if (m_camera == camera)
         return;
 
-    m_speedSlider->resetSpeed();
     m_timeSlider->resetSelectionRange();
     //restoreInfoText();
 
@@ -418,6 +417,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         if (reader) {
             setPlaying(!reader->isMediaPaused());
             m_timeSlider->setLiveMode(reader->isRealTimeSource());
+            m_speedSlider->setSpeed(reader->getSpeed());
         }
         else
             setPlaying(true);
