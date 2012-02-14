@@ -1,4 +1,5 @@
 #include "layout_resource.h"
+#include <utils/common/warnings.h>
 
 QnLayoutResource::QnLayoutResource(): base_type()
 {
@@ -7,16 +8,21 @@ QnLayoutResource::QnLayoutResource(): base_type()
 
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
 {
-    while(!m_items.empty())
-        removeItem(m_items.front());
+    while(!m_itemByUuid.empty())
+        removeItem(*m_itemByUuid.begin());
 
     foreach(const QnLayoutItemData &item, items)
         addItem(item);
 }
 
-const QnLayoutItemDataList &QnLayoutResource::getItems() const 
+QnLayoutItemDataList QnLayoutResource::getItems() const 
 {
-    return m_items;
+    return m_itemByUuid.values();
+}
+
+const QnLayoutItemDataMap &QnLayoutResource::getItemMap() const
+{
+    return m_itemByUuid;
 }
 
 QString QnLayoutResource::getUniqueId() const
@@ -31,14 +37,18 @@ void QnLayoutResource::updateInner(QnResourcePtr other)
     base_type::updateInner(other);
 
     QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
-    if(localOther) {
+    if(localOther)
         setItems(localOther->getItems());
-    }
 }
 
 void QnLayoutResource::addItem(const QnLayoutItemData &item) 
 {
-    m_items.push_back(item);
+    if(m_itemByUuid.contains(item.uuid)) {
+        qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
+        return;
+    }
+
+    m_itemByUuid[item.uuid] = item;
 
     emit itemAdded(item);
 }
@@ -50,14 +60,11 @@ void QnLayoutResource::removeItem(const QnLayoutItemData &item)
 
 void QnLayoutResource::removeItem(const QUuid &itemUuid) 
 {
-    int index;
-    for(index = 0; index < m_items.size(); index++)
-        if(m_items[index].uuid == itemUuid)
-            break;
-    if(index >= m_items.size())
+    QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
+    if(pos == m_itemByUuid.end())
         return;
 
-    QnLayoutItemData item = m_items[index];
-    m_items.removeAt(index);
+    QnLayoutItemData item = *pos;
+    m_itemByUuid.erase(pos);
     emit itemRemoved(item);
 }

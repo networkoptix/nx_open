@@ -16,6 +16,9 @@ public:
     void setWorkbench(QnWorkbench *workbench);
     QnWorkbench *workbench() const;
 
+signals:
+    void closeRequested(QnWorkbenchLayout *layout);
+
 protected:
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;

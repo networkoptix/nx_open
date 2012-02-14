@@ -214,6 +214,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBar->setWorkbench(m_workbench);
 
+    connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
+
+
     /* Tab bar layout. To snap tab bar to graphics view. */
     QVBoxLayout *tabBarLayout = new QVBoxLayout();
     tabBarLayout->setContentsMargins(0, 0, 0, 0);
@@ -624,6 +627,29 @@ void QnMainWindow::at_synchronizer_started() {
         /* Open the last layout from the user's layouts list. */
         qSort(resources.begin(), resources.end(), LayoutIdCmp());
         m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+    }
+}
+
+void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
+    bool isLocal = m_synchronizer->isLocal(layout);
+    bool isChanged = m_synchronizer->isChanged(layout);
+
+    if(isLocal && !isChanged) {
+        delete layout;
+        return;
+    }
+
+    if(isChanged) {
+        QMessageBox::StandardButton button = QMessageBox::question(this, tr(""), tr("Save changes to layout '%1'?").arg(layout->name()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        if(button = QMessageBox::Cancel) {
+            return;
+        } else if(button == QMessageBox::No) {
+            m_synchronizer->restore(layout);
+            delete layout;
+        } else {
+            m_synchronizer->save(layout, this, SLOT(at_layout_saved()));
+            delete layout;
+        }
     }
 }
 

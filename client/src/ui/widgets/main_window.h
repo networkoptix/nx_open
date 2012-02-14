@@ -79,6 +79,7 @@ protected slots:
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggred();
+    void at_layout_closeRequested(QnWorkbenchLayout *layout);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;

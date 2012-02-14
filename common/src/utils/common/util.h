@@ -125,20 +125,8 @@ inline static quint64 ntohll(quint64 x)  { return x;}
  * \returns                             Whether the given value lies in [min, max) interval.
  */
 template<class T>
-bool qnBetween(const T &value, const T &min, const T &max) {
+bool qBetween(const T &value, const T &min, const T &max) {
     return min <= value && value < max;
-}
-
-/**
- * \param value                         Value to check.
- * \param min                           Interval's left border.
- * \param max                           Interval's right border.
- * \returns                             Whether the given value lies in [min, max] interval, 
- */
-inline bool qnFuzzyBetween(double value, double min, double max, double precision = 0.000000000001) {
-    double localPrecision = precision * qMax(qAbs(min), qAbs(max));
-
-    return min - localPrecision <= value && value <= max + localPrecision;
 }
 
 quint64 QN_EXPORT getUsecTimer();

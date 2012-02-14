@@ -3,6 +3,7 @@
 
 #include <QRectF>
 #include <QUuid>
+#include <utils/common/fuzzy.h>
 #include "resource.h"
 
 class QnLayoutItemData
@@ -15,9 +16,21 @@ public:
     int flags;
     QRectF combinedGeometry;
     qreal rotation;
+
+    friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
+        return 
+            l.resourceId == r.resourceId &&
+            l.uuid == r.uuid &&
+            l.flags == r.flags &&
+            qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) &&
+            qFuzzyCompare(l.rotation, r.rotation);
+    }
 };
 
+
+
 typedef QList<QnLayoutItemData> QnLayoutItemDataList;
+typedef QHash<QUuid, QnLayoutItemData> QnLayoutItemDataMap;
 
 class QnLayoutResource : public QnResource
 {
@@ -32,7 +45,9 @@ public:
 
     void setItems(const QnLayoutItemDataList &items);
 
-    const QnLayoutItemDataList &getItems() const;
+    QnLayoutItemDataList getItems() const;
+
+    const QnLayoutItemDataMap &getItemMap() const;
 
     void addItem(const QnLayoutItemData &item);
 
@@ -48,7 +63,7 @@ protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
-    QList<QnLayoutItemData> m_items;
+    QnLayoutItemDataMap m_itemByUuid;
 };
 
 

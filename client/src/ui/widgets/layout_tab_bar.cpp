@@ -217,7 +217,7 @@ void QnLayoutTabBar::at_tabCloseRequested(int index) {
     if (count() <= 1)
         return; /* Don't remove the last tab. */
 
-    removeTab(index);
+    emit closeRequested(m_layouts[index]);
 }
 
 void QnLayoutTabBar::at_currentChanged(int index) {
