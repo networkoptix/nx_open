@@ -138,6 +138,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
         setPalette(palette);
     }
 
+
     /* Set up actions. */
     addAction(qnAction(Qn::ExitAction));
     addAction(qnAction(Qn::FullscreenAction));
@@ -166,6 +167,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
+
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene);
@@ -183,6 +185,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+
 
     /* Set up model & control machinery. */
     const QSizeF defaultCellSize = QSizeF(15000.0, 10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
@@ -206,9 +209,11 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
 
+    connect(m_ui,               SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
     connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
     connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
     connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
+
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
@@ -216,7 +221,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_tabBar->setWorkbench(m_workbench);
 
     connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
-
 
     /* Tab bar layout. To snap tab bar to graphics view. */
     QVBoxLayout *tabBarLayout = new QVBoxLayout();

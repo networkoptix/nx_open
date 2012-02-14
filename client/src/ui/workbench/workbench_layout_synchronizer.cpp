@@ -171,6 +171,9 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData
     if(!m_update)
         return;
 
+    if(m_layout->item(itemData.uuid) != NULL)
+        return; /* Was called back from at_layout_itemAdded because of layout resource living in a different thread. */
+
     QnId id = itemData.resourceId;
     QnResourcePtr resource = qnResPool->getResourceById(id);
     if(resource.isNull()) {
