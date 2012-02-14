@@ -67,6 +67,9 @@ bool QnEvent::load(const QVariant& parsed)
     resourceId = dict["resourceId"].toString();
     objectName = dict["objectName"].toString();
 
+    if (dict.contains("data"))
+        data = dict["data"].toString();
+
     if (eventType == QN_EVENT_RES_SETPARAM)
     {
         if (!dict.contains("paramName") || !dict.contains("paramValue"))

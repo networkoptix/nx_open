@@ -18,7 +18,7 @@ import re
 sys.path.insert(0, os.path.join('..', 'common'))
 
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB
-from convert import qt_path, copy_files, setup_tools, setup_qjson, platform
+from convert import qt_path, copy_files, setup_tools, setup_qjson, platform, gen_env_sh
 from convert import convert as convert_common
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
@@ -143,16 +143,18 @@ os.mkdir('bin/release-test')
 
 os.mkdir('build')
 
+if platform() == 'mac':
+    ldpath_debug = ''
+    ldpath_release = ''
+
 if platform() == 'win32':
     copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
     copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
 elif platform() == 'mac':
-    copy_files(ffmpeg_path_debug + '/lib/lib*[A-Za-z].[0-9].dylib', 'bin/debug')
-    copy_files(ffmpeg_path_debug + '/lib/lib*[A-Za-z].[0-9][0-9].dylib', 'bin/debug')
-    copy_files(ffmpeg_path_release + '/lib/lib*[A-Za-z].[0-9].dylib', 'bin/release')
-    copy_files(ffmpeg_path_release + '/lib/lib*[A-Za-z].[0-9][0-9].dylib', 'bin/release')
+    ldpath_debug += ffmpeg_path_debug + '/lib'
+    ldpath_release += ffmpeg_path_release + '/lib'
 
 copy_files(openal_path + '/*.dll', 'bin/release')
 copy_files(openal_path + '/*.dll', 'bin/debug')
@@ -164,28 +166,32 @@ if platform() == 'win32':
     copy_files(tools_path + '/bin/*.dll', 'bin/release')
     copy_files(tools_path + '/bin/*.dll', 'bin/debug')
 elif platform() == 'mac':
-    copy_files(tools_path + '/lib/libxerces-c-3.1.dylib', 'bin/release')
-    copy_files(tools_path + '/lib/libxerces-c-3.1.dylib', 'bin/debug')
+    ldpath_debug += ':' + tools_path + '/lib'
+    ldpath_release += ':' + tools_path + '/lib'
 
 if platform() == 'win32':
     copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
     copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
 elif platform() == 'mac':
-    copy_files(qjson_path + '/libqjson.0.dylib', 'bin/release')
-    copy_files(qjson_path + '/libqjson.0.dylib', 'bin/debug')
+    ldpath_debug += ':' + os.path.abspath(qjson_path)
+    ldpath_release += ':' + os.path.abspath(qjson_path)
 elif platform() == 'linux':
     copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
     copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
 
 if platform() == 'mac':
-    copy_files('../common/bin/debug/libcommon.1.dylib', 'bin/debug')
-    copy_files('../common/bin/release/libcommon.1.dylib', 'bin/debug')
+    ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
+    ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
 os.mkdir('bin/debug/arecontvision')
 os.mkdir('bin/release/arecontvision')
 
 copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
 copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
+
+if platform() == 'mac':
+    gen_env_sh('bin/debug/env.sh', ldpath_debug)
+    gen_env_sh('bin/release/env.sh', ldpath_release)
 
 gen_version_h()
 
