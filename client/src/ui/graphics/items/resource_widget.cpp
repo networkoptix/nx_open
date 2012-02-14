@@ -19,6 +19,7 @@
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "settings.h"
+#include "camera/camdisplay.h"
 
 namespace {
     /** Default frame width. */
@@ -541,6 +542,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(channelScreenSize != m_channelScreenSize) {
         m_channelScreenSize = channelScreenSize;
         m_renderer->setChannelScreenSize(m_channelScreenSize);
+
+
     }
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
@@ -567,6 +570,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
 
         /* Set overlay icon. */
+        if (m_display->camDisplay()->isEOFReached())
+        {
+            setOverlayIcon(i, NO_ICON);
+        }
         if(m_display->isPaused() && (m_displayFlags & DISPLAY_ACTIVITY_OVERLAY)) {
             setOverlayIcon(i, PAUSED);
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {

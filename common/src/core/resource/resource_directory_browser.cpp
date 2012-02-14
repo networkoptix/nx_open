@@ -139,12 +139,20 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
 {
     //if (FileTypeSupport::isImageFileExt(xfile))
     //    return QnResourcePtr(new QnLocalFileResource(xfile));
+
     if (QnAviDvdResource::isAcceptedUrl(xfile))
         return QnResourcePtr(new QnAviDvdResource(xfile));
     if (QnAviBlurayResource::isAcceptedUrl(xfile))
         return QnResourcePtr(new QnAviBlurayResource(xfile));
     if (FileTypeSupport::isMovieFileExt(xfile))
         return QnResourcePtr(new QnAviResource(xfile));
+
+    if (FileTypeSupport::isImageFileExt(xfile)) 
+    {
+        QnResourcePtr rez = QnResourcePtr(new QnAviResource(xfile));
+        rez->addFlags(QnResource::still_image);
+        return rez;
+    }
 
     return QnResourcePtr(0);
 }

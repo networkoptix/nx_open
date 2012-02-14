@@ -156,6 +156,22 @@ void SpeedSlider::sliderChange(SliderChange change)
     }
 }
 
+void SpeedSlider::setSpeed(int value)
+{
+    const Preset &preset = presets[int(m_precision)];
+    for (int i = 0; i < preset.size; i++)
+    {
+        if (preset.preset[i] == value) 
+        {
+            int pos = idx2pos(i);
+            GraphicsSlider::setValue(pos);
+            return;
+        }
+    }
+    qWarning() << "Unsupported value" << value << "for speed slider";
+    return;
+}
+
 void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     GraphicsSlider::mouseReleaseEvent(event);
