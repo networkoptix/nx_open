@@ -14,8 +14,8 @@ m_hostAddress(hostAddress),
 m_ip(hostAddress.toString().toLatin1().data()),
 m_timeout(timeout)
 {
-	m_wish_blk_size = double_blk_size;
-	//m_wish_blk_size  = blk_size;
+	//m_wish_blk_size = double_blk_size;
+	m_wish_blk_size  = blk_size;
     m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
     m_sock.setDestAddr(m_ip, SERVER_TFTP_PORT);
 }
