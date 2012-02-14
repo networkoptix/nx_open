@@ -141,8 +141,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_fpsCountingInstrument,    SIGNAL(fpsChanged(qreal)),                                                                  this,                           SLOT(at_fpsChanged(qreal)));
 
     /* Create controls. */
-    m_controlsWidget = m_uiElementsInstrument->widget();
-    m_controlsWidget->setFlag(QGraphicsItem::ItemIsPanel);
+    m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
     m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
@@ -763,8 +762,6 @@ void QnWorkbenchUi::at_fpsChanged(qreal fps) {
 
 void QnWorkbenchUi::at_activityStopped() {
     m_inactive = true;
-
-    qDebug() << display()->scene()->focusItem();
 
     updateControlsVisibility(true);
 }
