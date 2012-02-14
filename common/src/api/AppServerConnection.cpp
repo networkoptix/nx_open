@@ -263,20 +263,6 @@ int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId
     return status;
 }
 
-int QnAppServerConnection::getStorages(QnStorageResourceList& storages, QByteArray& errorString)
-{
-    QByteArray data;
-    int status = getObjects("storage", "", data, errorString);
-
-    try {
-        m_serializer.deserializeStorages(storages, data, m_resourceFactory);
-    } catch (const QnSerializeException& e) {
-        errorString += e.errorString();
-    }
-
-    return status;
-}
-
 int QnAppServerConnection::getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString)
 {
     QByteArray data;

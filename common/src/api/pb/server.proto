@@ -13,5 +13,9 @@ message Server {
     required string       guid         = 3;
     required string       url          = 4;
     required string       apiUrl       = 5;
-    repeated Storage      storages     = 6;
+    repeated Storage      storage      = 6;
+}
+
+message Servers {
+    repeated Server server = 1;
 }

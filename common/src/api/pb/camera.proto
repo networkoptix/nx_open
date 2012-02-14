@@ -46,6 +46,10 @@ message Camera {
     optional string       mac           = 8;
     optional string       login         = 9;
     optional string       password      = 10;
-    repeated Property     properties    = 11;
-    repeated ScheduleTask scheduleTasks = 12;
+    repeated Property     property    = 11;
+    repeated ScheduleTask scheduleTask = 12;
+}
+
+message Cameras {
+    repeated Camera camera = 1;
 }

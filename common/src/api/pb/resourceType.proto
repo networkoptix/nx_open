@@ -12,35 +12,39 @@ enum ParamType {
 
 
 message PropertyType {
-    required string name;
-    required ParamType type;
+    required string name          = 1;
+    required ParamType type       = 2;
 
     // MinMaxStep
-    optional int32 min;
-    optional int32 max;
-    optional int32 step;
+    optional int32 min            = 3;
+    optional int32 max            = 4;
+    optional int32 step           = 5;
 
     // Enumaration
-    optional string values;
-    optional string ui_values;
+    optional string values        = 6;
+    optional string ui_values     = 7;
 
     // Value
-    optional string default_value;
+    optional string default_value = 8;
 
-    optional string group;
-    optional string sub_group;
-    optional string description;
+    optional string group         = 9;
+    optional string sub_group     = 10;
+    optional string description   = 11;
 
-    optional bool ui;
-    optional bool readonly;
+    optional bool ui              = 12;
+    optional bool readonly        = 13;
 
-    optional string netHelper;
+    optional string netHelper     = 14;
 }
 
 message ResourceType {
-    required int32 id;
-    required string name;
-    optional string manufacture;
-    repeated int32 parentIDs;
-    repeated PropertyType propertyTypes;
+    required int32 id                   = 1;
+    required string name                = 2;
+    optional string manufacture         = 3;
+    repeated int32 parentId             = 4;
+    repeated PropertyType propertyType  = 5;
+}
+
+message ResourceTypes {
+    repeated ResourceType resourceType = 1;
 }

@@ -30,39 +30,6 @@ static const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_
 namespace {
     typedef xsd::cxx::tree::sequence<xsd::api::scheduleTasks::ScheduleTask>  QnApiScheduleTasks;
 
-    void parseRegion(QRegion& region, const QString& regionString)
-    {
-        foreach (QString rectString, regionString.split(';'))
-        {
-            QRect rect;
-            QStringList rectList = rectString.split(',');
-
-            if (rectList.size() == 4)
-            {
-                rect.setLeft(rectList[0].toInt());
-                rect.setTop(rectList[1].toInt());
-                rect.setWidth(rectList[2].toInt());
-                rect.setHeight(rectList[3].toInt());
-            }
-
-            region += rect;
-        }
-    }
-
-	QString serializeRegion(const QRegion& region)
-	{
-		QStringList regionList;
-
-		foreach (const QRect& rect, region.rects())
-		{
-			QStringList rectList;
-			rectList << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
-			regionList << rectList.join(",");
-		}
-
-		return regionList.join(";");
-	}
-
     void parseScheduleTasks(QnScheduleTaskList& scheduleTasks, const QnApiScheduleTasks& xsdScheduleTasks)
     {
         using xsd::api::scheduleTasks::ScheduleTasks;
@@ -397,29 +364,6 @@ namespace {
 
 }
 
-void QnApiXmlSerializer::deserializeStorages(QnStorageResourceList& storages, const QByteArray& data, QnResourceFactory& resourceFactory)
-{
-    Q_UNUSED(resourceFactory);
-
-    QByteArray errorString;
-
-    try {
-        QTextStream stream(data);
-        QStdIStream is(stream.device());
-
-        std::auto_ptr<xsd::api::storages::Storages> xsdStorages = xsd::api::storages::storages (is, XSD_FLAGS, xml_schema::properties ());
-
-        parseStorages(storages, xsdStorages->storage());
-    }
-    catch (const xml_schema::exception& e) {
-        errorString += "\nQnApiXmlSerializer::deserializeStorages(): ";
-        errorString += e.what();
-
-        qDebug() << e.what();
-        throw QnSerializeException(errorString);
-    }
-}
-
 void QnApiXmlSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     QByteArray errorString;
@@ -685,36 +629,3 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
 
     data = os.str().c_str();
 }
-
-void QnApiXmlSerializer::serializeStorage(const QnStorageResourcePtr& storagePtr, QByteArray& data)
-{
-    xsd::api::storages::Storage storage(storagePtr->getId().toString().toStdString(),
-                                         storagePtr->getName().toStdString(),
-                                         storagePtr->getUrl().toStdString(),
-                                         storagePtr->getTypeId().toString().toStdString(),
-                                         storagePtr->getParentId().toString().toStdString(),
-                                         storagePtr->getSpaceLimit(),
-                                         storagePtr->getMaxStoreTime());
-
-    std::ostringstream os;
-
-    ::xsd::api::storages::Storages storages;
-    storages.storage().push_back(storage);
-    ::xsd::api::storages::storages(os, storages, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
-
-    data = os.str().c_str();
-}
-
-void QnApiXmlSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
-{
-    if (resource.dynamicCast<QnStorageResource>()) {
-        serializeStorage(resource.dynamicCast<QnStorageResource>(), data);
-    } else if (resource.dynamicCast<QnVirtualCameraResource>()) {
-        serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
-    } else if (resource.dynamicCast<QnVideoServerResource>()) {
-        serializeServer(resource.dynamicCast<QnVideoServerResource>(), data);
-    } else if (resource.dynamicCast<QnUserResource>()) {
-        serializeUser(resource.dynamicCast<QnUserResource>(), data);
-    }
-}
-
