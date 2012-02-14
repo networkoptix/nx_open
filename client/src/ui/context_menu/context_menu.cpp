@@ -210,7 +210,7 @@ QnContextMenu::QnContextMenu(QObject *parent):
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("logo_icon.png")));
+        icon(Skin::icon(QLatin1String("logo_icon2.png")));
 
     factory(Qn::OpenFileAction).
         flags(Main).

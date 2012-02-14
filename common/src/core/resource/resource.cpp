@@ -70,6 +70,8 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 {
     bool signalsBlocked = blockSignals(true);
 
+    QMutexLocker locker(&m_mutex);
+
     if (parameters.contains(QLatin1String("id")))
         setId(parameters[QLatin1String("id")]);
 
@@ -86,7 +88,7 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
         setUrl(parameters[QLatin1String("url")]);
 
     if (parameters.contains(QLatin1String("status")))
-        setStatus(parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline);
+        m_status = parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline;
 
     blockSignals(signalsBlocked);
 }

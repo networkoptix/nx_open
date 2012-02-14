@@ -11,6 +11,8 @@ struct QnDlink_cam_info
 {
     QnDlink_cam_info();
 
+    void clear();
+
     bool inited() const;
 
     // returns resolution with width not less than width

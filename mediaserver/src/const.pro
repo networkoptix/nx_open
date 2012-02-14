@@ -36,7 +36,15 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ../build/debug/generated
   UI_DIR = ../build/debug/generated
   RCC_DIR = ../build/debug/generated
+  win32 {
   PRE_TARGETDEPS += ../../common/bin/debug/common.lib
+  }
+  unix:!mac {
+  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.so
+  }
+  mac {
+  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.dylib
+  }
 }
 
 CONFIG(release, debug|release) {
@@ -45,7 +53,15 @@ CONFIG(release, debug|release) {
   MOC_DIR = ../build/release/generated
   UI_DIR = ../build/release/generated
   RCC_DIR = ../build/release/generated
+  win32 {
   PRE_TARGETDEPS += ../../common/bin/release/common.lib
+  }
+  unix:!mac {
+  PRE_TARGETDEPS += ../../common/bin/release/libcommon.so
+  }
+  mac {
+  PRE_TARGETDEPS += ../../common/bin/release/libcommon.dylib
+  }
 }
 
 CONFIG(debug, debug|release) {

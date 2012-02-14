@@ -279,7 +279,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
         return QnSharedResourcePointer<Resource>();
     } else {
-        return resource->toSharedPointer().staticCast<Resource>();
+        return resource->toSharedPointer().template staticCast<Resource>();
     }
 }
 

@@ -65,13 +65,14 @@ namespace {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal scaleFactor = 0.85;
-        qreal size = baseSize / scaleFactor;
+        qreal height = baseSize / scaleFactor;
+        qreal width = height * SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
         QnZoomingImageButtonWidget *button = new QnZoomingImageButtonWidget(parent);
         button->setScaleFactor(scaleFactor);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
-        button->setMaximumSize(size, size);
-        button->setMinimumSize(size, size);
+        button->setMaximumSize(width, height);
+        button->setMinimumSize(width, height);
         button->setDefaultAction(action);
         button->setAnimationSpeed(4.0);
         button->setCached(true);
@@ -206,8 +207,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("pin.png"));
     m_treePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("unpin.png"));
     m_treePinButton->setCheckable(true);
+    m_treePinButton->setFocusProxy(m_treeItem);
 
     m_treeShowButton = newShowHideButton(m_controlsWidget);
+    m_treeShowButton->setFocusProxy(m_treeItem);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -259,6 +262,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
 
     m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderShowButton->setFocusProxy(m_sliderItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -340,6 +344,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         transform.scale(-1, 1);
         m_titleShowButton->setTransform(transform);
     }
+    m_titleShowButton->setFocusProxy(m_titleItem);
 
     m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_titleOpacityProcessor->addTargetItem(m_titleItem);
@@ -759,6 +764,8 @@ void QnWorkbenchUi::at_fpsChanged(qreal fps) {
 void QnWorkbenchUi::at_activityStopped() {
     m_inactive = true;
 
+    qDebug() << display()->scene()->focusItem();
+
     updateControlsVisibility(true);
 }
 
@@ -773,8 +780,10 @@ void QnWorkbenchUi::at_mainMenuAction_triggered() {
         return;
 
     QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
-    pos.rx() = qMax(pos.x(), 0);
-    pos.ry() = qMax(pos.y(), 0);
+    /* On multi-monitor setups where monitor sizes differ,
+     * these coordinates can be negative, so we shouldn't adjust them. */
+    //pos.rx() = qMax(pos.x(), 0);
+    //pos.ry() = qMax(pos.y(), 0);
 
     QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
     menu->move(pos);

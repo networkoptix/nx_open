@@ -38,6 +38,8 @@ public:
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL);
 
+    virtual ~QnImageButtonWidget();
+
     const QPixmap &pixmap(StateFlags flags) const;
 
     void setPixmap(StateFlags flags, const QPixmap &pixmap);
@@ -103,6 +105,8 @@ protected:
     void invalidatePixmapCache();
     StateFlags displayState(StateFlags flags) const;
 
+    bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
+
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
@@ -113,6 +117,8 @@ private:
     StateFlags m_state;
     bool m_checkable;
     bool m_cached;
+    int m_skipNextHoverEvents;
+    QPoint m_nextHoverEventPos;
 
     VariantAnimator *m_animator;
     qreal m_hoverProgress;

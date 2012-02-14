@@ -9,7 +9,7 @@
 
 class QTextStream;
 
-class QnCommandLineParameter {
+class QN_EXPORT QnCommandLineParameter {
 public:
     enum Type {
         STRING,
@@ -53,7 +53,7 @@ private:
 };
 
 
-class QnCommandLineParser {
+class QN_EXPORT QnCommandLineParser {
     Q_DECLARE_TR_FUNCTIONS(QnCommandLineParser);
 public:
     QnCommandLineParser() {}

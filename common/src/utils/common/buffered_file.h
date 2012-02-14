@@ -8,7 +8,7 @@
 
 class QBufferedFile;
 
-class QueueFileWriter: public CLLongRunnable
+class QN_EXPORT QueueFileWriter: public CLLongRunnable
 {
     Q_OBJECT;
 
@@ -36,7 +36,7 @@ private:
     CLThreadQueue<FileBlockInfo*> m_dataQueue;
 };
 
-class QBufferedFile: public QnFile
+class QN_EXPORT QBufferedFile: public QnFile
 {
 public:
     /*
