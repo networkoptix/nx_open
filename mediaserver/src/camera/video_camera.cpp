@@ -122,6 +122,10 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
     if (!reader) 
     {
         QnAbstractStreamDataProvider* p = m_resource->createDataProvider(role);
+
+        if (!p)
+            return;
+
         reader = dynamic_cast<QnAbstractMediaStreamDataProvider*> (p);
         QnClientPullMediaStreamProvider* clientPullReader = dynamic_cast<QnClientPullMediaStreamProvider*> (p);
         if (clientPullReader)
