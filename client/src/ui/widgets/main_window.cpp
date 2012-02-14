@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QToolButton>
 #include <QMenu>
+#include <QMessageBox>
 #include <QFile>
 #include <QNetworkReply>
 
@@ -635,22 +636,31 @@ void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
     bool isChanged = m_synchronizer->isChanged(layout);
 
     if(isLocal && !isChanged) {
+        QnLayoutResourcePtr resource = layout->resource();
         delete layout;
+        qnResPool->removeResource(resource);
         return;
     }
 
     if(isChanged) {
-        QMessageBox::StandardButton button = QMessageBox::question(this, tr(""), tr("Save changes to layout '%1'?").arg(layout->name()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-        if(button = QMessageBox::Cancel) {
+        QMessageBox::StandardButton button = QMessageBox::question(this, tr(""), tr("Save changes to layout '%1'?").arg(layout->name()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+        if(button == QMessageBox::Cancel) {
             return;
         } else if(button == QMessageBox::No) {
             m_synchronizer->restore(layout);
             delete layout;
         } else {
-            m_synchronizer->save(layout, this, SLOT(at_layout_saved()));
+            m_synchronizer->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
             delete layout;
         }
     }
+}
+
+void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
+    if(status == 0)   
+        return;
+
+    QMessageBox::critical(this, tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
 }
 
 bool QnMainWindow::event(QEvent *event) {

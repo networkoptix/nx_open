@@ -45,9 +45,11 @@ public:
 
     void setItems(const QnLayoutItemDataList &items);
 
-    QnLayoutItemDataList getItems() const;
+    void setItems(const QnLayoutItemDataMap &items);
 
-    const QnLayoutItemDataMap &getItemMap() const;
+    QnLayoutItemDataMap getItems() const;
+
+    QnLayoutItemData getItem(const QUuid &itemUuid) const;
 
     void addItem(const QnLayoutItemData &item);
 
@@ -55,9 +57,12 @@ public:
 
     void removeItem(const QUuid &itemUuid);
 
+    void updateItem(const QUuid &itemUuid, const QnLayoutItemData &item);
+
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);
+    void itemChanged(const QnLayoutItemData &item);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;

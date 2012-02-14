@@ -26,8 +26,12 @@ namespace {
         return resource->property(qn_savedItemsPropertyName).value<QnLayoutItemDataMap>();
     }
 
-    void setSavedItems(QnLayoutResourcePtr &resource, const QnLayoutItemDataMap &items) {
+    void setSavedItems(const QnLayoutResourcePtr &resource, const QnLayoutItemDataMap &items) {
         resource->setProperty(qn_savedItemsPropertyName, QVariant::fromValue(items));
+    }
+
+    bool hasSavedItems(const QnLayoutResourcePtr &resource) {
+        return !resource->property(qn_savedItemsPropertyName).isNull();
     }
 
 } // anonymous namespace
@@ -35,7 +39,7 @@ namespace {
 
 void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const QByteArray &errorString, QnResourceList, int) {
     if(status == 0)
-        setSavedItems(m_resource, m_resource->getItemMap());
+        setSavedItems(m_resource, m_resource->getItems());
 
     emit finished(status, errorString, m_resource);
 
@@ -105,6 +109,9 @@ void QnWorkbenchSynchronizer::save(QnWorkbenchLayout *layout, QObject *object, c
     if(!resource)
         return;
 
+    /* Submit all changes to the resource. */
+    QnWorkbenchLayoutSynchronizer::instance(layout)->submit();
+
     detail::WorkbenchSynchronizerReplyProcessor *processor = new detail::WorkbenchSynchronizerReplyProcessor(resource);
     connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
     m_connection->saveAsync(m_user, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
@@ -123,7 +130,7 @@ bool QnWorkbenchSynchronizer::isChanged(QnWorkbenchLayout *layout) {
     if(!resource)
         return false;
 
-    return resource->getItemMap() == savedItems(resource);
+    return resource->getItems() != savedItems(resource);
 }
 
 bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {
@@ -140,6 +147,11 @@ void QnWorkbenchSynchronizer::start() {
     /* Clean workbench's layouts. */
     while(!m_workbench->layouts().isEmpty())
         delete m_workbench->layouts().back();
+
+    /* Consider all user's layouts saved. */
+    foreach(const QnLayoutResourcePtr &resource, m_user->getLayouts())
+        if(!hasSavedItems(resource))
+            setSavedItems(resource, resource->getItems());
 
     /* Start listening to changes. */
     connect(m_user.data(),      SIGNAL(resourceChanged()),                  this, SLOT(at_user_resourceChanged()));

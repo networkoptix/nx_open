@@ -18,6 +18,7 @@ Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
 
 QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent),
+    m_running(false),
     m_layout(layout),
     m_resource(resource),
     m_update(false),
@@ -40,6 +41,7 @@ QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *
         return;
     }
 
+    m_running = true;
     initialize();
 }
 
@@ -91,6 +93,7 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_resource.data(),  SIGNAL(nameChanged()),                          this, SLOT(at_resource_nameChanged()));
     connect(m_resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this, SLOT(at_resource_itemAdded(const QnLayoutItemData &)));
     connect(m_resource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutItemData &)));
+    connect(m_resource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),  this, SLOT(at_resource_itemChanged(const QnLayoutItemData &)));
 
     m_update = m_submit = true;
 }
@@ -105,6 +108,8 @@ void QnWorkbenchLayoutSynchronizer::deinitialize() {
 
     m_resource->setProperty(layoutSynchronizerPropertyName, QVariant());
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant());
+
+    m_running = false;
 
     autoDeleteLater();
 }
@@ -123,7 +128,7 @@ void QnWorkbenchLayoutSynchronizer::autoDeleteLater() {
 }
 
 void QnWorkbenchLayoutSynchronizer::autoDelete() {
-    if(m_autoDeleting && (m_resource.isNull() || m_layout == NULL))
+    if(m_autoDeleting && !m_running)
         qnDeleteLater(this);
 }
 
@@ -185,6 +190,14 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemDa
     m_layout->removeItem(m_layout->item(itemData.uuid));
 }
 
+void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemData &itemData) {
+    if(!m_update)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_submit, false);
+    m_layout->item(itemData.uuid)->load(itemData);
+}
+
 void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     if(!m_submit)
         return;
@@ -203,6 +216,11 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     item->save(itemData);
 
     m_resource->addItem(itemData);
+
+    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
+    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
+    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
+    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagsChanged()));
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
@@ -210,6 +228,8 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item)
         return;
 
     QnScopedValueRollback<bool> guard(&m_update, false);
+
+    disconnect(item, NULL, this, NULL);
 
     m_resource->removeItem(item->uuid());
 }
@@ -226,4 +246,39 @@ void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed() {
     clearLayout();
 }
 
+void QnWorkbenchLayoutSynchronizer::at_item_geometryChanged() {
+    if(!m_submit)
+        return;
 
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
+    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
+    itemData.combinedGeometry = item->combinedGeometry();
+    m_resource->updateItem(item->uuid(), itemData);
+}
+
+void QnWorkbenchLayoutSynchronizer::at_item_geometryDeltaChanged() {
+    at_item_geometryChanged();
+}
+
+void QnWorkbenchLayoutSynchronizer::at_item_flagsChanged() {
+    if(!m_submit)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
+    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
+    itemData.flags = item->flags();
+    m_resource->updateItem(item->uuid(), itemData);
+}
+
+void QnWorkbenchLayoutSynchronizer::at_item_rotationChanged() {
+    if(!m_submit)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
+    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
+    itemData.rotation = item->rotation();
+    m_resource->updateItem(item->uuid(), itemData);
+}
