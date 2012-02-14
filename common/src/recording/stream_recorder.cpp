@@ -258,8 +258,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
-    fileStarted(m_startDateTime/1000, m_fileName);
-
     outputCtx->video_codec = mediaData->compressionType;
     
     QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
@@ -270,89 +268,93 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
     const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(mediaProvider);
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
-    
-    if (av_set_parameters(m_formatCtx, NULL) < 0) {
-        m_lastErrMessage = "Can't initialize output format parameters for recording video camera";
-        cl_log.log(m_lastErrMessage, cl_logERROR);
-        return false;
-    }
-    av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
-    av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+mediaData->timestamp/1000).toAscii().data(), 0);
-
-    m_formatCtx->start_time = mediaData->timestamp;
-
-    for (unsigned int i = 0; i < layout->numberOfChannels(); ++i) 
     {
-        AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
-        if (videoStream == 0)
+        QMutexLocker mutex(&global_ffmpeg_mutex);
+        
+        if (av_set_parameters(m_formatCtx, NULL) < 0) {
+            m_lastErrMessage = "Can't initialize output format parameters for recording video camera";
+            cl_log.log(m_lastErrMessage, cl_logERROR);
+            return false;
+        }
+        av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
+        av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+mediaData->timestamp/1000).toAscii().data(), 0);
+
+        m_formatCtx->start_time = mediaData->timestamp;
+
+        for (unsigned int i = 0; i < layout->numberOfChannels(); ++i) 
         {
-            m_lastErrMessage = "Can't allocate output stream for recording.";
+            AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
+            if (videoStream == 0)
+            {
+                m_lastErrMessage = "Can't allocate output stream for recording.";
+                cl_log.log(m_lastErrMessage, cl_logERROR);
+                return false;
+            }
+
+            AVCodecContext* videoCodecCtx = videoStream->codec;
+            // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
+            // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
+            if (mediaData->context && !m_forceDefaultCtx) 
+            {
+                avcodec_copy_context(videoCodecCtx, mediaData->context->ctx());
+            }
+            else {
+                videoCodecCtx->codec_id = outputCtx->video_codec;
+                videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
+                AVRational defaultFrameRate = {1, 30};
+                videoCodecCtx->time_base = defaultFrameRate;
+                videoCodecCtx->width = qMax(8,mediaData->width);
+                videoCodecCtx->height = qMax(8,mediaData->height);
+                
+                if (mediaData->compressionType == CODEC_ID_MJPEG)
+                    videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
+                else
+                    videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
+                videoCodecCtx->bit_rate = 1000000 * 6;
+
+                videoCodecCtx->sample_aspect_ratio.num = 1;
+                videoCodecCtx->sample_aspect_ratio.den = 1;
+            }
+            videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+            videoStream->sample_aspect_ratio = videoCodecCtx->sample_aspect_ratio;
+            videoStream->first_dts = 0;
+
+            //AVRational srcRate = {1, 1000000};
+            //videoStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, stream->time_base);
+
+            QString layoutData = QString::number(layout->v_position(i)) + QString(",") + QString(layout->h_position(i));
+            av_metadata_set2(&videoStream->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
+        }
+
+        for (unsigned int i = 0; i < audioLayout->numberOfChannels(); ++i) 
+        {
+            AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
+            if (audioStream == 0)
+            {
+                m_lastErrMessage = "Can't allocate output audio stream";
+                cl_log.log(m_lastErrMessage, cl_logERROR);
+                return false;
+            }
+
+            AVCodecContext* audioCodecCtx = audioStream->codec;
+            audioCodecCtx->codec_id = audioLayout->getAudioTrackInfo(i).codec;
+            audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
+
+            //AVRational srcRate = {1, 1000000};
+            //audioStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, audioStream->time_base);
+        }
+
+        if ((avio_open(&m_formatCtx->pb, url.toUtf8().constData(), AVIO_FLAG_WRITE)) < 0) 
+        {
+            m_lastErrMessage = "Can't allocate output stream for video recording.";
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
 
-        AVCodecContext* videoCodecCtx = videoStream->codec;
-        // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
-        // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-        if (mediaData->context && !m_forceDefaultCtx) 
-        {
-            avcodec_copy_context(videoCodecCtx, mediaData->context->ctx());
-        }
-        else {
-            videoCodecCtx->codec_id = outputCtx->video_codec;
-            videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-            AVRational defaultFrameRate = {1, 30};
-            videoCodecCtx->time_base = defaultFrameRate;
-            videoCodecCtx->width = qMax(8,mediaData->width);
-            videoCodecCtx->height = qMax(8,mediaData->height);
-            
-            if (mediaData->compressionType == CODEC_ID_MJPEG)
-                videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
-            else
-                videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
-            videoCodecCtx->bit_rate = 1000000 * 6;
-
-            videoCodecCtx->sample_aspect_ratio.num = 1;
-            videoCodecCtx->sample_aspect_ratio.den = 1;
-        }
-        videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-        videoStream->sample_aspect_ratio = videoCodecCtx->sample_aspect_ratio;
-        videoStream->first_dts = 0;
-
-        //AVRational srcRate = {1, 1000000};
-        //videoStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, stream->time_base);
-
-        QString layoutData = QString::number(layout->v_position(i)) + QString(",") + QString(layout->h_position(i));
-        av_metadata_set2(&videoStream->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
+        av_write_header(m_formatCtx);
     }
+    fileStarted(m_startDateTime/1000, m_fileName);
 
-    for (unsigned int i = 0; i < audioLayout->numberOfChannels(); ++i) 
-    {
-        AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
-        if (audioStream == 0)
-        {
-            m_lastErrMessage = "Can't allocate output audio stream";
-            cl_log.log(m_lastErrMessage, cl_logERROR);
-            return false;
-        }
-
-        AVCodecContext* audioCodecCtx = audioStream->codec;
-        audioCodecCtx->codec_id = audioLayout->getAudioTrackInfo(i).codec;
-        audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-
-        //AVRational srcRate = {1, 1000000};
-        //audioStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, audioStream->time_base);
-    }
-
-    if ((avio_open(&m_formatCtx->pb, url.toUtf8().constData(), AVIO_FLAG_WRITE)) < 0) 
-    {
-        m_lastErrMessage = "Can't allocate output stream for video recording.";
-        cl_log.log(m_lastErrMessage, cl_logERROR);
-        return false;
-    }
-
-    av_write_header(m_formatCtx);
     return true;
 }
 
