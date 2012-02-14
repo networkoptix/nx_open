@@ -129,6 +129,9 @@ void QnEventSource::slotError(QNetworkReply::NetworkError code)
 */
 void QnEventSource::httpFinished()
 {
+    if (!reply)
+        return;
+
     QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
     if (reply->error()) {
         QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
