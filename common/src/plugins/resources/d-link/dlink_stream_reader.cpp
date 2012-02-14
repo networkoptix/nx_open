@@ -44,6 +44,8 @@ void PlDlinkStreamReader::openStream()
     if (isStreamOpened())
         return;
 
+    //setRole(QnResource::Role_SecondaryLiveVideo);
+
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
 
     QString prifileStr = composeVideoProfile();
@@ -151,6 +153,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     else
     {
         profileNum = 1;
+        //resolution = info.resolutionCloseTo(320);
         resolution = info.resolutions.at(0);
     }
 

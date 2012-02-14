@@ -48,7 +48,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width)
     foreach(const QSize& size, resolutions)
     {
         if (size.width() <= width)
-            return result;
+            return size;
         else
             result = size;
     }
@@ -85,8 +85,14 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
 
     foreach(int fps, possibleFps)
     {
-        if (result <= fr)
-            return result;
+        if (fps <= fr)
+        {
+            // can return fps or result
+            int dif1 = abs(fps-fr);
+            int dif2 = abs(result-fr);
+
+            return dif1 <= dif2 ? fps : result;
+        }
         else
             result = fps;
     }
@@ -278,11 +284,25 @@ void QnPlDlinkResource::init()
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 
-
     //=======remove elements with diff aspect ratio
-    int w = m_camInfo.resolutions.at(0).width();
-    int h = m_camInfo.resolutions.at(0).height();
-    float apectRatio = ((float)w/h);
+    if (m_camInfo.resolutions.size() < 2)
+        return;
+
+
+    int w_0 = m_camInfo.resolutions.at(0).width();
+    int h_0 = m_camInfo.resolutions.at(0).height();
+    float apectRatio_0 = ((float)w_0/h_0);
+
+    int w_1 = m_camInfo.resolutions.at(1).width();
+    int h_1 = m_camInfo.resolutions.at(1).height();
+    float apectRatio_1 = ((float)w_1/h_1);
+
+    float apectRatio = apectRatio_0;
+
+    if (abs(apectRatio_0 - apectRatio_1) > 0.01)
+        apectRatio = apectRatio_1; // 
+            
+   
 
     QList<QSize>::iterator it = m_camInfo.resolutions.begin();
 
@@ -292,7 +312,7 @@ void QnPlDlinkResource::init()
 
         float apectRatioL = (float)s.width() / s.height();
 
-        if ( qAbs(apectRatioL - apectRatio) > 1e-4 )
+        if ( qAbs(apectRatioL - apectRatio) > 0.01 )
             it = m_camInfo.resolutions.erase(it);
         else
             ++it;
