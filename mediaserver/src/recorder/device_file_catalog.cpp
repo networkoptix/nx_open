@@ -321,6 +321,12 @@ void DeviceFileCatalog::deleteRecordsBefore(int idx)
         deleteFirstRecord();
 }
 
+void DeviceFileCatalog::clear()
+{
+    while(m_firstDeleteCount < m_chunks.size())
+        deleteFirstRecord();
+}
+
 bool DeviceFileCatalog::deleteFirstRecord()
 {
     QMutexLocker lock(&m_mutex);
