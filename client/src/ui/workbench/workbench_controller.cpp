@@ -61,7 +61,7 @@
 
 #include "ui/dialogs/camerasettingsdialog.h"
 
-#include <ui/menu/context_menu.h>
+#include <ui/menu/action_manager.h>
 
 #include <file_processor.h>
 

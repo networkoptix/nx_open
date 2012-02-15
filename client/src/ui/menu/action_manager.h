@@ -17,14 +17,14 @@ class QnActionBuilder;
 class QnActionCondition;
 class QnActionSourceProvider;
 
-class QnContextMenu: public QObject {
+class QnActionManager: public QObject {
     Q_OBJECT;
 public:
-    QnContextMenu(QObject *parent = NULL);
+    QnActionManager(QObject *parent = NULL);
 
-    virtual ~QnContextMenu();
+    virtual ~QnActionManager();
 
-    static QnContextMenu *instance();
+    static QnActionManager *instance();
 
     QAction *action(Qn::ActionId id) const;
 
@@ -75,10 +75,10 @@ private:
     QWeakPointer<QObject> m_sourceProviderGuard;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnContextMenu::ActionFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::ActionFlags);
 
 
-#define qnMenu          (QnContextMenu::instance())
-#define qnAction(id)    (QnContextMenu::instance()->action(id))
+#define qnMenu          (QnActionManager::instance())
+#define qnAction(id)    (QnActionManager::instance()->action(id))
 
 #endif // QN_CONTEXT_MENU_H

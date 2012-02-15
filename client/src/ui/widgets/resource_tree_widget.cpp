@@ -16,7 +16,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
-#include "ui/menu/context_menu.h"
+#include "ui/menu/action_manager.h"
 #include "ui/models/resource_model.h"
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/models/resource_search_synchronizer.h"

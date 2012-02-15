@@ -4,7 +4,7 @@
 #include <QToolButton>
 
 #include "ui/ui_common.h"
-#include "ui/menu/context_menu.h"
+#include "ui/menu/action_manager.h"
 
 #include "connectionssettingswidget.h"
 #include "licensewidget.h"

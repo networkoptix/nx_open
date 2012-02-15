@@ -1,4 +1,4 @@
-#include "context_menu.h"
+#include "action_manager.h"
 #include <cassert>
 #include <QAction>
 #include <QMenu>
