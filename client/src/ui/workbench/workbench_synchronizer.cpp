@@ -1,17 +1,46 @@
 #include "workbench_synchronizer.h"
 #include <cassert>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/warnings.h>
 #include <core/resource/user_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include "workbench.h"
 #include "workbench_layout.h"
 #include "workbench_layout_synchronizer.h"
 
+Q_DECLARE_METATYPE(QnLayoutItemDataMap)
+
+namespace {
+    const char *qn_createdLocallyPropertyName = "_qn_createdLocally";
+
+    void setCreatedLocally(QnWorkbenchLayout *layout, bool createdLocally) {
+        layout->setProperty(qn_createdLocallyPropertyName, createdLocally);
+    }
+
+    bool isCreatedLocally(QnWorkbenchLayout *layout) {
+        return layout->property(qn_createdLocallyPropertyName).toBool();
+    }
+
+} // anonymous namespace
+
+
+void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const QByteArray &errorString, QnResourceList, int) {
+    if(status == 0 && !m_synchronizer.isNull())
+        m_synchronizer.data()->m_savedItemsByResource[m_resource] = m_resource->getItems();
+
+    emit finished(status, errorString, m_resource);
+
+    deleteLater();
+}
+
+
 QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
     QObject(NULL),
+    m_running(false),
     m_workbench(NULL),
     m_update(false),
-    m_submit(false)
+    m_submit(false),
+    m_connection(QnAppServerConnectionFactory::createConnection())
 {}
 
 QnWorkbenchSynchronizer::~QnWorkbenchSynchronizer() {}
@@ -42,12 +71,73 @@ void QnWorkbenchSynchronizer::setUser(const QnUserResourcePtr &user) {
         start();
 }
 
+QnLayoutResourcePtr QnWorkbenchSynchronizer::checkLayoutResource(QnWorkbenchLayout *layout) {
+    if(layout == NULL) {
+        qnNullWarning(layout);
+        return QnLayoutResourcePtr();
+    }
+
+    if(!m_running) {
+        qnWarning("Synchronizer is not running.");
+        return QnLayoutResourcePtr();
+    }
+
+    QnLayoutResourcePtr resource = layout->resource();
+    if(resource.isNull()) {
+        qnWarning("Given layout is not registered with workbench synchronizer.");
+        return resource;
+    }
+
+    return resource;
+}
+
+void QnWorkbenchSynchronizer::save(QnWorkbenchLayout *layout, QObject *object, const char *slot) {
+    QnLayoutResourcePtr resource = checkLayoutResource(layout);
+    if(!resource)
+        return;
+
+    /* Submit all changes to the resource. */
+    QnWorkbenchLayoutSynchronizer::instance(layout)->submit();
+
+    detail::WorkbenchSynchronizerReplyProcessor *processor = new detail::WorkbenchSynchronizerReplyProcessor(this, resource);
+    connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
+    m_connection->saveAsync(m_user, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
+}
+
+void QnWorkbenchSynchronizer::restore(QnWorkbenchLayout *layout) {
+    QnLayoutResourcePtr resource = checkLayoutResource(layout);
+    if(!resource)
+        return;
+
+    resource->setItems(m_savedItemsByResource[resource]);
+}
+
+bool QnWorkbenchSynchronizer::isChanged(QnWorkbenchLayout *layout) {
+    QnLayoutResourcePtr resource = checkLayoutResource(layout);
+    if(!resource)
+        return false;
+
+    return resource->getItems() != m_savedItemsByResource[resource];
+}
+
+bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {
+    QnLayoutResourcePtr resource = checkLayoutResource(layout);
+    if(!resource)
+        return false;
+
+    return isCreatedLocally(layout);
+}
+
 void QnWorkbenchSynchronizer::start() {
     assert(m_workbench != NULL && !m_user.isNull());
 
     /* Clean workbench's layouts. */
     while(!m_workbench->layouts().isEmpty())
         delete m_workbench->layouts().back();
+
+    /* Consider all user's layouts saved. */
+    foreach(const QnLayoutResourcePtr &resource, m_user->getLayouts())
+        m_savedItemsByResource[resource] = resource->getItems();
 
     /* Start listening to changes. */
     connect(m_user.data(),      SIGNAL(resourceChanged()),                  this, SLOT(at_user_resourceChanged()));
@@ -57,6 +147,7 @@ void QnWorkbenchSynchronizer::start() {
 
     m_submit = m_update = true;
 
+    m_running = true;
     emit started();
 }
 
@@ -64,6 +155,7 @@ void QnWorkbenchSynchronizer::stop() {
     assert(m_workbench != NULL && !m_user.isNull());
 
     emit stopped();
+    m_running = false;
 
     m_submit = m_update = false;
 
@@ -92,8 +184,10 @@ void QnWorkbenchSynchronizer::update() {
     foreach(QnWorkbenchLayout *layout, m_workbench->layouts()) {
         QnLayoutResourcePtr resource = layout->resource();
 
-        if(!resources.contains(resource)) /* Corresponding layout resource was removed, remove layout. */
+        if(!resources.contains(resource)) { /* Corresponding layout resource was removed, remove layout. */
+            m_savedItemsByResource.remove(resource);
             delete layout;
+        }
     }
 }
 
@@ -115,6 +209,8 @@ void QnWorkbenchSynchronizer::submit() {
             resource = QnLayoutResourcePtr(new QnLayoutResource());
             qnResPool->addResource(resource);
             m_user->addLayout(resource);
+
+            setCreatedLocally(layout, true);
 
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);
             synchronizer->setAutoDeleting(true);

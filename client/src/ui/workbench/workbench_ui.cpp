@@ -362,6 +362,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
 
+    connect(tabBarWidget,               SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SIGNAL(closeRequested(QnWorkbenchLayout *)));
     connect(m_titleShowButton,          SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_titleShowButton_toggled(bool)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateTitleOpacity()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateTitleOpacity()));

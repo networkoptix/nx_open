@@ -58,13 +58,22 @@ protected slots:
     void at_resource_nameChanged();
     void at_resource_itemAdded(const QnLayoutItemData &itemData);
     void at_resource_itemRemoved(const QnLayoutItemData &itemData);
+    void at_resource_itemChanged(const QnLayoutItemData &itemData);
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_nameChanged();
     void at_layout_aboutToBeDestroyed();
 
+    void at_item_geometryChanged();
+    void at_item_geometryDeltaChanged();
+    void at_item_flagsChanged();
+    void at_item_rotationChanged();
+
 private:
+    /** Whether this synchronizer is functional. */
+    bool m_running;
+
     /** Associated workbench layout. */
     QnWorkbenchLayout *m_layout;
 

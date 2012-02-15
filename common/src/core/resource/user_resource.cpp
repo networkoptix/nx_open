@@ -27,8 +27,8 @@ void QnUserResource::addLayout(const QnLayoutResourcePtr &layout)
         return;
     }
 
-    if(layout->getParentId() != QnId()) {
-        qnWarning("Given layout '%1' is already in other users's layouts list.", layout->getName());
+    if(layout->getParentId() != QnId() && layout->getParentId() != getId()) {
+        qnWarning("Given layout '%1' is already in other user's layouts list.", layout->getName());
         return;
     }
 

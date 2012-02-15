@@ -180,10 +180,24 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 
 void QnPlDlinkResource::init()
 {
-    downloadFile("config/motion.cgi?enable=yes",  getHostAddress(), 80, 1000, getAuth()); // to enable md 
+    CLHttpStatus status;
+    downloadFile(status, "config/motion.cgi?enable=yes",  getHostAddress(), 80, 1000, getAuth()); // to enable md 
 
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+        return;
+    }
     
-    QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
+    QByteArray cam_info_file = downloadFile(status, "config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+        return;
+    }
+
+
     if (cam_info_file.size()==0)
         return;
 

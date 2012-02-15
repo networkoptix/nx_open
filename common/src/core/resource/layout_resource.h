@@ -3,6 +3,8 @@
 
 #include <QRectF>
 #include <QUuid>
+#include <QMetaType>
+#include <utils/common/fuzzy.h>
 #include "resource.h"
 
 class QnLayoutItemData
@@ -15,9 +17,22 @@ public:
     int flags;
     QRectF combinedGeometry;
     qreal rotation;
+
+    friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
+        return 
+            l.resourceId == r.resourceId &&
+            l.uuid == r.uuid &&
+            l.flags == r.flags &&
+            qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) &&
+            qFuzzyCompare(l.rotation, r.rotation);
+    }
 };
 
+Q_DECLARE_METATYPE(QnLayoutItemData);
+Q_DECLARE_TYPEINFO(QnLayoutItemData, Q_MOVABLE_TYPE);
+
 typedef QList<QnLayoutItemData> QnLayoutItemDataList;
+typedef QHash<QUuid, QnLayoutItemData> QnLayoutItemDataMap;
 
 class QnLayoutResource : public QnResource
 {
@@ -32,7 +47,11 @@ public:
 
     void setItems(const QnLayoutItemDataList &items);
 
-    const QnLayoutItemDataList &getItems() const;
+    void setItems(const QnLayoutItemDataMap &items);
+
+    QnLayoutItemDataMap getItems() const;
+
+    QnLayoutItemData getItem(const QUuid &itemUuid) const;
 
     void addItem(const QnLayoutItemData &item);
 
@@ -40,16 +59,21 @@ public:
 
     void removeItem(const QUuid &itemUuid);
 
+    void updateItem(const QUuid &itemUuid, const QnLayoutItemData &item);
+
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);
+    void itemChanged(const QnLayoutItemData &item);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
-    QList<QnLayoutItemData> m_items;
+    QnLayoutItemDataMap m_itemByUuid;
 };
+
+
 
 
 #endif // QN_LAYOUT_RESOURCE_H
