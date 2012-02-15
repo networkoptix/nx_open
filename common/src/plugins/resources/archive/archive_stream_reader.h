@@ -113,6 +113,7 @@ private:
     int m_newDataMarker;
 
 private:
+    bool m_bofReached;
     bool m_canChangeQuality;
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
