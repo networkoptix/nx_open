@@ -54,9 +54,14 @@ void QnEventManager::eventReceived(QnEvent event)
             {
                 if (resource->getId() == event.resourceId)
                 {
-                    qnResPool->addResource(resource);
-
                     QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+                    if (ownResource)
+                        ownResource->update(resource);
+                    else
+                    {
+                        qnResPool->addResource(resource);
+                        ownResource = resource;
+                    }
 
                     QnSecurityCamResourcePtr securityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
                     if (!securityCamera.isNull())
