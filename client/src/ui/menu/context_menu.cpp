@@ -10,6 +10,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/app_style.h>
 #include "action_conditions.h"
+#include "action_source_provider.h"
 
 Q_DECLARE_METATYPE(QList<QGraphicsItem *>);
 
@@ -141,12 +142,13 @@ public:
     }
 
     QnActionBuilder operator()(Qn::ActionId id) {
-        QnContextMenu::ActionData *data = m_menu->m_dataById.value(id);
+        QnActionData *data = m_menu->m_dataById.value(id);
         if(data == NULL) {
-            data = new QnContextMenu::ActionData();
+            data = new QnActionData();
 
             data->id = id;
-            data->action = new QAction(m_menu);
+            data->action = new QnAction(m_menu);
+            data->action->setActionData(data);
             data->action->setIconVisibleInMenu(true);
             setActionId(data->action, id);
             m_menu->m_dataById[id] = data;
@@ -168,7 +170,7 @@ private:
 QnContextMenu::QnContextMenu(QObject *parent): 
     QObject(parent)
 {
-    m_root = new ActionData();
+    m_root = new QnActionData();
     m_dataById[Qn::NoAction] = m_root;
 
     QnActionFactory factory(this, m_root);
@@ -377,17 +379,11 @@ QnContextMenu *QnContextMenu::instance() {
     return qn_contextMenu();
 }
 
-void QnContextMenu::at_action_toggled() {
-    QAction *action = checked_cast<QAction *>(sender());
-    Qn::ActionId id = actionId(action);
-    const ActionData *data = m_dataById[id];
-
-    if(data->flags & ToggledText)
-        action->setText(action->isChecked() ? data->toggledText : data->normalText);
-}
-
-void QnContextMenu::at_menu_destroyed(QObject *menu) {
-    m_menus.remove(menu);
+void QnContextMenu::setSourceProvider(QnActionSourceProvider *sourceProvider) {
+    m_sourceProvider = sourceProvider;
+    m_sourceProviderGuard = dynamic_cast<QObject *>(sourceProvider);
+    if(!m_sourceProviderGuard)
+        m_sourceProviderGuard = this;
 }
 
 QAction *QnContextMenu::action(Qn::ActionId id) const {
@@ -407,7 +403,7 @@ QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *
 }
 
 template<class ItemSequence>
-QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
+QMenu *QnContextMenu::newMenuInternal(const QnActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
     if(!m_menus.isEmpty())
         qnWarning("New menu was requested even though the previous one wasn't destroyed. Getting action cause will fail.");
 
@@ -422,10 +418,10 @@ QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope 
 }
 
 template<class ItemSequence>
-QMenu *QnContextMenu::newMenuRecursive(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
+QMenu *QnContextMenu::newMenuRecursive(const QnActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
     QMenu *result = new QMenu();
 
-    foreach(const ActionData *data, parent->children) {
+    foreach(const QnActionData *data, parent->children) {
         QAction *action = NULL;
 
         if(!(data->flags & scope))
@@ -489,4 +485,7 @@ QnResourceList QnContextMenu::cause(QObject *sender) {
     }
 }
 
+void QnContextMenu::at_menu_destroyed(QObject *menu) {
+    m_menus.remove(menu);
+}
 
