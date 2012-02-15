@@ -708,18 +708,28 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
-    m_isEOFReached = emptyData != 0;
+
+    bool isEOFReached = emptyData != 0;
+    if (m_extTimeSrc && isEOFReached != m_isEOFReached)
+        m_extTimeSrc->onEofReached(this, isEOFReached); // jump to live if needed
+    m_isEOFReached = isEOFReached;
     if (emptyData)
     {
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3)
         {
+            /*
             // One camera from several sync cameras may reach BOF/EOF
 		    // move current time position to the edge to prevent other cameras blocking
             m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
                 m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
+            }
+            */
+            m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
+            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+                m_display[i]->setLastDisplayedTime(AV_NOPTS_VALUE);
             }
 
             m_timeMutex.lock();
@@ -732,12 +742,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             }
             else 
                 m_timeMutex.unlock();
-
-            if (m_extTimeSrc)
-                m_extTimeSrc->onEofReached(this);
         }
         return true;
     }
+
     m_emptyPacketCounter = 0;
 
     bool flushCurrentBuffer = false;

@@ -195,9 +195,9 @@ bool QnArchiveStreamReader::init()
     return true;
 }
 
- qint64 QnArchiveStreamReader::determineDisplayTime()
+ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
  {
-     qint64 rez = 0;
+     qint64 rez = AV_NOPTS_VALUE;
      QMutexLocker mutex(&m_mutex);
      for (int i = 0; i < m_dataprocessors.size(); ++i)
      {
@@ -205,11 +205,20 @@ bool QnArchiveStreamReader::init()
          if (dp->isRealTimeSource())
              return DATETIME_NOW;
          QnlTimeSource* timeSource = dynamic_cast<QnlTimeSource*>(dp);
-         if (timeSource)
-            rez = qMax(rez, timeSource->getExternalTime());
+         if (timeSource) {
+             if (rez != AV_NOPTS_VALUE)
+                rez = qMax(rez, timeSource->getExternalTime());
+             else
+                 rez = timeSource->getExternalTime();
+         }
      }
-	 if(rez == AV_NOPTS_VALUE) {
-		rez = m_currentTime;
+	 if(rez == AV_NOPTS_VALUE) 
+     {
+		//rez = m_currentTime;
+         if (reverseMode)
+             return m_delegate->endTime();
+         else
+             return m_delegate->startTime();
 	 }
      return rez;
  }
@@ -299,7 +308,7 @@ begin_label:
         bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch);
         if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
-            qint64 displayTime = determineDisplayTime();
+            qint64 displayTime = determineDisplayTime(reverseMode);
             beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
                 intChanneljumpTo(displayTime, 0);
@@ -335,7 +344,7 @@ begin_label:
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
-        qint64 displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime();
+        qint64 displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime(reverseMode);
 
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
@@ -843,7 +852,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     if (maskedDelegate) {
         maskedDelegate->setSendMotion(value);
         if (!mFirstTime && !m_delegate->isRealTimeSource())
-            jumpToPreviousFrame(determineDisplayTime());
+            jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
         return true;
     }
     else {
@@ -862,7 +871,7 @@ bool QnArchiveStreamReader::setMotionRegion(const QRegion& region)
     if (maskedDelegate) {
         maskedDelegate->setMotionRegion(region);
         if (!mFirstTime && !m_delegate->isRealTimeSource())
-            jumpToPreviousFrame(determineDisplayTime());
+            jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
         return true;
     }
     else {

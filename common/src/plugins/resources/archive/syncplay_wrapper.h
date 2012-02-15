@@ -47,7 +47,7 @@ public:
     //
 
 public slots:
-    void onEofReached(QnlTimeSource* src);
+    void onEofReached(QnlTimeSource* src, bool value);
     void onBufferingStarted(QnlTimeSource* source);
     void onBufferingFinished(QnlTimeSource* source);
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
