@@ -40,7 +40,7 @@ CONFIG(debug, debug|release) {
   PRE_TARGETDEPS += ../../common/bin/debug/common.lib
   }
   unix:!mac {
-  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.so
+  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.a
   }
   mac {
   PRE_TARGETDEPS += ../../common/bin/debug/libcommon.dylib
@@ -79,7 +79,7 @@ win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
 
-    LIBS += -lxerces-c_3
+    LIBS += -lxerces-c_3 -lprotobuf
 
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
@@ -87,12 +87,12 @@ win32 {
 }
 
 mac {
-    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1
+    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1 -lprotobuf
     DEFINES += QN_EXPORT=
 }
 
 unix:!mac {
-    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c
+    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c -lprotobuf
 }
 
 LIBS += -L$$EVETOOLS_DIR/lib

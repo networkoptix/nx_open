@@ -26,6 +26,7 @@ Release
 appserver/db/appserver.db
 appserver/setup/db/appserver.db
 appserver/proto/xml/gen
+appserver/proto/pb/gen
 appserver/test/executions
 appserver/static
 
