@@ -40,7 +40,7 @@
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/context_menu/context_menu.h>
+#include <ui/menu/context_menu.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/style/skin.h>
@@ -777,11 +777,9 @@ void QnWorkbenchUi::at_mainMenuAction_triggered() {
     if(!m_mainMenuButton->isVisible())
         return;
 
-    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
     /* On multi-monitor setups where monitor sizes differ,
      * these coordinates can be negative, so we shouldn't adjust them. */
-    //pos.rx() = qMax(pos.x(), 0);
-    //pos.ry() = qMax(pos.y(), 0);
+    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
 
     QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
     menu->move(pos);
