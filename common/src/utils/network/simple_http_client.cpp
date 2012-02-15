@@ -355,10 +355,10 @@ QString CLSimpleHTTPClient::digestAccess(const QString& request) const
 }
 
 
-QByteArray downloadFile(const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
+QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
 {
     CLSimpleHTTPClient http (host, port, timeout, auth);
-    http.doGET(fileName);
+    status = http.doGET(fileName);
 
     
     QByteArray file;

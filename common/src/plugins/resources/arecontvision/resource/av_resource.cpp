@@ -323,8 +323,13 @@ bool QnPlAreconVisionResource::getParamPhysical(const QnParam &param, QVariant &
 
     QString request = QLatin1String("get?") + param.netHelper();
 
-    if (connection.doGET(request)!=CL_HTTP_SUCCESS)
+    CLHttpStatus status = connection.doGET(request);
+    if (status == CL_HTTP_AUTH_REQUIRED)
+        setStatus(QnResource::Unauthorized);
+
+    if (status != CL_HTTP_SUCCESS)
         return false;
+        
 
     char c_response[MAX_RESPONSE_LEN];
 
@@ -357,11 +362,20 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
     if (param.type() != QnParamType::None && param.type() != QnParamType::Button)
         request += QLatin1Char('=') + val.toString();
 
-    if (connection.doGET(request)!=CL_HTTP_SUCCESS)
-        if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
-            return false;
+    CLHttpStatus status = connection.doGET(request);
+    if (status != CL_HTTP_SUCCESS)
+        status = connection.doGET(request);
 
-    return true;
+    if (CL_HTTP_SUCCESS == status)
+        return true;
+
+    if (CL_HTTP_AUTH_REQUIRED == status)
+    {
+        setStatus(QnResource::Unauthorized);
+        return false;
+    }
+
+    return false;
 }
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)

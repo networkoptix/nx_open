@@ -113,6 +113,7 @@ private:
     int m_newDataMarker;
 
 private:
+    bool m_bofReached;
     bool m_canChangeQuality;
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
@@ -136,7 +137,7 @@ private:
     bool m_oldQualityFastSwitch;
     bool m_isStillImage;
 
-    qint64 determineDisplayTime();
+    qint64 determineDisplayTime(bool reverseMode);
     void intChanneljumpTo(qint64 mksec, int channel);
     bool getNextVideoPacket();
     void addAudioChannel(QnCompressedAudioDataPtr audio);
