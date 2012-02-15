@@ -15,6 +15,13 @@ static const int MAX_QUEUE_SIZE = 10;
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
+static const int HIGH_QUALITY_RETRY_COUNTER = 1;
+static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
+
+QHash<QHostAddress, qint64> QnRtspDataConsumer::m_lastSwitchTime;
+QSet<QnRtspDataConsumer*> QnRtspDataConsumer::m_allConsumers;
+QMutex QnRtspDataConsumer::m_allConsumersMutex;
+
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   QnAbstractDataConsumer(MAX_QUEUE_SIZE),
@@ -30,14 +37,26 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_prefferedProvider(0),
   m_currentDP(0),
   m_liveQuality(MEDIA_Quality_High),
-  m_newLiveQuality(MEDIA_Quality_None)
+  m_newLiveQuality(MEDIA_Quality_None),
+  m_hiQualityRetryCounter(0)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     m_timer.start();
+    QMutexLocker lock(&m_allConsumersMutex);
+    m_allConsumers << this;
 }
 
 QnRtspDataConsumer::~QnRtspDataConsumer()
 {
+    {
+        QMutexLocker lock(&m_allConsumersMutex);
+        m_allConsumers.remove(this);
+        foreach(QnRtspDataConsumer* consumer, m_allConsumers)
+        {
+            if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
+                consumer->resetQualityStatistics();
+        }
+    }
     stop();
 }
 
@@ -88,6 +107,44 @@ bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
 {
     return !(qSharedPointerDynamicCast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
 }
+
+void QnRtspDataConsumer::resetQualityStatistics()
+{
+    m_hiQualityRetryCounter = 0;
+}
+
+bool QnRtspDataConsumer::canSwitchToLowQuality()
+{
+    if (!m_owner->isSecondaryLiveDPSupported())
+        return false;
+
+    QMutexLocker lock(&m_allConsumersMutex);
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    QHostAddress clientAddress = m_owner->getPeerAddress();
+    if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
+        return false;
+
+    m_lastSwitchTime[clientAddress] = currentTime;
+    return true;
+}
+
+bool QnRtspDataConsumer::canSwitchToHiQuality()
+{
+    // RTSP queue is almost empty. But need some addition check to prevent quality change flood
+    QMutexLocker lock(&m_allConsumersMutex);
+    if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
+        return false;
+
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    QHostAddress clientAddress = m_owner->getPeerAddress();
+    if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
+        return false;
+
+    m_lastSwitchTime[clientAddress] = currentTime;
+    m_hiQualityRetryCounter++;
+    return true;
+}
+
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
@@ -107,11 +164,13 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         if (isSecondaryProvider)
             media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
-        if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_owner->isSecondaryLiveDPSupported())
-            m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
-        else if (m_dataQueue.size() <= 1)
-            m_newLiveQuality = MEDIA_Quality_High;
-
+        if (m_newLiveQuality == MEDIA_Quality_None)
+        {
+            if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
+                m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+            else if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
+                m_newLiveQuality = MEDIA_Quality_High;
+        }
         
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
@@ -386,4 +445,5 @@ void QnRtspDataConsumer::clearUnprocessedData()
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
+    m_hiQualityRetryCounter = 0;
 }

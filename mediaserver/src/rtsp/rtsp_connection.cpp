@@ -155,6 +155,12 @@ bool QnRtspConnectionProcessor::isSecondaryLiveDP(QnAbstractStreamDataProvider* 
     return dp == d->liveDpLow;
 }
 
+QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return QHostAddress(d->socket->getPeerAddressUint());
+}
+
 bool QnRtspConnectionProcessor::isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const
 {
     Q_D(const QnRtspConnectionProcessor);
