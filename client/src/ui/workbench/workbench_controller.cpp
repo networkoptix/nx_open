@@ -958,6 +958,9 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         m_resizingInstrument->setEffective(effective);
         m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
         m_dragInstrument->setEffective(effective);
+
+        if(widget == NULL) /* Un-raise on un-zoom. */
+            m_display->workbench()->setItem(QnWorkbench::RAISED, NULL);
         break;
     }
     default:

@@ -1114,18 +1114,19 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
     /* Update media quality. */
     if(role == QnWorkbench::ZOOMED) 
     {
-
         QnResourceWidget *oldWidget = this->widget(oldItem);
         if(oldWidget) 
         {
-            if (dynamic_cast<QnAbstractArchiveReader*>(oldWidget->display()->archiveReader()))
-            //oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
+            if (oldWidget->display()->archiveReader()) 
+            {
+                //oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
             	oldWidget->display()->archiveReader()->enableQualityChange();
+            }
         }
         QnResourceWidget *newWidget = this->widget(item);
         if(newWidget) 
         {
-            if (dynamic_cast<QnAbstractArchiveReader*>(newWidget->display()->archiveReader()))
+            if (newWidget->display()->archiveReader())
 			{
             	newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
             	newWidget->display()->archiveReader()->disableQualityChange();
