@@ -23,7 +23,7 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="typeId" type="xs:string"/>
       <xs:element name="region" type="xs:string" minOccurs="0"/>
-      <xs:element name="status" type="xs:string" minOccurs="0"/>
+      <xs:element name="status" type="xs:int" minOccurs="0"/>
       <xs:element name="url" type="xs:string"/>
       <xs:element name="mac" type="xs:string"/>
       <xs:element name="login" type="xs:string"/>

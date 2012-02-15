@@ -1,10 +1,10 @@
 package proto.pb;
 
 enum ParamType {
-    None        = 0;
+    Nope        = 0;
     Value       = 1;
     OnOff       = 2;
-    Boolen      = 3;
+    Boolean     = 3;
     MinMaxStep  = 4;
     Enumeration = 5;
     Button      = 6;

@@ -1,5 +1,3 @@
-#include <sstream>
-
 #include "camera.pb.h"
 #include "server.pb.h"
 #include "user.pb.h"
@@ -34,7 +32,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
         parameters["password"] = pb_camera.password().c_str();
 
         if (pb_camera.has_status())
-            parameters["status"] = (pb_camera.status() == proto::pb::Camera_Status_Active) ? "A" : "I";
+            parameters["status"] = QString::number((int)pb_camera.status());
 
         parameters["parentId"] = QString::number(pb_camera.parentid());
 
@@ -395,10 +393,9 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
         }
     }
 
-    std::ostringstream os;
-    pb_servers.SerializeToOstream(&os);
-
-    data = os.str().c_str();
+    std::string str;
+    pb_servers.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
 }
 
 void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArray& data)
@@ -434,10 +431,9 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
         }
     }
 
-    std::ostringstream os;
-    pb_users.SerializeToOstream(&os);
-
-    data = os.str().c_str();
+    std::string str;
+    pb_users.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
 }
 
 void QnApiPbSerializer::serializeCamera(const QnVirtualCameraResourcePtr& cameraPtr, QByteArray& data)
@@ -470,8 +466,7 @@ void QnApiPbSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camera
         pb_scheduleTask.set_fps(scheduleTaskIn.getFps());
     }
 
-    std::ostringstream os;
-    pb_cameras.SerializeToOstream(&os);
-
-    data = os.str().c_str();
+    std::string str;
+    pb_cameras.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
 }

@@ -75,11 +75,12 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory&
     : m_url(url),
       m_resourceFactory(resourceFactory)
 {
+    m_requestParams.append(QnRequestParam("format", m_serializer.format()));
 }
 
 int QnAppServerConnection::addObject(const QString& objectName, const QByteArray& data, QByteArray& reply, QByteArray& errorString)
 {
-    int status = SessionManager::instance()->sendPostRequest(m_url, objectName, data, reply, errorString);
+    int status = SessionManager::instance()->sendPostRequest(m_url, objectName, m_requestParams, data, reply, errorString);
     if (status != 0)
     {
         errorString += "\nSessionManager::sendPostRequest(): ";
@@ -91,7 +92,7 @@ int QnAppServerConnection::addObject(const QString& objectName, const QByteArray
 
 int QnAppServerConnection::addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot)
 {
-    return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, data, target, slot);
+    return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, m_requestParams, data, target, slot);
 }
 
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
@@ -103,7 +104,7 @@ int QnAppServerConnection::getObjects(const QString& objectName, const QString& 
     else
         request = QString("%1/%2").arg(objectName).arg(args);
 
-    return SessionManager::instance()->sendGetRequest(m_url, request, data, errorString);
+    return SessionManager::instance()->sendGetRequest(m_url, request, m_requestParams, data, errorString);
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
@@ -247,6 +248,20 @@ int QnAppServerConnection::addStorage(const QnStorageResourcePtr& storagePtr, QB
 
     QByteArray reply;
     return addObject("storage", data, reply, errorString);
+}
+
+int QnAppServerConnection::getServers(QnVideoServerResourceList &servers, QByteArray &errorString)
+{
+    QByteArray data;
+    int status = getObjects("server", "", data, errorString);
+
+    try {
+        m_serializer.deserializeServers(servers, data);
+    } catch (const QnSerializeException& e) {
+        errorString += e.errorString();
+    }
+
+    return status;
 }
 
 int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString)

@@ -9,6 +9,8 @@
 class QnApiXmlSerializer : public QnApiSerializer
 {
 public:
+    const char* format() const { return "xml"; }
+
     void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data);
     void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data);

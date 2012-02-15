@@ -100,7 +100,7 @@ namespace {
             parameters["password"] = i->password().c_str();
 
             if (i->status().present())
-                parameters["status"] = (*i->status()).c_str();
+                parameters["status"] = QString::number(*i->status());
 
             if (i->parentID().present())
                 parameters["parentId"] = (*i->parentID()).c_str();
@@ -542,7 +542,7 @@ void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteAr
     if (userPtr->getId().isValid())
         user.id(userPtr->getId().toString().toStdString());
 
-    user.status("A");
+    user.status(QnResource::Online);
     user.password(userPtr->getPassword().toStdString());
 
     xsd::api::layouts::Layouts layouts;
@@ -613,7 +613,7 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
     }
 
     camera.parentID(cameraPtr->getParentId().toString().toStdString());
-    camera.status((cameraPtr->getStatus() == QnResource::Online) ? "A" : "I");
+    camera.status(cameraPtr->getStatus());
 	camera.region(serializeRegion(cameraPtr->getMotionMask()).toStdString());
 
     const QAuthenticator& auth = cameraPtr->getAuth();
