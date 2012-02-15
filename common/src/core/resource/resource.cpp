@@ -484,6 +484,10 @@ void QnResource::setStatus(QnResource::Status newStatus)
     {
         QMutexLocker mutexLocker(&m_mutex);
         oldStatus = m_status;
+
+        if (oldStatus == Unauthorized && newStatus == Offline)
+            return; 
+
         m_status = newStatus;
     }
 

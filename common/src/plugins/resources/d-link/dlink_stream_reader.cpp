@@ -50,7 +50,15 @@ void PlDlinkStreamReader::openStream()
 
     QString prifileStr = composeVideoProfile();
 
-    QByteArray cam_info_file = downloadFile(prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth());
+    CLHttpStatus status;
+    QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        getResource()->setStatus(QnResource::Unauthorized);
+        return;
+    }
+
 
     if (cam_info_file.length()==0)
         return;
