@@ -3,10 +3,12 @@
 
 #include <QWidget>
 #include <QScopedPointer>
+#include <core/resource/resource_fwd.h>
 
 class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
+class QToolButton;
 
 class QnResourcePoolUserWatcher;
 class QnBlueBackgroundPainter;
@@ -58,17 +60,28 @@ protected slots:
     void showAboutDialog();
     void showPreferencesDialog();
     void showAuthenticationDialog();
+    void showMainMenu();
 
     void updateFullScreenState();
     void updateDwmState();
 
-    void at_sessionManager_error(int error);
+    void openNewLayout();
+    void closeCurrentLayout();
 
-    void at_newLayoutRequested();
-    void at_treeWidget_activated(uint resourceId);
+    void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
+
+    void at_sessionManager_error(int error);
 
     void at_settings_lastUsedConnectionChanged();
 
+    void at_synchronizer_started();
+
+    void at_cameraSettingsAction_triggered();
+    void at_serverSettingsAction_triggered();
+    void at_youtubeUploadAction_triggered();
+    void at_editTagsAction_triggred();
+    void at_layout_closeRequested(QnWorkbenchLayout *layout);
+    void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
@@ -82,6 +95,7 @@ private:
 
     QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;
+    QToolButton *m_mainMenuButton;
 
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_viewLayout;

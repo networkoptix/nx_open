@@ -10,8 +10,6 @@
 #include "core/misc/scheduleTask.h"
 #include "server_stream_recorder.h"
 
-static const int TRUNCATE_INTERVAL = 60; // seconds
-
 const float MIN_SECONDARY_FPS = 2.0;
 
 
@@ -28,6 +26,7 @@ void QnRecordingManager::start()
 {
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)));
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)));
+    QThread::start();
 }
 
 void QnRecordingManager::stop()
@@ -74,7 +73,7 @@ QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, Qn
     if (reader == 0)
         return 0;
     QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role);
-    recorder->setTruncateInterval(TRUNCATE_INTERVAL);
+    recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
     reader->addDataProcessor(recorder);
     reader->setNeedKeyData();
     recorder->start();
@@ -95,19 +94,20 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
             connect(recorderHiRes, SIGNAL(fpsChanged(float)), this, SLOT(onFpsChanged(float)));
         if (recorderLowRes) 
             connect(camera->getLiveReader(QnResource::Role_SecondaryLiveVideo), SIGNAL(threadPaused()), recorderLowRes, SLOT(closeOnEOF()), Qt::DirectConnection);
+        connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)), Qt::QueuedConnection);
         
 
         QMutexLocker lock(&m_mutex);
 
         m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
-        recorderHiRes->updateSchedule(cameraRes->getScheduleTasks());
+        recorderHiRes->updateCamera(cameraRes);
         if (recorderLowRes)
-            recorderLowRes->updateSchedule(cameraRes->getScheduleTasks());
+            recorderLowRes->updateCamera(cameraRes);
     }
 }
 
-void QnRecordingManager::updateSchedule(QnSecurityCamResourcePtr camera)
+void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr camera)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -115,9 +115,9 @@ void QnRecordingManager::updateSchedule(QnSecurityCamResourcePtr camera)
     if (itrRec != m_recordMap.end())
     {
         const Recorders& recorders = itrRec.value();
-        recorders.recorderHiRes->updateSchedule(camera->getScheduleTasks());
+        recorders.recorderHiRes->updateCamera(camera);
         if (recorders.recorderLowRes)
-            recorders.recorderLowRes->updateSchedule(camera->getScheduleTasks());
+            recorders.recorderLowRes->updateCamera(camera);
     }
 }
 
@@ -159,6 +159,26 @@ void QnRecordingManager::onFpsChanged(float value)
     }
 }
 
+void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+{
+    // Close file if resource is offline
+    // todo: Code is not thread safe now. So, while commented
+#if 1
+    if (newStatus != QnResource::Offline) 
+        return;
+    QnResource* res = (QnResource*) sender();
+    QnResourcePtr resPtr= res->toSharedPointer();
+    if (!resPtr)
+        return;
+    
+    QMutexLocker lock(&m_mutex);
+    Recorders recorders = m_recordMap.value(resPtr);
+    if (recorders.recorderHiRes)
+        recorders.recorderHiRes->closeOnEOF();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->closeOnEOF();
+#endif
+}
 
 Q_GLOBAL_STATIC(QnRecordingManager, inst2);
 QnRecordingManager* QnRecordingManager::instance()

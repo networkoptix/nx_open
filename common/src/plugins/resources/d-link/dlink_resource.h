@@ -9,80 +9,20 @@
 
 struct QnDlink_cam_info
 {
-    QnDlink_cam_info():
-    hasMPEG4(false),
-    numberOfVideoProfiles(0),
-    hasFixedQuality(false)
-    {
+    QnDlink_cam_info();
 
-    }
+    void clear();
 
-    bool inited() const
-    {
-        return numberOfVideoProfiles > 0;
-    }
+    bool inited() const;
 
     // returns resolution with width not less than width
-    QSize resolutionCloseTo(int width)
-    {
-        if (resolutions.size()==0)
-        {
-            Q_ASSERT(false);
-            return QSize(0,0);
-        }
-
-        QSize result = resolutions.at(0);
-
-        
-        foreach(const QSize& size, resolutions)
-        {
-            if (size.width() <= width)
-                return result;
-            else
-                result = size;
-        }
-
-        return result;
-    }
+    QSize resolutionCloseTo(int width);
 
     // returns next up bitrate 
-    QString bitrateCloseTo(int val)
-    {
-
-        QSize result;
-
-        if (possibleBitrates.size()==0)
-        {
-            Q_ASSERT(false);
-            return "";
-        }
-
-        QMap<int, QString>::iterator it = possibleBitrates.lowerBound(val);
-        if (it == possibleBitrates.end())
-            it--;
-
-        return it.value();
-
-    }
+    QString bitrateCloseTo(int val);
 
     // returns next up frame rate 
-    int frameRateCloseTo(int fr)
-    {
-        Q_ASSERT(possibleFps.size()>0);
-
-        int result = possibleFps.at(0);
-
-        foreach(int fps, possibleFps)
-        {
-            if (result <= fr)
-                return result;
-            else
-                result = fps;
-        }
-
-        return result;
-    }
-
+    int frameRateCloseTo(int fr);
 
     QString hasH264;// some cams have H.264, some H264
     bool hasMPEG4;
@@ -106,8 +46,6 @@ public:
 
     QnPlDlinkResource();
 
-    virtual int getMaxFps() override; 
-
     virtual bool isResourceAccessible();
 
     virtual bool updateMACAddress();
@@ -118,22 +56,16 @@ public:
 
     QnDlink_cam_info getCamInfo() const;
 
-    bool updateCamInfo(); // does a lot of physical work 
+    void init() override; // does a lot of physical work 
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 
-
-private Q_SLOTS:
-    void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-
 protected:
-    
-    
     QnDlink_cam_info  m_camInfo;
 };
 
-typedef QSharedPointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
+typedef QnSharedResourcePointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
 #endif //dlink_resource_h_2215

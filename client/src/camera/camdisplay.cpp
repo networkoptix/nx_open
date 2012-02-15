@@ -48,7 +48,7 @@ static void updateActivity()
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
-#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 20
+#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 15
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
@@ -103,7 +103,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_processedPackets(0),
       m_toLowQSpeed(1000.0),
       m_delayedFrameCnt(0),
-      m_emptyPacketCounter(0)
+      m_emptyPacketCounter(0),
+      m_isEOFReached(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -173,17 +174,20 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
     if (reader)
     {
-        if (realSleepTime <= -500*1000) 
+        if (realSleepTime <= -1000*1000) 
         {
             m_delayedFrameCnt = qMax(0, m_delayedFrameCnt);
             m_delayedFrameCnt++;
-            if (m_delayedFrameCnt > 10) {
-                reader->setQuality(MEDIA_Quality_Low, false);
+            if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low)
+            {
+                bool fastSwitch = false; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
+                // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
+                reader->setQuality(MEDIA_Quality_Low, fastSwitch);
                 m_toLowQSpeed = speed;
                 m_toLowQTimer.restart();
             }
         }
-        else if (realSleepTime >= 1*1000)
+        else if (realSleepTime >= 0)
         {
             m_delayedFrameCnt = qMin(0, m_delayedFrameCnt);
             m_delayedFrameCnt--;
@@ -333,12 +337,14 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         break;
                     }
                 }
+                /*
                 if (sleepTimer.elapsed() > 0)
                     realSleepTime = sleepTimer.elapsed()*1000;
-                else {
+                else 
                     realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
-                }
-
+                */
+                realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
+                //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }
         else {
@@ -356,6 +362,9 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         // this here to avoid situation where different channels have different down scale factor; it might lead to diffrent size
         scaleFactor = m_display[0]->getCurrentDownscaleFactor(); // [0] - master channel
     }
+    if (vd->flags & QnAbstractMediaData::MediaFlags_StillImage)
+        scaleFactor = CLVideoDecoderOutput::factor_1; // do not downscale still images
+
 
     if (m_display[channel])
     {
@@ -699,17 +708,28 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
+
+    bool isEOFReached = emptyData != 0;
+    if (m_extTimeSrc && isEOFReached != m_isEOFReached)
+        m_extTimeSrc->onEofReached(this, isEOFReached); // jump to live if needed
+    m_isEOFReached = isEOFReached;
     if (emptyData)
     {
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3)
         {
+            /*
             // One camera from several sync cameras may reach BOF/EOF
 		    // move current time position to the edge to prevent other cameras blocking
             m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
                 m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
+            }
+            */
+            m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
+            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+                m_display[i]->setLastDisplayedTime(AV_NOPTS_VALUE);
             }
 
             m_timeMutex.lock();
@@ -722,12 +742,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             }
             else 
                 m_timeMutex.unlock();
-
-            if (m_extTimeSrc)
-                m_extTimeSrc->onEofReached(this);
         }
         return true;
     }
+
     m_emptyPacketCounter = 0;
 
     bool flushCurrentBuffer = false;
@@ -1061,4 +1079,9 @@ void CLCamDisplay::setExternalTimeSource(QnlTimeSource* value)
 bool CLCamDisplay::isRealTimeSource() const 
 { 
     return m_isRealTimeSource; 
+}
+
+bool CLCamDisplay::isEOFReached() const
+{
+    return m_isEOFReached;
 }

@@ -5,7 +5,7 @@
 QnFakeCamera::QnFakeCamera():
     QnNetworkResource()
 {
-    addFlag(server_live_cam);
+    addFlags(server_live_cam);
 }
 
 QnAbstractStreamDataProvider* QnFakeCamera::createDataProvider(ConnectionRole /*role*/)

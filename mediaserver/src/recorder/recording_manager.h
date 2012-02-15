@@ -19,10 +19,13 @@ struct Recorders
     QnServerStreamRecorder* recorderLowRes;
 };
 
-class QnRecordingManager: public QObject
+class QnRecordingManager: public QThread
 {
     Q_OBJECT
 public:
+    static const int RECORDING_CHUNK_LEN = 60; // seconds
+
+
     static QnRecordingManager* instance();
     QnRecordingManager();
     virtual ~QnRecordingManager();
@@ -31,13 +34,14 @@ public:
     void stop();
     bool isCameraRecoring(QnResourcePtr camera);
 
-    void updateSchedule(QnSecurityCamResourcePtr camera);
+    void updateCamera(QnSecurityCamResourcePtr camera);
 
     Recorders findRecorders(QnResourcePtr res) const;
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
     void onFpsChanged(float value);
+    void onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
 private:

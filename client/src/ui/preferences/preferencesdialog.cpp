@@ -1,9 +1,10 @@
 #include "preferencesdialog.h"
 
 #include <QDir>
+#include <QToolButton>
 
 #include "ui/ui_common.h"
-#include "ui/context_menu_helper.h"
+#include "ui/context_menu/context_menu.h"
 
 #include "connectionssettingswidget.h"
 #include "licensewidget.h"
@@ -58,8 +59,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     tabWidget->insertTab(4, licenseWidget, tr("License"));
 #endif
 
-    QPushButton *aboutButton = buttonBox->addButton(cm_about.text(), QDialogButtonBox::HelpRole);
-    connect(aboutButton, SIGNAL(clicked()), &cm_about, SLOT(trigger()));
+    QToolButton *aboutButton = new QToolButton();
+    aboutButton->setDefaultAction(qnAction(Qn::AboutAction));
+    aboutButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    buttonBox->addButton(aboutButton, QDialogButtonBox::HelpRole);
 
     qnSettings->fillData(m_settingsData);
 

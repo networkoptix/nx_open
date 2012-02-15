@@ -21,8 +21,6 @@ const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64)
 {
-    connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-            this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -210,11 +208,8 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     return result;
 }
 
-void QnPlAreconVisionResource::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+void QnPlAreconVisionResource::init()
 {
-    if (!(oldStatus == Offline && newStatus == Online))
-        return;
-
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
 
@@ -262,6 +257,7 @@ void QnPlAreconVisionResource::onStatusChanged(QnResource::Status oldStatus, QnR
         zone_size = 1;
 
     setParam("Zone size", zone_size, QnDomainPhysical);
+
 }
 
 QString QnPlAreconVisionResource::manufacture() const
@@ -327,8 +323,13 @@ bool QnPlAreconVisionResource::getParamPhysical(const QnParam &param, QVariant &
 
     QString request = QLatin1String("get?") + param.netHelper();
 
-    if (connection.doGET(request)!=CL_HTTP_SUCCESS)
+    CLHttpStatus status = connection.doGET(request);
+    if (status == CL_HTTP_AUTH_REQUIRED)
+        setStatus(QnResource::Unauthorized);
+
+    if (status != CL_HTTP_SUCCESS)
         return false;
+        
 
     char c_response[MAX_RESPONSE_LEN];
 
@@ -361,11 +362,20 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
     if (param.type() != QnParamType::None && param.type() != QnParamType::Button)
         request += QLatin1Char('=') + val.toString();
 
-    if (connection.doGET(request)!=CL_HTTP_SUCCESS)
-        if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
-            return false;
+    CLHttpStatus status = connection.doGET(request);
+    if (status != CL_HTTP_SUCCESS)
+        status = connection.doGET(request);
 
-    return true;
+    if (CL_HTTP_SUCCESS == status)
+        return true;
+
+    if (CL_HTTP_AUTH_REQUIRED == status)
+    {
+        setStatus(QnResource::Unauthorized);
+        return false;
+    }
+
+    return false;
 }
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)

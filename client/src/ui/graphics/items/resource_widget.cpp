@@ -19,6 +19,7 @@
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "settings.h"
+#include "camera/camdisplay.h"
 
 namespace {
     /** Default frame width. */
@@ -73,13 +74,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_frameWidth(0.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_displayFlags(DISPLAY_SELECTION_OVERLAY)
+    m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
+    m_motionMaskValid(false),
+    m_motionMaskBinDataValid(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
     QnPolygonalShadowItem *shadow = m_shadow.data();
     shadow->setParent(this);
-    shadow->setColor(Globals::shadowColor());
+    shadow->setColor(qnGlobals->shadowColor());
     shadow->setShapeProvider(this);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setShadowDisplacement(defaultShadowDisplacement);
@@ -92,9 +95,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_buttonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the item to be placed in right end of the layout. */
+
+    m_buttonsWidget = new QGraphicsWidget(this);
+    m_buttonsWidget->setLayout(m_buttonsLayout);
+
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    layout->addItem(m_buttonsLayout);
+    layout->addItem(m_buttonsWidget);
     layout->addStretch(0x1000);
     setLayout(layout);
 
@@ -260,6 +267,21 @@ void QnResourceWidget::invalidateMotionMask() {
     m_motionMaskValid = false;
 }
 
+void QnResourceWidget::addToMotionMask(const QRect &gridRect) {
+    ensureMotionMask();
+
+    m_motionMask += gridRect;
+
+    invalidateMotionMaskBinData();
+}
+
+void QnResourceWidget::clearMotionMask() {
+    m_motionMask = QRegion();
+    m_motionMaskValid = true;
+
+    invalidateMotionMaskBinData();
+}
+
 void QnResourceWidget::ensureMotionMask()
 {
     if(m_motionMaskValid)
@@ -269,22 +291,21 @@ void QnResourceWidget::ensureMotionMask()
     if (camera)
     {
         m_motionMask = camera->getMotionMask();
-        QnMetaDataV1::createMask(m_motionMask, m_motionMaskBinData);
-
-        if (!m_motionMask.rects().isEmpty())
-        {
-            QVector<QRect> rects = m_motionMask.rects();
-            for (int i = 0; i < rects.size(); ++i) {
-                if (rects[i].x())
-                    rects[i].setX(rects[i].x()+1);
-                if (rects[i].y())
-                    rects[i].setY(rects[i].y()+1);
-            }
-            m_motionMask.setRects(&rects[0], rects.size());
-        }
 
     }
     m_motionMaskValid = true;
+}
+
+void QnResourceWidget::ensureMotionMaskBinData() {
+    if(m_motionMaskBinDataValid)
+        return;
+
+    ensureMotionMask();
+    QnMetaDataV1::createMask(m_motionMask, m_motionMaskBinData);
+}
+
+void QnResourceWidget::invalidateMotionMaskBinData() {
+    m_motionMaskBinDataValid = false;
 }
 
 void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
@@ -360,12 +381,14 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-    if(changedFlags & DISPLAY_MOTION_GRID)
-    {
-        QnAbstractArchiveReader* ar = dynamic_cast<QnAbstractArchiveReader*>(m_display->archiveReader());
-        if (ar)
-            ar->setSendMotion(flags & DISPLAY_MOTION_GRID);
+    if(changedFlags & DISPLAY_MOTION_GRID) {
+        QnAbstractArchiveReader *reader = m_display->archiveReader();
+        if (reader)
+            reader->setSendMotion(flags & DISPLAY_MOTION_GRID);
     }
+
+    if(changedFlags & DISPLAY_BUTTONS)
+        m_buttonsWidget->setVisible(flags & DISPLAY_BUTTONS);
 }
 
 // -------------------------------------------------------------------------- //
@@ -519,6 +542,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(channelScreenSize != m_channelScreenSize) {
         m_channelScreenSize = channelScreenSize;
         m_renderer->setChannelScreenSize(m_channelScreenSize);
+
+
     }
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
@@ -545,6 +570,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
 
         /* Set overlay icon. */
+        if (m_display->camDisplay()->isEOFReached())
+        {
+            setOverlayIcon(i, NO_ICON);
+        }
         if(m_display->isPaused() && (m_displayFlags & DISPLAY_ACTIVITY_OVERLAY)) {
             setOverlayIcon(i, PAUSED);
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
@@ -574,15 +603,18 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
             /* Selection. */
             if(!m_channelState[i].motionSelection.isEmpty())
-				drawFilledRegion(painter, rect, m_channelState[i].motionSelection, Globals::motionSelectionColor());
+				drawFilledRegion(painter, rect, m_channelState[i].motionSelection, qnGlobals->motionSelectionColor());
         }
     }
 
     /* Draw current time. */
     qint64 time = m_renderer->lastDisplayedTime(0);
-    if (time > 1000000ll * 3600 * 24) {
+    if (time > 1000000ll * 3600 * 24) 
+    {
+#ifdef _DEBUG
         drawCurrentTime(painter, rect(), time); /* Do not show time for regular media files. */
         drawQualityText(painter, rect(), m_renderer->isLowQualityImage(0) ? "Low" : "Hi");
+#endif
     }
 }
 
@@ -611,7 +643,7 @@ void QnResourceWidget::drawSelection(const QRectF &rect) {
     if(!(m_displayFlags & DISPLAY_SELECTION_OVERLAY))
         return;
 
-    QColor color = Globals::selectionColor();
+    QColor color = qnGlobals->selectionColor();
     color.setAlpha(color.alpha() * effectiveOpacity());
     glColor(color);
     glBegin(GL_QUADS);
@@ -679,10 +711,11 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, r.bottom()*yStep);
+                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, (r.top()+r.height())*yStep);
             }
         }
     }
+
     for (int y = 0; y < MD_HEIGHT; ++y) {
         if (m_motionMask.isEmpty()) {
             gridLines << QPointF(0.0, y*yStep) << QPointF(rect.width(), y*yStep);
@@ -692,7 +725,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF(r.right()*xStep, y*yStep);
+                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF((r.left()+r.width())*xStep, y*yStep);
             }
         }
     }
@@ -701,6 +734,8 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
 
     if (!motion)
         return;
+
+    ensureMotionMaskBinData();
 
     QPainterPath motionPath;
     motion->removeMotion(m_motionMaskBinData);
@@ -763,8 +798,6 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
 
 void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect)
 {
-    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
-    if (!camera)
-        return;
-    drawFilledRegion(painter, rect, camera->getMotionMask(), QColor(255, 255, 255, 26));
+    ensureMotionMask();
+    drawFilledRegion(painter, rect, m_motionMask, qnGlobals->motionMaskColor());
 }

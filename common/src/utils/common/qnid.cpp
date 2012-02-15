@@ -1,6 +1,5 @@
 #include "qnid.h"
-
-#include <QtCore/QMutex>
+#include <QMutex>
 
 static const int FIRST_CUSTOM_ID = INT_MAX / 2;
 

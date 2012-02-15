@@ -46,6 +46,8 @@ private:
 
     void at_viewport_destroyed(QObject *viewport);
 
+    void at_viewportWatcher_destroyed(QObject *viewportWatcher);
+
     void addSyncedViewport(QWidget *viewport);
 
     QWidget *syncedViewport() const;

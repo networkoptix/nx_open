@@ -1,14 +1,13 @@
-//#include <vld.h>
-#include "eve_app.h"
-
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "settings.h"
 
+#include <QtSingleApplication>
+
 #include "decoders/video/ipp_h264_decoder.h"
 
+#include <utils/common/command_line_parser.h>
 #include "ui/device_settings/dlg_factory.h"
-#include "ui/context_menu_helper.h"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
@@ -22,8 +21,6 @@
 #include "api/AppServerConnection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
-
-#include "core/resource/local_file_resource.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -40,6 +37,7 @@
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "api/SessionManager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
+#include "ui/context_menu/context_menu.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -236,11 +234,12 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
-    xercesc::XMLPlatformUtils::Initialize ();
-
+    /* Initialize everything. */
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
+
+    xercesc::XMLPlatformUtils::Initialize ();
 
 //    av_log_set_callback(decoderLogCallback);
 
@@ -248,21 +247,38 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
+
+    /* Pre-parse command line. */
     QnAutoTester autoTester(argc, argv);
 
-    EveApplication application(argc, argv);
-    application.setQuitOnLastWindowClosed(true);
-    application.setWindowIcon(Skin::icon(QLatin1String("appicon.png")));
+    QnCommandLineParser commandLinePreParser;
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::FLAG, "--no-single-application", NULL, NULL));
+    commandLinePreParser.parse(argc, argv);
+    
 
-    QString argsMessage;
-    for (int i = 1; i < argc; ++i)
-        argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
-
-    while (application.isRunning())
-    {
-        if (application.sendMessage(argsMessage))
-            return 0;
+    /* Create application instance. */
+    QtSingleApplication *singleApplication = NULL;
+    QScopedPointer<QApplication> application;
+    if(commandLinePreParser.value("--no-single-application").toBool()) {
+        application.reset(new QApplication(argc, argv));
+    } else {
+        singleApplication = new QtSingleApplication(argc, argv);
+        application.reset(singleApplication);
     }
+    application->setQuitOnLastWindowClosed(true);
+    application->setWindowIcon(Skin::icon(QLatin1String("appicon.png")));
+
+    if(singleApplication) {
+        QString argsMessage;
+        for (int i = 1; i < argc; ++i)
+            argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
+
+        while (singleApplication->isRunning()) {
+            if (singleApplication->sendMessage(argsMessage))
+                return 0;
+        }
+    }
+
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
@@ -425,27 +441,26 @@ int main(int argc, char *argv[])
 
     //=========================================================
 
-    initContextMenu();
-
     QnMainWindow mainWindow(argc, argv);
     mainWindow.setAttribute(Qt::WA_QuitOnClose);
+    mainWindow.showFullScreen();
     mainWindow.show();
 
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif
 
-    QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
-        &mainWindow, SLOT(handleMessage(const QString&)));
+    if(singleApplication)
+        QObject::connect(singleApplication, SIGNAL(messageReceived(const QString&)), &mainWindow, SLOT(handleMessage(const QString&)));
 
     QnEventManager::instance()->run();
 
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
-        QObject::connect(&autoTester, SIGNAL(finished()), &application, SLOT(quit()));
+        QObject::connect(&autoTester, SIGNAL(finished()), application.data(), SLOT(quit()));
         autoTester.start();
     }
 
-    int result = application.exec();
+    int result = application->exec();
 
     if(autoTester.state() == QnAutoTester::FINISHED) {
         if(!autoTester.succeeded())

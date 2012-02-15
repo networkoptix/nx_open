@@ -55,7 +55,8 @@ bool QnEvent::load(const QVariant& parsed)
 
     eventType = dict["type"].toString();
 
-    if (eventType != QN_EVENT_RES_CHANGE && eventType != QN_EVENT_RES_DELETE && eventType != QN_EVENT_RES_SETPARAM)
+    if (eventType != QN_EVENT_RES_CHANGE && eventType != QN_EVENT_RES_DELETE
+            && eventType != QN_EVENT_RES_SETPARAM && eventType != QN_EVENT_RES_STATUS_CHANGE)
     {
         return false;
     }
@@ -65,6 +66,9 @@ bool QnEvent::load(const QVariant& parsed)
 
     resourceId = dict["resourceId"].toString();
     objectName = dict["objectName"].toString();
+
+    if (dict.contains("data"))
+        data = dict["data"].toString();
 
     if (eventType == QN_EVENT_RES_SETPARAM)
     {
@@ -125,6 +129,9 @@ void QnEventSource::slotError(QNetworkReply::NetworkError code)
 */
 void QnEventSource::httpFinished()
 {
+    if (!reply)
+        return;
+
     QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
     if (reply->error()) {
         QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));

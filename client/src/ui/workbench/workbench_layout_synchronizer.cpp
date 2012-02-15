@@ -8,6 +8,7 @@
 #include <core/resource/user_resource.h>
 #include "workbench.h"
 #include "workbench_layout.h"
+#include "workbench_item.h"
 
 namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
@@ -15,8 +16,12 @@ namespace {
 
 Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
 
+typedef QHash<QnLayoutResource *, QnWorkbenchLayoutSynchronizer *> LayoutResourceSynchronizerHash;
+Q_GLOBAL_STATIC(LayoutResourceSynchronizerHash, qn_synchronizerByLayoutResource)
+
 QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent),
+    m_running(false),
     m_layout(layout),
     m_resource(resource),
     m_update(false),
@@ -39,6 +44,7 @@ QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *
         return;
     }
 
+    m_running = true;
     initialize();
 }
 
@@ -79,15 +85,18 @@ void QnWorkbenchLayoutSynchronizer::clearResource() {
 void QnWorkbenchLayoutSynchronizer::initialize() {
     assert(m_layout != NULL && !m_resource.isNull());
 
-    m_resource->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
+    qn_synchronizerByLayoutResource()->insert(m_resource.data(), this);
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
 
-    connect(m_layout,           SIGNAL(itemAdded(QnWorkbenchItem *)),       this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-    connect(m_layout,           SIGNAL(itemRemoved(QnWorkbenchItem *)),     this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-    connect(m_layout,           SIGNAL(nameChanged()),                      this, SLOT(at_layout_nameChanged()));
-    connect(m_layout,           SIGNAL(aboutToBeDestroyed()),               this, SLOT(at_layout_aboutToBeDestroyed()));
-    connect(m_resource.data(),  SIGNAL(resourceChanged()),                  this, SLOT(at_resource_resourceChanged()));
-    connect(m_resource.data(),  SIGNAL(nameChanged()),                      this, SLOT(at_resource_nameChanged()));
+    connect(m_layout,           SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(m_layout,           SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
+    connect(m_layout,           SIGNAL(nameChanged()),                          this, SLOT(at_layout_nameChanged()));
+    connect(m_layout,           SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_layout_aboutToBeDestroyed()));
+    connect(m_resource.data(),  SIGNAL(resourceChanged()),                      this, SLOT(at_resource_resourceChanged()));
+    connect(m_resource.data(),  SIGNAL(nameChanged()),                          this, SLOT(at_resource_nameChanged()));
+    connect(m_resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this, SLOT(at_resource_itemAdded(const QnLayoutItemData &)));
+    connect(m_resource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutItemData &)));
+    connect(m_resource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),  this, SLOT(at_resource_itemChanged(const QnLayoutItemData &)));
 
     m_update = m_submit = true;
 }
@@ -100,8 +109,10 @@ void QnWorkbenchLayoutSynchronizer::deinitialize() {
     disconnect(m_layout, NULL, this, NULL);
     disconnect(m_resource.data(), NULL, this, NULL);
 
-    m_resource->setProperty(layoutSynchronizerPropertyName, QVariant());
+    qn_synchronizerByLayoutResource()->remove(m_resource.data());
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant());
+
+    m_running = false;
 
     autoDeleteLater();
 }
@@ -111,7 +122,7 @@ QnWorkbenchLayoutSynchronizer *QnWorkbenchLayoutSynchronizer::instance(QnWorkben
 }
 
 QnWorkbenchLayoutSynchronizer *QnWorkbenchLayoutSynchronizer::instance(const QnLayoutResourcePtr &resource) {
-    return resource->property(layoutSynchronizerPropertyName).value<QnWorkbenchLayoutSynchronizer *>();
+    return qn_synchronizerByLayoutResource()->value(resource.data());
 }
 
 void QnWorkbenchLayoutSynchronizer::autoDeleteLater() {
@@ -120,7 +131,7 @@ void QnWorkbenchLayoutSynchronizer::autoDeleteLater() {
 }
 
 void QnWorkbenchLayoutSynchronizer::autoDelete() {
-    if(m_autoDeleting && (m_resource.isNull() || m_layout == NULL))
+    if(m_autoDeleting && !m_running)
         qnDeleteLater(this);
 }
 
@@ -156,16 +167,77 @@ void QnWorkbenchLayoutSynchronizer::at_resource_nameChanged() {
     m_layout->setName(m_resource->getName());
 }
 
-void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
-    Q_UNUSED(item);
+void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData &itemData) {
+    if(!m_update)
+        return;
 
-    submit();
+    if(m_layout->item(itemData.uuid) != NULL)
+        return; /* Was called back from at_layout_itemAdded because of layout resource living in a different thread. */
+
+    QnId id = itemData.resourceId;
+    QnResourcePtr resource = qnResPool->getResourceById(id);
+    if(resource.isNull()) {
+        qnWarning("No resource in resource pool for id '%1'.", id.toString());
+        return;
+    }
+
+    QnScopedValueRollback<bool> guard(&m_submit, false);
+
+    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), itemData.uuid);
+    m_layout->addItem(item);
+}
+
+void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemData &itemData) {
+    if(!m_update)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_submit, false);
+
+    m_layout->removeItem(m_layout->item(itemData.uuid));
+}
+
+void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemData &itemData) {
+    if(!m_update)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_submit, false);
+    m_layout->item(itemData.uuid)->load(itemData);
+}
+
+void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
+    if(!m_submit)
+        return;
+
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    if(!resource) {
+        qnWarning("Item '%1' that was added to layout has no corresponding resource in the pool.", item->resourceUid());
+        return;
+    }
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+
+    QnLayoutItemData itemData;
+    itemData.resourceId = resource->getId();
+    itemData.uuid = item->uuid();
+    item->save(itemData);
+
+    m_resource->addItem(itemData);
+
+    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
+    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
+    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
+    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagsChanged()));
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    Q_UNUSED(item);
+    if(!m_submit)
+        return;
 
-    submit();
+    QnScopedValueRollback<bool> guard(&m_update, false);
+
+    disconnect(item, NULL, this, NULL);
+
+    m_resource->removeItem(item->uuid());
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_nameChanged() {
@@ -180,4 +252,39 @@ void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed() {
     clearLayout();
 }
 
+void QnWorkbenchLayoutSynchronizer::at_item_geometryChanged() {
+    if(!m_submit)
+        return;
 
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
+    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
+    itemData.combinedGeometry = item->combinedGeometry();
+    m_resource->updateItem(item->uuid(), itemData);
+}
+
+void QnWorkbenchLayoutSynchronizer::at_item_geometryDeltaChanged() {
+    at_item_geometryChanged();
+}
+
+void QnWorkbenchLayoutSynchronizer::at_item_flagsChanged() {
+    if(!m_submit)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
+    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
+    itemData.flags = item->flags();
+    m_resource->updateItem(item->uuid(), itemData);
+}
+
+void QnWorkbenchLayoutSynchronizer::at_item_rotationChanged() {
+    if(!m_submit)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
+    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
+    itemData.rotation = item->rotation();
+    m_resource->updateItem(item->uuid(), itemData);
+}

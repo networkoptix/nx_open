@@ -22,6 +22,8 @@ public:
     CLHttpStatus setRegister(int page, int num, int val);
     CLHttpStatus setRegister_asynch(int page, int num, int val);
 
+    virtual void init() override;
+
     bool isPanoramic() const;
     bool isDualSensor() const;
 
@@ -68,13 +70,10 @@ public:
 protected:
     QString m_description;
 
-private Q_SLOTS:
-    void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-
 private:
     int m_totalMdZones;
 };
 
-typedef QSharedPointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
+typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
 
 #endif // QnPlAreconVisionResource_h_1252

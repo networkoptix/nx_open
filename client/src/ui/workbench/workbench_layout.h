@@ -43,6 +43,16 @@ public:
     QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent = NULL);
 
     /**
+     * \returns                         Resource associated with this layout, if any. 
+     */
+    QnLayoutResourcePtr resource() const;
+
+    /**
+     * \returns                         Layout associated with the given resource, if any.
+     */
+    static QnWorkbenchLayout *layout(const QnLayoutResourcePtr &resource);
+
+    /**
      * Virtual destructor.
      */
     virtual ~QnWorkbenchLayout();

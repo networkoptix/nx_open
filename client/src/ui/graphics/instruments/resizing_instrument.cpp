@@ -126,6 +126,9 @@ void ResizingInstrument::startDrag(DragInfo *info) {
         return;
     }
 
+    if(!m_effective)
+        return;
+
     emit resizingStarted(info->view(), m_widget.data(), ResizingInfo(this));
     m_resizingStartedEmitted = true;
 }

@@ -95,21 +95,22 @@ void QnLiveStreamProvider::setFps(float f)
 {
     QMutexLocker mtx(&m_livemutex);
 
+    QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
+    Q_ASSERT(ap);
+
+    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
+    Q_ASSERT(res);
+
+
     if (abs(m_fps - f) < 0.1)
         return; // same fps?
 
-    m_fps = f;
+
+    m_fps = qMin((int)f, res->getMaxFps());
     
     if (getRole() != QnResource::Role_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-
-        QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-        Q_ASSERT(ap);
-
-        QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-        Q_ASSERT(res);
-
         res->onPrimaryFpsUpdated(f);
     }
 
@@ -128,7 +129,14 @@ void QnLiveStreamProvider::setFps(float f)
 float QnLiveStreamProvider::getFps() const
 {
     QMutexLocker mtx(&m_livemutex);
-    return m_fps;
+
+    const QnAbstractMediaStreamDataProvider* ap = dynamic_cast<const QnAbstractMediaStreamDataProvider*>(this);
+    Q_ASSERT(ap);
+
+    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
+    Q_ASSERT(res);
+
+    return qMin((int)m_fps, res->getMaxFps());
 }
 
 bool QnLiveStreamProvider::isMaxFps() const

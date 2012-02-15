@@ -40,9 +40,15 @@ private:
 UiElementsInstrument::UiElementsInstrument(QObject *parent):
     Instrument(Instrument::VIEWPORT, makeSet(QEvent::Paint), parent) 
 {
+    /* It is important NOT to use ItemIgnoresTransformations flag here as it 
+     * messes up graphics scene framework's internals in a really awful way.
+     * 
+     * Possible problems:
+     * QGraphicsItem::isUnderMouse returning wrong result.
+     * QGraphicsItem::mapToScene returning wrong result.
+     * I'm sure there are more. */
     QGraphicsWidget *widget = new QGraphicsWidget();
     widget->setParent(this);
-    widget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
     widget->setAcceptedMouseButtons(0);
     m_widget = widget;
 
@@ -73,11 +79,12 @@ bool UiElementsInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     if(widget() == NULL)
         return false;
 
-    QGraphicsView *view = this->view(viewport);
+    QSizeF newSize = viewport->size();
+    if(!qFuzzyCompare(newSize, widget()->size()))
+        widget()->resize(newSize);
 
-    QRectF newGeometry = QRectF(view->mapToScene(0, 0), viewport->size());
-    if(!qFuzzyCompare(newGeometry, widget()->geometry()))
-        widget()->setGeometry(newGeometry);
+    QGraphicsView *view = this->view(viewport);
+    widget()->setTransform(view->viewportTransform().inverted());
 
     return false;
 }

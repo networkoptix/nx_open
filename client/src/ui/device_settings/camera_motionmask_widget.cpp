@@ -6,6 +6,11 @@
 #include "ui/graphics/instruments/signaling_instrument.h"
 #include "ui/graphics/instruments/instrument_manager.h"
 #include "ui/graphics/instruments/motion_selection_instrument.h"
+#include "ui/graphics/instruments/click_instrument.h"
+#include "ui/graphics/instruments/drag_instrument.h"
+#include "ui/graphics/instruments/resizing_instrument.h"
+#include "ui/graphics/instruments/forwarding_instrument.h"
+#include "ui/graphics/instruments/rubber_band_instrument.h"
 #include "ui/graphics/items/resource_widget.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench.h"
@@ -16,15 +21,13 @@
 #include "ui/style/globals.h"
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent)
-	: QWidget(parent),
-	  m_item(0)
+	: QWidget(parent)
 {
 	init();
 }
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QnResourcePtr &resource, QWidget *parent)
-	: QWidget(parent),
-	  m_item(0)
+	: QWidget(parent)
 {
 	init();
 	setCamera(resource);
@@ -62,19 +65,30 @@ void QnCameraMotionMaskWidget::init()
 
     m_controller = new QnWorkbenchController(m_display, this);
 
+    /* Disable unused instruments. */
+    m_controller->motionSelectionInstrument()->disable();
+    m_controller->itemRightClickInstrument()->disable();
+    m_controller->dragInstrument()->setEffective(false);
+    m_controller->resizingInstrument()->setEffective(false);
+    m_controller->rubberBandInstrument()->disable();
+
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
     m_display->instrumentManager()->installInstrument(resizeSignalingInstrument);
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
-	MotionSelectionInstrument* motionSelectionInstrument = m_controller->motionSelectionInstrument();
-	motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
+    /* Create motion mask selection instrument. */
+	MotionSelectionInstrument *motionSelectionInstrument = new MotionSelectionInstrument(this);
+    motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
+	motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
+	motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
+    m_display->instrumentManager()->installInstrument(motionSelectionInstrument);
 
-	motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, Globals::motionMaskSelectionColor());
-	// motionSelectionInstrument->setColor(MotionSelectionInstrument::Border);
-
+    ForwardingInstrument *itemMouseForwardingInstrument = m_controller->itemMouseForwardingInstrument();
 	connect(motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
 	connect(motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     /* Set up UI. */
     QVBoxLayout *layout = new QVBoxLayout();
@@ -98,32 +112,28 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 	m_motionMask = m_camera->getMotionMask();
 
     /* Add single item to the layout. */
-	m_item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
-	m_item->setPinned(true);
-	m_item->setGeometry(QRect(0, 0, 1, 1));
-	m_workbench->currentLayout()->addItem(m_item);
-	m_workbench->setItem(QnWorkbench::ZOOMED, m_item);
-}
+	QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
+	item->setPinned(true);
+	item->setGeometry(QRect(0, 0, 1, 1));
+	m_workbench->currentLayout()->addItem(item);
+	m_workbench->setItem(QnWorkbench::ZOOMED, item);
 
-void QnCameraMotionMaskWidget::displayMotionGrid(bool display)
-{
-	if (m_scene->items().isEmpty())
-		return;
-
-	QnResourceWidget *widget = m_display->widget(m_item); // qobject_cast<QnResourceWidget *>(m_scene->items().first()->toGraphicsObject());
-	if(!widget)
-		return;
-
-	widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
+    /* Set up the corresponding widget. */
+    m_widget = m_display->widget(item);
+    widget()->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
+    widget()->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
 }
 
 void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &rect)
 {
+    widget->addToMotionMask(rect);
 	m_motionMask += rect;
 }
 
-void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *rects)
+void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget)
 {
+    widget->clearMotionMask();
+    
 	m_motionMask = QRegion();
 }
 

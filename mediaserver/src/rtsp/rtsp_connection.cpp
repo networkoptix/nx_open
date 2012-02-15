@@ -458,9 +458,9 @@ int QnRtspConnectionProcessor::composePlay()
             d->liveDpLow->removeDataProcessor(d->dataProcessor);
     }
 
-    //QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? getLiveDp() : d->archiveDP;
-    //if (!currentDP)
-    //    return CODE_NOT_FOUND;
+    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
+    if (!currentDP)
+        return CODE_NOT_FOUND;
 
 
     d->dataProcessor->setLiveMode(d->liveMode);

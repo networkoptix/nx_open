@@ -481,7 +481,7 @@ public:
 
             qnResPool->addResource(camera);
 
-            QnRecordingManager::instance()->updateSchedule(camera);
+            QnRecordingManager::instance()->updateCamera(camera);
         }
 
         foreach (const QnScheduleTask &scheduleTask, scheduleTasks)

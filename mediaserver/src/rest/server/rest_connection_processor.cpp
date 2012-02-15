@@ -34,6 +34,7 @@ void QnRestConnectionProcessor::run()
     {
         globalTimeout.restart();
         d->requestHeaders = QHttpRequestHeader();
+        d->responseHeaders = QHttpResponseHeader();
         d->clientRequest.clear();
         d->requestBody.clear();
         d->responseBody.clear();

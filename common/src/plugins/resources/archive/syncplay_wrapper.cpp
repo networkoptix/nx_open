@@ -17,7 +17,8 @@ struct ReaderInfo
         oldDelegate(_oldDelegate),
         cam(_cam),
         enabled(true),
-        buffering(false)
+        buffering(false),
+        isEOF(false)
     {
     }
     QnAbstractArchiveReader* reader;
@@ -25,6 +26,7 @@ struct ReaderInfo
     QnlTimeSource* cam;
     bool enabled;
     bool buffering;
+    bool isEOF;
 };
 
 
@@ -287,6 +289,9 @@ void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
     if (!d->enabled || d->blockSetSpeedSignal)
         return;
     d->blockSetSpeedSignal = true;
+
+    QMutexLocker lock(&d->timeMutex);
+
     foreach(const ReaderInfo& info, d->readers)
     {
         if (info.reader != sender())
@@ -309,7 +314,7 @@ qint64 QnArchiveSyncPlayWrapper::getNextTime() const
     qint64 displayTime = AV_NOPTS_VALUE;
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled) {
+        if (info.enabled && !info.isEOF) {
             qint64 time = info.cam->getNextTime();
             if (displayTime == AV_NOPTS_VALUE)
                 displayTime = time;
@@ -344,7 +349,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     qint64 displayTime = AV_NOPTS_VALUE;
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled) {
+        if (info.enabled && !info.isEOF) {
             qint64 time = info.cam->getCurrentTime();
             //if (time == DATETIME_NOW)
             //    time = QDateTime::currentMSecsSinceEpoch()*1000;
@@ -498,20 +503,25 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     }
 }
 
-void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* src)
+void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    bool allReady = true;
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
-        bool readyForLive = i->cam->getDisplayedTime() == DATETIME_NOW || i->reader->isRealTimeSource();
-        allReady &= readyForLive;
+        if (i->cam == source)
+        {
+            i->isEOF = value;
+            break;
+        }
     }
+
+    bool allReady = d->speed > 0;
+    for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
+        allReady &= i->isEOF;
+
     if (allReady)
-    {
         jumpTo(DATETIME_NOW, 0);
-    }
 }
 
 qint64 QnArchiveSyncPlayWrapper::expectedTime() const
@@ -589,11 +599,13 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+
     for (int i = 0; i < d->readers.size(); ++i)
     {
         if (d->readers[i].reader == reader) 
         {
-            if (d->enabled && !d->readers[i].enabled && !value && d->lastJumpTime != DATETIME_NOW)
+            if (d->enabled && !d->readers[i].isEOF && !d->readers[i].enabled && !value && d->lastJumpTime != DATETIME_NOW)
             {
                 d->readers[i].reader->setNavDelegate(0);
                 d->readers[i].reader->jumpToPreviousFrame(getCurrentTime());

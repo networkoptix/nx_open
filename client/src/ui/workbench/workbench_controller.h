@@ -25,6 +25,8 @@ class ResizingInstrument;
 class DropInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
+class ForwardingInstrument;
+class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 
@@ -62,11 +64,7 @@ public:
 
     QnWorkbench *workbench() const;
 
-    QnWorkbenchLayout *layout() const;
-
     QnWorkbenchGridMapper *mapper() const;
-
-	MotionSelectionInstrument *motionSelectionInstrument() const;
 
     void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
     void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
@@ -75,8 +73,29 @@ public:
     void drop(const QnResourcePtr &resource, const QPointF &gridPos = QPointF());
     void drop(const QnResourceList &resources, const QPointF &gridPos = QPointF());
 
-    void remove(const QnResourcePtr &resource);
-    void remove(const QnResourceList &resources);
+    MotionSelectionInstrument *motionSelectionInstrument() const {
+	    return m_motionSelectionInstrument;
+    }
+
+    ClickInstrument *itemRightClickInstrument() const {
+        return m_itemRightClickInstrument;
+    }
+
+    DragInstrument *dragInstrument() const {
+        return m_dragInstrument;
+    }
+
+    ForwardingInstrument *itemMouseForwardingInstrument() const {
+        return m_itemMouseForwardingInstrument;
+    }
+
+    ResizingInstrument *resizingInstrument() const {
+        return m_resizingInstrument;
+    }
+
+    RubberBandInstrument *rubberBandInstrument() const {
+        return m_rubberBandInstrument;
+    }
 
 public slots:
     void startRecording();
@@ -87,7 +106,6 @@ protected:
 
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
-    int isMotionGridDisplayed();
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -104,7 +122,6 @@ protected slots:
     void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &region);
 
-    void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
@@ -121,9 +138,8 @@ protected slots:
 
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
-    void at_cameraSettingsAction_triggered();
 
-    void at_toggleRecordingAction_triggered();
+    void at_recordingAction_triggered(bool checked);
     void at_recordingSettingsAction_triggered();
 
     void at_screenRecorder_error(const QString &errorMessage);
@@ -132,8 +148,6 @@ protected slots:
 
     void at_recordingAnimation_valueChanged(const QVariant &value);
     void at_recordingAnimation_finished();
-
-    void at_randomGridAction_triggered();
 
 private:
     /* Global state. */
@@ -173,6 +187,12 @@ private:
 
     /** Motion selection instrument. */
     MotionSelectionInstrument *m_motionSelectionInstrument;
+
+    /** Item right click instrument. */
+    ClickInstrument *m_itemRightClickInstrument;
+
+    /** Item mouse forwarding instrument. */
+    ForwardingInstrument *m_itemMouseForwardingInstrument;
 
 
     /* Resizing-related state. */
@@ -216,16 +236,6 @@ private:
     /** Animation for screen recording countdown. */
     QPropertyAnimation *m_recordingAnimation;
 
-
-    /* Context menu-related state. */
-
-    /** Layout item context menu. */
-    QMenu *m_itemContextMenu;
-
-    QAction *m_showMotionAction;
-    QAction *m_cameraSettingsAction;
-    QAction *m_hideMotionAction;
-    QAction *m_randomGridAction;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

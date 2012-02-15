@@ -5,7 +5,6 @@
 #include <QFile>
 #include <QVector>
 #include <QMap>
-#include <QSharedPointer>
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period.h"
@@ -43,6 +42,8 @@ public:
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;
+    bool isLastChunk(qint64 startTimeMs) const;
+
     qint64 minTime() const;
     qint64 maxTime() const;
     bool lastFileDuplicateName() const;

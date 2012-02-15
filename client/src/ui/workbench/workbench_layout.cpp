@@ -8,6 +8,7 @@
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
 #include "workbench_layout_synchronizer.h"
+#include "workbench_utility.h"
 
 namespace {
     template<class PointContainer>
@@ -19,36 +20,6 @@ namespace {
             for (int c = region.left(); c <= region.right(); c++)
                 qnInsert(*points, points->end(), QPoint(c, r));
     }
-
-    class DistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
-    public:
-        DistanceMagnitudeCalculator(const QPointF &origin):
-            m_origin(origin),
-            m_calculator(MagnitudeCalculator::forType<QPointF>())
-        {}
-
-    protected:
-        virtual qreal calculateInternal(const void *value) const override {
-            const QPoint &p = *static_cast<const QPoint *>(value);
-
-            return m_calculator->calculate(p - m_origin);
-        }
-
-    private:
-        QPointF m_origin;
-        TypedMagnitudeCalculator<QPointF> *m_calculator;
-    };
-
-    struct WorkbenchItemLess {
-    public:
-        bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
-            if(l->resourceUid() == r->resourceUid()) {
-                return l < r;
-            } else {
-                return l->resourceUid() < r->resourceUid();
-            }
-        }
-    };
 
 } // anonymous namespace
 
@@ -69,13 +40,28 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
     synchronizer->update();
 }
     
-QnWorkbenchLayout::~QnWorkbenchLayout()
-{
-    clear();
-
+QnWorkbenchLayout::~QnWorkbenchLayout() {
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
+
+    clear();
+}
+
+QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
+    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(const_cast<QnWorkbenchLayout *>(this));
+    if(synchronizer == NULL)
+        return QnLayoutResourcePtr();
+
+    return synchronizer->resource();
+}
+
+QnWorkbenchLayout *QnWorkbenchLayout::layout(const QnLayoutResourcePtr &resource) {
+    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
+    if(synchronizer == NULL)
+        return NULL;
+
+    return synchronizer->layout();
 }
 
 const QString &QnWorkbenchLayout::name() const {
@@ -169,6 +155,9 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
         qnNullWarning(item);
         return;
     }
+
+    if(m_itemByUuid.contains(item->uuid()))
+        qnWarning("Item with UUID '%1' is already on layout '%2'.", item->uuid().toString(), m_name);
 
     if (item->layout() != NULL) {
         if (item->layout() == this)

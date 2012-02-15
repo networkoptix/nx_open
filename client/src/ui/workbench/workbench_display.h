@@ -10,6 +10,7 @@
 #include <utils/common/rect_set.h>
 #include "recording/time_period.h"
 #include "workbench.h"
+#include "workbench_item.h" /* For QnWorkbenchItem::ItemFlag. */
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -186,8 +187,6 @@ public:
      */
     QnResourceWidget *widget(QnAbstractRenderer *renderer) const;
 
-    QnResourceWidget *widget(const QnResourcePtr &resource) const;
-
     QnResourceWidget *widget(QnWorkbench::ItemRole role) const;
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
@@ -283,7 +282,6 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(QnWorkbench::ItemRole role);
     
-    //void playbackMaskChanged(const QnTimePeriodList&);
     void enableItemSync(bool value);
 
 protected:
@@ -298,18 +296,18 @@ protected:
     void synchronizeLayer(QnResourceWidget *widget);
     void synchronizeSceneBounds();
 
+    void adjustGeometry(QnWorkbenchItem *item, const QPointF &desiredPosition);
+
     qreal layerFrontZValue(Layer layer) const;
     Layer synchronizedLayer(QnWorkbenchItem *item) const;
 
-    void addItemInternal(QnWorkbenchItem *item);
-    void removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
+    bool addItemInternal(QnWorkbenchItem *item);
+    bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
     void deinitSceneWorkbench();
     void initSceneWorkbench();
     void initWorkbench(QnWorkbench *workbench);
     void initBoundingInstrument();
-
-    void changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
 
 protected slots:
     void synchronizeSceneBoundsExtension();
@@ -324,13 +322,15 @@ protected slots:
 
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_modeChanged();
+    void at_workbench_itemChanged(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
     void at_workbench_itemChanged(QnWorkbench::ItemRole role);
     void at_workbench_currentLayoutChanged();
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
     void at_item_rotationChanged();
-    void at_item_flagsChanged();
+    void at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value);
+    void at_item_geometryAdjustmentRequested(const QPointF &desiredPosition);
 
     void at_activityStopped();
     void at_activityStarted();
@@ -363,9 +363,6 @@ private:
 
 
     /* Internal state. */
-
-    /** Resource to widget mapping. */
-    QHash<QnResourcePtr, QnResourceWidget *> m_widgetByResource;
 
     /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;

@@ -231,13 +231,9 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         newChunkCatalog = m_catalogHi;
     }
 
-	/*
-    QString s;
-    QTextStream str(&s);
-    str << "chunk startTime= " << QDateTime::fromMSecsSinceEpoch(newChunk.startTime/1000).toString("hh.mm.ss.zzz") << " duration=" << newChunk.duration/1000000.0;
-    str.flush();
-    cl_log.log(s, cl_logALWAYS);
-	*/
+	
+    //qDebug() << "seekTo= " << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh.mm.ss.zzz");
+    //qDebug() << "chunk startTime= " << QDateTime::fromMSecsSinceEpoch(newChunk.startTimeMs).toString("hh.mm.ss.zzz") << " duration=" << newChunk.durationMs/1000.0;
 
     qint64 chunkOffset = 0;
     if (newChunk.durationMs == -1) // last live chunk
@@ -307,21 +303,28 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     qint64 prevEndTimeMs = m_currentChunk.startTimeMs + m_currentChunk.durationMs;
     QnChunkSequence* currentSequence = m_currentChunkCatalog == m_catalogHi ? m_chunkSequenceHi : m_chunkSequenceLow;
 
-    if (m_currentChunk.durationMs == -1)
+    // check for last chunk
+    if (m_currentChunkCatalog->isLastChunk(m_currentChunk.startTimeMs))
     {
-        // last chunk. Find same chunk again (possible it chunk already finished)
-        chunk = currentSequence->findChunk(m_resource, m_currentChunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
-        if (chunk.durationMs == -1) {
+        if (m_currentChunkCatalog == m_catalogHi || m_currentChunk.durationMs == -1)
+        {
             chunk.startTimeMs = -1;
             return;
         }
-        prevEndTimeMs = chunk.startTimeMs + chunk.durationMs;
+        else 
+        {
+            // It is last and closed chunk for low quality. Switch to high quality, possible archive is continue
+            chunk =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+            chunkCatalog = m_catalogHi;
+            if (chunk.startTimeMs < prevEndTimeMs)
+                m_skipFramesToTime = prevEndTimeMs*1000;
+            return;
+        }
     }
 
     //chunk = currentSequence->getNextChunk(m_resource);
     // todo: getNextChunk is faster, but need more logic because of 2 chunk sequence now. So, speed may be improved
     chunk = currentSequence->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
-    
     chunkCatalog = m_currentChunkCatalog;
 
     if (chunk.startTimeMs == -1)

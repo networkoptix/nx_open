@@ -210,7 +210,7 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resourcePtr, QObject* 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "user");
-    QObject::connect(processor, SIGNAL(finished(int, int, const QByteArray&, const QnResourceList&)), target, slot);
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serialize(userPtr, data);

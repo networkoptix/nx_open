@@ -2,6 +2,7 @@
 #define QN_CLICKABLE_H
 
 #include <QGraphicsSceneMouseEvent>
+#include <ui/common/scene_utility.h>
 
 /**
  * A mixin class that lets graphics items handle mouse clicks properly.
@@ -48,7 +49,7 @@ protected:
 
         releasedNotify(event);
 
-        if(!this->boundingRect().contains(event->pos()))
+        if(!qFuzzyContains(this->boundingRect(), event->pos()))
             return; /* If the button was released outside the item boundaries, then it is not a click. */
 
         event->accept();

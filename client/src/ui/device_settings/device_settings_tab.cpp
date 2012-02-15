@@ -23,7 +23,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, co
             QGroupBox *subgroupBox = new QGroupBox(this);
             subgroupBox->setObjectName(group + sub_group);
             subgroupBox->setTitle(sub_group);
-            subgroupBox->setFont(Globals::settingsFont());
+            subgroupBox->setFont(qnGlobals->settingsFont());
             subgroupBox->setFixedSize(size, 420);
             subgroupBox->move(10+x, 10);
 
@@ -46,7 +46,7 @@ CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, co
                 continue;
 
             widget->setParent(parent); // ### remove
-            widget->setFont(Globals::settingsFont());
+            widget->setFont(qnGlobals->settingsFont());
             widget->setEnabled(!param.isReadOnly());
             widget->setToolTip(param.description());
 

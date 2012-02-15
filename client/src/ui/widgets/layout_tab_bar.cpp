@@ -20,12 +20,11 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent):
     setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     setDrawBase(false);
     setShape(QTabBar::RoundedNorth);
+    setTabsClosable(true);
 
     connect(this, SIGNAL(currentChanged(int)),      this, SLOT(at_currentChanged(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),   this, SLOT(at_tabCloseRequested(int)));
     connect(this, SIGNAL(tabMoved(int, int)),       this, SLOT(at_tabMoved(int, int)));
-
-    updateTabsClosable();
 }
 
 QnLayoutTabBar::~QnLayoutTabBar() {
@@ -69,10 +68,6 @@ void QnLayoutTabBar::setWorkbench(QnWorkbench *workbench) {
 
 QnWorkbench *QnLayoutTabBar::workbench() const {
     return m_workbench;
-}
-
-void QnLayoutTabBar::updateTabsClosable() {
-    setTabsClosable(count() > 1);
 }
 
 void QnLayoutTabBar::submitCurrentLayout() {
@@ -174,7 +169,6 @@ void QnLayoutTabBar::tabInserted(int index) {
     if(!name.isNull())
         layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */
 
-    updateTabsClosable();
     if(m_submit)
         m_workbench->insertLayout(layout, index);
     submitCurrentLayout();
@@ -190,7 +184,6 @@ void QnLayoutTabBar::tabRemoved(int index) {
     disconnect(layout, NULL, this, NULL);
 
     m_layouts.removeAt(index);
-    updateTabsClosable();
     submitCurrentLayout();
 
     if(m_submit)
@@ -214,10 +207,10 @@ void QnLayoutTabBar::at_tabMoved(int from, int to) {
 }
 
 void QnLayoutTabBar::at_tabCloseRequested(int index) {
-    if (count() <= 1)
-        return; /* Don't remove the last tab. */
+    emit closeRequested(m_layouts[index]);
 
-    removeTab(index);
+    if(count() == 0)
+        addTab(QString());
 }
 
 void QnLayoutTabBar::at_currentChanged(int index) {

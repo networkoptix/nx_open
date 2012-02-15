@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_UI_H
 
 #include <QObject>
+#include <core/resource/resource_fwd.h>
 #include <ui/common/scene_utility.h>
 #include "workbench.h" /* For QnWorkbench::ItemRole. */
 
@@ -56,10 +57,6 @@ public:
 
     void setFlags(Flags flags);
 
-    QnResourceTreeWidget *treeWidget() const {
-        return m_treeWidget;
-    }
-
     bool isTitleUsed() const {
         return m_titleUsed;
     }
@@ -91,7 +88,7 @@ public:
     }
 
 signals:
-    void titleBarDoubleClicked();
+    void closeRequested(QnWorkbenchLayout *layout);
 
 public slots:
     void setTitleUsed(bool titleUsed);
@@ -131,7 +128,7 @@ protected:
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
-protected Q_SLOTS:
+protected slots:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
@@ -142,6 +139,8 @@ protected Q_SLOTS:
     void at_activityStopped();
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
+
+    void at_mainMenuAction_triggered();
 
     void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
 
@@ -155,6 +154,7 @@ protected Q_SLOTS:
     void at_sliderItem_geometryChanged();
     void at_sliderShowButton_toggled(bool checked);
 
+    void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
@@ -170,6 +170,7 @@ protected Q_SLOTS:
 
     void at_exportFailed(QString errMessage);
     void at_exportFinished(QString fileName);
+
 private:
     /* Global state. */
 
@@ -214,6 +215,8 @@ private:
     bool m_sliderVisible;
 
     bool m_titleVisible;
+
+    bool m_titleUsed;
 
     bool m_inactive;
 
@@ -281,6 +284,8 @@ private:
 
     QnImageButtonWidget *m_titleShowButton;
 
+    QnImageButtonWidget *m_mainMenuButton;
+
     QGraphicsProxyWidget *m_tabBarItem;
 
     AnimatorGroup *m_titleOpacityAnimatorGroup;
@@ -292,8 +297,6 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
-
-    bool m_titleUsed;
 
 };
 

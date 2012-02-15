@@ -20,6 +20,8 @@ public:
     virtual QString manufacture() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
+    virtual bool hasDualStreaming() const override;
+
     void setDataPort(int port);
     int getDataPort() const;
 
@@ -31,14 +33,11 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping) override;
 
-
-private Q_SLOTS:
-        void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 private:
     int m_videoPort;
     int m_dataPort;
 };
 
-typedef QSharedPointer<QnDroidResource> QnDroidResourcePtr;
+typedef QnSharedResourcePointer<QnDroidResource> QnDroidResourcePtr;
 
 #endif //droid_resource_h_18_04

@@ -3,13 +3,13 @@
 
 QnUserResource::QnUserResource(): base_type()
 {
-    addFlag(QnResource::user);
+    addFlags(QnResource::user);
 }
 
 void QnUserResource::setLayouts(const QnLayoutResourceList &layouts)
 {
     while(!m_layouts.empty())
-        removeLayout(m_layouts.back());
+        removeLayout(m_layouts.front()); /* Removing an item from QList's front is constant time. */
 
     foreach(const QnLayoutResourcePtr &layout, layouts)
         addLayout(layout);
@@ -27,8 +27,8 @@ void QnUserResource::addLayout(const QnLayoutResourcePtr &layout)
         return;
     }
 
-    if(layout->getParentId() != QnId()) {
-        qnWarning("Given layout '%1' is already in other users's layouts list.", layout->getName());
+    if(layout->getParentId() != QnId() && layout->getParentId() != getId()) {
+        qnWarning("Given layout '%1' is already in other user's layouts list.", layout->getName());
         return;
     }
 

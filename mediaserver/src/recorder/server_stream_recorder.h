@@ -13,7 +13,7 @@ public:
     QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role);
     ~QnServerStreamRecorder();
 
-    void updateSchedule(const QnScheduleTaskList& schedule);
+    void updateCamera(QnSecurityCamResourcePtr cameraRes);
 signals:
     void fpsChanged(float value);
 protected:
@@ -40,6 +40,7 @@ private:
     bool m_needUpdateStreamParams;
     mutable qint64 m_lastWarningTime;
     QnResource::ConnectionRole m_role;
+    __m128i *m_motionMaskBinData;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

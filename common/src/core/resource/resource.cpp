@@ -9,7 +9,6 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resourcemanagment/resource_pool.h"
 
-#include "local_file_resource.h"
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
 
@@ -25,6 +24,7 @@ QnResource::QnResource()
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
         qRegisterMetaType<QnParam>();
+        qRegisterMetaType<QnId>();
         metaTypesInitialized = true;
     }
 }
@@ -39,7 +39,6 @@ void QnResource::updateInner(QnResourcePtr other)
     Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_id = other->m_id;
-    m_parentId = other->m_parentId;
     m_typeId = other->m_typeId;
     m_flags = other->m_flags;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
@@ -47,6 +46,7 @@ void QnResource::updateInner(QnResourcePtr other)
     m_url = other->m_url;
 
     setName(other->m_name);
+    setParentId(other->m_parentId);
 }
 
 void QnResource::update(QnResourcePtr other)
@@ -70,6 +70,8 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 {
     bool signalsBlocked = blockSignals(true);
 
+    QMutexLocker locker(&m_mutex);
+
     if (parameters.contains(QLatin1String("id")))
         setId(parameters[QLatin1String("id")]);
 
@@ -86,21 +88,25 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
         setUrl(parameters[QLatin1String("url")]);
 
     if (parameters.contains(QLatin1String("status")))
-        setStatus(parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline);
+        m_status = parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline;
 
     blockSignals(signalsBlocked);
 }
 
 QnId QnResource::getParentId() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    QMutexLocker locker(&m_mutex);
     return m_parentId;
 }
 
 void QnResource::setParentId(QnId parent)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    m_parentId = parent;
+    {
+        QMutexLocker locker(&m_mutex);
+        m_parentId = parent;
+    }
+    
+    emit parentIdChanged();
 }
 
 
@@ -112,37 +118,40 @@ QString QnResource::getName() const
 
 void QnResource::setName(const QString& name)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    {
+        QMutexLocker mutexLocker(&m_mutex);
 
-    if(m_name == name)
-        return;
+        if(m_name == name)
+            return;
 
-    m_name = name;
+        m_name = name;
+    }
+
     emit nameChanged();
 }
 
-unsigned long QnResource::flags() const
+QnResource::Flags QnResource::flags() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_flags;
 }
 
-void QnResource::setFlags(unsigned long flags)
+void QnResource::setFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_flags = flags;
 }
 
-void QnResource::addFlag(unsigned long flag)
+void QnResource::addFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_flags |= flag;
+    m_flags |= flags;
 }
 
-void QnResource::removeFlag(unsigned long flag)
+void QnResource::removeFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_flags &= ~flag;
+    m_flags &= ~flags;
 }
 
 QString QnResource::toString() const
@@ -157,21 +166,21 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::toSharedPointer() const
 {
-    QnResourcePtr res = qnResPool->getResourceById(getId());
+    return m_weakPointer.toStrongRef();
+
+    /*QnResourcePtr res = qnResPool->getResourceById(getId());
     Q_ASSERT_X(res != 0, Q_FUNC_INFO, "Resource not found");
-    return res;
+    return res;*/
 }
 
-const QnParamList& QnResource::getResourceParamList() const
+QnParamList QnResource::getResourceParamList() const
 {
-    QnId resTypeId;
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-        if (!m_resourceParamList.isEmpty())
-            return m_resourceParamList;
-        resTypeId = m_typeId;
-    }
-
+    QMutexLocker mutexLocker(&m_mutex);
+    
+    if (!m_resourceParamList.isEmpty())
+        return m_resourceParamList;
+    QnId resTypeId = m_typeId;
+    
     QnParamList resourceParamList;
 
     // 1. read Q_PROPERTY params
@@ -251,7 +260,7 @@ const QnParamList& QnResource::getResourceParamList() const
         }
     }
 
-    QMutexLocker mutexLocker(&m_mutex);
+    
     if (m_resourceParamList.isEmpty())
         m_resourceParamList = resourceParamList;
 
@@ -287,8 +296,8 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
         return false;
     }
 
-    QnParam &param = m_resourceParamList[name];
     m_mutex.lock();
+    QnParam &param = m_resourceParamList[name];
     val = param.value();
     m_mutex.unlock();
     if (domain == QnDomainMemory)
@@ -340,14 +349,16 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         return false;
     }
 
+    m_mutex.lock();
     QnParam &param = m_resourceParamList[name];
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+        m_mutex.unlock();
         return false;
     }
 
-    m_mutex.lock();
+    
     QVariant oldValue = param.value();
     m_mutex.unlock();
 
@@ -372,7 +383,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
+        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
 
     return true;
 }
@@ -473,11 +484,20 @@ void QnResource::setStatus(QnResource::Status newStatus)
     {
         QMutexLocker mutexLocker(&m_mutex);
         oldStatus = m_status;
+
+        if (oldStatus == Unauthorized && newStatus == Offline)
+            return; 
+
         m_status = newStatus;
     }
 
-    if (oldStatus != newStatus)
-        emit statusChanged(oldStatus, newStatus);
+    if (oldStatus == newStatus)
+        return;
+
+    if (oldStatus == Offline && newStatus == Online)
+        init();
+
+    emit statusChanged(oldStatus, newStatus);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const

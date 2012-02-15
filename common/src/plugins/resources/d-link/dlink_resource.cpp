@@ -5,31 +5,113 @@
 const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 
 
+QnDlink_cam_info::QnDlink_cam_info():
+hasMPEG4(false),
+numberOfVideoProfiles(0),
+hasFixedQuality(false)
+{
+
+}
+
+void QnDlink_cam_info::clear()
+{
+    numberOfVideoProfiles = 0;
+    hasMPEG4 = false;
+    hasH264 = "";
+    hasFixedQuality = false;
+
+    videoProfileUrls.clear();
+    resolutions.clear();
+    possibleBitrates.clear();
+    possibleFps.clear();
+
+    possibleQualities = "";
+}
+
+bool QnDlink_cam_info::inited() const
+{
+    return numberOfVideoProfiles > 0;
+}
+
+// returns resolution with width not less than width
+QSize QnDlink_cam_info::resolutionCloseTo(int width)
+{
+    if (resolutions.size()==0)
+    {
+        Q_ASSERT(false);
+        return QSize(0,0);
+    }
+
+    QSize result = resolutions.at(0);
+
+
+    foreach(const QSize& size, resolutions)
+    {
+        if (size.width() <= width)
+            return size;
+        else
+            result = size;
+    }
+
+    return result;
+}
+
+// returns next up bitrate 
+QString QnDlink_cam_info::bitrateCloseTo(int val)
+{
+
+    QSize result;
+
+    if (possibleBitrates.size()==0)
+    {
+        Q_ASSERT(false);
+        return "";
+    }
+
+    QMap<int, QString>::iterator it = possibleBitrates.lowerBound(val);
+    if (it == possibleBitrates.end())
+        it--;
+
+    return it.value();
+
+}
+
+// returns next up frame rate 
+int QnDlink_cam_info::frameRateCloseTo(int fr)
+{
+    Q_ASSERT(possibleFps.size()>0);
+
+    int result = possibleFps.at(0);
+
+    foreach(int fps, possibleFps)
+    {
+        if (fps <= fr)
+        {
+            // can return fps or result
+            int dif1 = abs(fps-fr);
+            int dif2 = abs(result-fr);
+
+            return dif1 <= dif2 ? fps : result;
+        }
+        else
+            result = fps;
+    }
+
+    return result;
+}
+
+
+//=======================================================================================
+
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setAuth("admin", "1");
-    
-    connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-        this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
-
 }
 
-int QnPlDlinkResource::getMaxFps()
-{
-    QMutexLocker mutexLocker(&m_mutex);
-
-    if (m_camInfo.possibleFps.size()==0)
-    {
-        Q_ASSERT(false);
-        return 15;
-    }
-
-    return m_camInfo.possibleFps.at(0);
-}
 
 bool QnPlDlinkResource::isResourceAccessible()
 {
-    return updateCamInfo();
+    return true;
 }
 
 bool QnPlDlinkResource::updateMACAddress()
@@ -96,16 +178,35 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-bool QnPlDlinkResource::updateCamInfo()
+void QnPlDlinkResource::init()
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    QByteArray cam_info_file = downloadFile("config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
+    CLHttpStatus status;
+    downloadFile(status, "config/motion.cgi?enable=yes",  getHostAddress(), 80, 1000, getAuth()); // to enable md 
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+        return;
+    }
+    
+    QByteArray cam_info_file = downloadFile(status, "config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+        return;
+    }
+
 
     if (cam_info_file.size()==0)
-        return false;
+        return;
+
+    QMutexLocker mutexLocker(&m_mutex);
 
     QString file_s(cam_info_file);
     QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
+
+    m_camInfo.clear();
 
     foreach(QString line, lines)
     {
@@ -197,18 +298,39 @@ bool QnPlDlinkResource::updateCamInfo()
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 
-    return true;
-
-}
-
-void QnPlDlinkResource::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
-{
-    if (!(oldStatus == Offline && newStatus == Online))
+    //=======remove elements with diff aspect ratio
+    if (m_camInfo.resolutions.size() < 2)
         return;
 
-    QMutexLocker mutexLocker(&m_mutex);
-    if (!m_camInfo.inited())
+
+    int w_0 = m_camInfo.resolutions.at(0).width();
+    int h_0 = m_camInfo.resolutions.at(0).height();
+    float apectRatio_0 = ((float)w_0/h_0);
+
+    int w_1 = m_camInfo.resolutions.at(1).width();
+    int h_1 = m_camInfo.resolutions.at(1).height();
+    float apectRatio_1 = ((float)w_1/h_1);
+
+    float apectRatio = apectRatio_0;
+
+    if (abs(apectRatio_0 - apectRatio_1) > 0.01)
+        apectRatio = apectRatio_1; // 
+            
+   
+
+    QList<QSize>::iterator it = m_camInfo.resolutions.begin();
+
+    while (it != m_camInfo.resolutions.end()) 
     {
-        updateCamInfo();
+        QSize s = *it;
+
+        float apectRatioL = (float)s.width() / s.height();
+
+        if ( qAbs(apectRatioL - apectRatio) > 0.01 )
+            it = m_camInfo.resolutions.erase(it);
+        else
+            ++it;
     }
+
+
 }

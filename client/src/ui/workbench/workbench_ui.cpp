@@ -9,12 +9,14 @@
 #include <QStyle>
 #include <QApplication>
 #include <QSettings>
+#include <QMenu>
 
 #include <utils/common/event_signalizer.h>
 #include <utils/common/scoped_value_rollback.h>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <camera/resource_display.h>
 
@@ -33,26 +35,27 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
 #include <ui/graphics/items/clickable_widget.h>
-
 #include <ui/graphics/items/standard/graphicslabel.h>
+#include <ui/graphics/items/controls/navigationitem.h>
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/graphics/items/controls/navigationitem.h>
+#include <ui/context_menu/context_menu.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/context_menu_helper.h>
 #include <ui/style/skin.h>
-#include <ui/context_menu_helper.h>
 #include <ui/mixins/render_watch_mixin.h>
+
+#include "camera/camera.h"
+#include "openal/qtvaudiodevice.h"
+#include "core/resourcemanagment/resource_pool.h"
+#include "ui/ui_common.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "workbench.h"
 #include "workbench_display.h"
-#include "camera/camera.h"
-#include "openal/qtvaudiodevice.h"
-#include "core/resource/local_file_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "ui/ui_common.h"
+#include "workbench_layout.h"
+
 
 Q_DECLARE_METATYPE(VariantAnimator *)
 
@@ -62,13 +65,14 @@ namespace {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal scaleFactor = 0.85;
-        qreal size = baseSize / scaleFactor;
+        qreal height = baseSize / scaleFactor;
+        qreal width = height * SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
         QnZoomingImageButtonWidget *button = new QnZoomingImageButtonWidget(parent);
         button->setScaleFactor(scaleFactor);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
-        button->setMaximumSize(size, size);
-        button->setMinimumSize(size, size);
+        button->setMaximumSize(width, height);
+        button->setMinimumSize(width, height);
         button->setDefaultAction(action);
         button->setAnimationSpeed(4.0);
         button->setCached(true);
@@ -137,8 +141,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_fpsCountingInstrument,    SIGNAL(fpsChanged(qreal)),                                                                  this,                           SLOT(at_fpsChanged(qreal)));
 
     /* Create controls. */
-    m_controlsWidget = m_uiElementsInstrument->widget();
-    m_controlsWidget->setFlag(QGraphicsItem::ItemIsPanel);
+    m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
     m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
@@ -161,11 +164,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_fpsItem->setPalette(palette);
     }
 
-    setFpsVisible(false);
-
-    m_display->view()->addAction(&cm_toggle_fps);
-    connect(&cm_toggle_fps,             SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
+    m_display->view()->addAction(qnAction(Qn::ShowFpsAction));
+    connect(qnAction(Qn::ShowFpsAction),SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
+    setFpsVisible(false);
 
 
     /* Tree widget. */
@@ -177,9 +179,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setColor(QPalette::Base, Qt::transparent);
         m_treeWidget->setPalette(palette);
     }
-
-    connect(&cm_showNavTree, SIGNAL(triggered()), this, SLOT(toggleTreeOpened()));
-    m_treeWidget->addAction(&cm_showNavTree);
+    m_treeWidget->setWorkbench(display->workbench());
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
@@ -206,8 +206,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("pin.png"));
     m_treePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("unpin.png"));
     m_treePinButton->setCheckable(true);
+    m_treePinButton->setFocusProxy(m_treeItem);
 
     m_treeShowButton = newShowHideButton(m_controlsWidget);
+    m_treeShowButton->setFocusProxy(m_treeItem);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -237,6 +239,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treePinButton));
 
+    connect(m_treeWidget,               SIGNAL(activated(const QnResourcePtr &)),                                                   this,                           SLOT(at_treeWidget_activated(const QnResourcePtr &)));
     connect(m_treePinButton,            SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treePinButton_toggled(bool)));
     connect(m_treeShowButton,           SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_treeShowButton_toggled(bool)));
     connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateTreeOpacity()));
@@ -258,6 +261,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
 
     m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderShowButton->setFocusProxy(m_sliderItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -316,16 +320,19 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     tabBarWidget->setWorkbench(display->workbench());
     m_tabBarItem->setWidget(tabBarWidget);
 
+    m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
+    titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(&cm_new_tab));
+    titleLayout->addItem(newActionButton(qnAction(Qn::NewTabAction)));
     titleLayout->addStretch(0x1000);
-    titleLayout->addItem(newActionButton(&cm_reconnect));
-    titleLayout->addItem(newActionButton(&cm_preferences));
-    titleLayout->addItem(newActionButton(&cm_toggle_fullscreen));
-    titleLayout->addItem(newActionButton(&cm_exit));
+    titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::FullscreenAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::ExitAction)));
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
@@ -336,6 +343,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         transform.scale(-1, 1);
         m_titleShowButton->setTransform(transform);
     }
+    m_titleShowButton->setFocusProxy(m_titleItem);
 
     m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_titleOpacityProcessor->addTargetItem(m_titleItem);
@@ -354,13 +362,15 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
 
+    connect(tabBarWidget,               SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SIGNAL(closeRequested(QnWorkbenchLayout *)));
     connect(m_titleShowButton,          SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_titleShowButton_toggled(bool)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateTitleOpacity()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateTitleOpacity()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
-    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    this,                           SIGNAL(titleBarDoubleClicked()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    qnAction(Qn::FullscreenAction), SLOT(toggle()));
+    connect(qnAction(Qn::MainMenuAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_mainMenuAction_triggered()));
 
 
     /* Connect to display. */
@@ -690,7 +700,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
 
     m_fpsItem->setText(QString());
 
-    cm_toggle_fps.setChecked(fpsVisible);
+    qnAction(Qn::ShowFpsAction)->setChecked(fpsVisible);
 }
 
 void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
@@ -761,6 +771,21 @@ void QnWorkbenchUi::at_activityStarted() {
     m_inactive = false;
 
     updateControlsVisibility(true);
+}
+
+void QnWorkbenchUi::at_mainMenuAction_triggered() {
+    if(!m_mainMenuButton->isVisible())
+        return;
+
+    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
+    /* On multi-monitor setups where monitor sizes differ,
+     * these coordinates can be negative, so we shouldn't adjust them. */
+    //pos.rx() = qMax(pos.x(), 0);
+    //pos.ry() = qMax(pos.y(), 0);
+
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
+    menu->move(pos);
+    menu->exec();
 }
 
 void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
@@ -878,7 +903,7 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
 
 void QnWorkbenchUi::at_exportFinished(QString fileName)
 {
-    QnLocalFileResourcePtr file(new QnLocalFileResource(fileName));
+    QnAviResourcePtr file(new QnAviResource(fileName));
     qnResPool->addResource(file);
 
     QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));
@@ -942,6 +967,29 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
         (geometry.left() + geometry.right() - m_titleShowButton->size().height()) / 2,
         qMin(m_controlsWidgetRect.bottom(), geometry.top())
     ));
+}
+
+void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
+    if(resource.isNull())
+        return;
+
+    if(resource->checkFlags(QnResource::layout)) {
+        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+        if(layoutResource) {
+            QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
+            if(layout == NULL) {
+                layout = new QnWorkbenchLayout(layoutResource, workbench());
+                workbench()->addLayout(layout);
+            }
+
+            workbench()->setCurrentLayout(layout);
+        }
+    } else if(resource->checkFlags(QnResource::media)) {
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        item->setFlag(QnWorkbenchItem::Pinned, false);
+        display()->workbench()->currentLayout()->addItem(item);
+        item->adjustGeometry();
+    }
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {

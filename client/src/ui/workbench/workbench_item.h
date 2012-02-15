@@ -22,7 +22,7 @@ class QnWorkbenchItem : public QObject
 
 public:
     enum ItemFlag {
-        Pinned = 0x1  /**< Item is pinned to the grid. Items are not pinned by default. */
+        Pinned = 0x1        /**< Item is pinned to the grid. Items are not pinned by default. */
     };
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
@@ -188,11 +188,16 @@ public:
         return setPinned(!isPinned()); 
     }
 
+    void adjustGeometry();
+
+    void adjustGeometry(const QPointF &desiredPosition);
+
 signals:
     void geometryChanged();
     void geometryDeltaChanged();
-    void flagsChanged();
+    void flagChanged(QnWorkbenchItem::ItemFlag flag, bool value);
     void rotationChanged();
+    void geometryAdjustmentRequested(const QPointF &desiredPosition);
 
 protected:
     void setGeometryInternal(const QRect &geometry);

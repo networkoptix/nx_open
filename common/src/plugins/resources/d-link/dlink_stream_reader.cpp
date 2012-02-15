@@ -44,23 +44,26 @@ void PlDlinkStreamReader::openStream()
     if (isStreamOpened())
         return;
 
+    //setRole(QnResource::Role_SecondaryLiveVideo);
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
 
-    if (!res->getCamInfo().inited())
-    {
-        res->updateCamInfo();
-    }
-
     QString prifileStr = composeVideoProfile();
 
-    QByteArray cam_info_file = downloadFile(prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth());
+    CLHttpStatus status;
+    QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        getResource()->setStatus(QnResource::Unauthorized);
+        return;
+    }
+
 
     if (cam_info_file.length()==0)
         return;
 
-    if (!res->updateCamInfo()) // after we changed profile some videoprofile url might be changed
-        return;
+    res->init(); // after we changed profile some videoprofile url might be changed
     
     // ok, now lets open a stream
 
@@ -158,6 +161,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     else
     {
         profileNum = 1;
+        //resolution = info.resolutionCloseTo(320);
         resolution = info.resolutions.at(0);
     }
 
@@ -168,7 +172,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     t << "config/video.cgi?profileid=" << profileNum << "&";
     t << "resolution=" << resolution.width() << "x" << resolution.height() << "&";
 
-    int fps = info.frameRateCloseTo(getFps());
+    int fps = info.frameRateCloseTo( qMin((int)getFps(), res->getMaxFps()) );
     t << "framerate=" << fps << "&";
     t << "codec=";
 

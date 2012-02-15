@@ -15,13 +15,11 @@
 #include <utils/common/util.h>
 
 #include "ui/style/skin.h"
-#include "ui/style/proxystyle.h"
+#include "ui/style/proxy_style.h"
 
 #include "ui/graphics/items/standard/graphicsframe.h"
 #include "ui/graphics/items/standard/graphicsslider.h"
 #include "ui/graphics/items/tooltipitem.h"
-
-#include "ui/context_menu/menu_wrapper.h"
 
 #include <qmath.h>
 
@@ -50,21 +48,21 @@ typedef QHash<unsigned, QPixmap*> TextCache;
 // -------------------------------------------------------------------------- //
 // SliderProxyStyle
 // -------------------------------------------------------------------------- //
-class SliderProxyStyle : public ProxyStyle
+class SliderProxyStyle : public QnProxyStyle
 {
 public:
-    SliderProxyStyle(QObject *parent = 0) : ProxyStyle(0, parent) {}
+    SliderProxyStyle(QObject *parent = 0) : QnProxyStyle(0, parent) {}
 
     int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
     {
         if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
             return Qt::LeftButton;
-        return ProxyStyle::styleHint(hint, option, widget, returnData);
+        return QnProxyStyle::styleHint(hint, option, widget, returnData);
     }
 
     QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
     {
-        QRect r = ProxyStyle::subControlRect(cc, opt, sc, widget);
+        QRect r = QnProxyStyle::subControlRect(cc, opt, sc, widget);
         if (cc == CC_Slider && sc == SC_SliderHandle) {
             int side = qMin(r.width(), r.height());
             if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)

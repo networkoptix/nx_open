@@ -6,8 +6,6 @@ const char* QnDroidResource::MANUFACTURE = "NetworkOptixDroid";
 
 QnDroidResource::QnDroidResource()
 {
-    connect(this, SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-        this, SLOT(onStatusChanged(QnResource::Status,QnResource::Status)));
 }
 
 int QnDroidResource::getMaxFps()
@@ -45,10 +43,9 @@ void QnDroidResource::setCropingPhysical(QRect croping)
 
 }
 
-
-void QnDroidResource::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+bool QnDroidResource::hasDualStreaming() const
 {
-
+    return false;
 }
 
 void QnDroidResource::setDataPort(int port)

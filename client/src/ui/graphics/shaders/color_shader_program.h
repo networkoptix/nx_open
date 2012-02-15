@@ -4,6 +4,7 @@
 #include <QGLShaderProgram>
 
 class QnColorShaderProgram: public QGLShaderProgram {
+    Q_OBJECT;
 public:
     QnColorShaderProgram(QObject *parent = NULL);
 

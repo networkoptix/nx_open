@@ -55,6 +55,7 @@ public:
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
     virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual bool getQuality() const override;
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
 
@@ -107,11 +108,12 @@ private:
     qint64 m_lastFrameDuration;
     QString m_onDestroyFileName;
     bool m_BOF;
-    qint64 m_BOFTime;
+    int m_afterBOFCounter;
     int m_dataMarker;
     int m_newDataMarker;
 
 private:
+    bool m_bofReached;
     bool m_canChangeQuality;
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
@@ -133,8 +135,9 @@ private:
     bool m_qualityFastSwitch;
     MediaQuality m_oldQuality;
     bool m_oldQualityFastSwitch;
+    bool m_isStillImage;
 
-    qint64 determineDisplayTime();
+    qint64 determineDisplayTime(bool reverseMode);
     void intChanneljumpTo(qint64 mksec, int channel);
     bool getNextVideoPacket();
     void addAudioChannel(QnCompressedAudioDataPtr audio);

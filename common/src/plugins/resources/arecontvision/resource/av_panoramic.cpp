@@ -121,6 +121,10 @@ CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
         m_vrl = &avVideoLayout360;
 }
 
+bool CLArecontPanoramicResource::hasDualStreaming() const
+{
+    return false;
+}
 
 bool CLArecontPanoramicResource::getDescription()
 {

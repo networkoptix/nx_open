@@ -151,7 +151,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
     while (m_contexts.size() <= stream->index)
         m_contexts << QnMediaContextPtr(0);
 
-    if (m_contexts[stream->index] == 0)
+    if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
         m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
 
     return m_contexts[stream->index];
@@ -251,6 +251,7 @@ void QnAviArchiveDelegate::close()
 {
     if (m_formatContext)
         av_close_input_file(m_formatContext);
+    m_contexts.clear();
     m_formatContext = 0;
     m_initialized = false;
     m_streamsFound = false;
@@ -293,10 +294,11 @@ bool QnAviArchiveDelegate::findStreams()
         return 0;
     if (!m_streamsFound)
     {
-        QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
         if (!m_streamsFound)
         {
+            global_ffmpeg_mutex.lock();
             m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
+            global_ffmpeg_mutex.unlock();
             if (m_streamsFound) {
                 if (m_formatContext->start_time != AV_NOPTS_VALUE)
                     m_startMksec = m_formatContext->start_time;

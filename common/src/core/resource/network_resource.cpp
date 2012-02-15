@@ -21,7 +21,7 @@ QnNetworkResource::QnNetworkResource()
         metaTypesInitialized = true;
     }
 
-    addFlag(network);
+    addFlags(network);
 }
 
 QnNetworkResource::~QnNetworkResource()

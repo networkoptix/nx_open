@@ -61,14 +61,14 @@
 
 #include "ui/dialogs/camerasettingsdialog.h"
 
-#include <ui/context_menu/menu_wrapper.h>
-#include <ui/context_menu_helper.h>
+#include <ui/context_menu/context_menu.h>
 
 #include <file_processor.h>
 
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
+#include "workbench_utility.h"
 #include "workbench.h"
 #include "workbench_display.h"
 
@@ -87,47 +87,6 @@
 Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
-    class AspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
-    public:
-        AspectRatioMagnitudeCalculator(const QPointF &origin, const QSize &size, const QRect &boundary, qreal aspectRatio):
-            m_origin(origin),
-            m_size(SceneUtility::toPoint(size)),
-            m_boundary(boundary),
-            m_aspectRatio(aspectRatio)
-        {}
-
-    protected:
-        virtual qreal calculateInternal(const void *value) const override {
-            const QPoint &p = *static_cast<const QPoint *>(value);
-
-            QPointF delta = p + QPointF(m_size) / 2.0 - m_origin;
-            qreal spaceDistance = qMax(qAbs(delta.x() / m_aspectRatio), qAbs(delta.y()));
-
-            QRect extendedRect = QRect(
-                QPoint(
-                    qMin(m_boundary.left(), p.x()),
-                    qMin(m_boundary.top(), p.y())
-                ),
-                QPoint(
-                    qMax(m_boundary.right(), p.x() + m_size.x() - 1),
-                    qMax(m_boundary.bottom(), p.y() + m_size.y() - 1)
-                )
-            );
-            qreal aspectDistance = qAbs(std::log(SceneUtility::aspectRatio(extendedRect) / m_aspectRatio));
-
-            qreal extensionDistance = qAbs(m_boundary.width() - extendedRect.width()) + qAbs(m_boundary.height() - extendedRect.height());
-
-            qreal k = (m_boundary.width() + m_boundary.height());
-            return k * k * extensionDistance + k * aspectDistance + spaceDistance;
-        }
-
-    private:
-        QPointF m_origin;
-        QPoint m_size;
-        QRect m_boundary;
-        qreal m_aspectRatio;
-    };
-
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
         QAction *result = new QAction(text, parent);
         result->setShortcut(shortcut);
@@ -157,46 +116,6 @@ namespace {
             region += QRect(x,y, rect.width()-x*2,1);
         }
         return region;
-    }
-
-    QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
-        QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
-        if(boundOrientation == Qt::Horizontal) {
-            sceneSize.setHeight(sceneSize.width() / aspectRatio);
-        } else {
-            sceneSize.setWidth(sceneSize.height() * aspectRatio);
-        }
-
-        QSize gridSize0 = mapper->mapToGrid(sceneSize);
-        QSize gridSize1 = gridSize0;
-        if(boundOrientation == Qt::Horizontal) {
-            gridSize1.setHeight(qMax(gridSize1.height() - 1, 1));
-        } else {
-            gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
-        }
-
-        qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
-        qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
-        return distance0 < distance1 ? gridSize0 : gridSize1;
-    }
-
-    QSize bestDoubleBoundedSize(QnWorkbenchGridMapper *mapper, const QSize &bound, qreal aspectRatio) {
-        qreal boundAspectRatio = SceneUtility::aspectRatio(mapper->mapFromGrid(bound));
-
-        if(aspectRatio < boundAspectRatio) {
-            return bestSingleBoundedSize(mapper, bound.height(), Qt::Vertical, aspectRatio);
-        } else {
-            return bestSingleBoundedSize(mapper, bound.width(), Qt::Horizontal, aspectRatio);
-        }
-    }
-
-    QRect bestDoubleBoundedGeometry(QnWorkbenchGridMapper *mapper, const QRect &bound, qreal aspectRatio) {
-        QSize size = bestDoubleBoundedSize(mapper, bound.size(), aspectRatio);
-
-        return QRect(
-            bound.topLeft() + SceneUtility::toPoint(bound.size() - size) / 2,
-            size
-        );
     }
 
     QPoint invalidDragDelta() {
@@ -232,7 +151,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Install and configure instruments. */
     ClickInstrument *itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
-    ClickInstrument *itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
+    m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
     ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::ITEM, this);
     ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
@@ -244,12 +163,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_dragInstrument = new DragInstrument(this);
-    ForwardingInstrument *itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
+    m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
 
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, Globals::motionRubberBandColor());
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, Globals::motionRubberBandBorderColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
@@ -260,10 +179,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
     m_manager->installInstrument(m_resizingInstrument->resizeHoverInstrument());
     m_manager->installInstrument(selectionFixupInstrument);
-    m_manager->installInstrument(itemMouseForwardingInstrument);
+    m_manager->installInstrument(m_itemMouseForwardingInstrument);
     m_manager->installInstrument(selectionFixupInstrument->preForwardingInstrument());
     m_manager->installInstrument(itemLeftClickInstrument);
-    m_manager->installInstrument(itemRightClickInstrument);
+    m_manager->installInstrument(m_itemRightClickInstrument);
     m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
@@ -288,7 +207,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(itemRightClickInstrument,   SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(m_itemRightClickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
@@ -311,18 +230,18 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                m_wheelZoomInstrument,          SLOT(recursiveEnable()));
 
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                                itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessFinished(QGraphicsView *)),                                               itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_handScrollInstrument,     SIGNAL(scrollProcessStarted(QGraphicsView *)),                                              itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                                             itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                                          itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                                         itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
+    connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                                m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_dragInstrument,           SIGNAL(dragProcessFinished(QGraphicsView *)),                                               m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
+    connect(m_handScrollInstrument,     SIGNAL(scrollProcessStarted(QGraphicsView *)),                                              m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                                             m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
+    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                                          m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                                         m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
 
     connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               selectionOverlayHackInstrument, SLOT(recursiveDisable()));
     connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              selectionOverlayHackInstrument, SLOT(recursiveEnable()));
@@ -354,47 +273,17 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
     /* Set up context menu. */
-#if 0
-    QAction *addFilesAction             = newAction(tr("Add file(s)"),          tr("Ins"),          this);
-    QAction *addFolderAction            = newAction(tr("Add folder"),           tr("Shift+Ins"),    this);
-    QAction *addCameraAction            = newAction(tr("Add camera"),           tr("Ctrl+Ins"),     this);
-    QAction *newCameraAction            = newAction(tr("New camera"),           tr("Ctrl+C"),       this);
-    QAction *newLayoutAction            = newAction(tr("New layout"),           tr("Ctrl+L"),       this);
-    QAction *undoAction                 = newAction(tr("Undo"),                 tr("Ctrl+Z"),       this);
-    QAction *redoAction                 = newAction(tr("Redo"),                 tr("Ctrl+Shift+Z"), this);
-    QAction *fitInViewAction            = newAction(tr("Fit in view"),          tr("Ctrl+V"),       this);
-    QAction *fullscreenAction           = newAction(tr("Toggle fullscreen"),    tr("Ctrl+Enter"),   this);
-    QAction *startStopRecordingAction   = newAction(tr("Start/stop"),           tr("Alt+R"),        this);
-    QAction *recordingSettingsAction    = newAction(tr("Settings"),             QString(),          this);
-    QAction *saveLayoutAction           = newAction(tr("Save layout"),          tr("Ctrl+S"),       this);
-    QAction *saveLayoutAsAction         = newAction(tr("Save layout as..."),    tr("Ctrl+Shift+S"), this);
-    QAction *preferencesAction          = newAction(tr("Preferences"),          tr("Ctrl+P"),       this);
-    QAction *exportLayoutAction         = newAction(tr("Export layout"),        tr("Ctrl+Shift+E"), this);
-#endif
-    m_randomGridAction                  = newAction(tr("Randomize grid"), tr(""),                   this);
-    m_showMotionAction                  = newAction(tr("Show motion view/search grid"),          tr(""),             this);
-    m_cameraSettingsAction              = newAction(tr("Settings"),          tr(""),             this);
-    m_hideMotionAction                  = newAction(tr("Hide motion view/search grid"),          tr(""),             this);
-
-    connect(m_showMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_showMotionAction_triggered()));
-    connect(m_cameraSettingsAction,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_cameraSettingsAction_triggered()));
-
-    connect(m_hideMotionAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_hideMotionAction_triggered()));
-
-    connect(&cm_toggle_recording,       SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_toggleRecordingAction_triggered()));
-    connect(&cm_recording_settings,     SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_recordingSettingsAction_triggered()));
-    m_display->view()->addAction(&cm_screen_recording);
-
-    connect(m_randomGridAction,         SIGNAL(triggered(bool)),                                                    this,                           SLOT(at_randomGridAction_triggered()));
-
-    m_itemContextMenu = new QMenu(display->view());
+    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
+    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
+    connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered()),                                                       this,                           SLOT(at_recordingSettingsAction_triggered()));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
     if (m_screenRecorder->isSupported()) {
-        connect(m_screenRecorder,           SIGNAL(recordingStarted()),                                             this,                           SLOT(at_screenRecorder_recordingStarted()));
-        connect(m_screenRecorder,           SIGNAL(recordingFinished(QString)),                                     this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
-        connect(m_screenRecorder,           SIGNAL(error(QString)),                                                 this,                           SLOT(at_screenRecorder_error(QString)));
+        connect(m_screenRecorder,       SIGNAL(recordingStarted()),                                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
+        connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
+        connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
     m_countdownCanceled = false;
     m_recordingLabel = 0;
@@ -412,10 +301,6 @@ QnWorkbenchDisplay *QnWorkbenchController::display() const {
 
 QnWorkbench *QnWorkbenchController::workbench() const {
     return m_display->workbench();
-}
-
-QnWorkbenchLayout *QnWorkbenchController::layout() const {
-    return m_display->workbench()->currentLayout();
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -456,60 +341,20 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &g
         return;
     }
 
-    if (layout()->items().size() >= 24)
-        return; // TODO: item limit must be changeable.
-
-    if (!resource->checkFlag(QnResource::media))
-        return; // TODO: unsupported for now
-
-    //if (!layout()->items(resource->getUniqueId()).isEmpty())
-    //    return; /* Avoid duplicates. */
-
     workbench()->setItem(QnWorkbench::RAISED, NULL);
     workbench()->setItem(QnWorkbench::ZOOMED, NULL);
 
-    const QPointF newPos = !gridPos.isNull() ? gridPos : m_display->mapViewportToGridF(m_display->view()->viewport()->geometry().center());
-
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
     item->setFlag(QnWorkbenchItem::Pinned, false);
-    item->setCombinedGeometry(QRectF(newPos - QPointF(0.5, 0.5), QSizeF(1.0, 1.0)));
-    layout()->addItem(item);
+    workbench()->currentLayout()->addItem(item);
 
-    QnResourceWidget *widget = display()->widget(item);
-    Q_ASSERT(widget);
-
-    /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
-    const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
-    const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
-    const QSize size = bestSingleBoundedSize(mapper(), 1, orientation, estimatedAspectRatio);
-
-    /* Adjust item's geometry for the new size. */
-    if(size != item->geometry().size()) {
-        QRectF combinedGeometry = item->combinedGeometry();
-        combinedGeometry.moveTopLeft(combinedGeometry.topLeft() - toPoint(size - combinedGeometry.size()) / 2.0);
-        combinedGeometry.setSize(size);
-        item->setCombinedGeometry(combinedGeometry);
+    if(gridPos.isNull()) {
+        item->adjustGeometry();
+    } else {
+        item->adjustGeometry(gridPos);
     }
 
-    /* Pin the item. */
-    AspectRatioMagnitudeCalculator metric(gridPos, size, workbench()->currentLayout()->boundingRect(), aspectRatio(display()->view()->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
-    QRect geometry = layout()->closestFreeSlot(gridPos, size, &metric);
-    layout()->pinItem(item, geometry);
-
     display()->fitInView();
-}
-
-void QnWorkbenchController::remove(const QnResourcePtr &resource)
-{
-    foreach(QnWorkbenchItem *item, layout()->items(resource->getUniqueId()))
-        delete item;
-}
-
-void QnWorkbenchController::remove(const QnResourceList &resources)
-{
-    foreach (const QnResourcePtr &resource, resources)
-        remove(resource);
 }
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
@@ -559,30 +404,6 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-int QnWorkbenchController::isMotionGridDisplayed()
-{
-    bool allDisplayed = true;
-    bool allNonDisplayed = true;
-    bool isCameraSelected = false;
-    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
-    {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
-            continue;
-        allDisplayed &= widget->isMotionGridDisplayed();
-        allNonDisplayed &= !widget->isMotionGridDisplayed();
-        isCameraSelected |= qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()) != 0;
-    }
-    if (!isCameraSelected)
-        return -2;
-    if (allDisplayed)
-        return 1;
-    else if (allNonDisplayed)
-        return 0;
-    else
-        return -1;
-}
-
 void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
     foreach(QGraphicsItem *item, items) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -599,7 +420,14 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
 // -------------------------------------------------------------------------- //
 void QnWorkbenchController::startRecording()
 {
-    if (!m_screenRecorder->isSupported() || m_screenRecorder->isRecording())
+    if (!m_screenRecorder->isSupported()) {
+        stopRecording();
+        return;
+    }
+
+    qnAction(Qn::ScreenRecordingAction)->setChecked(true);
+
+    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running))
         return;
 
     m_countdownCanceled = false;
@@ -636,12 +464,12 @@ void QnWorkbenchController::startRecording()
     connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
     connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
     m_recordingAnimation->start();
-
-    cm_toggle_recording.setText(tr("Stop Screen Recording"));
 }
 
 void QnWorkbenchController::stopRecording()
 {
+    qnAction(Qn::ScreenRecordingAction)->setChecked(false);
+
     if (!m_screenRecorder->isSupported())
         return;
 
@@ -694,14 +522,12 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 }
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    cm_toggle_recording.setText(tr("Start Screen Recording"));
+    qnAction(Qn::ScreenRecordingAction)->setChecked(false);
 
     QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
-    cm_toggle_recording.setText(tr("Start Screen Recording"));
-
     QString suggetion = QFileInfo(recordedFileName).fileName();
     if (suggetion.isEmpty())
         suggetion = tr("recorded_video");
@@ -711,7 +537,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     QString selectedFilter;
-    while (1) {
+    while (true) {
         QString filePath = QFileDialog::getSaveFileName(
             display()->view(),
             tr("Save Recording As..."),
@@ -788,7 +614,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
     QRect newResizingWidgetRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
-        workbench()->currentLayout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
+        widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
 
         m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
         m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
@@ -810,7 +636,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     /* Resize if possible. */
-    QSet<QnWorkbenchItem *> entities = layout()->items(m_resizedWidgetRect);
+    QSet<QnWorkbenchItem *> entities = widget->item()->layout()->items(m_resizedWidgetRect);
     entities.remove(widget->item());
     if (entities.empty()) {
         widget->item()->setGeometry(m_resizedWidgetRect);
@@ -862,6 +688,8 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
     if(m_draggedWorkbenchItems.empty())
         return;
 
+    QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
+
     QPoint newDragDelta = mapper()->mapToGrid(display()->widget(m_draggedWorkbenchItems[0])->geometry()).topLeft() - m_draggedWorkbenchItems[0]->geometry().topLeft();
     if(newDragDelta != m_dragDelta) {
         m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
@@ -877,7 +705,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
 
             /* Find item that dragged item was dropped on. */
             QPoint cursorPos = QCursor::pos();
-            QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout()->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
+            QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
             if(replacedWorkbenchItems.size() == 1) {
                 QnWorkbenchItem *replacedWorkbenchItem = *replacedWorkbenchItems.begin();
 
@@ -919,7 +747,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
                     replacedGeometries.push_back(geometry);
             }
 
-            m_replacedWorkbenchItems = layout()->items(replacedGeometries).subtract(m_draggedWorkbenchItems.toSet()).toList();
+            m_replacedWorkbenchItems = layout->items(replacedGeometries).subtract(m_draggedWorkbenchItems.toSet()).toList();
 
             replacedGeometries.clear();
             foreach (QnWorkbenchItem *workbenchItem, m_replacedWorkbenchItems)
@@ -930,7 +758,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
         }
 
         QnWorkbenchLayout::Disposition disposition;
-        layout()->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
+        layout->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
 
         m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
         m_display->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
@@ -943,12 +771,14 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphi
     if(m_draggedWorkbenchItems.empty())
         return;
 
+    QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
+
     /* Hide grid. */
     m_display->gridItem()->animatedHide();
 
     /* Do drag. */
     QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
-    bool success = layout()->moveItems(workbenchItems, m_dragGeometries);
+    bool success = layout->moveItems(workbenchItems, m_dragGeometries);
 
     foreach(QnWorkbenchItem *item, workbenchItems) {
         QnResourceWidget *widget = display()->widget(item);
@@ -1002,22 +832,6 @@ void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnResourceW
     widget->addToMotionSelection(region);
 }
 
-void QnWorkbenchController::at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
-    switch(info.button()) {
-    case Qt::LeftButton:
-        at_item_leftClicked(view, item, info);
-        break;
-    case Qt::RightButton:
-        at_item_rightClicked(view, item, info);
-        break;
-    case Qt::MiddleButton:
-        at_item_middleClicked(view, item, info);
-        break;
-    default:
-        break;
-    }
-}
-
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
     TRACE("ITEM LCLICKED");
 
@@ -1050,26 +864,11 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         widget->setSelected(true);
     }
 
-    m_itemContextMenu->removeAction(m_hideMotionAction);
-    m_itemContextMenu->removeAction(m_showMotionAction);
-    m_itemContextMenu->removeAction(m_cameraSettingsAction);
-
-    int gridnowDisplayed = isMotionGridDisplayed();
-    if (gridnowDisplayed == 1)
-        m_itemContextMenu->addAction(m_hideMotionAction);
-    else if (gridnowDisplayed == 0)
-        m_itemContextMenu->addAction(m_showMotionAction);
-    else if (gridnowDisplayed == -1) {
-        m_itemContextMenu->addAction(m_hideMotionAction);
-        m_itemContextMenu->addAction(m_showMotionAction);
-    }
-
-    if (widget->scene()->selectedItems().size() == 1 && widget->resource().dynamicCast<QnVirtualCameraResource>())
-    {
-        m_itemContextMenu->addAction(m_cameraSettingsAction);
-    }
-
-    m_itemContextMenu->exec(info.screenPos());
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    if(menu->isEmpty())
+        return;
+    
+    menu->exec(info.screenPos());
 }
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
@@ -1132,13 +931,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
     TRACE("SCENE RCLICKED");
 
-    QScopedPointer<QMenu> menu(new QMenu(display()->view()));
-    menu->addAction(&cm_open_file);
-    menu->addAction(&cm_screen_recording);
-
-    //menu->addAction(m_randomGridAction);
-
-    menu->exec(info.screenPos());
+    /* No scene context menu, haha! */
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
@@ -1188,53 +981,17 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
     displayMotionGrid(display()->scene()->selectedItems(), false);
-    //m_motionSelectionInstrument->recursiveDisable();
 }
 
-void QnWorkbenchController::at_cameraSettingsAction_triggered()
-{
-    QGraphicsItem* item = display()->scene()->selectedItems().first();
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-
-    if (widget && widget->resource())
-    {
-        CameraSettingsDialog dialog(display()->view(), widget->resource().dynamicCast<QnVirtualCameraResource>());
-        dialog.setWindowModality(Qt::ApplicationModal);
-        dialog.exec();
-    }
+void QnWorkbenchController::at_showMotionAction_triggered() {
+    displayMotionGrid(display()->scene()->selectedItems(), true);
 }
 
-void QnWorkbenchController::at_showMotionAction_triggered()
-{
-    QList<QGraphicsItem*> items;
-    foreach(QGraphicsItem *item, display()->scene()->selectedItems())
-    {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if (widget && qSharedPointerDynamicCast<QnNetworkResource> (widget->resource()))
-            items << item;
-    }
-
-    displayMotionGrid(items, true);
-    //m_motionSelectionInstrument->recursiveEnable();
-
-#if 0
-    QGraphicsItem *item = display()->scene()->selectedItems().first();
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    QnCameraMotionMaskWidget* test2 = new QnCameraMotionMaskWidget(widget->resource());
-    test2->show();
-#endif
-}
-
-void QnWorkbenchController::at_randomGridAction_triggered() {
-    display()->workbench()->mapper()->setSpacing(QSizeF(50 * rand() / RAND_MAX, 50 * rand() / RAND_MAX));
-    display()->workbench()->mapper()->setCellSize(QSizeF(300 * rand() / RAND_MAX, 300 * rand() / RAND_MAX));
-}
-
-void QnWorkbenchController::at_toggleRecordingAction_triggered() {
-    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running)) {
-        stopRecording();
-    } else {
+void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
+    if(checked) {
         startRecording();
+    } else {
+        stopRecording();
     }
 }
 
@@ -1244,7 +1001,3 @@ void QnWorkbenchController::at_recordingSettingsAction_triggered() {
 	dialog.exec();
 }
 
-MotionSelectionInstrument * QnWorkbenchController::motionSelectionInstrument() const
-{
-	 return m_motionSelectionInstrument;
-}
