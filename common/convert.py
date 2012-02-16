@@ -107,7 +107,7 @@ def setup_tools():
     tools_path = os.getenv('EVE_TOOLS')
 
     if not tools_path or not os.path.isdir(tools_path):
-        tools_path = os.path.join('..', '..', 'evetools')
+        tools_path = os.path.join(os.path.dirname(__file__), '..', '..', 'evetools')
 
     tools_path = os.path.abspath(tools_path)
     if not os.path.isdir(tools_path):
