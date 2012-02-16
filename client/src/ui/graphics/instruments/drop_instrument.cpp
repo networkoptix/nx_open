@@ -20,9 +20,6 @@ DropInstrument::DropInstrument(QnWorkbenchController *controller, QObject *paren
 bool DropInstrument::dragEnterEvent(QWidget * /*viewport*/, QDragEnterEvent *event) {
     m_files = QnFileProcessor::findAcceptedFiles(event->mimeData()->urls());
     m_resources = deserializeResources(event->mimeData()->data(resourcesMime()));
-    //for(int i = m_resources.size() - 1; i >= 0; i--)
-    //    if(m_controller->display()->widget(m_resources[i]) != NULL)
-    //        m_resources.removeAt(i); /* Don't allow duplicates. */
 
     if (m_files.empty() && m_resources.empty())
         return false;

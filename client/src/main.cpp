@@ -37,7 +37,7 @@
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "api/SessionManager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
-#include "ui/menu/action_manager.h"
+#include "ui/actions/action_manager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {

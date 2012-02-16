@@ -30,7 +30,9 @@ public:
 
     QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources);
 
-    QMenu *newMenu(Qn::ActionScope scope, const QGraphicsItemList &items);
+    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
+
+    QMenu *newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets);
 
     QnActionTargetProvider *targetProvider() const {
         return m_targetProviderGuard ? m_targetProvider : NULL;
@@ -42,13 +44,13 @@ public:
 
     QnResourceList currentResourcesTarget(QnAction *action) const;
 
-    QList<QGraphicsItem *> currentGraphicsItemsTarget(QnAction *action) const;
+    QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
 
     QVariant currentTarget(QObject *sender) const;
 
     QnResourceList currentResourcesTarget(QObject *sender) const;
 
-    QList<QGraphicsItem *> currentGraphicsItemsTarget(QObject *sender) const;
+    QnResourceWidgetList currentWidgetsTarget(QObject *sender) const;
 
 protected:
     friend class QnAction;

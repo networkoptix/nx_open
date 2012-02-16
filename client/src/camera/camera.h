@@ -12,12 +12,11 @@ class QnResource;
 class QnStreamRecorder;
 class QnAbstractArchiveReader;
 
-class CLVideoCamera : public QObject
+class CLVideoCamera : public QObject 
 {
     Q_OBJECT
 public:
-    // number of videovindows in array must be the same as device->getNumberOfVideoChannels
-    CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader);
+    CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader);
     virtual ~CLVideoCamera();
 
     virtual void startDisplay();
@@ -28,6 +27,7 @@ public:
     void stopRecording();
     bool isRecording();
 
+    QnMediaResourcePtr resource();
 
     // this function must be called if stream was interupted or so; to synch audio and video again 
     //void streamJump(qint64 time);
@@ -39,7 +39,7 @@ public:
     QnAbstractStreamDataProvider* getStreamreader();
 
     const QnStatistics* getStatistics(int channel = 0);
-    CLCamDisplay* getCamCamDisplay();
+    CLCamDisplay* getCamDisplay();
 
     void setQuality(QnStreamQuality q, bool increase);
     qint64 getCurrentTime() const;
@@ -63,7 +63,7 @@ protected slots:
     void onReachedTheEnd();
 private:
     bool m_isVisible;
-    QnMediaResourcePtr m_device;
+    QnMediaResourcePtr m_resource;
     CLCamDisplay m_camdispay;
     QnStreamRecorder* m_recorder;
 

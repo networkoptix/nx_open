@@ -74,7 +74,7 @@ bool QnAction::event(QEvent *event) {
             if(targetProvider != NULL)
                 target = targetProvider->target(this);
 
-            if(satisfiesCondition(static_cast<Qn::ActionScope>(static_cast<int>(m_flags) & Qn::ScopeMask), target)) {
+            if(satisfiesCondition(scope(), target)) {
                 m_manager->m_shortcutAction = this;
                 m_manager->m_lastTarget = target;
                 activate(Trigger);

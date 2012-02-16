@@ -4,6 +4,7 @@
 #include <QObject>
 #include <core/resource/resource_fwd.h>
 #include <ui/common/scene_utility.h>
+#include <ui/actions/action_target_provider.h>
 #include "workbench.h" /* For QnWorkbench::ItemRole. */
 
 class QGraphicsProxyWidget;
@@ -31,13 +32,15 @@ class QnClickableWidget;
 class QnLayoutTabBar;
 
 
-class QnWorkbenchUi: public QObject, protected SceneUtility {
+class QnWorkbenchUi: public QObject, public QnActionTargetProvider, protected SceneUtility {
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 
 public:
     QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent = NULL);
     virtual ~QnWorkbenchUi();
+
+    virtual QVariant target(QnAction *action) override;
 
     enum Flag {
         HIDE_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */
