@@ -88,7 +88,7 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
         setUrl(parameters[QLatin1String("url")]);
 
     if (parameters.contains(QLatin1String("status")))
-        m_status = parameters[QLatin1String("status")] == "A" ? QnResource::Online : QnResource::Offline;
+        m_status = (QnResource::Status)parameters[QLatin1String("status")].toInt();
 
     blockSignals(signalsBlocked);
 }

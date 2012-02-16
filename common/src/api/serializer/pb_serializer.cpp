@@ -221,7 +221,6 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
 
         if (pb_resourceType.parentid_size() > 0)
         {
-            bool firstParent = true;
             for (int i = 0; i < pb_resourceType.parentid_size(); i++)
             {
                 qint32 id = pb_resourceType.parentid(i);
@@ -376,7 +375,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
 
     proto::pb::Server& pb_server = *pb_servers.add_server();
 
-    pb_server.set_id(serverPtr->getId().toString().toInt());
+    pb_server.set_id(serverPtr->getId().toInt());
     pb_server.set_name(serverPtr->getName().toStdString());
     pb_server.set_url(serverPtr->getUrl().toStdString());
     pb_server.set_guid(serverPtr->getGuid().toStdString());
@@ -386,7 +385,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
         foreach (const QnStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
             proto::pb::Server_Storage& pb_storage = *pb_server.add_storage();
 
-            pb_storage.set_id(storagePtr->getId().toString().toInt());
+            pb_storage.set_id(storagePtr->getId().toInt());
             pb_storage.set_name(storagePtr->getName().toStdString());
             pb_storage.set_url(storagePtr->getUrl().toStdString());
             pb_storage.set_spacelimit(storagePtr->getSpaceLimit());
@@ -406,20 +405,20 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb_user.set_name(userPtr->getName().toStdString());
 
     if (userPtr->getId().isValid())
-        pb_user.set_id(userPtr->getId().toString().toInt());
+        pb_user.set_id(userPtr->getId().toInt());
 
     pb_user.set_password(userPtr->getPassword().toStdString());
 
     foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
         proto::pb::Layout& pb_layout = *pb_user.add_layout();
         pb_layout.set_name(layoutIn->getName().toStdString());
-        pb_layout.set_parentid(userPtr->getId().toString().toInt());
+        pb_layout.set_parentid(userPtr->getId().toInt());
 
         if (!layoutIn->getItems().isEmpty()) {
             foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
                 proto::pb::Layout_Item& pb_item = *pb_layout.add_item();
 
-                pb_item.set_resourceid(itemIn.resourceId.toString().toInt());
+                pb_item.set_resourceid(itemIn.resourceId.toInt());
                 pb_item.set_uuid(itemIn.uuid.toString().toStdString());
                 pb_item.set_flags(itemIn.flags);
                 pb_item.set_left(itemIn.combinedGeometry.left());
@@ -441,20 +440,22 @@ void QnApiPbSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camera
     proto::pb::Cameras pb_cameras;
     proto::pb::Camera& pb_camera = *pb_cameras.add_camera();
 
-    pb_camera.set_id(cameraPtr->getId().toString().toInt());
-    pb_camera.set_parentid(cameraPtr->getParentId().toString().toInt());
+    pb_camera.set_id(cameraPtr->getId().toInt());
+    pb_camera.set_parentid(cameraPtr->getParentId().toInt());
     pb_camera.set_name(cameraPtr->getName().toStdString());
-    pb_camera.set_typeid_(cameraPtr->getTypeId().toString().toInt());
+    pb_camera.set_typeid_(cameraPtr->getTypeId().toInt());
     pb_camera.set_url(cameraPtr->getUrl().toStdString());
     pb_camera.set_mac(cameraPtr->getMAC().toString().toStdString());
     pb_camera.set_login(cameraPtr->getAuth().user().toStdString());
     pb_camera.set_password(cameraPtr->getAuth().password().toStdString());
-    pb_camera.set_status(cameraPtr->getStatus() == QnResource::Online ? proto::pb::Camera_Status_Active : proto::pb::Camera_Status_Inactive);
+    pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
     pb_camera.set_region(serializeRegion(cameraPtr->getMotionMask()).toStdString());
 
     foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
         proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();
 
+        pb_scheduleTask.set_id(scheduleTaskIn.getId().toInt());
+        pb_scheduleTask.set_sourceid(cameraPtr->getId().toInt());
         pb_scheduleTask.set_starttime(scheduleTaskIn.getStartTime());
         pb_scheduleTask.set_endtime(scheduleTaskIn.getEndTime());
         pb_scheduleTask.set_dorecordaudio(scheduleTaskIn.getDoRecordAudio());

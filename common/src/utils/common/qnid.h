@@ -20,6 +20,7 @@ public:
     bool isSpecial() const; // local generated ID. Id still unique
     operator uint() const { return uint(m_id); }
     QString toString() const { return QString::number(m_id); }
+    int toInt() const { return m_id; }
 
     /**
      * Generates a new unassigned id.

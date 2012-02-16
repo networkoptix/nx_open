@@ -2,8 +2,9 @@ package proto.pb;
 
 message Camera {
     enum Status {
-       Active   = 0;
-       Inactive = 1;
+       Offline      = 0;
+       Unauthorized = 1;
+       Online       = 2;
     }
 
     enum Quality {
