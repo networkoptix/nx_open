@@ -206,6 +206,8 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     m_skipFramesToTime = 0;
     qint64 timeMs = time/1000;
     m_newQualityTmpData.clear();
+    m_newQualityAviDelegate.clear();
+
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
     DeviceFileCatalog::Chunk newChunk;
     DeviceFileCatalogPtr newChunkCatalog;
@@ -294,7 +296,8 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
 
 void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog)
 {
-    m_newQualityTmpData.clear();
+    //m_newQualityTmpData.clear();
+    //m_newQualityAviDelegate.clear();
 
     m_skipFramesToTime = 0;
     bool isCatalogEqualQuality = (m_quality == MEDIA_Quality_High && m_currentChunkCatalog == m_catalogHi) ||
@@ -329,6 +332,11 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
 
     if (chunk.startTimeMs == -1)
         return; // EOF reached. do not switch quality
+
+    if (m_newQualityTmpData)
+        return; // new quality data already ready. So, do not switch quality now.
+
+
     if (isCatalogEqualQuality) 
     {
         if (m_currentChunkCatalog == m_catalogLow)
@@ -560,6 +568,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
 {
     m_quality = quality;
     m_newQualityTmpData.clear();
+    m_newQualityAviDelegate.clear();
 
     if (!fastSwitch)
     {
@@ -579,7 +588,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
             return false;
         qint64 chunkOffset = (timeMs - m_newQualityChunk.startTimeMs)*1000;
         m_newQualityAviDelegate->doNotFindStreamInfo();
-        if (!m_newQualityAviDelegate->seek(chunkOffset, false))
+        if (m_newQualityAviDelegate->seek(chunkOffset, false) == -1)
             return false;
 
         while (1) 
