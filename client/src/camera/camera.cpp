@@ -3,8 +3,8 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "client_util.h"
 
-CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
-    m_device(device),
+CLVideoCamera::CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
+    m_resource(resource),
     m_camdispay(generateEndOfStreamSignal),
     m_recorder(0),
     m_GenerateEndOfStreamSignal(generateEndOfStreamSignal),
@@ -14,9 +14,9 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStream
     m_exportRecorder(0),
     m_exportReader(0)
 {
-    cl_log.log(QLatin1String("Creating camera for "), m_device->toString(), cl_logDEBUG1);
+    cl_log.log(QLatin1String("Creating camera for "), m_resource->toString(), cl_logDEBUG1);
 
-    int videonum = device->getVideoLayout(m_reader)->numberOfChannels();// how many sensors camera has
+    int videonum = resource->getVideoLayout(m_reader)->numberOfChannels();// how many sensors camera has
 
     //m_stat = new QnStatistics[videonum]; // array of statistics
 
@@ -34,11 +34,15 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, bool generateEndOfStream
 
 CLVideoCamera::~CLVideoCamera()
 {
-	cl_log.log(QLatin1String("Destroy camera for "), m_device->toString(), cl_logDEBUG1);
+	cl_log.log(QLatin1String("Destroy camera for "), m_resource->toString(), cl_logDEBUG1);
 
 	stopDisplay();
 	delete m_reader;
 	//delete[] m_stat;
+}
+
+QnMediaResourcePtr CLVideoCamera::resource() {
+    return m_resource;
 }
 
 qint64 CLVideoCamera::getCurrentTime() const
@@ -58,7 +62,7 @@ void CLVideoCamera::streamJump(qint64 time)
 
 void CLVideoCamera::startDisplay()
 {
-	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::startDisplay "), m_device->getUniqueId(), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::startDisplay "), m_resource->getUniqueId(), cl_logDEBUG1);
 
 	m_camdispay.start();
 	//m_reader->start(QThread::HighestPriority);
@@ -67,7 +71,7 @@ void CLVideoCamera::startDisplay()
 
 void CLVideoCamera::stopDisplay()
 {
-	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDisplay"), m_device->getUniqueId(), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
 	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
 
 	stopRecording();
@@ -90,8 +94,8 @@ void CLVideoCamera::startRecording()
 {
 	//m_reader->setQuality(QnQualityHighest);
     if (m_recorder == 0) {
-        m_recorder = new QnStreamRecorder(m_device);
-        QFileInfo fi(m_device->getUniqueId());
+        m_recorder = new QnStreamRecorder(m_resource);
+        QFileInfo fi(m_resource->getUniqueId());
         m_recorder->setFileName(getTempRecordingDir() + fi.baseName());
         m_recorder->setTruncateInterval(15);
         connect(m_recorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(recordingFailed(QString)));
@@ -118,7 +122,7 @@ bool CLVideoCamera::isRecording()
 
 QnResourcePtr CLVideoCamera::getDevice() const
 {
-	return m_device;
+	return m_resource;
 }
 
 QnAbstractStreamDataProvider* CLVideoCamera::getStreamreader()
@@ -126,7 +130,7 @@ QnAbstractStreamDataProvider* CLVideoCamera::getStreamreader()
 	return m_reader;
 }
 
-CLCamDisplay* CLVideoCamera::getCamCamDisplay()
+CLCamDisplay* CLVideoCamera::getCamDisplay()
 {
 	return &m_camdispay;
 }
@@ -171,16 +175,16 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
 
     if (m_exportRecorder == 0)
     {
-        QnAbstractStreamDataProvider* tmpReader = m_device->createDataProvider(QnResource::Role_Default);
+        QnAbstractStreamDataProvider* tmpReader = m_resource->createDataProvider(QnResource::Role_Default);
         m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
         if (m_exportReader == 0)
         {
             delete tmpReader;
-            emit recordingFailed("Invalid device type for export data");
+            emit recordingFailed("Invalid resource type for export data");
             return;
         }
 
-        m_exportRecorder = new QnStreamRecorder(m_device);
+        m_exportRecorder = new QnStreamRecorder(m_resource);
         m_exportRecorder->disconnect(this);
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(exportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));

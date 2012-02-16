@@ -41,6 +41,8 @@
 #include <ui/processors/hover_processor.h>
 
 #include <ui/menu/action_manager.h>
+#include <ui/menu/action.h>
+#include <ui/menu/action_meta_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/style/skin.h>
@@ -394,6 +396,42 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 QnWorkbenchUi::~QnWorkbenchUi() {
     return;
+}
+
+QVariant QnWorkbenchUi::target(QnAction *action) {
+    /* Determine current scope. */
+    Qn::ActionScope scope = Qn::MainScope;
+
+    QGraphicsItem *focusItem = display()->scene()->focusItem();
+    if(focusItem == m_treeItem) {
+        scope = Qn::TreeScope;
+    } else if(focusItem == m_sliderItem) {
+        scope = Qn::SliderScope;
+    } else if(!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)) {
+        scope = Qn::SceneScope;
+    }
+
+    /* Compare to action's scope. */
+    if(!(action->scope() & scope))
+        return QVariant();
+    
+    /* Get items. */
+    switch(scope) {
+    case Qn::TreeScope:
+        return QVariant::fromValue(m_treeWidget->selectedResources());
+    case Qn::SliderScope: {
+        QnResourceList result;
+        CLVideoCamera *camera = m_sliderItem->videoCamera();
+        if(camera != NULL)
+            result.push_back(camera->resource());
+        
+        return QVariant::fromValue(result);
+    }
+    case Qn::SceneScope:
+        return QVariant::fromValue(display()->scene()->selectedItems());
+    default:
+        return QVariant();
+    }
 }
 
 QnWorkbenchDisplay *QnWorkbenchUi::display() const {

@@ -30,6 +30,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -59,8 +60,6 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
-#include "ui/dialogs/camerasettingsdialog.h"
-
 #include <ui/menu/action_manager.h>
 
 #include <file_processor.h>
@@ -72,9 +71,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 
-#include "ui/device_settings/camera_schedule_widget.h"
-#include "ui/device_settings/camera_motionmask_widget.h"
-#include "ui/style/skin.h"
 
 #define QN_WORKBENCH_CONTROLLER_DEBUG
 

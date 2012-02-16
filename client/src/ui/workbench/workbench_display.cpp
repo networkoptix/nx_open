@@ -478,7 +478,7 @@ CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
     if(camera == NULL)
         return NULL;
 
-    return camera->getCamCamDisplay();
+    return camera->getCamDisplay();
 }
 
 

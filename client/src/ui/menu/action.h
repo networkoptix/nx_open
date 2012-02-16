@@ -23,6 +23,10 @@ public:
         return m_id;
     }
 
+    Qn::ActionScope scope() const {
+        return static_cast<Qn::ActionScope>(static_cast<int>(m_flags) & Qn::ScopeMask);
+    }
+
     Qn::ActionFlags flags() const {
         return m_flags;
     }

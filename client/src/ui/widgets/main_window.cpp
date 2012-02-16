@@ -140,35 +140,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     }
 
 
-    /* Set up actions. */
-    addAction(qnAction(Qn::ExitAction));
-    addAction(qnAction(Qn::FullscreenAction));
-    addAction(qnAction(Qn::AboutAction));
-    addAction(qnAction(Qn::PreferencesAction));
-    addAction(qnAction(Qn::OpenFileAction));
-    addAction(qnAction(Qn::ConnectionSettingsAction));
-    addAction(qnAction(Qn::NewTabAction));
-    addAction(qnAction(Qn::CloseTabAction));
-    addAction(qnAction(Qn::MainMenuAction));
-    addAction(qnAction(Qn::ScreenRecordingAction));
-
-    connect(qnAction(Qn::ExitAction),               SIGNAL(triggered()),    this,   SLOT(close()));
-    connect(qnAction(Qn::FullscreenAction),         SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
-    connect(qnAction(Qn::AboutAction),              SIGNAL(triggered()),    this,   SLOT(showAboutDialog()));
-    connect(qnAction(Qn::PreferencesAction),        SIGNAL(triggered()),    this,   SLOT(showPreferencesDialog()));
-    connect(qnAction(Qn::OpenFileAction),           SIGNAL(triggered()),    this,   SLOT(showOpenFileDialog()));
-    connect(qnAction(Qn::ConnectionSettingsAction), SIGNAL(triggered()),    this,   SLOT(showAuthenticationDialog()));
-    connect(qnAction(Qn::NewTabAction),             SIGNAL(triggered()),    this,   SLOT(openNewLayout()));
-    connect(qnAction(Qn::CloseTabAction),           SIGNAL(triggered()),    this,   SLOT(closeCurrentLayout()));
-    connect(qnAction(Qn::MainMenuAction),           SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
-    connect(qnAction(Qn::CameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(qnAction(Qn::ServerSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
-    connect(qnAction(Qn::YouTubeUploadAction),      SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(qnAction(Qn::EditTagsAction),           SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
-
-    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
-
-
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene);
@@ -214,6 +185,39 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
     connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
     connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
+
+
+    /* Set up actions. */
+    addAction(qnAction(Qn::ExitAction));
+    addAction(qnAction(Qn::FullscreenAction));
+    addAction(qnAction(Qn::AboutAction));
+    addAction(qnAction(Qn::PreferencesAction));
+    addAction(qnAction(Qn::OpenFileAction));
+    addAction(qnAction(Qn::ConnectionSettingsAction));
+    addAction(qnAction(Qn::NewTabAction));
+    addAction(qnAction(Qn::CloseTabAction));
+    addAction(qnAction(Qn::MainMenuAction));
+    addAction(qnAction(Qn::ScreenRecordingAction));
+    addAction(qnAction(Qn::YouTubeUploadAction));
+    addAction(qnAction(Qn::EditTagsAction));
+
+    connect(qnAction(Qn::ExitAction),               SIGNAL(triggered()),    this,   SLOT(close()));
+    connect(qnAction(Qn::FullscreenAction),         SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
+    connect(qnAction(Qn::AboutAction),              SIGNAL(triggered()),    this,   SLOT(showAboutDialog()));
+    connect(qnAction(Qn::PreferencesAction),        SIGNAL(triggered()),    this,   SLOT(showPreferencesDialog()));
+    connect(qnAction(Qn::OpenFileAction),           SIGNAL(triggered()),    this,   SLOT(showOpenFileDialog()));
+    connect(qnAction(Qn::ConnectionSettingsAction), SIGNAL(triggered()),    this,   SLOT(showAuthenticationDialog()));
+    connect(qnAction(Qn::NewTabAction),             SIGNAL(triggered()),    this,   SLOT(openNewLayout()));
+    connect(qnAction(Qn::CloseTabAction),           SIGNAL(triggered()),    this,   SLOT(closeCurrentLayout()));
+    connect(qnAction(Qn::MainMenuAction),           SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
+    connect(qnAction(Qn::CameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(qnAction(Qn::ServerSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
+    connect(qnAction(Qn::YouTubeUploadAction),      SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
+    connect(qnAction(Qn::EditTagsAction),           SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
+
+    qnMenu->setTargetProvider(m_ui);
+
+    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
 
 
     /* Tab bar. */

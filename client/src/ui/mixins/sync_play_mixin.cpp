@@ -46,9 +46,9 @@ void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
         return;
     
     CLVideoCamera *camera = widget->display()->camera();
-    m_syncPlay->addArchiveReader(widget->display()->archiveReader(), camera->getCamCamDisplay());
+    m_syncPlay->addArchiveReader(widget->display()->archiveReader(), camera->getCamDisplay());
     camera->setExternalTimeSource(m_syncPlay);
-    camera->getCamCamDisplay()->setExternalTimeSource(m_syncPlay);
+    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
 }
 
 void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {

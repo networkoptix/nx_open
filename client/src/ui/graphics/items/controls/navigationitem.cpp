@@ -187,7 +187,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_liveButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("live_disabled.png")));
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setCheckable(true);
-    m_liveButton->setChecked(m_camera && m_camera->getCamCamDisplay()->isRealTimeSource());
+    m_liveButton->setChecked(m_camera && m_camera->getCamDisplay()->isRealTimeSource());
     m_liveButton->setEnabled(false);
     m_liveButton->setAnimationSpeed(4.0);
 
@@ -389,13 +389,13 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     //restoreInfoText();
 
     if (m_camera)
-        disconnect(m_camera->getCamCamDisplay(), 0, this, 0);
+        disconnect(m_camera->getCamDisplay(), 0, this, 0);
 
     m_camera = camera;
 
     if (m_camera)
     {
-        connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
+        connect(m_camera->getCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
         QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
@@ -460,7 +460,7 @@ void NavigationItem::updateSlider()
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
         else
             m_timeLabel->setText(QString()); //(QDateTime::fromMSecsSinceEpoch(m_timeSlider->maximumValue()).toString(Qt::SystemLocaleShortDate));
-        m_timeLabel->setVisible(!m_camera->getCamCamDisplay()->isRealTimeSource());
+        m_timeLabel->setVisible(!m_camera->getCamDisplay()->isRealTimeSource());
 
         quint64 time = m_camera->getCurrentTime();
         if (time != AV_NOPTS_VALUE)
@@ -472,7 +472,7 @@ void NavigationItem::updateSlider()
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    m_liveButton->setChecked(!reader->isMediaPaused() && m_camera->getCamCamDisplay()->isRealTimeSource());
+    m_liveButton->setChecked(!reader->isMediaPaused() && m_camera->getCamDisplay()->isRealTimeSource());
 }
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
@@ -748,7 +748,7 @@ void NavigationItem::onValueChanged(qint64 time)
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    if (reader->getSpeed() > 0 &&  m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamCamDisplay()->isRealTimeSource())
+    if (reader->getSpeed() > 0 &&  m_camera->getCurrentTime() == DATETIME_NOW && !m_camera->getCamDisplay()->isRealTimeSource())
     {
         smartSeek(DATETIME_NOW);
         return;
@@ -801,11 +801,11 @@ void NavigationItem::pause()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
     reader->pauseMedia();
-    m_camera->getCamCamDisplay()->pauseAudio();
+    m_camera->getCamDisplay()->pauseAudio();
     m_mrsButton->hide();
 
     reader->setSingleShotMode(true);
-    //m_camera->getCamCamDisplay()->setSingleShotMode(true);
+    //m_camera->getCamDisplay()->setSingleShotMode(true);
 }
 
 void NavigationItem::play()
@@ -829,7 +829,7 @@ void NavigationItem::play()
     }
 
     if (!m_playing)
-        m_camera->getCamCamDisplay()->playAudio(m_playing);
+        m_camera->getCamDisplay()->playAudio(m_playing);
 }
 
 void NavigationItem::rewindBackward()
@@ -888,11 +888,11 @@ void NavigationItem::stepBackward()
         quint64 curr_time = m_camera->getCurrentTime();
 
         if (reader->isSingleShotMode())
-            m_camera->getCamCamDisplay()->playAudio(false);
+            m_camera->getCamDisplay()->playAudio(false);
 
         reader->previousFrame(curr_time);
         //m_camera->streamJump(curr_time);
-        //m_camera->getCamCamDisplay()->setSingleShotMode(false);
+        //m_camera->getCamDisplay()->setSingleShotMode(false);
     }
 }
 
@@ -913,7 +913,7 @@ void NavigationItem::stepForward()
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->nextFrame();
-    //m_camera->getCamCamDisplay()->setSingleShotMode(true);
+    //m_camera->getCamDisplay()->setSingleShotMode(true);
 }
 
 void NavigationItem::onSliderPressed()
@@ -923,7 +923,7 @@ void NavigationItem::onSliderPressed()
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->setSingleShotMode(true);
-    m_camera->getCamCamDisplay()->playAudio(false);
+    m_camera->getCamDisplay()->playAudio(false);
     setActive(true);
 }
 
@@ -938,7 +938,7 @@ void NavigationItem::onSliderReleased()
     if (isPlaying())
     {
         reader->setSingleShotMode(false);
-        m_camera->getCamCamDisplay()->playAudio(true);
+        m_camera->getCamDisplay()->playAudio(true);
     }
 }
 
@@ -1023,7 +1023,7 @@ void NavigationItem::togglePlayPause()
 
 void NavigationItem::at_liveButton_clicked(bool checked)
 {
-    if (m_camera && checked == m_camera->getCamCamDisplay()->isRealTimeSource()) {
+    if (m_camera && checked == m_camera->getCamDisplay()->isRealTimeSource()) {
         qnWarning("Camera live state and live button state are not in sync, investigate.");
         return;
     }
