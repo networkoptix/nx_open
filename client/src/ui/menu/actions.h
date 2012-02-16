@@ -339,6 +339,7 @@ namespace Qn {
         SceneScope          = 0x2,              /**< Scene context menu requested. */
         TreeScope           = 0x4,              /**< Tree context menu requested. */
         SliderScope         = 0x8,              /**< Slider context menu requested. */
+        ScopeMask           = 0xF
     };
 
     enum ActionFlag {
@@ -353,9 +354,6 @@ namespace Qn {
         Tree                = Qn::TreeScope,                    /**< Action can appear in tree context menu. */
         Slider              = Qn::SliderScope | SingleTarget,   /**< Action can appears in slider context menu. */
         Global              = Scene | Tree | Slider, 
-
-        ToggledText         = 0x01000000,       /**< Action has different text for toggled state. */
-        Separator           = 0x10000000,       /**< Action is actually a menu separator. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);

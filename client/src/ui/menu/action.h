@@ -4,16 +4,18 @@
 #include <QAction>
 #include <QWeakPointer>
 #include <core/resource/resource_fwd.h>
+#include "action_fwd.h"
 #include "actions.h"
 
 class QGraphicsItem;
 
 class QnActionCondition;
+class QnActionManager;
 
 class QnAction: public QAction {
     Q_OBJECT;
 public:
-    QnAction(Qn::ActionId id, QObject *parent = NULL);
+    QnAction(QnActionManager *manager, Qn::ActionId id, QObject *parent = NULL);
 
     virtual ~QnAction();
 
@@ -22,7 +24,7 @@ public:
     }
 
     Qn::ActionFlags flags() const {
-        return 
+        return m_flags;
     }
 
     void setFlags(Qn::ActionFlags flags);
@@ -53,11 +55,7 @@ public:
 
     void removeChild(QnAction *action);
 
-    bool satisfiesCondition(Qn::ActionScope scope);
-
-    bool satisfiesCondition(Qn::ActionScope scope, const QnResourceList &resources);
-
-    bool satisfiesCondition(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
+    bool satisfiesCondition(Qn::ActionScope scope, const QVariant &items) const;
 
 protected:
     virtual bool event(QEvent *event) override;
@@ -69,6 +67,7 @@ private slots:
     void at_toggled(bool checked);
 
 private:
+    QnActionManager *const m_manager;
     const Qn::ActionId m_id;
     Qn::ActionFlags m_flags;
     QString m_normalText, m_toggledText;

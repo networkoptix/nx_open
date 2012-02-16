@@ -1,30 +1,24 @@
 #include "action_conditions.h"
+#include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <ui/graphics/items/resource_widget.h>
+#include "action_meta_types.h"
 
-QnResourcePtr QnActionCondition::resource(QGraphicsItem *item) {
-    if(item == NULL)
-        return QnResourcePtr();
-
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget == NULL)
-        return QnResourcePtr();
-
-    return widget->resource();
+QnActionCondition::QnActionCondition(QObject *parent): 
+    QObject(parent) 
+{
+    QnActionMetaTypes::initialize();
 }
 
-QnResourceList QnActionCondition::resources(const QList<QGraphicsItem *> &items) {
-    QnResourceList result;
-
-    foreach(QGraphicsItem *item, items) {
-        QnResourcePtr resource = QnActionCondition::resource(item);
-        if(!resource)
-            continue;
-
-        result.push_back(resource);
+bool QnActionCondition::check(const QVariant &items) {
+    if(items.userType() == QnActionMetaTypes::resourceList()) {
+        return check(items.value<QnResourceList>());
+    } else if(items.userType() == QnActionMetaTypes::graphicsItemList()) {
+        return check(items.value<QList<QGraphicsItem *> >());
+    } else {
+        qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
+        return false;
     }
-
-    return result;
 }
 
 
@@ -95,7 +89,7 @@ bool QnResourceActionCondition::checkOne(const QnResourcePtr &resource) {
 }
 
 bool QnResourceActionCondition::checkOne(QGraphicsItem *item) {
-    QnResourcePtr resource = this->resource(item);
+    QnResourcePtr resource = QnActionMetaTypes::resource(item);
     return resource ? checkOne(resource) : false;
 }
 

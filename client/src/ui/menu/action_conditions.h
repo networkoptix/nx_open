@@ -3,14 +3,13 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
-
-class QGraphicsItem;
+#include "action_fwd.h"
 
 class QnResourceCriterion;
 
 class QnActionCondition: public QObject {
 public:
-    QnActionCondition(QObject *parent = NULL): QObject(parent) {}
+    QnActionCondition(QObject *parent = NULL);
 
     virtual bool check(const QnResourceList &resources) { 
         Q_UNUSED(resources);
@@ -24,9 +23,7 @@ public:
         return false;
     };
 
-    static QnResourcePtr resource(QGraphicsItem *item);
-
-    static QnResourceList resources(const QList<QGraphicsItem *> &items);
+    virtual bool check(const QVariant &items);
 };
 
 

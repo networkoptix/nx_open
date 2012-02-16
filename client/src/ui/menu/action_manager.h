@@ -5,17 +5,15 @@
 #include <QHash>
 #include <QVariant>
 #include <core/resource/resource_fwd.h>
+#include "action_fwd.h"
 #include "actions.h"
 
 class QAction;
 class QMenu;
 class QGraphicsItem;
 
-class QnActionData;
 class QnActionFactory;
 class QnActionBuilder;
-class QnActionCondition;
-class QnActionSourceProvider;
 
 class QnActionManager: public QObject {
     Q_OBJECT;
@@ -32,24 +30,35 @@ public:
 
     QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources);
 
-    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
+    QMenu *newMenu(Qn::ActionScope scope, const QGraphicsItemList &items);
 
     QnResourceList cause(QObject *sender);
 
-    QnActionSourceProvider *sourceProvider() const {
-        return m_sourceProviderGuard ? m_sourceProvider : NULL;
+    QnActionTargetProvider *targetProvider() const {
+        return m_targetProviderGuard ? m_targetProvider : NULL;
     }
 
-    void setSourceProvider(QnActionSourceProvider *sourceProvider);
+    void setTargetProvider(QnActionTargetProvider *targetProvider);
+
+    QVariant currentTarget(QnAction *action) const;
+
+    QnResourceList currentResourcesTarget(QnAction *action) const;
+
+    QList<QGraphicsItem *> currentGraphicsItemsTarget(QnAction *action) const;
+
+    QVariant currentTarget(QObject *sender) const;
+
+    QnResourceList currentResourcesTarget(QObject *sender) const;
+
+    QList<QGraphicsItem *> currentGraphicsItemsTarget(QObject *sender) const;
 
 protected:
+    friend class QnAction;
     friend class QnActionFactory;
 
-    template<class ItemSequence>
-    QMenu *newMenuInternal(const QnActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
+    QMenu *newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
 
-    template<class ItemSequence>
-    QMenu *newMenuRecursive(const QnActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
+    QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
 
 private slots:
     void at_action_toggled();
@@ -57,25 +66,27 @@ private slots:
 
 private:
     /** Mapping from action id to action data. */ 
-    QHash<Qn::ActionId, QnActionData *> m_dataById;
+    QHash<Qn::ActionId, QnAction *> m_actionById;
 
     /** Root action data. Also contained in the map above. */
-    QnActionData *m_root;
+    QnAction *m_root;
 
     /** Set of all menus created by this object that are not yet destroyed. */
     QSet<QObject *> m_menus;
 
+    /** Target provider for actions. */
+    QnActionTargetProvider *m_targetProvider;
+
+    /** Guard for target provider. */
+    QWeakPointer<QObject> m_targetProviderGuard;
+
+    /** Currently active action that was activated via a shortcut. */
+    QnAction *m_shortcutAction;
+
     /** List of items supplied to the last call to <tt>newMenu</tt>. */
-    QVariant m_lastQuery;
+    QVariant m_lastTarget;
 
-    /** Source provider for actions. */
-    QnActionSourceProvider *m_sourceProvider;
-
-    /** Guard for source provider. */
-    QWeakPointer<QObject> m_sourceProviderGuard;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::ActionFlags);
 
 
 #define qnMenu          (QnActionManager::instance())
