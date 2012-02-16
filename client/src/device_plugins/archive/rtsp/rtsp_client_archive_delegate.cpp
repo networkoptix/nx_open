@@ -21,7 +21,9 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_closing(false),
     m_singleShotMode(false),
     m_lastReceivedTime(AV_NOPTS_VALUE),
-    m_blockReopening(false)
+    m_blockReopening(false),
+    m_quality(MEDIA_Quality_High),
+    m_qualityFastSwitch(true)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -212,6 +214,24 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         reopen();
     if (result)
         m_lastPacketFlags = result->flags;
+
+
+    if (result->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    {
+        // Media server can change quality for LIVE stream (for archive quality controlled by client only)
+        // So, if server is changed quality, update current quality variables
+
+        bool isLowPacket = result->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+        bool isLowQuality = m_quality == MEDIA_Quality_Low;
+        if (isLowPacket != isLowQuality) 
+        {
+            m_rtspSession.setAdditionAttribute("x-media-quality", isLowPacket ? "low" : "high");
+            m_qualityFastSwitch = true; // We already have got new quality. So, it is "fast" switch
+            m_quality = isLowPacket ? MEDIA_Quality_Low : MEDIA_Quality_High;
+        }
+
+    }
+
     m_lastReceivedTime = QDateTime::currentMSecsSinceEpoch();
     return result;
 }
@@ -454,6 +474,11 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
 
 bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
+    if (m_quality == quality && fastSwitch <= m_qualityFastSwitch)
+        return false;
+    m_quality = quality;
+    m_qualityFastSwitch = fastSwitch;
+
     QByteArray value = quality == MEDIA_Quality_High ? "high" : "low";
     QByteArray paramName = "x-media-quality";
     m_rtspSession.setAdditionAttribute(paramName, value);
