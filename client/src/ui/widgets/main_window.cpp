@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QNetworkReply>
+#include <QFileOpenEvent>
 
 #include <api/AppServerConnection.h>
 #include <api/SessionManager.h>
@@ -552,12 +553,12 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
         return;
     }
 
-    handleMessage(static_cast<QFileOpenEvent*>(event)->file());
+    handleMessage(static_cast<QFileOpenEvent *>(event)->file());
 }
 
 void QnMainWindow::at_editTagsAction_triggred() 
 {
-    QnResourceList resources = qnMenu->cause(sender());
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
     if(resources.empty() || !resources[0])
         return;
 
@@ -568,7 +569,7 @@ void QnMainWindow::at_editTagsAction_triggred()
 
 void QnMainWindow::at_cameraSettingsAction_triggered()
 {
-    QnResourceList resources = qnMenu->cause(sender());
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
     if(resources.empty() || !resources[0])
         return;
 
@@ -579,7 +580,7 @@ void QnMainWindow::at_cameraSettingsAction_triggered()
 
 void QnMainWindow::at_serverSettingsAction_triggered() 
 {
-    QnResourceList resources = qnMenu->cause(sender());
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
     if(resources.empty() || !resources[0])
         return;
 
@@ -590,7 +591,7 @@ void QnMainWindow::at_serverSettingsAction_triggered()
 
 void QnMainWindow::at_youtubeUploadAction_triggered() 
 {
-    QnResourceList resources = qnMenu->cause(sender());
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
     if(resources.empty() || !resources[0])
         return;
 

@@ -32,8 +32,6 @@ public:
 
     QMenu *newMenu(Qn::ActionScope scope, const QGraphicsItemList &items);
 
-    QnResourceList cause(QObject *sender);
-
     QnActionTargetProvider *targetProvider() const {
         return m_targetProviderGuard ? m_targetProvider : NULL;
     }
@@ -61,7 +59,6 @@ protected:
     QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
 
 private slots:
-    void at_action_toggled();
     void at_menu_destroyed(QObject *menu);
 
 private:

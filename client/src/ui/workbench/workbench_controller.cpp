@@ -410,6 +410,9 @@ void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &item
         if(widget == NULL)
             continue;
 
+        if(!(widget->resource()->flags() & QnResource::network))
+            continue;
+
         widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
     }
 }
@@ -983,11 +986,11 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(display()->scene()->selectedItems(), false);
+    displayMotionGrid(qnMenu->currentGraphicsItemsTarget(sender()), false);
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
-    displayMotionGrid(display()->scene()->selectedItems(), true);
+    displayMotionGrid(qnMenu->currentGraphicsItemsTarget(sender()), true);
 }
 
 void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
