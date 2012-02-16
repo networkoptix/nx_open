@@ -1,35 +1,29 @@
 #include "action_conditions.h"
+#include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <ui/graphics/items/resource_widget.h>
+#include "action_meta_types.h"
 
-QnResourcePtr QnActionCondition::resource(QGraphicsItem *item) {
-    if(item == NULL)
-        return QnResourcePtr();
-
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget == NULL)
-        return QnResourcePtr();
-
-    return widget->resource();
+QnActionCondition::QnActionCondition(QObject *parent): 
+    QObject(parent) 
+{
+    QnActionMetaTypes::initialize();
 }
 
-QnResourceList QnActionCondition::resources(const QList<QGraphicsItem *> &items) {
-    QnResourceList result;
-
-    foreach(QGraphicsItem *item, items) {
-        QnResourcePtr resource = QnActionCondition::resource(item);
-        if(!resource)
-            continue;
-
-        result.push_back(resource);
+bool QnActionCondition::check(const QVariant &items) {
+    if(items.userType() == QnActionMetaTypes::resourceList()) {
+        return check(items.value<QnResourceList>());
+    } else if(items.userType() == QnActionMetaTypes::widgetList()) {
+        return check(items.value<QnResourceWidgetList>());
+    } else {
+        qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
+        return false;
     }
-
-    return result;
 }
 
 
-bool QnMotionGridDisplayActionCondition::check(const QList<QGraphicsItem *> &items) {
-    foreach(QGraphicsItem *item, items) {
+bool QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widgets) {
+    foreach(QGraphicsItem *item, widgets) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)
             continue;
@@ -67,8 +61,8 @@ bool QnResourceActionCondition::check(const QnResourceList &resources) {
     return checkInternal<QnResourcePtr>(resources);
 }
 
-bool QnResourceActionCondition::check(const QList<QGraphicsItem *> &items) {
-    return checkInternal<QGraphicsItem *>(items);
+bool QnResourceActionCondition::check(const QnResourceWidgetList &widgets) {
+    return checkInternal<QnResourceWidget *>(widgets);
 }
 
 template<class Item, class ItemSequence>
@@ -94,8 +88,8 @@ bool QnResourceActionCondition::checkOne(const QnResourcePtr &resource) {
     return m_criterion->check(resource) == QnResourceCriterion::ACCEPT;
 }
 
-bool QnResourceActionCondition::checkOne(QGraphicsItem *item) {
-    QnResourcePtr resource = this->resource(item);
+bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
+    QnResourcePtr resource = QnActionMetaTypes::resource(widget);
     return resource ? checkOne(resource) : false;
 }
 

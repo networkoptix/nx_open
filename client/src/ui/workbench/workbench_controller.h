@@ -105,7 +105,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
     void updateGeometryDelta(QnResourceWidget *widget);
-    void displayMotionGrid(const QList<QGraphicsItem *> &items, bool display);
+    void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);

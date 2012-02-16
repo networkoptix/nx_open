@@ -22,6 +22,9 @@ class QnAbstractArchiveDelegate: public QObject
     Q_OBJECT;
     Q_FLAGS(Flags Flag);
 
+signals:
+    // delete itself change quality
+    void qualityChanged(MediaQuality quality);
 public:
     enum Flag 
     { 

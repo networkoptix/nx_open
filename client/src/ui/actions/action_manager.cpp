@@ -1,4 +1,4 @@
-#include "context_menu.h"
+#include "action_manager.h"
 #include <cassert>
 #include <QAction>
 #include <QMenu>
@@ -9,49 +9,35 @@
 #include <core/resource/resource.h>
 #include <ui/style/skin.h>
 #include <ui/style/app_style.h>
+#include "action.h"
 #include "action_conditions.h"
+#include "action_target_provider.h"
+#include "action_meta_types.h"
 
-Q_DECLARE_METATYPE(QList<QGraphicsItem *>);
-
-namespace {
-    const char *actionIdPropertyName = "_qn_actionId";
-
-    Qn::ActionId actionId(QAction *action) {
-        QVariant result = action->property(actionIdPropertyName);
-        if(result.type() != QVariant::Int)
-            return Qn::NoAction;
-
-        return static_cast<Qn::ActionId>(result.value<int>());
-    }
-
-    void setActionId(QAction *action, Qn::ActionId id) {
-        action->setProperty(actionIdPropertyName, static_cast<int>(id));
-    }
-
-} // anonymous namespace
-
-
+// -------------------------------------------------------------------------- //
+// QnActionBuilder 
+// -------------------------------------------------------------------------- //
 class QnActionBuilder {
 public:
-    QnActionBuilder(QnContextMenu *menu, QnContextMenu::ActionData *data): m_menu(menu), m_data(data) {}
+    QnActionBuilder(QnActionManager *manager, QnAction *action): m_manager(manager), m_action(action) {}
 
     QnActionBuilder shortcut(const QKeySequence &shortcut, Qt::ShortcutContext context = Qt::ApplicationShortcut) {
-        QList<QKeySequence> shortcuts = m_data->action->shortcuts();
+        QList<QKeySequence> shortcuts = m_action->shortcuts();
         shortcuts.push_back(shortcut);
-        m_data->action->setShortcuts(shortcuts);
-        m_data->action->setShortcutContext(context);
+        m_action->setShortcuts(shortcuts);
+        m_action->setShortcutContext(context);
 
         return *this;
     }
 
     QnActionBuilder icon(const QIcon &icon) {
-        m_data->action->setIcon(icon);
+        m_action->setIcon(icon);
 
         return *this;
     }
 
     QnActionBuilder toggledIcon(const QIcon &toggledIcon) {
-        QIcon icon = m_data->action->icon();
+        QIcon icon = m_action->icon();
         
         for(int i = 0; i <= QIcon::Selected; i++) {
             QIcon::Mode mode = static_cast<QIcon::Mode>(i);
@@ -60,116 +46,120 @@ public:
             icon.addPixmap(toggledIcon.pixmap(toggledIcon.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
         }
 
-        m_data->action->setIcon(icon);
-        m_data->action->setCheckable(true);
+        m_action->setIcon(icon);
+        m_action->setCheckable(true);
 
         return *this;
     }
 
     QnActionBuilder role(QAction::MenuRole role) {
-        m_data->action->setMenuRole(role);
+        m_action->setMenuRole(role);
 
         return *this;
     }
 
     QnActionBuilder autoRepeat(bool autoRepeat) {
-        m_data->action->setAutoRepeat(autoRepeat);
+        m_action->setAutoRepeat(autoRepeat);
 
         return *this;
     }
 
     QnActionBuilder text(const QString &text) {
-        m_data->action->setText(text);
-        m_data->normalText = text;
+        m_action->setText(text);
+        m_action->setNormalText(text);
 
         return *this;
     }
 
     QnActionBuilder toggledText(const QString &text) {
-        m_data->flags |= QnContextMenu::ToggledText;
-        m_data->toggledText = text;
-        m_data->action->setCheckable(true);
-
-        QObject::connect(m_data->action, SIGNAL(toggled(bool)), m_menu, SLOT(at_action_toggled()), Qt::UniqueConnection);
+        m_action->setToggledText(text);
+        m_action->setCheckable(true);
 
         showCheckBoxInMenu(false);
 
         return *this;
     }
 
-    QnActionBuilder flags(QnContextMenu::ActionFlags flags) {
-        m_data->flags |= flags;
+    QnActionBuilder flags(Qn::ActionFlags flags) {
+        m_action->setFlags(m_action->flags() | flags);
 
-        if(flags & QnContextMenu::Separator)
-            m_data->action->setSeparator(true);
+        return *this;
+    }
+
+    QnActionBuilder separator(bool isSeparator = true) {
+        m_action->setSeparator(isSeparator);
 
         return *this;
     }
 
     void showCheckBoxInMenu(bool show) {
-        m_data->action->setProperty(hideCheckBoxInMenuPropertyName, !show);
+        m_action->setProperty(hideCheckBoxInMenuPropertyName, !show);
     }
 
     void condition(QnActionCondition *condition) {
-        assert(m_data->condition == NULL);
+        assert(m_action->condition() == NULL);
 
-        condition->setParent(m_menu);
-        m_data->condition = condition;
+        condition->setParent(m_action);
+        m_action->setCondition(condition);
     }
 
 private:
-    QnContextMenu::ActionData *m_data;
-    QnContextMenu *m_menu;
+    QnAction *m_action;
+    QnActionManager *m_manager;
 };
 
 
+// -------------------------------------------------------------------------- //
+// QnActionFactory 
+// -------------------------------------------------------------------------- //
 class QnActionFactory {
 public:
-    QnActionFactory(QnContextMenu *menu, QnContextMenu::ActionData *parent): 
-        m_menu(menu)
+    QnActionFactory(QnActionManager *menu, QnAction *parent): 
+        m_manager(menu)
     {
-        m_dataStack.push_back(parent);
-        m_lastData = parent;
+        m_actionStack.push_back(parent);
+        m_lastAction = parent;
     }
 
     void enterSubMenu() {
-        m_dataStack.push_back(m_lastData);
+        m_actionStack.push_back(m_lastAction);
     }
 
     void leaveSubMenu() {
-        m_dataStack.pop_back();
+        m_actionStack.pop_back();
     }
 
     QnActionBuilder operator()(Qn::ActionId id) {
-        QnContextMenu::ActionData *data = m_menu->m_dataById.value(id);
-        if(data == NULL) {
-            data = new QnContextMenu::ActionData();
-
-            data->id = id;
-            data->action = new QAction(m_menu);
-            data->action->setIconVisibleInMenu(true);
-            setActionId(data->action, id);
-            m_menu->m_dataById[id] = data;
+        QnAction *action = m_manager->m_actionById.value(id);
+        if(action == NULL) {
+            action = new QnAction(m_manager, id, m_manager);
+            m_manager->m_actionById[id] = action;
         }
 
-        m_dataStack.back()->children.push_back(data);
-        m_lastData = data;
+        m_actionStack.back()->addChild(action);
+        m_lastAction = action;
 
-        return QnActionBuilder(m_menu, data);
+        return QnActionBuilder(m_manager, action);
     }
 
 private:
-    QnContextMenu *m_menu;
-    QnContextMenu::ActionData *m_lastData;
-    QList<QnContextMenu::ActionData *> m_dataStack;
+    QnActionManager *m_manager;
+    QnAction *m_lastAction;
+    QList<QnAction *> m_actionStack;
 };
 
 
-QnContextMenu::QnContextMenu(QObject *parent): 
-    QObject(parent)
+// -------------------------------------------------------------------------- //
+// QnActionManager 
+// -------------------------------------------------------------------------- //
+QnActionManager::QnActionManager(QObject *parent): 
+    QObject(parent),
+    m_shortcutAction(NULL),
+    m_targetProvider(NULL),
+    m_root(NULL)
 {
-    m_root = new ActionData();
-    m_dataById[Qn::NoAction] = m_root;
+    m_root = new QnAction(this, Qn::NoAction, this);
+    m_actionById[Qn::NoAction] = m_root;
 
     QnActionFactory factory(this, m_root);
 
@@ -213,19 +203,19 @@ QnContextMenu::QnContextMenu(QObject *parent):
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
 
     factory(Qn::OpenFileAction).
-        flags(Main).
+        flags(Qn::Main).
         text(tr("Open File(s)...")).
         shortcut(tr("Ctrl+O")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("folder.png")));
 
     factory(Qn::ScreenRecordingMenu).
-        flags(Main).
+        flags(Qn::Main).
         text(tr("Screen Recording"));
 
     factory.enterSubMenu(); {
         factory(Qn::ScreenRecordingAction).
-            flags(Main).
+            flags(Qn::Main).
             text(tr("Start Screen Recording")).
             toggledText(tr("Stop Screen Recording")).
             shortcut(tr("Alt+R")).
@@ -233,13 +223,13 @@ QnContextMenu::QnContextMenu(QObject *parent):
             autoRepeat(false);
 
         factory(Qn::ScreenRecordingSettingsAction).
-            flags(Main).
+            flags(Qn::Main).
             text(tr("Screen Recording Settings")).
             autoRepeat(false);
     } factory.leaveSubMenu();
 
     factory(Qn::FullscreenAction).
-        flags(Main).
+        flags(Qn::Main).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
@@ -253,7 +243,7 @@ QnContextMenu::QnContextMenu(QObject *parent):
         toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png")));
 
     factory(Qn::PreferencesAction).
-        flags(Main).
+        flags(Qn::Main).
         text(tr("Preferences")).
         shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
@@ -261,10 +251,11 @@ QnContextMenu::QnContextMenu(QObject *parent):
         icon(Skin::icon(QLatin1String("decorations/settings.png")));
 
     factory(Qn::ExitSeparator).
-        flags(Main | Separator);
+        flags(Qn::Main).
+        separator();
 
     factory(Qn::ExitAction).
-        flags(Main).
+        flags(Qn::Main).
         text(tr("Exit")).
         shortcut(tr("Alt+F4")).
         role(QAction::QuitRole).
@@ -275,37 +266,37 @@ QnContextMenu::QnContextMenu(QObject *parent):
     /* Resource actions. */
 
     factory(Qn::ShowMotionAction).
-        flags(Scene | SingleTarget | MultiTarget).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
         condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasHiddenGrid));
 
     factory(Qn::HideMotionAction).
-        flags(Scene | SingleTarget | MultiTarget).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Hide Motion Grid")).
         condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasShownGrid));
 
     // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
     factory(Qn::CameraSettingsAction).
-        flags(Scene | Tree | SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
         text(tr("Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
     factory(Qn::ServerSettingsAction).
-        flags(Scene | Tree | SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
         text(tr("Server Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::remote_server)));
 
     factory(Qn::YouTubeUploadAction).
-        flags(Scene | Tree | SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
         text(tr("Upload to YouTube...")).
-        // shortcut(tr("Ctrl+Y")).
+        shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::ARCHIVE)));
 
     factory(Qn::EditTagsAction).
-        flags(Scene | Tree | SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
         text(tr("Edit tags...")).
-        // shortcut(tr("Alt+T")).
+        shortcut(tr("Alt+T")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::media)));
 
@@ -367,51 +358,48 @@ QnContextMenu::QnContextMenu(QObject *parent):
 #endif
 }
 
-QnContextMenu::~QnContextMenu() {
-    qDeleteAll(m_dataById);
+QnActionManager::~QnActionManager() {
+    qDeleteAll(m_actionById);
 }
 
-Q_GLOBAL_STATIC(QnContextMenu, qn_contextMenu);
+Q_GLOBAL_STATIC(QnActionManager, qn_contextMenu);
 
-QnContextMenu *QnContextMenu::instance() {
+QnActionManager *QnActionManager::instance() {
     return qn_contextMenu();
 }
 
-void QnContextMenu::at_action_toggled() {
-    QAction *action = checked_cast<QAction *>(sender());
-    Qn::ActionId id = actionId(action);
-    const ActionData *data = m_dataById[id];
-
-    if(data->flags & ToggledText)
-        action->setText(action->isChecked() ? data->toggledText : data->normalText);
+void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) {
+    m_targetProvider = targetProvider;
+    m_targetProviderGuard = dynamic_cast<QObject *>(targetProvider);
+    if(!m_targetProviderGuard)
+        m_targetProviderGuard = this;
 }
 
-void QnContextMenu::at_menu_destroyed(QObject *menu) {
-    m_menus.remove(menu);
+QAction *QnActionManager::action(Qn::ActionId id) const {
+    return m_actionById.value(id, NULL);
 }
 
-QAction *QnContextMenu::action(Qn::ActionId id) const {
-    return m_dataById[id]->action;
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()));
 }
 
-QMenu *QnContextMenu::newMenu(Qn::ActionScope scope) {
-    return newMenuInternal(m_root, scope, QnResourceList());
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceList &resources) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(resources));
 }
 
-QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QnResourceList &resources) {
-    return newMenuInternal(m_root, scope, resources);
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) {
+    return newMenu(scope, QnActionMetaTypes::widgets(items));
 }
 
-QMenu *QnContextMenu::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) {
-    return newMenuInternal(m_root, scope, items);
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(widgets));
 }
 
-template<class ItemSequence>
-QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
+QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
     if(!m_menus.isEmpty())
         qnWarning("New menu was requested even though the previous one wasn't destroyed. Getting action cause will fail.");
 
-    m_lastQuery = QVariant::fromValue<ItemSequence>(items);
+    m_lastTarget = items;
 
     QMenu *result = newMenuRecursive(parent, scope, items);
     
@@ -421,72 +409,87 @@ QMenu *QnContextMenu::newMenuInternal(const ActionData *parent, Qn::ActionScope 
     return result;
 }
 
-template<class ItemSequence>
-QMenu *QnContextMenu::newMenuRecursive(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items) {
+QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
     QMenu *result = new QMenu();
 
-    foreach(const ActionData *data, parent->children) {
-        QAction *action = NULL;
+    foreach(QnAction *action, parent->children()) {
+        QAction *newAction = NULL;
 
-        if(!(data->flags & scope))
+        if(!action->satisfiesCondition(scope, items))
             continue;
-
-        if(items.size() == 0 && !(data->flags & NoTarget))
-            continue;
-
-        if(items.size() == 1 && !(data->flags & SingleTarget))
-            continue;
-
-        if(items.size() > 1 && !(data->flags & MultiTarget))
-            continue;
-
-        if(data->condition != NULL && !data->condition->check(items))
-            continue;
-
-        if(data->children.size() > 0) {
-            QMenu *menu = newMenuRecursive(data, scope, items);
+        
+        if(action->children().size() > 0) {
+            QMenu *menu = newMenuRecursive(action, scope, items);
             if(menu->isEmpty()) {
                 delete menu;
             } else {
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
-                action = new QAction(result);
-                action->setMenu(menu);
-                action->setText(data->action->text());
-                action->setIcon(data->action->icon());
+                newAction = new QAction(result);
+                newAction->setMenu(menu);
+                newAction->setText(action->text());
+                newAction->setIcon(action->icon());
             }
+        } else {
+            newAction = action;
         }
 
-        if(action == NULL)
-            action = data->action;
-
-        result->addAction(action);
+        if(newAction != NULL)
+            result->addAction(newAction);
     }
 
     return result;
 }
 
-QnResourceList QnContextMenu::cause(QObject *sender) {
-    QAction *action = qobject_cast<QAction *>(sender);
-    if(action == NULL) {
-        qnWarning("Cause cannot be determined for non-QAction senders.");
-        return QnResourceList();
-    }
-    
-    if(actionId(action) == Qn::NoAction) {
-        qnWarning("Cause can be determined only for QActions that were created inside this instance.");
-        return QnResourceList();
-    }
+QVariant QnActionManager::currentTarget(QnAction *action) const {
+    if(m_shortcutAction == action)
+        return m_lastTarget;
 
-    if(m_menus.size() != 1) {
-        qnWarning("For cause to be determined, there must exist exactly one menu created by this instance.");
-        return QnResourceList();
-    }
+    if(m_menus.size() == 1)
+        return m_lastTarget;
 
-    if(m_lastQuery.userType() == qMetaTypeId<QnResourceList>()) {
-        return m_lastQuery.value<QnResourceList>();
-    } else {
-        return QnActionCondition::resources(m_lastQuery.value<QList<QGraphicsItem *> >());
-    }
+    qnWarning("No active action, no target exists.");
+    return QVariant();
 }
 
+QnResourceList QnActionManager::currentResourcesTarget(QnAction *action) const {
+    return QnActionMetaTypes::resources(currentTarget(action));
+}
+
+QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) const {
+    return QnActionMetaTypes::widgets(currentTarget(action));
+}
+
+QVariant QnActionManager::currentTarget(QObject *sender) const {
+    QnAction *action = qobject_cast<QnAction *>(sender);
+    if(action == NULL) {
+        qnWarning("Cause cannot be determined for non-QnAction senders.");
+        return QVariant();
+    }
+
+    return currentTarget(action);
+}
+
+QnResourceList QnActionManager::currentResourcesTarget(QObject *sender) const {
+    QnAction *action = qobject_cast<QnAction *>(sender);
+    if(action == NULL) {
+        qnWarning("Cause cannot be determined for non-QnAction senders.");
+        return QnResourceList();
+    }
+
+    return currentResourcesTarget(action);
+}
+
+QnResourceWidgetList QnActionManager::currentWidgetsTarget(QObject *sender) const {
+    QnAction *action = qobject_cast<QnAction *>(sender);
+    if(action == NULL) {
+        qnWarning("Cause cannot be determined for non-QnAction senders.");
+        return QnResourceWidgetList();
+    }
+
+    return currentWidgetsTarget(action);
+}
+
+void QnActionManager::at_menu_destroyed(QObject *menu) {
+    m_menus.remove(menu);
+}
 

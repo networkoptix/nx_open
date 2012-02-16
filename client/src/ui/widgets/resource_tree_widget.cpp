@@ -16,7 +16,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
-#include "ui/context_menu/context_menu.h"
+#include "ui/actions/action_manager.h"
 #include "ui/models/resource_model.h"
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/models/resource_search_synchronizer.h"
@@ -248,12 +248,8 @@ void QnResourceTreeWidget::killSearchTimer() {
     m_filterTimerId = 0; 
 }
 
-
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
-    QnResourceList resources;
+QnResourceList QnResourceTreeWidget::selectedResources() const {
+    QnResourceList result;
 
     QItemSelectionModel *selectionModel;
     if (m_tabWidget->currentIndex() == 0) {
@@ -262,9 +258,17 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
         selectionModel = m_searchTreeView->selectionModel();
     }
     foreach (const QModelIndex &index, selectionModel->selectedRows())
-        resources.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+        result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
 
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, resources));
+    return result;
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, selectedResources()));
     if(menu->isEmpty())
         return;
 

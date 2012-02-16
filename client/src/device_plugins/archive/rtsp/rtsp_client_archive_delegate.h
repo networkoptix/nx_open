@@ -70,6 +70,8 @@ private:
     qint64 m_lastSeekTime;
     qint64 m_lastReceivedTime;
     bool m_blockReopening;
+    MediaQuality m_quality;
+    bool m_qualityFastSwitch;
 };
 
 #endif

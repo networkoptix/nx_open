@@ -19,7 +19,13 @@
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int TRY_HIGH_QUALITY_INTERVAL = 1000 * 30;
-//static qint64 MAX_QUEUE_LENGTH = 1000000ll * 1;
+static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
+static const int HIGH_QUALITY_RETRY_COUNTER = 1;
+
+
+QSet<CLCamDisplay*> CLCamDisplay::m_allCamDisplay;
+QMutex CLCamDisplay::m_qualityMutex;
+qint64 CLCamDisplay::m_lastQualitySwitchTime;
 
 static void updateActivity()
 {
@@ -104,17 +110,27 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_toLowQSpeed(1000.0),
       m_delayedFrameCnt(0),
       m_emptyPacketCounter(0),
-      m_isEOFReached(false)
+      m_isEOFReached(false),
+      m_hiQualityRetryCounter(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_display[i] = 0;
-
     m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+
+    QMutexLocker lock(&m_qualityMutex);
+    m_allCamDisplay << this;
 }
 
 CLCamDisplay::~CLCamDisplay()
 {
+    {
+        QMutexLocker lock(&m_qualityMutex);
+        m_allCamDisplay.remove(this);
+        foreach(CLCamDisplay* display, m_allCamDisplay)
+            display->resetQualityStatistics();
+    }
+
     Q_ASSERT(!m_runing);
     stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -162,14 +178,22 @@ void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
         hurryUpCheckForLocalFile(vd, speed, needToSleep, realSleepTime);
 }
 
+
+bool CLCamDisplay::canSwitchQuality()
+{
+    QMutexLocker lock(&m_qualityMutex);
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    if (currentTime - m_lastQualitySwitchTime < QUALITY_SWITCH_INTERVAL)
+        return false;
+    m_lastQualitySwitchTime = currentTime;
+    return true;
+}
 void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
         return;
     if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
         return;
-
-    //qDebug() << "realSleepTime=" << realSleepTime/1000.0;
 
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
     if (reader)
@@ -178,28 +202,41 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         {
             m_delayedFrameCnt = qMax(0, m_delayedFrameCnt);
             m_delayedFrameCnt++;
-            if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low)
+            if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low && canSwitchQuality())
             {
                 bool fastSwitch = false; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
                 reader->setQuality(MEDIA_Quality_Low, fastSwitch);
                 m_toLowQSpeed = speed;
-                m_toLowQTimer.restart();
+                //m_toLowQTimer.restart();
             }
         }
         else if (realSleepTime >= 0)
         {
             m_delayedFrameCnt = qMin(0, m_delayedFrameCnt);
             m_delayedFrameCnt--;
-            if (m_delayedFrameCnt < -10)
+            if (m_delayedFrameCnt < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
             {
                 if (qAbs(speed) < m_toLowQSpeed || m_toLowQSpeed < 0 && speed > 0)
+                {
                     reader->setQuality(MEDIA_Quality_High, true); // speed decreased, try to Hi quality again
-                else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
-                    reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
+                }
+                //else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
+                else if(qAbs(speed) < 1.0 + FPS_EPS && m_hiQualityRetryCounter < HIGH_QUALITY_RETRY_COUNTER)
+                {
+                    if (canSwitchQuality()) {
+                        reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
+                        m_hiQualityRetryCounter++;
+                    }
+                }
             }
         }
     }
+}
+
+void CLCamDisplay::resetQualityStatistics()
+{
+    m_hiQualityRetryCounter = 0;
 }
 
 void CLCamDisplay::hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)

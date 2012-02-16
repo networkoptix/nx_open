@@ -1,18 +1,5 @@
-#ifndef QN_CONTEXT_MENU_H
-#define QN_CONTEXT_MENU_H
-
-#include <QObject>
-#include <QHash>
-#include <QVariant>
-#include <core/resource/resource_fwd.h>
-
-class QAction;
-class QMenu;
-class QGraphicsItem;
-
-class QnActionFactory;
-class QnActionBuilder;
-class QnActionCondition;
+#ifndef QN_ACTIONS_H
+#define QN_ACTIONS_H
 
 namespace Qn {
 
@@ -352,14 +339,9 @@ namespace Qn {
         SceneScope          = 0x2,              /**< Scene context menu requested. */
         TreeScope           = 0x4,              /**< Tree context menu requested. */
         SliderScope         = 0x8,              /**< Slider context menu requested. */
+        ScopeMask           = 0xF
     };
 
-} // namespace Qn
-
-
-class QnContextMenu: public QObject {
-    Q_OBJECT;
-public:
     enum ActionFlag {
         NoTarget            = 0x00000010,       /**< Action can be applied when there are no targets. */
         SingleTarget        = 0x00000020,       /**< Action can be applied to a single target. */
@@ -372,73 +354,12 @@ public:
         Tree                = Qn::TreeScope,                    /**< Action can appear in tree context menu. */
         Slider              = Qn::SliderScope | SingleTarget,   /**< Action can appears in slider context menu. */
         Global              = Scene | Tree | Slider, 
-
-        ToggledText         = 0x01000000,       /**< Action has different text for toggled state. */
-        Separator           = 0x10000000,       /**< Action is actually a menu separator. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
 
-    QnContextMenu(QObject *parent = NULL);
+} // namespace Qn
 
-    virtual ~QnContextMenu();
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionFlags);
 
-    static QnContextMenu *instance();
-
-    QAction *action(Qn::ActionId id) const;
-
-    QMenu *newMenu(Qn::ActionScope scope);
-
-    QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources);
-
-    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
-
-    QnResourceList cause(QObject *sender);
-
-protected:
-    friend class QnActionFactory;
-    friend class QnActionBuilder;
-
-    struct ActionData {
-        ActionData(): id(Qn::NoAction), flags(0), action(NULL), condition(NULL) {}
-
-        Qn::ActionId id;
-        ActionFlags flags;
-        QAction *action;
-        QString normalText, toggledText;
-        QnActionCondition *condition;
-
-        QList<ActionData *> children;
-    };
-
-    template<class ItemSequence>
-    QMenu *newMenuInternal(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
-
-    template<class ItemSequence>
-    QMenu *newMenuRecursive(const ActionData *parent, Qn::ActionScope scope, const ItemSequence &items);
-
-private slots:
-    void at_action_toggled();
-    void at_menu_destroyed(QObject *menu);
-
-private:
-    /** Mapping from action id to action data. */ 
-    QHash<Qn::ActionId, ActionData *> m_dataById;
-
-    /** Root action data. Also contained in the map above. */
-    ActionData *m_root;
-
-    /** Set of all menus created by this object that are not yet destroyed. */
-    QSet<QObject *> m_menus;
-
-    /** List of items supplied to the last call to <tt>newMenu</tt>. */
-    QVariant m_lastQuery;
-};
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnContextMenu::ActionFlags);
-
-
-#define qnMenu          (QnContextMenu::instance())
-#define qnAction(id)    (QnContextMenu::instance()->action(id))
-
-#endif // QN_CONTEXT_MENU_H
+#endif // QN_ACTIONS_H

@@ -18,6 +18,7 @@
 #include <QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
+#include <utils/common/checked_cast.h>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
@@ -30,10 +31,12 @@
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/widget_opacity_animator.h>
+#include <ui/animation/accessor.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
@@ -55,13 +58,12 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
+#include <ui/graphics/instruments/grid_adjustment_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
-#include "ui/dialogs/camerasettingsdialog.h"
-
-#include <ui/context_menu/context_menu.h>
+#include <ui/actions/action_manager.h>
 
 #include <file_processor.h>
 
@@ -72,9 +74,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 
-#include "ui/device_settings/camera_schedule_widget.h"
-#include "ui/device_settings/camera_motionmask_widget.h"
-#include "ui/style/skin.h"
 
 #define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -166,6 +165,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
+    GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
+
+    gridAdjustmentInstrument->setSpeed(QSizeF(display->workbench()->mapper()->spacing() / 90.0));
 
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());
@@ -188,6 +190,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Scene instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
+    m_manager->installInstrument(gridAdjustmentInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, wheelEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, wheelEventTypes, this));
 
@@ -404,10 +407,9 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
-    foreach(QGraphicsItem *item, items) {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
+void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
+    foreach(QnResourceWidget *widget, widgets) {
+        if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
         widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
@@ -958,6 +960,9 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         m_resizingInstrument->setEffective(effective);
         m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
         m_dragInstrument->setEffective(effective);
+
+        if(widget == NULL) /* Un-raise on un-zoom. */
+            m_display->workbench()->setItem(QnWorkbench::RAISED, NULL);
         break;
     }
     default:
@@ -980,11 +985,11 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(display()->scene()->selectedItems(), false);
+    displayMotionGrid(qnMenu->currentWidgetsTarget(sender()), false);
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
-    displayMotionGrid(display()->scene()->selectedItems(), true);
+    displayMotionGrid(qnMenu->currentWidgetsTarget(sender()), true);
 }
 
 void QnWorkbenchController::at_recordingAction_triggered(bool checked) {

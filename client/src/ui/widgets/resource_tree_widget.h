@@ -28,6 +28,8 @@ public:
 
     void setWorkbench(QnWorkbench *workbench);
 
+    QnResourceList selectedResources() const;
+
 signals:
     void activated(const QnResourcePtr &resource);
     void newTabRequested();

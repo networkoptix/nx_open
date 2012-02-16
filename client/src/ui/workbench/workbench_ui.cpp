@@ -40,7 +40,9 @@
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/context_menu/context_menu.h>
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action.h>
+#include <ui/actions/action_meta_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/style/skin.h>
@@ -394,6 +396,42 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 QnWorkbenchUi::~QnWorkbenchUi() {
     return;
+}
+
+QVariant QnWorkbenchUi::target(QnAction *action) {
+    /* Determine current scope. */
+    Qn::ActionScope scope = Qn::MainScope;
+
+    QGraphicsItem *focusItem = display()->scene()->focusItem();
+    if(focusItem == m_treeItem) {
+        scope = Qn::TreeScope;
+    } else if(focusItem == m_sliderItem) {
+        scope = Qn::SliderScope;
+    } else if(!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)) {
+        scope = Qn::SceneScope;
+    }
+
+    /* Compare to action's scope. */
+    if(!(action->scope() & scope))
+        return QVariant();
+    
+    /* Get items. */
+    switch(scope) {
+    case Qn::TreeScope:
+        return QVariant::fromValue(m_treeWidget->selectedResources());
+    case Qn::SliderScope: {
+        QnResourceList result;
+        CLVideoCamera *camera = m_sliderItem->videoCamera();
+        if(camera != NULL)
+            result.push_back(camera->resource());
+        
+        return QVariant::fromValue(result);
+    }
+    case Qn::SceneScope:
+        return QVariant::fromValue(QnActionMetaTypes::widgets(display()->scene()->selectedItems()));
+    default:
+        return QVariant();
+    }
 }
 
 QnWorkbenchDisplay *QnWorkbenchUi::display() const {
@@ -777,11 +815,9 @@ void QnWorkbenchUi::at_mainMenuAction_triggered() {
     if(!m_mainMenuButton->isVisible())
         return;
 
-    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
     /* On multi-monitor setups where monitor sizes differ,
      * these coordinates can be negative, so we shouldn't adjust them. */
-    //pos.rx() = qMax(pos.x(), 0);
-    //pos.ry() = qMax(pos.y(), 0);
+    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
 
     QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
     menu->move(pos);

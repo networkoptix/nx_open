@@ -3,14 +3,13 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
-
-class QGraphicsItem;
+#include "action_fwd.h"
 
 class QnResourceCriterion;
 
 class QnActionCondition: public QObject {
 public:
-    QnActionCondition(QObject *parent = NULL): QObject(parent) {}
+    QnActionCondition(QObject *parent = NULL);
 
     virtual bool check(const QnResourceList &resources) { 
         Q_UNUSED(resources);
@@ -18,15 +17,13 @@ public:
         return false; 
     };
 
-    virtual bool check(const QList<QGraphicsItem *> &items) { 
-        Q_UNUSED(items);
+    virtual bool check(const QnResourceWidgetList &widgets) { 
+        Q_UNUSED(widgets);
     
         return false;
     };
 
-    static QnResourcePtr resource(QGraphicsItem *item);
-
-    static QnResourceList resources(const QList<QGraphicsItem *> &items);
+    virtual bool check(const QVariant &items);
 };
 
 
@@ -45,7 +42,7 @@ public:
         m_condition(condition)
     {}
 
-    virtual bool check(const QList<QGraphicsItem *> &items) override;
+    virtual bool check(const QnResourceWidgetList &widgets) override;
 
 private:
     Condition m_condition;
@@ -65,7 +62,7 @@ public:
 
     virtual bool check(const QnResourceList &resources) override;
 
-    virtual bool check(const QList<QGraphicsItem *> &items) override;
+    virtual bool check(const QnResourceWidgetList &widgets) override;
 
 protected:
     template<class Item, class ItemSequence>
@@ -73,7 +70,7 @@ protected:
 
     bool checkOne(const QnResourcePtr &resource);
 
-    bool checkOne(QGraphicsItem *item);
+    bool checkOne(QnResourceWidget *widget);
 
 private:
     MatchMode m_matchMode;

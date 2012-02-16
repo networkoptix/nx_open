@@ -95,6 +95,8 @@ private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
+    bool canSwitchQuality();
+    void resetQualityStatistics();
 
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -164,9 +166,15 @@ private:
     bool m_bofReceived;
     qint64 m_nextReverseTime;
     float m_toLowQSpeed; // speed then switching to low quality for camera
-    QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
+    //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
     bool m_isEOFReached;
+    
+    int m_hiQualityRetryCounter;
+
+    static QSet<CLCamDisplay*> m_allCamDisplay;
+    static QMutex m_qualityMutex;
+    static qint64 m_lastQualitySwitchTime;
 };
 
 #endif //clcam_display_h_1211

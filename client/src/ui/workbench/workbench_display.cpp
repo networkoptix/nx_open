@@ -108,11 +108,13 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_scene(NULL),
     m_view(NULL),
     m_viewportAnimator(NULL),
+    m_frameOpacityAnimator(NULL),
     m_curtainAnimator(NULL),
     m_mode(QnWorkbench::VIEWING),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
-	m_renderWatcher(NULL)
+	m_renderWatcher(NULL),
+    m_frameOpacity(1.0)
 {
     std::memset(m_itemByRole, 0, sizeof(m_itemByRole));
 
@@ -169,6 +171,13 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SIGNAL(viewportUngrabbed()));
     connect(m_viewportAnimator,             SIGNAL(finished()),                                         m_boundingInstrument,   SLOT(recursiveEnable()));
     connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SLOT(at_viewportAnimator_finished()));
+
+    /* Create frame opacity animator. */
+    m_frameOpacityAnimator = new VariantAnimator(this);
+    m_frameOpacityAnimator->setTimer(m_animationInstrument->animationTimer());
+    m_frameOpacityAnimator->setAccessor(new PropertyAccessor("widgetsFrameOpacity"));
+    m_frameOpacityAnimator->setTargetObject(this);
+    m_frameOpacityAnimator->setTimeLimit(500);
 
     /* Set up defaults. */
     initWorkbench(workbench);
@@ -416,9 +425,13 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
     }
 
     /* Moving items back and forth between layers should preserve their relative
-     * z order. Hence the fmod.*/
+     * z order. Hence the fmod. */
     item->setData(ITEM_LAYER, static_cast<int>(layer));
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
+
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+    if(widget)
+        widget->shadow()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
 void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Layer layer) {
@@ -457,6 +470,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbench::ItemRole role) const {
     return widget(m_itemByRole[role]);
 }
 
+QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
+    return m_widgetByRenderer.values();
+}
+
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     QnResourceWidget *widget = this->widget(item);
     if(widget == NULL)
@@ -478,7 +495,7 @@ CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
     if(camera == NULL)
         return NULL;
 
-    return camera->getCamCamDisplay();
+    return camera->getCamDisplay();
 }
 
 
@@ -553,6 +570,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     QnResourceWidget *widget = new QnResourceWidget(item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
+    widget->setFrameOpacity(m_frameOpacity);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -670,6 +688,20 @@ void QnWorkbenchDisplay::setMarginFlags(Qn::MarginFlags flags) {
     synchronizeSceneBoundsExtension();
 }
 
+qreal QnWorkbenchDisplay::widgetsFrameOpacity() const {
+    return m_frameOpacity;
+}
+
+void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity) {
+    if(qFuzzyCompare(m_frameOpacity, opacity))
+        return;
+
+    m_frameOpacity = opacity;
+    
+    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+        widget->setFrameOpacity(opacity);
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: calculators
@@ -680,6 +712,17 @@ qreal QnWorkbenchDisplay::layerFrontZValue(Layer layer) const {
 
 qreal QnWorkbenchDisplay::layerZValue(Layer layer) const {
     return layer * layerZSize;
+}
+
+QnWorkbenchDisplay::Layer QnWorkbenchDisplay::shadowLayer(Layer itemLayer) const {
+    switch(itemLayer) {
+    case PINNED_RAISED_LAYER:
+        return PINNED_LAYER;
+    case UNPINNED_RAISED_LAYER:
+        return UNPINNED_LAYER;
+    default:
+        return itemLayer;
+    }
 }
 
 QnWorkbenchDisplay::Layer QnWorkbenchDisplay::synchronizedLayer(QnWorkbenchItem *item) const {
@@ -1114,18 +1157,19 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
     /* Update media quality. */
     if(role == QnWorkbench::ZOOMED) 
     {
-
         QnResourceWidget *oldWidget = this->widget(oldItem);
         if(oldWidget) 
         {
-            if (dynamic_cast<QnAbstractArchiveReader*>(oldWidget->display()->archiveReader()))
-            //oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
+            if (oldWidget->display()->archiveReader()) 
+            {
+                //oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
             	oldWidget->display()->archiveReader()->enableQualityChange();
+            }
         }
         QnResourceWidget *newWidget = this->widget(item);
         if(newWidget) 
         {
-            if (dynamic_cast<QnAbstractArchiveReader*>(newWidget->display()->archiveReader()))
+            if (newWidget->display()->archiveReader())
 			{
             	newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
             	newWidget->display()->archiveReader()->disableQualityChange();
@@ -1219,13 +1263,26 @@ void QnWorkbenchDisplay::at_view_destroyed() {
 
 void QnWorkbenchDisplay::at_mapper_originChanged() {
     synchronizeAllGeometries(true);
+
+    synchronizeSceneBounds();
 }
 
 void QnWorkbenchDisplay::at_mapper_cellSizeChanged() {
     synchronizeAllGeometries(true);
+
+    synchronizeSceneBounds();
 }
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged() {
     synchronizeAllGeometries(true);
+
+    synchronizeSceneBounds();
+
+    QSizeF spacing = workbench()->mapper()->spacing();
+    if(qFuzzyIsNull(spacing.width()) || qFuzzyIsNull(spacing.height())) {
+        m_frameOpacityAnimator->animateTo(0.0);
+    } else {
+        m_frameOpacityAnimator->animateTo(1.0);
+    }
 }
 

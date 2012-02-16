@@ -906,12 +906,24 @@ void QnArchiveStreamReader::enableQualityChange()
 }
 
 
+void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
+{
+    QMutexLocker lock(&m_jumpMtx);
+    m_quality = quality;
+    m_qualityFastSwitch = true;
+}
+
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
 {
     if (m_canChangeQuality && (m_quality != quality || fastSwitch > m_qualityFastSwitch)) 
     {
+        bool useMutex = !m_externalLocked;
+        if (useMutex)
+            m_jumpMtx.lock();
         m_quality = quality;
         m_qualityFastSwitch = fastSwitch;
+        if (useMutex)
+            m_jumpMtx.unlock();
     }
 }
 
@@ -930,4 +942,11 @@ void QnArchiveStreamReader::unlock()
 {
     m_externalLocked = false;
     m_jumpMtx.unlock();
+}
+
+
+void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
+{
+    m_delegate = contextDelegate;
+    connect(m_delegate, SIGNAL(qualityChanged(MediaQuality)), this, SLOT(onDelegateChangeQuality(MediaQuality)), Qt::DirectConnection);
 }

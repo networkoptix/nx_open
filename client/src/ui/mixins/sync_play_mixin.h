@@ -5,6 +5,7 @@
 #include <QWeakPointer>
 #include "recording/time_period.h"
 
+class QnCounter;
 class QnWorkbenchDisplay;
 class QnResourceWidget;
 class QnArchiveSyncPlayWrapper;
@@ -23,7 +24,9 @@ protected slots:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
     //void at_playback_mask_changed(const QnTimePeriodList& playbackMask);
+
 private:
+    QnCounter *m_counter;
     QnArchiveSyncPlayWrapper *m_syncPlay;
     QWeakPointer<QnWorkbenchDisplay> m_display;
 };

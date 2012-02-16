@@ -38,10 +38,10 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
             m_camera = new CLVideoCamera(m_mediaResource, false, m_mediaProvider);
             
             QnCounter *counter = new QnCounter(2);
-            connect(m_camera->getCamCamDisplay(),   SIGNAL(finished()),         counter,        SLOT(increment()));
-            connect(m_mediaProvider,                SIGNAL(finished()),         counter,        SLOT(increment()));
-            connect(counter,                        SIGNAL(targetReached()),    counter,        SLOT(deleteLater()));
-            connect(counter,                        SIGNAL(targetReached()),    m_camera,       SLOT(deleteLater()));
+            connect(m_camera->getCamDisplay(),  SIGNAL(finished()),     counter,        SLOT(decrement()));
+            connect(m_mediaProvider,            SIGNAL(finished()),     counter,        SLOT(decrement()));
+            connect(counter,                    SIGNAL(reachedZero()),  counter,        SLOT(deleteLater()));
+            connect(counter,                    SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
         } else {
             m_camera = NULL;
 
@@ -71,7 +71,7 @@ CLCamDisplay *QnResourceDisplay::camDisplay() const {
     if(m_camera == NULL)
         return NULL;
 
-    return m_camera->getCamCamDisplay();
+    return m_camera->getCamDisplay();
 }
 
 void QnResourceDisplay::beforeDisconnectFromResource() {
@@ -86,7 +86,7 @@ void QnResourceDisplay::disconnectFromResource() {
         return; 
 
     if(m_mediaProvider != NULL)
-        m_mediaProvider->removeDataProcessor(m_camera->getCamCamDisplay());
+        m_mediaProvider->removeDataProcessor(m_camera->getCamDisplay());
 
     cleanUp(m_dataProvider);
     if(m_camera != NULL)
@@ -149,7 +149,7 @@ void QnResourceDisplay::play() {
     m_archiveReader->resumeMedia();
 
     //if (m_graphicsWidget->isSelected() || !m_playing)
-    //    m_camera->getCamCamDisplay()->playAudio(m_playing);
+    //    m_camera->getCamDisplay()->playAudio(m_playing);
 }
 
 void QnResourceDisplay::pause() {
@@ -160,7 +160,7 @@ void QnResourceDisplay::pause() {
     m_archiveReader->setSingleShotMode(true);
     m_archiveReader->pauseDataProcessors();
 
-    //m_camera->getCamCamDisplay()->pauseAudio();
+    //m_camera->getCamDisplay()->pauseAudio();
 }
 
 bool QnResourceDisplay::isPaused() {
@@ -180,10 +180,10 @@ void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
 
     int channelCount = videoLayout()->numberOfChannels();
     for(int i = 0; i < channelCount; i++)
-        m_camera->getCamCamDisplay()->addVideoChannel(i, renderer, true);
+        m_camera->getCamDisplay()->addVideoChannel(i, renderer, true);
 
     m_guards.push_back(new detail::QnRendererGuard(renderer));
-    connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_guards.back(), SLOT(deleteLater()));
+    connect(m_camera->getCamDisplay(), SIGNAL(finished()), m_guards.back(), SLOT(deleteLater()));
 }
 
 void QnResourceDisplay::afterUpdate()
