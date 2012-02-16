@@ -66,7 +66,6 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
     mFramesLost = 0;
-    getResource()->init();
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()

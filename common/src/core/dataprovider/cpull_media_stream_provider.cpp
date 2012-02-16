@@ -166,3 +166,9 @@ void QnClientPullMediaStreamProvider::run()
 
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }
+
+void QnClientPullMediaStreamProvider::beforeRun()
+{
+    QnAbstractMediaStreamDataProvider::beforeRun();
+    getResource()->init();
+}

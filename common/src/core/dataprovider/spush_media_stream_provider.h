@@ -25,6 +25,7 @@ protected:
 
 private:
 	void run(); // in a loop: takes data from device and puts into queue
+    virtual void beforeRun() override;
 };
 
 #endif //server_push_stream_reader_h2055
