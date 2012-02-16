@@ -216,7 +216,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         m_lastPacketFlags = result->flags;
 
 
-    if (result->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    if (result && result->flags & QnAbstractMediaData::MediaFlags_LIVE)
     {
         // Media server can change quality for LIVE stream (for archive quality controlled by client only)
         // So, if server is changed quality, update current quality variables
@@ -228,6 +228,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
             m_rtspSession.setAdditionAttribute("x-media-quality", isLowPacket ? "low" : "high");
             m_qualityFastSwitch = true; // We already have got new quality. So, it is "fast" switch
             m_quality = isLowPacket ? MEDIA_Quality_Low : MEDIA_Quality_High;
+            emit qualityChanged(m_quality);
         }
 
     }
