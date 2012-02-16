@@ -74,7 +74,6 @@ namespace {
             storage->setUrl(i->url().c_str());
 
             storage->setSpaceLimit(i->spaceLimit());
-            storage->setMaxStoreTime(i->time());
 
             storages.append(storage);
         }
@@ -515,8 +514,7 @@ void QnApiXmlSerializer::serializeServer(const QnVideoServerResourcePtr& serverP
                                                  storagePtr->getUrl().toStdString(),
                                                  storagePtr->getTypeId().toString().toStdString(),
                                                  storagePtr->getParentId().toString().toStdString(),
-                                                 storagePtr->getSpaceLimit(),
-                                                 storagePtr->getMaxStoreTime());
+                                                 storagePtr->getSpaceLimit());
 
             storages.storage().push_back(storage);
         }
