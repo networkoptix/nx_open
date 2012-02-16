@@ -156,6 +156,17 @@ QString Socket::getPeerAddress() const
     return inet_ntoa(addr.sin_addr);
 }
 
+quint32 Socket::getPeerAddressUint() const
+{
+    sockaddr_in addr;
+    unsigned int addr_len = sizeof(addr);
+
+    if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
+        return 0;
+
+    return ntohl(addr.sin_addr.s_addr);
+}
+
 unsigned short Socket::getLocalPort() const
 {
   sockaddr_in addr;

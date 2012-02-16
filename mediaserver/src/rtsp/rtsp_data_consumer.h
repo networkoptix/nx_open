@@ -1,6 +1,7 @@
 #ifndef __RTSP_DATA_CONSUMER_H__
 #define __RTSP_DATA_CONSUMER_H__
 
+#include <QHostAddress>
 #include <QTime>
 #include "core/dataconsumer/dataconsumer.h"
 #include "utils/network/rtp_stream_parser.h"
@@ -46,10 +47,14 @@ public:
     void setLiveMarker(int marker);
     void setLiveQuality(MediaQuality liveQuality);
     virtual void clearUnprocessedData() override;
+
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
+    bool canSwitchToHiQuality();
+    bool canSwitchToLowQuality();
+    void resetQualityStatistics();
 private:
     QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -75,6 +80,11 @@ private:
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
+    int m_hiQualityRetryCounter;
+
+    static QHash<QHostAddress, qint64> m_lastSwitchTime;
+    static QSet<QnRtspDataConsumer*> m_allConsumers;
+    static QMutex m_allConsumersMutex;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

@@ -67,6 +67,7 @@ public:
    *   @exception SocketException thrown if fetch fails
    */
   QString getPeerAddress() const;
+  quint32 getPeerAddressUint() const;
 
   /**
    *   Get the local port
