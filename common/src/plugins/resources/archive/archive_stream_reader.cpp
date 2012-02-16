@@ -50,7 +50,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_oldQuality(MEDIA_Quality_High),
     m_externalLocked(false),
     m_canChangeQuality(true),
-    m_isStillImage(false)
+    m_isStillImage(false),
+    m_bofReached(false)
 {
     m_isStillImage = dev->checkFlags(QnResource::still_image);
     // Should init packets here as some times destroy (av_free_packet) could be called before init
@@ -195,9 +196,9 @@ bool QnArchiveStreamReader::init()
     return true;
 }
 
- qint64 QnArchiveStreamReader::determineDisplayTime()
+ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
  {
-     qint64 rez = 0;
+     qint64 rez = AV_NOPTS_VALUE;
      QMutexLocker mutex(&m_mutex);
      for (int i = 0; i < m_dataprocessors.size(); ++i)
      {
@@ -205,11 +206,20 @@ bool QnArchiveStreamReader::init()
          if (dp->isRealTimeSource())
              return DATETIME_NOW;
          QnlTimeSource* timeSource = dynamic_cast<QnlTimeSource*>(dp);
-         if (timeSource)
-            rez = qMax(rez, timeSource->getExternalTime());
+         if (timeSource) {
+             if (rez != AV_NOPTS_VALUE)
+                rez = qMax(rez, timeSource->getExternalTime());
+             else
+                 rez = timeSource->getExternalTime();
+         }
      }
-	 if(rez == AV_NOPTS_VALUE) {
-		rez = m_currentTime;
+	 if(rez == AV_NOPTS_VALUE) 
+     {
+		//rez = m_currentTime;
+         if (reverseMode)
+             return m_delegate->endTime();
+         else
+             return m_delegate->startTime();
 	 }
      return rez;
  }
@@ -299,7 +309,7 @@ begin_label:
         bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch);
         if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
-            qint64 displayTime = determineDisplayTime();
+            qint64 displayTime = determineDisplayTime(reverseMode);
             beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
                 intChanneljumpTo(displayTime, 0);
@@ -335,7 +345,8 @@ begin_label:
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
-        qint64 displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime();
+        m_bofReached = false;
+        qint64 displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime(reverseMode);
 
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
@@ -356,12 +367,14 @@ begin_label:
     }
     m_dataMarker = m_newDataMarker;
 
+    /*
     if (reverseMode && m_topIFrameTime > 0 && m_topIFrameTime <= m_delegate->startTime() && !m_cycleMode)
     {
         // BOF reached in reverse mode
         m_eof = true;
         return createEmptyPacket(reverseMode);
     }
+    */
 
     if (m_delegate->startTime() == AV_NOPTS_VALUE)
         return createEmptyPacket(reverseMode); // no data at archive
@@ -467,33 +480,38 @@ begin_label:
                 }
                 if (m_currentTime >= m_topIFrameTime)
                 {
-                    // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
-                    // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
-                    qint64 ct = m_currentTime != DATETIME_NOW ? m_currentTime-BACKWARD_SEEK_STEP : m_currentTime;
-                    qint64 seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : ct);
-                    if (seekTime != DATETIME_NOW)
-                        seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
+                    qint64 seekTime;
+                    if (m_bofReached)
+                    {
+                        if (m_cycleMode)
+                        {
+                            if (m_delegate->endTime() != DATETIME_NOW)
+                                seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
+                            else
+                                seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
+                        }
+                        else {
+                            m_eof = true;
+                            return createEmptyPacket(reverseMode);
+                        }
+                    }
                     else
-                        seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
+                    {
+                        // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
+                        // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
+                        qint64 ct = m_currentTime != DATETIME_NOW ? m_currentTime-BACKWARD_SEEK_STEP : m_currentTime;
+                        seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : ct);
+                        if (seekTime != DATETIME_NOW)
+                            seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
+                        else
+                            seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
+                    }
+
                     if (m_currentTime != seekTime) {
                         m_currentData.clear();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
-                        if (m_lastGopSeekTime == m_delegate->startTime())
-                        {
-                            if (m_cycleMode)
-                            {
-                                if (m_delegate->endTime() != DATETIME_NOW)
-                                    seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
-                                else
-                                    seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
-                                tmpVal = m_delegate->endTime();
-                            }
-                            else {
-                                m_eof = true;
-                                return createEmptyPacket(reverseMode);
-                            }
-                        }
                         intChanneljumpTo(seekTime, 0);
+                        m_bofReached = seekTime == m_delegate->startTime();
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
                         //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
@@ -634,6 +652,7 @@ void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
     m_IFrameAfterJumpFound = false;
     m_eof = false;
     m_afterBOFCounter = -1;
+    m_bofReached = false;
 }
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
@@ -843,7 +862,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     if (maskedDelegate) {
         maskedDelegate->setSendMotion(value);
         if (!mFirstTime && !m_delegate->isRealTimeSource())
-            jumpToPreviousFrame(determineDisplayTime());
+            jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
         return true;
     }
     else {
@@ -862,7 +881,7 @@ bool QnArchiveStreamReader::setMotionRegion(const QRegion& region)
     if (maskedDelegate) {
         maskedDelegate->setMotionRegion(region);
         if (!mFirstTime && !m_delegate->isRealTimeSource())
-            jumpToPreviousFrame(determineDisplayTime());
+            jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
         return true;
     }
     else {
@@ -887,12 +906,24 @@ void QnArchiveStreamReader::enableQualityChange()
 }
 
 
+void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
+{
+    QMutexLocker lock(&m_jumpMtx);
+    m_quality = quality;
+    m_qualityFastSwitch = true;
+}
+
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
 {
     if (m_canChangeQuality && (m_quality != quality || fastSwitch > m_qualityFastSwitch)) 
     {
+        bool useMutex = !m_externalLocked;
+        if (useMutex)
+            m_jumpMtx.lock();
         m_quality = quality;
         m_qualityFastSwitch = fastSwitch;
+        if (useMutex)
+            m_jumpMtx.unlock();
     }
 }
 
@@ -911,4 +942,11 @@ void QnArchiveStreamReader::unlock()
 {
     m_externalLocked = false;
     m_jumpMtx.unlock();
+}
+
+
+void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
+{
+    m_delegate = contextDelegate;
+    connect(m_delegate, SIGNAL(qualityChanged(MediaQuality)), this, SLOT(onDelegateChangeQuality(MediaQuality)), Qt::DirectConnection);
 }

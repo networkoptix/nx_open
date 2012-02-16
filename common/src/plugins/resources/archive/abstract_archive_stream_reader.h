@@ -38,7 +38,6 @@ public:
     QnAbstractArchiveReader(QnResourcePtr dev);
     virtual ~QnAbstractArchiveReader();
 
-    void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate);
     void setNavDelegate(QnAbstractNavigator* navDelegate);
 
     QnAbstractArchiveDelegate* getArchiveDelegate() const;
@@ -84,6 +83,8 @@ public:
     virtual bool getQuality() const = 0;
     virtual void disableQualityChange() = 0;
     virtual void enableQualityChange() = 0;
+
+    virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) = 0;
 
     virtual void run() override;
 Q_SIGNALS:

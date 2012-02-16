@@ -38,6 +38,7 @@ public:
     void addRecord(const Chunk& chunk);
     void updateDuration(int durationMs);
     bool deleteFirstRecord();
+    void clear();
     void deleteRecordsBefore(int idx);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     QString fullFileName(const Chunk& chunk) const;

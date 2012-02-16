@@ -34,11 +34,6 @@ bool QnAbstractArchiveReader::setAudioChannel(unsigned int /*num*/)
     return false;
 }
 
-void QnAbstractArchiveReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
-{
-    m_delegate = contextDelegate;
-}
-
 void QnAbstractArchiveReader::setNavDelegate(QnAbstractNavigator* navDelegate)
 {
     m_navDelegate = navDelegate;

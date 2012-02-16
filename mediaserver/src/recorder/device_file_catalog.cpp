@@ -243,7 +243,7 @@ void DeviceFileCatalog::deserializeTitleFile()
         }
         else if (fileExists(chunk)) 
         {
-            if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2)
+            if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
             {
                 const QString fileName = fullFileName(chunk);
                 qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
@@ -318,6 +318,12 @@ void DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
     for (int i = 0; i < count; ++i)
+        deleteFirstRecord();
+}
+
+void DeviceFileCatalog::clear()
+{
+    while(m_firstDeleteCount < m_chunks.size())
         deleteFirstRecord();
 }
 

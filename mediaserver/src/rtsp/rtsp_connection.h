@@ -1,6 +1,7 @@
 #ifndef __RTSP_CONNECTION_H_
 #define __RTSP_CONNECTION_H_
 
+#include <QHostAddress>
 #include <QMutex>
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
@@ -24,6 +25,7 @@ public:
     bool isSecondaryLiveDP(QnAbstractStreamDataProvider* provider) const;
     bool isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const;
     bool isSecondaryLiveDPSupported() const;
+    QHostAddress getPeerAddress() const;
 protected:
     virtual void run();
 private:

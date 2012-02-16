@@ -62,6 +62,8 @@ public:
     /* For atomic changing several params: quality and position for example */
     void lock();
     void unlock();
+
+    virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) override;
 protected:
     virtual bool init();
 
@@ -93,7 +95,8 @@ protected:
 
     volatile bool m_wakeup;
     qint64 m_tmpSkipFramesToTime;
-
+private slots:
+    void onDelegateChangeQuality(MediaQuality quality);
 private:
     int m_selectedAudioChannel;
     bool m_eof;
@@ -113,6 +116,7 @@ private:
     int m_newDataMarker;
 
 private:
+    bool m_bofReached;
     bool m_canChangeQuality;
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
@@ -136,7 +140,7 @@ private:
     bool m_oldQualityFastSwitch;
     bool m_isStillImage;
 
-    qint64 determineDisplayTime();
+    qint64 determineDisplayTime(bool reverseMode);
     void intChanneljumpTo(qint64 mksec, int channel);
     bool getNextVideoPacket();
     void addAudioChannel(QnCompressedAudioDataPtr audio);
