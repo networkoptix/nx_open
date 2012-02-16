@@ -17,8 +17,8 @@ public:
         return false; 
     };
 
-    virtual bool check(const QList<QGraphicsItem *> &items) { 
-        Q_UNUSED(items);
+    virtual bool check(const QnResourceWidgetList &widgets) { 
+        Q_UNUSED(widgets);
     
         return false;
     };
@@ -42,7 +42,7 @@ public:
         m_condition(condition)
     {}
 
-    virtual bool check(const QList<QGraphicsItem *> &items) override;
+    virtual bool check(const QnResourceWidgetList &widgets) override;
 
 private:
     Condition m_condition;
@@ -62,7 +62,7 @@ public:
 
     virtual bool check(const QnResourceList &resources) override;
 
-    virtual bool check(const QList<QGraphicsItem *> &items) override;
+    virtual bool check(const QnResourceWidgetList &widgets) override;
 
 protected:
     template<class Item, class ItemSequence>
@@ -70,7 +70,7 @@ protected:
 
     bool checkOne(const QnResourcePtr &resource);
 
-    bool checkOne(QGraphicsItem *item);
+    bool checkOne(QnResourceWidget *widget);
 
 private:
     MatchMode m_matchMode;

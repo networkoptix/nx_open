@@ -3,13 +3,12 @@
 
 #include <QList>
 
-class QGraphicsItem;
-
 class QnAction;
 class QnActionCondition;
 class QnActionManager;
 class QnActionTargetProvider;
+class QnResourceWidget;
 
-typedef QList<QGraphicsItem *> QGraphicsItemList;
+typedef QList<QnResourceWidget *> QnResourceWidgetList;
 
 #endif // QN_ACTION_FWD_H

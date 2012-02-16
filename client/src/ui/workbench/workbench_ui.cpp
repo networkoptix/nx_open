@@ -428,7 +428,7 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
         return QVariant::fromValue(result);
     }
     case Qn::SceneScope:
-        return QVariant::fromValue(display()->scene()->selectedItems());
+        return QVariant::fromValue(QnActionMetaTypes::widgets(display()->scene()->selectedItems()));
     default:
         return QVariant();
     }

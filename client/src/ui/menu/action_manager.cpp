@@ -387,8 +387,12 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceList &res
     return newMenuInternal(m_root, scope, QVariant::fromValue(resources));
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QGraphicsItemList &items) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(items));
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) {
+    return newMenu(scope, QnActionMetaTypes::widgets(items));
+}
+
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(widgets));
 }
 
 QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
@@ -451,8 +455,8 @@ QnResourceList QnActionManager::currentResourcesTarget(QnAction *action) const {
     return QnActionMetaTypes::resources(currentTarget(action));
 }
 
-QList<QGraphicsItem *> QnActionManager::currentGraphicsItemsTarget(QnAction *action) const {
-    return QnActionMetaTypes::graphicsItems(currentTarget(action));
+QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) const {
+    return QnActionMetaTypes::widgets(currentTarget(action));
 }
 
 QVariant QnActionManager::currentTarget(QObject *sender) const {
@@ -475,14 +479,14 @@ QnResourceList QnActionManager::currentResourcesTarget(QObject *sender) const {
     return currentResourcesTarget(action);
 }
 
-QList<QGraphicsItem *> QnActionManager::currentGraphicsItemsTarget(QObject *sender) const {
+QnResourceWidgetList QnActionManager::currentWidgetsTarget(QObject *sender) const {
     QnAction *action = qobject_cast<QnAction *>(sender);
     if(action == NULL) {
         qnWarning("Cause cannot be determined for non-QnAction senders.");
-        return QList<QGraphicsItem *>();
+        return QnResourceWidgetList();
     }
 
-    return currentGraphicsItemsTarget(action);
+    return currentWidgetsTarget(action);
 }
 
 void QnActionManager::at_menu_destroyed(QObject *menu) {

@@ -400,12 +400,8 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-void QnWorkbenchController::displayMotionGrid(const QList<QGraphicsItem *> &items, bool display) {
-    foreach(QGraphicsItem *item, items) {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
-            continue;
-
+void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
+    foreach(QnResourceWidget *widget, widgets) {
         if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
@@ -982,11 +978,11 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(qnMenu->currentGraphicsItemsTarget(sender()), false);
+    displayMotionGrid(qnMenu->currentWidgetsTarget(sender()), false);
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
-    displayMotionGrid(qnMenu->currentGraphicsItemsTarget(sender()), true);
+    displayMotionGrid(qnMenu->currentWidgetsTarget(sender()), true);
 }
 
 void QnWorkbenchController::at_recordingAction_triggered(bool checked) {

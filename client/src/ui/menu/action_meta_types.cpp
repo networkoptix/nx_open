@@ -3,11 +3,11 @@
 #include <ui/graphics/items/resource_widget.h>
 
 namespace {
-    int qn_graphicsItemListMetaType = 0;
+    int qn_widgetListMetaType = 0;
     int qn_resourceListMetaType = 0;
 
     Q_GLOBAL_STATIC_WITH_INITIALIZER(bool, qn_initializeActionMetaTypes, {
-        qn_graphicsItemListMetaType = qMetaTypeId<QGraphicsItemList>();
+        qn_widgetListMetaType = qMetaTypeId<QnResourceWidgetList>();
         qn_resourceListMetaType = qMetaTypeId<QnResourceList>();
     });
 
@@ -17,8 +17,8 @@ int QnActionMetaTypes::resourceList() {
     return qn_resourceListMetaType;
 }
 
-int QnActionMetaTypes::graphicsItemList() {
-    return qn_graphicsItemListMetaType;
+int QnActionMetaTypes::widgetList() {
+    return qn_widgetListMetaType;
 }
 
 void QnActionMetaTypes::initialize() {
@@ -28,29 +28,25 @@ void QnActionMetaTypes::initialize() {
 int QnActionMetaTypes::size(const QVariant &items) {
     if(items.userType() == resourceList()) {
         return items.value<QnResourceList>().size();
-    } else if(items.userType() == graphicsItemList()) {
-        return items.value<QGraphicsItemList>().size();
+    } else if(items.userType() == widgetList()) {
+        return items.value<QnResourceWidgetList>().size();
     } else {
         return 0;
     }
 }
 
-QnResourcePtr QnActionMetaTypes::resource(QGraphicsItem *item) {
-    if(item == NULL)
-        return QnResourcePtr();
-
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+QnResourcePtr QnActionMetaTypes::resource(QnResourceWidget *widget) {
     if(widget == NULL)
         return QnResourcePtr();
 
     return widget->resource();
 }
 
-QnResourceList QnActionMetaTypes::resources(const QGraphicsItemList &items) {
+QnResourceList QnActionMetaTypes::resources(const QnResourceWidgetList &widgets) {
     QnResourceList result;
 
-    foreach(QGraphicsItem *item, items) {
-        QnResourcePtr resource = QnActionMetaTypes::resource(item);
+    foreach(QnResourceWidget *widget, widgets) {
+        QnResourcePtr resource = QnActionMetaTypes::resource(widget);
         if(!resource)
             continue;
 
@@ -63,17 +59,31 @@ QnResourceList QnActionMetaTypes::resources(const QGraphicsItemList &items) {
 QnResourceList QnActionMetaTypes::resources(const QVariant &items) {
     if(items.userType() == qn_resourceListMetaType) {
         return items.value<QnResourceList>();
-    } else if(items.userType() == qn_graphicsItemListMetaType) {
-        return resources(items.value<QGraphicsItemList>());
+    } else if(items.userType() == qn_widgetListMetaType) {
+        return resources(items.value<QnResourceWidgetList>());
     } else {
         return QnResourceList();
     }
 }
 
-QGraphicsItemList QnActionMetaTypes::graphicsItems(const QVariant &items) {
-    if(items.userType() == qn_graphicsItemListMetaType) {
-        return items.value<QGraphicsItemList>();
+QnResourceWidgetList QnActionMetaTypes::widgets(const QVariant &items) {
+    if(items.userType() == qn_widgetListMetaType) {
+        return items.value<QnResourceWidgetList>();
     } else {
-        return QGraphicsItemList();
+        return QnResourceWidgetList();
     }
+}
+
+QnResourceWidgetList QnActionMetaTypes::widgets(const QList<QGraphicsItem *> items) {
+    QnResourceWidgetList result;
+
+    foreach(QGraphicsItem *item, items) {
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+        if(widget == NULL)
+            continue;
+
+        result.push_back(widget);
+    }
+
+    return result;
 }

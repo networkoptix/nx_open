@@ -5,26 +5,29 @@
 #include <core/resource/resource_fwd.h>
 
 class QVariant;
+class QGraphicsItem;
 
 class QnActionMetaTypes {
 public:
     static int resourceList();
 
-    static int graphicsItemList();
+    static int widgetList();
 
     static void initialize();
 
     static int size(const QVariant &items);
 
-    static QnResourcePtr resource(QGraphicsItem *item);
+    static QnResourcePtr resource(QnResourceWidget *widget);
 
-    static QnResourceList resources(const QGraphicsItemList &items);
+    static QnResourceList resources(const QnResourceWidgetList &widgets);
 
     static QnResourceList resources(const QVariant &items);
 
-    static QGraphicsItemList graphicsItems(const QVariant &items);
+    static QnResourceWidgetList widgets(const QVariant &items);
+
+    static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
 };
 
-Q_DECLARE_METATYPE(QGraphicsItemList);
+Q_DECLARE_METATYPE(QnResourceWidgetList);
 
 #endif // QN_ACTION_META_TYPES_H
