@@ -54,7 +54,7 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
 
         workbench()->mapper()->setSpacing(spacing + k * delta);
 
-        SceneUtility::moveViewport(this->view(viewport), event->scenePos() - workbench()->mapper()->mapFromGridF(gridMousePos));
+        SceneUtility::moveViewportScene(this->view(viewport), workbench()->mapper()->mapFromGridF(gridMousePos) - event->scenePos());
     }
 
     event->accept();
