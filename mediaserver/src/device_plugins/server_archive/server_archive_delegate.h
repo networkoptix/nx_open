@@ -39,6 +39,7 @@ private:
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
     void loadPlaybackMask(qint64 msTime, bool useReverseSearch);
     void getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
+    bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
 private:
     bool m_opened;
     QnResourcePtr m_resource;

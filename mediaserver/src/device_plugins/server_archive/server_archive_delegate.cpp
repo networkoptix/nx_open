@@ -553,6 +553,11 @@ void QnServerArchiveDelegate::setSendMotion(bool value)
 
 bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
+    return setQualityInternal(quality, fastSwitch, m_lastPacketTime/1000 + 1, true);
+}
+
+bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive)
+{
     m_quality = quality;
     m_newQualityTmpData.clear();
 
@@ -560,7 +565,6 @@ bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
     {
         m_newQualityCatalog = quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
         QnChunkSequence* chunkSequence = quality == MEDIA_Quality_High ? m_chunkSequenceHi : m_chunkSequenceLow;
-        qint64 timeMs = m_lastPacketTime/1000 + 1;
         m_newQualityChunk = chunkSequence->findChunk(m_resource, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
         if (m_newQualityChunk.distanceToTime(timeMs) > SECOND_STREAM_FIND_EPS) {
 
@@ -578,27 +582,24 @@ bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
         if (!m_newQualityAviDelegate->seek(chunkOffset, false))
             return false;
 
-        while (1) {
+        while (1) 
+        {
             m_newQualityTmpData = m_newQualityAviDelegate->getNextData();
             if (m_newQualityTmpData == 0) 
             {
                 qDebug() << "switching data not found. Chunk start=" << QDateTime::fromMSecsSinceEpoch(m_newQualityChunk.startTimeMs).toString();
-                qDebug() << "requiredTime=" << QDateTime::fromMSecsSinceEpoch(m_lastPacketTime/1000.0).toString();
+                qDebug() << "requiredTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString();
+                // seems like requested position near chunk border. So, try next chunk
+                if (recursive && m_newQualityChunk.startTimeMs != -1)
+                    return setQualityInternal(quality, fastSwitch, m_newQualityChunk.startTimeMs+m_newQualityChunk.durationMs, false);
                 break;
             }
             m_newQualityTmpData->timestamp += m_newQualityChunk.startTimeMs*1000;
             qDebug() << "switching data. skip time=" << QDateTime::fromMSecsSinceEpoch(m_newQualityTmpData->timestamp/1000).toString() << "flags=" << (m_newQualityTmpData->flags & AV_PKT_FLAG_KEY);
-            if (m_newQualityTmpData->timestamp >= m_lastPacketTime && (m_newQualityTmpData->flags & AV_PKT_FLAG_KEY))
+            if (m_newQualityTmpData->timestamp >= timeMs*1000ll && (m_newQualityTmpData->flags & AV_PKT_FLAG_KEY))
                 break;
         }
     }
 
     return fastSwitch;
-    /*
-    if (fastSwitch)
-    if (m_lastPacketTime != 0) {
-        seekInternal(m_lastPacketTime + 1, true, true);
-        m_skipFramesToTime = m_lastPacketTime + 1;
-    }
-    */
 }
