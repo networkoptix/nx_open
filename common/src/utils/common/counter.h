@@ -2,29 +2,35 @@
 #define QN_COUNTER_H
 
 #include <QObject>
+#include <QMutex>
 
 class QnCounter: public QObject {
     Q_OBJECT;
 public:
-    QnCounter(int targetCount, QObject *parent = NULL):    
+    QnCounter(int initialCount, QObject *parent = NULL):    
         QObject(parent),
-        m_count(0), 
-        m_targetCount(targetCount)
+        m_count(initialCount)
     {}
 
 signals:
-    void targetReached();
+    void reachedZero();
 
 public slots:
     void increment() {
+        QMutexLocker locker(&m_mutex);
         m_count++;
-        if(m_count == m_targetCount)
-            emit targetReached();
+    }
+
+    void decrement() {
+        QMutexLocker locker(&m_mutex);
+        m_count++;
+        if(m_count == 0)
+            emit reachedZero();
     }
 
 private:
+    QMutex m_mutex;
     int m_count;
-    int m_targetCount;
 };
 
 #endif // QN_COUNTER_H

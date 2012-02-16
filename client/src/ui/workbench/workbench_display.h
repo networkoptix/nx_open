@@ -31,6 +31,7 @@ class QnWorkbenchLayout;
 class QnResourceWidget;
 class QnResourceDisplay;
 class ViewportAnimator;
+class VariantAnimator;
 class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
@@ -47,6 +48,7 @@ class CLCamDisplay;
  */
 class QnWorkbenchDisplay: public QObject, protected AnimationTimerListener, protected SceneUtility {
     Q_OBJECT;
+    Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
     Q_ENUMS(Layer);
 
 public:
@@ -189,6 +191,8 @@ public:
 
     QnResourceWidget *widget(QnWorkbench::ItemRole role) const;
 
+    QList<QnResourceWidget *> widgets() const;
+
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
     CLVideoCamera *camera(QnWorkbenchItem *item) const;
@@ -300,6 +304,7 @@ protected:
 
     qreal layerFrontZValue(Layer layer) const;
     Layer synchronizedLayer(QnWorkbenchItem *item) const;
+    Layer shadowLayer(Layer itemLayer) const;
 
     bool addItemInternal(QnWorkbenchItem *item);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
@@ -308,6 +313,9 @@ protected:
     void initSceneWorkbench();
     void initWorkbench(QnWorkbench *workbench);
     void initBoundingInstrument();
+
+    qreal widgetsFrameOpacity() const;
+    void setWidgetsFrameOpacity(qreal opacity);
 
 protected slots:
     void synchronizeSceneBoundsExtension();
@@ -382,6 +390,9 @@ private:
     /** Grid item. */
     QWeakPointer<QnGridItem> m_gridItem;
 
+    /** Current frame opacity for widgets. */
+    qreal m_frameOpacity;
+
 
     /* Instruments. */
 
@@ -420,6 +431,10 @@ private:
 
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;
+
+    /** Frame opacity animator. */
+    VariantAnimator *m_frameOpacityAnimator;
+
 
 
     /* Helpers. */

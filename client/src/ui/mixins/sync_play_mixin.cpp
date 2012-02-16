@@ -1,5 +1,6 @@
 #include "sync_play_mixin.h"
 #include <utils/common/warnings.h>
+#include <utils/common/counter.h>
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
@@ -11,7 +12,8 @@
 QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin *renderWatcher, QObject *parent):
     QObject(parent),
     m_syncPlay(NULL),
-    m_display(display)
+    m_display(display),
+    m_counter(NULL)
 {
     if(display == NULL) {
         qnNullWarning(display);
@@ -20,7 +22,6 @@ QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin
 
     /* Prepare syncplay. */
     m_syncPlay = new QnArchiveSyncPlayWrapper();
-    m_syncPlay->setParent(this);
 
     /* Connect to display. */
     connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),              this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -28,6 +29,11 @@ QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin
     //connect(display,    SIGNAL(playbackMaskChanged(const QnTimePeriodList&)), this,   SLOT(at_playback_mask_changed(const QnTimePeriodList&)));
     connect(display,    SIGNAL(enableItemSync(bool)),                         this,   SLOT(at_enable_sync(bool)));
     
+    /* Prepare counter. */
+    m_counter = new QnCounter(1);
+    connect(this,                       SIGNAL(destroyed()),    m_counter,      SLOT(decrement()));
+    connect(m_counter,                  SIGNAL(reachedZero()),  m_syncPlay,     SLOT(deleteLater()));
+    connect(m_counter,                  SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
 
     /* Prepare render watcher. */
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
@@ -49,6 +55,9 @@ void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
     m_syncPlay->addArchiveReader(widget->display()->archiveReader(), camera->getCamDisplay());
     camera->setExternalTimeSource(m_syncPlay);
     camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
+
+    m_counter->increment();
+    connect(widget->display()->archiveReader(), SIGNAL(finished()), m_counter, SLOT(decrement()));
 }
 
 void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {

@@ -38,10 +38,10 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
             m_camera = new CLVideoCamera(m_mediaResource, false, m_mediaProvider);
             
             QnCounter *counter = new QnCounter(2);
-            connect(m_camera->getCamDisplay(),   SIGNAL(finished()),         counter,        SLOT(increment()));
-            connect(m_mediaProvider,                SIGNAL(finished()),         counter,        SLOT(increment()));
-            connect(counter,                        SIGNAL(targetReached()),    counter,        SLOT(deleteLater()));
-            connect(counter,                        SIGNAL(targetReached()),    m_camera,       SLOT(deleteLater()));
+            connect(m_camera->getCamDisplay(),  SIGNAL(finished()),     counter,        SLOT(decrement()));
+            connect(m_mediaProvider,            SIGNAL(finished()),     counter,        SLOT(decrement()));
+            connect(counter,                    SIGNAL(reachedZero()),  counter,        SLOT(deleteLater()));
+            connect(counter,                    SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
         } else {
             m_camera = NULL;
 

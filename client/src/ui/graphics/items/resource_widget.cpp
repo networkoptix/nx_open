@@ -418,7 +418,8 @@ void QnResourceWidget::invalidateShadowShape() {
 
 void QnResourceWidget::updateShadowZ() {
     if(!m_shadow.isNull()) {
-        m_shadow.data()->setZValue(zValue());
+        /* Shadow Z value is managed by workbench display. */
+        // m_shadow.data()->setZValue(zValue());
         m_shadow.data()->stackBefore(this);
     }
 }

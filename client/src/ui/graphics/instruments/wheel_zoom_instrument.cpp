@@ -1,5 +1,6 @@
 #include "wheel_zoom_instrument.h"
 #include <cmath> /* For std::pow. */
+#include <QWheelEvent>
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
 #include <QCursor>
@@ -34,8 +35,12 @@ void WheelZoomInstrument::aboutToBeDisabledNotify() {
     kineticProcessor()->reset();
 }
 
-bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *) {
-    m_currentViewport = viewport;
+bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *event) {
+    if(event->modifiers() & Qt::ControlModifier) {
+        m_currentViewport.clear();
+    } else {
+        m_currentViewport = viewport;
+    }
     return false;
 }
 
