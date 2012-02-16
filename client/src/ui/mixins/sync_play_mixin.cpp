@@ -57,7 +57,7 @@ void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
     camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
 
     m_counter->increment();
-    connect(widget->display()->archiveReader(), SIGNAL(finished()), m_counter, SLOT(decrement()));
+    connect(widget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
 }
 
 void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {

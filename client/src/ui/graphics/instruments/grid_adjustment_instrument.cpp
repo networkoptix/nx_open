@@ -41,6 +41,8 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
     qreal degrees = event->delta() / 8.0;
 
     if(workbench()) {
+        QPointF gridMousePos = workbench()->mapper()->mapToGridF(event->scenePos());
+
         QSizeF spacing = workbench()->mapper()->spacing();
         QSizeF delta = m_speed * -degrees;
         
@@ -51,6 +53,8 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
             k = qMin(k, spacing.height() / -delta.height());
 
         workbench()->mapper()->setSpacing(spacing + k * delta);
+
+        SceneUtility::moveViewportScene(this->view(viewport), workbench()->mapper()->mapFromGridF(gridMousePos) - event->scenePos());
     }
 
     event->accept();
