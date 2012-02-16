@@ -10,7 +10,7 @@ win32 {
 FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
-INCLUDEPATH += $$PWD
+INCLUDEPATH += $$PWD $$PWD/../build/generated
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
@@ -123,29 +123,6 @@ XSD_FILES = $$PWD/api/xsd/cameras.xsd \
             $$PWD/api/xsd/scheduleTasks.xsd \
             $$PWD/api/xsd/events.xsd \
             $$PWD/api/xsd/videoserver/recordedTimePeriods.xsd
-
-xsd2.name = Generating code from ${QMAKE_FILE_IN}
-xsd2.input = XSD_FILES
-xsd2.output = $${MOC_DIR}/xsd_${QMAKE_FILE_BASE}.cpp
-xsd2.commands = $$EVETOOLS_DIR/bin/xsd cxx-tree --generate-serialization --output-dir $${MOC_DIR} --cxx-regex \"/^(.*).xsd/xsd_\\1.cpp/\" --hxx-regex \"/^(.*).xsd/xsd_\\1.h/\" --generate-ostream --root-element ${QMAKE_FILE_BASE} ${QMAKE_FILE_IN}
-xsd2.CONFIG += target_predeps
-xsd2.variable_out = GENERATED_SOURCES
-QMAKE_EXTRA_COMPILERS += xsd2
-
-PB_FILES = $$PWD/api/pb/camera.proto \
-           $$PWD/api/pb/user.proto \
-           $$PWD/api/pb/resourceType.proto \
-           $$PWD/api/pb/resource.proto \
-           $$PWD/api/pb/server.proto \
-           $$PWD/api/pb/ms_recordedTimePeriod.proto
-
-pb.name = Generating code from ${QMAKE_FILE_IN}
-pb.input = PB_FILES
-pb.output = $${MOC_DIR}/${QMAKE_FILE_BASE}.pb.cc
-pb.commands = $$EVETOOLS_DIR/bin/protoc --proto_path=../src/api/pb --cpp_out=$${MOC_DIR} ${QMAKE_FILE_NAME}
-pb.CONFIG += target_predeps
-pb.variable_out = GENERATED_SOURCES
-QMAKE_EXTRA_COMPILERS += pb
 
 #RESOURCES += api/xsd/api.qrc
 RESOURCES += $${MOC_DIR}/api.qrc

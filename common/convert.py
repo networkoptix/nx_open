@@ -6,6 +6,7 @@ import os, sys, posixpath
 import time
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
+from genproto import generate_xsd, generate_pb
 
 # os.path = posixpath
 
@@ -169,7 +170,7 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
     for xdir in xdirs:
         for root, dirs, files in os.walk(xdir):
-            parent = root[len(xdir):]
+            parent = root[len(xdir)+1:]
             for exclude_dir in exclude_dirs:
                 if exclude_dir in dirs:
                     dirs.remove(exclude_dir)
@@ -250,9 +251,19 @@ def convert():
         ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
         gen_filetypes_h()
         tools_path = setup_tools()
+        
+        os.mkdir('build/generated')
+        generated_files = []
+        generated_files += generate_xsd(tools_path, 'build/generated')
+        generated_files += generate_pb(tools_path, 'build/generated')
 
         index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
         instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
+
+        f = open('src/common.pro', 'a')
+        for xfile in generated_files:
+            print >> f, 'SOURCES += $$PWD/../' + xfile
+        f.close()
 
         if platform() == 'win32':
             os.system('qmake -tp vc -o src/common.vcproj src/common.pro')
