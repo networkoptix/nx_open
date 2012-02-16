@@ -634,6 +634,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
 
     emit widgetAdded(widget);
+
+    widget->display()->start();
+
     return true;
 }
 
