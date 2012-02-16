@@ -60,7 +60,7 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
-#include <ui/menu/action_manager.h>
+#include <ui/actions/action_manager.h>
 
 #include <file_processor.h>
 

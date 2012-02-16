@@ -40,9 +40,9 @@
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/menu/action_manager.h>
-#include <ui/menu/action.h>
-#include <ui/menu/action_meta_types.h>
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action.h>
+#include <ui/actions/action_meta_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/style/skin.h>

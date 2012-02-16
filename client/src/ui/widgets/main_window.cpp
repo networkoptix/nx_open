@@ -17,7 +17,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 
-#include "ui/menu/action_manager.h"
+#include "ui/actions/action_manager.h"
 
 #include "ui/dialogs/aboutdialog.h"
 #include "ui/dialogs/logindialog.h"

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <core/resource/resource_fwd.h>
 #include <ui/common/scene_utility.h>
-#include <ui/menu/action_target_provider.h>
+#include <ui/actions/action_target_provider.h>
 #include "workbench.h" /* For QnWorkbench::ItemRole. */
 
 class QGraphicsProxyWidget;
