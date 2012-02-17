@@ -165,19 +165,65 @@ QString serverGuid()
     return guid;
 }
 
-QnVideoServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnection, const QString& myAddress)
+QnStorageResourcePtr createDefaultStorage()
+{
+    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
+
+    QnStorageResourcePtr storage(new QnStorageResource());
+    storage->setName("Initial");
+#ifdef Q_OS_WIN
+    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
+#else
+    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "/tmp/vmsrecords").toString()));
+#endif
+    storage->setSpaceLimit(5ll * 1000000000);
+
+    cl_log.log("Creating new storage", cl_logINFO);
+
+    return storage;
+}
+
+QnVideoServerResourcePtr createServer(const QString& myAddress)
 {
     QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
     QnVideoServerResourcePtr serverPtr(new QnVideoServerResource());
-
-    // If there is already stored server with this guid, other parameters will be ignored
     serverPtr->setGuid(serverGuid());
 
     serverPtr->setName(QString("Server ") + myAddress);
     serverPtr->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
     serverPtr->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 
+    serverPtr->setStorages(QnStorageResourceList() << createDefaultStorage());
+
+    return serverPtr;
+}
+
+QnVideoServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection)
+{
+    QnVideoServerResourceList servers;
+
+    while (servers.isEmpty())
+    {
+        QByteArray errorString;
+        if (appServerConnection->getServers(servers, errorString) == 0)
+            break;
+
+        qDebug() << "findServer(): Call to registerServer failed. Reason: " << errorString;
+        QnSleep::msleep(1000);
+    }
+
+    foreach(QnVideoServerResourcePtr server, servers)
+    {
+        if (server->getGuid() == serverGuid())
+            return server;
+    }
+
+    return QnVideoServerResourcePtr();
+}
+
+QnVideoServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnection, QnVideoServerResourcePtr serverPtr)
+{
     QnVideoServerResourceList servers;
     QByteArray errorString;
     if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
@@ -398,7 +444,15 @@ public:
 
         while (videoServer.isNull())
         {
-            videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverHost));
+            QnVideoServerResourcePtr server = findServer(appServerConnection);
+
+            if (!server)
+                server = createServer(defaultLocalAddress(appserverHost));
+
+            if (server->getStorages().isEmpty())
+                server->setStorages(QnStorageResourceList() << createDefaultStorage());
+
+            videoServer = registerServer(appServerConnection, server);
             if (videoServer.isNull())
                 QnSleep::msleep(1000);
         }
@@ -416,32 +470,10 @@ public:
 
         QByteArray errorString;
 
-        if (videoServer->getStorages().isEmpty())
+        foreach (QnStorageResourcePtr storage, videoServer->getStorages())
         {
-            cl_log.log("Creating new storage", cl_logINFO);
-
-            QnStorageResourcePtr storage(new QnStorageResource());
-            storage->setParentId(videoServer->getId());
-            storage->setName("Initial");
-            storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
-            storage->setSpaceLimit(5ll * 1000000000);
-
-            videoServer->setStorages(QnStorageResourceList() << storage);
-
-            if (appServerConnection->saveSync(videoServer, errorString))
-            {
-                cl_log.log("Can't save initial storage", cl_logERROR);
-            }
-
             qnResPool->addResource(storage);
             qnStorageMan->addStorage(storage);
-        } else
-        {
-            foreach (QnStorageResourcePtr storage, videoServer->getStorages())
-            {
-                qnResPool->addResource(storage);
-                qnStorageMan->addStorage(storage);
-            }
         }
         qnStorageMan->loadFullFileCatalog();
 

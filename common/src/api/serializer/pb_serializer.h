@@ -1,15 +1,15 @@
-#ifndef _API_XML_SERIALIZER_H_
-#define _API_XML_SERIALIZER_H_
+#ifndef _API_PB_SERIALIZER_H_
+#define _API_PB_SERIALIZER_H_
 
 #include "serializer.h"
 
 /**
-  * Serialize resource to xml
+  * Serialize resource to protobuf
   */
-class QnApiXmlSerializer : public QnApiSerializer
+class QnApiPbSerializer : public QnApiSerializer
 {
 public:
-    const char* format() const { return "xml"; }
+    const char* format() const { return "pb"; }
 
     void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data);
@@ -24,4 +24,4 @@ private:
     void serializeUser(const QnUserResourcePtr& resource, QByteArray& data);
 };
 
-#endif // _API_XML_SERIALIZER_H_
+#endif // _API_PB_SERIALIZER_H_

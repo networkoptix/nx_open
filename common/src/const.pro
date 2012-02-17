@@ -10,7 +10,7 @@ win32 {
 FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
-INCLUDEPATH += $$PWD
+INCLUDEPATH += $$PWD $$PWD/../build/generated
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
@@ -123,14 +123,6 @@ XSD_FILES = $$PWD/api/xsd/cameras.xsd \
             $$PWD/api/xsd/scheduleTasks.xsd \
             $$PWD/api/xsd/events.xsd \
             $$PWD/api/xsd/videoserver/recordedTimePeriods.xsd
-
-xsd2.name = Generating code from ${QMAKE_FILE_IN}
-xsd2.input = XSD_FILES
-xsd2.output = $${MOC_DIR}/xsd_${QMAKE_FILE_BASE}.cpp
-xsd2.commands = $$EVETOOLS_DIR/bin/xsd cxx-tree --generate-serialization --output-dir $${MOC_DIR} --cxx-regex \"/^(.*).xsd/xsd_\\1.cpp/\" --hxx-regex \"/^(.*).xsd/xsd_\\1.h/\" --generate-ostream --root-element ${QMAKE_FILE_BASE} ${QMAKE_FILE_IN}
-xsd2.CONFIG += target_predeps
-xsd2.variable_out = GENERATED_SOURCES
-QMAKE_EXTRA_COMPILERS += xsd2
 
 #RESOURCES += api/xsd/api.qrc
 RESOURCES += $${MOC_DIR}/api.qrc

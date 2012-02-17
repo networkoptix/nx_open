@@ -111,7 +111,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_delayedFrameCnt(0),
       m_emptyPacketCounter(0),
       m_isEOFReached(false),
-      m_hiQualityRetryCounter(0)
+      m_hiQualityRetryCounter(0),
+      m_isStillImage(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -711,6 +712,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
     //else
     //    return true;
+    
+    m_isStillImage = media->flags & QnAbstractMediaData::MediaFlags_StillImage;
 
     bool isReversePacket = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
     bool isReverseMode = speed < 0.0;
@@ -1118,7 +1121,27 @@ bool CLCamDisplay::isRealTimeSource() const
     return m_isRealTimeSource; 
 }
 
+bool CLCamDisplay::isStillImage() const
+{
+    return m_isStillImage;
+}
+
+bool CLCamDisplay::isNoData() const
+{
+    if (m_isEOFReached)
+        return true;
+    qint64 ct = m_extTimeSrc->getCurrentTime();
+    bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled();
+    if (useSync || ct == DATETIME_NOW)
+        return false;
+
+    int sign = m_speed >= 0 ? 1 : -1;
+    return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
+}
+
+/*
 bool CLCamDisplay::isEOFReached() const
 {
     return m_isEOFReached;
 }
+*/

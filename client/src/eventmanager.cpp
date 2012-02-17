@@ -46,17 +46,7 @@ void QnEventManager::eventReceived(QnEvent event)
         QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
         if (resource)
         {
-            QnResource::Status status;
-            if (event.data == "A")
-                status = QnResource::Online;
-            else if (event.data == "I")
-                status = QnResource::Offline;
-            else
-            {
-                qWarning() << "Reveived RSC event with incomplete or invalid status value";
-                return;
-            }
-
+            QnResource::Status status = (QnResource::Status)event.data.toInt();
             resource->setStatus(status);
         }
     }

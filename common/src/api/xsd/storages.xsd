@@ -15,7 +15,6 @@
 			<xs:element name="typeId" type="xs:string"/>
 			<xs:element name="parentId" type="xs:string"/>
 			<xs:element name="spaceLimit" type="xs:long"/>
-			<xs:element name="time" type="xs:int"/>
 		</xs:all>
 	</xs:complexType>
 </xs:schema>

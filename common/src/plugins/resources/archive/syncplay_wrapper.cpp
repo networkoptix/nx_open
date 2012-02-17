@@ -257,9 +257,6 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     QMutexLocker lock(&d->timeMutex);
 
-    if (d->enabled)
-        reader->setNavDelegate(this);
-
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     
     reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
@@ -275,6 +272,9 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
         reader->jumpToPreviousFrame(currentTime);
         reader->setSpeed(d->speed);
     }
+
+    if (d->enabled)
+        reader->setNavDelegate(this);
 
     //connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
     //connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);

@@ -20,8 +20,13 @@
 #include "resource_widget_renderer.h"
 #include "settings.h"
 #include "camera/camdisplay.h"
+#include "math.h"
 
 namespace {
+
+    /** Flashing text flash interval */
+    static const int TEXT_FLASHING_PERIOD = 1000;
+
     /** Default frame width. */
     const qreal defaultFrameWidth = 50.0;
 
@@ -76,7 +81,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_aboutToBeDestroyedEmitted(false),
     m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
     m_motionMaskValid(false),
-    m_motionMaskBinDataValid(false)
+    m_motionMaskBinDataValid(false),
+    m_noDataStaticText("No data"),
+    m_offlineStaticText("Offline"),
+    m_unauthorizedStaticText("Unauthorized")
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -123,12 +131,19 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
+    /* Init static text. */
+    m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    
     /* Set up overlay icons. */
     m_channelState.resize(m_channelCount);
 
     /* Start displaying. This must be the last line in the constructor. */
-    m_display->start();
+    //m_display->start();
+
 }
+
 
 QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
@@ -517,6 +532,26 @@ void QnResourceWidget::at_display_resourceUpdated() {
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
+
+void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText& text) 
+{
+    qint64 ticks = QDateTime::currentMSecsSinceEpoch() / TEXT_FLASHING_PERIOD;
+
+    QFont font;
+    font.setPointSizeF(550);
+    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+    QnScopedPainterFontRollback fontRollback(painter, font);
+    
+    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 224, 224)));
+    qreal prevOpacity = painter->opacity();
+    qreal opacityF = sin(QDateTime::currentMSecsSinceEpoch()/qreal(TEXT_FLASHING_PERIOD) * M_PI)*0.8 + 0.2;
+    painter->setOpacity(opacityF);
+    painter->setRenderHint(QPainter::TextAntialiasing);
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->drawStaticText(4, 16, text);
+    painter->setOpacity(prevOpacity);
+}
+
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
     if (painter->paintEngine() == NULL) {
         qnWarning("No OpenGL-compatible paint engine was found.");
@@ -531,6 +566,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(m_pausedPainter.isNull()) {
         m_pausedPainter = qn_pausedPainterStorage()->get();
         m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
+        //m_noDataPainter = qn_noDataPainterStorage()->get();
     }
 
     QnScopedPainterPenRollback penRollback(painter);
@@ -571,12 +607,16 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
 
         /* Set overlay icon. */
-        if (m_display->camDisplay()->isEOFReached())
-        {
+        if (m_display->camDisplay()->isStillImage()) {
             setOverlayIcon(i, NO_ICON);
-        }
-        if(m_display->isPaused() && (m_displayFlags & DISPLAY_ACTIVITY_OVERLAY)) {
+        } else if(m_display->isPaused() && (m_displayFlags & DISPLAY_ACTIVITY_OVERLAY)) {
             setOverlayIcon(i, PAUSED);
+        } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
+            setOverlayIcon(i, OFFLINE);
+        } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
+            setOverlayIcon(i, UNAUTHORIZED);
+        } else if (m_display->camDisplay()->isNoData()) {
+            setOverlayIcon(i, NO_DATA); 
         } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
             setOverlayIcon(i, LOADING);
         } else {
@@ -593,9 +633,20 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     glPopAttrib();
     painter->endNativePainting();
 
+    for(int i = 0; i < m_channelCount; i++) 
+    {
+        if (m_channelState[i].icon == NO_DATA) 
+            drawFlashingText(painter, m_noDataStaticText);
+        else if (m_channelState[i].icon == OFFLINE) 
+            drawFlashingText(painter, m_offlineStaticText);
+        else if (m_channelState[i].icon == UNAUTHORIZED) 
+            drawFlashingText(painter, m_unauthorizedStaticText);
+    }
+
     /* Draw motion grid. */
     if (m_displayFlags & DISPLAY_MOTION_GRID) {
-        for(int i = 0; i < m_channelCount; i++) {
+        for(int i = 0; i < m_channelCount; i++) 
+        {
             QRectF rect = channelRect(i);
 
             drawMotionGrid(painter, rect, m_renderer->lastFrameMetadata(i));
@@ -664,6 +715,9 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     glBegin(GL_QUADS);
     glVertices(rect);
     glEnd();
+
+    if(state.icon == NO_DATA)
+        return;
 
     QRectF iconRect = expanded(
         1.0,

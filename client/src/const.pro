@@ -43,7 +43,7 @@ CONFIG(debug, debug|release) {
   PRE_TARGETDEPS += ../../common/bin/debug/common.lib
   }
   unix:!mac {
-  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.so
+  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.a
   }
   mac {
   PRE_TARGETDEPS += ../../common/bin/debug/libcommon.dylib
@@ -89,7 +89,7 @@ mac {
 win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
-    LIBS += -lxerces-c_3
+    LIBS += -lxerces-c_3 -llibprotobuf
 
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
@@ -103,11 +103,11 @@ unix {
 }
 
 mac {
-    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1
+    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1 -lprotobuf
 }
 
 unix:!mac {
-    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c -lopenal
+    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c -lprotobuf -lopenal
 }
 
 DEFINES += __STDC_CONSTANT_MACROS
@@ -116,11 +116,11 @@ LIBS += -L$$EVETOOLS_DIR/lib
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug $$LIBS
+  LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug $$LIBS
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release $$LIBS
+  LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release $$LIBS
 }
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson

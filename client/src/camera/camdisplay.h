@@ -61,7 +61,9 @@ public:
     void setExternalTimeSource(QnlTimeSource* value);
 
     bool canAcceptData() const;
-    bool isEOFReached() const;
+    //bool isEOFReached() const;
+    bool isNoData() const;
+    bool isStillImage() const;
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -169,6 +171,7 @@ private:
     //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
     bool m_isEOFReached;
+    bool m_isStillImage;
     
     int m_hiQualityRetryCounter;
 

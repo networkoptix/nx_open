@@ -1,6 +1,7 @@
 #ifndef QN_RESOURCE_WIDGET_H
 #define QN_RESOURCE_WIDGET_H
 
+#include <QStaticText>
 #include <QWeakPointer>
 #include <QVector>
 #include <camera/render_status.h>
@@ -23,6 +24,10 @@ class QnAbstractArchiveReader;
 
 class QnLoadingProgressPainter;
 class QnPausedPainter;
+
+#ifdef NO_DATA
+#   undef NO_DATA
+#endif
 
 class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
@@ -304,7 +309,10 @@ private:
     enum OverlayIcon {
         NO_ICON,
         PAUSED,
-        LOADING
+        LOADING,
+        NO_DATA,
+        OFFLINE,
+        UNAUTHORIZED
     };
 
     struct ChannelState {
@@ -342,6 +350,7 @@ private:
 
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
 
+    void drawFlashingText(QPainter *painter, const QStaticText& text);
 private:
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
@@ -366,6 +375,7 @@ private:
 
     /** Paused painter. */
     QSharedPointer<QnPausedPainter> m_pausedPainter;
+
 
     /** Loading progress painter. */
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
@@ -414,6 +424,10 @@ private:
 
     /** Whether motion mask binary data is valid. */
     bool m_motionMaskBinDataValid;
+
+    QStaticText m_noDataStaticText;
+    QStaticText m_offlineStaticText;
+    QStaticText m_unauthorizedStaticText;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);

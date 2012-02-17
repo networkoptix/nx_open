@@ -15,7 +15,7 @@
 #include "core/misc/scheduleTask.h"
 #include "core/resource/user_resource.h"
 
-#include "api/serializer/xml_serializer.h"
+#include "api/serializer/pb_serializer.h"
 
 class QnAppServerConnectionFactory;
 
@@ -65,7 +65,7 @@ public:
     int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
-    int getStorages(QnStorageResourceList& storages, QByteArray& errorString);
+    int getServers(QnVideoServerResourceList& servers, QByteArray& errorString);
     int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
 
@@ -91,10 +91,12 @@ private:
 
 private:
     QUrl m_url;
+    QnRequestParamList m_requestParams;
+
     QnResourceFactory& m_resourceFactory;
     QnVideoServerResourceFactory m_serverFactory;
 
-    QnApiXmlSerializer m_serializer;
+    QnApiPbSerializer m_serializer;
 
     friend class QnAppServerConnectionFactory;
 };
