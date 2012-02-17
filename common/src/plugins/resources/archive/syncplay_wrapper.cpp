@@ -41,6 +41,7 @@ public:
         speed = 1.0;
         processingJump = false;
         enabled = true;
+        bufferingTime = AV_NOPTS_VALUE;
     }
 
 
@@ -61,6 +62,7 @@ public:
     
     bool processingJump;
     bool enabled;
+    qint64 bufferingTime;
     //QnPlaybackMaskHelper playbackMaskHelper;
 };
 
@@ -467,12 +469,13 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
             d->readers.erase(i);
             if (d->readers.isEmpty())
                 d->initValues();
+            d->bufferingTime = AV_NOPTS_VALUE; // possible current item in buffering or jumping state
             break;
         }
     }
 }
 
-void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source)
+void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source, qint64 bufferingTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 
@@ -482,6 +485,7 @@ void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source)
         if (i->cam == source)
         {
             i->buffering = true;
+            d->bufferingTime = bufferingTime;
             break;
         }
     }
@@ -497,10 +501,25 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
         if (i->cam == source)
         {
             i->buffering = false;
-            d->timer.restart();
             break;
         }
     }
+
+
+    if (d->inJumpCount > 0)
+        return;
+
+    for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
+    {
+        if (i->buffering)
+            return;
+    }
+    // no more buffering
+    qint64 bt = d->bufferingTime;
+    d->bufferingTime = AV_NOPTS_VALUE;
+
+    qDebug() << "correctTime after end of buffering=" << (getCurrentTime() - bt)/1000.0;
+    reinitTime(getCurrentTime());
 }
 
 void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
@@ -540,6 +559,9 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 
     if (d->inJumpCount > 0)
         return d->lastJumpTime;
+
+    if (d->bufferingTime != AV_NOPTS_VALUE)
+        return d->bufferingTime; // same as last jump time
 
     foreach(const ReaderInfo& info, d->readers) {
         if (info.enabled && info.buffering) 

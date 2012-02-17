@@ -14,7 +14,7 @@ public:
     virtual qint64 expectedTime() const { return getCurrentTime(); }
 
 
-    virtual void onBufferingStarted(QnlTimeSource* src) { Q_UNUSED(src); }
+    virtual void onBufferingStarted(QnlTimeSource* src, qint64 firstTime) { Q_UNUSED(src); Q_UNUSED(firstTime);}
     virtual void onBufferingFinished(QnlTimeSource* src) { Q_UNUSED(src); }
     virtual void onEofReached(QnlTimeSource* src, bool value) { Q_UNUSED(src); Q_UNUSED(value); }
     virtual bool isEnabled() const { return true; }

@@ -518,7 +518,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
         cl_log.log("after jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     */       
     if (m_extTimeSrc)
-        m_extTimeSrc->onBufferingStarted(this);
+        m_extTimeSrc->onBufferingStarted(this, time);
 
     QMutexLocker lock(&m_timeMutex);
     m_afterJump = true;
@@ -1131,6 +1131,8 @@ bool CLCamDisplay::isNoData() const
     if (m_isEOFReached)
         return true;
     if (!m_extTimeSrc)
+        return false;
+    if (m_executingJump > 0 || m_buffering)
         return false;
 
     qint64 ct = m_extTimeSrc->getCurrentTime();

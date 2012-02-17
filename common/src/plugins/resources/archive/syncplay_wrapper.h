@@ -45,11 +45,11 @@ public:
     //virtual bool setMotionRegion(const QRegion& region);
     //virtual bool setSendMotion(bool value);
     //
+    virtual void onBufferingFinished(QnlTimeSource* source) override;
+    virtual void onBufferingStarted(QnlTimeSource* source, qint64 bufferingTime) override;
 
 public slots:
     void onEofReached(QnlTimeSource* src, bool value);
-    void onBufferingStarted(QnlTimeSource* source);
-    void onBufferingFinished(QnlTimeSource* source);
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 private slots:
     void onBeforeJump(qint64 mksec);
