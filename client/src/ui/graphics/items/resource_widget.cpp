@@ -542,7 +542,7 @@ void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText& te
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
     QnScopedPainterFontRollback fontRollback(painter, font);
     
-    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 224, 224)));
+    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208)));
     qreal prevOpacity = painter->opacity();
     qreal opacityF = sin(QDateTime::currentMSecsSinceEpoch()/qreal(TEXT_FLASHING_PERIOD) * M_PI)*0.8 + 0.2;
     painter->setOpacity(opacityF);
