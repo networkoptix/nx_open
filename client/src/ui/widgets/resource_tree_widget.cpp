@@ -36,23 +36,35 @@ namespace {
 
 class QnResourceTreeItemDelegate: public QStyledItemDelegate {
 public:
-    explicit QnResourceTreeItemDelegate(QnResourceTreeWidget *parent): QStyledItemDelegate(parent) {
-        Q_ASSERT(parent);
+    explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
+        QStyledItemDelegate(parent)
+    {}
+
+    QnWorkbench *workbench() const {
+        return m_workbench.data();
+    }
+
+    void setWorkbench(QnWorkbench *workbench) {
+        m_workbench = workbench;
     }
 
 protected:
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
         QStyledItemDelegate::initStyleOption(option, index);
 
-        QnResourceTreeWidget *navTree = static_cast<QnResourceTreeWidget *>(parent());
-        if (navTree->m_workbench && navTree->m_workbench->currentLayout()) {
-            if (const QnResourceModel *model = qobject_cast<const QnResourceModel *>(index.model())) {
-                QnResourcePtr resource = model->resource(index);
-                if (resource && !navTree->m_workbench->currentLayout()->items(resource->getUniqueId()).isEmpty())
-                    option->font.setBold(true);
-            }
-        }
+        if(workbench() == NULL)
+            return;
+
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if(resource.isNull())
+            return;
+
+        if(!workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty())
+            option->font.setBold(true);
     }
+
+private:
+    QWeakPointer<QnWorkbench> m_workbench;
 };
 
 
@@ -104,7 +116,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_resourceTreeView->setUniformRowHeights(true);
     m_resourceTreeView->setWordWrap(false);
     m_resourceTreeView->setDragDropMode(QAbstractItemView::DragDrop);
-    m_resourceTreeView->setItemDelegate(new QnResourceTreeItemDelegate(this));
+
+    m_resourceDelegate = new QnResourceTreeItemDelegate(this);
+    m_resourceTreeView->setItemDelegate(m_resourceDelegate);
 
     connect(m_resourceTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(at_treeView_activated(QModelIndex)));
 
@@ -118,6 +132,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_searchTreeView->setUniformRowHeights(true);
     m_searchTreeView->setWordWrap(false);
     m_searchTreeView->setDragDropMode(QAbstractItemView::DragOnly); // ###
+    
+    m_searchDelegate = new QnResourceTreeItemDelegate(this);
+    m_searchTreeView->setItemDelegate(m_searchDelegate);
 
     connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(at_treeView_activated(QModelIndex)));
 
@@ -170,11 +187,15 @@ void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
         at_workbench_currentLayoutAboutToBeChanged();
 
         m_filterLineEdit->setEnabled(false);
+        m_searchDelegate->setWorkbench(NULL);
+        m_resourceDelegate->setWorkbench(NULL);
     }
 
     m_workbench = workbench;
 
     if(m_workbench) {
+        m_searchDelegate->setWorkbench(m_workbench);
+        m_resourceDelegate->setWorkbench(m_workbench);
         m_filterLineEdit->setEnabled(true);
 
         at_workbench_currentLayoutChanged();

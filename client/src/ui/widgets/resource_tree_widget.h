@@ -18,6 +18,7 @@ class QnResourceCriterion;
 class QnResourceModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
+class QnResourceTreeItemDelegate;
 
 class QnResourceTreeWidget: public QWidget {
     Q_OBJECT
@@ -75,9 +76,10 @@ private:
     QTreeView *m_resourceTreeView;
     QTreeView *m_searchTreeView;
 
-    QnWorkbench *m_workbench;
+    QnResourceTreeItemDelegate *m_resourceDelegate;
+    QnResourceTreeItemDelegate *m_searchDelegate;
 
-    friend class QnResourceTreeItemDelegate;
+    QnWorkbench *m_workbench;
 };
 
 #endif // QN_RESOURCE_TREE_WIDGET_H

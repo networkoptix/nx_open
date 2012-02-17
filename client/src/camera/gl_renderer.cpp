@@ -413,7 +413,6 @@ void QnGLRenderer::beforeDestroy()
 void QnGLRenderer::draw(CLVideoDecoderOutput *img)
 {
     QMutexLocker locker(&m_displaySync);
-    //m_abort_drawing = false;
 
     //m_imageList.enqueue(img);
     if (m_curImg) 

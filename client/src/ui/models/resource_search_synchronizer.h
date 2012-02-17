@@ -16,6 +16,9 @@ class QnResourceSearchSynchronizerCriterion;
 /**
  * This class performs bidirectional synchronization of 
  * <tt>QnWorkbenchLayout</tt> and <tt>QnResourceSearchProxyModel</tt> instances.
+ * 
+ * For all resources found, it adds new items to the layout. When the search
+ * criteria changes, added items are replaced with the newly found ones.
  */
 class QnResourceSearchSynchronizer: public QObject {
     Q_OBJECT;
@@ -95,16 +98,13 @@ private:
     /** Whether there were update requests while updates were disabled. */
     bool m_hasPendingUpdates;
 
-    /** Whether the associated resource criterion should perform the checks. */
-    bool m_criterionFunctional;
-
-    /** Number of items in the model by resource. */
+    /** Number of items in the search model by resource. */
     QHash<QnResourcePtr, int> m_modelItemCountByResource;
 
-    /** Result of last search operation. */
+    /** Result of the last search operation. */
     QSet<QnResourcePtr> m_searchResult;
 
-    /** Mapping from resource to an item that was added to layout as a result of search operation. */
+    /** Mapping from resource to an item that was added to layout as a result of a search operation. */
     QHash<QnResourcePtr, QnWorkbenchItem *> m_layoutItemByResource;
 
     /** Mapping from an item that was added to layout as a result of search operation to resource. */
@@ -112,9 +112,6 @@ private:
 
     /** Temporary object used for postponed updates. */
     QObject *m_updateListener;
-
-    /** Resource criterion that is used to accept additional resources. */
-    QWeakPointer<QnResourceSearchSynchronizerCriterion> m_criterion;
 };
 
 #endif // QN_RESOURCE_SEARCH_SYNCHRONIZER_H
