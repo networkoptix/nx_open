@@ -606,7 +606,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
         if (d->readers[i].reader == reader) 
         {
             // Use seek for live too. to clear curent buffer
-            if (d->enabled && !d->readers[i].isEOF && !d->readers[i].enabled /*&& !value && d->lastJumpTime != DATETIME_NOW*/)
+            if (d->enabled && !d->readers[i].enabled /*&& !value && d->lastJumpTime != DATETIME_NOW*/)
             {
                 d->readers[i].reader->setNavDelegate(0);
                 d->readers[i].reader->jumpToPreviousFrame(getCurrentTime());
