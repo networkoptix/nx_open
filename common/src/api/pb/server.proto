@@ -5,7 +5,7 @@ message Server {
         optional int32        id           = 1;
         required string       name         = 2;
         required string       url          = 3;
-        required int32        spaceLimit   = 4;
+        required int64        spaceLimit   = 4;
     }
 
     optional int32        id           = 1;
