@@ -64,14 +64,16 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
 }
 
 void QnLayoutResource::addItem(const QnLayoutItemData &item) {
-    QMutexLocker locker(&m_mutex);
+    {
+        QMutexLocker locker(&m_mutex);
+        
+        if(m_itemByUuid.contains(item.uuid)) {
+            qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
+            return;
+        }
 
-    if(m_itemByUuid.contains(item.uuid)) {
-        qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
-        return;
+        m_itemByUuid[item.uuid] = item;
     }
-
-    m_itemByUuid[item.uuid] = item;
 
     emit itemAdded(item);
 }
@@ -81,30 +83,36 @@ void QnLayoutResource::removeItem(const QnLayoutItemData &item) {
 }
 
 void QnLayoutResource::removeItem(const QUuid &itemUuid) {
-    QMutexLocker locker(&m_mutex);
+    QnLayoutItemData item;
+    {
+        QMutexLocker locker(&m_mutex);
 
-    QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-    if(pos == m_itemByUuid.end())
-        return;
+        QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
+        if(pos == m_itemByUuid.end())
+            return;
 
-    QnLayoutItemData item = *pos;
-    m_itemByUuid.erase(pos);
+        item = *pos;
+        m_itemByUuid.erase(pos);
+    }
+
     emit itemRemoved(item);
 }
 
 void QnLayoutResource::updateItem(const QUuid &itemUuid, const QnLayoutItemData &item) {
-    QMutexLocker locker(&m_mutex);
+    {
+        QMutexLocker locker(&m_mutex);
 
-    QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-    if(pos == m_itemByUuid.end()) {
-        qnWarning("There is no item with UUID %1 in this layout.", itemUuid.toString());
-        return;
+        QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
+        if(pos == m_itemByUuid.end()) {
+            qnWarning("There is no item with UUID %1 in this layout.", itemUuid.toString());
+            return;
+        }
+
+        if(*pos == item)
+            return;
+
+        *pos = item;
     }
-
-    if(*pos == item)
-        return;
-
-    *pos = item;
 
     emit itemChanged(item);
 }

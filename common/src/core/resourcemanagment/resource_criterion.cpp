@@ -331,25 +331,30 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
     if(normalizedPattern.isEmpty())
         return;
 
-    /* Accept by default. */
-    addCriterion(new QnResourceCriterion(QVariant(), NOTHING, ID, NEXT, ACCEPT));
+    /* Reject by default. */
+    addCriterion(new QnResourceCriterion(QVariant(), NOTHING, ID, REJECT, REJECT));
 
     /* Parse pattern string. */
-    QRegExp regExp(QLatin1String("(\\W?)(\\w+:)?(\\w*)"), Qt::CaseSensitive, QRegExp::RegExp2);
+    QRegExp regExp(QLatin1String("(\\w+:)?(\\w*)|([\\-\\+])"), Qt::CaseSensitive, QRegExp::RegExp2);
     int pos = 0;
 
+    bool positive = true;
     while ((pos = regExp.indexIn(normalizedPattern, pos)) != -1) {
         pos += regExp.matchedLength();
         if (regExp.matchedLength() == 0)
             break;
 
-        const QString sign = regExp.cap(1);
-        const QString key = regExp.cap(2).toLower();
-        const QString pattern = regExp.cap(3);
+        const QString sign = regExp.cap(3);
+        if(!sign.isEmpty()) {
+            positive = sign == QLatin1String("+");
+            continue;
+        }
+
+        const QString key = regExp.cap(1).toLower();
+        const QString pattern = regExp.cap(2);
         if (pattern.isEmpty())
             continue;
 
-        bool positive = true;
         Type type = CONTAINMENT;
         Target target = SEARCH_STRING;
         QVariant targetValue = pattern;
@@ -369,16 +374,15 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
                 targetValue = static_cast<int>(QnResource::still_image);
             } else if(pattern == "video") {
                 targetValue = static_cast<int>(QnResource::local | QnResource::video);
+            } else {
+                targetValue = 0xFFFFFFFF;
             }
         } else if (pattern == QLatin1String("live")) {
             target = FLAGS;
             targetValue = static_cast<int>(QnResource::live);
         }
 
-        if (sign == QLatin1String("-"))
-            positive = false;
-
-        addCriterion(new QnResourceCriterion(targetValue, type, target, positive ? NEXT : REJECT, positive ? REJECT : NEXT));
+        addCriterion(new QnResourceCriterion(targetValue, type, target, positive ? ACCEPT : REJECT, NEXT));
     }
 }
 

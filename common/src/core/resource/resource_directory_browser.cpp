@@ -151,6 +151,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
     {
         QnResourcePtr rez = QnResourcePtr(new QnAviResource(xfile));
         rez->addFlags(QnResource::still_image);
+        rez->removeFlags(QnResource::video | QnResource::audio);
         return rez;
     }
 
