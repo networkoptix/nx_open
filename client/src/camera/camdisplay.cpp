@@ -112,7 +112,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_emptyPacketCounter(0),
       m_isEOFReached(false),
       m_hiQualityRetryCounter(0),
-      m_isStillImage(false)
+      m_isStillImage(false),
+      m_isLongWaiting(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -348,7 +349,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 //QTime t;
                 //t.start();
                 int sign = speed >= 0 ? 1 : -1;
-                //bool firstWait = true;
+                bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
                 while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed && useSync(vd))
@@ -356,9 +357,10 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
                     {
-						/*
 					    if (firstWait)
                         {
+                            m_isLongWaiting = sign *(displayedTime - ct) > MAX_FRAME_DURATION*1000;
+                            /*
                             QString s;
                             QTextStream str(&s);
                             str << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz") <<
@@ -366,15 +368,16 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                             str << " wait=" << (displayedTime - ct)/1000.0;
                             str.flush();
                             cl_log.log(s, cl_logALWAYS);
+                            */
                             firstWait = false;
                         }
-                        */
                         QnSleep::msleep(1);
                     }
                     else {
                         break;
                     }
                 }
+                m_isLongWaiting = false;
                 /*
                 if (sleepTimer.elapsed() > 0)
                     realSleepTime = sleepTimer.elapsed()*1000;
@@ -1134,6 +1137,8 @@ bool CLCamDisplay::isNoData() const
         return false;
     if (m_executingJump > 0 || m_buffering)
         return false;
+    if (m_isLongWaiting)
+        return true;
 
     qint64 ct = m_extTimeSrc->getCurrentTime();
     bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_jumpTime != DATETIME_NOW;

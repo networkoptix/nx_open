@@ -172,6 +172,7 @@ private:
     int m_emptyPacketCounter;
     bool m_isEOFReached;
     bool m_isStillImage;
+    bool m_isLongWaiting;
     
     int m_hiQualityRetryCounter;
 
