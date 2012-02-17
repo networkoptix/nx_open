@@ -1135,7 +1135,7 @@ bool CLCamDisplay::isNoData() const
 
     qint64 ct = m_extTimeSrc->getCurrentTime();
     bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled();
-    if (useSync || ct == DATETIME_NOW)
+    if (!useSync || ct == DATETIME_NOW)
         return false;
 
     int sign = m_speed >= 0 ? 1 : -1;
