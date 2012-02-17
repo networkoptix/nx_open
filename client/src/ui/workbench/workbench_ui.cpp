@@ -96,7 +96,6 @@ namespace {
 
     const qreal normalTreeOpacity = 0.85;
     const qreal hoverTreeOpacity = 0.95;
-
     const qreal normalTreeBackgroundOpacity = 0.5;
     const qreal hoverTreeBackgroundOpacity = 1.0;
 
@@ -105,6 +104,11 @@ namespace {
 
     const qreal normalTitleBackgroundOpacity = 0.5;
     const qreal hoverTitleBackgroundOpacity = 0.95;
+
+    const qreal normalHelpOpacity = 0.85;
+    const qreal hoverHelpOpacity = 0.95;
+    const qreal normalHelpBackgroundOpacity = 0.5;
+    const qreal hoverHelpBackgroundOpacity = 1.0;
 
     const int hideConstrolsTimeoutMSec = 2000;
 
@@ -375,6 +379,76 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(qnAction(Qn::MainMenuAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_mainMenuAction_triggered()));
 
 
+    /* Help window. */
+    m_helpBackgroundItem = new QGraphicsWidget(m_controlsWidget);
+    m_helpBackgroundItem->setAutoFillBackground(true);
+    {
+        QPalette palette = m_helpBackgroundItem->palette();
+
+        QLinearGradient gradient(0, 0, 1, 0);
+        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+        gradient.setColorAt(1.0,  QColor(0, 0, 0, 255));
+        gradient.setColorAt(0.005, QColor(0, 0, 0, 64));
+        gradient.setColorAt(0.0,  QColor(0, 0, 0, 255));
+        gradient.setSpread(QGradient::RepeatSpread);
+
+        palette.setBrush(QPalette::Window, QBrush(gradient));
+        m_helpBackgroundItem->setPalette(palette);
+    }
+
+    m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
+
+    m_helpPinButton = new QnImageButtonWidget(m_controlsWidget);
+    m_helpPinButton->resize(24, 24);
+    m_helpPinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("pin.png"));
+    m_helpPinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("unpin.png"));
+    m_helpPinButton->setCheckable(true);
+    m_helpPinButton->setFocusProxy(m_helpItem);
+
+    m_helpShowButton = newShowHideButton(m_controlsWidget);
+    m_helpShowButton->setFocusProxy(m_helpItem);
+
+    m_helpOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_helpOpacityProcessor->addTargetItem(m_helpItem);
+    m_helpOpacityProcessor->addTargetItem(m_helpShowButton);
+
+    m_helpHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_helpHidingProcessor->addTargetItem(m_helpItem);
+    m_helpHidingProcessor->addTargetItem(m_helpShowButton);
+    m_helpHidingProcessor->setHoverLeaveDelay(1000);
+    m_helpHidingProcessor->setFocusLeaveDelay(1000);
+
+    m_helpShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_helpShowingProcessor->addTargetItem(m_helpShowButton);
+    m_helpShowingProcessor->setHoverEnterDelay(250);
+
+    m_helpXAnimator = new VariantAnimator(this);
+    m_helpXAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_helpXAnimator->setTargetObject(m_helpItem);
+    m_helpXAnimator->setAccessor(new PropertyAccessor("x"));
+    m_helpXAnimator->setSpeed(m_helpItem->size().width() * 2.0);
+    m_helpXAnimator->setTimeLimit(500);
+
+    m_helpOpacityAnimatorGroup = new AnimatorGroup(this);
+    m_helpOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
+    m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpItem));
+    m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpBackgroundItem)); /* Speed of 1.0 is OK here. */
+    m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpShowButton));
+    m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpPinButton));
+
+    connect(m_helpPinButton,            SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_helpPinButton_toggled(bool)));
+    connect(m_helpShowButton,           SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_helpShowButton_toggled(bool)));
+    connect(m_helpOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpOpacity()));
+    connect(m_helpOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpOpacity()));
+    connect(m_helpOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
+    connect(m_helpOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
+    connect(m_helpHidingProcessor,      SIGNAL(hoverFocusLeft()),                                                                   this,                           SLOT(at_helpHidingProcessor_hoverFocusLeft()));
+    connect(m_helpShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_helpShowingProcessor_hoverEntered()));
+    connect(m_helpItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_helpItem_paintGeometryChanged()));
+    connect(m_helpItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_helpItem_paintGeometryChanged()));
+
+
+
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -494,6 +568,25 @@ void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
     m_titleShowButton->setChecked(opened);
 }
 
+void QnWorkbenchUi::setHelpOpened(bool opened, bool animate)
+{
+    m_helpShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
+
+    m_helpOpened = opened;
+    m_helpShowButton->setChecked(opened);
+
+    qreal newX = opened ? 0.0 : -m_helpItem->size().width() - 1.0 /* Just in case. */;
+    if (animate) {
+        m_helpXAnimator->animateTo(newX);
+    } else {
+        m_helpXAnimator->stop();
+        m_helpItem->setX(newX);
+    }
+
+    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    m_helpShowButton->setChecked(opened);
+}
+
 void QnWorkbenchUi::setTreeVisible(bool visible, bool animate) {
     bool changed = m_treeVisible != visible;
 
@@ -523,6 +616,17 @@ void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
     if(changed)
         updateTreeGeometry();
 }
+
+void QnWorkbenchUi::setHelpVisible(bool visible, bool animate) {
+    bool changed = m_helpVisible != visible;
+
+    m_helpVisible = visible;
+
+    updateHelpOpacity(animate);
+    if(changed)
+        updateHelpGeometry();
+}
+
 
 void QnWorkbenchUi::setTitleUsed(bool used) {
     m_titleItem->setVisible(used);
@@ -594,6 +698,24 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
     }
 }
 
+void QnWorkbenchUi::setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
+    if(animate) {
+        m_helpOpacityAnimatorGroup->pause();
+        opacityAnimator(m_helpItem)->setTargetValue(foregroundOpacity);
+        opacityAnimator(m_helpPinButton)->setTargetValue(foregroundOpacity);
+        opacityAnimator(m_helpBackgroundItem)->setTargetValue(backgroundOpacity);
+        opacityAnimator(m_helpShowButton)->setTargetValue(backgroundOpacity);
+        m_helpOpacityAnimatorGroup->start();
+    } else {
+        m_helpOpacityAnimatorGroup->stop();
+        m_helpItem->setOpacity(foregroundOpacity);
+        m_helpPinButton->setOpacity(foregroundOpacity);
+        m_helpBackgroundItem->setOpacity(backgroundOpacity);
+        m_helpShowButton->setOpacity(backgroundOpacity);
+    }
+}
+
+
 void QnWorkbenchUi::updateTreeOpacity(bool animate) {
     if(!m_treeVisible) {
         setTreeOpacity(0.0, 0.0, animate);
@@ -630,16 +752,30 @@ void QnWorkbenchUi::updateTitleOpacity(bool animate) {
     }
 }
 
+void QnWorkbenchUi::updateHelpOpacity(bool animate) {
+    if(!m_helpVisible) {
+        setHelpOpacity(0.0, 0.0, animate);
+    } else {
+        if(m_helpOpacityProcessor->isHovered()) {
+            setHelpOpacity(hoverHelpOpacity, hoverHelpBackgroundOpacity, animate);
+        } else {
+            setHelpOpacity(normalHelpOpacity, normalHelpBackgroundOpacity, animate);
+        }
+    }
+}
+
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
     if(m_inactive) {
-        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered();
+        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();
         setSliderVisible(hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
+        setHelpVisible(hovered, animate);
     } else {
         setSliderVisible(m_sliderItem->videoCamera() != NULL, animate);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
+        setHelpVisible(true, animate);
     }
 }
 
@@ -698,6 +834,10 @@ void QnWorkbenchUi::updateTreeGeometry() {
         return;
 
     m_treeItem->resize(geometry.size());
+}
+
+void QnWorkbenchUi::updateHelpGeometry() {
+
 }
 
 void QnWorkbenchUi::updateFpsGeometry() {
