@@ -28,11 +28,11 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget *parent)
     m_disableUpdateGridParams = false;
 }
 
-QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
+QList<QnScheduleTask::Data> CameraScheduleWidget::scheduleTasks() const
 {
-    QnScheduleTaskList tasks;
+    QList<QnScheduleTask::Data> tasks;
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
-        QnScheduleTask task;
+        QnScheduleTask::Data task;
 
         for (int col = 0; col < ui->gridWidget->columnCount();) {
             const QPoint cell(col, row);
@@ -83,7 +83,7 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
                 ++col;
             } else {
                 tasks.append(task);
-                task = QnScheduleTask();
+                task = QnScheduleTask::Data();
             }
         }
 
@@ -94,9 +94,9 @@ QnScheduleTaskList CameraScheduleWidget::scheduleTasks() const
     return tasks;
 }
 
-void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasksFrom)
+void CameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> &tasksFrom)
 {
-    QnScheduleTaskList tasks = tasksFrom;
+    QList<QnScheduleTask::Data> tasks = tasksFrom;
 
     for (int y = 0; y < ui->gridWidget->rowCount(); ++y) {
         for (int x = 0; x < ui->gridWidget->columnCount(); ++x)
@@ -104,42 +104,42 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList &tasksFrom)
     }
 
     if (!tasks.isEmpty()) {
-        const QnScheduleTask &task = tasks.first();
+        const QnScheduleTask::Data &task = tasks.first();
 
-        ui->spinBoxRecordBefore->setValue(task.getBeforeThreshold());
-        ui->spinBoxRecordAfter->setValue(task.getAfterThreshold());
+        ui->spinBoxRecordBefore->setValue(task.m_beforeThreshold);
+        ui->spinBoxRecordAfter->setValue(task.m_afterThreshold);
     } else {
         for (int nDay = 1; nDay <= 7; ++nDay)
-            tasks.append(QnScheduleTask(0, 0, nDay, 0, 86400, QnScheduleTask::RecordingType_Run, 10, 10));
+            tasks.append(QnScheduleTask::Data(nDay, 0, 86400, QnScheduleTask::RecordingType_Run, 10, 10));
     }
 
-    foreach (const QnScheduleTask &task, tasks) {
-        const int row = task.getDayOfWeek() - 1;
+    foreach (const QnScheduleTask::Data &task, tasks) {
+        const int row = task.m_dayOfWeek - 1;
 
         QColor color;
-        switch (task.getRecordingType()) {
+        switch (task.m_recordType) {
         case QnScheduleTask::RecordingType_Run: color = ui->btnRecordAlways->color(); break;
         case QnScheduleTask::RecordingType_MotionOnly: color = ui->btnRecordMotion->color(); break;
         case QnScheduleTask::RecordingType_Never: color = ui->btnNoRecord->color(); break;
         default:
-            qWarning("CameraScheduleWidget::setScheduleTasks(): Unhandled RecordingType value %d", task.getRecordingType());
+            qWarning("CameraScheduleWidget::setScheduleTasks(): Unhandled RecordingType value %d", task.m_recordType);
             break;
         }
 
         QString shortQuality;
-        switch (task.getStreamQuality()) {
+        switch (task.m_streamQuality) {
         case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
         case QnQualityNormal: shortQuality = QLatin1String("Md"); break;
         case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
         case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
         default:
-            qWarning("CameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d", task.getStreamQuality());
+            qWarning("CameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d", task.m_streamQuality);
             break;
         }
 
-        int fps = task.getFps();
+        int fps = task.m_fps;
 
-        for (int col = task.getStartTime() / 3600; col < task.getEndTime() / 3600; ++col) {
+        for (int col = task.m_startTime / 3600; col < task.m_endTime / 3600; ++col) {
             const QPoint cell(col, row);
 
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::ColorParam, color.rgba());

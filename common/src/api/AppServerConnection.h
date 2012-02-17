@@ -76,6 +76,7 @@ public:
     int saveAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
+    int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 

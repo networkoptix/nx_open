@@ -59,7 +59,12 @@ void CameraSettingsDialog::saveToModel()
     m_camera->setName(ui->nameEdit->text());
     m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
-    m_camera->setScheduleTasks(ui->cameraScheduleWidget->scheduleTasks());
+
+    QnScheduleTaskList scheduleTasks;
+    foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
+        scheduleTasks.append(QnScheduleTask(scheduleTaskData));
+    m_camera->setScheduleTasks(scheduleTasks);
+
 	m_camera->setMotionMask(ui->motionWidget->motionMask());
 }
 
@@ -72,7 +77,11 @@ void CameraSettingsDialog::updateView()
     ui->passwordEdit->setText(m_camera->getAuth().password());
 
     ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
-    ui->cameraScheduleWidget->setScheduleTasks(m_camera->getScheduleTasks());
+
+    QList<QnScheduleTask::Data> scheduleTasks;
+    foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
+        scheduleTasks.append(scheduleTaskData.getData());
+    ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
 }
 
 void CameraSettingsDialog::buttonClicked(QAbstractButton *button)

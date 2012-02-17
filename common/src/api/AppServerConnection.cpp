@@ -241,6 +241,17 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr
     return addObjectAsync("camera", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
+int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "camera");
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeCameras(cameras, data);
+
+    return addObjectAsync("camera", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
 int QnAppServerConnection::addStorage(const QnStorageResourcePtr& storagePtr, QByteArray& errorString)
 {
     QByteArray data;

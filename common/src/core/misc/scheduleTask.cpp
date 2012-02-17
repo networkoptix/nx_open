@@ -9,10 +9,10 @@ bool QnScheduleTask::containTimeMs(int weekTimeMs) const
 
 int QnScheduleTask::durationMs() const
 {
-    return 1000 * (m_endTime - m_startTime);
+    return 1000 * (m_data.m_endTime - m_data.m_startTime);
 }
 
 int QnScheduleTask::startTimeMs() const
 {
-    return 1000 * ((m_dayOfWeek - 1) * 3600 * 24 + m_startTime);
+    return 1000 * ((m_data.m_dayOfWeek - 1) * 3600 * 24 + m_data.m_startTime);
 }
