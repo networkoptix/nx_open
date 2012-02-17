@@ -429,7 +429,6 @@ void QnGLRenderer::draw(CLVideoDecoderOutput *img)
         m_color_old = (PixelFormat) m_curImg->format;
     }
 
-    qDebug() << "got new image. lineSize=" << m_curImg->linesize[0];
 }
 
 void QnGLRenderer::waitForFrameDisplayed(int channel)
@@ -702,7 +701,6 @@ void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTextu
 CLVideoDecoderOutput *QnGLRenderer::update()
 {
     QMutexLocker locker(&m_displaySync);
-    qDebug() << "Update new image" << (m_curImg != 0) << (m_curImg ? m_curImg->linesize[0] : 0);
 
     if (m_curImg && m_curImg->linesize[0]) {
         m_videoWidth = m_curImg->width;
