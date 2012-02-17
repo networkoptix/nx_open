@@ -1130,6 +1130,9 @@ bool CLCamDisplay::isNoData() const
 {
     if (m_isEOFReached)
         return true;
+    if (!m_extTimeSrc)
+        return false;
+
     qint64 ct = m_extTimeSrc->getCurrentTime();
     bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled();
     if (useSync || ct == DATETIME_NOW)
