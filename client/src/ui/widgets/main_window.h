@@ -80,6 +80,8 @@ protected slots:
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggred();
+    void at_openInFolderAction_triggered();
+
     void at_layout_closeRequested(QnWorkbenchLayout *layout);
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
 

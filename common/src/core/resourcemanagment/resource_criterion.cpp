@@ -358,8 +358,18 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
             type = EQUALITY;
         } else if (key == QLatin1String("name:")) {
             target = NAME;
-        } else if (key == QLatin1String("tag")) {
+        } else if (key == QLatin1String("tag:")) {
             target = TAGS;
+        } else if (key == QLatin1String("type:")) {
+            target = FLAGS;
+
+            if(pattern == "camera") {
+                targetValue = static_cast<int>(QnResource::live);
+            } else if(pattern == "image") {
+                targetValue = static_cast<int>(QnResource::still_image);
+            } else if(pattern == "video") {
+                targetValue = static_cast<int>(QnResource::local | QnResource::video);
+            }
         } else if (pattern == QLatin1String("live")) {
             target = FLAGS;
             targetValue = static_cast<int>(QnResource::live);
