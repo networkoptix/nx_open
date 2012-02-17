@@ -361,13 +361,11 @@ QnGLRenderer::QnGLRenderer(const QGLContext *context)
     m_hue = 0;
     m_saturation = 0;
     m_painterOpacity = 1.0;
-    m_gotnewimage = false;
     m_needwait = true;
     m_curImg = 0;
     m_videoWidth = 0;
     m_videoHeight = 0;
     m_newtexture = false;
-    m_updated = false;
 
     m_yuv2rgbBuffer = 0;
     m_yuv2rgbBufferLen = 0;
@@ -432,7 +430,7 @@ void QnGLRenderer::draw(CLVideoDecoderOutput *img)
         m_color_old = (PixelFormat) m_curImg->format;
     }
 
-    m_gotnewimage = true;
+    qDebug() << "got new image. lineSize=" << m_curImg->linesize[0];
 }
 
 void QnGLRenderer::waitForFrameDisplayed(int channel)
@@ -643,8 +641,6 @@ void QnGLRenderer::updateTexture()
 
         // TODO: free memory immediately for still images
     }
-
-    m_gotnewimage = false;
 }
 
 void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float* v_array)
@@ -704,26 +700,23 @@ void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTextu
         prog->release();
 }
 
-void QnGLRenderer::update()
+CLVideoDecoderOutput *QnGLRenderer::update()
 {
-    CLVideoDecoderOutput *curImg;
-    {
-        QMutexLocker locker(&m_displaySync);
-        curImg = m_curImg;
-        if (m_gotnewimage && curImg && curImg->linesize[0]) {
-            m_videoWidth = curImg->width;
-            m_videoHeight = curImg->height;
-            updateTexture();
-            if (curImg->pkt_dts != AV_NOPTS_VALUE)
-                m_lastDisplayedTime = curImg->pkt_dts;
-            m_lastDisplayedMetadata = curImg->metadata;
-            m_lastDisplayedFlags = curImg->flags;
-            m_newtexture = true;
-            m_textureImg = curImg;
-        } 
-    }
+    QMutexLocker locker(&m_displaySync);
+    qDebug() << "Update new image" << (m_curImg != 0) << (m_curImg ? m_curImg->linesize[0] : 0);
 
-    m_updated = true;
+    if (m_curImg && m_curImg->linesize[0]) {
+        m_videoWidth = m_curImg->width;
+        m_videoHeight = m_curImg->height;
+        updateTexture();
+        if (m_curImg->pkt_dts != AV_NOPTS_VALUE)
+            m_lastDisplayedTime = m_curImg->pkt_dts;
+        m_lastDisplayedMetadata = m_curImg->metadata;
+        m_lastDisplayedFlags = m_curImg->flags;
+        m_newtexture = true;
+    } 
+
+    return m_curImg;
 }
 
 QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
@@ -739,11 +732,7 @@ QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
 
     RenderStatus result;
 
-    if(!m_updated)
-        update();
-    m_updated = false;
-
-    CLVideoDecoderOutput *curImg = m_textureImg;
+    CLVideoDecoderOutput *curImg = update();
     if(m_newtexture) {
         result = RENDERED_NEW_FRAME;
     } else {

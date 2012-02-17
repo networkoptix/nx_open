@@ -35,7 +35,7 @@ public:
     void waitForFrameDisplayed(int channel);
     
     
-    void update();
+    CLVideoDecoderOutput *update();
     RenderStatus paint(const QRectF &r);
 
     qreal opacity() const;
@@ -95,13 +95,10 @@ private:
     qreal m_saturation;
     qreal m_painterOpacity;
 
-    bool m_gotnewimage;
     bool m_needwait;
     bool m_newtexture;
-    bool m_updated;
 
     CLVideoDecoderOutput *m_curImg;
-    CLVideoDecoderOutput *m_textureImg;
     
     int m_format;
 

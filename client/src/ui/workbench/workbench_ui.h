@@ -78,6 +78,10 @@ public:
         return m_titleUsed && m_titleOpened;
     }
 
+    bool isHelpOpened() const {
+        return m_helpOpened;
+    }
+
     bool isTreeVisible() const {
         return m_treeVisible;
     }
@@ -90,6 +94,11 @@ public:
         return m_titleVisible;
     }
 
+    bool isHelpVisible() const {
+        return m_helpVisible;
+    }
+
+
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
 
@@ -100,10 +109,12 @@ public slots:
     void setTreeVisible(bool visible, bool animate = true);
     void setSliderVisible(bool visible, bool animate = true);
     void setTitleVisible(bool visible, bool animate = true);
+    void setHelpVisible(bool visible, bool animate = true);
 
     void setTreeOpened(bool opened, bool animate = true);
     void setSliderOpened(bool opened, bool animate = true);
     void setTitleOpened(bool opened, bool animate = true);
+    void setHelpOpened(bool opened, bool animate = true);
 
     void toggleTreeOpened() {
         setTreeOpened(!isTreeOpened());
@@ -117,11 +128,16 @@ public slots:
         setTitleOpened(!isTitleOpened());
     }
 
+    void toggleHelpOpened() {
+        setHelpOpened(!isHelpOpened());
+    }
+
 protected:
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);
     void updateViewportMargins();
 
     void updateTreeGeometry();
+    void updateHelpGeometry();
     void updateFpsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
@@ -130,11 +146,13 @@ protected:
     void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+    void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
 protected slots:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
+    void updateHelpOpacity(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
     void setTreeShowButtonUsed(bool enabled = true);
@@ -213,11 +231,15 @@ private:
     /** Whether title bar is opened. */
     bool m_titleOpened;
 
+    bool m_helpOpened;
+
     bool m_treeVisible;
 
     bool m_sliderVisible;
 
     bool m_titleVisible;
+
+    bool m_helpVisible;
 
     bool m_titleUsed;
 
@@ -300,6 +322,26 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
+
+
+    /* Help window-related state. */
+    QGraphicsWidget *m_helpBackgroundItem;
+
+    QnMaskedProxyWidget *m_helpItem;
+
+    QnImageButtonWidget *m_helpPinButton;
+
+    QnImageButtonWidget *m_helpShowButton;
+
+    HoverFocusProcessor *m_helpOpacityProcessor;
+
+    HoverFocusProcessor *m_helpHidingProcessor;
+
+    HoverFocusProcessor *m_helpShowingProcessor;
+
+    VariantAnimator *m_helpXAnimator;
+
+    AnimatorGroup *m_helpOpacityAnimatorGroup;
 
 };
 
