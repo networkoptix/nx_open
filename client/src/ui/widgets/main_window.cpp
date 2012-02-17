@@ -197,9 +197,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(qnAction(Qn::NewTabAction));
     addAction(qnAction(Qn::CloseTabAction));
     addAction(qnAction(Qn::MainMenuAction));
-    addAction(qnAction(Qn::ScreenRecordingAction));
     addAction(qnAction(Qn::YouTubeUploadAction));
     addAction(qnAction(Qn::EditTagsAction));
+    addAction(qnAction(Qn::OpenInFolderAction));
 
     connect(qnAction(Qn::ExitAction),               SIGNAL(triggered()),    this,   SLOT(close()));
     connect(qnAction(Qn::FullscreenAction),         SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
@@ -214,6 +214,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(qnAction(Qn::ServerSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
     connect(qnAction(Qn::YouTubeUploadAction),      SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(qnAction(Qn::EditTagsAction),           SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
+    connect(qnAction(Qn::OpenInFolderAction),       SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
 
     qnMenu->setTargetProvider(m_ui);
 
@@ -550,6 +551,69 @@ if (action == &cm_remove_from_disk) {
     QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
 */
 
+bool QnMainWindow::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+        qnAction(Qn::MainMenuAction)->trigger();
+        return true;
+    }
+
+    if(m_dwm != NULL)
+        result |= m_dwm->widgetEvent(event);
+
+    return result;
+}
+
+void QnMainWindow::changeEvent(QEvent *event) 
+{
+    if(event->type() == QEvent::WindowStateChange)
+        updateFullScreenState();
+
+    base_type::changeEvent(event);
+}
+
+void QnMainWindow::paintEvent(QPaintEvent *event) 
+{
+    base_type::paintEvent(event);
+
+    if(m_drawCustomFrame) {
+        QPainter painter(this);
+
+        painter.setPen(QPen(qnGlobals->frameColor(), 3));
+        painter.drawRect(QRect(
+            0,
+            0,
+            width() - 1,
+            height() - 1
+            ));
+    }
+}
+
+void QnMainWindow::resizeEvent(QResizeEvent *event) {
+    QRect rect = this->rect();
+    QRect viewGeometry = m_view->geometry();
+
+    m_dwm->setNonErasableContentMargins(QMargins(
+        viewGeometry.left(),
+        viewGeometry.top(),
+        rect.right() - viewGeometry.right(),
+        rect.bottom() - viewGeometry.bottom()
+        ));
+
+    base_type::resizeEvent(event);
+}
+
+#ifdef Q_OS_WIN
+bool QnMainWindow::winEvent(MSG *message, long *result)
+{
+    if(m_dwm->widgetWinEvent(message, result))
+        return true;
+
+    return base_type::winEvent(message, result);
+}
+#endif
+
 void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
 {
     if(event->type() != QEvent::FileOpen) {
@@ -558,50 +622,6 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
     }
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
-}
-
-void QnMainWindow::at_editTagsAction_triggred() 
-{
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
-        return;
-
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resources[0]->getUniqueId(), this));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_cameraSettingsAction_triggered()
-{
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
-        return;
-
-    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(this, resources[0].dynamicCast<QnVirtualCameraResource>()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_serverSettingsAction_triggered() 
-{
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
-        return;
-
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(this, resources[0].dynamicCast<QnVideoServerResource>()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_youtubeUploadAction_triggered() 
-{
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
-        return;
-
-    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resources[0], this));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
 }
 
 void QnMainWindow::at_sessionManager_error(int error)
@@ -673,66 +693,51 @@ void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, co
     QMessageBox::critical(this, tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
 }
 
-bool QnMainWindow::event(QEvent *event) {
-    bool result = base_type::event(event);
-
-    if(event->type() == QnSystemMenuEvent::SystemMenu) {
-        qnAction(Qn::MainMenuAction)->trigger();
-        return true;
-    }
-
-    if(m_dwm != NULL)
-        result |= m_dwm->widgetEvent(event);
-
-    return result;
-}
-
-void QnMainWindow::changeEvent(QEvent *event) 
+void QnMainWindow::at_editTagsAction_triggred() 
 {
-    if(event->type() == QEvent::WindowStateChange)
-        updateFullScreenState();
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
+    if(resources.empty() || !resources[0])
+        return;
 
-    base_type::changeEvent(event);
+    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resources[0]->getUniqueId(), this));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 }
 
-void QnMainWindow::paintEvent(QPaintEvent *event) 
+void QnMainWindow::at_cameraSettingsAction_triggered()
 {
-    base_type::paintEvent(event);
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
+    if(resources.empty() || !resources[0])
+        return;
 
-    if(m_drawCustomFrame) {
-        QPainter painter(this);
-
-        painter.setPen(QPen(qnGlobals->frameColor(), 3));
-        painter.drawRect(QRect(
-            0,
-            0,
-            width() - 1,
-            height() - 1
-        ));
-    }
+    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(this, resources[0].dynamicCast<QnVirtualCameraResource>()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 }
 
-void QnMainWindow::resizeEvent(QResizeEvent *event) {
-    QRect rect = this->rect();
-    QRect viewGeometry = m_view->geometry();
-
-    m_dwm->setNonErasableContentMargins(QMargins(
-        viewGeometry.left(),
-        viewGeometry.top(),
-        rect.right() - viewGeometry.right(),
-        rect.bottom() - viewGeometry.bottom()
-    ));
-
-    base_type::resizeEvent(event);
-}
-
-#ifdef Q_OS_WIN
-bool QnMainWindow::winEvent(MSG *message, long *result)
+void QnMainWindow::at_serverSettingsAction_triggered() 
 {
-    if(m_dwm->widgetWinEvent(message, result))
-        return true;
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
+    if(resources.empty() || !resources[0])
+        return;
 
-    return base_type::winEvent(message, result);
+    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(this, resources[0].dynamicCast<QnVideoServerResource>()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 }
-#endif
+
+void QnMainWindow::at_youtubeUploadAction_triggered() 
+{
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
+    if(resources.empty() || !resources[0])
+        return;
+
+    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resources[0], this));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnMainWindow::at_openInFolderAction_triggered() {
+    return;
+}
 

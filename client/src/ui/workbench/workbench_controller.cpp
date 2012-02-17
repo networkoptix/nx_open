@@ -19,6 +19,7 @@
 
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/delete_later.h>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
@@ -276,10 +277,15 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
     /* Set up context menu. */
+    QWidget *window = m_display->view()->window();
+    window->addAction(qnAction(Qn::ScreenRecordingAction));
+    window->addAction(qnAction(Qn::RemoveLayoutItemAction));
+
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered()),                                                       this,                           SLOT(at_recordingSettingsAction_triggered()));
+    connect(qnAction(Qn::RemoveLayoutItemAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_removeLayoutItemAction_triggered()));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -1006,3 +1012,7 @@ void QnWorkbenchController::at_recordingSettingsAction_triggered() {
 	dialog.exec();
 }
 
+void QnWorkbenchController::at_removeLayoutItemAction_triggered() {
+    foreach(QnResourceWidget *widget, qnMenu->currentWidgetsTarget(sender()))
+        qnDeleteLater(widget);
+}

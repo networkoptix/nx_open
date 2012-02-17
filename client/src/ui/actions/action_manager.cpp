@@ -263,6 +263,7 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
 
 
+
     /* Resource actions. */
 
     factory(Qn::ShowMotionAction).
@@ -300,6 +301,25 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::media)));
 
+    factory(Qn::OpenInFolderAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
+        text(tr("Open in Containing Folder")).
+        shortcut(tr("Ctrl+Enter")).
+        autoRepeat(false).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::url | QnResource::local | QnResource::media)));
+
+
+    /* Layout actions. */
+
+    factory(Qn::ItemSeparator).
+        flags(Qn::Scene).
+        separator();
+
+    factory(Qn::RemoveLayoutItemAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Remove from Layout")).
+        shortcut(tr("Del")).
+        autoRepeat(false);
 
 
 

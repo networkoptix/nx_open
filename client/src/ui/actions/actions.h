@@ -117,6 +117,27 @@ namespace Qn {
          */
         EditTagsAction,
 
+        /**
+         * Opens a folder that contains the file resource.
+         */
+        OpenInFolderAction,
+
+        /**
+         * Deletes the file from disk.
+         */
+        DeleteFromDiskAction,
+
+
+
+        /* Layout actions. */
+
+        ItemSeparator,
+
+        /**
+         * Removes an item from a layout.
+         */
+        RemoveLayoutItemAction,
+
 
 #if 0
         /** 
