@@ -475,38 +475,59 @@ QnResourceList QnActionManager::currentResourcesTarget(QnAction *action) const {
     return QnActionMetaTypes::resources(currentTarget(action));
 }
 
+QnResourcePtr QnActionManager::currentResourceTarget(QnAction *action) const {
+    QnResourceList resources = currentResourcesTarget(action);
+
+    if(resources.size() != 1)
+        qnWarning("Invalid number of target resources for action '%1': expected %2, got %3.", action->text(), 1, resources.size());
+
+    return resources.isEmpty() ? QnResourcePtr() : resources.front();
+}
+
 QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) const {
     return QnActionMetaTypes::widgets(currentTarget(action));
 }
 
-QVariant QnActionManager::currentTarget(QObject *sender) const {
-    QnAction *action = qobject_cast<QnAction *>(sender);
-    if(action == NULL) {
-        qnWarning("Cause cannot be determined for non-QnAction senders.");
-        return QVariant();
+namespace {
+    QnAction *checkSender(QObject *sender) {
+        QnAction *result = qobject_cast<QnAction *>(sender);
+        if(result == NULL)
+            qnWarning("Cause cannot be determined for non-QnAction senders.");
+        return result;
     }
 
-    return currentTarget(action);
+} // anonymous namespace
+
+QVariant QnActionManager::currentTarget(QObject *sender) const {
+    if(QnAction *action = checkSender(sender)) {
+        return currentTarget(action);
+    } else {
+        return QVariant();
+    }
 }
 
 QnResourceList QnActionManager::currentResourcesTarget(QObject *sender) const {
-    QnAction *action = qobject_cast<QnAction *>(sender);
-    if(action == NULL) {
-        qnWarning("Cause cannot be determined for non-QnAction senders.");
+    if(QnAction *action = checkSender(sender)) {
+        return currentResourcesTarget(action);
+    } else {
         return QnResourceList();
     }
+}
 
-    return currentResourcesTarget(action);
+QnResourcePtr QnActionManager::currentResourceTarget(QObject *sender) const {
+    if(QnAction *action = checkSender(sender)) {
+        return currentResourceTarget(action);
+    } else {
+        return QnResourcePtr();
+    }
 }
 
 QnResourceWidgetList QnActionManager::currentWidgetsTarget(QObject *sender) const {
-    QnAction *action = qobject_cast<QnAction *>(sender);
-    if(action == NULL) {
-        qnWarning("Cause cannot be determined for non-QnAction senders.");
+    if(QnAction *action = checkSender(sender)) {
+        return currentWidgetsTarget(action);
+    } else {
         return QnResourceWidgetList();
     }
-
-    return currentWidgetsTarget(action);
 }
 
 void QnActionManager::at_menu_destroyed(QObject *menu) {

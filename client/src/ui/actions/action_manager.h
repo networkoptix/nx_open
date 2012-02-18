@@ -44,11 +44,15 @@ public:
 
     QnResourceList currentResourcesTarget(QnAction *action) const;
 
+    QnResourcePtr currentResourceTarget(QnAction *action) const;
+
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
 
     QVariant currentTarget(QObject *sender) const;
 
     QnResourceList currentResourcesTarget(QObject *sender) const;
+
+    QnResourcePtr currentResourceTarget(QObject *sender) const;
 
     QnResourceWidgetList currentWidgetsTarget(QObject *sender) const;
 

@@ -76,8 +76,8 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, co
 
 void ConnectionTestingDialog::testSettings()
 {
-    connection = QnAppServerConnectionFactory::createConnection(m_url);
-    connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
+    m_connection = QnAppServerConnectionFactory::createConnection(m_url);
+    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
 }
 
 void ConnectionTestingDialog::accept()

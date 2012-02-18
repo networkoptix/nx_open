@@ -19,11 +19,11 @@ class ConnectionTestingDialog : public QDialog
 
 public:
     explicit ConnectionTestingDialog(QWidget *parent, QUrl url);
-    ~ConnectionTestingDialog();
+    virtual ~ConnectionTestingDialog();
 
 public slots:
-    virtual void accept();
-    virtual void reject();
+    virtual void accept() override;
+    virtual void reject() override;
 
     void timeout();
     void testResults(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle);
@@ -32,14 +32,12 @@ private:
     void testSettings();
 
 private:
-    Q_DISABLE_COPY(ConnectionTestingDialog)
-
-    QTimer m_timeoutTimer;
-    QUrl m_url;
+    Q_DISABLE_COPY(ConnectionTestingDialog);
 
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
-
-    QnAppServerConnectionPtr connection;
+    QTimer m_timeoutTimer;
+    QUrl m_url;
+    QnAppServerConnectionPtr m_connection;
 };
 
 #endif // CONNECTION_TESTING_DIALOG_H

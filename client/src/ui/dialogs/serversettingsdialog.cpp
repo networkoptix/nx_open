@@ -16,7 +16,7 @@
 
 #define BILLION 1000000000LL
 
-ServerSettingsDialog::ServerSettingsDialog(QWidget *parent, QnVideoServerResourcePtr server) :
+ServerSettingsDialog::ServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent):
     QDialog(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
@@ -129,15 +129,6 @@ void ServerSettingsDialog::initView()
         ui->storagesTable->setItem(row, 0, new QTableWidgetItem(storage->getUrl(), QTableWidgetItem::Type));
         static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row,1))->setValue(storage->getSpaceLimit() / (BILLION));
         // setItem(row, 1, new QTableWidgetItem(QString::number(storage->getSpaceLimit() / (BILLION)), QTableWidgetItem::Type));
-    }
-}
-
-void ServerSettingsDialog::buttonClicked(QAbstractButton *button)
-{
-    if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Apply)
-    {
-        saveToModel();
-        save();
     }
 }
 

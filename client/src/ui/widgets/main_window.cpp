@@ -695,49 +695,49 @@ void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, co
 
 void QnMainWindow::at_editTagsAction_triggred() 
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resources[0]->getUniqueId(), this));
+    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_cameraSettingsAction_triggered()
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(this, resources[0].dynamicCast<QnVirtualCameraResource>()));
+    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(resource.dynamicCast<QnVirtualCameraResource>(), this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_serverSettingsAction_triggered() 
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(this, resources[0].dynamicCast<QnVideoServerResource>()));
+    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resource.dynamicCast<QnVideoServerResource>(), this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_youtubeUploadAction_triggered() 
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resources[0], this));
+    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resource, this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_openInFolderAction_triggered() {
-    return;
+    
 }
 
