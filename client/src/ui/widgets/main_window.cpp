@@ -10,12 +10,16 @@
 #include <QNetworkReply>
 #include <QFileOpenEvent>
 
-#include <api/AppServerConnection.h>
-#include <api/SessionManager.h>
+#include <utils/common/warnings.h>
+#include <utils/common/event_signalizer.h>
+#include <utils/common/environment.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
+
+#include <api/AppServerConnection.h>
+#include <api/SessionManager.h>
 
 #include "ui/actions/action_manager.h"
 
@@ -46,9 +50,6 @@
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
 
-#include <utils/common/warnings.h>
-#include <utils/common/event_signalizer.h>
-
 #include "file_processor.h"
 #include "settings.h"
 
@@ -57,8 +58,6 @@
 #include "system_menu_event.h"
 
 #include "eventmanager.h"
-
-#include <QAbstractEventDispatcher>
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
@@ -738,6 +737,10 @@ void QnMainWindow::at_youtubeUploadAction_triggered()
 }
 
 void QnMainWindow::at_openInFolderAction_triggered() {
-    
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
+        return;
+
+    QnEnvironment::showInGraphicalShell(this, resource->getUrl());
 }
 
