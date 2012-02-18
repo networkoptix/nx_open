@@ -87,7 +87,6 @@ void QnContextHelp::setHelpContext(ContextId id)
             return;
     }
     emit helpContextChanged(id, text, !isShown(id));
-    setShown(id, true);
 }
 
 void QnContextHelp::setShown(ContextId id, bool value)

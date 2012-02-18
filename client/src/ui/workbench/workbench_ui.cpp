@@ -398,7 +398,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_helpBackgroundItem->setPalette(palette);
-        connect(QnContextHelp::instance(), SIGNAL(helpContextChanged(ContextId, const QString&, bool)), m_helpBackgroundItem, SLOT(onHelpContextChanged(ContextId, const QString&, bool)));
     }
 
     QLabel *m_helpWidget = new QLabel();
@@ -413,6 +412,9 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_helpWidget->setText(trUtf8("<div style=\"color:red;font-size:100px\" align=\"center\">:)</div>"));
     m_helpWidget->setMinimumWidth(200);
     m_helpWidget->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+    //connect(QnContextHelp::instance(), SIGNAL(helpContextChanged(ContextId, const QString&, bool)), m_helpWidget, SLOT(onHelpContextChanged(ContextId, const QString&, bool)));
+
     
 
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
