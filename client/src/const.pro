@@ -1,3 +1,4 @@
+
 INCLUDEPATH += ../../common/src
 INCLUDEPATH += ../../common/contrib/qjson/include
 
@@ -25,6 +26,9 @@ FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
 include(../../common/contrib/qtsingleapplication/src/qtsingleapplication.pri)
+
+TRANSLATIONS += help/context_help_en.ts
+RESOURCES += help/context_help.qrc
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h

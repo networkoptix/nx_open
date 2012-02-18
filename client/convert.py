@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import shutil
@@ -200,6 +200,8 @@ genskin()
 index_dirs(('src',), 'src/const.pro', 'src/client.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/client.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 # index_dirs(('src', 'test'), 'test/const.pro', 'test/client_tests.pro', True, exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+
+os.system('lrelease src/client.pro')
 
 if platform() == 'win32':
     os.system('qmake -tp vc -o src/client.vcproj src/client.pro')
