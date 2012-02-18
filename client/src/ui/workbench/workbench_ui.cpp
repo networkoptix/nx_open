@@ -129,6 +129,9 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleVisible(false),
     m_treeVisible(false),
     m_sliderVisible(false),
+    m_helpPinned(false),
+    m_helpVisible(false),
+    m_helpOpened(false),
     m_flags(0),
     m_ignoreClickEvent(false)
 {

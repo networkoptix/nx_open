@@ -106,6 +106,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
 
     m_buttonsWidget = new QGraphicsWidget(this);
     m_buttonsWidget->setLayout(m_buttonsLayout);
+    m_buttonsWidget->setAcceptedMouseButtons(0);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);

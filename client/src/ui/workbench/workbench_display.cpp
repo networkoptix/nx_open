@@ -19,6 +19,7 @@
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
 #include <ui/animation/curtain_animator.h>
+#include <ui/animation/widget_opacity_animator.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
@@ -1179,6 +1180,20 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
 			}
         }
     }
+
+    /* Hide / show other items when zoomed. */
+    if(role == QnWorkbench::ZOOMED) 
+    {
+        QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+        if(zoomedItem)
+            opacityAnimator(widget(zoomedItem))->animateTo(1.0);
+        qreal opacity = zoomedItem ? 0.0 : 1.0;
+
+        foreach(QnResourceWidget *widget, m_widgetByRenderer)
+            if(widget->item() != zoomedItem)
+                opacityAnimator(widget)->animateTo(opacity);
+    }
+
 
     emit widgetChanged(role);
 }
