@@ -20,16 +20,20 @@ public:
     ~QnContextHelp();
     void setHelpContext(ContextId id);
     
-    void setShown(ContextId id, bool value);
-    bool isShown(ContextId id) const;
+    void setNeedAutoShow(ContextId id, bool value);
+    bool isNeedAutoShow(ContextId id) const;
+
+    QString currentText() const;
+
     void resetShownInfo();
 signals:
-    void helpContextChanged(ContextId id, const QString& helpText, bool isFirstTime);
+    void helpContextChanged(ContextId id);
 private:
     void installHelpContext(const QString& lang);
     void deserializeShownContext();
     void serializeShownContext();
 private:
+    QString m_currentText;
     QTranslator* m_translator;
     QSettings m_settings;
     QMap<ContextId, bool> m_shownContext;

@@ -66,30 +66,29 @@ void QnContextHelp::installHelpContext(const QString& lang)
     }
 }
 
-bool QnContextHelp::isShown(ContextId id) const
+bool QnContextHelp::isNeedAutoShow(ContextId id) const
 {
-    return m_shownContext[id];
+    return !m_shownContext[id];
 }
 
 void QnContextHelp::setHelpContext(ContextId id)
 {
-    QString text;
     switch(id)
     {
         case ContextId_Scene:
-            text = trUtf8("ContextId_Scene");
+            m_currentText = trUtf8("ContextId_Scene");
             break;
         case ContextId_MotionGrid:
-            text = trUtf8("ContextId_MotionGrid");
+            m_currentText = trUtf8("ContextId_MotionGrid");
             break;
         default:
             qWarning() << "Unknown help context" << (int) id;
             return;
     }
-    emit helpContextChanged(id, text, !isShown(id));
+    emit helpContextChanged(id);
 }
 
-void QnContextHelp::setShown(ContextId id, bool value)
+void QnContextHelp::setNeedAutoShow(ContextId id, bool value)
 {
     m_shownContext[id] = value;
     serializeShownContext();
