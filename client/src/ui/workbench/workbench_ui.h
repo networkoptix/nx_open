@@ -98,7 +98,6 @@ public:
         return m_helpVisible;
     }
 
-
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
 
@@ -133,7 +132,7 @@ public slots:
     }
 
 protected:
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY);
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY);
     void updateViewportMargins();
 
     void updateTreeGeometry();
@@ -141,6 +140,7 @@ protected:
     void updateFpsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
+    QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     void updateActivityInstrumentState();
 
     void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
@@ -184,6 +184,12 @@ protected slots:
 
     void at_titleItem_geometryChanged();
     void at_titleShowButton_toggled(bool checked);
+
+    void at_helpPinButton_toggled(bool checked);
+    void at_helpShowButton_toggled(bool checked);
+    void at_helpHidingProcessor_hoverFocusLeft();
+    void at_helpShowingProcessor_hoverEntered();
+    void at_helpItem_paintGeometryChanged();
 
     void at_fpsItem_geometryChanged();
 
@@ -342,6 +348,8 @@ private:
     VariantAnimator *m_helpXAnimator;
 
     AnimatorGroup *m_helpOpacityAnimatorGroup;
+
+    bool m_helpPinned;
 
 };
 

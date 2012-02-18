@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QSettings>
 #include <QMenu>
+#include <QLabel>
 
 #include <utils/common/event_signalizer.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -396,7 +397,21 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_helpBackgroundItem->setPalette(palette);
     }
 
+    QLabel *m_helpWidget = new QLabel();
+    m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
+    {
+        QPalette palette = m_helpWidget->palette();
+        palette.setColor(QPalette::Window, Qt::transparent);
+        palette.setColor(QPalette::Base, Qt::transparent);
+        m_helpWidget->setPalette(palette);
+    }
+    m_helpWidget->setTextFormat(Qt::RichText);
+    m_helpWidget->setText(trUtf8("<div style=\"color:red;font-size:100px\" align=\"center\">:)</div>"));
+    m_helpWidget->setMinimumWidth(200);
+    m_helpWidget->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
+    m_helpItem->setWidget(m_helpWidget);
 
     m_helpPinButton = new QnImageButtonWidget(m_controlsWidget);
     m_helpPinButton->resize(24, 24);
@@ -406,6 +421,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_helpPinButton->setFocusProxy(m_helpItem);
 
     m_helpShowButton = newShowHideButton(m_controlsWidget);
+    m_helpShowButton->setTransform(QTransform::fromScale(-1, 1));
+
     m_helpShowButton->setFocusProxy(m_helpItem);
 
     m_helpOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
@@ -466,6 +483,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setTitleOpened(true, false);
     setTitleVisible(true, false);
     setTitleUsed(false);
+    setHelpOpened(false, false);
+    setHelpVisible(true, false);
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -521,7 +540,6 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     m_treeOpened = opened;
-    m_treeShowButton->setChecked(opened);
 
     qreal newX = opened ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case. */;
     if (animate) {
@@ -573,9 +591,8 @@ void QnWorkbenchUi::setHelpOpened(bool opened, bool animate)
     m_helpShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     m_helpOpened = opened;
-    m_helpShowButton->setChecked(opened);
 
-    qreal newX = opened ? 0.0 : -m_helpItem->size().width() - 1.0 /* Just in case. */;
+    qreal newX = m_controlsWidgetRect.right() + (opened ? -m_helpItem->size().width() : 1.0 /* Just in case. */);
     if (animate) {
         m_helpXAnimator->animateTo(newX);
     } else {
@@ -603,8 +620,10 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
     m_sliderVisible = visible;
 
     updateSliderOpacity(animate);
-    if(changed)
+    if(changed) {
         updateTreeGeometry();
+        updateHelpGeometry();
+    }
 }
 
 void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
@@ -613,8 +632,10 @@ void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
     m_titleVisible = visible;
 
     updateTitleOpacity(animate);
-    if(changed)
+    if(changed) {
         updateTreeGeometry();
+        updateHelpGeometry();
+    }
 }
 
 void QnWorkbenchUi::setHelpVisible(bool visible, bool animate) {
@@ -836,8 +857,61 @@ void QnWorkbenchUi::updateTreeGeometry() {
     m_treeItem->resize(geometry.size());
 }
 
-void QnWorkbenchUi::updateHelpGeometry() {
+QRectF QnWorkbenchUi::updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
+    QPointF pos(
+        helpGeometry.x(),
+        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0)
+    );
+    QSizeF size(
+        helpGeometry.width(),
+        ((!m_sliderVisible && m_helpVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y()
+    );
+    return QRectF(pos, size);
+}
 
+void QnWorkbenchUi::updateHelpGeometry() {
+    /* Update painting rect the "fair" way. */
+    QRectF geometry = updatedHelpGeometry(m_helpItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry());
+    m_helpItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
+
+    /* Always change position. */
+    m_helpItem->setPos(geometry.topLeft());
+
+    /* Whether actual size change should be deferred. */
+    bool defer = false;
+
+    /* Calculate slider target position. */
+    QPointF sliderPos;
+    if(!m_sliderVisible && m_helpVisible) {
+        sliderPos = QPointF(m_sliderItem->pos().x(), m_controlsWidgetRect.bottom());
+    } else if(m_sliderYAnimator->isRunning()) {
+        sliderPos = QPointF(m_sliderItem->pos().x(), m_sliderYAnimator->targetValue().toReal());
+        defer |= !qFuzzyCompare(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+    } else {
+        sliderPos = m_sliderItem->pos();
+    }
+
+    /* Calculate title target position. */
+    QPointF titlePos;
+    if((!m_titleVisible || !m_titleUsed) && m_helpVisible) {
+        titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
+    } else if(m_titleYAnimator->isRunning()) {
+        titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
+        defer |= !qFuzzyCompare(titlePos, m_titleItem->pos());
+    } else {
+        titlePos = m_titleItem->pos();
+    }
+
+    /* Calculate target geometry. */
+    geometry = updatedHelpGeometry(m_helpItem->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_sliderItem->size()));
+    if(qFuzzyCompare(geometry, m_helpItem->geometry()))
+        return;
+
+    /* Defer size change if it doesn't cause empty space to occur. */
+    if(defer && geometry.height() < m_helpItem->size().height())
+        return;
+
+    m_helpItem->resize(geometry.size());
 }
 
 void QnWorkbenchUi::updateFpsGeometry() {
@@ -852,11 +926,11 @@ void QnWorkbenchUi::updateFpsGeometry() {
     m_fpsItem->setPos(pos);
 }
 
-QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY) {
+QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY) {
     return QMargins(
         m_treePinned ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
-        0.0,
+        std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - (m_helpPinned ? helpY : 0.0))),
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY))
     );
 }
@@ -885,7 +959,7 @@ void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
     if(used) {
         m_treeShowButton->setAcceptedMouseButtons(Qt::LeftButton);
     } else {
-        m_treeShowButton->setAcceptedMouseButtons(Qt::RightButton);
+        m_treeShowButton->setAcceptedMouseButtons(0);
     }
 }
 
@@ -915,7 +989,8 @@ void QnWorkbenchUi::updateViewportMargins() {
             m_treeItem->size().width(),
             m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y(),
             m_titleItem->size().height(),
-            m_sliderYAnimator->isRunning() ? m_sliderYAnimator->targetValue().toReal() : m_sliderItem->pos().y()
+            m_sliderYAnimator->isRunning() ? m_sliderYAnimator->targetValue().toReal() : m_sliderItem->pos().y(),
+            m_helpXAnimator->isRunning() ? m_helpXAnimator->targetValue().toReal() : m_helpItem->pos().y()
         ));
     }
 }
@@ -1123,7 +1198,15 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
         m_titleItem->size().height()
     ));
 
+    m_helpItem->setGeometry(QRectF(
+        m_helpItem->pos().x() - oldRect.width() + rect.width(),
+        m_helpItem->pos().y(),
+        m_helpItem->size().width(),
+        m_helpItem->size().height() - oldRect.height() + rect.height()
+    ));
+
     updateTreeGeometry();
+    updateHelpGeometry();
     updateFpsGeometry();
 }
 
@@ -1134,6 +1217,7 @@ void QnWorkbenchUi::at_sliderShowButton_toggled(bool checked) {
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateTreeGeometry();
+    updateHelpGeometry();
 
     updateViewportMargins();
 
@@ -1230,6 +1314,7 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
 
     updateFpsGeometry();
     updateTreeGeometry();
+    updateHelpGeometry();
 
     QRectF geometry = m_titleItem->geometry();
 
@@ -1245,3 +1330,50 @@ void QnWorkbenchUi::at_fpsItem_geometryChanged() {
     updateFpsGeometry();
 }
 
+void QnWorkbenchUi::at_helpPinButton_toggled(bool checked) {
+    m_helpPinned = checked;
+
+    if(checked)
+        setHelpOpened(true);
+
+    updateViewportMargins();
+}
+
+void QnWorkbenchUi::at_helpShowButton_toggled(bool checked) {
+    if(!m_ignoreClickEvent)
+        setHelpOpened(checked);
+}
+
+void QnWorkbenchUi::at_helpHidingProcessor_hoverFocusLeft() {
+    if(!m_helpPinned)
+        setHelpOpened(false);
+}
+
+void QnWorkbenchUi::at_helpShowingProcessor_hoverEntered() {
+    if(!m_helpPinned && !isHelpOpened()) {
+        setHelpOpened(true);
+
+        /* So that the click that may follow won't hide it. */
+        //setTreeShowButtonUsed(false);
+        //QTimer::singleShot(200, this, SLOT(setTreeShowButtonUsed()));
+    }
+
+    m_helpHidingProcessor->forceHoverEnter();
+    m_helpOpacityProcessor->forceHoverEnter();
+}
+
+void QnWorkbenchUi::at_helpItem_paintGeometryChanged() {
+    QRectF paintGeometry = m_helpItem->paintGeometry();
+
+    /* Don't hide help item here. It will repaint itself when shown, which will
+     * degrade performance. */
+
+    m_helpBackgroundItem->setGeometry(paintGeometry);
+    m_helpShowButton->setPos(QPointF(
+        qMin(m_controlsWidgetRect.right(), paintGeometry.left()),
+        (paintGeometry.top() + paintGeometry.bottom() - m_helpShowButton->size().height()) / 2
+    ));
+    m_helpPinButton->setPos(paintGeometry.topLeft());
+
+    updateViewportMargins();
+}
