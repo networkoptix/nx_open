@@ -933,7 +933,7 @@ QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal
     return QMargins(
         m_treePinned ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
-        std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - (m_helpPinned ? helpY : 0.0))),
+        std::floor(qMax(0.0, m_helpPinned ? m_controlsWidgetRect.right() - helpY : 0.0)),
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY))
     );
 }
