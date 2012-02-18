@@ -51,13 +51,12 @@ void QnContextHelp::installHelpContext(const QString& lang)
     QFile file(trFileName);
     if (file.open(QFile::ReadOnly))
     {
-        QByteArray data = file.readAll();
         if (m_translator) {
             QCoreApplication::removeTranslator(m_translator);
             delete m_translator;
         }
         m_translator = new QTranslator();
-        if (m_translator->load(reinterpret_cast<uchar *>(data.data()),data.length()))
+        if (m_translator->load(trFileName))
             qApp->installTranslator(m_translator);
         else
             qWarning() << "Invalid translation file" << trFileName;
@@ -67,7 +66,7 @@ void QnContextHelp::installHelpContext(const QString& lang)
     }
 }
 
-bool QnContextHelp::isFirstTime(ContextId id) const
+bool QnContextHelp::isShown(ContextId id) const
 {
     return m_shownContext[id];
 }
@@ -82,18 +81,23 @@ void QnContextHelp::setHelpContext(ContextId id)
             break;
         case ContextId_MotionGrid:
             text = trUtf8("ContextId_MotionGrid");
-            text = qApp->translate("QnContextHelp", "ContextId_MotionGrid", 0, QCoreApplication::UnicodeUTF8);
             break;
         default:
             qWarning() << "Unknown help context" << (int) id;
             return;
     }
-    emit helpContextChanged(id, text, isFirstTime(id));
-    setFirstTime(id, false);
+    emit helpContextChanged(id, text, !isShown(id));
+    setShown(id, true);
 }
 
-void QnContextHelp::setFirstTime(ContextId id, bool value)
+void QnContextHelp::setShown(ContextId id, bool value)
 {
     m_shownContext[id] = value;
+    serializeShownContext();
+}
+
+void QnContextHelp::resetShownInfo()
+{
+    m_shownContext.clear();
     serializeShownContext();
 }

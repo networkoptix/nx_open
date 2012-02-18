@@ -20,8 +20,9 @@ public:
     ~QnContextHelp();
     void setHelpContext(ContextId id);
     
-    void setFirstTime(ContextId id, bool value);
-    bool isFirstTime(ContextId id) const;
+    void setShown(ContextId id, bool value);
+    bool isShown(ContextId id) const;
+    void resetShownInfo();
 signals:
     void helpContextChanged(ContextId id, const QString& helpText, bool isFirstTime);
 private:
