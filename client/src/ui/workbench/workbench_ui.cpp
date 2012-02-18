@@ -46,8 +46,11 @@
 #include <ui/actions/action_meta_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
+#include <ui/widgets/help_context_widget.h>
 #include <ui/style/skin.h>
 #include <ui/mixins/render_watch_mixin.h>
+
+#include <help/qncontext_help.h>
 
 #include "camera/camera.h"
 #include "openal/qtvaudiodevice.h"
@@ -401,7 +404,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         connect(QnContextHelp::instance(), SIGNAL(helpContextChanged(ContextId, const QString&, bool)), m_helpBackgroundItem, SLOT(onHelpContextChanged(ContextId, const QString&, bool)));
     }
 
-    QLabel *m_helpWidget = new QLabel();
+    m_helpWidget = new QnHelpContextWidget(QnContextHelp::instance());
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_helpWidget->palette();
@@ -409,11 +412,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setColor(QPalette::Base, Qt::transparent);
         m_helpWidget->setPalette(palette);
     }
-    m_helpWidget->setTextFormat(Qt::RichText);
-    m_helpWidget->setText(trUtf8("<div style=\"color:red;font-size:100px\" align=\"center\">:)</div>"));
-    m_helpWidget->setMinimumWidth(200);
-    m_helpWidget->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    
 
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_helpItem->setWidget(m_helpWidget);

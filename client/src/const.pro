@@ -180,12 +180,20 @@ PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 RESOURCES += ../build/skin.qrc
-FORMS += ui/preferences/connectionssettingswidget.ui ui/preferences/licensewidget.ui \
-         ui/preferences/preferences.ui ui/preferences/recordingsettingswidget.ui \
-         ui/dialogs/logindialog.ui ui/dialogs/tagseditdialog.ui ui/dialogs/camerasettingsdialog.ui \
-         ui/dialogs/serversettingsdialog.ui \
-         youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui \
-         ui/device_settings/camera_schedule.ui ui/dialogs/connectiontestingdialog.ui
+FORMS += \
+    ui/preferences/connectionssettingswidget.ui \
+    ui/preferences/licensewidget.ui \
+    ui/preferences/preferences.ui \
+    ui/preferences/recordingsettingswidget.ui \
+    ui/dialogs/logindialog.ui \
+    ui/dialogs/tagseditdialog.ui \
+    ui/dialogs/camerasettingsdialog.ui \
+    ui/dialogs/serversettingsdialog.ui \
+    youtube/youtubeuploaddialog.ui \
+    youtube/youtubesetting.ui \
+    ui/device_settings/camera_schedule.ui \
+    ui/dialogs/connectiontestingdialog.ui \
+    ui/widgets/help_context_widget.ui \
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"
