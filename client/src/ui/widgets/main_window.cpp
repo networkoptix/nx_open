@@ -271,9 +271,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Update state. */
     updateDwmState();
     at_settings_lastUsedConnectionChanged();
-
-    /* Add single tab. */
-    openNewLayout();
 }
 
 QnMainWindow::~QnMainWindow()
