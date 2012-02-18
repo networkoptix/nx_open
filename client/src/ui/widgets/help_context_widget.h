@@ -17,6 +17,7 @@ public:
 
 protected slots:
     void at_contextHelp_helpContextChanged(QnContextHelp::ContextId id);
+    void at_checkBox_toggled(bool checked);
 
 protected:
     QnContextHelp *contextHelp() const {
@@ -26,6 +27,7 @@ protected:
 private:
     QScopedPointer<Ui::HelpContextWidget> ui;
     QWeakPointer<QnContextHelp> m_contextHelp;
+    QnContextHelp::ContextId m_id;
 };
 
 #endif // QN_HELP_CONTEXT_WIDGET_H

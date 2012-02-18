@@ -193,6 +193,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_treeWidget->setPalette(palette);
     }
     m_treeWidget->setWorkbench(display->workbench());
+    m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
@@ -411,8 +412,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setColor(QPalette::Base, Qt::transparent);
         m_helpWidget->setPalette(palette);
     }
-
-    //connect(QnContextHelp::instance(), SIGNAL(helpContextChanged(ContextId, const QString&, bool)), m_helpWidget, SLOT(onHelpContextChanged(ContextId, const QString&, bool)));
+    m_helpWidget->resize(250, 0);
 
 
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
@@ -931,11 +931,11 @@ void QnWorkbenchUi::updateFpsGeometry() {
     m_fpsItem->setPos(pos);
 }
 
-QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY) {
+QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
     return QMargins(
         m_treePinned ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
-        std::floor(qMax(0.0, m_helpPinned ? m_controlsWidgetRect.right() - helpY : 0.0)),
+        std::floor(qMax(0.0, m_helpPinned ? m_controlsWidgetRect.right() - helpX : 0.0)),
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY))
     );
 }
@@ -995,7 +995,7 @@ void QnWorkbenchUi::updateViewportMargins() {
             m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y(),
             m_titleItem->size().height(),
             m_sliderYAnimator->isRunning() ? m_sliderYAnimator->targetValue().toReal() : m_sliderItem->pos().y(),
-            m_helpXAnimator->isRunning() ? m_helpXAnimator->targetValue().toReal() : m_helpItem->pos().y()
+            m_helpXAnimator->isRunning() ? m_helpXAnimator->targetValue().toReal() : m_helpItem->pos().x()
         ));
     }
 }

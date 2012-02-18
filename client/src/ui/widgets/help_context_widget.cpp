@@ -9,10 +9,8 @@ QnHelpContextWidget::QnHelpContextWidget(QnContextHelp *contextHelp, QWidget *pa
 {
     ui->setupUi(this);
 
-    setMinimumWidth(180);
-    setMaximumWidth(300);
-
-    connect(contextHelp, SIGNAL(helpContextChanged(QnContextHelp::ContextId)), this, SLOT(at_contextHelp_helpContextChanged(QnContextHelp::ContextId)));
+    connect(contextHelp,    SIGNAL(helpContextChanged(QnContextHelp::ContextId)),   this,   SLOT(at_contextHelp_helpContextChanged(QnContextHelp::ContextId)));
+    connect(ui->checkBox,   SIGNAL(toggled(bool)),                                  this,   SLOT(at_checkBox_toggled(bool)));
 }
 
 QnHelpContextWidget::~QnHelpContextWidget() {
@@ -20,6 +18,11 @@ QnHelpContextWidget::~QnHelpContextWidget() {
 }
 
 void QnHelpContextWidget::at_contextHelp_helpContextChanged(QnContextHelp::ContextId id) {
-    
+    m_id = id;
+    ui->label->setText(contextHelp()->text(id));
+    ui->checkBox->setCheckState(contextHelp()->isNeedAutoShow(id) ? Qt::Unchecked : Qt::Checked);
 }
 
+void QnHelpContextWidget::at_checkBox_toggled(bool checked) {
+    contextHelp()->setNeedAutoShow(m_id, !checked);
+}

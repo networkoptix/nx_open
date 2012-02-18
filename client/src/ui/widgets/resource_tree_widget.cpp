@@ -165,10 +165,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
 
-    setMinimumWidth(180);
-    setMaximumWidth(300);
-
-
     m_resourceTreeView->setModel(m_resourceModel);
     //QMetaObject::invokeMethod(m_resourceTreeView, "expandAll", Qt::QueuedConnection); // ###
 }

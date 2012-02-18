@@ -10,8 +10,9 @@ class QnContextHelp: public QObject
 
 public:
     enum ContextId {
-        ContextId_Scene,
-        ContextId_MotionGrid
+        ContextId_Invalid = -1,
+        ContextId_Scene = 0,
+        ContextId_MotionGrid,
     };
 
     static QnContextHelp* instance();
@@ -23,17 +24,19 @@ public:
     void setNeedAutoShow(ContextId id, bool value);
     bool isNeedAutoShow(ContextId id) const;
 
-    QString currentText() const;
+    QString text(ContextId id) const;
+
+    ContextId currentId() const;
 
     void resetShownInfo();
 signals:
-    void helpContextChanged(ContextId id);
+    void helpContextChanged(QnContextHelp::ContextId id);
 private:
     void installHelpContext(const QString& lang);
     void deserializeShownContext();
     void serializeShownContext();
 private:
-    QString m_currentText;
+    ContextId m_currentId;
     QTranslator* m_translator;
     QSettings m_settings;
     QMap<ContextId, bool> m_shownContext;
