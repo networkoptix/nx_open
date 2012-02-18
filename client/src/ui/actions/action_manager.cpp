@@ -304,6 +304,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
         text(tr("Open in Containing Folder")).
+        shortcut(tr("Ctrl+Return")).
         shortcut(tr("Ctrl+Enter")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::url | QnResource::local | QnResource::media)));
