@@ -12,10 +12,10 @@ class AboutDialog : public QDialog
 
 public:
     explicit AboutDialog(QWidget *parent = 0);
-    ~AboutDialog();
+    virtual ~AboutDialog();
 
 protected:
-    void changeEvent(QEvent *event);
+    virtual void changeEvent(QEvent *event) override;
 
 private:
     void retranslateUi();

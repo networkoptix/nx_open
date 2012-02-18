@@ -88,6 +88,6 @@ bool QnAction::event(QEvent *event) {
 }
 
 void QnAction::at_toggled(bool checked) {
-    setText(checked ? m_normalText : m_toggledText);
+    setText(checked ? m_toggledText : m_normalText);
 }
 

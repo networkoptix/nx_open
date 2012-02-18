@@ -10,12 +10,16 @@
 #include <QNetworkReply>
 #include <QFileOpenEvent>
 
-#include <api/AppServerConnection.h>
-#include <api/SessionManager.h>
+#include <utils/common/warnings.h>
+#include <utils/common/event_signalizer.h>
+#include <utils/common/environment.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
+
+#include <api/AppServerConnection.h>
+#include <api/SessionManager.h>
 
 #include "ui/actions/action_manager.h"
 
@@ -46,9 +50,6 @@
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
 
-#include <utils/common/warnings.h>
-#include <utils/common/event_signalizer.h>
-
 #include "file_processor.h"
 #include "settings.h"
 
@@ -57,8 +58,6 @@
 #include "system_menu_event.h"
 
 #include "eventmanager.h"
-
-#include <QAbstractEventDispatcher>
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
@@ -695,49 +694,53 @@ void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, co
 
 void QnMainWindow::at_editTagsAction_triggred() 
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resources[0]->getUniqueId(), this));
+    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_cameraSettingsAction_triggered()
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(this, resources[0].dynamicCast<QnVirtualCameraResource>()));
+    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(resource.dynamicCast<QnVirtualCameraResource>(), this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_serverSettingsAction_triggered() 
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(this, resources[0].dynamicCast<QnVideoServerResource>()));
+    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resource.dynamicCast<QnVideoServerResource>(), this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_youtubeUploadAction_triggered() 
 {
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
         return;
 
-    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resources[0], this));
+    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resource, this));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnMainWindow::at_openInFolderAction_triggered() {
-    return;
+    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
+    if(resource.isNull())
+        return;
+
+    QnEnvironment::showInGraphicalShell(this, resource->getUrl());
 }
 

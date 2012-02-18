@@ -18,16 +18,16 @@ class TagsEditDialog : public QDialog
 
 public:
     explicit TagsEditDialog(const QStringList &objectIds, QWidget *parent = 0);
-    ~TagsEditDialog();
+    virtual ~TagsEditDialog();
 
 public Q_SLOTS:
-    virtual void accept();
-    virtual void reset();
+    virtual void accept() override;
+    void reset();
 
 protected:
-    void changeEvent(QEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void showEvent(QShowEvent *event);
+    virtual void changeEvent(QEvent *event) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void showEvent(QShowEvent *event) override;
 
     void retranslateUi();
 

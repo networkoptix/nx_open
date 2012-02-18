@@ -15,7 +15,7 @@
 
 #include "settings.h"
 
-CameraSettingsDialog::CameraSettingsDialog(QWidget *parent, QnVirtualCameraResourcePtr camera) :
+CameraSettingsDialog::CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraSettingsDialog),
     m_camera(camera),
@@ -73,15 +73,6 @@ void CameraSettingsDialog::updateView()
 
     ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
     ui->cameraScheduleWidget->setScheduleTasks(m_camera->getScheduleTasks());
-}
-
-void CameraSettingsDialog::buttonClicked(QAbstractButton *button)
-{
-    if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Apply)
-    {
-        saveToModel();
-        save();
-    }
 }
 
 void CameraSettingsDialog::save()

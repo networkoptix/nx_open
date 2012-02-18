@@ -13,17 +13,18 @@ namespace Ui {
 class LoginDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit LoginDialog(QWidget *parent = 0);
-    ~LoginDialog();
+    virtual ~LoginDialog();
 
 public slots:
-    virtual void accept();
-    virtual void reset();
+    virtual void accept() override;
+    void reset();
 
 protected:
-    void changeEvent(QEvent *event);
+    virtual void changeEvent(QEvent *event) override;
+
+    QUrl currentUrl();
 
 private slots:
     void testSettings();
@@ -34,12 +35,8 @@ private slots:
 private:
     Q_DISABLE_COPY(LoginDialog)
 
-    QUrl currentUrl();
-
     QScopedPointer<Ui::LoginDialog> ui;
-
     QStandardItemModel *m_connectionsModel;
-
     QDataWidgetMapper *m_dataWidgetMapper;
 };
 

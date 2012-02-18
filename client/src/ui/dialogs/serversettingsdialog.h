@@ -15,17 +15,16 @@ class ServerSettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ServerSettingsDialog(QWidget *parent, QnVideoServerResourcePtr server);
-    ~ServerSettingsDialog();
+    explicit ServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent = NULL);
+    virtual ~ServerSettingsDialog();
 
 public slots:
-    virtual void accept();
-    virtual void reject();
-    virtual void buttonClicked(QAbstractButton *button);
+    virtual void accept() override;
+    virtual void reject() override;
 
+protected slots: 
     void addClicked();
     void removeClicked();
-
     void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
 
 private:
@@ -33,16 +32,13 @@ private:
     void initView();
     bool saveToModel();
     bool validateStorages(const QnStorageResourceList& storages, QString& errorString);
-
     void save();
 
 private:
     Q_DISABLE_COPY(ServerSettingsDialog)
 
-    QnVideoServerResourcePtr m_server;
-
     QScopedPointer<Ui::ServerSettingsDialog> ui;
-
+    QnVideoServerResourcePtr m_server;
     QnAppServerConnectionPtr m_connection;
 };
 

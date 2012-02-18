@@ -16,20 +16,18 @@ class CameraSettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CameraSettingsDialog(QWidget *parent, QnVirtualCameraResourcePtr camera);
-    ~CameraSettingsDialog();
+    explicit CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QWidget *parent = NULL);
+    virtual ~CameraSettingsDialog();
 
 public slots:
-    virtual void accept();
-    virtual void reject();
-    virtual void buttonClicked(QAbstractButton *button);
+    virtual void accept() override;
+    virtual void reject() override;
 
     void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
 
 private:
     void updateView();
     void saveToModel();
-
     void save();
 
 private:
