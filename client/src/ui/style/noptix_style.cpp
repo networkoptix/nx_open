@@ -1,4 +1,4 @@
-#include "app_style.h"
+#include "noptix_style.h"
 #include <QApplication>
 #include <QPainter>
 #include <QStyleOption>
@@ -8,13 +8,13 @@
 #include "skin.h"
 
 // -------------------------------------------------------------------------- //
-// AppStyle
+// QnNoptixStyle
 // -------------------------------------------------------------------------- //
-AppStyle::AppStyle(QStyle *style): 
+QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style)
 {}
 
-void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
+void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     switch (control) {
     case CC_Slider:
         if(drawSliderComplexControl(option, painter, widget))
@@ -37,7 +37,7 @@ void AppStyle::drawComplexControl(ComplexControl control, const QStyleOptionComp
     base_type::drawComplexControl(control, option, painter, widget);
 }
 
-void AppStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     switch(element) {
     case CE_MenuItem:
         if(drawMenuItemControl(option, painter, widget))
@@ -50,7 +50,7 @@ void AppStyle::drawControl(ControlElement element, const QStyleOption *option, Q
     base_type::drawControl(element, option, painter, widget);
 }
 
-void AppStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     switch(element) {
     case PE_IndicatorTabClose:
         if(drawTabClosePrimitive(option, painter, widget))
@@ -63,14 +63,14 @@ void AppStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *optio
     base_type::drawPrimitive(element, option, painter, widget);
 }
 
-int AppStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const {
+int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const {
     if (hint == QStyle::SH_ToolTipLabel_Opacity)
         return 255;
 
     return base_type::styleHint(hint, option, widget, returnData);
 }
 
-void AppStyle::polish(QApplication *application) {
+void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
     QFont menuFont;
@@ -79,21 +79,21 @@ void AppStyle::polish(QApplication *application) {
     application->setFont(menuFont, "QMenu");
 }
 
-void AppStyle::unpolish(QApplication *application) {
+void QnNoptixStyle::unpolish(QApplication *application) {
     application->setFont(QFont(), "QMenu");
 
     base_type::unpolish(application);
 }
 
-void AppStyle::polish(QWidget *widget) {
+void QnNoptixStyle::polish(QWidget *widget) {
     base_type::polish(widget);
 }
 
-void AppStyle::unpolish(QWidget *widget) {
+void QnNoptixStyle::unpolish(QWidget *widget) {
     base_type::unpolish(widget);
 }
 
-bool AppStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
     if(!itemOption)
         return false;
@@ -116,7 +116,7 @@ bool AppStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter
     return true;
 }
 
-bool AppStyle::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
+bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     /* Bespin's slider painting is way to slow, so we do it our way. */
     const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
     if (!sliderOption) 
@@ -150,7 +150,7 @@ bool AppStyle::drawSliderComplexControl(const QStyleOptionComplex *option, QPain
     return true;
 }
 
-bool AppStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *) const {
+bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *) const {
     bool sunken = option->state & State_Sunken;
     bool hover = (option->state & State_Enabled) && (option->state & State_MouseOver);
     if (sunken) 

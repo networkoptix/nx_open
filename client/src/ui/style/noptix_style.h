@@ -1,15 +1,15 @@
-#ifndef QN_APP_STYLE_H
-#define QN_APP_STYLE_H
+#ifndef QN_NOPTIX_STYLE_H
+#define QN_NOPTIX_STYLE_H
 
 #include <QProxyStyle>
 
-class AppStyle: public QProxyStyle { 
+class QnNoptixStyle: public QProxyStyle { 
     Q_OBJECT;
 
     typedef QProxyStyle base_type;
 
 public:
-    AppStyle(QStyle *style = NULL);
+    QnNoptixStyle(QStyle *style = NULL);
 
     virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
@@ -33,4 +33,4 @@ namespace {
     const char *hideCheckBoxInMenuPropertyName = "_qn_hideCheckBoxInMenu";
 }
 
-#endif // QN_APP_STYLE_H
+#endif // QN_NOPTIX_STYLE_H

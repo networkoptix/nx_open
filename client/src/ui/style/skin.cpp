@@ -2,7 +2,7 @@
 #include <QImage>
 #include <QPixmapCache>
 #include <QStyleFactory>
-#include "app_style.h"
+#include "noptix_style.h"
 
 #ifndef CL_SKIN_PATH
 #  ifdef CL_CUSTOMIZATION_PRESET
@@ -66,7 +66,7 @@ QStyle *Skin::style()
 #endif
 
     QStyle *baseStyle = QStyleFactory::create(baseStyleName);
-    AppStyle *style = new AppStyle(baseStyle);
+    QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
 
     return style;
 }
