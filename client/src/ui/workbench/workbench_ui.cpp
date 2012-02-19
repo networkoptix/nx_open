@@ -14,6 +14,7 @@
 
 #include <utils/common/event_signalizer.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/checked_cast.h>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
@@ -669,9 +670,15 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
         /* For reasons unknown, tab bar's size gets messed up when it is shown 
          * after new items were added to it. Re-embedding helps, probably there is
          * a simpler workaround. */
-        QWidget *widget = m_tabBarItem->widget();
+        QTabBar *widget = checked_cast<QTabBar *>(m_tabBarItem->widget());
         m_tabBarItem->setWidget(NULL);
         m_tabBarItem->setWidget(widget);
+
+        /* There are cases where even re-embedding doesn't help. 
+         * So we cheat even more, forcing the tab bar to refresh. */
+        QTabBar::Shape shape = widget->shape();
+        widget->setShape(QTabBar::TriangularWest);
+        widget->setShape(shape);
     } else {
         m_titleItem->setPos(0.0, -m_titleItem->size().height() - 1.0);
 
