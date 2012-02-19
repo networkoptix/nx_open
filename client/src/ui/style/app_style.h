@@ -2,15 +2,14 @@
 #define QN_APP_STYLE_H
 
 #include <QProxyStyle>
-#include "proxy_style.h"
 
-class AppStyle: public QnProxyStyle { 
+class AppStyle: public QProxyStyle { 
     Q_OBJECT;
 
-    typedef QnProxyStyle base_type;
+    typedef QProxyStyle base_type;
 
 public:
-    AppStyle(const QString &baseStyle, QObject *parent = 0);
+    AppStyle(QStyle *style = NULL);
 
     virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
@@ -30,24 +29,8 @@ protected:
 };
 
 
-class AppProxyStyle : public QProxyStyle
-{
-    Q_OBJECT
-
-public:
-    AppProxyStyle(QStyle *style = 0);
-
-    virtual QRect subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget = 0) const override;
-
-    virtual QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option = 0, const QWidget *widget = 0) const override;
-
-protected Q_SLOTS:
-    QIcon standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const;
-};
-
 namespace {
     const char *hideCheckBoxInMenuPropertyName = "_qn_hideCheckBoxInMenu";
 }
-
 
 #endif // QN_APP_STYLE_H

@@ -1,8 +1,7 @@
 #include "skin.h"
-
-#include <QtGui/QImage>
-#include <QtGui/QPixmapCache>
-
+#include <QImage>
+#include <QPixmapCache>
+#include <QStyleFactory>
 #include "app_style.h"
 
 #ifndef CL_SKIN_PATH
@@ -56,18 +55,18 @@ QPixmap Skin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode
 
 QStyle *Skin::style()
 {
-    QString styleName;
+    QString baseStyleName;
 #ifndef Q_OS_DARWIN
-#  ifdef CL_CUSTOMIZATION_PRESET
+#   ifdef CL_CUSTOMIZATION_PRESET
     qputenv("BESPIN_PRESET", CL_CUSTOMIZATION_PRESET);
-#  endif
-    styleName = QLatin1String("Bespin");
+#   endif
+    baseStyleName = QLatin1String("Bespin");
 #else
-    styleName = QLatin1String("cleanlooks");
+    baseStyleName = QLatin1String("cleanlooks");
 #endif
 
-    AppStyle *style = new AppStyle(styleName);
-    (void)new AppProxyStyle(style->baseStyle());
+    QStyle *baseStyle = QStyleFactory::create(baseStyleName);
+    AppStyle *style = new AppStyle(baseStyle);
 
     return style;
 }
