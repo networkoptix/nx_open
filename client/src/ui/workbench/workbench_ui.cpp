@@ -975,6 +975,14 @@ void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
     }
 }
 
+void QnWorkbenchUi::setHelpShowButtonUsed(bool used) {
+    if(used) {
+        m_helpShowButton->setAcceptedMouseButtons(Qt::LeftButton);
+    } else {
+        m_helpShowButton->setAcceptedMouseButtons(0);
+    }
+}
+
 void QnWorkbenchUi::setFlags(Flags flags) {
     if(flags == m_flags)
         return;
@@ -1294,7 +1302,7 @@ void QnWorkbenchUi::at_treeShowingProcessor_hoverEntered() {
 
         /* So that the click that may follow won't hide it. */
         setTreeShowButtonUsed(false);
-        QTimer::singleShot(200, this, SLOT(setTreeShowButtonUsed()));
+        QTimer::singleShot(300, this, SLOT(setTreeShowButtonUsed()));
     }
 
     m_treeHidingProcessor->forceHoverEnter();
@@ -1366,8 +1374,8 @@ void QnWorkbenchUi::at_helpShowingProcessor_hoverEntered() {
         setHelpOpened(true);
 
         /* So that the click that may follow won't hide it. */
-        //setTreeShowButtonUsed(false);
-        //QTimer::singleShot(200, this, SLOT(setTreeShowButtonUsed()));
+        setHelpShowButtonUsed(false);
+        QTimer::singleShot(300, this, SLOT(setHelpShowButtonUsed()));
     }
 
     m_helpHidingProcessor->forceHoverEnter();

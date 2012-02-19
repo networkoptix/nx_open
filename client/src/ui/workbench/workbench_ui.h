@@ -155,7 +155,8 @@ protected slots:
     void updateHelpOpacity(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void setTreeShowButtonUsed(bool enabled = true);
+    void setTreeShowButtonUsed(bool used = true);
+    void setHelpShowButtonUsed(bool used = true);
 
     void at_activityStopped();
     void at_activityStarted();
