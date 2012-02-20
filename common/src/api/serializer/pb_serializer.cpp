@@ -293,6 +293,36 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
     }
 }
 
+void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResourcePtr& cameraPtr)
+{
+    pb_camera.set_id(cameraPtr->getId().toInt());
+    pb_camera.set_parentid(cameraPtr->getParentId().toInt());
+    pb_camera.set_name(cameraPtr->getName().toStdString());
+    pb_camera.set_typeid_(cameraPtr->getTypeId().toInt());
+    pb_camera.set_url(cameraPtr->getUrl().toStdString());
+    pb_camera.set_mac(cameraPtr->getMAC().toString().toStdString());
+    pb_camera.set_login(cameraPtr->getAuth().user().toStdString());
+    pb_camera.set_password(cameraPtr->getAuth().password().toStdString());
+    pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
+    pb_camera.set_region(serializeRegion(cameraPtr->getMotionMask()).toStdString());
+
+    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
+        proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();
+
+        pb_scheduleTask.set_id(scheduleTaskIn.getId().toInt());
+        pb_scheduleTask.set_sourceid(cameraPtr->getId().toInt());
+        pb_scheduleTask.set_starttime(scheduleTaskIn.getStartTime());
+        pb_scheduleTask.set_endtime(scheduleTaskIn.getEndTime());
+        pb_scheduleTask.set_dorecordaudio(scheduleTaskIn.getDoRecordAudio());
+        pb_scheduleTask.set_recordtype(scheduleTaskIn.getRecordingType());
+        pb_scheduleTask.set_dayofweek(scheduleTaskIn.getDayOfWeek());
+        pb_scheduleTask.set_beforethreshold(scheduleTaskIn.getBeforeThreshold());
+        pb_scheduleTask.set_afterthreshold(scheduleTaskIn.getAfterThreshold());
+        pb_scheduleTask.set_streamquality((proto::pb::Camera_Quality)scheduleTaskIn.getStreamQuality());
+        pb_scheduleTask.set_fps(scheduleTaskIn.getFps());
+    }
+}
+
 }
 
 void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
@@ -369,6 +399,18 @@ void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTyp
     parseResourceTypes(resourceTypes, pb_resourceTypes.resourcetype());
 }
 
+void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)
+{
+    proto::pb::Cameras pb_cameras;
+
+    foreach(QnVirtualCameraResourcePtr cameraPtr, cameras)
+        serializeCamera_i(*pb_cameras.add_camera(), cameraPtr);
+
+    std::string str;
+    pb_cameras.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
 void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPtr, QByteArray& data)
 {
     proto::pb::Servers pb_servers;
@@ -438,34 +480,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 void QnApiPbSerializer::serializeCamera(const QnVirtualCameraResourcePtr& cameraPtr, QByteArray& data)
 {
     proto::pb::Cameras pb_cameras;
-    proto::pb::Camera& pb_camera = *pb_cameras.add_camera();
-
-    pb_camera.set_id(cameraPtr->getId().toInt());
-    pb_camera.set_parentid(cameraPtr->getParentId().toInt());
-    pb_camera.set_name(cameraPtr->getName().toStdString());
-    pb_camera.set_typeid_(cameraPtr->getTypeId().toInt());
-    pb_camera.set_url(cameraPtr->getUrl().toStdString());
-    pb_camera.set_mac(cameraPtr->getMAC().toString().toStdString());
-    pb_camera.set_login(cameraPtr->getAuth().user().toStdString());
-    pb_camera.set_password(cameraPtr->getAuth().password().toStdString());
-    pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
-    pb_camera.set_region(serializeRegion(cameraPtr->getMotionMask()).toStdString());
-
-    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
-        proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();
-
-        pb_scheduleTask.set_id(scheduleTaskIn.getId().toInt());
-        pb_scheduleTask.set_sourceid(cameraPtr->getId().toInt());
-        pb_scheduleTask.set_starttime(scheduleTaskIn.getStartTime());
-        pb_scheduleTask.set_endtime(scheduleTaskIn.getEndTime());
-        pb_scheduleTask.set_dorecordaudio(scheduleTaskIn.getDoRecordAudio());
-        pb_scheduleTask.set_recordtype(scheduleTaskIn.getRecordingType());
-        pb_scheduleTask.set_dayofweek(scheduleTaskIn.getDayOfWeek());
-        pb_scheduleTask.set_beforethreshold(scheduleTaskIn.getBeforeThreshold());
-        pb_scheduleTask.set_afterthreshold(scheduleTaskIn.getAfterThreshold());
-        pb_scheduleTask.set_streamquality((proto::pb::Camera_Quality)scheduleTaskIn.getStreamQuality());
-        pb_scheduleTask.set_fps(scheduleTaskIn.getFps());
-    }
+    serializeCamera_i(*pb_cameras.add_camera(), cameraPtr);
 
     std::string str;
     pb_cameras.SerializeToString(&str);

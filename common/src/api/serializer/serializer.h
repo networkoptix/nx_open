@@ -45,6 +45,8 @@ public:
     virtual void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) = 0;
 
+    virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
+
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data) = 0;

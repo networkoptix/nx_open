@@ -13,41 +13,62 @@ class QnScheduleTask
 public:
     enum RecordingType { RecordingType_Run, RecordingType_MotionOnly, RecordingType_Never };
 
+    struct Data
+    {
+        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, RecordingType recordType = RecordingType_Run,
+             int beforeThreshold = 0, int afterThreshold = 0, QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
+            : m_dayOfWeek(dayOfWeek),
+              m_startTime(startTime),
+              m_endTime(endTime),
+              m_recordType(recordType),
+              m_beforeThreshold(beforeThreshold),
+              m_afterThreshold(afterThreshold),
+              m_streamQuality(streamQuality),
+              m_fps(fps),
+              m_doRecordAudio(doRecordAudio)
+        {
+        }
+
+        int m_dayOfWeek;
+        int m_startTime;
+        int m_endTime;
+        RecordingType m_recordType;
+        int m_beforeThreshold;
+        int m_afterThreshold;
+        QnStreamQuality m_streamQuality;
+        int m_fps;
+        bool m_doRecordAudio;
+    };
+
     QnScheduleTask()
-        : m_id(0), m_resourceId(0),
-          m_dayOfWeek(1),
-          m_startTime(0), m_endTime(0),
-          m_recordType(RecordingType_Run),
-          m_beforeThreshold(0), m_afterThreshold(0),
-          m_streamQuality(QnQualityHighest),
-          m_fps(10),
-          m_doRecordAudio(false)
+        : m_id(0), m_resourceId(0)
     {}
+    QnScheduleTask(const Data& data)
+        : m_id(0), m_resourceId(0), m_data(data)
+    {
+    }
+
     QnScheduleTask(QnId id, QnId resourceId, int dayOfWeek, int startTime, int endTime,
                    RecordingType recordType, int beforeThreshold, int afterThreshold,
                    QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
         : m_id(id), m_resourceId(resourceId),
-          m_dayOfWeek(dayOfWeek),
-          m_startTime(startTime), m_endTime(endTime),
-          m_recordType(recordType),
-          m_beforeThreshold(beforeThreshold),
-          m_afterThreshold(afterThreshold),
-          m_streamQuality(streamQuality),
-          m_fps(fps),
-          m_doRecordAudio(doRecordAudio)
+          m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
     {}
+
+    const Data& getData() const { return m_data; }
+    void setData(const Data& data) { m_data = data; }
 
     QnId getId() const { return m_id; }
     QnId getResourceId() const { return m_resourceId; }
-    int getDayOfWeek() const { return m_dayOfWeek; }
-    int getStartTime() const { return m_startTime; }
-    int getEndTime() const { return m_endTime; }
-    RecordingType getRecordingType() const { return m_recordType; }
-    int getBeforeThreshold() const { return m_beforeThreshold; }
-    int getAfterThreshold() const { return m_afterThreshold; }
-    QnStreamQuality getStreamQuality() const { return m_streamQuality; }
-    int getFps() const { return m_fps; }
-    bool getDoRecordAudio() const { return m_doRecordAudio; }
+    int getDayOfWeek() const { return m_data.m_dayOfWeek; }
+    int getStartTime() const { return m_data.m_startTime; }
+    int getEndTime() const { return m_data.m_endTime; }
+    RecordingType getRecordingType() const { return m_data.m_recordType; }
+    int getBeforeThreshold() const { return m_data.m_beforeThreshold; }
+    int getAfterThreshold() const { return m_data.m_afterThreshold; }
+    QnStreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
+    int getFps() const { return m_data.m_fps; }
+    bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
 
     /*
     * Duration at ms
@@ -67,15 +88,8 @@ public:
 private:
     QnId m_id;
     QnId m_resourceId;
-    int m_dayOfWeek;
-    int m_startTime;
-    int m_endTime;
-    RecordingType m_recordType;
-    int m_beforeThreshold;
-    int m_afterThreshold;
-    QnStreamQuality m_streamQuality;
-    int m_fps;
-    bool m_doRecordAudio;
+
+    Data m_data;
 
     friend class CameraScheduleWidget; // ###
 };
@@ -84,6 +98,24 @@ inline bool operator<(qint64 first, const QnScheduleTask &other)
 { return first < other.startTimeMs(); }
 inline bool operator<(const QnScheduleTask &other, qint64 first)
 { return other.startTimeMs() < first; }
+
+inline bool operator==(const QnScheduleTask::Data &e1, const QnScheduleTask::Data &e2)
+{
+    e1.m_dayOfWeek == e2.m_dayOfWeek &&
+    e1.m_startTime == e2.m_startTime &&
+    e1.m_endTime == e2.m_endTime &&
+    e1.m_recordType == e2.m_recordType &&
+    e1.m_beforeThreshold == e2.m_beforeThreshold &&
+    e1.m_afterThreshold == e2.m_afterThreshold &&
+    e1.m_streamQuality == e2.m_streamQuality &&
+    e1.m_fps == e2.m_fps &&
+    e1.m_doRecordAudio == e2.m_doRecordAudio;
+}
+
+inline uint qHash(const QnScheduleTask::Data &key)
+{
+    return qHash(key.m_dayOfWeek ^ key.m_startTime ^ key.m_endTime);
+}
 
 //typedef QSharedPointer<QnScheduleTask> QnScheduleTaskPtr;
 typedef QList<QnScheduleTask> QnScheduleTaskList;

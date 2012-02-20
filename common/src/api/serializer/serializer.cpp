@@ -36,13 +36,13 @@ QString serializeRegion(const QRegion& region)
 void QnApiSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
 {
     try {
-    if (resource.dynamicCast<QnVirtualCameraResource>()) {
-        serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
-    } else if (resource.dynamicCast<QnVideoServerResource>()) {
-        serializeServer(resource.dynamicCast<QnVideoServerResource>(), data);
-    } else if (resource.dynamicCast<QnUserResource>()) {
-        serializeUser(resource.dynamicCast<QnUserResource>(), data);
-    }
+        if (resource.dynamicCast<QnVirtualCameraResource>()) {
+            serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
+        } else if (resource.dynamicCast<QnVideoServerResource>()) {
+            serializeServer(resource.dynamicCast<QnVideoServerResource>(), data);
+        } else if (resource.dynamicCast<QnUserResource>()) {
+            serializeUser(resource.dynamicCast<QnUserResource>(), data);
+        }
     } catch (const std::exception& e) {
         qWarning() << "QnApiSerializer::serialize(): Exception caught. Message: "  << e.what();
         Q_ASSERT(0);

@@ -282,6 +282,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
+    factory(Qn::MultipleCameraSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::MultiTarget).
+        text(tr("Multiple Camera Settings")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
+
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
         text(tr("Server Settings")).

@@ -188,6 +188,7 @@ FORMS += \
     ui/dialogs/logindialog.ui \
     ui/dialogs/tagseditdialog.ui \
     ui/dialogs/camerasettingsdialog.ui \
+    ui/dialogs/multiplecamerasettingsdialog.ui \
     ui/dialogs/serversettingsdialog.ui \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \

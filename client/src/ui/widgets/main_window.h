@@ -77,6 +77,7 @@ protected slots:
     void at_synchronizer_started();
 
     void at_cameraSettingsAction_triggered();
+    void at_multipleCamerasSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggred();

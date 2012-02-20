@@ -12,13 +12,13 @@ namespace Ui {
 class CameraScheduleWidget : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QnScheduleTaskList scheduleTasks READ scheduleTasks WRITE setScheduleTasks USER true DESIGNABLE false)
+    Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks USER true DESIGNABLE false)
 
 public:
     CameraScheduleWidget(QWidget *parent = 0);
 
-    QnScheduleTaskList scheduleTasks() const;
-    void setScheduleTasks(const QnScheduleTaskList &tasks);
+    QList<QnScheduleTask::Data> scheduleTasks() const;
+    void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
 
     void setMaxFps(int value);
 private Q_SLOTS:
