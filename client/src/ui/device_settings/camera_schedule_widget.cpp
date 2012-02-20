@@ -30,6 +30,17 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget *parent)
     doNotChangeStateChanged(2);
 }
 
+void CameraScheduleWidget::setDoNotChange(bool val)
+{
+    ui->chkBoxDontChange->setChecked(val);
+    doNotChangeStateChanged(val ? 2 : 0);
+}
+
+bool CameraScheduleWidget::isDoNotChange() const
+{
+    return ui->chkBoxDontChange->isChecked();
+}
+
 QList<QnScheduleTask::Data> CameraScheduleWidget::scheduleTasks() const
 {
     QList<QnScheduleTask::Data> tasks;

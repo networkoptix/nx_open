@@ -42,6 +42,8 @@ void QnApiSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
             serializeServer(resource.dynamicCast<QnVideoServerResource>(), data);
         } else if (resource.dynamicCast<QnUserResource>()) {
             serializeUser(resource.dynamicCast<QnUserResource>(), data);
+        } else if (resource.dynamicCast<QnLayoutResource>()) {
+            serializeLayout(resource.dynamicCast<QnLayoutResource>(), data);
         }
     } catch (const std::exception& e) {
         qWarning() << "QnApiSerializer::serialize(): Exception caught. Message: "  << e.what();
