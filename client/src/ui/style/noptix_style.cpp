@@ -4,14 +4,21 @@
 #include <QStyleOption>
 #include <QMenu>
 #include <QAction>
+#include <QSet>
 #include <utils/common/scoped_painter_rollback.h>
 #include "skin.h"
+#include "noptix_style_animator.h"
+
+namespace {
+    const char *qn_hoveredPropertyName = "_qn_hovered";
+}
 
 // -------------------------------------------------------------------------- //
 // QnNoptixStyle
 // -------------------------------------------------------------------------- //
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
-    base_type(style)
+    base_type(style),
+    m_animator(new QnNoptixStyleAnimator(this))
 {}
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
@@ -150,24 +157,40 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
     return true;
 }
 
-bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *) const {
+bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     bool sunken = option->state & State_Sunken;
-    bool hover = (option->state & State_Enabled) && (option->state & State_MouseOver);
-    if (sunken) 
-        hover = false;
+    bool hovered = (option->state & State_Enabled) && (option->state & State_MouseOver);
+
+    /* Get animation progress & stop animation if necessary. */
+    qreal progress = m_animator->value(widget, 0.0);
+    if(progress < 0.0 || progress > 1.0) {
+        progress = qBound(0.0, progress, 1.0);
+        m_animator->stop(widget);
+    }
+
+    qDebug() << "PROGRESS" << static_cast<const void *>(widget) << progress;
+
+    /* Update animation if needed. */
+    bool wasHovered = widget->property(qn_hoveredPropertyName).toBool();
+    const_cast<QWidget *>(widget)->setProperty(qn_hoveredPropertyName, hovered);
+    if(hovered != wasHovered) {
+        if(hovered) {
+            m_animator->start(widget, 4.0, progress);
+        } else {
+            m_animator->start(widget, -4.0, progress);
+        }
+    }
 
     QRectF rect = option->rect;
-    qreal d = sunken ? 0.25 : (hover ? 0.1 : 0.2);
+    qreal d = sunken ? 0.25 : (0.2 - progress * 0.1);
     rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
 
-    QBrush b = option->palette.text(); //Colors::mid( CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 3, 1+hover );
+    QBrush b = option->palette.text(); //Colors::mid( CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 3, 1+hovered );
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QnScopedPainterPenRollback penRollback(painter, QPen(b, qMin(rect.width(), rect.height()) * 0.2));
     painter->drawEllipse(rect);
     return true;
-
-    return false;
 }
 
 

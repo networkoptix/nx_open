@@ -3,6 +3,8 @@
 
 #include <QProxyStyle>
 
+class QnNoptixStyleAnimator;
+
 class QnNoptixStyle: public QProxyStyle { 
     Q_OBJECT;
 
@@ -26,6 +28,9 @@ protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+
+private:
+    QnNoptixStyleAnimator *m_animator;
 };
 
 
