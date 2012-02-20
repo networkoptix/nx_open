@@ -241,6 +241,28 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr
     return addObjectAsync("camera", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
+int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "layout");
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serialize(layout, data);
+
+    return addObjectAsync("layout", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
+int QnAppServerConnection::saveAsync(const QnLayoutResourceList& layouts, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "layout");
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeLayouts(layouts, data);
+
+    return addObjectAsync("layout", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
 int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "camera");

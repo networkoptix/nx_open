@@ -51,6 +51,7 @@ protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeUser(const QnUserResourcePtr& resource, QByteArray& data) = 0;
+    virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
 };
 
 #endif // _API_SERIALIZER_H_

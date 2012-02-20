@@ -323,6 +323,26 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     }
 }
 
+void serializeLayout_i(proto::pb::Layout& pb_layout, const QnLayoutResourcePtr& layoutIn)
+{
+    pb_layout.set_name(layoutIn->getName().toStdString());
+
+    if (!layoutIn->getItems().isEmpty()) {
+        foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
+            proto::pb::Layout_Item& pb_item = *pb_layout.add_item();
+
+            pb_item.set_resourceid(itemIn.resourceId.toInt());
+            pb_item.set_uuid(itemIn.uuid.toString().toStdString());
+            pb_item.set_flags(itemIn.flags);
+            pb_item.set_left(itemIn.combinedGeometry.left());
+            pb_item.set_top(itemIn.combinedGeometry.top());
+            pb_item.set_right(itemIn.combinedGeometry.right());
+            pb_item.set_bottom(itemIn.combinedGeometry.bottom());
+            pb_item.set_rotation(itemIn.rotation);
+        }
+    }
+}
+
 }
 
 void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
@@ -453,23 +473,8 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 
     foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
         proto::pb::Layout& pb_layout = *pb_user.add_layout();
-        pb_layout.set_name(layoutIn->getName().toStdString());
         pb_layout.set_parentid(userPtr->getId().toInt());
-
-        if (!layoutIn->getItems().isEmpty()) {
-            foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
-                proto::pb::Layout_Item& pb_item = *pb_layout.add_item();
-
-                pb_item.set_resourceid(itemIn.resourceId.toInt());
-                pb_item.set_uuid(itemIn.uuid.toString().toStdString());
-                pb_item.set_flags(itemIn.flags);
-                pb_item.set_left(itemIn.combinedGeometry.left());
-                pb_item.set_top(itemIn.combinedGeometry.top());
-                pb_item.set_right(itemIn.combinedGeometry.right());
-                pb_item.set_bottom(itemIn.combinedGeometry.bottom());
-                pb_item.set_rotation(itemIn.rotation);
-            }
-        }
+        serializeLayout_i(pb_layout, layoutIn);
     }
 
     std::string str;
@@ -484,5 +489,27 @@ void QnApiPbSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camera
 
     std::string str;
     pb_cameras.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeLayout(const QnLayoutResourcePtr& layout, QByteArray& data)
+{
+    proto::pb::Layouts pb_layouts;
+    serializeLayout_i(*pb_layouts.add_layout(), layout);
+
+    std::string str;
+    pb_layouts.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data)
+{
+    proto::pb::Layouts pb_layouts;
+
+    foreach(QnLayoutResourcePtr layout, layouts)
+        serializeLayout_i(*pb_layouts.add_layout(), layout);
+
+    std::string str;
+    pb_layouts.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
