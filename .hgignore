@@ -49,6 +49,9 @@ common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
 common/src/common.mak*
 
+client/contrib/bespin/debug
+client/contrib/bespin/release
+
 mediaserver/src/server.pro
 mediaserver/src/version.h
 mediaserver/src/Makefile
