@@ -71,7 +71,7 @@ void CameraSettingsDialog::saveToModel()
 void CameraSettingsDialog::updateView()
 {
     ui->nameEdit->setText(m_camera->getName());
-    ui->macAddressValueLabel->setText(m_camera->getMAC().toString());
+    ui->macAddressEdit->setText(m_camera->getMAC().toString());
     ui->ipAddressEdit->setText(m_camera->getHostAddress().toString());
     ui->loginEdit->setText(m_camera->getAuth().user());
     ui->passwordEdit->setText(m_camera->getAuth().password());
