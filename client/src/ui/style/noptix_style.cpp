@@ -11,7 +11,20 @@
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
-}
+
+    bool hasMenuIndicator(const QStyleOptionToolButton *option) {
+        /* Subcontrol requested? */
+        bool result = (option->subControls & QStyle::SC_ToolButtonMenu) || (option->features & QStyleOptionToolButton::Menu);
+
+        /* Delayed menu? */
+        const QStyleOptionToolButton::ToolButtonFeatures menuFeatures = QStyleOptionToolButton::HasMenu | QStyleOptionToolButton::PopupDelay;
+        if (!result)
+            result = (option->features & menuFeatures) == menuFeatures;
+
+        return result;
+    }
+
+} // anonymous namespace
 
 // -------------------------------------------------------------------------- //
 // QnNoptixStyle
@@ -36,6 +49,10 @@ void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptio
                 painter->fillRect(option->rect, bgColor);
             }
         }
+        break;
+    case CC_ToolButton:
+        if(drawToolButtonComplexControl(option, painter, widget))
+            return;
         break;
     default:
         break;
@@ -100,6 +117,7 @@ void QnNoptixStyle::unpolish(QWidget *widget) {
     base_type::unpolish(widget);
 }
 
+
 bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
     if(!itemOption)
@@ -159,6 +177,62 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 
 bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     bool sunken = option->state & State_Sunken;
+    if(sunken)
+        setHoverProgress(widget, 0.0);
+    qreal d = sunken ? 0.25 : (0.2 - hoverProgress(option, widget, 4.0) * 0.1);
+    QRectF rect = option->rect;
+    rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
+
+    QBrush brush = option->palette.text(); //Colors::mid( CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 3, 1+hovered );
+
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+    QnScopedPainterPenRollback penRollback(painter, QPen(brush, qMin(rect.width(), rect.height()) * 0.2));
+    painter->drawEllipse(rect);
+    return true;
+}
+
+bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
+    const QStyleOptionToolButton *buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
+    if (!buttonOption) 
+        return false;
+
+    if (buttonOption->features & QStyleOptionToolButton::Arrow)
+        return false; /* We don't handle arrow tool buttons,... */
+
+    if (qobject_cast<QTabBar *>(widget->parent()))
+        return false; /* ...toolbar buttons,... */
+
+    if(hasMenuIndicator(buttonOption))
+        return false; /* ...menu buttons,... */
+
+    if(buttonOption->icon.isNull() || buttonOption->toolButtonStyle == Qt::ToolButtonTextOnly)
+        return false; /* ...buttons without icons,... */
+
+    if(!buttonOption->text.isNull() && buttonOption->toolButtonStyle != Qt::ToolButtonIconOnly)
+        return false; /* ...and buttons with text. */
+
+    bool sunken = option->state & State_Sunken;
+    if(sunken)
+        setHoverProgress(widget, 0.0);
+    qreal d = sunken ? 0.1 : (0.1 - hoverProgress(option, widget, 4.0) * 0.1);
+    QRectF rect = option->rect;
+    rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
+
+    QIcon::Mode mode = option->state & State_Enabled ? QIcon::Normal : QIcon::Disabled;
+    QIcon::State state = option->state & State_On ? QIcon::On : QIcon::Off;
+    QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
+
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+    QnScopedPainterSmoothPixmapTransformRollback pixmapRollback(painter, true);
+    painter->drawPixmap(rect, pixmap, pixmap.rect());
+    return true;
+}
+
+void QnNoptixStyle::setHoverProgress(const QWidget *widget, qreal value) const {
+    m_animator->setValue(widget, value);
+}
+
+qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const {
     bool hovered = (option->state & State_Enabled) && (option->state & State_MouseOver);
 
     /* Get animation progress & stop animation if necessary. */
@@ -173,22 +247,13 @@ bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *
     const_cast<QWidget *>(widget)->setProperty(qn_hoveredPropertyName, hovered);
     if(hovered != wasHovered) {
         if(hovered) {
-            m_animator->start(widget, 4.0, progress);
+            m_animator->start(widget, speed, progress);
         } else {
-            m_animator->start(widget, -4.0, progress);
+            m_animator->start(widget, -speed, progress);
         }
     }
 
-    QRectF rect = option->rect;
-    qreal d = sunken ? 0.25 : (0.2 - progress * 0.1);
-    rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
-
-    QBrush b = option->palette.text(); //Colors::mid( CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 3, 1+hovered );
-
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterPenRollback penRollback(painter, QPen(b, qMin(rect.width(), rect.height()) * 0.2));
-    painter->drawEllipse(rect);
-    return true;
+    return progress;
 }
 
 

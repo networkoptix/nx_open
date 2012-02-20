@@ -44,6 +44,10 @@ public:
         return pos->value;
     }
 
+    void setValue(const QWidget *widget, qreal value) {
+        m_animationByWidget[widget].value = value;
+    }
+
 protected:
     virtual void tick(int deltaTime) override {
         for(QHash<const QWidget *, Animation>::iterator pos = m_animationByWidget.begin(), end = m_animationByWidget.end(); pos != end; pos++) {
