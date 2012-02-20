@@ -23,6 +23,10 @@ CameraSettingsDialog::CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QW
 {
     ui->setupUi(this);
     ui->motionWidget->setCamera(m_camera);
+    
+    // Do not block editing by default it schedule task list is empty
+    ui->cameraScheduleWidget->setDoNotChange(false);
+
     updateView();
 }
 
@@ -60,10 +64,13 @@ void CameraSettingsDialog::saveToModel()
     m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-    QnScheduleTaskList scheduleTasks;
-    foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
-        scheduleTasks.append(QnScheduleTask(scheduleTaskData));
-    m_camera->setScheduleTasks(scheduleTasks);
+    if (!ui->cameraScheduleWidget->isDoNotChange())
+    {
+        QnScheduleTaskList scheduleTasks;
+        foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
+            scheduleTasks.append(QnScheduleTask(scheduleTaskData));
+        m_camera->setScheduleTasks(scheduleTasks);
+    }
 
 	m_camera->setMotionMask(ui->motionWidget->motionMask());
 }

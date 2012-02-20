@@ -404,7 +404,16 @@ void QnApiPbSerializer::deserializeResources(QnResourceList& resources, const QB
 
     parseCameras(resources, pb_resources.camera(), resourceFactory);
     parseServers(resources, pb_resources.server());
-    parseUsers(resources, pb_resources.user());
+
+    QnUserResourceList users;
+    parseUsers(users, pb_resources.user());
+    qCopy(users.begin(), users.end(), std::back_inserter(resources));
+
+    foreach(const QnUserResourcePtr& user, users)
+    {
+        const QnLayoutResourceList& layouts = user->getLayouts();
+        qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
+    }
 }
 
 void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data)
