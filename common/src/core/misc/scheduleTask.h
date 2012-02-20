@@ -101,15 +101,15 @@ inline bool operator<(const QnScheduleTask &other, qint64 first)
 
 inline bool operator==(const QnScheduleTask::Data &e1, const QnScheduleTask::Data &e2)
 {
-    e1.m_dayOfWeek == e2.m_dayOfWeek &&
-    e1.m_startTime == e2.m_startTime &&
-    e1.m_endTime == e2.m_endTime &&
-    e1.m_recordType == e2.m_recordType &&
-    e1.m_beforeThreshold == e2.m_beforeThreshold &&
-    e1.m_afterThreshold == e2.m_afterThreshold &&
-    e1.m_streamQuality == e2.m_streamQuality &&
-    e1.m_fps == e2.m_fps &&
-    e1.m_doRecordAudio == e2.m_doRecordAudio;
+    return e1.m_dayOfWeek == e2.m_dayOfWeek &&
+        e1.m_startTime == e2.m_startTime &&
+        e1.m_endTime == e2.m_endTime &&
+        e1.m_recordType == e2.m_recordType &&
+        e1.m_beforeThreshold == e2.m_beforeThreshold &&
+        e1.m_afterThreshold == e2.m_afterThreshold &&
+        e1.m_streamQuality == e2.m_streamQuality &&
+        e1.m_fps == e2.m_fps &&
+        e1.m_doRecordAudio == e2.m_doRecordAudio;
 }
 
 inline uint qHash(const QnScheduleTask::Data &key)

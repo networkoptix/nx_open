@@ -22,6 +22,7 @@ public:
 
     void setMaxFps(int value);
 private Q_SLOTS:
+    void doNotChangeStateChanged(int state);
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
     void updateGridParams();

@@ -26,6 +26,8 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget *parent)
     connect(ui->gridWidget, SIGNAL(needReadCellParams(QPoint)), this, SLOT(onNeedReadCellParams(QPoint)));
 
     m_disableUpdateGridParams = false;
+
+    doNotChangeStateChanged(2);
 }
 
 QList<QnScheduleTask::Data> CameraScheduleWidget::scheduleTasks() const
@@ -96,6 +98,9 @@ QList<QnScheduleTask::Data> CameraScheduleWidget::scheduleTasks() const
 
 void CameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> &tasksFrom)
 {
+    if (!tasksFrom.isEmpty())
+        doNotChangeStateChanged(0);
+
     QList<QnScheduleTask::Data> tasks = tasksFrom;
 
     for (int y = 0; y < ui->gridWidget->rowCount(); ++y) {
@@ -236,6 +241,19 @@ void CameraScheduleWidget::onNeedReadCellParams(const QPoint &cell)
 void CameraScheduleWidget::onDisplayQualityChanged(int state)
 {
     ui->gridWidget->setShowSecondParam(state);
+}
+
+void CameraScheduleWidget::doNotChangeStateChanged(int state)
+{
+    bool enabled = state == 0;
+    ui->gridWidget->setEnabled(enabled);
+    ui->fpsSpinBox->setEnabled(enabled);
+    ui->btnRecordAlways->setEnabled(enabled);
+    ui->btnRecordMotion->setEnabled(enabled);
+    ui->btnNoRecord->setEnabled(enabled);
+    ui->comboBoxQuality->setEnabled(enabled);
+    ui->spinBoxRecordBefore->setEnabled(enabled);
+    ui->spinBoxRecordAfter->setEnabled(enabled);
 }
 
 void CameraScheduleWidget::onDisplayFPSChanged(int state)

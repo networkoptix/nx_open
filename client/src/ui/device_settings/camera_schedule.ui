@@ -68,6 +68,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="chkBoxDontChange">
+          <property name="text">
+           <string>Do not change</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -498,5 +508,25 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>chkBoxDontChange</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>CameraSchedule</receiver>
+   <slot>doNotChangeStateChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>311</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>478</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>doNotChangeStateChanged(int)</slot>
+ </slots>
 </ui>
