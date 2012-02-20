@@ -168,8 +168,6 @@ bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *
         m_animator->stop(widget);
     }
 
-    qDebug() << "PROGRESS" << static_cast<const void *>(widget) << progress;
-
     /* Update animation if needed. */
     bool wasHovered = widget->property(qn_hoveredPropertyName).toBool();
     const_cast<QWidget *>(widget)->setProperty(qn_hoveredPropertyName, hovered);
