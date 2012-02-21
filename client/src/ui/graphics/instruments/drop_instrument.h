@@ -12,10 +12,10 @@ public:
     DropInstrument(QnWorkbenchController *controller, QObject *parent = NULL);
 
 protected:
-    virtual bool dragEnterEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
-    virtual bool dragMoveEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
-    virtual bool dragLeaveEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
-    virtual bool dropEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
+    virtual bool dragEnterEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
+    virtual bool dragMoveEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
+    virtual bool dragLeaveEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
+    virtual bool dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
 
 private:
     bool dropInternal(QGraphicsView *view, const QStringList &files, const QPoint &pos);
