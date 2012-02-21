@@ -304,7 +304,7 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     {
         if (m_currentChunkCatalog == m_catalogHi || m_currentChunk.durationMs == -1)
         {
-            // Got same chunk again (possible is closed now)
+            // EOF reached
             chunk.startTimeMs = -1;
             return;
         }
