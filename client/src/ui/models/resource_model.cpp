@@ -614,7 +614,7 @@ void QnResourceModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, c
     Node *parentNode = this->node(layout->getId());
     Node *node = this->node(item.uuid);
 
-    node->setResource(m_resourcePool->getResourceById(item.resourceId));
+    node->setResource(m_resourcePool->getResourceById(item.resource.id));
     node->setParent(parentNode);
 }
 

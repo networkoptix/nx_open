@@ -88,10 +88,17 @@ bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &resource) {
         item->setPinned(false);
 
     foreach(const QnLayoutItemData itemData, resource->getItems()) {
-        QnId id = itemData.resourceId;
-        QnResourcePtr resource = qnResPool->getResourceById(id);
+        QnId id = itemData.resource.id;
+        QString path = itemData.resource.path;
+
+        QnResourcePtr resource;
+        if (id.isValid())
+            resource = qnResPool->getResourceById(id);
+        else
+            resource = qnResPool->getResourceByUniqId(path);
+
         if(resource.isNull()) {
-            qnWarning("No resource in resource pool for id '%1'.", id.toString());
+            qnWarning("No resource in resource pool for id '%1' or path '%s'.", id.toString(), path);
             result = false;
             continue;
         }
@@ -140,7 +147,8 @@ void QnWorkbenchLayout::save(const QnLayoutResourcePtr &resource) const {
             continue;
         }
 
-        itemData.resourceId = resource->getId();
+        itemData.resource.id = resource->getId();
+        itemData.resource.path = resource->getUrl();
         itemData.uuid = item->uuid();
         item->save(itemData);
 
