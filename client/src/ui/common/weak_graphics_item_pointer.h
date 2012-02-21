@@ -7,7 +7,7 @@ class QGraphicsItem;
 
 /**
  * This class presents functionality similar to that of a <tt>QWeakPointer</tt>,
- * but also works for non-<tt>QObject</tt> derived <tt>QGraphicsItem</tt>s
+ * but also works for non-<tt>QObject</tt> derived <tt>QGraphicsItem</tt>s.
  */
 class WeakGraphicsItemPointer {
 public:

@@ -149,6 +149,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(mouseEventTypeArray);
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
+    Instrument::EventTypeSet dndEventTypes = Instrument::makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop);
 
     /* Install and configure instruments. */
     ClickInstrument *itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
@@ -190,7 +191,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
+    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, dndEventTypes, this));
     m_manager->installInstrument(m_dropInstrument);
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, dndEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, dndEventTypes, this));
 
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
