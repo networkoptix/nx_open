@@ -183,7 +183,7 @@ private:
     ResizingInstrument *m_resizingInstrument;
 
     /** Archive drop instrument. */
-    DropInstrument *m_archiveDropInstrument;
+    DropInstrument *m_dropInstrument;
 
     /** Motion selection instrument. */
     MotionSelectionInstrument *m_motionSelectionInstrument;

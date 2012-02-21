@@ -1,23 +1,21 @@
 #include "drop_instrument.h"
-
-#include <QtGui/QtEvents>
-
+#include <QGraphicsSceneDragDropEvent>
+#include <QMimeData>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/view_drag_and_drop.h>
-
 #include "file_processor.h"
 
 DropInstrument::DropInstrument(QnWorkbenchController *controller, QObject *parent):
-    Instrument(VIEWPORT, makeSet(QEvent::DragEnter, QEvent::DragMove, QEvent::DragLeave, QEvent::Drop), parent),
+    Instrument(SCENE, makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop), parent),
     m_controller(controller)
 {
     Q_ASSERT(controller);
 }
 
-bool DropInstrument::dragEnterEvent(QWidget * /*viewport*/, QDragEnterEvent *event) {
+bool DropInstrument::dragEnterEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDragDropEvent *event) {
     m_files = QnFileProcessor::findAcceptedFiles(event->mimeData()->urls());
     m_resources = deserializeResources(event->mimeData()->data(resourcesMime()));
 
@@ -28,7 +26,7 @@ bool DropInstrument::dragEnterEvent(QWidget * /*viewport*/, QDragEnterEvent *eve
     return true;
 }
 
-bool DropInstrument::dragMoveEvent(QWidget * /*viewport*/, QDragMoveEvent *event) {
+bool DropInstrument::dragMoveEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDragDropEvent *event) {
     if(m_files.empty() && m_resources.empty())
         return false;
 
@@ -36,15 +34,15 @@ bool DropInstrument::dragMoveEvent(QWidget * /*viewport*/, QDragMoveEvent *event
     return true;
 }
 
-bool DropInstrument::dragLeaveEvent(QWidget * /*viewport*/, QDragLeaveEvent * /*event*/) {
+bool DropInstrument::dragLeaveEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDragDropEvent * /*event*/) {
     if(m_files.empty() && m_resources.empty())
         return false;
 
     return true;
 }
 
-bool DropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
-    QPointF gridPos = m_controller->workbench()->mapper()->mapToGridF(view(viewport)->mapToScene(event->pos()));
+bool DropInstrument::dropEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) {
+    QPointF gridPos = m_controller->workbench()->mapper()->mapToGridF(event->scenePos());
 
     if(!m_resources.empty())
         m_controller->drop(m_resources, gridPos);
