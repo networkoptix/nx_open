@@ -160,7 +160,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
 
     /* Set up model & control machinery. */
-    const QSizeF defaultCellSize = QSizeF(15000.0, 10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
+    const QSizeF defaultCellSize = QSizeF(16000.0, 12000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
     const QSizeF defaultSpacing = QSizeF(2500.0, 2500.0);
     m_workbench = new QnWorkbench(this);
     m_workbench->mapper()->setCellSize(defaultCellSize);
