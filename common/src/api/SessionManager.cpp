@@ -67,6 +67,8 @@ SessionManager::SessionManager()
 
     connect(this, SIGNAL(asyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QObject*,const char*, int)), this, SLOT(doSendAsyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QObject*,const char*, int)));
     connect(this, SIGNAL(asyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)), this, SLOT(doSendAsyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)));
+    connect(this, SIGNAL(asyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString,int,QObject*,const char*, int)), this, SLOT(doSendAsyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString,int,QObject*,const char*, int)));
+
     connect(this, SIGNAL(stopSignal()), this, SLOT(doStop()));
     connect(this, SIGNAL(startSignal()), this, SLOT(doStart()));
 }
@@ -174,11 +176,27 @@ void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyPr
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
-    //request.setRawHeader("Connection", "close");
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
     QNetworkReply* reply = m_accessManager->get(request);
+    connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
+}
+
+void SessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle)
+{
+    if (!m_accessManager)
+    {
+        qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";
+        return;
+    }
+
+    QNetworkRequest request;
+    request.setUrl(createApiUrl(url, objectName, QnRequestParamList() << QnRequestParam("id", QString::number(id))));
+    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+
+    QNetworkReply* reply = m_accessManager->deleteResource(request);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
 }
 
@@ -199,6 +217,20 @@ int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectNa
 int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot)
 {
     return sendAsyncPostRequest(url, objectName, QnRequestParamList(), data, target, slot);
+}
+
+int SessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot)
+{
+    int handle = m_handle.fetchAndAddAcquire(1);
+
+    // We need to create reply processor here as target could not exist when doAsyncDeleteRequest gets called
+    SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
+    replyProcessor->moveToThread(thread());
+    connect(target, SIGNAL(destroyed(QObject*)), replyProcessor, SLOT(targetDestroyed(QObject*)));
+
+    emit asyncDeleteRequest(replyProcessor, url, objectName, id, target, slot, handle);
+
+    return handle;
 }
 
 void SessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle)
