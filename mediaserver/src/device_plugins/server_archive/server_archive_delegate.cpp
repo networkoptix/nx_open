@@ -10,8 +10,6 @@ static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
-    m_chunkSequenceHi(0),
-    m_chunkSequenceLow(0),
     m_reverseMode(false),
     m_selectedAudioChannel(0),
     m_opened(false),
@@ -33,8 +31,6 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
 
 QnServerArchiveDelegate::~QnServerArchiveDelegate()
 {
-    delete m_chunkSequenceHi;
-    delete m_chunkSequenceLow;
 }
 
 qint64 QnServerArchiveDelegate::startTime()
@@ -58,8 +54,6 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     Q_ASSERT(netResource != 0);
     m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
     m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_SecondaryLiveVideo);
-    m_chunkSequenceHi = new QnChunkSequence(netResource, QnResource::Role_LiveVideo, 0);
-    m_chunkSequenceLow = new QnChunkSequence(netResource, QnResource::Role_SecondaryLiveVideo, 0);
 
     m_currentChunkCatalog = m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
 
@@ -72,10 +66,6 @@ void QnServerArchiveDelegate::close()
     m_aviDelegate->close();
     m_catalogHi.clear();
     m_catalogLow.clear();
-    delete m_chunkSequenceHi;
-    delete m_chunkSequenceLow;
-    m_chunkSequenceHi = 0;
-    m_chunkSequenceLow = 0;
     //m_reverseMode = false;
     m_opened = false;
     m_lastSeekTime = AV_NOPTS_VALUE;
@@ -213,13 +203,13 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     DeviceFileCatalogPtr newChunkCatalog;
     if (m_quality == MEDIA_Quality_Low)
     {
-        newChunk = m_chunkSequenceLow->findChunk(m_resource, timeMs, findMethod);
+        newChunk = findChunk(m_catalogLow, timeMs, findMethod);
         newChunkCatalog = m_catalogLow;
         int distanceLow = newChunk.distanceToTime(timeMs);
         if (distanceLow > 0) 
         {
             // Low quality chunk not found exactly for requested time. So, find chunk in high quality sequence
-            DeviceFileCatalog::Chunk newChunkPrimary = m_chunkSequenceHi->findChunk(m_resource, timeMs, findMethod);
+            DeviceFileCatalog::Chunk newChunkPrimary = findChunk(m_catalogHi, timeMs, findMethod); 
             int distanceHi = newChunkPrimary.distanceToTime(timeMs);
             if (distanceLow - distanceHi > SECOND_STREAM_FIND_EPS)
             {
@@ -229,7 +219,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         }
     }
     else {
-        newChunk = m_chunkSequenceHi->findChunk(m_resource, timeMs, findMethod);
+        newChunk = findChunk(m_catalogHi, timeMs, findMethod);
         newChunkCatalog = m_catalogHi;
     }
 
@@ -294,40 +284,55 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
     return seekInternal(time, findIFrame, true);
 }
 
+DeviceFileCatalog::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod)
+{
+    int index = catalog->findFileIndex(time, findMethod);
+    return catalog->chunkAt(index);
+}
+
 void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog)
 {
     //m_newQualityTmpData.clear();
     //m_newQualityAviDelegate.clear();
 
     m_skipFramesToTime = 0;
-    bool isCatalogEqualQuality = (m_quality == MEDIA_Quality_High && m_currentChunkCatalog == m_catalogHi) ||
-                                 (m_quality == MEDIA_Quality_Low && m_currentChunkCatalog == m_catalogLow);
 
     qint64 prevEndTimeMs = m_currentChunk.startTimeMs + m_currentChunk.durationMs;
-    QnChunkSequence* currentSequence = m_currentChunkCatalog == m_catalogHi ? m_chunkSequenceHi : m_chunkSequenceLow;
 
     // check for last chunk
     if (m_currentChunkCatalog->isLastChunk(m_currentChunk.startTimeMs))
     {
         if (m_currentChunkCatalog == m_catalogHi || m_currentChunk.durationMs == -1)
         {
+            // Got same chunk again (possible is closed now)
             chunk.startTimeMs = -1;
             return;
         }
         else 
         {
-            // It is last and closed chunk for low quality. Switch to high quality, possible archive is continue
-            chunk =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+            // It is last and closed chunk for low quality. Check if HQ archive is continue
+            chunk =  findChunk(m_catalogHi, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+            if (chunk.durationMs > 0 && chunk.startTimeMs + chunk.durationMs < prevEndTimeMs) 
+            {
+                // no HQ chunk found after LQ EOF
+                chunk.startTimeMs = -1;
+                return; 
+            }
+
+            // Switch to high quality, archive is continue
             chunkCatalog = m_catalogHi;
             if (chunk.startTimeMs < prevEndTimeMs)
                 m_skipFramesToTime = prevEndTimeMs*1000;
             return;
         }
     }
+    else if (m_currentChunk.durationMs == -1) {
+        // It is not last chunk now. Update chunk duration
+        m_currentChunk = findChunk(m_currentChunkCatalog, m_currentChunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+        prevEndTimeMs = m_currentChunk.startTimeMs + m_currentChunk.durationMs;
+    }
 
-    //chunk = currentSequence->getNextChunk(m_resource);
-    // todo: getNextChunk is faster, but need more logic because of 2 chunk sequence now. So, speed may be improved
-    chunk = currentSequence->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+    chunk = findChunk(m_currentChunkCatalog, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
     chunkCatalog = m_currentChunkCatalog;
 
     if (chunk.startTimeMs == -1)
@@ -336,7 +341,13 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     if (m_newQualityTmpData)
         return; // new quality data already ready. So, do not switch quality now.
 
+    //if (m_currentChunk.durationMs == -1)
+    //    return; // do not switch quality
 
+    bool isCatalogEqualQuality = (m_quality == MEDIA_Quality_High && m_currentChunkCatalog == m_catalogHi) ||
+        (m_quality == MEDIA_Quality_Low && m_currentChunkCatalog == m_catalogLow);
+
+    // Check if quality switching required
     if (isCatalogEqualQuality) 
     {
         if (m_currentChunkCatalog == m_catalogLow)
@@ -347,7 +358,7 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
                 // Hole in a low quality chunks. Try to find chunk in a high quality
                 // Find Hi chunk slightly in a future because of Hi/Low chunks endians not full sync 
                 // (if chunk start will be found in the past, so at least SECOND_STREAM_FIND_EPS data can be used)
-                const DeviceFileCatalog::Chunk& chunkHi =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs+SECOND_STREAM_FIND_EPS, DeviceFileCatalog::OnRecordHole_NextChunk);
+                const DeviceFileCatalog::Chunk& chunkHi =  findChunk(m_catalogHi, prevEndTimeMs+SECOND_STREAM_FIND_EPS, DeviceFileCatalog::OnRecordHole_NextChunk);
                 qint64 hiDistance = chunkHi.distanceToTime(prevEndTimeMs);
                 if (hiDistance < lowDistance && lowDistance - hiDistance > SECOND_STREAM_FIND_EPS)
                 {
@@ -364,7 +375,7 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     {
         // Quality is Low, but current catalog is High because not low data for current period.
         // Checing for switching to a low quality
-        const DeviceFileCatalog::Chunk& chunkLow =  m_chunkSequenceLow->findChunk(m_resource, chunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+        const DeviceFileCatalog::Chunk& chunkLow =  findChunk(m_catalogLow, chunk.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
         qint64 lowDistance = chunkLow.distanceToTime(chunk.startTimeMs);
         qint64 hiDistance = chunk.distanceToTime(prevEndTimeMs);
         if (hiDistance < lowDistance && lowDistance - hiDistance > SECOND_STREAM_FIND_EPS)
@@ -378,7 +389,7 @@ void QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     }
     else {
         // Switch to hiQuality
-        const DeviceFileCatalog::Chunk& chunkHi =  m_chunkSequenceHi->findChunk(m_resource, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+        const DeviceFileCatalog::Chunk& chunkHi =  findChunk(m_catalogHi, prevEndTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
         if (chunkHi.startTimeMs < prevEndTimeMs)
             m_skipFramesToTime = prevEndTimeMs*1000;
         chunk = chunkHi;
@@ -573,8 +584,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
     if (!fastSwitch)
     {
         m_newQualityCatalog = quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
-        QnChunkSequence* chunkSequence = quality == MEDIA_Quality_High ? m_chunkSequenceHi : m_chunkSequenceLow;
-        m_newQualityChunk = chunkSequence->findChunk(m_resource, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+        m_newQualityChunk = findChunk(m_newQualityCatalog, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
         if (m_newQualityChunk.distanceToTime(timeMs) > SECOND_STREAM_FIND_EPS) {
 
             return false;
