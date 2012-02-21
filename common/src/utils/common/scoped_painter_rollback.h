@@ -85,6 +85,7 @@ typedef QnGenericScopedPainterRollback<QFont,       detail::PainterFontAccessor>
 typedef QnGenericScopedPainterRollback<qreal,       detail::PainterOpacityAccessor>                                         QnScopedPainterOpacityRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::Antialiasing> >             QnScopedPainterAntialiasingRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen> >    QnScopedPainterNonCosmeticDefaultPenRollback;
+typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::SmoothPixmapTransform> >    QnScopedPainterSmoothPixmapTransformRollback;
 
 
 #endif // QN_SCOPED_PAINTER_ROLLBACK_H

@@ -8,7 +8,7 @@
 #include <core/resourcemanagment/resource_criterion.h>
 #include <core/resource/resource.h>
 #include <ui/style/skin.h>
-#include <ui/style/app_style.h>
+#include <ui/style/noptix_style.h>
 #include "action.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
@@ -280,6 +280,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
         text(tr("Camera Settings")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
+
+    factory(Qn::MultipleCameraSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::MultiTarget).
+        text(tr("Multiple Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
     factory(Qn::ServerSettingsAction).

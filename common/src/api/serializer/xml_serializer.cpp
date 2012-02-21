@@ -203,8 +203,9 @@ namespace {
                 const Items::item_sequence& xsdItems = (*(i->items())).item();
                 for (Items::item_const_iterator ci(xsdItems.begin()); ci != xsdItems.end(); ++ci)
                 {
+                    // XXX there is no support for local files
                     QnLayoutItemData itemData;
-                    itemData.resourceId = ci->resourceId().c_str();
+                    itemData.resource.id = ci->resourceId().c_str();
                     itemData.uuid = QUuid(ci->uuid().c_str());
                     itemData.flags = ci->flags();
                     itemData.combinedGeometry.setLeft(ci->left());
@@ -551,7 +552,8 @@ void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteAr
             xsd::api::layouts::Items items;
 
             foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
-                xsd::api::layouts::Item item(itemIn.resourceId.toString().toStdString(),
+                // XXX: There is no support for local files here
+                xsd::api::layouts::Item item(itemIn.resource.id.toString().toStdString(),
                                              itemIn.uuid.toString().toStdString(),
                                              itemIn.flags,
                                              itemIn.combinedGeometry.left(),

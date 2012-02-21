@@ -103,6 +103,11 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
+         * Opens multiple cameras settings dialog.
+         */
+        MultipleCameraSettingsAction,
+
+        /**
          * Opens server settings dialog.
          */
         ServerSettingsAction,

@@ -14,6 +14,7 @@
 
 #include <utils/common/event_signalizer.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/checked_cast.h>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
@@ -46,8 +47,11 @@
 #include <ui/actions/action_meta_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
+#include <ui/widgets/help_context_widget.h>
 #include <ui/style/skin.h>
 #include <ui/mixins/render_watch_mixin.h>
+
+#include <help/qncontext_help.h>
 
 #include "camera/camera.h"
 #include "openal/qtvaudiodevice.h"
@@ -190,6 +194,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_treeWidget->setPalette(palette);
     }
     m_treeWidget->setWorkbench(display->workbench());
+    m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
@@ -400,7 +405,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_helpBackgroundItem->setPalette(palette);
     }
 
-    QLabel *m_helpWidget = new QLabel();
+    m_helpWidget = new QnHelpContextWidget(QnContextHelp::instance());
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_helpWidget->palette();
@@ -408,14 +413,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setColor(QPalette::Base, Qt::transparent);
         m_helpWidget->setPalette(palette);
     }
-    m_helpWidget->setTextFormat(Qt::RichText);
-    m_helpWidget->setText(trUtf8("<div style=\"color:red;font-size:100px\" align=\"center\">:)</div>"));
-    m_helpWidget->setMinimumWidth(200);
-    m_helpWidget->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    m_helpWidget->resize(250, 0);
 
-    //connect(QnContextHelp::instance(), SIGNAL(helpContextChanged(ContextId, const QString&, bool)), m_helpWidget, SLOT(onHelpContextChanged(ContextId, const QString&, bool)));
-
-    
 
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_helpItem->setWidget(m_helpWidget);
@@ -671,9 +670,15 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
         /* For reasons unknown, tab bar's size gets messed up when it is shown 
          * after new items were added to it. Re-embedding helps, probably there is
          * a simpler workaround. */
-        QWidget *widget = m_tabBarItem->widget();
+        QTabBar *widget = checked_cast<QTabBar *>(m_tabBarItem->widget());
         m_tabBarItem->setWidget(NULL);
         m_tabBarItem->setWidget(widget);
+
+        /* There are cases where even re-embedding doesn't help. 
+         * So we cheat even more, forcing the tab bar to refresh. */
+        QTabBar::Shape shape = widget->shape();
+        widget->setShape(QTabBar::TriangularWest);
+        widget->setShape(shape);
     } else {
         m_titleItem->setPos(0.0, -m_titleItem->size().height() - 1.0);
 
@@ -933,11 +938,11 @@ void QnWorkbenchUi::updateFpsGeometry() {
     m_fpsItem->setPos(pos);
 }
 
-QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY) {
+QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
     return QMargins(
         m_treePinned ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
-        std::floor(qMax(0.0, m_helpPinned ? m_controlsWidgetRect.right() - helpY : 0.0)),
+        std::floor(qMax(0.0, m_helpPinned ? m_controlsWidgetRect.right() - helpX : 0.0)),
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY))
     );
 }
@@ -970,6 +975,14 @@ void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
     }
 }
 
+void QnWorkbenchUi::setHelpShowButtonUsed(bool used) {
+    if(used) {
+        m_helpShowButton->setAcceptedMouseButtons(Qt::LeftButton);
+    } else {
+        m_helpShowButton->setAcceptedMouseButtons(0);
+    }
+}
+
 void QnWorkbenchUi::setFlags(Flags flags) {
     if(flags == m_flags)
         return;
@@ -997,7 +1010,7 @@ void QnWorkbenchUi::updateViewportMargins() {
             m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y(),
             m_titleItem->size().height(),
             m_sliderYAnimator->isRunning() ? m_sliderYAnimator->targetValue().toReal() : m_sliderItem->pos().y(),
-            m_helpXAnimator->isRunning() ? m_helpXAnimator->targetValue().toReal() : m_helpItem->pos().y()
+            m_helpXAnimator->isRunning() ? m_helpXAnimator->targetValue().toReal() : m_helpItem->pos().x()
         ));
     }
 }
@@ -1289,7 +1302,7 @@ void QnWorkbenchUi::at_treeShowingProcessor_hoverEntered() {
 
         /* So that the click that may follow won't hide it. */
         setTreeShowButtonUsed(false);
-        QTimer::singleShot(200, this, SLOT(setTreeShowButtonUsed()));
+        QTimer::singleShot(300, this, SLOT(setTreeShowButtonUsed()));
     }
 
     m_treeHidingProcessor->forceHoverEnter();
@@ -1361,8 +1374,8 @@ void QnWorkbenchUi::at_helpShowingProcessor_hoverEntered() {
         setHelpOpened(true);
 
         /* So that the click that may follow won't hide it. */
-        //setTreeShowButtonUsed(false);
-        //QTimer::singleShot(200, this, SLOT(setTreeShowButtonUsed()));
+        setHelpShowButtonUsed(false);
+        QTimer::singleShot(300, this, SLOT(setHelpShowButtonUsed()));
     }
 
     m_helpHidingProcessor->forceHoverEnter();

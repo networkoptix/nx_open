@@ -18,10 +18,14 @@ public:
     void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data);
 
+    void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data);
+    void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data);
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data);
     void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data);
     void serializeUser(const QnUserResourcePtr& resource, QByteArray& data);
+    void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data);
+
 };
 
 #endif // _API_PB_SERIALIZER_H_

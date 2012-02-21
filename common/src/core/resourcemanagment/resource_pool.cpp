@@ -113,6 +113,9 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources) 
     {
+        if (!resource)
+            continue;
+
         if (resource == localServer) // special case
             continue;
 

@@ -160,7 +160,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_archiveDropInstrument = new DropInstrument(this, this);
+    m_dropInstrument = new DropInstrument(this, this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_dragInstrument = new DragInstrument(this);
@@ -190,9 +190,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
+    m_manager->installInstrument(m_dropInstrument);
+
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(gridAdjustmentInstrument);
+
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, wheelEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, wheelEventTypes, this));
 
@@ -207,7 +210,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
-    m_manager->installInstrument(m_archiveDropInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
     connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));

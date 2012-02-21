@@ -2,17 +2,24 @@
 
 Q_GLOBAL_STATIC(QnContextHelp, getInstance)
 
-QnContextHelp* QnContextHelp::instance()
-{
-    return getInstance();
-}
-
-QnContextHelp::QnContextHelp(): m_translator(0)
+QnContextHelp::QnContextHelp(): 
+    m_translator(0),
+    m_currentId(ContextId_Invalid)
 {
     installHelpContext("en");
     
     m_settings.beginGroup(QLatin1String("helpContext"));
     deserializeShownContext();
+}
+
+QnContextHelp* QnContextHelp::instance()
+{
+    return getInstance();
+}
+
+QnContextHelp::~QnContextHelp()
+{
+    delete m_translator;
 }
 
 void QnContextHelp::deserializeShownContext()
@@ -38,11 +45,6 @@ void QnContextHelp::serializeShownContext()
         }
     }
     m_settings.setValue("shownContext", rez);
-}
-
-QnContextHelp::~QnContextHelp()
-{
-    delete m_translator;
 }
 
 void QnContextHelp::installHelpContext(const QString& lang)
@@ -73,24 +75,16 @@ bool QnContextHelp::isNeedAutoShow(ContextId id) const
 
 void QnContextHelp::setHelpContext(ContextId id)
 {
-    switch(id)
-    {
-        case ContextId_Scene:
-            m_currentText = trUtf8("ContextId_Scene");
-            break;
-        case ContextId_MotionGrid:
-            m_currentText = trUtf8("ContextId_MotionGrid");
-            break;
-        default:
-            qWarning() << "Unknown help context" << (int) id;
-            return;
-    }
+    if(m_currentId == id)
+        return;
+
+    m_currentId = id;
     emit helpContextChanged(id);
 }
 
 void QnContextHelp::setNeedAutoShow(ContextId id, bool value)
 {
-    m_shownContext[id] = value;
+    m_shownContext[id] = !value;
     serializeShownContext();
 }
 
@@ -98,4 +92,23 @@ void QnContextHelp::resetShownInfo()
 {
     m_shownContext.clear();
     serializeShownContext();
+}
+
+QnContextHelp::ContextId QnContextHelp::currentId() const {
+    return m_currentId;
+}
+
+QString QnContextHelp::text(ContextId id) const {
+    switch(id)
+    {
+    case ContextId_Scene:
+        return tr("ContextId_Scene");
+        break;
+    case ContextId_MotionGrid:
+        return tr("ContextId_MotionGrid");
+        break;
+    default:
+        qWarning() << "Unknown help context" << (int) m_currentId;
+        return QString();
+    }
 }

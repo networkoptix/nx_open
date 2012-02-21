@@ -174,10 +174,18 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData
     if(m_layout->item(itemData.uuid) != NULL)
         return; /* Was called back from at_layout_itemAdded because of layout resource living in a different thread. */
 
-    QnId id = itemData.resourceId;
-    QnResourcePtr resource = qnResPool->getResourceById(id);
+    QnId id = itemData.resource.id;
+    QString path = itemData.resource.path;
+
+    QnResourcePtr resource;
+
+    if (id.isValid())
+        resource = qnResPool->getResourceById(id);
+    else
+        resource = qnResPool->getResourceByUniqId(path);
+
     if(resource.isNull()) {
-        qnWarning("No resource in resource pool for id '%1'.", id.toString());
+        qnWarning("No resource in resource pool for id '%1' or path '%2'.", id.toString(), path);
         return;
     }
 
@@ -217,7 +225,8 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     QnScopedValueRollback<bool> guard(&m_update, false);
 
     QnLayoutItemData itemData;
-    itemData.resourceId = resource->getId();
+    itemData.resource.id = resource->getId();
+    itemData.resource.path = resource->getUrl();
     itemData.uuid = item->uuid();
     item->save(itemData);
 

@@ -23,6 +23,10 @@ CameraSettingsDialog::CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QW
 {
     ui->setupUi(this);
     ui->motionWidget->setCamera(m_camera);
+    
+    // Do not block editing by default it schedule task list is empty
+    ui->cameraScheduleWidget->setDoNotChange(false);
+
     updateView();
 }
 
@@ -59,20 +63,32 @@ void CameraSettingsDialog::saveToModel()
     m_camera->setName(ui->nameEdit->text());
     m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
-    m_camera->setScheduleTasks(ui->cameraScheduleWidget->scheduleTasks());
+
+    if (!ui->cameraScheduleWidget->isDoNotChange())
+    {
+        QnScheduleTaskList scheduleTasks;
+        foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
+            scheduleTasks.append(QnScheduleTask(scheduleTaskData));
+        m_camera->setScheduleTasks(scheduleTasks);
+    }
+
 	m_camera->setMotionMask(ui->motionWidget->motionMask());
 }
 
 void CameraSettingsDialog::updateView()
 {
     ui->nameEdit->setText(m_camera->getName());
-    ui->macAddressValueLabel->setText(m_camera->getMAC().toString());
+    ui->macAddressEdit->setText(m_camera->getMAC().toString());
     ui->ipAddressEdit->setText(m_camera->getHostAddress().toString());
     ui->loginEdit->setText(m_camera->getAuth().user());
     ui->passwordEdit->setText(m_camera->getAuth().password());
 
     ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
-    ui->cameraScheduleWidget->setScheduleTasks(m_camera->getScheduleTasks());
+
+    QList<QnScheduleTask::Data> scheduleTasks;
+    foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
+        scheduleTasks.append(scheduleTaskData.getData());
+    ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
 }
 
 void CameraSettingsDialog::save()

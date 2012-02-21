@@ -95,6 +95,11 @@ int QnAppServerConnection::addObjectAsync(const QString& objectName, const QByte
     return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, m_requestParams, data, target, slot);
 }
 
+int QnAppServerConnection::deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot)
+{
+    return SessionManager::instance()->sendAsyncDeleteRequest(m_url, objectName, id, target, slot);
+}
+
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
 {
     QString request;
@@ -241,6 +246,39 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr
     return addObjectAsync("camera", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
+int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "layout");
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serialize(layout, data);
+
+    return addObjectAsync("layout", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
+int QnAppServerConnection::saveAsync(const QnLayoutResourceList& layouts, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "layout");
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeLayouts(layouts, data);
+
+    return addObjectAsync("layout", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
+int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "camera");
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeCameras(cameras, data);
+
+    return addObjectAsync("camera", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
 int QnAppServerConnection::addStorage(const QnStorageResourcePtr& storagePtr, QByteArray& errorString)
 {
     QByteArray data;
@@ -380,4 +418,24 @@ int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera, QB
 {
     QnVirtualCameraResourceList cameras;
     return addCamera(camera, cameras, errorString);
+}
+
+int QnAppServerConnection::deleteAsync(const QnVideoServerResourcePtr& server, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("server", server->getId().toInt(), target, slot);
+}
+
+int QnAppServerConnection::deleteAsync(const QnVirtualCameraResourcePtr& camera, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("camera", camera->getId().toInt(), target, slot);
+}
+
+int QnAppServerConnection::deleteAsync(const QnUserResourcePtr& user, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("user", user->getId().toInt(), target, slot);
+}
+
+int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("layout", layout->getId().toInt(), target, slot);
 }
