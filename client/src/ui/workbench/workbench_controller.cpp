@@ -161,7 +161,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_dropInstrument = new DropInstrument(this, this);
+    m_dropInstrument = new DropInstrument(workbench(), this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_dragInstrument = new DragInstrument(this);
@@ -171,6 +171,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(display->workbench()->mapper()->spacing() / 90.0));
+
+    display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());

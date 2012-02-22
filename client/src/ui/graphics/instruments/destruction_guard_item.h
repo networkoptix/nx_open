@@ -11,6 +11,7 @@ public:
     {
         setFlags(ItemHasNoContents);
         setAcceptedMouseButtons(0);
+        setPos(0.0, 0.0);
     }
 
     virtual ~DestructionGuardItem() {
@@ -20,10 +21,16 @@ public:
     }
 
     void setGuarded(QGraphicsObject *guarded) {
+        if(!m_guarded.isNull())
+            disconnect(guarded, NULL, this, NULL);
+
         m_guarded = guarded;
 
-        if(guarded != NULL)
+        if(guarded != NULL) {
             guarded->setParentItem(this);
+
+            connect(guarded, SIGNAL(zChanged()), this, SLOT(at_guarded_zValueChanged()));
+        }
     }
 
     QGraphicsObject *guarded() const {
@@ -36,6 +43,11 @@ public:
 
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override {
         return;
+    }
+
+protected slots:
+    void at_guarded_zValueChanged() {
+        setZValue(guarded()->zValue());
     }
 
 private:

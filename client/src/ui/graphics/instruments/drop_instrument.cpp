@@ -3,22 +3,24 @@
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QGraphicsItem>
-#include <ui/workbench/workbench_controller.h>
-#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/view_drag_and_drop.h>
 #include "file_processor.h"
+#include "destruction_guard_item.h"
 
-class DropSurfaceItem: public QGraphicsItem {
+class DropSurfaceItem: public QGraphicsObject {
 public:
     DropSurfaceItem(QGraphicsItem *parent = NULL): 
-        QGraphicsItem(parent)
+        QGraphicsObject(parent)
     {
         qreal d = std::numeric_limits<qreal>::max() / 4;
-        m_boundingRect = QRectF(QPointF(-d, -d), QPoint(d, d));
+        m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
 
         setAcceptedMouseButtons(0);
+        setAcceptDrops(true);
         /* Don't disable this item here or it will swallow mouse wheel events. */
     }
 
@@ -30,25 +32,33 @@ public:
         m_dropInstrument = dropInstrument;
     }
 
+    virtual QRectF boundingRect() const override {
+        return m_boundingRect;
+    }
+
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override {
+        return;
+    }
+
 protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override {
         if(m_dropInstrument)
-            m_dropInstrument.data()->dragEnterEvent(this, event);
+            m_dropInstrument.data()->sceneEvent(this, event);
     }
 
     virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override {
         if(m_dropInstrument)
-            m_dropInstrument.data()->dragLeaveEvent(this, event);
+            m_dropInstrument.data()->sceneEvent(this, event);
     }
 
     virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override {
         if(m_dropInstrument)
-            m_dropInstrument.data()->dragMoveEvent(this, event);
+            m_dropInstrument.data()->sceneEvent(this, event);
     }
 
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override {
         if(m_dropInstrument)
-            m_dropInstrument.data()->dropEvent(this, event);
+            m_dropInstrument.data()->sceneEvent(this, event);
     }
     
 private:
@@ -56,14 +66,39 @@ private:
     QRectF m_boundingRect;
 };
 
-DropInstrument::DropInstrument(QnWorkbenchController *controller, QObject *parent):
-    Instrument(SCENE, makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop), parent),
-    m_controller(controller)
+
+DropInstrument::DropInstrument(QnWorkbench *workbench, QObject *parent):
+    Instrument(ITEM, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
+    m_workbench(workbench)
 {
-    Q_ASSERT(controller);
+    if(workbench == NULL)
+        qnNullWarning(workbench)
+
+    DropSurfaceItem *surface = new DropSurfaceItem();
+    surface->setDropInstrument(this);
+    surface->setParent(this);
+    m_surface = surface;
 }
 
-bool DropInstrument::dragEnterEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDragDropEvent *event) {
+QGraphicsObject *DropInstrument::surface() const {
+    return m_surface.data();
+}
+
+void DropInstrument::installedNotify() {
+    DestructionGuardItem *guard = new DestructionGuardItem();
+    guard->setGuarded(surface());
+    guard->setPos(0.0, 0.0);
+    scene()->addItem(guard);
+
+    m_guard = guard;
+}
+
+void DropInstrument::aboutToBeUninstalledNotify() {
+    if(guard() != NULL)
+        delete guard();
+}
+
+bool DropInstrument::dragEnterEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
     m_files = QnFileProcessor::findAcceptedFiles(event->mimeData()->urls());
     m_resources = deserializeResources(event->mimeData()->data(resourcesMime()));
 
@@ -74,7 +109,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDr
     return true;
 }
 
-bool DropInstrument::dragMoveEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDragDropEvent *event) {
+bool DropInstrument::dragMoveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
     if(m_files.empty() && m_resources.empty())
         return false;
 
@@ -82,20 +117,29 @@ bool DropInstrument::dragMoveEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDra
     return true;
 }
 
-bool DropInstrument::dragLeaveEvent(QGraphicsScene * /*scene*/, QGraphicsSceneDragDropEvent * /*event*/) {
+bool DropInstrument::dragLeaveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent * /*event*/) {
     if(m_files.empty() && m_resources.empty())
         return false;
 
     return true;
 }
 
-bool DropInstrument::dropEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) {
-    QPointF gridPos = m_controller->workbench()->mapper()->mapToGridF(event->scenePos());
+bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) {
+    QnWorkbench *workbench = m_workbench.data();
+    if(workbench == NULL)
+        return true;
 
-    if(!m_resources.empty())
-        m_controller->drop(m_resources, gridPos);
-    else if(!m_files.empty())
-        m_controller->drop(m_files, gridPos, false);
+    QnResourceList resources = QnFileProcessor::createResourcesForFiles(m_files);
+    resources.append(m_resources);
+
+    QPointF gridPos = workbench->mapper()->mapToGridF(event->scenePos());
+
+    foreach(const QnResourcePtr &resource, m_resources) {
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        item->setFlag(QnWorkbenchItem::Pinned, false);
+        workbench->currentLayout()->addItem(item);
+        item->adjustGeometry(gridPos);
+    }
 
     return true;
 }

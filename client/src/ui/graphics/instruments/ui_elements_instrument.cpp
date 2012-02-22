@@ -16,8 +16,6 @@ UiElementsInstrument::UiElementsInstrument(QObject *parent):
     widget->setParent(this);
     widget->setAcceptedMouseButtons(0);
     m_widget = widget;
-
-    connect(widget, SIGNAL(zChanged()), this, SLOT(at_widget_zValueChanged()));
 }
 
 UiElementsInstrument::~UiElementsInstrument() {
@@ -31,11 +29,9 @@ void UiElementsInstrument::installedNotify() {
     scene()->addItem(guard);
 
     m_guard = guard;
-    
-    at_widget_zValueChanged();
 }
 
-void UiElementsInstrument::uninstalledNotify() {
+void UiElementsInstrument::aboutToBeUninstalledNotify() {
     if(guard() != NULL)
         delete guard();
 }
@@ -54,9 +50,3 @@ bool UiElementsInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     return false;
 }
 
-void UiElementsInstrument::at_widget_zValueChanged() {
-    if(guard() == NULL || widget() == NULL) 
-        return;
-
-    guard()->setZValue(widget()->zValue());
-}
