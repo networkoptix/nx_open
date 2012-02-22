@@ -10,6 +10,8 @@ QnUserResource::QnUserResource()
 
 void QnUserResource::setLayouts(const QnLayoutResourceList &layouts)
 {
+    QMutexLocker locker(&m_mutex);
+
     while(!m_layouts.empty())
         removeLayout(m_layouts.front()); /* Removing an item from QList's front is constant time. */
 
@@ -17,13 +19,17 @@ void QnUserResource::setLayouts(const QnLayoutResourceList &layouts)
         addLayout(layout);
 }
 
-const QnLayoutResourceList &QnUserResource::getLayouts() const
+QnLayoutResourceList QnUserResource::getLayouts() const
 {
+    QMutexLocker locker(&m_mutex);
+
     return m_layouts;
 }
 
 void QnUserResource::addLayout(const QnLayoutResourcePtr &layout) 
 {
+    QMutexLocker locker(&m_mutex);
+
     if(m_layouts.contains(layout)) {
         qnWarning("Given layout '%1' is already in %2's layouts list.", layout->getName(), getName());
         return;
@@ -40,6 +46,8 @@ void QnUserResource::addLayout(const QnLayoutResourcePtr &layout)
 
 void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout) 
 {
+    QMutexLocker locker(&m_mutex);
+
     m_layouts.removeOne(layout); /* Removing a layout that is not there is not an error. */
     layout->setParentId(QnId());
 }
@@ -52,11 +60,15 @@ QString QnUserResource::getUniqueId() const
 
 QString QnUserResource::getPassword() const
 {
+    QMutexLocker locker(&m_mutex);
+
     return m_password;
 }
 
 void QnUserResource::setPassword(const QString& password)
 {
+    QMutexLocker locker(&m_mutex);
+
     m_password = password;
 }
 

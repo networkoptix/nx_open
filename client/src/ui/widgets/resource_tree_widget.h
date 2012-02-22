@@ -3,12 +3,15 @@
 
 #include <QWidget>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/layout_item_index.h>
+#include <ui/actions/action_target_provider.h>
 
 class QLineEdit;
 class QTabWidget;
 class QToolButton;
 class QTreeView;
 class QModelIndex;
+class QItemSelectionModel;
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -20,7 +23,7 @@ class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeItemDelegate;
 
-class QnResourceTreeWidget: public QWidget {
+class QnResourceTreeWidget: public QWidget, public QnActionTargetProvider {
     Q_OBJECT
 
 public:
@@ -31,6 +34,10 @@ public:
 
     QnResourceList selectedResources() const;
 
+    QnLayoutItemIndexList selectedLayoutItems() const;
+
+    virtual QVariant target(QnAction *action) override;
+
 signals:
     void activated(const QnResourcePtr &resource);
     void newTabRequested();
@@ -40,6 +47,8 @@ protected:
     void wheelEvent(QWheelEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void timerEvent(QTimerEvent *event);
+
+    QItemSelectionModel *currentSelectionModel() const;
 
     QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
     QnResourceSearchSynchronizer *layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const;

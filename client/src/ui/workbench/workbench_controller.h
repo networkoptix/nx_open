@@ -140,7 +140,6 @@ protected slots:
     void at_hideMotionAction_triggered();
     void at_recordingAction_triggered(bool checked);
     void at_recordingSettingsAction_triggered();
-    void at_removeLayoutItemAction_triggered();
 
     void at_screenRecorder_error(const QString &errorMessage);
     void at_screenRecorder_recordingStarted();

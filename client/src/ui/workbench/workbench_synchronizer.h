@@ -31,6 +31,19 @@ namespace detail {
         QnLayoutResourcePtr m_resource;
     };
 
+    class LayoutData {
+    public:
+        LayoutData(const QnLayoutResourcePtr &resource):
+            items(resource->getItems()),
+            name(resource->getName())
+        {}
+
+        LayoutData() {}
+
+        QnLayoutItemDataMap items;
+        QString name;
+    };
+
 } // namespace detail
 
 /**
@@ -60,6 +73,10 @@ public:
     void save(QnWorkbenchLayout *layout, QObject *object, const char *slot);
 
     void restore(QnWorkbenchLayout *layout);
+
+    bool isChanged(const QnLayoutResourcePtr &resource);
+
+    bool isLocal(const QnLayoutResourcePtr &resource);
 
     bool isChanged(QnWorkbenchLayout *layout);
 
@@ -115,7 +132,7 @@ private:
     QnAppServerConnectionPtr m_connection;
 
     /** Mapping from layout resource to its saved state. */
-    QHash<QnLayoutResourcePtr, QnLayoutItemDataMap> m_savedItemsByResource;
+    QHash<QnLayoutResourcePtr, detail::LayoutData> m_savedDataByResource;
 };
 
 

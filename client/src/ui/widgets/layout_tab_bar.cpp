@@ -148,18 +148,6 @@ void QnLayoutTabBar::tabInserted(int index) {
     QString name;
     if(m_layouts.size() != count()) { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
         QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-
-        /* Create name for new layout. */
-        QSet<QString> layoutNames;
-        foreach(QnWorkbenchLayout *layout, m_layouts)
-            layoutNames.insert(layout->name());
-
-        for(int i = 1;; i++) {
-            name = i == 1 ? tr("New layout") : tr("New layout %1").arg(i);
-            if(!layoutNames.contains(name))
-                break;
-        }
-
         m_layouts.insert(index, layout);
     }
 

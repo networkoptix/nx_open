@@ -44,7 +44,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_meta_types.h>
+#include <ui/actions/action_target_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_context_widget.h>
@@ -517,7 +517,7 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
     /* Get items. */
     switch(scope) {
     case Qn::TreeScope:
-        return QVariant::fromValue(m_treeWidget->selectedResources());
+        return m_treeWidget->target(action);
     case Qn::SliderScope: {
         QnResourceList result;
         CLVideoCamera *camera = m_sliderItem->videoCamera();
@@ -527,7 +527,7 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
         return QVariant::fromValue(result);
     }
     case Qn::SceneScope:
-        return QVariant::fromValue(QnActionMetaTypes::widgets(display()->scene()->selectedItems()));
+        return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
         return QVariant();
     }

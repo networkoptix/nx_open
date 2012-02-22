@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QSet>
+#include <QAbstractItemView>
 #include <utils/common/scoped_painter_rollback.h>
 #include "skin.h"
 #include "noptix_style_animator.h"
@@ -65,6 +66,10 @@ void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *opti
     switch(element) {
     case CE_MenuItem:
         if(drawMenuItemControl(option, painter, widget))
+            return;
+        break;
+    case CE_ItemViewItem:
+        if(drawItemViewItemControl(option, painter, widget))
             return;
         break;
     default:
@@ -138,6 +143,30 @@ bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *pa
     localOption->checkType = QStyleOptionMenuItem::NotCheckable;
     base_type::drawControl(CE_MenuItem, option, painter, widget);
     localOption->checkType = checkType;
+    return true;
+}
+
+bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+    const QStyleOptionViewItemV4 *itemOption = qstyleoption_cast<const QStyleOptionViewItemV4 *>(option);
+    if(!itemOption)
+        return false;
+
+    const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
+    if(view == NULL)
+        return false;
+
+    QWidget *editor = view->indexWidget(itemOption->index);
+    if(editor == NULL)
+        return false;
+
+    /* If an editor is opened, don't draw item's text. 
+     * Editor's background may be transparent, and item text will shine through. */
+
+    QStyleOptionViewItemV4 *localOption = const_cast<QStyleOptionViewItemV4 *>(itemOption);
+    QString text = localOption->text;
+    localOption->text = QString();
+    base_type::drawControl(CE_ItemViewItem, option, painter, widget);
+    localOption->text = text;
     return true;
 }
 

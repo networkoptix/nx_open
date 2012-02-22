@@ -112,6 +112,11 @@ namespace detail {
             handler(functionName, s << arg0 << arg1 << arg2 << arg3);
         }
 
+        template<class T0, class T1, class T2, class T3, class T4>
+        inline void invokeInternal(const WarningHandler &handler, const char *functionName, const QString &s, const T0 &arg0, const T1 &arg1, const T2 &arg2, const T3 &arg3, const T4 &arg4) {
+            handler(functionName, s << arg0 << arg1 << arg2 << arg3 << arg4);
+        }
+
     } // namespace operators
 
 

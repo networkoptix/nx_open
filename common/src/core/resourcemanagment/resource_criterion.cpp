@@ -110,6 +110,10 @@ bool QnResourceCriterion::isGroup() const {
     return m_type == GROUP;
 }
 
+QnResourceCriterionGroup *QnResourceCriterion::asGroup() {
+    return isGroup() ? static_cast<QnResourceCriterionGroup *>(this) : NULL;
+}
+
 void QnResourceCriterion::setType(Type type) {
     if(m_type == type)
         return;
@@ -222,7 +226,7 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
         }
         break;
     }
-    case QnResourceCriterion::GROUP:
+    case GROUP:
         foreach(const QnResourceCriterion *criterion, static_cast<const QnResourceCriterionGroup *>(this)->criteria()) {
             result = criterion->check(resource);
             if(result != NEXT)
@@ -237,16 +241,14 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
     switch(result) {
     case ACCEPT: return m_matchOperation;
     case REJECT: return m_mismatchOperation;
-    default: return NEXT;
+    default: return m_nextOperation;
     }
 }
 
-QnResourceList QnResourceCriterion::filter(const QnResourceList &resources, Operation nextOperation) {
+QnResourceList QnResourceCriterion::filter(const QnResourceList &resources) {
     QnResourceList result;
     foreach(const QnResourcePtr &resource, resources) {
         Operation operation = check(resource);
-        if(operation == NEXT)
-            operation = nextOperation;
         if(operation == ACCEPT)
             result.push_back(resource);
     }

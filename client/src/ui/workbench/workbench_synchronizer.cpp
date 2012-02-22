@@ -8,8 +8,6 @@
 #include "workbench_layout.h"
 #include "workbench_layout_synchronizer.h"
 
-Q_DECLARE_METATYPE(QnLayoutItemDataMap)
-
 namespace {
     const char *qn_createdLocallyPropertyName = "_qn_createdLocally";
 
@@ -26,7 +24,7 @@ namespace {
 
 void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const QByteArray &errorString, QnResourceList, int) {
     if(status == 0 && !m_synchronizer.isNull())
-        m_synchronizer.data()->m_savedItemsByResource[m_resource] = m_resource->getItems();
+        m_synchronizer.data()->m_savedDataByResource[m_resource] = detail::LayoutData(m_resource);
 
     emit finished(status, errorString, m_resource);
 
@@ -108,8 +106,24 @@ void QnWorkbenchSynchronizer::restore(QnWorkbenchLayout *layout) {
     QnLayoutResourcePtr resource = checkLayoutResource(layout);
     if(!resource)
         return;
+    
+    resource->setItems(m_savedDataByResource[resource].items);
+    resource->setName(m_savedDataByResource[resource].name);
+}
 
-    resource->setItems(m_savedItemsByResource[resource]);
+bool QnWorkbenchSynchronizer::isChanged(const QnLayoutResourcePtr &resource) {
+    detail::LayoutData &data = m_savedDataByResource[resource];
+    return 
+        resource->getItems() != data.items ||
+        resource->getName() != data.name;
+}
+
+bool QnWorkbenchSynchronizer::isLocal(const QnLayoutResourcePtr &resource) {
+    QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(resource);
+    if(layout == NULL)
+        return false;
+    
+    return isLocal(layout);
 }
 
 bool QnWorkbenchSynchronizer::isChanged(QnWorkbenchLayout *layout) {
@@ -117,7 +131,7 @@ bool QnWorkbenchSynchronizer::isChanged(QnWorkbenchLayout *layout) {
     if(!resource)
         return false;
 
-    return resource->getItems() != m_savedItemsByResource[resource];
+    return isChanged(resource);
 }
 
 bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {
@@ -137,7 +151,7 @@ void QnWorkbenchSynchronizer::start() {
 
     /* Consider all user's layouts saved. */
     foreach(const QnLayoutResourcePtr &resource, m_user->getLayouts())
-        m_savedItemsByResource[resource] = resource->getItems();
+        m_savedDataByResource[resource] = detail::LayoutData(resource);
 
     /* Start listening to changes. */
     connect(m_user.data(),      SIGNAL(resourceChanged()),                  this, SLOT(at_user_resourceChanged()));
@@ -185,7 +199,7 @@ void QnWorkbenchSynchronizer::update() {
         QnLayoutResourcePtr resource = layout->resource();
 
         if(!resources.contains(resource)) { /* Corresponding layout resource was removed, remove layout. */
-            m_savedItemsByResource.remove(resource);
+            m_savedDataByResource.remove(resource);
             delete layout;
         }
     }
@@ -215,6 +229,9 @@ void QnWorkbenchSynchronizer::submit() {
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);
             synchronizer->setAutoDeleting(true);
             synchronizer->submit();
+
+            /* Consider it saved in its present state. */
+            m_savedDataByResource[resource] = detail::LayoutData(resource);
         }
     }
 }

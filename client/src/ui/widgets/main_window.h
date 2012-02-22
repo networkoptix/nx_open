@@ -47,6 +47,9 @@ protected:
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
 
+    QString newLayoutName() const;
+    bool canAutoDelete(const QnResourcePtr &resource) const;
+
 protected slots:
     void setTitleVisible(bool visible);
     void setFullScreen(bool fullScreen);
@@ -65,6 +68,7 @@ protected slots:
     void updateFullScreenState();
     void updateDwmState();
 
+    void addNewLayout();
     void openNewLayout();
     void closeCurrentLayout();
 
@@ -80,11 +84,14 @@ protected slots:
     void at_multipleCamerasSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
-    void at_editTagsAction_triggred();
+    void at_editTagsAction_triggered();
     void at_openInFolderAction_triggered();
+    void at_removeLayoutItemAction_triggered();
+    void at_removeFromServerAction_triggered();
 
     void at_layout_closeRequested(QnWorkbenchLayout *layout);
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
+    void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
