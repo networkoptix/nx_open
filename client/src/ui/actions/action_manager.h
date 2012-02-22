@@ -46,6 +46,8 @@ public:
 
     void setTargetProvider(QnActionTargetProvider *targetProvider);
 
+    Qn::ActionTarget currentTargetType(QnAction *action) const;
+
     QVariant currentTarget(QnAction *action) const;
 
     QnResourceList currentResourcesTarget(QnAction *action) const;
@@ -55,6 +57,8 @@ public:
     QnLayoutItemIndexList currentLayoutItemsTarget(QnAction *action) const;
 
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
+
+    Qn::ActionTarget currentTargetType(QObject *sender) const;
 
     QVariant currentTarget(QObject *sender) const;
 

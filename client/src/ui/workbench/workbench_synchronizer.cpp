@@ -111,15 +111,27 @@ void QnWorkbenchSynchronizer::restore(QnWorkbenchLayout *layout) {
     resource->setName(m_savedDataByResource[resource].name);
 }
 
+bool QnWorkbenchSynchronizer::isChanged(const QnLayoutResourcePtr &resource) {
+    detail::LayoutData &data = m_savedDataByResource[resource];
+    return 
+        resource->getItems() != data.items ||
+        resource->getName() != data.name;
+}
+
+bool QnWorkbenchSynchronizer::isLocal(const QnLayoutResourcePtr &resource) {
+    QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(resource);
+    if(layout == NULL)
+        return false;
+    
+    return isLocal(layout);
+}
+
 bool QnWorkbenchSynchronizer::isChanged(QnWorkbenchLayout *layout) {
     QnLayoutResourcePtr resource = checkLayoutResource(layout);
     if(!resource)
         return false;
 
-    detail::LayoutData &data = m_savedDataByResource[resource];
-    return 
-        resource->getItems() != data.items ||
-        resource->getName() != data.name;
+    return isChanged(resource);
 }
 
 bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {

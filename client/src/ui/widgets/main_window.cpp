@@ -220,6 +220,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(qnAction(Qn::EditTagsAction),                   SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
     connect(qnAction(Qn::OpenInFolderAction),               SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
+    connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
 
     qnMenu->setTargetProvider(m_ui);
 
@@ -816,6 +817,125 @@ void QnMainWindow::at_openInFolderAction_triggered() {
 void QnMainWindow::at_removeLayoutItemAction_triggered() {
     foreach(const QnLayoutItemIndex &index, qnMenu->currentLayoutItemsTarget(sender()))
         index.layout()->removeItem(index.uuid());
+}
+
+
+namespace {
+    enum RemovedResourceType {
+        Layout,
+        User,
+        Server,
+        Camera,
+        Other,
+        Count
+    };
+
+    RemovedResourceType removedResourceType(const QnResourcePtr &resource) {
+        if(resource->checkFlags(QnResource::layout)) {
+            return Layout;
+        } else if(resource->checkFlags(QnResource::user)) {
+            return User;
+        } else if(resource->checkFlags(QnResource::server)) {
+            return Server;
+        } else if(resource->checkFlags(QnResource::live_cam)) {
+            return Camera;
+        } else {
+            qnWarning("Getting removal type for an unrecognized resource '%1' of type '%2'", resource->getName(), resource->metaObject()->className());
+            return Other;
+        }
+    }
+
+} // anonymous namespace
+
+bool QnMainWindow::canAutoDelete(const QnResourcePtr &resource) const {
+    if(!resource->checkFlags(QnResource::layout))
+        return false;
+
+    QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
+    return m_synchronizer->isLocal(layout) && !m_synchronizer->isChanged(layout);
+}
+
+void QnMainWindow::at_removeFromServerAction_triggered() {
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
+    
+    /* User cannot delete himself. */
+    resources.removeOne(m_userWatcher->user());
+    if(resources.isEmpty())
+        return;
+
+    /* Check if it's OK to delete everything without asking. */
+    bool okToDelete = true;
+    foreach(const QnResourcePtr &resource, resources) {
+        if(!canAutoDelete(resource)) {
+            okToDelete = false;
+            break;
+        }
+    }
+
+    /* Ask if it is OK to delete it all. */
+    if(!okToDelete) {
+        QString message;
+
+        if(resources.size() == 1) {
+            switch(removedResourceType(resources[0])) {
+            case Layout:    message = tr("Do you really want to delete layout '%1'?");      break;
+            case User:      message = tr("Do you really want to delete user '%1'?");        break;
+            case Server:    message = tr("Do you really want to delete server '%1'?");      break;
+            case Camera:    message = tr("Do you really want to delete camera '%1'?");      break;
+            default:        message = tr("Do you really want to delete resource '%1'?");    break;
+            }
+            message = message.arg(resources[0]->getName());
+        } else {
+            message = tr("You are about to delete the following objects:\n\n");
+
+            foreach(const QnResourcePtr &resource, resources) {
+                QString subMessage;
+                switch(removedResourceType(resource)) {
+                case Layout:    subMessage = tr("Layout '%1'");      break;
+                case User:      subMessage = tr("User '%1'");        break;
+                case Server:    subMessage = tr("Server '%1'");      break;
+                case Camera:    subMessage = tr("Camera '%1'");      break;
+                default:        subMessage = tr("Resource '%1'");    break;
+                }
+                message += subMessage.arg(resource->getName()) + QLatin1String("\n");
+            }
+
+            message += tr("\nAre you sure you want to delete them?");
+        }
+
+        QMessageBox::StandardButton button = QMessageBox::question(this, tr("Delete resources"), message, QMessageBox::Yes | QMessageBox::Cancel);
+        okToDelete = button == QMessageBox::Yes;
+    }
+
+    if(!okToDelete)
+        return; /* User does not want it deleted. */
+
+    foreach(const QnResourcePtr &resource, resources) {
+        RemovedResourceType type = removedResourceType(resource);
+
+        switch(type) {
+        case Layout: {
+            QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
+            if(m_synchronizer->isLocal(layout)) {
+                m_userWatcher->user()->removeLayout(layout);
+                qnResPool->removeResource(resource);
+                break;
+            }
+            /* FALL THROUGH */
+        }
+        default: {
+            QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
+            connection->deleteAsync(resource, this, SLOT(at_resource_deleted(int, const QByteArray &, const QByteArray &, int)));
+        }
+        }
+    }
+}
+
+void QnMainWindow::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
+    if(status == 0)   
+        return;
+
+    QMessageBox::critical(this, tr(""), tr("Could not delete resource from application server. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
 }
 
 

@@ -87,6 +87,8 @@ public:
     int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
 
+    int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
+
     void stop();
 
 private:

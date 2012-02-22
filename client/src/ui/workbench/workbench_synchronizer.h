@@ -74,6 +74,10 @@ public:
 
     void restore(QnWorkbenchLayout *layout);
 
+    bool isChanged(const QnLayoutResourcePtr &resource);
+
+    bool isLocal(const QnLayoutResourcePtr &resource);
+
     bool isChanged(QnWorkbenchLayout *layout);
 
     bool isLocal(QnWorkbenchLayout *layout);

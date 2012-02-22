@@ -488,6 +488,10 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     return result;
 }
 
+Qn::ActionTarget QnActionManager::currentTargetType(QnAction *action) const {
+    return QnActionTargetTypes::target(currentTarget(action));
+}
+
 QVariant QnActionManager::currentTarget(QnAction *action) const {
     if(m_shortcutAction == action)
         return m_lastTarget;
@@ -529,6 +533,10 @@ namespace {
     }
 
 } // anonymous namespace
+
+Qn::ActionTarget QnActionManager::currentTargetType(QObject *sender) const {
+    return QnActionTargetTypes::target(currentTarget(sender));
+}
 
 QVariant QnActionManager::currentTarget(QObject *sender) const {
     if(QnAction *action = checkSender(sender)) {
