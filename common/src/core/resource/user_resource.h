@@ -13,28 +13,25 @@ class QnUserResource : public QnResource
 public:
     QnUserResource();
 
-    virtual QString getUniqueId() const override
-    {
-        return getName();
-    }
+    virtual QString getUniqueId() const override;
 
-    void setLayouts(const QnLayoutResourceList &layouts);
-    
+    void setLayouts(const QnLayoutResourceList &layouts);    
     const QnLayoutResourceList &getLayouts() const;
-
     void addLayout(const QnLayoutResourcePtr &layout);
-
     void removeLayout(const QnLayoutResourcePtr &layout);
 
-    QString getPassword() const;
-    
+    QString getPassword() const;    
     void setPassword(const QString& password);
+
+    bool isAdmin() const;    
+    void setAdmin(bool admin = true);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
     QString m_password;
+    bool m_isAdmin;
     QnLayoutResourceList m_layouts;
 };
 

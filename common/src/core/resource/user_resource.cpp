@@ -1,7 +1,9 @@
 #include "user_resource.h"
 #include <utils/common/warnings.h>
 
-QnUserResource::QnUserResource(): base_type()
+QnUserResource::QnUserResource()
+    : base_type(),
+      m_isAdmin(false)
 {
     addFlags(QnResource::user);
 }
@@ -42,6 +44,12 @@ void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout)
     layout->setParentId(QnId());
 }
 
+
+QString QnUserResource::getUniqueId() const
+{
+    return getName();
+}
+
 QString QnUserResource::getPassword() const
 {
     return m_password;
@@ -50,6 +58,16 @@ QString QnUserResource::getPassword() const
 void QnUserResource::setPassword(const QString& password)
 {
     m_password = password;
+}
+
+bool QnUserResource::isAdmin() const
+{
+    return m_isAdmin;
+}
+
+void QnUserResource::setAdmin(bool admin)
+{
+    m_isAdmin = admin;
 }
 
 void QnUserResource::updateInner(QnResourcePtr other) {

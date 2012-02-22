@@ -478,12 +478,12 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     proto::pb::Users pb_users;
     proto::pb::User& pb_user = *pb_users.add_user();
 
-    pb_user.set_name(userPtr->getName().toStdString());
-
     if (userPtr->getId().isValid())
         pb_user.set_id(userPtr->getId().toInt());
 
+    pb_user.set_name(userPtr->getName().toStdString());
     pb_user.set_password(userPtr->getPassword().toStdString());
+    pb_user.set_isadmin(userPtr->isAdmin());
 
     foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
         proto::pb::Layout& pb_layout = *pb_user.add_layout();
