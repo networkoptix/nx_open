@@ -138,6 +138,9 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     void removeMotion(const __m128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
 
     // ti check if we've got motion at 
+    static bool isMotionAt(int x, int y, char* mask);
+
+    // ti check if we've got motion at 
     bool isMotionAt(int x, int y) const;
 
     void setMotionAt(int x, int y);
@@ -157,7 +160,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     bool isEmpty() const;
 
 
-    static void createMask(const QRegion& region,  __m128i* mask, int* maskStart = 0, int* maskEnd = 0);
+    static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
     unsigned char i_mask;
     quint8 m_input;

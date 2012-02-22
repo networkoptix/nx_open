@@ -130,6 +130,16 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     }
 }
 
+bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
+{
+    Q_ASSERT(x<MD_WIDTH);
+    Q_ASSERT(y<MD_HEIGHT);
+
+    int shift = x*MD_HEIGHT + y;
+    unsigned char b = *((unsigned char*)mask + shift/8 );
+    return b & (128 >> (shift&7));
+}
+
 bool QnMetaDataV1::isMotionAt(int x, int y) const
 {
     Q_ASSERT(x<MD_WIDTH);
@@ -191,7 +201,7 @@ inline void setBit(quint8* data, int x, int y)
 }
 
 
-void QnMetaDataV1::createMask(const QRegion& region,  __m128i* mask, int* maskStart, int* maskEnd)
+void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart, int* maskEnd)
 {
     if (maskStart)
         *maskStart = 0;

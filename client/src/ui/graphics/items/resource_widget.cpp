@@ -317,7 +317,8 @@ void QnResourceWidget::ensureMotionMaskBinData() {
         return;
 
     ensureMotionMask();
-    QnMetaDataV1::createMask(m_motionMask, m_motionMaskBinData);
+    Q_ASSERT(((unsigned int)m_motionMaskBinData)%16 == 0);
+    QnMetaDataV1::createMask(m_motionMask, (char*)m_motionMaskBinData);
 }
 
 void QnResourceWidget::invalidateMotionMaskBinData() {
