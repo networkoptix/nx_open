@@ -329,7 +329,7 @@ void initAppServerConnection(const QSettings &settings)
     appServerUrl.setScheme(QLatin1String("http"));
     appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
     qDebug() << appServerUrl;
@@ -345,7 +345,7 @@ void initAppServerEventConnection(const QSettings &settings)
     appServerEventsUrl.setScheme(QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events");
 
@@ -449,6 +449,7 @@ public:
             if (!server)
                 server = createServer(defaultLocalAddress(appserverHost));
 
+            server->set
             if (server->getStorages().isEmpty())
                 server->setStorages(QnStorageResourceList() << createDefaultStorage());
 
