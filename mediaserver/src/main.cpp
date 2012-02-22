@@ -113,17 +113,38 @@ QString defaultLocalAddress(const QHostAddress& target)
         socket.connectToHost(target, 53);
 
         if (socket.localAddress() != QHostAddress::LocalHost)
-            return socket.localAddress().toString();
+            return socket.localAddress().toString(); // if app server is on other computer we use same address as used to connect to app server 
     }
 
     {
         // try select default interface
-
         QUdpSocket socket;
         socket.connectToHost("8.8.8.8", 53);
+        QString result = socket.localAddress().toString();
 
-        return socket.localAddress().toString();
+        if (result.length()>0)
+            return result;
     }
+
+
+    {
+        // if nothing else works use first enabled hostaddr
+        QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+
+        for (int i = 0; i < ipaddrs.size();++i)
+        {
+            QUdpSocket socket;
+            if (!socket.bind(ipaddrs.at(i), 0))
+                continue;
+
+            QString result = socket.localAddress().toString();
+
+            Q_ASSERT(result.length() > 0 );
+
+            return result;
+        }
+    }
+
 }
 
 QString localMac(const QString& myAddress)
@@ -183,16 +204,19 @@ QnStorageResourcePtr createDefaultStorage()
     return storage;
 }
 
-QnVideoServerResourcePtr createServer(const QString& myAddress)
+void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
     QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
+    server->setName(QString("Server ") + myAddress);
+    server->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    server->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
+}
+
+QnVideoServerResourcePtr createServer()
+{
     QnVideoServerResourcePtr serverPtr(new QnVideoServerResource());
     serverPtr->setGuid(serverGuid());
-
-    serverPtr->setName(QString("Server ") + myAddress);
-    serverPtr->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    serverPtr->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 
     serverPtr->setStorages(QnStorageResourceList() << createDefaultStorage());
 
@@ -329,7 +353,7 @@ void initAppServerConnection(const QSettings &settings)
     appServerUrl.setScheme(QLatin1String("http"));
     appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
     qDebug() << appServerUrl;
@@ -345,7 +369,7 @@ void initAppServerEventConnection(const QSettings &settings)
     appServerEventsUrl.setScheme(QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("appserver")).toString());
+    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events");
 
@@ -437,6 +461,7 @@ public:
         QHostAddress appserverHost;
         do
         {
+
             appserverHost = resolveHost(appserverHostString);
         } while (appserverHost.toIPv4Address() == 0);
 
@@ -447,7 +472,9 @@ public:
             QnVideoServerResourcePtr server = findServer(appServerConnection);
 
             if (!server)
-                server = createServer(defaultLocalAddress(appserverHost));
+                server = createServer();
+
+            setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
 
             if (server->getStorages().isEmpty())
                 server->setStorages(QnStorageResourceList() << createDefaultStorage());

@@ -768,7 +768,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, (r.top()+r.height())*yStep);
+                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, qMin(rect.height(),(r.top()+r.height())*yStep));
             }
         }
     }
@@ -782,7 +782,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             QRegion drawRegion = lineRect - m_motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
-                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF((r.left()+r.width())*xStep, y*yStep);
+                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF(qMin(rect.width(), (r.left()+r.width())*xStep), y*yStep);
             }
         }
     }

@@ -34,7 +34,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        m_motionMask = other_casted->m_motionMask;
+        setMotionMask(other_casted->m_motionMask);
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }
 }
