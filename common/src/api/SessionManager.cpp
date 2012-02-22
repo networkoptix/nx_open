@@ -91,6 +91,8 @@ void SessionManager::stop()
 
 void SessionManager::doStart()
 {
+    QMutexLocker locker(&m_accessManagerMutex);
+
     if (m_accessManager)
         return;
 
@@ -99,6 +101,8 @@ void SessionManager::doStart()
 
 void SessionManager::doStop()
 {
+    QMutexLocker locker(&m_accessManagerMutex);
+
     if (m_accessManager)
     {
         m_accessManager->deleteLater();
@@ -142,7 +146,19 @@ int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, 
 {
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
-    connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
+
+    {
+        QMutexLocker locker(&m_accessManagerMutex);
+
+        if (!m_accessManager)
+        {
+            errorString = "Network client is not ready yet.";
+            return -1;
+        }
+
+        connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
+    }
+
     sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(finished(int,QByteArray,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
@@ -156,7 +172,19 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, c
 {
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
-    connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
+
+    {
+        QMutexLocker locker(&m_accessManagerMutex);
+
+        if (!m_accessManager)
+        {
+            errorString = "Network client is not ready yet";
+            return -1;
+        }
+
+        connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
+    }
+
     sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(finished(int,QByteArray,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }

@@ -130,6 +130,8 @@ signals:
 
 private:
     QNetworkAccessManager* m_accessManager;
+    QMutex m_accessManagerMutex;
+
     static QAtomicInt m_handle;
 
 private:
