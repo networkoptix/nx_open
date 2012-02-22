@@ -674,6 +674,7 @@ void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
             delete layout;
         } else {
             m_synchronizer->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+            isLocal = false;
             delete layout;
         }
     } else {

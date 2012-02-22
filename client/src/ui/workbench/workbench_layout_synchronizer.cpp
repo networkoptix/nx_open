@@ -178,7 +178,6 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData
     QString path = itemData.resource.path;
 
     QnResourcePtr resource;
-
     if (id.isValid())
         resource = qnResPool->getResourceById(id);
     else
