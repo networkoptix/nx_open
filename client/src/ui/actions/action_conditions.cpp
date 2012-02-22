@@ -2,18 +2,18 @@
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <ui/graphics/items/resource_widget.h>
-#include "action_meta_types.h"
+#include "action_target_types.h"
 
 QnActionCondition::QnActionCondition(QObject *parent): 
     QObject(parent) 
 {
-    QnActionMetaTypes::initialize();
+    QnActionTargetTypes::initialize();
 }
 
 bool QnActionCondition::check(const QVariant &items) {
-    if(items.userType() == QnActionMetaTypes::resourceList()) {
+    if(items.userType() == QnActionTargetTypes::resourceList()) {
         return check(items.value<QnResourceList>());
-    } else if(items.userType() == QnActionMetaTypes::widgetList()) {
+    } else if(items.userType() == QnActionTargetTypes::widgetList()) {
         return check(items.value<QnResourceWidgetList>());
     } else {
         qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
@@ -89,7 +89,7 @@ bool QnResourceActionCondition::checkOne(const QnResourcePtr &resource) {
 }
 
 bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
-    QnResourcePtr resource = QnActionMetaTypes::resource(widget);
+    QnResourcePtr resource = QnActionTargetTypes::resource(widget);
     return resource ? checkOne(resource) : false;
 }
 

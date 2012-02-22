@@ -17,6 +17,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
 #include "ui/actions/action_manager.h"
+#include "ui/actions/action.h"
 #include "ui/models/resource_model.h"
 #include "ui/models/resource_search_proxy_model.h"
 #include "ui/models/resource_search_synchronizer.h"
@@ -267,19 +268,52 @@ void QnResourceTreeWidget::killSearchTimer() {
     m_filterTimerId = 0; 
 }
 
+QItemSelectionModel *QnResourceTreeWidget::currentSelectionModel() const {
+    if (m_tabWidget->currentIndex() == 0) {
+        return m_resourceTreeView->selectionModel();
+    } else {
+        return m_searchTreeView->selectionModel();
+    }
+}
+
 QnResourceList QnResourceTreeWidget::selectedResources() const {
     QnResourceList result;
 
-    QItemSelectionModel *selectionModel;
-    if (m_tabWidget->currentIndex() == 0) {
-        selectionModel = m_resourceTreeView->selectionModel();
-    } else {
-        selectionModel = m_searchTreeView->selectionModel();
-    }
-    foreach (const QModelIndex &index, selectionModel->selectedRows())
+    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows())
         result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
 
     return result;
+}
+
+QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
+    QnLayoutItemIndexList result;
+
+    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+        if(uuid.isNull())
+            continue;
+
+        QnLayoutResourcePtr layout = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnLayoutResource>();
+        if(!layout)
+            continue;
+
+        result.push_back(QnLayoutItemIndex(layout, uuid));
+    }
+
+    return result;
+}
+
+QVariant QnResourceTreeWidget::target(QnAction *action) {
+    if(action != NULL && !(action->scope() & Qn::Tree))
+        return QVariant();
+
+    QItemSelectionModel *selectionModel = currentSelectionModel();
+    
+    if(!selectionModel->currentIndex().data(Qn::UuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
+        return QVariant::fromValue(selectedLayoutItems());
+    } else {
+        return QVariant::fromValue(selectedResources());
+    }
 }
 
 
@@ -287,7 +321,7 @@ QnResourceList QnResourceTreeWidget::selectedResources() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, selectedResources()));
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, target(NULL)));
     if(menu->isEmpty())
         return;
 

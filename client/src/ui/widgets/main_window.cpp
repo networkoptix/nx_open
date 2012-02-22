@@ -536,16 +536,23 @@ QString QnMainWindow::newLayoutName() const {
     const QString nonZeroName = tr("New layout %1");
     QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
 
-    int layoutNumber = -1;
+    QStringList layoutNames;
+    if(m_userWatcher->user()) {
+        foreach(const QnLayoutResourcePtr &resource, m_userWatcher->user()->getLayouts())
+            layoutNames.push_back(resource->getName());
+    } else {
+        foreach(QnWorkbenchLayout *layout, m_workbench->layouts())
+            layoutNames.push_back(layout->name());
+    }
 
     /* Prepare name for new layout. */
-    foreach(const QnLayoutResourcePtr &resource, m_userWatcher->user()->getLayouts()) {
-        if(!pattern.exactMatch(resource->getName()))
+    int layoutNumber = -1;
+    foreach(const QString &name, layoutNames) {
+        if(!pattern.exactMatch(name))
             continue;
 
         layoutNumber = qMax(layoutNumber, pattern.cap(1).toInt());
     }
-
     layoutNumber++;
 
     return layoutNumber == 0 ? zeroName : nonZeroName.arg(layoutNumber);

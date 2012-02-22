@@ -361,6 +361,7 @@ namespace Qn {
     };
 
     enum ActionScope {
+        InvalidScope        = 0x0,
         MainScope           = 0x1,              /**< Application's main menu requested. */
         SceneScope          = 0x2,              /**< Scene context menu requested. */
         TreeScope           = 0x4,              /**< Tree context menu requested. */
@@ -368,18 +369,27 @@ namespace Qn {
         ScopeMask           = 0xF
     };
 
-    enum ActionFlag {
-        NoTarget            = 0x00000010,       /**< Action can be applied when there are no targets. */
-        SingleTarget        = 0x00000020,       /**< Action can be applied to a single target. */
-        MultiTarget         = 0x00000040,       /**< Action can be applied to multiple targets. */
-        TargetMask          = 0x00000070,
+    enum ActionTarget {
+        ResourceTarget      = 0x10,             
+        LayoutItemTarget    = 0x20,
+        WidgetTarget        = 0x40,
+        TargetMask          = 0x70
+    };
 
-        Invisible           = 0,                                /**< Action cannot appear in any menu. */
-        Main                = Qn::MainScope | NoTarget,         /**< Action can appear in main menu. */
-        Scene               = Qn::SceneScope,                   /**< Action can appear in scene context menu. */
-        Tree                = Qn::TreeScope,                    /**< Action can appear in tree context menu. */
-        Slider              = Qn::SliderScope | SingleTarget,   /**< Action can appears in slider context menu. */
-        Global              = Scene | Tree | Slider, 
+    enum ActionFlag {
+        NoTarget            = 0x00000100,       /**< Action can be applied when there are no targets. */
+        SingleTarget        = 0x00000200,       /**< Action can be applied to a single target. */
+        MultiTarget         = 0x00000400,       /**< Action can be applied to multiple targets. */
+
+        Resource            = ResourceTarget,
+        LayoutItem          = LayoutItemTarget,
+        Widget              = WidgetTarget,
+
+        Invisible           = 0,                                            /**< Action cannot appear in any menu. */
+        Main                = Qn::MainScope | NoTarget,                     /**< Action can appear in main menu. */
+        Scene               = Qn::SceneScope | Widget,                      /**< Action can appear in scene context menu. */
+        Tree                = Qn::TreeScope,                                /**< Action can appear in tree context menu. */
+        Slider              = Qn::SliderScope | SingleTarget | Resource,    /**< Action can appears in slider context menu. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);

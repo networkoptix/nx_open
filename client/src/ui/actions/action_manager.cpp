@@ -12,7 +12,7 @@
 #include "action.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
-#include "action_meta_types.h"
+#include "action_target_types.h"
 
 // -------------------------------------------------------------------------- //
 // QnActionBuilder 
@@ -278,36 +278,36 @@ QnActionManager::QnActionManager(QObject *parent):
 
     // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
     factory(Qn::CameraSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
     factory(Qn::MultipleCameraSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::MultiTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Multiple Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
 
     factory(Qn::ServerSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Server Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::remote_server)));
 
     factory(Qn::YouTubeUploadAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Upload to YouTube...")).
         shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::ARCHIVE)));
 
     factory(Qn::EditTagsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Edit tags...")).
         shortcut(tr("Alt+T")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::media)));
 
     factory(Qn::OpenInFolderAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Open in Containing Folder")).
         shortcut(tr("Ctrl+Return")).
         shortcut(tr("Ctrl+Enter")).
@@ -322,7 +322,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RemoveLayoutItemAction).
-        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItem).
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
         autoRepeat(false);
@@ -409,16 +409,30 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope) {
     return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()));
 }
 
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QVariant &items) {
+    int type = items.userType();
+    if(type != QnActionTargetTypes::resourceList() && type != QnActionTargetTypes::widgetList() && type != QnActionTargetTypes::layoutItemList()) {
+        qnWarning("Unrecognized menu target type '%1'.", items.typeName());
+        return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()));
+    }
+
+    return newMenuInternal(m_root, scope, items);
+}
+
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceList &resources) {
     return newMenuInternal(m_root, scope, QVariant::fromValue(resources));
 }
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) {
-    return newMenu(scope, QnActionMetaTypes::widgets(items));
+    return newMenu(scope, QnActionTargetTypes::widgets(items));
 }
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets) {
     return newMenuInternal(m_root, scope, QVariant::fromValue(widgets));
+}
+
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems));
 }
 
 QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
@@ -478,7 +492,7 @@ QVariant QnActionManager::currentTarget(QnAction *action) const {
 }
 
 QnResourceList QnActionManager::currentResourcesTarget(QnAction *action) const {
-    return QnActionMetaTypes::resources(currentTarget(action));
+    return QnActionTargetTypes::resources(currentTarget(action));
 }
 
 QnResourcePtr QnActionManager::currentResourceTarget(QnAction *action) const {
@@ -490,8 +504,12 @@ QnResourcePtr QnActionManager::currentResourceTarget(QnAction *action) const {
     return resources.isEmpty() ? QnResourcePtr() : resources.front();
 }
 
+QnLayoutItemIndexList QnActionManager::currentLayoutItemsTarget(QnAction *action) const {
+    return QnActionTargetTypes::layoutItems(currentTarget(action));
+}
+
 QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) const {
-    return QnActionMetaTypes::widgets(currentTarget(action));
+    return QnActionTargetTypes::widgets(currentTarget(action));
 }
 
 namespace {
@@ -525,6 +543,14 @@ QnResourcePtr QnActionManager::currentResourceTarget(QObject *sender) const {
         return currentResourceTarget(action);
     } else {
         return QnResourcePtr();
+    }
+}
+
+QnLayoutItemIndexList QnActionManager::currentLayoutItemsTarget(QObject *sender) const {
+    if(QnAction *action = checkSender(sender)) {
+        return currentLayoutItemsTarget(action);
+    } else {
+        return QnLayoutItemIndexList();
     }
 }
 

@@ -5,7 +5,7 @@
 #include "action_manager.h"
 #include "action_target_provider.h"
 #include "action_conditions.h"
-#include "action_meta_types.h"
+#include "action_target_types.h"
 
 QnAction::QnAction(QnActionManager *manager, Qn::ActionId id, QObject *parent): 
     QAction(parent), 
@@ -46,7 +46,7 @@ bool QnAction::satisfiesCondition(Qn::ActionScope scope, const QVariant &items) 
     if(!(this->scope() & scope) && (this->scope() & Qn::ScopeMask))
         return false;
 
-    int size = QnActionMetaTypes::size(items);
+    int size = QnActionTargetTypes::size(items);
 
     if(size == 0 && !(m_flags & Qn::NoTarget))
         return false;
@@ -55,6 +55,10 @@ bool QnAction::satisfiesCondition(Qn::ActionScope scope, const QVariant &items) 
         return false;
 
     if(size > 1 && !(m_flags & Qn::MultiTarget))
+        return false;
+
+    Qn::ActionTarget target = QnActionTargetTypes::target(items);
+    if(!(this->target() & target) && size != 0)
         return false;
 
     if(!m_condition.isNull() && !m_condition.data()->check(items))

@@ -24,6 +24,7 @@
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
@@ -1023,6 +1024,6 @@ void QnWorkbenchController::at_recordingSettingsAction_triggered() {
 }
 
 void QnWorkbenchController::at_removeLayoutItemAction_triggered() {
-    foreach(QnResourceWidget *widget, qnMenu->currentWidgetsTarget(sender()))
-        qnDeleteLater(widget);
+    foreach(const QnLayoutItemIndex &index, qnMenu->currentLayoutItemsTarget(sender()))
+        index.layout()->removeItem(index.uuid());
 }

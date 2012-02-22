@@ -8,8 +8,6 @@
 #include "workbench_layout.h"
 #include "workbench_layout_synchronizer.h"
 
-Q_DECLARE_METATYPE(QnLayoutItemDataMap)
-
 namespace {
     const char *qn_createdLocallyPropertyName = "_qn_createdLocally";
 
