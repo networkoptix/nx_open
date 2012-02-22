@@ -167,29 +167,34 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Actions that are not assigned to any menu. */
     factory(Qn::AboutAction).
+        flags(Qn::NoTarget).
         text(tr("About...")).
         role(QAction::AboutRole).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("info.png")));
 
     factory(Qn::ConnectionSettingsAction).
+        flags(Qn::NoTarget).
         text(tr("Connection Settings")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("connect.png")));
 
     factory(Qn::ShowFpsAction).
+        flags(Qn::NoTarget).
         text(tr("Show FPS")).
         toggledText(tr("Hide FPS")).
         shortcut(tr("Ctrl+Alt+F")).
         autoRepeat(false);
 
     factory(Qn::NewTabAction).
+        flags(Qn::NoTarget).
         text(tr("New Layout")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
     factory(Qn::CloseTabAction).
+        flags(Qn::NoTarget).
         text(tr("Close Layout")).
         shortcut(tr("Ctrl+W")).
         autoRepeat(true);

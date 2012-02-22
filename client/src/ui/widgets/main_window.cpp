@@ -217,7 +217,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(qnAction(Qn::MultipleCameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
     connect(qnAction(Qn::ServerSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
     connect(qnAction(Qn::YouTubeUploadAction),              SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(qnAction(Qn::EditTagsAction),                   SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
+    connect(qnAction(Qn::EditTagsAction),                   SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
     connect(qnAction(Qn::OpenInFolderAction),               SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
@@ -567,6 +567,8 @@ void QnMainWindow::addNewLayout() {
     layout->setName(newLayoutName());
     
     m_workbench->addLayout(layout);
+    if(m_workbench->layouts().size() == 1)
+        m_workbench->setCurrentLayout(m_workbench->layouts().back());
 }
 
 void QnMainWindow::openNewLayout() {
@@ -576,8 +578,7 @@ void QnMainWindow::openNewLayout() {
 }
 
 void QnMainWindow::closeCurrentLayout() {
-    if(m_tabBar->tabsClosable())
-        m_tabBar->removeTab(m_tabBar->currentIndex());
+    at_layout_closeRequested(m_workbench->currentLayout());
 }
 
 
@@ -695,6 +696,7 @@ void QnMainWindow::at_synchronizer_started() {
         /* Open the last layout from the user's layouts list. */
         qSort(resources.begin(), resources.end(), LayoutIdCmp());
         m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+        m_workbench->setCurrentLayout(m_workbench->layouts().back());
     }
 }
 
@@ -743,7 +745,7 @@ void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, co
     QMessageBox::critical(this, tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
 }
 
-void QnMainWindow::at_editTagsAction_triggred() 
+void QnMainWindow::at_editTagsAction_triggered() 
 {
     QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
     if(resource.isNull())

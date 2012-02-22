@@ -84,7 +84,7 @@ protected slots:
     void at_multipleCamerasSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
-    void at_editTagsAction_triggred();
+    void at_editTagsAction_triggered();
     void at_openInFolderAction_triggered();
     void at_removeLayoutItemAction_triggered();
     void at_removeFromServerAction_triggered();
