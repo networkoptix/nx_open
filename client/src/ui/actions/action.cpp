@@ -1,6 +1,8 @@
 #include "action.h"
 #include <QEvent>
 #include <QShortcutEvent>
+#include <QGraphicsWidget>
+#include <QCoreApplication>
 #include <utils/common/warnings.h>
 #include "action_manager.h"
 #include "action_target_provider.h"
@@ -71,19 +73,41 @@ bool QnAction::event(QEvent *event) {
     if (event->type() == QEvent::Shortcut) {
         QShortcutEvent *e = static_cast<QShortcutEvent *>(event);
         if (e->isAmbiguous()) {
-            qnWarning("Ambiguous shortcut overload: %s.", e->key().toString());
-        } else {
-            QVariant target;
-            QnActionTargetProvider *targetProvider = m_manager->targetProvider();
-            if(targetProvider != NULL)
-                target = targetProvider->target(this);
+            if(m_flags & Qn::IntentionallyAmbiguous) {
+                QSet<QAction *> actions;
 
-            if(satisfiesCondition(scope(), target)) {
-                m_manager->m_shortcutAction = this;
-                m_manager->m_lastTarget = target;
-                activate(Trigger);
-                m_manager->m_shortcutAction = NULL;
+                foreach(QWidget *widget, associatedWidgets())
+                    foreach(QAction *action, widget->actions())
+                        if(action->shortcuts().contains(e->key()))
+                            actions.insert(action);
+
+                foreach(QGraphicsWidget *widget, associatedGraphicsWidgets())
+                    foreach(QAction *action, widget->actions())
+                        if(action->shortcuts().contains(e->key()))
+                            actions.insert(action);
+
+                actions.remove(this);
+
+                foreach(QAction *action, actions) {
+                    QShortcutEvent se(e->key(), e->shortcutId(), false);
+                    QCoreApplication::sendEvent(action, &se);
+                }
+            } else {
+                qnWarning("Ambiguous shortcut overload: %1.", e->key().toString());
+                return true;
             }
+        } 
+
+        QVariant target;
+        QnActionTargetProvider *targetProvider = m_manager->targetProvider();
+        if(targetProvider != NULL)
+            target = targetProvider->target(this);
+
+        if(satisfiesCondition(scope(), target)) {
+            m_manager->m_shortcutAction = this;
+            m_manager->m_lastTarget = target;
+            activate(Trigger);
+            m_manager->m_shortcutAction = NULL;
         }
         return true;
     }

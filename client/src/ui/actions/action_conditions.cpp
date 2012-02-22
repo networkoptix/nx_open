@@ -94,3 +94,17 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 }
 
 
+bool QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources) {
+        if(resource->checkFlags(QnResource::user) || resource->checkFlags(QnResource::layout))
+            continue; /* OK to remove. */
+
+        if(resource->checkFlags(QnResource::remote_server) || resource->checkFlags(QnResource::live_cam))
+            if(resource->getStatus() == QnResource::Offline)
+                continue; /* Can remove only if offline. */
+
+        return false;
+    }
+
+    return true;
+}

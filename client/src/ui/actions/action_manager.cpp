@@ -163,6 +163,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     QnActionFactory factory(this, m_root);
 
+    using namespace QnResourceCriterionExpressions;
+
     /* Actions that are not assigned to any menu. */
     factory(Qn::AboutAction).
         text(tr("About...")).
@@ -280,31 +282,31 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Camera Settings")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
 
     factory(Qn::MultipleCameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Multiple Camera Settings")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::live_cam)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
 
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Server Settings")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::remote_server)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::remote_server)));
 
     factory(Qn::YouTubeUploadAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Upload to YouTube...")).
         shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::ARCHIVE)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE)));
 
     factory(Qn::EditTagsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Edit tags...")).
         shortcut(tr("Alt+T")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::media)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::media)));
 
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
@@ -312,7 +314,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Return")).
         shortcut(tr("Ctrl+Enter")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, new QnResourceCriterion(QnResource::url | QnResource::local | QnResource::media)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media)));
 
 
     /* Layout actions. */
@@ -322,11 +324,17 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RemoveLayoutItemAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItem).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItem | Qn::IntentionallyAmbiguous).
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
         autoRepeat(false);
 
+    factory(Qn::RemoveFromServerAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::IntentionallyAmbiguous).
+        text(tr("Remove from Server")).
+        shortcut(tr("Del")).
+        autoRepeat(false).
+        condition(new QnResourceRemovalActionCondition());
 
 
 

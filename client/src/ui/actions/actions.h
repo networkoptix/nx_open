@@ -143,6 +143,10 @@ namespace Qn {
          */
         RemoveLayoutItemAction,
 
+        /**
+         * Removes a resource from application server.
+         */
+        RemoveFromServerAction,
 
 #if 0
         /** 
@@ -384,6 +388,8 @@ namespace Qn {
         Resource            = ResourceTarget,
         LayoutItem          = LayoutItemTarget,
         Widget              = WidgetTarget,
+
+        IntentionallyAmbiguous = 0x00001000,
 
         Invisible           = 0,                                            /**< Action cannot appear in any menu. */
         Main                = Qn::MainScope | NoTarget,                     /**< Action can appear in main menu. */

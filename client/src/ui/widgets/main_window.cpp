@@ -201,22 +201,25 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(qnAction(Qn::YouTubeUploadAction));
     addAction(qnAction(Qn::EditTagsAction));
     addAction(qnAction(Qn::OpenInFolderAction));
+    addAction(qnAction(Qn::RemoveLayoutItemAction));
+    addAction(qnAction(Qn::RemoveFromServerAction));
 
-    connect(qnAction(Qn::ExitAction),                        SIGNAL(triggered()),    this,   SLOT(close()));
-    connect(qnAction(Qn::FullscreenAction),                  SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
-    connect(qnAction(Qn::AboutAction),                       SIGNAL(triggered()),    this,   SLOT(showAboutDialog()));
-    connect(qnAction(Qn::PreferencesAction),                 SIGNAL(triggered()),    this,   SLOT(showPreferencesDialog()));
-    connect(qnAction(Qn::OpenFileAction),                    SIGNAL(triggered()),    this,   SLOT(showOpenFileDialog()));
-    connect(qnAction(Qn::ConnectionSettingsAction),          SIGNAL(triggered()),    this,   SLOT(showAuthenticationDialog()));
-    connect(qnAction(Qn::NewTabAction),                      SIGNAL(triggered()),    this,   SLOT(openNewLayout()));
-    connect(qnAction(Qn::CloseTabAction),                    SIGNAL(triggered()),    this,   SLOT(closeCurrentLayout()));
-    connect(qnAction(Qn::MainMenuAction),                    SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
-    connect(qnAction(Qn::CameraSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(qnAction(Qn::MultipleCameraSettingsAction),      SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
-    connect(qnAction(Qn::ServerSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
-    connect(qnAction(Qn::YouTubeUploadAction),               SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(qnAction(Qn::EditTagsAction),                    SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
-    connect(qnAction(Qn::OpenInFolderAction),                SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
+    connect(qnAction(Qn::ExitAction),                       SIGNAL(triggered()),    this,   SLOT(close()));
+    connect(qnAction(Qn::FullscreenAction),                 SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
+    connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(showAboutDialog()));
+    connect(qnAction(Qn::PreferencesAction),                SIGNAL(triggered()),    this,   SLOT(showPreferencesDialog()));
+    connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(showOpenFileDialog()));
+    connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(showAuthenticationDialog()));
+    connect(qnAction(Qn::NewTabAction),                     SIGNAL(triggered()),    this,   SLOT(openNewLayout()));
+    connect(qnAction(Qn::CloseTabAction),                   SIGNAL(triggered()),    this,   SLOT(closeCurrentLayout()));
+    connect(qnAction(Qn::MainMenuAction),                   SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
+    connect(qnAction(Qn::CameraSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(qnAction(Qn::MultipleCameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
+    connect(qnAction(Qn::ServerSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
+    connect(qnAction(Qn::YouTubeUploadAction),              SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
+    connect(qnAction(Qn::EditTagsAction),                   SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
+    connect(qnAction(Qn::OpenInFolderAction),               SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
+    connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
 
     qnMenu->setTargetProvider(m_ui);
 
@@ -809,4 +812,10 @@ void QnMainWindow::at_openInFolderAction_triggered() {
 
     QnEnvironment::showInGraphicalShell(this, resource->getUrl());
 }
+
+void QnMainWindow::at_removeLayoutItemAction_triggered() {
+    foreach(const QnLayoutItemIndex &index, qnMenu->currentLayoutItemsTarget(sender()))
+        index.layout()->removeItem(index.uuid());
+}
+
 
