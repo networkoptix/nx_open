@@ -295,7 +295,7 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 currentTimeHint)
     {
         if (info.enabled) {
             info.reader->setNavDelegate(0);
-            info.reader->setSpeed(value, displayedTime);
+            info.reader->setSpeed(value, d->lastJumpTime == DATETIME_NOW ? DATETIME_NOW : displayedTime);
             info.reader->setNavDelegate(this);
         }
     }
