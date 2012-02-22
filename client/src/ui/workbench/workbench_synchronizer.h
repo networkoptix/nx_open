@@ -31,6 +31,19 @@ namespace detail {
         QnLayoutResourcePtr m_resource;
     };
 
+    class LayoutData {
+    public:
+        LayoutData(const QnLayoutResourcePtr &resource):
+            items(resource->getItems()),
+            name(resource->getName())
+        {}
+
+        LayoutData() {}
+
+        QnLayoutItemDataMap items;
+        QString name;
+    };
+
 } // namespace detail
 
 /**
@@ -115,7 +128,7 @@ private:
     QnAppServerConnectionPtr m_connection;
 
     /** Mapping from layout resource to its saved state. */
-    QHash<QnLayoutResourcePtr, QnLayoutItemDataMap> m_savedItemsByResource;
+    QHash<QnLayoutResourcePtr, detail::LayoutData> m_savedDataByResource;
 };
 
 

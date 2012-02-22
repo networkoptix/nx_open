@@ -212,6 +212,11 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemDa
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
+    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
+    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
+    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
+    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagsChanged()));
+
     if(!m_submit)
         return;
 
@@ -230,20 +235,15 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     item->save(itemData);
 
     m_resource->addItem(itemData);
-
-    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
-    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
-    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
-    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagsChanged()));
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
+    disconnect(item, NULL, this, NULL);
+
     if(!m_submit)
         return;
 
     QnScopedValueRollback<bool> guard(&m_update, false);
-
-    disconnect(item, NULL, this, NULL);
 
     m_resource->removeItem(item->uuid());
 }

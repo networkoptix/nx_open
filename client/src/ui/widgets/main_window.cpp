@@ -29,6 +29,7 @@
 #include "ui/dialogs/multiplecamerasettingsdialog.h"
 #include "ui/dialogs/serversettingsdialog.h"
 #include "ui/dialogs/tagseditdialog.h"
+#include "ui/dialogs/layout_save_dialog.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "youtube/youtubeuploaddialog.h"
 
@@ -530,9 +531,37 @@ void QnMainWindow::updateDwmState()
     }
 }
 
+QString QnMainWindow::newLayoutName() const {
+    const QString zeroName = tr("New layout");
+    const QString nonZeroName = tr("New layout %1");
+    QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
+
+    int layoutNumber = -1;
+
+    /* Prepare name for new layout. */
+    foreach(const QnLayoutResourcePtr &resource, m_userWatcher->user()->getLayouts()) {
+        if(!pattern.exactMatch(resource->getName()))
+            continue;
+
+        layoutNumber = qMax(layoutNumber, pattern.cap(1).toInt());
+    }
+
+    layoutNumber++;
+
+    return layoutNumber == 0 ? zeroName : nonZeroName.arg(layoutNumber);
+}
+
+void QnMainWindow::addNewLayout() {
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+    layout->setName(newLayoutName());
+    
+    m_workbench->addLayout(layout);
+}
+
 void QnMainWindow::openNewLayout() {
-    m_tabBar->addTab(QString());
-    m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
+    addNewLayout();
+    
+    m_workbench->setCurrentLayout(m_workbench->layouts().back());
 }
 
 void QnMainWindow::closeCurrentLayout() {
@@ -663,26 +692,37 @@ void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
     bool isChanged = m_synchronizer->isChanged(layout);
     bool isLocal = m_synchronizer->isLocal(layout);
 
-    bool wasClosed = true;
+    bool close = false;
     if(isChanged) {
-        QMessageBox::StandardButton button = QMessageBox::question(this, tr(""), tr("Save changes to layout '%1'?").arg(layout->name()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
-        if(button == QMessageBox::Cancel) {
-            wasClosed = false;
+        QScopedPointer<QnLayoutSaveDialog> dialog(new QnLayoutSaveDialog(this));
+        dialog->setLayoutName(layout->name());
+        dialog->exec();
+        QDialogButtonBox::StandardButton button = dialog->clickedButton();
+        if(button == QDialogButtonBox::Cancel) {
             return;
-        } else if(button == QMessageBox::No) {
+        } else if(button == QDialogButtonBox::No) {
             m_synchronizer->restore(layout);
-            delete layout;
+            close = true;
         } else {
+            layout->setName(dialog->layoutName());
             m_synchronizer->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
             isLocal = false;
-            delete layout;
+            close = true;
         }
     } else {
-        delete layout;
+        close = true;
     }
 
-    if(wasClosed && isLocal)
-        qnResPool->removeResource(resource);
+    if(close) {
+        if(m_workbench->layouts().size() == 1)
+            addNewLayout();
+        delete layout;
+
+        if(isLocal) {
+            m_userWatcher->user()->removeLayout(resource);
+            qnResPool->removeResource(resource);
+        }
+    }
 }
 
 void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {

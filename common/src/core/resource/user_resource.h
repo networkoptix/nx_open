@@ -13,14 +13,13 @@ class QnUserResource : public QnResource
 public:
     QnUserResource();
 
-    virtual QString getUniqueId() const override
-    {
+    virtual QString getUniqueId() const override {
         return getName();
     }
 
     void setLayouts(const QnLayoutResourceList &layouts);
     
-    const QnLayoutResourceList &getLayouts() const;
+    QnLayoutResourceList getLayouts() const;
 
     void addLayout(const QnLayoutResourcePtr &layout);
 
@@ -28,7 +27,7 @@ public:
 
     QString getPassword() const;
     
-    void setPassword(const QString& password);
+    void setPassword(const QString &password);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;

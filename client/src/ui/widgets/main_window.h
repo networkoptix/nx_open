@@ -47,6 +47,8 @@ protected:
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
 
+    QString newLayoutName() const;
+
 protected slots:
     void setTitleVisible(bool visible);
     void setFullScreen(bool fullScreen);
@@ -65,6 +67,7 @@ protected slots:
     void updateFullScreenState();
     void updateDwmState();
 
+    void addNewLayout();
     void openNewLayout();
     void closeCurrentLayout();
 
