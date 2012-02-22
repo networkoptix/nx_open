@@ -26,6 +26,7 @@ public:
 
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+    bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;

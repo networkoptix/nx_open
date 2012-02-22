@@ -35,9 +35,11 @@ namespace {
 }
 
 class QnResourceTreeItemDelegate: public QStyledItemDelegate {
+    typedef QStyledItemDelegate base_type;
+
 public:
     explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
-        QStyledItemDelegate(parent)
+        base_type(parent)
     {}
 
     QnWorkbench *workbench() const {
@@ -50,7 +52,7 @@ public:
 
 protected:
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
-        QStyledItemDelegate::initStyleOption(option, index);
+        base_type::initStyleOption(option, index);
 
         if(workbench() == NULL)
             return;
@@ -107,7 +109,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_resourceModel->setResourcePool(qnResPool);
 
     m_resourceTreeView = new QTreeView(this);
-    m_resourceTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_resourceTreeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
     m_resourceTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_resourceTreeView->setAllColumnsShowFocus(true);
     m_resourceTreeView->setRootIsDecorated(true);
