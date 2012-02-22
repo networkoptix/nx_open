@@ -449,7 +449,6 @@ public:
             if (!server)
                 server = createServer(defaultLocalAddress(appserverHost));
 
-            server->set
             if (server->getStorages().isEmpty())
                 server->setStorages(QnStorageResourceList() << createDefaultStorage());
 
