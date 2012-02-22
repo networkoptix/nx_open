@@ -436,7 +436,7 @@ bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     QMutexLocker lock(&m_mutex);
-    if (index < m_chunks.size())
+    if (index < m_chunks.size() && index >= 0)
         return m_chunks.at(index);
     else
         return DeviceFileCatalog::Chunk();

@@ -268,11 +268,9 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     connect(reader, SIGNAL(jumpOccured(qint64)), this, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
     connect(reader, SIGNAL(jumpCanceled(qint64)), this, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
 
-    connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
-
     if (d->enabled && currentTime != DATETIME_NOW) {
-        reader->jumpToPreviousFrame(currentTime);
-        reader->setSpeed(d->speed);
+        //reader->jumpToPreviousFrame(currentTime);
+        reader->setSpeed(d->speed, currentTime);
     }
 
     if (d->enabled)
@@ -285,27 +283,26 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     //connect(reader, SIGNAL(prevFrameOccured()), this, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
 }
 
-void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
+void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 currentTimeHint)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    if (!d->enabled || d->blockSetSpeedSignal)
-        return;
-    d->blockSetSpeedSignal = true;
 
     QMutexLocker lock(&d->timeMutex);
 
+    qint64 displayedTime = getDisplayedTimeInternal();
+    qDebug() << "Speed changed. CurrentTime" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString();
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.reader != sender())
-            info.reader->setSpeed(value);
+        if (info.enabled) {
+            info.reader->setNavDelegate(0);
+            info.reader->setSpeed(value, d->lastJumpTime == DATETIME_NOW ? DATETIME_NOW : displayedTime);
+            info.reader->setNavDelegate(this);
+        }
     }
-    qint64 displayedTime = getDisplayedTimeInternal();
     if (d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW)
         displayedTime = QDateTime::currentMSecsSinceEpoch()*1000;
     reinitTime(displayedTime);
     d->speed = value;
-
-    d->blockSetSpeedSignal = false;
 }
 
 qint64 QnArchiveSyncPlayWrapper::getNextTime() const
@@ -597,16 +594,14 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     }
     else if (d->speed < 0 && nextTime != AV_NOPTS_VALUE && nextTime < expectTime - MAX_FRAME_DURATION*1000)
     {
+        /*
+        qDebug() << "nextTime=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
+            "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz")
+            << "d->lastJumpTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString();
+        */
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
         expectTime = expectedTime();
-        /*
-        QString s;
-        QTextStream str(&s);
-        str << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << "correctExpectTime to=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
-        str.flush();
-        cl_log.log(s, cl_logALWAYS);
-        */
     }
 
     qint64 displayedTime =  getDisplayedTimeInternal();

@@ -40,6 +40,8 @@ private:
     void loadPlaybackMask(qint64 msTime, bool useReverseSearch);
     void getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
+
+    DeviceFileCatalog::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
 private:
     bool m_opened;
     QnResourcePtr m_resource;
@@ -48,8 +50,8 @@ private:
     qint64 m_skipFramesToTime;
     DeviceFileCatalogPtr m_catalogHi;
     DeviceFileCatalogPtr m_catalogLow;
-    QnChunkSequence* m_chunkSequenceHi;
-    QnChunkSequence* m_chunkSequenceLow;
+    //QnChunkSequence* m_chunkSequenceHi;
+    //QnChunkSequence* m_chunkSequenceLow;
     DeviceFileCatalog::Chunk m_currentChunk;
     DeviceFileCatalogPtr m_currentChunkCatalog;
 

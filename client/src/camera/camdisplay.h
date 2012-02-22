@@ -179,6 +179,7 @@ private:
     static QSet<CLCamDisplay*> m_allCamDisplay;
     static QMutex m_qualityMutex;
     static qint64 m_lastQualitySwitchTime;
+    bool m_executingChangeSpeed;
 };
 
 #endif //clcam_display_h_1211

@@ -8,33 +8,6 @@
 #include "device_file_catalog.h"
 #include "core/resource/storage_resource.h"
 
-// This class used for extract chunk sequence from storage
-class QnChunkSequence: public QObject
-{
-    Q_OBJECT
-public:
-    QnChunkSequence(const QnNetworkResourcePtr res, QnResource::ConnectionRole role, qint64 startTime);
-    QnChunkSequence(const QnNetworkResourceList& resList, QnResource::ConnectionRole role,  qint64 startTime);
-    DeviceFileCatalog::Chunk findChunk(QnResourcePtr res, qint64 timeMs, DeviceFileCatalog::FindMethod findMethod);
-    DeviceFileCatalog::Chunk getNextChunk(QnResourcePtr res);
-    //qint64 nextChunkStartTime(QnResourcePtr res);
-    //DeviceFileCatalog::Chunk getPrevChunk(QnResourcePtr res);
-private slots:
-    void onFirstDataRemoved(int n);
-private:
-    void addResource(QnNetworkResourcePtr res);
-private:
-    struct CacheInfo
-    {
-        DeviceFileCatalogPtr m_catalog;
-        int m_index; // last find index
-        qint64 m_startTimeMs;
-    };
-    QMap<QnResourcePtr, CacheInfo> m_cache;
-    qint64 m_startTime;
-    QnResource::ConnectionRole m_role;
-};
-
 class QnStorageManager
 {
 public:

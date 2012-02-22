@@ -23,6 +23,7 @@ public:
 
     virtual bool isEnabled() const { return true; }
 
+    virtual void setSpeed(double value, qint64 currentTimeHint) = 0;
 
     // playback filter by motion detection mask
     //virtual bool setMotionRegion(const QRegion& region) = 0;
@@ -87,6 +88,9 @@ public:
     virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) = 0;
 
     virtual void run() override;
+
+    virtual void setSpeed(double value, qint64 currentTimeHint = -1) = 0;
+    virtual double getSpeed() const = 0;
 Q_SIGNALS:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);

@@ -513,7 +513,7 @@ int QnRtspConnectionProcessor::composePlay()
         }
 
         d->archiveDP->lock();
-        d->archiveDP->setReverseMode(d->rtspScale < 0);
+        d->archiveDP->setSpeed(d->rtspScale);
         d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
         if (!d->requestHeaders.value("Range").isNull())
         {

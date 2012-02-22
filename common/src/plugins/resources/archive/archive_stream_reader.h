@@ -24,7 +24,6 @@ public:
     virtual QStringList getAudioTracksInfo() const;
     virtual unsigned int getCurrentAudioChannel() const;
     virtual bool setAudioChannel(unsigned int num);
-    virtual void setReverseMode(bool value);
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isNegativeSpeedSupported() const;
     virtual void setSingleShotMode(bool single);
@@ -58,6 +57,10 @@ public:
     virtual bool getQuality() const override;
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
+
+    virtual void setSpeed(double value, qint64 currentTimeHint = -1) override;
+    virtual double QnArchiveStreamReader::getSpeed() const override;
+
 
     /* For atomic changing several params: quality and position for example */
     void lock();
@@ -95,6 +98,8 @@ protected:
 
     volatile bool m_wakeup;
     qint64 m_tmpSkipFramesToTime;
+private:
+    void setReverseMode(bool value, qint64 currentTimeHint = -1);
 private slots:
     void onDelegateChangeQuality(MediaQuality quality);
 private:
@@ -114,6 +119,7 @@ private:
     int m_afterBOFCounter;
     int m_dataMarker;
     int m_newDataMarker;
+    qint64 m_currentTimeHint;
 
 private:
     bool m_bofReached;
@@ -139,6 +145,7 @@ private:
     MediaQuality m_oldQuality;
     bool m_oldQualityFastSwitch;
     bool m_isStillImage;
+    double m_speed;
 
     qint64 determineDisplayTime(bool reverseMode);
     void intChanneljumpTo(qint64 mksec, int channel);
