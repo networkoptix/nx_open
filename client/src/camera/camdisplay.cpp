@@ -113,7 +113,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_isEOFReached(false),
       m_hiQualityRetryCounter(0),
       m_isStillImage(false),
-      m_isLongWaiting(false)
+      m_isLongWaiting(false),
+      m_executingChangeSpeed(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -601,7 +602,14 @@ void CLCamDisplay::setSingleShotMode(bool single)
 
 void CLCamDisplay::setSpeed(float speed)
 {
-    m_speed = speed;
+    QMutexLocker lock(&m_timeMutex);
+    if (qAbs(speed-m_speed) > FPS_EPS)
+    {
+        m_executingChangeSpeed = true;
+        if (speed < 0 && m_speed >= 0)
+            m_nextReverseTime = AV_NOPTS_VALUE;
+        m_speed = speed;
+    }
 };
 
 void CLCamDisplay::processNewSpeed(float speed)
@@ -619,6 +627,9 @@ void CLCamDisplay::processNewSpeed(float speed)
     else {
         setMTDecoding(m_useMtDecoding);
     }
+
+    if (speed < 0 && m_prevSpeed >= 0)
+        m_buffering = true; // decode first gop is required some time
 
     if (speed >= 0 && m_prevSpeed < 0 || speed < 0 && m_prevSpeed >= 0)
     {
@@ -642,6 +653,7 @@ void CLCamDisplay::processNewSpeed(float speed)
             m_display[i]->setSpeed(speed);
     }
     setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Full);
+    m_executingChangeSpeed = false;
 }
 
 bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
@@ -1094,7 +1106,7 @@ qint64 CLCamDisplay::getNextTime() const
     if (m_display[0]->isTimeBlocked())
         return m_display[0]->getLastDisplayedTime();
     else 
-        return m_nextReverseTime != AV_NOPTS_VALUE ? m_nextReverseTime : m_lastDecodedTime;
+        return m_speed < 0 ? m_nextReverseTime : m_lastDecodedTime;
 }
 
 qint64 CLCamDisplay::getDisplayedTime() const
@@ -1135,7 +1147,7 @@ bool CLCamDisplay::isNoData() const
         return true;
     if (!m_extTimeSrc)
         return false;
-    if (m_executingJump > 0 || m_buffering)
+    if (m_executingJump > 0 || m_executingChangeSpeed || m_buffering)
         return false;
     if (m_isLongWaiting)
         return true;

@@ -594,16 +594,14 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     }
     else if (d->speed < 0 && nextTime != AV_NOPTS_VALUE && nextTime < expectTime - MAX_FRAME_DURATION*1000)
     {
+        /*
+        qDebug() << "nextTime=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
+            "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz")
+            << "d->lastJumpTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString();
+        */
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
         expectTime = expectedTime();
-        /*
-        QString s;
-        QTextStream str(&s);
-        str << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << "correctExpectTime to=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
-        str.flush();
-        cl_log.log(s, cl_logALWAYS);
-        */
     }
 
     qint64 displayedTime =  getDisplayedTimeInternal();
