@@ -183,16 +183,19 @@ QnStorageResourcePtr createDefaultStorage()
     return storage;
 }
 
-QnVideoServerResourcePtr createServer(const QString& myAddress)
+void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
     QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
+    server->setName(QString("Server ") + myAddress);
+    server->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    server->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
+}
+
+QnVideoServerResourcePtr createServer()
+{
     QnVideoServerResourcePtr serverPtr(new QnVideoServerResource());
     serverPtr->setGuid(serverGuid());
-
-    serverPtr->setName(QString("Server ") + myAddress);
-    serverPtr->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    serverPtr->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 
     serverPtr->setStorages(QnStorageResourceList() << createDefaultStorage());
 
@@ -434,11 +437,11 @@ public:
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
-        QHostAddress appserverHost;
+        QHostAddress myAddress;
         do
         {
-            appserverHost = resolveHost(appserverHostString);
-        } while (appserverHost.toIPv4Address() == 0);
+            myAddress = resolveHost(appserverHostString);
+        } while (myAddress.toIPv4Address() == 0);
 
         QnVideoServerResourcePtr videoServer;
 
@@ -447,7 +450,9 @@ public:
             QnVideoServerResourcePtr server = findServer(appServerConnection);
 
             if (!server)
-                server = createServer(defaultLocalAddress(appserverHost));
+                server = createServer();
+
+            setServerNameAndUrls(server, myAddress.toString());
 
             if (server->getStorages().isEmpty())
                 server->setStorages(QnStorageResourceList() << createDefaultStorage());
