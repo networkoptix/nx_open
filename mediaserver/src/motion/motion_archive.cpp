@@ -107,6 +107,8 @@ QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource):
     m_lastDetailedData(new QnMetaDataV1()),
     m_lastTimestamp(AV_NOPTS_VALUE)
 {
+    m_motionMask = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, CL_MEDIA_ALIGNMENT);
+
     m_camResource = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
     m_firstTime = 0;
@@ -115,6 +117,11 @@ QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource):
         updateMotionMask(m_camResource->getMotionMask());
     }
     loadRecordedRange();
+}
+
+QnMotionArchive::~QnMotionArchive()
+{
+    qFreeAligned(m_motionMask);
 }
 
 void QnMotionArchive::loadRecordedRange()
@@ -145,7 +152,8 @@ void QnMotionArchive::maskMotion(QnMetaDataV1Ptr data)
 void QnMotionArchive::updateMotionMask(QRegion maskedRegion)
 {
     QMutexLocker lock(&m_maskMutex);
-    QnMetaDataV1::createMask(maskedRegion, m_motionMask, &m_motionMaskStart, &m_motionMaskEnd);
+    Q_ASSERT(((unsigned int)m_motionMask)%16 == 0);
+    QnMetaDataV1::createMask(maskedRegion, (char*)m_motionMask, &m_motionMaskStart, &m_motionMaskEnd);
 }
 
 QString QnMotionArchive::getFilePrefix(const QDate& datetime)
@@ -195,7 +203,10 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
     __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
-    QnMetaDataV1::createMask(region, mask, &maskStart, &maskEnd);
+
+    Q_ASSERT(((unsigned int)mask)%16 == 0);
+
+    QnMetaDataV1::createMask(region, (char*)mask, &maskStart, &maskEnd);
     bool isFirstStep = true;
 
     while (msStartTime < msEndTime)

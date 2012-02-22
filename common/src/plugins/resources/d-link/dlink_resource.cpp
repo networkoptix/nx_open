@@ -180,15 +180,11 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 
 void QnPlDlinkResource::init()
 {
-    CLHttpStatus status;
-    downloadFile(status, "config/motion.cgi?enable=yes",  getHostAddress(), 80, 1000, getAuth()); // to enable md 
 
-    if (status == CL_HTTP_AUTH_REQUIRED)
-    {
-        setStatus(Unauthorized);
-        return;
-    }
+    setMotionMaskPhysical();
     
+    CLHttpStatus status;
+
     QByteArray cam_info_file = downloadFile(status, "config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -332,5 +328,92 @@ void QnPlDlinkResource::init()
             ++it;
     }
 
+}
+
+static void setBitAt(int x, int y, unsigned char* data)
+{
+    Q_ASSERT(x<32);
+    Q_ASSERT(y<16);
+
+
+    int offset = (y * 32 + x) / 8;
+    data[offset] |= 0x80 >> (x&7);
+}
+
+void QnPlDlinkResource::setMotionMask(const QRegion& mask)
+{
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        if (m_motionMask == mask)
+            return;
+
+        m_motionMask = mask;
+
+    }
+
+    setMotionMaskPhysical();
+
+    emit motionMaskChanged(mask);
+}
+
+void QnPlDlinkResource::setMotionMaskPhysical()
+{
+    unsigned char maskBit[MD_WIDTH * MD_HEIGHT / 8];
+    QnMetaDataV1::createMask(getMotionMask(),  (char*)maskBit);
+
+
+    QImage img(MD_WIDTH, MD_HEIGHT, QImage::Format_Mono);
+    memset(img.bits(), 0, img.byteCount());
+    img.setColor(0, qRgb(0, 0, 0));
+    img.setColor(1, qRgb(255, 255, 255));
+
+
+    for (int x = 0; x  < MD_WIDTH; ++x)
+    {
+        for (int y = 0; y  < MD_HEIGHT; ++y)
+        {
+            if (QnMetaDataV1::isMotionAt(x,y,(char*)maskBit))
+                img.setPixel(x,y,1);
+        }
+    }
+
+
+    QImage imgOut = img.scaled(32, 16, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    unsigned char outData[32*16/8];
+    memset(outData,0,sizeof(outData));
+
+    for (int x = 0; x  < 32; ++x)
+    {
+        for (int y = 0; y  < 16; ++y)
+        {
+            if (imgOut.pixel(x,y) == img.color(1))
+                setBitAt(x,y, outData);
+        }
+    }
+
+
+
+    QString str;
+    QTextStream stream(&str);
+
+    stream << "config/motion.cgi?enable=yes&mbmask=";
+
+    for (int i = 0; i < sizeof(outData); ++i)
+    {
+        stream << QString::number(outData[i], 16).toUpper();
+    }
+
+    stream.flush();
+
+
+    CLHttpStatus status;
+    downloadFile(status, str,  getHostAddress(), 80, 1000, getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+        return;
+    }
 
 }

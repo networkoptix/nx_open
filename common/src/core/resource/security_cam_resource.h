@@ -43,7 +43,7 @@ public:
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
-    void setMotionMask(const QRegion& mask);
+    virtual void setMotionMask(const QRegion& mask);
     QRegion getMotionMask() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
@@ -61,9 +61,12 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0;
+
+protected:
+    QRegion m_motionMask;
 private:
     QnDataProviderFactory* m_dpFactory;
-    QRegion m_motionMask;
+    
     QnScheduleTaskList m_scheduleTasks;
 };
 

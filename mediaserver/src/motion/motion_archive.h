@@ -65,6 +65,7 @@ class QnMotionArchive: public QObject
     Q_OBJECT
 public:
     QnMotionArchive(QnNetworkResourcePtr resource);
+    virtual ~QnMotionArchive();
     bool saveToArchive(QnMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection();
@@ -104,7 +105,8 @@ private:
     QnMetaDataV1Ptr m_lastDetailedData;
 
     // motion mask
-    __m128i m_motionMask[MD_WIDTH * MD_HEIGHT / 128];
+    //__m128i m_motionMask[MD_WIDTH * MD_HEIGHT / 128];
+    __m128i* m_motionMask;
     int m_motionMaskStart;
     int m_motionMaskEnd;
 
