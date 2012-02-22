@@ -58,9 +58,13 @@ public:
 
     void init() override; // does a lot of physical work 
 
+    void setMotionMask(const QRegion& mask) override;
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
+
+    void setMotionMaskPhysical();
 
 protected:
     QnDlink_cam_info  m_camInfo;
