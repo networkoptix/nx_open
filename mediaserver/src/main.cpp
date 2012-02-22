@@ -437,11 +437,12 @@ public:
 
         QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
-        QHostAddress myAddress;
+        QHostAddress appserverHost;
         do
         {
-            myAddress = resolveHost(appserverHostString);
-        } while (myAddress.toIPv4Address() == 0);
+
+            appserverHost = resolveHost(appserverHostString);
+        } while (appserverHost.toIPv4Address() == 0);
 
         QnVideoServerResourcePtr videoServer;
 
@@ -452,7 +453,7 @@ public:
             if (!server)
                 server = createServer();
 
-            setServerNameAndUrls(server, myAddress.toString());
+            setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
 
             if (server->getStorages().isEmpty())
                 server->setStorages(QnStorageResourceList() << createDefaultStorage());
