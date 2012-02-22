@@ -40,13 +40,13 @@
         
         <!-- AppServer properties-->
         <Property Id="APPSERVER_PORT" Secure="yes" Value="8000"/>
-        <Property Id="APPSERVER_LOGIN" Secure="yes" Value="appserver"/>
+        <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         
         <!-- MediaServer properties-->
         <Property Id="SERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="SERVER_PORT" Secure="yes" Value="8000"/>
-        <Property Id="SERVER_LOGIN" Secure="yes" Value="appserver"/>
+        <Property Id="SERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="SERVER_RTSP_PORT" Secure="yes" Value="8001"/>
         <Property Id="SERVER_API_PORT" Secure="yes" Value="8002"/>
@@ -62,7 +62,7 @@
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="8000"/>
-        <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="appserver"/>
+        <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
@@ -253,7 +253,7 @@
                                 <RegistryKey Root="HKCU"
                                              Key="Software\[Manufacturer]\VMS Client"
                                              Action="createAndRemoveOnUninstall">
-                                	<RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
+                                    <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
