@@ -95,6 +95,11 @@ int QnAppServerConnection::addObjectAsync(const QString& objectName, const QByte
     return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, m_requestParams, data, target, slot);
 }
 
+int QnAppServerConnection::deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot)
+{
+    return SessionManager::instance()->sendAsyncDeleteRequest(m_url, objectName, id, target, slot);
+}
+
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
 {
     QString request;
@@ -413,4 +418,24 @@ int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera, QB
 {
     QnVirtualCameraResourceList cameras;
     return addCamera(camera, cameras, errorString);
+}
+
+int QnAppServerConnection::deleteAsync(const QnVideoServerResourcePtr& server, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("server", server->getId().toInt(), target, slot);
+}
+
+int QnAppServerConnection::deleteAsync(const QnVirtualCameraResourcePtr& camera, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("camera", camera->getId().toInt(), target, slot);
+}
+
+int QnAppServerConnection::deleteAsync(const QnUserResourcePtr& user, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("user", user->getId().toInt(), target, slot);
+}
+
+int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
+{
+    return deleteObjectAsync("layout", layout->getId().toInt(), target, slot);
 }

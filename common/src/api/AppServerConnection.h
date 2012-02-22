@@ -82,6 +82,11 @@ public:
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
+    int deleteAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
+    int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
+    int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
+    int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
+
     void stop();
 
 private:
@@ -89,6 +94,8 @@ private:
 
     int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
     int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
+    int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
+
 
     int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
 

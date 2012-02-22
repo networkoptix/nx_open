@@ -155,7 +155,9 @@ void parseLayouts(QList<T>& layouts, const PbLayoutList& pb_layouts)
                 const proto::pb::Layout_Item& pb_item = pb_layout.item(j);
 
                 QnLayoutItemData itemData;
-                itemData.resourceId = pb_item.resourceid();
+                itemData.resource.id = pb_item.resource().id();
+                itemData.resource.path = pb_item.resource().path().c_str();
+
                 itemData.uuid = QUuid(pb_item.uuid().c_str());
                 itemData.flags = pb_item.flags();
                 itemData.combinedGeometry.setLeft(pb_item.left());
@@ -331,7 +333,10 @@ void serializeLayout_i(proto::pb::Layout& pb_layout, const QnLayoutResourcePtr& 
         foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
             proto::pb::Layout_Item& pb_item = *pb_layout.add_item();
 
-            pb_item.set_resourceid(itemIn.resourceId.toInt());
+            pb_item.mutable_resource()->set_path(itemIn.resource.path.toStdString());
+            if (itemIn.resource.id.isValid() && !itemIn.resource.id.isSpecial())
+                pb_item.mutable_resource()->set_id(itemIn.resource.id.toInt());
+
             pb_item.set_uuid(itemIn.uuid.toString().toStdString());
             pb_item.set_flags(itemIn.flags);
             pb_item.set_left(itemIn.combinedGeometry.left());

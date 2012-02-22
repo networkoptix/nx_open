@@ -12,7 +12,11 @@ class QnLayoutItemData
 public:
     QnLayoutItemData(): flags(0), rotation(0) {}
 
-    QnId resourceId;
+    struct {
+        QnId id;
+        QString path;
+    } resource;
+
     QUuid uuid;
     int flags;
     QRectF combinedGeometry;
@@ -20,7 +24,8 @@ public:
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
         return 
-            l.resourceId == r.resourceId &&
+            l.resource.id == r.resource.id &&
+            l.resource.path == r.resource.path &&
             l.uuid == r.uuid &&
             l.flags == r.flags &&
             qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) &&
