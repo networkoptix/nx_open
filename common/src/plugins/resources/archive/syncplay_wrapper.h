@@ -47,6 +47,7 @@ public:
     //
     virtual void onBufferingFinished(QnlTimeSource* source) override;
     virtual void onBufferingStarted(QnlTimeSource* source, qint64 bufferingTime) override;
+    virtual void setSpeed(double value, qint64 currentTimeHint) override;
 
 public slots:
     void onEofReached(QnlTimeSource* src, bool value);
@@ -55,7 +56,6 @@ private slots:
     void onBeforeJump(qint64 mksec);
     void onJumpOccured(qint64 mksec);
     void onJumpCanceled(qint64 time);
-    void onSpeedChanged(double value);
 private:
     qint64 minTime() const;
     qint64 endTime() const;

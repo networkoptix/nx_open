@@ -51,7 +51,9 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_externalLocked(false),
     m_canChangeQuality(true),
     m_isStillImage(false),
-    m_bofReached(false)
+    m_bofReached(false),
+    m_currentTimeHint(-1),
+    m_speed(1.0)
 {
     m_isStillImage = dev->checkFlags(QnResource::still_image);
     // Should init packets here as some times destroy (av_free_packet) could be called before init
@@ -298,6 +300,8 @@ begin_label:
     qint64 tmpSkipFramesToTime = m_tmpSkipFramesToTime;
     m_tmpSkipFramesToTime = 0;
     bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
+    qint64 currentTimeHint = m_currentTimeHint;
+    m_currentTimeHint = -1;
     m_jumpMtx.unlock();
 
     // change quality checking
@@ -346,7 +350,9 @@ begin_label:
     if (reverseMode != m_prevReverseMode)
     {
         m_bofReached = false;
-        qint64 displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime(reverseMode);
+        qint64 displayTime = currentTimeHint;
+        if (currentTimeHint == -1)
+            displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime(reverseMode);
 
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
@@ -711,7 +717,7 @@ bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
     return audioContext != 0;
 }
 
-void QnArchiveStreamReader::setReverseMode(bool value)
+void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
 {
     if (value != m_reverseMode) 
     {
@@ -720,6 +726,7 @@ void QnArchiveStreamReader::setReverseMode(bool value)
             m_jumpMtx.lock();
         m_lastJumpTime = AV_NOPTS_VALUE;
         m_reverseMode = value;
+        m_currentTimeHint = currentTimeHint;
         if (useMutex)
             m_jumpMtx.unlock();
         m_delegate->beforeChangeReverseMode(m_reverseMode);
@@ -950,3 +957,27 @@ void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contex
     m_delegate = contextDelegate;
     connect(m_delegate, SIGNAL(qualityChanged(MediaQuality)), this, SLOT(onDelegateChangeQuality(MediaQuality)), Qt::DirectConnection);
 }
+
+void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
+{
+    if (m_navDelegate) {
+        m_navDelegate->setSpeed(value, currentTimeHint);
+        return;
+    }
+
+    QMutexLocker mutex(&m_mutex);
+    m_speed = value;
+    for (int i = 0; i < m_dataprocessors.size(); ++i)
+    {
+        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        dp->setSpeed(value);
+    }
+    setReverseMode(value < 0, currentTimeHint);
+}
+
+double QnArchiveStreamReader::getSpeed() const
+{
+    QMutexLocker mutex(&m_mutex);
+    return m_speed;
+}
+
