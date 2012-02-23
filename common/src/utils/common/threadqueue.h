@@ -2,6 +2,7 @@
 #define cl_ThreadQueue_h_2236 
 
 #include <QQueue>
+#include <QVariant>
 #include <QSemaphore>
 
 #include "log.h"
@@ -90,7 +91,7 @@ public:
     void removeDataByCondition(const ConditionFunc& cond, QVariant opaque)
     {
         QMutexLocker mutex(&m_cs);
-        QQueue<T>::iterator itr = m_queue.begin();
+        typename QQueue<T>::iterator itr = m_queue.begin();
         while (itr != m_queue.end())
         {
             if (cond(*itr, opaque))
