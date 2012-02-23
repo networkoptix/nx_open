@@ -361,7 +361,7 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
 }
 
-void initAppServerEventConnection(const QSettings &settings)
+void initAppServerEventConnection(const QSettings &settings, const QnVideoServerResourcePtr& mediaServer)
 {
     QUrl appServerEventsUrl;
 
@@ -372,6 +372,7 @@ void initAppServerEventConnection(const QSettings &settings)
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events");
+    appServerEventsUrl.addQueryItem("id", mediaServer->getId().toString());
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
@@ -438,8 +439,6 @@ public:
         sm->start();
 
         initAppServerConnection(settings);
-        initAppServerEventConnection(settings);
-        QnEventManager* eventManager = QnEventManager::instance();
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
@@ -484,6 +483,8 @@ public:
                 QnSleep::msleep(1000);
         }
 
+        initAppServerEventConnection(settings, videoServer);
+        QnEventManager* eventManager = QnEventManager::instance();
         eventManager->run();
 
         m_processor = new QnAppserverResourceProcessor(videoServer->getId());

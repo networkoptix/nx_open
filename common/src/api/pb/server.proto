@@ -1,6 +1,12 @@
 package proto.pb;
 
 message Server {
+    enum Status {
+       Offline      = 0;
+       Unauthorized = 1;
+       Online       = 2;
+    }
+
     message Storage {
         optional int32        id           = 1;
         required string       name         = 2;
@@ -10,10 +16,11 @@ message Server {
 
     optional int32        id           = 1;
     required string       name         = 2;
-    required string       guid         = 3;
-    required string       url          = 4;
-    required string       apiUrl       = 5;
-    repeated Storage      storage      = 6;
+    optional Status       status       = 3;
+    required string       guid         = 4;
+    required string       url          = 5;
+    required string       apiUrl       = 6;
+    repeated Storage      storage      = 7;
 }
 
 message Servers {

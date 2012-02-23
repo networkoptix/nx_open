@@ -3,10 +3,6 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "../dataprovider/live_stream_provider.h"
 
-static const char *property_descriptions[] = {
-    QT_TRANSLATE_NOOP("QnResource", "Motion Mask"),
-    QT_TRANSLATE_NOOP("QnResource", "Camera Scheduling")
-};
 
 QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
@@ -34,7 +30,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        setMotionMask(other_casted->m_motionMask);
+        setMotionMask(other_casted->m_motionMask, QnDomainPhysical);
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }
 }
@@ -116,12 +112,18 @@ QRegion QnSecurityCamResource::getMotionMask() const
     return m_motionMask;
 }
 
-void QnSecurityCamResource::setMotionMask(const QRegion& mask)
+void QnSecurityCamResource::setMotionMask(const QRegion& mask, QnDomain domain)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    if (m_motionMask == mask)
-        return;
-    m_motionMask = mask;
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        if (m_motionMask == mask)
+            return;
+        m_motionMask = mask;
+    }
+
+    if (domain == QnDomainPhysical)
+        setMotionMaskPhysical();
+
     emit motionMaskChanged(mask);
 }
 

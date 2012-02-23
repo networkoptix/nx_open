@@ -72,7 +72,7 @@ void CameraSettingsDialog::saveToModel()
         m_camera->setScheduleTasks(scheduleTasks);
     }
 
-	m_camera->setMotionMask(ui->motionWidget->motionMask());
+	m_camera->setMotionMask(ui->motionWidget->motionMask(), QnDomainMemory);
 }
 
 void CameraSettingsDialog::updateView()

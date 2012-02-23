@@ -59,7 +59,7 @@ public:
     virtual void enableQualityChange() override;
 
     virtual void setSpeed(double value, qint64 currentTimeHint = -1) override;
-    virtual double QnArchiveStreamReader::getSpeed() const override;
+    virtual double getSpeed() const override;
 
 
     /* For atomic changing several params: quality and position for example */

@@ -61,12 +61,11 @@ signals:
     void finished(int status, const QByteArray& data, const QByteArray& errorString, int handle);
 
 private slots:
-    void targetDestroyed(QObject* target);
     void at_replyReceived();
 
 private:
-    QObject* m_target;
-    const char* m_slot;
+    QObject *m_target;
+    const char *m_slot;
     int m_handle;
 };
 

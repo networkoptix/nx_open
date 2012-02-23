@@ -184,7 +184,7 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
 {
     QMutexLocker lock(&m_scheduleMutex);
     m_schedule = cameraRes->getScheduleTasks();
-    Q_ASSERT(((unsigned int)m_motionMaskBinData)%16 == 0);
+    Q_ASSERT(((unsigned long)m_motionMaskBinData)%16 == 0);
     QnMetaDataV1::createMask(cameraRes->getMotionMask(), (char*)m_motionMaskBinData);
     m_lastSchedulePeriod.clear();
 }

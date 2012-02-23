@@ -16,12 +16,6 @@ public:
 class QnSecurityCamResource : virtual public QnMediaResource
 {
     Q_OBJECT
-    Q_PROPERTY(QRegion motionMask READ getMotionMask WRITE setMotionMask)
-    Q_CLASSINFO("motionMask", "Motion Mask")
-    Q_CLASSINFO("motionMask_group", "Motion detection")
-    Q_PROPERTY(QnScheduleTaskList scheduleTasks READ getScheduleTasks WRITE setScheduleTasks)
-    Q_CLASSINFO("scheduleTasks", "Camera Scheduling")
-    Q_CLASSINFO("scheduleTasks_group", "Camera Scheduling")
 
 public:
     QnSecurityCamResource();
@@ -43,7 +37,7 @@ public:
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
-    virtual void setMotionMask(const QRegion& mask);
+    void setMotionMask(const QRegion& mask, QnDomain domain);
     QRegion getMotionMask() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
@@ -61,6 +55,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0;
+    virtual void setMotionMaskPhysical(){};
 
 protected:
     QRegion m_motionMask;
