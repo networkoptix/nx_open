@@ -10,17 +10,9 @@
 SessionManager* SessionManager::m_instance = 0;
 QAtomicInt SessionManager::m_handle(1);
 
-void SessionManagerReplyProcessor::targetDestroyed(QObject* target)
-{
-    m_target = 0;
-}
-
 void SessionManagerReplyProcessor::at_replyReceived()
 {
     QNetworkReply *reply = (QNetworkReply *)sender();
-
-    if (m_target)
-        connect(this, SIGNAL(finished(int,QByteArray,QByteArray, int)), m_target, m_slot, Qt::QueuedConnection);
 
     emit finished(reply->error(), reply->readAll(), reply->errorString().toAscii(), m_handle);
 
@@ -235,7 +227,7 @@ int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectNa
     // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
-    connect(target, SIGNAL(destroyed(QObject*)), replyProcessor, SLOT(targetDestroyed(QObject*)));
+    connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
 
     emit asyncGetRequest(replyProcessor, url, objectName, params, target, slot, handle);
 
@@ -254,7 +246,7 @@ int SessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objec
     // We need to create reply processor here as target could not exist when doAsyncDeleteRequest gets called
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
-    connect(target, SIGNAL(destroyed(QObject*)), replyProcessor, SLOT(targetDestroyed(QObject*)));
+    connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
 
     emit asyncDeleteRequest(replyProcessor, url, objectName, id, target, slot, handle);
 
@@ -286,7 +278,7 @@ int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectN
     // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
-    connect(target, SIGNAL(destroyed(QObject*)), replyProcessor, SLOT(targetDestroyed(QObject*)));
+    connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
 
     emit asyncPostRequest(replyProcessor, url, objectName, params, data, target, slot, handle);
 
