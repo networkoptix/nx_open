@@ -267,7 +267,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
-    outputCtx->video_codec = mediaData->compressionType;
     
     QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     Q_ASSERT(mediaProvider);
@@ -308,7 +307,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 avcodec_copy_context(videoCodecCtx, mediaData->context->ctx());
             }
             else {
-                videoCodecCtx->codec_id = outputCtx->video_codec;
+                videoCodecCtx->codec_id = mediaData->compressionType;
                 videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
                 AVRational defaultFrameRate = {1, 30};
                 videoCodecCtx->time_base = defaultFrameRate;
