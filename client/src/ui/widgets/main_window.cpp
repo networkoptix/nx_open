@@ -464,11 +464,6 @@ void QnMainWindow::updateDwmState()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-/* // TODO
-if (action == &cm_remove_from_disk) {
-    QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
-*/
-
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 

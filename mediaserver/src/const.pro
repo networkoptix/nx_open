@@ -110,17 +110,11 @@ win32 {
     DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
 
     INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
-    INCLUDEPATH += "$$(DXSDK_DIR)/Include"
-    !contains(QMAKE_HOST.arch, x86_64) {
-      LIBS += -L"$$(DXSDK_DIR)/Lib/x86"
-    } else {
-      LIBS += -L"$$(DXSDK_DIR)/Lib/x64"
-    }
   }
 
   LIBS += -lws2_32 -lIphlpapi -lOle32
 
-  LIBS += -ld3d9 -ld3dx9 -lwinmm
+  LIBS += -lwinmm
 
   SOURCES += 
 
