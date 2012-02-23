@@ -118,7 +118,7 @@ namespace {
             {
                 QRegion region;
                 parseRegion(region, (*i->region()).c_str());
-                camera->setMotionMask(region);
+                camera->setMotionMask(region, QnDomainMemory);
             }
 
             if (i->properties().present())

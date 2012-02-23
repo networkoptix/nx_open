@@ -13,6 +13,9 @@ public:
         ContextId_Invalid = -1,
         ContextId_Scene = 0,
         ContextId_MotionGrid,
+        ContextId_Slider,
+        ContextId_Tree,
+        ContextId_Search
     };
 
     static QnContextHelp* instance();

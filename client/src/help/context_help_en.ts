@@ -13,5 +13,27 @@
         <translation>Type Motion Grid help here
 </translation>
     </message>
+
+    <message>
+        <source>ContextId_Slider</source>
+        <translation>
+            Type slider context help here
+        </translation>
+    </message>
+
+    <message>
+        <source>ContextId_Tree</source>
+        <translation>
+            Type tree context help here
+        </translation>
+    </message>
+
+    <message>
+        <source>ContextId_Search</source>
+        <translation>
+            Type search context help here
+        </translation>
+    </message>
+
 </context>
 </TS>

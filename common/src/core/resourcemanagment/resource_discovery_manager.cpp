@@ -180,9 +180,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             if (newNetRes)
             {
                 QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-                if (rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress())
+                bool diffAddr = rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress(); //if such network resource is in pool and has diff IP 
+                bool diffNet = !m_netState.isInMachineSubnet(newNetRes->getHostAddress()); // or is diff NET
+                if ( diffAddr || diffNet)
                 {
-                    // if such network resource is in pool and has diff IP => should keep it
+                    // should keep it into resources to investigate it further 
                     ++it;
                     continue;
                 }
