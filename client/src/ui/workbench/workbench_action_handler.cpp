@@ -462,3 +462,8 @@ void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &err
 
     QMessageBox::critical(widget(), tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
 }
+
+/* // TODO
+if (action == &cm_remove_from_disk) {
+    QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
+*/
