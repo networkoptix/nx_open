@@ -22,9 +22,20 @@ namespace {
 } // anonymous namespace
 
 
-void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const QByteArray &errorString, QnResourceList, int) {
+void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int) {
     if(status == 0 && !m_synchronizer.isNull())
         m_synchronizer.data()->m_savedDataByResource[m_resource] = detail::LayoutData(m_resource);
+
+    if(resources.size() != 1) {
+        qnWarning("Received reply of invalid size %1: expected a list containing a single layout resource.", resources.size());
+    } else {
+        QnLayoutResourcePtr resource = resources[0].dynamicCast<QnLayoutResource>();
+        if(!resource) {
+            qnWarning("Received reply of invalid type: expected layout resource, got %1.", resources[0]->metaObject()->className());
+        } else {
+            m_resource->setId(resource->getId());
+        }
+    }
 
     emit finished(status, errorString, m_resource);
 
@@ -107,7 +118,7 @@ void QnWorkbenchSynchronizer::save(QnWorkbenchLayout *layout, QObject *object, c
 
     detail::WorkbenchSynchronizerReplyProcessor *processor = new detail::WorkbenchSynchronizerReplyProcessor(this, resource);
     connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
-    m_connection->saveAsync(m_user, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
+    m_connection->saveAsync(resource, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
 }
 
 void QnWorkbenchSynchronizer::restore(QnWorkbenchLayout *layout) {

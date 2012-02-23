@@ -68,6 +68,25 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnResourceList resources;
         qCopy(users.begin(), users.end(), std::back_inserter(resources));
         emit finished(status, errorString, resources, handle);
+    } else if (m_objectName == "layout")
+    {
+        QnLayoutResourceList layouts;
+
+        if (status == 0)
+        {
+            try {
+                m_serializer.deserializeLayouts(layouts, result);
+            } catch (const QnSerializeException& e) {
+                errorString += e.errorString();
+            }
+        } else
+        {
+            errorString += SessionManager::formatNetworkError(status);
+        }
+
+        QnResourceList resources;
+        qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
+        emit finished(status, errorString, resources, handle);
     }
 }
 

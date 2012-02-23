@@ -5,6 +5,8 @@
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
 #include "core/resource/video_server.h"
+#include "core/resource/layout_resource.h"
+#include "core/resource/user_resource.h"
 
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
@@ -129,6 +131,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
 
         QMetaObject::invokeMethod(this, "resourceRemoved", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
+    }
+
+    /* Remove layouts from their users. */
+    foreach (const QnResourcePtr &resource, removedResources) {
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+            if(QnUserResourcePtr user = getResourceById(layout->getParentId()).dynamicCast<QnUserResource>())
+                user->removeLayout(layout);
     }
 }
 
