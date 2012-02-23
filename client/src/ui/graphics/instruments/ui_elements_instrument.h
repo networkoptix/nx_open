@@ -27,13 +27,10 @@ public:
     }
 
 protected:
-    virtual void installedNotify();
-    virtual void uninstalledNotify();
+    virtual void installedNotify() override;
+    virtual void aboutToBeUninstalledNotify() override;
 
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
-
-private slots:
-    void at_widget_zValueChanged();
 
 private:
     DestructionGuardItem *guard() const {

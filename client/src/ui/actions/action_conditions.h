@@ -78,4 +78,10 @@ private:
 };
 
 
+class QnResourceRemovalActionCondition: public QnActionCondition {
+public:
+    virtual bool check(const QnResourceList &resources) override;
+};
+
+
 #endif // QN_ACTION_CONDITIONS_H

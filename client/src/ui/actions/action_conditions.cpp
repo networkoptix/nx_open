@@ -2,19 +2,23 @@
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <ui/graphics/items/resource_widget.h>
-#include "action_meta_types.h"
+#include "action_target_types.h"
 
 QnActionCondition::QnActionCondition(QObject *parent): 
     QObject(parent) 
 {
-    QnActionMetaTypes::initialize();
+    QnActionTargetTypes::initialize();
 }
 
 bool QnActionCondition::check(const QVariant &items) {
-    if(items.userType() == QnActionMetaTypes::resourceList()) {
+    if(items.userType() == QnActionTargetTypes::resourceList()) {
         return check(items.value<QnResourceList>());
-    } else if(items.userType() == QnActionMetaTypes::widgetList()) {
+    } else if(items.userType() == QnActionTargetTypes::widgetList()) {
         return check(items.value<QnResourceWidgetList>());
+    } else if(items.userType() == QnActionTargetTypes::layoutList()) {
+        return true;
+    } else if(items.userType() == QnActionTargetTypes::layoutItemList()) {
+        return true;
     } else {
         qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
         return false;
@@ -89,8 +93,22 @@ bool QnResourceActionCondition::checkOne(const QnResourcePtr &resource) {
 }
 
 bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
-    QnResourcePtr resource = QnActionMetaTypes::resource(widget);
+    QnResourcePtr resource = QnActionTargetTypes::resource(widget);
     return resource ? checkOne(resource) : false;
 }
 
 
+bool QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources) {
+        if(resource->checkFlags(QnResource::user) || resource->checkFlags(QnResource::layout))
+            continue; /* OK to remove. */
+
+        if(resource->checkFlags(QnResource::remote_server) || resource->checkFlags(QnResource::live_cam))
+            if(resource->getStatus() == QnResource::Offline)
+                continue; /* Can remove only if offline. */
+
+        return false;
+    }
+
+    return true;
+}

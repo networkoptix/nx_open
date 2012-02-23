@@ -196,6 +196,8 @@ public:
         switch(m_type) {
         case Resource:
         case Item:
+            if(m_flags & QnResource::layout)
+                result |= Qt::ItemIsEditable;
             if(m_flags & QnResource::media)
                 result |= Qt::ItemIsDragEnabled;
             break;
@@ -220,7 +222,7 @@ public:
                 return m_icon;
             break;
         case Qt::EditRole:
-            break;
+            return m_name;
         case Qn::ResourceRole:
             if(!m_resource.isNull())
                 return QVariant::fromValue<QnResourcePtr>(m_resource);
@@ -246,6 +248,20 @@ public:
         }
 
         return QVariant();        
+    }
+
+    bool setData(const QVariant &value, int role, int column) {
+        Q_UNUSED(column);
+
+        if(role != Qt::EditRole)
+            return false;
+
+        if(m_flags & QnResource::layout) {
+            m_resource->setName(value.toString());
+            return true;
+        }
+
+        return false;
     }
 
 protected:
@@ -480,7 +496,10 @@ QVariant QnResourceModel::data(const QModelIndex &index, int role) const {
 }
 
 bool QnResourceModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    return false; /* Resource model is not editable. */
+    if(!index.isValid())
+        return false;
+
+    return node(index)->setData(value, role, index.column());
 }
 
 QVariant QnResourceModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -614,7 +633,14 @@ void QnResourceModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, c
     Node *parentNode = this->node(layout->getId());
     Node *node = this->node(item.uuid);
 
-    node->setResource(m_resourcePool->getResourceById(item.resource.id));
+    QnResourcePtr resource;
+    if(item.resource.id.isValid()) {
+        resource = m_resourcePool->getResourceById(item.resource.id);
+    } else {
+        resource = m_resourcePool->getResourceByUniqId(item.resource.path);
+    }
+
+    node->setResource(resource);
     node->setParent(parentNode);
 }
 

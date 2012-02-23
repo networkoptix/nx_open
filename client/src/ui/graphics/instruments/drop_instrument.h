@@ -4,18 +4,35 @@
 #include "instrument.h"
 #include <core/resource/resource.h>
 
-class QnWorkbenchController;
+class QnWorkbench;
+class DropSurfaceItem;
+class DestructionGuardItem;
 
 class DropInstrument: public Instrument {
     Q_OBJECT;
 public:
-    DropInstrument(QnWorkbenchController *controller, QObject *parent = NULL);
+    DropInstrument(QnWorkbench *workbench, QObject *parent = NULL);
+
+    /**
+     * \returns                         Graphics item that serves as a surface for 
+     *                                  drag and drop. Is never NULL, unless explicitly deleted by user.
+     */
+    QGraphicsObject *surface() const;
 
 protected:
-    virtual bool dragEnterEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
-    virtual bool dragMoveEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
-    virtual bool dragLeaveEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
-    virtual bool dropEvent(QGraphicsScene *scene, QGraphicsSceneDragDropEvent *event) override;
+    friend class DropSurfaceItem;
+
+    virtual void installedNotify() override;
+    virtual void aboutToBeUninstalledNotify() override;
+
+    virtual bool dragEnterEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
+    virtual bool dragMoveEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
+    virtual bool dragLeaveEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
+    virtual bool dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
+
+    DestructionGuardItem *guard() const {
+        return m_guard.data();
+    }
 
 private:
     bool dropInternal(QGraphicsView *view, const QStringList &files, const QPoint &pos);
@@ -23,7 +40,10 @@ private:
 private:
     QStringList m_files;
     QnResourceList m_resources;
-    QnWorkbenchController *const m_controller;
+    
+    QWeakPointer<QnWorkbench> m_workbench;
+    QWeakPointer<DropSurfaceItem> m_surface;
+    QWeakPointer<DestructionGuardItem> m_guard;
 };
 
 #endif // QN_DROP_INSTRUMENT_H

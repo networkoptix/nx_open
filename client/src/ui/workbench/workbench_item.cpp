@@ -25,8 +25,8 @@ bool QnWorkbenchItem::load(const QnLayoutItemData &itemData) {
 
 #ifdef _DEBUG
     QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
-    if(itemData.resource.id != localId)
-        qnWarning("Loading item '%1' from a data with different id (%2 != %3).", resourceUid(), localId.toString(), itemData.resource.id.toString());
+    if(itemData.resource.id != localId && itemData.resource.path != m_resourceUid)
+        qnWarning("Loading item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), itemData.resource.id.toString(), itemData.resource.path, m_resourceUid);
 #endif
 
     bool result = true;
@@ -46,8 +46,8 @@ void QnWorkbenchItem::save(QnLayoutItemData &itemData) const {
 
 #ifdef _DEBUG
     QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
-    if(itemData.resource.id != localId)
-        qnWarning("Saving item '%1' to a data with different id (%2 != %3).", resourceUid(), localId.toString(), itemData.resource.id.toString());
+    if(itemData.resource.id != localId && itemData.resource.path != m_resourceUid)
+        qnWarning("Saving item '%1' to a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), itemData.resource.id.toString(), itemData.resource.path, m_resourceUid);
 #endif
 
     itemData.flags = flags();

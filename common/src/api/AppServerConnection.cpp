@@ -201,14 +201,14 @@ int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr
     return 1;
 }
 
-int QnAppServerConnection::saveAsync(const QnResourcePtr& resourcePtr, QObject* target, const char* slot)
+int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot)
 {
-    if (resourcePtr.dynamicCast<QnVideoServerResource>())
-        return saveAsync(resourcePtr.dynamicCast<QnVideoServerResource>(), target, slot);
-    else if (resourcePtr.dynamicCast<QnVirtualCameraResource>())
-        return saveAsync(resourcePtr.dynamicCast<QnVirtualCameraResource>(), target, slot);
-    else if (resourcePtr.dynamicCast<QnUserResource>())
-        return saveAsync(resourcePtr.dynamicCast<QnUserResource>(), target, slot);
+    if (QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
+        return saveAsync(server, target, slot);
+    else if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        return saveAsync(camera, target, slot);
+    else if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        return saveAsync(user, target, slot);
 
     return 0;
 }
@@ -438,4 +438,19 @@ int QnAppServerConnection::deleteAsync(const QnUserResourcePtr& user, QObject* t
 int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
 {
     return deleteObjectAsync("layout", layout->getId().toInt(), target, slot);
+}
+
+int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot) {
+    if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>()) {
+        return deleteAsync(server, target, slot);
+    } else if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
+        return deleteAsync(camera, target, slot);
+    } else if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
+        return deleteAsync(user, target, slot);
+    } else if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+        return deleteAsync(layout, target, slot);
+    } else {
+        qnWarning("Cannot delete resources of type '%1'.", resource->metaObject()->className());
+        return 0;
+    }
 }

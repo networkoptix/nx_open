@@ -27,6 +27,10 @@ public:
         return m_userName;
     }
 
+    const QnUserResourcePtr &user() const {
+        return m_user;
+    }
+
 signals:
     void userChanged(const QnUserResourcePtr &user);
 

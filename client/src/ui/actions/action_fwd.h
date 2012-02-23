@@ -8,7 +8,9 @@ class QnActionCondition;
 class QnActionManager;
 class QnActionTargetProvider;
 class QnResourceWidget;
+class QnWorkbenchLayout;
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;
+typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
 
 #endif // QN_ACTION_FWD_H

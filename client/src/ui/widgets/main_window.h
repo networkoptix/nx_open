@@ -21,6 +21,7 @@ class QnWorkbenchUi;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
+class QnWorkbenchActionHandler;
 
 class QnMainWindow : public QWidget
 {
@@ -47,6 +48,8 @@ protected:
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
 
+    bool canAutoDelete(const QnResourcePtr &resource) const;
+
 protected slots:
     void setTitleVisible(bool visible);
     void setFullScreen(bool fullScreen);
@@ -54,19 +57,12 @@ protected slots:
     void toggleFullScreen();
     void toggleTitleVisibility();
 
-    void handleMessage(const QString &message);
-
-    void showOpenFileDialog();
-    void showAboutDialog();
-    void showPreferencesDialog();
-    void showAuthenticationDialog();
     void showMainMenu();
+
+    void handleMessage(const QString &message);
 
     void updateFullScreenState();
     void updateDwmState();
-
-    void openNewLayout();
-    void closeCurrentLayout();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
 
@@ -76,15 +72,7 @@ protected slots:
 
     void at_synchronizer_started();
 
-    void at_cameraSettingsAction_triggered();
-    void at_multipleCamerasSettingsAction_triggered();
-    void at_serverSettingsAction_triggered();
-    void at_youtubeUploadAction_triggered();
-    void at_editTagsAction_triggred();
-    void at_openInFolderAction_triggered();
-
     void at_layout_closeRequested(QnWorkbenchLayout *layout);
-    void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
@@ -93,6 +81,7 @@ private:
     QnWorkbenchUi *m_ui;
     QnWorkbenchDisplay *m_display;
     QnWorkbench *m_workbench;
+    QnWorkbenchActionHandler *m_actionHandler;
 
     QnResourcePoolUserWatcher *m_userWatcher;
 

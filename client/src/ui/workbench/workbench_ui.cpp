@@ -44,7 +44,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_meta_types.h>
+#include <ui/actions/action_target_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_context_widget.h>
@@ -342,7 +342,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(qnAction(Qn::NewTabAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::NewLayoutAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
@@ -512,12 +512,17 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
 
     /* Compare to action's scope. */
     if(!(action->scope() & scope))
-        return QVariant();
+        scope = action->scope();
     
     /* Get items. */
     switch(scope) {
+    case Qn::TabBarScope: {
+        QnWorkbenchLayoutList result;
+        result.push_back(m_display->workbench()->currentLayout());
+        return QVariant::fromValue(result);
+    }
     case Qn::TreeScope:
-        return QVariant::fromValue(m_treeWidget->selectedResources());
+        return m_treeWidget->target(action);
     case Qn::SliderScope: {
         QnResourceList result;
         CLVideoCamera *camera = m_sliderItem->videoCamera();
@@ -527,7 +532,7 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
         return QVariant::fromValue(result);
     }
     case Qn::SceneScope:
-        return QVariant::fromValue(QnActionMetaTypes::widgets(display()->scene()->selectedItems()));
+        return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
         return QVariant();
     }

@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QHash>
+#include <QSet>
 #include <QVariant>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/layout_item_index.h>
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -26,7 +28,25 @@ public:
 
     QAction *action(Qn::ActionId id) const;
 
+    QList<QnAction *> actions() const;
+
+    void trigger(Qn::ActionId id);
+
+    void trigger(Qn::ActionId id, const QVariant &items);
+
+    void trigger(Qn::ActionId id, const QnResourceList &resources);
+
+    void trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items);
+
+    void trigger(Qn::ActionId id, const QnResourceWidgetList &widgets);
+
+    void trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts);
+
+    void trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems);
+
     QMenu *newMenu(Qn::ActionScope scope);
+
+    QMenu *newMenu(Qn::ActionScope scope, const QVariant &items);
 
     QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources);
 
@@ -34,11 +54,17 @@ public:
 
     QMenu *newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets);
 
+    QMenu *newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts);
+
+    QMenu *newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems);
+
     QnActionTargetProvider *targetProvider() const {
         return m_targetProviderGuard ? m_targetProvider : NULL;
     }
 
     void setTargetProvider(QnActionTargetProvider *targetProvider);
+
+    Qn::ActionTarget currentTargetType(QnAction *action) const;
 
     QVariant currentTarget(QnAction *action) const;
 
@@ -46,7 +72,13 @@ public:
 
     QnResourcePtr currentResourceTarget(QnAction *action) const;
 
+    QnLayoutItemIndexList currentLayoutItemsTarget(QnAction *action) const;
+
+    QnWorkbenchLayoutList currentLayoutsTarget(QnAction *action) const;
+
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
+
+    Qn::ActionTarget currentTargetType(QObject *sender) const;
 
     QVariant currentTarget(QObject *sender) const;
 
@@ -54,11 +86,17 @@ public:
 
     QnResourcePtr currentResourceTarget(QObject *sender) const;
 
+    QnLayoutItemIndexList currentLayoutItemsTarget(QObject *sender) const;
+
+    QnWorkbenchLayoutList currentLayoutsTarget(QObject *sender) const;
+
     QnResourceWidgetList currentWidgetsTarget(QObject *sender) const;
 
 protected:
     friend class QnAction;
     friend class QnActionFactory;
+
+    void triggerInternal(Qn::ActionId id, const QVariant &items);
 
     QMenu *newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
 
