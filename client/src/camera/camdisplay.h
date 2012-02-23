@@ -93,6 +93,7 @@ private:
     void afterJump(QnAbstractMediaDataPtr media);
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
+    int getBufferingMask();
 private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
@@ -160,7 +161,7 @@ private:
     //qint64 m_nextTime;
     mutable QMutex m_timeMutex;
     bool m_useMtDecoding;
-    bool m_buffering;
+    int m_buffering;
     int m_executingJump;
     int skipPrevJumpSignal;
     int m_processedPackets;

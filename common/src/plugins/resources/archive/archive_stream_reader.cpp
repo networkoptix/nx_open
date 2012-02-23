@@ -814,6 +814,8 @@ void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int ma
     beforeJumpInternal(mksec);
     m_newDataMarker = marker;
     m_exactJumpToSpecifiedFrame = !findIFrame;
+    if (findIFrame)
+        setNeedKeyData();
     channeljumpToUnsync(mksec, 0, 0);
     if (useMutex)
         m_jumpMtx.unlock();
