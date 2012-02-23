@@ -50,7 +50,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
         {
             QRegion region;
             parseRegion(region, pb_camera.region().c_str());
-            camera->setMotionMask(region);
+            camera->setMotionMask(region, QnDomainMemory);
         }
 
         if (pb_camera.scheduletask_size())

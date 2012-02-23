@@ -335,26 +335,10 @@ static void setBitAt(int x, int y, unsigned char* data)
     Q_ASSERT(x<32);
     Q_ASSERT(y<16);
 
-
     int offset = (y * 32 + x) / 8;
-    data[offset] |= 0x80 >> (x&7);
+    data[offset] |= 0x01 << (x&7);
 }
 
-void QnPlDlinkResource::setMotionMask(const QRegion& mask)
-{
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-        if (m_motionMask == mask)
-            return;
-
-        m_motionMask = mask;
-
-    }
-
-    setMotionMaskPhysical();
-
-    emit motionMaskChanged(mask);
-}
 
 void QnPlDlinkResource::setMotionMaskPhysical()
 {
@@ -378,7 +362,10 @@ void QnPlDlinkResource::setMotionMaskPhysical()
     }
 
 
-    QImage imgOut = img.scaled(32, 16, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    QImage imgOut = img.scaled(32, 16);//, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    //imgOut.save("c:/img.bmp");
 
     unsigned char outData[32*16/8];
     memset(outData,0,sizeof(outData));
@@ -401,7 +388,10 @@ void QnPlDlinkResource::setMotionMaskPhysical()
 
     for (int i = 0; i < sizeof(outData); ++i)
     {
-        stream << QString::number(outData[i], 16).toUpper();
+        QString t = QString::number(outData[i], 16).toUpper();
+        if (t.length() < 2)
+            t = QString("0") + t;
+        stream << t[1] << t[0];
     }
 
     stream.flush();
