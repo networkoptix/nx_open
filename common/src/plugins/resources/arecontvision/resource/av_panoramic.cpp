@@ -112,7 +112,7 @@ AVVideoLayout180 avVideoLayout180;
 
 
 
-CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
+QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
     if (name.contains("8180") || name.contains("8185") || name.contains("20185"))
@@ -121,25 +121,25 @@ CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
         m_vrl = &avVideoLayout360;
 }
 
-bool CLArecontPanoramicResource::hasDualStreaming() const
+bool QnArecontPanoramicResource::hasDualStreaming() const
 {
     return false;
 }
 
-bool CLArecontPanoramicResource::getDescription()
+bool QnArecontPanoramicResource::getDescription()
 {
     m_description = "";
     return true;
 }
 
-QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider()
+QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider()
 {
     cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
     return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
 
-bool CLArecontPanoramicResource::setParamPhysical(const QnParam &param, const QVariant& val )
+bool QnArecontPanoramicResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
@@ -171,7 +171,7 @@ bool CLArecontPanoramicResource::setParamPhysical(const QnParam &param, const QV
     return true;
 }
 
-bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
+bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
 {
     Q_UNUSED(domain);
 
@@ -192,8 +192,14 @@ bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QVar
     return false;
 }
 
+void QnArecontPanoramicResource::init()
+{
+    QnPlAreconVisionResource::init();
+    setRegister(3, 100, 15); // sets I frame frequency to 1/20
+}
+
 //=======================================================================
-bool CLArecontPanoramicResource::setResolution(bool full)
+bool QnArecontPanoramicResource::setResolution(bool full)
 {
     int value = full ? 15 : 0; // all sensors to full/half resolution
 
@@ -203,7 +209,7 @@ bool CLArecontPanoramicResource::setResolution(bool full)
     return true;
 }
 
-bool CLArecontPanoramicResource::setCamQuality(int q)
+bool QnArecontPanoramicResource::setCamQuality(int q)
 {
     if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
         return false;
@@ -215,7 +221,7 @@ bool CLArecontPanoramicResource::setCamQuality(int q)
 
 }
 
-const QnVideoResourceLayout* CLArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
+const QnVideoResourceLayout* QnArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
 {
     return m_vrl;
 }
