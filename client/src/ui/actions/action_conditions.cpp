@@ -100,6 +100,9 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 
 bool QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources) {
+        if(!resource)
+            continue; /* OK to remove. */
+
         if(resource->checkFlags(QnResource::user) || resource->checkFlags(QnResource::layout))
             continue; /* OK to remove. */
 

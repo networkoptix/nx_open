@@ -39,14 +39,16 @@ public:
     /**
      * Constructor for resource nodes. 
      */
-    Node(QnResourceModel *model, const QnId &id): 
+    Node(QnResourceModel *model, const QnResourcePtr &resource): 
         m_model(model),
         m_type(Resource),
-        m_id(id), 
         m_state(Invalid),
-        m_parent(NULL)
+        m_parent(NULL),
+        m_status(QnResource::Offline)
     {
         assert(model != NULL);
+
+        setResource(resource);
     }
 
     /**
@@ -55,10 +57,10 @@ public:
     Node(QnResourceModel *model, const QUuid &uuid):
         m_model(model),
         m_type(Item),
-        m_id(0),
         m_uuid(uuid),
         m_state(Invalid),
-        m_parent(NULL)
+        m_parent(NULL),
+        m_status(QnResource::Offline)
     {
         assert(model != NULL);
     }
@@ -76,7 +78,14 @@ public:
         if(m_resource == resource)
             return;
 
+        if(m_resource && m_type == Item)
+            m_model->m_itemNodesByResource[m_resource.data()].removeOne(this);
+
         m_resource = resource;
+
+        if(m_resource && m_type == Item)
+            m_model->m_itemNodesByResource[m_resource.data()].push_back(this);
+        
         update();
     }
 
@@ -93,34 +102,9 @@ public:
             m_status = m_resource->getStatus();
             m_searchString = m_resource->toSearchString();
             m_icon = qnResIconCache->icon(m_flags, m_status);
-
-            if(m_type == Item) {
-                setId(m_resource->getId());
-            } else {
-                assert(m_id == m_resource->getId());
-            }
         }
 
         changeInternal();
-    }
-
-    const QnId &id() const {
-        return m_id;
-    }
-
-    void setId(const QnId &id) {
-        assert(m_type == Item);
-
-        if(m_id == id)
-            return;
-
-        if(m_id.isValid())
-            m_model->m_itemNodesById[m_id].removeOne(this);
-
-        m_id = id;
-
-        if(m_id.isValid())
-            m_model->m_itemNodesById[m_id].push_back(this);
     }
 
     const QUuid &uuid() const {
@@ -197,7 +181,7 @@ public:
         case Resource:
         case Item:
             if(m_flags & QnResource::layout)
-                result |= Qt::ItemIsEditable;
+                result |= Qt::ItemIsEditable; /* Only layouts are currently editable - user can change layout's name. */
             if(m_flags & QnResource::media)
                 result |= Qt::ItemIsDragEnabled;
             break;
@@ -230,10 +214,6 @@ public:
         case Qn::ResourceFlagsRole:
             if(!m_resource.isNull())
                 return static_cast<int>(m_flags);
-            break;
-        case Qn::IdRole: 
-            if(m_id.isValid())
-                return QVariant::fromValue<QnId>(m_id);
             break;
         case Qn::UuidRole:
             if(m_type == Item)
@@ -315,13 +295,11 @@ private:
     /** Uuid that this node represents. */
     const QUuid m_uuid;
 
-    /** Id that this node represents. */
-    QnId m_id;
+    /** Resource associated with this node. */
+    QnResourcePtr m_resource;
 
     /** Whether this node is valid, i.e. represents an entity that should be
-     * visible in the view.
-     * 
-     *  */
+     * visible in the view. */
     State m_state;
 
     /** Parent of this node. */
@@ -332,9 +310,6 @@ private:
 
 
     /* Resource-related state. */
-
-    /** Resource associated with this node. */
-    QnResourcePtr m_resource;
 
     /** Resource flags. */
     QnResource::Flags m_flags;
@@ -365,20 +340,21 @@ QnResourceModel::QnResourceModel(QObject *parent):
     QHash<int, QByteArray> roles = roleNames();
     roles.insert(Qn::ResourceRole,      "resource");
     roles.insert(Qn::ResourceFlagsRole, "flags");
-    roles.insert(Qn::IdRole,            "id");
     roles.insert(Qn::UuidRole,          "uuid");
     roles.insert(Qn::SearchStringRole,  "searchString");
     roles.insert(Qn::StatusRole,        "status");
     setRoleNames(roles);
 
     /* Create root. */
-    m_root = this->node(QnId());;
+    m_root = this->node(QnResourcePtr());
     m_root->setState(Node::Normal);
 }
 
 QnResourceModel::~QnResourceModel() {
     setResourcePool(NULL);
-    delete m_root;
+    
+    qDeleteAll(m_resourceNodeByResource);
+    qDeleteAll(m_itemNodeByUuid);
 }
 
 void QnResourceModel::setResourcePool(QnResourcePool *resourcePool) {
@@ -423,10 +399,11 @@ void QnResourceModel::stop() {
         at_resPool_resourceRemoved(resource);
 }
 
-QnResourceModel::Node *QnResourceModel::node(const QnId &id) {
-    QHash<QnId, Node *>::iterator pos = m_resourceNodeById.find(id);
-    if(pos == m_resourceNodeById.end())
-        pos = m_resourceNodeById.insert(id, new Node(this, id));
+QnResourceModel::Node *QnResourceModel::node(const QnResourcePtr &resource) {
+    QnResource *index = resource.data();
+    QHash<QnResource *, Node *>::iterator pos = m_resourceNodeByResource.find(index);
+    if(pos == m_resourceNodeByResource.end())
+        pos = m_resourceNodeByResource.insert(index, new Node(this, resource));
     return *pos;
 }
 
@@ -591,7 +568,7 @@ void QnResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
         connect(layout.data(), SIGNAL(itemRemoved(const QnLayoutItemData &)),               this, SLOT(at_resource_itemRemoved(const QnLayoutItemData &)));
     }
 
-    Node *node = this->node(resource->getId());
+    Node *node = this->node(resource);
     node->setResource(resource);
 
     at_resource_parentIdChanged(resource);
@@ -602,8 +579,12 @@ void QnResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
 }
 
 void QnResourceModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    Node *node = this->node(resource->getId());
+    disconnect(resource.data(), NULL, this, NULL);
+
+    Node *node = this->node(resource);
     node->clear();
+
+    // TODO: delete node here?
 }
 
 void QnResourceModel::at_resPool_aboutToBeDestroyed() {
@@ -611,8 +592,8 @@ void QnResourceModel::at_resPool_aboutToBeDestroyed() {
 }
 
 void QnResourceModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
-    Node *node = this->node(resource->getId());
-    Node *parentNode = this->node(resource->getParentId());
+    Node *node = this->node(resource);
+    Node *parentNode = this->node(m_resourcePool->getResourceById(resource->getParentId()));
 
     node->setParent(parentNode);
 }
@@ -624,13 +605,13 @@ void QnResourceModel::at_resource_parentIdChanged() {
 void QnResourceModel::at_resource_resourceChanged() {
     QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
 
-    node(resource->getId())->update();
-    foreach(Node *node, m_itemNodesById[resource->getId()])
+    node(resource)->update();
+    foreach(Node *node, m_itemNodesByResource[resource.data()])
         node->update();
 }
 
 void QnResourceModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
-    Node *parentNode = this->node(layout->getId());
+    Node *parentNode = this->node(layout);
     Node *node = this->node(item.uuid);
 
     QnResourcePtr resource;

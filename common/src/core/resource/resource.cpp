@@ -517,9 +517,17 @@ QnId QnResource::getId() const
     QMutexLocker mutexLocker(&m_mutex);
     return m_id;
 }
+
 void QnResource::setId(QnId id) {
     QMutexLocker mutexLocker(&m_mutex);
+
+    if(m_id == id)
+        return;
+
+    QnId oldId = m_id;
     m_id = id;
+
+    emit idChanged(oldId, id);
 }
 
 QString QnResource::getUrl() const
