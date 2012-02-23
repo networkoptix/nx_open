@@ -45,7 +45,7 @@ void QnAction::removeChild(QnAction *action) {
 }
 
 bool QnAction::satisfiesCondition(Qn::ActionScope scope, const QVariant &items) const {
-    if(!(this->scope() & scope) && (this->scope() & Qn::ScopeMask))
+    if(!(this->scope() & scope) && scope != this->scope())
         return false;
 
     int size = QnActionTargetTypes::size(items);

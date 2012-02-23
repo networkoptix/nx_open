@@ -22,6 +22,7 @@
 #include <ui/dialogs/camerasettingsdialog.h>
 #include <ui/dialogs/connectiontestingdialog.h>
 #include <ui/dialogs/multiplecamerasettingsdialog.h>
+#include <ui/dialogs/layout_save_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
@@ -32,7 +33,33 @@
 #include "workbench_synchronizer.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
-#include "ui/dialogs/layout_save_dialog.h"
+
+namespace {
+    enum RemovedResourceType {
+        Layout,
+        User,
+        Server,
+        Camera,
+        Other,
+        Count
+    };
+
+    RemovedResourceType removedResourceType(const QnResourcePtr &resource) {
+        if(resource->checkFlags(QnResource::layout)) {
+            return Layout;
+        } else if(resource->checkFlags(QnResource::user)) {
+            return User;
+        } else if(resource->checkFlags(QnResource::server)) {
+            return Server;
+        } else if(resource->checkFlags(QnResource::live_cam)) {
+            return Camera;
+        } else {
+            qnWarning("Getting removal type for an unrecognized resource '%1' of type '%2'", resource->getName(), resource->metaObject()->className());
+            return Other;
+        }
+    }
+
+} // anonymous namespace
 
 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
@@ -85,11 +112,11 @@ void QnWorkbenchActionHandler::setSynchronizer(QnWorkbenchSynchronizer *synchron
 void QnWorkbenchActionHandler::initialize() {
     assert(m_workbench != NULL);
 
-    connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(showAboutDialog()));
-    connect(qnAction(Qn::PreferencesAction),                SIGNAL(triggered()),    this,   SLOT(showPreferencesDialog()));
-    connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(showOpenFileDialog()));
-    connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(showAuthenticationDialog()));
-    connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(openNewLayout()));
+    connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
+    connect(qnAction(Qn::PreferencesAction),                SIGNAL(triggered()),    this,   SLOT(at_preferencesAction_triggered()));
+    connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
+    connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
+    connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(qnAction(Qn::CameraSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(qnAction(Qn::MultipleCameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
@@ -106,14 +133,6 @@ void QnWorkbenchActionHandler::deinitialize() {
 
     foreach(QAction *action, qnMenu->actions())
         disconnect(action, NULL, this, NULL);
-}
-
-void QnWorkbenchActionHandler::at_workbench_aboutToBeDestroyed() {
-    setWorkbench(NULL);
-}
-
-void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
-    setSynchronizer(NULL);
 }
 
 QString QnWorkbenchActionHandler::newLayoutName() const {
@@ -143,91 +162,32 @@ QString QnWorkbenchActionHandler::newLayoutName() const {
     return layoutNumber == 0 ? zeroName : nonZeroName.arg(layoutNumber);
 }
 
-void QnWorkbenchActionHandler::addNewLayout() {
+bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
+    if(!resource->checkFlags(QnResource::layout))
+        return false;
+
+    QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
+    return m_synchronizer->isLocal(layout) && !m_synchronizer->isChanged(layout);
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnWorkbenchActionHandler::at_workbench_aboutToBeDestroyed() {
+    setWorkbench(NULL);
+}
+
+void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
+    setSynchronizer(NULL);
+}
+
+void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
     layout->setName(newLayoutName());
 
     m_workbench->addLayout(layout);
-    if(m_workbench->layouts().size() == 1)
-        m_workbench->setCurrentLayout(m_workbench->layouts().back());
-}
-
-void QnWorkbenchActionHandler::openNewLayout() {
-    addNewLayout();
-
     m_workbench->setCurrentLayout(m_workbench->layouts().back());
-}
-
-void QnWorkbenchActionHandler::showOpenFileDialog() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(widget(), tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
-    dialog->setFileMode(QFileDialog::ExistingFiles);
-    QStringList filters;
-    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
-    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("All files (*.*)");
-    dialog->setNameFilters(filters);
-    
-    if (dialog->exec()) {
-        QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(dialog->selectedFiles()));
-        foreach(const QnResourcePtr &resource, resources) {
-            QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-            item->setFlag(QnWorkbenchItem::Pinned, false);
-            m_workbench->currentLayout()->addItem(item);
-            item->adjustGeometry();
-        }
-    }
-}
-
-void QnWorkbenchActionHandler::showAboutDialog() {
-    QScopedPointer<AboutDialog> dialog(new AboutDialog(widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::showPreferencesDialog() {
-    QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::showAuthenticationDialog() {
-    static LoginDialog *dialog = 0;
-    if (dialog)
-        return;
-
-    const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
-    if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
-        return;
-
-    dialog = new LoginDialog(widget());
-    dialog->setModal(true);
-    if (dialog->exec()) {
-        const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
-        if (connection.url.isValid()) {
-            QnEventManager::instance()->stop();
-            SessionManager::instance()->stop();
-
-            QnAppServerConnectionFactory::setDefaultUrl(connection.url);
-
-            // repopulate the resource pool
-            QnResource::stopCommandProc();
-            QnResourceDiscoveryManager::instance().stop();
-
-            // don't remove local resources
-            const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
-            qnResPool->removeResources(remoteResources);
-
-            SessionManager::instance()->start();
-            QnEventManager::instance()->run();
-
-            QnResourceDiscoveryManager::instance().start();
-            QnResource::startCommandProc();
-        }
-    }
-    delete dialog;
-    dialog = 0;
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
@@ -263,21 +223,86 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
 
     if(close) {
         if(m_workbench->layouts().size() == 1)
-            addNewLayout();
+            at_newLayoutAction_triggered();
         delete layout;
 
         if(isLocal) {
-            m_synchronizer->user()->removeLayout(resource);
+            m_synchronizer->user()->removeLayout(resource); // TODO
             qnResPool->removeResource(resource);
         }
     }
 }
 
-void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
-    if(status == 0)   
+void QnWorkbenchActionHandler::at_openFileAction_triggered() {
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(widget(), tr("Open file")));
+    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog->setFileMode(QFileDialog::ExistingFiles);
+    QStringList filters;
+    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
+    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("All files (*.*)");
+    dialog->setNameFilters(filters);
+    
+    if (dialog->exec()) {
+        QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(dialog->selectedFiles()));
+        foreach(const QnResourcePtr &resource, resources) {
+            QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+            item->setFlag(QnWorkbenchItem::Pinned, false);
+            m_workbench->currentLayout()->addItem(item);
+            item->adjustGeometry();
+        }
+    }
+}
+
+void QnWorkbenchActionHandler::at_aboutAction_triggered() {
+    QScopedPointer<AboutDialog> dialog(new AboutDialog(widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_preferencesAction_triggered() {
+    QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
+    static LoginDialog *dialog = 0;
+    if (dialog)
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
+    const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
+    if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
+        return;
+
+    dialog = new LoginDialog(widget());
+    dialog->setModal(true);
+    if (dialog->exec()) {
+        const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
+        if (connection.url.isValid()) {
+            QnEventManager::instance()->stop();
+            SessionManager::instance()->stop();
+
+            QnAppServerConnectionFactory::setDefaultUrl(connection.url);
+
+            // repopulate the resource pool
+            QnResource::stopCommandProc();
+            QnResourceDiscoveryManager::instance().stop();
+
+            // don't remove local resources
+            const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
+            qnResPool->removeResources(remoteResources);
+
+            SessionManager::instance()->start();
+            QnEventManager::instance()->run();
+
+            QnResourceDiscoveryManager::instance().start();
+            QnResource::startCommandProc();
+        }
+    }
+    delete dialog;
+    dialog = 0;
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -348,42 +373,6 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
         index.layout()->removeItem(index.uuid());
 }
 
-
-namespace {
-    enum RemovedResourceType {
-        Layout,
-        User,
-        Server,
-        Camera,
-        Other,
-        Count
-    };
-
-    RemovedResourceType removedResourceType(const QnResourcePtr &resource) {
-        if(resource->checkFlags(QnResource::layout)) {
-            return Layout;
-        } else if(resource->checkFlags(QnResource::user)) {
-            return User;
-        } else if(resource->checkFlags(QnResource::server)) {
-            return Server;
-        } else if(resource->checkFlags(QnResource::live_cam)) {
-            return Camera;
-        } else {
-            qnWarning("Getting removal type for an unrecognized resource '%1' of type '%2'", resource->getName(), resource->metaObject()->className());
-            return Other;
-        }
-    }
-
-} // anonymous namespace
-
-bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
-    if(!resource->checkFlags(QnResource::layout))
-        return false;
-
-    QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
-    return m_synchronizer->isLocal(layout) && !m_synchronizer->isChanged(layout);
-}
-
 void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     QnResourceList resources = qnMenu->currentResourcesTarget(sender());
     
@@ -401,7 +390,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         }
     }
 
-    /* Ask if it is OK to delete it all. */
+    /* Ask if needed. */
     if(!okToDelete) {
         QString message;
 
@@ -446,7 +435,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         case Layout: {
             QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
             if(m_synchronizer->isLocal(layout)) {
-                m_synchronizer->user()->removeLayout(layout);
+                m_synchronizer->user()->removeLayout(layout); // TODO
                 qnResPool->removeResource(resource);
                 break;
             }
@@ -467,3 +456,9 @@ void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray 
     QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from application server. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
 }
 
+void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
+    if(status == 0)   
+        return;
+
+    QMessageBox::critical(widget(), tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
+}

@@ -46,20 +46,19 @@ protected slots:
     void at_workbench_aboutToBeDestroyed();
     void at_synchronizer_destroyed();
 
-    void showOpenFileDialog();
-    void showAboutDialog();
-    void showPreferencesDialog();
-    void showAuthenticationDialog();
-
-    void addNewLayout();
-    void openNewLayout();
-
+    void at_newLayoutAction_triggered();
     void at_closeLayoutAction_triggered();
+
+    void at_openFileAction_triggered();
+    void at_aboutAction_triggered();
+    void at_preferencesAction_triggered();
+    void at_connectionSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_multipleCamerasSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
+
     void at_openInFolderAction_triggered();
     void at_removeLayoutItemAction_triggered();
     void at_removeFromServerAction_triggered();

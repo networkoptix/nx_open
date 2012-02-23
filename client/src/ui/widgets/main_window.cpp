@@ -504,7 +504,7 @@ void QnMainWindow::paintEvent(QPaintEvent *event)
             0,
             width() - 1,
             height() - 1
-            ));
+        ));
     }
 }
 
@@ -517,7 +517,7 @@ void QnMainWindow::resizeEvent(QResizeEvent *event) {
         viewGeometry.top(),
         rect.right() - viewGeometry.right(),
         rect.bottom() - viewGeometry.bottom()
-        ));
+    ));
 
     base_type::resizeEvent(event);
 }
