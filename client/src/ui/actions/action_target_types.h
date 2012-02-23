@@ -19,6 +19,8 @@ public:
 
     static int layoutItemList();
 
+    static int layoutList();
+
     static void initialize();
 
     static int size(const QVariant &items);
@@ -31,11 +33,15 @@ public:
 
     static QnResourceList resources(const QnLayoutItemIndexList &layoutItems);
 
+    static QnResourceList resources(const QnWorkbenchLayoutList &layouts);
+
     static QnResourceList resources(const QVariant &items);
 
     static QnLayoutItemIndexList layoutItems(const QnResourceWidgetList &widgets);
 
     static QnLayoutItemIndexList layoutItems(const QVariant &items);
+
+    static QnWorkbenchLayoutList layouts(const QVariant &items);
 
     static QnResourceWidgetList widgets(const QVariant &items);
 
@@ -44,5 +50,6 @@ public:
 };
 
 Q_DECLARE_METATYPE(QnResourceWidgetList);
+Q_DECLARE_METATYPE(QnWorkbenchLayoutList);
 
 #endif // QN_ACTION_TARGET_TYPES_H

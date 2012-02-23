@@ -28,6 +28,22 @@ public:
 
     QAction *action(Qn::ActionId id) const;
 
+    QList<QnAction *> actions() const;
+
+    void trigger(Qn::ActionId id);
+
+    void trigger(Qn::ActionId id, const QVariant &items);
+
+    void trigger(Qn::ActionId id, const QnResourceList &resources);
+
+    void trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items);
+
+    void trigger(Qn::ActionId id, const QnResourceWidgetList &widgets);
+
+    void trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts);
+
+    void trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems);
+
     QMenu *newMenu(Qn::ActionScope scope);
 
     QMenu *newMenu(Qn::ActionScope scope, const QVariant &items);
@@ -37,6 +53,8 @@ public:
     QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
 
     QMenu *newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets);
+
+    QMenu *newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts);
 
     QMenu *newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems);
 
@@ -56,6 +74,8 @@ public:
 
     QnLayoutItemIndexList currentLayoutItemsTarget(QnAction *action) const;
 
+    QnWorkbenchLayoutList currentLayoutsTarget(QnAction *action) const;
+
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
 
     Qn::ActionTarget currentTargetType(QObject *sender) const;
@@ -68,11 +88,15 @@ public:
 
     QnLayoutItemIndexList currentLayoutItemsTarget(QObject *sender) const;
 
+    QnWorkbenchLayoutList currentLayoutsTarget(QObject *sender) const;
+
     QnResourceWidgetList currentWidgetsTarget(QObject *sender) const;
 
 protected:
     friend class QnAction;
     friend class QnActionFactory;
+
+    void triggerInternal(Qn::ActionId id, const QVariant &items);
 
     QMenu *newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
 

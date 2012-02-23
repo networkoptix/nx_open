@@ -47,13 +47,21 @@ void QnWorkbenchSynchronizer::setWorkbench(QnWorkbench *workbench) {
     if(m_workbench == workbench)
         return;
 
-    if(m_workbench != NULL && !m_user.isNull())
-        stop();
+    if(m_workbench != NULL) {
+        disconnect(m_workbench, NULL, this, NULL);
+
+        if(!m_user.isNull())
+            stop();
+    }
 
     m_workbench = workbench;
 
-    if(m_workbench != NULL && !m_user.isNull())
-        start();
+    if(m_workbench != NULL) {
+        connect(m_workbench, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_workbench_aboutToBeDestroyed()));
+
+        if(!m_user.isNull())
+            start();
+    }
 }
 
 void QnWorkbenchSynchronizer::setUser(const QnUserResourcePtr &user) {
@@ -156,7 +164,6 @@ void QnWorkbenchSynchronizer::start() {
     /* Start listening to changes. */
     connect(m_user.data(),      SIGNAL(resourceChanged()),                  this, SLOT(at_user_resourceChanged()));
 
-    connect(m_workbench,        SIGNAL(aboutToBeDestroyed()),               this, SLOT(at_workbench_aboutToBeDestroyed()));
     connect(m_workbench,        SIGNAL(layoutsChanged()),                   this, SLOT(at_workbench_layoutsChanged()));
 
     m_submit = m_update = true;

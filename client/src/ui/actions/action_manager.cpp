@@ -152,6 +152,27 @@ private:
 // -------------------------------------------------------------------------- //
 // QnActionManager 
 // -------------------------------------------------------------------------- //
+namespace {
+    QnAction *checkSender(QObject *sender) {
+        QnAction *result = qobject_cast<QnAction *>(sender);
+        if(result == NULL)
+            qnWarning("Cause cannot be determined for non-QnAction senders.");
+        return result;
+    }
+
+    bool checkType(const QVariant &items) {
+        int type = items.userType();
+        if(type != QnActionTargetTypes::resourceList() && type != QnActionTargetTypes::widgetList() && type != QnActionTargetTypes::layoutItemList() && type != QnActionTargetTypes::layoutList()) {
+            qnWarning("Unrecognized menu target type '%1'.", items.typeName());
+            return false;
+        }
+
+        return true;
+    }
+
+} // anonymous namespace
+
+
 QnActionManager::QnActionManager(QObject *parent): 
     QObject(parent),
     m_shortcutAction(NULL),
@@ -186,14 +207,14 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+F")).
         autoRepeat(false);
 
-    factory(Qn::NewTabAction).
+    factory(Qn::NewLayoutAction).
         flags(Qn::NoTarget).
         text(tr("New Layout")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
-    factory(Qn::CloseTabAction).
+    factory(Qn::CloseLayoutAction).
         flags(Qn::NoTarget).
         text(tr("Close Layout")).
         shortcut(tr("Ctrl+W")).
@@ -268,6 +289,16 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::QuitRole).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
+
+
+
+    /* Tab bar actions. */
+    factory(Qn::CloseLayoutAction).
+        flags(Qn::TabBar).
+        text(tr("Close")).
+        shortcut(tr("Ctrl+W")).
+        autoRepeat(false).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
 
 
@@ -418,18 +449,52 @@ QAction *QnActionManager::action(Qn::ActionId id) const {
     return m_actionById.value(id, NULL);
 }
 
+QList<QnAction *> QnActionManager::actions() const {
+    return m_actionById.values();
+}
+
+void QnActionManager::trigger(Qn::ActionId id) {
+    triggerInternal(id, QVariant::fromValue(QnResourceList()));
+}
+
+void QnActionManager::trigger(Qn::ActionId id, const QVariant &items) {
+    if(checkType(items)) {
+        return triggerInternal(id, items);
+    } else {
+        return triggerInternal(id, QVariant::fromValue(QnResourceList()));
+    }
+}
+
+void QnActionManager::trigger(Qn::ActionId id, const QnResourceList &resources) {
+    triggerInternal(id, QVariant::fromValue(resources));
+}
+
+void QnActionManager::trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items) {
+    trigger(id, QnActionTargetTypes::widgets(items));
+}
+
+void QnActionManager::trigger(Qn::ActionId id, const QnResourceWidgetList &widgets) {
+    triggerInternal(id, QVariant::fromValue(widgets));
+}
+
+void QnActionManager::trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts) {
+    triggerInternal(id, QVariant::fromValue(layouts));
+}
+
+void QnActionManager::trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems) {
+    triggerInternal(id, QVariant::fromValue(layoutItems));
+}
+
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope) {
     return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()));
 }
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QVariant &items) {
-    int type = items.userType();
-    if(type != QnActionTargetTypes::resourceList() && type != QnActionTargetTypes::widgetList() && type != QnActionTargetTypes::layoutItemList()) {
-        qnWarning("Unrecognized menu target type '%1'.", items.typeName());
+    if(checkType(items)) {
+        return newMenuInternal(m_root, scope, items);
+    } else {
         return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()));
     }
-
-    return newMenuInternal(m_root, scope, items);
 }
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceList &resources) {
@@ -444,8 +509,27 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceWidgetLis
     return newMenuInternal(m_root, scope, QVariant::fromValue(widgets));
 }
 
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(layouts));
+}
+
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems) {
     return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems));
+}
+
+void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items) {
+    QnAction *action = m_actionById.value(id);
+    if(action == NULL) {
+        qnWarning("Invalid action id '%1'.", static_cast<int>(id));
+        return;
+    }
+
+    m_lastTarget = items;
+    m_shortcutAction = action;
+    
+    action->trigger();
+
+    m_shortcutAction = NULL;
 }
 
 QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
@@ -521,6 +605,10 @@ QnResourcePtr QnActionManager::currentResourceTarget(QnAction *action) const {
     return resources.isEmpty() ? QnResourcePtr() : resources.front();
 }
 
+QnWorkbenchLayoutList QnActionManager::currentLayoutsTarget(QnAction *action) const {
+    return QnActionTargetTypes::layouts(currentTarget(action));
+}
+
 QnLayoutItemIndexList QnActionManager::currentLayoutItemsTarget(QnAction *action) const {
     return QnActionTargetTypes::layoutItems(currentTarget(action));
 }
@@ -528,16 +616,6 @@ QnLayoutItemIndexList QnActionManager::currentLayoutItemsTarget(QnAction *action
 QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) const {
     return QnActionTargetTypes::widgets(currentTarget(action));
 }
-
-namespace {
-    QnAction *checkSender(QObject *sender) {
-        QnAction *result = qobject_cast<QnAction *>(sender);
-        if(result == NULL)
-            qnWarning("Cause cannot be determined for non-QnAction senders.");
-        return result;
-    }
-
-} // anonymous namespace
 
 Qn::ActionTarget QnActionManager::currentTargetType(QObject *sender) const {
     return QnActionTargetTypes::target(currentTarget(sender));
@@ -572,6 +650,14 @@ QnLayoutItemIndexList QnActionManager::currentLayoutItemsTarget(QObject *sender)
         return currentLayoutItemsTarget(action);
     } else {
         return QnLayoutItemIndexList();
+    }
+}
+
+QnWorkbenchLayoutList QnActionManager::currentLayoutsTarget(QObject *sender) const {
+    if(QnAction *action = checkSender(sender)) {
+        return currentLayoutsTarget(action);
+    } else {
+        return QnWorkbenchLayoutList();
     }
 }
 

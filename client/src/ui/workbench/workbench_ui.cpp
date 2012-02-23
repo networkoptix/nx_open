@@ -342,7 +342,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(qnAction(Qn::NewTabAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::NewLayoutAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
@@ -512,10 +512,15 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
 
     /* Compare to action's scope. */
     if(!(action->scope() & scope))
-        return QVariant();
+        scope = action->scope();
     
     /* Get items. */
     switch(scope) {
+    case Qn::TabBarScope: {
+        QnWorkbenchLayoutList result;
+        result.push_back(m_display->workbench()->currentLayout());
+        return QVariant::fromValue(result);
+    }
     case Qn::TreeScope:
         return m_treeWidget->target(action);
     case Qn::SliderScope: {
