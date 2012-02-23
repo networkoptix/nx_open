@@ -842,6 +842,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     {
         QMutexLocker mutex(&m_jumpMtx);
 		beforeJumpInternal(newTime);
+        setNeedKeyData();
         channeljumpToUnsync(newTime, 0, skipTime);
     }
 
