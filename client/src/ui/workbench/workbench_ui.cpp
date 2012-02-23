@@ -377,7 +377,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
 
-    connect(tabBarWidget,               SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SIGNAL(closeRequested(QnWorkbenchLayout *)));
+    connect(tabBarWidget,               SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
     connect(m_titleShowButton,          SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_titleShowButton_toggled(bool)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateTitleOpacity()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateTitleOpacity()));
@@ -1328,6 +1328,12 @@ void QnWorkbenchUi::at_treePinButton_toggled(bool checked) {
     updateViewportMargins();
 }
 
+void QnWorkbenchUi::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
+    QnWorkbenchLayoutList layouts;
+    layouts.push_back(layout);
+    qnMenu->trigger(Qn::CloseLayoutAction, layouts);
+}
+
 void QnWorkbenchUi::at_titleShowButton_toggled(bool checked) {
     if(!m_ignoreClickEvent)
         setTitleOpened(checked);
@@ -1402,3 +1408,4 @@ void QnWorkbenchUi::at_helpItem_paintGeometryChanged() {
 
     updateViewportMargins();
 }
+
