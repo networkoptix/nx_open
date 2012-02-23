@@ -214,12 +214,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
-    factory(Qn::CloseLayoutAction).
-        flags(Qn::NoTarget).
-        text(tr("Close Layout")).
-        shortcut(tr("Ctrl+W")).
-        autoRepeat(true);
-
 
 
     /* Main menu actions. */
@@ -297,8 +291,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::TabBar).
         text(tr("Close")).
         shortcut(tr("Ctrl+W")).
-        autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+        autoRepeat(false);
 
 
 

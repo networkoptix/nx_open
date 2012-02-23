@@ -15,6 +15,10 @@ bool QnActionCondition::check(const QVariant &items) {
         return check(items.value<QnResourceList>());
     } else if(items.userType() == QnActionTargetTypes::widgetList()) {
         return check(items.value<QnResourceWidgetList>());
+    } else if(items.userType() == QnActionTargetTypes::layoutList()) {
+        return true;
+    } else if(items.userType() == QnActionTargetTypes::layoutItemList()) {
+        return true;
     } else {
         qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
         return false;
