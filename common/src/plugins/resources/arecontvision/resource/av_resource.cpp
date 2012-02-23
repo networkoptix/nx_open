@@ -403,7 +403,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
     QnPlAreconVisionResource* res = 0;
 
     if (isPanoramic(resourceType->getName()))
-        res = new CLArecontPanoramicResource(resourceType->getName());
+        res = new QnArecontPanoramicResource(resourceType->getName());
     else
         res = new CLArecontSingleSensorResource(resourceType->getName());
 
