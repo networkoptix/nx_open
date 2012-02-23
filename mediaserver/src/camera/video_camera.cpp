@@ -20,13 +20,16 @@ public:
     virtual bool canAcceptData() const;
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool processData(QnAbstractDataPacketPtr data);
+
 private:
     QMutex m_queueMtx;
+    int m_lastKeyFrameChannel;
 };
 
 QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource): 
     QnResourceConsumer(resource),
-    QnAbstractDataConsumer(100)
+    QnAbstractDataConsumer(220),
+    m_lastKeyFrameChannel(0)
 {
 }
 
@@ -45,14 +48,23 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
+bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNumber)
+{
+    int ch = channelNumber.toInt();
+    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    return media && media->channelNumber == ch;
+}
+
 void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return;
     QMutexLocker lock(&m_queueMtx);
-    if (media->flags & AV_PKT_FLAG_KEY)
-        m_dataQueue.clear();
+    if (media->flags & AV_PKT_FLAG_KEY) {
+        m_lastKeyFrameChannel = media->channelNumber;
+        m_dataQueue.removeDataByCondition(channelCheckFunctor, media->channelNumber);
+    }
     if (m_dataQueue.size() < m_dataQueue.maxSize()) {
         media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         QnAbstractDataConsumer::putData(data);
