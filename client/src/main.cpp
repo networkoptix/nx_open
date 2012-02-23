@@ -470,6 +470,9 @@ int main(int argc, char *argv[])
         out << autoTester.message();
     }
 
+    QnEventManager::instance()->stop();
+    SessionManager::instance()->stop();
+
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
 

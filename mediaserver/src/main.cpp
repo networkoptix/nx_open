@@ -113,17 +113,38 @@ QString defaultLocalAddress(const QHostAddress& target)
         socket.connectToHost(target, 53);
 
         if (socket.localAddress() != QHostAddress::LocalHost)
-            return socket.localAddress().toString();
+            return socket.localAddress().toString(); // if app server is on other computer we use same address as used to connect to app server 
     }
 
     {
         // try select default interface
-
         QUdpSocket socket;
         socket.connectToHost("8.8.8.8", 53);
+        QString result = socket.localAddress().toString();
 
-        return socket.localAddress().toString();
+        if (result.length()>0)
+            return result;
     }
+
+
+    {
+        // if nothing else works use first enabled hostaddr
+        QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+
+        for (int i = 0; i < ipaddrs.size();++i)
+        {
+            QUdpSocket socket;
+            if (!socket.bind(ipaddrs.at(i), 0))
+                continue;
+
+            QString result = socket.localAddress().toString();
+
+            Q_ASSERT(result.length() > 0 );
+
+            return result;
+        }
+    }
+
 }
 
 QString localMac(const QString& myAddress)
