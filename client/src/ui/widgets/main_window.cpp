@@ -189,7 +189,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_actionHandler->setSynchronizer(m_synchronizer);
     m_actionHandler->setWidget(this);
 
-    connect(m_ui,               SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
     connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
     connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
     connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
@@ -225,7 +224,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBar->setWorkbench(m_workbench);
 
-    connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
+    connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
+
 
     /* Tab bar layout. To snap tab bar to graphics view. */
     QVBoxLayout *tabBarLayout = new QVBoxLayout();
@@ -579,8 +579,9 @@ void QnMainWindow::at_synchronizer_started() {
     }
 }
 
-void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
+void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     QnWorkbenchLayoutList layouts;
     layouts.push_back(layout);
     qnMenu->trigger(Qn::CloseLayoutAction, layouts);
 }
+

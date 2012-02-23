@@ -72,7 +72,7 @@ protected slots:
 
     void at_synchronizer_started();
 
-    void at_layout_closeRequested(QnWorkbenchLayout *layout);
+    void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
