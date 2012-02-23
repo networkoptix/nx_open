@@ -98,9 +98,6 @@ public:
         return m_helpVisible;
     }
 
-signals:
-    void closeRequested(QnWorkbenchLayout *layout);
-
 public slots:
     void setTitleUsed(bool titleUsed);
     void setFpsVisible(bool fpsVisible);
@@ -183,6 +180,7 @@ protected slots:
     void at_treeShowButton_toggled(bool checked);
     void at_treePinButton_toggled(bool checked);
 
+    void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_titleItem_geometryChanged();
     void at_titleShowButton_toggled(bool checked);
 

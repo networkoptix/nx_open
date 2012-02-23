@@ -86,6 +86,24 @@ public:
         }
     }
 
+    template <class ConditionFunc>
+    void removeDataByCondition(const ConditionFunc& cond, QVariant opaque)
+    {
+        QMutexLocker mutex(&m_cs);
+        QQueue<T>::iterator itr = m_queue.begin();
+        while (itr != m_queue.end())
+        {
+            if (cond(*itr, opaque))
+            {
+                m_sem.acquire(1);
+                itr = m_queue.erase(itr);
+            }
+            else {
+                ++itr;
+            }
+        }
+    }
+
     int size() const
     {
         QMutexLocker mutex(&m_cs);

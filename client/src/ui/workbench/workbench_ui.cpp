@@ -44,7 +44,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_meta_types.h>
+#include <ui/actions/action_target_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_context_widget.h>
@@ -342,7 +342,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(qnAction(Qn::NewTabAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::NewLayoutAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
@@ -377,7 +377,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
 
-    connect(tabBarWidget,               SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SIGNAL(closeRequested(QnWorkbenchLayout *)));
+    connect(tabBarWidget,               SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
     connect(m_titleShowButton,          SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_titleShowButton_toggled(bool)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateTitleOpacity()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateTitleOpacity()));
@@ -512,12 +512,17 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
 
     /* Compare to action's scope. */
     if(!(action->scope() & scope))
-        return QVariant();
+        scope = action->scope();
     
     /* Get items. */
     switch(scope) {
+    case Qn::TabBarScope: {
+        QnWorkbenchLayoutList result;
+        result.push_back(m_display->workbench()->currentLayout());
+        return QVariant::fromValue(result);
+    }
     case Qn::TreeScope:
-        return QVariant::fromValue(m_treeWidget->selectedResources());
+        return m_treeWidget->target(action);
     case Qn::SliderScope: {
         QnResourceList result;
         CLVideoCamera *camera = m_sliderItem->videoCamera();
@@ -527,7 +532,7 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
         return QVariant::fromValue(result);
     }
     case Qn::SceneScope:
-        return QVariant::fromValue(QnActionMetaTypes::widgets(display()->scene()->selectedItems()));
+        return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
         return QVariant();
     }
@@ -1323,6 +1328,12 @@ void QnWorkbenchUi::at_treePinButton_toggled(bool checked) {
     updateViewportMargins();
 }
 
+void QnWorkbenchUi::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
+    QnWorkbenchLayoutList layouts;
+    layouts.push_back(layout);
+    qnMenu->trigger(Qn::CloseLayoutAction, layouts);
+}
+
 void QnWorkbenchUi::at_titleShowButton_toggled(bool checked) {
     if(!m_ignoreClickEvent)
         setTitleOpened(checked);
@@ -1397,3 +1408,4 @@ void QnWorkbenchUi::at_helpItem_paintGeometryChanged() {
 
     updateViewportMargins();
 }
+

@@ -8,6 +8,8 @@
 
 class QRegExp;
 
+class QnResourceCriterionGroup;
+
 class QN_EXPORT QnResourceCriterion {
 public:
     enum Operation {
@@ -68,7 +70,17 @@ public:
         m_mismatchOperation = mismatchOperation;
     }
 
+    Operation nextOperation() const {
+        return m_nextOperation;
+    }
+
+    void setNextOperation(Operation nextOperation) {
+        m_nextOperation = nextOperation;
+    }
+
     bool isGroup() const;
+
+    QnResourceCriterionGroup *asGroup();
 
     Type type() const {
         return m_type;
@@ -94,7 +106,7 @@ public:
 
     Operation check(const QnResourcePtr &resource) const;
 
-    QnResourceList filter(const QnResourceList &resources, Operation nextOperation = REJECT);
+    QnResourceList filter(const QnResourceList &resources);
 
 protected:
     void *targetValueData();
@@ -106,8 +118,9 @@ private:
         struct {
             Operation m_matchOperation : 4;
             Operation m_mismatchOperation : 4;
+            Operation m_nextOperation : 8;
             Type m_type : 8;
-            Target m_target : 16;
+            Target m_target : 8;
         };
 
         int m_padding;
@@ -145,5 +158,81 @@ private:
 
 Q_DECLARE_METATYPE(QnResourceCriterion *);
 Q_DECLARE_METATYPE(QnResourceCriterionList);
+
+
+namespace QnResourceCriterionExpressions {
+
+    class QnResourceCriterionExpression {
+    public:
+        QnResourceCriterionExpression(QnResourceCriterion *criterion): m_criterion(criterion) {}
+
+        operator QnResourceCriterion *() {
+            return m_criterion;
+        }
+
+    private:
+        QnResourceCriterion *m_criterion;
+    };
+
+    inline QnResourceCriterionExpression hasFlags(int flags) {
+        return new QnResourceCriterion(flags);
+    }
+
+    inline QnResourceCriterionExpression hasStatus(int status) {
+        return new QnResourceCriterion(status, QnResourceCriterion::EQUALITY, QnResourceCriterion::STATUS);
+    }
+
+    inline QnResourceCriterionExpression operator||(QnResourceCriterionExpression &le, QnResourceCriterionExpression &re) {
+        QnResourceCriterion *l = le, *r = re;
+
+        QnResourceCriterionGroup *result;
+        if(l->isGroup() && l->asGroup()->nextOperation() == QnResourceCriterion::REJECT) { /* Is OR operation. */
+            result = l->asGroup();
+
+            r->setMatchOperation(QnResourceCriterion::ACCEPT);
+            r->setMismatchOperation(QnResourceCriterion::NEXT);
+
+            result->addCriterion(r);
+        } else {
+            result = new QnResourceCriterionGroup();
+            l->setMatchOperation(QnResourceCriterion::ACCEPT);
+            l->setMismatchOperation(QnResourceCriterion::NEXT);
+
+            r->setMatchOperation(QnResourceCriterion::ACCEPT);
+            r->setMismatchOperation(QnResourceCriterion::NEXT);
+
+            result->setNextOperation(QnResourceCriterion::REJECT);
+        }
+
+        return result;
+    }
+
+    inline QnResourceCriterionExpression operator&&(QnResourceCriterionExpression &le, QnResourceCriterionExpression &re) {
+        QnResourceCriterion *l = le, *r = re;
+
+        QnResourceCriterionGroup *result;
+        if(l->isGroup() && l->asGroup()->nextOperation() == QnResourceCriterion::ACCEPT) { /* Is AND operation. */
+            result = l->asGroup();
+
+            r->setMatchOperation(QnResourceCriterion::NEXT);
+            r->setMismatchOperation(QnResourceCriterion::REJECT);
+
+            result->addCriterion(r);
+        } else {
+            result = new QnResourceCriterionGroup();
+            l->setMatchOperation(QnResourceCriterion::NEXT);
+            l->setMismatchOperation(QnResourceCriterion::REJECT);
+
+            r->setMatchOperation(QnResourceCriterion::NEXT);
+            r->setMismatchOperation(QnResourceCriterion::REJECT);
+
+            result->setNextOperation(QnResourceCriterion::ACCEPT);
+        }
+
+        return result;
+    }
+
+} // namespace QnResourceCriterionExpressions
+
 
 #endif // QN_RESOURCE_CRITERION_H

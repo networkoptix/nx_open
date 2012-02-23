@@ -29,6 +29,7 @@
 #include "ui/dialogs/multiplecamerasettingsdialog.h"
 #include "ui/dialogs/serversettingsdialog.h"
 #include "ui/dialogs/tagseditdialog.h"
+#include "ui/dialogs/layout_save_dialog.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "youtube/youtubeuploaddialog.h"
 
@@ -44,6 +45,7 @@
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_ui.h"
 #include "ui/workbench/workbench_synchronizer.h"
+#include "ui/workbench/workbench_action_handler.h"
 
 #include "ui/widgets/resource_tree_widget.h"
 
@@ -104,7 +106,8 @@ namespace {
     int minimalWindowWidth = 800;
     int minimalWindowHeight = 600;
 
-}
+} // anonymous namespace
+
 
 QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
@@ -181,7 +184,11 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
 
-    connect(m_ui,               SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
+    m_actionHandler = new QnWorkbenchActionHandler(this);
+    m_actionHandler->setWorkbench(m_workbench);
+    m_actionHandler->setSynchronizer(m_synchronizer);
+    m_actionHandler->setWidget(this);
+
     connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
     connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
     connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
@@ -194,28 +201,18 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(qnAction(Qn::PreferencesAction));
     addAction(qnAction(Qn::OpenFileAction));
     addAction(qnAction(Qn::ConnectionSettingsAction));
-    addAction(qnAction(Qn::NewTabAction));
-    addAction(qnAction(Qn::CloseTabAction));
+    addAction(qnAction(Qn::NewLayoutAction));
+    addAction(qnAction(Qn::CloseLayoutAction));
     addAction(qnAction(Qn::MainMenuAction));
     addAction(qnAction(Qn::YouTubeUploadAction));
     addAction(qnAction(Qn::EditTagsAction));
     addAction(qnAction(Qn::OpenInFolderAction));
+    addAction(qnAction(Qn::RemoveLayoutItemAction));
+    addAction(qnAction(Qn::RemoveFromServerAction));
 
-    connect(qnAction(Qn::ExitAction),                        SIGNAL(triggered()),    this,   SLOT(close()));
-    connect(qnAction(Qn::FullscreenAction),                  SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
-    connect(qnAction(Qn::AboutAction),                       SIGNAL(triggered()),    this,   SLOT(showAboutDialog()));
-    connect(qnAction(Qn::PreferencesAction),                 SIGNAL(triggered()),    this,   SLOT(showPreferencesDialog()));
-    connect(qnAction(Qn::OpenFileAction),                    SIGNAL(triggered()),    this,   SLOT(showOpenFileDialog()));
-    connect(qnAction(Qn::ConnectionSettingsAction),          SIGNAL(triggered()),    this,   SLOT(showAuthenticationDialog()));
-    connect(qnAction(Qn::NewTabAction),                      SIGNAL(triggered()),    this,   SLOT(openNewLayout()));
-    connect(qnAction(Qn::CloseTabAction),                    SIGNAL(triggered()),    this,   SLOT(closeCurrentLayout()));
-    connect(qnAction(Qn::MainMenuAction),                    SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
-    connect(qnAction(Qn::CameraSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(qnAction(Qn::MultipleCameraSettingsAction),      SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
-    connect(qnAction(Qn::ServerSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
-    connect(qnAction(Qn::YouTubeUploadAction),               SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(qnAction(Qn::EditTagsAction),                    SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggred()));
-    connect(qnAction(Qn::OpenInFolderAction),                SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
+    connect(qnAction(Qn::ExitAction),                       SIGNAL(triggered()),    this,   SLOT(close()));
+    connect(qnAction(Qn::FullscreenAction),                 SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
+    connect(qnAction(Qn::MainMenuAction),                   SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
 
     qnMenu->setTargetProvider(m_ui);
 
@@ -227,7 +224,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBar->setWorkbench(m_workbench);
 
-    connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_layout_closeRequested(QnWorkbenchLayout *)));
+    connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
+
 
     /* Tab bar layout. To snap tab bar to graphics view. */
     QVBoxLayout *tabBarLayout = new QVBoxLayout();
@@ -245,7 +243,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->setSpacing(0);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewTabAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewLayoutAction)));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::PreferencesAction)));
@@ -335,74 +333,6 @@ void QnMainWindow::showMainMenu()
     QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
     menu->move(mapToGlobal(m_mainMenuButton->geometry().bottomLeft()));
     menu->exec();
-}
-
-void QnMainWindow::showOpenFileDialog()
-{
-    QFileDialog dialog(this, tr("Open file"));
-    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-    QStringList filters;
-    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
-    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("All files (*.*)");
-    dialog.setNameFilters(filters);
-    if (dialog.exec())
-        m_controller->drop(dialog.selectedFiles());
-}
-
-void QnMainWindow::showAboutDialog()
-{
-    AboutDialog dialog(this);
-    dialog.setWindowModality(Qt::ApplicationModal);
-    dialog.exec();
-}
-
-void QnMainWindow::showPreferencesDialog()
-{
-    PreferencesDialog dialog(this);
-    dialog.setWindowModality(Qt::ApplicationModal);
-    dialog.exec();
-}
-
-void QnMainWindow::showAuthenticationDialog()
-{
-    static LoginDialog *dialog = 0;
-    if (dialog)
-        return;
-
-    const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
-    if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
-        return;
-
-    dialog = new LoginDialog(this);
-    dialog->setModal(true);
-    if (dialog->exec()) {
-        const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
-        if (connection.url.isValid()) {
-            QnEventManager::instance()->stop();
-            SessionManager::instance()->stop();
-
-            QnAppServerConnectionFactory::setDefaultUrl(connection.url);
-
-            // repopulate the resource pool
-            QnResource::stopCommandProc();
-            QnResourceDiscoveryManager::instance().stop();
-
-            // don't remove local resources
-            const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
-            qnResPool->removeResources(remoteResources);
-
-            SessionManager::instance()->start();
-            QnEventManager::instance()->run();
-
-            QnResourceDiscoveryManager::instance().start();
-            QnResource::startCommandProc();
-        }
-    }
-    delete dialog;
-    dialog = 0;
 }
 
 void QnMainWindow::updateFullScreenState() 
@@ -530,25 +460,10 @@ void QnMainWindow::updateDwmState()
     }
 }
 
-void QnMainWindow::openNewLayout() {
-    m_tabBar->addTab(QString());
-    m_tabBar->setCurrentIndex(m_tabBar->count() - 1);
-}
-
-void QnMainWindow::closeCurrentLayout() {
-    if(m_tabBar->tabsClosable())
-        m_tabBar->removeTab(m_tabBar->currentIndex());
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-/* // TODO
-if (action == &cm_remove_from_disk) {
-    QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
-*/
-
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
@@ -584,7 +499,7 @@ void QnMainWindow::paintEvent(QPaintEvent *event)
             0,
             width() - 1,
             height() - 1
-            ));
+        ));
     }
 }
 
@@ -597,7 +512,7 @@ void QnMainWindow::resizeEvent(QResizeEvent *event) {
         viewGeometry.top(),
         rect.right() - viewGeometry.right(),
         rect.bottom() - viewGeometry.bottom()
-        ));
+    ));
 
     base_type::resizeEvent(event);
 }
@@ -650,115 +565,18 @@ void QnMainWindow::at_synchronizer_started() {
     QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
     if(resources.isEmpty()) {
         /* There are no layouts in user's layouts list, just create a new one. */
-        openNewLayout();
+        qnAction(Qn::NewLayoutAction)->trigger();
     } else {
         /* Open the last layout from the user's layouts list. */
         qSort(resources.begin(), resources.end(), LayoutIdCmp());
         m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+        m_workbench->setCurrentLayout(m_workbench->layouts().back());
     }
 }
 
-void QnMainWindow::at_layout_closeRequested(QnWorkbenchLayout *layout) {
-    QnLayoutResourcePtr resource = layout->resource();
-    bool isChanged = m_synchronizer->isChanged(layout);
-    bool isLocal = m_synchronizer->isLocal(layout);
-
-    bool wasClosed = true;
-    if(isChanged) {
-        QMessageBox::StandardButton button = QMessageBox::question(this, tr(""), tr("Save changes to layout '%1'?").arg(layout->name()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
-        if(button == QMessageBox::Cancel) {
-            wasClosed = false;
-            return;
-        } else if(button == QMessageBox::No) {
-            m_synchronizer->restore(layout);
-            delete layout;
-        } else {
-            m_synchronizer->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
-            delete layout;
-        }
-    } else {
-        delete layout;
-    }
-
-    if(wasClosed && isLocal)
-        qnResPool->removeResource(resource);
-}
-
-void QnMainWindow::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
-    if(status == 0)   
-        return;
-
-    QMessageBox::critical(this, tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
-}
-
-void QnMainWindow::at_editTagsAction_triggred() 
-{
-    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
-    if(resource.isNull())
-        return;
-
-    QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), this));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_cameraSettingsAction_triggered()
-{
-    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
-    if(resource.isNull())
-        return;
-
-    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(resource.dynamicCast<QnVirtualCameraResource>(), this));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_multipleCamerasSettingsAction_triggered()
-{
-    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
-    if(resources.empty() || !resources[0])
-        return;
-
-    QnVirtualCameraResourceList cameras;
-    foreach(QnResourcePtr resource, resources)
-    {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camera)
-            cameras.append(camera);
-    }
-
-    QScopedPointer<MultipleCameraSettingsDialog> dialog(new MultipleCameraSettingsDialog(this, cameras));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_serverSettingsAction_triggered()
-{
-    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
-    if(resource.isNull())
-        return;
-
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resource.dynamicCast<QnVideoServerResource>(), this));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_youtubeUploadAction_triggered() 
-{
-    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
-    if(resource.isNull())
-        return;
-
-    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(resource, this));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnMainWindow::at_openInFolderAction_triggered() {
-    QnResourcePtr resource = qnMenu->currentResourceTarget(sender());
-    if(resource.isNull())
-        return;
-
-    QnEnvironment::showInGraphicalShell(this, resource->getUrl());
+void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
+    QnWorkbenchLayoutList layouts;
+    layouts.push_back(layout);
+    qnMenu->trigger(Qn::CloseLayoutAction, layouts);
 }
 

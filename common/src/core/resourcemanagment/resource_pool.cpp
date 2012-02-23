@@ -59,12 +59,9 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
             if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId())) 
             {
-                qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.",
-                          resource->getUniqueId().toLocal8Bit().constData());
+                qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.", resource->getUniqueId());
 
                 resource->setId(existing->getId());
-
-                //Q_ASSERT(false); //new resource in the pool already? strange case; please pay attantion
             } 
             else 
             {

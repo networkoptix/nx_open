@@ -24,6 +24,7 @@
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
@@ -149,6 +150,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(mouseEventTypeArray);
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
+    Instrument::EventTypeSet dndEventTypes = Instrument::makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop);
 
     /* Install and configure instruments. */
     ClickInstrument *itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
@@ -160,7 +162,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_dropInstrument = new DropInstrument(this, this);
+    m_dropInstrument = new DropInstrument(workbench(), this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_dragInstrument = new DragInstrument(this);
@@ -170,6 +172,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(display->workbench()->mapper()->spacing() / 90.0));
+
+    display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());
@@ -190,7 +194,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
+    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, dndEventTypes, this));
     m_manager->installInstrument(m_dropInstrument);
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, dndEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, dndEventTypes, this));
 
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
@@ -282,13 +289,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Set up context menu. */
     QWidget *window = m_display->view()->window();
     window->addAction(qnAction(Qn::ScreenRecordingAction));
-    window->addAction(qnAction(Qn::RemoveLayoutItemAction));
 
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered()),                                                       this,                           SLOT(at_recordingSettingsAction_triggered()));
-    connect(qnAction(Qn::RemoveLayoutItemAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_removeLayoutItemAction_triggered()));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -1016,7 +1021,3 @@ void QnWorkbenchController::at_recordingSettingsAction_triggered() {
 	dialog.exec();
 }
 
-void QnWorkbenchController::at_removeLayoutItemAction_triggered() {
-    foreach(QnResourceWidget *widget, qnMenu->currentWidgetsTarget(sender()))
-        qnDeleteLater(widget);
-}

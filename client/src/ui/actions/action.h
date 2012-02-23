@@ -27,6 +27,10 @@ public:
         return static_cast<Qn::ActionScope>(static_cast<int>(m_flags) & Qn::ScopeMask);
     }
 
+    Qn::ActionTarget target() const {
+        return static_cast<Qn::ActionTarget>(static_cast<int>(m_flags) & Qn::TargetMask);
+    }
+
     Qn::ActionFlags flags() const {
         return m_flags;
     }

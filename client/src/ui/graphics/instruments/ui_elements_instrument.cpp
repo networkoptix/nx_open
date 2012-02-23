@@ -1,41 +1,6 @@
 #include "ui_elements_instrument.h"
 #include <QGraphicsWidget>
-
-class DestructionGuardItem: public QGraphicsObject {
-public:
-    DestructionGuardItem(QGraphicsItem *parent = NULL): 
-        QGraphicsObject(parent) 
-    {}
-
-    virtual ~DestructionGuardItem() {
-        /* Don't let it be deleted. */
-        if(guarded() != NULL && guarded()->scene() != NULL)
-            guarded()->scene()->removeItem(guarded());
-    }
-
-    void setGuarded(QGraphicsObject *guarded) {
-        m_guarded = guarded;
-
-        if(guarded != NULL)
-            guarded->setParentItem(this);
-    }
-
-    QGraphicsObject *guarded() const {
-        return m_guarded.data();
-    }
-
-    virtual QRectF boundingRect() const override {
-        return QRectF();
-    }
-
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override {
-        return;
-    }
-
-private:
-    QWeakPointer<QGraphicsObject> m_guarded;
-};
-
+#include "destruction_guard_item.h"
 
 UiElementsInstrument::UiElementsInstrument(QObject *parent):
     Instrument(Instrument::VIEWPORT, makeSet(QEvent::Paint), parent) 
@@ -51,8 +16,6 @@ UiElementsInstrument::UiElementsInstrument(QObject *parent):
     widget->setParent(this);
     widget->setAcceptedMouseButtons(0);
     m_widget = widget;
-
-    connect(widget, SIGNAL(zChanged()), this, SLOT(at_widget_zValueChanged()));
 }
 
 UiElementsInstrument::~UiElementsInstrument() {
@@ -66,11 +29,9 @@ void UiElementsInstrument::installedNotify() {
     scene()->addItem(guard);
 
     m_guard = guard;
-    
-    at_widget_zValueChanged();
 }
 
-void UiElementsInstrument::uninstalledNotify() {
+void UiElementsInstrument::aboutToBeUninstalledNotify() {
     if(guard() != NULL)
         delete guard();
 }
@@ -89,9 +50,3 @@ bool UiElementsInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     return false;
 }
 
-void UiElementsInstrument::at_widget_zValueChanged() {
-    if(guard() == NULL || widget() == NULL) 
-        return;
-
-    guard()->setZValue(widget()->zValue());
-}

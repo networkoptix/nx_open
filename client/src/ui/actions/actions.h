@@ -30,12 +30,7 @@ namespace Qn {
         /**
          * Opens a new tab (layout).
          */
-        NewTabAction,
-
-        /**
-         * Closes current tab (layout).
-         */
-        CloseTabAction,
+        NewLayoutAction,
 
 
 
@@ -82,6 +77,15 @@ namespace Qn {
          * Closes the client.
          */
         ExitAction,
+
+
+
+        /* Tab bar actions. */
+
+        /**
+         * Closes layout.
+         */
+        CloseLayoutAction,
 
 
 
@@ -133,7 +137,6 @@ namespace Qn {
         DeleteFromDiskAction,
 
 
-
         /* Layout actions. */
 
         ItemSeparator,
@@ -143,6 +146,10 @@ namespace Qn {
          */
         RemoveLayoutItemAction,
 
+        /**
+         * Removes a resource from application server.
+         */
+        RemoveFromServerAction,
 
 #if 0
         /** 
@@ -361,25 +368,41 @@ namespace Qn {
     };
 
     enum ActionScope {
+        InvalidScope        = 0x0,
         MainScope           = 0x1,              /**< Application's main menu requested. */
         SceneScope          = 0x2,              /**< Scene context menu requested. */
         TreeScope           = 0x4,              /**< Tree context menu requested. */
         SliderScope         = 0x8,              /**< Slider context menu requested. */
-        ScopeMask           = 0xF
+        TabBarScope         = 0x10,             /**< Tab bar context menu requested. */
+        ScopeMask           = 0xFF
+    };
+
+    enum ActionTarget {
+        ResourceTarget      = 0x100,             
+        LayoutItemTarget    = 0x200,
+        WidgetTarget        = 0x400,
+        LayoutTarget        = 0x800,
+        TargetMask          = 0xF00
     };
 
     enum ActionFlag {
-        NoTarget            = 0x00000010,       /**< Action can be applied when there are no targets. */
-        SingleTarget        = 0x00000020,       /**< Action can be applied to a single target. */
-        MultiTarget         = 0x00000040,       /**< Action can be applied to multiple targets. */
-        TargetMask          = 0x00000070,
+        NoTarget            = 0x1000,       /**< Action can be applied when there are no targets. */
+        SingleTarget        = 0x2000,       /**< Action can be applied to a single target. */
+        MultiTarget         = 0x4000,       /**< Action can be applied to multiple targets. */
 
-        Invisible           = 0,                                /**< Action cannot appear in any menu. */
-        Main                = Qn::MainScope | NoTarget,         /**< Action can appear in main menu. */
-        Scene               = Qn::SceneScope,                   /**< Action can appear in scene context menu. */
-        Tree                = Qn::TreeScope,                    /**< Action can appear in tree context menu. */
-        Slider              = Qn::SliderScope | SingleTarget,   /**< Action can appears in slider context menu. */
-        Global              = Scene | Tree | Slider, 
+        Resource            = ResourceTarget,
+        LayoutItem          = LayoutItemTarget,
+        Widget              = WidgetTarget,
+        Layout              = LayoutTarget,
+
+        IntentionallyAmbiguous = 0x10000,
+
+        Invisible           = 0,                                            /**< Action cannot appear in any menu. */
+        Main                = Qn::MainScope | NoTarget,                     /**< Action can appear in main menu. */
+        Scene               = Qn::SceneScope | Widget,                      /**< Action can appear in scene context menu. */
+        Tree                = Qn::TreeScope,                                /**< Action can appear in tree context menu. */
+        Slider              = Qn::SliderScope | SingleTarget | Resource,    /**< Action can appear in slider context menu. */
+        TabBar              = Qn::TabBarScope | SingleTarget | Layout,      /**< Action can appear in tab bar context menu. */
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
