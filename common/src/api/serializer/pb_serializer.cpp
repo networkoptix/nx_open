@@ -327,6 +327,7 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
 
 void serializeLayout_i(proto::pb::Layout& pb_layout, const QnLayoutResourcePtr& layoutIn)
 {
+    pb_layout.set_parentid(layoutIn->getParentId().toInt());
     pb_layout.set_name(layoutIn->getName().toStdString());
 
     if (!layoutIn->getItems().isEmpty()) {
@@ -487,7 +488,6 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 
     foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
         proto::pb::Layout& pb_layout = *pb_user.add_layout();
-        pb_layout.set_parentid(userPtr->getId().toInt());
         serializeLayout_i(pb_layout, layoutIn);
     }
 

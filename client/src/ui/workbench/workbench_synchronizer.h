@@ -21,7 +21,7 @@ namespace detail {
         {}
 
     public slots:
-        void at_finished(int status, const QByteArray &errorString, QnResourceList resources, int handle);
+        void at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     signals:
         void finished(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
