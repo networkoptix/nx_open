@@ -361,15 +361,13 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 					    if (firstWait)
                         {
                             m_isLongWaiting = sign *(displayedTime - ct) > MAX_FRAME_DURATION*1000;
-                            /*
-                            QString s;
-                            QTextStream str(&s);
-                            str << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz") <<
-                                " currentTime=" << QDateTime::fromMSecsSinceEpoch(ct/1000).toString("hh:mm:ss.zzz");
-                            str << " wait=" << (displayedTime - ct)/1000.0;
-                            str.flush();
-                            cl_log.log(s, cl_logALWAYS);
-                            */
+                            
+							/*
+                            qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
+                                     << " currentTime=" << QDateTime::fromMSecsSinceEpoch(ct/1000).toString("hh:mm:ss.zzz")
+                                     << " wait=" << (displayedTime - ct)/1000.0;
+							*/
+                            
                             firstWait = false;
                         }
                         QnSleep::msleep(1);
@@ -496,7 +494,8 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     QMutexLocker lock(&m_timeMutex);
 
     m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
-    m_display[0]->blockTimeValue(time);
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+        m_display[i]->blockTimeValue(time);
     clearUnprocessedData();
 
     if (skipPrevJumpSignal > 0) {
@@ -530,7 +529,8 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_buffering = true;
     m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
     //clearUnprocessedData();
-    m_display[0]->blockTimeValue(time);
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+        m_display[i]->blockTimeValue(time);
     m_singleShotMode = false;
     m_jumpTime = time;
 
@@ -560,12 +560,10 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        if (m_display[i]) {
-            if (vd && !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
-                m_display[i]->blockTimeValue(media->timestamp);
-            m_display[i]->unblockTimeValue();
-        }
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        if (vd && !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
+            m_display[i]->blockTimeValue(media->timestamp);
+        m_display[i]->unblockTimeValue();
     }
 
     m_audioDisplay->clearAudioBuffer();
@@ -1092,7 +1090,7 @@ void CLCamDisplay::onSlowSourceHint()
 qint64 CLCamDisplay::getCurrentTime() const 
 {
     qint64 result = m_display[0]->getLastDisplayedTime();
-    if (result == AV_NOPTS_VALUE)
+    if (m_display[0]->isTimeBlocked() || result == AV_NOPTS_VALUE)
         return result;
     for (int i = 1; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i])
