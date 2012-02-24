@@ -47,7 +47,7 @@
 #include <ui/actions/action_target_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/widgets/help_context_widget.h>
+#include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 #include <ui/mixins/render_watch_mixin.h>
 
@@ -405,7 +405,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_helpBackgroundItem->setPalette(palette);
     }
 
-    m_helpWidget = new QnHelpContextWidget(QnContextHelp::instance());
+    m_helpWidget = new QnHelpWidget(qnHelp);
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_helpWidget->palette();
@@ -491,46 +491,61 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setTitleUsed(false);
     setHelpOpened(false, false);
     setHelpVisible(true, false);
+
+
+    /* Set up help context processing. */
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
+    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+
+    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(setHelpOpened()));
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
     return;
 }
 
-QVariant QnWorkbenchUi::target(QnAction *action) {
-    /* Determine current scope. */
-    Qn::ActionScope scope = Qn::MainScope;
-
+Qn::ActionScope QnWorkbenchUi::currentScope() const {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     if(focusItem == m_treeItem) {
-        scope = Qn::TreeScope;
+        return Qn::TreeScope;
     } else if(focusItem == m_sliderItem) {
-        scope = Qn::SliderScope;
+        return Qn::SliderScope;
+    } else if(focusItem == m_tabBarItem) {
+        return Qn::TabBarScope;
     } else if(!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)) {
-        scope = Qn::SceneScope;
+        return Qn::SceneScope;
+    } else {
+        return Qn::MainScope;
     }
+}
 
-    /* Compare to action's scope. */
-    if(!(action->scope() & scope))
-        scope = action->scope();
-    
+QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     /* Get items. */
     switch(scope) {
     case Qn::TabBarScope: {
         QnWorkbenchLayoutList result;
         result.push_back(m_display->workbench()->currentLayout());
         return QVariant::fromValue(result);
-    }
+                          }
     case Qn::TreeScope:
-        return m_treeWidget->target(action);
+        return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope: {
         QnResourceList result;
         CLVideoCamera *camera = m_sliderItem->videoCamera();
         if(camera != NULL)
             result.push_back(camera->resource());
-        
+
         return QVariant::fromValue(result);
-    }
+                          }
     case Qn::SceneScope:
         return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
@@ -1030,6 +1045,54 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
     }
 }
 
+void QnWorkbenchUi::updateHelpContext() {
+    Qn::ActionScope scope = Qn::InvalidScope;
+
+    if(m_treeOpacityProcessor->isHovered()) {
+        scope = Qn::TreeScope;
+    } else if(m_sliderOpacityProcessor->isHovered()) {
+        scope = Qn::SliderScope;
+    } 
+#if 0
+    else if(m_treeOpacityProcessor->isFocused()) {
+        scope = Qn::TreeScope;
+    } else if(m_sliderOpacityProcessor->isFocused()) {
+        scope = Qn::SliderScope;
+    } 
+#endif
+    else {
+        scope = Qn::SceneScope;
+    }
+
+    QnContextHelp::ContextId context;
+    switch(scope) {
+    case Qn::TreeScope:
+        if(m_treeWidget->currentTab() == QnResourceTreeWidget::SearchTab) {
+            context = QnContextHelp::ContextId_Search;
+        } else {
+            context = QnContextHelp::ContextId_Tree;
+        }
+        break;
+    case Qn::SliderScope:
+        context = QnContextHelp::ContextId_Slider;
+        break;
+    case Qn::SceneScope:
+        context = QnContextHelp::ContextId_Scene;
+        foreach(QnResourceWidget *widget, display()->widgets()) {
+            if(widget->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID) {
+                context = QnContextHelp::ContextId_MotionGrid;
+                break;
+            }
+        }
+        break;
+    default:
+        context = QnContextHelp::ContextId_Invalid;
+        break;
+    }
+
+    qnHelp->setHelpContext(context);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1097,7 +1160,7 @@ void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
     if(cameraResource != NULL)
 #endif
     {
-        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QRegion)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QRegion)));
+        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));
         connect(m_sliderItem, SIGNAL(clearMotionSelection()), widget, SLOT(clearMotionSelection()));
         m_sliderItem->addReserveCamera(widget->display()->camera());
     }

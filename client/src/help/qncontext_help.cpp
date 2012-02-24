@@ -80,6 +80,8 @@ void QnContextHelp::setHelpContext(ContextId id)
 
     m_currentId = id;
     emit helpContextChanged(id);
+
+    qDebug() << "HELP CONTEXT" << id;
 }
 
 void QnContextHelp::setNeedAutoShow(ContextId id, bool value)
@@ -106,6 +108,15 @@ QString QnContextHelp::text(ContextId id) const {
         break;
     case ContextId_MotionGrid:
         return tr("ContextId_MotionGrid");
+        break;
+    case ContextId_Slider:
+        return tr("ContextId_Slider");
+        break;
+    case ContextId_Tree:
+        return tr("ContextId_Tree");
+        break;
+    case ContextId_Search:
+        return tr("ContextId_Search");
         break;
     default:
         qWarning() << "Unknown help context" << (int) m_currentId;

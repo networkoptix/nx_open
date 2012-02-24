@@ -18,62 +18,59 @@ QnMotionHelper::~QnMotionHelper()
     m_writers.clear();
 }
 
-QnMotionArchive* QnMotionHelper::getArchive(QnResourcePtr res)
+QnMotionArchive* QnMotionHelper::getArchive(QnResourcePtr res, int channel)
 {
     QMutexLocker lock(&m_mutex);
     QnNetworkResourcePtr netres = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (!netres)
         return 0;
-    QnMotionArchive* writer = m_writers.value(netres);
+    QnMotionArchive* writer = m_writers.value(MotionArchiveKey(netres, channel));
     if (writer == 0) {
-        writer = new QnMotionArchive(netres);
-        m_writers.insert(netres, writer);
+        writer = new QnMotionArchive(netres, channel);
+        m_writers.insert(MotionArchiveKey(netres, channel), writer);
     }
     return writer;
 }
 
 void QnMotionHelper::saveToArchive(QnMetaDataV1Ptr data)
 {
-    QnMotionArchive* archive = getArchive(data->dataProvider->getResource());
+    QnMotionArchive* archive = getArchive(data->dataProvider->getResource(), data->channelNumber);
     if (archive)
         archive->saveToArchive(data);
 
 }
 
-void QnMotionHelper::maskMotion(QnMetaDataV1Ptr data)
+QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(QnResourcePtr res, int channel)
 {
-    QnMotionArchive* archive = getArchive(data->dataProvider->getResource());
-    if (archive)
-        archive->maskMotion(data);
-}
-
-QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
-{
-    QnTimePeriodList rez;
-    QnMotionArchive* archive = getArchive(res);
-    if (archive) 
-        rez =  archive->mathPeriod(region, msStartTime, msEndTime, detailLevel);
-    return rez;
-}
-
-QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(QnResourcePtr res)
-{
-    QnMotionArchive* archive = getArchive(res);
+    QnMotionArchive* archive = getArchive(res, channel);
     if (archive) 
         return archive->createConnection();
     else
         return QnMotionArchiveConnectionPtr();
 }
 
+QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+{
+    QVector<QnTimePeriodList> data;
+    for (int i = 0; i < regions.size(); ++i)
+    {
+        QnMotionArchive* archive = getArchive(res, i);
+        if (archive) 
+            data << archive->mathPeriod(regions[i], msStartTime, msEndTime, detailLevel);
+    }
+    return QnTimePeriod::mergeTimePeriods(data);
+}
 
-QnTimePeriodList QnMotionHelper::mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QVector<QnTimePeriodList> data;
     foreach(QnResourcePtr res, resList)
     {
-        QnMotionArchive* archive = getArchive(res);
-        if (archive) 
-            data << archive->mathPeriod(region, msStartTime, msEndTime, detailLevel);
+        for (int i = 0; i < regions.size(); ++i) {
+            QnMotionArchive* archive = getArchive(res, i);
+            if (archive) 
+                data << archive->mathPeriod(regions[i], msStartTime, msEndTime, detailLevel);
+        }
     }
     return QnTimePeriod::mergeTimePeriods(data);
 }

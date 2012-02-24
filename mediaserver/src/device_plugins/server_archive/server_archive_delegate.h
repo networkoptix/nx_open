@@ -17,7 +17,6 @@ public:
     QnServerArchiveDelegate();
     virtual ~QnServerArchiveDelegate();
 
-    void setMotionRegion(const QRegion& region);
     void setSendMotion(bool value);
 
     virtual bool open(QnResourcePtr resource);
@@ -35,9 +34,7 @@ public:
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
-    qint64 correctTimeByMask(qint64 time, bool useReverseSearch);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
-    void loadPlaybackMask(qint64 msTime, bool useReverseSearch);
     void getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
 
@@ -61,14 +58,11 @@ private:
     int m_selectedAudioChannel;
 
     QRegion m_motionRegion;
-    QnTimePeriodList m_playbackMask;
-    qint64 m_playbackMaskStart;
-    qint64 m_playbackMaskEnd;
 
     QnTimePeriod m_lastTimePeriod;
     qint64 m_lastSeekTime;
     bool m_afterSeek;
-    QnMotionArchiveConnectionPtr m_motionConnection;
+    QnMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     QnAbstractMediaDataPtr m_tmpData;
 
     DeviceFileCatalog::Chunk m_newQualityChunk;

@@ -26,8 +26,6 @@ public:
     virtual void setSpeed(double value, qint64 currentTimeHint) = 0;
 
     // playback filter by motion detection mask
-    //virtual bool setMotionRegion(const QRegion& region) = 0;
-
     // delivery motion data to a client
     //virtual bool setSendMotion(bool value) = 0;
 };
@@ -77,7 +75,6 @@ public:
     qint64 endTime() const;
     bool isRealTimeSource() const;
 
-    virtual bool setMotionRegion(const QRegion& region) = 0;
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
     virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;

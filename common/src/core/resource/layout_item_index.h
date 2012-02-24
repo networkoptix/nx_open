@@ -4,6 +4,7 @@
 #include <QMetaType>
 #include <QUuid>
 #include <QList>
+#include "resource_fwd.h"
 #include "layout_resource.h"
 
 /**
@@ -43,8 +44,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnLayoutItemIndex);
-
-typedef QList<QnLayoutItemIndex> QnLayoutItemIndexList;
 
 Q_DECLARE_METATYPE(QnLayoutItemIndexList);
 

@@ -30,7 +30,7 @@ class QnMaskedProxyWidget;
 class QnAbstractRenderer;
 class QnClickableWidget;
 class QnLayoutTabBar;
-class QnHelpContextWidget;
+class QnHelpWidget;
 
 class QnWorkbenchUi: public QObject, public QnActionTargetProvider, protected SceneUtility {
     Q_OBJECT;
@@ -40,7 +40,9 @@ public:
     QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent = NULL);
     virtual ~QnWorkbenchUi();
 
-    virtual QVariant target(QnAction *action) override;
+    virtual Qn::ActionScope currentScope() const override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     enum Flag {
         HIDE_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */
@@ -99,18 +101,18 @@ public:
     }
 
 public slots:
-    void setTitleUsed(bool titleUsed);
-    void setFpsVisible(bool fpsVisible);
+    void setTitleUsed(bool titleUsed = true);
+    void setFpsVisible(bool fpsVisible = true);
 
-    void setTreeVisible(bool visible, bool animate = true);
-    void setSliderVisible(bool visible, bool animate = true);
-    void setTitleVisible(bool visible, bool animate = true);
-    void setHelpVisible(bool visible, bool animate = true);
+    void setTreeVisible(bool visible = true, bool animate = true);
+    void setSliderVisible(bool visible = true, bool animate = true);
+    void setTitleVisible(bool visible = true, bool animate = true);
+    void setHelpVisible(bool visible = true, bool animate = true);
 
-    void setTreeOpened(bool opened, bool animate = true);
-    void setSliderOpened(bool opened, bool animate = true);
-    void setTitleOpened(bool opened, bool animate = true);
-    void setHelpOpened(bool opened, bool animate = true);
+    void setTreeOpened(bool opened = true, bool animate = true);
+    void setSliderOpened(bool opened = true, bool animate = true);
+    void setTitleOpened(bool opened = true, bool animate = true);
+    void setHelpOpened(bool opened = true, bool animate = true);
 
     void toggleTreeOpened() {
         setTreeOpened(!isTreeOpened());
@@ -146,6 +148,8 @@ protected:
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
 protected slots:
+    void updateHelpContext();
+    
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
@@ -334,7 +338,7 @@ private:
 
     QnMaskedProxyWidget *m_helpItem;
 
-    QnHelpContextWidget *m_helpWidget;
+    QnHelpWidget *m_helpWidget;
 
     QnImageButtonWidget *m_helpPinButton;
 

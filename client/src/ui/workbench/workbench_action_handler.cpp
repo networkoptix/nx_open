@@ -35,6 +35,12 @@
 #include "workbench_item.h"
 
 namespace {
+    struct LayoutIdCmp {
+        bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
+            return l->getId() < r->getId();
+        }
+    };
+
     enum RemovedResourceType {
         Layout,
         User,
@@ -112,11 +118,15 @@ void QnWorkbenchActionHandler::setSynchronizer(QnWorkbenchSynchronizer *synchron
 void QnWorkbenchActionHandler::initialize() {
     assert(m_workbench != NULL);
 
+    /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
+    connect(m_workbench,                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+
     connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(qnAction(Qn::PreferencesAction),                SIGNAL(triggered()),    this,   SLOT(at_preferencesAction_triggered()));
     connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
     connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
+    connect(qnAction(Qn::OpenSingleLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_openSingleLayoutAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(qnAction(Qn::CameraSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(qnAction(Qn::MultipleCameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
@@ -130,6 +140,8 @@ void QnWorkbenchActionHandler::initialize() {
 
 void QnWorkbenchActionHandler::deinitialize() {
     assert(m_workbench != NULL);
+
+    disconnect(m_workbench, NULL, this, NULL);
 
     foreach(QAction *action, qnMenu->actions())
         disconnect(action, NULL, this, NULL);
@@ -178,6 +190,13 @@ void QnWorkbenchActionHandler::at_workbench_aboutToBeDestroyed() {
     setWorkbench(NULL);
 }
 
+void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
+    if(!m_workbench->layouts().empty())
+        return;
+
+    qnAction(Qn::OpenSingleLayoutAction)->trigger();
+}
+
 void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
     setSynchronizer(NULL);
 }
@@ -188,6 +207,20 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
 
     m_workbench->addLayout(layout);
     m_workbench->setCurrentLayout(m_workbench->layouts().back());
+}
+
+void QnWorkbenchActionHandler::at_openSingleLayoutAction_triggered() {
+    /* No layouts are open, so we need to open one. */
+    QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
+    if(resources.isEmpty()) {
+        /* There are no layouts in user's layouts list, just create a new one. */
+        qnAction(Qn::NewLayoutAction)->trigger();
+    } else {
+        /* Open the last layout from the user's layouts list. */
+        qSort(resources.begin(), resources.end(), LayoutIdCmp());
+        m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+        m_workbench->setCurrentLayout(m_workbench->layouts().back());
+    }
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
@@ -222,8 +255,6 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
     }
 
     if(close) {
-        if(m_workbench->layouts().size() == 1)
-            at_newLayoutAction_triggered();
         delete layout;
 
         if(isLocal) {
@@ -369,7 +400,15 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
-    foreach(const QnLayoutItemIndex &index, qnMenu->currentLayoutItemsTarget(sender()))
+    QnLayoutItemIndexList items = qnMenu->currentLayoutItemsTarget(sender());
+
+    if(items.size() > 1) {
+        QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Remove confirmation"), tr("Remove %n item(s)?", 0, items.size()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        if(button != QMessageBox::Yes)
+            return;
+    }
+
+    foreach(const QnLayoutItemIndex &index, items)
         index.layout()->removeItem(index.uuid());
 }
 

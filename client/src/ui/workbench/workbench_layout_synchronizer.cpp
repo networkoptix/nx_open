@@ -192,6 +192,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData
 
     QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), itemData.uuid);
     m_layout->addItem(item);
+    item->load(itemData);
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemData &itemData) {

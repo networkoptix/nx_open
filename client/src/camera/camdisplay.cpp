@@ -110,7 +110,6 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_toLowQSpeed(1000.0),
       m_delayedFrameCnt(0),
       m_emptyPacketCounter(0),
-      m_isEOFReached(false),
       m_hiQualityRetryCounter(0),
       m_isStillImage(false),
       m_isLongWaiting(false),
@@ -687,7 +686,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
     if (metadata) {
-        m_lastMetadata = metadata;
+        m_lastMetadata[metadata->channelNumber] = metadata;
         return true;
     }
 
@@ -715,15 +714,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         m_prevSpeed = speed;
     }
 
-
     if (vd)
     {
         m_ignoringVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-        if (m_lastMetadata && m_lastMetadata->containTime(vd->timestamp))
-            vd->motion = m_lastMetadata;
-        else {
-            int gg = 4; // TODO: remove
-        }
+        if (m_lastMetadata[vd->channelNumber] && m_lastMetadata[vd->channelNumber]->containTime(vd->timestamp))
+            vd->motion = m_lastMetadata[vd->channelNumber];
     }
     else if (ad)
     {
@@ -771,16 +766,15 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
 
-    bool isEOFReached = emptyData != 0;
-    if (m_extTimeSrc && isEOFReached != m_isEOFReached)
-        m_extTimeSrc->onEofReached(this, isEOFReached); // jump to live if needed
-    m_isEOFReached = isEOFReached;
     if (emptyData)
     {
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3)
         {
+			if (m_extTimeSrc)
+            	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
+
             /*
             // One camera from several sync cameras may reach BOF/EOF
 		    // move current time position to the edge to prevent other cameras blocking
@@ -807,8 +801,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         }
         return true;
     }
-
-    m_emptyPacketCounter = 0;
+    else if (m_emptyPacketCounter > 0) {
+		if (m_extTimeSrc)
+        	m_extTimeSrc->onEofReached(this, false); // jump to live if needed
+        m_emptyPacketCounter = 0;
+    }
 
     bool flushCurrentBuffer = false;
     bool audioParamsChanged = ad && m_playingFormat != ad->format;
@@ -1150,7 +1147,7 @@ bool CLCamDisplay::isStillImage() const
 
 bool CLCamDisplay::isNoData() const
 {
-    if (m_isEOFReached)
+    if (m_emptyPacketCounter >= 3)
         return true;
     if (!m_extTimeSrc)
         return false;
@@ -1167,10 +1164,3 @@ bool CLCamDisplay::isNoData() const
     int sign = m_speed >= 0 ? 1 : -1;
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
 }
-
-/*
-bool CLCamDisplay::isEOFReached() const
-{
-    return m_isEOFReached;
-}
-*/

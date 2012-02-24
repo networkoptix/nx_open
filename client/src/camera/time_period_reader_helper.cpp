@@ -51,7 +51,7 @@ int QnTimePeriodReaderHelper::load(QnNetworkResourcePtr netRes, const QnTimePeri
 
         m_cache.insert(netRes, updater);
     }
-    return updater->load(period, QRegion());
+    return updater->load(period, QList<QRegion>());
 }
 
 void QnTimePeriodReaderHelper::onDataLoaded(const QnTimePeriodList& periods, int handle)

@@ -39,7 +39,7 @@ public:
 public Q_SLOTS:
     void setMute(bool mute);
     void setPlaying(bool playing);
-    void loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region);
+    void loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> regions);
     void onSyncButtonToggled(bool value);
     void onDisplayingStateChanged(QnResourcePtr, bool);
 
@@ -100,8 +100,10 @@ private:
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
-        QRegion region;
+        QList<QRegion> regions;
         QnAbstractArchiveReader* reader;
+
+        bool isMotionEmpty() const;
     };
     MotionPeriodLoader* getMotionLoader(QnAbstractArchiveReader* reader);
 

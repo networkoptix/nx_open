@@ -32,6 +32,12 @@ namespace Qn {
          */
         NewLayoutAction,
 
+        /**
+         * Opens some existing layout if there exists one, creates a new one otherwise.
+         * This action is executed every time the last layout on a workbench is closed.
+         */
+        OpenSingleLayoutAction,
+
 
 
         /* Main menu actions. */
@@ -386,23 +392,56 @@ namespace Qn {
     };
 
     enum ActionFlag {
-        NoTarget            = 0x1000,       /**< Action can be applied when there are no targets. */
-        SingleTarget        = 0x2000,       /**< Action can be applied to a single target. */
-        MultiTarget         = 0x4000,       /**< Action can be applied to multiple targets. */
+        /** Action can be applied when there are no targets. */
+        NoTarget                = 0x1000,           
 
-        Resource            = ResourceTarget,
-        LayoutItem          = LayoutItemTarget,
-        Widget              = WidgetTarget,
-        Layout              = LayoutTarget,
+        /** Action can be applied to a single target. */
+        SingleTarget            = 0x2000,           
 
-        IntentionallyAmbiguous = 0x10000,
+        /** Action can be applied to multiple targets. */
+        MultiTarget             = 0x4000,           
 
-        Invisible           = 0,                                            /**< Action cannot appear in any menu. */
-        Main                = Qn::MainScope | NoTarget,                     /**< Action can appear in main menu. */
-        Scene               = Qn::SceneScope | Widget,                      /**< Action can appear in scene context menu. */
-        Tree                = Qn::TreeScope,                                /**< Action can appear in tree context menu. */
-        Slider              = Qn::SliderScope | SingleTarget | Resource,    /**< Action can appear in slider context menu. */
-        TabBar              = Qn::TabBarScope | SingleTarget | Layout,      /**< Action can appear in tab bar context menu. */
+
+        /** Action accepts resources as target. */
+        Resource                = ResourceTarget,   
+
+        /** Action accepts layout items as target. */
+        LayoutItem              = LayoutItemTarget, 
+
+        /** Action accepts resource widgets as target. */
+        Widget                  = WidgetTarget,     
+
+        /** Action accepts layouts as target. */
+        Layout                  = LayoutTarget,     
+
+
+        /** Action has a hotkey that is intentionally ambiguous. 
+         * It is up to the user to ensure that proper action conditions make it 
+         * impossible for several actions to be triggered by this hotkey. */
+        IntentionallyAmbiguous  = 0x10000,          
+
+        /** When the action is activated via hotkey, its scope should not be compared to the current one. 
+         * Action can be executed from any scope, and its target will be taken from its scope. */
+        ScopelessHotkey         = 0x20000,       
+
+
+        /** Action cannot appear in any menu. */
+        Invisible               = 0,                                            
+        
+        /** Action can appear in main menu. */
+        Main                    = Qn::MainScope | NoTarget,                     
+
+        /** Action can appear in scene context menu. */
+        Scene                   = Qn::SceneScope | Widget,                      
+
+        /** Action can appear in tree context menu. */
+        Tree                    = Qn::TreeScope,                                
+
+        /** Action can appear in slider context menu. */
+        Slider                  = Qn::SliderScope | SingleTarget | Resource,    
+
+        /** Action can appear in tab bar context menu. */
+        TabBar                  = Qn::TabBarScope | SingleTarget | Layout,      
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);

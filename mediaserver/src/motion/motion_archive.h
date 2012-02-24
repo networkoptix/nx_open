@@ -64,26 +64,23 @@ class QnMotionArchive: public QObject
 {
     Q_OBJECT
 public:
-    QnMotionArchive(QnNetworkResourcePtr resource);
+    QnMotionArchive(QnNetworkResourcePtr resource, int channel);
     virtual ~QnMotionArchive();
     bool saveToArchive(QnMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection();
 
-    // remove part of motion by mask
-    void maskMotion(QnMetaDataV1Ptr data);
-
     qint64 minTime() const;
     qint64 maxTime() const;
+    int getChannel() const;
 
-public slots:
-    void updateMotionMask(QRegion maskedRegion);
 private:
     QString getFilePrefix(const QDate& datetime);
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
     bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile);
     bool saveToArchiveInternal(QnMetaDataV1Ptr data);
+    QString getChannelPrefix();
 
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time);
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time);
@@ -94,6 +91,7 @@ private:
     friend class QnMotionArchiveConnection;
 private:
     QnNetworkResourcePtr m_resource;
+    int m_channel;
     QnSecurityCamResourcePtr m_camResource;
     qint64 m_lastDateForCurrentFile;
 
@@ -103,12 +101,6 @@ private:
     QMutex m_fileAccessMutex;
     QMutex m_maskMutex;
     QnMetaDataV1Ptr m_lastDetailedData;
-
-    // motion mask
-    //__m128i m_motionMask[MD_WIDTH * MD_HEIGHT / 128];
-    __m128i* m_motionMask;
-    int m_motionMaskStart;
-    int m_motionMaskEnd;
 
     qint64 m_minMotionTime;
     qint64 m_maxMotionTime;

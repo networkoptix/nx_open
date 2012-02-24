@@ -169,11 +169,23 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     setLayout(mainLayout);
 
     m_resourceTreeView->setModel(m_resourceModel);
-    //QMetaObject::invokeMethod(m_resourceTreeView, "expandAll", Qt::QueuedConnection); // ###
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
     return;
+}
+
+QnResourceTreeWidget::Tab QnResourceTreeWidget::currentTab() const {
+    return static_cast<Tab>(m_tabWidget->currentIndex());
+}
+
+void QnResourceTreeWidget::setCurrentTab(Tab tab) {
+    if(tab < 0 || tab >= TabCount) {
+        qnWarning("Invalid resource tree widget tab '%1'.", static_cast<int>(tab));
+        return;
+    }
+
+    m_tabWidget->setCurrentIndex(tab);
 }
 
 void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
@@ -303,12 +315,16 @@ QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
     return result;
 }
 
-QVariant QnResourceTreeWidget::target(QnAction *action) {
-    if(action != NULL && !(action->scope() & Qn::Tree))
+Qn::ActionScope QnResourceTreeWidget::currentScope() const {
+    return Qn::TreeScope;
+}
+
+QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
+    if(scope != Qn::TreeScope)
         return QVariant();
 
     QItemSelectionModel *selectionModel = currentSelectionModel();
-    
+
     if(!selectionModel->currentIndex().data(Qn::UuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
     } else {
@@ -321,7 +337,7 @@ QVariant QnResourceTreeWidget::target(QnAction *action) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, target(NULL)));
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
     if(menu->isEmpty())
         return;
 
@@ -392,16 +408,17 @@ void QnResourceTreeWidget::at_workbench_aboutToBeDestroyed() {
 }
 
 void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
-    if(index != 1)
-        return;
+    if(index == SearchTab) {
+        QnWorkbenchLayout *layout = m_workbench->currentLayout();
 
-    QnWorkbenchLayout *layout = m_workbench->currentLayout();
+        layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
+        QnResourceSearchProxyModel *model = layoutModel(layout, true);
 
-    layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
-    QnResourceSearchProxyModel *model = layoutModel(layout, true);
+        m_searchTreeView->setModel(model);
+        m_searchTreeView->expandAll();
+    }
 
-    m_searchTreeView->setModel(model);
-    m_searchTreeView->expandAll();
+    emit currentTabChanged();
 }
 
 void QnResourceTreeWidget::at_filterLineEdit_textChanged(const QString &filter) {

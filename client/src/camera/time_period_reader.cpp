@@ -12,14 +12,14 @@ QnTimePeriodReader::QnTimePeriodReader(const QnVideoServerConnectionPtr &connect
     connect(this, SIGNAL(delayedReady(const QnTimePeriodList&, int)), this, SIGNAL(ready(const QnTimePeriodList&, int)), Qt::QueuedConnection);
 }
 
-int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QRegion& region)
+int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QList<QRegion>& regions)
 {
     QMutexLocker lock(&m_mutex);
-    if (region != m_region) {
+    if (regions != m_regions) {
         m_loadedPeriods.clear();
         m_loadedData.clear();
     }
-    m_region = region;
+    m_regions = regions;
 
     foreach(const QnTimePeriod& loadedPeriod, m_loadedPeriods) 
     {
@@ -130,7 +130,7 @@ int QnTimePeriodReader::sendRequest(const QnTimePeriod& periodToLoad)
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 
         1, 
-        m_region, 
+        m_regions,
         this, 
         SLOT(at_replyReceived(int, const QnTimePeriodList &, int)));
 }

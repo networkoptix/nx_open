@@ -29,6 +29,9 @@ class QnLayoutResource;
 typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
 typedef QList<QnLayoutResourcePtr> QnLayoutResourceList;
 
+class QnLayoutItemIndex;
+typedef QList<QnLayoutItemIndex> QnLayoutItemIndexList;
+
 class QnLocalFileResource;
 typedef QnSharedResourcePointer<QnLocalFileResource> QnLocalFileResourcePtr;
 typedef QList<QnLocalFileResourcePtr> QnLocalFileResourceList;

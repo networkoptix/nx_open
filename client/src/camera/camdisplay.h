@@ -61,7 +61,6 @@ public:
     void setExternalTimeSource(QnlTimeSource* value);
 
     bool canAcceptData() const;
-    //bool isEOFReached() const;
     bool isNoData() const;
     bool isStillImage() const;
 public slots:
@@ -165,13 +164,12 @@ private:
     int m_executingJump;
     int skipPrevJumpSignal;
     int m_processedPackets;
-    QnMetaDataV1Ptr m_lastMetadata;
+    QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
     bool m_bofReceived;
     qint64 m_nextReverseTime;
     float m_toLowQSpeed; // speed then switching to low quality for camera
     //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
-    bool m_isEOFReached;
     bool m_isStillImage;
     bool m_isLongWaiting;
     

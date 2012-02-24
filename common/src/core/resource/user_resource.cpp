@@ -28,28 +28,41 @@ QnLayoutResourceList QnUserResource::getLayouts() const
 
 void QnUserResource::addLayout(const QnLayoutResourcePtr &layout) 
 {
-    QMutexLocker locker(&m_mutex);
+    {
+        QMutexLocker locker(&m_mutex);
 
-    if(m_layouts.contains(layout)) {
-        qnWarning("Given layout '%1' is already in %2's layouts list.", layout->getName(), getName());
-        return;
+        if(m_layouts.contains(layout)) {
+            qnWarning("Given layout '%1' is already in %2's layouts list.", layout->getName(), getName());
+            return;
+        }
+
+        if(layout->getParentId() != QnId() && layout->getParentId() != getId()) {
+            qnWarning("Given layout '%1' is already in other user's layouts list.", layout->getName());
+            return;
+        }
+
+        m_layouts.push_back(layout);
     }
 
-    if(layout->getParentId() != QnId() && layout->getParentId() != getId()) {
-        qnWarning("Given layout '%1' is already in other user's layouts list.", layout->getName());
-        return;
-    }
-
-    m_layouts.push_back(layout);
     layout->setParentId(getId());
+
+    emit resourceChanged();
 }
 
 void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout) 
 {
-    QMutexLocker locker(&m_mutex);
+    bool removed;
+    {
+        QMutexLocker locker(&m_mutex);
 
-    m_layouts.removeOne(layout); /* Removing a layout that is not there is not an error. */
-    layout->setParentId(QnId());
+        removed = m_layouts.removeOne(layout); /* Removing a layout that is not there is not an error. */
+    }
+
+    if(removed) {
+        layout->setParentId(QnId());
+
+        emit resourceChanged();
+    }
 }
 
 

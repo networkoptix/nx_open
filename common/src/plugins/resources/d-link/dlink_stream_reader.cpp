@@ -103,6 +103,10 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
+    if (needMetaData())
+        return getMetaData();
+
+
     if (m_h264)
         return getNextDataMPEG(CODEC_ID_H264);
 
@@ -347,4 +351,55 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 
     return videoData;
 
+}
+
+
+QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
+{
+
+    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
+
+
+    CLHttpStatus status;
+    QByteArray cam_info_file = downloadFile(status, "config/notify.cgi",  res->getHostAddress(), 80, 1000, res->getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        res->setStatus(QnResource::Unauthorized);
+        return QnMetaDataV1Ptr(0);
+    }
+
+    if (cam_info_file.size()==0)
+        return QnMetaDataV1Ptr(0);
+
+    QString file_s(cam_info_file);
+    QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
+
+    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+
+    foreach(QString line, lines)
+    {
+        QString line_low = line.toLower();
+
+        if (line_low.contains("md0") || line_low.contains("md1") || line_low.contains("md2"))
+        {
+
+            for (int x = 0; x < MD_WIDTH; ++x)
+            {
+                for (int y = 0; y < MD_HEIGHT; ++y)
+                {
+                    motion->setMotionAt(x,y);
+                }
+            }
+
+
+        }
+    }
+
+
+    
+
+    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
+    motion->m_duration = 1000*1000*1000; // 1000 sec 
+    return motion;
 }

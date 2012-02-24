@@ -22,7 +22,10 @@ class QnWorkbenchItem : public QObject
 
 public:
     enum ItemFlag {
-        Pinned = 0x1        /**< Item is pinned to the grid. Items are not pinned by default. */
+        Pinned = 0x1,                       /**< Item is pinned to the grid. Items are not pinned by default. */
+        PendingGeometryAdjustment = 0x2     /**< Geometry adjustment is pending. 
+                                             * Center of item's combined geometry defines desired position. 
+                                             * If item's rect is invalid, but not empty (width or height are negative), then any position is OK. */
     };
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
@@ -197,7 +200,6 @@ signals:
     void geometryDeltaChanged();
     void flagChanged(QnWorkbenchItem::ItemFlag flag, bool value);
     void rotationChanged();
-    void geometryAdjustmentRequested(const QPointF &desiredPosition);
 
 protected:
     void setGeometryInternal(const QRect &geometry);

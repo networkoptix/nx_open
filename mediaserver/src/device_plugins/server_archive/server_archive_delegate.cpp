@@ -13,8 +13,6 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_reverseMode(false),
     m_selectedAudioChannel(0),
     m_opened(false),
-    m_playbackMaskStart(AV_NOPTS_VALUE),
-    m_playbackMaskEnd(AV_NOPTS_VALUE),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     m_sendMotion(false),
@@ -72,121 +70,6 @@ void QnServerArchiveDelegate::close()
     m_afterSeek = false;
     m_skipFramesToTime = 0;
     m_lastPacketTime = 0;
-}
-
-void QnServerArchiveDelegate::loadPlaybackMask(qint64 msTime, bool useReverseSearch)
-{
-    if (msTime >= m_playbackMaskStart && msTime < m_playbackMaskEnd)
-        return;
-
-    qint64 loadMin = msTime - MOTION_LOAD_STEP;
-    qint64 loadMax = msTime + MOTION_LOAD_STEP;
-
-    if (!m_playbackMask.isEmpty()) {
-        if (m_playbackMaskStart <= loadMin)
-            loadMin = m_playbackMask.last().startTimeMs;
-        if (m_playbackMaskEnd >= loadMax)
-            loadMax = m_playbackMask.first().startTimeMs;
-        if (loadMax - loadMin <= 0)
-            return;
-    }
-
-    bool dataFound = false;
-    QnMotionArchive* archive = QnMotionHelper::instance()->getArchive(m_resource);
-    while (!dataFound)
-    {
-        QnTimePeriodList newMask = archive->mathPeriod(m_motionRegion, loadMin, loadMax, 1);
-        if (!newMask.isEmpty())
-        {
-            QVector<QnTimePeriodList> periods;
-            periods << m_playbackMask << newMask;
-            m_playbackMask = QnTimePeriod::mergeTimePeriods(periods);
-            dataFound = true;
-        }
-        if (m_playbackMaskStart != AV_NOPTS_VALUE) {
-            m_playbackMaskStart = qMin(loadMin, m_playbackMaskStart);
-            m_playbackMaskEnd = qMin(archive->maxTime(), qMax(loadMax, m_playbackMaskEnd));
-        }
-        else {
-            m_playbackMaskStart = loadMin;
-            m_playbackMaskEnd = qMin(archive->maxTime(), loadMax);
-        }
-
-        if (!useReverseSearch) {
-            loadMin = loadMax;
-            loadMax += MOTION_LOAD_STEP;
-            if (loadMin >= archive->maxTime())
-                break;
-        }
-        else {
-            loadMax = loadMin;
-            loadMin -= MOTION_LOAD_STEP;
-            if (loadMax <= archive->minTime())
-                break;
-        }
-    }
-
-    /*
-    if (!m_playbackMask.isEmpty()) {
-        m_playbackMaskStart = qMin(loadMin, m_playbackMask.first().startTimeMs);
-        m_playbackMaskEnd = qMin(QDateTime::currentDateTime().toMSecsSinceEpoch(), qMax(loadMax, m_playbackMask.last().startTimeMs + m_playbackMask.last().durationMs));
-    }
-    */
-}
-
-qint64 QnServerArchiveDelegate::correctTimeByMask(qint64 time, bool useReverseSearch)
-{
-    qint64 timeMs = time/1000;
-
-    loadPlaybackMask(timeMs, useReverseSearch);
-
-
-
-    if (timeMs >= m_lastTimePeriod.startTimeMs && timeMs < m_lastTimePeriod.startTimeMs + m_lastTimePeriod.durationMs)
-        return time;
-
-    if (m_playbackMask.isEmpty())
-        return AV_NOPTS_VALUE;
-
-    //qDebug() << "inputTime=" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
-
-    QnTimePeriodList::iterator itr = qUpperBound(m_playbackMask.begin(), m_playbackMask.end(), timeMs);
-    if (itr != m_playbackMask.begin())
-    {
-        --itr;
-        if (itr->startTimeMs + itr->durationMs > timeMs) 
-        {
-            m_lastTimePeriod = *itr;
-            //qDebug() << "found period:" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz") << "duration=" << itr->durationMs/1000.0;
-        }
-        else {
-            if (!useReverseSearch)
-            {
-                ++itr;
-                if (itr != m_playbackMask.end())
-                {
-                    m_lastTimePeriod = *itr;
-                    timeMs = itr->startTimeMs;
-                    //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
-                }
-                else {
-                    //qDebug() << "End of motion filter reached" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
-                    return AV_NOPTS_VALUE;
-                }
-            }
-            else {
-                m_lastTimePeriod = *itr;
-                timeMs = qMax(itr->startTimeMs, itr->startTimeMs + itr->durationMs - BACKWARD_SEEK_STEP);
-                //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(timeMs).toString("hh:mm:ss.zzz");
-            }
-        }
-    }
-    else {
-        m_lastTimePeriod = *itr;
-        //qDebug() << "correct time to" << QDateTime::fromMSecsSinceEpoch(itr->startTimeMs).toString("hh:mm:ss.zzz");
-        timeMs = itr->startTimeMs;
-    }
-    return timeMs*1000;
 }
 
 qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool recursive)
@@ -276,7 +159,7 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
     m_eof = false;
     if (!m_motionRegion.isEmpty()) 
     {
-        time = correctTimeByMask(time, m_reverseMode);
+        //time = correctTimeByMask(time, m_reverseMode);
         m_eof = time == AV_NOPTS_VALUE;
         if (m_eof)
             return -1; 
@@ -462,37 +345,6 @@ begin_label:
             m_newQualityFileRes.clear();
         }
 
-
-        if (!m_playbackMask.isEmpty()) 
-        {
-            bool afterSeekIgnore = m_lastSeekTime != AV_NOPTS_VALUE && data->timestamp < m_lastSeekTime;
-            if (!afterSeekIgnore)
-            {
-                qint64 newTime = correctTimeByMask(data->timestamp, false);
-                if (newTime == AV_NOPTS_VALUE)
-                {
-                    // eof reached
-                    if (m_reverseMode) {
-                        data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
-                        data->timestamp = INT64_MAX; // EOF reached
-                    }
-                    else {
-                        data.clear();
-                    }
-                    return data;
-                }
-                if (newTime != data->timestamp) 
-                {
-                    if (waitMotionCnt > 1)
-                        QnSleep::msleep(10);
-
-                    seekInternal(newTime, true, true);
-                    waitMotionCnt++;
-                    goto begin_label;
-                }
-            }
-        }
-
     }
     if (data)
     {
@@ -505,9 +357,10 @@ begin_label:
     
     if (data && m_sendMotion) 
     {
-        if (!m_motionConnection)
-            m_motionConnection = QnMotionHelper::instance()->createConnection(m_resource);
-        QnMetaDataV1Ptr motion = m_motionConnection->getMotionData(data->timestamp);
+        int channel = data->channelNumber;
+        if (!m_motionConnection[channel])
+            m_motionConnection[channel] = QnMotionHelper::instance()->createConnection(m_resource, channel);
+        QnMetaDataV1Ptr motion = m_motionConnection[channel]->getMotionData(data->timestamp);
         if (motion) 
         {
             motion->flags = data->flags;
@@ -554,15 +407,6 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     //if (rez)
     //    m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
     return rez;
-}
-
-void QnServerArchiveDelegate::setMotionRegion(const QRegion& region)
-{
-    if (region != m_motionRegion) {
-        m_motionRegion = region;
-        m_playbackMaskStart = m_playbackMaskEnd = AV_NOPTS_VALUE;
-        m_playbackMask.clear();
-    }
 }
 
 void QnServerArchiveDelegate::setSendMotion(bool value)
