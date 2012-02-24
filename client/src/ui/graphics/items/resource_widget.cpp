@@ -410,6 +410,7 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
         }
 
         newSelection << m_channelState[i].motionSelection;
+        if (display()->archiveReader())
     }
 
     if(prevSelection != newSelection)
@@ -427,9 +428,12 @@ void QnResourceWidget::clearMotionSelection()
     QList<QRegion> rez;
     for (int i = 0; i < m_channelState.size(); ++i) {
         m_channelState[i].motionSelection = QRegion();
+    if (display()->archiveReader())
+    {
         rez << QRegion();
     }
     emit motionRegionSelected(m_resource, display()->archiveReader(), rez);
+    }
 }
 
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {

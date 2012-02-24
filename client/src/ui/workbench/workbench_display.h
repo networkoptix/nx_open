@@ -300,7 +300,7 @@ protected:
     void synchronizeLayer(QnResourceWidget *widget);
     void synchronizeSceneBounds();
 
-    void adjustGeometry(QnWorkbenchItem *item, const QPointF &desiredPosition);
+    void adjustGeometry(QnWorkbenchItem *item, bool animate = true);
 
     qreal layerFrontZValue(Layer layer) const;
     Layer synchronizedLayer(QnWorkbenchItem *item) const;
@@ -338,7 +338,6 @@ protected slots:
     void at_item_geometryDeltaChanged();
     void at_item_rotationChanged();
     void at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value);
-    void at_item_geometryAdjustmentRequested(const QPointF &desiredPosition);
 
     void at_activityStopped();
     void at_activityStarted();

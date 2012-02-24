@@ -100,8 +100,15 @@ bool QnAction::event(QEvent *event) {
 
         QVariant target;
         QnActionTargetProvider *targetProvider = m_manager->targetProvider();
-        if(targetProvider != NULL)
-            target = targetProvider->target(this);
+        if(targetProvider != NULL) {
+            if(flags() & Qn::ScopelessHotkey) {
+                target = targetProvider->currentTarget(scope());
+            } else {
+                Qn::ActionScope scope = targetProvider->currentScope();
+                if(this->scope() & scope)
+                    target = targetProvider->currentTarget(scope);
+            }
+        }
 
         if(satisfiesCondition(scope(), target)) {
             m_manager->m_shortcutAction = this;

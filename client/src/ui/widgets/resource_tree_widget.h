@@ -27,26 +27,43 @@ class QnResourceTreeWidget: public QWidget, public QnActionTargetProvider {
     Q_OBJECT
 
 public:
+    enum Tab {
+        ResourcesTab,
+        SearchTab,
+        TabCount
+    };
+
     QnResourceTreeWidget(QWidget *parent = 0);
-    ~QnResourceTreeWidget();
+
+    virtual ~QnResourceTreeWidget();
+
+    Tab currentTab() const;
+
+    void setCurrentTab(Tab tab);
 
     void setWorkbench(QnWorkbench *workbench);
+
+    QnWorkbench *workbench() const {
+        return m_workbench;
+    }
 
     QnResourceList selectedResources() const;
 
     QnLayoutItemIndexList selectedLayoutItems() const;
 
-    virtual QVariant target(QnAction *action) override;
+    virtual Qn::ActionScope currentScope() const override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
 signals:
     void activated(const QnResourcePtr &resource);
-    void newTabRequested();
+    void currentTabChanged();
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void wheelEvent(QWheelEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void timerEvent(QTimerEvent *event);
+    virtual void contextMenuEvent(QContextMenuEvent *event) override;
+    virtual void wheelEvent(QWheelEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 
     QItemSelectionModel *currentSelectionModel() const;
 

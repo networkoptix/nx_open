@@ -11,17 +11,13 @@ class QnActionCondition: public QObject {
 public:
     QnActionCondition(QObject *parent = NULL);
 
-    virtual bool check(const QnResourceList &resources) { 
-        Q_UNUSED(resources);
+    virtual bool check(const QnResourceList &resources);
 
-        return false; 
-    };
+    virtual bool check(const QnLayoutItemIndexList &layoutItems);
 
-    virtual bool check(const QnResourceWidgetList &widgets) { 
-        Q_UNUSED(widgets);
-    
-        return false;
-    };
+    virtual bool check(const QnResourceWidgetList &widgets);
+
+    virtual bool check(const QnWorkbenchLayoutList &layouts);
 
     virtual bool check(const QVariant &items);
 };

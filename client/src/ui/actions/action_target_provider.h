@@ -2,6 +2,7 @@
 #define QN_ACTION_TARGET_PROVIDER_H
 
 #include "action_fwd.h"
+#include "actions.h"
 
 class QVariant;
 
@@ -9,7 +10,9 @@ class QnActionTargetProvider {
 public:
     virtual ~QnActionTargetProvider() {};
 
-    virtual QVariant target(QnAction *action) = 0;
+    virtual Qn::ActionScope currentScope() const = 0;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const = 0;
 };
 
 #endif // QN_ACTION_TARGET_PROVIDER_H

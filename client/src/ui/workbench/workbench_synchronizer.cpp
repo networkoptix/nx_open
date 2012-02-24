@@ -26,6 +26,9 @@ void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const 
     if(status == 0 && !m_synchronizer.isNull())
         m_synchronizer.data()->m_savedDataByResource[m_resource] = detail::LayoutData(m_resource);
 
+    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+        qDebug() << resource->metaObject()->className() << " " << resource->getName();
+
     if(resources.size() != 1) {
         qnWarning("Received reply of invalid size %1: expected a list containing a single layout resource.", resources.size());
     } else {
@@ -158,7 +161,7 @@ bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {
     if(!resource)
         return false;
 
-    return isCreatedLocally(layout);
+    return resource->getId().isSpecial(); //isCreatedLocally(layout); // TODO: this is not good, but we have no other options. Fix.
 }
 
 void QnWorkbenchSynchronizer::start() {

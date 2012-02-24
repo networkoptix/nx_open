@@ -44,9 +44,11 @@ protected:
 
 protected slots:
     void at_workbench_aboutToBeDestroyed();
+    void at_workbench_layoutsChanged();
     void at_synchronizer_destroyed();
 
     void at_newLayoutAction_triggered();
+    void at_openSingleLayoutAction_triggered();
     void at_closeLayoutAction_triggered();
 
     void at_openFileAction_triggered();

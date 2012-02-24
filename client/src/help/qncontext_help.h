@@ -45,4 +45,8 @@ private:
     QMap<ContextId, bool> m_shownContext;
 };
 
+
+#define qnHelp (QnContextHelp::instance())
+
+
 #endif // __QNCONTEXT_HELP_H_
