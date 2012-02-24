@@ -161,7 +161,7 @@ bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {
     if(!resource)
         return false;
 
-    return isCreatedLocally(layout);
+    return resource->getId().isSpecial(); //isCreatedLocally(layout); // TODO: this is not good, but we have no other options. Fix.
 }
 
 void QnWorkbenchSynchronizer::start() {
