@@ -400,7 +400,15 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
-    foreach(const QnLayoutItemIndex &index, qnMenu->currentLayoutItemsTarget(sender()))
+    QnLayoutItemIndexList items = qnMenu->currentLayoutItemsTarget(sender());
+
+    if(items.size() > 1) {
+        QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Remove confirmation"), tr("Remove %n item(s)?", 0, items.size()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        if(button != QMessageBox::Yes)
+            return;
+    }
+
+    foreach(const QnLayoutItemIndex &index, items)
         index.layout()->removeItem(index.uuid());
 }
 
