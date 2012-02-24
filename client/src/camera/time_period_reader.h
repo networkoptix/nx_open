@@ -12,7 +12,7 @@ class QnTimePeriodReader: public QObject
     Q_OBJECT
 public:
     QnTimePeriodReader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
-    int load(const QnTimePeriod &timePeriod, const QRegion& region);
+    int load(const QnTimePeriod &timePeriod, const QList<QRegion>& regions);
 
 signals:
     void ready(const QnTimePeriodList &timePeriods, int handle);
@@ -45,7 +45,7 @@ private:
 
     QnTimePeriodList m_loadedData;
 
-    QRegion m_region; // math only motion by specified region
+    QList<QRegion> m_regions; // math only motion by specified region
 };
 
 typedef QSharedPointer<QnTimePeriodReader> QnTimePeriodUpdaterPtr;

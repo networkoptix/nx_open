@@ -181,7 +181,7 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 void QnPlDlinkResource::init()
 {
 
-    setMotionMaskPhysical();
+    setMotionMaskPhysical(0);
     
     CLHttpStatus status;
 
@@ -340,10 +340,12 @@ static void setBitAt(int x, int y, unsigned char* data)
 }
 
 
-void QnPlDlinkResource::setMotionMaskPhysical()
+void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 {
+    Q_UNUSED(channel);
+
     unsigned char maskBit[MD_WIDTH * MD_HEIGHT / 8];
-    QnMetaDataV1::createMask(getMotionMask(),  (char*)maskBit);
+    QnMetaDataV1::createMask(getMotionMask(0),  (char*)maskBit);
 
 
     QImage img(MD_WIDTH, MD_HEIGHT, QImage::Format_Mono);

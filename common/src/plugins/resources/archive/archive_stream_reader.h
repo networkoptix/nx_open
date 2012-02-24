@@ -49,7 +49,6 @@ public:
     virtual void resumeMedia();
     virtual QnAbstractMediaDataPtr getNextData();
 
-    bool setMotionRegion(const QRegion& region);
     bool setSendMotion(bool value);
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);

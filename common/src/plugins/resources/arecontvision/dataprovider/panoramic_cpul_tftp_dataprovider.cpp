@@ -40,8 +40,49 @@ AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreade
     delete m_tftp_client;
 }
 
+
+QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getMetaData()
+{
+    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+    int part = QDateTime::currentDateTime().time().second() / 15;
+    motion->channelNumber = part;
+    int xOffs = 0;
+    int yOffs = 0;
+    switch(part)
+    {
+    case 0:
+        xOffs = 0;
+        yOffs = 0;
+        break;
+    case 1:
+        xOffs = MD_WIDTH/2;
+        yOffs = 0;
+        break;
+    case 2:
+        xOffs = MD_WIDTH/2;
+        yOffs = MD_HEIGHT/2;
+        break;
+    case 3:
+        xOffs = 0;
+        yOffs = MD_HEIGHT/2;
+        break;
+    }
+
+    for (int x = 0; x < MD_WIDTH/2; ++x)
+    {
+        for (int y = 0; y < MD_HEIGHT/2; ++y)
+            motion->setMotionAt(x + xOffs, y + yOffs);
+    }
+    motion->m_duration = 1000000ll * 1000;
+    return motion;
+}
+
 QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 {
+    if (needMetaData())
+        return getMetaData();
+
+
     QByteArray request;
 
     unsigned int forecast_size = 0;

@@ -164,7 +164,7 @@ private:
     int m_executingJump;
     int skipPrevJumpSignal;
     int m_processedPackets;
-    QnMetaDataV1Ptr m_lastMetadata;
+    QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
     bool m_bofReceived;
     qint64 m_nextReverseTime;
     float m_toLowQSpeed; // speed then switching to low quality for camera

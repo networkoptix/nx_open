@@ -483,8 +483,12 @@ void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
         if (netRes)
         {
             MotionPeriods::iterator itr = m_motionPeriodLoader.find(netRes);
-            if (itr != m_motionPeriodLoader.end() && !itr.value().region.isEmpty())
-                itr.value().loadingHandle = itr.value().loader->load(period, itr.value().region);
+            if (itr != m_motionPeriodLoader.end())
+            {
+                MotionPeriodLoader& loader = itr.value();
+                if (!loader.isMotionEmpty())
+                    itr.value().loadingHandle = itr.value().loader->load(period, itr.value().regions);
+            }
         }
     }
 }
@@ -526,7 +530,7 @@ QnTimePeriodList generateTestPeriods(const QnTimePeriod& interval)
     return result;
 }
 
-void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region)
+void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> regions)
 {
 #ifndef DEBUG_MOTION
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
@@ -537,9 +541,13 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchive
     MotionPeriodLoader* p = getMotionLoader(reader);
     if (!p)
         return;
-    p->region = region;
+    p->regions = regions;
 
-    if (region.isEmpty())
+    bool regionsEmpty = true;
+    for (int i = 0; i < regions.size(); ++i)
+        regionsEmpty &= regions[i].isEmpty();
+
+    if (regionsEmpty)
     {
         repaintMotionPeriods();
         return;
@@ -567,7 +575,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchive
     return;
 #endif
 
-    p->loadingHandle = p->loader->load(loadingPeriod, region);
+    p->loadingHandle = p->loader->load(loadingPeriod, regions);
 }
 
 bool NavigationItem::updateRecPeriodList(bool force)
@@ -692,9 +700,9 @@ void NavigationItem::repaintMotionPeriods()
     {
         const MotionPeriodLoader& info = itr.value();
         CLVideoCamera *camera = findCameraByResource(info.reader->getResource());
-        if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.region.isEmpty())
+        if (!info.periods.isEmpty() && camera && camera->isVisible() && !info.isMotionEmpty())
             allPeriods << info.periods;
-        QnTimePeriodList tp = info.region.isEmpty() ? QnTimePeriodList() : info.periods;
+        QnTimePeriodList tp = info.isMotionEmpty() ? QnTimePeriodList() : info.periods;
         isMotionExist |= !tp.isEmpty();
         if (!useSync) 
         {
@@ -1066,4 +1074,15 @@ void NavigationItem::onSyncButtonToggled(bool value)
 void NavigationItem::onExportRange(qint64 startTimeMs,qint64 endTimeMs)
 {
     emit exportRange(videoCamera(), startTimeMs, endTimeMs);
+}
+
+
+bool NavigationItem::MotionPeriodLoader::isMotionEmpty() const
+{
+    for (int i = 0; i < regions.size(); ++i)
+    {
+        if (!regions[i].isEmpty())
+            return false;
+    }
+    return true;
 }

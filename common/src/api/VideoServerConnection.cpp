@@ -13,6 +13,7 @@
 #include "VideoServerConnection_p.h"
 #include "xsd_recordedTimePeriods.h"
 #include "SessionManager.h"
+#include "api/serializer/serializer.h"
 
 namespace {
     const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;
@@ -99,7 +100,7 @@ QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *paren
 
 QnVideoServerConnection::~QnVideoServerConnection() {}
 
-QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QRegion& motionRegion) 
+QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions)
 {
     QnRequestParamList result;
 
@@ -109,24 +110,19 @@ QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResou
     result << QnRequestParam("endTime", QString::number(endTimeUSec));
     result << QnRequestParam("detail", QString::number(detail));
     result << QnRequestParam("format", "bin");
-    for (int i = 0; i < motionRegion.rects().size(); ++i)
-    {
-        QRect r = motionRegion.rects().at(i);
-        QString rectStr;
-        QTextStream str(&rectStr);
-        str << r.left() << ',' << r.top() << ',' << r.width() << ',' << r.height();
-        str.flush();
-        result << QnRequestParam("motionRect", rectStr);
-    }
+
+    QString regionStr = serializeRegionList(motionRegions);
+    if (!regionStr.isEmpty())
+        result << QnRequestParam("motionRegions", regionStr);
 
     return result;
 }
 
-QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QRegion& motionRegion)
+QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion>& motionRegions)
 {
     QnTimePeriodList result;
     QByteArray errorString;
-    int status = recordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), result, errorString);
+    int status = recordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), result, errorString);
     if (status)
     {
         qDebug() << errorString;
@@ -135,11 +131,11 @@ QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkRes
     return result;
 }
 
-int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot) {
+int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QList<QRegion> motionRegions, QObject *target, const char *slot) {
     detail::QnVideoServerConnectionReplyProcessor *processor = new detail::QnVideoServerConnectionReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList &, int)), target, slot);
 
-    return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegion), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
+    return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& errorString, int handle)

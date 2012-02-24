@@ -102,26 +102,20 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
 // ----------------------- QnMotionArchive ------------------
 
-QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource): 
+QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource, int channel): 
     m_resource(resource),
+    m_channel(channel),
     m_lastDetailedData(new QnMetaDataV1()),
     m_lastTimestamp(AV_NOPTS_VALUE)
 {
-    m_motionMask = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, CL_MEDIA_ALIGNMENT);
-
     m_camResource = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
     m_firstTime = 0;
-    if (m_camResource) {
-        connect(m_camResource.data(), SIGNAL(motionMaskChanged(QRegion)), this, SLOT(updateMotionMask(QRegion)), Qt::DirectConnection);
-        updateMotionMask(m_camResource->getMotionMask());
-    }
     loadRecordedRange();
 }
 
 QnMotionArchive::~QnMotionArchive()
 {
-    qFreeAligned(m_motionMask);
 }
 
 void QnMotionArchive::loadRecordedRange()
@@ -143,22 +137,14 @@ void QnMotionArchive::loadRecordedRange()
         m_maxMotionTime = index.last().start + indexHeader.startTime;
 }
 
-void QnMotionArchive::maskMotion(QnMetaDataV1Ptr data)
-{
-    data->removeMotion(m_motionMask, m_motionMaskStart, m_motionMaskEnd);
-}
-
-
-void QnMotionArchive::updateMotionMask(QRegion maskedRegion)
-{
-    QMutexLocker lock(&m_maskMutex);
-    Q_ASSERT(((unsigned long)m_motionMask)%16 == 0);
-    QnMetaDataV1::createMask(maskedRegion, (char*)m_motionMask, &m_motionMaskStart, &m_motionMaskEnd);
-}
-
 QString QnMotionArchive::getFilePrefix(const QDate& datetime)
 {
     return QnMotionHelper::instance()->getMotionDir(datetime, m_resource->getMAC().toString());
+}
+
+QString QnMotionArchive::getChannelPrefix()
+{
+    return m_channel == 0 ? QString() : QString::number(m_channel);
 }
 
 void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile)
@@ -166,9 +152,9 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
     QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
     QString fileName = getFilePrefix(datetime.date());
     if (motionFile)
-        motionFile->setFileName(fileName+"motion_detailed_data.bin");
+        motionFile->setFileName(fileName + QString("motion_detailed_data") + getChannelPrefix() + ".bin");
     if (indexFile)
-        indexFile->setFileName(fileName+"motion_detailed_index.bin");
+        indexFile->setFileName(fileName + QString("motion_detailed_index") + getChannelPrefix() + ".bin");
     QMutex m_fileAccessMutex;
     QDir dir;
     dir.mkpath(fileName);
@@ -204,7 +190,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
 
-    Q_ASSERT(((unsigned long)mask)%16 == 0);
+    Q_ASSERT(((unsigned int)mask)%16 == 0);
 
     QnMetaDataV1::createMask(region, (char*)mask, &maskStart, &maskEnd);
     bool isFirstStep = true;

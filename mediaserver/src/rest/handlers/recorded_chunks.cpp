@@ -6,6 +6,7 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "utils/common/util.h"
 #include "motion/motion_helper.h"
+#include "api/serializer/serializer.h"
 
 QString QnRestXsdHelpHandler::getXsdUrl(TCPSocket* tcpSocket) const
 {
@@ -49,15 +50,13 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     QByteArray errStrMac;
     bool urlFound = false;
     bool useBinary = false;
-    QRegion motionRegion;
+    QList<QRegion> motionRegions;
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "motionRect")
+        if (params[i].first == "motionRegions")
         {
-            QRect tmp = deserializeMotionRect(params[i].second);
-            if (tmp.width() > 0 && tmp.height() > 0)
-                motionRegion += tmp;
+            parseRegionList(motionRegions, params[i].second);
         }
         if (params[i].first == "mac")
         {
@@ -102,10 +101,10 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     }
 
     QnTimePeriodList periods;
-    if (motionRegion.isEmpty())
+    if (motionRegions.isEmpty())
         periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
     else
-        periods = QnMotionHelper::instance()->mathImage(motionRegion, resList, startTime, endTime, detailLevel);
+        periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
     if (useBinary) {
         result.append("BIN");
         QnTimePeriod::encode(result,periods);

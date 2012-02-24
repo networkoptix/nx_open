@@ -37,16 +37,15 @@ public:
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
-    void setMotionMask(const QRegion& mask, QnDomain domain);
-    QRegion getMotionMask() const;
+    void setMotionMaskList(const QList<QRegion>& maskList, QnDomain domain);
+    void setMotionMask(const QRegion& mask, QnDomain domain, int channel);
+    QRegion getMotionMask(int channel) const;
+    QList<QRegion> getMotionMaskList() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     const QnScheduleTaskList &getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
-
-Q_SIGNALS:
-    void motionMaskChanged(QRegion region);
 
 protected:
     void updateInner(QnResourcePtr other) override;
@@ -55,10 +54,10 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0;
-    virtual void setMotionMaskPhysical(){};
+    virtual void setMotionMaskPhysical(int channel){Q_UNUSED(channel);};
 
 protected:
-    QRegion m_motionMask;
+    QList<QRegion> m_motionMaskList;
 private:
     QnDataProviderFactory* m_dpFactory;
     

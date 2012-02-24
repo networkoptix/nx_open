@@ -1097,7 +1097,7 @@ void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
     if(cameraResource != NULL)
 #endif
     {
-        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QRegion)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QRegion)));
+        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));
         connect(m_sliderItem, SIGNAL(clearMotionSelection()), widget, SLOT(clearMotionSelection()));
         m_sliderItem->addReserveCamera(widget->display()->camera());
     }

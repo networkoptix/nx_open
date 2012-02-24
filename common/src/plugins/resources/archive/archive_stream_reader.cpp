@@ -886,25 +886,6 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     }
 }
 
-bool QnArchiveStreamReader::setMotionRegion(const QRegion& region)
-{
-    /*
-    if (m_navDelegate) {
-        return m_navDelegate->setMotionRegion(region);
-    }
-    */
-    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
-    if (maskedDelegate) {
-        maskedDelegate->setMotionRegion(region);
-        if (!mFirstTime && !m_delegate->isRealTimeSource())
-            jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
 void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)
 {
     QMutexLocker lock(&m_playbackMaskSync);

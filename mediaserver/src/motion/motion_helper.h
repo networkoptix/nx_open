@@ -18,17 +18,14 @@ public:
     static QnMotionHelper* instance();
     virtual ~QnMotionHelper();
 
-    // remove part of motion by mask
-    void maskMotion(QnMetaDataV1Ptr data);
-
     // write motion data to file
     void saveToArchive(QnMetaDataV1Ptr data);
 
-    QnTimePeriodList mathImage(const QRegion& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
-    QnTimePeriodList mathImage(const QRegion& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
-    QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res);
+    QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
+    QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
+    QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res, int channel);
 
-    QnMotionArchive* getArchive(QnResourcePtr res);
+    QnMotionArchive* getArchive(QnResourcePtr res, int channel);
 
     static QString getMotionDir(const QDate& date, const QString& macAddress);
     static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& macAddress);
@@ -45,7 +42,8 @@ private:
     bool mathImage(const __m128i* data);
 
 private:
-    typedef QMap<QnNetworkResourcePtr, QnMotionArchive*> MotionWriters;
+    typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;
+    typedef QMap<MotionArchiveKey, QnMotionArchive*> MotionWriters;
     MotionWriters m_writers;
     QMutex m_mutex;
 };
