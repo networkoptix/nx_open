@@ -70,8 +70,6 @@ protected slots:
 
     void at_settings_lastUsedConnectionChanged();
 
-    void at_synchronizer_started();
-
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:

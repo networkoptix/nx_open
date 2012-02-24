@@ -35,6 +35,12 @@
 #include "workbench_item.h"
 
 namespace {
+    struct LayoutIdCmp {
+        bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
+            return l->getId() < r->getId();
+        }
+    };
+
     enum RemovedResourceType {
         Layout,
         User,
@@ -120,6 +126,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
     connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
+    connect(qnAction(Qn::OpenSingleLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_openSingleLayoutAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(qnAction(Qn::CameraSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(qnAction(Qn::MultipleCameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
@@ -184,8 +191,10 @@ void QnWorkbenchActionHandler::at_workbench_aboutToBeDestroyed() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
-    if(m_workbench->layouts().empty())
-        at_newLayoutAction_triggered();
+    if(!m_workbench->layouts().empty())
+        return;
+
+    qnAction(Qn::OpenSingleLayoutAction)->trigger();
 }
 
 void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
@@ -198,6 +207,20 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
 
     m_workbench->addLayout(layout);
     m_workbench->setCurrentLayout(m_workbench->layouts().back());
+}
+
+void QnWorkbenchActionHandler::at_openSingleLayoutAction_triggered() {
+    /* No layouts are open, so we need to open one. */
+    QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
+    if(resources.isEmpty()) {
+        /* There are no layouts in user's layouts list, just create a new one. */
+        qnAction(Qn::NewLayoutAction)->trigger();
+    } else {
+        /* Open the last layout from the user's layouts list. */
+        qSort(resources.begin(), resources.end(), LayoutIdCmp());
+        m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
+        m_workbench->setCurrentLayout(m_workbench->layouts().back());
+    }
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {

@@ -66,12 +66,6 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 namespace {
 
-    struct LayoutIdCmp {
-        bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
-            return l->getId() < r->getId();
-        }
-    };
-
     QToolButton *newActionButton(QAction *action)
     {
         QToolButton *button = new QToolButton();
@@ -123,13 +117,13 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
     fileOpenSignalizer->setEventType(QEvent::FileOpen);
     qApp->installEventFilter(fileOpenSignalizer);
-    connect(fileOpenSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_fileOpenSignalizer_activated(QObject *, QEvent *)));
+    connect(fileOpenSignalizer,             SIGNAL(activated(QObject *, QEvent *)),         this,                                   SLOT(at_fileOpenSignalizer_activated(QObject *, QEvent *)));
 
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
-    connect(m_dwm, SIGNAL(compositionChanged(bool)), this, SLOT(updateDwmState()));
-    connect(m_dwm, SIGNAL(titleBarDoubleClicked()), this, SLOT(toggleFullScreen()));
+    connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
+    connect(m_dwm,                          SIGNAL(titleBarDoubleClicked()),                this,                                   SLOT(toggleFullScreen()));
 
     /* Set up QWidget. */
     setWindowTitle(QApplication::applicationName());
@@ -189,10 +183,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_actionHandler->setSynchronizer(m_synchronizer);
     m_actionHandler->setWidget(this);
 
-    connect(m_userWatcher,      SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                 SLOT(setUser(const QnUserResourcePtr &)));
-    connect(qnSettings,         SIGNAL(lastUsedConnectionChanged()),            this,                           SLOT(at_settings_lastUsedConnectionChanged()));
-    connect(m_synchronizer,     SIGNAL(started()),                              this,                           SLOT(at_synchronizer_started()));
-
+    connect(m_userWatcher,                  SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                         SLOT(setUser(const QnUserResourcePtr &)));
+    connect(qnSettings,                     SIGNAL(lastUsedConnectionChanged()),            this,                                   SLOT(at_settings_lastUsedConnectionChanged()));
+    connect(m_synchronizer,                 SIGNAL(started()),                              qnAction(Qn::OpenSingleLayoutAction),   SLOT(trigger()));
 
     /* Set up actions. */
     addAction(qnAction(Qn::ExitAction));
@@ -210,13 +203,13 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(qnAction(Qn::RemoveLayoutItemAction));
     addAction(qnAction(Qn::RemoveFromServerAction));
 
-    connect(qnAction(Qn::ExitAction),                       SIGNAL(triggered()),    this,   SLOT(close()));
-    connect(qnAction(Qn::FullscreenAction),                 SIGNAL(toggled(bool)),  this,   SLOT(setFullScreen(bool)));
-    connect(qnAction(Qn::MainMenuAction),                   SIGNAL(triggered()),    this,   SLOT(showMainMenu()));
+    connect(qnAction(Qn::ExitAction),       SIGNAL(triggered()),                            this,                                   SLOT(close()));
+    connect(qnAction(Qn::FullscreenAction), SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
+    connect(qnAction(Qn::MainMenuAction),   SIGNAL(triggered()),                            this,                                   SLOT(showMainMenu()));
 
     qnMenu->setTargetProvider(m_ui);
 
-    connect(SessionManager::instance(), SIGNAL(error(int)), this, SLOT(at_sessionManager_error(int)));
+    connect(SessionManager::instance(),     SIGNAL(error(int)),                             this,                                   SLOT(at_sessionManager_error(int)));
 
 
     /* Tab bar. */
@@ -224,7 +217,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBar->setWorkbench(m_workbench);
 
-    connect(m_tabBar,           SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
+    connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
 
     /* Tab bar layout. To snap tab bar to graphics view. */
@@ -558,20 +551,6 @@ void QnMainWindow::at_sessionManager_error(int error)
 
 void QnMainWindow::at_settings_lastUsedConnectionChanged() {
     m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
-}
-
-void QnMainWindow::at_synchronizer_started() {
-    /* No layouts are open, so we need to open one. */
-    QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
-    if(resources.isEmpty()) {
-        /* There are no layouts in user's layouts list, just create a new one. */
-        qnAction(Qn::NewLayoutAction)->trigger();
-    } else {
-        /* Open the last layout from the user's layouts list. */
-        qSort(resources.begin(), resources.end(), LayoutIdCmp());
-        m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
-        m_workbench->setCurrentLayout(m_workbench->layouts().back());
-    }
 }
 
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

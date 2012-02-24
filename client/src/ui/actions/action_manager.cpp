@@ -214,6 +214,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
+    factory(Qn::OpenSingleLayoutAction).
+        flags(Qn::NoTarget).
+        text(tr("Open Single Layout"));
+
 
 
     /* Main menu actions. */

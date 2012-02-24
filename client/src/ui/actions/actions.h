@@ -32,6 +32,12 @@ namespace Qn {
          */
         NewLayoutAction,
 
+        /**
+         * Opens some existing layout if there exists one, creates a new one otherwise.
+         * This action is executed every time the last layout on a workbench is closed.
+         */
+        OpenSingleLayoutAction,
+
 
 
         /* Main menu actions. */
