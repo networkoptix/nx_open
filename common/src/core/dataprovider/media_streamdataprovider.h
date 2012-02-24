@@ -43,8 +43,6 @@ protected:
     
     void checkTime(QnAbstractMediaDataPtr data);
 protected:
-    int m_channel_number;
-
 	QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 

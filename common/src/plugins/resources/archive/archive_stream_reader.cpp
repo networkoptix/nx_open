@@ -187,7 +187,6 @@ bool QnArchiveStreamReader::init()
     if (!m_delegate->open(m_resource))
         return false;
     m_delegate->setAudioChannel(m_selectedAudioChannel);
-    m_channel_number = m_delegate->getVideoLayout()->numberOfChannels();
 
     // Alloc common resources
     m_lastFrameDuration = 0;
