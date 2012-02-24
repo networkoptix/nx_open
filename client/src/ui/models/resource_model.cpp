@@ -9,6 +9,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <ui/view_drag_and_drop.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_item.h>
 #include "file_processor.h"
 
 namespace {
@@ -570,7 +571,7 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
             QnLayoutItemData item;
             item.resource.id = mediaResource->getId();
             item.uuid = QUuid::createUuid();
-            //item.flags = QnWorkbenchItem:: // TODO
+            item.flags = QnWorkbenchItem::PendingGeometryAdjustment;
 
             layout->addItem(item);
         }

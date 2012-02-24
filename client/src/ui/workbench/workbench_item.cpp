@@ -136,6 +136,9 @@ bool QnWorkbenchItem::setFlags(ItemFlags flags) {
     bool result = true;
     if((m_flags ^ flags) & Pinned)
         result &= setFlag(Pinned, flags & Pinned);
+    if((m_flags ^ flags) & PendingGeometryAdjustment)
+        result &= setFlag(PendingGeometryAdjustment, flags & PendingGeometryAdjustment);
+
 
     return result;
 }
@@ -162,11 +165,25 @@ void QnWorkbenchItem::setRotation(qreal rotation) {
 }
 
 void QnWorkbenchItem::adjustGeometry() {
-    qreal nan = std::numeric_limits<qreal>::quiet_NaN();
+    /* Invalidate geometry. */
+    QPoint topLeft = m_geometry.topLeft();
+    setGeometry(QRect(topLeft + QPoint(1, 1), topLeft - QPoint(1, 1)));
+    setGeometryDelta(QRectF());
 
-    adjustGeometry(QPointF(nan, nan));
+    /* Set geometry adjustment flag. */
+    setFlag(PendingGeometryAdjustment, true);
 }
 
 void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
-    emit geometryAdjustmentRequested(desiredPosition);
+    /* Update combined geometry to reflect desired position. */
+    QRectF combinedGeometry = this->combinedGeometry();
+    QPointF delta = desiredPosition - combinedGeometry.center();
+    combinedGeometry = QRectF(
+        combinedGeometry.topLeft() + delta,
+        combinedGeometry.bottomRight() + delta
+    );
+    setCombinedGeometry(combinedGeometry);
+
+    /* Set geometry adjustment flag. */
+    setFlag(PendingGeometryAdjustment, true);
 }

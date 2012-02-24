@@ -621,11 +621,13 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagChanged(QnWorkbenchItem::ItemFlag, bool)));
-    connect(item, SIGNAL(geometryAdjustmentRequested(const QPointF &)), this, SLOT(at_item_geometryAdjustmentRequested(const QPointF &)));
 
     m_widgetByItem.insert(item, widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
+
+    if(item->checkFlag(QnWorkbenchItem::PendingGeometryAdjustment))
+        adjustGeometry(item, false);
 
     synchronize(widget, false);
     bringToFront(widget);
@@ -998,22 +1000,23 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
     synchronizeGeometry(widget, animator(widget)->isRunning());
 }
 
-void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, const QPointF &desiredPosition) {
+void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
+    if(!item->checkFlag(QnWorkbenchItem::PendingGeometryAdjustment))
+        return; /* May have been unchecked already. */
+
     QnResourceWidget *widget = this->widget(item);
 
     /* Calculate target position. */
     QPointF newPos;
-    if(qnIsFinite(desiredPosition.x()) && qnIsFinite(desiredPosition.y())) {
-        newPos = desiredPosition;
-    } else {
+    if(item->geometry().width() < 0 || item->geometry().height() < 0) {
         newPos = mapViewportToGridF(m_view->viewport()->geometry().center());
-    }
 
-    /* Check if item's geometry is not initialized. */
-    if(item->geometry().isNull() && item->geometryDelta().isNull()) {
+        /* Initialize item's geometry with adequate values. */
         item->setFlag(QnWorkbenchItem::Pinned, false);
         item->setCombinedGeometry(QRectF(newPos, QSizeF(0.0, 0.0)));
         synchronizeGeometry(widget, false);
+    } else {
+        newPos = item->combinedGeometry().center();
     }
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
@@ -1034,6 +1037,10 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, const QPointF &de
     QnAspectRatioMagnitudeCalculator metric(newPos, size, item->layout()->boundingRect(), aspectRatio(m_view->viewport()->size()) / aspectRatio(m_workbench->mapper()->step()));
     QRect geometry = item->layout()->closestFreeSlot(newPos, size, &metric);
     item->layout()->pinItem(item, geometry);
+    item->setFlag(QnWorkbenchItem::PendingGeometryAdjustment, false);
+
+    /* Synchronize. */
+    synchronizeGeometry(item, animate);
 }
 
 
@@ -1225,14 +1232,14 @@ void QnWorkbenchDisplay::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, boo
     case QnWorkbenchItem::Pinned:
         synchronizeLayer(static_cast<QnWorkbenchItem *>(sender()));
         break;
+    case QnWorkbenchItem::PendingGeometryAdjustment:
+        if(value)
+            adjustGeometry(static_cast<QnWorkbenchItem *>(sender()));
+        break;
     default:
         qnWarning("Invalid item flag '%1'.", static_cast<int>(flag));
         break;
     }
-}
-
-void QnWorkbenchDisplay::at_item_geometryAdjustmentRequested(const QPointF &desiredPosition) {
-    adjustGeometry(static_cast<QnWorkbenchItem *>(sender()), desiredPosition);
 }
 
 void QnWorkbenchDisplay::at_activityStopped() {
