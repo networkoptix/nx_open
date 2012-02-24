@@ -72,6 +72,7 @@ public:
 
     qint64 minTime() const;
     qint64 maxTime() const;
+    int getChannel() const;
 
 private:
     QString getFilePrefix(const QDate& datetime);

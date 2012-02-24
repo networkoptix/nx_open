@@ -92,6 +92,7 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
     m_lastResult->data.write((const char*) m_motionBuffer + motionIndex*MOTION_DATA_RECORD_SIZE, MOTION_DATA_RECORD_SIZE);
     m_lastResult->timestamp = foundStartTime*1000;
     m_lastResult->m_duration = m_indexItr->duration*1000;
+    m_lastResult->channelNumber = m_owner->getChannel();
 
     //qDebug() << "motion=" << QDateTime::fromMSecsSinceEpoch(m_lastResult->timestamp/1000).toString("hh.mm.ss.zzz")
     //         << "dur=" << m_lastResult->m_duration/1000.0
@@ -425,4 +426,9 @@ qint64 QnMotionArchive::minTime() const
 qint64 QnMotionArchive::maxTime() const
 {
     return m_maxMotionTime;
+}
+
+int QnMotionArchive::getChannel() const
+{
+    return m_channel;
 }
