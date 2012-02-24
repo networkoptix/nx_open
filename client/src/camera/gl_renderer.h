@@ -9,6 +9,7 @@
 #include <QSharedPointer>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "render_status.h"
+#include "core/resource/resource_media_layout.h"
 
 class CLVideoDecoderOutput;
 class QnGLRendererPrivate;
@@ -45,7 +46,7 @@ public:
 
     bool isLowQualityImage() const;
     qint64 lastDisplayedTime() const;
-    QnMetaDataV1Ptr lastFrameMetadata() const; 
+    QnMetaDataV1Ptr lastFrameMetadata(int channel) const; 
 
 private:
     void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
@@ -105,7 +106,7 @@ private:
     int m_videoWidth;
     int m_videoHeight;
     qint64 m_lastDisplayedTime;
-    QnMetaDataV1Ptr m_lastDisplayedMetadata;
+    QnMetaDataV1Ptr m_lastDisplayedMetadata[CL_MAX_CHANNELS];
     unsigned m_lastDisplayedFlags;
 };
 

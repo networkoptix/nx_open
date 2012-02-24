@@ -38,7 +38,7 @@ qint64 QnResourceWidgetRenderer::isLowQualityImage(int channel) const {
 
 QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const 
 { 
-    return m_channelRenderers[channel]->lastFrameMetadata();
+    return m_channelRenderers[channel]->lastFrameMetadata(channel);
 }
 
 QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect, qreal opacity) {
