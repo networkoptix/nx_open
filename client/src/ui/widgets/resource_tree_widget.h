@@ -36,7 +36,9 @@ public:
 
     QnLayoutItemIndexList selectedLayoutItems() const;
 
-    virtual QVariant target(QnAction *action) override;
+    virtual Qn::ActionScope currentScope() const override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
 signals:
     void activated(const QnResourcePtr &resource);

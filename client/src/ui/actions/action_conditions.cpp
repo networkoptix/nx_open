@@ -10,15 +10,34 @@ QnActionCondition::QnActionCondition(QObject *parent):
     QnActionTargetTypes::initialize();
 }
 
+bool QnActionCondition::check(const QnResourceList &resources) { 
+    Q_UNUSED(resources);
+
+    return false; 
+};
+
+bool QnActionCondition::check(const QnLayoutItemIndexList &layoutItems) { 
+    return check(QnActionTargetTypes::resources(layoutItems));
+};
+
+bool QnActionCondition::check(const QnResourceWidgetList &widgets) { 
+    return check(QnActionTargetTypes::layoutItems(widgets));
+};
+
+bool QnActionCondition::check(const QnWorkbenchLayoutList &layouts) { 
+    return check(QnActionTargetTypes::resources(layouts));
+};
+
+
 bool QnActionCondition::check(const QVariant &items) {
     if(items.userType() == QnActionTargetTypes::resourceList()) {
         return check(items.value<QnResourceList>());
     } else if(items.userType() == QnActionTargetTypes::widgetList()) {
         return check(items.value<QnResourceWidgetList>());
     } else if(items.userType() == QnActionTargetTypes::layoutList()) {
-        return true;
+        return check(items.value<QnWorkbenchLayoutList>());
     } else if(items.userType() == QnActionTargetTypes::layoutItemList()) {
-        return true;
+        return check(items.value<QnLayoutItemIndexList>());
     } else {
         qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
         return false;

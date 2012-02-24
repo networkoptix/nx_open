@@ -292,7 +292,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Tab bar actions. */
     factory(Qn::CloseLayoutAction).
-        flags(Qn::TabBar).
+        flags(Qn::TabBar | Qn::ScopelessHotkey).
         text(tr("Close")).
         shortcut(tr("Ctrl+W")).
         autoRepeat(false);

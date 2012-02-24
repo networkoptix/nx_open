@@ -40,7 +40,9 @@ public:
     QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent = NULL);
     virtual ~QnWorkbenchUi();
 
-    virtual QVariant target(QnAction *action) override;
+    virtual Qn::ActionScope currentScope() const override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     enum Flag {
         HIDE_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */

@@ -303,12 +303,16 @@ QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
     return result;
 }
 
-QVariant QnResourceTreeWidget::target(QnAction *action) {
-    if(action != NULL && !(action->scope() & Qn::Tree))
+Qn::ActionScope QnResourceTreeWidget::currentScope() const {
+    return Qn::TreeScope;
+}
+
+QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
+    if(scope != Qn::TreeScope)
         return QVariant();
 
     QItemSelectionModel *selectionModel = currentSelectionModel();
-    
+
     if(!selectionModel->currentIndex().data(Qn::UuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
     } else {
@@ -321,7 +325,7 @@ QVariant QnResourceTreeWidget::target(QnAction *action) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, target(NULL)));
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
     if(menu->isEmpty())
         return;
 

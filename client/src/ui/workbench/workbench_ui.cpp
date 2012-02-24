@@ -497,40 +497,39 @@ QnWorkbenchUi::~QnWorkbenchUi() {
     return;
 }
 
-QVariant QnWorkbenchUi::target(QnAction *action) {
-    /* Determine current scope. */
-    Qn::ActionScope scope = Qn::MainScope;
-
+Qn::ActionScope QnWorkbenchUi::currentScope() const {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     if(focusItem == m_treeItem) {
-        scope = Qn::TreeScope;
+        return Qn::TreeScope;
     } else if(focusItem == m_sliderItem) {
-        scope = Qn::SliderScope;
+        return Qn::SliderScope;
+    } else if(focusItem == m_tabBarItem) {
+        return Qn::TabBarScope;
     } else if(!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)) {
-        scope = Qn::SceneScope;
+        return Qn::SceneScope;
+    } else {
+        return Qn::MainScope;
     }
+}
 
-    /* Compare to action's scope. */
-    if(!(action->scope() & scope))
-        return QVariant();
-    
+QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     /* Get items. */
     switch(scope) {
     case Qn::TabBarScope: {
         QnWorkbenchLayoutList result;
         result.push_back(m_display->workbench()->currentLayout());
         return QVariant::fromValue(result);
-    }
+                          }
     case Qn::TreeScope:
-        return m_treeWidget->target(action);
+        return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope: {
         QnResourceList result;
         CLVideoCamera *camera = m_sliderItem->videoCamera();
         if(camera != NULL)
             result.push_back(camera->resource());
-        
+
         return QVariant::fromValue(result);
-    }
+                          }
     case Qn::SceneScope:
         return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
