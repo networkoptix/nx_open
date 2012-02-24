@@ -708,7 +708,7 @@ CLVideoDecoderOutput *QnGLRenderer::update()
         updateTexture();
         if (m_curImg->pkt_dts != AV_NOPTS_VALUE)
             m_lastDisplayedTime = m_curImg->pkt_dts;
-        m_lastDisplayedMetadata = m_curImg->metadata;
+        m_lastDisplayedMetadata[m_curImg->channel] = m_curImg->metadata;
         m_lastDisplayedFlags = m_curImg->flags;
         m_newtexture = true;
     } 
@@ -780,10 +780,10 @@ bool QnGLRenderer::isLowQualityImage() const
     return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_LowQuality;
 }
 
-QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
+QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata(int channel) const
 {
     QMutexLocker locker(&m_displaySync);
-    return m_lastDisplayedMetadata;
+    return m_lastDisplayedMetadata[channel];
 }
 
 bool QnGLRenderer::usingShaderYuvToRgb() const {

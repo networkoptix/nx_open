@@ -47,7 +47,7 @@ private:
     void start();
     void stop();
 
-    Node *node(const QnId &id);
+    Node *node(const QnResourcePtr &resource);
     Node *node(const QUuid &uuid);
     Node *node(const QModelIndex &index) const;
 
@@ -67,17 +67,17 @@ private:
     /** Associated resource pool. */
     QnResourcePool *m_resourcePool;
 
-    /** Root node. Considered a resource node with id = 0.  */
+    /** Root node. Considered a resource node for NULL resource. */
     Node *m_root;
 
-    /** Mapping for resource nodes, by resource id. */
-    QHash<QnId, Node *> m_resourceNodeById;
+    /** Mapping for resource nodes, by resource. */
+    QHash<QnResource *, Node *> m_resourceNodeByResource;
 
     /** Mapping for item nodes, by item id. */
     QHash<QUuid, Node *> m_itemNodeByUuid;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
-    QHash<QnId, QList<Node *> > m_itemNodesById;
+    QHash<QnResource *, QList<Node *> > m_itemNodesByResource;
 };
 
 Q_DECLARE_METATYPE(QUuid);

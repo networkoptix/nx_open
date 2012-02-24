@@ -790,7 +790,10 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             }
         }
     }
+
+    QnScopedPainterTransformRollback transformRollback(painter);
     painter->setPen(QPen(QColor(255, 255, 255, 40)));
+    painter->translate(rect.topLeft());
     painter->drawLines(gridLines);
 
     if (!motion)

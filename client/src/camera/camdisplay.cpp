@@ -103,14 +103,13 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_realTimeHurryUp(0),
       m_extTimeSrc(0),
       m_useMtDecoding(false),
-      m_buffering(false),
+      m_buffering(0),
       m_executingJump(0),
       skipPrevJumpSignal(0),
       m_processedPackets(0),
       m_toLowQSpeed(1000.0),
       m_delayedFrameCnt(0),
       m_emptyPacketCounter(0),
-      m_isEOFReached(false),
       m_hiQualityRetryCounter(0),
       m_isStillImage(false),
       m_isLongWaiting(false),
@@ -269,6 +268,14 @@ void CLCamDisplay::hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float s
         }
     }
 }
+
+int CLCamDisplay::getBufferingMask()
+{
+    int channelMask = 0;
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+        channelMask = channelMask*2  + 1;
+    return channelMask;
+};
 
 void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
@@ -450,20 +457,19 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             if (speed < 0)
                 m_nextReverseTime = m_display[0]->nextReverseTime();
 
-            if (m_extTimeSrc)
+            m_timeMutex.lock();
+            if (m_buffering && m_executingJump == 0) 
             {
-                m_timeMutex.lock();
-                if (m_buffering && m_executingJump == 0) 
-                {
-                    m_buffering = false;
-                    m_timeMutex.unlock();
+                m_buffering &= ~(1 << vd->channelNumber);
+                m_timeMutex.unlock();
+                if (m_buffering == 0 && m_extTimeSrc)
                     m_extTimeSrc->onBufferingFinished(this);
-                }
-                else
-                    m_timeMutex.unlock();
             }
+            else
+                m_timeMutex.unlock();
         }
-        else if (!ignoreVideo)
+
+        if (!ignoreVideo && m_buffering)
         {
             // Frame does not displayed for some reason (and it is not ignored frames)
             QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(vd->dataProvider);
@@ -506,7 +512,9 @@ void CLCamDisplay::onBeforeJump(qint64 time)
 
     
     m_executingJump++;
-    m_buffering = true;
+
+    m_buffering = getBufferingMask();
+
     if (m_executingJump > 1)
         clearUnprocessedData();
     m_processedPackets = 0;
@@ -526,7 +534,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     QMutexLocker lock(&m_timeMutex);
     m_afterJump = true;
     m_bofReceived = false;
-    m_buffering = true;
+    m_buffering = getBufferingMask();
     m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
     //clearUnprocessedData();
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
@@ -627,7 +635,7 @@ void CLCamDisplay::processNewSpeed(float speed)
     }
 
     if (speed < 0 && m_prevSpeed >= 0)
-        m_buffering = true; // decode first gop is required some time
+        m_buffering = getBufferingMask(); // decode first gop is required some time
 
     if (speed >= 0 && m_prevSpeed < 0 || speed < 0 && m_prevSpeed >= 0)
     {
@@ -762,16 +770,15 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
 
-    bool isEOFReached = emptyData != 0;
-    if (m_extTimeSrc && isEOFReached != m_isEOFReached)
-        m_extTimeSrc->onEofReached(this, isEOFReached); // jump to live if needed
-    m_isEOFReached = isEOFReached;
     if (emptyData)
     {
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3)
         {
+			if (m_extTimeSrc)
+            	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
+
             /*
             // One camera from several sync cameras may reach BOF/EOF
 		    // move current time position to the edge to prevent other cameras blocking
@@ -788,7 +795,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_timeMutex.lock();
             if (m_buffering && m_executingJump == 0) 
             {
-                m_buffering = false;
+                m_buffering = 0;
                 m_timeMutex.unlock();
                 if (m_extTimeSrc)
                     m_extTimeSrc->onBufferingFinished(this);
@@ -798,8 +805,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         }
         return true;
     }
-
-    m_emptyPacketCounter = 0;
+    else if (m_emptyPacketCounter > 0) {
+		if (m_extTimeSrc)
+        	m_extTimeSrc->onEofReached(this, false); // jump to live if needed
+        m_emptyPacketCounter = 0;
+    }
 
     bool flushCurrentBuffer = false;
     bool audioParamsChanged = ad && m_playingFormat != ad->format;
@@ -1141,7 +1151,7 @@ bool CLCamDisplay::isStillImage() const
 
 bool CLCamDisplay::isNoData() const
 {
-    if (m_isEOFReached)
+    if (m_emptyPacketCounter >= 3)
         return true;
     if (!m_extTimeSrc)
         return false;
@@ -1158,10 +1168,3 @@ bool CLCamDisplay::isNoData() const
     int sign = m_speed >= 0 ? 1 : -1;
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
 }
-
-/*
-bool CLCamDisplay::isEOFReached() const
-{
-    return m_isEOFReached;
-}
-*/

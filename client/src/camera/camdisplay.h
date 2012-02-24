@@ -61,7 +61,6 @@ public:
     void setExternalTimeSource(QnlTimeSource* value);
 
     bool canAcceptData() const;
-    //bool isEOFReached() const;
     bool isNoData() const;
     bool isStillImage() const;
 public slots:
@@ -93,6 +92,7 @@ private:
     void afterJump(QnAbstractMediaDataPtr media);
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
+    int getBufferingMask();
 private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
@@ -160,7 +160,7 @@ private:
     //qint64 m_nextTime;
     mutable QMutex m_timeMutex;
     bool m_useMtDecoding;
-    bool m_buffering;
+    int m_buffering;
     int m_executingJump;
     int skipPrevJumpSignal;
     int m_processedPackets;
@@ -170,7 +170,6 @@ private:
     float m_toLowQSpeed; // speed then switching to low quality for camera
     //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
-    bool m_isEOFReached;
     bool m_isStillImage;
     bool m_isLongWaiting;
     

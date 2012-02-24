@@ -184,6 +184,7 @@ signals:
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void nameChanged();
     void parentIdChanged();
+    void idChanged(const QnId &oldId, const QnId &newId);
 
     void resourceChanged();
 
