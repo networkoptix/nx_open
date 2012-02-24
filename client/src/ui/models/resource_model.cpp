@@ -5,6 +5,7 @@
 #include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <ui/view_drag_and_drop.h>
@@ -195,7 +196,7 @@ public:
         case Item:
             if(m_flags & QnResource::layout)
                 result |= Qt::ItemIsEditable; /* Only layouts are currently editable - user can change layout's name. */
-            if(m_flags & QnResource::media)
+            if(m_flags & (QnResource::media | QnResource::layout))
                 result |= Qt::ItemIsDragEnabled;
             break;
         default:
@@ -553,7 +554,7 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
         resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
 
         /* Insert. Resources will be inserted into this model in callbacks. */
-        qnResPool->addResources(resources);
+        m_resourcePool->addResources(resources);
     }
 
     /* Check where we're dropping it. */
@@ -564,16 +565,35 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
-            QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-            if(!mediaResource)
+            QnMediaResourcePtr media = resource.dynamicCast<QnMediaResource>();
+            if(!media)
                 continue; /* Can drop only media resources on layout. */
 
             QnLayoutItemData item;
-            item.resource.id = mediaResource->getId();
+            item.resource.id = media->getId();
             item.uuid = QUuid::createUuid();
             item.flags = QnWorkbenchItem::PendingGeometryAdjustment;
 
             layout->addItem(item);
+        }
+    } else if(QnUserResourcePtr &user = node->resource().dynamicCast<QnUserResource>()) {
+        foreach(const QnResourcePtr &resource, resources) {
+            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+            if(!layout)
+                continue; /* Can drop only layout resources on user. */
+            
+            if(layout->getParentId() == user->getId())
+                continue; /* Dropping layout into its owner does nothing. */
+
+            QnLayoutResourcePtr newLayout(new QnLayoutResource());
+            m_resourcePool->addResource(newLayout);
+            user->addLayout(newLayout);
+
+            newLayout->setName(layout->getName());
+            QnLayoutItemDataList items = layout->getItems().values();
+            for(int i = 0; i < items.size(); i++)
+                items[i].uuid = QUuid::createUuid();
+            newLayout->setItems(items);
         }
     }
     
