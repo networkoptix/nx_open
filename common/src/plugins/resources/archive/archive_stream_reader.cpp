@@ -317,7 +317,7 @@ begin_label:
             if (displayTime != AV_NOPTS_VALUE) {
 				if (!exactJumpToSpecifiedFrame)
                 	needKeyData();
-                intChanneljumpTo(displayTime, 0);
+                internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
                 emit jumpOccured(displayTime);
@@ -344,7 +344,7 @@ begin_label:
         m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
         if (!exactJumpToSpecifiedFrame)
             setNeedKeyData();
-        intChanneljumpTo(jumpTime, 0);
+        internalJumpTo(jumpTime);
         emit jumpOccured(jumpTime);
         m_BOF = true;
     }
@@ -363,7 +363,7 @@ begin_label:
         if (!delegateForNegativeSpeed) {
             if (!exactJumpToSpecifiedFrame)
                 setNeedKeyData();
-            intChanneljumpTo(displayTime, 0);
+            internalJumpTo(displayTime);
             if (reverseMode) {
                 if (displayTime != DATETIME_NOW)
                     m_topIFrameTime = displayTime;
@@ -472,7 +472,7 @@ begin_label:
                 {
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
-                    intChanneljumpTo(QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP, 0);
+                    internalJumpTo(QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP);
                     m_afterBOFCounter = 0;
                     goto begin_label;
                 }
@@ -522,7 +522,7 @@ begin_label:
                     if (m_currentTime != seekTime) {
                         m_currentData.clear();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
-                        intChanneljumpTo(seekTime, 0);
+                        internalJumpTo(seekTime);
                         m_bofReached = seekTime == m_delegate->startTime();
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
                         //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
@@ -626,7 +626,7 @@ begin_label:
         {
             if (!exactJumpToSpecifiedFrame)
                 setNeedKeyData();
-            intChanneljumpTo(newTime, 0);
+            internalJumpTo(newTime);
             setSkipFramesToTime(newTime, true);
             m_BOF = true;
             goto begin_label;
@@ -643,7 +643,7 @@ begin_label:
     return m_currentData;
 }
 
-void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
+void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
 {
     m_skippedMetadata.clear();
     m_nextData.clear();

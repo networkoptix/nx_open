@@ -147,7 +147,7 @@ private:
     double m_speed;
 
     qint64 determineDisplayTime(bool reverseMode);
-    void intChanneljumpTo(qint64 mksec, int channel);
+    void internalJumpTo(qint64 mksec);
     bool getNextVideoPacket();
     void addAudioChannel(QnCompressedAudioDataPtr audio);
     QnAbstractMediaDataPtr getNextPacket();
