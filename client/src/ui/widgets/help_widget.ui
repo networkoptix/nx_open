@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>HelpContextWidget</class>
+ <class>HelpWidget</class>
  <widget class="QWidget" name="HelpContextWidget">
   <property name="geometry">
    <rect>

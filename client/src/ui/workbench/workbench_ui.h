@@ -30,7 +30,7 @@ class QnMaskedProxyWidget;
 class QnAbstractRenderer;
 class QnClickableWidget;
 class QnLayoutTabBar;
-class QnHelpContextWidget;
+class QnHelpWidget;
 
 class QnWorkbenchUi: public QObject, public QnActionTargetProvider, protected SceneUtility {
     Q_OBJECT;
@@ -336,7 +336,7 @@ private:
 
     QnMaskedProxyWidget *m_helpItem;
 
-    QnHelpContextWidget *m_helpWidget;
+    QnHelpWidget *m_helpWidget;
 
     QnImageButtonWidget *m_helpPinButton;
 

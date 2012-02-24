@@ -195,7 +195,7 @@ FORMS += \
     youtube/youtubesetting.ui \
     ui/device_settings/camera_schedule.ui \
     ui/dialogs/connectiontestingdialog.ui \
-    ui/widgets/help_context_widget.ui \
+    ui/widgets/help_widget.ui \
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"

@@ -1,10 +1,10 @@
-#include "help_context_widget.h"
-#include "ui_help_context_widget.h"
+#include "help_widget.h"
+#include "ui_help_widget.h"
 #include <help/qncontext_help.h>
 
-QnHelpContextWidget::QnHelpContextWidget(QnContextHelp *contextHelp, QWidget *parent):
+QnHelpWidget::QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent):
     QWidget(parent),
-    ui(new Ui::HelpContextWidget()),
+    ui(new Ui::HelpWidget()),
     m_contextHelp(contextHelp)
 {
     ui->setupUi(this);
@@ -13,16 +13,16 @@ QnHelpContextWidget::QnHelpContextWidget(QnContextHelp *contextHelp, QWidget *pa
     connect(ui->checkBox,   SIGNAL(toggled(bool)),                                  this,   SLOT(at_checkBox_toggled(bool)));
 }
 
-QnHelpContextWidget::~QnHelpContextWidget() {
+QnHelpWidget::~QnHelpWidget() {
     return;
 }
 
-void QnHelpContextWidget::at_contextHelp_helpContextChanged(QnContextHelp::ContextId id) {
+void QnHelpWidget::at_contextHelp_helpContextChanged(QnContextHelp::ContextId id) {
     m_id = id;
     ui->label->setText(contextHelp()->text(id));
     ui->checkBox->setCheckState(contextHelp()->isNeedAutoShow(id) ? Qt::Unchecked : Qt::Checked);
 }
 
-void QnHelpContextWidget::at_checkBox_toggled(bool checked) {
+void QnHelpWidget::at_checkBox_toggled(bool checked) {
     contextHelp()->setNeedAutoShow(m_id, !checked);
 }

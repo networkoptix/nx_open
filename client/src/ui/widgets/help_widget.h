@@ -1,19 +1,19 @@
-#ifndef QN_HELP_CONTEXT_WIDGET_H
-#define QN_HELP_CONTEXT_WIDGET_H
+#ifndef QN_HELP_WIDGET_H
+#define QN_HELP_WIDGET_H
 
 #include <QWidget>
 #include <QScopedPointer>
 #include <help/qncontext_help.h>
 
 namespace Ui {
-    class HelpContextWidget;
+    class HelpWidget;
 }
 
-class QnHelpContextWidget: public QWidget {
+class QnHelpWidget: public QWidget {
     Q_OBJECT;
 public:
-    QnHelpContextWidget(QnContextHelp *contextHelp, QWidget *parent = NULL);
-    virtual ~QnHelpContextWidget();
+    QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent = NULL);
+    virtual ~QnHelpWidget();
 
 protected slots:
     void at_contextHelp_helpContextChanged(QnContextHelp::ContextId id);
@@ -25,9 +25,9 @@ protected:
     }
 
 private:
-    QScopedPointer<Ui::HelpContextWidget> ui;
+    QScopedPointer<Ui::HelpWidget> ui;
     QWeakPointer<QnContextHelp> m_contextHelp;
     QnContextHelp::ContextId m_id;
 };
 
-#endif // QN_HELP_CONTEXT_WIDGET_H
+#endif // QN_HELP_WIDGET_H

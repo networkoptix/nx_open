@@ -47,7 +47,7 @@
 #include <ui/actions/action_target_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/widgets/help_context_widget.h>
+#include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 #include <ui/mixins/render_watch_mixin.h>
 
@@ -405,7 +405,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_helpBackgroundItem->setPalette(palette);
     }
 
-    m_helpWidget = new QnHelpContextWidget(QnContextHelp::instance());
+    m_helpWidget = new QnHelpWidget(qnHelp);
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_helpWidget->palette();
