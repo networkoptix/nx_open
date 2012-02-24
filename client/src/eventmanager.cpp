@@ -39,11 +39,16 @@ void QnEventManager::stop()
 
 void QnEventManager::eventReceived(QnEvent event)
 {
-    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
+    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId << event.resourceGuid;
 
     if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
+        QnResourcePtr resource;
+        if (event.resourceGuid)
+            resource = qnResPool->getResourceById(event.resourceGuid);
+        else
+            resource = qnResPool->getResourceById(event.resourceId);
+
         if (resource)
         {
             QnResource::Status status = (QnResource::Status)event.data.toInt();
@@ -58,11 +63,16 @@ void QnEventManager::eventReceived(QnEvent event)
         QnResourceList resources;
         if (appServerConnection->getResources(resources, errorString) == 0)
         {
-            QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
+            QnResourcePtr ownResource;
+
+            if (!event.resourceGuid.isEmpty())
+                ownResource = qnResPool->getResourceById(event.resourceGuid);
+            else
+                ownResource = qnResPool->getResourceById(event.resourceId);
 
             foreach(QnResourcePtr resource, resources)
             {
-                if (resource->getId() == event.resourceId)
+                if ((!event.resourceGuid.isEmpty() && resource->getGuid() == event.resourceGuid) || (event.resourceGuid.isEmpty() && resource->getId() == event.resourceId))
                 {
                     if (ownResource.isNull())
                         qnResPool->addResource(resource);

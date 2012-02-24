@@ -231,3 +231,15 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
+QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
+{
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
+        if (netResource != 0 && netResource->getGuid() == guid)
+            return netResource;
+    }
+
+    return QnNetworkResourcePtr(0);
+}
+

@@ -59,16 +59,6 @@ QnVideoServerConnectionPtr QnVideoServerResource::apiConnection()
     return m_restConnection;
 }
 
-void QnVideoServerResource::setGuid(const QString& guid)
-{
-    m_guid = guid;
-}
-
-QString QnVideoServerResource::getGuid() const
-{
-    return m_guid;
-}
-
 QnResourcePtr QnVideoServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     Q_UNUSED(resourceTypeId)

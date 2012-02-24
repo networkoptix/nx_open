@@ -19,9 +19,10 @@ message Layout {
     }
 
     optional int32 id       = 1;
-    required string name    = 2;
-    required int32 parentId = 3;
-    repeated Item item      = 4;
+    optional string guid    = 2;
+    required string name    = 3;
+    required int32 parentId = 4;
+    repeated Item item      = 5;
 }
 
 message Layouts {

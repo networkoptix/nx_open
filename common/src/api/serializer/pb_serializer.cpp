@@ -140,6 +140,12 @@ void parseLayouts(QList<T>& layouts, const PbLayoutList& pb_layouts)
             parameters["id"] = QString::number(pb_layout.id());
         }
 
+        if (pb_layout.has_guid())
+        {
+            layout->setGuid(pb_layout.guid().c_str());
+            parameters["guid"] = pb_layout.guid().c_str();
+        }
+
         layout->setParentId(pb_layout.parentid());
         parameters["parentId"] = QString::number(pb_layout.parentid());
 
