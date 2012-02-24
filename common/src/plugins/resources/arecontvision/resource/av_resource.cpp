@@ -144,6 +144,9 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
 
         //
         CLPing ping;
+
+        QString oldIp = getHostAddress().toString();
+
         if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed
             return false;
 
