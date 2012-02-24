@@ -225,7 +225,7 @@
 					&lt;span style=&quot;font-size: 16px; &quot;&gt;&lt;strong&gt;&lt;span style=&quot;color: rgb(255, 255, 0); &quot;&gt;NAVIGATION TIPS&lt;/span&gt;&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
 			&lt;/div&gt;
 			&lt;div&gt;
-				&lt;strong style=&quot;color: rgb(153, 255, 153); &quot;&gt;&lt;span style=&quot;font-size: 14px; &quot;&gt;Change Position&lt;/span&gt;&lt;/strong&gt;&lt;/div&gt;
+				&lt;strong style=&quot;color: rgb(153, 255, 153); &quot;&gt;&lt;span style=&quot;font-size: 14px; &quot;&gt;Change Position/Go to Archive&lt;/span&gt;&lt;/strong&gt;&lt;/div&gt;
 			&lt;div&gt;
 				&lt;span style=&quot;font-size: 12px; &quot;&gt;Click on Time Line or Time Scale&lt;/span&gt;&lt;/div&gt;
 			&lt;div&gt;
