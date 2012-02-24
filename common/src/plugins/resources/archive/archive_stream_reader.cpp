@@ -55,6 +55,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_currentTimeHint(-1),
     m_speed(1.0)
 {
+    memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
+
     m_isStillImage = dev->checkFlags(QnResource::still_image);
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -484,11 +486,25 @@ begin_label:
                 }
             }
 
+            // multisensor cameras support
+            int ch = videoData->channelNumber;
+            if (ch > 0 && !m_rewSecondaryStarted[ch])
+            {
+                if (isKeyFrame) {
+                    videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+                    m_rewSecondaryStarted[ch] = true;
+                }
+                else
+                    goto begin_label; // skip 
+            }
+
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
-                if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime) {
+                if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime) 
+                {
                     m_bottomIFrameTime = m_currentTime;
                     videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+                    memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
                 }
                 if (m_currentTime >= m_topIFrameTime)
                 {
