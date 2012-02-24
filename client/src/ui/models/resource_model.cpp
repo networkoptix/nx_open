@@ -5,6 +5,7 @@
 #include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <ui/view_drag_and_drop.h>
 #include <ui/style/resource_icon_cache.h>
@@ -67,6 +68,9 @@ public:
 
     ~Node() {
         clear();
+
+        foreach(Node *child, m_children)
+            child->setParent(NULL);
     }
 
     void clear() {
@@ -105,6 +109,14 @@ public:
         }
 
         changeInternal();
+    }
+
+    Type type() const {
+        return m_type;
+    }
+
+    const QnResourcePtr &resource() const {
+        return m_resource;
     }
 
     const QUuid &uuid() const {
@@ -534,14 +546,35 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
 
     /* Decode. */
     QnResourceList resources;
-    if (!mimeData->hasFormat(format)) {
-        resources += deserializeResources(mimeData->data(format));
+    if (mimeData->hasFormat(format)) {
+        resources = deserializeResources(mimeData->data(format));
     } else if (mimeData->hasUrls()) {
-        resources += QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
+        resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
+
+        /* Insert. Resources will be inserted into this model in callbacks. */
+        qnResPool->addResources(resources);
     }
 
-    /* Insert. Resources will be inserted into this model in callbacks. */
-    qnResPool->addResources(resources);
+    /* Check where we're dropping it. */
+    Node *node = this->node(parent);
+    
+    if(node->type() == Node::Item) 
+        node = node->parent(); /* Dropping into layout item == dropping into layout. */
+
+    if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
+        foreach(const QnResourcePtr &resource, resources) {
+            QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+            if(!mediaResource)
+                continue; /* Can drop only media resources on layout. */
+
+            QnLayoutItemData item;
+            item.resource.id = mediaResource->getId();
+            item.uuid = QUuid::createUuid();
+            //item.flags = QnWorkbenchItem:: // TODO
+
+            layout->addItem(item);
+        }
+    }
     
     return true;
 }
