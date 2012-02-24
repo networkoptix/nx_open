@@ -241,8 +241,8 @@ bool QnArchiveStreamReader::getNextVideoPacket()
             m_skippedMetadata << m_nextData;
 
         QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(m_nextData);
-        if (video && video->channelNumber == 0)
-            return true; // packet with primary video channel
+        if (video)
+            return true;
     }
 }
 
@@ -316,8 +316,11 @@ begin_label:
             qint64 displayTime = determineDisplayTime(reverseMode);
             beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
+				if (!exactJumpToSpecifiedFrame)
+                	needKeyData();
                 intChanneljumpTo(displayTime, 0);
                 setSkipFramesToTime(displayTime, false);
+
                 emit jumpOccured(displayTime);
                 m_BOF = true;
             }
@@ -340,6 +343,8 @@ begin_label:
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
         m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
+        if (!exactJumpToSpecifiedFrame)
+            setNeedKeyData();
         intChanneljumpTo(jumpTime, 0);
         emit jumpOccured(jumpTime);
         m_BOF = true;
@@ -357,6 +362,8 @@ begin_label:
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
         if (!delegateForNegativeSpeed) {
+            if (!exactJumpToSpecifiedFrame)
+                setNeedKeyData();
             intChanneljumpTo(displayTime, 0);
             if (reverseMode) {
                 if (displayTime != DATETIME_NOW)
@@ -618,6 +625,8 @@ begin_label:
         m_playbackMaskSync.unlock();
         if (newTime != m_currentData->timestamp)
         {
+            if (!exactJumpToSpecifiedFrame)
+                setNeedKeyData();
             intChanneljumpTo(newTime, 0);
             setSkipFramesToTime(newTime, true);
             m_BOF = true;
@@ -814,8 +823,6 @@ void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int ma
     beforeJumpInternal(mksec);
     m_newDataMarker = marker;
     m_exactJumpToSpecifiedFrame = !findIFrame;
-    if (findIFrame)
-        setNeedKeyData();
     channeljumpToUnsync(mksec, 0, 0);
     if (useMutex)
         m_jumpMtx.unlock();
@@ -844,7 +851,6 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     {
         QMutexLocker mutex(&m_jumpMtx);
 		beforeJumpInternal(newTime);
-        setNeedKeyData();
         channeljumpToUnsync(newTime, 0, skipTime);
     }
 
