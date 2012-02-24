@@ -13,6 +13,9 @@
 void parseRegion(QRegion& region, const QString& regionString);
 QString serializeRegion(const QRegion& region);
 
+void parseRegionList(QList<QRegion>& regions, const QString& regionsString);
+QString serializeRegionList(const QList<QRegion>& regions);
+
 class QnSerializeException : public std::exception
 {
 public:

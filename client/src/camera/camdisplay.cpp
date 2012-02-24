@@ -686,7 +686,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
     if (metadata) {
-        m_lastMetadata = metadata;
+        m_lastMetadata[metadata->channelNumber] = metadata;
         return true;
     }
 
@@ -714,15 +714,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         m_prevSpeed = speed;
     }
 
-
     if (vd)
     {
         m_ignoringVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-        if (m_lastMetadata && m_lastMetadata->containTime(vd->timestamp))
-            vd->motion = m_lastMetadata;
-        else {
-            int gg = 4; // TODO: remove
-        }
+        if (m_lastMetadata[vd->channelNumber] && m_lastMetadata[vd->channelNumber]->containTime(vd->timestamp))
+            vd->motion = m_lastMetadata[vd->channelNumber];
     }
     else if (ad)
     {

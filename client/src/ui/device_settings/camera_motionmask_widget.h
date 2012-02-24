@@ -24,7 +24,7 @@ public:
 
 	void setCamera(const QnResourcePtr &resource);
 
-	const QRegion& motionMask() const;
+    const QList<QRegion>& QnCameraMotionMaskWidget::motionMaskList() const;
 
 protected slots:
     void at_viewport_resized();
@@ -41,7 +41,7 @@ private:
 
 private:
 	QnVirtualCameraResourcePtr m_camera;
-	QRegion m_motionMask;
+	QList<QRegion> m_motionMaskList;
 
     QGraphicsScene *m_scene;
     QnGraphicsView *m_view;

@@ -469,7 +469,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_helpShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_helpShowingProcessor_hoverEntered()));
     connect(m_helpItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_helpItem_paintGeometryChanged()));
     connect(m_helpItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_helpItem_paintGeometryChanged()));
-    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(setHelpOpened()));
 
 
 
@@ -506,6 +505,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+
+    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(setHelpOpened()));
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -1159,7 +1160,7 @@ void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
     if(cameraResource != NULL)
 #endif
     {
-        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QRegion)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QRegion)));
+        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));
         connect(m_sliderItem, SIGNAL(clearMotionSelection()), widget, SLOT(clearMotionSelection()));
         m_sliderItem->addReserveCamera(widget->display()->camera());
     }

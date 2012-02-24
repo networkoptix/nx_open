@@ -64,7 +64,7 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 
-    void setMotionMaskPhysical() override;
+    virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
     QnDlink_cam_info  m_camInfo;

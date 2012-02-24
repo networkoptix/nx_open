@@ -116,9 +116,11 @@ namespace {
 
             if (i->region().present())
             {
-                QRegion region;
-                parseRegion(region, (*i->region()).c_str());
-                camera->setMotionMask(region, QnDomainMemory);
+                QList<QRegion> regions;
+                parseRegionList(regions, (*i->region()).c_str());
+                while (regions.size() < CL_MAX_CHANNELS)
+                    regions << QRegion();
+                camera->setMotionMaskList(regions, QnDomainMemory);
             }
 
             if (i->properties().present())
@@ -614,7 +616,7 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
 
     camera.parentID(cameraPtr->getParentId().toString().toStdString());
     camera.status(cameraPtr->getStatus());
-	camera.region(serializeRegion(cameraPtr->getMotionMask()).toStdString());
+	camera.region(serializeRegionList(cameraPtr->getMotionMaskList()).toStdString());
 
     const QAuthenticator& auth = cameraPtr->getAuth();
 

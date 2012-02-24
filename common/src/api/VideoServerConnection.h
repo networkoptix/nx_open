@@ -1,6 +1,7 @@
 #ifndef __VIDEO_SERVER_CONNECTION_H_
 #define __VIDEO_SERVER_CONNECTION_H_
 
+#include <QUrl>
 #include <QRegion>
 #include <QScopedPointer>
 #include <QSharedPointer>
@@ -33,9 +34,9 @@ public:
     QnVideoServerConnection(const QUrl &url, QObject *parent = 0);
     virtual ~QnVideoServerConnection();
 
-    QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QRegion& motionRegion = QRegion());
+    QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion>& motionRegions = QList<QRegion>());
 
-    int asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QRegion motionRegion, QObject *target, const char *slot);
+    int asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QList<QRegion> motionRegions, QObject *target, const char *slot);
 
 private:
     int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList, QByteArray& errorString);
@@ -43,7 +44,7 @@ private:
     int asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot);
 
 protected:
-    QnRequestParamList createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QRegion& motionRegion);
+    QnRequestParamList createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions);
 
 private:
     QUrl m_url;

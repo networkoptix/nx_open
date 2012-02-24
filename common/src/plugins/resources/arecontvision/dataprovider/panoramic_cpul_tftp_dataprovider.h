@@ -17,7 +17,7 @@ public:
 
 protected:
 	virtual QnAbstractMediaDataPtr getNextData();
-    
+    QnMetaDataV1Ptr getMetaData();
 
 	virtual bool needKeyData() const;
 

@@ -492,6 +492,7 @@ int QnRtspConnectionProcessor::composePlay()
         QnServerArchiveDelegate* serverArchive = dynamic_cast<QnServerArchiveDelegate*>(d->archiveDP->getArchiveDelegate());
         if (serverArchive) 
         {
+            /*
             QnTimePeriodList motionPeriods;
             QRegion region;
             QString motionRegion = d->requestHeaders.value("x-motion-region").toUtf8();
@@ -505,7 +506,7 @@ int QnRtspConnectionProcessor::composePlay()
                 stream >> region;
                 serverArchive->setMotionRegion(region);
             }
-
+            */
             QString sendMotion = d->requestHeaders.value("x-send-motion");
             if (!sendMotion.isNull()) {
                 serverArchive->setSendMotion(sendMotion == "1" || sendMotion == "true");

@@ -394,7 +394,6 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getMetaData()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
-
     QVariant mdresult;
     if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
         return QnMetaDataV1Ptr(0);
