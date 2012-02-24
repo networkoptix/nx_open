@@ -653,11 +653,19 @@ void QnResourceModel::at_resource_parentIdChanged(const QnResourcePtr &resource)
 }
 
 void QnResourceModel::at_resource_parentIdChanged() {
-    at_resource_parentIdChanged(toSharedPointer(checked_cast<QnResource *>(sender())));
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
+
+    at_resource_parentIdChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnResourceModel::at_resource_resourceChanged() {
-    QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
+
+    QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender));
 
     node(resource)->update();
     foreach(Node *node, m_itemNodesByResource[resource.data()])
@@ -680,7 +688,11 @@ void QnResourceModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, c
 }
 
 void QnResourceModel::at_resource_itemAdded(const QnLayoutItemData &item) {
-    at_resource_itemAdded(toSharedPointer(checked_cast<QnLayoutResource *>(sender())), item);
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
+
+    at_resource_itemAdded(toSharedPointer(checked_cast<QnLayoutResource *>(sender)), item);
 }
 
 void QnResourceModel::at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
@@ -689,7 +701,11 @@ void QnResourceModel::at_resource_itemRemoved(const QnLayoutResourcePtr &layout,
 }
 
 void QnResourceModel::at_resource_itemRemoved(const QnLayoutItemData &item) {
-    at_resource_itemRemoved(toSharedPointer(checked_cast<QnLayoutResource *>(sender())), item);
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
+
+    at_resource_itemRemoved(toSharedPointer(checked_cast<QnLayoutResource *>(sender)), item);
 }
 
 

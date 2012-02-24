@@ -512,7 +512,7 @@ QVariant QnWorkbenchUi::target(QnAction *action) {
 
     /* Compare to action's scope. */
     if(!(action->scope() & scope))
-        scope = action->scope();
+        return QVariant();
     
     /* Get items. */
     switch(scope) {

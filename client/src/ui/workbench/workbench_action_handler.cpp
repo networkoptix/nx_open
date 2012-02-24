@@ -112,6 +112,9 @@ void QnWorkbenchActionHandler::setSynchronizer(QnWorkbenchSynchronizer *synchron
 void QnWorkbenchActionHandler::initialize() {
     assert(m_workbench != NULL);
 
+    /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
+    connect(m_workbench,                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+
     connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(qnAction(Qn::PreferencesAction),                SIGNAL(triggered()),    this,   SLOT(at_preferencesAction_triggered()));
     connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
@@ -130,6 +133,8 @@ void QnWorkbenchActionHandler::initialize() {
 
 void QnWorkbenchActionHandler::deinitialize() {
     assert(m_workbench != NULL);
+
+    disconnect(m_workbench, NULL, this, NULL);
 
     foreach(QAction *action, qnMenu->actions())
         disconnect(action, NULL, this, NULL);
@@ -178,6 +183,11 @@ void QnWorkbenchActionHandler::at_workbench_aboutToBeDestroyed() {
     setWorkbench(NULL);
 }
 
+void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
+    if(m_workbench->layouts().empty())
+        at_newLayoutAction_triggered();
+}
+
 void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
     setSynchronizer(NULL);
 }
@@ -222,8 +232,6 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
     }
 
     if(close) {
-        if(m_workbench->layouts().size() == 1)
-            at_newLayoutAction_triggered();
         delete layout;
 
         if(isLocal) {
