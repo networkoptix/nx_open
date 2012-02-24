@@ -27,10 +27,25 @@ class QnResourceTreeWidget: public QWidget, public QnActionTargetProvider {
     Q_OBJECT
 
 public:
+    enum Tab {
+        ResourcesTab,
+        SearchTab,
+        TabCount
+    };
+
     QnResourceTreeWidget(QWidget *parent = 0);
-    ~QnResourceTreeWidget();
+
+    virtual ~QnResourceTreeWidget();
+
+    Tab currentTab() const;
+
+    void setCurrentTab(Tab tab);
 
     void setWorkbench(QnWorkbench *workbench);
+
+    QnWorkbench *workbench() const {
+        return m_workbench;
+    }
 
     QnResourceList selectedResources() const;
 
@@ -42,7 +57,7 @@ public:
 
 signals:
     void activated(const QnResourcePtr &resource);
-    void newTabRequested();
+    void currentTabChanged();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);

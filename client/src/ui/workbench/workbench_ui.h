@@ -148,6 +148,8 @@ protected:
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
 protected slots:
+    void updateHelpContext();
+    
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);

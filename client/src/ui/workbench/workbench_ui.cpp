@@ -472,6 +472,21 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
 
+    /* Set up help context processing. */
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
+    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+
+
+
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -1027,6 +1042,50 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
     } else {
         m_controlsActivityInstrument->setEnabled(m_flags & HIDE_WHEN_NORMAL);
     }
+}
+
+void QnWorkbenchUi::updateHelpContext() {
+    Qn::ActionScope scope = Qn::InvalidScope;
+
+    if(m_treeOpacityProcessor->isHovered()) {
+        scope = Qn::TreeScope;
+    } else if(m_sliderOpacityProcessor->isHovered()) {
+        scope = Qn::SliderScope;
+    } else if(m_treeOpacityProcessor->isFocused()) {
+        scope = Qn::TreeScope;
+    } else if(m_sliderOpacityProcessor->isFocused()) {
+        scope = Qn::SliderScope;
+    } else {
+        scope = Qn::SceneScope;
+    }
+
+    QnContextHelp::ContextId context;
+    switch(scope) {
+    case Qn::TreeScope:
+        if(m_treeWidget->currentTab() == QnResourceTreeWidget::SearchTab) {
+            context = QnContextHelp::ContextId_Search;
+        } else {
+            context = QnContextHelp::ContextId_Tree;
+        }
+        break;
+    case Qn::SliderScope:
+        context = QnContextHelp::ContextId_Slider;
+        break;
+    case Qn::SceneScope:
+        context = QnContextHelp::ContextId_Scene;
+        foreach(QnResourceWidget *widget, display()->widgets()) {
+            if(widget->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID) {
+                context = QnContextHelp::ContextId_MotionGrid;
+                break;
+            }
+        }
+        break;
+    default:
+        context = QnContextHelp::ContextId_Invalid;
+        break;
+    }
+
+    qnHelp->setHelpContext(context);
 }
 
 

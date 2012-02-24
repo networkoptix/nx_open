@@ -992,7 +992,6 @@ void QnWorkbenchController::at_hideMotionAction_triggered() {
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
-    QnContextHelp::instance()->setHelpContext(QnContextHelp::ContextId_MotionGrid);
     displayMotionGrid(qnMenu->currentWidgetsTarget(sender()), true);
 }
 

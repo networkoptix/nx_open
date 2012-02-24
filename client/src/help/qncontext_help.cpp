@@ -80,6 +80,8 @@ void QnContextHelp::setHelpContext(ContextId id)
 
     m_currentId = id;
     emit helpContextChanged(id);
+
+    qDebug() << "HELP CONTEXT" << id;
 }
 
 void QnContextHelp::setNeedAutoShow(ContextId id, bool value)
