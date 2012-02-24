@@ -469,21 +469,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_helpShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_helpShowingProcessor_hoverEntered()));
     connect(m_helpItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_helpItem_paintGeometryChanged()));
     connect(m_helpItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_helpItem_paintGeometryChanged()));
-
-
-
-    /* Set up help context processing. */
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
-    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
-    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(setHelpOpened()));
 
 
 
@@ -506,6 +492,20 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setTitleUsed(false);
     setHelpOpened(false, false);
     setHelpVisible(true, false);
+
+
+    /* Set up help context processing. */
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
+    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -1051,11 +1051,15 @@ void QnWorkbenchUi::updateHelpContext() {
         scope = Qn::TreeScope;
     } else if(m_sliderOpacityProcessor->isHovered()) {
         scope = Qn::SliderScope;
-    } else if(m_treeOpacityProcessor->isFocused()) {
+    } 
+#if 0
+    else if(m_treeOpacityProcessor->isFocused()) {
         scope = Qn::TreeScope;
     } else if(m_sliderOpacityProcessor->isFocused()) {
         scope = Qn::SliderScope;
-    } else {
+    } 
+#endif
+    else {
         scope = Qn::SceneScope;
     }
 

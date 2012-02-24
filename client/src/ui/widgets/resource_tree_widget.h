@@ -60,10 +60,10 @@ signals:
     void currentTabChanged();
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void wheelEvent(QWheelEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void timerEvent(QTimerEvent *event);
+    virtual void contextMenuEvent(QContextMenuEvent *event) override;
+    virtual void wheelEvent(QWheelEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 
     QItemSelectionModel *currentSelectionModel() const;
 

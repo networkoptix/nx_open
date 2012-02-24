@@ -15,11 +15,16 @@ public:
     QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent = NULL);
     virtual ~QnHelpWidget();
 
+signals:
+    void showRequested();
+
 protected slots:
     void at_contextHelp_helpContextChanged(QnContextHelp::ContextId id);
     void at_checkBox_toggled(bool checked);
 
 protected:
+    virtual void wheelEvent(QWheelEvent *event) override;
+
     QnContextHelp *contextHelp() const {
         return m_contextHelp.data();
     }
