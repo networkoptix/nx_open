@@ -31,7 +31,7 @@ public:
     void addDataProcessor(QnAbstractDataConsumer* dp);
     void removeDataProcessor(QnAbstractDataConsumer* dp);
 
-    virtual void setReverseMode(bool value, qint64 currentTimeHint = -1) { Q_UNUSED(value); Q_UNUSED(currentTimeHint); }
+    virtual void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE) { Q_UNUSED(value); Q_UNUSED(currentTimeHint); }
     virtual bool isReverseMode() const { return false;}
 
     bool isConnectedToTheResource() const;

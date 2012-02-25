@@ -523,6 +523,9 @@ int QnRtspConnectionProcessor::composePlay()
             bool findIFrame = d->requestHeaders.value("x-no-find-iframe").isNull();
             d->archiveDP->jumpWithMarker(d->startTime, findIFrame, d->lastPlayCSeq);
         }
+        else {
+            d->archiveDP->setMarker(d->lastPlayCSeq);
+        }
         d->archiveDP->unlock();
 
     }

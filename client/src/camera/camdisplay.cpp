@@ -80,7 +80,6 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_iFrames(0),
       m_lastVideoPacketTime(0),
       m_lastDecodedTime(AV_NOPTS_VALUE),
-      m_nextReverseTime(AV_NOPTS_VALUE),
       m_previousVideoTime(0),
       m_lastNonZerroDuration(0),
       m_lastSleepInterval(0),
@@ -116,8 +115,10 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_executingChangeSpeed(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_display[i] = 0;
+        m_nextReverseTime[i] = AV_NOPTS_VALUE;
+    }
     m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
 
     QMutexLocker lock(&m_qualityMutex);
@@ -204,7 +205,7 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         {
             m_delayedFrameCnt = qMax(0, m_delayedFrameCnt);
             m_delayedFrameCnt++;
-            if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low && canSwitchQuality())
+            if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
             {
                 bool fastSwitch = false; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
@@ -455,7 +456,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
         {
             if (speed < 0)
-                m_nextReverseTime = m_display[0]->nextReverseTime();
+                m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
             if (m_buffering && m_executingJump == 0) 
@@ -499,9 +500,11 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     
     QMutexLocker lock(&m_timeMutex);
 
-    m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
-    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+    m_lastDecodedTime = AV_NOPTS_VALUE;
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        m_nextReverseTime[i] = AV_NOPTS_VALUE;
         m_display[i]->blockTimeValue(time);
+    }
     clearUnprocessedData();
 
     if (skipPrevJumpSignal > 0) {
@@ -535,10 +538,12 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_afterJump = true;
     m_bofReceived = false;
     m_buffering = getBufferingMask();
-    m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
+    m_lastDecodedTime = AV_NOPTS_VALUE;
     //clearUnprocessedData();
-    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        m_nextReverseTime[i] = AV_NOPTS_VALUE;
         m_display[i]->blockTimeValue(time);
+    }
     m_singleShotMode = false;
     m_jumpTime = time;
 
@@ -612,8 +617,10 @@ void CLCamDisplay::setSpeed(float speed)
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
         m_executingChangeSpeed = true;
-        if (speed < 0 && m_speed >= 0)
-            m_nextReverseTime = AV_NOPTS_VALUE;
+        if (speed < 0 && m_speed >= 0) {
+            for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+                m_nextReverseTime[i] = AV_NOPTS_VALUE;
+        }
         m_speed = speed;
     }
 };
@@ -641,7 +648,9 @@ void CLCamDisplay::processNewSpeed(float speed)
     {
         m_dataQueue.clear();
         clearVideoQueue();
-        m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
+        m_lastDecodedTime = AV_NOPTS_VALUE;
+        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+            m_nextReverseTime[i] = AV_NOPTS_VALUE;
     }
     if (qAbs(speed) > 1.0) {
         m_storedMaxQueueSize = m_dataQueue.maxSize();
@@ -783,9 +792,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                 m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
             }
             */
-            m_nextReverseTime = m_lastDecodedTime = AV_NOPTS_VALUE;
+            m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
                 m_display[i]->setLastDisplayedTime(AV_NOPTS_VALUE);
+                m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }
 
             m_timeMutex.lock();
@@ -1093,16 +1103,48 @@ void CLCamDisplay::onSlowSourceHint()
     m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }
 
+qint64 CLCamDisplay::getDisplayedMax() const
+{
+    qint64 rez = AV_NOPTS_VALUE;
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+    {
+        rez = qMax(rez, m_display[i]->getLastDisplayedTime());
+    }
+    return rez;
+}
+
+qint64 CLCamDisplay::getDisplayedMin() const
+{
+    qint64 rez = m_display[0]->getLastDisplayedTime();
+    for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+    {
+        qint64 val = m_display[i]->getLastDisplayedTime();
+        if (val != AV_NOPTS_VALUE) {
+            rez = qMin(rez, val);
+        }
+    }
+    return rez;
+}
+
 qint64 CLCamDisplay::getCurrentTime() const 
 {
-    qint64 result = m_display[0]->getLastDisplayedTime();
-    if (m_display[0]->isTimeBlocked() || result == AV_NOPTS_VALUE)
-        return result;
-    for (int i = 1; i < CL_MAX_CHANNELS; ++i) {
-        if (m_display[i])
-            result = qMax(result, m_display[i]->getLastDisplayedTime());
+    if (m_display[0]->isTimeBlocked())
+        return m_display[0]->getLastDisplayedTime();
+    else if (m_speed >= 0)
+        return getDisplayedMax();
+    else
+        return getDisplayedMin();
+}
+
+qint64 CLCamDisplay::getMinReverseTime() const
+{
+    qint64 rez = m_nextReverseTime[0];
+    for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+    {
+        if (m_nextReverseTime[i] != AV_NOPTS_VALUE && m_nextReverseTime[i] < rez)
+            rez = m_nextReverseTime[i];
     }
-    return result;
+    return rez;
 }
 
 qint64 CLCamDisplay::getNextTime() const
@@ -1110,7 +1152,7 @@ qint64 CLCamDisplay::getNextTime() const
     if (m_display[0]->isTimeBlocked())
         return m_display[0]->getLastDisplayedTime();
     else 
-        return m_speed < 0 ? m_nextReverseTime : m_lastDecodedTime;
+        return m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
 }
 
 qint64 CLCamDisplay::getDisplayedTime() const

@@ -357,6 +357,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
             {
+                tmpOutFrame->channel = data->channelNumber;
                 tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
                 if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
                     tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data

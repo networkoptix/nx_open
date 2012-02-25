@@ -99,6 +99,10 @@ private:
     void hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     bool canSwitchQuality();
     void resetQualityStatistics();
+    qint64 getMinReverseTime() const;
+
+    qint64 getDisplayedMax() const;
+    qint64 getDisplayedMin() const;
 
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -166,7 +170,7 @@ private:
     int m_processedPackets;
     QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
     bool m_bofReceived;
-    qint64 m_nextReverseTime;
+    qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     float m_toLowQSpeed; // speed then switching to low quality for camera
     //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
