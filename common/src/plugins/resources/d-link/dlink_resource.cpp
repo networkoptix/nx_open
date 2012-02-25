@@ -376,7 +376,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     {
         for (int y = 0; y  < 16; ++y)
         {
-            if (imgOut.pixel(x,y) == img.color(1))
+            if (imgOut.pixel(x,y) == img.color(0))
                 setBitAt(x,y, outData);
         }
     }

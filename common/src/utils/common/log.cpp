@@ -128,7 +128,7 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 
     QString th;
     QTextStream textStream(&th);
-    hex(textStream) << (quint64)QThread::currentThread();
+    hex(textStream) << (quint64)QThread::currentThread()->currentThreadId();
 
     QTextStream fstr(&m_file);
     fstr << QDateTime::currentDateTime().toString(QLatin1String("ddd MMM d yy  hh:mm:ss.zzz"))
