@@ -21,6 +21,7 @@
 #include "settings.h"
 #include "camera/camdisplay.h"
 #include "math.h"
+#include "utils/common/util.h"
 
 namespace {
 
@@ -41,7 +42,7 @@ namespace {
     const QPointF defaultShadowDisplacement = QPointF(500.0, 500.0);
 
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
-    const qint64 defaultLoadingTimeoutMSec = 2000;
+    const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
 
     /** Default period of progress circle. */
     const qint64 defaultProgressPeriodMSec = 1000;
