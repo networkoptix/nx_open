@@ -27,8 +27,8 @@ void QnHelpWidget::at_contextHelp_helpContextChanged(QnContextHelp::ContextId id
     ui->textEdit->setText(contextHelp()->text(id));
     ui->checkBox->setCheckState(contextHelp()->isNeedAutoShow(id) ? Qt::Unchecked : Qt::Checked);
 
-    if(contextHelp()->isNeedAutoShow(id))
-        emit showRequested();
+    //if(contextHelp()->isNeedAutoShow(id))
+    //    emit showRequested();
 }
 
 void QnHelpWidget::at_checkBox_toggled(bool checked) {
