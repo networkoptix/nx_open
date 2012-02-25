@@ -86,7 +86,7 @@ public:
 
     virtual void run() override;
 
-    virtual void setSpeed(double value, qint64 currentTimeHint = -1) = 0;
+    virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) = 0;
     virtual double getSpeed() const = 0;
 Q_SIGNALS:
     void beforeJump(qint64 mksec);

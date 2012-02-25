@@ -58,7 +58,7 @@ public:
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
 
-    virtual void setSpeed(double value, qint64 currentTimeHint = -1) override;
+    virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
     virtual double getSpeed() const override;
 
 
@@ -99,7 +99,7 @@ protected:
     volatile bool m_wakeup;
     qint64 m_tmpSkipFramesToTime;
 private:
-    void setReverseMode(bool value, qint64 currentTimeHint = -1);
+    void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE);
 private slots:
     void onDelegateChangeQuality(MediaQuality quality);
 private:
