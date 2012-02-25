@@ -28,7 +28,7 @@ private:
 
 QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource): 
     QnResourceConsumer(resource),
-    QnAbstractDataConsumer(220),
+    QnAbstractDataConsumer(100),
     m_lastKeyFrameChannel(0)
 {
 }
