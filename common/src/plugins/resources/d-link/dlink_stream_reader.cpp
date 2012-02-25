@@ -309,7 +309,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 
 
     int contentLen = getIntParam(contentLenPtr + 16);
-    contentLen = qMin(contentLen, 10*1024*10124); // to avoid crash id camera is crazy
+    contentLen = qMin(contentLen, 10*1024*1024); // to avoid crash if camera is crazy
 
     QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
     videoData->data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
