@@ -4,7 +4,7 @@
 #include <QHostAddress>
 #include <QNetworkAddressEntry>
 
-static const int ping_timeout = 100;
+static const int ping_timeout = 300;
 
 struct CLSubNetState;
 

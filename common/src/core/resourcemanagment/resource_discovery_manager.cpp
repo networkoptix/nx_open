@@ -181,7 +181,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             {
                 QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
                 bool diffAddr = rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress(); //if such network resource is in pool and has diff IP 
-                bool diffNet = !m_netState.isInMachineSubnet(newNetRes->getHostAddress()); // or is diff NET
+                bool diffNet = !m_netState.isResourceInMachineSubnet(newNetRes->getHostAddress(), newNetRes->getDiscoveryAddr()); // or is diff subnet NET
                 if ( diffAddr || diffNet)
                 {
                     // should keep it into resources to investigate it further 
@@ -277,6 +277,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         }
         else
         {
+            if (netRes)
+                cl_log.log("Ready to go resource: ", netRes->getHostAddress().toString(), cl_logALWAYS);
+
             readyToGo.push_back(*it);
             it = resources.erase(it);
         }
@@ -428,7 +431,10 @@ struct check_if_accessible_STRUCT
 
 
         if (!acc)
+        {
             resourceNet->addNetworkStatus(QnNetworkResource::BadHostAddr);
+            qDebug() << "Bad addr detected: ip = " << resourceNet->getHostAddress().toString() << "  name = " << resourceNet->getName();
+        }
 
     }
 };
@@ -446,15 +452,24 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
         if (!nr)
             continue;
 
-        check_if_accessible_STRUCT t(nr, m_netState.isInMachineSubnet(nr->getHostAddress()) );
+        bool inSameSubnet = m_netState.isResourceInMachineSubnet(nr->getHostAddress(), nr->getDiscoveryAddr());
+
+        check_if_accessible_STRUCT t(nr, inSameSubnet );
         checkLst.push_back(t);
     }
 
+#ifdef _DEBUG
+    foreach(check_if_accessible_STRUCT t, checkLst)
+    {
+        qDebug() << "Checking conflicts for " << t.resourceNet->getHostAddress().toString() << "  name = " << t.resourceNet->getName();
+        t.f();
+    }
+#else
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
     QtConcurrent::blockingMap(checkLst, &check_if_accessible_STRUCT::f);
     for (int i = 0; i < threads; ++i )global->reserveThread();
-
+#endif //_DEBUG
 }
 
 //====================================================================================
