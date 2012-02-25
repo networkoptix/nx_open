@@ -49,6 +49,11 @@ void PlDlinkStreamReader::openStream()
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
 
+    if (!res->getCamInfo().inited())
+    {
+        res->init();
+    }
+
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
