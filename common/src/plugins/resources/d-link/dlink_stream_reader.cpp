@@ -391,9 +391,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
 
         }
     }
-
-
-    
+   
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = 1000*1000*1000; // 1000 sec 

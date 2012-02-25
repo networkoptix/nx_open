@@ -181,8 +181,6 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 void QnPlDlinkResource::init()
 {
 
-    setMotionMaskPhysical(0);
-    
     CLHttpStatus status;
 
     QByteArray cam_info_file = downloadFile(status, "config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
@@ -196,6 +194,10 @@ void QnPlDlinkResource::init()
 
     if (cam_info_file.size()==0)
         return;
+
+
+    setMotionMaskPhysical(0);
+    
 
     QMutexLocker mutexLocker(&m_mutex);
 
