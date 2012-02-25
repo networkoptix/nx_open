@@ -52,7 +52,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_canChangeQuality(true),
     m_isStillImage(false),
     m_bofReached(false),
-    m_currentTimeHint(-1),
+    m_currentTimeHint(AV_NOPTS_VALUE),
     m_speed(1.0)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
@@ -302,7 +302,7 @@ begin_label:
     m_tmpSkipFramesToTime = 0;
     bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
     qint64 currentTimeHint = m_currentTimeHint;
-    m_currentTimeHint = -1;
+    m_currentTimeHint = AV_NOPTS_VALUE;
     m_jumpMtx.unlock();
 
     // change quality checking
@@ -357,7 +357,7 @@ begin_label:
     {
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
-        if (currentTimeHint == -1)
+        if (currentTimeHint == AV_NOPTS_VALUE)
             displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime(reverseMode);
 
         m_delegate->onReverseMode(displayTime, reverseMode);
