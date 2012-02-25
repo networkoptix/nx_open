@@ -843,6 +843,16 @@ void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int ma
         m_jumpMtx.unlock();
 }
 
+void QnArchiveStreamReader::setMarker(int marker)
+{
+    bool useMutex = !m_externalLocked;
+    if (useMutex)
+        m_jumpMtx.lock();
+    m_newDataMarker = marker;
+    if (useMutex)
+        m_jumpMtx.unlock();
+}
+
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 {
     if (m_navDelegate) {

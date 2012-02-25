@@ -36,6 +36,7 @@ public:
     static QString serializeLayout(const QnVideoResourceLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
     void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
+    void setMarker(int marker);
 
     // jump to frame directly ignoring start of GOP
     virtual void directJumpToNonKeyFrame(qint64 mksec);
