@@ -494,19 +494,20 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Set up help context processing. */
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_helpOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_helpOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_titleOpacityProcessor,    SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_titleOpacityProcessor,    SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
-
-    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(setHelpOpened()));
+    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(at_helpWidget_showRequested()));
+    connect(m_helpWidget,               SIGNAL(hideRequested()),                                                                    this,                           SLOT(at_helpWidget_hideRequested()));
+    updateHelpContext();
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -1046,22 +1047,29 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
 }
 
 void QnWorkbenchUi::updateHelpContext() {
+    /* This totally evil hack is here to work around a problem that when scene 
+     * focus item changes, it is first cleared.
+     * 
+     * We want to skip the cleared state, hence the delay. There is a 
+     * better way of doing it, so this is a TODO. */
+    QTimer::singleShot(100, this, SLOT(updateHelpContextInternal()));
+}
+
+void QnWorkbenchUi::updateHelpContextInternal() {
     Qn::ActionScope scope = Qn::InvalidScope;
 
-    if(m_treeOpacityProcessor->isHovered()) {
-        scope = Qn::TreeScope;
-    } else if(m_sliderOpacityProcessor->isHovered()) {
-        scope = Qn::SliderScope;
-    } 
-#if 0
-    else if(m_treeOpacityProcessor->isFocused()) {
-        scope = Qn::TreeScope;
-    } else if(m_sliderOpacityProcessor->isFocused()) {
-        scope = Qn::SliderScope;
-    } 
-#endif
-    else {
+    QGraphicsItem *focusItem = display()->scene()->focusItem();
+
+    if(focusItem == NULL) {
         scope = Qn::SceneScope;
+    } else if(focusItem == m_helpItem || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
+        return; /* Focusing on help widget or title item shouldn't change help context. */
+    } else if(focusItem == m_treeItem) {
+        scope = Qn::TreeScope;
+    } else if(focusItem == m_sliderItem || m_treeItem->isAncestorOf(focusItem)) {
+        scope = Qn::SliderScope;
+    } else {
+        return;
     }
 
     QnContextHelp::ContextId context;
@@ -1098,6 +1106,8 @@ void QnWorkbenchUi::updateHelpContext() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchUi::at_fpsChanged(qreal fps) {
+    qDebug() << display()->scene()->focusItem();
+
     m_fpsItem->setText(QString::number(fps, 'g', 4));
     m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
 }
@@ -1472,3 +1482,16 @@ void QnWorkbenchUi::at_helpItem_paintGeometryChanged() {
     updateViewportMargins();
 }
 
+void QnWorkbenchUi::at_helpWidget_showRequested() {
+    m_helpHidingProcessor->forceHoverEnter();
+    m_helpShowingProcessor->forceHoverEnter();
+
+    setHelpOpened(true);
+}
+
+void QnWorkbenchUi::at_helpWidget_hideRequested() {
+    m_helpHidingProcessor->forceHoverLeave();
+    m_helpShowingProcessor->forceHoverLeave();
+
+    setHelpOpened(false);
+}

@@ -85,7 +85,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
-    setFlag(QGraphicsItem::ItemIsFocusable, false);
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
+    setFocusPolicy(Qt::ClickFocus);
     //setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     setCursor(Qt::ArrowCursor);
@@ -107,30 +108,35 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_backwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_backward_blue.png")));
     m_backwardButton->setPreferredSize(32, 18);
     m_backwardButton->setAnimationSpeed(4.0);
+    m_backwardButton->setFocusProxy(this);
 
     m_stepBackwardButton = new QnImageButtonWidget(this);
     m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward_grey.png")));
     m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_blue.png")));
     m_stepBackwardButton->setPreferredSize(32, 18);
     m_stepBackwardButton->setAnimationSpeed(4.0);
+    m_stepBackwardButton->setFocusProxy(this);
 
     m_playButton = new QnImageButtonWidget(this);
     m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play_grey.png")));
     m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_blue.png")));
     m_playButton->setPreferredSize(32, 30);
     m_playButton->setAnimationSpeed(4.0);
+    m_playButton->setFocusProxy(this);
 
     m_stepForwardButton = new QnImageButtonWidget(this);
     m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward_grey.png")));
     m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_blue.png")));
     m_stepForwardButton->setPreferredSize(32, 18);
     m_stepForwardButton->setAnimationSpeed(4.0);
+    m_stepForwardButton->setFocusProxy(this);
 
     m_forwardButton = new QnImageButtonWidget(this);
     m_forwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_forward_grey.png")));
     m_forwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_forward_blue.png")));
     m_forwardButton->setPreferredSize(32, 18);
     m_forwardButton->setAnimationSpeed(4.0);
+    m_forwardButton->setFocusProxy(this);
 
     connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
     connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
@@ -143,6 +149,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_speedSlider->setObjectName("SpeedSlider");
     m_speedSlider->setToolTipItem(new SliderToolTipItem(m_speedSlider));
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    m_speedSlider->setFocusProxy(this);
 
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
     connect(m_speedSlider, SIGNAL(frameBackward()), this, SLOT(stepBackward()));
@@ -151,9 +158,15 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_timeSlider = new TimeSlider(this);
     m_timeSlider->setObjectName("TimeSlider");
-    m_timeSlider->setToolTipItem(new TimeSliderToolTipItem(m_timeSlider));
     m_timeSlider->toolTipItem()->setVisible(false);
     m_timeSlider->setEndSize(SLIDER_NOW_AREA_WIDTH);
+    m_timeSlider->setFlag(QGraphicsItem::ItemIsFocusable, true);
+    m_timeSlider->setFocusProxy(this);
+    
+    ToolTipItem *timeSliderToolTip = new TimeSliderToolTipItem(m_timeSlider);
+    timeSliderToolTip->setFlag(QGraphicsItem::ItemIsFocusable, true);
+    m_timeSlider->setToolTipItem(timeSliderToolTip);
+    timeSliderToolTip->setFocusProxy(m_timeSlider);
 
     m_timeSlider->setAutoFillBackground(true);
     {
@@ -177,6 +190,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_muteButton->setPreferredSize(20, 20);
     m_muteButton->setCheckable(true);
     m_muteButton->setChecked(m_volumeSlider->isMute());
+    m_muteButton->setFocusProxy(this);
 
     m_liveButton = new QnImageButtonWidget(this);
     m_liveButton->setObjectName("LiveButton");
@@ -190,6 +204,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_liveButton->setChecked(m_camera && m_camera->getCamDisplay()->isRealTimeSource());
     m_liveButton->setEnabled(false);
     m_liveButton->setAnimationSpeed(4.0);
+    m_liveButton->setFocusProxy(this);
 
     connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(at_liveButton_clicked(bool)));
 
@@ -202,6 +217,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_mrsButton->setChecked(true);
     //m_mrsButton->hide();
     m_mrsButton->setAnimationSpeed(4.0);
+    m_mrsButton->setFocusProxy(this);
 
     connect(m_mrsButton, SIGNAL(clicked()), this, SIGNAL(clearMotionSelection()));
 
@@ -213,6 +229,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_syncButton->setCheckable(true);
     m_syncButton->setChecked(true);
     m_syncButton->setAnimationSpeed(4.0);
+    m_syncButton->setFocusProxy(this);
 
     //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
     connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
@@ -222,6 +239,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    m_volumeSlider->setFocusProxy(this);
 
     connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
     connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
@@ -235,7 +253,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
         pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
         m_timeLabel->setPalette(pal);
     }
-
 
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     buttonsLayout->setSpacing(2);

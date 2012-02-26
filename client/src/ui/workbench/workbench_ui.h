@@ -149,6 +149,7 @@ protected:
 
 protected slots:
     void updateHelpContext();
+    void updateHelpContextInternal();
     
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
@@ -193,6 +194,8 @@ protected slots:
     void at_helpHidingProcessor_hoverFocusLeft();
     void at_helpShowingProcessor_hoverEntered();
     void at_helpItem_paintGeometryChanged();
+    void at_helpWidget_showRequested();
+    void at_helpWidget_hideRequested();
 
     void at_fpsItem_geometryChanged();
 

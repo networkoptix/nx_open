@@ -367,6 +367,9 @@ public:
         m_cachedFontPixelPerTime(-1)
     {
         setFlag(QGraphicsItem::ItemClipsToShape); // ### paints out of shape, bitch
+        setFlag(QGraphicsItem::ItemIsFocusable);
+
+        setFocusPolicy(Qt::ClickFocus);
 
         setAcceptHoverEvents(true);
 
@@ -974,14 +977,17 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_slider->setContentsMargins(0, 4, 0, 4);
     m_slider->setMaximum(10000);
     m_slider->installEventFilter(this);
+    m_slider->setFocusProxy(this);
 
     m_slider->setStyle(new SliderProxyStyle(m_slider));
+
 
     m_timeLine = new TimeLine(this);
     m_timeLine->setLineWidth(0);
     m_timeLine->setFrameShape(GraphicsFrame::Box);
     m_timeLine->setFrameShadow(GraphicsFrame::Sunken);
     m_timeLine->installEventFilter(this);
+    m_timeLine->setFocusProxy(this);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);

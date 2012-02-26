@@ -17,10 +17,11 @@ public:
 
 signals:
     void showRequested();
+    void hideRequested();
 
 protected slots:
     void at_contextHelp_helpContextChanged(QnContextHelp::ContextId id);
-    void at_checkBox_toggled(bool checked);
+    void at_checkBox_clicked(bool checked);
 
 protected:
     virtual void wheelEvent(QWheelEvent *event) override;
