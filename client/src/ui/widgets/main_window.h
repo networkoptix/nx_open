@@ -64,6 +64,8 @@ protected slots:
     void updateFullScreenState();
     void updateDwmState();
 
+    void at_mainMenu_destroyed();
+
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
 
     void at_sessionManager_error(int error);

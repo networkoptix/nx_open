@@ -104,6 +104,7 @@ protected:
 
 private slots:
     void at_menu_destroyed(QObject *menu);
+    void at_menu_aboutToShow();
 
 private:
     /** Mapping from action id to action data. */ 
@@ -112,8 +113,9 @@ private:
     /** Root action data. Also contained in the map above. */
     QnAction *m_root;
 
-    /** Set of all menus created by this object that are not yet destroyed. */
-    QSet<QObject *> m_menus;
+    /** Mapping from a menu created by this manager to the parameters that were 
+     * passed to it at construction time. NULL key is used for shortcut actions. */
+    QHash<QObject *, QVariant> m_targetByMenu;
 
     /** Target provider for actions. */
     QnActionTargetProvider *m_targetProvider;
@@ -124,9 +126,8 @@ private:
     /** Currently active action that was activated via a shortcut. */
     QnAction *m_shortcutAction;
 
-    /** List of items supplied to the last call to <tt>newMenu</tt>. */
-    QVariant m_lastTarget;
-
+    /** Last menu that was shown to the user. */
+    QObject *m_lastShownMenu;
 };
 
 

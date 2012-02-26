@@ -267,45 +267,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_paintGeometryChanged()));
 
 
-    /* Navigation slider. */
-    m_sliderShowButton = newShowHideButton(m_controlsWidget);
-    {
-        QTransform transform;
-        transform.rotate(-90);
-        m_sliderShowButton->setTransform(transform);
-    }
-
-    m_sliderItem = new NavigationItem(m_controlsWidget);
-    m_sliderShowButton->setFocusProxy(m_sliderItem);
-
-    m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
-    m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
-
-    m_sliderYAnimator = new VariantAnimator(this);
-    m_sliderYAnimator->setTimer(display->animationInstrument()->animationTimer());
-    m_sliderYAnimator->setTargetObject(m_sliderItem);
-    m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
-    m_sliderYAnimator->setTimeLimit(500);
-
-    m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_sliderOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
-    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
-    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
-
-    connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateSliderOpacity()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
-    connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
-    connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
-    //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
-    connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
-    connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
-
-
     /* Title bar. */
     m_titleBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_titleBackgroundItem->setAutoFillBackground(true);
@@ -470,6 +431,44 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_helpItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_helpItem_paintGeometryChanged()));
     connect(m_helpItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_helpItem_paintGeometryChanged()));
 
+
+    /* Navigation slider. */
+    m_sliderShowButton = newShowHideButton(m_controlsWidget);
+    {
+        QTransform transform;
+        transform.rotate(-90);
+        m_sliderShowButton->setTransform(transform);
+    }
+
+    m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderShowButton->setFocusProxy(m_sliderItem);
+
+    m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
+
+    m_sliderYAnimator = new VariantAnimator(this);
+    m_sliderYAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_sliderYAnimator->setTargetObject(m_sliderItem);
+    m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
+    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
+    m_sliderYAnimator->setTimeLimit(500);
+
+    m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
+    m_sliderOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
+    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
+    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
+
+    connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateSliderOpacity()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
+    connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
+    connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
+    //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
+    connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
+    connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
 
 
     /* Connect to display. */
