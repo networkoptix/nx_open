@@ -57,14 +57,10 @@ protected slots:
     void toggleFullScreen();
     void toggleTitleVisibility();
 
-    void showMainMenu();
-
     void handleMessage(const QString &message);
 
     void updateFullScreenState();
     void updateDwmState();
-
-    void at_mainMenu_destroyed();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
 

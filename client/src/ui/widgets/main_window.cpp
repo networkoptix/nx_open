@@ -205,7 +205,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     connect(qnAction(Qn::ExitAction),       SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(qnAction(Qn::FullscreenAction), SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
-    //connect(qnAction(Qn::MainMenuAction),   SIGNAL(triggered()),                            this,                                   SLOT(showMainMenu()));
 
     qnMenu->setTargetProvider(m_ui);
 
@@ -319,19 +318,6 @@ void QnMainWindow::handleMessage(const QString &message)
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     m_controller->drop(files);
-}
-
-void QnMainWindow::showMainMenu() 
-{
-    if(!m_titleVisible)
-        return;
-
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
-    menu->move(mapToGlobal(m_mainMenuButton->geometry().bottomLeft()));
-
-    connect(menu.data(), SIGNAL(destroyed()), this, SLOT(at_mainMenu_destroyed()));
-
-    menu->exec();
 }
 
 void QnMainWindow::updateFullScreenState() 
@@ -525,13 +511,6 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
     return base_type::winEvent(message, result);
 }
 #endif
-
-void QnMainWindow::at_mainMenu_destroyed() 
-{
-    //m_mainMenuButton->setDisabled(true);
-
-    //QTimer::singleShot(100, m_mainMenuButton, SLOT(setEnabled()));
-}
 
 void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
 {
