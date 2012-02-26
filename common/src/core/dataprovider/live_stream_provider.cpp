@@ -126,6 +126,7 @@ void QnLiveStreamProvider::setFps(float f)
 
 
         m_fps = qMin((int)f, res->getMaxFps());
+        f = m_fps;
 
     }
     
