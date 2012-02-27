@@ -28,11 +28,6 @@ namespace Qn {
         ShowFpsAction,
 
         /**
-         * Opens a new tab (layout).
-         */
-        NewLayoutAction,
-
-        /**
          * Opens some existing layout if there exists one, creates a new one otherwise.
          * This action is executed every time the last layout on a workbench is closed.
          */
@@ -48,9 +43,16 @@ namespace Qn {
         MainMenuAction,
 
         /**
+         * Opens a new tab (layout).
+         */
+        NewLayoutAction,
+
+        /**
          * Opens a file dialog and adds selected files to the current layout.
          */
         OpenFileAction,
+
+        FileSeparator,
 
         /**
          * Submenu for screen recording.

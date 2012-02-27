@@ -208,13 +208,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+F")).
         autoRepeat(false);
 
-    factory(Qn::NewLayoutAction).
-        flags(Qn::NoTarget).
-        text(tr("New Layout")).
-        shortcut(tr("Ctrl+T")).
-        autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-        icon(Skin::icon(QLatin1String("plus.png")));
-
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::NoTarget).
         text(tr("Open Single Layout"));
@@ -229,12 +222,23 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
 
+    factory(Qn::NewLayoutAction).
+        flags(Qn::Main).
+        text(tr("New Layout")).
+        shortcut(tr("Ctrl+T")).
+        autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
+        icon(Skin::icon(QLatin1String("plus.png")));
+
     factory(Qn::OpenFileAction).
         flags(Qn::Main).
         text(tr("Open File(s)...")).
         shortcut(tr("Ctrl+O")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("folder.png")));
+
+    factory(Qn::FileSeparator).
+        flags(Qn::Main).
+        separator();
 
     factory(Qn::ScreenRecordingMenu).
         flags(Qn::Main).
