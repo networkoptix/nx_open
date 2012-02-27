@@ -32,16 +32,12 @@ public:
 
     QnVideoServerConnectionPtr apiConnection();
 
-    void setGuid(const QString& guid);
-    QString getGuid() const;
-
     QnStorageResourceList getStorages() const;
     void setStorages(const QnStorageResourceList& storages);
 
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
-    QString m_guid;
     QnStorageResourceList m_storages;
 };
 

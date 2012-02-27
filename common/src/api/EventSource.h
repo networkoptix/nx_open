@@ -23,6 +23,7 @@ struct QnEvent
     QString eventType;
     QString objectName;
     QnId resourceId;
+    QString resourceGuid;
     QString data;
 
     // for RSP event
