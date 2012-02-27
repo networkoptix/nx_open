@@ -234,8 +234,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
     connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
 
-
-    m_volumeSlider = new VolumeSlider(Qt::Horizontal);
+    m_volumeSlider = new VolumeSlider(Qt::Horizontal, this);
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
