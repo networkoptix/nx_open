@@ -40,11 +40,11 @@ public:
     inline QStringList fileTags() const { return m_tags; }
 
     /**
-    * Read youtube category list
-    *
-    * @return Returns category list. Each element is QPair. First: internal category name (used in uploadFile function), Second: category display name in national charset
-    *
-    */
+     * Read youtube category list
+     *
+     * @return Returns category list. Each element is QPair. First: internal category name (used in uploadFile function), Second: category display name in national charset
+     *
+     */
     QList<QPair<QString, QString> > getCategoryList() const;
 
 Q_SIGNALS:
@@ -56,8 +56,8 @@ Q_SIGNALS:
     void uploadFinished();
 
     /**
-    * Signal is emmited then category list is loaded from youtube. If function getCategoryList is called before this signal, category list is empty (not ready)
-    */
+     * Signal is emmited when category list is loaded from youtube. If function getCategoryList is called before this signal, category list is empty (not ready)
+     */
     void categoryListLoaded();
 
 private Q_SLOTS:
