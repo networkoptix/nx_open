@@ -337,54 +337,67 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
     addCriterion(new QnResourceCriterion(QVariant(), NOTHING, ID, REJECT, REJECT));
 
     /* Parse pattern string. */
-    QRegExp regExp(QLatin1String("(\\w+:)?(\\w*)|([\\-\\+])"), Qt::CaseSensitive, QRegExp::RegExp2);
+    QRegExp spaces(QLatin1String("[\\s]+"), Qt::CaseSensitive, QRegExp::RegExp2);
     int pos = 0;
-
     bool positive = true;
-    while ((pos = regExp.indexIn(normalizedPattern, pos)) != -1) {
-        pos += regExp.matchedLength();
-        if (regExp.matchedLength() == 0)
-            break;
-
-        const QString sign = regExp.cap(3);
-        if(!sign.isEmpty()) {
-            positive = sign == QLatin1String("+");
-            continue;
+    for(int i = 0, size = normalizedPattern.size(); i <= size; i++) {
+        QChar c;
+        if(i == size) {
+            c = '+'; /* So that chunk parsing logic is triggered. */
+        } else {
+            c = normalizedPattern[i];
         }
-
-        const QString key = regExp.cap(1).toLower();
-        const QString pattern = regExp.cap(2);
-        if (pattern.isEmpty())
+        if(c != '-' && c != '+')
             continue;
 
-        Type type = CONTAINMENT;
-        Target target = SEARCH_STRING;
-        QVariant targetValue = pattern;
-        if (key == QLatin1String("id:")) {
-            target = ID;
-            type = EQUALITY;
-        } else if (key == QLatin1String("name:")) {
-            target = NAME;
-        } else if (key == QLatin1String("tag:")) {
-            target = TAGS;
-        } else if (key == QLatin1String("type:")) {
-            target = FLAGS;
-
-            if(pattern == "camera") {
-                targetValue = static_cast<int>(QnResource::live);
-            } else if(pattern == "image") {
-                targetValue = static_cast<int>(QnResource::still_image);
-            } else if(pattern == "video") {
-                targetValue = static_cast<int>(QnResource::local | QnResource::video);
+        QString chunks = normalizedPattern.mid(pos, i - pos);
+        pos = i + 1;
+        foreach(const QString &chunk, chunks.split(spaces, QString::SkipEmptyParts)) {
+            QString key;
+            QString pattern;
+            
+            int index = chunk.indexOf(QChar(':'));
+            if(index != -1) {
+                key = chunk.left(index);
+                pattern = chunk.mid(index + 1);
             } else {
-                targetValue = 0xFFFFFFFF;
+                pattern = chunk;
             }
-        } else if (pattern == QLatin1String("live")) {
-            target = FLAGS;
-            targetValue = static_cast<int>(QnResource::live);
+
+            if (pattern.isEmpty())
+                continue;
+
+            Type type = CONTAINMENT;
+            Target target = SEARCH_STRING;
+            QVariant targetValue = pattern;
+            if (key == QLatin1String("id:")) {
+                target = ID;
+                type = EQUALITY;
+            } else if (key == QLatin1String("name:")) {
+                target = NAME;
+            } else if (key == QLatin1String("tag:")) {
+                target = TAGS;
+            } else if (key == QLatin1String("type:")) {
+                target = FLAGS;
+
+                if(pattern == "camera") {
+                    targetValue = static_cast<int>(QnResource::live);
+                } else if(pattern == "image") {
+                    targetValue = static_cast<int>(QnResource::still_image);
+                } else if(pattern == "video") {
+                    targetValue = static_cast<int>(QnResource::local | QnResource::video);
+                } else {
+                    targetValue = 0xFFFFFFFF;
+                }
+            } else if (pattern == QLatin1String("live")) {
+                target = FLAGS;
+                targetValue = static_cast<int>(QnResource::live);
+            }
+
+            addCriterion(new QnResourceCriterion(targetValue, type, target, positive ? ACCEPT : REJECT, NEXT));
         }
 
-        addCriterion(new QnResourceCriterion(targetValue, type, target, positive ? ACCEPT : REJECT, NEXT));
+        positive = c == '+';
     }
 }
 
