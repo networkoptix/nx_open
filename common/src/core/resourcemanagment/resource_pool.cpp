@@ -235,9 +235,8 @@ QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
 {
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
-        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getGuid() == guid)
-            return netResource;
+        if (resource->getGuid() == guid)
+            return resource;
     }
 
     return QnNetworkResourcePtr(0);

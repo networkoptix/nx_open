@@ -66,7 +66,7 @@ void QnEventManager::eventReceived(QnEvent event)
             QnResourcePtr ownResource;
 
             if (!event.resourceGuid.isEmpty())
-                ownResource = qnResPool->getResourceById(event.resourceGuid);
+                ownResource = qnResPool->getResourceByGuid(event.resourceGuid);
             else
                 ownResource = qnResPool->getResourceById(event.resourceId);
 

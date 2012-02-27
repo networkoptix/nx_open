@@ -338,6 +338,7 @@ void serializeLayout_i(proto::pb::Layout& pb_layout, const QnLayoutResourcePtr& 
 {
     pb_layout.set_parentid(layoutIn->getParentId().toInt());
     pb_layout.set_name(layoutIn->getName().toStdString());
+    pb_layout.set_guid(layoutIn->getGuid().toStdString());
 
     if (!layoutIn->getItems().isEmpty()) {
         foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
