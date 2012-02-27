@@ -14,8 +14,7 @@ public:
         ContextId_Scene = 0,
         ContextId_MotionGrid,
         ContextId_Slider,
-        ContextId_Tree,
-        ContextId_Search
+        ContextId_Tree
     };
 
     static QnContextHelp* instance();
@@ -32,12 +31,15 @@ public:
     ContextId currentId() const;
 
     void resetShownInfo();
+
 signals:
     void helpContextChanged(QnContextHelp::ContextId id);
+
 private:
     void installHelpContext(const QString& lang);
     void deserializeShownContext();
     void serializeShownContext();
+
 private:
     ContextId m_currentId;
     QTranslator* m_translator;

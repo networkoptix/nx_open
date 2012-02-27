@@ -1078,11 +1078,7 @@ void QnWorkbenchUi::updateHelpContextInternal() {
     QnContextHelp::ContextId context;
     switch(scope) {
     case Qn::TreeScope:
-        if(m_treeWidget->currentTab() == QnResourceTreeWidget::SearchTab) {
-            context = QnContextHelp::ContextId_Search;
-        } else {
-            context = QnContextHelp::ContextId_Tree;
-        }
+        context = QnContextHelp::ContextId_Tree;
         break;
     case Qn::SliderScope:
         context = QnContextHelp::ContextId_Slider;

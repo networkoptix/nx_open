@@ -115,9 +115,6 @@ QString QnContextHelp::text(ContextId id) const {
     case ContextId_Tree:
         return tr("ContextId_Tree");
         break;
-    case ContextId_Search:
-        return tr("ContextId_Search");
-        break;
     default:
         qWarning() << "Unknown help context" << (int) m_currentId;
         return QString();
