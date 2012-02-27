@@ -143,6 +143,7 @@ namespace Qn {
         DeleteFromDiskAction,
 
 
+
         /* Layout actions. */
 
         ItemSeparator,
@@ -156,6 +157,15 @@ namespace Qn {
          * Removes a resource from application server.
          */
         RemoveFromServerAction,
+
+
+        /**
+         * Opens a user creation dialog.
+         */
+        NewUserAction,
+
+
+
 
 #if 0
         /** 

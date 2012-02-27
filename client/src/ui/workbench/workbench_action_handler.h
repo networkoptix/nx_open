@@ -65,6 +65,8 @@ protected slots:
     void at_removeLayoutItemAction_triggered();
     void at_removeFromServerAction_triggered();
 
+    void at_newUserAction_triggered();
+
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 

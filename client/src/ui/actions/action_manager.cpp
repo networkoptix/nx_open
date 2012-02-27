@@ -370,6 +370,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition());
 
+    factory(Qn::NewUserAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("New User..."));
+
 
     action(Qn::MainMenuAction)->setMenu(newMenu(Qn::MainScope));
 

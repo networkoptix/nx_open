@@ -23,6 +23,7 @@
 #include <ui/dialogs/connectiontestingdialog.h>
 #include <ui/dialogs/multiplecamerasettingsdialog.h>
 #include <ui/dialogs/layout_save_dialog.h>
+#include <ui/dialogs/new_user_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
@@ -136,6 +137,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::OpenInFolderAction),               SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
+    connect(qnAction(Qn::NewUserAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::deinitialize() {
@@ -486,6 +488,12 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         }
         }
     }
+}
+
+void QnWorkbenchActionHandler::at_newUserAction_triggered() {
+    QScopedPointer<QnNewUserDialog> dialog(new QnNewUserDialog(widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
