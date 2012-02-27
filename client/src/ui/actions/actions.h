@@ -140,16 +140,16 @@ namespace Qn {
          */
         OpenInFolderAction,
 
-        /**
-         * Deletes the file from disk.
-         */
-        DeleteFromDiskAction,
-
 
 
         /* Layout actions. */
 
         ItemSeparator,
+
+        /**
+         * Deletes the file from disk.
+         */
+        DeleteFromDiskAction,
 
         /**
          * Removes an item from a layout.

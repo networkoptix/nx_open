@@ -5,6 +5,7 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include "ui/workbench/workbench_layout_synchronizer.h"
 
 namespace {
     int qn_widgetListMetaType = 0;
@@ -152,7 +153,7 @@ QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QnResourceWidgetLis
 
         QnLayoutResourcePtr resource = layout->resource();
         if(!resource)
-            continue;
+            qnWarning("Appserver is down, layout item deletion may not work as expected.");
 
         result.push_back(QnLayoutItemIndex(resource, widget->item()->uuid()));
     }

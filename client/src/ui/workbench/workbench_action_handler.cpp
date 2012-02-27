@@ -136,6 +136,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::YouTubeUploadAction),              SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(qnAction(Qn::EditTagsAction),                   SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
     connect(qnAction(Qn::OpenInFolderAction),               SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
+    connect(qnAction(Qn::DeleteFromDiskAction),             SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
     connect(qnAction(Qn::NewUserAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
@@ -414,17 +415,48 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
     QnEnvironment::showInGraphicalShell(widget(), resource->getUrl());
 }
 
+void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
+    QSet<QnResourcePtr> resources = qnMenu->currentResourcesTarget(sender()).toSet();
+
+    QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Delete Files"), tr("Are you sure you want to permanently delete these %n file(s)?", 0, resources.size()), QMessageBox::Yes | QMessageBox::No);
+    if(button != QMessageBox::Yes)
+        return;
+    
+    foreach(const QnResourcePtr &resource, resources)
+        QnFileProcessor::deleteLocalResources(resources.toList());
+}
+
 void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     QnLayoutItemIndexList items = qnMenu->currentLayoutItemsTarget(sender());
 
     if(items.size() > 1) {
-        QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Remove confirmation"), tr("Remove %n item(s)?", 0, items.size()), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Remove Items"), tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()), QMessageBox::Yes | QMessageBox::No);
         if(button != QMessageBox::Yes)
             return;
     }
 
-    foreach(const QnLayoutItemIndex &index, items)
-        index.layout()->removeItem(index.uuid());
+    QList<QUuid> orphanedUuids;
+    foreach(const QnLayoutItemIndex &index, items) {
+        if(index.layout()) {
+            index.layout()->removeItem(index.uuid());
+        } else {
+            orphanedUuids.push_back(index.uuid());
+        }
+    }
+
+    /* If appserver is not running, we may get removal requests without layout resource. */
+    if(!orphanedUuids.isEmpty()) {
+        QList<QnWorkbenchLayout *> layouts;
+        layouts.push_front(m_workbench->currentLayout());
+        foreach(const QUuid &uuid, orphanedUuids) {
+            foreach(QnWorkbenchLayout *layout, layouts) {
+                if(QnWorkbenchItem *item = layout->item(uuid)) {
+                    layout->removeItem(item);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
@@ -544,7 +576,3 @@ void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &err
     QMessageBox::critical(widget(), tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
 }
 
-/* // TODO
-if (action == &cm_remove_from_disk) {
-    QnFileProcessor::deleteLocalResources(QnResourceList() << resource);
-*/
