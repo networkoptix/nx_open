@@ -346,7 +346,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    qnAction(Qn::FullscreenAction), SLOT(toggle()));
-    connect(qnAction(Qn::MainMenuAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_mainMenuAction_triggered()));
 
 
     /* Help window. */
@@ -1121,19 +1120,6 @@ void QnWorkbenchUi::at_activityStarted() {
     m_inactive = false;
 
     updateControlsVisibility(true);
-}
-
-void QnWorkbenchUi::at_mainMenuAction_triggered() {
-    if(!m_mainMenuButton->isVisible())
-        return;
-
-    /* On multi-monitor setups where monitor sizes differ,
-     * these coordinates can be negative, so we shouldn't adjust them. */
-    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
-
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
-    menu->move(pos);
-    menu->exec();
 }
 
 void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {

@@ -371,6 +371,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceRemovalActionCondition());
 
 
+    action(Qn::MainMenuAction)->setMenu(newMenu(Qn::MainScope));
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);

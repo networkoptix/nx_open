@@ -229,7 +229,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
-    m_mainMenuButton->setMenu(qnMenu->newMenu(Qn::MainScope));
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
     m_mainMenuButton->setIcon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
