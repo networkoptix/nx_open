@@ -191,7 +191,13 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         QPalette palette = m_treeWidget->palette();
         palette.setColor(QPalette::Window, Qt::transparent);
         palette.setColor(QPalette::Base, Qt::transparent);
+        
+        QPalette cbPalette = m_treeWidget->comboBoxPalette();
+        cbPalette.setColor(QPalette::Window, Qt::black);
+        cbPalette.setColor(QPalette::Base, Qt::black);
+        
         m_treeWidget->setPalette(palette);
+        m_treeWidget->setComboBoxPalette(cbPalette);
     }
     m_treeWidget->setWorkbench(display->workbench());
     m_treeWidget->resize(250, 0);

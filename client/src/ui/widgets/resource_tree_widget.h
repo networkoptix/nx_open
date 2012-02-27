@@ -23,6 +23,10 @@ class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeItemDelegate;
 
+namespace Ui {
+    class ResourceTreeWidget;
+}
+
 class QnResourceTreeWidget: public QWidget, public QnActionTargetProvider {
     Q_OBJECT
 
@@ -55,6 +59,10 @@ public:
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
+    QPalette comboBoxPalette() const;
+
+    void setComboBoxPalette(const QPalette &palette);
+
 signals:
     void activated(const QnResourcePtr &resource);
     void currentTabChanged();
@@ -78,8 +86,8 @@ protected:
 
 private slots:
     void open();
-
-    void at_filterLineEdit_textChanged(const QString &filter);
+    void updateFilter();
+    
     void at_treeView_activated(const QModelIndex &index);
     void at_tabWidget_currentChanged(int index);
 
@@ -88,20 +96,12 @@ private slots:
     void at_workbench_aboutToBeDestroyed();
 
 private:
-    QTabWidget *m_tabWidget;
-    QToolButton *m_previousItemButton;
-    QToolButton *m_nextItemButton;
+    QScopedPointer<Ui::ResourceTreeWidget> ui;
 
-    QLineEdit *m_filterLineEdit;
     bool m_ignoreFilterChanges;
-
-    QToolButton *m_clearFilterButton;
     int m_filterTimerId;
 
     QnResourceModel *m_resourceModel;
-    QTreeView *m_resourceTreeView;
-    QTreeView *m_searchTreeView;
-
     QnResourceTreeItemDelegate *m_resourceDelegate;
     QnResourceTreeItemDelegate *m_searchDelegate;
 
