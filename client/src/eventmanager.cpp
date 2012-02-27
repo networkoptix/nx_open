@@ -44,7 +44,7 @@ void QnEventManager::eventReceived(QnEvent event)
     if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
     {
         QnResourcePtr resource;
-        if (event.resourceGuid)
+        if (!event.resourceGuid.isEmpty())
             resource = qnResPool->getResourceById(event.resourceGuid);
         else
             resource = qnResPool->getResourceById(event.resourceId);

@@ -68,10 +68,10 @@ public:
         if(!qn_openGlInfoWrittenOut) {
             qn_openGlInfoWrittenOut = true;
 
-            cl_log.log(cl_logINFO, "OpenGL extensions: %s.", extensions);
-            cl_log.log(cl_logINFO, "OpenGL version: %s.", version);
-            cl_log.log(cl_logINFO, "OpenGL renderer: %s.", renderer);
-            cl_log.log(cl_logINFO, "OpenGL vendor: %s.", vendor);
+            cl_log.log(cl_logINFO, "OpenGL extensions: %s.", extensions.constData());
+            cl_log.log(cl_logINFO, "OpenGL version: %s.", version.constData());
+            cl_log.log(cl_logINFO, "OpenGL renderer: %s.", renderer.constData());
+            cl_log.log(cl_logINFO, "OpenGL vendor: %s.", vendor.constData());
 
             bool messageBoxShown = false;
 
