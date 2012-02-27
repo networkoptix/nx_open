@@ -15,6 +15,12 @@ public:
 
     virtual ~QnNewUserDialog();
 
+    QString login() const;
+
+    QString password() const;
+
+    bool isAdmin() const;
+
 protected:
     enum Element {
         Login,

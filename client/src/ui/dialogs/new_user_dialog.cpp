@@ -118,3 +118,15 @@ void QnNewUserDialog::updateAll() {
     updateElement(Password);
     updateElement(Login);
 }
+
+QString QnNewUserDialog::login() const {
+    return ui->loginEdit->text();
+}
+
+QString QnNewUserDialog::password() const {
+    return ui->passwordEdit->text();
+}
+
+bool QnNewUserDialog::isAdmin() const {
+    return ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toBool();
+}

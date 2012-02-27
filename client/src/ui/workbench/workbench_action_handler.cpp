@@ -493,7 +493,26 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QScopedPointer<QnNewUserDialog> dialog(new QnNewUserDialog(widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    if(!dialog->exec())
+        return;
+
+    QnUserResourcePtr user(new QnUserResource());
+    user->setName(dialog->login());
+    user->setPassword(dialog->password());
+    user->setAdmin(dialog->isAdmin());
+
+    m_connection->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, QnResourceList, int)));
+}
+
+void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
+    if(status == 0)
+        return;
+
+    if(resources.isEmpty() || resources[0].isNull()) {
+        QMessageBox::critical(widget(), tr(""), tr("Could not save user to application server. \n\nError description: '%1'").arg(QLatin1String(errorString.data())));
+    } else {
+        QMessageBox::critical(widget(), tr(""), tr("Could not save user '%1' to application server. \n\nError description: '%2'").arg(resources[0]->getName()).arg(QLatin1String(errorString.data())));
+    }
 }
 
 void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
