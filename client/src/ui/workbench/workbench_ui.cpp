@@ -1063,7 +1063,7 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
 
-    if(focusItem == NULL) {
+    if(focusItem == NULL || dynamic_cast<QnResourceWidget *>(focusItem)) {
         scope = Qn::SceneScope;
     } else if(focusItem == m_helpItem || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
         return; /* Focusing on help widget or title item shouldn't change help context. */
