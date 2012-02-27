@@ -183,7 +183,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
     setFpsVisible(false);
 
-
     /* Tree widget. */
     m_treeWidget = new QnResourceTreeWidget();
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
@@ -1110,8 +1109,6 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchUi::at_fpsChanged(qreal fps) {
-    qDebug() << display()->scene()->focusItem();
-
     m_fpsItem->setText(QString::number(fps, 'g', 4));
     m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
 }
