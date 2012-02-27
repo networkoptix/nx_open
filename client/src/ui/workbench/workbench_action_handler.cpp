@@ -505,8 +505,10 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
-    if(status == 0)
+    if(status == 0) {
+        qnResPool->addResources(resources);
         return;
+    }
 
     if(resources.isEmpty() || resources[0].isNull()) {
         QMessageBox::critical(widget(), tr(""), tr("Could not save user to application server. \n\nError description: '%1'").arg(QLatin1String(errorString.data())));
