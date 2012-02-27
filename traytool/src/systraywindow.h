@@ -1,0 +1,102 @@
+ #ifndef WINDOW_H
+ #define WINDOW_H
+
+ #include <QSystemTrayIcon>
+ #include <QDialog>
+
+ class QAction;
+ class QCheckBox;
+ class QComboBox;
+ class QGroupBox;
+ class QLabel;
+ class QLineEdit;
+ class QMenu;
+ class QPushButton;
+ class QSpinBox;
+ class QTextEdit;
+
+ namespace Ui {
+     class SettingsDialog;
+ }
+
+
+ class QnSystrayWindow : public QDialog
+ {
+     Q_OBJECT
+
+ public:
+     QnSystrayWindow();
+     virtual ~QnSystrayWindow();
+
+     void setVisible(bool visible);
+
+ protected:
+     virtual void closeEvent(QCloseEvent *event) override;
+
+ private slots:
+     void setIcon(int index);
+     void iconActivated(QSystemTrayIcon::ActivationReason reason);
+     void showMessage();
+     void messageClicked();
+
+     void mediaServerStartAction();
+     void mediaServerStopAction();
+     void appServerStartAction();
+     void appServerStopAction();
+     void findServiceInfo();
+     void updateServiceInfo();
+
+     void buttonClicked(QAbstractButton * button);
+ private:
+     //void createIconGroupBox();
+     //void createMessageGroupBox();
+     void createActions();
+     void createTrayIcon();
+
+     void updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction);
+
+     //QGroupBox *iconGroupBox;
+     //QLabel *iconLabel;
+     //QComboBox *iconComboBox;
+     //QCheckBox *showIconCheckBox;
+
+     //QGroupBox *messageGroupBox;
+     //QLabel *typeLabel;
+     //QLabel *durationLabel;
+     //QLabel *durationWarningLabel;
+     //QLabel *titleLabel;
+     //QLabel *bodyLabel;
+     //QComboBox *typeComboBox;
+     //QSpinBox *durationSpinBox;
+     //QLineEdit *titleEdit;
+     //QTextEdit *bodyEdit;
+     //QPushButton *showMessageButton;
+
+     QScopedPointer<Ui::SettingsDialog> ui;
+
+     //QAction *minimizeAction;
+     //QAction *maximizeAction;
+     QAction *restoreAction;
+     QAction *quitAction;
+
+     QSystemTrayIcon *trayIcon;
+     QMenu *trayIconMenu;
+
+     QString m_detailedErrorText;
+     QIcon m_iconOK;
+     QIcon m_iconBad;
+
+     SC_HANDLE m_scManager;
+     SC_HANDLE m_mediaServerHandle;
+     SC_HANDLE m_appServerHandle;
+     
+     QAction* m_mediaServerStartAction;
+     QAction* m_mediaServerStopAction;
+     QAction* m_appServerStartAction;
+     QAction* m_appServerStopAction;
+     bool m_firstTimeToolTipError;
+     QTimer m_findServices;
+     QTimer m_updateServiceStatus;
+ };
+
+ #endif
