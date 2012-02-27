@@ -12,6 +12,7 @@
 #include <core/resource/resource_consumer.h>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "polygonal_shadow_item.h"
+#include "core/resource/resource_media_layout.h"
 
 class QGraphicsLinearLayout;
 
@@ -249,7 +250,7 @@ public:
      */
     void addToMotionSelection(const QRect &gridRect);
 
-    void addToMotionMask(const QRect &gridRect);
+    void addToMotionMask(const QRect &gridRect, int channel);
 
     void clearMotionMask();
 
@@ -267,7 +268,7 @@ public slots:
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
-    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region);
+    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> region);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -295,6 +296,8 @@ protected:
     void ensureMotionMaskBinData();
     void invalidateMotionMaskBinData();
 
+    int motionGridWidth() const;
+    int motionGridHeight() const;
 private Q_SLOTS:
     void at_sourceSizeChanged(const QSize &size);
     void at_display_resourceUpdated();
@@ -344,9 +347,9 @@ private:
 
     void drawQualityText(QPainter *painter, const QRectF &rect, const QString& text);
 
-    void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion);
+    void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion, int channel);
 
-    void drawMotionMask(QPainter *painter, const QRectF& rect);
+    void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
 
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
 
@@ -414,13 +417,13 @@ private:
     QVector<ChannelState> m_channelState;
 
     /** Image region where motion is currently present, in parrots. */
-    QRegion m_motionMask;
+    QList<QRegion> m_motionMaskList;
 
     /** Whether the motion mask is valid. */
     bool m_motionMaskValid;
 
     /** Binary mask for the current motion region. */
-    __m128i *m_motionMaskBinData;
+    __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
 
     /** Whether motion mask binary data is valid. */
     bool m_motionMaskBinDataValid;

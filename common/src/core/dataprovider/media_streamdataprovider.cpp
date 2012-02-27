@@ -13,7 +13,6 @@ m_numberOfchannels(0)
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
     Q_ASSERT(m_mediaResource);
-    m_channel_number = 1;
     memset(m_lastVideoTime, 0, sizeof(m_lastVideoTime));
 
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();

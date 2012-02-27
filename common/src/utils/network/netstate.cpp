@@ -100,15 +100,15 @@ CLSubNetState& CLNetState::getSubNetState(const QHostAddress& machine_ip)
 	return m_netstate[machine_ip.toString()];
 }
 
-bool CLNetState::isInMachineSubnet(const QHostAddress& addr) const
+bool CLNetState::isAddrInMachineSubnet(const QHostAddress& addr) const
 {
 	for (int i = 0; i < m_net_entries.size(); ++i)
 	{
 		const QNetworkAddressEntry& entr = m_net_entries.at(i);
 
-		//QString addr_str = addr.toString();
-		//QString entr_ip_str = entr.ip().toString();
-		//QString entr_mask = entr.netmask().toString();
+		QString addr_str = addr.toString();
+		QString entr_ip_str = entr.ip().toString();
+		QString entr_mask = entr.netmask().toString();
 		if (entr.ip().isInSubnet(addr, entr.prefixLength()))
 		//if (entr.ip().isInSubnet(addr, entr.netmask().toIPv4Address()))
 			return true;
@@ -118,3 +118,20 @@ bool CLNetState::isInMachineSubnet(const QHostAddress& addr) const
 
 }
 
+bool CLNetState::isResourceInMachineSubnet(const QHostAddress& addr, const QHostAddress& discAddr) const
+{
+    for (int i = 0; i < m_net_entries.size(); ++i)
+    {
+        const QNetworkAddressEntry& entr = m_net_entries.at(i);
+
+        QString addr_str = addr.toString();
+        QString discAddr_str = discAddr.toString();
+        QString entr_ip_str = entr.ip().toString();
+        QString entr_mask = entr.netmask().toString();
+        if (entr.ip().isInSubnet(addr, entr.prefixLength()) && entr.ip().isInSubnet(discAddr, entr.prefixLength()))
+            //if (entr.ip().isInSubnet(addr, entr.netmask().toIPv4Address()))
+            return true;
+
+    }
+    return false;
+}

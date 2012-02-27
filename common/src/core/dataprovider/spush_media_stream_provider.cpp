@@ -7,7 +7,8 @@
 
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
-QnAbstractMediaStreamDataProvider(dev)
+QnAbstractMediaStreamDataProvider(dev),
+m_needReopen(false)
 {
 }
 
@@ -50,7 +51,14 @@ void CLServerPushStreamreader::run()
             }
         }
 
+        if (m_needReopen)
+        {
+            m_needReopen = false;
+            closeStream();
+        }
+
         QnAbstractMediaDataPtr data = getNextData();
+
 
 		if (data==0)
 		{
@@ -125,7 +133,9 @@ void CLServerPushStreamreader::run()
 
         // check queue sizes
         if (dataCanBeAccepted())
+        {
             putData(data);
+        }
         else
         {
             setNeedKeyData();
@@ -146,4 +156,10 @@ void CLServerPushStreamreader::beforeRun()
 {
     QnAbstractMediaStreamDataProvider::beforeRun();
     getResource()->init();
+}
+
+
+void CLServerPushStreamreader::pleaseReOpen()
+{
+    m_needReopen = true;
 }

@@ -267,45 +267,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_paintGeometryChanged()));
 
 
-    /* Navigation slider. */
-    m_sliderShowButton = newShowHideButton(m_controlsWidget);
-    {
-        QTransform transform;
-        transform.rotate(-90);
-        m_sliderShowButton->setTransform(transform);
-    }
-
-    m_sliderItem = new NavigationItem(m_controlsWidget);
-    m_sliderShowButton->setFocusProxy(m_sliderItem);
-
-    m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
-    m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
-
-    m_sliderYAnimator = new VariantAnimator(this);
-    m_sliderYAnimator->setTimer(display->animationInstrument()->animationTimer());
-    m_sliderYAnimator->setTargetObject(m_sliderItem);
-    m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
-    m_sliderYAnimator->setTimeLimit(500);
-
-    m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_sliderOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
-    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
-    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
-
-    connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateSliderOpacity()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
-    connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
-    connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
-    //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
-    connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
-    connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
-
-
     /* Title bar. */
     m_titleBackgroundItem = new QGraphicsWidget(m_controlsWidget);
     m_titleBackgroundItem->setAutoFillBackground(true);
@@ -385,7 +346,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    qnAction(Qn::FullscreenAction), SLOT(toggle()));
-    connect(qnAction(Qn::MainMenuAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_mainMenuAction_triggered()));
 
 
     /* Help window. */
@@ -469,8 +429,45 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_helpShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_helpShowingProcessor_hoverEntered()));
     connect(m_helpItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_helpItem_paintGeometryChanged()));
     connect(m_helpItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_helpItem_paintGeometryChanged()));
-    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(setHelpOpened()));
 
+
+    /* Navigation slider. */
+    m_sliderShowButton = newShowHideButton(m_controlsWidget);
+    {
+        QTransform transform;
+        transform.rotate(-90);
+        m_sliderShowButton->setTransform(transform);
+    }
+
+    m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderShowButton->setFocusProxy(m_sliderItem);
+
+    m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
+
+    m_sliderYAnimator = new VariantAnimator(this);
+    m_sliderYAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_sliderYAnimator->setTargetObject(m_sliderItem);
+    m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
+    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
+    m_sliderYAnimator->setTimeLimit(500);
+
+    m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
+    m_sliderOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
+    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
+    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
+
+    connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateSliderOpacity()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
+    connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
+    connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
+    //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
+    connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
+    connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
 
 
     /* Connect to display. */
@@ -495,17 +492,20 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Set up help context processing. */
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_helpOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_helpOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    connect(m_titleOpacityProcessor,    SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
+    connect(m_titleOpacityProcessor,    SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(at_helpWidget_showRequested()));
+    connect(m_helpWidget,               SIGNAL(hideRequested()),                                                                    this,                           SLOT(at_helpWidget_hideRequested()));
+    updateHelpContext();
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -1045,22 +1045,29 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
 }
 
 void QnWorkbenchUi::updateHelpContext() {
+    /* This totally evil hack is here to work around a problem that when scene 
+     * focus item changes, it is first cleared.
+     * 
+     * We want to skip the cleared state, hence the delay. There is a 
+     * better way of doing it, so this is a TODO. */
+    QTimer::singleShot(100, this, SLOT(updateHelpContextInternal()));
+}
+
+void QnWorkbenchUi::updateHelpContextInternal() {
     Qn::ActionScope scope = Qn::InvalidScope;
 
-    if(m_treeOpacityProcessor->isHovered()) {
-        scope = Qn::TreeScope;
-    } else if(m_sliderOpacityProcessor->isHovered()) {
-        scope = Qn::SliderScope;
-    } 
-#if 0
-    else if(m_treeOpacityProcessor->isFocused()) {
-        scope = Qn::TreeScope;
-    } else if(m_sliderOpacityProcessor->isFocused()) {
-        scope = Qn::SliderScope;
-    } 
-#endif
-    else {
+    QGraphicsItem *focusItem = display()->scene()->focusItem();
+
+    if(focusItem == NULL) {
         scope = Qn::SceneScope;
+    } else if(focusItem == m_helpItem || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
+        return; /* Focusing on help widget or title item shouldn't change help context. */
+    } else if(focusItem == m_treeItem) {
+        scope = Qn::TreeScope;
+    } else if(focusItem == m_sliderItem || m_treeItem->isAncestorOf(focusItem)) {
+        scope = Qn::SliderScope;
+    } else {
+        return;
     }
 
     QnContextHelp::ContextId context;
@@ -1097,6 +1104,8 @@ void QnWorkbenchUi::updateHelpContext() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchUi::at_fpsChanged(qreal fps) {
+    qDebug() << display()->scene()->focusItem();
+
     m_fpsItem->setText(QString::number(fps, 'g', 4));
     m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
 }
@@ -1111,19 +1120,6 @@ void QnWorkbenchUi::at_activityStarted() {
     m_inactive = false;
 
     updateControlsVisibility(true);
-}
-
-void QnWorkbenchUi::at_mainMenuAction_triggered() {
-    if(!m_mainMenuButton->isVisible())
-        return;
-
-    /* On multi-monitor setups where monitor sizes differ,
-     * these coordinates can be negative, so we shouldn't adjust them. */
-    QPoint pos = m_display->view()->mapToGlobal(m_display->view()->mapFromScene(m_mainMenuButton->mapToScene(m_mainMenuButton->rect().bottomLeft())));
-
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
-    menu->move(pos);
-    menu->exec();
 }
 
 void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
@@ -1159,7 +1155,7 @@ void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
     if(cameraResource != NULL)
 #endif
     {
-        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QRegion)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QRegion)));
+        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));
         connect(m_sliderItem, SIGNAL(clearMotionSelection()), widget, SLOT(clearMotionSelection()));
         m_sliderItem->addReserveCamera(widget->display()->camera());
     }
@@ -1471,3 +1467,16 @@ void QnWorkbenchUi::at_helpItem_paintGeometryChanged() {
     updateViewportMargins();
 }
 
+void QnWorkbenchUi::at_helpWidget_showRequested() {
+    m_helpHidingProcessor->forceHoverEnter();
+    m_helpShowingProcessor->forceHoverEnter();
+
+    setHelpOpened(true);
+}
+
+void QnWorkbenchUi::at_helpWidget_hideRequested() {
+    m_helpHidingProcessor->forceHoverLeave();
+    m_helpShowingProcessor->forceHoverLeave();
+
+    setHelpOpened(false);
+}

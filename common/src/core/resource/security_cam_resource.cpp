@@ -16,6 +16,9 @@ QnSecurityCamResource::QnSecurityCamResource()
         metaTypesInitialized = true;
     }
 
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_motionMaskList << QRegion();
+
     addFlags(live_cam);
 }
 
@@ -30,7 +33,12 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        setMotionMask(other_casted->m_motionMask, QnDomainPhysical);
+
+        const QnVideoResourceLayout* layout = getVideoLayout();
+        int numChannels = layout->numberOfChannels();
+
+        for (int i = 0; i < numChannels; ++i)
+            setMotionMask(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }
 }
@@ -106,26 +114,52 @@ void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFact
     m_dpFactory = dpFactory;
 }
 
-QRegion QnSecurityCamResource::getMotionMask() const
+QList<QRegion> QnSecurityCamResource::getMotionMaskList() const
 {
     QMutexLocker mutexLocker(&m_mutex);
-    return m_motionMask;
+    return m_motionMaskList;
 }
 
-void QnSecurityCamResource::setMotionMask(const QRegion& mask, QnDomain domain)
+QRegion QnSecurityCamResource::getMotionMask(int channel) const
+{
+    QMutexLocker mutexLocker(&m_mutex);
+    return m_motionMaskList[channel];
+}
+
+void QnSecurityCamResource::setMotionMask(const QRegion& mask, QnDomain domain, int channel)
 {
     {
         QMutexLocker mutexLocker(&m_mutex);
-        if (m_motionMask == mask)
+        if (m_motionMaskList[channel] == mask)
             return;
-        m_motionMask = mask;
+        m_motionMaskList[channel] = mask;
     }
 
     if (domain == QnDomainPhysical)
-        setMotionMaskPhysical();
-
-    emit motionMaskChanged(mask);
+        setMotionMaskPhysical(channel);
 }
+
+void QnSecurityCamResource::setMotionMaskList(const QList<QRegion>& maskList, QnDomain domain)
+{
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        bool sameMask = true;
+        for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
+        {
+            sameMask &= m_motionMaskList[i] == maskList[i];
+        }
+        if (sameMask)
+            return;
+        m_motionMaskList = maskList;
+    }
+
+    if (domain == QnDomainPhysical) 
+    {
+        for (int i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
+            setMotionMaskPhysical(i);
+    }
+}
+
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {

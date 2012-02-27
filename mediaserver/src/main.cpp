@@ -145,6 +145,8 @@ QString defaultLocalAddress(const QHostAddress& target)
         }
     }
 
+    return "127.0.0.1";
+
 }
 
 QString localMac(const QString& myAddress)

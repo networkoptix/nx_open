@@ -40,7 +40,7 @@ private:
     bool m_needUpdateStreamParams;
     mutable qint64 m_lastWarningTime;
     QnResource::ConnectionRole m_role;
-    __m128i *m_motionMaskBinData;
+    __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

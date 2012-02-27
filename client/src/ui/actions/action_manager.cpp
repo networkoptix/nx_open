@@ -177,7 +177,8 @@ QnActionManager::QnActionManager(QObject *parent):
     QObject(parent),
     m_shortcutAction(NULL),
     m_targetProvider(NULL),
-    m_root(NULL)
+    m_root(NULL),
+    m_lastShownMenu(NULL)
 {
     m_root = new QnAction(this, Qn::NoAction, this);
     m_actionById[Qn::NoAction] = m_root;
@@ -207,13 +208,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+F")).
         autoRepeat(false);
 
-    factory(Qn::NewLayoutAction).
-        flags(Qn::NoTarget).
-        text(tr("New Layout")).
-        shortcut(tr("Ctrl+T")).
-        autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-        icon(Skin::icon(QLatin1String("plus.png")));
-
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::NoTarget).
         text(tr("Open Single Layout"));
@@ -228,12 +222,27 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
 
+    factory(Qn::NewLayoutAction).
+        flags(Qn::Main).
+        text(tr("New Layout")).
+        shortcut(tr("Ctrl+T")).
+        autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
+        icon(Skin::icon(QLatin1String("plus.png")));
+
     factory(Qn::OpenFileAction).
         flags(Qn::Main).
         text(tr("Open File(s)...")).
         shortcut(tr("Ctrl+O")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("folder.png")));
+
+    factory(Qn::OpenFolderAction).
+        flags(Qn::Main).
+        text(tr("Open Folder..."));
+
+    factory(Qn::FileSeparator).
+        flags(Qn::Main).
+        separator();
 
     factory(Qn::ScreenRecordingMenu).
         flags(Qn::Main).
@@ -369,7 +378,12 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition());
 
+    factory(Qn::NewUserAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("New User..."));
 
+
+    action(Qn::MainMenuAction)->setMenu(newMenu(Qn::MainScope));
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);
@@ -521,7 +535,7 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items) {
         return;
     }
 
-    m_lastTarget = items;
+    m_targetByMenu[NULL] = items;
     m_shortcutAction = action;
     
     action->trigger();
@@ -530,15 +544,11 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items) {
 }
 
 QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
-    if(!m_menus.isEmpty())
-        qnWarning("New menu was requested even though the previous one wasn't destroyed. Getting action cause will fail.");
-
-    m_lastTarget = items;
-
     QMenu *result = newMenuRecursive(parent, scope, items);
-    
-    m_menus.insert(result);
+    m_targetByMenu[result] = items;
+
     connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
+    connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
     
     return result;
 }
@@ -580,13 +590,12 @@ Qn::ActionTarget QnActionManager::currentTargetType(QnAction *action) const {
 
 QVariant QnActionManager::currentTarget(QnAction *action) const {
     if(m_shortcutAction == action)
-        return m_lastTarget;
+        return m_targetByMenu.value(NULL);
 
-    if(m_menus.size() == 1)
-        return m_lastTarget;
+    if(m_lastShownMenu == NULL || !m_targetByMenu.contains(m_lastShownMenu))
+        qnWarning("No active menu, no target exists.");
 
-    qnWarning("No active action, no target exists.");
-    return QVariant();
+    return m_targetByMenu.value(m_lastShownMenu);
 }
 
 QnResourceList QnActionManager::currentResourcesTarget(QnAction *action) const {
@@ -667,6 +676,9 @@ QnResourceWidgetList QnActionManager::currentWidgetsTarget(QObject *sender) cons
 }
 
 void QnActionManager::at_menu_destroyed(QObject *menu) {
-    m_menus.remove(menu);
+    m_targetByMenu.remove(menu);
 }
 
+void QnActionManager::at_menu_aboutToShow() {
+    m_lastShownMenu = sender();
+}

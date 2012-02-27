@@ -6,6 +6,7 @@
 #include <ui/processors/clickable.h>
 
 class QAction;
+class QMenu;
 class QIcon;
 
 class VariantAnimator;
@@ -56,6 +57,8 @@ public:
 
     bool isDisabled() const { return !isEnabled(); }
 
+    bool isPressed() const { return state() & PRESSED; }
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     qreal animationSpeed() const;
@@ -70,14 +73,15 @@ public:
 
     void setCached(bool cached);
 
-public Q_SLOTS:
+public slots:
+    void setPressed(bool pressed = true);
     void setCheckable(bool checkable);
     void setChecked(bool checked);
     void setDisabled(bool disabled = false);
     inline void toggle() { setChecked(!isChecked()); }
     void click();
 
-Q_SIGNALS:
+signals:
     void clicked(bool checked = false);
     void toggled(bool checked);
     void enabled();
@@ -106,6 +110,7 @@ protected:
     StateFlags displayState(StateFlags flags) const;
 
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
+    bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
@@ -119,6 +124,8 @@ private:
     bool m_cached;
     int m_skipNextHoverEvents;
     QPoint m_nextHoverEventPos;
+    int m_skipNextMenuEvents;
+    QPoint m_nextMenuEventPos;
 
     VariantAnimator *m_animator;
     qreal m_hoverProgress;
@@ -131,6 +138,9 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags);
 
 
+/**
+ * An image button widget that "raises" when hovered.
+ */
 class QnZoomingImageButtonWidget: public QnImageButtonWidget {
     Q_OBJECT;
 

@@ -11,7 +11,7 @@ QnHelpWidget::QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent):
     ui->setupUi(this);
 
     connect(contextHelp,    SIGNAL(helpContextChanged(QnContextHelp::ContextId)),   this,   SLOT(at_contextHelp_helpContextChanged(QnContextHelp::ContextId)));
-    connect(ui->checkBox,   SIGNAL(toggled(bool)),                                  this,   SLOT(at_checkBox_toggled(bool)));
+    connect(ui->checkBox,   SIGNAL(clicked(bool)),                                  this,   SLOT(at_checkBox_clicked(bool)));
 }
 
 QnHelpWidget::~QnHelpWidget() {
@@ -31,6 +31,9 @@ void QnHelpWidget::at_contextHelp_helpContextChanged(QnContextHelp::ContextId id
         emit showRequested();
 }
 
-void QnHelpWidget::at_checkBox_toggled(bool checked) {
+void QnHelpWidget::at_checkBox_clicked(bool checked) {
     contextHelp()->setNeedAutoShow(m_id, !checked);
+
+    if(checked)
+        emit hideRequested();
 }

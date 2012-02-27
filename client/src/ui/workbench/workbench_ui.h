@@ -149,6 +149,7 @@ protected:
 
 protected slots:
     void updateHelpContext();
+    void updateHelpContextInternal();
     
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
@@ -162,8 +163,6 @@ protected slots:
     void at_activityStopped();
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
-
-    void at_mainMenuAction_triggered();
 
     void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
 
@@ -193,6 +192,8 @@ protected slots:
     void at_helpHidingProcessor_hoverFocusLeft();
     void at_helpShowingProcessor_hoverEntered();
     void at_helpItem_paintGeometryChanged();
+    void at_helpWidget_showRequested();
+    void at_helpWidget_hideRequested();
 
     void at_fpsItem_geometryChanged();
 

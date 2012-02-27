@@ -21,11 +21,13 @@ protected:
     virtual void openStream() = 0;
     virtual void closeStream() = 0;
     virtual bool isStreamOpened() const = 0;
-	
+	void pleaseReOpen();
 
 private:
 	void run(); // in a loop: takes data from device and puts into queue
     virtual void beforeRun() override;
+private:
+    bool m_needReopen;
 };
 
 #endif //server_push_stream_reader_h2055

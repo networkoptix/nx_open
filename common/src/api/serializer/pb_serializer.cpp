@@ -48,9 +48,12 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
 
         if (pb_camera.has_region())
         {
-            QRegion region;
-            parseRegion(region, pb_camera.region().c_str());
-            camera->setMotionMask(region, QnDomainMemory);
+            QList<QRegion> regions;
+            parseRegionList(regions, pb_camera.region().c_str());
+            while (regions.size() < CL_MAX_CHANNELS)
+                regions << QRegion();
+
+            camera->setMotionMaskList(regions, QnDomainMemory);
         }
 
         if (pb_camera.scheduletask_size())
@@ -312,7 +315,7 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_login(cameraPtr->getAuth().user().toStdString());
     pb_camera.set_password(cameraPtr->getAuth().password().toStdString());
     pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
-    pb_camera.set_region(serializeRegion(cameraPtr->getMotionMask()).toStdString());
+    pb_camera.set_region(serializeRegionList(cameraPtr->getMotionMaskList()).toStdString());
 
     foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
         proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();

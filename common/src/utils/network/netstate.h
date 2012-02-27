@@ -24,7 +24,10 @@ public:
 	CLSubNetState& getSubNetState(const QHostAddress& machine_ip);
 
 	// check if addr is in the same subnet as one of our IPV4 interface 
-	bool isInMachineSubnet(const QHostAddress& addr) const;
+	bool isAddrInMachineSubnet(const QHostAddress& addr) const;
+
+    // checks if resource with such hostaddr and discover addr
+    bool isResourceInMachineSubnet(const QHostAddress& addr, const QHostAddress& discAddr) const;
 
 	// this function updates all IPV4 subnets;
 	// if it gets new subnet => m_netstate gonna be increased

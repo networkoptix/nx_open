@@ -378,11 +378,14 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
-            QList<QGraphicsItem *> selectedItems = display()->scene()->selectedItems();
-            if(!selectedItems.contains(widget))
-                selectedItems.push_back(widget);
+            /* Clicking on close button of a widget that is not selected should select it,
+             * thus clearing the existing selection. */
+            if(!widget->isSelected()) {
+                display()->scene()->clearSelection();
+                widget->setSelected(true);
+            }
 
-            qnMenu->trigger(Qn::RemoveLayoutItemAction, selectedItems);
+            qnMenu->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
             event->ignore();
             return true;
         }

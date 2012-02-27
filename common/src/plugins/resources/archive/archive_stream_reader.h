@@ -36,6 +36,7 @@ public:
     static QString serializeLayout(const QnVideoResourceLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
     void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
+    void setMarker(int marker);
 
     // jump to frame directly ignoring start of GOP
     virtual void directJumpToNonKeyFrame(qint64 mksec);
@@ -49,7 +50,6 @@ public:
     virtual void resumeMedia();
     virtual QnAbstractMediaDataPtr getNextData();
 
-    bool setMotionRegion(const QRegion& region);
     bool setSendMotion(bool value);
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
@@ -58,7 +58,7 @@ public:
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
 
-    virtual void setSpeed(double value, qint64 currentTimeHint = -1) override;
+    virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
     virtual double getSpeed() const override;
 
 
@@ -99,7 +99,7 @@ protected:
     volatile bool m_wakeup;
     qint64 m_tmpSkipFramesToTime;
 private:
-    void setReverseMode(bool value, qint64 currentTimeHint = -1);
+    void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE);
 private slots:
     void onDelegateChangeQuality(MediaQuality quality);
 private:
@@ -146,9 +146,10 @@ private:
     bool m_oldQualityFastSwitch;
     bool m_isStillImage;
     double m_speed;
+    bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
 
     qint64 determineDisplayTime(bool reverseMode);
-    void intChanneljumpTo(qint64 mksec, int channel);
+    void internalJumpTo(qint64 mksec);
     bool getNextVideoPacket();
     void addAudioChannel(QnCompressedAudioDataPtr audio);
     QnAbstractMediaDataPtr getNextPacket();

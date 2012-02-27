@@ -23,6 +23,7 @@
 #include <ui/dialogs/connectiontestingdialog.h>
 #include <ui/dialogs/multiplecamerasettingsdialog.h>
 #include <ui/dialogs/layout_save_dialog.h>
+#include <ui/dialogs/new_user_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
@@ -124,6 +125,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(qnAction(Qn::PreferencesAction),                SIGNAL(triggered()),    this,   SLOT(at_preferencesAction_triggered()));
     connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
+    connect(qnAction(Qn::OpenFolderAction),                 SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
     connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
     connect(qnAction(Qn::OpenSingleLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_openSingleLayoutAction_triggered()));
@@ -136,6 +138,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::OpenInFolderAction),               SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
+    connect(qnAction(Qn::NewUserAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::deinitialize() {
@@ -180,6 +183,15 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
     QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
     return m_synchronizer->isLocal(layout) && !m_synchronizer->isChanged(layout);
+}
+
+void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files) const {
+    QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
+    foreach(const QnResourcePtr &resource, resources) {
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        item->setFlag(QnWorkbenchItem::PendingGeometryAdjustment);
+        m_workbench->currentLayout()->addItem(item);
+    }
 }
 
 
@@ -275,15 +287,18 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     filters << tr("All files (*.*)");
     dialog->setNameFilters(filters);
     
-    if (dialog->exec()) {
-        QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(dialog->selectedFiles()));
-        foreach(const QnResourcePtr &resource, resources) {
-            QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-            item->setFlag(QnWorkbenchItem::Pinned, false);
-            m_workbench->currentLayout()->addItem(item);
-            item->adjustGeometry();
-        }
-    }
+    if(dialog->exec())
+        addToWorkbench(dialog->selectedFiles());
+}
+
+void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(widget(), tr("Open file")));
+    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setOptions(QFileDialog::ShowDirsOnly);
+    
+    if(dialog->exec())
+        addToWorkbench(dialog->selectedFiles());
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
@@ -485,6 +500,33 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             connection->deleteAsync(resource, this, SLOT(at_resource_deleted(int, const QByteArray &, const QByteArray &, int)));
         }
         }
+    }
+}
+
+void QnWorkbenchActionHandler::at_newUserAction_triggered() {
+    QScopedPointer<QnNewUserDialog> dialog(new QnNewUserDialog(widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    if(!dialog->exec())
+        return;
+
+    QnUserResourcePtr user(new QnUserResource());
+    user->setName(dialog->login());
+    user->setPassword(dialog->password());
+    user->setAdmin(dialog->isAdmin());
+
+    m_connection->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, QnResourceList, int)));
+}
+
+void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
+    if(status == 0) {
+        qnResPool->addResources(resources);
+        return;
+    }
+
+    if(resources.isEmpty() || resources[0].isNull()) {
+        QMessageBox::critical(widget(), tr(""), tr("Could not save user to application server. \n\nError description: '%1'").arg(QLatin1String(errorString.data())));
+    } else {
+        QMessageBox::critical(widget(), tr(""), tr("Could not save user '%1' to application server. \n\nError description: '%2'").arg(resources[0]->getName()).arg(QLatin1String(errorString.data())));
     }
 }
 

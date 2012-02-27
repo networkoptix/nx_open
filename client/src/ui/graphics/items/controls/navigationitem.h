@@ -39,7 +39,7 @@ public:
 public Q_SLOTS:
     void setMute(bool mute);
     void setPlaying(bool playing);
-    void loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QRegion region);
+    void loadMotionPeriods(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> regions);
     void onSyncButtonToggled(bool value);
     void onDisplayingStateChanged(QnResourcePtr, bool);
 
@@ -50,8 +50,9 @@ Q_SIGNALS:
     void enableItemSync(bool value);
     void clearMotionSelection();
     void actualCameraChanged(CLVideoCamera *camera);
+
 protected:
-    void timerEvent(QTimerEvent* event);
+    virtual void timerEvent(QTimerEvent* event) override;
     void updateSlider();
     bool updateRecPeriodList(bool force);
 
@@ -91,17 +92,28 @@ private Q_SLOTS:
     void at_liveButton_clicked(bool checked);
     
     void onExportRange(qint64 startTimeMs,qint64 endTimeMs);
+
 protected:
-    void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *) override {
+        /* Don't let wheel events escape into the scene. */
+    }
+
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override {
+        /* Prevent surprising click-through scenarios. */
+    }
+
     CLVideoCamera* findCameraByResource(QnResourcePtr resource);
+
 private:
     struct MotionPeriodLoader {
         MotionPeriodLoader(): loadingHandle(0), reader(0) {}
         QnTimePeriodUpdaterPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
-        QRegion region;
+        QList<QRegion> regions;
         QnAbstractArchiveReader* reader;
+
+        bool isMotionEmpty() const;
     };
     MotionPeriodLoader* getMotionLoader(QnAbstractArchiveReader* reader);
 
