@@ -228,9 +228,11 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     if(isDisabled())
         return;
 
+    QWeakPointer<QObject> self(this);
+
     click();
 
-    if(m_action && m_action->menu() && !skipMenuEvent(event)) {
+    if(self && m_action && m_action->menu() && !skipMenuEvent(event)) {
         QGraphicsView *view = qobject_cast<QGraphicsView *>(event->widget() ? event->widget()->parent() : NULL);
         if(!view) {
             qnWarning("No graphics view in scope, cannot show menu for an image button widget.");
