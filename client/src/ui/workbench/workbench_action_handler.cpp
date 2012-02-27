@@ -6,6 +6,7 @@
 #include <QMessageBox>
 
 #include <utils/common/environment.h>
+#include <utils/common/delete_later.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
@@ -451,7 +452,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
         foreach(const QUuid &uuid, orphanedUuids) {
             foreach(QnWorkbenchLayout *layout, layouts) {
                 if(QnWorkbenchItem *item = layout->item(uuid)) {
-                    layout->removeItem(item);
+                    qnDeleteLater(item);
                     break;
                 }
             }
