@@ -1109,8 +1109,6 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchUi::at_fpsChanged(qreal fps) {
-    qDebug() << display()->scene()->focusItem();
-
     m_fpsItem->setText(QString::number(fps, 'g', 4));
     m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
 }
