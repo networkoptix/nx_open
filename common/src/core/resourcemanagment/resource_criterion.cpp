@@ -347,7 +347,7 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
         } else {
             c = normalizedPattern[i];
         }
-        if(c != '-' && c != '+')
+        if(c != '\\' && c != '+')
             continue;
 
         QnResourceCriterionGroup *group = new QnResourceCriterionGroup(NEXT, NEXT);
