@@ -38,6 +38,7 @@
 #include "api/SessionManager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
+#include "ui/tooltips/tool_tip.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -279,6 +280,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    QnToolTip::instance();
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 

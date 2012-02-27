@@ -183,7 +183,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
     setFpsVisible(false);
 
-
     /* Tree widget. */
     m_treeWidget = new QnResourceTreeWidget();
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
