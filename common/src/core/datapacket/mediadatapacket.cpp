@@ -196,6 +196,13 @@ bool QnMetaDataV1::containTime(const qint64 timeUsec) const
 
 inline void setBit(quint8* data, int x, int y)
 {
+    bool correctData = (x >= 0 && x < MD_WIDTH) && (y >= 0 && y < MD_HEIGHT);
+
+    Q_ASSERT(correctData);
+
+    if (!correctData)
+        return;
+
     int offset = (x * MD_HEIGHT + y) / 8;
     data[offset] |= 0x80 >> (y&7);
 }
@@ -219,7 +226,9 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
         for (int x = rect.left(); x <= rect.right(); ++x)
         {
             for (int y = rect.top(); y <= rect.bottom(); ++y)
+            {
                 setBit((quint8*) mask, x,y);
+            }
         }
     }
 

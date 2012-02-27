@@ -33,7 +33,11 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+
+        const QnVideoResourceLayout* layout = getVideoLayout();
+        int numChannels = layout->numberOfChannels();
+
+        for (int i = 0; i < numChannels; ++i)
             setMotionMask(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }

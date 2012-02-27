@@ -28,11 +28,6 @@ namespace Qn {
         ShowFpsAction,
 
         /**
-         * Opens a new tab (layout).
-         */
-        NewLayoutAction,
-
-        /**
          * Opens some existing layout if there exists one, creates a new one otherwise.
          * This action is executed every time the last layout on a workbench is closed.
          */
@@ -48,24 +43,32 @@ namespace Qn {
         MainMenuAction,
 
         /**
-         * Opens a file dialog and adds selected files to the current layout.
+         * Opens a new tab (layout).
          */
-        OpenFileAction,
+        NewLayoutAction,
 
         /**
-         * Submenu for screen recording.
+         * Submenu for 'open' commands.
          */
-        ScreenRecordingMenu,
+        OpenMenu,
 
             /**
-             * Starts / stops screen recording.
+             * Opens a file dialog and adds selected files to the current layout.
              */
-            ScreenRecordingAction,
+            OpenFileAction,
 
             /**
-             * Opens screen recording dialog.
+             * Opens a file dialog and adds all files from selected folder 
+             * to the current layout.
              */
-            ScreenRecordingSettingsAction,
+            OpenFolderAction,
+
+        FileSeparator,
+
+        /**
+         * Starts / stops screen recording.
+         */
+        ScreenRecordingAction,
 
         /**
          * Toggles client's fullscreen state.
@@ -137,15 +140,16 @@ namespace Qn {
          */
         OpenInFolderAction,
 
-        /**
-         * Deletes the file from disk.
-         */
-        DeleteFromDiskAction,
 
 
         /* Layout actions. */
 
         ItemSeparator,
+
+        /**
+         * Deletes the file from disk.
+         */
+        DeleteFromDiskAction,
 
         /**
          * Removes an item from a layout.
@@ -156,6 +160,15 @@ namespace Qn {
          * Removes a resource from application server.
          */
         RemoveFromServerAction,
+
+
+        /**
+         * Opens a user creation dialog.
+         */
+        NewUserAction,
+
+
+
 
 #if 0
         /** 

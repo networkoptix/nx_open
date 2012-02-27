@@ -39,6 +39,13 @@ void QnClientPullMediaStreamProvider::run()
     setPriority(QThread::HighPriority);
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
+    int numberOfChnnels = 1;
+
+    if (QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>())
+    {
+        numberOfChnnels = mr->getVideoLayout()->numberOfChannels();
+    }
+
     beforeRun();
 
 	while(!needToStop())
@@ -158,7 +165,7 @@ void QnClientPullMediaStreamProvider::run()
 		putData(data);
 
         if (videoData && !isMaxFps())
-            m_fpsSleep.sleep(1000*1000/getFps());
+            m_fpsSleep.sleep(1000*1000/getFps()/numberOfChnnels);
 
 	}
 

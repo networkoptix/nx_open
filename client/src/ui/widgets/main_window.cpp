@@ -205,7 +205,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     connect(qnAction(Qn::ExitAction),       SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(qnAction(Qn::FullscreenAction), SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
-    connect(qnAction(Qn::MainMenuAction),   SIGNAL(triggered()),                            this,                                   SLOT(showMainMenu()));
 
     qnMenu->setTargetProvider(m_ui);
 
@@ -230,6 +229,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
+    m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
+
     m_mainMenuButton->setIcon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -316,16 +317,6 @@ void QnMainWindow::handleMessage(const QString &message)
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     m_controller->drop(files);
-}
-
-void QnMainWindow::showMainMenu() 
-{
-    if(!m_titleVisible)
-        return;
-
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::MainScope));
-    menu->move(mapToGlobal(m_mainMenuButton->geometry().bottomLeft()));
-    menu->exec();
 }
 
 void QnMainWindow::updateFullScreenState() 

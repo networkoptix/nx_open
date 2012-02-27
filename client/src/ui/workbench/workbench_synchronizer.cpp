@@ -242,6 +242,7 @@ void QnWorkbenchSynchronizer::submit() {
         if(resource.isNull()) { 
             /* This actually is a newly created layout. */
             resource = QnLayoutResourcePtr(new QnLayoutResource());
+            resource->setGuid(QUuid::createUuid());
             qnResPool->addResource(resource);
             m_user->addLayout(resource);
 

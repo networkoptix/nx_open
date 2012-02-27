@@ -1,6 +1,7 @@
 #include "dlink_stream_reader.h"
 #include <QTextStream>
 #include "dlink_resource.h"
+#include "utils/common/sleep.h"
 
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 extern inline int getIntParam(const char* pos);
@@ -47,6 +48,11 @@ void PlDlinkStreamReader::openStream()
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
+
+    if (!res->getCamInfo().inited())
+    {
+        res->init();
+    }
 
     QString prifileStr = composeVideoProfile();
 
@@ -119,30 +125,14 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 
 void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
 {
-    bool runing = isRunning();
-    pleaseStop();
-    stop();
-    closeStream();
-    
-    if (runing)
-    {
-        start(); // it will call openstream by itself
-    }
-
+    if (isRunning())
+        pleaseReOpen();
 }
 
 void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
 {
-    bool runing = isRunning();
-    pleaseStop();
-    stop();
-    closeStream();
-
-    if (runing)
-    {
-        start(); // it will call openstream by itself
-    }
-
+    if (isRunning())
+        pleaseReOpen();
 }
 
 //=====================================================================================
@@ -321,7 +311,10 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     char* contentLenPtr = strstr(headerBuffer, "Content-Length:");
     if (!contentLenPtr)
         return QnAbstractMediaDataPtr(0);
+
+
     int contentLen = getIntParam(contentLenPtr + 16);
+    contentLen = qMin(contentLen, 10*1024*1024); // to avoid crash if camera is crazy
 
     QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
     videoData->data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
@@ -369,13 +362,15 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
         return QnMetaDataV1Ptr(0);
     }
 
+    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+
     if (cam_info_file.size()==0)
-        return QnMetaDataV1Ptr(0);
+        return motion;
 
     QString file_s(cam_info_file);
     QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
 
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+    
 
     foreach(QString line, lines)
     {
@@ -384,20 +379,19 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
         if (line_low.contains("md0") || line_low.contains("md1") || line_low.contains("md2"))
         {
 
-            for (int x = 0; x < MD_WIDTH; ++x)
-            {
-                for (int y = 0; y < MD_HEIGHT; ++y)
+            if (line_low.contains("on"))
+                for (int x = 0; x < MD_WIDTH; ++x)
                 {
-                    motion->setMotionAt(x,y);
+                    for (int y = 0; y < MD_HEIGHT; ++y)
+                    {
+                        motion->setMotionAt(x,y);
+                    }
                 }
-            }
 
 
         }
     }
-
-
-    
+   
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = 1000*1000*1000; // 1000 sec 

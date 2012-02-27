@@ -130,7 +130,9 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &gridRect)
 {
     const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+
+    int numChannels = layout->numberOfChannels();
+    for (int i = 0; i < numChannels; ++i)
     {
         QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
         r.translate(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT);

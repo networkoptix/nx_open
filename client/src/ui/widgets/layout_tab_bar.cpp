@@ -196,9 +196,6 @@ void QnLayoutTabBar::at_tabMoved(int from, int to) {
 
 void QnLayoutTabBar::at_tabCloseRequested(int index) {
     emit closeRequested(m_layouts[index]);
-
-    if(count() == 0)
-        addTab(QString());
 }
 
 void QnLayoutTabBar::at_currentChanged(int index) {

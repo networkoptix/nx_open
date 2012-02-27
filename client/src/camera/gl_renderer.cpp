@@ -68,10 +68,10 @@ public:
         if(!qn_openGlInfoWrittenOut) {
             qn_openGlInfoWrittenOut = true;
 
-            qnDebug("OpenGL extensions: %1.", extensions);
-            qnDebug("OpenGL version: %1.", version);
-            qnDebug("OpenGL renderer: %1.", renderer);
-            qnDebug("OpenGL vendor: %1.", vendor);
+            cl_log.log(QString(QLatin1String("OpenGL extensions: %1.")).arg(QLatin1String(extensions.constData())), cl_logINFO);
+            cl_log.log(QString(QLatin1String("OpenGL version: %1.")).arg(QLatin1String(version.constData())), cl_logINFO);
+            cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
+            cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
 
             bool messageBoxShown = false;
 
@@ -102,7 +102,7 @@ public:
 
         /* Maximal texture size. */
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-        qnDebug("OpenGL max texture size: %1.", maxTextureSize);
+        cl_log.log(QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSize), cl_logINFO);
 
         /* Clamp constant. */
         clampConstant = GL_CLAMP;

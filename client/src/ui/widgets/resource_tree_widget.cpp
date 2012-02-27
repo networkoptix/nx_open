@@ -25,6 +25,8 @@
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_layout.h"
 
+#include "ui_resource_tree_widget.h"
+
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
 Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
 
@@ -73,110 +75,55 @@ private:
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent): 
     QWidget(parent),
+    ui(new Ui::ResourceTreeWidget()),
     m_filterTimerId(0),
     m_workbench(NULL),
     m_ignoreFilterChanges(false)
 {
-    m_previousItemButton = new QToolButton(this);
-    m_previousItemButton->setText(QLatin1String("<"));
-    m_previousItemButton->setToolTip(tr("Previous Item"));
-    m_previousItemButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    m_previousItemButton->setIcon(Skin::icon(QLatin1String("left-arrow.png"))); // ###
-    m_previousItemButton->hide(); // ###
+    ui->setupUi(this);
 
-    m_nextItemButton = new QToolButton(this);
-    m_nextItemButton->setText(QLatin1String(">"));
-    m_nextItemButton->setToolTip(tr("Next Item"));
-    m_nextItemButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    m_nextItemButton->setIcon(Skin::icon(QLatin1String("right-arrow.png"))); // ###
-    m_nextItemButton->hide(); // ###
+    ui->typeComboBox->addItem(tr("Any Type"), 0);
+    ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(QnResource::local | QnResource::video));
+    ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(QnResource::still_image));
+    ui->typeComboBox->addItem(tr("Live Cameras"), static_cast<int>(QnResource::live));
 
-
-    m_filterLineEdit = new QLineEdit(this);
-    m_filterLineEdit->setPlaceholderText(tr("Search"));
-
-    m_clearFilterButton = new QToolButton(this);
-    m_clearFilterButton->setText(QLatin1String("X"));
-    m_clearFilterButton->setToolTip(tr("Reset Filter"));
-    m_clearFilterButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    m_clearFilterButton->setIcon(Skin::icon(QLatin1String("clear.png")));
-    m_clearFilterButton->setIconSize(QSize(16, 16));
-    m_clearFilterButton->setVisible(!m_filterLineEdit->text().isEmpty());
-
-    connect(m_filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_filterLineEdit_textChanged(QString)));
-    connect(m_clearFilterButton, SIGNAL(clicked()), m_filterLineEdit, SLOT(clear()));
+    ui->clearFilterButton->setIcon(Skin::icon(QLatin1String("clear.png")));
+    ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourceModel(this);
     m_resourceModel->setResourcePool(qnResPool);
-
-    m_resourceTreeView = new QTreeView(this);
-    m_resourceTreeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
-    m_resourceTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_resourceTreeView->setAllColumnsShowFocus(true);
-    m_resourceTreeView->setRootIsDecorated(true);
-    m_resourceTreeView->setHeaderHidden(true); // ###
-    m_resourceTreeView->setSortingEnabled(false); // ###
-    m_resourceTreeView->setUniformRowHeights(true);
-    m_resourceTreeView->setWordWrap(false);
-    m_resourceTreeView->setDragDropMode(QAbstractItemView::DragDrop);
+    ui->resourceTreeView->setModel(m_resourceModel);
 
     m_resourceDelegate = new QnResourceTreeItemDelegate(this);
-    m_resourceTreeView->setItemDelegate(m_resourceDelegate);
+    ui->resourceTreeView->setItemDelegate(m_resourceDelegate);
 
-    connect(m_resourceTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(at_treeView_activated(QModelIndex)));
-
-    m_searchTreeView = new QTreeView(this);
-    m_searchTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_searchTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_searchTreeView->setAllColumnsShowFocus(true);
-    m_searchTreeView->setRootIsDecorated(true);
-    m_searchTreeView->setHeaderHidden(true); // ###
-    m_searchTreeView->setSortingEnabled(false); // ###
-    m_searchTreeView->setUniformRowHeights(true);
-    m_searchTreeView->setWordWrap(false);
-    m_searchTreeView->setDragDropMode(QAbstractItemView::DragOnly); // ###
-    
     m_searchDelegate = new QnResourceTreeItemDelegate(this);
-    m_searchTreeView->setItemDelegate(m_searchDelegate);
+    ui->searchTreeView->setItemDelegate(m_searchDelegate);
 
-    connect(m_searchTreeView, SIGNAL(activated(QModelIndex)), this, SLOT(at_treeView_activated(QModelIndex)));
+    connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
+    connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
+    connect(ui->clearFilterButton,  SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
+    connect(ui->resourceTreeView,   SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
+    connect(ui->searchTreeView,     SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
+    connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
 
-
-    QHBoxLayout *topLayout = new QHBoxLayout;
-    topLayout->setSpacing(3);
-    topLayout->addWidget(m_previousItemButton);
-    topLayout->addWidget(m_nextItemButton);
-    topLayout->addWidget(m_filterLineEdit);
-    topLayout->addWidget(m_clearFilterButton);
-
-    QWidget *searchTab = new QWidget(this);
-
-    QVBoxLayout *searchTabLayout = new QVBoxLayout;
-    searchTabLayout->setContentsMargins(0, 0, 0, 0);
-    searchTabLayout->addLayout(topLayout);
-    searchTabLayout->addWidget(m_searchTreeView);
-    searchTab->setLayout(searchTabLayout);
-
-    m_tabWidget = new QTabWidget(this);
-    m_tabWidget->addTab(m_resourceTreeView, tr("Resources"));
-    m_tabWidget->addTab(searchTab, tr("Search"));
-
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged(int)));
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->addWidget(m_tabWidget);
-    setLayout(mainLayout);
-
-    m_resourceTreeView->setModel(m_resourceModel);
+    updateFilter();
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
     return;
 }
 
+QPalette QnResourceTreeWidget::comboBoxPalette() const {
+    return ui->typeComboBox->palette();
+}
+
+void QnResourceTreeWidget::setComboBoxPalette(const QPalette &palette) {
+    ui->typeComboBox->setPalette(palette);
+}
+
 QnResourceTreeWidget::Tab QnResourceTreeWidget::currentTab() const {
-    return static_cast<Tab>(m_tabWidget->currentIndex());
+    return static_cast<Tab>(ui->tabWidget->currentIndex());
 }
 
 void QnResourceTreeWidget::setCurrentTab(Tab tab) {
@@ -185,7 +132,7 @@ void QnResourceTreeWidget::setCurrentTab(Tab tab) {
         return;
     }
 
-    m_tabWidget->setCurrentIndex(tab);
+    ui->tabWidget->setCurrentIndex(tab);
 }
 
 void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
@@ -197,7 +144,8 @@ void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
 
         at_workbench_currentLayoutAboutToBeChanged();
 
-        m_filterLineEdit->setEnabled(false);
+        ui->filterLineEdit->setEnabled(false);
+        ui->typeComboBox->setEnabled(false);
         m_searchDelegate->setWorkbench(NULL);
         m_resourceDelegate->setWorkbench(NULL);
     }
@@ -207,7 +155,8 @@ void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
     if(m_workbench) {
         m_searchDelegate->setWorkbench(m_workbench);
         m_resourceDelegate->setWorkbench(m_workbench);
-        m_filterLineEdit->setEnabled(true);
+        ui->filterLineEdit->setEnabled(true);
+        ui->typeComboBox->setEnabled(true);
 
         at_workbench_currentLayoutChanged();
 
@@ -218,7 +167,7 @@ void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
 }
 
 void QnResourceTreeWidget::open() {
-    QAbstractItemView *view = m_tabWidget->currentIndex() == 0 ? m_resourceTreeView : m_searchTreeView;
+    QAbstractItemView *view = ui->tabWidget->currentIndex() == 0 ? ui->resourceTreeView : ui->searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
         at_treeView_activated(index);
 }
@@ -281,10 +230,10 @@ void QnResourceTreeWidget::killSearchTimer() {
 }
 
 QItemSelectionModel *QnResourceTreeWidget::currentSelectionModel() const {
-    if (m_tabWidget->currentIndex() == 0) {
-        return m_resourceTreeView->selectionModel();
+    if (ui->tabWidget->currentIndex() == 0) {
+        return ui->resourceTreeView->selectionModel();
     } else {
-        return m_searchTreeView->selectionModel();
+        return ui->searchTreeView->selectionModel();
     }
 }
 
@@ -332,6 +281,30 @@ QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
     }
 }
 
+void QnResourceTreeWidget::updateFilter() {
+    QString filter = ui->filterLineEdit->text();
+
+    /* Don't allow empty filters. */
+    if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
+        ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
+        return;
+    }
+
+    ui->clearFilterButton->setVisible(!filter.isEmpty());
+    killSearchTimer();
+
+    if(!m_workbench)
+        return;
+
+    if(m_ignoreFilterChanges)
+        return;
+
+    if (!filter.isEmpty() && filter.size() < 3) 
+        return; /* Filter too short, ignore. */
+
+    m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -361,10 +334,13 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
             QnWorkbenchLayout *layout = m_workbench->currentLayout();
             QnResourceSearchProxyModel *model = layoutModel(layout, true);
             
-            QString filter = m_filterLineEdit->text();
+            QString filter = ui->filterLineEdit->text();
+            QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             QnResourceCriterion *oldCriterion = layoutCriterion(layout);
-            QnResourceCriterion *newCriterion = new QnResourceCriterionGroup(filter);
+            QnResourceCriterionGroup *newCriterion = new QnResourceCriterionGroup(filter);
+            if(flags != 0)
+                newCriterion->addCriterion(new QnResourceCriterion(flags, QnResourceCriterion::FLAGS, QnResourceCriterion::NEXT, QnResourceCriterion::REJECT));
 
             model->replaceCriterion(oldCriterion, newCriterion);
 
@@ -382,11 +358,11 @@ void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
     if(synchronizer)
         synchronizer->disableUpdates();
-    setLayoutSearchString(layout, m_filterLineEdit->text());
+    setLayoutSearchString(layout, ui->filterLineEdit->text());
 
     QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
-    m_searchTreeView->setModel(NULL);
-    m_filterLineEdit->setText(QString());
+    ui->searchTreeView->setModel(NULL);
+    ui->filterLineEdit->setText(QString());
     killSearchTimer();
 }
 
@@ -397,10 +373,10 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
     if(synchronizer)
         synchronizer->enableUpdates();
 
-    at_tabWidget_currentChanged(m_tabWidget->currentIndex());
+    at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
     QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
-    m_filterLineEdit->setText(layoutSearchString(layout));
+    ui->filterLineEdit->setText(layoutSearchString(layout));
 }
 
 void QnResourceTreeWidget::at_workbench_aboutToBeDestroyed() {
@@ -414,33 +390,11 @@ void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         QnResourceSearchProxyModel *model = layoutModel(layout, true);
 
-        m_searchTreeView->setModel(model);
-        m_searchTreeView->expandAll();
+        ui->searchTreeView->setModel(model);
+        ui->searchTreeView->expandAll();
     }
 
     emit currentTabChanged();
-}
-
-void QnResourceTreeWidget::at_filterLineEdit_textChanged(const QString &filter) {
-    /* Don't allow empty filters. */
-    if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
-        m_filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
-        return;
-    }
-
-    m_clearFilterButton->setVisible(!filter.isEmpty());
-    killSearchTimer();
-
-    if(!m_workbench)
-        return;
-
-    if(m_ignoreFilterChanges)
-        return;
-
-    if (!filter.isEmpty() && filter.size() < 3) 
-        return; /* Filter too short, ignore. */
-
-    m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
 }
 
 void QnResourceTreeWidget::at_treeView_activated(const QModelIndex &index) {

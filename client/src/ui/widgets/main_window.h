@@ -57,8 +57,6 @@ protected slots:
     void toggleFullScreen();
     void toggleTitleVisibility();
 
-    void showMainMenu();
-
     void handleMessage(const QString &message);
 
     void updateFullScreenState();

@@ -50,9 +50,7 @@ QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
 
 QString QnLayoutResource::getUniqueId() const
 {
-    /* Actually it's not a unique id, as situation is possible when there is no id yet.
-     * But QnResource requires us to define this method. */
-    return getId().toString();
+    return getGuid();
 }
 
 void QnLayoutResource::updateInner(QnResourcePtr other) {

@@ -49,6 +49,7 @@ public:
     QnResourceList getResources() const;
 
     QnResourcePtr getResourceById(QnId id) const;
+    QnResourcePtr getResourceByGuid(QString guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
 

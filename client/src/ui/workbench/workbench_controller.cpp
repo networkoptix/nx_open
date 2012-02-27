@@ -293,7 +293,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
-    connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered()),                                                       this,                           SLOT(at_recordingSettingsAction_triggered()));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -378,11 +377,14 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
-            QList<QGraphicsItem *> selectedItems = display()->scene()->selectedItems();
-            if(!selectedItems.contains(widget))
-                selectedItems.push_back(widget);
+            /* Clicking on close button of a widget that is not selected should select it,
+             * thus clearing the existing selection. */
+            if(!widget->isSelected()) {
+                display()->scene()->clearSelection();
+                widget->setSelected(true);
+            }
 
-            qnMenu->trigger(Qn::RemoveLayoutItemAction, selectedItems);
+            qnMenu->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
             event->ignore();
             return true;
         }
@@ -1001,11 +1003,5 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
     } else {
         stopRecording();
     }
-}
-
-void QnWorkbenchController::at_recordingSettingsAction_triggered() {
-    PreferencesDialog dialog(display()->view());
-    dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
-	dialog.exec();
 }
 

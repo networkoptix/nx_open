@@ -67,6 +67,9 @@ bool QnEvent::load(const QVariant& parsed)
     resourceId = dict["resourceId"].toString();
     objectName = dict["objectName"].toString();
 
+    if (dict.contains("resourceGuid"))
+        resourceGuid = dict["resourceGuid"].toString();
+
     if (dict.contains("data"))
         data = dict["data"].toString();
 

@@ -76,22 +76,13 @@ QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files
 void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
 {
     QnResourceList resources;
-    foreach (const QnResourcePtr &resource, resources_) {
+    foreach (const QnResourcePtr &resource, resources_)
         if (resource->checkFlags(QnResource::url | QnResource::local))
             resources.append(resource);
-    }
     if (resources.isEmpty())
         return;
 
-    QString text;
-    if (resources.size() == 1)
-        text = QObject::tr("Are you sure you want to delete file '%1'?").arg(resources.first()->getUniqueId());
-    else
-        text = QObject::tr("Are you sure you want to delete %1 files?").arg(resources.size());
-    if (QMessageBox::question(QApplication::activeWindow(), QObject::tr("Delete file(s)?"), text,
-                              QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Yes) {
-        qnResPool->removeResources(resources);
-        foreach (const QnResourcePtr &resource, resources)
-            QFile::remove(resource->getUrl());
-    }
+    qnResPool->removeResources(resources);
+    foreach (const QnResourcePtr &resource, resources)
+        QFile::remove(resource->getUrl());
 }

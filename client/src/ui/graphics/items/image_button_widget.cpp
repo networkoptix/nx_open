@@ -153,6 +153,15 @@ void QnImageButtonWidget::setDisabled(bool disabled) {
     setEnabled(!disabled);
 }
 
+void QnImageButtonWidget::setPressed(bool pressed) {
+    if(pressed) {
+        updateState(m_state | PRESSED);
+        updateState(m_state & ~HOVERED);
+    } else {
+        updateState(m_state & ~PRESSED);
+    }
+}
+
 qreal QnImageButtonWidget::animationSpeed() const {
     return m_animator->speed();
 }
@@ -215,20 +224,39 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     painter->endNativePainting();
 }
 
-void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
+void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     if(isDisabled())
         return;
 
+    QWeakPointer<QObject> self(this);
+
     click();
+
+    if(self && m_action && m_action->menu() && !skipMenuEvent(event)) {
+        QGraphicsView *view = qobject_cast<QGraphicsView *>(event->widget() ? event->widget()->parent() : NULL);
+        if(!view) {
+            qnWarning("No graphics view in scope, cannot show menu for an image button widget.");
+            return;
+        }
+
+        QMenu *menu = m_action->menu();
+        QPoint pos = view->mapFromScene(mapToScene(rect().bottomLeft()));
+
+        menu->exec(pos);
+
+        /* Cannot use QMenu::setNoReplayFor, as it will block clicks events for the whole scene. 
+         * This is why we resort to nasty hacks with mouse position compares. */
+        m_skipNextMenuEvents = 1;
+        m_nextMenuEventPos = QCursor::pos();
+    }
 }
 
 void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *) {
-    updateState(m_state | PRESSED);
-    updateState(m_state & ~HOVERED);
+    setPressed(true);
 }
 
 void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *event) {
-    updateState(m_state & ~PRESSED);
+    setPressed(false);
 
     /* Next hover events that we will receive are enter and move converted from 
      * release event, skip them. */ 
@@ -243,6 +271,20 @@ bool QnImageButtonWidget::skipHoverEvent(QGraphicsSceneHoverEvent *event) {
             return true;
         } else {
             m_skipNextHoverEvents = 0;
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+bool QnImageButtonWidget::skipMenuEvent(QGraphicsSceneMouseEvent *event) {
+    if(m_skipNextMenuEvents) {
+        if(event->screenPos() == m_nextMenuEventPos) {
+            m_skipNextMenuEvents--;
+            return true;
+        } else {
+            m_skipNextMenuEvents = 0;
             return false;
         }
     } else {
@@ -425,7 +467,7 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     m_state = state;
 
     if((oldState ^ m_state) & CHECKED) { /* CHECKED has changed, emit notification signal and sync with action. */
-        Q_EMIT toggled(isChecked());
+        emit toggled(isChecked());
 
         if(m_action != NULL)
             m_action->setChecked(isChecked());

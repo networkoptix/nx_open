@@ -88,6 +88,9 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
+    void setGuid(const QString& guid);
+    QString getGuid() const;
+
     // device unique identifier
     virtual QString getUniqueId() const = 0;
 
@@ -247,6 +250,9 @@ private:
 
     /** Identifier of this resource. */
     QnId m_id;
+
+    /** Globally unique identifier ot this resource. */
+    QString m_guid;
 
     /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
     QnId m_parentId;
