@@ -293,7 +293,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
     connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
     connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
-    connect(qnAction(Qn::ScreenRecordingSettingsAction), SIGNAL(triggered()),                                                       this,                           SLOT(at_recordingSettingsAction_triggered()));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -1004,11 +1003,5 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
     } else {
         stopRecording();
     }
-}
-
-void QnWorkbenchController::at_recordingSettingsAction_triggered() {
-    PreferencesDialog dialog(display()->view());
-    dialog.setCurrentPage(PreferencesDialog::PageRecordingSettings);
-	dialog.exec();
 }
 

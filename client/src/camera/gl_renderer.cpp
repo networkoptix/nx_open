@@ -68,10 +68,10 @@ public:
         if(!qn_openGlInfoWrittenOut) {
             qn_openGlInfoWrittenOut = true;
 
-            qDebug() << "OpenGL extensions: " << extensions;
-            qDebug() << "OpenGL version: " << version;
-            qDebug() << "OpenGL renderer: " << renderer;
-            qDebug() << "OpenGL vendor: " << vendor;
+            cl_log.log(QString(QLatin1String("OpenGL extensions: %1.")).arg(QLatin1String(extensions.constData())), cl_logINFO);
+            cl_log.log(QString(QLatin1String("OpenGL version: %1.")).arg(QLatin1String(version.constData())), cl_logINFO);
+            cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
+            cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
 
             bool messageBoxShown = false;
 

@@ -48,32 +48,27 @@ namespace Qn {
         NewLayoutAction,
 
         /**
-         * Opens a file dialog and adds selected files to the current layout.
+         * Submenu for 'open' commands.
          */
-        OpenFileAction,
+        OpenMenu,
 
-        /**
-         * Opens a file dialog and adds all files from selected folder 
-         * to the current layout.
-         */
-        OpenFolderAction,
+            /**
+             * Opens a file dialog and adds selected files to the current layout.
+             */
+            OpenFileAction,
+
+            /**
+             * Opens a file dialog and adds all files from selected folder 
+             * to the current layout.
+             */
+            OpenFolderAction,
 
         FileSeparator,
 
         /**
-         * Submenu for screen recording.
+         * Starts / stops screen recording.
          */
-        ScreenRecordingMenu,
-
-            /**
-             * Starts / stops screen recording.
-             */
-            ScreenRecordingAction,
-
-            /**
-             * Opens screen recording dialog.
-             */
-            ScreenRecordingSettingsAction,
+        ScreenRecordingAction,
 
         /**
          * Toggles client's fullscreen state.

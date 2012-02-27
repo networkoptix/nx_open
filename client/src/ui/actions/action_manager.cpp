@@ -229,39 +229,34 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
-    factory(Qn::OpenFileAction).
+    factory(Qn::OpenMenu).
         flags(Qn::Main).
-        text(tr("Open File(s)...")).
-        shortcut(tr("Ctrl+O")).
-        autoRepeat(false).
-        icon(Skin::icon(QLatin1String("folder.png")));
+        text(tr("Open"));
 
-    factory(Qn::OpenFolderAction).
-        flags(Qn::Main).
-        text(tr("Open Folder..."));
+    factory.enterSubMenu(); {
+        factory(Qn::OpenFileAction).
+            flags(Qn::Main).
+            text(tr("File(s)...")).
+            shortcut(tr("Ctrl+O")).
+            autoRepeat(false).
+            icon(Skin::icon(QLatin1String("folder.png")));
+
+        factory(Qn::OpenFolderAction).
+            flags(Qn::Main).
+            text(tr("Folder..."));
+    } factory.leaveSubMenu();
 
     factory(Qn::FileSeparator).
         flags(Qn::Main).
         separator();
 
-    factory(Qn::ScreenRecordingMenu).
+    factory(Qn::ScreenRecordingAction).
         flags(Qn::Main).
-        text(tr("Screen Recording"));
-
-    factory.enterSubMenu(); {
-        factory(Qn::ScreenRecordingAction).
-            flags(Qn::Main).
-            text(tr("Start Screen Recording")).
-            toggledText(tr("Stop Screen Recording")).
-            shortcut(tr("Alt+R")).
-            shortcut(Qt::Key_MediaRecord).
-            autoRepeat(false);
-
-        factory(Qn::ScreenRecordingSettingsAction).
-            flags(Qn::Main).
-            text(tr("Screen Recording Settings")).
-            autoRepeat(false);
-    } factory.leaveSubMenu();
+        text(tr("Start Screen Recording")).
+        toggledText(tr("Stop Screen Recording")).
+        shortcut(tr("Alt+R")).
+        shortcut(Qt::Key_MediaRecord).
+        autoRepeat(false);
 
     factory(Qn::FullscreenAction).
         flags(Qn::Main).
