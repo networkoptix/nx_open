@@ -674,8 +674,7 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
     m_display->gridItem()->animatedShow();
 
     /* Build item lists. */
-    m_draggedItems = items;
-    foreach (QGraphicsItem *item, m_draggedItems) {
+    foreach (QGraphicsItem *item, items) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)
             continue;
@@ -810,7 +809,6 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphi
     /* Clean up dragging state. */
     m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
     m_dragDelta = invalidDragDelta();
-    m_draggedItems.clear();
     m_draggedWorkbenchItems.clear();
     m_replacedWorkbenchItems.clear();
     m_dragGeometries.clear();
