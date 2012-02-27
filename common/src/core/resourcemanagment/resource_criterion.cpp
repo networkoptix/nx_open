@@ -350,6 +350,9 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
         if(c != '-' && c != '+')
             continue;
 
+        QnResourceCriterionGroup *group = new QnResourceCriterionGroup(NEXT, NEXT);
+        group->setNextOperation(positive ? ACCEPT : REJECT);
+
         QString chunks = normalizedPattern.mid(pos, i - pos);
         pos = i + 1;
         foreach(const QString &chunk, chunks.split(spaces, QString::SkipEmptyParts)) {
@@ -370,14 +373,14 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
             Type type = CONTAINMENT;
             Target target = SEARCH_STRING;
             QVariant targetValue = pattern;
-            if (key == QLatin1String("id:")) {
+            if (key == QLatin1String("id")) {
                 target = ID;
                 type = EQUALITY;
-            } else if (key == QLatin1String("name:")) {
+            } else if (key == QLatin1String("name")) {
                 target = NAME;
-            } else if (key == QLatin1String("tag:")) {
+            } else if (key == QLatin1String("tag")) {
                 target = TAGS;
-            } else if (key == QLatin1String("type:")) {
+            } else if (key == QLatin1String("type")) {
                 target = FLAGS;
 
                 if(pattern == "camera") {
@@ -394,7 +397,13 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
                 targetValue = static_cast<int>(QnResource::live);
             }
 
-            addCriterion(new QnResourceCriterion(targetValue, type, target, positive ? ACCEPT : REJECT, NEXT));
+            group->addCriterion(new QnResourceCriterion(targetValue, type, target, NEXT, REJECT));
+        }
+
+        if(group->criteria().empty()) {
+            delete group;
+        } else {
+            addCriterion(group);
         }
 
         positive = c == '+';
