@@ -52,6 +52,12 @@ namespace Qn {
          */
         OpenFileAction,
 
+        /**
+         * Opens a file dialog and adds all files from selected folder 
+         * to the current layout.
+         */
+        OpenFolderAction,
+
         FileSeparator,
 
         /**

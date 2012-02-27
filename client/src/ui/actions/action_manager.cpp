@@ -236,6 +236,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("folder.png")));
 
+    factory(Qn::OpenFolderAction).
+        flags(Qn::Main).
+        text(tr("Open Folder..."));
+
     factory(Qn::FileSeparator).
         flags(Qn::Main).
         separator();
