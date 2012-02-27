@@ -266,15 +266,16 @@ QnActionManager::QnActionManager(QObject *parent):
 #ifdef Q_OS_MAC
         shortcut(tr("Ctrl+F")).
 #else
+        shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
         shortcut(tr("Esc")).
 #endif
         icon(Skin::icon(QLatin1String("decorations/fullscreen.png"))).
         toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png")));
 
-    factory(Qn::PreferencesAction).
+    factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
-        text(tr("Preferences")).
+        text(tr("System Settings")).
         shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
@@ -348,8 +349,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Open in Containing Folder")).
-        shortcut(tr("Ctrl+Return")).
         shortcut(tr("Ctrl+Enter")).
+        shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media)));
 

@@ -311,7 +311,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->addItem(newActionButton(qnAction(Qn::NewLayoutAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
-    titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::SystemSettingsAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::FullscreenAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::ExitAction)));
     m_titleItem->setLayout(titleLayout);

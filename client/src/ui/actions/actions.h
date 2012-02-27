@@ -76,9 +76,9 @@ namespace Qn {
         FullscreenAction,
 
         /**
-         * Opens preferences dialog.
+         * Opens system settings dialog.
          */
-        PreferencesAction,
+        SystemSettingsAction,
 
         ExitSeparator,
 

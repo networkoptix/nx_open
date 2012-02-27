@@ -123,7 +123,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(m_workbench,                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
     connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
-    connect(qnAction(Qn::PreferencesAction),                SIGNAL(triggered()),    this,   SLOT(at_preferencesAction_triggered()));
+    connect(qnAction(Qn::SystemSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(qnAction(Qn::OpenFolderAction),                 SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
@@ -308,7 +308,7 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_preferencesAction_triggered() {
+void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
