@@ -576,7 +576,7 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
 
             layout->addItem(item);
         }
-    } else if(QnUserResourcePtr &user = node->resource().dynamicCast<QnUserResource>()) {
+    } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
             QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
             if(!layout)
@@ -586,6 +586,7 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
                 continue; /* Dropping layout into its owner does nothing. */
 
             QnLayoutResourcePtr newLayout(new QnLayoutResource());
+            newLayout->setGuid(QUuid::createUuid());
             m_resourcePool->addResource(newLayout);
             user->addLayout(newLayout);
 

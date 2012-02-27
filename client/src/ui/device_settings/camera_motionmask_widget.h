@@ -24,7 +24,7 @@ public:
 
 	void setCamera(const QnResourcePtr &resource);
 
-    const QList<QRegion>& QnCameraMotionMaskWidget::motionMaskList() const;
+    const QList<QRegion>& motionMaskList() const;
 
 protected slots:
     void at_viewport_resized();

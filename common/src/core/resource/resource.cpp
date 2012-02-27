@@ -34,6 +34,16 @@ QnResource::~QnResource()
     disconnectAllConsumers();
 }
 
+void QnResource::setGuid(const QString& guid)
+{
+    m_guid = guid;
+}
+
+QString QnResource::getGuid() const
+{
+    return m_guid;
+}
+
 void QnResource::updateInner(QnResourcePtr other)
 {
     Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same

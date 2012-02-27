@@ -191,7 +191,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
 
-    Q_ASSERT(((unsigned int)mask)%16 == 0);
+    Q_ASSERT(((unsigned long)mask)%16 == 0);
 
     QnMetaDataV1::createMask(region, (char*)mask, &maskStart, &maskEnd);
     bool isFirstStep = true;
