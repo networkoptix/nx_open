@@ -425,7 +425,7 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
 
 QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric) const {
     if(metric == NULL) {
-        DistanceMagnitudeCalculator metric(gridPos - SceneUtility::toPoint(QSizeF(size)) / 2.0);
+        QnDistanceMagnitudeCalculator metric(gridPos - SceneUtility::toPoint(QSizeF(size)) / 2.0);
         return closestFreeSlot(gridPos, size, &metric); /* Use default metric if none provided. */
     }
 

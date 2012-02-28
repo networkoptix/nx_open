@@ -184,12 +184,8 @@ QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout 
         result->setSourceModel(m_resourceModel);
         layout->setProperty(qn_searchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel *>(result));
 
-        QnResourceCriterion *criterion = new QnResourceCriterion();
-        result->addCriterion(criterion);
-        setLayoutCriterion(layout, criterion);
-
-        /* Add default criteria. */
-        result->addCriterion(new QnResourceCriterion(QnResource::server)); /* Always accept servers. */
+        /* Always accept servers. */
+        result->addCriterion(QnResourceCriterion(QnResource::server)); 
     }
     return result;
 }
@@ -211,14 +207,6 @@ QString QnResourceTreeWidget::layoutSearchString(QnWorkbenchLayout *layout) cons
 
 void QnResourceTreeWidget::setLayoutSearchString(QnWorkbenchLayout *layout, const QString &searchString) const {
     layout->setProperty(qn_searchStringPropertyName, searchString);
-}
-
-QnResourceCriterion *QnResourceTreeWidget::layoutCriterion(QnWorkbenchLayout *layout) const {
-    return layout->property(qn_searchCriterionPropertyName).value<QnResourceCriterion *>();
-}
-
-void QnResourceTreeWidget::setLayoutCriterion(QnWorkbenchLayout *layout, QnResourceCriterion *criterion) const {
-    layout->setProperty(qn_searchCriterionPropertyName, QVariant::fromValue<QnResourceCriterion *>(criterion));
 }
 
 void QnResourceTreeWidget::killSearchTimer() {
@@ -337,15 +325,11 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
             QString filter = ui->filterLineEdit->text();
             QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
-            QnResourceCriterion *oldCriterion = layoutCriterion(layout);
-            QnResourceCriterionGroup *newCriterion = new QnResourceCriterionGroup(filter);
+            model->clearCriteria();
+            model->addCriterion(QnResourceCriterionGroup(filter));
             if(flags != 0)
-                newCriterion->addCriterion(new QnResourceCriterion(flags, QnResourceCriterion::FLAGS, QnResourceCriterion::NEXT, QnResourceCriterion::REJECT));
-
-            model->replaceCriterion(oldCriterion, newCriterion);
-
-            delete oldCriterion;
-            setLayoutCriterion(layout, newCriterion);
+                model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
+            model->addCriterion(QnResourceCriterion(QnResource::server));
         }
     }
 

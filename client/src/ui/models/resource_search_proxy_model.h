@@ -3,10 +3,9 @@
 
 #include <QSortFilterProxyModel>
 #include <core/resource/resource_fwd.h>
+#include <core/resourcemanagment/resource_criterion.h>
 #include "item_data_role.h"
 
-class QnResourceCriterionGroup;
-class QnResourceCriterion;
 
 /**
  * A resource filtering model that uses resource criteria for filtering.
@@ -19,14 +18,14 @@ public:
 
     virtual ~QnResourceSearchProxyModel();
 
-    void addCriterion(QnResourceCriterion *criterion);
+    void addCriterion(const QnResourceCriterion &criterion);
 
-    bool removeCriterion(QnResourceCriterion *criterion);
+    bool removeCriterion(const QnResourceCriterion &criterion);
 
-    bool replaceCriterion(QnResourceCriterion *from, QnResourceCriterion *to);
+    void clearCriteria();
 
-    const QnResourceCriterionGroup *criteria() {
-        return m_criterionGroup.data();
+    const QnResourceCriterionGroup &criteria() {
+        return m_criterionGroup;
     }
 
     QnResourcePtr resource(const QModelIndex &index) const;
@@ -49,7 +48,7 @@ protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:
-    QScopedPointer<QnResourceCriterionGroup> m_criterionGroup;
+    QnResourceCriterionGroup m_criterionGroup;
     QObject *m_invalidateListener;
 };
 

@@ -68,13 +68,11 @@ bool QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widge
 }
 
 
-QnResourceActionCondition::QnResourceActionCondition(MatchMode matchMode, QnResourceCriterion *criterion, QObject *parent): 
+QnResourceActionCondition::QnResourceActionCondition(MatchMode matchMode, const QnResourceCriterion &criterion, QObject *parent): 
     QnActionCondition(parent),
     m_matchMode(matchMode),
     m_criterion(criterion)
-{
-    assert(criterion != NULL);
-}
+{}
 
 QnResourceActionCondition::~QnResourceActionCondition() {
     return;
@@ -108,7 +106,7 @@ bool QnResourceActionCondition::checkInternal(const ItemSequence &sequence) {
 }
 
 bool QnResourceActionCondition::checkOne(const QnResourcePtr &resource) {
-    return m_criterion->check(resource) == QnResourceCriterion::ACCEPT;
+    return m_criterion.check(resource) == QnResourceCriterion::Accept;
 }
 
 bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {

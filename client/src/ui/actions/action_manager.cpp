@@ -212,6 +212,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Open Single Layout"));
 
+    factory(Qn::ResourceDropAction).
+        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Drop Resources"));
 
 
     /* Main menu actions. */

@@ -79,8 +79,6 @@ protected:
     QnResourceSearchSynchronizer *layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const;
     QString layoutSearchString(QnWorkbenchLayout *layout) const;
     void setLayoutSearchString(QnWorkbenchLayout *layout, const QString &searchString) const;
-    QnResourceCriterion *layoutCriterion(QnWorkbenchLayout *layout) const;
-    void setLayoutCriterion(QnWorkbenchLayout *layout, QnResourceCriterion *criterion) const;
 
     void killSearchTimer();
 

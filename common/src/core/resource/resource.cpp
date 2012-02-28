@@ -11,6 +11,7 @@
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
+#include "resource_property.h"
 
 #include <typeinfo>
 #include <limits.h>
@@ -26,6 +27,8 @@ QnResource::QnResource()
         qRegisterMetaType<QnParam>();
         qRegisterMetaType<QnId>();
         metaTypesInitialized = true;
+
+        QnResourceProperty::test();
     }
 }
 

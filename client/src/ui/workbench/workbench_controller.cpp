@@ -323,56 +323,6 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
 }
 
-void QnWorkbenchController::drop(const QUrl &url, const QPointF &gridPos, bool findAccepted) {
-    drop(url.toLocalFile(), gridPos, findAccepted);
-}
-
-void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPointF &gridPos, bool findAccepted) {
-    QList<QString> files;
-    foreach(const QUrl &url, urls)
-        files.push_back(url.toLocalFile());
-    drop(files, gridPos, findAccepted);
-}
-
-void QnWorkbenchController::drop(const QString &file, const QPointF &gridPos, bool findAccepted) {
-    QList<QString> files;
-    files.push_back(fromNativePath(file));
-    drop(files, gridPos, findAccepted);
-}
-
-void QnWorkbenchController::drop(const QList<QString> &files, const QPointF &gridPos, bool findAccepted) {
-    const QList<QString> validFiles = !findAccepted ? files : QnFileProcessor::findAcceptedFiles(files);
-    if (!validFiles.empty())
-        drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
-}
-
-void QnWorkbenchController::drop(const QnResourceList &resources, const QPointF &gridPos) {
-    foreach (const QnResourcePtr &resource, resources)
-        drop(resource, gridPos);
-}
-
-void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &gridPos) {
-    if (!resource) {
-        qnNullWarning(resource);
-        return;
-    }
-
-    workbench()->setItem(QnWorkbench::RAISED, NULL);
-    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
-
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-    item->setFlag(QnWorkbenchItem::Pinned, false);
-    workbench()->currentLayout()->addItem(item);
-
-    if(gridPos.isNull()) {
-        item->adjustGeometry();
-    } else {
-        item->adjustGeometry(gridPos);
-    }
-
-    display()->fitInView();
-}
-
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
     if (event->type() == QEvent::Close) {
