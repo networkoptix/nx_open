@@ -662,7 +662,7 @@ int main(int argc, char* argv[])
 
     initAppServerConnection(settings);
 
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection(QUrl("http://appserver:123@physic:8000"));
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection(QUrl("http://admin:123@127.0.0.1:8000"));
 
     QnResourceDiscoveryManager::instance().setServer(true);
     // QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
@@ -674,6 +674,26 @@ int main(int argc, char* argv[])
     QByteArray errorString;
     initResourceTypes(conn);
 
+        QnVideoServerResourcePtr videoServer;
+
+        while (videoServer.isNull())
+        {
+            QnVideoServerResourcePtr server = findServer(conn);
+
+            if (!server)
+                server = createServer();
+
+            setServerNameAndUrls(server, defaultLocalAddress(QHostAddress("127.0.0.1")));
+
+            if (server->getStorages().isEmpty())
+                server->setStorages(QnStorageResourceList() << createDefaultStorage());
+
+            videoServer = registerServer(conn, server);
+            if (videoServer.isNull())
+                QnSleep::msleep(1000);
+        }
+
+    /*
     QnVideoServerConnection vc(QUrl("http://physic:8080")); // /api/RecordedTimePeriods?mac=00-40-8C-BF-92-CE&startTime=123&detail=12);
     QnCameraResourceList cameras;
     conn->getCameras(cameras, QnId(2), errorString);
@@ -681,7 +701,7 @@ int main(int argc, char* argv[])
 
     QnNetworkResourceList nrl;
     nrl.append(cameras[1]);
-    QnTimePeriodList tpl = vc.recordedTimePeriods(nrl);
+    QnTimePeriodList tpl = vc.recordedTimePeriods(nrl); */
     app.exec();
     return 0;
  #endif   
