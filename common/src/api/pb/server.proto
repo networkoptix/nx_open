@@ -20,7 +20,8 @@ message Server {
     required string       guid         = 4;
     required string       url          = 5;
     required string       apiUrl       = 6;
-    repeated Storage      storage      = 7;
+    optional string       netAddrList  = 7;
+    repeated Storage      storage      = 8;
 }
 
 message Servers {

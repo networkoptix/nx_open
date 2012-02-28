@@ -30,15 +30,22 @@ public:
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
 
+    void setNetAddrList(const QList<QHostAddress>&);
+    QList<QHostAddress> getNetAddrList();
+
     QnVideoServerConnectionPtr apiConnection();
 
     QnStorageResourceList getStorages() const;
     void setStorages(const QnStorageResourceList& storages);
 
+    void determineOptimalNetIF();
+    void setPrimaryIF(const QString& primaryIF);
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
+    QList<QHostAddress> m_netAddrList;
     QnStorageResourceList m_storages;
+    bool m_primaryIFSelected;
 };
 
 typedef QnSharedResourcePointer<QnVideoServerResource> QnVideoServerResourcePtr;
