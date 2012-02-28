@@ -130,6 +130,7 @@ void CLServerPushStreamreader::run()
 
         }
 
+        //qDebug() << "fps = " << m_stat[0].getFrameRate();
 
         // check queue sizes
         if (dataCanBeAccepted())
