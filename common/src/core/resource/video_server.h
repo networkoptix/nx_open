@@ -30,6 +30,9 @@ public:
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
 
+    void setNetAddrList(const QList<QHostAddress>&);
+    QList<QHostAddress> getNetAddrList();
+
     QnVideoServerConnectionPtr apiConnection();
 
     QnStorageResourceList getStorages() const;
@@ -38,6 +41,7 @@ public:
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
+    QList<QHostAddress> m_netAddrList;
     QnStorageResourceList m_storages;
 };
 

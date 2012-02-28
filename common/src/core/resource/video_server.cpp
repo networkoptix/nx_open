@@ -54,6 +54,16 @@ QString QnVideoServerResource::getApiUrl() const
     return m_apiUrl;
 }
 
+void QnVideoServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
+{
+    m_netAddrList = netAddrList;
+}
+
+QList<QHostAddress> QnVideoServerResource::getNetAddrList()
+{
+    return m_netAddrList;
+}
+
 QnVideoServerConnectionPtr QnVideoServerResource::apiConnection()
 {
     return m_restConnection;
