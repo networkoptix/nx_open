@@ -106,9 +106,9 @@ QHostAddress resolveHost(const QString& hostString)
 }
 
 
-QString allLocalAddresses()
+QList<QHostAddress> allLocalAddresses()
 {
-    QString rez;
+    QList<QHostAddress> rez;
 
     // if nothing else works use first enabled hostaddr
     QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
@@ -119,12 +119,10 @@ QString allLocalAddresses()
         bool isLocalAddress = addr == "localhost" || addr == "127.0.0.1";
         if (isLocalAddress || !QUdpSocket().bind(ipaddrs.at(i), 0))
             continue;
-        if (!rez.isEmpty())
-            rez += ';';
-        rez += addr;
+        rez << ipaddrs.at(i);
     }
     if (rez.isEmpty())
-        rez = "127.0.0.1";
+        rez << QHostAddress("127.0.0.1");
 
     return rez;
 }
@@ -503,6 +501,7 @@ public:
                 server = createServer();
 
             setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
+            server->setNetAddrList(allLocalAddresses());
 
             if (server->getStorages().isEmpty())
                 server->setStorages(QnStorageResourceList() << createDefaultStorage());

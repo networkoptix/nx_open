@@ -2,6 +2,7 @@
 
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
+#include "api/SessionManager.h"
 
 QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
@@ -24,6 +25,7 @@ QnVideoServerResource::QnVideoServerResource():
 {
     setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("Server")));
     addFlags(server | remote);
+    m_primaryIFSelected = false;
 }
 
 QnVideoServerResource::~QnVideoServerResource()
@@ -42,6 +44,7 @@ QString QnVideoServerResource::getUniqueId() const
 
 void QnVideoServerResource::setApiUrl(const QString& restUrl)
 {
+    QMutexLocker lock(&m_mutex);
     m_apiUrl = restUrl;
 
     /* We want the video server connection to be deleted in its associated thread, 
@@ -51,16 +54,19 @@ void QnVideoServerResource::setApiUrl(const QString& restUrl)
 
 QString QnVideoServerResource::getApiUrl() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_apiUrl;
 }
 
 void QnVideoServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
+    QMutexLocker lock(&m_mutex);
     m_netAddrList = netAddrList;
 }
 
 QList<QHostAddress> QnVideoServerResource::getNetAddrList()
 {
+    QMutexLocker lock(&m_mutex);
     return m_netAddrList;
 }
 
@@ -89,17 +95,54 @@ void QnVideoServerResource::setStorages(const QnStorageResourceList &storages)
     m_storages = storages;
 }
 
-#if 0
-void QnVideoServer::startRTSPListener(const QHostAddress& address, int port)
+
+// --------------------------------------------------
+
+class TestConnectionTask: public QRunnable
 {
-    if (m_rtspListener)
+public:
+    TestConnectionTask(QnVideoServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
+    void run()
+    {
+        QByteArray reply;
+        QByteArray errorString;
+        SessionManager::instance()->sendGetRequest(m_url.toString(), "RecordedTimePeriods", QnRequestParamList(), reply, errorString);
+        if (reply.contains("Parameter startTime must be provided"))
+        {
+            // server OK
+            m_owner->setPrimaryIF(m_url.host());
+        }
+    }
+private:
+    QUrl m_url;
+    QnVideoServerResource* m_owner;
+};
+
+void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_primaryIFSelected)
         return;
-    m_rtspListener = new QnRtspListener(address, port);
+    m_primaryIFSelected = true;
+    
+    QUrl apiUrl(getApiUrl());
+    apiUrl.setHost(primaryIF);
+    setApiUrl(apiUrl.toString());
+
+    QUrl url(getUrl());
+    url.setHost(primaryIF);
+    setUrl(url.toString());
+    setName(QString("Server ") + primaryIF);
 }
 
-void QnVideoServer::stopRTSPListener()
+void QnVideoServerResource::determineOptimalNetIF()
 {
-    delete m_rtspListener;
-    m_rtspListener = 0;
+    QMutexLocker lock(&m_mutex);
+    for (int i = 0; i < m_netAddrList.size(); ++i)
+    {
+        QUrl url(m_apiUrl);
+        url.setHost(m_netAddrList[i].toString());
+        TestConnectionTask *task = new TestConnectionTask(this, url);
+        QThreadPool::globalInstance()->start(task);
+    }
 }
-#endif
