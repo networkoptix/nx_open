@@ -6,34 +6,33 @@
 
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent): 
     QSortFilterProxyModel(parent),
-    m_invalidateListener(NULL),
-    m_criterionGroup(new QnResourceCriterionGroup())
+    m_invalidateListener(NULL)
 {}
 
 QnResourceSearchProxyModel::~QnResourceSearchProxyModel() {
     return;
 }
 
-void QnResourceSearchProxyModel::addCriterion(QnResourceCriterion *criterion) {
-    m_criterionGroup->addCriterion(criterion);
+void QnResourceSearchProxyModel::addCriterion(const QnResourceCriterion &criterion) {
+    m_criterionGroup.addCriterion(criterion);
 
     invalidateFilterLater();
 }
 
-bool QnResourceSearchProxyModel::removeCriterion(QnResourceCriterion *criterion) {
-    bool removed = m_criterionGroup->removeCriterion(criterion);
+bool QnResourceSearchProxyModel::removeCriterion(const QnResourceCriterion &criterion) {
+    bool removed = m_criterionGroup.removeCriterion(criterion);
     if(removed)
         invalidateFilterLater();
 
     return removed;
 }
 
-bool QnResourceSearchProxyModel::replaceCriterion(QnResourceCriterion *from, QnResourceCriterion *to) {
-    bool replaced = m_criterionGroup->replaceCriterion(from, to);
-    if(replaced)
-        invalidateFilterLater();
+void QnResourceSearchProxyModel::clearCriteria() {
+    if(m_criterionGroup.empty())
+        return;
 
-    return replaced;
+    m_criterionGroup.clear();
+    invalidateFilterLater();
 }
 
 QnResourcePtr QnResourceSearchProxyModel::resource(const QModelIndex &index) const {
@@ -68,8 +67,8 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
     if(resource.isNull())
         return true;
 
-    QnResourceCriterion::Operation operation = m_criterionGroup->check(resource);
-    if(operation != QnResourceCriterion::ACCEPT)
+    QnResourceCriterion::Operation operation = m_criterionGroup.check(resource);
+    if(operation != QnResourceCriterion::Accept)
         return false;
 
     return true;

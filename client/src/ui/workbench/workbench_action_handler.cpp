@@ -141,6 +141,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
     connect(qnAction(Qn::NewUserAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
+    connect(qnAction(Qn::ResourceDropAction),               SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::deinitialize() {
@@ -187,13 +188,19 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     return m_synchronizer->isLocal(layout) && !m_synchronizer->isChanged(layout);
 }
 
-void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files) const {
-    QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
+void QnWorkbenchActionHandler::addToWorkbench(const QnResourceList &resources) const {
     foreach(const QnResourcePtr &resource, resources) {
+        //if(resource) // TODO
+
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
         item->setFlag(QnWorkbenchItem::PendingGeometryAdjustment);
         m_workbench->currentLayout()->addItem(item);
     }
+}
+
+
+void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files) const {
+    addToWorkbench(QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
 }
 
 
@@ -276,6 +283,10 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
             qnResPool->removeResource(resource);
         }
     }
+}
+
+void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
+    addToWorkbench(qnMenu->currentResourcesTarget(sender()));
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {

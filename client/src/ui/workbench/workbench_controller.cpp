@@ -233,6 +233,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),                               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),                              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      this,                           SLOT(at_motionSelectionProcessStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
 
@@ -321,56 +322,6 @@ QnWorkbench *QnWorkbenchController::workbench() const {
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_display->workbench()->mapper();
-}
-
-void QnWorkbenchController::drop(const QUrl &url, const QPointF &gridPos, bool findAccepted) {
-    drop(url.toLocalFile(), gridPos, findAccepted);
-}
-
-void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPointF &gridPos, bool findAccepted) {
-    QList<QString> files;
-    foreach(const QUrl &url, urls)
-        files.push_back(url.toLocalFile());
-    drop(files, gridPos, findAccepted);
-}
-
-void QnWorkbenchController::drop(const QString &file, const QPointF &gridPos, bool findAccepted) {
-    QList<QString> files;
-    files.push_back(fromNativePath(file));
-    drop(files, gridPos, findAccepted);
-}
-
-void QnWorkbenchController::drop(const QList<QString> &files, const QPointF &gridPos, bool findAccepted) {
-    const QList<QString> validFiles = !findAccepted ? files : QnFileProcessor::findAcceptedFiles(files);
-    if (!validFiles.empty())
-        drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
-}
-
-void QnWorkbenchController::drop(const QnResourceList &resources, const QPointF &gridPos) {
-    foreach (const QnResourcePtr &resource, resources)
-        drop(resource, gridPos);
-}
-
-void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPointF &gridPos) {
-    if (!resource) {
-        qnNullWarning(resource);
-        return;
-    }
-
-    workbench()->setItem(QnWorkbench::RAISED, NULL);
-    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
-
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-    item->setFlag(QnWorkbenchItem::Pinned, false);
-    workbench()->currentLayout()->addItem(item);
-
-    if(gridPos.isNull()) {
-        item->adjustGeometry();
-    } else {
-        item->adjustGeometry(gridPos);
-    }
-
-    display()->fitInView();
 }
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
@@ -827,6 +778,17 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidge
         return; /* We may get NULL if the widget being rotated gets deleted. */
 
     widget->item()->setRotation(widget->rotation());
+}
+
+void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnResourceWidget *widget) {
+    if(!(widget->resource()->flags() & QnResource::network)) {
+        m_motionSelectionInstrument->recursiveDisable();
+        m_motionSelectionInstrument->recursiveEnable();
+        return;
+    }
+
+    displayMotionGrid(display()->widgets(), false);
+    widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
 }
 
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnResourceWidget *widget) {

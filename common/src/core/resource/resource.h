@@ -32,14 +32,17 @@ class QN_EXPORT QnResource : public QObject
     Q_OBJECT
     Q_FLAGS(Flags Flag)
     Q_ENUMS(ConnectionRole Status)
-    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false)
     Q_PROPERTY(QnId id READ getId WRITE setId)
-    Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(QnId typeId READ getTypeId WRITE setTypeId)
+    Q_PROPERTY(QString uniqueId READ getUniqueId)
+    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false)
+    Q_PROPERTY(QString searchString READ toSearchString)
+    Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Status status READ getStatus WRITE setStatus)
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
+    Q_PROPERTY(QStringList tags READ tagList WRITE setTags)
     Q_CLASSINFO("url", "URL")
 
 public:

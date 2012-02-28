@@ -9,9 +9,9 @@
 /**
  * Simple magnitude calculator for finding the best place for an item. 
  */
-class DistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
+class QnDistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
 public:
-    DistanceMagnitudeCalculator(const QPointF &origin):
+    QnDistanceMagnitudeCalculator(const QPointF &origin):
         m_origin(origin),
         m_calculator(MagnitudeCalculator::forType<QPointF>())
     {}

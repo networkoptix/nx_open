@@ -5,25 +5,7 @@
 
 namespace {
     QnResourceCriterion::Operation nextCriterionFunction(const QnResourcePtr &, const QVariant &) {
-        return QnResourceCriterion::NEXT;
-    }
-
-    QVariant resourceValue(const QnResourcePtr &resource, QnResourceCriterion::Target target) {
-        if(resource.isNull())
-            return QVariant();
-
-        switch(target) {
-        case QnResourceCriterion::ID:               return resource->getId().toString();
-        case QnResourceCriterion::TYPE_ID:          return resource->getTypeId().toString();
-        case QnResourceCriterion::NAME:             return resource->getName();
-        case QnResourceCriterion::SEARCH_STRING:    return resource->toSearchString();
-        case QnResourceCriterion::STATUS:           return static_cast<int>(resource->getStatus());
-        case QnResourceCriterion::FLAGS:            return static_cast<int>(resource->flags());
-        case QnResourceCriterion::URL:              return resource->getUrl();
-        case QnResourceCriterion::TAGS:             return resource->tagList();
-        default:
-            return QVariant();
-        }
+        return QnResourceCriterion::Next;
     }
 
     /**
@@ -52,20 +34,20 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnResourceCriterion
 // -------------------------------------------------------------------------- //
-QnResourceCriterion::QnResourceCriterion(const QRegExp &regExp, Target target, Operation matchOperation, Operation mismatchOperation):
+QnResourceCriterion::QnResourceCriterion(const QRegExp &regExp, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
-    m_type(REGEXP),
-    m_target(target),
+    m_type(RegExp),
+    m_propertyName(propertyName),
     m_targetValue(regExp),
     m_customCriterion(NULL)
 {}
 
-QnResourceCriterion::QnResourceCriterion(int flags, Target target, Operation matchOperation, Operation mismatchOperation):
+QnResourceCriterion::QnResourceCriterion(int flags, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
-    m_type(CONTAINMENT),
-    m_target(target),
+    m_type(Containment),
+    m_propertyName(propertyName),
     m_targetValue(flags),
     m_customCriterion(NULL)
 {}
@@ -73,19 +55,19 @@ QnResourceCriterion::QnResourceCriterion(int flags, Target target, Operation mat
 QnResourceCriterion::QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
-    m_type(NOTHING),
-    m_target(ID),
+    m_type(Nothing),
+    m_propertyName(NULL),
     m_targetValue(targetValue),
     m_customCriterion(NULL)
 {
     setCustomType(function);
 }
 
-QnResourceCriterion::QnResourceCriterion(const QVariant &targetValue, Type type, Target target, Operation matchOperation, Operation mismatchOperation):
+QnResourceCriterion::QnResourceCriterion(const QVariant &targetValue, Type type, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
-    m_type(NOTHING),
-    m_target(target),
+    m_type(Nothing),
+    m_propertyName(propertyName),
     m_targetValue(targetValue),
     m_customCriterion(NULL)
 {
@@ -93,39 +75,46 @@ QnResourceCriterion::QnResourceCriterion(const QVariant &targetValue, Type type,
 }
 
 QnResourceCriterion::QnResourceCriterion():
-    m_matchOperation(ACCEPT),
-    m_mismatchOperation(NEXT),
-    m_type(NOTHING),
-    m_target(ID),
+    m_matchOperation(Accept),
+    m_mismatchOperation(Next),
+    m_type(Nothing),
+    m_propertyName(NULL),
     m_targetValue(QVariant()),
     m_customCriterion(NULL)
 {}
 
 QnResourceCriterion::~QnResourceCriterion() {
-    if(isGroup())
-        qDeleteAll(static_cast<const QnResourceCriterionGroup *>(this)->criteria());
+    return;
 }
 
 bool QnResourceCriterion::isGroup() const {
-    return m_type == GROUP;
+    return m_type == Group;
 }
 
-QnResourceCriterionGroup *QnResourceCriterion::asGroup() {
-    return isGroup() ? static_cast<QnResourceCriterionGroup *>(this) : NULL;
+QnResourceCriterionGroup &QnResourceCriterion::asGroup() {
+    assert(isGroup());
+
+    return static_cast<QnResourceCriterionGroup &>(*this);
+}
+
+const QnResourceCriterionGroup &QnResourceCriterion::asGroup() const {
+    assert(isGroup());
+
+    return static_cast<const QnResourceCriterionGroup &>(*this);
 }
 
 void QnResourceCriterion::setType(Type type) {
     if(m_type == type)
         return;
 
-    if(type < 0 || type > CUSTOM) {
+    if(type < 0 || type > Custom) {
         qnWarning("Invalid resource criterion type '%1'.", static_cast<int>(type));
         return;
     }
 
     m_type = type;
 
-    if(m_type == CUSTOM) {
+    if(m_type == Custom) {
         m_customCriterion = &nextCriterionFunction;
     } else {
         m_customCriterion = NULL;
@@ -134,38 +123,33 @@ void QnResourceCriterion::setType(Type type) {
     if(isGroup() && m_targetValue.userType() != qn_criterionListMetaTypeId)
         m_targetValue = QVariant::fromValue<QnResourceCriterionList>(QnResourceCriterionList());
 
-    if(m_type == REGEXP && m_targetValue.userType() != QVariant::RegExp)
+    if(m_type == RegExp && m_targetValue.userType() != QVariant::RegExp)
         m_targetValue = QVariant::fromValue<QRegExp>(QRegExp());
 }
 
-void QnResourceCriterion::setTarget(Target target) {
-    if(target < 0 || target >= TARGET_COUNT) {
-        qnWarning("Invalid criterion target '%1'.", static_cast<int>(target));
-        return;
-    }
-
-    m_target = target;
+void QnResourceCriterion::setPropertyName(const char *propertyName) {
+    m_propertyName = propertyName;
 }
 
 void QnResourceCriterion::setTargetValue(const QVariant &targetValue) {
     switch(m_type) {
-    case QnResourceCriterionGroup::GROUP:
+    case QnResourceCriterionGroup::Group:
         if(targetValue.userType() != qn_criterionListMetaTypeId) {
             qnWarning("Criterion group expects its target value to be an instance of QnResourceCriterionList.");
             return;
         }
         m_targetValue = targetValue;
         break;
-    case REGEXP:
+    case RegExp:
         if(targetValue.type() != QVariant::RegExp) {
-            qnWarning("Criterion of type REGEXP expects a QRegExp as its target value.");
+            qnWarning("Criterion of type RegExp expects a QRegExp as its target value.");
             return;
         }
         /* FALL THROUGH. */
-    case CONTAINMENT:
-    case EQUALITY:
-    case CUSTOM:
-    case NOTHING:
+    case Containment:
+    case Equality:
+    case Custom:
+    case Nothing:
         m_targetValue = targetValue;
         break;
     default:
@@ -175,6 +159,10 @@ void QnResourceCriterion::setTargetValue(const QVariant &targetValue) {
 
 void *QnResourceCriterion::targetValueData() {
     return m_targetValue.data();
+}
+
+const void *QnResourceCriterion::targetValueData() const {
+    return m_targetValue.constData();
 }
 
 QnResourceCriterion::CriterionFunction QnResourceCriterion::customType() const {
@@ -188,59 +176,61 @@ void QnResourceCriterion::setCustomType(const CriterionFunction &function) {
         return;
     }
 
-    m_type = CUSTOM;
+    m_type = Custom;
     m_customCriterion = function;
 }
 
 QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &resource) const {
-    Operation result = REJECT;
+    Operation result = Reject;
 
     switch(m_type) {
-    case NOTHING:
+    case Nothing:
         break;
-    case EQUALITY:
-        if(m_targetValue == resourceValue(resource, m_target)) {
-            result = ACCEPT;
-        } else if(m_targetValue.toString() == resourceValue(resource, m_target).toString()) {
-            result = ACCEPT;
+    case Equality: {
+        QVariant value = resource->property(m_propertyName);
+        if(m_targetValue == value) {
+            result = Accept;
+        } else if(m_targetValue.toString() == value.toString()) {
+            result = Accept;
         }
         break;
-    case REGEXP: {
+    }
+    case RegExp: {
         QRegExp regExp = m_targetValue.toRegExp();
-        if(regExp.exactMatch(resourceValue(resource, m_target).toString()))
-            result = ACCEPT;
+        if(regExp.exactMatch(resource->property(m_propertyName).toString()))
+            result = Accept;
         break;
     }
-    case CONTAINMENT: {
-        QVariant value = resourceValue(resource, m_target);
+    case Containment: {
+        QVariant value = resource->property(m_propertyName);
         if(value.userType() == QVariant::StringList) {
             if(value.toStringList().contains(m_targetValue.toString(), Qt::CaseInsensitive))
-                result = ACCEPT;
+                result = Accept;
         } else if(value.userType() == QVariant::Int) {
             int mask = m_targetValue.toInt();
             if((value.toInt() & mask) == mask)
-                result = ACCEPT;
+                result = Accept;
         } else {
             if(value.toString().contains(m_targetValue.toString(), Qt::CaseInsensitive))
-                result = ACCEPT;
+                result = Accept;
         }
         break;
     }
-    case GROUP:
-        foreach(const QnResourceCriterion *criterion, static_cast<const QnResourceCriterionGroup *>(this)->criteria()) {
-            result = criterion->check(resource);
-            if(result != NEXT)
+    case Group:
+        foreach(const QnResourceCriterion &criterion, static_cast<const QnResourceCriterionGroup *>(this)->criteria()) {
+            result = criterion.check(resource);
+            if(result != Next)
                 break;
         }
         break;
-    case CUSTOM:
+    case Custom:
         result = m_customCriterion(resource, m_targetValue);
         break;
     }
 
     switch(result) {
-    case ACCEPT: return m_matchOperation;
-    case REJECT: return m_mismatchOperation;
+    case Accept: return m_matchOperation;
+    case Reject: return m_mismatchOperation;
     default: return m_nextOperation;
     }
 }
@@ -249,10 +239,47 @@ QnResourceList QnResourceCriterion::filter(const QnResourceList &resources) {
     QnResourceList result;
     foreach(const QnResourcePtr &resource, resources) {
         Operation operation = check(resource);
-        if(operation == ACCEPT)
+        if(operation == Accept)
             result.push_back(resource);
     }
     return result;
+}
+
+bool operator==(const QnResourceCriterion &l, const QnResourceCriterion &r) {
+    if(l.type() != r.type())
+        return false;
+
+    if(l.matchOperation() != r.matchOperation() || l.mismatchOperation() != r.mismatchOperation() || l.nextOperation() != r.nextOperation())
+        return false;
+
+    switch(l.type()) {
+    case QnResourceCriterion::Nothing:
+        return true;
+    case QnResourceCriterion::Equality:
+    case QnResourceCriterion::Containment:
+    case QnResourceCriterion::RegExp: {
+        bool equalPropertyNames = false;
+        if(l.propertyName() == r.propertyName()) {
+            equalPropertyNames = true;
+        } else if(l.propertyName() == NULL || r.propertyName() == NULL) {
+            equalPropertyNames = false;
+        } else {
+            equalPropertyNames = strcmp(l.propertyName(), r.propertyName()) == 0;
+        }
+        if(!equalPropertyNames)
+            return false;
+
+        return l.targetValue() == r.targetValue();
+    }
+    case QnResourceCriterion::Group: {
+        return l.asGroup().criteria() == r.asGroup().criteria();
+    }
+    case QnResourceCriterion::Custom:
+        return l.customType() == r.customType() && l.targetValue() == r.targetValue();
+    default:
+        qnWarning("Unreachable code executed.");
+        return false;
+    }
 }
 
 
@@ -262,7 +289,7 @@ QnResourceList QnResourceCriterion::filter(const QnResourceList &resources) {
 QnResourceCriterionGroup::QnResourceCriterionGroup(const QString &pattern, Operation matchOperation, Operation mismatchOperation) {
     qn_initCriterionListMetaType();
 
-    setType(GROUP);
+    setType(Group);
     setMatchOperation(matchOperation);
     setMismatchOperation(mismatchOperation);
     setPattern(pattern);
@@ -271,45 +298,41 @@ QnResourceCriterionGroup::QnResourceCriterionGroup(const QString &pattern, Opera
 QnResourceCriterionGroup::QnResourceCriterionGroup(Operation matchOperation, Operation mismatchOperation) {
     qn_initCriterionListMetaType();
 
-    setType(GROUP);
+    setType(Group);
     setMatchOperation(matchOperation);
     setMismatchOperation(mismatchOperation);
 }
 
-void QnResourceCriterionGroup::addCriterion(QnResourceCriterion *criterion) {
+void QnResourceCriterionGroup::addCriterion(const QnResourceCriterion &criterion) {
     assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     d->push_front(criterion);
 }
 
-bool QnResourceCriterionGroup::removeCriterion(QnResourceCriterion *criterion) {
+bool QnResourceCriterionGroup::removeCriterion(const QnResourceCriterion &criterion) {
     assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     return d->removeOne(criterion);
 }
 
-bool QnResourceCriterionGroup::replaceCriterion(QnResourceCriterion *from, QnResourceCriterion *to) {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
-
-    QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
-    int index = d->indexOf(from);
-    if(index < 0)
-        return false;
-
-    d->replace(index, to);
-    return true;
-}
-
 void QnResourceCriterionGroup::clear() {
     setCriteria(QnResourceCriterionList());
 }
 
-QnResourceCriterionList QnResourceCriterionGroup::criteria() const {
+const QnResourceCriterionList &QnResourceCriterionGroup::criteria() const {
     assert(targetValue().userType() == qn_criterionListMetaTypeId);
 
-    return targetValue().value<QnResourceCriterionList>();
+    return *static_cast<const QnResourceCriterionList *>(targetValueData());
+}
+
+bool QnResourceCriterionGroup::empty() const {
+    return criteria().empty();
+}
+
+int QnResourceCriterionGroup::size() const {
+    return criteria().size();
 }
 
 void QnResourceCriterionGroup::setCriteria(const QnResourceCriterionList &criteria) {
@@ -334,7 +357,7 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
         return;
 
     /* Reject by default. */
-    addCriterion(new QnResourceCriterion(QVariant(), NOTHING, ID, REJECT, REJECT));
+    addCriterion(QnResourceCriterion(QVariant(), Nothing, NULL, Reject, Reject));
 
     /* Parse pattern string. */
     QRegExp spaces(QLatin1String("[\\s]+"), Qt::CaseSensitive, QRegExp::RegExp2);
@@ -350,8 +373,8 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
         if(c != '\\' && c != '+')
             continue;
 
-        QnResourceCriterionGroup *group = new QnResourceCriterionGroup(NEXT, NEXT);
-        group->setNextOperation(positive ? ACCEPT : REJECT);
+        QnResourceCriterionGroup group = QnResourceCriterionGroup(Next, Next);
+        group.setNextOperation(positive ? Accept : Reject);
 
         QString chunks = normalizedPattern.mid(pos, i - pos);
         pos = i + 1;
@@ -370,18 +393,18 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
             if (pattern.isEmpty())
                 continue;
 
-            Type type = CONTAINMENT;
-            Target target = SEARCH_STRING;
+            Type type = Containment;
+            const char *propertyName = QnResourceProperty::searchString;
             QVariant targetValue = pattern;
             if (key == QLatin1String("id")) {
-                target = ID;
-                type = EQUALITY;
+                propertyName = QnResourceProperty::id;
+                type = Equality;
             } else if (key == QLatin1String("name")) {
-                target = NAME;
+                propertyName = QnResourceProperty::name;
             } else if (key == QLatin1String("tag")) {
-                target = TAGS;
+                propertyName = QnResourceProperty::tags;
             } else if (key == QLatin1String("type")) {
-                target = FLAGS;
+                propertyName = QnResourceProperty::flags;
 
                 if(pattern == "camera") {
                     targetValue = static_cast<int>(QnResource::live);
@@ -393,18 +416,15 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
                     targetValue = 0xFFFFFFFF;
                 }
             } else if (pattern == QLatin1String("live")) {
-                target = FLAGS;
+                propertyName = QnResourceProperty::flags;
                 targetValue = static_cast<int>(QnResource::live);
             }
 
-            group->addCriterion(new QnResourceCriterion(targetValue, type, target, NEXT, REJECT));
+            group.addCriterion(QnResourceCriterion(targetValue, type, propertyName, Next, Reject));
         }
 
-        if(group->criteria().empty()) {
-            delete group;
-        } else {
+        if(!group.criteria().empty())
             addCriterion(group);
-        }
 
         positive = c == '+';
     }

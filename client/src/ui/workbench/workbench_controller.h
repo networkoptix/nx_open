@@ -66,13 +66,6 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    void drop(const QUrl &url, const QPointF &gridPos = QPointF(), bool findAccepted = true);
-    void drop(const QList<QUrl> &urls, const QPointF &gridPos = QPointF(), bool findAccepted = true);
-    void drop(const QString &file, const QPointF &gridPos = QPointF(), bool findAccepted = true);
-    void drop(const QList<QString> &files, const QPointF &gridPos = QPointF(), bool findAccepted = true);
-    void drop(const QnResourcePtr &resource, const QPointF &gridPos = QPointF());
-    void drop(const QnResourceList &resources, const QPointF &gridPos = QPointF());
-
     MotionSelectionInstrument *motionSelectionInstrument() const {
 	    return m_motionSelectionInstrument;
     }
@@ -119,6 +112,7 @@ protected slots:
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
+    void at_motionSelectionProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &region);
 
