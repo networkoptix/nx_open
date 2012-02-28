@@ -196,6 +196,7 @@ QnParamList QnResource::getResourceParamList() const
     
     QnParamList resourceParamList;
 
+    /*
     // 1. read Q_PROPERTY params
     const QMetaObject *mObject = metaObject();
     for (int i = 1; i < mObject->propertyCount(); ++i) { // from 1 to skip `objectName`
@@ -258,6 +259,7 @@ QnParamList QnResource::getResourceParamList() const
         QnParam newParam(paramType, mProperty.read(this));
         resourceParamList.append(newParam);
     }
+    */
 
     // 2. read AppServer params
     if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) 
