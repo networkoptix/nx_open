@@ -37,12 +37,11 @@
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
-#include <ui/mixins/sync_play_mixin.h>
-#include <ui/mixins/render_watch_mixin.h>
+#include <ui/style/skin.h>
+#include <ui/style/globals.h>
 
-#include "ui/style/skin.h"
-#include "ui/style/globals.h"
-
+#include "extensions/workbench_stream_synchronizer.h"
+#include "extensions/workbench_render_watcher.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
@@ -194,8 +193,8 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay() {
 
 void QnWorkbenchDisplay::initSyncPlay() {
     /* Set up syncplay and render watcher. */
-    m_renderWatcher = new QnRenderWatchMixin(this, this);
-    new QnSyncPlayMixin(this, m_renderWatcher, this);
+    m_renderWatcher = new QnWorkbenchRenderWatcher(this, this);
+    new QnWorkbenchStreamSynchronizer(this, m_renderWatcher, this);
 }
 
 void QnWorkbenchDisplay::initWorkbench(QnWorkbench *workbench) {
@@ -405,7 +404,7 @@ QnGridItem *QnWorkbenchDisplay::gridItem() {
     return m_gridItem.data();
 }
 
-QnRenderWatchMixin *QnWorkbenchDisplay::renderWatcher() const {
+QnWorkbenchRenderWatcher *QnWorkbenchDisplay::renderWatcher() const {
     return m_renderWatcher;
 }
 

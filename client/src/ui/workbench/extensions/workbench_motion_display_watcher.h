@@ -1,0 +1,8 @@
+#ifndef QN_WORKBENCH_MOTION_DISPLAY_WATCHER_H
+#define QN_WORKBENCH_MOTION_DISPLAY_WATCHER_H
+
+class QnWorkbenchMotionDisplayWatcher: public 
+
+
+
+#endif // QN_WORKBENCH_MOTION_DISPLAY_WATCHER_H

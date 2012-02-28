@@ -1,5 +1,5 @@
-#ifndef QN_SYNC_PLAY_MIXIN_H
-#define QN_SYNC_PLAY_MIXIN_H
+#ifndef QN_WORKBENCH_STREAM_SYNCHRONIZER_H
+#define QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 
 #include <QObject>
 #include <QWeakPointer>
@@ -9,14 +9,14 @@ class QnCounter;
 class QnWorkbenchDisplay;
 class QnResourceWidget;
 class QnArchiveSyncPlayWrapper;
-class QnRenderWatchMixin;
+class QnWorkbenchRenderWatcher;
 
 class QnAbstractRenderer;
 
-class QnSyncPlayMixin: public QObject {
+class QnWorkbenchStreamSynchronizer: public QObject {
     Q_OBJECT;
 public:
-    QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin *renderWatcher, QObject *parent = NULL);
+    QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent = NULL);
 
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -31,4 +31,4 @@ private:
     QWeakPointer<QnWorkbenchDisplay> m_display;
 };
 
-#endif // QN_SYNC_PLAY_MIXIN_H
+#endif // QN_WORKBENCH_STREAM_SYNCHRONIZER_H

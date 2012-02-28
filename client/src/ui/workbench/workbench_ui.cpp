@@ -49,7 +49,6 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
-#include <ui/mixins/render_watch_mixin.h>
 
 #include <help/qncontext_help.h>
 
@@ -59,6 +58,7 @@
 #include "ui/ui_common.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
+#include "extensions/workbench_render_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_layout.h"
