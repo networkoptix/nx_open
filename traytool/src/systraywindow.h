@@ -98,6 +98,10 @@
 
      bool m_needStartMediaServer;
      bool m_needStartAppServer;
+     bool m_waitingMediaServerStopping;
+     bool m_waitingAppServerStopping;
+     bool m_waitingMediaServerStarted;
+     bool m_waitingAppServerStarted;
  };
 
  #endif

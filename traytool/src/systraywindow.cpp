@@ -10,6 +10,7 @@
 static const QString MEDIA_SERVER_NAME ("VMS Media Server");
 static const QString APP_SERVER_NAME("VMS Application Server");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
+static const int MESSAGE_DURATION = 3 * 1000;
 
 QnSystrayWindow::QnSystrayWindow():
     ui(new Ui::SettingsDialog),
@@ -32,6 +33,11 @@ QnSystrayWindow::QnSystrayWindow():
     m_firstTimeToolTipError = true;
     m_needStartMediaServer = false;
     m_needStartAppServer = false;
+    m_waitingMediaServerStopping = false;
+    m_waitingAppServerStopping = false;
+    m_waitingAppServerStopping = false;
+    m_waitingMediaServerStarted = false;
+    m_waitingAppServerStarted = false;
 
     findServiceInfo();
 
@@ -87,7 +93,7 @@ void QnSystrayWindow::findServiceInfo()
                 break;
         }
         if (m_firstTimeToolTipError) {
-            trayIcon->setToolTip("Insufficient permissions to start/stop services");
+            trayIcon->showMessage("Insufficient permissions to start/stop services", m_detailedErrorText, QSystemTrayIcon::Critical, MESSAGE_DURATION);
             trayIcon->setIcon(m_iconBad);
             m_firstTimeToolTipError = false;
         }
@@ -173,7 +179,7 @@ void QnSystrayWindow::findServiceInfo()
 
  void QnSystrayWindow::messageClicked()
  {
-     QMessageBox::information(0, qApp->applicationName(), m_detailedErrorText);
+     //QMessageBox::information(0, qApp->applicationName(), m_detailedErrorText);
        
  }
 
@@ -182,14 +188,52 @@ void QnSystrayWindow::updateServiceInfo()
     int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, MEDIA_SERVER_NAME,       m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
     int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
 
-    if (m_needStartMediaServer && mediaServerStatus == SERVICE_STOPPED) {
-        m_needStartMediaServer = false;
-        StartService(m_mediaServerHandle, NULL, 0);
+    if (mediaServerStatus == SERVICE_STOPPED)
+    {
+        if (m_needStartMediaServer) 
+        {
+            m_needStartMediaServer = false;
+            StartService(m_mediaServerHandle, NULL, 0);
+        }
+        if (m_waitingMediaServerStopping)
+        {
+            m_waitingMediaServerStopping = false;
+            QString message = MEDIA_SERVER_NAME + QString(" has been stopped");
+            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
+        }
+    }
+    else if (mediaServerStatus == SERVICE_RUNNING)
+    {
+        if (m_waitingMediaServerStarted)
+        {
+            m_waitingMediaServerStarted = false;
+            QString message = MEDIA_SERVER_NAME + QString(" has been started");
+            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
+        }
     }
 
-    if (m_needStartAppServer && appServerStatus == SERVICE_STOPPED) {
-        m_needStartAppServer = false;
-        StartService(m_appServerHandle, NULL, 0);
+    if (appServerStatus == SERVICE_STOPPED) 
+    {
+        if (m_needStartAppServer)
+        {
+            m_needStartAppServer = false;
+            StartService(m_appServerHandle, NULL, 0);
+        }
+        if (m_waitingAppServerStopping)
+        {
+            m_waitingAppServerStopping = false;
+            QString message = APP_SERVER_NAME + QString(" has been stopped");
+            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
+        }
+    }
+    else if (appServerStatus == SERVICE_RUNNING)
+    {
+        if (m_waitingAppServerStarted)
+        {
+            m_waitingAppServerStarted = false;
+            QString message = APP_SERVER_NAME + QString(" has been started");
+            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
+        }
     }
 }
 
@@ -263,31 +307,47 @@ int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString&
 
 void QnSystrayWindow::at_mediaServerStartAction()
 {
-    if (m_mediaServerHandle)
+    if (m_mediaServerHandle) {
         StartService(m_mediaServerHandle, NULL, 0);
-    updateServiceInfo();
+        m_waitingMediaServerStarted = true;
+        updateServiceInfo();
+    }
 }
 
 void QnSystrayWindow::at_mediaServerStopAction()
 {
     SERVICE_STATUS serviceStatus;
-    if (m_mediaServerHandle)
-        ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-    updateServiceInfo();
+    if (m_mediaServerHandle) 
+    {
+        if (QMessageBox::question(0, tr("Systray"), "Media server is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+            m_waitingMediaServerStopping = true;
+            updateServiceInfo();
+        }
+    }
 }
 
 void QnSystrayWindow::at_appServerStartAction()
 {
-    if (m_appServerHandle)
+    if (m_appServerHandle) {
         StartService(m_appServerHandle, NULL, 0);
+        m_waitingAppServerStarted = true;
+    }
 }
 
 void QnSystrayWindow::at_appServerStopAction()
 {
     SERVICE_STATUS serviceStatus;
-    if (m_appServerHandle)
-        ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-    updateServiceInfo();
+    if (m_appServerHandle) 
+    {
+        if (QMessageBox::question(0, tr("Systray"), "Application server is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+            m_waitingAppServerStopping = true;
+            updateServiceInfo();
+        }
+    }
 }
 
  void QnSystrayWindow::createActions()
@@ -453,15 +513,17 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
                 requestStr += tr(" to be restarted. Would you like to restart now?");
                 if (QMessageBox::question(this, tr("Systray"), requestStr, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
                 {
+                    SERVICE_STATUS serviceStatus;
                     if (appServerParamChanged) {
-                        at_appServerStopAction();
+                        ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
                         m_needStartAppServer = true;
 
                     }
                     if (mediaServerParamChanged) {
-                        at_mediaServerStopAction();
+                        ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
                         m_needStartMediaServer = true;
                     }
+                    updateServiceInfo();
                     // restart services
                 }
             }
