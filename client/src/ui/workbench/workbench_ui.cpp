@@ -62,6 +62,7 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_layout.h"
+#include "extensions/workbench_motion_display_watcher.h"
 
 
 Q_DECLARE_METATYPE(VariantAnimator *)
@@ -497,6 +498,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Set up help context processing. */
+    QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display, this);
     connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
@@ -506,8 +508,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_titleOpacityProcessor,    SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
-    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
-    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+    connect(motionDisplayWatcher,       SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
+    connect(motionDisplayWatcher,       SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
     connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(at_helpWidget_showRequested()));
     connect(m_helpWidget,               SIGNAL(hideRequested()),                                                                    this,                           SLOT(at_helpWidget_hideRequested()));
     updateHelpContext();
