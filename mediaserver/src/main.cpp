@@ -310,7 +310,11 @@ int serverMain(int argc, char *argv[])
     QDir dataDirectory;
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
 
-    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
+    QString logFileName = dataLocation + QLatin1String("/log/log_file");
+    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
+    settings.setValue("logFile", logFileName);
+
+    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
     {
         qApp->quit();
 
