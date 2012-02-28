@@ -1330,7 +1330,6 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
         }
     } else if(resource->checkFlags(QnResource::media)) {
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        item->setFlag(QnWorkbenchItem::Pinned, false);
         display()->workbench()->currentLayout()->addItem(item);
         item->adjustGeometry();
     }
