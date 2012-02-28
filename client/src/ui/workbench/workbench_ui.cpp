@@ -311,7 +311,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->addItem(newActionButton(qnAction(Qn::NewLayoutAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
-    titleLayout->addItem(newActionButton(qnAction(Qn::PreferencesAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::SystemSettingsAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::FullscreenAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::ExitAction)));
     m_titleItem->setLayout(titleLayout);
@@ -1063,7 +1063,7 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
 
-    if(focusItem == NULL) {
+    if(focusItem == NULL || dynamic_cast<QnResourceWidget *>(focusItem)) {
         scope = Qn::SceneScope;
     } else if(focusItem == m_helpItem || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
         return; /* Focusing on help widget or title item shouldn't change help context. */
@@ -1078,11 +1078,7 @@ void QnWorkbenchUi::updateHelpContextInternal() {
     QnContextHelp::ContextId context;
     switch(scope) {
     case Qn::TreeScope:
-        if(m_treeWidget->currentTab() == QnResourceTreeWidget::SearchTab) {
-            context = QnContextHelp::ContextId_Search;
-        } else {
-            context = QnContextHelp::ContextId_Tree;
-        }
+        context = QnContextHelp::ContextId_Tree;
         break;
     case Qn::SliderScope:
         context = QnContextHelp::ContextId_Slider;

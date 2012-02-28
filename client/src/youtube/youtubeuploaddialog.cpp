@@ -191,8 +191,8 @@ void YouTubeUploadDialog::authFinished()
     m_youtubeuploader->setParent(progressDialog);
 
     connect(m_youtubeuploader, SIGNAL(uploadProgress(qint64,qint64)), progressDialog, SLOT(uploadProgress(qint64,qint64)), Qt::QueuedConnection);
-    connect(m_youtubeuploader, SIGNAL(uploadFailed(QString,int)), progressDialog, SLOT(uploadFailed(QString,int)));
-    connect(m_youtubeuploader, SIGNAL(uploadFinished()), progressDialog, SLOT(uploadFinished()));
+    connect(m_youtubeuploader, SIGNAL(uploadFailed(QString,int)), progressDialog, SLOT(uploadFailed(QString,int)), Qt::QueuedConnection);
+    connect(m_youtubeuploader, SIGNAL(uploadFinished()), progressDialog, SLOT(uploadFinished()), Qt::QueuedConnection);
 
     progressDialog->open();
 

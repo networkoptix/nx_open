@@ -201,7 +201,19 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemDa
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
 
-    m_layout->removeItem(m_layout->item(itemData.uuid));
+    QnWorkbenchItem *item = m_layout->item(itemData.uuid);
+    if(item == NULL) {
+        /* We can get here in the following situation:
+         * 
+         * Item was removed from layout, then it was removed from resource.
+         * Resource was in another thread, so we have received removal event
+         * outside the update guard. In this case there is nothing to do and we
+         * should just return. */
+        return;
+    }
+
+    m_layout->removeItem(item); /* It is important to remove the item here, not inside the deleteLater callback, as we're under submit guard. */
+    qnDeleteLater(item);
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemData &itemData) {

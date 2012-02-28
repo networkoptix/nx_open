@@ -63,3 +63,6 @@ wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
 
 My Amplifier XE Results*
+
+traytool/src/traytool.pro
+traytool/src/version.h

@@ -198,7 +198,7 @@ YouTubeUploader::YouTubeUploader(QObject *parent)
       m_errorCode(0),
       m_categoryReply(0)
 {
-    m_manager = new QNetworkAccessManager(this);
+    m_manager = new QNetworkAccessManager();
     connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     readCategoryList();
 }

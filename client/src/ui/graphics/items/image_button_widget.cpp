@@ -240,7 +240,7 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
         }
 
         QMenu *menu = m_action->menu();
-        QPoint pos = view->mapFromScene(mapToScene(rect().bottomLeft()));
+        QPoint pos = view->mapToGlobal(view->mapFromScene(mapToScene(rect().bottomLeft())));
 
         menu->exec(pos);
 

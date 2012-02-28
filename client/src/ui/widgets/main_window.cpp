@@ -191,7 +191,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(qnAction(Qn::ExitAction));
     addAction(qnAction(Qn::FullscreenAction));
     addAction(qnAction(Qn::AboutAction));
-    addAction(qnAction(Qn::PreferencesAction));
+    addAction(qnAction(Qn::SystemSettingsAction));
     addAction(qnAction(Qn::OpenFileAction));
     addAction(qnAction(Qn::ConnectionSettingsAction));
     addAction(qnAction(Qn::NewLayoutAction));
@@ -240,7 +240,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewLayoutAction)));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::PreferencesAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::SystemSettingsAction)));
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::ExitAction)));
 

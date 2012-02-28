@@ -204,9 +204,6 @@ private:
 
     /* Dragging-related state. */
 
-    /** Items that are being dragged. */
-    QList<QGraphicsItem *> m_draggedItems;
-
     /** Workbench items that are being dragged. */
     QList<QnWorkbenchItem *> m_draggedWorkbenchItems;
 

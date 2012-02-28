@@ -5,6 +5,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
 #include <ui/common/weak_graphics_item_pointer.h>
+#include <ui/common/weak_pointer.h>
 
 namespace {
     void copyEvent(const QGraphicsSceneMouseEvent *src, QGraphicsSceneMouseEvent *dst) {
@@ -154,6 +155,9 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
     if(!m_isClick)
         return false;
     
+    /* Object may get deleted in click signal handlers, so we have to be careful. */
+    WeakPointer<T> guard(object);
+
     /* Note that qobject_cast is for a reason here. There are no guarantees
      * regarding the widget stored in the supplied event. */
     QGraphicsView *view = NULL;
@@ -174,7 +178,12 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
     m_isClick = false;
     m_isDoubleClick = false;
 
-    dragProcessor()->mouseReleaseEvent(object, event);
+    if(guard) {
+        dragProcessor()->mouseReleaseEvent(object, event);
+    } else {
+        dragProcessor()->reset();
+    }
+
     return false;
 }
 

@@ -2,6 +2,7 @@
 #define QN_DELETE_LATER_H
 
 #include <QObject>
+#include "warnings.h"
 
 #ifdef QN_DELETE_LATER_DEBUG
 #   include <QThread>
@@ -10,6 +11,11 @@
 #endif
 
 inline void qnDeleteLater(QObject *object) {
+    if(object == NULL) {
+        qnNullWarning(object);
+        return;
+    }
+
     QThread *thread = object->thread();
     if(thread == NULL) { 
         return; /* Application is being terminated. It's OK not to delete it. */

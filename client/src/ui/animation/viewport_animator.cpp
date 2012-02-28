@@ -101,6 +101,9 @@ QRectF ViewportAnimator::adjustedToReal(const QRectF &adjustedRect) const {
 }
 
 QRectF ViewportAnimator::realToAdjusted(const QGraphicsView *view, const QRectF &realRect) const {
+    if(view == NULL)
+        return realRect; /* Graphics view was destroyed, cannot adjust. */
+
     MarginsF relativeMargins = SceneUtility::cwiseDiv(m_margins, view->viewport()->size());
 
     /* Calculate size to match real aspect ratio. */
@@ -127,6 +130,9 @@ QRectF ViewportAnimator::realToAdjusted(const QGraphicsView *view, const QRectF 
 }
 
 QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF &adjustedRect) const {
+    if(view == NULL)
+        return adjustedRect; /* Graphics view was destroyed, cannot adjust. */
+
     MarginsF relativeMargins = SceneUtility::cwiseDiv(m_margins, view->viewport()->size());
 
     /* Calculate margins that can be used for expanding adjusted to real rect. 

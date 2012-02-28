@@ -55,7 +55,7 @@ protected slots:
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
-    void at_preferencesAction_triggered();
+    void at_systemSettingsAction_triggered();
     void at_connectionSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_multipleCamerasSettingsAction_triggered();
