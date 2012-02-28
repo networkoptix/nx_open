@@ -18,7 +18,6 @@ sys.path.insert(0, os.path.join('..', 'common'))
 
 from convert import index_dirs, rmtree, instantiate_pro, copy_files, BUILDLIB, platform
 from convert import gen_env_sh
-from convert import convert as convert_common
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
@@ -54,8 +53,6 @@ def gen_version_h():
     print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
-if len(sys.argv) == 2 and sys.argv[1] == '-parents':
-    convert_common()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -77,10 +74,6 @@ if platform() == 'mac':
 
 
 if platform() == 'mac':
-    ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
-    ldpath_release += ':' + os.path.abspath('../common/bin/release')
-
-if platform() == 'mac':
     gen_env_sh('bin/debug/env.sh', ldpath_debug)
     gen_env_sh('bin/release/env.sh', ldpath_release)
 
@@ -90,7 +83,7 @@ index_dirs(('src',), 'src/const.pro', 'src/traytool.pro', exclude_dirs=EXCLUDE_D
 instantiate_pro('src/traytool.pro', {'BUILDLIB' : BUILDLIB})
 
 if platform() == 'win32':
-    os.system('qmake -tp vc -o src/server.vcproj src/traytool.pro')
+    os.system('qmake -tp vc -o src/traytool.vcproj src/traytool.pro')
 elif platform() == 'mac':
     if os.path.exists('src/Makefile.debug'):
         os.unlink('src/Makefile.debug')

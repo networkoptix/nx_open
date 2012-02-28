@@ -1,14 +1,25 @@
 #include <QtGui>
 
- #include "systraywindow.h"
+#include "systraywindow.h"
 #include "ui_settings.h"
+#include "connectiontestingdialog.h"
+
+#include <shlobj.h>
+
+
+static const QString MEDIA_SERVER_NAME ("VMS Media Server");
+static const QString APP_SERVER_NAME("VMS Application Server");
+static const int DEFAULT_APP_SERVER_PORT = 8000;
 
 QnSystrayWindow::QnSystrayWindow():
-    ui(new Ui::SettingsDialog)
+    ui(new Ui::SettingsDialog),
+    m_mServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
+    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME)
 {
     ui->setupUi(this);
 
-    m_iconOK = QIcon(":/images/heart.png");
+    //m_iconOK = QIcon(":/images/powered.png"); //QIcon(":/images/heart.png");
+    m_iconOK = QIcon(":/traytool.ico"); //QIcon(":/images/heart.png");
     m_iconBad = QIcon(":/images/bad.png");
 
     m_mediaServerHandle = 0;
@@ -20,15 +31,10 @@ QnSystrayWindow::QnSystrayWindow():
     m_appServerStopAction = 0;
     m_scManager = 0;
     m_firstTimeToolTipError = true;
-
-
-
-    //createIconGroupBox();
-    //createMessageGroupBox();
+    m_needStartMediaServer = false;
+    m_needStartAppServer = false;
 
     findServiceInfo();
-
-    //iconLabel->setMinimumWidth(durationLabel->sizeHint().width());
 
     createActions();
     createTrayIcon();
@@ -36,19 +42,11 @@ QnSystrayWindow::QnSystrayWindow():
 
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton * )), this, SLOT(buttonClicked(QAbstractButton * )));
 
-    //connect(showMessageButton, SIGNAL(clicked()), this, SLOT(showMessage()));
-    //connect(showIconCheckBox, SIGNAL(toggled(bool)),trayIcon, SLOT(setVisible(bool)));
-    //connect(iconComboBox, SIGNAL(currentIndexChanged(int)),this, SLOT(setIcon(int)));
     connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-    this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    //mainLayout->addWidget(iconGroupBox);
-    //mainLayout->addWidget(messageGroupBox);
-    setLayout(mainLayout);
+    connect(ui->testButton, SIGNAL(clicked()), this, SLOT(onTestButtonClicked()));
 
-    //iconComboBox->setCurrentIndex(1);
     trayIcon->show();
 
     setWindowTitle(tr("VMS settings"));
@@ -107,9 +105,20 @@ void QnSystrayWindow::findServiceInfo()
  {
      //minimizeAction->setEnabled(visible);
      //maximizeAction->setEnabled(!isMaximized());
-     restoreAction->setEnabled(isMaximized() || !visible);
+     settingsAction->setEnabled(isMaximized() || !visible);
      QDialog::setVisible(visible);
  }
+
+ /*
+ void QnSystrayWindow::hideEvent( QHideEvent *event)
+ {
+     if (trayIcon->isVisible()) 
+     {
+         hide();
+         event->ignore();
+     }
+ }
+ */
 
  void QnSystrayWindow::closeEvent(QCloseEvent *event)
  {
@@ -169,96 +178,23 @@ void QnSystrayWindow::findServiceInfo()
        
  }
 
-/*
- void QnSystrayWindow::createIconGroupBox()
- {
-     iconGroupBox = new QGroupBox(tr("Tray Icon"));
-
-     iconLabel = new QLabel("Icon:");
-
-     iconComboBox = new QComboBox;
-     iconComboBox->addItem(QIcon(":/images/bad.png"), tr("Bad"));
-     iconComboBox->addItem(QIcon(":/images/heart.png"), tr("Heart"));
-     iconComboBox->addItem(QIcon(":/images/trash.png"), tr("Trash"));
-
-     showIconCheckBox = new QCheckBox(tr("Show icon"));
-     showIconCheckBox->setChecked(true);
-
-     QHBoxLayout *iconLayout = new QHBoxLayout;
-     iconLayout->addWidget(iconLabel);
-     iconLayout->addWidget(iconComboBox);
-     iconLayout->addStretch();
-     iconLayout->addWidget(showIconCheckBox);
-     iconGroupBox->setLayout(iconLayout);
- }
-
- void QnSystrayWindow::createMessageGroupBox()
- {
-     messageGroupBox = new QGroupBox(tr("Balloon Message"));
-
-     typeLabel = new QLabel(tr("Type:"));
-
-     typeComboBox = new QComboBox;
-     typeComboBox->addItem(tr("None"), QSystemTrayIcon::NoIcon);
-     typeComboBox->addItem(style()->standardIcon(
-             QStyle::SP_MessageBoxInformation), tr("Information"),
-             QSystemTrayIcon::Information);
-     typeComboBox->addItem(style()->standardIcon(
-             QStyle::SP_MessageBoxWarning), tr("Warning"),
-             QSystemTrayIcon::Warning);
-     typeComboBox->addItem(style()->standardIcon(
-             QStyle::SP_MessageBoxCritical), tr("Critical"),
-             QSystemTrayIcon::Critical);
-     typeComboBox->setCurrentIndex(1);
-
-     durationLabel = new QLabel(tr("Duration:"));
-
-     durationSpinBox = new QSpinBox;
-     durationSpinBox->setRange(5, 60);
-     durationSpinBox->setSuffix(" s");
-     durationSpinBox->setValue(15);
-
-     durationWarningLabel = new QLabel(tr("(some systems might ignore this "
-                                          "hint)"));
-     durationWarningLabel->setIndent(10);
-
-     titleLabel = new QLabel(tr("Title:"));
-
-     titleEdit = new QLineEdit(tr("Cannot connect to network"));
-
-     bodyLabel = new QLabel(tr("Body:"));
-
-     bodyEdit = new QTextEdit;
-     bodyEdit->setPlainText(tr("Don't believe me. Honestly, I don't have a "
-                               "clue.\nClick this balloon for details."));
-
-     showMessageButton = new QPushButton(tr("Show Message"));
-     showMessageButton->setDefault(true);
-
-     QGridLayout *messageLayout = new QGridLayout;
-     messageLayout->addWidget(typeLabel, 0, 0);
-     messageLayout->addWidget(typeComboBox, 0, 1, 1, 2);
-     messageLayout->addWidget(durationLabel, 1, 0);
-     messageLayout->addWidget(durationSpinBox, 1, 1);
-     messageLayout->addWidget(durationWarningLabel, 1, 2, 1, 3);
-     messageLayout->addWidget(titleLabel, 2, 0);
-     messageLayout->addWidget(titleEdit, 2, 1, 1, 4);
-     messageLayout->addWidget(bodyLabel, 3, 0);
-     messageLayout->addWidget(bodyEdit, 3, 1, 2, 4);
-     messageLayout->addWidget(showMessageButton, 5, 4);
-     messageLayout->setColumnStretch(3, 1);
-     messageLayout->setRowStretch(4, 1);
-     messageGroupBox->setLayout(messageLayout);
- }
- */
-
 void QnSystrayWindow::updateServiceInfo()
 {
-    updateServiceInfoInternal(m_mediaServerHandle, "VMS Media Server",       m_mediaServerStartAction, m_mediaServerStopAction);
-    updateServiceInfoInternal(m_appServerHandle,   "VMS Application Server", m_appServerStartAction,   m_appServerStopAction);
+    int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, "VMS Media Server",       m_mediaServerStartAction, m_mediaServerStopAction);
+    int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   "VMS Application Server", m_appServerStartAction,   m_appServerStopAction);
+
+    if (m_needStartMediaServer && mediaServerStatus == SERVICE_STOPPED) {
+        m_needStartMediaServer = false;
+        StartService(m_mediaServerHandle, NULL, 0);
+    }
+
+    if (m_needStartAppServer && appServerStatus == SERVICE_STOPPED) {
+        m_needStartAppServer = false;
+        StartService(m_appServerHandle, NULL, 0);
+    }
 }
 
-void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction)
+int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction)
 {
     SERVICE_STATUS serviceStatus;
 
@@ -266,7 +202,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString
     {
         stopAction->setVisible(false);
         startAction->setVisible(false);
-        return;
+        return -1;
     }
 
     QString str;
@@ -321,16 +257,17 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString
             break;
         }
     }
+    return serviceStatus.dwCurrentState;
 }
 
-void QnSystrayWindow::mediaServerStartAction()
+void QnSystrayWindow::at_mediaServerStartAction()
 {
     if (m_mediaServerHandle)
         StartService(m_mediaServerHandle, NULL, 0);
     updateServiceInfo();
 }
 
-void QnSystrayWindow::mediaServerStopAction()
+void QnSystrayWindow::at_mediaServerStopAction()
 {
     SERVICE_STATUS serviceStatus;
     if (m_mediaServerHandle)
@@ -338,13 +275,13 @@ void QnSystrayWindow::mediaServerStopAction()
     updateServiceInfo();
 }
 
-void QnSystrayWindow::appServerStartAction()
+void QnSystrayWindow::at_appServerStartAction()
 {
     if (m_appServerHandle)
         StartService(m_appServerHandle, NULL, 0);
 }
 
-void QnSystrayWindow::appServerStopAction()
+void QnSystrayWindow::at_appServerStopAction()
 {
     SERVICE_STATUS serviceStatus;
     if (m_appServerHandle)
@@ -360,29 +297,32 @@ void QnSystrayWindow::appServerStopAction()
      //maximizeAction = new QAction(tr("Ma&ximize"), this);
      //connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
 
-     restoreAction = new QAction(tr("&Settings"), this);
-     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
+     settingsAction = new QAction(tr("&Settings"), this);
+     connect(settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
+
+     showLogAction = new QAction(tr("&Show log file"), this);
+     connect(showLogAction, SIGNAL(triggered()), this, SLOT(onShowLogAction()));
 
      quitAction = new QAction(tr("&Quit"), this);
      connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
      m_mediaServerStartAction = new QAction(tr("Start VMS MediaServer"), this);
-     connect(m_mediaServerStartAction, SIGNAL(triggered()), this, SLOT(mediaServerStartAction()));
+     connect(m_mediaServerStartAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStartAction()));
 
      m_mediaServerStopAction = new QAction(tr("Stop VMS MediaServer"), this);
-     connect(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(mediaServerStopAction()));
+     connect(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStopAction()));
 
      m_appServerStartAction = new QAction(tr("Start VMS AppServer"), this);
-     connect(m_appServerStartAction, SIGNAL(triggered()), this, SLOT(appServerStartAction()));
+     connect(m_appServerStartAction, SIGNAL(triggered()), this, SLOT(at_appServerStartAction()));
 
      m_appServerStopAction = new QAction(tr("Stop VMS AppServer"), this);
-     connect(m_appServerStopAction, SIGNAL(triggered()), this, SLOT(appServerStopAction()));
+     connect(m_appServerStopAction, SIGNAL(triggered()), this, SLOT(at_appServerStopAction()));
 
      updateServiceInfo();
  }
 
- void QnSystrayWindow::createTrayIcon()
- {
+void QnSystrayWindow::createTrayIcon()
+{
      trayIconMenu = new QMenu(this);
 
      trayIconMenu->addAction(m_mediaServerStartAction);
@@ -391,18 +331,188 @@ void QnSystrayWindow::appServerStopAction()
      trayIconMenu->addAction(m_appServerStopAction);
      trayIconMenu->addSeparator();
 
-     //trayIconMenu->addAction(minimizeAction);
-     trayIconMenu->addAction(restoreAction);
+     trayIconMenu->addAction(settingsAction);
+     trayIconMenu->addAction(showLogAction);
      trayIconMenu->addSeparator();
 
      trayIconMenu->addAction(quitAction);
 
      trayIcon = new QSystemTrayIcon(this);
-     trayIcon->setContextMenu(trayIconMenu);
+     trayIcon->setContextMenu(trayIconMenu);    
      trayIcon->setIcon(m_iconOK);
- }
+}
 
- void QnSystrayWindow::buttonClicked(QAbstractButton * button)
- {
-    int gg = 4;
- }
+QUrl QnSystrayWindow::getAppServerURL() const
+{
+    QUrl appServerUrl;
+    appServerUrl.setScheme("http");
+    appServerUrl.setHost(m_mServerSettings.value("appserverHost").toString());
+    int appServerPort = m_mServerSettings.value("appserverPort").toInt();
+    appServerUrl.setPort(appServerPort != 0 ? appServerPort : DEFAULT_APP_SERVER_PORT);
+    return appServerUrl;
+}
+
+void QnSystrayWindow::setAppServerURL(const QUrl& url)
+{
+    m_mServerSettings.setValue("appserverHost", url.host());
+    m_mServerSettings.setValue("appserverPort", url.port(DEFAULT_APP_SERVER_PORT));
+}
+
+void QnSystrayWindow::onShowLogAction()
+{
+    QString logFileName = m_mServerSettings.value("logFile").toString() + QString(".log");
+    QProcess::execute(QString("notepad ") + logFileName);
+};
+
+void QnSystrayWindow::onSettingsAction()
+{
+    QUrl appServerUrl = getAppServerURL();
+
+    QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
+    urlList.insert(0, appServerUrl.toString());
+    urlList.removeDuplicates();
+    
+    ui->appServerUrlComboBox->clear();
+    foreach(const QString& value, urlList) {
+        ui->appServerUrlComboBox->addItem(value);
+    }
+
+    ui->appServerLogin->setText(m_mServerSettings.value("appserverLogin").toString());
+    ui->appServerPassword->setText(m_mServerSettings.value("appserverPassword").toString());
+    ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
+    ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
+    ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
+
+    showNormal();
+}
+
+bool QnSystrayWindow::isAppServerParamChanged() const
+{
+    return ui->appServerPortLineEdit->text().toInt() != m_appServerSettings.value("port").toInt();
+}
+
+bool QnSystrayWindow::isMediaServerParamChanged() const
+{
+    QUrl savedURL = getAppServerURL();
+    QUrl currentURL(ui->appServerUrlComboBox->currentText());
+    if (savedURL.host() != currentURL.host() || savedURL.port(DEFAULT_APP_SERVER_PORT) != currentURL.port(DEFAULT_APP_SERVER_PORT))
+        return true;
+
+
+    if (ui->appServerLogin->text() != m_mServerSettings.value("appserverLogin").toString())
+        return true;
+
+    if (ui->appServerPassword->text() != m_mServerSettings.value("appserverPassword").toString())
+        return true;
+
+    if (ui->rtspPortLineEdit->text().toInt() != m_mServerSettings.value("rtspPort").toInt())
+        return true;
+
+    if (ui->apiPortLineEdit->text().toInt() != m_mServerSettings.value("apiPort").toInt())
+        return true;
+
+    return false;
+}
+
+void QnSystrayWindow::buttonClicked(QAbstractButton * button)
+{
+    if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Ok)
+    {
+        if (validateData()) 
+        {
+            bool appServerParamChanged = isAppServerParamChanged();
+            bool mediaServerParamChanged = isMediaServerParamChanged();
+            saveData();
+            if (appServerParamChanged || mediaServerParamChanged)
+            {
+                QString requestStr = tr("The changes you made require ");
+                if (appServerParamChanged)
+                    requestStr += APP_SERVER_NAME;
+                if (mediaServerParamChanged) {
+                    if (appServerParamChanged)
+                        requestStr += QString(' ') + tr("and") + QString(' ');
+                    requestStr += MEDIA_SERVER_NAME;
+                }
+
+                requestStr += tr(" to be restarted. Would you like to restart now?");
+                if (QMessageBox::question(this, tr("Systray"), requestStr, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+                {
+                    if (appServerParamChanged) {
+                        at_appServerStopAction();
+                        m_needStartAppServer = true;
+
+                    }
+                    if (mediaServerParamChanged) {
+                        at_mediaServerStopAction();
+                        m_needStartMediaServer = true;
+                    }
+                    // restart services
+                }
+            }
+        }
+    }
+}
+
+bool QnSystrayWindow::checkPort(const QString& text, const QString& message)
+{
+    int port = ui->apiPortLineEdit->text().toInt();
+    if (port < 1 || port > 65535)
+    {
+        QMessageBox::warning(this, tr("Systray"), message);
+        return false;
+    }
+    return true;
+}
+
+bool QnSystrayWindow::validateData()
+{
+    if (!checkPort(ui->appServerPortLineEdit->text(), "Invalid application server port specified."))
+        return false;
+    if (!checkPort(ui->rtspPortLineEdit->text(), "Invalid media server RTSP port specified."))
+        return false;
+    if (!checkPort(ui->apiPortLineEdit->text(), "Invalid media server API port specified."))
+        return false;
+    return true;
+}
+
+void QnSystrayWindow::saveData()
+{
+    m_mServerSettings.setValue("appserverLogin", ui->appServerLogin->text());
+    m_mServerSettings.setValue("appserverPassword",ui->appServerPassword->text());
+    m_mServerSettings.setValue("rtspPort", ui->rtspPortLineEdit->text());
+    m_mServerSettings.setValue("apiPort", ui->apiPortLineEdit->text());
+    m_appServerSettings.setValue("port", ui->appServerPortLineEdit->text());
+
+    QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
+    urlList.insert(0, getAppServerURL().toString());
+    urlList.removeDuplicates();
+    QString rez;
+    foreach(QString str, urlList)
+    {
+        str = str.trimmed();
+        if (!str.isEmpty()) {
+            if (!rez.isEmpty())
+                rez += ';';
+            rez += str;
+        }
+    }
+    m_settings.setValue("appserverUrlHistory", rez);
+    setAppServerURL(ui->appServerUrlComboBox->currentText());
+}
+
+void QnSystrayWindow::onTestButtonClicked()
+{
+    QUrl url = ui->appServerUrlComboBox->currentText();
+    url.setUserName(ui->appServerLogin->text());
+    url.setPassword(ui->appServerPassword->text());
+
+    if (!url.isValid())
+    {
+        QMessageBox::warning(this, tr("Invalid paramters"), tr("You have entered invalid URL."));
+        return;
+    }
+
+    ConnectionTestingDialog dialog(this, url);
+    dialog.setModal(true);
+    dialog.exec();
+}

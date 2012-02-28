@@ -16,7 +16,9 @@ BUILDLIB = %BUILDLIB
 
 include(../../common/contrib/qtsingleapplication/src/qtsingleapplication.pri)
 
-FORMS += settings.ui
+INCLUDEPATH += ../../common/src
+
+FORMS += settings.ui connectiontestingdialog.ui
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
@@ -102,3 +104,10 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
+
+CONFIG(debug, debug|release) {
+  LIBS += -L$$PWD/../../common/bin/debug -lcommon
+}
+CONFIG(release, debug|release) {
+  LIBS += -L$$PWD/../../common/bin/release -lcommon
+}
