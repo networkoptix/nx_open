@@ -125,6 +125,19 @@ void QnResourceDiscoveryManager::run()
     }
 }
 
+void printInLogNetResources(const QnResourceList& resources)
+{
+    foreach(QnResourcePtr res, resources)
+    {
+        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+        if (!netRes)
+            continue;
+
+        cl_log.log(netRes->getHostAddress().toString() + QString(" "), netRes->getName(), cl_logALWAYS);
+    }
+
+}
+
 QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 {
     //bool allow_to_change_ip = true;
@@ -135,8 +148,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     QTime time;
     time.start();
 
-    //====================================
-    //CL_LOG(cl_logDEBUG1) cl_log.log("looking for resources...", cl_logDEBUG1);
+    
+    cl_log.log("looking for resources ===========...", cl_logALWAYS);
 
     QnResourceList resources;
     QnResourceList::iterator it;
@@ -167,6 +180,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         }
     }
 
+
+    //assemble list of existing ip
+    QMap<quint32, int> ipsList;
+
+
     //excluding already existing resources
     it = resources.begin();
     while (it != resources.end())
@@ -179,6 +197,16 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
             if (newNetRes)
             {
+                if (!newNetRes->checkFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
+                {
+                    quint32 ips = newNetRes->getHostAddress().toIPv4Address();
+                    if (ipsList.contains(ips))
+                        ipsList[ips]++;
+                    else
+                        ipsList[ips] = 1;
+                }
+
+
                 QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
                 bool diffAddr = rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress(); //if such network resource is in pool and has diff IP 
                 bool diffNet = !m_netState.isResourceInMachineSubnet(newNetRes->getHostAddress(), newNetRes->getDiscoveryAddr()); // or is diff subnet NET
@@ -197,47 +225,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             ++it; // new resource => shouls keep it
     }
 
-    //qDebug() << resources.size();
-    //assemble list of existing ip
 
-    // from pool
-    QMap<quint32, int> ipsList;
-    foreach (const QnResourcePtr &res, qnResPool->getResourcesWithFlag(QnResource::network))
-    {
-        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
-            continue;
+    cl_log.log("Discovery----: after excluding existing resources we've got ", resources.size(), " new resources:", cl_logALWAYS);
+    printInLogNetResources(resources);
 
-        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
-        if (netRes)
-        {
-            quint32 ips = netRes->getHostAddress().toIPv4Address();
-            if (ipsList.contains(ips))
-                ipsList[ips]++;
-            else
-                ipsList[ips] = 1;
-        }
-    }
+    if (resources.size()==0)
+        return resources;
 
-    // from just found
-    foreach (const QnResourcePtr &res, resources)
-    {
-        //if (qnResPool->hasSuchResouce(res->getUniqueId()))
-        //    continue; // this ip is already taken into account
-
-        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
-            continue;
-
-
-        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
-        if (netRes)
-        {
-            quint32 ips = netRes->getHostAddress().toIPv4Address();
-            if (ipsList.contains(ips))
-                ipsList[ips]++;
-            else
-                ipsList[ips] = 1;
-        }
-    }
 
     // now let's mark conflicting resources( just new )
     // in pool could not be 2 resources with same ip
@@ -251,7 +245,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         {
             quint32 ips = netRes->getHostAddress().toIPv4Address();
             if (ipsList.count(ips) > 0 && ipsList[ips] > 1)
+            {
                 netRes->setNetworkStatus(QnNetworkResource::BadHostAddr);
+                cl_log.log(netRes->getHostAddress().toString() , " conflicting. Has same IP as someone else.", cl_logALWAYS);
+            }
         }
     }
 
@@ -260,6 +257,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     }
 
     //marks all new network resources as badip if: 1) not in the same subnet and not accesible or 2) same subnet and conflicting
+    cl_log.log("Discovery---- Checking if resources are accessible...", cl_logALWAYS);
     check_if_accessible(resources, threads);
 
 
@@ -288,22 +286,25 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
     // readyToGo contains ready to go resources
     // resources contains only new network conflicting resources
-
     // now resources list has only network resources
-    if (resources.size()) {
-        cl_log.log("Found ", resources.size(), " conflicting resources.", cl_logDEBUG1);
-        cl_log.log("Time elapsed: ", time.elapsed(), cl_logDEBUG1);
-    }
+
+    cl_log.log("Discovery---- After check_if_accessible readyToGo List: ", cl_logALWAYS);
+    printInLogNetResources(readyToGo);
+
+    cl_log.log("Discovery---- After check_if_accessible conflicting List: ", cl_logALWAYS);
+    printInLogNetResources(resources);
+    
+
     //======================================
 
     time.restart();
     if (resources.size())
-        cl_log.log("Changing IP addresses... ", cl_logDEBUG1);
+        cl_log.log("Discovery---- Changing IP addresses... ", cl_logDEBUG1);
 
     resovle_conflicts(resources, ipsList.keys(), ip_finished);
 
     if (resources.size())
-        cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+        cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
 
 
@@ -327,6 +328,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         resources.push_back(res);
 
 
+    cl_log.log("Discovery---- After resovle_conflicts - list of non conflicting resource: ", cl_logALWAYS);
+    printInLogNetResources(resources);
+
+
+
     QnResourceList swapList;
     foreach (const QnResourcePtr &res, resources)
     {
@@ -343,8 +349,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     }
 
     resources = swapList;
-    if (resources.size())
-        qDebug() << "Returning " << resources.size() << " resources";
+
+    cl_log.log("Discovery---- After update unknown - list of non conflicting resource: ", cl_logALWAYS);
+    printInLogNetResources(resources);
 
 
     //and now lets correct the ip of already existing resources
@@ -399,8 +406,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             ++it; // nothing to do
     }
 
-
-
+    cl_log.log("Discovery---- Final result: ", cl_logALWAYS);
+    printInLogNetResources(resources);
+    
 
     return resources;
 }
@@ -433,7 +441,11 @@ struct check_if_accessible_STRUCT
         if (!acc)
         {
             resourceNet->addNetworkStatus(QnNetworkResource::BadHostAddr);
-            qDebug() << "Bad addr detected: ip = " << resourceNet->getHostAddress().toString() << "  name = " << resourceNet->getName();
+
+            if (m_isSameSubnet)
+                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logALWAYS);
+            else
+                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logALWAYS);
         }
 
     }
@@ -485,7 +497,7 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
 
         CLSubNetState& subnet = m_netState.getSubNetState(resource->getDiscoveryAddr());
 
-        cl_log.log("Looking for next addr...", cl_logDEBUG1);
+        cl_log.log("Looking for next addr...", cl_logALWAYS);
 
         if (!getNextAvailableAddr(subnet, busy_list))
         {
