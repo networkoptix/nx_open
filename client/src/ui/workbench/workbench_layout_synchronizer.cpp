@@ -71,6 +71,8 @@ void QnWorkbenchLayoutSynchronizer::clearLayout() {
         deinitialize();
 
     m_layout = NULL;
+
+    m_pendingItems.clear();
 }
 
 void QnWorkbenchLayoutSynchronizer::clearResource() {
@@ -104,6 +106,8 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
 
 void QnWorkbenchLayoutSynchronizer::deinitialize() {
     assert(m_layout != NULL && !m_resource.isNull());
+
+    submitPendingItems();
 
     m_update = m_submit = false;
 
@@ -157,9 +161,25 @@ void QnWorkbenchLayoutSynchronizer::submit() {
 void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
     m_submitting = false;
 
+    QnScopedValueRollback<bool> guard(&m_update, false);
+
     foreach(const QUuid &uuid, m_pendingItems) {
-        // TODO
+        QnWorkbenchItem *item = m_layout->item(uuid);
+        if(item == NULL)
+            continue;
+
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+        if(!resource) {
+            qnWarning("Item '%1' has no corresponding resource in the pool.", item->resourceUid());
+            continue;
+        }
+
         QnLayoutItemData itemData;
+        itemData.resource.id = resource->getId();
+        itemData.resource.path = resource->getUrl();
+        itemData.uuid = item->uuid();
+        item->save(itemData);
+
         m_resource->updateItem(itemData.uuid, itemData);
     }
 
@@ -235,6 +255,8 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemDa
         return;
     }
 
+    m_pendingItems.remove(item->uuid());
+
     m_layout->removeItem(item); /* It is important to remove the item here, not inside the deleteLater callback, as we're under submit guard. */
     qnDeleteLater(item);
 }
@@ -280,6 +302,8 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item)
         return;
 
     QnScopedValueRollback<bool> guard(&m_update, false);
+
+    m_pendingItems.remove(item->uuid());
 
     m_resource->removeItem(item->uuid());
 }

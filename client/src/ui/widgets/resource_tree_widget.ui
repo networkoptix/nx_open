@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="resourcesTab">
       <attribute name="title">
@@ -33,7 +33,7 @@
        <item>
         <widget class="QTreeView" name="resourceTreeView">
          <property name="editTriggers">
-          <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+          <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
          </property>
          <property name="dragDropMode">
           <enum>QAbstractItemView::DragDrop</enum>
