@@ -24,6 +24,7 @@ QnSystrayWindow::QnSystrayWindow():
 
     m_mediaServerHandle = 0;
     m_appServerHandle = 0;
+    m_skipTicks = 0;
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
@@ -185,32 +186,13 @@ void QnSystrayWindow::findServiceInfo()
 
 void QnSystrayWindow::updateServiceInfo()
 {
+    if (m_skipTicks > 0) {
+        m_skipTicks--;
+        return;
+    }
+
     int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, MEDIA_SERVER_NAME,       m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
     int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
-
-    if (mediaServerStatus == SERVICE_STOPPED)
-    {
-        if (m_needStartMediaServer) 
-        {
-            m_needStartMediaServer = false;
-            StartService(m_mediaServerHandle, NULL, 0);
-        }
-        if (m_waitingMediaServerStopping)
-        {
-            m_waitingMediaServerStopping = false;
-            QString message = MEDIA_SERVER_NAME + QString(" has been stopped");
-            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
-        }
-    }
-    else if (mediaServerStatus == SERVICE_RUNNING)
-    {
-        if (m_waitingMediaServerStarted)
-        {
-            m_waitingMediaServerStarted = false;
-            QString message = MEDIA_SERVER_NAME + QString(" has been started");
-            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
-        }
-    }
 
     if (appServerStatus == SERVICE_STOPPED) 
     {
@@ -232,6 +214,34 @@ void QnSystrayWindow::updateServiceInfo()
         {
             m_waitingAppServerStarted = false;
             QString message = APP_SERVER_NAME + QString(" has been started");
+            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
+            if (m_waitingMediaServerStarted) {
+                m_skipTicks = 2;
+                return;
+            }
+        }
+    }
+
+    if (mediaServerStatus == SERVICE_STOPPED)
+    {
+        if (m_needStartMediaServer) 
+        {
+            m_needStartMediaServer = false;
+            StartService(m_mediaServerHandle, NULL, 0);
+        }
+        if (m_waitingMediaServerStopping)
+        {
+            m_waitingMediaServerStopping = false;
+            QString message = MEDIA_SERVER_NAME + QString(" has been stopped");
+            trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
+        }
+    }
+    else if (mediaServerStatus == SERVICE_RUNNING)
+    {
+        if (m_waitingMediaServerStarted)
+        {
+            m_waitingMediaServerStarted = false;
+            QString message = MEDIA_SERVER_NAME + QString(" has been started");
             trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
         }
     }
@@ -517,11 +527,12 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
                     if (appServerParamChanged) {
                         ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
                         m_needStartAppServer = true;
-
+                        m_waitingAppServerStarted = true;
                     }
                     if (mediaServerParamChanged) {
                         ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
                         m_needStartMediaServer = true;
+                        m_waitingMediaServerStarted = true;
                     }
                     updateServiceInfo();
                     // restart services

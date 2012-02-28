@@ -102,6 +102,7 @@
      bool m_waitingAppServerStopping;
      bool m_waitingMediaServerStarted;
      bool m_waitingAppServerStarted;
+     int m_skipTicks;
  };
 
  #endif
