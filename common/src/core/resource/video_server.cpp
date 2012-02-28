@@ -45,11 +45,14 @@ QString QnVideoServerResource::getUniqueId() const
 void QnVideoServerResource::setApiUrl(const QString& restUrl)
 {
     QMutexLocker lock(&m_mutex);
-    m_apiUrl = restUrl;
+    if (restUrl != m_apiUrl)
+    {
+        m_apiUrl = restUrl;
 
-    /* We want the video server connection to be deleted in its associated thread, 
-     * no matter where the reference count reached zero. Hence the custom deleter. */
-    m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(restUrl), &qnDeleteLater);
+        /* We want the video server connection to be deleted in its associated thread, 
+         * no matter where the reference count reached zero. Hence the custom deleter. */
+        m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(restUrl), &qnDeleteLater);
+    }
 }
 
 QString QnVideoServerResource::getApiUrl() const
@@ -138,11 +141,29 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
 void QnVideoServerResource::determineOptimalNetIF()
 {
     QMutexLocker lock(&m_mutex);
+    if (m_prevNetAddrList == m_netAddrList)
+        return;
+    m_prevNetAddrList = m_netAddrList;
+    m_primaryIFSelected = false;
+
     for (int i = 0; i < m_netAddrList.size(); ++i)
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
         TestConnectionTask *task = new TestConnectionTask(this, url);
         QThreadPool::globalInstance()->start(task);
+    }
+}
+
+void QnVideoServerResource::updateInner(QnResourcePtr other) 
+{
+    QMutexLocker lock(&m_mutex);
+
+    QnResource::updateInner(other);
+
+    QnVideoServerResourcePtr localOther = other.dynamicCast<QnVideoServerResource>();
+    if(localOther) {
+        m_netAddrList = localOther->m_netAddrList;
+        setApiUrl(localOther->m_apiUrl);
     }
 }
