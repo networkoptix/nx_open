@@ -49,14 +49,15 @@
 
      void buttonClicked(QAbstractButton * button);
      void onSettingsAction();
-     void onShowLogAction();
+     void onShowMediaServerLogAction();
+     void onShowAppServerLogAction();
 
      void onTestButtonClicked();
  private:
      void createActions();
      void createTrayIcon();
 
-     int updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction);
+     int updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
      bool validateData();
      void saveData();
      bool checkPort(const QString& text, const QString& message);
@@ -71,7 +72,8 @@
      QSettings m_mServerSettings;
      QSettings m_appServerSettings;
 
-     QAction *showLogAction;
+     QAction *m_showMediaServerLogAction;
+     QAction *m_showAppLogAction;
      QAction *settingsAction;
      QAction *quitAction;
 

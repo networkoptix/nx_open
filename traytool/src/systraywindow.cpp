@@ -19,7 +19,7 @@ QnSystrayWindow::QnSystrayWindow():
     ui->setupUi(this);
 
     m_iconOK = QIcon(":/traytool.ico"); //QIcon(":/images/heart.png");
-    m_iconBad = QIcon(":/images/bad.png");
+    m_iconBad = QIcon(":/traytool.ico");
 
     m_mediaServerHandle = 0;
     m_appServerHandle = 0;
@@ -179,8 +179,8 @@ void QnSystrayWindow::findServiceInfo()
 
 void QnSystrayWindow::updateServiceInfo()
 {
-    int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, "VMS Media Server",       m_mediaServerStartAction, m_mediaServerStopAction);
-    int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   "VMS Application Server", m_appServerStartAction,   m_appServerStopAction);
+    int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, MEDIA_SERVER_NAME,       m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
+    int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
 
     if (m_needStartMediaServer && mediaServerStatus == SERVICE_STOPPED) {
         m_needStartMediaServer = false;
@@ -193,7 +193,7 @@ void QnSystrayWindow::updateServiceInfo()
     }
 }
 
-int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction)
+int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction)
 {
     SERVICE_STATUS serviceStatus;
 
@@ -201,8 +201,10 @@ int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString&
     {
         stopAction->setVisible(false);
         startAction->setVisible(false);
+        logAction->setVisible(false);
         return -1;
     }
+    logAction->setVisible(true);
 
     QString str;
 
@@ -299,22 +301,25 @@ void QnSystrayWindow::at_appServerStopAction()
      settingsAction = new QAction(tr("&Settings"), this);
      connect(settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
 
-     showLogAction = new QAction(tr("&Show log file"), this);
-     connect(showLogAction, SIGNAL(triggered()), this, SLOT(onShowLogAction()));
+     m_showMediaServerLogAction = new QAction(tr("&Show Media server log"), this);
+     connect(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
+
+     m_showAppLogAction = new QAction(tr("&Show Application server log"), this);
+     connect(m_showAppLogAction, SIGNAL(triggered()), this, SLOT(onShowAppServerLogAction()));
 
      quitAction = new QAction(tr("&Quit"), this);
      connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-     m_mediaServerStartAction = new QAction(tr("Start VMS MediaServer"), this);
+     m_mediaServerStartAction = new QAction(QString(tr("Start ") + MEDIA_SERVER_NAME), this);
      connect(m_mediaServerStartAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStartAction()));
 
-     m_mediaServerStopAction = new QAction(tr("Stop VMS MediaServer"), this);
+     m_mediaServerStopAction = new QAction(QString(tr("Stop ") + MEDIA_SERVER_NAME), this);
      connect(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStopAction()));
 
-     m_appServerStartAction = new QAction(tr("Start VMS AppServer"), this);
+     m_appServerStartAction = new QAction(QString(tr("Start ") + APP_SERVER_NAME), this);
      connect(m_appServerStartAction, SIGNAL(triggered()), this, SLOT(at_appServerStartAction()));
 
-     m_appServerStopAction = new QAction(tr("Stop VMS AppServer"), this);
+     m_appServerStopAction = new QAction(QString(tr("Stop ") + APP_SERVER_NAME), this);
      connect(m_appServerStopAction, SIGNAL(triggered()), this, SLOT(at_appServerStopAction()));
 
      updateServiceInfo();
@@ -331,7 +336,10 @@ void QnSystrayWindow::createTrayIcon()
      trayIconMenu->addSeparator();
 
      trayIconMenu->addAction(settingsAction);
-     trayIconMenu->addAction(showLogAction);
+     trayIconMenu->addSeparator();
+
+     trayIconMenu->addAction(m_showMediaServerLogAction);
+     trayIconMenu->addAction(m_showAppLogAction);
      trayIconMenu->addSeparator();
 
      trayIconMenu->addAction(quitAction);
@@ -357,11 +365,20 @@ void QnSystrayWindow::setAppServerURL(const QUrl& url)
     m_mServerSettings.setValue("appserverPort", url.port(DEFAULT_APP_SERVER_PORT));
 }
 
-void QnSystrayWindow::onShowLogAction()
+void QnSystrayWindow::onShowMediaServerLogAction()
 {
     QString logFileName = m_mServerSettings.value("logFile").toString() + QString(".log");
-    QProcess::execute(QString("notepad ") + logFileName);
+    QProcess::startDetached(QString("notepad ") + logFileName);
 };
+
+void QnSystrayWindow::onShowAppServerLogAction()
+{
+    QString logFileName = m_mServerSettings.value("logFile").toString();
+    logFileName = logFileName.left(logFileName.lastIndexOf(MEDIA_SERVER_NAME));
+    logFileName += APP_SERVER_NAME;
+    logFileName += "\\appserver.log";
+    QProcess::startDetached(QString("notepad ") + logFileName);
+}
 
 void QnSystrayWindow::onSettingsAction()
 {
