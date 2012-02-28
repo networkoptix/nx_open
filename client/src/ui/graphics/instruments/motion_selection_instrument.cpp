@@ -185,7 +185,7 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
 
     QGraphicsView *view = this->view(viewport);
     QnResourceWidget *target = this->item<QnResourceWidget>(view, event->pos());
-    if(target == NULL || !(target->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID))
+    if(target == NULL)
         return false;
 
     m_target = target;
