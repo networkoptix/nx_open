@@ -18,7 +18,6 @@ QnSystrayWindow::QnSystrayWindow():
 {
     ui->setupUi(this);
 
-    //m_iconOK = QIcon(":/images/powered.png"); //QIcon(":/images/heart.png");
     m_iconOK = QIcon(":/traytool.ico"); //QIcon(":/images/heart.png");
     m_iconBad = QIcon(":/images/bad.png");
 
@@ -450,12 +449,15 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
                 }
             }
         }
+        else {
+            QTimer::singleShot(0, this, SLOT(showNormal()));
+        }
     }
 }
 
 bool QnSystrayWindow::checkPort(const QString& text, const QString& message)
 {
-    int port = ui->apiPortLineEdit->text().toInt();
+    int port = text.toInt();
     if (port < 1 || port > 65535)
     {
         QMessageBox::warning(this, tr("Systray"), message);
