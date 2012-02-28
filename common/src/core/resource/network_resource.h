@@ -81,6 +81,7 @@ public:
     // we need to get mac anyway to differentiate one device from another
     virtual bool updateMACAddress() = 0;
 
+    virtual void updateInner(QnResourcePtr other) override;
 
 private:
     QAuthenticator m_auth;

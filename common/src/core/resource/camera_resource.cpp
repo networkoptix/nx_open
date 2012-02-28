@@ -81,3 +81,9 @@ void QnPhysicalCameraResource::debugCheck() const
 
 }
 #endif
+
+void QnVirtualCameraResource::updateInner(QnResourcePtr other)
+{
+    QnNetworkResource::updateInner(other);
+    QnSecurityCamResource::updateInner(other);
+}

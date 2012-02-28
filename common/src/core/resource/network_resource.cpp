@@ -170,6 +170,16 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
     return m_networkTimeout;
 }
 
+void QnNetworkResource::updateInner(QnResourcePtr other)
+{
+    QMutexLocker mutexLocker(&m_mutex);
+    QnResource::updateInner(other);
+    QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
+    if (other_casted)
+    {
+        m_auth = other_casted->m_auth;
+    }
+}
 
 bool QnNetworkResource::conflicting()
 {
