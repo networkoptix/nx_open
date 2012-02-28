@@ -106,6 +106,29 @@ QHostAddress resolveHost(const QString& hostString)
 }
 
 
+QString allLocalAddresses()
+{
+    QString rez;
+
+    // if nothing else works use first enabled hostaddr
+    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+
+    for (int i = 0; i < ipaddrs.size();++i)
+    {
+        QString addr = ipaddrs.at(i).toString();
+        bool isLocalAddress = addr == "localhost" || addr == "127.0.0.1";
+        if (isLocalAddress || !QUdpSocket().bind(ipaddrs.at(i), 0))
+            continue;
+        if (!rez.isEmpty())
+            rez += ';';
+        rez += addr;
+    }
+    if (rez.isEmpty())
+        rez = "127.0.0.1";
+
+    return rez;
+}
+
 QString defaultLocalAddress(const QHostAddress& target)
 {
     {
