@@ -2,6 +2,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "core/resource/video_server.h"
 
 void QnServerCameraProcessor::processResources(const QnResourceList &resources)
 {
@@ -11,6 +12,9 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
     {
         if (!res.dynamicCast<QnServerCamera>())
             res->setStatus(QnResource::Online);
+        QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
+        if (videoServer)
+            videoServer->determineOptimalNetIF();
     }
 }
 

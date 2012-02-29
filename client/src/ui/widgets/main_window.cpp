@@ -259,8 +259,10 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     setLayout(m_globalLayout);
 
     /* Process input files. */
+    QList<QString> files;
     for (int i = 1; i < argc; ++i)
-        m_controller->drop(QFile::decodeName(argv[i]));
+        files.push_back(QFile::decodeName(argv[i]));
+    qnMenu->trigger(Qn::ResourceDropAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
 
     /* Update state. */
     updateDwmState();
@@ -316,7 +318,7 @@ void QnMainWindow::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
-    m_controller->drop(files);
+    qnMenu->trigger(Qn::ResourceDropAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
 }
 
 void QnMainWindow::updateFullScreenState() 

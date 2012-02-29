@@ -33,6 +33,10 @@ namespace Qn {
          */
         OpenSingleLayoutAction,
 
+        /**
+         * Drops provided resources on the current layout.
+         */ 
+        ResourceDropAction,
 
 
         /* Main menu actions. */

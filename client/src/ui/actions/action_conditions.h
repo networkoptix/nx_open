@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
+#include <core/resourcemanagment/resource_criterion.h>
 #include "action_fwd.h"
 
-class QnResourceCriterion;
 
 class QnActionCondition: public QObject {
 public:
@@ -52,7 +52,7 @@ public:
         AllMatch,   /**< Match only if all resources satisfy the criterion. */
     };
 
-    QnResourceActionCondition(MatchMode matchMode, QnResourceCriterion *criterion, QObject *parent = NULL);
+    QnResourceActionCondition(MatchMode matchMode, const QnResourceCriterion &criterion, QObject *parent = NULL);
 
     virtual ~QnResourceActionCondition();
 
@@ -70,7 +70,7 @@ protected:
 
 private:
     MatchMode m_matchMode;
-    QScopedPointer<QnResourceCriterion> m_criterion;
+    QnResourceCriterion m_criterion;
 };
 
 

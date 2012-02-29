@@ -101,6 +101,13 @@ void parseServers(QList<T> &servers, const PbServerList& pb_servers)
         server->setGuid(pb_server.guid().c_str());
         server->setApiUrl(pb_server.apiurl().c_str());
 
+        if (pb_server.has_netaddrlist())
+        {
+            QList<QHostAddress> netAddrList;
+            deserializeNetAddrList(netAddrList, pb_server.netaddrlist().c_str());
+            server->setNetAddrList(netAddrList);
+        }
+
         if (pb_server.storage_size() > 0)
         {
             QnStorageResourceList storages;
@@ -456,6 +463,24 @@ void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& came
     data = QByteArray(str.data(), str.length());
 }
 
+QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
+{
+    QStringList addListStrings;
+    std::transform(netAddrList.begin(), netAddrList.end(), std::back_inserter(addListStrings), std::mem_fun_ref(&QHostAddress::toString));
+    return addListStrings.join(";");
+}
+
+QHostAddress stringToAddr(const QString& hostStr)
+{
+    return QHostAddress(hostStr);
+}
+
+void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString)
+{
+    QStringList addListStrings = netAddrListString.split(";");
+    std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), stringToAddr);
+}
+
 void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPtr, QByteArray& data)
 {
     proto::pb::Servers pb_servers;
@@ -467,6 +492,9 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     pb_server.set_url(serverPtr->getUrl().toStdString());
     pb_server.set_guid(serverPtr->getGuid().toStdString());
     pb_server.set_apiurl(serverPtr->getApiUrl().toStdString());
+
+    if (!serverPtr->getNetAddrList().isEmpty())
+        pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toStdString());
 
     if (!serverPtr->getStorages().isEmpty()) {
         foreach (const QnStorageResourcePtr& storagePtr, serverPtr->getStorages()) {

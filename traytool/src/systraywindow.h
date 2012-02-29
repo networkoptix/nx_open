@@ -39,44 +39,42 @@
      void showMessage();
      void messageClicked();
 
-     void mediaServerStartAction();
-     void mediaServerStopAction();
-     void appServerStartAction();
-     void appServerStopAction();
+     void at_mediaServerStartAction();
+     void at_mediaServerStopAction();
+     void at_appServerStartAction();
+     void at_appServerStopAction();
+
      void findServiceInfo();
      void updateServiceInfo();
 
      void buttonClicked(QAbstractButton * button);
+     void onSettingsAction();
+     void onShowMediaServerLogAction();
+     void onShowAppServerLogAction();
+
+     void onTestButtonClicked();
  private:
-     //void createIconGroupBox();
-     //void createMessageGroupBox();
      void createActions();
      void createTrayIcon();
 
-     void updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction);
-
-     //QGroupBox *iconGroupBox;
-     //QLabel *iconLabel;
-     //QComboBox *iconComboBox;
-     //QCheckBox *showIconCheckBox;
-
-     //QGroupBox *messageGroupBox;
-     //QLabel *typeLabel;
-     //QLabel *durationLabel;
-     //QLabel *durationWarningLabel;
-     //QLabel *titleLabel;
-     //QLabel *bodyLabel;
-     //QComboBox *typeComboBox;
-     //QSpinBox *durationSpinBox;
-     //QLineEdit *titleEdit;
-     //QTextEdit *bodyEdit;
-     //QPushButton *showMessageButton;
+     int updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
+     bool validateData();
+     void saveData();
+     bool checkPort(const QString& text, const QString& message);
+     QUrl getAppServerURL() const;
+     void setAppServerURL(const QUrl& url);
+     bool isAppServerParamChanged() const;
+     bool isMediaServerParamChanged() const;
 
      QScopedPointer<Ui::SettingsDialog> ui;
 
-     //QAction *minimizeAction;
-     //QAction *maximizeAction;
-     QAction *restoreAction;
+     QSettings m_settings;
+     QSettings m_mServerSettings;
+     QSettings m_appServerSettings;
+
+     QAction *m_showMediaServerLogAction;
+     QAction *m_showAppLogAction;
+     QAction *settingsAction;
      QAction *quitAction;
 
      QSystemTrayIcon *trayIcon;
@@ -97,6 +95,14 @@
      bool m_firstTimeToolTipError;
      QTimer m_findServices;
      QTimer m_updateServiceStatus;
+
+     bool m_needStartMediaServer;
+     bool m_needStartAppServer;
+     bool m_waitingMediaServerStopping;
+     bool m_waitingAppServerStopping;
+     bool m_waitingMediaServerStarted;
+     bool m_waitingAppServerStarted;
+     int m_skipTicks;
  };
 
  #endif

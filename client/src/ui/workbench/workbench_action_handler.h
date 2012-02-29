@@ -41,6 +41,7 @@ protected:
 
     QString newLayoutName() const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
+    void addToWorkbench(const QnResourceList &resources) const;
     void addToWorkbench(const QList<QString> &files) const;
 
 protected slots:
@@ -51,7 +52,8 @@ protected slots:
     void at_newLayoutAction_triggered();
     void at_openSingleLayoutAction_triggered();
     void at_closeLayoutAction_triggered();
-
+    
+    void at_resourceDropAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
