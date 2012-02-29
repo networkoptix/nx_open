@@ -26,7 +26,8 @@ QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *
     m_resource(resource),
     m_update(false),
     m_submit(false),
-    m_autoDeleting(false)
+    m_autoDeleting(false),
+    m_submitting(false)
 {
     if(layout == NULL) {
         qnNullWarning(layout);
@@ -70,6 +71,8 @@ void QnWorkbenchLayoutSynchronizer::clearLayout() {
         deinitialize();
 
     m_layout = NULL;
+
+    m_pendingItems.clear();
 }
 
 void QnWorkbenchLayoutSynchronizer::clearResource() {
@@ -103,6 +106,8 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
 
 void QnWorkbenchLayoutSynchronizer::deinitialize() {
     assert(m_layout != NULL && !m_resource.isNull());
+
+    submitPendingItems();
 
     m_update = m_submit = false;
 
@@ -147,8 +152,46 @@ void QnWorkbenchLayoutSynchronizer::submit() {
     if(!m_submit)
         return;
 
+    m_submitting = false;
+    m_pendingItems.clear();
     QnScopedValueRollback<bool> guard(&m_update, false);
     m_layout->save(m_resource);
+}
+
+void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
+    m_submitting = false;
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+
+    foreach(const QUuid &uuid, m_pendingItems) {
+        QnWorkbenchItem *item = m_layout->item(uuid);
+        if(item == NULL)
+            continue;
+
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+        if(!resource) {
+            qnWarning("Item '%1' has no corresponding resource in the pool.", item->resourceUid());
+            continue;
+        }
+
+        QnLayoutItemData itemData;
+        itemData.resource.id = resource->getId();
+        itemData.resource.path = resource->getUrl();
+        itemData.uuid = item->uuid();
+        item->save(itemData);
+
+        m_resource->updateItem(itemData.uuid, itemData);
+    }
+
+    m_pendingItems.clear();
+}
+
+void QnWorkbenchLayoutSynchronizer::submitPendingItemsLater() {
+    if(m_submitting)
+        return;
+
+    m_submitting = true;
+    QMetaObject::invokeMethod(this, "submitPendingItems", Qt::QueuedConnection);
 }
 
 
@@ -212,6 +255,8 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemDa
         return;
     }
 
+    m_pendingItems.remove(item->uuid());
+
     m_layout->removeItem(item); /* It is important to remove the item here, not inside the deleteLater callback, as we're under submit guard. */
     qnDeleteLater(item);
 }
@@ -225,10 +270,10 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemDa
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
-    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
-    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
-    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
-    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagsChanged()));
+    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_changed()));
+    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_changed()));
+    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_changed()));
+    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagChanged(QnWorkbenchItem::ItemFlag, bool)));
 
     if(!m_submit)
         return;
@@ -258,6 +303,8 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item)
 
     QnScopedValueRollback<bool> guard(&m_update, false);
 
+    m_pendingItems.remove(item->uuid());
+
     m_resource->removeItem(item->uuid());
 }
 
@@ -273,39 +320,26 @@ void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed() {
     clearLayout();
 }
 
-void QnWorkbenchLayoutSynchronizer::at_item_geometryChanged() {
+void QnWorkbenchLayoutSynchronizer::at_item_changed() {
     if(!m_submit)
         return;
 
     QnScopedValueRollback<bool> guard(&m_update, false);
     QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
-    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
-    itemData.combinedGeometry = item->combinedGeometry();
-    m_resource->updateItem(item->uuid(), itemData);
+    m_pendingItems.insert(item->uuid());
+    submitPendingItemsLater();
 }
 
-void QnWorkbenchLayoutSynchronizer::at_item_geometryDeltaChanged() {
-    at_item_geometryChanged();
-}
-
-void QnWorkbenchLayoutSynchronizer::at_item_flagsChanged() {
+void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value) {
     if(!m_submit)
         return;
 
     QnScopedValueRollback<bool> guard(&m_update, false);
     QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
-    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
-    itemData.flags = item->flags();
-    m_resource->updateItem(item->uuid(), itemData);
+    if(item->checkFlag(flag) != value)
+        return; /* Somebody has already changed it back. */
+
+    m_pendingItems.insert(item->uuid());
+    submitPendingItemsLater();
 }
 
-void QnWorkbenchLayoutSynchronizer::at_item_rotationChanged() {
-    if(!m_submit)
-        return;
-
-    QnScopedValueRollback<bool> guard(&m_update, false);
-    QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
-    QnLayoutItemData itemData = m_resource->getItem(item->uuid());
-    itemData.rotation = item->rotation();
-    m_resource->updateItem(item->uuid(), itemData);
-}

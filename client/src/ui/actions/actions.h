@@ -49,7 +49,7 @@ namespace Qn {
         /**
          * Opens a new tab (layout).
          */
-        NewLayoutAction,
+        OpenNewLayoutAction,
 
         /**
          * Submenu for 'open' commands.
@@ -171,7 +171,10 @@ namespace Qn {
          */
         NewUserAction,
 
-
+        /**
+         * Opens a layout creation dialog.
+         */
+        NewLayoutAction,
 
 
 #if 0

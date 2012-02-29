@@ -49,7 +49,6 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
-#include <ui/mixins/render_watch_mixin.h>
 
 #include <help/qncontext_help.h>
 
@@ -59,9 +58,11 @@
 #include "ui/ui_common.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
+#include "extensions/workbench_render_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_layout.h"
+#include "extensions/workbench_motion_display_watcher.h"
 
 
 Q_DECLARE_METATYPE(VariantAnimator *)
@@ -308,7 +309,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(qnAction(Qn::NewLayoutAction)));
+    titleLayout->addItem(newActionButton(qnAction(Qn::OpenNewLayoutAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     titleLayout->addItem(newActionButton(qnAction(Qn::SystemSettingsAction)));
@@ -497,6 +498,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Set up help context processing. */
+    QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display, this);
     connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
@@ -506,8 +508,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_titleOpacityProcessor,    SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
-    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
-    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(updateHelpContext()), Qt::QueuedConnection);
+    connect(motionDisplayWatcher,       SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
+    connect(motionDisplayWatcher,       SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
     connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(at_helpWidget_showRequested()));
     connect(m_helpWidget,               SIGNAL(hideRequested()),                                                                    this,                           SLOT(at_helpWidget_hideRequested()));
     updateHelpContext();
@@ -1328,7 +1330,6 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
         }
     } else if(resource->checkFlags(QnResource::media)) {
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        item->setFlag(QnWorkbenchItem::Pinned, false);
         display()->workbench()->currentLayout()->addItem(item);
         item->adjustGeometry();
     }

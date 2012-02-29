@@ -24,7 +24,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         cameraResource->setParentId(m_serverId);
     }
 
-    QnResourcePool::instance()->addResources(resources);
+    //QnResourcePool::instance()->addResources(resources);
 
     // we've got two loops to avoid double call of double sending addCamera
 
@@ -34,13 +34,18 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
-        resource->setStatus(QnResource::Online); // camera MUST be in the pool already;
+        // previous comment: camera MUST be in the pool already;
+        // but now (new version) camera NOT in resource pool!
+        resource->setStatus(QnResource::Online, true); // set status in silence mode. Do not send any signals e.t.c
 
         QByteArray errorString;
         if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
         {
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
+            continue;
         }
+        // cameras contains updated resource with all fields
+        QnResourcePool::instance()->addResource(cameras.first());
 
         qDebug() << "Connecting resource: " << resource->getName();
         QObject::disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),

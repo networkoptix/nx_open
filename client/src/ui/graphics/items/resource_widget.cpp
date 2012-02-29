@@ -142,10 +142,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     
     /* Set up overlay icons. */
     m_channelState.resize(m_channelCount);
-
-    /* Start displaying. This must be the last line in the constructor. */
-    //m_display->start();
-
 }
 
 
@@ -435,6 +431,9 @@ void QnResourceWidget::clearMotionSelection()
 }
 
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
+    if(m_displayFlags == flags)
+        return;
+
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
@@ -446,7 +445,10 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
 
     if(changedFlags & DISPLAY_BUTTONS)
         m_buttonsWidget->setVisible(flags & DISPLAY_BUTTONS);
+
+    emit displayFlagsChanged();
 }
+
 
 // -------------------------------------------------------------------------- //
 // Shadow

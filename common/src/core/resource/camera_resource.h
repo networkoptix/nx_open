@@ -10,6 +10,8 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
 
 public:
     QnVirtualCameraResource() {}
+
+    virtual void updateInner(QnResourcePtr other) override;
 };
 
 

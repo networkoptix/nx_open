@@ -551,8 +551,6 @@ public:
         //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
         //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
-        QnScheduleTaskList scheduleTasks;
-
         errorString.clear();
         QnVirtualCameraResourceList cameras;
         while (appServerConnection->getCameras(cameras, videoServer->getId(), errorString) != 0)
@@ -569,9 +567,11 @@ public:
 
             qnResPool->addResource(camera);
 
-            QnRecordingManager::instance()->updateCamera(camera);
+            //QnRecordingManager::instance()->updateCamera(camera);
         }
 
+        /*
+        QnScheduleTaskList scheduleTasks;
         foreach (const QnScheduleTask &scheduleTask, scheduleTasks)
         {
             QString str;
@@ -589,6 +589,7 @@ public:
                    << scheduleTask.getResourceId().toString();
             cl_log.log(str, cl_logALWAYS);
         }
+        */
 
         QnResourceDiscoveryManager::instance().start();
 

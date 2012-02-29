@@ -1,4 +1,4 @@
-#include "render_watch_mixin.h"
+#include "workbench_render_watcher.h"
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/resource_widget.h>
@@ -8,7 +8,7 @@
 #include <camera/abstractrenderer.h>
 #include <utils/common/warnings.h>
 
-QnRenderWatchMixin::QnRenderWatchMixin(QnWorkbenchDisplay *display, QObject *parent):
+QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent) 
 {
     if(display == NULL) {
@@ -33,11 +33,11 @@ QnRenderWatchMixin::QnRenderWatchMixin(QnWorkbenchDisplay *display, QObject *par
     connect(afterDisplayInstrument,  SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(finishDisplay()));
 }
 
-QnRenderWatchMixin::QnRenderWatchMixin(QObject *parent): 
+QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent): 
     QObject(parent)
 {}
 
-void QnRenderWatchMixin::registerRenderer(QnAbstractRenderer *renderer, QObject *lifetime) {
+void QnWorkbenchRenderWatcher::registerRenderer(QnAbstractRenderer *renderer, QObject *lifetime) {
     if(renderer == NULL) {
         qnNullWarning(renderer);
         return;
@@ -59,7 +59,7 @@ void QnRenderWatchMixin::registerRenderer(QnAbstractRenderer *renderer, QObject 
     connect(lifetime, SIGNAL(destroyed()), this, SLOT(at_lifetime_destroyed()));
 }
 
-void QnRenderWatchMixin::unregisterRenderer(QnAbstractRenderer *renderer) {
+void QnWorkbenchRenderWatcher::unregisterRenderer(QnAbstractRenderer *renderer) {
     if(renderer == NULL) {
         qnNullWarning(renderer);
         return;
@@ -75,16 +75,16 @@ void QnRenderWatchMixin::unregisterRenderer(QnAbstractRenderer *renderer) {
     m_infoByRenderer.remove(renderer);
 }
 
-void QnRenderWatchMixin::at_lifetime_destroyed() {
+void QnWorkbenchRenderWatcher::at_lifetime_destroyed() {
     unregisterRenderer(m_rendererByLifetime[sender()]);
 }
 
-void QnRenderWatchMixin::startDisplay() {
+void QnWorkbenchRenderWatcher::startDisplay() {
     for(QHash<QnAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++)
         pos->displayCounter = pos.key()->displayCounter();
 }
 
-void QnRenderWatchMixin::finishDisplay() {
+void QnWorkbenchRenderWatcher::finishDisplay() {
     for(QHash<QnAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++) {
         bool displayed = pos->displayCounter != pos.key()->displayCounter();
 
@@ -100,14 +100,14 @@ void QnRenderWatchMixin::finishDisplay() {
     }
 }
 
-void QnRenderWatchMixin::at_display_widgetAdded(QnResourceWidget *widget) {
+void QnWorkbenchRenderWatcher::at_display_widgetAdded(QnResourceWidget *widget) {
     if(widget->renderer() == NULL) 
         return;
 
     registerRenderer(widget->renderer(), widget->renderer());
 }
 
-void QnRenderWatchMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
+void QnWorkbenchRenderWatcher::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     if(widget->renderer() == NULL) 
         return;
 

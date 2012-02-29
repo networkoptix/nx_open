@@ -2,7 +2,9 @@
 #define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 
 #include <QObject>
+#include <QSet>
 #include <core/resource/resource_fwd.h>
+#include <ui/workbench/workbench_item.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -42,6 +44,8 @@ public:
 public slots:
     void update();
     void submit();
+    void submitPendingItems();
+    void submitPendingItemsLater();
     void autoDeleteLater();
 
 protected:
@@ -65,10 +69,8 @@ protected slots:
     void at_layout_nameChanged();
     void at_layout_aboutToBeDestroyed();
 
-    void at_item_geometryChanged();
-    void at_item_geometryDeltaChanged();
-    void at_item_flagsChanged();
-    void at_item_rotationChanged();
+    void at_item_changed();
+    void at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value);
 
 private:
     /** Whether this synchronizer is functional. */
@@ -88,6 +90,12 @@ private:
 
     /** Whether this layout synchronizer should delete itself once it is not functional anymore. */
     bool m_autoDeleting;
+
+    /** Whether queued submit is in progress. */
+    bool m_submitting;
+
+    /** Deferred submit queue. */
+    QSet<QUuid> m_pendingItems;
 };
 
 #endif // QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
