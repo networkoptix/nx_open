@@ -182,7 +182,6 @@ void QnPlDlinkResource::init()
 {
 
     CLHttpStatus status;
-
     QByteArray cam_info_file = downloadFile(status, "config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -195,9 +194,6 @@ void QnPlDlinkResource::init()
     if (cam_info_file.size()==0)
         return;
 
-
-    setMotionMaskPhysical(0);
-    
 
     QMutexLocker mutexLocker(&m_mutex);
 
@@ -410,4 +406,8 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
         return;
     }
 
+}
+bool QnPlDlinkResource::hasDualStreaming() const
+{
+    return false;
 }
