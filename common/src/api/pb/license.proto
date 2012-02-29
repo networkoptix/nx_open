@@ -1,0 +1,12 @@
+package proto.pb;
+
+message License {
+    required string name        = 1;
+    required string key         = 2;
+    required int32  cameraCount = 3;
+    required string signature   = 4;
+}
+
+message Licenses {
+    repeated License license = 1;
+}

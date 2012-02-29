@@ -3,6 +3,7 @@
 #include "user.pb.h"
 #include "resource.pb.h"
 #include "resourceType.pb.h"
+#include "license.pb.h"
 
 #include "api/QStdIStream.h"
 
@@ -460,6 +461,24 @@ void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& came
 
     std::string str;
     pb_cameras.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeLicenses(const QnLicenseList& licenses, QByteAray& data)
+{
+    proto::pb::Licenses pb_licenses;
+
+    foreach(QnLicensePtr license, licenses)
+    {
+        proto::pb::License& pb_license = *(pb_licenses.add_license());
+        pb_license.set_name(license->getName().toStdString());
+        pb_license.set_key(license->getKey().toStdString());
+        pb_license.set_cameracount(license->getCameraCount());
+        pb_license.set_signature(license->getSignature().toStdString());
+    }
+
+    std::string str;
+    pb_licenses.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 

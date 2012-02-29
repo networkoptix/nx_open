@@ -20,6 +20,7 @@ public:
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data);
     void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data);
+    void serializeLicenses(const QnLicenseList& licenses, QByteAray& data);
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data);
     void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data);
