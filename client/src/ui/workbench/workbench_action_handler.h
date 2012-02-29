@@ -49,6 +49,7 @@ protected slots:
     void at_workbench_layoutsChanged();
     void at_synchronizer_destroyed();
 
+    void at_openLayoutAction_triggered();
     void at_openNewLayoutAction_triggered();
     void at_openSingleLayoutAction_triggered();
     void at_closeLayoutAction_triggered();

@@ -309,6 +309,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Resource actions. */
 
+    factory(Qn::OpenLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Open Layout")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
@@ -485,6 +490,12 @@ void QnActionManager::trigger(Qn::ActionId id, const QVariant &items) {
     }
 }
 
+void QnActionManager::trigger(Qn::ActionId id, const QnResourcePtr &resource) {
+    QnResourceList resources;
+    resources.push_back(resource);
+    trigger(id, resources);
+}
+
 void QnActionManager::trigger(Qn::ActionId id, const QnResourceList &resources) {
     triggerInternal(id, QVariant::fromValue(resources));
 }
@@ -541,6 +552,11 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items) {
     QnAction *action = m_actionById.value(id);
     if(action == NULL) {
         qnWarning("Invalid action id '%1'.", static_cast<int>(id));
+        return;
+    }
+
+    if(!action->satisfiesCondition(action->scope(), items)) {
+        qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
         return;
     }
 

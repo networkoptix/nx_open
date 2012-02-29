@@ -129,6 +129,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(qnAction(Qn::OpenFolderAction),                 SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
+    connect(qnAction(Qn::OpenLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(qnAction(Qn::OpenNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(qnAction(Qn::OpenSingleLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_openSingleLayoutAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
@@ -165,7 +166,7 @@ QString QnWorkbenchActionHandler::newLayoutName() const {
         foreach(const QnLayoutResourcePtr &resource, m_synchronizer->user()->getLayouts())
             layoutNames.push_back(resource->getName());
     } else {
-        foreach(QnWorkbenchLayout *layout, m_workbench->layouts())
+        foreach(QnWorkbenchLayout *layout, workbench()->layouts())
             layoutNames.push_back(layout->name());
     }
 
@@ -196,7 +197,7 @@ void QnWorkbenchActionHandler::addToWorkbench(const QnResourceList &resources) c
 
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
         item->setFlag(QnWorkbenchItem::PendingGeometryAdjustment);
-        m_workbench->currentLayout()->addItem(item);
+        workbench()->currentLayout()->addItem(item);
     }
 }
 
@@ -214,7 +215,7 @@ void QnWorkbenchActionHandler::at_workbench_aboutToBeDestroyed() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
-    if(!m_workbench->layouts().empty())
+    if(!workbench()->layouts().empty())
         return;
 
     qnAction(Qn::OpenSingleLayoutAction)->trigger();
@@ -224,12 +225,25 @@ void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
     setSynchronizer(NULL);
 }
 
+void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
+    QnLayoutResourcePtr resource = qnMenu->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
+    if(!resource)
+        return;
+
+    QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(resource);
+    if(layout == NULL) {
+        layout = new QnWorkbenchLayout(resource, workbench());
+        workbench()->addLayout(layout);
+    }
+    workbench()->setCurrentLayout(layout);
+}
+
 void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
     layout->setName(newLayoutName());
 
-    m_workbench->addLayout(layout);
-    m_workbench->setCurrentLayout(m_workbench->layouts().back());
+    workbench()->addLayout(layout);
+    workbench()->setCurrentLayout(workbench()->layouts().back());
 }
 
 void QnWorkbenchActionHandler::at_openSingleLayoutAction_triggered() {
@@ -241,8 +255,8 @@ void QnWorkbenchActionHandler::at_openSingleLayoutAction_triggered() {
     } else {
         /* Open the last layout from the user's layouts list. */
         qSort(resources.begin(), resources.end(), LayoutIdCmp());
-        m_workbench->addLayout(new QnWorkbenchLayout(resources.back(), this));
-        m_workbench->setCurrentLayout(m_workbench->layouts().back());
+        workbench()->addLayout(new QnWorkbenchLayout(resources.back(), this));
+        workbench()->setCurrentLayout(workbench()->layouts().back());
     }
 }
 
@@ -461,7 +475,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     /* If appserver is not running, we may get removal requests without layout resource. */
     if(!orphanedUuids.isEmpty()) {
         QList<QnWorkbenchLayout *> layouts;
-        layouts.push_front(m_workbench->currentLayout());
+        layouts.push_front(workbench()->currentLayout());
         foreach(const QUuid &uuid, orphanedUuids) {
             foreach(QnWorkbenchLayout *layout, layouts) {
                 if(QnWorkbenchItem *item = layout->item(uuid)) {

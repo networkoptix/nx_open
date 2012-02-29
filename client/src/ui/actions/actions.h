@@ -29,7 +29,6 @@ namespace Qn {
 
         /**
          * Opens some existing layout if there exists one, creates a new one otherwise.
-         * This action is executed every time the last layout on a workbench is closed.
          */
         OpenSingleLayoutAction,
 
@@ -48,6 +47,7 @@ namespace Qn {
 
         /**
          * Opens a new tab (layout).
+         * This action is executed every time the last layout on a workbench is closed.
          */
         OpenNewLayoutAction,
 
@@ -103,6 +103,11 @@ namespace Qn {
 
 
         /* Resource actions. */
+
+        /**
+         * Opens selected layout.
+         */
+        OpenLayoutAction,
 
         /**
          * Shows motion search grid on an item.

@@ -34,6 +34,8 @@ public:
 
     void trigger(Qn::ActionId id, const QVariant &items);
 
+    void trigger(Qn::ActionId id, const QnResourcePtr &resource);
+
     void trigger(Qn::ActionId id, const QnResourceList &resources);
 
     void trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items);

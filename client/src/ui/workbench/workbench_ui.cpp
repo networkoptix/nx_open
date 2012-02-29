@@ -1318,16 +1318,7 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
         return;
 
     if(resource->checkFlags(QnResource::layout)) {
-        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-        if(layoutResource) {
-            QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
-            if(layout == NULL) {
-                layout = new QnWorkbenchLayout(layoutResource, workbench());
-                workbench()->addLayout(layout);
-            }
-
-            workbench()->setCurrentLayout(layout);
-        }
+        qnMenu->trigger(Qn::OpenLayoutAction, resource);
     } else if(resource->checkFlags(QnResource::media)) {
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
         display()->workbench()->currentLayout()->addItem(item);
