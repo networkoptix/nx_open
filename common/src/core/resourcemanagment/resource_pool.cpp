@@ -89,7 +89,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         {
             // new resource 
             m_resources[uniqueId] = resource;
-            m_resourceTree[resource->getParentId()].append(resource); // unsorted
             newResources.insert(resId, resource);
         }
 
@@ -122,7 +121,6 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         if (m_resources.remove(uniqueId) != 0) 
         {
-            m_resourceTree[resource->getParentId()].removeOne(resource);
             removedResources.append(resource);
         }
     }
@@ -206,17 +204,26 @@ QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
     QnResourceList result;
 
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources) {
+    foreach (const QnResourcePtr &resource, m_resources)
         if (resource->checkFlags(flag))
             result.append(resource);
-    }
 
     return result;
 }
 
 QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
 {
-    return m_resourceTree.value(id);
+    QMutexLocker locker(&m_resourcesMtx);
+
+    // TODO: 
+    // cache it, but remember that id and parentId of a resource may change 
+    // while it's in the pool.
+
+    QnResourceList result;
+    foreach(const QnResourcePtr &resource, m_resources)
+        if(resource->getParentId() == id)
+            result.push_back(resource);
+    return result;
 }
 
 

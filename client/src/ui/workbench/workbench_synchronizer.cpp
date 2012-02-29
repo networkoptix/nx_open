@@ -112,23 +112,27 @@ QnLayoutResourcePtr QnWorkbenchSynchronizer::checkLayoutResource(QnWorkbenchLayo
     return resource;
 }
 
-void QnWorkbenchSynchronizer::save(QnWorkbenchLayout *layout, QObject *object, const char *slot) {
-    QnLayoutResourcePtr resource = checkLayoutResource(layout);
-    if(!resource)
+void QnWorkbenchSynchronizer::save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot) {
+    if(!resource) {
+        qnNullWarning(resource);
         return;
+    }
 
-    /* Submit all changes to the resource. */
-    QnWorkbenchLayoutSynchronizer::instance(layout)->submit();
+    /* Submit all changes from workbench to resource. */
+    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
+    if(synchronizer)
+        synchronizer->submit();
 
     detail::WorkbenchSynchronizerReplyProcessor *processor = new detail::WorkbenchSynchronizerReplyProcessor(this, resource);
     connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
     m_connection->saveAsync(resource, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
 }
 
-void QnWorkbenchSynchronizer::restore(QnWorkbenchLayout *layout) {
-    QnLayoutResourcePtr resource = checkLayoutResource(layout);
-    if(!resource)
+void QnWorkbenchSynchronizer::restore(const QnLayoutResourcePtr &resource) {
+    if(!resource) {
+        qnNullWarning(resource);
         return;
+    }
     
     const detail::LayoutData &state = savedState(resource);
     resource->setItems(state.items);
@@ -136,6 +140,11 @@ void QnWorkbenchSynchronizer::restore(QnWorkbenchLayout *layout) {
 }
 
 bool QnWorkbenchSynchronizer::isChanged(const QnLayoutResourcePtr &resource) {
+    if(!resource) {
+        qnNullWarning(resource);
+        return false;
+    }
+
     const detail::LayoutData &data = savedState(resource);
     return 
         resource->getItems() != data.items ||
@@ -149,22 +158,6 @@ bool QnWorkbenchSynchronizer::isLocal(const QnLayoutResourcePtr &resource) {
     }
 
     return resource->getId().isSpecial(); // TODO: this is not good, but we have no other options. Fix?
-}
-
-bool QnWorkbenchSynchronizer::isChanged(QnWorkbenchLayout *layout) {
-    QnLayoutResourcePtr resource = checkLayoutResource(layout);
-    if(!resource)
-        return false;
-
-    return isChanged(resource);
-}
-
-bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {
-    QnLayoutResourcePtr resource = checkLayoutResource(layout);
-    if(!resource)
-        return false;
-
-    return isLocal(resource);
 }
 
 void QnWorkbenchSynchronizer::start() {

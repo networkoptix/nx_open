@@ -69,17 +69,13 @@ public:
         return m_running;
     }
 
-    void save(QnWorkbenchLayout *layout, QObject *object, const char *slot);
+    void save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
 
-    void restore(QnWorkbenchLayout *layout);
+    void restore(const QnLayoutResourcePtr &resource);
 
     bool isChanged(const QnLayoutResourcePtr &resource);
 
     bool isLocal(const QnLayoutResourcePtr &resource);
-
-    bool isChanged(QnWorkbenchLayout *layout);
-
-    bool isLocal(QnWorkbenchLayout *layout);
 
 signals:
     /**

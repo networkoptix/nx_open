@@ -144,13 +144,10 @@ QString QnWorkbenchActionHandler::newLayoutName() const {
     QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
 
     QStringList layoutNames;
-    if(context()->user()) {
-        foreach(const QnLayoutResourcePtr &resource, context()->user()->getLayouts())
+    QnId parentId = context()->user() ? context()->user()->getId() : QnId();
+    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(parentId))
+        if(resource->flags() & QnResource::layout)
             layoutNames.push_back(resource->getName());
-    } else {
-        foreach(QnWorkbenchLayout *layout, workbench()->layouts())
-            layoutNames.push_back(layout->name());
-    }
 
     /* Prepare name for new layout. */
     int layoutNumber = -1;
@@ -214,7 +211,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId()))
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
             if(synchronizer()->isLocal(layout))
-                layout->setParentId(user->getId());
+                user->addLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
@@ -252,8 +249,8 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
     QnWorkbenchLayout *layout = layouts[0];
 
     QnLayoutResourcePtr resource = layout->resource();
-    bool isChanged = synchronizer()->isChanged(layout);
-    bool isLocal = synchronizer()->isLocal(layout);
+    bool isChanged = synchronizer()->isChanged(resource);
+    bool isLocal = synchronizer()->isLocal(resource);
 
     bool close = false;
     if(isChanged) {
@@ -266,11 +263,11 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
         if(button == QDialogButtonBox::Cancel) {
             return;
         } else if(button == QDialogButtonBox::No) {
-            synchronizer()->restore(layout);
+            synchronizer()->restore(resource);
             close = true;
         } else {
             layout->setName(dialog->name());
-            synchronizer()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+            synchronizer()->save(resource, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
             isLocal = false;
             close = true;
         }
@@ -608,8 +605,10 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
     qnResPool->addResource(layout);
-    
+
     user->addLayout(layout);
+
+    synchronizer()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
 
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
