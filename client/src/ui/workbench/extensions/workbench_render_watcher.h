@@ -1,5 +1,5 @@
-#ifndef QN_RENDER_WATCH_MIXIN_H
-#define QN_RENDER_WATCH_MIXIN_H
+#ifndef QN_WORKBENCH_RENDER_WATCHER_H
+#define QN_WORKBENCH_RENDER_WATCHER_H
 
 #include <QObject>
 #include <QHash>
@@ -9,7 +9,7 @@ class QnResourceWidget;
 
 class QnAbstractRenderer;
 
-class QnRenderWatchMixin: public QObject {
+class QnWorkbenchRenderWatcher: public QObject {
     Q_OBJECT;
 public:
     /**
@@ -19,7 +19,7 @@ public:
      * \param display                   Workbench display to work with.
      * \param parent                    Parent object.
      */
-    QnRenderWatchMixin(QnWorkbenchDisplay *display, QObject *parent = NULL);
+    QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, QObject *parent = NULL);
 
     /**
      * Manual constructor. User will have to call registering and notification 
@@ -27,7 +27,7 @@ public:
      * 
      * \param parent                    Parent object.
      */
-    QnRenderWatchMixin(QObject *parent = NULL);
+    QnWorkbenchRenderWatcher(QObject *parent = NULL);
 
     /**
      * Registers a renderer.
@@ -89,4 +89,4 @@ private:
     QHash<QObject *, QnAbstractRenderer *> m_rendererByLifetime;
 };
 
-#endif // QN_RENDER_WATCH_MIXIN_H
+#endif // QN_WORKBENCH_RENDER_WATCHER_H

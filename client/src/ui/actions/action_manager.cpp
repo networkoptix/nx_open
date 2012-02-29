@@ -225,7 +225,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
 
-    factory(Qn::NewLayoutAction).
+    factory(Qn::OpenNewLayoutAction).
         flags(Qn::Main).
         text(tr("New Layout")).
         shortcut(tr("Ctrl+T")).
@@ -385,6 +385,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::NewUserAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("New User..."));
+
+    factory(Qn::NewLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("New Layout...")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
 
 
     action(Qn::MainMenuAction)->setMenu(newMenu(Qn::MainScope));

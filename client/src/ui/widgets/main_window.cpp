@@ -33,9 +33,6 @@
 #include "ui/preferences/preferencesdialog.h"
 #include "youtube/youtubeuploaddialog.h"
 
-#include "ui/mixins/sync_play_mixin.h"
-#include "ui/mixins/render_watch_mixin.h"
-
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/blue_background_painter.h"
 
@@ -194,7 +191,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(qnAction(Qn::SystemSettingsAction));
     addAction(qnAction(Qn::OpenFileAction));
     addAction(qnAction(Qn::ConnectionSettingsAction));
-    addAction(qnAction(Qn::NewLayoutAction));
+    addAction(qnAction(Qn::OpenNewLayoutAction));
     addAction(qnAction(Qn::CloseLayoutAction));
     addAction(qnAction(Qn::MainMenuAction));
     addAction(qnAction(Qn::YouTubeUploadAction));
@@ -237,7 +234,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->setSpacing(0);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::NewLayoutAction)));
+    m_titleLayout->addWidget(newActionButton(qnAction(Qn::OpenNewLayoutAction)));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
     m_titleLayout->addWidget(newActionButton(qnAction(Qn::SystemSettingsAction)));

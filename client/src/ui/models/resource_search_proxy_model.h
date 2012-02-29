@@ -49,7 +49,7 @@ protected:
 
 private:
     QnResourceCriterionGroup m_criterionGroup;
-    QObject *m_invalidateListener;
+    bool m_invalidating;
 };
 
 #endif // QN_RESOURCE_SEARCH_PROXY_MODEL_H

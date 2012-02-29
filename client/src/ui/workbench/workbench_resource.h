@@ -1,9 +1,9 @@
-#ifndef QN_WORKBENCH_RESOURCE_EXTENSIONS_H
-#define QN_WORKBENCH_RESOURCE_EXTENSIONS_H
+#ifndef QN_WORKBENCH_RESOURCE_H
+#define QN_WORKBENCH_RESOURCE_H
 
 #include <core/resource/resource_fwd.h>
 
-class QnWorkbenchResourceExtensions {
+class QnWorkbenchResource {
 public:
     static bool isSceneDroppable(const QnResourcePtr &resource);
 
@@ -16,4 +16,4 @@ private:
 };
 
 
-#endif // QN_WORKBENCH_RESOURCE_EXTENSIONS_H
+#endif // QN_WORKBENCH_RESOURCE_H

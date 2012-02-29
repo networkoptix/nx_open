@@ -4,7 +4,7 @@ SET ARCH=win32
 
 SETLOCAL
 
-SET QT_PATH=c:\develop\Qt\4.7.4
+SET QT_PATH=c:\develop\environment\qt
 
 SET PATH=%PATH%;%QT_PATH%\bin
 

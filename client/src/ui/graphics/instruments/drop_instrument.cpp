@@ -136,7 +136,6 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
 
     foreach(const QnResourcePtr &resource, m_resources) {
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        item->setFlag(QnWorkbenchItem::Pinned, false);
         workbench->currentLayout()->addItem(item);
         item->adjustGeometry(gridPos);
     }

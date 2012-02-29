@@ -787,8 +787,10 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
         return;
     }
 
-    displayMotionGrid(display()->widgets(), false);
     widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+    foreach(QnResourceWidget *otherWidget, display()->widgets())
+        if(otherWidget != widget)
+            otherWidget->clearMotionSelection();
 }
 
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnResourceWidget *widget) {

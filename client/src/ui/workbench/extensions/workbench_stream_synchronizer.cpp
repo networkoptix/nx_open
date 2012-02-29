@@ -1,4 +1,4 @@
-#include "sync_play_mixin.h"
+#include "workbench_stream_synchronizer.h"
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
 #include <camera/resource_display.h>
@@ -7,9 +7,9 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <plugins/resources/archive/syncplay_wrapper.h>
-#include "render_watch_mixin.h"
+#include "workbench_render_watcher.h"
 
-QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin *renderWatcher, QObject *parent):
+QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent):
     QObject(parent),
     m_syncPlay(NULL),
     m_display(display),
@@ -39,12 +39,12 @@ QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QnRenderWatchMixin
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
 }
 
-void QnSyncPlayMixin::at_enable_sync(bool value) 
+void QnWorkbenchStreamSynchronizer::at_enable_sync(bool value) 
 {
     m_syncPlay->setEnabled(value);
 }
 
-void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
+void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *widget) {
     if(!widget->resource()->checkFlags(QnResource::live_cam))
         return;
 
@@ -60,7 +60,7 @@ void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
     connect(widget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
 }
 
-void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
+void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     if(!widget->resource()->checkFlags(QnResource::live_cam))
         return;
 
@@ -70,7 +70,7 @@ void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget
     m_syncPlay->removeArchiveReader(widget->display()->archiveReader());
 }
 
-void QnSyncPlayMixin::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
+void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
     if(m_display.isNull())
         return;
 
@@ -86,7 +86,7 @@ void QnSyncPlayMixin::at_renderWatcher_displayingStateChanged(QnAbstractRenderer
 }
 
 /*
-void QnSyncPlayMixin::at_playback_mask_changed(const QnTimePeriodList& playbackMask)
+void QnWorkbenchStreamSynchronizer::at_playback_mask_changed(const QnTimePeriodList& playbackMask)
 {
     m_syncPlay->setPlaybackMask(playbackMask);
 }

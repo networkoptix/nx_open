@@ -25,6 +25,7 @@
 #include <ui/dialogs/multiplecamerasettingsdialog.h>
 #include <ui/dialogs/layout_save_dialog.h>
 #include <ui/dialogs/new_user_dialog.h>
+#include <ui/dialogs/new_layout_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
@@ -128,7 +129,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::OpenFileAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(qnAction(Qn::OpenFolderAction),                 SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
-    connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
+    connect(qnAction(Qn::OpenNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(qnAction(Qn::OpenSingleLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_openSingleLayoutAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(qnAction(Qn::CameraSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
@@ -141,6 +142,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::RemoveLayoutItemAction),           SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
     connect(qnAction(Qn::NewUserAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
+    connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
     connect(qnAction(Qn::ResourceDropAction),               SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
 }
 
@@ -222,7 +224,7 @@ void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
     setSynchronizer(NULL);
 }
 
-void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
+void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
     layout->setName(newLayoutName());
 
@@ -235,7 +237,7 @@ void QnWorkbenchActionHandler::at_openSingleLayoutAction_triggered() {
     QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
     if(resources.isEmpty()) {
         /* There are no layouts in user's layouts list, just create a new one. */
-        qnAction(Qn::NewLayoutAction)->trigger();
+        qnAction(Qn::OpenNewLayoutAction)->trigger();
     } else {
         /* Open the last layout from the user's layouts list. */
         qSort(resources.begin(), resources.end(), LayoutIdCmp());
@@ -559,6 +561,25 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setAdmin(dialog->isAdmin());
 
     m_connection->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, QnResourceList, int)));
+}
+
+void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
+    QnUserResourcePtr user = qnMenu->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
+    if(user.isNull())
+        return;
+
+    QScopedPointer<QnNewLayoutDialog> dialog(new QnNewLayoutDialog(widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setName(newLayoutName());
+    if(!dialog->exec())
+        return;
+
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->setGuid(QUuid::createUuid());
+    qnResPool->addResource(layout);
+    
+    layout->setName(dialog->name());
+    user->addLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {

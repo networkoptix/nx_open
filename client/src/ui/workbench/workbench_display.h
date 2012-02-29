@@ -36,7 +36,7 @@ class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
-class QnRenderWatchMixin;
+class QnWorkbenchRenderWatcher;
 
 class CLVideoCamera;
 class CLCamDisplay;
@@ -273,7 +273,7 @@ public:
 
     QPointF mapGlobalToGridF(const QPoint &globalPoint) const;
 
-    QnRenderWatchMixin *renderWatcher() const;
+    QnWorkbenchRenderWatcher *renderWatcher() const;
 
 public slots:
     void fitInView(bool animate = true);
@@ -366,7 +366,7 @@ private:
     QGraphicsView *m_view;
 
     /** Render watcher. */
-    QnRenderWatchMixin *m_renderWatcher;
+    QnWorkbenchRenderWatcher *m_renderWatcher;
 
 
     /* Internal state. */

@@ -6,7 +6,7 @@
 
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent): 
     QSortFilterProxyModel(parent),
-    m_invalidateListener(NULL)
+    m_invalidating(false)
 {}
 
 QnResourceSearchProxyModel::~QnResourceSearchProxyModel() {
@@ -40,22 +40,17 @@ QnResourcePtr QnResourceSearchProxyModel::resource(const QModelIndex &index) con
 }
 
 void QnResourceSearchProxyModel::invalidateFilter() {
-    if(m_invalidateListener != NULL) {
-        disconnect(m_invalidateListener, NULL, this, NULL);
-        m_invalidateListener = NULL;
-    }
-
+    m_invalidating = false;
     QSortFilterProxyModel::invalidateFilter();
     emit criteriaChanged();
 }
 
 void QnResourceSearchProxyModel::invalidateFilterLater() {
-    if(m_invalidateListener != NULL)
+    if(m_invalidating)
         return; /* Already waiting for invalidation. */
 
-    m_invalidateListener = new QObject(this);
-    connect(m_invalidateListener, SIGNAL(destroyed()), this, SLOT(invalidateFilter()));
-    qnDeleteLater(m_invalidateListener);
+    m_invalidating = true;
+    QMetaObject::invokeMethod(this, "invalidateFilter", Qt::QueuedConnection);
 }
 
 bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const {
