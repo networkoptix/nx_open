@@ -30,7 +30,7 @@ public:
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
-    void copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime = 0);
+    int copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime = 0);
     void lockDataQueue();
     void unlockDataQueue();
     void setSingleShotMode(bool value);
@@ -48,6 +48,8 @@ public:
     void setLiveQuality(MediaQuality liveQuality);
     virtual void clearUnprocessedData() override;
 
+    // put data without mutex. Used for RTSP connection after lockDataQueue
+    void addData(QnAbstractMediaDataPtr data);
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);

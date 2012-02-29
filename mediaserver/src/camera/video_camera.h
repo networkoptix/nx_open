@@ -14,7 +14,7 @@ public:
     QnVideoCamera(QnResourcePtr resource);
     virtual ~QnVideoCamera();
     QnAbstractMediaStreamDataProvider* getLiveReader(QnResource::ConnectionRole role);
-    void copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
+    int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
     void beforeStop();
 private:
     void createReader(QnResource::ConnectionRole role);
