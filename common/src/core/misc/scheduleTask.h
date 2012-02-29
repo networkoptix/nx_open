@@ -15,7 +15,7 @@ public:
 
     struct Data
     {
-        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, RecordingType recordType = RecordingType_Run,
+        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, RecordingType recordType = RecordingType_Never,
              int beforeThreshold = 0, int afterThreshold = 0, QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
             : m_dayOfWeek(dayOfWeek),
               m_startTime(startTime),

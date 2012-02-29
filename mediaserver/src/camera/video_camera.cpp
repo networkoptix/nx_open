@@ -156,14 +156,14 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_getReaderMutex);
-    if (!m_primaryReader)
+    if (m_primaryReader == 0 && m_resource->getStatus() != QnResource::Disabled)
     {
         createReader(QnResource::Role_LiveVideo);
         createReader(QnResource::Role_SecondaryLiveVideo);
-        if (m_primaryReader)
-            m_primaryReader->start();
-        if (m_secondaryReader)
-            m_secondaryReader->start();
+        //if (m_primaryReader)
+        //    m_primaryReader->start();
+        //if (m_secondaryReader)
+        //    m_secondaryReader->start();
     }
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
