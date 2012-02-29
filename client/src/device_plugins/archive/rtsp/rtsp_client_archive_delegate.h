@@ -46,9 +46,9 @@ public:
 protected:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
-    void deleteContexts();
     void reopen();
 private:
+    QMutex m_mutex;
     RTPSession m_rtspSession;
     RTPIODevice* m_rtpData;
     quint8* m_rtpDataBuffer;
