@@ -202,28 +202,28 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
     updateScheduleInfo(QDateTime::currentMSecsSinceEpoch());
 }
 
-QString QnServerStreamRecorder::fillFileName()
+QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)
 {
     if (m_fixedFileName.isEmpty())
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role));
+        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role), provider);
     }
     else {
         return m_fixedFileName;
     }
 }
 
-void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName)
+void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
     if (m_truncateInterval != 0)
-        qnStorageMan->fileFinished(durationMs, fileName);
+        qnStorageMan->fileFinished(durationMs, fileName, provider);
 };
 
-void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, const QString& fileName)
+void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
     if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(startTimeMs, fileName);
+        qnStorageMan->fileStarted(startTimeMs, fileName, provider);
     }
 }

@@ -1,5 +1,6 @@
 #include "storage_resource.h"
 #include "utils/common/util.h"
+#include "../dataprovider/media_streamdataprovider.h"
 
 QnStorageResource::QnStorageResource():
     QnResource(),
@@ -69,4 +70,22 @@ void QnStorageResource::setUrl(const QString& value)
             setStatus(Offline);
         }
     }
+}
+
+float QnStorageResource::bitrate() const
+{
+    float rez = 0;
+    foreach(QnAbstractMediaStreamDataProvider* provider, m_providers)
+        rez += provider->getBitrate();
+    return rez;
+}
+
+void QnStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
+{
+    m_providers << provider;
+}
+
+void QnStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
+{
+    m_providers.remove(provider);
 }
