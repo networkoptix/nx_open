@@ -278,7 +278,6 @@ void QnWorkbenchSynchronizer::at_resourcePool_resourceAdded(const QnResourcePtr 
         return;
 
     setSavedState(layoutResource, detail::LayoutData(layoutResource));
-
 }
 
 void QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
