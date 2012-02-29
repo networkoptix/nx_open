@@ -41,8 +41,10 @@ protected:
 
     QString newLayoutName() const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
-    void addToWorkbench(const QnResourceList &resources) const;
-    void addToWorkbench(const QList<QString> &files) const;
+    void addToWorkbench(const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
+    void addToWorkbench(const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
+    void addToWorkbench(const QnMediaResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
+    void addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
 
 protected slots:
     void at_workbench_aboutToBeDestroyed();

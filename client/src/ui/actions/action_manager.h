@@ -30,35 +30,35 @@ public:
 
     QList<QnAction *> actions() const;
 
-    void trigger(Qn::ActionId id);
+    void trigger(Qn::ActionId id, const QVariantMap &params = QVariantMap());
 
-    void trigger(Qn::ActionId id, const QVariant &items);
+    void trigger(Qn::ActionId id, const QVariant &items, const QVariantMap &params = QVariantMap());
 
-    void trigger(Qn::ActionId id, const QnResourcePtr &resource);
+    void trigger(Qn::ActionId id, const QnResourcePtr &resource, const QVariantMap &params = QVariantMap());
 
-    void trigger(Qn::ActionId id, const QnResourceList &resources);
+    void trigger(Qn::ActionId id, const QnResourceList &resources, const QVariantMap &params = QVariantMap());
 
-    void trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items);
+    void trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items, const QVariantMap &params = QVariantMap());
 
-    void trigger(Qn::ActionId id, const QnResourceWidgetList &widgets);
+    void trigger(Qn::ActionId id, const QnResourceWidgetList &widgets, const QVariantMap &params = QVariantMap());
 
-    void trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts);
+    void trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts, const QVariantMap &params = QVariantMap());
 
-    void trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems);
+    void trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems, const QVariantMap &params = QVariantMap());
 
-    QMenu *newMenu(Qn::ActionScope scope);
+    QMenu *newMenu(Qn::ActionScope scope, const QVariantMap &params = QVariantMap());
 
-    QMenu *newMenu(Qn::ActionScope scope, const QVariant &items);
+    QMenu *newMenu(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params = QVariantMap());
 
-    QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources);
+    QMenu *newMenu(Qn::ActionScope scope, const QnResourceList &resources, const QVariantMap &params = QVariantMap());
 
-    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items);
+    QMenu *newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items, const QVariantMap &params = QVariantMap());
 
-    QMenu *newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets);
+    QMenu *newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets, const QVariantMap &params = QVariantMap());
 
-    QMenu *newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts);
+    QMenu *newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts, const QVariantMap &params = QVariantMap());
 
-    QMenu *newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems);
+    QMenu *newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems, const QVariantMap &params = QVariantMap());
 
     QnActionTargetProvider *targetProvider() const {
         return m_targetProviderGuard ? m_targetProvider : NULL;
@@ -67,6 +67,8 @@ public:
     void setTargetProvider(QnActionTargetProvider *targetProvider);
 
     Qn::ActionTarget currentTargetType(QnAction *action) const;
+
+    QVariant currentParameter(QnAction *action, const char *name) const;
 
     QVariant currentTarget(QnAction *action) const;
 
@@ -81,6 +83,8 @@ public:
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
 
     Qn::ActionTarget currentTargetType(QObject *sender) const;
+
+    QVariant currentParameter(QObject *sender, const char *name) const;
 
     QVariant currentTarget(QObject *sender) const;
 
@@ -98,11 +102,21 @@ protected:
     friend class QnAction;
     friend class QnActionFactory;
 
-    void triggerInternal(Qn::ActionId id, const QVariant &items);
+    struct ActionParameters {
+        ActionParameters(QVariant items, QVariantMap params): items(items), params(params) {}
+        ActionParameters() {}
 
-    QMenu *newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
+        QVariant items;
+        QVariantMap params;
+    };
+
+    void triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params);
+
+    QMenu *newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items, const QVariantMap &params);
 
     QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
+
+    ActionParameters currentParametersInternal(QnAction *action) const;
 
 private slots:
     void at_menu_destroyed(QObject *menu);
@@ -117,7 +131,7 @@ private:
 
     /** Mapping from a menu created by this manager to the parameters that were 
      * passed to it at construction time. NULL key is used for shortcut actions. */
-    QHash<QObject *, QVariant> m_targetByMenu;
+    QHash<QObject *, ActionParameters> m_parametersByMenu;
 
     /** Target provider for actions. */
     QnActionTargetProvider *m_targetProvider;

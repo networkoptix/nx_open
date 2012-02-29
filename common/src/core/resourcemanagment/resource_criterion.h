@@ -11,6 +11,7 @@ class QRegExp;
 
 class QnResourceCriterionGroup;
 
+
 class QN_EXPORT QnResourceCriterion {
 public:
     enum Operation {
@@ -96,7 +97,20 @@ public:
 
     Operation check(const QnResourcePtr &resource) const;
 
-    QnResourceList filter(const QnResourceList &resources);
+    QnResourceList filter(const QnResourceList &resources) const;
+
+    static QnResourceList filter(const QnResourceList &resources, const QnResourceCriterion &criterion) {
+        return criterion.filter(resources);
+    }
+
+    template<class Resource>
+    static QList<QnSharedResourcePointer<Resource> > filter(const QnResourceList &resources) {
+        QList<QnSharedResourcePointer<Resource> > result;
+        foreach(const QnResourcePtr &resource, resources)
+            if(QnSharedResourcePointer<Resource> derived = resource.dynamicCast<Resource>())
+                result.push_back(derived);
+        return result;
+    }
 
     friend bool operator==(const QnResourceCriterion &l, const QnResourceCriterion &r);
 

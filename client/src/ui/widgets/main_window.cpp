@@ -256,10 +256,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     setLayout(m_globalLayout);
 
     /* Process input files. */
-    QList<QString> files;
     for (int i = 1; i < argc; ++i)
-        files.push_back(QFile::decodeName(argv[i]));
-    qnMenu->trigger(Qn::ResourceDropAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
+        handleMessage(QFile::decodeName(argv[i]));
 
     /* Update state. */
     updateDwmState();

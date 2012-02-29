@@ -112,9 +112,9 @@ bool QnAction::event(QEvent *event) {
 
         if(satisfiesCondition(scope(), target)) {
             m_manager->m_shortcutAction = this;
-            m_manager->m_targetByMenu[NULL] = target;
+            m_manager->m_parametersByMenu[NULL] = QnActionManager::ActionParameters(target, QVariantMap());
             activate(Trigger);
-            m_manager->m_targetByMenu[NULL] = QVariant();
+            m_manager->m_parametersByMenu[NULL] = QnActionManager::ActionParameters();
             m_manager->m_shortcutAction = NULL;
         }
         return true;

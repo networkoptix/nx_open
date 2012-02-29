@@ -478,77 +478,77 @@ QList<QnAction *> QnActionManager::actions() const {
     return m_actionById.values();
 }
 
-void QnActionManager::trigger(Qn::ActionId id) {
-    triggerInternal(id, QVariant::fromValue(QnResourceList()));
+void QnActionManager::trigger(Qn::ActionId id, const QVariantMap &params) {
+    triggerInternal(id, QVariant::fromValue(QnResourceList()), params);
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QVariant &items) {
+void QnActionManager::trigger(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
     if(checkType(items)) {
-        return triggerInternal(id, items);
+        return triggerInternal(id, items, params);
     } else {
-        return triggerInternal(id, QVariant::fromValue(QnResourceList()));
+        return triggerInternal(id, QVariant::fromValue(QnResourceList()), params);
     }
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QnResourcePtr &resource) {
+void QnActionManager::trigger(Qn::ActionId id, const QnResourcePtr &resource, const QVariantMap &params) {
     QnResourceList resources;
     resources.push_back(resource);
-    trigger(id, resources);
+    trigger(id, resources, params);
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QnResourceList &resources) {
-    triggerInternal(id, QVariant::fromValue(resources));
+void QnActionManager::trigger(Qn::ActionId id, const QnResourceList &resources, const QVariantMap &params) {
+    triggerInternal(id, QVariant::fromValue(resources), params);
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items) {
-    trigger(id, QnActionTargetTypes::widgets(items));
+void QnActionManager::trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items, const QVariantMap &params) {
+    trigger(id, QnActionTargetTypes::widgets(items), params);
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QnResourceWidgetList &widgets) {
-    triggerInternal(id, QVariant::fromValue(widgets));
+void QnActionManager::trigger(Qn::ActionId id, const QnResourceWidgetList &widgets, const QVariantMap &params) {
+    triggerInternal(id, QVariant::fromValue(widgets), params);
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts) {
-    triggerInternal(id, QVariant::fromValue(layouts));
+void QnActionManager::trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts, const QVariantMap &params) {
+    triggerInternal(id, QVariant::fromValue(layouts), params);
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems) {
-    triggerInternal(id, QVariant::fromValue(layoutItems));
+void QnActionManager::trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems, const QVariantMap &params) {
+    triggerInternal(id, QVariant::fromValue(layoutItems), params);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()));
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QVariantMap &params) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()), params);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QVariant &items) {
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) {
     if(checkType(items)) {
-        return newMenuInternal(m_root, scope, items);
+        return newMenuInternal(m_root, scope, items, params);
     } else {
-        return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()));
+        return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()), params);
     }
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceList &resources) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(resources));
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceList &resources, const QVariantMap &params) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(resources), params);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items) {
-    return newMenu(scope, QnActionTargetTypes::widgets(items));
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items, const QVariantMap &params) {
+    return newMenu(scope, QnActionTargetTypes::widgets(items), params);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(widgets));
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets, const QVariantMap &params) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(widgets), params);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(layouts));
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts, const QVariantMap &params) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(layouts), params);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems));
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems, const QVariantMap &params) {
+    return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
 }
 
-void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items) {
+void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
     QnAction *action = m_actionById.value(id);
     if(action == NULL) {
         qnWarning("Invalid action id '%1'.", static_cast<int>(id));
@@ -560,7 +560,7 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items) {
         return;
     }
 
-    m_targetByMenu[NULL] = items;
+    m_parametersByMenu[NULL] = ActionParameters(items, params);
     m_shortcutAction = action;
     
     action->trigger();
@@ -568,9 +568,9 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items) {
     m_shortcutAction = NULL;
 }
 
-QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
+QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) {
     QMenu *result = newMenuRecursive(parent, scope, items);
-    m_targetByMenu[result] = items;
+    m_parametersByMenu[result] = ActionParameters(items, params);
 
     connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
     connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
@@ -609,18 +609,26 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     return result;
 }
 
+QnActionManager::ActionParameters QnActionManager::currentParametersInternal(QnAction *action) const {
+    if(m_shortcutAction == action)
+        return m_parametersByMenu.value(NULL);
+
+    if(m_lastShownMenu == NULL || !m_parametersByMenu.contains(m_lastShownMenu))
+        qnWarning("No active menu, no target exists.");
+
+    return m_parametersByMenu.value(m_lastShownMenu);
+}
+
 Qn::ActionTarget QnActionManager::currentTargetType(QnAction *action) const {
     return QnActionTargetTypes::target(currentTarget(action));
 }
 
+QVariant QnActionManager::currentParameter(QnAction *action, const char *name) const {
+    return currentParametersInternal(action).params.value(QLatin1String(name));
+}
+
 QVariant QnActionManager::currentTarget(QnAction *action) const {
-    if(m_shortcutAction == action)
-        return m_targetByMenu.value(NULL);
-
-    if(m_lastShownMenu == NULL || !m_targetByMenu.contains(m_lastShownMenu))
-        qnWarning("No active menu, no target exists.");
-
-    return m_targetByMenu.value(m_lastShownMenu);
+    return currentParametersInternal(action).items;
 }
 
 QnResourceList QnActionManager::currentResourcesTarget(QnAction *action) const {
@@ -650,6 +658,14 @@ QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) con
 
 Qn::ActionTarget QnActionManager::currentTargetType(QObject *sender) const {
     return QnActionTargetTypes::target(currentTarget(sender));
+}
+
+QVariant QnActionManager::currentParameter(QObject *sender, const char *name) const {
+    if(QnAction *action = checkSender(sender)) {
+        return currentParameter(action, name);
+    } else {
+        return QVariant();
+    }
 }
 
 QVariant QnActionManager::currentTarget(QObject *sender) const {
@@ -701,7 +717,7 @@ QnResourceWidgetList QnActionManager::currentWidgetsTarget(QObject *sender) cons
 }
 
 void QnActionManager::at_menu_destroyed(QObject *menu) {
-    m_targetByMenu.remove(menu);
+    m_parametersByMenu.remove(menu);
 }
 
 void QnActionManager::at_menu_aboutToShow() {

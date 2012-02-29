@@ -3,9 +3,9 @@
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QGraphicsItem>
+#include <utils/common/warnings.h>
+#include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/view_drag_and_drop.h>
 #include "file_processor.h"
@@ -72,7 +72,7 @@ DropInstrument::DropInstrument(QnWorkbench *workbench, QObject *parent):
     m_workbench(workbench)
 {
     if(workbench == NULL)
-        qnNullWarning(workbench)
+        qnNullWarning(workbench);
 
     DropSurfaceItem *surface = new DropSurfaceItem();
     surface->setDropInstrument(this);
@@ -129,16 +129,14 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
     if(workbench == NULL)
         return true;
 
-    QnResourceList resources = QnFileProcessor::createResourcesForFiles(m_files);
-    resources.append(m_resources);
+    QnResourceList resources = m_resources;
+    if(resources.empty())
+        resources = QnFileProcessor::createResourcesForFiles(m_files);
 
-    QPointF gridPos = workbench->mapper()->mapToGridF(event->scenePos());
+    QVariantMap params;
+    params[Qn::GridPosition] = workbench->mapper()->mapToGridF(event->scenePos());
 
-    foreach(const QnResourcePtr &resource, m_resources) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        workbench->currentLayout()->addItem(item);
-        item->adjustGeometry(gridPos);
-    }
+    qnMenu->trigger(Qn::ResourceDropAction, resources, params);
 
     return true;
 }

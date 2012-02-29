@@ -191,19 +191,29 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     return m_synchronizer->isLocal(layout) && !m_synchronizer->isChanged(layout);
 }
 
-void QnWorkbenchActionHandler::addToWorkbench(const QnResourceList &resources) const {
-    foreach(const QnResourcePtr &resource, resources) {
-        //if(resource) // TODO
+void QnWorkbenchActionHandler::addToWorkbench(const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
+    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+    workbench()->currentLayout()->addItem(item);
 
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        item->setFlag(QnWorkbenchItem::PendingGeometryAdjustment);
-        workbench()->currentLayout()->addItem(item);
+    if(usePosition) {
+        item->adjustGeometry(position);
+    } else {
+        item->adjustGeometry();
     }
 }
 
+void QnWorkbenchActionHandler::addToWorkbench(const QnResourceList &resources, bool usePosition, const QPointF &position) const {
+    foreach(const QnResourcePtr &resource, resources)
+        addToWorkbench(resource, usePosition, position);
+}
 
-void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files) const {
-    addToWorkbench(QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
+void QnWorkbenchActionHandler::addToWorkbench(const QnMediaResourceList &resources, bool usePosition, const QPointF &position) const {
+    foreach(const QnMediaResourcePtr &resource, resources)
+        addToWorkbench(resource, usePosition, position);
+}
+
+void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position) const {
+    addToWorkbench(QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)), usePosition, position);
 }
 
 
@@ -302,7 +312,19 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
-    addToWorkbench(qnMenu->currentResourcesTarget(sender()));
+    QnResourceList resources = qnMenu->currentResourcesTarget(sender());
+    QVariant position = qnMenu->currentParameter(sender(), Qn::GridPosition);
+    QnLayoutResourceList layouts = QnResourceCriterion::filter<QnLayoutResource>(resources);
+    QnMediaResourceList  medias  = QnResourceCriterion::filter<QnMediaResource>(resources);
+
+    if(!layouts.empty()) {
+        /* Open dropped layouts. Ignore media resources in this case. */
+        foreach(const QnLayoutResourcePtr &resource, layouts)
+            qnMenu->trigger(Qn::OpenLayoutAction, resource);
+    } else {
+        /* Open dropped media resources in current layout. */
+        addToWorkbench(medias, position.canConvert(QVariant::PointF), position.toPointF());
+    }
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
@@ -317,7 +339,7 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     dialog->setNameFilters(filters);
     
     if(dialog->exec())
-        addToWorkbench(dialog->selectedFiles());
+        addToWorkbench(dialog->selectedFiles(), false);
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -327,7 +349,7 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
     dialog->setOptions(QFileDialog::ShowDirsOnly);
     
     if(dialog->exec())
-        addToWorkbench(dialog->selectedFiles());
+        addToWorkbench(dialog->selectedFiles(), false);
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {

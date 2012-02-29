@@ -3,11 +3,18 @@
 
 namespace Qn {
 
+    namespace {
+        /** Key for grid position action parameter. */
+        const char *GridPosition = "_qn_gridPosition";
+
+        /* Get syntax highlighting. */
+#define GridPosition GridPosition
+
+    } // anonymous namespace
+
+
     /**
      * Enum of all menu actions.
-     * 
-     * ACHTUNG! Item order is important. 
-     * It defines item ordering in the resulting menu.
      */
     enum ActionId {
         /* Actions that are not assigned to any menu. */

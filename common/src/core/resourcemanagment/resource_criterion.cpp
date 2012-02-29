@@ -235,7 +235,7 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
     }
 }
 
-QnResourceList QnResourceCriterion::filter(const QnResourceList &resources) {
+QnResourceList QnResourceCriterion::filter(const QnResourceList &resources) const {
     QnResourceList result;
     foreach(const QnResourcePtr &resource, resources) {
         Operation operation = check(resource);

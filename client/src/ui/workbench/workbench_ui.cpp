@@ -1317,13 +1317,7 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(resource.isNull())
         return;
 
-    if(resource->checkFlags(QnResource::layout)) {
-        qnMenu->trigger(Qn::OpenLayoutAction, resource);
-    } else if(resource->checkFlags(QnResource::media)) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        display()->workbench()->currentLayout()->addItem(item);
-        item->adjustGeometry();
-    }
+    qnMenu->trigger(Qn::ResourceDropAction, resource);
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
