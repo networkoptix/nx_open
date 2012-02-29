@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NewLayoutDialog</class>
- <widget class="QDialog" name="NewLayoutDialog">
+ <class>LayoutNameDialog</class>
+ <widget class="QDialog" name="LayoutNameDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>New Layout</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Enter the name of the layout to be created:</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -54,7 +54,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>NewLayoutDialog</receiver>
+   <receiver>LayoutNameDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -70,7 +70,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>NewLayoutDialog</receiver>
+   <receiver>LayoutNameDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

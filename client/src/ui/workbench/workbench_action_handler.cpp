@@ -23,9 +23,8 @@
 #include <ui/dialogs/camerasettingsdialog.h>
 #include <ui/dialogs/connectiontestingdialog.h>
 #include <ui/dialogs/multiplecamerasettingsdialog.h>
-#include <ui/dialogs/layout_save_dialog.h>
+#include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/new_user_dialog.h>
-#include <ui/dialogs/new_layout_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
@@ -144,6 +143,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::RemoveFromServerAction),           SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
     connect(qnAction(Qn::NewUserAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
     connect(qnAction(Qn::NewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
+    connect(qnAction(Qn::RenameLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_renameLayoutAction_triggered()));
     connect(qnAction(Qn::ResourceDropAction),               SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
 }
 
@@ -282,8 +282,10 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
 
     bool close = false;
     if(isChanged) {
-        QScopedPointer<QnLayoutSaveDialog> dialog(new QnLayoutSaveDialog(widget()));
-        dialog->setLayoutName(layout->name());
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
+        dialog->setWindowTitle(tr("Close Layout"));
+        dialog->setText(tr("Do you want to save changes made to layout '%1'?\n\nIf yes, you may also want to change its name:").arg(layout->name()));
+        dialog->setName(layout->name());
         dialog->exec();
         QDialogButtonBox::StandardButton button = dialog->clickedButton();
         if(button == QDialogButtonBox::Cancel) {
@@ -292,7 +294,7 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
             m_synchronizer->restore(layout);
             close = true;
         } else {
-            layout->setName(dialog->layoutName());
+            layout->setName(dialog->name());
             m_synchronizer->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
             isLocal = false;
             close = true;
@@ -509,6 +511,22 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     }
 }
 
+void QnWorkbenchActionHandler::at_renameLayoutAction_triggered() {
+    QnLayoutResourcePtr layout = qnMenu->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
+    if(!layout)
+        return;
+
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
+    dialog->setWindowTitle(tr("Rename Layout"));
+    dialog->setText(tr("Enter new name for the selected layout:"));
+    dialog->setName(layout->getName());
+    dialog->setWindowModality(Qt::ApplicationModal);
+    if(!dialog->exec())
+        return;
+
+    layout->setName(dialog->name());
+}
+
 void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     QnResourceList resources = qnMenu->currentResourcesTarget(sender());
     
@@ -604,9 +622,11 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
     if(user.isNull())
         return;
 
-    QScopedPointer<QnNewLayoutDialog> dialog(new QnNewLayoutDialog(widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
+    dialog->setWindowTitle(tr("New Layout"));
+    dialog->setText(tr("Enter the name of the layout to create:"));
     dialog->setName(newLayoutName());
+    dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
 

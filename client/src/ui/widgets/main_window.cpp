@@ -23,16 +23,6 @@
 
 #include "ui/actions/action_manager.h"
 
-#include "ui/dialogs/aboutdialog.h"
-#include "ui/dialogs/logindialog.h"
-#include "ui/dialogs/camerasettingsdialog.h"
-#include "ui/dialogs/multiplecamerasettingsdialog.h"
-#include "ui/dialogs/serversettingsdialog.h"
-#include "ui/dialogs/tagseditdialog.h"
-#include "ui/dialogs/layout_save_dialog.h"
-#include "ui/preferences/preferencesdialog.h"
-#include "youtube/youtubeuploaddialog.h"
-
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/blue_background_painter.h"
 

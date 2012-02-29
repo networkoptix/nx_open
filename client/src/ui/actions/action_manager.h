@@ -98,6 +98,8 @@ public:
 
     QnResourceWidgetList currentWidgetsTarget(QObject *sender) const;
 
+    void redirectAction(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
+
 protected:
     friend class QnAction;
     friend class QnActionFactory;
@@ -116,6 +118,8 @@ protected:
 
     QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QVariant &items);
 
+    bool redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
+
     ActionParameters currentParametersInternal(QnAction *action) const;
 
 private slots:
@@ -125,6 +129,9 @@ private slots:
 private:
     /** Mapping from action id to action data. */ 
     QHash<Qn::ActionId, QnAction *> m_actionById;
+
+    /** Mapping from action to action id. */
+    QHash<QAction *, Qn::ActionId> m_idByAction;
 
     /** Root action data. Also contained in the map above. */
     QnAction *m_root;

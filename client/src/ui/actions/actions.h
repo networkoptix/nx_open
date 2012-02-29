@@ -177,6 +177,10 @@ namespace Qn {
          */
         RemoveFromServerAction,
 
+        /**
+         * Opens layout name editor.
+         */
+        RenameLayoutAction,
 
         /**
          * Opens a user creation dialog.
