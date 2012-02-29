@@ -38,7 +38,7 @@ public:
     QnStorageResourceList getStorages() const;
     void setStorages(const QnStorageResourceList& storages);
 
-    virtual void QnVideoServerResource::updateInner(QnResourcePtr other) override;
+    virtual void updateInner(QnResourcePtr other) override;
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
