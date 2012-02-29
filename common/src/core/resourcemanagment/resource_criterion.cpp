@@ -245,6 +245,10 @@ QnResourceList QnResourceCriterion::filter(const QnResourceList &resources) cons
     return result;
 }
 
+QnResourceList QnResourceCriterion::filter(const QnResourceList &resources, const QnResourceCriterion &criterion) {
+    return criterion.filter(resources);
+}
+
 bool operator==(const QnResourceCriterion &l, const QnResourceCriterion &r) {
     if(l.type() != r.type())
         return false;

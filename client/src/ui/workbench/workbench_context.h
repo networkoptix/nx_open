@@ -7,6 +7,7 @@
 class QnResourcePoolUserWatcher;
 class QnResourcePool;
 class QnWorkbench;
+class QnWorkbenchSynchronizer;
 
 class QnWorkbenchContext: public QObject {
     Q_OBJECT;
@@ -25,6 +26,10 @@ public:
         return m_workbench;
     }
 
+    QnWorkbenchSynchronizer *synchronizer() const {
+        return m_synchronizer;
+    }
+
     QnUserResourcePtr user();
 
 signals:
@@ -38,6 +43,7 @@ protected slots:
 private:
     QnResourcePoolUserWatcher *m_userWatcher;
     QnResourcePool *m_resourcePool;
+    QnWorkbenchSynchronizer *m_synchronizer;
     QnWorkbench *m_workbench;
 };
 
