@@ -163,15 +163,11 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_synchronizer = new QnWorkbenchSynchronizer(this);
     m_synchronizer->setWorkbench(m_workbench);
 
-    m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
-
     m_actionHandler = new QnWorkbenchActionHandler(this);
     m_actionHandler->setWorkbench(m_workbench);
     m_actionHandler->setSynchronizer(m_synchronizer);
     m_actionHandler->setWidget(this);
 
-    connect(m_userWatcher,                  SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                         SLOT(setUser(const QnUserResourcePtr &)));
-    connect(qnSettings,                     SIGNAL(lastUsedConnectionChanged()),            this,                                   SLOT(at_settings_lastUsedConnectionChanged()));
     connect(m_synchronizer,                 SIGNAL(started()),                              qnAction(Qn::OpenSingleLayoutAction),   SLOT(trigger()));
 
     /* Set up actions. */
@@ -251,7 +247,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     /* Update state. */
     updateDwmState();
-    at_settings_lastUsedConnectionChanged();
 }
 
 QnMainWindow::~QnMainWindow()
@@ -525,10 +520,6 @@ void QnMainWindow::at_sessionManager_error(int error)
     default:
         break;
     }
-}
-
-void QnMainWindow::at_settings_lastUsedConnectionChanged() {
-    m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
 }
 
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

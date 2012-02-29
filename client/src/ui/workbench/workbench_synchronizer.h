@@ -8,7 +8,9 @@
 
 class QnWorkbench;
 class QnWorkbenchLayout;
+class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
+class QnResourcePool;
 
 namespace detail {
     class WorkbenchSynchronizerReplyProcessor : public QObject {
@@ -59,15 +61,9 @@ public:
 
     virtual ~QnWorkbenchSynchronizer();
 
-    QnWorkbench *workbench() {
-        return m_workbench;
+    QnWorkbenchContext *context() const {
+        return m_context;
     }
-
-    const QnUserResourcePtr &user() const {
-        return m_user;
-    }
-
-    QnId userId() const;
 
     bool isRunning() const {
         return m_running;
@@ -98,8 +94,7 @@ signals:
     void stopped();
 
 public slots:
-    void setWorkbench(QnWorkbench *workbench);
-    void setUser(const QnUserResourcePtr &user);
+    void setContext(QnWorkbenchContext *context);
     void update();
     void submit();
 
@@ -107,10 +102,11 @@ protected:
     void start();
     void stop();
     QnLayoutResourcePtr checkLayoutResource(QnWorkbenchLayout *layout);
+    QnLayoutResourceList poolLayoutResources() const;
 
 protected slots:
-    void at_user_resourceChanged();
-    void at_workbench_aboutToBeDestroyed();
+    void at_context_aboutToBeDestroyed();
+    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_workbench_layoutsChanged();
 
 private:
@@ -119,11 +115,8 @@ private:
     /** Whether this synchronizer is running. */
     bool m_running;
 
-    /** Associated workbench. */
-    QnWorkbench *m_workbench;
-
-    /** Associated user resource. */
-    QnUserResourcePtr m_user;
+    /** Associated context. */
+    QnWorkbenchContext *m_context;
 
     /** Whether changes should be propagated from workbench to resources. */
     bool m_submit;

@@ -66,8 +66,6 @@ protected slots:
 
     void at_sessionManager_error(int error);
 
-    void at_settings_lastUsedConnectionChanged();
-
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
