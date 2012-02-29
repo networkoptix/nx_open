@@ -46,9 +46,10 @@ namespace detail {
 
 } // namespace detail
 
+
 /**
  * This class performs bidirectional synchronization of instances of 
- * <tt>QnWorkbench</tt> and <tt>QnUserResource</tt>.
+ * <tt>QnWorkbench</tt> and <tt>QnResourcePool</tt>.
  */
 class QnWorkbenchSynchronizer: public QObject {
     Q_OBJECT;
@@ -65,6 +66,8 @@ public:
     const QnUserResourcePtr &user() const {
         return m_user;
     }
+
+    QnId userId() const;
 
     bool isRunning() const {
         return m_running;
