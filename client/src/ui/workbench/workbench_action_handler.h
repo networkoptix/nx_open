@@ -71,6 +71,7 @@ protected slots:
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
     void at_removeLayoutItemAction_triggered();
+    void at_renameLayoutAction_triggered();
     void at_removeFromServerAction_triggered();
 
     void at_newUserAction_triggered();
