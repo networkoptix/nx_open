@@ -210,10 +210,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+F")).
         autoRepeat(false);
 
-    factory(Qn::OpenSingleLayoutAction).
-        flags(Qn::NoTarget).
-        text(tr("Open Single Layout"));
-
     factory(Qn::ResourceDropAction).
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
