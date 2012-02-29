@@ -49,7 +49,7 @@ protected slots:
     void at_workbench_layoutsChanged();
     void at_synchronizer_destroyed();
 
-    void at_newLayoutAction_triggered();
+    void at_openNewLayoutAction_triggered();
     void at_openSingleLayoutAction_triggered();
     void at_closeLayoutAction_triggered();
     
@@ -71,6 +71,7 @@ protected slots:
     void at_removeFromServerAction_triggered();
 
     void at_newUserAction_triggered();
+    void at_newLayoutAction_triggered();
 
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
     void at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
