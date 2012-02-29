@@ -78,6 +78,14 @@ void QnWorkbenchSynchronizer::setWorkbench(QnWorkbench *workbench) {
     }
 }
 
+QnId QnWorkbenchSynchronizer::userId() const {
+    if(m_user) {
+        return m_user->getId();
+    } else {
+        return QnId();
+    }
+}
+
 void QnWorkbenchSynchronizer::setUser(const QnUserResourcePtr &user) {
     if(m_user == user)
         return;
