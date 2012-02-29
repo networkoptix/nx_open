@@ -20,6 +20,8 @@ namespace {
         return layout->property(qn_createdLocallyPropertyName).toBool();
     }
 
+    Q_GLOBAL_STATIC(detail::LayoutData, qn_dummyLayoutState);
+
 } // anonymous namespace
 
 
@@ -68,6 +70,24 @@ void QnWorkbenchSynchronizer::setContext(QnWorkbenchContext *context) {
         start();
 }
 
+const detail::LayoutData &QnWorkbenchSynchronizer::savedState(const QnLayoutResourcePtr &resource) {
+    QHash<QnLayoutResourcePtr, detail::LayoutData>::const_iterator pos = m_savedDataByResource.find(resource);
+    if(pos == m_savedDataByResource.end()) {
+        qnWarning("No saved state exists for layout '%1'.", resource ? resource->getName() : QLatin1String("null"));
+        return *qn_dummyLayoutState();
+    }
+
+    return *pos;
+}
+
+void QnWorkbenchSynchronizer::setSavedState(const QnLayoutResourcePtr &resource, const detail::LayoutData &state) {
+    m_savedDataByResource[resource] = state;
+}
+
+void QnWorkbenchSynchronizer::removeSavedState(const QnLayoutResourcePtr &resource) {
+    m_savedDataByResource.remove(resource);
+}
+
 QnLayoutResourceList QnWorkbenchSynchronizer::poolLayoutResources() const {
     return QnResourceCriterion::filter<QnLayoutResource>(context()->resourcePool()->getResources());
 }
@@ -110,23 +130,25 @@ void QnWorkbenchSynchronizer::restore(QnWorkbenchLayout *layout) {
     if(!resource)
         return;
     
-    resource->setItems(m_savedDataByResource[resource].items);
-    resource->setName(m_savedDataByResource[resource].name);
+    const detail::LayoutData &state = savedState(resource);
+    resource->setItems(state.items);
+    resource->setName(state.name);
 }
 
 bool QnWorkbenchSynchronizer::isChanged(const QnLayoutResourcePtr &resource) {
-    detail::LayoutData &data = m_savedDataByResource[resource];
+    const detail::LayoutData &data = savedState(resource);
     return 
         resource->getItems() != data.items ||
         resource->getName() != data.name;
 }
 
 bool QnWorkbenchSynchronizer::isLocal(const QnLayoutResourcePtr &resource) {
-    QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(resource);
-    if(layout == NULL)
-        return false;
-    
-    return isLocal(layout);
+    if(!resource) {
+        qnNullWarning(resource);
+        return true;
+    }
+
+    return resource->getId().isSpecial(); // TODO: this is not good, but we have no other options. Fix?
 }
 
 bool QnWorkbenchSynchronizer::isChanged(QnWorkbenchLayout *layout) {
@@ -142,7 +164,7 @@ bool QnWorkbenchSynchronizer::isLocal(QnWorkbenchLayout *layout) {
     if(!resource)
         return false;
 
-    return resource->getId().isSpecial(); //isCreatedLocally(layout); // TODO: this is not good, but we have no other options. Fix.
+    return isLocal(resource);
 }
 
 void QnWorkbenchSynchronizer::start() {
@@ -154,11 +176,12 @@ void QnWorkbenchSynchronizer::start() {
 
     /* Consider all pool's layouts saved. */
     foreach(const QnLayoutResourcePtr &resource, poolLayoutResources())
-        m_savedDataByResource[resource] = detail::LayoutData(resource);
+        setSavedState(resource, detail::LayoutData(resource));
 
     /* Start listening to changes. */
     connect(context(),                  SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
     connect(context()->resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(context()->resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(context()->workbench(),     SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()));
 
     m_submit = m_update = true;
@@ -202,7 +225,7 @@ void QnWorkbenchSynchronizer::update() {
         QnLayoutResourcePtr resource = layout->resource();
 
         if(!resources.contains(resource)) { /* Corresponding layout resource was removed, remove layout. */
-            m_savedDataByResource.remove(resource);
+            removeSavedState(resource);
             delete layout;
         }
     }
@@ -236,7 +259,7 @@ void QnWorkbenchSynchronizer::submit() {
             synchronizer->submit();
 
             /* Consider it saved in its present state. */
-            m_savedDataByResource[resource] = detail::LayoutData(resource);
+            setSavedState(resource, detail::LayoutData(resource));
         }
     }
 }
@@ -249,16 +272,26 @@ void QnWorkbenchSynchronizer::at_context_aboutToBeDestroyed() {
     setContext(NULL);
 }
 
+void QnWorkbenchSynchronizer::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+    if(!layoutResource)
+        return;
+
+    setSavedState(layoutResource, detail::LayoutData(layoutResource));
+
+}
+
 void QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
     if(!layoutResource)
         return;
 
-    m_savedDataByResource.remove(layoutResource);
+    removeSavedState(layoutResource);
 
     /* Layout was removed, we need to remove it from the workbench too. */
     QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
-    delete layout;
+    if(layout != NULL)
+        delete layout;
 }
 
 void QnWorkbenchSynchronizer::at_workbench_layoutsChanged() {

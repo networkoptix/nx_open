@@ -563,7 +563,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         case Layout: {
             QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
             if(synchronizer()->isLocal(layout)) {
-                context()->user()->removeLayout(layout); // TODO
+                context()->user()->removeLayout(layout); // TODO: do it automatically in user
                 qnResPool->removeResource(resource);
                 break;
             }
@@ -606,9 +606,9 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
+    layout->setName(dialog->name());
     qnResPool->addResource(layout);
     
-    layout->setName(dialog->name());
     user->addLayout(layout);
 }
 

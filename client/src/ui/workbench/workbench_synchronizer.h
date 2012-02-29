@@ -104,8 +104,13 @@ protected:
     QnLayoutResourcePtr checkLayoutResource(QnWorkbenchLayout *layout);
     QnLayoutResourceList poolLayoutResources() const;
 
+    const detail::LayoutData &savedState(const QnLayoutResourcePtr &resource);
+    void setSavedState(const QnLayoutResourcePtr &resource, const detail::LayoutData &state);
+    void removeSavedState(const QnLayoutResourcePtr &resource);
+
 protected slots:
     void at_context_aboutToBeDestroyed();
+    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_workbench_layoutsChanged();
 
