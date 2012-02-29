@@ -32,6 +32,7 @@ mHttpClient(0),
 m_h264(false),
 m_mpeg4(false)
 {
+    
 }
 
 PlDlinkStreamReader::~PlDlinkStreamReader()
@@ -47,8 +48,9 @@ void PlDlinkStreamReader::openStream()
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
-    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
+    QnResource::ConnectionRole role = getRole();
 
+    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     if (!res->getCamInfo().inited())
     {
         res->init();
@@ -60,7 +62,7 @@ void PlDlinkStreamReader::openStream()
         return;
 
     CLHttpStatus status;
-    QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth());
+    QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -73,6 +75,11 @@ void PlDlinkStreamReader::openStream()
         return;
 
     res->init(); // after we changed profile some videoprofile url might be changed
+
+    if (role != QnResource::Role_SecondaryLiveVideo)
+    {
+        res->setMotionMaskPhysical(0);
+    }
     
     // ok, now lets open a stream
 
@@ -84,7 +91,7 @@ void PlDlinkStreamReader::openStream()
     }
 
 
-    QString url = (getRole() == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
+    QString url = (role == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
 
     if (url.length() > 1 && url.at(0)=='/')
         url = url.mid(1);
@@ -254,8 +261,14 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
     }
 
     ACS_VideoHeader *vh = (ACS_VideoHeader*)(headerBuffer);
+    if (vh->ulHdrID != 0xF5010000)
+        return QnAbstractMediaDataPtr(0); // must be bad header
 
-    int dataLeft = qMin(vh->ulDataLength, (quint32)1024*1024*10); // to avoid crash
+    if (vh->ulDataLength > 1024*1024*10)
+        return QnAbstractMediaDataPtr(0); // to big video image 
+
+
+    int dataLeft = vh->ulDataLength;//qMin(vh->ulDataLength, (quint32)1024*1024*10); // to avoid crash
 
 
     QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));

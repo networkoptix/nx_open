@@ -14,7 +14,7 @@ public:
     virtual ~QnVideoCameraGopKeeper();
     QnAbstractMediaStreamDataProvider* getLiveReader();
 
-    void copyLastGop(qint64 skipTime, CLDataQueue& dstQueue);
+    int copyLastGop(qint64 skipTime, CLDataQueue& dstQueue);
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
@@ -76,8 +76,9 @@ bool QnVideoCameraGopKeeper::processData(QnAbstractDataPacketPtr /*data*/)
     return true;
 }
 
-void QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
+int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
 {
+    int rez = 0;
     QMutexLocker lock(&m_queueMtx);
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
@@ -89,7 +90,9 @@ void QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
                 video->flags |= QnAbstractMediaData::MediaFlags_Ignore;
         }
         dstQueue.push(data);
+        rez++;
     }
+    return rez;
 }
 
 // --------------- QnVideoCamera ----------------------------
@@ -156,22 +159,22 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_getReaderMutex);
-    if (!m_primaryReader)
+    if (m_primaryReader == 0 && m_resource->getStatus() != QnResource::Disabled)
     {
         createReader(QnResource::Role_LiveVideo);
         createReader(QnResource::Role_SecondaryLiveVideo);
-        if (m_primaryReader)
-            m_primaryReader->start();
-        if (m_secondaryReader)
-            m_secondaryReader->start();
+        //if (m_primaryReader)
+        //    m_primaryReader->start();
+        //if (m_secondaryReader)
+        //    m_secondaryReader->start();
     }
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 
-void QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue)
+int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue)
 {
     if (primaryLiveStream)
-        m_primaryGopKeeper->copyLastGop(skipTime, dstQueue);
+        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue);
     else
-        m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
+        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
 }

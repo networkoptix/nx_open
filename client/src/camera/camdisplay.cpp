@@ -781,7 +781,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3)
         {
-			if (m_extTimeSrc)
+            bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
+			if (m_extTimeSrc && !isLive)
             	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
 
             /*

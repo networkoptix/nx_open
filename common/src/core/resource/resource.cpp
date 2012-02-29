@@ -493,7 +493,7 @@ QnResource::Status QnResource::getStatus() const
     return m_status;
 }
 
-void QnResource::setStatus(QnResource::Status newStatus)
+void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 {
     Status oldStatus;
     {
@@ -504,6 +504,9 @@ void QnResource::setStatus(QnResource::Status newStatus)
             return; 
 
         m_status = newStatus;
+
+        if (silenceMode)
+            return;
     }
 
     if (oldStatus == newStatus)

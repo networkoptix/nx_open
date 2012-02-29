@@ -406,14 +406,21 @@ void QnRtspDataConsumer::unlockDataQueue()
     m_dataQueueMtx.unlock();
 }
 
-void QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime)
+void QnRtspDataConsumer::addData(QnAbstractMediaDataPtr data)
+{
+    m_dataQueue.push(data);
+}
+
+int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(m_owner->getResource());
+    int copySize = 0;
     if (camera)
-        camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
+        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
+    return copySize;
 }
 
 void QnRtspDataConsumer::setSingleShotMode(bool value)

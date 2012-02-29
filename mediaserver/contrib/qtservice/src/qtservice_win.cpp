@@ -647,7 +647,7 @@ void WINAPI QtServiceSysPrivate::handler( DWORD code )
 void QtServiceSysPrivate::setStatus(DWORD state)
 {
     if (!available())
-	return;
+	    return;
     status.dwCurrentState = state;
     pSetServiceStatus(serviceStatus, &status);
 }

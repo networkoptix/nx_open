@@ -10,12 +10,13 @@ class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
 public:
-    QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role);
+    QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider);
     ~QnServerStreamRecorder();
 
     void updateCamera(QnSecurityCamResourcePtr cameraRes);
+    QnScheduleTask currentScheduleTask() const;
 signals:
-    void fpsChanged(float value);
+    void fpsChanged(QnServerStreamRecorder* recorder, float value);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
@@ -29,18 +30,21 @@ protected:
     virtual bool canAcceptData() const;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
+    void updateScheduleInfo(qint64 timeMs);
+    void updateStreamParams();
 private:
-    QMutex m_scheduleMutex;
+    mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
     QnScheduleTask m_currentScheduleTask;
     //qint64 m_skipDataToTime;
     qint64 m_lastMotionTimeUsec;
     bool m_lastMotionContainData;
-    bool m_needUpdateStreamParams;
+    //bool m_needUpdateStreamParams;
     mutable qint64 m_lastWarningTime;
     QnResource::ConnectionRole m_role;
     __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
+    QnAbstractMediaStreamDataProvider* m_mediaProvider;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

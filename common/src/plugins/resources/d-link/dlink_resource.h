@@ -58,13 +58,16 @@ public:
 
     void init() override; // does a lot of physical work 
 
+    bool hasDualStreaming() const override;
+
     
+    virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 
-    virtual void setMotionMaskPhysical(int channel) override;
+    
 
 protected:
     QnDlink_cam_info  m_camInfo;
