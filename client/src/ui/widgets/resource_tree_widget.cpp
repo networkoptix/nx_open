@@ -100,6 +100,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_searchDelegate = new QnResourceTreeItemDelegate(this);
     ui->searchTreeView->setItemDelegate(m_searchDelegate);
 
+    m_renameLayoutAction = new QAction(this);
+
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
     connect(ui->clearFilterButton,  SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
@@ -217,12 +219,16 @@ void QnResourceTreeWidget::killSearchTimer() {
     m_filterTimerId = 0; 
 }
 
-QItemSelectionModel *QnResourceTreeWidget::currentSelectionModel() const {
-    if (ui->tabWidget->currentIndex() == 0) {
-        return ui->resourceTreeView->selectionModel();
+QTreeView *QnResourceTreeWidget::currentItemView() const {
+    if (ui->tabWidget->currentIndex() == ResourcesTab) {
+        return ui->resourceTreeView;
     } else {
-        return ui->searchTreeView->selectionModel();
+        return ui->searchTreeView;
     }
+}
+
+QItemSelectionModel *QnResourceTreeWidget::currentSelectionModel() const {
+    return currentItemView()->selectionModel();
 }
 
 QnResourceList QnResourceTreeWidget::selectedResources() const {
@@ -302,7 +308,15 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     if(menu->isEmpty())
         return;
 
-    menu->exec(QCursor::pos());
+    /* Add tree-local actions to the menu. */
+    qnMenu->redirectAction(menu.data(), Qn::RenameLayoutAction, m_renameLayoutAction);
+
+    /* Run menu. */
+    QAction *action = menu->exec(QCursor::pos());
+
+    /* Process tree-local actions. */
+    if(action == m_renameLayoutAction)
+        currentItemView()->edit(currentSelectionModel()->currentIndex());
 }
 
 void QnResourceTreeWidget::wheelEvent(QWheelEvent *event) {

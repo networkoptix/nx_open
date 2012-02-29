@@ -190,9 +190,8 @@ FORMS += \
     ui/dialogs/camerasettingsdialog.ui \
     ui/dialogs/multiplecamerasettingsdialog.ui \
     ui/dialogs/serversettingsdialog.ui \
-    ui/dialogs/layout_save_dialog.ui \
+    ui/dialogs/layout_name_dialog.ui \
     ui/dialogs/new_user_dialog.ui \
-    ui/dialogs/new_layout_dialog.ui \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
     ui/device_settings/camera_schedule.ui \

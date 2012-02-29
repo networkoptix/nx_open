@@ -134,6 +134,7 @@ public:
         if(action == NULL) {
             action = new QnAction(m_manager, id, m_manager);
             m_manager->m_actionById[id] = action;
+            m_manager->m_idByAction[action] = id;
         }
 
         m_actionStack.back()->addChild(action);
@@ -182,6 +183,7 @@ QnActionManager::QnActionManager(QObject *parent):
 {
     m_root = new QnAction(this, Qn::NoAction, this);
     m_actionById[Qn::NoAction] = m_root;
+    m_idByAction[m_root] = Qn::NoAction;
 
     QnActionFactory factory(this, m_root);
 
@@ -386,6 +388,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Del")).
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition());
+
+    factory(Qn::RenameLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Rename")).
+        shortcut(tr("F2")).
+        autoRepeat(false).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
     factory(Qn::NewUserAction).
         flags(Qn::Tree | Qn::NoTarget).
@@ -714,6 +723,35 @@ QnResourceWidgetList QnActionManager::currentWidgetsTarget(QObject *sender) cons
     } else {
         return QnResourceWidgetList();
     }
+}
+
+void QnActionManager::redirectAction(QMenu *menu, Qn::ActionId targetId, QAction *targetAction) {
+    redirectActionRecursive(menu, targetId, targetAction);
+}
+
+bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction) {
+    QList<QAction *> actions = menu->actions();
+
+    foreach(QAction *action, actions) {
+        Qn::ActionId id = m_idByAction.value(action, Qn::NoAction);
+        if(id == targetId) {
+            int index = actions.indexOf(action);
+            
+            targetAction->setText(action->text());
+            targetAction->setShortcuts(action->shortcuts());
+            targetAction->setIcon(action->icon());
+
+            menu->removeAction(action);
+            menu->insertAction(index == actions.size() - 1 ? NULL : actions[index], targetAction);
+            return true;
+        }
+
+        if(action->menu() != NULL)
+            if(redirectActionRecursive(action->menu(), targetId, targetAction))
+                return true;
+    }
+        
+    return false;
 }
 
 void QnActionManager::at_menu_destroyed(QObject *menu) {

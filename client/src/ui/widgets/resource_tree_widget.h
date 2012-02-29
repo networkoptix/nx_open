@@ -73,6 +73,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
 
+    QTreeView *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;
 
     QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
@@ -102,6 +103,8 @@ private:
     QnResourceModel *m_resourceModel;
     QnResourceTreeItemDelegate *m_resourceDelegate;
     QnResourceTreeItemDelegate *m_searchDelegate;
+
+    QAction *m_renameLayoutAction;
 
     QnWorkbench *m_workbench;
 };
