@@ -20,7 +20,7 @@ public:
     void setName(const QString &name);
 
 protected slots:
-    void at_nameLineEdit_textChanged(const QString& text);
+    void at_nameLineEdit_textChanged(const QString &text);
 
 private:
     QScopedPointer<Ui::NewLayoutDialog> ui;

@@ -8,6 +8,8 @@ QnNewLayoutDialog::QnNewLayoutDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    connect(ui->nameLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(at_nameLineEdit_textChanged(const QString &)));
+
     at_nameLineEdit_textChanged(ui->nameLineEdit->text());
 }
 
@@ -23,6 +25,6 @@ void QnNewLayoutDialog::setName(const QString &name) {
     ui->nameLineEdit->setText(name);
 }
 
-void QnNewLayoutDialog::at_nameLineEdit_textChanged(const QString& text) {
+void QnNewLayoutDialog::at_nameLineEdit_textChanged(const QString &text) {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!text.isEmpty());
 }
