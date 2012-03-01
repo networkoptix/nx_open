@@ -9,29 +9,11 @@
 #include "workbench_layout_synchronizer.h"
 #include "workbench_context.h"
 
-namespace {
-    const char *qn_createdLocallyPropertyName = "_qn_createdLocally";
-
-    void setCreatedLocally(QnWorkbenchLayout *layout, bool createdLocally) {
-        layout->setProperty(qn_createdLocallyPropertyName, createdLocally);
-    }
-
-    bool isCreatedLocally(QnWorkbenchLayout *layout) {
-        return layout->property(qn_createdLocallyPropertyName).toBool();
-    }
-
-    Q_GLOBAL_STATIC(detail::LayoutData, qn_dummyLayoutState);
-
-} // anonymous namespace
-
-
-
 QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
     QObject(NULL),
     m_context(NULL),
     m_update(false),
-    m_submit(false),
-    m_connection(QnAppServerConnectionFactory::createConnection())
+    m_submit(false)
 {}
 
 QnWorkbenchSynchronizer::~QnWorkbenchSynchronizer() {
@@ -98,18 +80,14 @@ void QnWorkbenchSynchronizer::submit() {
             /* This actually is a newly created layout. */
             resource = QnLayoutResourcePtr(new QnLayoutResource());
             resource->setGuid(QUuid::createUuid());
-            context()->resourcePool()->addResource(resource);
-            if(context()->user())
-                context()->user()->addLayout(resource); /* Leave layout a toplevel resource if there is no current user. */
-
-            setCreatedLocally(layout, true);
 
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);
             synchronizer->setAutoDeleting(true);
             synchronizer->submit();
 
-            /* Consider it saved in its present state. */
-            setSavedState(resource, detail::LayoutData(resource));
+            context()->resourcePool()->addResource(resource);
+            if(context()->user())
+                context()->user()->addLayout(resource); /* Leave layout a toplevel resource if there is no current user. */
         }
     }
 }

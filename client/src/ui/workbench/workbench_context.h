@@ -8,6 +8,7 @@ class QnResourcePoolUserWatcher;
 class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
+class QnWorkbenchLayoutSnapshotManager;
 
 class QnWorkbenchContext: public QObject {
     Q_OBJECT;
@@ -30,6 +31,10 @@ public:
         return m_synchronizer;
     }
 
+    QnWorkbenchLayoutSnapshotManager *snapshotManager() const {
+        return m_snapshotManager;
+    }
+
     QnUserResourcePtr user();
 
 signals:
@@ -44,6 +49,7 @@ private:
     QnResourcePoolUserWatcher *m_userWatcher;
     QnResourcePool *m_resourcePool;
     QnWorkbenchSynchronizer *m_synchronizer;
+    QnWorkbenchLayoutSnapshotManager *m_snapshotManager;
     QnWorkbench *m_workbench;
 };
 

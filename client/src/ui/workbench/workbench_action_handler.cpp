@@ -36,6 +36,7 @@
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_context.h"
+#include "workbench_layout_state_manager.h"
 
 namespace {
     enum RemovedResourceType {
@@ -76,11 +77,15 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 }
 
 QnWorkbench *QnWorkbenchActionHandler::workbench() const {
-    return m_context ? m_context->workbench() : NULL;
+    return m_context->workbench();
 }
 
 QnWorkbenchSynchronizer *QnWorkbenchActionHandler::synchronizer() const {
-    return m_context ? m_context->synchronizer() : NULL;
+    return m_context->synchronizer();
+}
+
+QnWorkbenchLayoutSnapshotManager *QnWorkbenchActionHandler::snapshotManager() const {
+    return m_context->snapshotManager();
 }
 
 void QnWorkbenchActionHandler::setContext(QnWorkbenchContext *context) {
@@ -167,7 +172,7 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
         return false;
 
     QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
-    return synchronizer()->isLocal(layout) && !synchronizer()->isChanged(layout);
+    return snapshotManager()->isLocal(layout) && !synchronizer()->isChanged(layout);
 }
 
 void QnWorkbenchActionHandler::addToWorkbench(const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {

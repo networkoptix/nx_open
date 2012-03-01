@@ -8,6 +8,7 @@
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
+class QnWorkbenchLayoutSnapshotManager;
 
 class QnWorkbenchActionHandler: public QObject {
     Q_OBJECT;
@@ -23,6 +24,8 @@ public:
     QnWorkbench *workbench() const;
 
     QnWorkbenchSynchronizer *synchronizer() const;
+
+    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
 
     void setContext(QnWorkbenchContext *context);
 

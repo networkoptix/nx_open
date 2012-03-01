@@ -43,8 +43,6 @@ protected slots:
     void at_workbench_layoutsChanged();
 
 private:
-    friend class detail::WorkbenchSynchronizerReplyProcessor;
-
     /** Associated context. */
     QnWorkbenchContext *m_context;
 
@@ -53,12 +51,6 @@ private:
 
     /** Whether changes should be propagated from resources to workbench. */
     bool m_update;
-
-    /** Appserver connection. */
-    QnAppServerConnectionPtr m_connection;
-
-    /** Mapping from layout resource to its saved state. */
-    QHash<QnLayoutResourcePtr, detail::LayoutData> m_savedDataByResource;
 };
 
 
