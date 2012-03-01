@@ -81,9 +81,9 @@ void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByt
 
 
 // -------------------------------------------------------------------------- //
-// QnWorkbenchLayoutManager
+// QnWorkbenchLayoutStateManager
 // -------------------------------------------------------------------------- //
-QnWorkbenchLayoutManager::QnWorkbenchLayoutManager(QObject *parent):    
+QnWorkbenchLayoutStateManager::QnWorkbenchLayoutStateManager(QObject *parent):    
     QObject(parent),
     m_context(NULL),
     m_stateStorage(new QnWorkbenchLayoutStateStorage(this))
@@ -91,11 +91,11 @@ QnWorkbenchLayoutManager::QnWorkbenchLayoutManager(QObject *parent):
 
 }
 
-QnWorkbenchLayoutManager::~QnWorkbenchLayoutManager() {
+QnWorkbenchLayoutStateManager::~QnWorkbenchLayoutStateManager() {
     setContext(NULL);
 }
 
-void QnWorkbenchLayoutManager::setContext(QnWorkbenchContext *context) {
+void QnWorkbenchLayoutStateManager::setContext(QnWorkbenchContext *context) {
     if(m_context == context)
         return;
 
@@ -108,7 +108,7 @@ void QnWorkbenchLayoutManager::setContext(QnWorkbenchContext *context) {
         start();
 }
 
-void QnWorkbenchLayoutManager::start() {
+void QnWorkbenchLayoutStateManager::start() {
     assert(m_context != NULL);
 
 
@@ -122,7 +122,7 @@ void QnWorkbenchLayoutManager::start() {
     connect(context()->resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
 }
 
-void QnWorkbenchLayoutManager::stop() {
+void QnWorkbenchLayoutStateManager::stop() {
     assert(m_context != NULL);
 
     disconnect(context(), NULL, this, NULL);
@@ -187,7 +187,7 @@ bool QnWorkbenchSynchronizer::isLocal(const QnLayoutResourcePtr &resource) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutManager::at_context_aboutToBeDestroyed() {
+void QnWorkbenchLayoutStateManager::at_context_aboutToBeDestroyed() {
     setContext(NULL);
 }
 

@@ -31,13 +31,13 @@ namespace detail {
 } // namespace detail
 
 
-class QnWorkbenchLayoutManager: public QObject {
+class QnWorkbenchLayoutStateManager: public QObject {
     Q_OBJECT;
 
 public:
-    QnWorkbenchLayoutManager(QObject *parent = NULL);
+    QnWorkbenchLayoutStateManager(QObject *parent = NULL);
 
-    virtual ~QnWorkbenchLayoutManager();
+    virtual ~QnWorkbenchLayoutStateManager();
 
     QnWorkbenchContext *context() const {
         return m_context;
