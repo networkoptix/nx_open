@@ -341,6 +341,7 @@ void parseLicenses(QList<QnLicensePtr>& licenses, const PbLicenseList& pb_licens
                                  pb_license.name().c_str(),
                                  pb_license.key().c_str(),
                                  pb_license.cameracount(),
+                                 pb_license.hwid().c_str(),
                                  pb_license.signature().c_str()
                                  ));
         licenses.append(license);
@@ -519,10 +520,11 @@ void QnApiPbSerializer::serializeLicenses(const QnLicenseList& licenses, QByteAr
     foreach(QnLicensePtr license, licenses)
     {
         proto::pb::License& pb_license = *(pb_licenses.add_license());
-        pb_license.set_name(license->name().toStdString());
-        pb_license.set_key(license->key().toStdString());
+        pb_license.set_name(license->name().constData());
+        pb_license.set_key(license->key().constData());
         pb_license.set_cameracount(license->cameraCount());
-        pb_license.set_signature(license->signature().toStdString());
+        pb_license.set_hwid(qnLicensePool->hardwareId().constData());
+        pb_license.set_signature(license->signature().constData());
     }
 
     std::string str;

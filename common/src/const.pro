@@ -83,7 +83,7 @@ unix {
 }
 
 mac {
-  LIBS += -framework IOKit
+  LIBS += -framework IOKit -lcrypto
   LIBS += -L../contrib/qjson/lib/mac
 }
 

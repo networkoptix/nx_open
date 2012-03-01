@@ -9,20 +9,27 @@
 class QnLicense
 {
 public:
-    QnLicense(const QString& name, const QString& key, int cameraCount, const QString& signature);
+    QnLicense(const QByteArray& name, const QByteArray& key, int cameraCount, const QByteArray& hardwareId, const QByteArray& signature);
 
     bool isValid() const;
 
-    const QString& name() const;
-    const QString& key() const ;
+    const QByteArray& name() const;
+    const QByteArray& key() const ;
     const qint32 cameraCount() const;
-    const QString& signature() const;
+    const QByteArray& hardwareId() const;
+    const QByteArray& signature() const;
+
+    QByteArray toString() const;
+    static QnLicense fromString(const QByteArray &licenseString);
 
 private:
-    QString m_name;
-    QString m_key;
+    QByteArray m_name;
+    QByteArray m_key;
     qint32 m_cameraCount;
-    QString m_signature;
+    QByteArray m_signature;
+    QByteArray m_hardwareId;
+
+    mutable int m_validLicense;
 };
 
 typedef QSharedPointer<QnLicense> QnLicensePtr;
@@ -39,8 +46,12 @@ public:
     void removeLicense(const QnLicensePtr&);
 
     bool isEmpty() const;
+    bool haveValidLicense() const;
+
+    const QByteArray& hardwareId() const;
 
 private:
+    QByteArray m_hardwareId;
     QnLicenseList m_licenses;
     mutable QMutex m_mutex;
 };

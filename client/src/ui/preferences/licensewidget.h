@@ -3,9 +3,10 @@
 
 #include <QtGui/QWidget>
 
-class QNetworkAccessManager;
+#include "licensing/license.h"
+#include "ui_licensewidget.h"
 
-class QnLicense;
+class QNetworkAccessManager;
 
 namespace Ui {
     class LicenseWidget;
@@ -35,8 +36,8 @@ private Q_SLOTS:
 private:
     void updateFromServer(const QString &licenseKey, const QString &hardwareId);
 
-    void updateControls(const QnLicense &license);
-    void validateLicense(const QnLicense &license);
+    void updateControls();
+    void validateLicense(const QnLicensePtr &license);
 
 private:
     Q_DISABLE_COPY(LicenseWidget)

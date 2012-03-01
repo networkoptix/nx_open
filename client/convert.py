@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import shutil
@@ -82,10 +82,25 @@ def generate_info_plist():
     strings_template = Template(xin)
     print >> xout, strings_template.substitute(associations=associations.getvalue(), version=APPLICATION_VERSION)
 
+def get_library_path():
+    if platform() == 'mac':
+        return os.getenv('DYLD_LIBRARY_PATH')
+    
+    return None
+
+def set_library_path(value):
+    if platform() == 'mac':
+        os.putenv('DYLD_LIBRARY_PATH', value)
+
 def gen_version_h():
     revision = os.popen('hg id -i').read().strip()
 
+    library_path = get_library_path()
+    set_library_path(os.path.join(ffmpeg_path_release, 'lib'))
     ffmpeg_output = os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()
+    if library_path:
+        set_library_path(library_path)
+    
     ffmpeg_version = re.search(r'(N-[^\s]*)', ffmpeg_output).groups()[0]
 
     version_h = open('src/version.h', 'w')

@@ -11,7 +11,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include "license.h"
+#include "licensing/license.h"
 
 LicenseWidget::LicenseWidget(QWidget *parent) :
     QWidget(parent),
@@ -29,7 +29,7 @@ LicenseWidget::LicenseWidget(QWidget *parent) :
 
     setOnlineActivation(ui->licenseGoupBox->isChecked());
 
-    ui->hardwareIdEdit->setText(QnLicense::machineHardwareId());
+    ui->hardwareIdEdit->setText(qnLicensePool->hardwareId());
 
     ui->serialKeyEdit->setFocus();
 }
@@ -71,7 +71,7 @@ void LicenseWidget::setOnlineActivation(bool online)
         }
     }
 
-    updateControls(QnLicense::defaultLicense());
+    updateControls();
 }
 
 void LicenseWidget::browseLicenseFileButtonClicked()
@@ -89,7 +89,8 @@ void LicenseWidget::browseLicenseFileButtonClicked()
 
 void LicenseWidget::licenseDetailsButtonClicked()
 {
-    const QnLicense license = QnLicense::defaultLicense();
+    // get tab element
+    const QnLicense license("", "", 1, "", ""); // = QnLicense::defaultLicense();
 
     QString details = tr("<b>Generic:</b><br />\n"
                          "License Qwner: %1<br />\n"
@@ -98,9 +99,9 @@ void LicenseWidget::licenseDetailsButtonClicked()
                          "<br />\n"
                          "<b>Features:</b><br />\n"
                          "Archive Streams Allowed: %4")
-                      .arg(license.name())
-                      .arg(license.serialKey())
-                      .arg(license.hardwareId())
+                      .arg(license.name().constData())
+                      .arg(license.key().constData())
+                      .arg(license.hardwareId().constData())
                       .arg(license.cameraCount());
     QMessageBox::information(this, tr("License Details"), details);
 }
@@ -115,7 +116,7 @@ void LicenseWidget::activateLicenseButtonClicked()
     if (ui->licenseGoupBox->isChecked())
         updateFromServer(ui->serialKeyEdit->text(), ui->hardwareIdEdit->text());
     else
-        validateLicense(QnLicense::fromString(ui->activationKeyTextEdit->toPlainText().toLatin1()));
+        validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(ui->activationKeyTextEdit->toPlainText().toLatin1()))));
 }
 
 void LicenseWidget::updateFromServer(const QString &serialKey, const QString &hardwareId)
@@ -123,7 +124,7 @@ void LicenseWidget::updateFromServer(const QString &serialKey, const QString &ha
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QLatin1String("http://networkoptix.com/nolicensed/activate.php"));
+    QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/nolicensed/activate.php"));
 
     QNetworkRequest request;
     request.setUrl(url);
@@ -155,56 +156,38 @@ void LicenseWidget::downloadError()
 void LicenseWidget::downloadFinished()
 {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
-        validateLicense(QnLicense::fromString(reply->readAll()));
+        validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(reply->readAll()))));
 
         reply->deleteLater();
     }
 }
 
-void LicenseWidget::updateControls(const QnLicense &license)
+void LicenseWidget::updateControls()
 {
-    if (QnLicense::defaultLicense().isValid()) {
-        QPalette palette = ui->infoLabel->palette();
-        palette.setColor(QPalette::Foreground, parentWidget() ? parentWidget()->palette().color(QPalette::Foreground) : Qt::black);
-        ui->infoLabel->setPalette(palette);
-
-        ui->infoLabel->setText(tr("You have a valid License installed"));
-
+    if (qnLicensePool->haveValidLicense()) {
         ui->licenseDetailsButton->setEnabled(true);
-    } else {
-        QPalette palette = ui->infoLabel->palette();
-        palette.setColor(QPalette::Foreground, Qt::red);
-        ui->infoLabel->setPalette(palette);
-
-        ui->infoLabel->setText(tr("You do not have a valid License installed"));
     }
-
+/*
     if (license.isValid()) {
         ui->serialKeyEdit->setText(license.serialKey());
         ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(license.toString()));
 
         ui->licenseDetailsButton->setEnabled(true);
     }
-
+*/
     ui->activateLicenseButton->setText(tr("Activate License"));
     ui->activateLicenseButton->setEnabled(true);
 }
 
-void LicenseWidget::validateLicense(const QnLicense &license)
+void LicenseWidget::validateLicense(const QnLicensePtr &license)
 {
-    if (license.isValid()) {
-        QnLicense::setDefaultLicense(license);
+    if (license->isValid()) {
+        qnLicensePool->addLicense(license);
 
-        updateControls(license);
+        updateControls();
 
         QMessageBox::information(this, tr("License Activation"),
                                  tr("License was succesfully activated."));
-    } else if (QnLicense::defaultLicense().isValid()) {
-        if (QMessageBox::question(this, tr("License Activation"),
-                                  tr("License was not activated but you have a valid License already installed.\nWould you like to try again."),
-                                  QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes) == QMessageBox::Cancel) {
-            updateControls(QnLicense::defaultLicense());
-        }
     } else {
         QMessageBox::warning(this, tr("License Activation"),
                              tr("Invalid License. Contact our support team to get a valid License."));

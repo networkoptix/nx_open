@@ -7,7 +7,7 @@
 #include "ui/actions/action_manager.h"
 
 #include "connectionssettingswidget.h"
-#include "licensewidget.h"
+#include "licensemanagerwidget.h"
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
@@ -35,7 +35,7 @@ static inline QString cameraInfoString(QnResourcePtr resource)
 
 PreferencesDialog::PreferencesDialog(QWidget *parent)
     : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
-      connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
+      connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseManagerWidget(0)
 {
     setupUi(this);
 
@@ -55,8 +55,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
     tabWidget->insertTab(3, youTubeSettingsWidget, tr("YouTube"));
 
 #ifndef CL_TRIAL_MODE
-    licenseWidget = new LicenseWidget(this);
-    tabWidget->insertTab(4, licenseWidget, tr("License"));
+    licenseManagerWidget = new LicenseManagerWidget(this);
+    tabWidget->insertTab(4, licenseManagerWidget, tr("License"));
 #endif
 
     QToolButton *aboutButton = new QToolButton();

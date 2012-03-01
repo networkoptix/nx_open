@@ -4,7 +4,7 @@
 #include <QSettings>
 #include <QDir>
 
-#include "license.h"
+#include "licensing/license.h"
 #include "utils/common/util.h"
 #include "utils/common/log.h"
 
@@ -31,8 +31,8 @@ namespace {
 
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
 
-QnSettings::QnSettings(): 
-    m_lock(QMutex::Recursive) 
+QnSettings::QnSettings():
+    m_lock(QMutex::Recursive)
 {}
 
 QnSettings *QnSettings::instance()
@@ -238,7 +238,7 @@ void QnSettings::setConnections(const QList<QnSettings::ConnectionData> &connect
 
 bool QnSettings::haveValidLicense()
 {
-    return QnLicense::defaultLicense().isValid();
+    return qnLicensePool->haveValidLicense();
 }
 
 /// Private methods. No internal synchronization needed.
