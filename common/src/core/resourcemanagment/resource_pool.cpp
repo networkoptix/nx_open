@@ -132,11 +132,10 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     }
 
     /* Remove layouts from their users. */
-    foreach (const QnResourcePtr &resource, removedResources) {
+    foreach (const QnResourcePtr &resource, removedResources)
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
             if(QnUserResourcePtr user = getResourceById(layout->getParentId()).dynamicCast<QnUserResource>())
                 user->removeLayout(layout);
-    }
 }
 
 void QnResourcePool::handleResourceChange()

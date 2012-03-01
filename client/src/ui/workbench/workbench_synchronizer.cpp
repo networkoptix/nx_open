@@ -27,7 +27,7 @@ namespace {
 
 void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int) {
     if(status == 0 && !m_synchronizer.isNull())
-        m_synchronizer.data()->m_savedDataByResource[m_resource] = detail::LayoutData(m_resource);
+        m_synchronizer.data()->setSavedState(m_resource, detail::LayoutData(m_resource));
 
     if(resources.size() != 1) {
         qnWarning("Received reply of invalid size %1: expected a list containing a single layout resource.", resources.size());

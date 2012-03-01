@@ -278,10 +278,8 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
     if(close) {
         delete layout;
 
-        if(isLocal) {
-            context()->user()->removeLayout(resource); // TODO
+        if(isLocal)
             qnResPool->removeResource(resource);
-        }
     }
 }
 
@@ -560,7 +558,6 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         case Layout: {
             QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
             if(synchronizer()->isLocal(layout)) {
-                context()->user()->removeLayout(layout); // TODO: do it automatically in user
                 qnResPool->removeResource(resource);
                 break;
             }
