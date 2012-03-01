@@ -15,6 +15,7 @@ public:
 
     void updateCamera(QnSecurityCamResourcePtr cameraRes);
     QnScheduleTask currentScheduleTask() const;
+    void updateScheduleInfo(qint64 timeMs);
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
 protected:
@@ -30,7 +31,6 @@ protected:
     virtual bool canAcceptData() const;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
-    void updateScheduleInfo(qint64 timeMs);
     void updateStreamParams();
 private:
     mutable QMutex m_scheduleMutex;

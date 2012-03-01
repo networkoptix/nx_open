@@ -68,6 +68,10 @@ public:
         delete dataProcessor;
         archiveDP = 0;
         dataProcessor = 0;
+
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes);
+        camera->stopIfNoActivity();
+
     }
 
     ~QnRtspConnectionProcessorPrivate()
@@ -386,10 +390,16 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
-    if (!d->liveDpHi && camera) 
+    if (!d->liveDpHi && camera) {
         d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    if (!d->liveDpLow && camera) 
+        if (d->liveDpHi)
+            d->liveDpHi->start();
+    }
+    if (!d->liveDpLow && camera)  {
         d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+        if (d->liveDpLow)
+            d->liveDpLow->start();
+    }
     if (!d->archiveDP) 
         d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
 }

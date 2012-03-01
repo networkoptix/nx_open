@@ -1,6 +1,7 @@
 #ifndef __RECORDING_MANAGER_H__
 #define __RECORDING_MANAGER_H__
 
+#include <QTimer>
 #include <QObject>
 #include <QMap>
 #include "core/resource/resource.h"
@@ -42,11 +43,14 @@ private slots:
     void onRemoveResource(QnResourcePtr res);
     void onFpsChanged(QnServerStreamRecorder* recorder, float value);
     void onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
+    void onTimer();
 private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
+    void startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
 private:
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
+    QTimer m_scheduleWatchingTimer;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory
