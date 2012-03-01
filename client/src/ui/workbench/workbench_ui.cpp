@@ -824,14 +824,16 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
+    bool sliderVisible = m_sliderItem->videoCamera() != NULL && !m_sliderItem->videoCamera()->getCamDisplay()->isStillImage();
+
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();
-        setSliderVisible(hovered, animate);
+        setSliderVisible(sliderVisible && hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
         setHelpVisible(hovered, animate);
     } else {
-        setSliderVisible(m_sliderItem->videoCamera() != NULL, animate);
+        setSliderVisible(sliderVisible, animate);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
         setHelpVisible(true, animate);
