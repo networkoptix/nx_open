@@ -219,9 +219,10 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         // sometimes preffer drive with maximum free space
         qint64 maxSpace = 0;
         qint64 minSpace = INT64_MAX;
-        for (int i = 0; i < m_storageRoots.size(); ++i)
+        //for (int i = 0; i < m_storageRoots.size(); ++i)
+        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            qint64 freeSpace = getDiskFreeSpace(m_storageRoots[i]->getUrl());
+            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
             maxSpace = qMax(maxSpace, freeSpace);
             minSpace = qMin(minSpace, freeSpace);
         }
@@ -233,26 +234,26 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     if (balanceByBitrate)
     {
         // select storage with mimimum bitrate
-        for (int i = 0; i < m_storageRoots.size(); ++i)
+        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            float bitrate = m_storageRoots[i]->bitrate();
+            float bitrate = itr.value()->bitrate();
             if (bitrate < minBitrate)
             {
                 minBitrate = bitrate;
-                result = m_storageRoots[i];
+                result = itr.value();
             }
         }
     }
     else 
     {
         // select storage with maximum free space
-        for (int i = 0; i < m_storageRoots.size(); ++i)
+        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            qint64 freeSpace = getDiskFreeSpace(m_storageRoots[i]->getUrl());
+            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
             if (freeSpace > maxFreeSpace)
             {
                 maxFreeSpace = freeSpace;
-                result = m_storageRoots[i];
+                result = itr.value();
             }
         }
     }
@@ -306,7 +307,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
     storageIndex = -1;
     for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
-        QString root = closeDirPath((*itr)->getUrl());
+        QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))
         {
             int qualityLen = fileName.indexOf('/', root.length()+1) - root.length();
@@ -314,7 +315,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
             quality = QFileInfo(quality).baseName();
             int macPos = root.length() + qualityLen;
             mac = fileName.mid(macPos+1, fileName.indexOf('/', macPos+1) - macPos-1);
-            storageIndex = (*itr)->getIndex();
+            storageIndex = itr.value()->getIndex();
             return *itr;
         }
     }
