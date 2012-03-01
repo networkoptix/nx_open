@@ -64,7 +64,7 @@ private:
     int m_bufferSize;
     int m_minBufferSize;
     quint8* m_buffer;
-    static QueueFileWriter m_queueWriter;
+    QueueFileWriter* m_queueWriter;
 public:
     bool m_isDirectIO;
     int m_bufferLen;

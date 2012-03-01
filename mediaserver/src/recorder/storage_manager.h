@@ -44,8 +44,7 @@ private:
     void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality);
 private:
-    //typedef QMap<int, QnStorageResourcePtr> StorageMap;
-    typedef QList<QnStorageResourcePtr> StorageMap;
+    typedef QMap<int, QnStorageResourcePtr> StorageMap;
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalogHi;

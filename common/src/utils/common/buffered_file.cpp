@@ -1,8 +1,10 @@
 #include "buffered_file.h"
 
+#include <QSharedPointer>
+
 static const int SECTOR_SIZE = 32768;
 
-QueueFileWriter QBufferedFile::m_queueWriter;
+//QueueFileWriter QBufferedFile::m_queueWriter;
 
 
 // -------------- QueueFileWriter ------------
@@ -51,13 +53,46 @@ void QueueFileWriter::run()
     }
 }
 
+// -------------- WriterPool ------------
+class WriterPool
+{
+public:
+    WriterPool() {}
+    ~WriterPool()
+    {
+        foreach(QueueFileWriter* writer, m_writers.values())
+            delete writer;
+    }
+
+    QueueFileWriter* getWriter(const QString& fileName)
+    {
+        QString drive = fileName.left(fileName.indexOf("/"));
+
+        QMutexLocker lock(&m_mutex);
+        WritersMap::iterator itr = m_writers.find(drive);
+        if (itr == m_writers.end())
+        {
+            itr = m_writers.insert(drive, new QueueFileWriter());
+        }
+        return itr.value();
+    }
+private:
+    QMutex m_mutex;
+    typedef QMap<QString, QueueFileWriter*> WritersMap;
+    WritersMap m_writers;
+};
+
+
+static WriterPool m_writerPool;
+
+
 // -------------- QBufferedFile -------------
 
 QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int minBufferSize): 
     QnFile(fileName), 
     m_bufferSize(fileBlockSize+minBufferSize),
-    m_buffer(0)
-
+    m_buffer(0),
+    m_queueWriter(0)
 {
     m_minBufferSize = minBufferSize;
     if (m_bufferSize > 0)
@@ -104,7 +139,7 @@ void QBufferedFile::flushBuffer()
     {
         int toWrite = (m_bufferLen/SECTOR_SIZE)*SECTOR_SIZE;
         //qint64 writed = QnFile::write((char*) m_buffer, toWrite);
-        qint64 writed = m_queueWriter.write(this, (const char*) m_buffer, toWrite);
+        qint64 writed = m_queueWriter->write(this, (const char*) m_buffer, toWrite);
         if (writed == toWrite)
         {
             m_totalWrited += writed;
@@ -158,7 +193,7 @@ qint64	QBufferedFile::write ( const char * data, qint64 len )
         {
             int writed;
             if (m_isDirectIO)
-                writed = m_queueWriter.write(this, (const char*) m_buffer, m_bufferSize - m_minBufferSize);
+                writed = m_queueWriter->write(this, (const char*) m_buffer, m_bufferSize - m_minBufferSize);
             else
                 writed = QnFile::write((char*) m_buffer, m_bufferSize - m_minBufferSize);
             m_totalWrited += writed;
@@ -208,6 +243,10 @@ bool QBufferedFile::open(QIODevice::OpenMode& mode, unsigned int systemDependent
 #endif
     bool rez = QnFile::open(mode, systemDependentFlags);
     m_filePos = 0;
+
+    if (m_isDirectIO)
+        m_queueWriter = m_writerPool.getWriter(m_fileName);
+
     return rez;
 }
 
