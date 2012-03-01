@@ -488,7 +488,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     setSliderOpened(true, false);
     setSliderVisible(false, false);
-    setTreeOpened(false, false);
+    setTreeOpened(true, false);
     setTreeVisible(true, false);
     setTitleOpened(true, false);
     setTitleVisible(true, false);
@@ -496,6 +496,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setHelpOpened(false, false);
     setHelpVisible(true, false);
 
+    /* Tree is pinned by default. */
+    m_treePinButton->setChecked(true);
 
     /* Set up help context processing. */
     QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display, this);
