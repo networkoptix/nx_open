@@ -184,7 +184,7 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
     // for empty schedule we record all time
     QMutexLocker lock(&m_scheduleMutex);
 
-    updateScheduleInfo(media->timestamp/1000);
+    //updateScheduleInfo(media->timestamp/1000);
 
     beforeProcessData(media);
 

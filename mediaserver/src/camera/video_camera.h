@@ -15,7 +15,11 @@ public:
     virtual ~QnVideoCamera();
     QnAbstractMediaStreamDataProvider* getLiveReader(QnResource::ConnectionRole role);
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
+
     void beforeStop();
+
+    /* stop reading from camera if no active DataConsumers left */
+    void stopIfNoActivity();
 private:
     void createReader(QnResource::ConnectionRole role);
 private:
