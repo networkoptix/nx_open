@@ -152,7 +152,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_context->workbench()->mapper()->setCellSize(defaultCellSize);
     m_context->workbench()->mapper()->setSpacing(defaultSpacing);
 
-    m_display = new QnWorkbenchDisplay(m_context->workbench(), this);
+    m_display = new QnWorkbenchDisplay(m_context, this);
 	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);

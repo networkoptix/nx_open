@@ -131,11 +131,28 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
         return;
     }
 
-    const QnWorkbenchLayoutSnapshot &state = m_storage->snapshot(resource);
-    resource->setItems(state.items);
-    resource->setName(state.name);
+    /* We don't want to get queued layout change signals for these changes, 
+     * so there are no options but to disconnect before making them. */
+    disconnectFrom(resource);
+    {
+        const QnWorkbenchLayoutSnapshot &snapshot = m_storage->snapshot(resource);
+        resource->setItems(snapshot.items);
+        resource->setName(snapshot.name);
+    }
+    connectTo(resource);
 
     setFlags(resource, flags(resource) & ~Qn::LayoutIsChanged);
+}
+
+void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource) {
+    connect(resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this,   SLOT(at_layout_changed()));
+    connect(resource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),  this,   SLOT(at_layout_changed()));
+    connect(resource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),  this,   SLOT(at_layout_changed()));
+    connect(resource.data(),  SIGNAL(nameChanged()),                          this,   SLOT(at_layout_changed()));
+}
+
+void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource) {
+    disconnect(resource.data(), NULL, this, NULL);
 }
 
 
@@ -157,9 +174,7 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     setFlags(layoutResource, layoutResource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0));
 
     /* Subscribe to changes to track changed status. */
-    connect(layoutResource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this,   SLOT(at_layout_changed()));
-    connect(layoutResource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),  this,   SLOT(at_layout_changed()));
-    connect(layoutResource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),  this,   SLOT(at_layout_changed()));
+    connectTo(layoutResource);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -170,7 +185,7 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
     m_storage->remove(layoutResource);
     m_flagsByLayout.remove(layoutResource);
 
-    disconnect(layoutResource.data(), NULL, this, NULL);
+    disconnectFrom(layoutResource);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_saved(const QnLayoutResourcePtr &resource) {

@@ -92,6 +92,9 @@ protected:
 
     void setFlags(const QnLayoutResourcePtr &resource, Qn::LayoutFlags flags);
 
+    void connectTo(const QnLayoutResourcePtr &resource);
+    void disconnectFrom(const QnLayoutResourcePtr &resource);
+
 protected slots:
     void at_context_aboutToBeDestroyed();
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);

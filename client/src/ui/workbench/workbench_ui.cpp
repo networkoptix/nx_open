@@ -199,7 +199,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_treeWidget->setPalette(palette);
         m_treeWidget->setComboBoxPalette(cbPalette);
     }
-    m_treeWidget->setWorkbench(display->workbench());
+    m_treeWidget->setContext(display->context());
     m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);

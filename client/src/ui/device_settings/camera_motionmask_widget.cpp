@@ -19,6 +19,7 @@
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_layout.h"
 #include "ui/style/globals.h"
+#include "ui/workbench/workbench_context.h"
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent)
 	: QWidget(parent)
@@ -57,11 +58,11 @@ void QnCameraMotionMaskWidget::init()
     const QSizeF defaultCellSize = QSizeF(15000.0, 10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
     const QSizeF defaultSpacing = QSizeF(2500.0, 2500.0);
     
-    m_workbench = new QnWorkbench(this);
-    m_workbench->mapper()->setCellSize(defaultCellSize);
-    m_workbench->mapper()->setSpacing(defaultSpacing);
+    m_context = new QnWorkbenchContext(NULL, this);
+    m_context->workbench()->mapper()->setCellSize(defaultCellSize);
+    m_context->workbench()->mapper()->setSpacing(defaultSpacing);
 
-    m_display = new QnWorkbenchDisplay(m_workbench, this);
+    m_display = new QnWorkbenchDisplay(m_context, this);
     m_display->setScene(m_scene);
     m_display->setView(m_view);
     m_display->setMarginFlags(0);
@@ -118,8 +119,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 	QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
 	item->setPinned(true);
 	item->setGeometry(QRect(0, 0, 1, 1));
-	m_workbench->currentLayout()->addItem(item);
-	m_workbench->setItem(QnWorkbench::ZOOMED, item);
+	m_context->workbench()->currentLayout()->addItem(item);
+	m_context->workbench()->setItem(QnWorkbench::ZOOMED, item);
 
     /* Set up the corresponding widget. */
     m_widget = m_display->widget(item);
