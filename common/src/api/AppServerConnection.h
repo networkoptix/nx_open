@@ -14,6 +14,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/user_resource.h"
+#include "licensing/license.h"
 
 #include "api/serializer/pb_serializer.h"
 
@@ -68,6 +69,7 @@ public:
     int getServers(QnVideoServerResourceList& servers, QByteArray& errorString);
     int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
+    int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
 
     int saveSync(const QnVideoServerResourcePtr&, QByteArray& errorString);
     int saveSync(const QnVirtualCameraResourcePtr&, QByteArray& errorString);
@@ -133,5 +135,6 @@ private:
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);
+bool initLicenses(QnAppServerConnectionPtr appServerConnection);
 
 #endif // APPSERVERCONNECTIONIMPL_H

@@ -36,22 +36,43 @@ bool QnLicense::isValid() const
     return true;
 }
 
-QnLisencePool* QnLisencePool::instance()
+QnLicensePool* QnLicensePool::instance()
 {
     return globalLicensePool();
 }
 
-const QnLisenseList& QnLisencePool::getLicenses()
+const QnLicenseList& QnLicensePool::getLicenses() const
 {
+    QMutexLocker locker(&m_mutex);
+
     return m_licenses;
 }
 
-void QnLisencePool::addLicense(const QnLicensePtr& license)
+void QnLicensePool::addLicenses(const QnLicenseList& licenses)
 {
+    QMutexLocker locker(&m_mutex);
+
+    int n = licenses.size();
+    m_licenses.append(licenses);
+}
+
+void QnLicensePool::addLicense(const QnLicensePtr& license)
+{
+    QMutexLocker locker(&m_mutex);
+
     m_licenses.append(license);
 }
 
-void QnLisencePool::removeLicense(const QnLicensePtr& license)
+void QnLicensePool::removeLicense(const QnLicensePtr& license)
 {
-    m_licenses.remove(license);
+    QMutexLocker locker(&m_mutex);
+
+    m_licenses.removeOne(license);
+}
+
+bool QnLicensePool::isEmpty() const
+{
+    QMutexLocker locker(&m_mutex);
+
+    return m_licenses.isEmpty();
 }

@@ -9,6 +9,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/user_resource.h"
+#include "licensing/license.h"
 
 void parseRegion(QRegion& region, const QString& regionString);
 QString serializeRegion(const QRegion& region);
@@ -47,9 +48,10 @@ public:
     virtual void deserializeUsers(QnUserResourceList& users, const QByteArray& data) = 0;
     virtual void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) = 0;
+    virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
 
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
-    virtual void serializeLicenses(const QnLicenseList& licenses, QByteAray& data) = 0;
+    virtual void serializeLicenses(const QnLicenseList& licenses, QByteArray& data) = 0;
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;

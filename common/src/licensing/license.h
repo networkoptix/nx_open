@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QList>
+#include <QMutex>
 
 class QnLicense
 {
@@ -24,21 +25,25 @@ private:
     QString m_signature;
 };
 
+typedef QSharedPointer<QnLicense> QnLicensePtr;
+typedef QList<QnLicensePtr> QnLicenseList;
+
 class QnLicensePool
 {
 public:
     static QnLicensePool* instance();
 
-    const QnLisenseList& getLicenses();
+    const QnLicenseList& getLicenses() const;
+    void addLicenses(const QnLicenseList& licenses);
     void addLicense(const QnLicensePtr&);
     void removeLicense(const QnLicensePtr&);
 
-private:
-    QnLisenseList m_licenses;
-};
+    bool isEmpty() const;
 
-typedef QSharedPointer<QnLicense> QnLicensePtr;
-typedef QList<QnLicensePtr> QnLisenseList;
+private:
+    QnLicenseList m_licenses;
+    mutable QMutex m_mutex;
+};
 
 #define qnLicensePool QnLicensePool::instance()
 

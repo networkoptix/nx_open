@@ -365,6 +365,21 @@ int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& error
     return status;
 }
 
+int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &errorString)
+{
+    QByteArray data;
+
+    int status = getObjects("license", "", data, errorString);
+
+    try {
+        m_serializer.deserializeLicenses(licenses, data);
+    } catch (const QnSerializeException& e) {
+        errorString += e.errorString();
+    }
+
+    return status;
+}
+
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, theAppServerConnectionFactory)
 
 QUrl QnAppServerConnectionFactory::defaultUrl()
@@ -423,6 +438,25 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
     }
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
+
+    return true;
+}
+
+bool initLicenses(QnAppServerConnectionPtr appServerConnection)
+{
+    if (!qnLicensePool->isEmpty())
+        return true;
+
+    QnLicenseList licenses;
+
+    QByteArray errorString;
+    if (appServerConnection->getLicenses(licenses, errorString) != 0)
+    {
+        qDebug() << "Can't get licenses: " << errorString;
+        return false;
+    }
+
+    qnLicensePool->addLicenses(licenses);
 
     return true;
 }
