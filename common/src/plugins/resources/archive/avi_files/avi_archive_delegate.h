@@ -32,7 +32,6 @@ public:
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
 protected:
-    virtual qint64 contentLength() const;
     virtual qint64 packetTimestamp(const AVPacket& packet);
     virtual bool findStreams();
     void initLayoutStreams();
@@ -57,6 +56,7 @@ private:
 
     qint64 m_startTime;
     bool m_useAbsolutePos;
+    qint64 m_duration;
 
     friend class QnAviAudioLayout;
 };

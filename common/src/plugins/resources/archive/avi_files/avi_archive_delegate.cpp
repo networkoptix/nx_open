@@ -116,7 +116,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_audioStreamIndex(-1),
     m_selectedAudioChannel(0),
     m_startTime(0),
-    m_useAbsolutePos(true)
+    m_useAbsolutePos(true),
+    m_duration(AV_NOPTS_VALUE)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -141,9 +142,12 @@ qint64 QnAviArchiveDelegate::startTime()
 
 qint64 QnAviArchiveDelegate::endTime()
 {
-    if (!m_streamsFound && !findStreams())
-        return 0;
-    return contentLength()+m_startTime;
+    //if (!m_streamsFound && !findStreams())
+    //    return 0;
+    if (m_duration == AV_NOPTS_VALUE)
+        return m_duration;
+    else
+        return m_duration + m_startTime;
 }
 
 QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
@@ -297,7 +301,9 @@ bool QnAviArchiveDelegate::findStreams()
         global_ffmpeg_mutex.lock();
         m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
         global_ffmpeg_mutex.unlock();
-        if (m_streamsFound) {
+        if (m_streamsFound) 
+        {
+            m_duration = m_formatContext->duration;
             if (m_formatContext->start_time != AV_NOPTS_VALUE)
                 m_startMksec = m_formatContext->start_time;
             if ((m_startMksec == 0 || m_startMksec == AV_NOPTS_VALUE) && m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != AV_NOPTS_VALUE)
@@ -363,11 +369,6 @@ void QnAviArchiveDelegate::initLayoutStreams()
             break;
         }
     }
-}
-
-qint64 QnAviArchiveDelegate::contentLength() const
-{
-    return m_formatContext->duration;
 }
 
 qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)

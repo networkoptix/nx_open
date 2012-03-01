@@ -66,6 +66,7 @@ public:
 
     QueueFileWriter* getWriter(const QString& fileName)
     {
+        //todo: determine physical drive here by path. Now I just got storage root
         QString drive;
         int cnt = 0;
         for (int i = fileName.size()-1; i >= 0; --i)
