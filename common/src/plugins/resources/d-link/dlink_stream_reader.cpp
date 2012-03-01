@@ -86,7 +86,7 @@ void PlDlinkStreamReader::openStream()
     QnDlink_cam_info info = res->getCamInfo();
     if (info.videoProfileUrls.size() < 2)
     {
-        Q_ASSERT(false);
+        qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
         return;
     }
 
