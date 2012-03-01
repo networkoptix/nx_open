@@ -8,7 +8,9 @@
 
 class QnWorkbench;
 class QnWorkbenchLayout;
+class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
+class QnResourcePool;
 
 namespace detail {
     class WorkbenchSynchronizerReplyProcessor : public QObject {
@@ -59,31 +61,21 @@ public:
 
     virtual ~QnWorkbenchSynchronizer();
 
-    QnWorkbench *workbench() {
-        return m_workbench;
+    QnWorkbenchContext *context() const {
+        return m_context;
     }
-
-    const QnUserResourcePtr &user() const {
-        return m_user;
-    }
-
-    QnId userId() const;
 
     bool isRunning() const {
         return m_running;
     }
 
-    void save(QnWorkbenchLayout *layout, QObject *object, const char *slot);
+    void save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
 
-    void restore(QnWorkbenchLayout *layout);
+    void restore(const QnLayoutResourcePtr &resource);
 
     bool isChanged(const QnLayoutResourcePtr &resource);
 
     bool isLocal(const QnLayoutResourcePtr &resource);
-
-    bool isChanged(QnWorkbenchLayout *layout);
-
-    bool isLocal(QnWorkbenchLayout *layout);
 
 signals:
     /**
@@ -98,8 +90,7 @@ signals:
     void stopped();
 
 public slots:
-    void setWorkbench(QnWorkbench *workbench);
-    void setUser(const QnUserResourcePtr &user);
+    void setContext(QnWorkbenchContext *context);
     void update();
     void submit();
 
@@ -107,10 +98,16 @@ protected:
     void start();
     void stop();
     QnLayoutResourcePtr checkLayoutResource(QnWorkbenchLayout *layout);
+    QnLayoutResourceList poolLayoutResources() const;
+
+    const detail::LayoutData &savedState(const QnLayoutResourcePtr &resource);
+    void setSavedState(const QnLayoutResourcePtr &resource, const detail::LayoutData &state);
+    void removeSavedState(const QnLayoutResourcePtr &resource);
 
 protected slots:
-    void at_user_resourceChanged();
-    void at_workbench_aboutToBeDestroyed();
+    void at_context_aboutToBeDestroyed();
+    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_workbench_layoutsChanged();
 
 private:
@@ -119,11 +116,8 @@ private:
     /** Whether this synchronizer is running. */
     bool m_running;
 
-    /** Associated workbench. */
-    QnWorkbench *m_workbench;
-
-    /** Associated user resource. */
-    QnUserResourcePtr m_user;
+    /** Associated context. */
+    QnWorkbenchContext *m_context;
 
     /** Whether changes should be propagated from workbench to resources. */
     bool m_submit;

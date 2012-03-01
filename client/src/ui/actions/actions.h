@@ -35,11 +35,6 @@ namespace Qn {
         ShowFpsAction,
 
         /**
-         * Opens some existing layout if there exists one, creates a new one otherwise.
-         */
-        OpenSingleLayoutAction,
-
-        /**
          * Drops provided resources on the current layout.
          */ 
         ResourceDropAction,

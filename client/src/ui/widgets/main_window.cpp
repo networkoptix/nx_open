@@ -33,6 +33,7 @@
 #include "ui/workbench/workbench_ui.h"
 #include "ui/workbench/workbench_synchronizer.h"
 #include "ui/workbench/workbench_action_handler.h"
+#include "ui/workbench/workbench_context.h"
 
 #include "ui/widgets/resource_tree_widget.h"
 
@@ -146,11 +147,12 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Set up model & control machinery. */
     const QSizeF defaultCellSize = QSizeF(16000.0, 12000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
     const QSizeF defaultSpacing = QSizeF(2500.0, 2500.0);
-    m_workbench = new QnWorkbench(this);
-    m_workbench->mapper()->setCellSize(defaultCellSize);
-    m_workbench->mapper()->setSpacing(defaultSpacing);
+    m_context = new QnWorkbenchContext(qnResPool, this);
 
-    m_display = new QnWorkbenchDisplay(m_workbench, this);
+    m_context->workbench()->mapper()->setCellSize(defaultCellSize);
+    m_context->workbench()->mapper()->setSpacing(defaultSpacing);
+
+    m_display = new QnWorkbenchDisplay(m_context->workbench(), this);
 	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);
@@ -160,19 +162,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_ui = new QnWorkbenchUi(m_display, this);
     m_ui->setFlags(QnWorkbenchUi::HIDE_WHEN_ZOOMED | QnWorkbenchUi::AFFECT_MARGINS_WHEN_NORMAL);
 
-    m_synchronizer = new QnWorkbenchSynchronizer(this);
-    m_synchronizer->setWorkbench(m_workbench);
-
-    m_userWatcher = new QnResourcePoolUserWatcher(qnResPool, this);
-
     m_actionHandler = new QnWorkbenchActionHandler(this);
-    m_actionHandler->setWorkbench(m_workbench);
-    m_actionHandler->setSynchronizer(m_synchronizer);
+    m_actionHandler->setContext(m_context);
     m_actionHandler->setWidget(this);
-
-    connect(m_userWatcher,                  SIGNAL(userChanged(const QnUserResourcePtr &)), m_synchronizer,                         SLOT(setUser(const QnUserResourcePtr &)));
-    connect(qnSettings,                     SIGNAL(lastUsedConnectionChanged()),            this,                                   SLOT(at_settings_lastUsedConnectionChanged()));
-    connect(m_synchronizer,                 SIGNAL(started()),                              qnAction(Qn::OpenSingleLayoutAction),   SLOT(trigger()));
 
     /* Set up actions. */
     addAction(qnAction(Qn::ExitAction));
@@ -201,7 +193,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-    m_tabBar->setWorkbench(m_workbench);
+    m_tabBar->setWorkbench(m_context->workbench());
 
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
@@ -251,7 +243,9 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     /* Update state. */
     updateDwmState();
-    at_settings_lastUsedConnectionChanged();
+
+    /* Open single tab. */
+    qnAction(Qn::OpenNewLayoutAction)->trigger();
 }
 
 QnMainWindow::~QnMainWindow()
@@ -525,10 +519,6 @@ void QnMainWindow::at_sessionManager_error(int error)
     default:
         break;
     }
-}
-
-void QnMainWindow::at_settings_lastUsedConnectionChanged() {
-    m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
 }
 
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

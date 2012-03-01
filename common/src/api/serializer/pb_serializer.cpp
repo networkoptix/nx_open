@@ -17,6 +17,24 @@ typedef google::protobuf::RepeatedPtrField<proto::pb::Layout>         PbLayoutLi
 typedef google::protobuf::RepeatedPtrField<proto::pb::User>           PbUserList;
 typedef google::protobuf::RepeatedPtrField<proto::pb::ResourceType>   PbResourceTypeList;
 
+QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
+{
+    QStringList addListStrings;
+    std::transform(netAddrList.begin(), netAddrList.end(), std::back_inserter(addListStrings), std::mem_fun_ref(&QHostAddress::toString));
+    return addListStrings.join(";");
+}
+
+QHostAddress stringToAddr(const QString& hostStr)
+{
+    return QHostAddress(hostStr);
+}
+
+void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString)
+{
+    QStringList addListStrings = netAddrListString.split(";");
+    std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), stringToAddr);
+}
+
 template<class T>
 void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceFactory& resourceFactory)
 {
@@ -480,24 +498,6 @@ void QnApiPbSerializer::serializeLicenses(const QnLicenseList& licenses, QByteAr
     std::string str;
     pb_licenses.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
-}
-
-QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
-{
-    QStringList addListStrings;
-    std::transform(netAddrList.begin(), netAddrList.end(), std::back_inserter(addListStrings), std::mem_fun_ref(&QHostAddress::toString));
-    return addListStrings.join(";");
-}
-
-QHostAddress stringToAddr(const QString& hostStr)
-{
-    return QHostAddress(hostStr);
-}
-
-void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString)
-{
-    QStringList addListStrings = netAddrListString.split(";");
-    std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), stringToAddr);
 }
 
 void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPtr, QByteArray& data)

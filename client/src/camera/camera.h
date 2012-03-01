@@ -19,10 +19,6 @@ public:
     CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader);
     virtual ~CLVideoCamera();
 
-    virtual void startDisplay();
-    virtual void beforeStopDisplay();
-    virtual void stopDisplay();
-
     void startRecording();
     void stopRecording();
     bool isRecording();
@@ -50,17 +46,25 @@ public:
     void setVisible(bool value) { m_isVisible = value; }
 
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName);
+
 signals:
     void reachedTheEnd();
     void recordingFailed(QString errMessage);
     void exportProgress(int progress);
     void exportFailed(const QString &errMessage);
     void exportFinished(const QString &fileName);
+
 public slots:
+    virtual void startDisplay();
+    virtual void beforeStopDisplay();
+    virtual void stopDisplay();
+
     void stopExport();
     void onExportFinished(QString fileName);
+
 protected slots:
     void onReachedTheEnd();
+
 private:
     bool m_isVisible;
     QnMediaResourcePtr m_resource;

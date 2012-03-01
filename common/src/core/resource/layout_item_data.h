@@ -23,13 +23,16 @@ public:
     qreal rotation;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-        return 
-            l.resource.id == r.resource.id &&
-            l.resource.path == r.resource.path &&
-            l.uuid == r.uuid &&
-            l.flags == r.flags &&
-            qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) &&
-            qFuzzyCompare(l.rotation, r.rotation);
+        if (l.uuid != r.uuid || l.flags != r.flags || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.rotation, r.rotation))
+            return false;
+
+        if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))
+            return true;
+
+        if(l.resource.id == r.resource.id && (l.resource.path == r.resource.path || l.resource.path.isNull() || r.resource.path.isNull()))
+            return true;
+
+        return false;
     }
 };
 

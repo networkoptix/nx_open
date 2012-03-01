@@ -82,18 +82,14 @@ void QnRtspClientArchiveDelegate::beforeClose()
 
 void QnRtspClientArchiveDelegate::close()
 {
+    QMutexLocker lock(&m_mutex);
     //m_waitBOF = false;
     m_rtspSession.stop();
     m_rtpData = 0;
     m_lastPacketFlags = -1;
     m_nextDataPacket.clear();
-    deleteContexts();
-    m_opened = false;
-}
-
-void QnRtspClientArchiveDelegate::deleteContexts()
-{
     m_contextMap.clear();
+    m_opened = false;
 }
 
 qint64 QnRtspClientArchiveDelegate::startTime()
@@ -300,6 +296,8 @@ QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
 
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize)
 {
+    QMutexLocker lock(&m_mutex);
+
     QnAbstractDataPacketPtr result;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)
     {

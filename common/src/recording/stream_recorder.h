@@ -6,6 +6,8 @@
 #include "core/resource/resource.h"
 #include "core/resource/resource_media_layout.h"
 
+class QnAbstractMediaStreamDataProvider;
+
 class QnStreamRecorder : public QnAbstractDataConsumer
 {
     Q_OBJECT
@@ -52,9 +54,9 @@ protected:
     virtual bool saveMotion(QnAbstractMediaDataPtr media);
     bool saveData(QnAbstractMediaDataPtr md);
 
-    virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/) {}
-    virtual void fileStarted(qint64 /*startTimeMs*/, const QString& /*fileName*/) {}
-    virtual QString fillFileName();
+    virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
+    virtual void fileStarted(qint64 /*startTimeMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
+    virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 private:
     void markNeedKeyData();
 protected:
@@ -87,6 +89,7 @@ private:
     bool m_endOfData;
     int m_lastProgress;
     bool m_needKeyData;
+    QnAbstractMediaStreamDataProvider* m_mediaProvider;
 };
 
 #endif // _STREAM_RECORDER_H__

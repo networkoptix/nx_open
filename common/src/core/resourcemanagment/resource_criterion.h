@@ -99,9 +99,7 @@ public:
 
     QnResourceList filter(const QnResourceList &resources) const;
 
-    static QnResourceList filter(const QnResourceList &resources, const QnResourceCriterion &criterion) {
-        return criterion.filter(resources);
-    }
+    static QnResourceList filter(const QnResourceList &resources, const QnResourceCriterion &criterion);
 
     template<class Resource>
     static QList<QnSharedResourcePointer<Resource> > filter(const QnResourceList &resources) {

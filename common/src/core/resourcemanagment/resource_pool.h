@@ -80,7 +80,6 @@ private:
     mutable QMutex m_resourcesMtx;
     QnResourcePtr localServer;
     QHash<QString, QnResourcePtr> m_resources;
-    QHash<QnId, QnResourceList> m_resourceTree;
 };
 
 

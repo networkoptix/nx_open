@@ -51,7 +51,7 @@ void QnStreamRecorder::close()
         if (m_startDateTime != AV_NOPTS_VALUE)
         {
             qint64 fileLength = m_startDateTime != AV_NOPTS_VALUE  ? (m_endDateTime - m_startDateTime)/1000 : 0;
-            fileFinished(fileLength, m_fileName);
+            fileFinished(fileLength, m_fileName, m_mediaProvider);
             m_startDateTime = AV_NOPTS_VALUE;
         }
 
@@ -239,6 +239,9 @@ void QnStreamRecorder::endOfRun()
 
 bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 {
+    m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
+    Q_ASSERT(m_mediaProvider);
+
     if (m_startDateTime == AV_NOPTS_VALUE)
         m_startDateTime = mediaData->timestamp;
     //QnResourcePtr resource = mediaData->dataProvider->getResource();
@@ -253,7 +256,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
     QString fileExt = QString(outputCtx->extensions).split(',')[0];
 
-    m_fileName = fillFileName();
+    m_fileName = fillFileName(m_mediaProvider);
     m_fileName += QString(".") + fileExt;
     QString url = QString("ufile:") + m_fileName;
 
@@ -267,14 +270,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
-    
-    QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
-    Q_ASSERT(mediaProvider);
-
     QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
-    const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(mediaProvider);
+    const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
-    const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(mediaProvider);
+    const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
 
     {
         QMutexLocker mutex(&global_ffmpeg_mutex);
@@ -361,7 +360,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         av_write_header(m_formatCtx);
     }
-    fileStarted(m_startDateTime/1000, m_fileName);
+    fileStarted(m_startDateTime/1000, m_fileName, m_mediaProvider);
 
     return true;
 }
@@ -402,8 +401,9 @@ bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
     return true;
 }
 
-QString QnStreamRecorder::fillFileName()
+QString QnStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)
 {
+    Q_UNUSED(provider);
     return m_fixedFileName;
 }
 

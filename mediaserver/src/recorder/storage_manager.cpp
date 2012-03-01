@@ -6,6 +6,7 @@
 #include "server_stream_recorder.h"
 #include "recording_manager.h"
 
+static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
@@ -204,26 +205,65 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
     }
 }
 
-QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
+QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
     QMutexLocker lock(&m_mutex);
     QnStorageResourcePtr result;
-    qint64 minFreeSpace = 0x7fffffffffffffffll;
-    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    qint64 maxFreeSpace = 0;
+    float minBitrate = INT_MAX;
+
+    // balance storages evenly by bitrate
+    bool balanceByBitrate = true;
+    if (rand()%100 < 10)
     {
-        qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
-        if (freeSpace < minFreeSpace)
+        // sometimes preffer drive with maximum free space
+        qint64 maxSpace = 0;
+        qint64 minSpace = INT64_MAX;
+        //for (int i = 0; i < m_storageRoots.size(); ++i)
+        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            minFreeSpace = freeSpace;
-            result = itr.value();
+            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
+            maxSpace = qMax(maxSpace, freeSpace);
+            minSpace = qMin(minSpace, freeSpace);
+        }
+
+        // If free space difference is small, keep balanceByBitrate strategy
+        balanceByBitrate = maxSpace - minSpace <= BALANCE_BY_FREE_SPACE_THRESHOLD; 
+    }
+    
+    if (balanceByBitrate)
+    {
+        // select storage with mimimum bitrate
+        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+        {
+            float bitrate = itr.value()->bitrate();
+            if (bitrate < minBitrate)
+            {
+                minBitrate = bitrate;
+                result = itr.value();
+            }
         }
     }
+    else 
+    {
+        // select storage with maximum free space
+        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+        {
+            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
+            if (freeSpace > maxFreeSpace)
+            {
+                maxFreeSpace = freeSpace;
+                result = itr.value();
+            }
+        }
+    }
+
     return result;
 }
 
-QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix)
+QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix, QnAbstractMediaStreamDataProvider* provider)
 {
-    QnStorageResourcePtr storage = getOptimalStorageRoot();
+    QnStorageResourcePtr storage = getOptimalStorageRoot(provider);
     Q_ASSERT(camera != 0);
     QString base = closeDirPath(storage->getUrl());
 
@@ -262,25 +302,10 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
     return fileCatalog;
 }
 
-bool QnStorageManager::fileFinished(int durationMs, const QString& fileName)
-{
-    QMutexLocker lock(&m_mutex);
-    int storageIndex;
-    QString quality, mac;
-    extractFromFileName(storageIndex, fileName, mac, quality);
-    if (storageIndex == -1)
-        return false;
-    DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
-    if (catalog == 0)
-        return false;
-    catalog->updateDuration(durationMs);
-    return true;
-}
-
-void QnStorageManager::extractFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
+QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
     storageIndex = -1;
-    for(QMap<int, QnStorageResourcePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))
@@ -290,20 +315,40 @@ void QnStorageManager::extractFromFileName(int& storageIndex, const QString& fil
             quality = QFileInfo(quality).baseName();
             int macPos = root.length() + qualityLen;
             mac = fileName.mid(macPos+1, fileName.indexOf('/', macPos+1) - macPos-1);
-            storageIndex = itr.key();
-            break;
+            storageIndex = itr.value()->getIndex();
+            return *itr;
         }
     }
+    return QnStorageResourcePtr();
 }
 
-bool QnStorageManager::fileStarted(const qint64& startDateMs, const QString& fileName)
+bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
     QMutexLocker lock(&m_mutex);
     int storageIndex;
     QString quality, mac;
-    extractFromFileName(storageIndex, fileName, mac, quality);
+    QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
     if (storageIndex == -1)
         return false;
+    storage->releaseBitrate(provider);
+    DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
+    if (catalog == 0)
+        return false;
+    catalog->updateDuration(durationMs);
+    return true;
+}
+
+bool QnStorageManager::fileStarted(const qint64& startDateMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+{
+    QMutexLocker lock(&m_mutex);
+    int storageIndex;
+    QString quality, mac;
+
+    QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
+    if (storageIndex == -1)
+        return false;
+    storage->addBitrate(provider);
+
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;

@@ -24,9 +24,9 @@ protected:
     void beforeProcessData(QnAbstractMediaDataPtr media);
     bool saveMotion(QnAbstractMediaDataPtr media);
 
-    virtual void fileStarted(qint64 startTimeMs, const QString& fileName);
-    virtual void fileFinished(qint64 durationMs, const QString& fileName);
-    virtual QString fillFileName();
+    virtual void fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
+    virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
+    virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);

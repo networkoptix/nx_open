@@ -23,6 +23,7 @@ public:
 
 
 	const QnStatistics* getStatistics(int channel) const;
+    float getBitrate() const;
 
 	virtual void setNeedKeyData();
 	virtual bool needKeyData(int channel) const;
