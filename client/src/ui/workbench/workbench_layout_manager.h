@@ -2,16 +2,17 @@
 #define QN_WORKBENCH_LAYOUT_MANAGER_H
 
 #include <QObject>
-#include <core/resource/layout_item_data.h>
+#include <core/resource/resource_fwd.h>
 
 class QnWorkbenchContext;
+class QnWorkbenchLayoutStateStorage;
 
 namespace detail {
-    class WorkbenchSynchronizerReplyProcessor: public QObject {
+    class QnWorkbenchLayoutReplyProcessor: public QObject {
         Q_OBJECT
 
     public:
-        WorkbenchSynchronizerReplyProcessor(QnWorkbenchSynchronizer *synchronizer, const QnLayoutResourcePtr &resource): 
+        QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutStateStorage *stateStorage, const QnLayoutResourcePtr &resource): 
             m_synchronizer(synchronizer),
             m_resource(resource)
         {}
@@ -23,23 +24,8 @@ namespace detail {
         void finished(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
 
     private:
-        QWeakPointer<QnWorkbenchSynchronizer> m_synchronizer;
+        QWeakPointer<QnWorkbenchLayoutStateStorage> m_synchronizer;
         QnLayoutResourcePtr m_resource;
-    };
-
-    class LayoutData {
-    public:
-        LayoutData(const QnLayoutResourcePtr &resource):
-            items(resource->getItems()),
-            name(resource->getName()),
-            changed(false)
-        {}
-
-        LayoutData() {}
-
-        QnLayoutItemDataMap items;
-        QString name;
-        bool changed;
     };
 
 } // namespace detail
@@ -74,9 +60,6 @@ protected:
     QnLayoutResourceList poolLayoutResources() const;
 
     void setChanged(const QnLayoutResourcePtr &resource, bool changed);
-    const detail::LayoutData &savedState(const QnLayoutResourcePtr &resource);
-    void setSavedState(const QnLayoutResourcePtr &resource, const detail::LayoutData &state);
-    void removeSavedState(const QnLayoutResourcePtr &resource);
 
 protected slots:
     void at_context_aboutToBeDestroyed();
@@ -85,6 +68,7 @@ protected slots:
 
 private:
     QnWorkbenchContext *m_context;
+    QnWorkbenchLayoutStateStorage *m_stateStorage;
 };
 
 

@@ -1,9 +1,92 @@
 #include "workbench_layout_manager.h"
 #include <cassert>
+#include <utils/common/warnings.h>
+#include <core/resource/layout_resource.h>
 #include "workbench_context.h"
 
+// -------------------------------------------------------------------------- //
+// QnWorkbenchLayoutState
+// -------------------------------------------------------------------------- //
+class QnWorkbenchLayoutState {
+public:
+    QnWorkbenchLayoutState() {}
+
+    QnWorkbenchLayoutState(const QnLayoutResourcePtr &resource):
+        items(resource->getItems()),
+        name(resource->getName())
+    {}
+
+    QnLayoutItemDataMap items;
+    QString name;
+};
+
+
+// -------------------------------------------------------------------------- //
+// QnWorkbenchLayoutStateStorage
+// -------------------------------------------------------------------------- //
+class QnWorkbenchLayoutStateStorage: public QObject {
+public:
+    QnWorkbenchLayoutStateStorage(QObject *parent = NULL): QObject(parent) {}
+
+    const QnWorkbenchLayoutState &state(const QnLayoutResourcePtr &resource) const {
+        QHash<QnLayoutResourcePtr, QnWorkbenchLayoutState>::const_iterator pos = m_stateByLayout.find(resource);
+        if(pos == m_stateByLayout.end()) {
+            qnWarning("No saved state exists for layout '%1'.", resource ? resource->getName() : QLatin1String("null"));
+            return m_emptyState;
+        }
+
+        return *pos;
+    }
+
+    void store(const QnLayoutResourcePtr &resource) {
+        m_stateByLayout[resource] = QnWorkbenchLayoutState(resource);
+    }
+
+    void remove(const QnLayoutResourcePtr &resource) {
+        m_stateByLayout.remove(resource);
+    }
+
+    void clear() {
+        m_stateByLayout.clear();
+    }
+
+private:
+    QHash<QnLayoutResourcePtr, QnWorkbenchLayoutState> m_stateByLayout;
+    QnWorkbenchLayoutState m_emptyState;
+};
+
+
+// -------------------------------------------------------------------------- //
+// QnWorkbenchLayoutReplyProcessor
+// -------------------------------------------------------------------------- //
+void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int) {
+    if(status == 0 && !m_synchronizer.isNull())
+        m_synchronizer.data()->setSavedState(m_resource, detail::LayoutData(m_resource));
+
+    if(resources.size() != 1) {
+        qnWarning("Received reply of invalid size %1: expected a list containing a single layout resource.", resources.size());
+    } else {
+        QnLayoutResourcePtr resource = resources[0].dynamicCast<QnLayoutResource>();
+        if(!resource) {
+            qnWarning("Received reply of invalid type: expected layout resource, got %1.", resources[0]->metaObject()->className());
+        } else {
+            m_resource->setId(resource->getId());
+        }
+    }
+
+    emit finished(status, errorString, m_resource);
+
+    deleteLater();
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnWorkbenchLayoutManager
+// -------------------------------------------------------------------------- //
 QnWorkbenchLayoutManager::QnWorkbenchLayoutManager(QObject *parent):    
-    QObject(parent)
+    QObject(parent),
+    m_context(NULL),
+    m_stateStorage(new QnWorkbenchLayoutStateStorage(this))
 {
 
 }
@@ -31,7 +114,7 @@ void QnWorkbenchLayoutManager::start() {
 
     /* Consider all pool's layouts saved. */
     foreach(const QnLayoutResourcePtr &resource, poolLayoutResources())
-        setSavedState(resource, detail::LayoutData(resource));
+        m_stateStorage->store(resource);
 
     /* Start listening to changes. */
     connect(context(),                  SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
@@ -43,26 +126,10 @@ void QnWorkbenchLayoutManager::stop() {
     assert(m_context != NULL);
 
     disconnect(context(), NULL, this, NULL);
+
+    m_stateStorage->clear();
 }
 
-
-const detail::LayoutData &QnWorkbenchSynchronizer::savedState(const QnLayoutResourcePtr &resource) {
-    QHash<QnLayoutResourcePtr, detail::LayoutData>::const_iterator pos = m_savedDataByResource.find(resource);
-    if(pos == m_savedDataByResource.end()) {
-        qnWarning("No saved state exists for layout '%1'.", resource ? resource->getName() : QLatin1String("null"));
-        return *qn_dummyLayoutState();
-    }
-
-    return *pos;
-}
-
-void QnWorkbenchSynchronizer::setSavedState(const QnLayoutResourcePtr &resource, const detail::LayoutData &state) {
-    m_savedDataByResource[resource] = state;
-}
-
-void QnWorkbenchSynchronizer::removeSavedState(const QnLayoutResourcePtr &resource) {
-    m_savedDataByResource.remove(resource);
-}
 
 QnLayoutResourceList QnWorkbenchSynchronizer::poolLayoutResources() const {
     return QnResourceCriterion::filter<QnLayoutResource>(context()->resourcePool()->getResources());
@@ -79,7 +146,7 @@ void QnWorkbenchSynchronizer::save(const QnLayoutResourcePtr &resource, QObject 
     if(synchronizer)
         synchronizer->submit();
 
-    detail::WorkbenchSynchronizerReplyProcessor *processor = new detail::WorkbenchSynchronizerReplyProcessor(this, resource);
+    detail::QnWorkbenchLayoutReplyProcessor *processor = new detail::QnWorkbenchLayoutReplyProcessor(this, resource);
     connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
     m_connection->saveAsync(resource, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
 }

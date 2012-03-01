@@ -25,26 +25,6 @@ namespace {
 } // anonymous namespace
 
 
-void detail::WorkbenchSynchronizerReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int) {
-    if(status == 0 && !m_synchronizer.isNull())
-        m_synchronizer.data()->setSavedState(m_resource, detail::LayoutData(m_resource));
-
-    if(resources.size() != 1) {
-        qnWarning("Received reply of invalid size %1: expected a list containing a single layout resource.", resources.size());
-    } else {
-        QnLayoutResourcePtr resource = resources[0].dynamicCast<QnLayoutResource>();
-        if(!resource) {
-            qnWarning("Received reply of invalid type: expected layout resource, got %1.", resources[0]->metaObject()->className());
-        } else {
-            m_resource->setId(resource->getId());
-        }
-    }
-
-    emit finished(status, errorString, m_resource);
-
-    deleteLater();
-}
-
 
 QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
     QObject(NULL),
