@@ -16,6 +16,7 @@ class QnLayoutTabBar;
 class QnGraphicsView;
 class QnDwm;
 class QnWorkbench;
+class QnWorkbenchContext;
 class QnWorkbenchController;
 class QnWorkbenchUi;
 class QnWorkbenchSynchronizer;
@@ -66,20 +67,15 @@ protected slots:
 
     void at_sessionManager_error(int error);
 
-    void at_settings_lastUsedConnectionChanged();
-
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
+    QnWorkbenchContext *m_context;
     QnWorkbenchController *m_controller;
-    QnWorkbenchSynchronizer *m_synchronizer;
     QnWorkbenchUi *m_ui;
     QnWorkbenchDisplay *m_display;
-    QnWorkbench *m_workbench;
     QnWorkbenchActionHandler *m_actionHandler;
-
-    QnResourcePoolUserWatcher *m_userWatcher;
 
     QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;
