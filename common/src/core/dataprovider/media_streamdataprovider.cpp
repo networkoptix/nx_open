@@ -69,7 +69,10 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 
 void QnAbstractMediaStreamDataProvider::afterRun()
 {
-
+    for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
+    {
+        m_stat[i].resetStatistics();
+    }
 }
 
 
