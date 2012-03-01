@@ -1,5 +1,5 @@
-#ifndef QN_WORKBENCH_LAYOUT_STATE_MANAGER_H
-#define QN_WORKBENCH_LAYOUT_STATE_MANAGER_H
+#ifndef QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
+#define QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
@@ -112,4 +112,4 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchLayoutSnapshotManager::LayoutFlags);
 
-#endif // QN_WORKBENCH_LAYOUT_STATE_MANAGER_H
+#endif // QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
