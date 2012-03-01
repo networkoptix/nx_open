@@ -5,7 +5,7 @@
 #include "settings.h"
 #include "workbench.h"
 #include "workbench_synchronizer.h"
-#include "workbench_layout_state_manager.h"
+#include "workbench_layout_snapshot_manager.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnWorkbenchContext, qn_workbenchContext, (qnResPool));
 

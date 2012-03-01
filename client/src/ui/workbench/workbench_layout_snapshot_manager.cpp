@@ -1,6 +1,7 @@
-#include "workbench_layout_state_manager.h"
+#include "workbench_layout_snapshot_manager.h"
 #include <cassert>
 #include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
 #include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include "workbench_context.h"
@@ -62,15 +63,13 @@ void QnWorkbenchLayoutSnapshotManager::setContext(QnWorkbenchContext *context) {
 void QnWorkbenchLayoutSnapshotManager::start() {
     assert(m_context != NULL);
 
-
-    /* Consider all pool's layouts saved. */
-    foreach(const QnLayoutResourcePtr &resource, poolLayoutResources())
-        m_storage->store(resource);
-
     /* Start listening to changes. */
     connect(context(),                  SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
     connect(context()->resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     connect(context()->resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+
+    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResources())
+        at_resourcePool_resourceAdded(resource);
 }
 
 void QnWorkbenchLayoutSnapshotManager::stop() {
@@ -78,27 +77,30 @@ void QnWorkbenchLayoutSnapshotManager::stop() {
 
     disconnect(context(), NULL, this, NULL);
 
+    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResources())
+        at_resourcePool_resourceRemoved(resource);
+
     m_storage->clear();
+    m_flagsByLayout.clear();
 }
 
-QnLayoutResourceList QnWorkbenchLayoutSnapshotManager::poolLayoutResources() const {
-    return QnResourceCriterion::filter<QnLayoutResource>(context()->resourcePool()->getResources());
-}
-
-QnWorkbenchLayoutSnapshotManager::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
-    QHash<QnLayoutResourcePtr, LayoutFlags>::const_iterator pos = m_flagsByLayout.find(resource);
+Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
+    QHash<QnLayoutResourcePtr, Qn::LayoutFlags>::const_iterator pos = m_flagsByLayout.find(resource);
     if(pos == m_flagsByLayout.end()) {
         qnWarning("Layout '%1' is not managed by this layout snapshot manager.", resource ? resource->getName() : QLatin1String("null"));
-        return Local;
+        return Qn::LayoutIsLocal;
     }
 
     return *pos;
 }
 
-void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, LayoutFlags flags) {
-    QHash<QnLayoutResourcePtr, LayoutFlags>::iterator pos = m_flagsByLayout.find(resource);
-    if(*pos == flags)
+void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::LayoutFlags flags) {
+    QHash<QnLayoutResourcePtr, Qn::LayoutFlags>::iterator pos = m_flagsByLayout.find(resource);
+    if(pos == m_flagsByLayout.end()) {
+        pos = m_flagsByLayout.insert(resource, flags);
+    } else if(*pos == flags) {
         return;
+    }
 
     *pos = flags;
     
@@ -120,7 +122,7 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &resource,
     connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
     m_connection->saveAsync(resource, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
 
-    setFlags(resource, flags(resource) | BeingSaved);
+    setFlags(resource, flags(resource) | Qn::LayoutIsBeingSaved);
 }
 
 void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource) {
@@ -133,7 +135,7 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
     resource->setItems(state.items);
     resource->setName(state.name);
 
-    setFlags(resource, flags(resource) & ~Changed);
+    setFlags(resource, flags(resource) & ~Qn::LayoutIsChanged);
 }
 
 
@@ -152,7 +154,12 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
 
-    setFlags(layoutResource, layoutResource->getId().isSpecial() ? Local : static_cast<LayoutFlags>(0));
+    setFlags(layoutResource, layoutResource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0));
+
+    /* Subscribe to changes to track changed status. */
+    connect(layoutResource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this,   SLOT(at_layout_changed()));
+    connect(layoutResource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),  this,   SLOT(at_layout_changed()));
+    connect(layoutResource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),  this,   SLOT(at_layout_changed()));
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -162,6 +169,8 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
 
     m_storage->remove(layoutResource);
     m_flagsByLayout.remove(layoutResource);
+
+    disconnect(layoutResource.data(), NULL, this, NULL);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_saved(const QnLayoutResourcePtr &resource) {
@@ -169,3 +178,14 @@ void QnWorkbenchLayoutSnapshotManager::at_layout_saved(const QnLayoutResourcePtr
 
     setFlags(resource, 0); /* Not local, not being saved, not changed. */
 }
+
+void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
+    setFlags(resource, flags(resource) | Qn::LayoutIsChanged);
+}
+
+void QnWorkbenchLayoutSnapshotManager::at_layout_changed() {
+    QnLayoutResourcePtr resource = toSharedPointer(checked_cast<QnLayoutResource *>(sender()));
+    at_layout_changed(resource);
+}
+
+

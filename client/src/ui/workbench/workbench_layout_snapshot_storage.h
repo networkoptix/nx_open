@@ -4,16 +4,14 @@
 #include <QObject>
 #include <QHash>
 #include <core/resource/layout_item_data.h>
+#include <core/resource/resource_fwd.h>
 #include <utils/common/warnings.h>
 
 class QnWorkbenchLayoutSnapshot {
 public:
     QnWorkbenchLayoutSnapshot() {}
 
-    QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &resource):
-        items(resource->getItems()),
-        name(resource->getName())
-    {}
+    QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &resource);
 
     QnLayoutItemDataMap items;
     QString name;
@@ -23,29 +21,17 @@ public:
 class QnWorkbenchLayoutSnapshotStorage: public QObject {
     Q_OBJECT;
 public:
-    QnWorkbenchLayoutSnapshotStorage(QObject *parent = NULL): QObject(parent) {}
+    QnWorkbenchLayoutSnapshotStorage(QObject *parent = NULL);
 
-    const QnWorkbenchLayoutSnapshot &snapshot(const QnLayoutResourcePtr &resource) const {
-        QHash<QnLayoutResourcePtr, QnWorkbenchLayoutSnapshot>::const_iterator pos = m_snapshotByLayout.find(resource);
-        if(pos == m_snapshotByLayout.end()) {
-            qnWarning("No saved snapshot exists for layout '%1'.", resource ? resource->getName() : QLatin1String("null"));
-            return m_emptyState;
-        }
+    virtual ~QnWorkbenchLayoutSnapshotStorage();
 
-        return *pos;
-    }
+    const QnWorkbenchLayoutSnapshot &snapshot(const QnLayoutResourcePtr &resource) const;
 
-    void store(const QnLayoutResourcePtr &resource) {
-        m_snapshotByLayout[resource] = QnWorkbenchLayoutSnapshot(resource);
-    }
+    void store(const QnLayoutResourcePtr &resource);
 
-    void remove(const QnLayoutResourcePtr &resource) {
-        m_snapshotByLayout.remove(resource);
-    }
+    void remove(const QnLayoutResourcePtr &resource);
 
-    void clear() {
-        m_snapshotByLayout.clear();
-    }
+    void clear();
 
 private:
     QHash<QnLayoutResourcePtr, QnWorkbenchLayoutSnapshot> m_snapshotByLayout;

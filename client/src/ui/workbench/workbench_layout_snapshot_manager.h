@@ -33,22 +33,28 @@ namespace detail {
 } // namespace detail
 
 
-class QnWorkbenchLayoutSnapshotManager: public QObject {
-    Q_OBJECT;
-public:
+namespace Qn {
+
     enum LayoutFlag {
         /** Layout is local and was never saved to appserver. */
-        Local = 0x1,
+        LayoutIsLocal = 0x1,
 
         /** Layout is currently being saved to appserver. */
-        BeingSaved = 0x2,
+        LayoutIsBeingSaved = 0x2,
 
-        /** Local unsaved changes are present in the layout. */
-        Changed = 0x4,
+        /** LayoutIsLocal unsaved changes are present in the layout. */
+        LayoutIsChanged = 0x4,
     };
     Q_DECLARE_FLAGS(LayoutFlags, LayoutFlag);
 
+} // namespace Qn
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::LayoutFlags);
+
+
+class QnWorkbenchLayoutSnapshotManager: public QObject {
+    Q_OBJECT;
+public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
 
     virtual ~QnWorkbenchLayoutSnapshotManager();
@@ -63,18 +69,18 @@ public:
 
     void restore(const QnLayoutResourcePtr &resource);
 
-    LayoutFlags flags(const QnLayoutResourcePtr &resource) const;
+    Qn::LayoutFlags flags(const QnLayoutResourcePtr &resource) const;
 
     bool isChanged(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Changed;
+        return flags(resource) & Qn::LayoutIsChanged;
     }
 
     bool isLocal(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Local;
+        return flags(resource) & Qn::LayoutIsLocal;
     }
 
     bool isBeingSaved(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & BeingSaved;
+        return flags(resource) & Qn::LayoutIsBeingSaved;
     }
 
 signals:
@@ -84,15 +90,15 @@ protected:
     void start();
     void stop();
 
-    QnLayoutResourceList poolLayoutResources() const;
-
-    void setFlags(const QnLayoutResourcePtr &resource, LayoutFlags flags);
+    void setFlags(const QnLayoutResourcePtr &resource, Qn::LayoutFlags flags);
 
 protected slots:
     void at_context_aboutToBeDestroyed();
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layout_saved(const QnLayoutResourcePtr &resource);
+    void at_layout_changed(const QnLayoutResourcePtr &resource);
+    void at_layout_changed();
 
 private:
     friend class detail::QnWorkbenchLayoutReplyProcessor;
@@ -104,12 +110,11 @@ private:
     QnWorkbenchLayoutSnapshotStorage *m_storage;
 
     /** Layout to flags mapping. */
-    QHash<QnLayoutResourcePtr, LayoutFlags> m_flagsByLayout;
+    QHash<QnLayoutResourcePtr, Qn::LayoutFlags> m_flagsByLayout;
 
     /** Appserver connection. */
     QnAppServerConnectionPtr m_connection;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchLayoutSnapshotManager::LayoutFlags);
 
 #endif // QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
