@@ -23,7 +23,7 @@ public slots:
 
     void decrement() {
         QMutexLocker locker(&m_mutex);
-        m_count++;
+        m_count--;
         if(m_count == 0)
             emit reachedZero();
     }
