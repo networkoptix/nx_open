@@ -66,7 +66,19 @@ public:
 
     QueueFileWriter* getWriter(const QString& fileName)
     {
-        QString drive = fileName.left(fileName.indexOf("/"));
+        QString drive;
+        int cnt = 0;
+        for (int i = fileName.size()-1; i >= 0; --i)
+        {
+            if (fileName.at(i) == '/')
+            {
+                cnt++;
+                if (cnt >= 7) {
+                    drive = fileName.left(i);
+                    break;
+                }
+            }
+        }
 
         QMutexLocker lock(&m_mutex);
         WritersMap::iterator itr = m_writers.find(drive);
