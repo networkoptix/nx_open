@@ -35,14 +35,10 @@
 #include "workbench_synchronizer.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
+#include "workbench_context.h"
+#include "workbench_layout_snapshot_manager.h"
 
 namespace {
-    struct LayoutIdCmp {
-        bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) const {
-            return l->getId() < r->getId();
-        }
-    };
-
     enum RemovedResourceType {
         Layout,
         User,
@@ -72,56 +68,51 @@ namespace {
 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
-    m_workbench(NULL),
-    m_synchronizer(NULL),
+    m_context(NULL),
     m_connection(QnAppServerConnectionFactory::createConnection())
 {}
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
-    setWorkbench(NULL);
+    setContext(NULL);
 }
 
-void QnWorkbenchActionHandler::setWorkbench(QnWorkbench *workbench) {
-    if(m_workbench != NULL) {
-        disconnect(m_workbench, NULL, this, NULL);
-
-        if(m_synchronizer != NULL)
-            deinitialize();
-    }
-
-    m_workbench = workbench;
-
-    if(m_workbench != NULL) {
-        connect(m_workbench, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_workbench_aboutToBeDestroyed()));
-
-        if(m_synchronizer != NULL)
-            initialize();
-    }
+QnWorkbench *QnWorkbenchActionHandler::workbench() const {
+    return m_context->workbench();
 }
 
-void QnWorkbenchActionHandler::setSynchronizer(QnWorkbenchSynchronizer *synchronizer) {
-    if(m_synchronizer != NULL) {
-        disconnect(m_synchronizer, NULL, this, NULL);
+QnWorkbenchSynchronizer *QnWorkbenchActionHandler::synchronizer() const {
+    return m_context->synchronizer();
+}
 
-        if(m_workbench != NULL)
-            deinitialize();
-    }
+QnWorkbenchLayoutSnapshotManager *QnWorkbenchActionHandler::snapshotManager() const {
+    return m_context->snapshotManager();
+}
 
-    m_synchronizer = synchronizer;
+QnResourcePool *QnWorkbenchActionHandler::resourcePool() const {
+    return m_context->resourcePool();
+}
 
-    if(m_synchronizer != NULL) {
-        connect(m_synchronizer, SIGNAL(destroyed()), this, SLOT(at_synchronizer_destroyed()));
+void QnWorkbenchActionHandler::setContext(QnWorkbenchContext *context) {
+    if(m_context == context)
+        return;
 
-        if(m_workbench != NULL)
-            initialize();
-    }
+    if(m_context != NULL)
+        deinitialize();
+
+    m_context = context;
+
+    if(m_context != NULL)
+        initialize();
 }
 
 void QnWorkbenchActionHandler::initialize() {
-    assert(m_workbench != NULL);
+    assert(m_context != NULL);
+
+    connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_context_aboutToBeDestroyed()));
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
-    connect(m_workbench,                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
     connect(qnAction(Qn::AboutAction),                      SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(qnAction(Qn::SystemSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
@@ -130,7 +121,10 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
     connect(qnAction(Qn::OpenLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(qnAction(Qn::OpenNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
-    connect(qnAction(Qn::OpenSingleLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_openSingleLayoutAction_triggered()));
+    connect(qnAction(Qn::SaveLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
+    connect(qnAction(Qn::SaveLayoutAsAction),               SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
+    connect(qnAction(Qn::SaveCurrentLayoutAction),          SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
+    connect(qnAction(Qn::SaveCurrentLayoutAsAction),        SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(qnAction(Qn::CameraSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(qnAction(Qn::MultipleCameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
@@ -148,9 +142,10 @@ void QnWorkbenchActionHandler::initialize() {
 }
 
 void QnWorkbenchActionHandler::deinitialize() {
-    assert(m_workbench != NULL);
+    assert(m_context != NULL);
 
-    disconnect(m_workbench, NULL, this, NULL);
+    disconnect(context(), NULL, this, NULL);
+    disconnect(workbench(), NULL, this, NULL);
 
     foreach(QAction *action, qnMenu->actions())
         disconnect(action, NULL, this, NULL);
@@ -162,13 +157,10 @@ QString QnWorkbenchActionHandler::newLayoutName() const {
     QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
 
     QStringList layoutNames;
-    if(m_synchronizer->user()) {
-        foreach(const QnLayoutResourcePtr &resource, m_synchronizer->user()->getLayouts())
+    QnId parentId = context()->user() ? context()->user()->getId() : QnId();
+    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(parentId))
+        if(resource->flags() & QnResource::layout)
             layoutNames.push_back(resource->getName());
-    } else {
-        foreach(QnWorkbenchLayout *layout, workbench()->layouts())
-            layoutNames.push_back(layout->name());
-    }
 
     /* Prepare name for new layout. */
     int layoutNumber = -1;
@@ -184,11 +176,11 @@ QString QnWorkbenchActionHandler::newLayoutName() const {
 }
 
 bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
-    if(!resource->checkFlags(QnResource::layout))
+    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+    if(!layoutResource)
         return false;
-
-    QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
-    return m_synchronizer->isLocal(layout) && !m_synchronizer->isChanged(layout);
+    
+    return snapshotManager()->flags(layoutResource) == Qn::LayoutIsLocal; /* Local, not changed and not being saved. */
 }
 
 void QnWorkbenchActionHandler::addToWorkbench(const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
@@ -220,19 +212,26 @@ void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files, bool 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchActionHandler::at_workbench_aboutToBeDestroyed() {
-    setWorkbench(NULL);
+void QnWorkbenchActionHandler::at_context_aboutToBeDestroyed() {
+    setContext(NULL);
+}
+
+void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
+    if(!user)
+        return;
+
+    /* Move all orphaned local layouts to the new user. */
+    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId()))
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+            if(snapshotManager()->isLocal(layout))
+                user->addLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     if(!workbench()->layouts().empty())
         return;
 
-    qnAction(Qn::OpenSingleLayoutAction)->trigger();
-}
-
-void QnWorkbenchActionHandler::at_synchronizer_destroyed() {
-    setSynchronizer(NULL);
+    qnAction(Qn::OpenNewLayoutAction)->trigger();
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
@@ -256,18 +255,58 @@ void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
     workbench()->setCurrentLayout(workbench()->layouts().back());
 }
 
-void QnWorkbenchActionHandler::at_openSingleLayoutAction_triggered() {
-    /* No layouts are open, so we need to open one. */
-    QnLayoutResourceList resources = m_synchronizer->user()->getLayouts();
-    if(resources.isEmpty()) {
-        /* There are no layouts in user's layouts list, just create a new one. */
-        qnAction(Qn::OpenNewLayoutAction)->trigger();
-    } else {
-        /* Open the last layout from the user's layouts list. */
-        qSort(resources.begin(), resources.end(), LayoutIdCmp());
-        workbench()->addLayout(new QnWorkbenchLayout(resources.back(), this));
-        workbench()->setCurrentLayout(workbench()->layouts().back());
-    }
+void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout) {
+    if(!layout)
+        return;
+
+    if(!snapshotManager()->isSaveable(layout))
+        return;
+
+    snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+}
+
+void QnWorkbenchActionHandler::at_saveLayoutAction_triggered() {
+    at_saveLayoutAction_triggered(qnMenu->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>());
+}
+
+void QnWorkbenchActionHandler::at_saveCurrentLayoutAction_triggered() {
+    at_saveLayoutAction_triggered(workbench()->currentLayout()->resource());
+}
+
+void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout) {
+    if(!layout)
+        return;
+
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+    dialog->setWindowTitle(tr("Save Layout As"));
+    dialog->setText(tr("Enter layout name:"));
+    dialog->setName(layout->getName());
+    dialog->exec();
+    if(dialog->clickedButton() != QDialogButtonBox::Save)
+        return;
+
+    QnLayoutResourcePtr newLayout(new QnLayoutResource());
+    newLayout->setGuid(QUuid::createUuid());
+    newLayout->setName(dialog->name());
+
+    context()->resourcePool()->addResource(newLayout);
+    if(context()->user())
+        context()->user()->addLayout(newLayout);
+
+    QnLayoutItemDataList items = layout->getItems().values();
+    for(int i = 0; i < items.size(); i++)
+        items[i].uuid = QUuid::createUuid();
+    newLayout->setItems(items);
+
+    snapshotManager()->save(newLayout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+}
+
+void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered() {
+    at_saveLayoutAsAction_triggered(qnMenu->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>());
+}
+
+void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
+    at_saveLayoutAsAction_triggered(workbench()->currentLayout()->resource());
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
@@ -277,39 +316,38 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
     QnWorkbenchLayout *layout = layouts[0];
 
     QnLayoutResourcePtr resource = layout->resource();
-    bool isChanged = m_synchronizer->isChanged(layout);
-    bool isLocal = m_synchronizer->isLocal(layout);
+    bool isChanged = snapshotManager()->isChanged(resource);
+    bool isLocal = snapshotManager()->isLocal(resource);
 
     bool close = false;
-    if(isChanged) {
+    if(isChanged && isLocal) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Close Layout"));
-        dialog->setText(tr("Do you want to save changes made to layout '%1'?\n\nIf yes, you may also want to change its name:").arg(layout->name()));
+        dialog->setText(tr("Layout '%1' is not saved. Do you want to save it?\n\nIf yes, you may also want to change its name:").arg(layout->name()));
         dialog->setName(layout->name());
         dialog->exec();
         QDialogButtonBox::StandardButton button = dialog->clickedButton();
         if(button == QDialogButtonBox::Cancel) {
-            return;
+            close = false;
         } else if(button == QDialogButtonBox::No) {
-            m_synchronizer->restore(layout);
+            snapshotManager()->restore(resource);
             close = true;
         } else {
             layout->setName(dialog->name());
-            m_synchronizer->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+            snapshotManager()->save(resource, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
             isLocal = false;
             close = true;
         }
     } else {
+        snapshotManager()->restore(resource);
         close = true;
     }
 
     if(close) {
         delete layout;
 
-        if(isLocal) {
-            m_synchronizer->user()->removeLayout(resource); // TODO
-            qnResPool->removeResource(resource);
-        }
+        if(isLocal)
+            resourcePool()->removeResource(resource);
     }
 }
 
@@ -390,8 +428,8 @@ void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
             QnResourceDiscoveryManager::instance().stop();
 
             // don't remove local resources
-            const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
-            qnResPool->removeResources(remoteResources);
+            const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+            resourcePool()->removeResources(remoteResources);
 
             SessionManager::instance()->start();
             QnEventManager::instance()->run();
@@ -474,8 +512,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
     if(button != QMessageBox::Yes)
         return;
     
-    foreach(const QnResourcePtr &resource, resources)
-        QnFileProcessor::deleteLocalResources(resources.toList());
+    QnFileProcessor::deleteLocalResources(resources.toList());
 }
 
 void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
@@ -531,7 +568,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     QnResourceList resources = qnMenu->currentResourcesTarget(sender());
     
     /* User cannot delete himself. */
-    resources.removeOne(m_synchronizer->user());
+    resources.removeOne(context()->user());
     if(resources.isEmpty())
         return;
 
@@ -588,9 +625,9 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         switch(type) {
         case Layout: {
             QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
-            if(m_synchronizer->isLocal(layout)) {
-                m_synchronizer->user()->removeLayout(layout); // TODO
-                qnResPool->removeResource(resource);
+            if(snapshotManager()->isLocal(layout)) { 
+                /* This one can be simply deleted from resource pool. */
+                resourcePool()->removeResource(resource);
                 break;
             }
             /* FALL THROUGH */
@@ -632,15 +669,17 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
-    qnResPool->addResource(layout);
-    
     layout->setName(dialog->name());
+    resourcePool()->addResource(layout);
+
     user->addLayout(layout);
+
+    snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
 
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
     if(status == 0) {
-        qnResPool->addResources(resources);
+        resourcePool()->addResources(resources);
         return;
     }
 

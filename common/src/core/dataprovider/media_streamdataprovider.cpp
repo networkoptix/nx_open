@@ -136,6 +136,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
     return true;
 
+
 }
 
 const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel) const
@@ -143,6 +144,13 @@ const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel
     return &m_stat[channel];
 }
 
+float QnAbstractMediaStreamDataProvider::getBitrate() const
+{
+    float rez = 0;
+    for (int i = 0; i < m_numberOfchannels; ++i)
+        rez += m_stat[i].getBitrate();
+    return rez;
+}
 
 void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
 {

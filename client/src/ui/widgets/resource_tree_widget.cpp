@@ -16,14 +16,16 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
-#include "ui/actions/action_manager.h"
-#include "ui/actions/action.h"
-#include "ui/models/resource_model.h"
-#include "ui/models/resource_search_proxy_model.h"
-#include "ui/models/resource_search_synchronizer.h"
-#include "ui/style/skin.h"
-#include "ui/workbench/workbench.h"
-#include "ui/workbench/workbench_layout.h"
+
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action.h>
+#include <ui/models/resource_model.h>
+#include <ui/models/resource_search_proxy_model.h>
+#include <ui/models/resource_search_synchronizer.h>
+#include <ui/style/skin.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "ui_resource_tree_widget.h"
 
@@ -76,8 +78,8 @@ private:
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent): 
     QWidget(parent),
     ui(new Ui::ResourceTreeWidget()),
+    m_context(NULL),
     m_filterTimerId(0),
-    m_workbench(NULL),
     m_ignoreFilterChanges(false)
 {
     ui->setupUi(this);
@@ -91,7 +93,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourceModel(this);
-    m_resourceModel->setResourcePool(qnResPool);
     ui->resourceTreeView->setModel(m_resourceModel);
 
     m_resourceDelegate = new QnResourceTreeItemDelegate(this);
@@ -137,12 +138,17 @@ void QnResourceTreeWidget::setCurrentTab(Tab tab) {
     ui->tabWidget->setCurrentIndex(tab);
 }
 
-void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
-    if(m_workbench == workbench)
+QnWorkbench *QnResourceTreeWidget::workbench() const {
+    return m_context ? m_context->workbench() : NULL;
+}
+
+void QnResourceTreeWidget::setContext(QnWorkbenchContext *context) {
+    if(m_context == context)
         return;
 
-    if(m_workbench != NULL) {
-        disconnect(m_workbench, NULL, this, NULL);
+    if(m_context != NULL) {
+        disconnect(m_context, NULL, this, NULL);
+        disconnect(workbench(), NULL, this, NULL);
 
         at_workbench_currentLayoutAboutToBeChanged();
 
@@ -150,21 +156,25 @@ void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
         ui->typeComboBox->setEnabled(false);
         m_searchDelegate->setWorkbench(NULL);
         m_resourceDelegate->setWorkbench(NULL);
+
+        m_resourceModel->setContext(NULL);
     }
 
-    m_workbench = workbench;
+    m_context = context;
 
-    if(m_workbench) {
-        m_searchDelegate->setWorkbench(m_workbench);
-        m_resourceDelegate->setWorkbench(m_workbench);
+    if(m_context) {
+        m_resourceModel->setContext(context);
+
+        m_searchDelegate->setWorkbench(workbench());
+        m_resourceDelegate->setWorkbench(workbench());
         ui->filterLineEdit->setEnabled(true);
         ui->typeComboBox->setEnabled(true);
 
         at_workbench_currentLayoutChanged();
 
-        connect(m_workbench, SIGNAL(currentLayoutAboutToBeChanged()),   this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
-        connect(m_workbench, SIGNAL(currentLayoutChanged()),            this, SLOT(at_workbench_currentLayoutChanged()));
-        connect(m_workbench, SIGNAL(aboutToBeDestroyed()),              this, SLOT(at_workbench_aboutToBeDestroyed()));
+        connect(m_context,          SIGNAL(aboutToBeDestroyed()),                       this, SLOT(at_context_aboutToBeDestroyed()));
+        connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
+        connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
     }
 }
 
@@ -287,7 +297,7 @@ void QnResourceTreeWidget::updateFilter() {
     ui->clearFilterButton->setVisible(!filter.isEmpty());
     killSearchTimer();
 
-    if(!m_workbench)
+    if(!workbench())
         return;
 
     if(m_ignoreFilterChanges)
@@ -332,8 +342,8 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
         killTimer(m_filterTimerId);
         m_filterTimerId = 0;
 
-        if (m_workbench) {
-            QnWorkbenchLayout *layout = m_workbench->currentLayout();
+        if (workbench()) {
+            QnWorkbenchLayout *layout = workbench()->currentLayout();
             QnResourceSearchProxyModel *model = layoutModel(layout, true);
             
             QString filter = ui->filterLineEdit->text();
@@ -351,7 +361,7 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
 }
 
 void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
-    QnWorkbenchLayout *layout = m_workbench->currentLayout();
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
     if(synchronizer)
@@ -365,7 +375,7 @@ void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
 }
 
 void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
-    QnWorkbenchLayout *layout = m_workbench->currentLayout();
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
     if(synchronizer)
@@ -377,13 +387,13 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
     ui->filterLineEdit->setText(layoutSearchString(layout));
 }
 
-void QnResourceTreeWidget::at_workbench_aboutToBeDestroyed() {
-    setWorkbench(NULL);
+void QnResourceTreeWidget::at_context_aboutToBeDestroyed() {
+    setContext(NULL);
 }
 
 void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
     if(index == SearchTab) {
-        QnWorkbenchLayout *layout = m_workbench->currentLayout();
+        QnWorkbenchLayout *layout = workbench()->currentLayout();
 
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         QnResourceSearchProxyModel *model = layoutModel(layout, true);
@@ -400,3 +410,5 @@ void QnResourceTreeWidget::at_treeView_activated(const QModelIndex &index) {
     if (resource)
         emit activated(resource);
 }
+
+

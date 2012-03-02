@@ -1,7 +1,10 @@
 #ifndef QN_STORAGE_RESOURCE_H
 #define QN_STORAGE_RESOURCE_H
 
+#include <QSet>
 #include "resource.h"
+
+class QnAbstractMediaStreamDataProvider;
 
 class QnStorageResource : public QnResource
 {
@@ -22,6 +25,10 @@ public:
     void setMaxStoreTime(int timeInSeconds);
     int getMaxStoreTime() const;
 
+    float bitrate() const;
+    void addBitrate(QnAbstractMediaStreamDataProvider* provider);
+    void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
+
     /*
      * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
      */
@@ -32,6 +39,7 @@ private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // at seconds
     quint16 m_index;
+    QSet<QnAbstractMediaStreamDataProvider*> m_providers;
 };
 
 #endif // QN_STORAGE_RESOURCE_H

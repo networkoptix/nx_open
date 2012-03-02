@@ -39,7 +39,7 @@ public:
 	void stop(); // stops the statistic;
 
 	void onData(unsigned int datalen);// must be called then new data from cam arrived; if datalen==0 => timeout
-	float getBitrate() const; // returns instant bitrate
+	float getBitrate() const; // returns instant bitrate at megabits
 	float getFrameRate() const;// returns instant framerate
 	int getFrameSize() const;// returns average frame size in kb( based on getBitrate and getFrameRate)
 	float getavBitrate() const; // returns average bitrate

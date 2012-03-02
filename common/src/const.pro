@@ -102,7 +102,7 @@ win32 {
 }
 
 mac {
-    LIBS += -lxerces-c-3.1
+    LIBS += -lxerces-c-3.1 -lprotobuf
 }
 
 uniq:!mac {

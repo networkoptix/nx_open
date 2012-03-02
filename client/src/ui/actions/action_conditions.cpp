@@ -1,7 +1,14 @@
 #include "action_conditions.h"
+
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
+
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+
 #include "action_target_types.h"
 
 QnActionCondition::QnActionCondition(QObject *parent): 
@@ -132,3 +139,4 @@ bool QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
 
     return true;
 }
+

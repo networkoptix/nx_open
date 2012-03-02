@@ -89,7 +89,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         {
             // new resource 
             m_resources[uniqueId] = resource;
-            m_resourceTree[resource->getParentId()].append(resource); // unsorted
             newResources.insert(resId, resource);
         }
 
@@ -97,9 +96,10 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, newResources.values()) 
     {
-        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
-        connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()));
-        QMetaObject::invokeMethod(this, "resourceAdded", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
+        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+
+        emit resourceAdded(resource);
     }
 
 }
@@ -122,7 +122,6 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         if (m_resources.remove(uniqueId) != 0) 
         {
-            m_resourceTree[resource->getParentId()].removeOne(resource);
             removedResources.append(resource);
         }
     }
@@ -130,22 +129,21 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
 
-        QMetaObject::invokeMethod(this, "resourceRemoved", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
+        emit resourceRemoved(resource);
     }
 
     /* Remove layouts from their users. */
-    foreach (const QnResourcePtr &resource, removedResources) {
+    foreach (const QnResourcePtr &resource, removedResources)
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
             if(QnUserResourcePtr user = getResourceById(layout->getParentId()).dynamicCast<QnUserResource>())
                 user->removeLayout(layout);
-    }
 }
 
 void QnResourcePool::handleResourceChange()
 {
     const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
 
-    QMetaObject::invokeMethod(this, "resourceChanged", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
+    emit resourceChanged(resource);
 }
 
 QnResourceList QnResourcePool::getResources() const
@@ -206,17 +204,26 @@ QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
     QnResourceList result;
 
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources) {
+    foreach (const QnResourcePtr &resource, m_resources)
         if (resource->checkFlags(flag))
             result.append(resource);
-    }
 
     return result;
 }
 
 QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
 {
-    return m_resourceTree.value(id);
+    QMutexLocker locker(&m_resourcesMtx);
+
+    // TODO: 
+    // cache it, but remember that id and parentId of a resource may change 
+    // while it's in the pool.
+
+    QnResourceList result;
+    foreach(const QnResourcePtr &resource, m_resources)
+        if(resource->getParentId() == id)
+            result.push_back(resource);
+    return result;
 }
 
 

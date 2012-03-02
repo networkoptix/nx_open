@@ -32,21 +32,25 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     if(m_dataProvider != NULL) {
         m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
-
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
+
         if(m_mediaProvider != NULL) {
+            /* Camera will free media provider in its destructor. */
             m_camera = new CLVideoCamera(m_mediaResource, false, m_mediaProvider);
-            
+
+            connect(this,                           SIGNAL(destroyed()),    m_camera,   SLOT(beforeStopDisplay()));
+
             QnCounter *counter = new QnCounter(2);
-            connect(m_camera->getCamDisplay(),  SIGNAL(destroyed()),    counter,        SLOT(decrement()));
-            connect(m_mediaProvider,            SIGNAL(destroyed()),    counter,        SLOT(decrement()));
-            connect(counter,                    SIGNAL(reachedZero()),  counter,        SLOT(deleteLater()));
-            connect(counter,                    SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
+            connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     counter,    SLOT(decrement()));
+            connect(m_camera->getStreamreader(),    SIGNAL(finished()),     counter,    SLOT(decrement()));
+
+            connect(counter,                        SIGNAL(reachedZero()),  counter,    SLOT(deleteLater()));
+            connect(counter,                        SIGNAL(reachedZero()),  m_camera,   SLOT(deleteLater()));
         } else {
             m_camera = NULL;
 
-            connect(this, SIGNAL(destroyed()), m_dataProvider, SLOT(stop()));
-            connect(m_dataProvider, SIGNAL(finished()), m_dataProvider, SLOT(deleteLater()));
+            connect(this,           SIGNAL(destroyed()),    m_dataProvider, SLOT(pleaseStop()));
+            connect(m_dataProvider, SIGNAL(finished()),     m_dataProvider, SLOT(deleteLater()));
         }
     }
 }

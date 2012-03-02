@@ -35,11 +35,6 @@ namespace Qn {
         ShowFpsAction,
 
         /**
-         * Opens some existing layout if there exists one, creates a new one otherwise.
-         */
-        OpenSingleLayoutAction,
-
-        /**
          * Drops provided resources on the current layout.
          */ 
         ResourceDropAction,
@@ -57,6 +52,16 @@ namespace Qn {
          * This action is executed every time the last layout on a workbench is closed.
          */
         OpenNewLayoutAction,
+
+        /**
+         * Saves current layout on appserver.
+         */
+        SaveCurrentLayoutAction,
+
+        /**
+         * Saves current layout under another name.
+         */
+        SaveCurrentLayoutAsAction,
 
         /**
          * Submenu for 'open' commands.
@@ -115,6 +120,16 @@ namespace Qn {
          * Opens selected layout.
          */
         OpenLayoutAction,
+
+        /**
+         * Saves selected layout.
+         */
+        SaveLayoutAction,
+
+        /**
+         * Saves selected layout under another name.
+         */
+        SaveLayoutAsAction,
 
         /**
          * Shows motion search grid on an item.

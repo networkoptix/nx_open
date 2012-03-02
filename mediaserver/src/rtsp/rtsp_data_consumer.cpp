@@ -187,7 +187,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     }
 
     // overflow control
-    if (media->flags & AV_PKT_FLAG_KEY)
+    if ((media->flags & AV_PKT_FLAG_KEY) || m_dataQueue.size() > 100)  
     {
         bool isMainStream = true;
         if (isLive) 
@@ -196,7 +196,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             bool isLowQuality = m_liveQuality == MEDIA_Quality_Low;
             isMainStream = isSecondaryDP == isLowQuality;
         }
-        if (isMainStream && (m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)) 
+        while (isMainStream && m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)
         {
             QnAbstractDataPacketPtr tmp;
             m_dataQueue.pop(tmp);

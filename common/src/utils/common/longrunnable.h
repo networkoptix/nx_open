@@ -21,6 +21,25 @@ public slots:
         QThread::start(priority);
     }
 
+    virtual void pleaseStop()
+    {
+        if (!m_needStop) 
+        {
+            m_needStop = true;
+            if (m_onPause)
+                resume();
+        }
+    }
+
+    virtual void stop()
+    {
+        if (m_runing)
+        {
+            pleaseStop();
+            wait();
+            m_runing = false;
+        }
+    }
 public:
     CLLongRunnable() : m_runing(false), m_onPause(false) {}
     
@@ -30,23 +49,10 @@ public:
             qnCritical("Runnable instance was destroyed without a call to stop().");
     }
 
-    virtual void pleaseStop()
-    {
-        m_needStop = true;
-        if (m_onPause)
-            resume();
-    }
 
     virtual bool needToStop() const
     {
         return m_needStop;
-    }
-
-    virtual void stop()
-    {
-        pleaseStop();
-        wait();
-        m_runing = false;
     }
 
     virtual void pause()

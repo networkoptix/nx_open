@@ -8,44 +8,9 @@
 
 class QnWorkbench;
 class QnWorkbenchLayout;
+class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
-
-namespace detail {
-    class WorkbenchSynchronizerReplyProcessor : public QObject {
-        Q_OBJECT
-
-    public:
-        WorkbenchSynchronizerReplyProcessor(QnWorkbenchSynchronizer *synchronizer, const QnLayoutResourcePtr &resource): 
-            m_synchronizer(synchronizer),
-            m_resource(resource)
-        {}
-
-    public slots:
-        void at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
-
-    signals:
-        void finished(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
-
-    private:
-        QWeakPointer<QnWorkbenchSynchronizer> m_synchronizer;
-        QnLayoutResourcePtr m_resource;
-    };
-
-    class LayoutData {
-    public:
-        LayoutData(const QnLayoutResourcePtr &resource):
-            items(resource->getItems()),
-            name(resource->getName())
-        {}
-
-        LayoutData() {}
-
-        QnLayoutItemDataMap items;
-        QString name;
-    };
-
-} // namespace detail
-
+class QnResourcePool;
 
 /**
  * This class performs bidirectional synchronization of instances of 
@@ -59,83 +24,33 @@ public:
 
     virtual ~QnWorkbenchSynchronizer();
 
-    QnWorkbench *workbench() {
-        return m_workbench;
+    QnWorkbenchContext *context() const {
+        return m_context;
     }
 
-    const QnUserResourcePtr &user() const {
-        return m_user;
-    }
-
-    QnId userId() const;
-
-    bool isRunning() const {
-        return m_running;
-    }
-
-    void save(QnWorkbenchLayout *layout, QObject *object, const char *slot);
-
-    void restore(QnWorkbenchLayout *layout);
-
-    bool isChanged(const QnLayoutResourcePtr &resource);
-
-    bool isLocal(const QnLayoutResourcePtr &resource);
-
-    bool isChanged(QnWorkbenchLayout *layout);
-
-    bool isLocal(QnWorkbenchLayout *layout);
-
-signals:
-    /**
-     * This signal is emitted whenever synchronization starts. For synchronization
-     * to start, both workbench and user must be set.
-     */
-    void started();
-
-    /**
-     * This signal is emitted whenever synchronization stops.
-     */
-    void stopped();
+    void setContext(QnWorkbenchContext *context);
 
 public slots:
-    void setWorkbench(QnWorkbench *workbench);
-    void setUser(const QnUserResourcePtr &user);
-    void update();
     void submit();
 
 protected:
     void start();
     void stop();
-    QnLayoutResourcePtr checkLayoutResource(QnWorkbenchLayout *layout);
 
 protected slots:
-    void at_user_resourceChanged();
-    void at_workbench_aboutToBeDestroyed();
+    void at_context_aboutToBeDestroyed();
+    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_workbench_layoutsChanged();
 
 private:
-    friend class detail::WorkbenchSynchronizerReplyProcessor;
-
-    /** Whether this synchronizer is running. */
-    bool m_running;
-
-    /** Associated workbench. */
-    QnWorkbench *m_workbench;
-
-    /** Associated user resource. */
-    QnUserResourcePtr m_user;
+    /** Associated context. */
+    QnWorkbenchContext *m_context;
 
     /** Whether changes should be propagated from workbench to resources. */
     bool m_submit;
 
     /** Whether changes should be propagated from resources to workbench. */
     bool m_update;
-
-    /** Appserver connection. */
-    QnAppServerConnectionPtr m_connection;
-
-    /** Mapping from layout resource to its saved state. */
-    QHash<QnLayoutResourcePtr, detail::LayoutData> m_savedDataByResource;
 };
 
 

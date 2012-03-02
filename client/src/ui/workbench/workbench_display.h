@@ -37,6 +37,7 @@ class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
 class QnWorkbenchRenderWatcher;
+class QnWorkbenchContext;
 
 class CLVideoCamera;
 class CLCamDisplay;
@@ -71,10 +72,10 @@ public:
     /**
      * Constructor.
      * 
-     * \param workbench                 Workbench to display.
+     * \param context                   Context to display.
      * \param parent                    Parent object for this workbench display.
      */
-    QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent = NULL);
+    QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *parent = NULL);
 
 	/**
 	  * This is method initSyncPlay. Should be called for only main display.
@@ -132,14 +133,16 @@ public:
         return m_selectionOverlayHackInstrument;
     }
 
+    QnWorkbenchContext *context() const {
+        return m_context;
+    }
+    
     /**
      * Note that this function never returns NULL.
      * 
      * \returns                         Current workbench of this workbench display. 
      */
-    QnWorkbench *workbench() const {
-        return m_workbench;
-    }
+    QnWorkbench *workbench() const;
 
     /**
      * Note that this function never returns NULL.
@@ -309,9 +312,9 @@ protected:
     bool addItemInternal(QnWorkbenchItem *item);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
-    void deinitSceneWorkbench();
-    void initSceneWorkbench();
-    void initWorkbench(QnWorkbench *workbench);
+    void deinitSceneContext();
+    void initSceneContext();
+    void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
     qreal widgetsFrameOpacity() const;
@@ -328,7 +331,7 @@ protected slots:
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
 
-    void at_workbench_aboutToBeDestroyed();
+    void at_context_aboutToBeDestroyed();
     void at_workbench_modeChanged();
     void at_workbench_itemChanged(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
     void at_workbench_itemChanged(QnWorkbench::ItemRole role);
@@ -356,8 +359,8 @@ protected slots:
 private:
     /* Directly visible state */
 
-    /** Current workbench. */
-    QnWorkbench *m_workbench;
+    /** Current context. */
+    QnWorkbenchContext *m_context;
 
     /** Current scene. */
     QGraphicsScene *m_scene;

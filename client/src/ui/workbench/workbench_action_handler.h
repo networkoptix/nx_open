@@ -5,8 +5,11 @@
 #include <QWeakPointer>
 #include <api/AppServerConnection.h>
 
+class QnResourcePool;
 class QnWorkbench;
+class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
+class QnWorkbenchLayoutSnapshotManager;
 
 class QnWorkbenchActionHandler: public QObject {
     Q_OBJECT;
@@ -15,17 +18,19 @@ public:
 
     virtual ~QnWorkbenchActionHandler();
 
-    QnWorkbench *workbench() const {
-        return m_workbench;
+    QnWorkbenchContext *context() const {
+        return m_context;
     }
 
-    void setWorkbench(QnWorkbench *workbench);
+    QnWorkbench *workbench() const;
 
-    QnWorkbenchSynchronizer *synchronizer() const {
-        return m_synchronizer;
-    }
+    QnWorkbenchSynchronizer *synchronizer() const;
 
-    void setSynchronizer(QnWorkbenchSynchronizer *synchronizer);
+    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
+
+    QnResourcePool *resourcePool() const;
+
+    void setContext(QnWorkbenchContext *context);
 
     QWidget *widget() const {
         return m_widget.data();
@@ -47,13 +52,18 @@ protected:
     void addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
 
 protected slots:
-    void at_workbench_aboutToBeDestroyed();
+    void at_context_aboutToBeDestroyed();
+    void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
-    void at_synchronizer_destroyed();
 
     void at_openLayoutAction_triggered();
     void at_openNewLayoutAction_triggered();
-    void at_openSingleLayoutAction_triggered();
+    void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
+    void at_saveLayoutAction_triggered();
+    void at_saveCurrentLayoutAction_triggered();
+    void at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout);
+    void at_saveLayoutAsAction_triggered();
+    void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     
     void at_resourceDropAction_triggered();
@@ -82,8 +92,7 @@ protected slots:
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 
 private:
-    QnWorkbench *m_workbench;
-    QnWorkbenchSynchronizer *m_synchronizer;
+    QnWorkbenchContext *m_context;
     QWeakPointer<QWidget> m_widget;
     QnAppServerConnectionPtr m_connection;
 };

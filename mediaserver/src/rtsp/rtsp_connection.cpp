@@ -68,6 +68,9 @@ public:
         delete dataProcessor;
         archiveDP = 0;
         dataProcessor = 0;
+
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes);
+        camera->notInUse(this);
     }
 
     ~QnRtspConnectionProcessorPrivate()
@@ -386,10 +389,17 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
-    if (!d->liveDpHi && camera) 
+    camera->inUse(d);
+    if (!d->liveDpHi && camera) {
         d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    if (!d->liveDpLow && camera) 
+        if (d->liveDpHi)
+            d->liveDpHi->start();
+    }
+    if (!d->liveDpLow && camera)  {
         d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+        if (d->liveDpLow)
+            d->liveDpLow->start();
+    }
     if (!d->archiveDP) 
         d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
 }
@@ -401,19 +411,6 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
     if (d->liveDpLow)
         d->liveDpLow->addDataProcessor(d->dataProcessor);
 
-    /*
-    if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0) {
-        if (d->liveDpLow)
-            d->liveDpLow->removeDataProcessor(d->dataProcessor);
-        d->liveDpHi->addDataProcessor(d->dataProcessor);
-        d->dataProcessor->setSecondaryDataProvider(0);
-    }
-    else {
-        d->liveDpHi->addDataProcessor(d->dataProcessor);
-        d->liveDpLow->addDataProcessor(d->dataProcessor);
-        d->dataProcessor->setSecondaryDataProvider(d->liveDpHi); // got data from Hi provider, but skip all data instead of motion
-    }
-    */
     d->dataProcessor->setLiveQuality(d->quality);
     d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
 }
@@ -547,6 +544,8 @@ int QnRtspConnectionProcessor::composePlay()
 
     }
 
+    d->dataProcessor->start();
+
     if (d->liveMode) {
         if (d->liveDpHi)
             d->liveDpHi->start();
@@ -557,7 +556,6 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->archiveDP)
             d->archiveDP->start();
     }
-    d->dataProcessor->start();
     //d->dataProcessor->resume();
 
     return CODE_OK;

@@ -199,7 +199,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_treeWidget->setPalette(palette);
         m_treeWidget->setComboBoxPalette(cbPalette);
     }
-    m_treeWidget->setWorkbench(display->workbench());
+    m_treeWidget->setContext(display->context());
     m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
@@ -299,7 +299,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     
     QnLayoutTabBar *tabBarWidget = new QnLayoutTabBar();
     tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
-    tabBarWidget->setWorkbench(display->workbench());
+    tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(tabBarWidget);
 
     m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
@@ -471,7 +471,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
     connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
-    //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
     connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
     connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
 
@@ -488,7 +487,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     setSliderOpened(true, false);
     setSliderVisible(false, false);
-    setTreeOpened(false, false);
+    setTreeOpened(true, false);
     setTreeVisible(true, false);
     setTitleOpened(true, false);
     setTitleVisible(true, false);
@@ -496,6 +495,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     setHelpOpened(false, false);
     setHelpVisible(true, false);
 
+    /* Tree is pinned by default. */
+    m_treePinButton->setChecked(true);
 
     /* Set up help context processing. */
     QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display, this);
@@ -824,14 +825,16 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
+    bool sliderVisible = m_sliderItem->videoCamera() != NULL && !m_sliderItem->videoCamera()->getCamDisplay()->isStillImage();
+
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();
-        setSliderVisible(hovered, animate);
+        setSliderVisible(sliderVisible && hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
         setHelpVisible(hovered, animate);
     } else {
-        setSliderVisible(m_sliderItem->videoCamera() != NULL, animate);
+        setSliderVisible(sliderVisible, animate);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
         setHelpVisible(true, animate);
