@@ -501,22 +501,22 @@ void QnApiXmlSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTy
 void QnApiXmlSerializer::serializeServer(const QnVideoServerResourcePtr& serverPtr, QByteArray& data)
 {
     xsd::api::servers::Server server(
-                   serverPtr->getId().toString().toStdString(),
-                   serverPtr->getName().toStdString(),
-                   serverPtr->getTypeId().toString().toStdString(),
-                   serverPtr->getUrl().toStdString(),
-                   serverPtr->getGuid().toStdString(),
-                   serverPtr->getApiUrl().toStdString());
+                   serverPtr->getId().toString().toUtf8().constData(),
+                   serverPtr->getName().toUtf8().constData(),
+                   serverPtr->getTypeId().toString().toUtf8().constData(),
+                   serverPtr->getUrl().toUtf8().constData(),
+                   serverPtr->getGuid().toUtf8().constData(),
+                   serverPtr->getApiUrl().toUtf8().constData());
 
     if (!serverPtr->getStorages().isEmpty()) {
         ::xsd::api::storages::Storages storages;
 
         foreach (const QnStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
-            xsd::api::storages::Storage storage(storagePtr->getId().toString().toStdString(),
-                                                 storagePtr->getName().toStdString(),
-                                                 storagePtr->getUrl().toStdString(),
-                                                 storagePtr->getTypeId().toString().toStdString(),
-                                                 storagePtr->getParentId().toString().toStdString(),
+            xsd::api::storages::Storage storage(storagePtr->getId().toString().toUtf8().constData(),
+                                                 storagePtr->getName().toUtf8().constData(),
+                                                 storagePtr->getUrl().toUtf8().constData(),
+                                                 storagePtr->getTypeId().toString().toUtf8().constData(),
+                                                 storagePtr->getParentId().toString().toUtf8().constData(),
                                                  storagePtr->getSpaceLimit());
 
             storages.storage().push_back(storage);
@@ -537,26 +537,26 @@ void QnApiXmlSerializer::serializeServer(const QnVideoServerResourcePtr& serverP
 void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArray& data)
 {
     xsd::api::users::User user(
-                   userPtr->getName().toStdString(),
-                   userPtr->getTypeId().toString().toStdString());
+                   userPtr->getName().toUtf8().constData(),
+                   userPtr->getTypeId().toString().toUtf8().constData());
 
     if (userPtr->getId().isValid())
-        user.id(userPtr->getId().toString().toStdString());
+        user.id(userPtr->getId().toString().toUtf8().constData());
 
     user.status(QnResource::Online);
-    user.password(userPtr->getPassword().toStdString());
+    user.password(userPtr->getPassword().toUtf8().constData());
 
     xsd::api::layouts::Layouts layouts;
     foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
-        xsd::api::layouts::Layout layout(layoutIn->getName().toStdString(), layoutIn->getParentId().toString().toStdString());
+        xsd::api::layouts::Layout layout(layoutIn->getName().toUtf8().constData(), layoutIn->getParentId().toString().toUtf8().constData());
 
         if (!layoutIn->getItems().isEmpty()) {
             xsd::api::layouts::Items items;
 
             foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
                 // XXX: There is no support for local files here
-                xsd::api::layouts::Item item(itemIn.resource.id.toString().toStdString(),
-                                             itemIn.uuid.toString().toStdString(),
+                xsd::api::layouts::Item item(itemIn.resource.id.toString().toUtf8().constData(),
+                                             itemIn.uuid.toString().toUtf8().constData(),
                                              itemIn.flags,
                                              itemIn.combinedGeometry.left(),
                                              itemIn.combinedGeometry.top(),
@@ -585,13 +585,13 @@ void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteAr
 
 void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& cameraPtr, QByteArray& data)
 {
-    xsd::api::cameras::Camera camera(cameraPtr->getId().toString().toStdString(),
-                                     cameraPtr->getName().toStdString(),
-                                     cameraPtr->getTypeId().toString().toStdString(),
-                                     cameraPtr->getUrl().toStdString(),
-                                     cameraPtr->getMAC().toString().toStdString(),
-                                     cameraPtr->getAuth().user().toStdString(),
-                                     cameraPtr->getAuth().password().toStdString());
+    xsd::api::cameras::Camera camera(cameraPtr->getId().toString().toUtf8().constData(),
+                                     cameraPtr->getName().toUtf8().constData(),
+                                     cameraPtr->getTypeId().toString().toUtf8().constData(),
+                                     cameraPtr->getUrl().toUtf8().constData(),
+                                     cameraPtr->getMAC().toString().toUtf8().constData(),
+                                     cameraPtr->getAuth().user().toUtf8().constData(),
+                                     cameraPtr->getAuth().password().toUtf8().constData());
 
     xsd::api::scheduleTasks::ScheduleTasks scheduleTasks;
     if (!cameraPtr->getScheduleTasks().isEmpty())
@@ -614,14 +614,14 @@ void QnApiXmlSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camer
         camera.scheduleTasks(scheduleTasks);
     }
 
-    camera.parentID(cameraPtr->getParentId().toString().toStdString());
+    camera.parentID(cameraPtr->getParentId().toString().toUtf8().constData());
     camera.status(cameraPtr->getStatus());
-	camera.region(serializeRegionList(cameraPtr->getMotionMaskList()).toStdString());
+	camera.region(serializeRegionList(cameraPtr->getMotionMaskList()).toUtf8().constData());
 
     const QAuthenticator& auth = cameraPtr->getAuth();
 
-    camera.login(auth.user().toStdString());
-    camera.password(auth.password().toStdString());
+    camera.login(auth.user().toUtf8().constData());
+    camera.password(auth.password().toUtf8().constData());
 
     std::ostringstream os;
 
