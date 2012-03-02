@@ -261,11 +261,12 @@ void QnWorkbenchDisplay::deinitSceneContext() {
     disconnect(context(), NULL, this, NULL);
     disconnect(workbench(), NULL, this, NULL);
 
+    for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
+        at_workbench_itemChanged(static_cast<QnWorkbench::ItemRole>(i), NULL);
+
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
         removeItemInternal(item, true, false);
 
-    for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
-        at_workbench_itemChanged(static_cast<QnWorkbench::ItemRole>(i), NULL);
     m_mode = QnWorkbench::VIEWING;
 }
 

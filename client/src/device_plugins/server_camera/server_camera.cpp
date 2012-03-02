@@ -10,8 +10,6 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
 
     foreach(QnResourcePtr res, resources)
     {
-        if (!res.dynamicCast<QnServerCamera>())
-            res->setStatus(QnResource::Online);
         QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
         if (videoServer)
             videoServer->determineOptimalNetIF();

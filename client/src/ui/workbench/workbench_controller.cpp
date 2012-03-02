@@ -900,7 +900,11 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
     TRACE("SCENE RCLICKED");
 
-    /* No scene context menu, haha! */
+    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::SceneScope));
+    if(menu->isEmpty())
+        return;
+
+    menu->exec(info.screenPos());
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {

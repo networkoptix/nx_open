@@ -231,13 +231,13 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(Skin::icon(QLatin1String("plus.png")));
 
     factory(Qn::SaveCurrentLayoutAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget).
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false); /* There is no point in saving the same layout many times in a row. */
 
     factory(Qn::SaveCurrentLayoutAsAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false);

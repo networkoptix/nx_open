@@ -10,7 +10,10 @@ from genproto import generate_xsd, generate_pb
 
 # os.path = posixpath
 
-FFMPEG_VERSION = '2011-08-29-patched'
+if sys.platform == 'win32':
+    FFMPEG_VERSION = '2011-08-29-patched'
+else:
+    FFMPEG_VERSION = '2011-08-29'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')

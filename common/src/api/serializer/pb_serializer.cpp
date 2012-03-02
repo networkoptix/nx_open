@@ -43,11 +43,11 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
 
         QnResourceParameters parameters;
         parameters["id"] = QString::number(pb_camera.id());
-        parameters["name"] = pb_camera.name().c_str();
-        parameters["url"] = pb_camera.url().c_str();
-        parameters["mac"] = pb_camera.mac().c_str();
-        parameters["login"] = pb_camera.login().c_str();
-        parameters["password"] = pb_camera.password().c_str();
+        parameters["name"] = QString::fromUtf8(pb_camera.name().c_str());
+        parameters["url"] = QString::fromUtf8(pb_camera.url().c_str());
+        parameters["mac"] = QString::fromUtf8(pb_camera.mac().c_str());
+        parameters["login"] = QString::fromUtf8(pb_camera.login().c_str());
+        parameters["password"] = QString::fromUtf8(pb_camera.password().c_str());
 
         if (pb_camera.has_status())
             parameters["status"] = QString::number((int)pb_camera.status());
@@ -62,7 +62,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
         if (camera.isNull())
             continue;
 
-        camera->setAuth(pb_camera.login().c_str(), pb_camera.password().c_str());
+        camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
 
         if (pb_camera.has_region())
         {
@@ -114,10 +114,13 @@ void parseServers(QList<T> &servers, const PbServerList& pb_servers)
 
         QnVideoServerResourcePtr server(new QnVideoServerResource());
         server->setId(pb_server.id());
-        server->setName(pb_server.name().c_str());
-        server->setUrl(pb_server.url().c_str());
+        server->setName(QString::fromUtf8(pb_server.name().c_str()));
+        server->setUrl(QString::fromUtf8(pb_server.url().c_str()));
         server->setGuid(pb_server.guid().c_str());
-        server->setApiUrl(pb_server.apiurl().c_str());
+        server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
+
+        if (pb_server.has_status())
+            server->setStatus(static_cast<QnResource::Status>(pb_server.status()));
 
         if (pb_server.has_netaddrlist())
         {
@@ -137,9 +140,9 @@ void parseServers(QList<T> &servers, const PbServerList& pb_servers)
                 QnStorageResourcePtr storage(new QnStorageResource());
                 storage->setId(pb_storage.id());
                 storage->setParentId(pb_server.id());
-                storage->setName(pb_storage.name().c_str());
+                storage->setName(QString::fromUtf8(pb_storage.name().c_str()));
 
-                storage->setUrl(pb_storage.url().c_str());
+                storage->setUrl(QString::fromUtf8(pb_storage.url().c_str()));
                 storage->setSpaceLimit(pb_storage.spacelimit());
 
                 storages.append(storage);
@@ -177,8 +180,8 @@ void parseLayouts(QList<T>& layouts, const PbLayoutList& pb_layouts)
         layout->setParentId(pb_layout.parentid());
         parameters["parentId"] = QString::number(pb_layout.parentid());
 
-        layout->setName(pb_layout.name().c_str());
-        parameters["name"] = pb_layout.name().c_str();
+        layout->setName(QString::fromUtf8(pb_layout.name().c_str()));
+        parameters["name"] = QString::fromUtf8(pb_layout.name().c_str());
 
         if (pb_layout.item_size() > 0)
         {
@@ -190,7 +193,7 @@ void parseLayouts(QList<T>& layouts, const PbLayoutList& pb_layouts)
 
                 QnLayoutItemData itemData;
                 itemData.resource.id = pb_item.resource().id();
-                itemData.resource.path = pb_item.resource().path().c_str();
+                itemData.resource.path = QString::fromUtf8(pb_item.resource().path().c_str());
 
                 itemData.uuid = QUuid(pb_item.uuid().c_str());
                 itemData.flags = pb_item.flags();
@@ -227,9 +230,9 @@ void parseUsers(QList<T>& users, const PbUserList& pb_users)
             parameters["id"] = QString::number(pb_user.id());
         }
 
-        parameters["name"] = pb_user.name().c_str();
+        parameters["name"] = QString::fromUtf8(pb_user.name().c_str());
 
-        user->setName(pb_user.name().c_str());
+        user->setName(QString::fromUtf8(pb_user.name().c_str()));
 
         if (pb_user.layout_size() > 0)
         {
@@ -251,9 +254,9 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
         QnResourceTypePtr resourceType(new QnResourceType());
 
         resourceType->setId(pb_resourceType.id());
-        resourceType->setName(pb_resourceType.name().c_str());
+        resourceType->setName(QString::fromUtf8(pb_resourceType.name().c_str()));
         if (pb_resourceType.has_manufacture())
-            resourceType->setManufacture(pb_resourceType.manufacture().c_str());
+            resourceType->setManufacture(QString::fromUtf8(pb_resourceType.manufacture().c_str()));
 
         if (pb_resourceType.parentid_size() > 0)
         {
@@ -274,7 +277,7 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
                 const proto::pb::PropertyType& pb_propertyType = pb_resourceType.propertytype(i);
 
                 QnParamTypePtr param(new QnParamType());
-                param->name = pb_propertyType.name().c_str();
+                param->name = QString::fromUtf8(pb_propertyType.name().c_str());
                 param->type = (QnParamType::DataType)pb_propertyType.type();
 
                 if (pb_propertyType.has_min())
@@ -288,32 +291,32 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
 
                 if (pb_propertyType.has_values())
                 {
-                    QString values = pb_propertyType.values().c_str();
+                    QString values = QString::fromUtf8(pb_propertyType.values().c_str());
                     foreach(QString val, values.split(QLatin1Char(',')))
                         param->possible_values.push_back(val.trimmed());
                 }
 
                 if (pb_propertyType.has_ui_values())
                 {
-                    QString ui_values = pb_propertyType.ui_values().c_str();
+                    QString ui_values = QString::fromUtf8(pb_propertyType.ui_values().c_str());
                     foreach(QString val, ui_values.split(QLatin1Char(',')))
                         param->ui_possible_values.push_back(val.trimmed());
                 }
 
                 if (pb_propertyType.has_default_value())
-                    param->default_value = pb_propertyType.default_value().c_str();
+                    param->default_value = QString::fromUtf8(pb_propertyType.default_value().c_str());
 
                 if (pb_propertyType.has_nethelper())
-                    param->paramNetHelper = pb_propertyType.nethelper().c_str();
+                    param->paramNetHelper = QString::fromUtf8(pb_propertyType.nethelper().c_str());
 
                 if (pb_propertyType.has_group())
-                    param->group = pb_propertyType.group().c_str();
+                    param->group = QString::fromUtf8(pb_propertyType.group().c_str());
 
                 if (pb_propertyType.has_sub_group())
-                    param->subgroup = pb_propertyType.sub_group().c_str();
+                    param->subgroup = QString::fromUtf8(pb_propertyType.sub_group().c_str());
 
                 if (pb_propertyType.has_description())
-                    param->description = pb_propertyType.description().c_str();
+                    param->description = QString::fromUtf8(pb_propertyType.description().c_str());
 
                 if (pb_propertyType.has_ui())
                     param->ui = pb_propertyType.ui();
@@ -333,14 +336,14 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
 {
     pb_camera.set_id(cameraPtr->getId().toInt());
     pb_camera.set_parentid(cameraPtr->getParentId().toInt());
-    pb_camera.set_name(cameraPtr->getName().toStdString());
+    pb_camera.set_name(cameraPtr->getName().toUtf8().constData());
     pb_camera.set_typeid_(cameraPtr->getTypeId().toInt());
-    pb_camera.set_url(cameraPtr->getUrl().toStdString());
-    pb_camera.set_mac(cameraPtr->getMAC().toString().toStdString());
-    pb_camera.set_login(cameraPtr->getAuth().user().toStdString());
-    pb_camera.set_password(cameraPtr->getAuth().password().toStdString());
+    pb_camera.set_url(cameraPtr->getUrl().toUtf8().constData());
+    pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
+    pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
+    pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
     pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
-    pb_camera.set_region(serializeRegionList(cameraPtr->getMotionMaskList()).toStdString());
+    pb_camera.set_region(serializeRegionList(cameraPtr->getMotionMaskList()).toUtf8().constData());
 
     foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
         proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();
@@ -362,18 +365,18 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
 void serializeLayout_i(proto::pb::Layout& pb_layout, const QnLayoutResourcePtr& layoutIn)
 {
     pb_layout.set_parentid(layoutIn->getParentId().toInt());
-    pb_layout.set_name(layoutIn->getName().toStdString());
-    pb_layout.set_guid(layoutIn->getGuid().toStdString());
+    pb_layout.set_name(layoutIn->getName().toUtf8().constData());
+    pb_layout.set_guid(layoutIn->getGuid().toAscii().constData());
 
     if (!layoutIn->getItems().isEmpty()) {
         foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
             proto::pb::Layout_Item& pb_item = *pb_layout.add_item();
 
-            pb_item.mutable_resource()->set_path(itemIn.resource.path.toStdString());
+            pb_item.mutable_resource()->set_path(itemIn.resource.path.toUtf8().constData());
             if (itemIn.resource.id.isValid() && !itemIn.resource.id.isSpecial())
                 pb_item.mutable_resource()->set_id(itemIn.resource.id.toInt());
 
-            pb_item.set_uuid(itemIn.uuid.toString().toStdString());
+            pb_item.set_uuid(itemIn.uuid.toString().toUtf8().constData());
             pb_item.set_flags(itemIn.flags);
             pb_item.set_left(itemIn.combinedGeometry.left());
             pb_item.set_top(itemIn.combinedGeometry.top());
@@ -488,21 +491,21 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     proto::pb::Server& pb_server = *pb_servers.add_server();
 
     pb_server.set_id(serverPtr->getId().toInt());
-    pb_server.set_name(serverPtr->getName().toStdString());
-    pb_server.set_url(serverPtr->getUrl().toStdString());
-    pb_server.set_guid(serverPtr->getGuid().toStdString());
-    pb_server.set_apiurl(serverPtr->getApiUrl().toStdString());
+    pb_server.set_name(serverPtr->getName().toUtf8().constData());
+    pb_server.set_url(serverPtr->getUrl().toUtf8().constData());
+    pb_server.set_guid(serverPtr->getGuid().toAscii().constData());
+    pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
 
     if (!serverPtr->getNetAddrList().isEmpty())
-        pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toStdString());
+        pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());
 
     if (!serverPtr->getStorages().isEmpty()) {
         foreach (const QnStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
             proto::pb::Server_Storage& pb_storage = *pb_server.add_storage();
 
             pb_storage.set_id(storagePtr->getId().toInt());
-            pb_storage.set_name(storagePtr->getName().toStdString());
-            pb_storage.set_url(storagePtr->getUrl().toStdString());
+            pb_storage.set_name(storagePtr->getName().toUtf8().constData());
+            pb_storage.set_url(storagePtr->getUrl().toUtf8().constData());
             pb_storage.set_spacelimit(storagePtr->getSpaceLimit());
         }
     }
@@ -520,8 +523,8 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     if (userPtr->getId().isValid())
         pb_user.set_id(userPtr->getId().toInt());
 
-    pb_user.set_name(userPtr->getName().toStdString());
-    pb_user.set_password(userPtr->getPassword().toStdString());
+    pb_user.set_name(userPtr->getName().toUtf8().constData());
+    pb_user.set_password(userPtr->getPassword().toUtf8().constData());
     pb_user.set_isadmin(userPtr->isAdmin());
 
     foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
