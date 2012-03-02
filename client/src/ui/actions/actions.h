@@ -127,6 +127,11 @@ namespace Qn {
         SaveLayoutAction,
 
         /**
+         * Saves selected layout under another name.
+         */
+        SaveLayoutAsAction,
+
+        /**
          * Shows motion search grid on an item.
          */
         ShowMotionAction,

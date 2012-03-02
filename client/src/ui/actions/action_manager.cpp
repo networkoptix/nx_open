@@ -329,6 +329,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Layout")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
+    factory(Qn::SaveLayoutAsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Save Layout As...")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).

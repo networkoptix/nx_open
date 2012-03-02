@@ -122,6 +122,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::OpenLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(qnAction(Qn::OpenNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(qnAction(Qn::SaveLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
+    connect(qnAction(Qn::SaveLayoutAsAction),               SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
     connect(qnAction(Qn::SaveCurrentLayoutAction),          SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
     connect(qnAction(Qn::SaveCurrentLayoutAsAction),        SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
@@ -272,8 +273,7 @@ void QnWorkbenchActionHandler::at_saveCurrentLayoutAction_triggered() {
     at_saveLayoutAction_triggered(workbench()->currentLayout()->resource());
 }
 
-void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
-    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout) {
     if(!layout)
         return;
 
@@ -298,7 +298,15 @@ void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
         items[i].uuid = QUuid::createUuid();
     newLayout->setItems(items);
 
-    snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+    snapshotManager()->save(newLayout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+}
+
+void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered() {
+    at_saveLayoutAsAction_triggered(qnMenu->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>());
+}
+
+void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
+    at_saveLayoutAsAction_triggered(workbench()->currentLayout()->resource());
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
