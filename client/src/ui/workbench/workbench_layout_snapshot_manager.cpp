@@ -12,13 +12,16 @@
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
 void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int) {
-    if(status == 0 && m_manager)
-        m_manager.data()->at_layout_saved(m_resource);
+    if(m_manager) {
+        if(status == 0) {
+            m_manager.data()->at_layout_saved(m_resource);
+        } else {
+            m_manager.data()->at_layout_saveFailed(m_resource);
+        }
+    }
 
-
-    if(resources.size() != 1) {
-        qnWarning("Received reply of invalid size %1: expected a list containing a single layout resource.", resources.size());
-    } else {
+    /* We may get reply of size 0 if appserver is down. */
+    if(resources.size() == 1) {
         QnLayoutResourcePtr resource = resources[0].dynamicCast<QnLayoutResource>();
         if(!resource) {
             qnWarning("Received reply of invalid type: expected layout resource, got %1.", resources[0]->metaObject()->className());
@@ -192,6 +195,10 @@ void QnWorkbenchLayoutSnapshotManager::at_layout_saved(const QnLayoutResourcePtr
     m_storage->store(resource);
 
     setFlags(resource, 0); /* Not local, not being saved, not changed. */
+}
+
+void QnWorkbenchLayoutSnapshotManager::at_layout_saveFailed(const QnLayoutResourcePtr &resource) {
+    setFlags(resource, flags(resource) & ~Qn::LayoutIsBeingSaved);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {

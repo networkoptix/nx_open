@@ -98,13 +98,16 @@ void QnLayoutTabBar::submitCurrentLayout() {
     checkInvariants();
 }
 
-void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
+QString QnLayoutTabBar::layoutText(QnWorkbenchLayout *layout) const {
     if(layout == NULL)
-        return;
+        return QString();
 
     QnLayoutResourcePtr resource = layout->resource();
+    return layout->name() + (snapshotManager()->isModified(resource) ? QLatin1String("*") : QString());
+}
 
-    setTabText(m_layouts.indexOf(layout), layout->name() + (snapshotManager()->isUnsaved(resource) ? QLatin1String("*") : QString()));
+void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
+    setTabText(m_layouts.indexOf(layout), layoutText(layout));
 }
 
 
@@ -129,7 +132,7 @@ void QnLayoutTabBar::at_workbench_layoutsChanged() {
         int index = m_layouts.indexOf(layouts[i]);
         if(index == -1) {
             m_layouts.insert(i, layouts[i]);
-            insertTab(i, layouts[i]->name());
+            insertTab(i, layoutText(layouts[i]));
         } else {
             moveTab(index, i);
         }
@@ -179,6 +182,7 @@ void QnLayoutTabBar::tabInserted(int index) {
     if(m_layouts.size() != count()) { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
         QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
         m_layouts.insert(index, layout);
+        name = tabText(index);
     }
 
     QnWorkbenchLayout *layout = m_layouts[index];

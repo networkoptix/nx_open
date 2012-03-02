@@ -54,6 +54,16 @@ namespace Qn {
         OpenNewLayoutAction,
 
         /**
+         * Saves current layout on appserver.
+         */
+        SaveCurrentLayoutAction,
+
+        /**
+         * Saves current layout under another name.
+         */
+        SaveCurrentLayoutAsAction,
+
+        /**
          * Submenu for 'open' commands.
          */
         OpenMenu,

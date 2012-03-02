@@ -28,6 +28,8 @@ protected:
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
 
+    QString layoutText(QnWorkbenchLayout *layout) const;
+
     void updateCurrentLayout();
     void updateTabText(QnWorkbenchLayout *layout);
 

@@ -230,6 +230,18 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
+    factory(Qn::SaveCurrentLayoutAction).
+        flags(Qn::Main).
+        text(tr("Save Current Layout")).
+        shortcut(tr("Ctrl+S")).
+        autoRepeat(false); /* There is no point in saving the same layout many times in a row. */
+
+    factory(Qn::SaveCurrentLayoutAsAction).
+        flags(Qn::Main).
+        text(tr("Save Current Layout As...")).
+        shortcut(tr("Ctrl+Alt+S")).
+        autoRepeat(false);
+
     factory(Qn::OpenMenu).
         flags(Qn::Main).
         text(tr("Open"));

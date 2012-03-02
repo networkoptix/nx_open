@@ -117,6 +117,8 @@ void QnWorkbenchActionHandler::initialize() {
     connect(qnAction(Qn::ConnectionSettingsAction),         SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
     connect(qnAction(Qn::OpenLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(qnAction(Qn::OpenNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
+    connect(qnAction(Qn::SaveCurrentLayoutAction),          SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
+    connect(qnAction(Qn::SaveCurrentLayoutAsAction),        SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
     connect(qnAction(Qn::CloseLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(qnAction(Qn::CameraSettingsAction),             SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(qnAction(Qn::MultipleCameraSettingsAction),     SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
@@ -245,6 +247,22 @@ void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(workbench()->layouts().back());
+}
+
+void QnWorkbenchActionHandler::at_saveCurrentLayoutAction_triggered() {
+    QnLayoutResourcePtr resource = workbench()->currentLayout()->resource();
+    if(!resource)
+        return;
+
+    if(!snapshotManager()->isSaveable(resource))
+        return;
+
+    snapshotManager()->save(resource, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+}
+
+void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {

@@ -50,7 +50,7 @@ public:
         m_state(Invalid),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_unsaved(false)
+        m_modified(false)
     {
         assert(model != NULL);
 
@@ -67,7 +67,7 @@ public:
         m_state(Invalid),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_unsaved(false)
+        m_modified(false)
     {
         assert(model != NULL);
     }
@@ -218,7 +218,7 @@ public:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            return m_name + (m_unsaved ? QLatin1String("*") : QString());
+            return m_name + (m_modified ? QLatin1String("*") : QString());
         case Qt::DecorationRole:
             if (column == 0)
                 return m_icon;
@@ -262,15 +262,15 @@ public:
         return false;
     }
 
-    bool isUnsaved() const {
-        return !m_unsaved;
+    bool isModified() const {
+        return !m_modified;
     }
 
-    void setUnsaved(bool unsaved) {
-        if(m_unsaved == unsaved)
+    void setModified(bool modified) {
+        if(m_modified == modified)
             return;
 
-        m_unsaved = unsaved; 
+        m_modified = modified; 
 
         changeInternal();
     }
@@ -357,8 +357,8 @@ private:
     /** Icon of this node. */
     QIcon m_icon;
 
-    /** Whether this resource is unsaved. */
-    bool m_unsaved;
+    /** Whether this resource is modified. */
+    bool m_modified;
 };
 
 
@@ -681,7 +681,7 @@ void QnResourceModel::at_context_aboutToBeDestroyed() {
 void QnResourceModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     Node *node = this->node(resource);
 
-    node->setUnsaved(snapshotManager()->isUnsaved(resource));
+    node->setModified(snapshotManager()->isModified(resource));
 }
 
 void QnResourceModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {

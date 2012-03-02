@@ -83,7 +83,18 @@ public:
         return flags(resource) & Qn::LayoutIsBeingSaved;
     }
 
-    bool isUnsaved(const QnLayoutResourcePtr &resource) const {
+    bool isSaveable(const QnLayoutResourcePtr &resource) const {
+        Qn::LayoutFlags flags = this->flags(resource);
+        if(flags & Qn::LayoutIsBeingSaved)
+            return false;
+
+        if(flags & (Qn::LayoutIsLocal | Qn::LayoutIsChanged))
+            return true;
+
+        return false;
+    }
+
+    bool isModified(const QnLayoutResourcePtr &resource) const {
         return (flags(resource) & (Qn::LayoutIsChanged | Qn::LayoutIsBeingSaved)) == Qn::LayoutIsChanged; /* Changed and not being saved. */
     }
 
@@ -104,6 +115,7 @@ protected slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layout_saved(const QnLayoutResourcePtr &resource);
+    void at_layout_saveFailed(const QnLayoutResourcePtr &resource);
     void at_layout_changed(const QnLayoutResourcePtr &resource);
     void at_layout_changed();
 
