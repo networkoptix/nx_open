@@ -87,9 +87,10 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     int headerSize = 0;
     char* headerBufferEnd = 0;
     char* realHeaderEnd = 0;
+    int readed;
     while (headerSize < sizeof(headerBuffer)-1)
     {
-        int readed = mHttpClient->read(headerBuffer+headerSize, sizeof(headerBuffer)-1 - headerSize);
+        readed = mHttpClient->read(headerBuffer+headerSize, sizeof(headerBuffer)-1 - headerSize);
         if (readed < 1)
             return QnAbstractMediaDataPtr(0);
         headerSize += readed;
