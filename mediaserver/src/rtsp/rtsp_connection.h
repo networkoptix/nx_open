@@ -26,8 +26,11 @@ public:
     bool isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const;
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
+
+    void sendCurrentRangeIfUpdated();
 protected:
     virtual void run();
+    void addResponseRangeHeader();
 private:
     void checkQuality();
     void processRequest();

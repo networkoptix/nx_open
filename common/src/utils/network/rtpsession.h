@@ -37,8 +37,9 @@ private:
     bool m_tcpMode;
 };
 
-class RTPSession
+class RTPSession: public QObject
 {
+    Q_OBJECT;
 public:
     struct SDPTrackInfo
     {
@@ -89,6 +90,8 @@ public:
 
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
+signals:
+    void gotTextResponse(QByteArray text);
 private:
     qint64 m_startTime;
     qint64 m_endTime;

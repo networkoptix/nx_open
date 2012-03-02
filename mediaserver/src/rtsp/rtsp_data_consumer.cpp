@@ -391,6 +391,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_owner->clearBuffer();
     }
 
+    m_owner->sendCurrentRangeIfUpdated();
+
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
     return true;
