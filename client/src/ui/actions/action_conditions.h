@@ -6,6 +6,7 @@
 #include <core/resourcemanagment/resource_criterion.h>
 #include "action_fwd.h"
 
+class QnWorkbenchContext;
 
 class QnActionCondition: public QObject {
 public:
@@ -75,6 +76,12 @@ private:
 
 
 class QnResourceRemovalActionCondition: public QnActionCondition {
+public:
+    virtual bool check(const QnResourceList &resources) override;
+};
+
+
+class QnResourceSaveLayoutActionCondition: public QnActionCondition {
 public:
     virtual bool check(const QnResourceList &resources) override;
 };

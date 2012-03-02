@@ -199,7 +199,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_treeWidget->setPalette(palette);
         m_treeWidget->setComboBoxPalette(cbPalette);
     }
-    m_treeWidget->setWorkbench(display->workbench());
+    m_treeWidget->setContext(display->context());
     m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
@@ -299,7 +299,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     
     QnLayoutTabBar *tabBarWidget = new QnLayoutTabBar();
     tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
-    tabBarWidget->setWorkbench(display->workbench());
+    tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(tabBarWidget);
 
     m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
@@ -471,7 +471,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
     connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
-    //connect(m_sliderItem,           SIGNAL(playbackMaskChanged(const QnTimePeriodList &)),                                      m_display,                      SIGNAL(playbackMaskChanged(const QnTimePeriodList &)));
     connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
     connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
 

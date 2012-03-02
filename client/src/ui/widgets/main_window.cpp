@@ -152,7 +152,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_context->workbench()->mapper()->setCellSize(defaultCellSize);
     m_context->workbench()->mapper()->setSpacing(defaultSpacing);
 
-    m_display = new QnWorkbenchDisplay(m_context->workbench(), this);
+    m_display = new QnWorkbenchDisplay(m_context, this);
 	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);
@@ -193,7 +193,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-    m_tabBar->setWorkbench(m_context->workbench());
+    m_tabBar->setContext(m_context);
 
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 

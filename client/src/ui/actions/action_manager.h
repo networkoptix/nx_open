@@ -112,6 +112,8 @@ protected:
         QVariantMap params;
     };
 
+    void copyAction(QAction *dst, const QAction *src);
+
     void triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params);
 
     QMenu *newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items, const QVariantMap &params);
