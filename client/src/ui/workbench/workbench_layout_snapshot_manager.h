@@ -83,6 +83,10 @@ public:
         return flags(resource) & Qn::LayoutIsBeingSaved;
     }
 
+    bool isUnsaved(const QnLayoutResourcePtr &resource) const {
+        return (flags(resource) & (Qn::LayoutIsChanged | Qn::LayoutIsBeingSaved)) == Qn::LayoutIsChanged; /* Changed and not being saved. */
+    }
+
 signals:
     void flagsChanged(const QnLayoutResourcePtr &resource);
 

@@ -193,7 +193,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-    m_tabBar->setWorkbench(m_context->workbench());
+    m_tabBar->setContext(m_context);
 
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 

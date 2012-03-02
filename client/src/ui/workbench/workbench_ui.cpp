@@ -299,7 +299,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     
     QnLayoutTabBar *tabBarWidget = new QnLayoutTabBar();
     tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
-    tabBarWidget->setWorkbench(display->workbench());
+    tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(tabBarWidget);
 
     m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));

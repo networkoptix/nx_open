@@ -681,9 +681,7 @@ void QnResourceModel::at_context_aboutToBeDestroyed() {
 void QnResourceModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     Node *node = this->node(resource);
 
-    node->setUnsaved((snapshotManager()->flags(resource) & (Qn::LayoutIsChanged | Qn::LayoutIsBeingSaved)) == Qn::LayoutIsChanged); /* Changed, not being saved. */
-
-
+    node->setUnsaved(snapshotManager()->isUnsaved(resource));
 }
 
 void QnResourceModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
