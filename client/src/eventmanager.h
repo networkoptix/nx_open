@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 
 #include "api/EventSource.h"
+#include "core/resource/resource.h"
 
 class QnEventManager : public QObject
 {
@@ -18,6 +19,7 @@ public:
     void stop();
 
 public slots:
+	void resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
     void run();
 
 private slots:

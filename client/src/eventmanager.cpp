@@ -37,6 +37,31 @@ void QnEventManager::stop()
     m_source->stop();
 }
 
+void QnEventManager::resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)
+{
+	if (status != 0)
+	{
+		qDebug() << "QnEventManager::resourcesReceived(): Can't get resource from appserver. Reason: " << errorString;
+		return;
+	}
+
+    foreach (const QnResourcePtr& resource, resources)
+    {
+        QnResourcePtr ownResource;
+    
+		QString guid = resource->getGuid();
+		if (!guid.isEmpty())
+			ownResource = qnResPool->getResourceByGuid(guid);
+        else
+			ownResource = qnResPool->getResourceById(resource->getId());
+
+		if (ownResource.isNull())
+			qnResPool->addResource(resource);
+		else
+			ownResource->update(resource);
+	}
+}
+
 void QnEventManager::eventReceived(QnEvent event)
 {
     qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId << event.resourceGuid;
@@ -58,33 +83,8 @@ void QnEventManager::eventReceived(QnEvent event)
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
-        QByteArray errorString;
-        QnResourceList resources;
-        if (appServerConnection->getResources(resources, errorString) == 0)
-        {
-            QnResourcePtr ownResource;
-
-            if (!event.resourceGuid.isEmpty())
-                ownResource = qnResPool->getResourceByGuid(event.resourceGuid);
-            else
-                ownResource = qnResPool->getResourceById(event.resourceId);
-
-            foreach(QnResourcePtr resource, resources)
-            {
-                if ((!event.resourceGuid.isEmpty() && resource->getGuid() == event.resourceGuid) || (event.resourceGuid.isEmpty() && resource->getId() == event.resourceId))
-                {
-                    if (ownResource.isNull())
-                        qnResPool->addResource(resource);
-                    else
-                        ownResource->update(resource);
-                }
-            }
-        } else
-        {
-            qDebug()  << "QnEventManager::eventReceived(): Can't get resource from appserver. Reason: "
-                      << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
-        }
+        
+		appServerConnection->getResourcesAsync(QString::number(event.resourceId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
