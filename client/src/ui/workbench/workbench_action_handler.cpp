@@ -250,19 +250,43 @@ void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_saveCurrentLayoutAction_triggered() {
-    QnLayoutResourcePtr resource = workbench()->currentLayout()->resource();
-    if(!resource)
+    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    if(!layout)
         return;
 
-    if(!snapshotManager()->isSaveable(resource))
+    if(!snapshotManager()->isSaveable(layout))
         return;
 
-    snapshotManager()->save(resource, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+    snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
 
 void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    if(!layout)
+        return;
 
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+    dialog->setWindowTitle(tr("Save Layout As"));
+    dialog->setText(tr("Enter layout name:"));
+    dialog->setName(layout->getName());
+    dialog->exec();
+    if(dialog->clickedButton() != QDialogButtonBox::Save)
+        return;
+
+    QnLayoutResourcePtr newLayout(new QnLayoutResource());
+    newLayout->setGuid(QUuid::createUuid());
+    newLayout->setName(dialog->name());
+
+    context()->resourcePool()->addResource(newLayout);
+    if(context()->user())
+        context()->user()->addLayout(newLayout);
+
+    QnLayoutItemDataList items = layout->getItems().values();
+    for(int i = 0; i < items.size(); i++)
+        items[i].uuid = QUuid::createUuid();
+    newLayout->setItems(items);
+
+    snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {

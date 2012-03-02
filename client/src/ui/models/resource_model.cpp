@@ -421,8 +421,8 @@ void QnResourceModel::start() {
     assert(m_context != NULL);
 
     connect(m_context,          SIGNAL(aboutToBeDestroyed()),           this, SLOT(at_context_aboutToBeDestroyed()));
-    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)));
-    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
+    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)), Qt::QueuedConnection);
     connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
 
     QnResourceList resources = resourcePool()->getResources(); 
@@ -659,6 +659,7 @@ void QnResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     node->setResource(resource);
 
     at_resource_parentIdChanged(resource);
+    at_resource_resourceChanged(resource);
 
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
@@ -699,16 +700,18 @@ void QnResourceModel::at_resource_parentIdChanged() {
     at_resource_parentIdChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
+void QnResourceModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
+    node(resource)->update();
+    foreach(Node *node, m_itemNodesByResource[resource.data()])
+        node->update();
+}
+
 void QnResourceModel::at_resource_resourceChanged() {
     QObject *sender = this->sender();
     if(!sender)
         return; /* Already disconnected from this sender. */
 
-    QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender));
-
-    node(resource)->update();
-    foreach(Node *node, m_itemNodesByResource[resource.data()])
-        node->update();
+    at_resource_resourceChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnResourceModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
