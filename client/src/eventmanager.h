@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 
 #include "api/EventSource.h"
+#include "api/AppServerConnection.h"
 #include "core/resource/resource.h"
 
 class QnEventManager : public QObject
@@ -19,14 +20,15 @@ public:
     void stop();
 
 public slots:
-	void resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
     void run();
 
 private slots:
+    void resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
     void eventReceived(QnEvent event);
     void connectionClosed(QString errorString);
 
 private:
+    QnAppServerConnectionPtr m_connection;
     QSharedPointer<QnEventSource> m_source;
 };
 

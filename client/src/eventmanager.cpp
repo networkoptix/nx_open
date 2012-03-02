@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <qglobal.h>
 
-#include "api/AppServerConnection.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "device_plugins/server_camera/server_camera.h"
@@ -17,6 +16,9 @@ QnEventManager* QnEventManager::instance()
 
 void QnEventManager::init(const QUrl& url, int timeout)
 {
+    // We should invent something here. As there will be a problem if this method will be called when there are some request running.
+    m_connection = QnAppServerConnectionFactory::createConnection();
+
     m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
 
     connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(eventReceived(QnEvent)));
@@ -82,9 +84,7 @@ void QnEventManager::eventReceived(QnEvent event)
     }
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-        
-		appServerConnection->getResourcesAsync(QString::number(event.resourceId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
+        m_connection->getResourcesAsync(QString::number(event.resourceId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
