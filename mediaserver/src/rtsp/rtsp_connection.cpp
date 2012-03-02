@@ -557,6 +557,8 @@ int QnRtspConnectionProcessor::composePlay()
 
     }
 
+    d->dataProcessor->start();
+
     if (d->liveMode) {
         if (d->liveDpHi)
             d->liveDpHi->start();
@@ -567,7 +569,6 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->archiveDP)
             d->archiveDP->start();
     }
-    d->dataProcessor->start();
     //d->dataProcessor->resume();
 
     return CODE_OK;

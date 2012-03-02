@@ -33,6 +33,9 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 bool QnServerStreamRecorder::canAcceptData() const
 {
+    if (!isRunning())
+        return true;
+
     bool rez = QnStreamRecorder::canAcceptData();
     if (!rez) {
         qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -43,6 +46,14 @@ bool QnServerStreamRecorder::canAcceptData() const
         }
     }
     return rez;
+}
+
+void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
+{
+    if (!isRunning()) {
+        return;
+    }
+    QnStreamRecorder::putData(data);
 }
 
 bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
