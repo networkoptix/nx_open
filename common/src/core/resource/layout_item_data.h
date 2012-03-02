@@ -6,6 +6,7 @@
 #include <QList>
 #include <QHash>
 #include <utils/common/fuzzy.h>
+#include <utils/common/qnid.h>
 
 class QnLayoutItemData
 {

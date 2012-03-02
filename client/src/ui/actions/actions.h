@@ -54,6 +54,16 @@ namespace Qn {
         OpenNewLayoutAction,
 
         /**
+         * Saves current layout on appserver.
+         */
+        SaveCurrentLayoutAction,
+
+        /**
+         * Saves current layout under another name.
+         */
+        SaveCurrentLayoutAsAction,
+
+        /**
          * Submenu for 'open' commands.
          */
         OpenMenu,
@@ -110,6 +120,16 @@ namespace Qn {
          * Opens selected layout.
          */
         OpenLayoutAction,
+
+        /**
+         * Saves selected layout.
+         */
+        SaveLayoutAction,
+
+        /**
+         * Saves selected layout under another name.
+         */
+        SaveLayoutAsAction,
 
         /**
          * Shows motion search grid on an item.

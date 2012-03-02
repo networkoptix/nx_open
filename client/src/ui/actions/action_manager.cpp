@@ -230,6 +230,18 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
+    factory(Qn::SaveCurrentLayoutAction).
+        flags(Qn::Main).
+        text(tr("Save Current Layout")).
+        shortcut(tr("Ctrl+S")).
+        autoRepeat(false); /* There is no point in saving the same layout many times in a row. */
+
+    factory(Qn::SaveCurrentLayoutAsAction).
+        flags(Qn::Main).
+        text(tr("Save Current Layout As...")).
+        shortcut(tr("Ctrl+Alt+S")).
+        autoRepeat(false);
+
     factory(Qn::OpenMenu).
         flags(Qn::Main).
         text(tr("Open"));
@@ -312,6 +324,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layout")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
+    factory(Qn::SaveLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Save Layout")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
+    factory(Qn::SaveLayoutAsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Save Layout As...")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
@@ -338,12 +360,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Server Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::remote_server)));
 
+
     factory(Qn::YouTubeUploadAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Upload to YouTube...")).
-        shortcut(tr("Ctrl+Y")).
+        //shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE)));
+
 
     factory(Qn::EditTagsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
@@ -553,6 +577,19 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexLi
     return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
 }
 
+void QnActionManager::copyAction(QAction *dst, const QAction *src) {
+    dst->setText(src->text());
+    dst->setIcon(src->icon());
+    dst->setShortcuts(src->shortcuts());
+    dst->setCheckable(src->isCheckable());
+    dst->setChecked(src->isChecked());
+    dst->setFont(src->font());
+    dst->setIconText(src->iconText());
+    
+    connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
+    connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+}
+
 void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
     QnAction *action = m_actionById.value(id);
     if(action == NULL) {
@@ -600,8 +637,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
                 newAction = new QAction(result);
                 newAction->setMenu(menu);
-                newAction->setText(action->text());
-                newAction->setIcon(action->icon());
+                copyAction(newAction, action);
             }
         } else {
             newAction = action;

@@ -11,6 +11,8 @@
 class QnResourceModelPrivate;
 class QnResourcePool;
 class QnLayoutItemData;
+class QnWorkbenchContext;
+class QnWorkbenchLayoutSnapshotManager;
 
 class QnResourceModel : public QAbstractItemModel {
     Q_OBJECT;
@@ -36,8 +38,10 @@ public:
     virtual bool dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
     virtual Qt::DropActions supportedDropActions() const override;
 
-    void setResourcePool(QnResourcePool *resourcePool);
+    void setContext(QnWorkbenchContext *context);
+    QnWorkbenchContext *context() const;
     QnResourcePool *resourcePool() const;
+    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
 
     QnResourcePtr resource(const QModelIndex &index) const;
 
@@ -52,11 +56,16 @@ private:
     Node *node(const QModelIndex &index) const;
 
 private slots:
+    void at_context_aboutToBeDestroyed();
+
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
-    void at_resPool_aboutToBeDestroyed();
+
+    void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
+
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_parentIdChanged();
+    void at_resource_resourceChanged(const QnResourcePtr &resource);
     void at_resource_resourceChanged();
     void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
     void at_resource_itemAdded(const QnLayoutItemData &item);
@@ -64,8 +73,8 @@ private slots:
     void at_resource_itemRemoved(const QnLayoutItemData &item);
 
 private:
-    /** Associated resource pool. */
-    QnResourcePool *m_resourcePool;
+    /** Associated context. */
+    QnWorkbenchContext *m_context;
 
     /** Root node. Considered a resource node for NULL resource. */
     Node *m_root;

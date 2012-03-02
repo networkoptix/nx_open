@@ -96,9 +96,10 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, newResources.values()) 
     {
-        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
-        connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()));
-        QMetaObject::invokeMethod(this, "resourceAdded", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
+        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+
+        emit resourceAdded(resource);
     }
 
 }
@@ -128,7 +129,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
 
-        QMetaObject::invokeMethod(this, "resourceRemoved", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
+        emit resourceRemoved(resource);
     }
 
     /* Remove layouts from their users. */
@@ -142,7 +143,7 @@ void QnResourcePool::handleResourceChange()
 {
     const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
 
-    QMetaObject::invokeMethod(this, "resourceChanged", Qt::QueuedConnection, Q_ARG(QnResourcePtr, resource));
+    emit resourceChanged(resource);
 }
 
 QnResourceList QnResourcePool::getResources() const

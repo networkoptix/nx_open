@@ -11,6 +11,7 @@ class QnWorkbench;
 class QnWorkbenchDisplay;
 class QnWorkbenchController;
 class QnWorkbenchItem;
+class QnWorkbenchContext;
 class QnResourceWidget;
 
 class QnCameraMotionMaskWidget: public QWidget
@@ -46,7 +47,7 @@ private:
     QGraphicsScene *m_scene;
     QnGraphicsView *m_view;
 
-    QnWorkbench *m_workbench;
+    QnWorkbenchContext *m_context;
     QnWorkbenchDisplay *m_display;
     QnWorkbenchController *m_controller;
 
