@@ -119,6 +119,9 @@ void parseServers(QList<T> &servers, const PbServerList& pb_servers)
         server->setGuid(pb_server.guid().c_str());
         server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
 
+        if (pb_server.has_status())
+            server->setStatus(static_cast<QnResource::Status>(pb_server.status()));
+
         if (pb_server.has_netaddrlist())
         {
             QList<QHostAddress> netAddrList;
