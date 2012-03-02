@@ -5,6 +5,7 @@
 #include <QWeakPointer>
 #include <api/AppServerConnection.h>
 
+class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
@@ -26,6 +27,8 @@ public:
     QnWorkbenchSynchronizer *synchronizer() const;
 
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
+
+    QnResourcePool *resourcePool() const;
 
     void setContext(QnWorkbenchContext *context);
 

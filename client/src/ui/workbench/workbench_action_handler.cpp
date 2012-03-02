@@ -88,6 +88,10 @@ QnWorkbenchLayoutSnapshotManager *QnWorkbenchActionHandler::snapshotManager() co
     return m_context->snapshotManager();
 }
 
+QnResourcePool *QnWorkbenchActionHandler::resourcePool() const {
+    return m_context->resourcePool();
+}
+
 void QnWorkbenchActionHandler::setContext(QnWorkbenchContext *context) {
     if(m_context == context)
         return;
@@ -308,15 +312,15 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
     bool isLocal = snapshotManager()->isLocal(resource);
 
     bool close = false;
-    if(isChanged) {
+    if(isChanged && isLocal) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Close Layout"));
-        dialog->setText(tr("Do you want to save changes made to layout '%1'?\n\nIf yes, you may also want to change its name:").arg(layout->name()));
+        dialog->setText(tr("Layout '%1' is not saved. Do you want to save it?\n\nIf yes, you may also want to change its name:").arg(layout->name()));
         dialog->setName(layout->name());
         dialog->exec();
         QDialogButtonBox::StandardButton button = dialog->clickedButton();
         if(button == QDialogButtonBox::Cancel) {
-            return;
+            close = false;
         } else if(button == QDialogButtonBox::No) {
             snapshotManager()->restore(resource);
             close = true;
@@ -327,6 +331,7 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
             close = true;
         }
     } else {
+        snapshotManager()->restore(resource);
         close = true;
     }
 
@@ -334,7 +339,7 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
         delete layout;
 
         if(isLocal)
-            qnResPool->removeResource(resource);
+            resourcePool()->removeResource(resource);
     }
 }
 
@@ -415,8 +420,8 @@ void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
             QnResourceDiscoveryManager::instance().stop();
 
             // don't remove local resources
-            const QnResourceList remoteResources = qnResPool->getResourcesWithFlag(QnResource::remote);
-            qnResPool->removeResources(remoteResources);
+            const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+            resourcePool()->removeResources(remoteResources);
 
             SessionManager::instance()->start();
             QnEventManager::instance()->run();
@@ -614,7 +619,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
             if(snapshotManager()->isLocal(layout)) { 
                 /* This one can be simply deleted from resource pool. */
-                qnResPool->removeResource(resource);
+                resourcePool()->removeResource(resource);
                 break;
             }
             /* FALL THROUGH */
@@ -657,7 +662,7 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     user->addLayout(layout);
 
@@ -666,7 +671,7 @@ void QnWorkbenchActionHandler::at_newLayoutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
     if(status == 0) {
-        qnResPool->addResources(resources);
+        resourcePool()->addResources(resources);
         return;
     }
 
