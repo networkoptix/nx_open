@@ -37,6 +37,8 @@ public:
 
     QnUserResourcePtr user();
 
+    static QnWorkbenchContext *instance(QnWorkbench *workbench);
+
 signals:
     void userChanged(const QnUserResourcePtr &user);
     void aboutToBeDestroyed();

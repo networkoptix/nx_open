@@ -324,6 +324,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layout")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
+    factory(Qn::SaveLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Save Layout")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
@@ -350,12 +355,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Server Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::remote_server)));
 
+
     factory(Qn::YouTubeUploadAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Upload to YouTube...")).
-        shortcut(tr("Ctrl+Y")).
+        //shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE)));
+
 
     factory(Qn::EditTagsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
@@ -565,6 +572,19 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexLi
     return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
 }
 
+void QnActionManager::copyAction(QAction *dst, const QAction *src) {
+    dst->setText(src->text());
+    dst->setIcon(src->icon());
+    dst->setShortcuts(src->shortcuts());
+    dst->setCheckable(src->isCheckable());
+    dst->setChecked(src->isChecked());
+    dst->setFont(src->font());
+    dst->setIconText(src->iconText());
+    
+    connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
+    connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+}
+
 void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
     QnAction *action = m_actionById.value(id);
     if(action == NULL) {
@@ -612,8 +632,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
                 newAction = new QAction(result);
                 newAction->setMenu(menu);
-                newAction->setText(action->text());
-                newAction->setIcon(action->icon());
+                copyAction(newAction, action);
             }
         } else {
             newAction = action;

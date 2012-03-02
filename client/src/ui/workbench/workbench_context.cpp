@@ -42,6 +42,10 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     blockSignals(signalsBlocked);
 }
 
+QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
+    return dynamic_cast<QnWorkbenchContext *>(workbench->parent());
+}
+
 QnWorkbenchContext *QnWorkbenchContext::instance() {
     return qn_workbenchContext();
 }
@@ -49,7 +53,6 @@ QnWorkbenchContext *QnWorkbenchContext::instance() {
 QnUserResourcePtr QnWorkbenchContext::user() {
     return m_userWatcher->user();
 }
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
