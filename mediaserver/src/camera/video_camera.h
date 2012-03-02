@@ -20,10 +20,12 @@ public:
 
     /* stop reading from camera if no active DataConsumers left */
     void stopIfNoActivity();
+
+    void inUse(void* user);
+    void notInUse(void* user);
 private:
     void createReader(QnResource::ConnectionRole role);
 private:
-    //QMutex m_queueMtx;
     QMutex m_readersMutex;
     QMutex m_getReaderMutex;
     QnResourcePtr m_resource;
@@ -32,6 +34,7 @@ private:
 
     QnVideoCameraGopKeeper* m_primaryGopKeeper;
     QnVideoCameraGopKeeper* m_secondaryGopKeeper;
+    QSet<void*> m_cameraUsers;
 };
 
 #endif // __VIDEO_CAMERA_H__

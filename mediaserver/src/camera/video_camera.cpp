@@ -179,23 +179,31 @@ int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQu
         return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
 }
 
+void QnVideoCamera::inUse(void* user)
+{
+    QMutexLocker lock(&m_getReaderMutex);
+    m_cameraUsers << user;
+}
+
+void QnVideoCamera::notInUse(void* user)
+{
+    QMutexLocker lock(&m_getReaderMutex);
+    m_cameraUsers.remove(user);
+}
+
 void QnVideoCamera::stopIfNoActivity()
 {
-    bool allStopped = true;
+    QMutexLocker lock(&m_getReaderMutex);
+    if (!m_cameraUsers.isEmpty())
+        return;
+
     if (m_primaryReader)
-        allStopped &= m_primaryReader->isAllDataProcessorStopped();
+        m_primaryReader->pleaseStop();
     if (m_secondaryReader)
-        allStopped &= m_secondaryReader->isAllDataProcessorStopped();
+        m_secondaryReader->pleaseStop();
 
-    if (allStopped) {
-        if (m_primaryReader)
-            m_primaryReader->pleaseStop();
-        if (m_secondaryReader)
-            m_secondaryReader->pleaseStop();
-
-        if (m_primaryReader)
-            m_primaryReader->stop();
-        if (m_secondaryReader)
-            m_secondaryReader->stop();
-    }
+    if (m_primaryReader)
+        m_primaryReader->stop();
+    if (m_secondaryReader)
+        m_secondaryReader->stop();
 }

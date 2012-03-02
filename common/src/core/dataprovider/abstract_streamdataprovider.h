@@ -27,7 +27,6 @@ public:
     virtual ~QnAbstractStreamDataProvider();
 
     virtual bool dataCanBeAccepted() const;
-    bool isAllDataProcessorStopped() const;
 
     void addDataProcessor(QnAbstractDataConsumer* dp);
     void removeDataProcessor(QnAbstractDataConsumer* dp);

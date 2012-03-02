@@ -70,8 +70,7 @@ public:
         dataProcessor = 0;
 
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes);
-        camera->stopIfNoActivity();
-
+        camera->notInUse(this);
     }
 
     ~QnRtspConnectionProcessorPrivate()
@@ -390,6 +389,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
+    camera->inUse(d);
     if (!d->liveDpHi && camera) {
         d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
         if (d->liveDpHi)
@@ -411,19 +411,6 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
     if (d->liveDpLow)
         d->liveDpLow->addDataProcessor(d->dataProcessor);
 
-    /*
-    if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0) {
-        if (d->liveDpLow)
-            d->liveDpLow->removeDataProcessor(d->dataProcessor);
-        d->liveDpHi->addDataProcessor(d->dataProcessor);
-        d->dataProcessor->setSecondaryDataProvider(0);
-    }
-    else {
-        d->liveDpHi->addDataProcessor(d->dataProcessor);
-        d->liveDpLow->addDataProcessor(d->dataProcessor);
-        d->dataProcessor->setSecondaryDataProvider(d->liveDpHi); // got data from Hi provider, but skip all data instead of motion
-    }
-    */
     d->dataProcessor->setLiveQuality(d->quality);
     d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
 }

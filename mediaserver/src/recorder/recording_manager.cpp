@@ -24,8 +24,8 @@ QnRecordingManager::~QnRecordingManager()
 
 void QnRecordingManager::start()
 {
-    connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)));
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)));
+    connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
+    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
     m_scheduleWatchingTimer.start(1000);
 
@@ -192,7 +192,9 @@ void QnRecordingManager::onFpsChanged(QnServerStreamRecorder* recorder, float va
         QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource> (recorder->getResource());
         if (cameraRes && providerLow)
         {
-            if (cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS) 
+            if (recorder->getResource()->getStatus() == QnResource::Disabled ||
+                cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS || 
+                recorder->currentScheduleTask().getRecordingType() == QnScheduleTask::RecordingType_Never) 
                 providerLow->stop();
             else 
                 providerLow->start();

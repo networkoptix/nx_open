@@ -13,18 +13,6 @@ QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
     stop();
 }
 
-bool QnAbstractStreamDataProvider::isAllDataProcessorStopped() const
-{
-    QMutexLocker mutex(&m_mutex);
-    for (int i = 0; i < m_dataprocessors.size(); ++i)
-    {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
-        if (dp->isRunning())
-            return false;
-    }
-    return true;
-}
-
 bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 {
     // need to read only if all queues has more space and at least one queue is exist
