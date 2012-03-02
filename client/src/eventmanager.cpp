@@ -16,9 +16,6 @@ QnEventManager* QnEventManager::instance()
 
 void QnEventManager::init(const QUrl& url, int timeout)
 {
-    // We should invent something here. As there will be a problem if this method will be called when there are some request running.
-    m_connection = QnAppServerConnectionFactory::createConnection();
-
     m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
 
     connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(eventReceived(QnEvent)));
@@ -31,6 +28,10 @@ QnEventManager::QnEventManager()
 
 void QnEventManager::run()
 {
+    // We should invent something here. As there will be a problem if this method will be called when there are some request running.
+    // Currently everything should be fine as run() is called after stopping SessionManager, so there will be no pending request.
+    m_connection = QnAppServerConnectionFactory::createConnection();
+
     m_source->startRequest();
 }
 
