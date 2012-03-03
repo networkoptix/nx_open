@@ -122,6 +122,8 @@ void QnWorkbenchActionHandler::initialize() {
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
+    connect(action(Qn::LightMainMenuAction),                SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::DarkMainMenuAction),                 SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::AboutAction),                        SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
@@ -240,6 +242,13 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     action(Qn::OpenNewLayoutAction)->trigger();
+}
+
+void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
+    m_mainMenu.reset(menu()->newMenu(Qn::MainScope));
+
+    action(Qn::LightMainMenuAction)->setMenu(m_mainMenu.data());
+    action(Qn::DarkMainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {

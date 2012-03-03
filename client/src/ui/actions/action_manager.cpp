@@ -219,11 +219,17 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Main menu actions. */
 
-    factory(Qn::MainMenuAction).
+    factory(Qn::LightMainMenuAction).
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
+
+    factory(Qn::DarkMainMenuAction).
+        text(tr("Main Menu")).
+        shortcut(tr("Alt+Space")).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
 
     factory(Qn::OpenNewLayoutAction).
         flags(Qn::Main).
@@ -428,9 +434,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
         text(tr("New Layout...")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
-
-
-    action(Qn::MainMenuAction)->setMenu(newMenu(Qn::MainScope));
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);
