@@ -153,7 +153,7 @@ QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QSt
 
     cl_log.log("Cannot find such resource type!!!!: ", manufacture + name, cl_logERROR);
 
-    Q_ASSERT(false);
+    // Q_ASSERT(false);
     return QnId();
 }
 

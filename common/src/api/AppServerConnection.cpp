@@ -5,6 +5,7 @@
 
 #include "utils/common/sleep.h"
 #include "SessionManager.h"
+#include "utils/common/synctime.h"
 
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, const QByteArray &errorStringIn, int handle)
 {
@@ -109,6 +110,16 @@ int QnAppServerConnection::addObject(const QString& objectName, const QByteArray
     return status;
 }
 
+int QnAppServerConnection::getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot)
+{
+    QnRequestParamList requestParams(m_requestParams);
+
+    if (!args.isEmpty())
+		requestParams.append(QnRequestParam("id", args));
+
+    return SessionManager::instance()->sendAsyncGetRequest(m_url, objectName, requestParams, target, slot);
+}
+
 int QnAppServerConnection::addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot)
 {
     return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, m_requestParams, data, target, slot);
@@ -121,12 +132,7 @@ int QnAppServerConnection::deleteObjectAsync(const QString& objectName, int id, 
 
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
 {
-    QString request;
-
-    if (args.isEmpty())
-        request = objectName;
-    else
-        request = QString("%1/%2").arg(objectName).arg(args);
+    QString request = args.isEmpty() ? objectName : QString("%1/%2").arg(objectName).arg(args);
 
     return SessionManager::instance()->sendGetRequest(m_url, request, m_requestParams, data, errorString);
 }
@@ -230,6 +236,14 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
         return saveAsync(user, target, slot);
 
     return 0;
+}
+
+int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, objectName);
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+	return getObjectsAsync(objectName, args, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
@@ -471,5 +485,28 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
     } else {
         qnWarning("Cannot delete resources of type '%1'.", resource->metaObject()->className());
         return 0;
+    }
+}
+
+qint64 QnAppServerConnection::getCurrentTime()
+{
+    // todo: debug line. remove it!
+    return QDateTime::currentMSecsSinceEpoch();
+
+    QByteArray data;
+    QByteArray errorString;
+
+    int rez = SessionManager::instance()->sendGetRequest(m_url, "getCurrentTime", QnRequestParamList(), data, errorString);
+    if (rez != 0) {
+        qWarning() << "Can't read time from Application server." << errorString;
+        return -1;
+    }
+
+    try 
+    {
+        // todo: deserialize time here
+        //m_serializer.deserializeTime(data);
+    } catch (const QnSerializeException& e) {
+        qWarning() << "Can't parse time from Application server. Invalid time format." << e.errorString();
     }
 }

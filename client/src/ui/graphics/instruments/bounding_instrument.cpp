@@ -8,6 +8,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <ui/animation/animation_event.h>
+#include "utils/common/synctime.h"
 
 namespace {
 
@@ -530,7 +531,7 @@ BoundingInstrument::~BoundingInstrument() {
 }
 
 void BoundingInstrument::enabledNotify() {
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     foreach(ViewData *d, m_data) {
         if(d->view() != NULL) {
@@ -566,7 +567,7 @@ bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     if(d == NULL)
         return false;
 
-    d->tick(QDateTime::currentMSecsSinceEpoch());
+    d->tick(qnSyncTime->currentMSecsSinceEpoch());
 
     return false;
 }

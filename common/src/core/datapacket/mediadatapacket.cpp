@@ -3,6 +3,7 @@
 #include "libavformat/avformat.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/sse_helper.h"
+#include "utils/common/synctime.h"
 
 extern QMutex global_ffmpeg_mutex;
 
@@ -65,7 +66,7 @@ QnMetaDataV1::QnMetaDataV1():
     m_input = 0;
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
-    timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
+    timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     data.fill(0, data.capacity());
 }
 
