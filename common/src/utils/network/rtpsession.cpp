@@ -181,9 +181,7 @@ bool RTPSession::open(const QString& url)
 
     QString tmp = extractRTSPParam(response, "Range:");
     if (!tmp.isEmpty())
-    {
         parseRangeHeader(tmp);
-    }
 
     int sdp_index = response.indexOf("\r\n\r\n");
 
@@ -433,7 +431,7 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
 bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
 {
     QByteArray request;
-    QByteArray responce;
+    QByteArray response;
 
     m_scale = scale;
 
@@ -472,13 +470,18 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
         return false;
 
 
-    if (!readTextResponce(responce))
+    if (!readTextResponce(response))
         return false;
 
 
-    if (responce.startsWith("RTSP/1.0 200"))
+    if (response.startsWith("RTSP/1.0 200"))
     {
-        updateTransportHeader(responce);
+        updateTransportHeader(response);
+
+        QString tmp = extractRTSPParam(response, "Range:");
+        if (!tmp.isEmpty())
+            parseRangeHeader(tmp);
+
         m_keepAliveTime.restart();
         return true;
     }
@@ -491,7 +494,7 @@ bool RTPSession::sendPause()
 {
 
     QByteArray request;
-    QByteArray responce;
+    QByteArray response;
 
     request += "PAUSE ";
     request += mUrl.toString();
@@ -509,11 +512,11 @@ bool RTPSession::sendPause()
         return false;
 
 
-    if (!readTextResponce(responce))
+    if (!readTextResponce(response))
         return false;
 
 
-    if (responce.startsWith("RTSP/1.0 200"))
+    if (response.startsWith("RTSP/1.0 200"))
     {
         m_keepAliveTime.restart();
         return true;
@@ -696,6 +699,7 @@ int RTPSession::readRAWData()
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
     bool readMore = false;
+    QByteArray textResponse;
     while (m_tcpSock.isConnected())
     {
         if (readMore) {
@@ -706,26 +710,42 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 
         quint8* bEnd = m_responseBuffer + m_responseBufferLen;
 
-        for(quint8* curPtr = m_responseBuffer; curPtr < bEnd-4; curPtr++)
+        //for(quint8* curPtr = m_responseBuffer; curPtr < bEnd-4; curPtr++)
+        quint8* curPtr = m_responseBuffer;
+
+        if (*curPtr != '$') 
         {
-            if (*curPtr == '$') // start of binary data
+            // text Data
+            for(; curPtr < bEnd && *curPtr != '$'; curPtr++);
+            textResponse.append((const char*) m_responseBuffer, curPtr - m_responseBuffer);
+            memmove(m_responseBuffer, curPtr, bEnd - curPtr);
+            m_responseBufferLen = bEnd - curPtr;
+            if (QnTCPConnectionProcessor::isFullMessage(textResponse)) 
             {
-                int dataRest = bEnd - curPtr;
-                quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
-                if (maxDataSize < dataLen)
-                {
-                    qWarning("Too low RTSP receiving buffer. Data can't be demuxed");
-                    m_responseBufferLen = 0;
-                    return -1;
-                }
+                QString tmp = extractRTSPParam(textResponse, "Range:");
+                if (!tmp.isEmpty())
+                    parseRangeHeader(tmp);
+                emit gotTextResponse(textResponse);
+                textResponse.clear();
+                continue;
+            }
+        }
+        else // start of binary data
+        {
+            int dataRest = bEnd - curPtr;
+            quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
+            if (maxDataSize < dataLen)
+            {
+                qWarning("Too low RTSP receiving buffer. Data can't be demuxed");
+                m_responseBufferLen = 0;
+                return -1;
+            }
 
-                if (dataRest < dataLen)
-                    break;
-
+            if (dataRest >= dataLen)
+            {
                 memcpy(data, curPtr, dataLen);
                 memmove(curPtr, curPtr + dataLen, dataRest - dataLen);
                 m_responseBufferLen -= dataLen;
-
                 return dataLen;
             }
         }

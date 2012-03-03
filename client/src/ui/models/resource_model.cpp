@@ -37,7 +37,7 @@ public:
     enum State {
         Normal,     /**< Normal node. */
         Invalid     /**< Invalid node that should not be displayed. 
-                     * Invalid nodes may be parts of dangling tree branches during incremental
+                     * Invalid nodes are parts of dangling tree branches during incremental
                      * tree construction. They do not emit model signals. */
     };
 
@@ -48,6 +48,7 @@ public:
         m_model(model),
         m_type(Resource),
         m_state(Invalid),
+        m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
         m_modified(false)
@@ -65,6 +66,7 @@ public:
         m_type(Item),
         m_uuid(uuid),
         m_state(Invalid),
+        m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
         m_modified(false)
@@ -134,7 +136,7 @@ public:
     }
 
     bool isValid() const {
-        return m_state != Invalid;
+        return m_state == Normal;
     }
 
     void setState(State state) {
@@ -145,6 +147,26 @@ public:
 
         foreach(Node *node, m_children)
             node->setState(state);
+    }
+
+    bool isBastard() const {
+        return m_bastard;
+    }
+
+    void setBastard(bool bastard) {
+        if(m_bastard == bastard)
+            return;
+
+        m_bastard = bastard;
+
+        if(m_parent) {
+            if(m_bastard) {
+                m_parent->removeChildInternal(this);
+            } else {
+                setState(m_parent->state());
+                m_parent->addChildInternal(this);
+            }
+        }
     }
 
     const QList<Node *> &children() const {
@@ -163,14 +185,16 @@ public:
         if(m_parent == parent)
             return;
 
-        if(m_parent)
+        if(m_parent && !m_bastard)
             m_parent->removeChildInternal(this);
         
         m_parent = parent;
 
         if(m_parent) {
-            setState(m_parent->state());
-            m_parent->addChildInternal(this);
+            if(!m_bastard) {
+                setState(m_parent->state());
+                m_parent->addChildInternal(this);
+            }
         } else {
             setState(Invalid);
         }
@@ -279,7 +303,7 @@ protected:
     void removeChildInternal(Node *child) {
         assert(child->parent() == this);
 
-        if(isValid()) {
+        if(isValid() && !isBastard()) {
             QModelIndex index = this->index(0);
             int row = m_children.indexOf(child);
 
@@ -294,7 +318,7 @@ protected:
     void addChildInternal(Node *child) {
         assert(child->parent() == this);
 
-        if(isValid()) {
+        if(isValid() && !isBastard()) {
             QModelIndex index = this->index(0);
             int row = m_children.size();
 
@@ -307,7 +331,7 @@ protected:
     }
 
     void changeInternal() {
-        if(!isValid())
+        if(!isValid() || isBastard())
             return;
         
         QModelIndex index = this->index(0);
@@ -329,9 +353,12 @@ private:
     /** Resource associated with this node. */
     QnResourcePtr m_resource;
 
-    /** Whether this node is valid, i.e. represents an entity that should be
-     * visible in the view. */
+    /** State of this node. */
     State m_state;
+
+    /** Whether this node is a bastard node. Bastard nodes do not appear in
+     * their parent's children list and do not inherit their parent's state. */
+    bool m_bastard;
 
     /** Parent of this node. */
     Node *m_parent;
@@ -701,7 +728,10 @@ void QnResourceModel::at_resource_parentIdChanged() {
 }
 
 void QnResourceModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
+    QnResource::Status status = resource->getStatus();
+
     node(resource)->update();
+    node(resource)->setBastard(status == QnResource::Disabled);
     foreach(Node *node, m_itemNodesByResource[resource.data()])
         node->update();
 }

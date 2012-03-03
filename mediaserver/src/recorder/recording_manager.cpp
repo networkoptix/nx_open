@@ -179,7 +179,7 @@ void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 {
     QMutexLocker lock(&m_mutex);
-    return m_recordMap.contains(camera);
+    return m_recordMap.contains(camera) && m_recordMap.value(camera).recorderHiRes->isRunning();
 }
 
 void QnRecordingManager::onFpsChanged(QnServerStreamRecorder* recorder, float value)

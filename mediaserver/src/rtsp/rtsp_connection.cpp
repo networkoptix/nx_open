@@ -48,7 +48,9 @@ public:
         gotLivePacket(false),
         lastPlayCSeq(0),
         quality(MEDIA_Quality_High),
-        qualityFastSwitch(true)
+        qualityFastSwitch(true),
+        prevStartTime(AV_NOPTS_VALUE),
+        prevEndTime(AV_NOPTS_VALUE)
     {
     }
     void deleteDP()
@@ -97,6 +99,8 @@ public:
     int lastPlayCSeq;
     MediaQuality quality;
     bool qualityFastSwitch;
+    qint64 prevStartTime;
+    qint64 prevEndTime;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -191,6 +195,23 @@ void QnRtspConnectionProcessor::generateSessionId()
     d->sessionId += QString::number(rand());
 }
 
+void QnRtspConnectionProcessor::sendCurrentRangeIfUpdated()
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (!d->archiveDP)
+        return;
+
+    qint64 endTime = d->archiveDP->endTime();
+    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) 
+        endTime = DATETIME_NOW;
+
+    if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
+    {
+        addResponseRangeHeader();
+        sendResponse(CODE_OK);
+    }
+};
+
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
     QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
@@ -205,6 +226,33 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP);
     return layout ? layout->numberOfChannels() : -1;
 }
+
+void QnRtspConnectionProcessor::addResponseRangeHeader()
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (d->archiveDP) 
+    {
+        QString range = "npt=";
+        d->archiveDP->open();
+        if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+            range += "now";
+        else
+            range += QString::number(d->archiveDP->startTime());
+        d->prevStartTime = d->archiveDP->startTime();
+
+        range += "-";
+        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) {
+            range += "now";
+            d->prevEndTime = DATETIME_NOW;
+        }
+        else {
+            range += QString::number(d->archiveDP->endTime());
+            d->prevEndTime = d->archiveDP->endTime();
+        }
+        d->responseHeaders.removeValue("Range");
+        d->responseHeaders.addValue("Range", range);
+    }
+};
 
 int QnRtspConnectionProcessor::composeDescribe()
 {
@@ -226,20 +274,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
     int numAudio = audioLayout ? audioLayout->numberOfChannels() : 0;
 
-    if (d->archiveDP) {
-        QString range = "npt=";
-        d->archiveDP->open();
-        if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
-            range += "now";
-        else
-            range += QString::number(d->archiveDP->startTime());
-        range += "-";
-        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
-            range += "now";
-        else
-            range += QString::number(d->archiveDP->endTime());
-        d->responseHeaders.addValue("Range", range);
-    }
+    addResponseRangeHeader();
 
     for (int i = 0; i < numVideo + numAudio; ++i)
     {
@@ -543,6 +578,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->archiveDP->unlock();
 
     }
+    addResponseRangeHeader();
 
     d->dataProcessor->start();
 
@@ -628,6 +664,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
             d->responseBody.append("position: ");
             d->responseBody.append(QString::number(getRtspTime()));
             d->responseBody.append(ENDL);
+            addResponseRangeHeader();
         }
         else {
             qWarning() << Q_FUNC_INFO << __LINE__ << "Unsupported RTSP parameter " << parameter.trimmed();

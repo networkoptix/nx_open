@@ -9,6 +9,7 @@ class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
+class QnWorkbenchLayoutVisibilityController;
 
 class QnWorkbenchContext: public QObject {
     Q_OBJECT;
@@ -52,6 +53,7 @@ private:
     QnResourcePool *m_resourcePool;
     QnWorkbenchSynchronizer *m_synchronizer;
     QnWorkbenchLayoutSnapshotManager *m_snapshotManager;
+    QnWorkbenchLayoutVisibilityController *m_visibilityController;
     QnWorkbench *m_workbench;
 };
 

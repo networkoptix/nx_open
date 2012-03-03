@@ -6,6 +6,7 @@
 #include "workbench.h"
 #include "workbench_synchronizer.h"
 #include "workbench_layout_snapshot_manager.h"
+#include "workbench_layout_visibility_controller.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnWorkbenchContext, qn_workbenchContext, (qnResPool));
 
@@ -34,6 +35,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_snapshotManager = new QnWorkbenchLayoutSnapshotManager(this);
     m_snapshotManager->setContext(this);
+
+    m_visibilityController = new QnWorkbenchLayoutVisibilityController(this);
+    m_visibilityController->setContext(this);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
