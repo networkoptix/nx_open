@@ -4,6 +4,7 @@
 #ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
 #endif
+#include "utils/common/util.h"
 
 
 extern QMutex global_ffmpeg_mutex;
@@ -193,10 +194,11 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
     }
     Q_ASSERT(m_context->codec);
 
-	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_context->width, m_context->height);
+    int roundWidth = roundUp((unsigned) m_context->width, 32);
+	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, roundWidth, m_context->height);
     if (numBytes > 0) {
 	    m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-	    avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, m_context->width, m_context->height);
+	    avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, roundWidth, m_context->height);
     }
 
 //	avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
