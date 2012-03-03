@@ -10,4 +10,5 @@ message License {
 
 message Licenses {
     repeated License license = 1;
+    optional string  hwid    = 2;
 }

@@ -16,7 +16,8 @@
 LicenseWidget::LicenseWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::LicenseWidget),
-    m_httpClient(0)
+    m_httpClient(0),
+    m_connection(QnAppServerConnectionFactory::createConnection())
 {
     ui->setupUi(this);
 
@@ -29,13 +30,21 @@ LicenseWidget::LicenseWidget(QWidget *parent) :
 
     setOnlineActivation(ui->licenseGoupBox->isChecked());
 
-    ui->hardwareIdEdit->setText(qnLicensePool->hardwareId());
-
     ui->serialKeyEdit->setFocus();
 }
 
 LicenseWidget::~LicenseWidget()
 {
+}
+
+void LicenseWidget::setManager(QObject *manager)
+{
+    m_manager = manager;
+}
+
+void LicenseWidget::setHardwareId(const QByteArray& hardwareId)
+{
+    ui->hardwareIdEdit->setText(hardwareId);
 }
 
 void LicenseWidget::changeEvent(QEvent *event)
@@ -164,7 +173,7 @@ void LicenseWidget::downloadFinished()
 
 void LicenseWidget::updateControls()
 {
-    if (qnLicensePool->haveValidLicense()) {
+    if (!qnLicensePool->isEmpty()) {
         ui->licenseDetailsButton->setEnabled(true);
     }
 /*
@@ -182,12 +191,7 @@ void LicenseWidget::updateControls()
 void LicenseWidget::validateLicense(const QnLicensePtr &license)
 {
     if (license->isValid()) {
-        qnLicensePool->addLicense(license);
-
-        updateControls();
-
-        QMessageBox::information(this, tr("License Activation"),
-                                 tr("License was succesfully activated."));
+        m_connection->addLicenseAsync(license, m_manager, SLOT(licensesReceived(int,QByteArray,QnLicenseList,int)));
     } else {
         QMessageBox::warning(this, tr("License Activation"),
                              tr("Invalid License. Contact our support team to get a valid License."));

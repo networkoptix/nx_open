@@ -5,12 +5,16 @@
 #include <QString>
 #include <QList>
 #include <QMutex>
+#include <QSet>
 
 class QnLicense
 {
 public:
     QnLicense(const QByteArray& name, const QByteArray& key, int cameraCount, const QByteArray& hardwareId, const QByteArray& signature);
 
+    /**
+      * Check if signature matches other fields
+      */
     bool isValid() const;
 
     const QByteArray& name() const;
@@ -33,25 +37,46 @@ private:
 };
 
 typedef QSharedPointer<QnLicense> QnLicensePtr;
-typedef QList<QnLicensePtr> QnLicenseList;
 
-class QnLicensePool
+class QnLicenseList
 {
+public:
+    void setHardwareId(const QByteArray& hardwareId);
+    QByteArray hardwareId() const;
+
+    void append(QnLicensePtr license);
+    void append(QnLicenseList license);
+    bool isEmpty() const;
+    void clear();
+
+private:
+    QMap<QByteArray, QnLicensePtr> m_licenses;
+    QByteArray m_hardwareId;
+};
+
+/**
+  * License storage which is associated with instance of application server (i.e. should be reloaded when switching appserver).
+  *
+  */
+class QnLicensePool : public QObject
+{
+    Q_OBJECT
+
 public:
     static QnLicensePool* instance();
 
     const QnLicenseList& getLicenses() const;
     void addLicenses(const QnLicenseList& licenses);
+    void replaceLicenses(const QnLicenseList& licenses);
     void addLicense(const QnLicensePtr&);
-    void removeLicense(const QnLicensePtr&);
 
+    void clear();
     bool isEmpty() const;
-    bool haveValidLicense() const;
 
-    const QByteArray& hardwareId() const;
+signals:
+    void licensesChanged();
 
 private:
-    QByteArray m_hardwareId;
     QnLicenseList m_licenses;
     mutable QMutex m_mutex;
 };

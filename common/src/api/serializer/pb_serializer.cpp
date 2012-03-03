@@ -335,7 +335,7 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
     }
 }
 
-void parseLicenses(QList<QnLicensePtr>& licenses, const PbLicenseList& pb_licenses)
+void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
 {
     for (PbLicenseList::const_iterator ci = pb_licenses.begin(); ci != pb_licenses.end(); ++ci)
     {
@@ -502,6 +502,7 @@ void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByte
         throw QnSerializeException(errorString);
     }
 
+    licenses.setHardwareId(pb_licenses.hwid().c_str());
     parseLicenses(licenses, pb_licenses.license());
 }
 
@@ -517,19 +518,16 @@ void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& came
     data = QByteArray(str.data(), str.length());
 }
 
-void QnApiPbSerializer::serializeLicenses(const QnLicenseList& licenses, QByteArray& data)
+void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray& data)
 {
     proto::pb::Licenses pb_licenses;
 
-    foreach(QnLicensePtr license, licenses)
-    {
-        proto::pb::License& pb_license = *(pb_licenses.add_license());
-        pb_license.set_name(license->name().constData());
-        pb_license.set_key(license->key().constData());
-        pb_license.set_cameracount(license->cameraCount());
-        pb_license.set_hwid(qnLicensePool->hardwareId().constData());
-        pb_license.set_signature(license->signature().constData());
-    }
+    proto::pb::License& pb_license = *(pb_licenses.add_license());
+    pb_license.set_name(license->name().constData());
+    pb_license.set_key(license->key().constData());
+    pb_license.set_cameracount(license->cameraCount());
+    pb_license.set_hwid(license->hardwareId().constData());
+    pb_license.set_signature(license->signature().constData());
 
     std::string str;
     pb_licenses.SerializeToString(&str);

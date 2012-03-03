@@ -130,7 +130,8 @@ bool QnLicense::isValid() const
     {
         m_validLicense = 0;
 
-        if (!m_signature.isEmpty() && m_hardwareId == qnLicensePool->hardwareId())
+        // Note, than we do not check HWID here
+        if (!m_signature.isEmpty())
         {
             QByteArray licenseString;
             licenseString += "NAME=" + m_name + "\n";
@@ -213,8 +214,19 @@ void QnLicensePool::addLicenses(const QnLicenseList& licenses)
 {
     QMutexLocker locker(&m_mutex);
 
-    int n = licenses.size();
     m_licenses.append(licenses);
+
+    emit licensesChanged();
+}
+
+void QnLicensePool::replaceLicenses(const QnLicenseList& licenses)
+{
+    QMutexLocker locker(&m_mutex);
+
+    m_licenses.setHardwareId(licenses.hardwareId());
+    m_licenses = licenses;
+
+    emit licensesChanged();
 }
 
 void QnLicensePool::addLicense(const QnLicensePtr& license)
@@ -224,11 +236,11 @@ void QnLicensePool::addLicense(const QnLicensePtr& license)
     m_licenses.append(license);
 }
 
-void QnLicensePool::removeLicense(const QnLicensePtr& license)
+void QnLicensePool::clear()
 {
     QMutexLocker locker(&m_mutex);
 
-    m_licenses.removeOne(license);
+    m_licenses.clear();
 }
 
 bool QnLicensePool::isEmpty() const
@@ -238,20 +250,40 @@ bool QnLicensePool::isEmpty() const
     return m_licenses.isEmpty();
 }
 
-bool QnLicensePool::haveValidLicense() const
+void QnLicenseList::setHardwareId(const QByteArray &hardwareId)
 {
-    QMutexLocker locker(&m_mutex);
-
-    foreach(const QnLicensePtr& license, m_licenses)
-    {
-        if (license->isValid())
-            return true;
-    }
-
-    return false;
+    m_hardwareId = hardwareId;
 }
 
-const QByteArray &QnLicensePool::hardwareId() const
+QByteArray QnLicenseList::hardwareId() const
 {
     return m_hardwareId;
 }
+
+void QnLicenseList::append(QnLicensePtr license)
+{
+    if (m_licenses.contains(license->key()))
+        return;
+
+    if (!license->isValid())
+        return;
+
+    m_licenses.insert(license->key(), license);
+}
+
+void QnLicenseList::append(QnLicenseList licenses)
+{
+    foreach (QnLicensePtr license, licenses.m_licenses.values())
+        append(license);
+}
+
+bool QnLicenseList::isEmpty() const
+{
+    return m_licenses.isEmpty();
+}
+
+void QnLicenseList::clear()
+{
+    m_licenses.clear();
+}
+

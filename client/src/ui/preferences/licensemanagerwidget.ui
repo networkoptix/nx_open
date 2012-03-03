@@ -26,6 +26,12 @@
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <widget class="QTableWidget" name="gridLicenses">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
             <attribute name="horizontalHeaderCascadingSectionResizes">
              <bool>false</bool>
             </attribute>
@@ -34,17 +40,17 @@
             </attribute>
             <column>
              <property name="text">
-              <string>Name</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Serial</string>
+              <string>Licensed to</string>
              </property>
             </column>
             <column>
              <property name="text">
               <string>Cameras</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Serial</string>
              </property>
             </column>
            </widget>

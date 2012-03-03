@@ -47,6 +47,28 @@ namespace conn_detail
         QnApiSerializer& m_serializer;
         QString m_objectName;
     };
+
+    class LicenseReplyProcessor : public QObject
+    {
+        Q_OBJECT
+
+    public:
+        LicenseReplyProcessor(QnApiSerializer& serializer, const QString& objectName)
+              : m_serializer(serializer),
+                m_objectName(objectName)
+        {
+        }
+
+    public slots:
+        void finished(int status, const QByteArray &result, const QByteArray &errorString, int handle);
+
+    signals:
+        void finished(int status, const QByteArray& errorString, QnLicenseList resources, int handle);
+
+    private:
+        QnApiSerializer& m_serializer;
+        QString m_objectName;
+    };
 }
 
 class QN_EXPORT QnAppServerConnection
@@ -60,13 +82,13 @@ public:
 
     int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
-	/**
-	  get resources synchronously
+    /**
+      get resources synchronously
 
-	  @param args Currently we use args for passing id. Later we can introduce more sophisticated filters here.
-	*/
-	int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
-	int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
+      @param args Currently we use args for passing id. Later we can introduce more sophisticated filters here.
+    */
+    int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
+    int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
 
     int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
@@ -91,7 +113,8 @@ public:
     int saveAsync(const QnLayoutResourceList&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
 
-    int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
+    int saveAsync(const QnResourcePtr& license, QObject* target, const char* slot);
+    int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
 
     int deleteAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
@@ -107,11 +130,11 @@ public:
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 
-	int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
-	int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
+    int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
+    int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
 
-	int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
-	int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
+    int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
+    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
 
     int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
 

@@ -236,11 +236,6 @@ void QnSettings::setConnections(const QList<QnSettings::ConnectionData> &connect
     setLastUsedConnection(lastUsed);
 }
 
-bool QnSettings::haveValidLicense()
-{
-    return qnLicensePool->haveValidLicense();
-}
-
 /// Private methods. No internal synchronization needed.
 void QnSettings::setAllowChangeIP(bool allow)
 {

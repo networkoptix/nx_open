@@ -51,7 +51,7 @@ public:
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
 
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
-    virtual void serializeLicenses(const QnLicenseList& licenses, QByteArray& data) = 0;
+    virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;

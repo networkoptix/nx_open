@@ -4,6 +4,7 @@
 #include <QtGui/QWidget>
 
 #include "licensing/license.h"
+#include "api/AppServerConnection.h"
 #include "ui_licensewidget.h"
 
 class QNetworkAccessManager;
@@ -20,10 +21,13 @@ public:
     explicit LicenseWidget(QWidget *parent = 0);
     ~LicenseWidget();
 
+    void setManager(QObject* manager);
+    void setHardwareId(const QByteArray&);
+
 protected:
     void changeEvent(QEvent *event);
 
-private Q_SLOTS:
+private slots:
     void setOnlineActivation(bool online);
 
     void browseLicenseFileButtonClicked();
@@ -44,7 +48,10 @@ private:
 
     QScopedPointer<Ui::LicenseWidget> ui;
 
+    QObject* m_manager;
     QNetworkAccessManager *m_httpClient;
+    QnAppServerConnectionPtr m_connection;
+    QnLicenseList m_licenses;
 };
 
 #endif // LICENSEWIDGET_H

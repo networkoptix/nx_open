@@ -91,6 +91,27 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     }
 }
 
+void conn_detail::LicenseReplyProcessor::finished(int status, const QByteArray &result, const QByteArray &errorStringIn, int handle)
+{
+    QByteArray errorString = errorStringIn;
+
+    QnLicenseList licenses;
+
+    if (status == 0)
+    {
+        try {
+            m_serializer.deserializeLicenses(licenses, result);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
+    } else
+    {
+        errorString += SessionManager::formatNetworkError(status);
+    }
+
+    emit finished(status, errorString, licenses, handle);
+}
+
 QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory)
     : m_url(url),
       m_resourceFactory(resourceFactory)
@@ -115,7 +136,7 @@ int QnAppServerConnection::getObjectsAsync(const QString& objectName, const QStr
     QnRequestParamList requestParams(m_requestParams);
 
     if (!args.isEmpty())
-		requestParams.append(QnRequestParam("id", args));
+        requestParams.append(QnRequestParam("id", args));
 
     return SessionManager::instance()->sendAsyncGetRequest(m_url, objectName, requestParams, target, slot);
 }
@@ -151,14 +172,14 @@ int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, Q
     QByteArray data;
     int status = getObjects("resourceType", "", data, errorString);
 
-	if (status == 0)
-	{
-		try {
-			m_serializer.deserializeResourceTypes(resourceTypes, data);
-		} catch (const QnSerializeException& e) {
-			errorString += e.errorString();
-		}
-	}
+    if (status == 0)
+    {
+        try {
+            m_serializer.deserializeResourceTypes(resourceTypes, data);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
+    }
 
     return status;
 }
@@ -238,12 +259,23 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
     return 0;
 }
 
+int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject *target, const char *slot)
+{
+    conn_detail::LicenseReplyProcessor* processor = new conn_detail::LicenseReplyProcessor(m_serializer, "license");
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnLicenseList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeLicense(license, data);
+
+    return addObjectAsync("license", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
 int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, objectName);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
-	return getObjectsAsync(objectName, args, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+    return getObjectsAsync(objectName, args, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
@@ -470,7 +502,7 @@ bool initLicenses(QnAppServerConnectionPtr appServerConnection)
         return false;
     }
 
-    qnLicensePool->addLicenses(licenses);
+    qnLicensePool->replaceLicenses(licenses);
 
     return true;
 }
@@ -527,20 +559,20 @@ qint64 QnAppServerConnection::getCurrentTime()
     QByteArray data;
     QByteArray errorString;
 
-	int rez = SessionManager::instance()->sendGetRequest(m_url, "time", data, errorString);
+    int rez = SessionManager::instance()->sendGetRequest(m_url, "time", data, errorString);
     if (rez != 0) {
-		qWarning() << "Can't read time from Application server" << errorString;
-		return QDateTime::currentMSecsSinceEpoch();
+        qWarning() << "Can't read time from Application server" << errorString;
+        return QDateTime::currentMSecsSinceEpoch();
     }
 
-	return data.toLongLong();
+    return data.toLongLong();
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
 {
-	QnRequestParamList requestParams;
-	requestParams.append(QnRequestParam("id", resourceId.toString()));
-	requestParams.append(QnRequestParam("status", QString::number(status)));
+    QnRequestParamList requestParams;
+    requestParams.append(QnRequestParam("id", resourceId.toString()));
+    requestParams.append(QnRequestParam("status", QString::number(status)));
 
-	return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
+    return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }
