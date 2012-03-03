@@ -535,6 +535,8 @@ public:
         qnStorageMan->loadFullFileCatalog();
 
         QnRecordingManager::instance()->start();
+        qnResPool->addResource(videoServer);
+
         // ------------------------------------------
 
 
