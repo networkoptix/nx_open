@@ -490,25 +490,16 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
 
 qint64 QnAppServerConnection::getCurrentTime()
 {
-    // todo: debug line. remove it!
-    return QDateTime::currentMSecsSinceEpoch();
-
     QByteArray data;
     QByteArray errorString;
 
-    int rez = SessionManager::instance()->sendGetRequest(m_url, "time", QnRequestParamList(), data, errorString);
+	int rez = SessionManager::instance()->sendGetRequest(m_url, "time", data, errorString);
     if (rez != 0) {
-        qWarning() << "Can't read time from Application server." << errorString;
-        return -1;
+		qWarning() << "Can't read time from Application server" << errorString;
+		return QDateTime::currentMSecsSinceEpoch();
     }
 
-    try 
-    {
-        // todo: deserialize time here
-        //m_serializer.deserializeTime(data);
-    } catch (const QnSerializeException& e) {
-        qWarning() << "Can't parse time from Application server. Invalid time format." << e.errorString();
-	}
+	return data.toLongLong();
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
