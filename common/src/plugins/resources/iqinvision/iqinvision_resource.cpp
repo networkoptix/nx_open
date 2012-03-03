@@ -53,7 +53,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
         return new RTPH264Streamreader(toSharedPointer());
         /**/
 
-    return new MJPEGtreamreader(toSharedPointer(), "now.jpg?snap=spush?dummy=1305868336917");
+    return new MJPEGtreamreader(toSharedPointer(), "now.jpg?snap=spush");
 }
 
 void QnPlIqResource::setCropingPhysical(QRect croping)
