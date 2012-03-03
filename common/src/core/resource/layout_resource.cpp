@@ -10,6 +10,7 @@ QnLayoutResource::QnLayoutResource():
         metaTypesInitialized = true;
     }
     
+    setStatus(Online, true);
     addFlags(QnResource::layout);
 }
 

@@ -5,6 +5,7 @@ QnUserResource::QnUserResource()
     : base_type(),
       m_isAdmin(false)
 {
+    setStatus(Online, true);
     addFlags(QnResource::user);
 }
 

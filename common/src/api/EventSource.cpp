@@ -46,6 +46,14 @@ bool QnJsonStreamParser::nextMessage(QVariant& parsed)
     return ok;
 }
 
+QString QnEvent::objectNameLower() const
+{
+	if (objectName.isEmpty())
+		return objectName;
+
+	return objectName[0].toLower() + objectName.mid(1);
+}
+
 bool QnEvent::load(const QVariant& parsed)
 {   
     QMap<QString, QVariant> dict = parsed.toMap();

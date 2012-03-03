@@ -110,6 +110,16 @@ int QnAppServerConnection::addObject(const QString& objectName, const QByteArray
     return status;
 }
 
+int QnAppServerConnection::getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot)
+{
+    QnRequestParamList requestParams(m_requestParams);
+
+    if (!args.isEmpty())
+		requestParams.append(QnRequestParam("id", args));
+
+    return SessionManager::instance()->sendAsyncGetRequest(m_url, objectName, requestParams, target, slot);
+}
+
 int QnAppServerConnection::addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot)
 {
     return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, m_requestParams, data, target, slot);
@@ -122,12 +132,7 @@ int QnAppServerConnection::deleteObjectAsync(const QString& objectName, int id, 
 
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
 {
-    QString request;
-
-    if (args.isEmpty())
-        request = objectName;
-    else
-        request = QString("%1/%2").arg(objectName).arg(args);
+    QString request = args.isEmpty() ? objectName : QString("%1/%2").arg(objectName).arg(args);
 
     return SessionManager::instance()->sendGetRequest(m_url, request, m_requestParams, data, errorString);
 }
@@ -231,6 +236,14 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
         return saveAsync(user, target, slot);
 
     return 0;
+}
+
+int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, objectName);
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+	return getObjectsAsync(objectName, args, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)

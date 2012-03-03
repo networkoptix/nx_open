@@ -59,6 +59,13 @@ public:
 
     int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
 
+	/**
+	  get resources synchronously
+
+	  @param args Currently we use args for passing id. Later we can introduce more sophisticated filters here.
+	*/
+	int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
+
     int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
@@ -97,12 +104,14 @@ public:
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
 
-    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
-    int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
+	int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
+	int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
+
+	int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
+	int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
+
     int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
 
-
-    int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
 
 private:
     QUrl m_url;
