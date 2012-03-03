@@ -174,8 +174,9 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
 
-    setFlags(layoutResource, layoutResource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0));
-
+    Qn::LayoutFlags flags = layoutResource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0);
+    setFlags(layoutResource, flags);
+    
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);
 }
