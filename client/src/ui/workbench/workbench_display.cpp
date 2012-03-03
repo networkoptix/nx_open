@@ -670,10 +670,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         m_widgetByRenderer.remove(widget->renderer());
 
     if(destroyWidget)
-        qnDeleteLater(widget);
+        delete widget;
 
     if(destroyItem)
-        qnDeleteLater(item);
+        delete item;
     return true;
 }
 
