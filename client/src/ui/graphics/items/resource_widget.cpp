@@ -22,6 +22,7 @@
 #include "camera/camdisplay.h"
 #include "math.h"
 #include "utils/common/util.h"
+#include "utils/common/synctime.h"
 
 namespace {
 
@@ -333,7 +334,7 @@ void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
         return;
 
     state.iconFadeInNeeded = state.icon == NO_ICON;
-    state.iconChangeTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    state.iconChangeTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
     state.icon = icon;
 }
 
@@ -579,7 +580,7 @@ void QnResourceWidget::at_display_resourceUpdated() {
 
 void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText& text) 
 {
-    qint64 ticks = QDateTime::currentMSecsSinceEpoch() / TEXT_FLASHING_PERIOD;
+    qint64 ticks = qnSyncTime->currentMSecsSinceEpoch() / TEXT_FLASHING_PERIOD;
 
     QFont font;
     font.setPointSizeF(550);
@@ -588,7 +589,7 @@ void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText& te
     
     QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208)));
     qreal prevOpacity = painter->opacity();
-    qreal opacityF = sin(QDateTime::currentMSecsSinceEpoch()/qreal(TEXT_FLASHING_PERIOD) * M_PI)*0.8 + 0.2;
+    qreal opacityF = sin(qnSyncTime->currentMSecsSinceEpoch()/qreal(TEXT_FLASHING_PERIOD) * M_PI)*0.8 + 0.2;
     painter->setOpacity(opacityF);
     painter->setRenderHint(QPainter::TextAntialiasing);
     painter->setRenderHint(QPainter::Antialiasing);
@@ -627,7 +628,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     }
 
-    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
     painter->beginNativePainting();
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
@@ -752,7 +753,7 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     if(state.icon == NO_ICON)
         return;
 
-    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
     qreal opacityMultiplier = effectiveOpacity() * (state.iconFadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.iconChangeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0);
 
     glColor4f(0.0, 0.0, 0.0, 0.5 * opacityMultiplier);

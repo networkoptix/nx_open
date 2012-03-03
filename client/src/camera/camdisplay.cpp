@@ -4,6 +4,7 @@
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
 #include "decoders/audio/ffmpeg_audio.h"
+#include "utils/common/synctime.h"
 
 #include <QDateTime>
 
@@ -31,7 +32,7 @@ static void updateActivity()
 {
     QMutexLocker locker(activityMutex());
 
-    if (QDateTime::currentMSecsSinceEpoch() >= activityTime)
+    if (qnSyncTime->currentMSecsSinceEpoch() >= activityTime)
     {
 #ifdef Q_OS_MAC
         UpdateSystemActivity(UsrActivity);
@@ -47,7 +48,7 @@ static void updateActivity()
             SetThreadExecutionState(ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
 #endif
         // Update system activity timer once per 20 seconds
-        activityTime = QDateTime::currentMSecsSinceEpoch() + 20000;
+        activityTime = qnSyncTime->currentMSecsSinceEpoch() + 20000;
     }
 }
 
@@ -185,7 +186,7 @@ void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 bool CLCamDisplay::canSwitchQuality()
 {
     QMutexLocker lock(&m_qualityMutex);
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (currentTime - m_lastQualitySwitchTime < QUALITY_SWITCH_INTERVAL)
         return false;
     m_lastQualitySwitchTime = currentTime;
@@ -300,7 +301,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     /*
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
     {
-        needToSleep = vd->timestamp - QDateTime::currentMSecsSinceEpoch()*1000;
+        needToSleep = vd->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000;
     }
     else 
     */

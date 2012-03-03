@@ -4,6 +4,7 @@
 #include "avi_files/avi_archive_delegate.h"
 #include "utils/common/util.h"
 #include "utils/media/externaltimesource.h"
+#include "utils/common/synctime.h"
 
 
 // used in reverse mode.
@@ -474,7 +475,7 @@ begin_label:
                 {
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
-                    internalJumpTo(QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP);
+                    internalJumpTo(qnSyncTime->currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP);
                     m_afterBOFCounter = 0;
                     goto begin_label;
                 }
@@ -516,7 +517,7 @@ begin_label:
                             if (m_delegate->endTime() != DATETIME_NOW)
                                 seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
                             else
-                                seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
+                                seekTime = qnSyncTime->currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
                         }
                         else {
                             m_eof = true;
@@ -532,7 +533,7 @@ begin_label:
                         if (seekTime != DATETIME_NOW)
                             seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
                         else
-                            seekTime = QDateTime::currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
+                            seekTime = qnSyncTime->currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
                     }
 
                     if (m_currentTime != seekTime) {

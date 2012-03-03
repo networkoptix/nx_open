@@ -22,6 +22,7 @@
 #include "ui/graphics/items/tooltipitem.h"
 
 #include <qmath.h>
+#include "utils/common/synctime.h"
 
 //#define TIMESLIDER_ANIMATED_DRAG
 
@@ -1065,7 +1066,7 @@ void TimeSlider::setMinimumValue(qint64 value)
 */
 qint64 TimeSlider::maximumValue() const
 {
-    return m_maximumValue == DATETIME_NOW ? QDateTime::currentMSecsSinceEpoch() : m_maximumValue;
+    return m_maximumValue == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : m_maximumValue;
 }
 
 void TimeSlider::setMaximumValue(qint64 value)

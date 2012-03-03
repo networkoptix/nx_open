@@ -5,6 +5,7 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
+#include "utils/common/synctime.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
@@ -210,7 +211,7 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         QnMetaDataV1::createMask(cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
     m_lastSchedulePeriod.clear();
-    updateScheduleInfo(QDateTime::currentMSecsSinceEpoch());
+    updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 }
 
 QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)

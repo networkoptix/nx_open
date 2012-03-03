@@ -1,7 +1,7 @@
 #include "h264_rtp_parser.h"
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
-
+#include "utils/common/synctime.h"
 
 static const int MAX_RTP_PACKET_SIZE = 1024 * 8;
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
@@ -313,7 +313,8 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
         m_lastTimeStamp = timeStamp;
         */
 
-        videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+        //videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+        videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
     }
 
     return QnAbstractMediaDataPtr(videoData);

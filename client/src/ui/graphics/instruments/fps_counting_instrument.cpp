@@ -1,6 +1,7 @@
 #include "fps_counting_instrument.h"
 #include <QDateTime>
 #include <utils/common/warnings.h>
+#include "utils/common/synctime.h"
 
 FpsCountingInstrument::FpsCountingInstrument(int updateIntervalMSec, QObject *parent):
     Instrument(VIEWPORT, makeSet(QEvent::Paint), parent),
@@ -23,7 +24,7 @@ qreal FpsCountingInstrument::fps() const {
 }
 
 void FpsCountingInstrument::enabledNotify() {
-    m_lastTime = QDateTime::currentMSecsSinceEpoch();
+    m_lastTime = qnSyncTime->currentMSecsSinceEpoch();
     m_frameCount = 0;
 }
 
@@ -33,7 +34,7 @@ void FpsCountingInstrument::aboutToBeDisabledNotify() {
 
 bool FpsCountingInstrument::paintEvent(QWidget *, QPaintEvent *) {
     m_frameCount++;
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     if(currentTime - m_lastTime > m_updateInterval) {
         updateFps(static_cast<qreal>(m_frameCount) * 1000 / (currentTime - m_lastTime));

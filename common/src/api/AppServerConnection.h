@@ -97,6 +97,8 @@ public:
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
+    qint64 getCurrentTime();
+
     void stop();
 
 private:
