@@ -9,6 +9,7 @@
 #include "camera/video_camera.h"
 #include "core/misc/scheduleTask.h"
 #include "server_stream_recorder.h"
+#include "utils/common/synctime.h"
 
 const float MIN_SECONDARY_FPS = 2.0;
 
@@ -225,7 +226,7 @@ void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, Q
 
 void QnRecordingManager::onTimer()
 {
-    qint64 time = QDateTime::currentMSecsSinceEpoch();
+    qint64 time = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
     {
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(itrRec.key());

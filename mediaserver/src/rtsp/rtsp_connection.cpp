@@ -72,7 +72,8 @@ public:
         dataProcessor = 0;
 
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes);
-        camera->notInUse(this);
+		if (camera)
+			camera->notInUse(this);
     }
 
     ~QnRtspConnectionProcessorPrivate()
@@ -424,19 +425,22 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
-    camera->inUse(d);
-    if (!d->liveDpHi && camera) {
-        d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-        if (d->liveDpHi)
-            d->liveDpHi->start();
-    }
-    if (!d->liveDpLow && camera)  {
-        d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
-        if (d->liveDpLow)
-            d->liveDpLow->start();
-    }
-    if (!d->archiveDP) 
-        d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
+	if (camera)	
+	{
+		camera->inUse(d);
+		if (!d->liveDpHi) {
+			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+			if (d->liveDpHi)
+				d->liveDpHi->start();
+		}
+		if (!d->liveDpLow)  {
+			d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+			if (d->liveDpLow)
+				d->liveDpLow->start();
+		}
+	}
+	if (!d->archiveDP) 
+		d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
 }
 
 void QnRtspConnectionProcessor::connectToLiveDataProviders()

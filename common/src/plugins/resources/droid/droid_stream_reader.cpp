@@ -78,7 +78,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     videoData->flags |= AV_PKT_FLAG_KEY;
 
     videoData->channelNumber = 0;
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     return videoData;
 

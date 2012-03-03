@@ -2,6 +2,7 @@
 #include <QTextStream>
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
+#include "utils/common/synctime.h"
 
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 extern inline int getIntParam(const char* pos);
@@ -294,7 +295,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
         videoData->flags |= AV_PKT_FLAG_KEY;
 
     videoData->channelNumber = 0;
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     return videoData;
 
@@ -353,7 +354,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     videoData->height = 1088;
     videoData->flags |= AV_PKT_FLAG_KEY;
     videoData->channelNumber = 0;
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     return videoData;
 

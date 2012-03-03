@@ -233,6 +233,7 @@ void parseUsers(QList<T>& users, const PbUserList& pb_users)
         parameters["name"] = QString::fromUtf8(pb_user.name().c_str());
 
         user->setName(QString::fromUtf8(pb_user.name().c_str()));
+        user->setAdmin(pb_user.isadmin());
 
         if (pb_user.layout_size() > 0)
         {

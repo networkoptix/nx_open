@@ -5,6 +5,7 @@
 
 #include "utils/common/sleep.h"
 #include "SessionManager.h"
+#include "utils/common/synctime.h"
 
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, const QByteArray &errorStringIn, int handle)
 {
@@ -484,6 +485,29 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
     } else {
         qnWarning("Cannot delete resources of type '%1'.", resource->metaObject()->className());
         return 0;
+    }
+}
+
+qint64 QnAppServerConnection::getCurrentTime()
+{
+    // todo: debug line. remove it!
+    return QDateTime::currentMSecsSinceEpoch();
+
+    QByteArray data;
+    QByteArray errorString;
+
+    int rez = SessionManager::instance()->sendGetRequest(m_url, "time", QnRequestParamList(), data, errorString);
+    if (rez != 0) {
+        qWarning() << "Can't read time from Application server." << errorString;
+        return -1;
+    }
+
+    try 
+    {
+        // todo: deserialize time here
+        //m_serializer.deserializeTime(data);
+    } catch (const QnSerializeException& e) {
+        qWarning() << "Can't parse time from Application server. Invalid time format." << e.errorString();
 	}
 }
 

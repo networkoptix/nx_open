@@ -317,7 +317,7 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
 
     QnLayoutResourcePtr resource = layout->resource();
     bool isChanged = snapshotManager()->isChanged(resource);
-    bool isLocal = snapshotManager()->isLocal(resource);
+    bool isLocal = snapshotManager()->isLocal(resource) && !snapshotManager()->isBeingSaved(resource);
 
     bool close = false;
     if(isChanged && isLocal) {
@@ -701,6 +701,28 @@ void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &err
     if(status == 0)   
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not save layout '%1' to application server. \n\nError description: '%2'").arg(resource->getName()).arg(QLatin1String(errorString.data())));
+    bool needReopening = resource->getStatus() == QnResource::Disabled && QnWorkbenchLayout::layout(resource) == NULL;
+
+    if(needReopening) {
+        QMessageBox::StandardButton button = QMessageBox::critical(
+            widget(), 
+            tr(""), 
+            tr("Could not save layout '%1' to application server. \n\nError description: '%2'. \n\nDo you want to restore this layout?").arg(resource->getName()).arg(QLatin1String(errorString.data())),
+            QMessageBox::Yes | QMessageBox::No
+        );
+        if(button == QMessageBox::Yes) {
+            QnWorkbenchLayout *layout = new QnWorkbenchLayout(resource, this);
+            workbench()->addLayout(layout);
+            workbench()->setCurrentLayout(layout);
+        } else {
+            resourcePool()->removeResource(resource);
+        }
+    } else {
+        QMessageBox::critical(
+            widget(), 
+            tr(""), 
+            tr("Could not save layout '%1' to application server. \n\nError description: '%2'.").arg(resource->getName()).arg(QLatin1String(errorString.data()))
+        );
+    }
 }
 
