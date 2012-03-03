@@ -673,8 +673,8 @@ Qn::ActionTarget QnActionManager::currentTargetType(QnAction *action) const {
     return QnActionTargetTypes::target(currentTarget(action));
 }
 
-QVariant QnActionManager::currentParameter(QnAction *action, const char *name) const {
-    return currentParametersInternal(action).params.value(QLatin1String(name));
+QVariant QnActionManager::currentParameter(QnAction *action, const QString &name) const {
+    return currentParametersInternal(action).params.value(name);
 }
 
 QVariant QnActionManager::currentTarget(QnAction *action) const {
@@ -710,7 +710,7 @@ Qn::ActionTarget QnActionManager::currentTargetType(QObject *sender) const {
     return QnActionTargetTypes::target(currentTarget(sender));
 }
 
-QVariant QnActionManager::currentParameter(QObject *sender, const char *name) const {
+QVariant QnActionManager::currentParameter(QObject *sender, const QString &name) const {
     if(QnAction *action = checkSender(sender)) {
         return currentParameter(action, name);
     } else {
