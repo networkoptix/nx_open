@@ -62,6 +62,8 @@ private:
     CLNetState m_netState;
 
     bool m_server;
+
+    bool m_foundSmth; // minor just to minimize lof output
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H
