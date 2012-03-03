@@ -293,18 +293,25 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(dialog->clickedButton() != QDialogButtonBox::Save)
         return;
 
-    QnLayoutResourcePtr newLayout(new QnLayoutResource());
-    newLayout->setGuid(QUuid::createUuid());
-    newLayout->setName(dialog->name());
+    QnLayoutResourcePtr newLayout;
+    if(snapshotManager()->isLocal(layout) && !snapshotManager()->isBeingSaved(layout)) {
+        /* Local layout that is not being saved should not be copied. */
+        newLayout = layout;
+        newLayout->setName(dialog->name());
+    } else {
+        newLayout = QnLayoutResourcePtr(new QnLayoutResource());
+        newLayout->setGuid(QUuid::createUuid());
+        newLayout->setName(dialog->name());
 
-    context()->resourcePool()->addResource(newLayout);
-    if(context()->user())
-        context()->user()->addLayout(newLayout);
+        context()->resourcePool()->addResource(newLayout);
+        if(context()->user())
+            context()->user()->addLayout(newLayout);
 
-    QnLayoutItemDataList items = layout->getItems().values();
-    for(int i = 0; i < items.size(); i++)
-        items[i].uuid = QUuid::createUuid();
-    newLayout->setItems(items);
+        QnLayoutItemDataList items = layout->getItems().values();
+        for(int i = 0; i < items.size(); i++)
+            items[i].uuid = QUuid::createUuid();
+        newLayout->setItems(items);
+    }
 
     snapshotManager()->save(newLayout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
