@@ -96,7 +96,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
         headerSize += readed;
         headerBufferEnd = headerBuffer + headerSize;
         *headerBufferEnd = 0;
-        realHeaderEnd = strstr(headerBuffer, "\r\n\r\n");
+        realHeaderEnd = strstr(headerBuffer + 1, "\r\n\r\n");
         if (realHeaderEnd)
             break;
     }
