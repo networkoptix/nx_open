@@ -8,7 +8,9 @@ namespace {
         RESOURCES_BINARY_V1_TAG = 0xE1E00001
     };
 
-    quint64 localMagic = qnSyncTime->currentMSecsSinceEpoch();
+    // do not access to app server time for static variables!
+    // If access occured before appServer conection is initialized in main, connection is not work at all
+    quint64 localMagic = QDateTime::currentMSecsSinceEpoch();
 
 } // anonymous namespace
 
