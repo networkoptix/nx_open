@@ -216,7 +216,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_mrsButton->setPreferredSize(48, 24);
     m_mrsButton->setCheckable(true);
     m_mrsButton->setChecked(true);
-    //m_mrsButton->hide();
+    m_mrsButton->hide();
     m_mrsButton->setAnimationSpeed(4.0);
     m_mrsButton->setFocusProxy(this);
 
@@ -745,7 +745,8 @@ void NavigationItem::repaintMotionPeriods()
         }
         m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
     }
-    m_mrsButton->setVisible(isMotionExist);
+    //m_mrsButton->setVisible(isMotionExist);
+    m_mrsButton->setVisible(false);
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
