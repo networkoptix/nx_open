@@ -65,6 +65,7 @@ public:
 	  @param args Currently we use args for passing id. Later we can introduce more sophisticated filters here.
 	*/
 	int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
+	int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
 
     int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
