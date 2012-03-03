@@ -144,13 +144,16 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
             continue; /* OK to remove. */
 
         if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
+            if(user->getName() == QLatin1String("admin"))
+                return Qn::InvisibleAction; /* Can't delete superadmin. */
+
             if(!context()) 
                 continue;
 
-            if(user != context()->user())
-                continue;
+            if(user == context()->user())
+                return Qn::InvisibleAction; /* Can't delete self from server. */
 
-            return Qn::InvisibleAction; /* Can't delete self from server. */
+            continue;            
         }
 
         if(resource->checkFlags(QnResource::layout))
