@@ -6,6 +6,7 @@
 #include "utils/media/externaltimesource.h"
 #include "utils/common/util.h"
 #include "playbackmask_helper.h"
+#include "utils/common/synctime.h"
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -182,7 +183,7 @@ void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
     Q_D(QnArchiveSyncPlayWrapper);
     d->lastJumpTime = mksec;
     if (d->speed < 0 && d->lastJumpTime == DATETIME_NOW)
-        d->lastJumpTime = QDateTime::currentMSecsSinceEpoch()*1000ll; // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
+        d->lastJumpTime = qnSyncTime->currentMSecsSinceEpoch()*1000ll; // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
     d->timer.restart();
 }
 
@@ -300,7 +301,7 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 currentTimeHint)
         }
     }
     if (d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW)
-        displayedTime = QDateTime::currentMSecsSinceEpoch()*1000;
+        displayedTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
     reinitTime(displayedTime);
     d->speed = value;
 }
@@ -351,7 +352,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
         if (info.enabled && !info.isEOF) {
             qint64 time = info.cam->getCurrentTime();
             //if (time == DATETIME_NOW)
-            //    time = QDateTime::currentMSecsSinceEpoch()*1000;
+            //    time = qnSyncTime->currentMSecsSinceEpoch()*1000;
             if (displayTime == AV_NOPTS_VALUE)
                 displayTime = time;
             else if (time != AV_NOPTS_VALUE)

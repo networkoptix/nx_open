@@ -9,6 +9,7 @@
 #include "utils/common/sleep.h"
 #include "utils/network/rtpsession.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+#include "utils/common/synctime.h"
 
 static const int MAX_QUEUE_SIZE = 10;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
@@ -119,7 +120,7 @@ bool QnRtspDataConsumer::canSwitchToLowQuality()
         return false;
 
     QMutexLocker lock(&m_allConsumersMutex);
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
         return false;
@@ -135,7 +136,7 @@ bool QnRtspDataConsumer::canSwitchToHiQuality()
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
         return false;
 
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
         return false;

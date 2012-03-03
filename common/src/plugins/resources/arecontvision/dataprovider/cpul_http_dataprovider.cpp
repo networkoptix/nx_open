@@ -1,5 +1,6 @@
 #include "cpul_http_dataprovider.h"
 #include "../resource/av_resource.h"
+#include "utils/common/synctime.h"
 
 
 AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResourcePtr res):
@@ -180,7 +181,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
     videoData->channelNumber = 0;
 
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
 
     return videoData;
 

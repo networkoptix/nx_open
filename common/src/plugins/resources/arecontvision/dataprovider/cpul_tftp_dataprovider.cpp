@@ -6,6 +6,7 @@
 #include <QMutex>
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "utils/common/util.h"
+#include "utils/common/synctime.h"
 
 //======================================================
 
@@ -385,7 +386,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     videoData->channelNumber = 0;
 
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     return videoData;
 
 }

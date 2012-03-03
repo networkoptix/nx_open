@@ -1,13 +1,14 @@
 #include "view_drag_and_drop.h"
 #include <QApplication>
 #include <core/resourcemanagment/resource_pool.h>
+#include "utils/common/synctime.h"
 
 namespace {
     enum {
         RESOURCES_BINARY_V1_TAG = 0xE1E00001
     };
 
-    quint64 localMagic = QDateTime::currentMSecsSinceEpoch();
+    quint64 localMagic = qnSyncTime->currentMSecsSinceEpoch();
 
 } // anonymous namespace
 

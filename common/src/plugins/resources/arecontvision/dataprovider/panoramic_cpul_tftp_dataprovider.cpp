@@ -4,6 +4,7 @@
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"
 #include "core/resource/resource_media_layout.h"
+#include "utils/common/synctime.h"
 
 //======================================================
 
@@ -307,7 +308,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     videoData->height = size.height;
     videoData->channelNumber = channelNum;
 
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
 
     return videoData;
 
