@@ -530,7 +530,10 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
 
     bool allReady = d->speed > 0;
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
-        allReady &= i->isEOF;
+    {
+        if (i->enabled)
+            allReady &= i->isEOF;
+    }
 
     if (allReady)
         jumpTo(DATETIME_NOW, 0);
