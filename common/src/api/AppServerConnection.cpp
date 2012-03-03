@@ -484,5 +484,14 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
     } else {
         qnWarning("Cannot delete resources of type '%1'.", resource->metaObject()->className());
         return 0;
-    }
+	}
+}
+
+int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
+{
+	QnRequestParamList requestParams;
+	requestParams.append(QnRequestParam("id", resourceId.toString()));
+	requestParams.append(QnRequestParam("status", QString::number(status)));
+
+	return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }

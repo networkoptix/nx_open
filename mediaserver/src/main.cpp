@@ -571,6 +571,11 @@ public:
 
             qnResPool->addResource(camera);
 
+            QObject::disconnect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+                m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
+            QObject::connect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+                m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
+
             //QnRecordingManager::instance()->updateCamera(camera);
         }
 
