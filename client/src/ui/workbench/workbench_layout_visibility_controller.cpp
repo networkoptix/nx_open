@@ -13,6 +13,9 @@ QnWorkbenchLayoutVisibilityController::~QnWorkbenchLayoutVisibilityController() 
 }
 
 void QnWorkbenchLayoutVisibilityController::setContext(QnWorkbenchContext *context) {
+    if(m_context == context)
+        return;
+
     if(m_context != NULL)
         stop();
 

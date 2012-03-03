@@ -10,6 +10,7 @@ class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchLayoutVisibilityController;
+class QnWorkbenchAccessController;
 
 class QnWorkbenchContext: public QObject {
     Q_OBJECT;
@@ -54,6 +55,7 @@ private:
     QnWorkbenchSynchronizer *m_synchronizer;
     QnWorkbenchLayoutSnapshotManager *m_snapshotManager;
     QnWorkbenchLayoutVisibilityController *m_visibilityController;
+    QnWorkbenchAccessController *m_accessController;
     QnWorkbench *m_workbench;
 };
 
