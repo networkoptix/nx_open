@@ -402,9 +402,14 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
         QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
         r.translate(m_videoLayout->h_position(i)*MD_WIDTH, m_videoLayout->v_position(i)*MD_HEIGHT);
         r = gridRect.intersected(r);
-        if (r.width() > 0 && r.height() > 0) {
-            r.translate(-m_videoLayout->h_position(i)*MD_WIDTH, -m_videoLayout->v_position(i)*MD_HEIGHT);
-            m_channelState[i].motionSelection += r;
+
+        if (r.width() > 0 && r.height() > 0) 
+        {
+            QRegion r1(r);
+            r1.translate(-m_videoLayout->h_position(i)*MD_WIDTH, -m_videoLayout->v_position(i)*MD_HEIGHT);
+            r1 -= m_motionMaskList[i];
+
+            m_channelState[i].motionSelection += r1;
         }
 
         newSelection << m_channelState[i].motionSelection;
