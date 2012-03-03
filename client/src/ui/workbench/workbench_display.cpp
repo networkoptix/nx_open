@@ -6,6 +6,8 @@
 #include <functional> /* For std::binary_function. */
 
 #include <QtAlgorithms>
+#include <QGLContext>
+#include <QGLWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -46,7 +48,9 @@
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
 #include "workbench_utility.h"
+#include "workbench_context.h"
 #include "workbench.h"
+
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
@@ -101,10 +105,10 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
+QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *parent):
     QObject(parent),
     m_instrumentManager(new InstrumentManager(this)),
-    m_workbench(NULL),
+    m_context(NULL),
     m_scene(NULL),
     m_view(NULL),
     m_viewportAnimator(NULL),
@@ -180,15 +184,19 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_frameOpacityAnimator->setTimeLimit(500);
 
     /* Set up defaults. */
-    initWorkbench(workbench);
+    initContext(context);
     setScene(m_dummyScene);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     m_dummyScene = NULL;
 
-    initWorkbench(NULL);
+    initContext(NULL);
     setScene(NULL);
+}
+
+QnWorkbench *QnWorkbenchDisplay::workbench() const {
+    return m_context ? m_context->workbench() : NULL;
 }
 
 void QnWorkbenchDisplay::initSyncPlay() {
@@ -197,25 +205,25 @@ void QnWorkbenchDisplay::initSyncPlay() {
     new QnWorkbenchStreamSynchronizer(this, m_renderWatcher, this);
 }
 
-void QnWorkbenchDisplay::initWorkbench(QnWorkbench *workbench) {
-    if(m_workbench == workbench)
+void QnWorkbenchDisplay::initContext(QnWorkbenchContext *context) {
+    if(m_context == context)
         return;
 
-    if(m_workbench != NULL && m_scene != NULL)
-        deinitSceneWorkbench();
+    if(m_context != NULL && m_scene != NULL)
+        deinitSceneContext();
 
-    m_workbench = workbench;
+    m_context = context;
 
-    if(m_workbench != NULL && m_scene != NULL)
-        initSceneWorkbench();
+    if(m_context != NULL && m_scene != NULL)
+        initSceneContext();
 }
 
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene == scene)
         return;
 
-    if(m_scene != NULL && m_workbench != NULL)
-        deinitSceneWorkbench();
+    if(m_scene != NULL && m_context != NULL)
+        deinitSceneContext();
 
     /* Prepare new scene. */
     m_scene = scene;
@@ -226,12 +234,12 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
 
     /* Set up new scene.
      * It may be NULL only when this function is called from destructor. */
-    if(m_scene != NULL && m_workbench != NULL)
-        initSceneWorkbench();
+    if(m_scene != NULL && m_context != NULL)
+        initSceneContext();
 }
 
-void QnWorkbenchDisplay::deinitSceneWorkbench() {
-    assert(m_scene != NULL && m_workbench != NULL);
+void QnWorkbenchDisplay::deinitSceneContext() {
+    assert(m_scene != NULL && m_context != NULL);
 
     /* Deinit scene. */
     m_instrumentManager->unregisterScene(m_scene);
@@ -250,18 +258,20 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
         delete m_gridItem.data();
 
     /* Deinit workbench. */
-    disconnect(m_workbench, NULL, this, NULL);
-
-    foreach(QnWorkbenchItem *item, m_workbench->currentLayout()->items())
-        removeItemInternal(item, true, false);
+    disconnect(context(), NULL, this, NULL);
+    disconnect(workbench(), NULL, this, NULL);
 
     for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
         at_workbench_itemChanged(static_cast<QnWorkbench::ItemRole>(i), NULL);
+
+    foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
+        removeItemInternal(item, true, false);
+
     m_mode = QnWorkbench::VIEWING;
 }
 
-void QnWorkbenchDisplay::initSceneWorkbench() {
-    assert(m_scene != NULL && m_workbench != NULL);
+void QnWorkbenchDisplay::initSceneContext() {
+    assert(m_scene != NULL && m_context != NULL);
 
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
@@ -293,33 +303,33 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setLineWidth(100.0);
-    m_gridItem.data()->setMapper(m_workbench->mapper());
+    m_gridItem.data()->setMapper(workbench()->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
     /* Connect to workbench. */
-    connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_workbench_aboutToBeDestroyed()));
-    connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
-    connect(m_workbench,            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
-    connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-    connect(m_workbench,            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
-    connect(m_workbench,            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
-    connect(m_workbench,            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
+    connect(context(),              SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_context_aboutToBeDestroyed()));
+    connect(workbench(),            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
+    connect(workbench(),            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
+    connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
+    connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
+    connect(workbench(),            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
+    connect(workbench(),            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
 
     /* Connect to grid mapper. */
-    QnWorkbenchGridMapper *mapper = m_workbench->mapper();
+    QnWorkbenchGridMapper *mapper = workbench()->mapper();
     connect(mapper,                 SIGNAL(originChanged()),                        this,                   SLOT(at_mapper_originChanged()));
     connect(mapper,                 SIGNAL(cellSizeChanged()),                      this,                   SLOT(at_mapper_cellSizeChanged()));
     connect(mapper,                 SIGNAL(spacingChanged()),                       this,                   SLOT(at_mapper_spacingChanged()));
 
     /* Create items. */
-    foreach(QnWorkbenchItem *item, m_workbench->currentLayout()->items())
+    foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
         addItemInternal(item);
 
     /* Fire signals if needed. */
-    if(m_workbench->mode() != m_mode)
+    if(workbench()->mode() != m_mode)
         at_workbench_modeChanged();
     for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
-        if(m_workbench->item(static_cast<QnWorkbench::ItemRole>(i)) != m_itemByRole[i])
+        if(workbench()->item(static_cast<QnWorkbench::ItemRole>(i)) != m_itemByRole[i])
             at_workbench_itemChanged(static_cast<QnWorkbench::ItemRole>(i));
 
     synchronizeSceneBounds();
@@ -660,10 +670,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         m_widgetByRenderer.remove(widget->renderer());
 
     if(destroyWidget)
-        qnDeleteLater(widget);
+        delete widget;
 
     if(destroyItem)
-        qnDeleteLater(item);
+        delete item;
     return true;
 }
 
@@ -756,9 +766,9 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const {
         return QRectF();
     }
 
-    QRectF result = m_workbench->mapper()->mapFromGrid(item->geometry());
+    QRectF result = workbench()->mapper()->mapFromGrid(item->geometry());
 
-    QSizeF step = m_workbench->mapper()->step();
+    QSizeF step = workbench()->mapper()->step();
     QRectF delta = item->geometryDelta();
     result = QRectF(
         result.left()   + delta.left()   * step.width(),
@@ -792,11 +802,11 @@ QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
 }
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
-    QRect layoutBoundingRect = m_workbench->currentLayout()->boundingRect();
+    QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
-    return m_workbench->mapper()->mapFromGridF(QRectF(layoutBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
+    return workbench()->mapper()->mapFromGridF(QRectF(layoutBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -811,7 +821,7 @@ QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const 
     if(m_view == NULL)
         return QPoint();
 
-    return m_workbench->mapper()->mapToGrid(m_view->mapToScene(viewportPoint));
+    return workbench()->mapper()->mapToGrid(m_view->mapToScene(viewportPoint));
 }
 
 QPoint QnWorkbenchDisplay::mapGlobalToGrid(const QPoint &globalPoint) const {
@@ -825,7 +835,7 @@ QPointF QnWorkbenchDisplay::mapViewportToGridF(const QPoint &viewportPoint) cons
     if(m_view == NULL)
         return QPointF();
 
-    return m_workbench->mapper()->mapToGridF(m_view->mapToScene(viewportPoint));
+    return workbench()->mapper()->mapToGridF(m_view->mapToScene(viewportPoint));
 
 }
 
@@ -866,7 +876,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate) {
     assert(widget != NULL);
-    assert(m_workbench != NULL);
+    assert(m_context != NULL);
 
     QnWorkbenchItem *item = widget->item();
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
@@ -1022,7 +1032,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
     const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
-    const QSize size = bestSingleBoundedSize(m_workbench->mapper(), 1, orientation, estimatedAspectRatio);
+    const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
 
     /* Adjust item's geometry for the new size. */
     if(size != item->geometry().size()) {
@@ -1033,7 +1043,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     }
 
     /* Pin the item. */
-    QnAspectRatioMagnitudeCalculator metric(newPos, size, item->layout()->boundingRect(), aspectRatio(m_view->viewport()->size()) / aspectRatio(m_workbench->mapper()->step()));
+    QnAspectRatioMagnitudeCalculator metric(newPos, size, item->layout()->boundingRect(), aspectRatio(m_view->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
     QRect geometry = item->layout()->closestFreeSlot(newPos, size, &metric);
     item->layout()->pinItem(item, geometry);
     item->setFlag(QnWorkbenchItem::PendingGeometryAdjustment, false);
@@ -1070,19 +1080,19 @@ void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
     }
 }
 
-void QnWorkbenchDisplay::at_workbench_aboutToBeDestroyed() {
-    initWorkbench(new QnWorkbench(this));
+void QnWorkbenchDisplay::at_context_aboutToBeDestroyed() {
+    initContext(new QnWorkbenchContext(qnResPool, this));
 }
 
 void QnWorkbenchDisplay::at_workbench_modeChanged() {
-    if(m_mode == m_workbench->mode()) {
+    if(m_mode == workbench()->mode()) {
         qnWarning("Mode change signal was received even though the mode didn't change.");
         return;
     }
 
-    m_mode = m_workbench->mode();
+    m_mode = workbench()->mode();
 
-    if(m_workbench->mode() == QnWorkbench::EDITING) {
+    if(workbench()->mode() == QnWorkbench::EDITING) {
         m_boundingInstrument->recursiveDisable();
     } else {
         m_boundingInstrument->recursiveEnable();
@@ -1206,7 +1216,7 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
 
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
-    at_workbench_itemChanged(role, m_workbench->item(role));
+    at_workbench_itemChanged(role, workbench()->item(role));
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {

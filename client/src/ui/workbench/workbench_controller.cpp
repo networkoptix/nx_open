@@ -73,6 +73,7 @@
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
 #include "workbench_utility.h"
+#include "workbench_context.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
@@ -162,7 +163,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_dropInstrument = new DropInstrument(workbench(), this);
+    m_dropInstrument = new DropInstrument(display->context(), this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_dragInstrument = new DragInstrument(this);
@@ -289,11 +290,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Set up context menu. */
     QWidget *window = m_display->view()->window();
-    window->addAction(qnAction(Qn::ScreenRecordingAction));
+    window->addAction(action(Qn::ScreenRecordingAction));
 
-    connect(qnAction(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_showMotionAction_triggered()));
-    connect(qnAction(Qn::HideMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_hideMotionAction_triggered()));
-    connect(qnAction(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                           this,                           SLOT(at_recordingAction_triggered(bool)));
+    connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
+    connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -310,6 +311,14 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 QnWorkbenchController::~QnWorkbenchController() {
     disconnect(m_screenRecorder, NULL, this, NULL);
     m_screenRecorder->stopRecording();
+}
+
+QAction *QnWorkbenchController::action(const Qn::ActionId id) const {
+    return m_display->context() ? m_display->context()->action(id) : NULL;
+}
+
+QnActionManager *QnWorkbenchController::menu() const {
+    return m_display->context() ? m_display->context()->menu() : NULL;
 }
 
 QnWorkbenchDisplay *QnWorkbenchController::display() const {
@@ -335,7 +344,7 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
                 widget->setSelected(true);
             }
 
-            qnMenu->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
+            menu()->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
             event->ignore();
             return true;
         }
@@ -383,7 +392,7 @@ void QnWorkbenchController::startRecording()
         return;
     }
 
-    qnAction(Qn::ScreenRecordingAction)->setChecked(true);
+    action(Qn::ScreenRecordingAction)->setChecked(true);
 
     if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running))
         return;
@@ -426,7 +435,7 @@ void QnWorkbenchController::startRecording()
 
 void QnWorkbenchController::stopRecording()
 {
-    qnAction(Qn::ScreenRecordingAction)->setChecked(false);
+    action(Qn::ScreenRecordingAction)->setChecked(false);
 
     if (!m_screenRecorder->isSupported())
         return;
@@ -480,7 +489,7 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 }
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    qnAction(Qn::ScreenRecordingAction)->setChecked(false);
+    action(Qn::ScreenRecordingAction)->setChecked(false);
 
     QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
 }
@@ -833,7 +842,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
         widget->setSelected(true);
     }
 
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
     
@@ -900,7 +909,11 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
     TRACE("SCENE RCLICKED");
 
-    /* No scene context menu, haha! */
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope));
+    if(menu->isEmpty())
+        return;
+
+    menu->exec(info.screenPos());
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {
@@ -952,11 +965,11 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(qnMenu->currentWidgetsTarget(sender()), false);
+    displayMotionGrid(menu()->currentWidgetsTarget(sender()), false);
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
-    displayMotionGrid(qnMenu->currentWidgetsTarget(sender()), true);
+    displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
 }
 
 void QnWorkbenchController::at_recordingAction_triggered(bool checked) {

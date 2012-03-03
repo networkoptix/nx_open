@@ -1,12 +1,15 @@
 #include "view_drag_and_drop.h"
 #include <QApplication>
 #include <core/resourcemanagment/resource_pool.h>
+#include "utils/common/synctime.h"
 
 namespace {
     enum {
         RESOURCES_BINARY_V1_TAG = 0xE1E00001
     };
 
+    // do not access to app server time for static variables!
+    // If access occured before appServer conection is initialized in main, connection is not work at all
     quint64 localMagic = QDateTime::currentMSecsSinceEpoch();
 
 } // anonymous namespace

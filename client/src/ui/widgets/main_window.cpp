@@ -152,7 +152,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_context->workbench()->mapper()->setCellSize(defaultCellSize);
     m_context->workbench()->mapper()->setSpacing(defaultSpacing);
 
-    m_display = new QnWorkbenchDisplay(m_context->workbench(), this);
+    m_display = new QnWorkbenchDisplay(m_context, this);
 	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);
@@ -167,25 +167,27 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_actionHandler->setWidget(this);
 
     /* Set up actions. */
-    addAction(qnAction(Qn::ExitAction));
-    addAction(qnAction(Qn::FullscreenAction));
-    addAction(qnAction(Qn::AboutAction));
-    addAction(qnAction(Qn::SystemSettingsAction));
-    addAction(qnAction(Qn::OpenFileAction));
-    addAction(qnAction(Qn::ConnectionSettingsAction));
-    addAction(qnAction(Qn::OpenNewLayoutAction));
-    addAction(qnAction(Qn::CloseLayoutAction));
-    addAction(qnAction(Qn::MainMenuAction));
-    addAction(qnAction(Qn::YouTubeUploadAction));
-    addAction(qnAction(Qn::EditTagsAction));
-    addAction(qnAction(Qn::OpenInFolderAction));
-    addAction(qnAction(Qn::RemoveLayoutItemAction));
-    addAction(qnAction(Qn::RemoveFromServerAction));
+    addAction(action(Qn::SaveCurrentLayoutAction));
+    addAction(action(Qn::SaveCurrentLayoutAsAction));
+    addAction(action(Qn::ExitAction));
+    addAction(action(Qn::FullscreenAction));
+    addAction(action(Qn::AboutAction));
+    addAction(action(Qn::SystemSettingsAction));
+    addAction(action(Qn::OpenFileAction));
+    addAction(action(Qn::ConnectionSettingsAction));
+    addAction(action(Qn::OpenNewLayoutAction));
+    addAction(action(Qn::CloseLayoutAction));
+    addAction(action(Qn::MainMenuAction));
+    addAction(action(Qn::YouTubeUploadAction));
+    addAction(action(Qn::EditTagsAction));
+    addAction(action(Qn::OpenInFolderAction));
+    addAction(action(Qn::RemoveLayoutItemAction));
+    addAction(action(Qn::RemoveFromServerAction));
 
-    connect(qnAction(Qn::ExitAction),       SIGNAL(triggered()),                            this,                                   SLOT(close()));
-    connect(qnAction(Qn::FullscreenAction), SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
+    connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
+    connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
 
-    qnMenu->setTargetProvider(m_ui);
+    menu()->setTargetProvider(m_ui);
 
     connect(SessionManager::instance(),     SIGNAL(error(int)),                             this,                                   SLOT(at_sessionManager_error(int)));
 
@@ -193,7 +195,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-    m_tabBar->setWorkbench(m_context->workbench());
+    m_tabBar->setContext(m_context);
 
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
@@ -207,7 +209,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction));
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
     m_mainMenuButton->setIcon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
@@ -216,12 +218,12 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->setSpacing(0);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::OpenNewLayoutAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewLayoutAction)));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::SystemSettingsAction)));
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::FullscreenAction)));
-    m_titleLayout->addWidget(newActionButton(qnAction(Qn::ExitAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectionSettingsAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::SystemSettingsAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();
@@ -245,12 +247,20 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     updateDwmState();
 
     /* Open single tab. */
-    qnAction(Qn::OpenNewLayoutAction)->trigger();
+    action(Qn::OpenNewLayoutAction)->trigger();
 }
 
 QnMainWindow::~QnMainWindow()
 {
     return;
+}
+
+QAction *QnMainWindow::action(const Qn::ActionId id) const {
+    return m_context ? m_context->action(id) : NULL;
+}
+
+QnActionManager *QnMainWindow::menu() const {
+    return m_context ? m_context->menu() : NULL;
 }
 
 void QnMainWindow::setTitleVisible(bool visible) 
@@ -297,14 +307,14 @@ void QnMainWindow::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
-    qnMenu->trigger(Qn::ResourceDropAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
+    menu()->trigger(Qn::ResourceDropAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
 }
 
 void QnMainWindow::updateFullScreenState() 
 {
     bool fullScreen = isFullScreen();
 
-    qnAction(Qn::FullscreenAction)->setChecked(fullScreen);
+    action(Qn::FullscreenAction)->setChecked(fullScreen);
 
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);
@@ -433,7 +443,7 @@ bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
     if(event->type() == QnSystemMenuEvent::SystemMenu) {
-        qnAction(Qn::MainMenuAction)->trigger();
+        menu()->trigger(Qn::MainMenuAction);
         return true;
     }
 
@@ -524,6 +534,6 @@ void QnMainWindow::at_sessionManager_error(int error)
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     QnWorkbenchLayoutList layouts;
     layouts.push_back(layout);
-    qnMenu->trigger(Qn::CloseLayoutAction, layouts);
+    menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 

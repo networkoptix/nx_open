@@ -31,6 +31,7 @@ struct QnEvent
     QString paramValue;
 
     bool load(const QVariant& parsed);
+	QString objectNameLower() const;
 };
 
 class QnJsonStreamParser

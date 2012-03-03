@@ -2,24 +2,48 @@
 #define QN_ACTION_CONDITIONS_H
 
 #include <QObject>
+#include <QWeakPointer>
 #include <core/resource/resource_fwd.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include "action_fwd.h"
+#include "actions.h"
 
+class QnWorkbenchContext;
 
 class QnActionCondition: public QObject {
 public:
     QnActionCondition(QObject *parent = NULL);
 
-    virtual bool check(const QnResourceList &resources);
+    virtual Qn::ActionVisibility check(const QnResourceList &resources);
 
-    virtual bool check(const QnLayoutItemIndexList &layoutItems);
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems);
 
-    virtual bool check(const QnResourceWidgetList &widgets);
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets);
 
-    virtual bool check(const QnWorkbenchLayoutList &layouts);
+    virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts);
 
-    virtual bool check(const QVariant &items);
+    virtual Qn::ActionVisibility check(const QVariant &items);
+
+    QnActionManager *manager() const {
+        return m_manager.data();
+    }
+
+    QnWorkbenchContext *context() const;
+
+    void setManager(QnActionManager *manager);
+
+private:
+    QWeakPointer<QnActionManager> m_manager;
+};
+
+
+class QnTargetlessActionCondition: public QnActionCondition {
+    typedef QnActionCondition base_type;
+
+public:
+    using base_type::check;
+
+    virtual Qn::ActionVisibility check(const QVariant &items) override;
 };
 
 
@@ -38,7 +62,7 @@ public:
         m_condition(condition)
     {}
 
-    virtual bool check(const QnResourceWidgetList &widgets) override;
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 
 private:
     Condition m_condition;
@@ -56,9 +80,9 @@ public:
 
     virtual ~QnResourceActionCondition();
 
-    virtual bool check(const QnResourceList &resources) override;
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
-    virtual bool check(const QnResourceWidgetList &widgets) override;
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 
 protected:
     template<class Item, class ItemSequence>
@@ -76,8 +100,31 @@ private:
 
 class QnResourceRemovalActionCondition: public QnActionCondition {
 public:
-    virtual bool check(const QnResourceList &resources) override;
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
+
+
+class QnResourceSaveLayoutActionCondition: public QnTargetlessActionCondition {
+public:
+    QnResourceSaveLayoutActionCondition(bool isCurrent): m_current(isCurrent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+private:
+    bool m_current;
+};
+
+
+class QnResourceActionUserAccessCondition: public QnTargetlessActionCondition {
+public:
+    QnResourceActionUserAccessCondition(bool adminRequired): m_adminRequired(adminRequired) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+private:
+    bool m_adminRequired;
+};
+
 
 
 #endif // QN_ACTION_CONDITIONS_H

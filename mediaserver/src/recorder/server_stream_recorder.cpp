@@ -5,6 +5,7 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
+#include "utils/common/synctime.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
@@ -33,6 +34,9 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 bool QnServerStreamRecorder::canAcceptData() const
 {
+    if (!isRunning())
+        return true;
+
     bool rez = QnStreamRecorder::canAcceptData();
     if (!rez) {
         qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -43,6 +47,14 @@ bool QnServerStreamRecorder::canAcceptData() const
         }
     }
     return rez;
+}
+
+void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
+{
+    if (!isRunning()) {
+        return;
+    }
+    QnStreamRecorder::putData(data);
 }
 
 bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
@@ -184,7 +196,7 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
     // for empty schedule we record all time
     QMutexLocker lock(&m_scheduleMutex);
 
-    updateScheduleInfo(media->timestamp/1000);
+    //updateScheduleInfo(media->timestamp/1000);
 
     beforeProcessData(media);
 
@@ -199,7 +211,7 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         QnMetaDataV1::createMask(cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
     m_lastSchedulePeriod.clear();
-    updateScheduleInfo(QDateTime::currentMSecsSinceEpoch());
+    updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 }
 
 QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)

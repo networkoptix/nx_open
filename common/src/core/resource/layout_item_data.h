@@ -6,6 +6,7 @@
 #include <QList>
 #include <QHash>
 #include <utils/common/fuzzy.h>
+#include <utils/common/qnid.h>
 
 class QnLayoutItemData
 {
@@ -29,7 +30,7 @@ public:
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))
             return true;
 
-        if(l.resource.id == r.resource.id && (l.resource.path == r.resource.path || l.resource.path.isNull() || r.resource.path.isNull()))
+        if(l.resource.id == r.resource.id && (l.resource.path == r.resource.path || l.resource.path.isEmpty() || r.resource.path.isEmpty()))
             return true;
 
         return false;

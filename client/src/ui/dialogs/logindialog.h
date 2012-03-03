@@ -5,6 +5,7 @@
 
 class QDataWidgetMapper;
 class QStandardItemModel;
+class QnWorkbenchContext;
 
 namespace Ui {
     class LoginDialog;
@@ -14,7 +15,7 @@ class LoginDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit LoginDialog(QWidget *parent = 0);
+    explicit LoginDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     virtual ~LoginDialog();
 
 public slots:
@@ -36,6 +37,7 @@ private:
     Q_DISABLE_COPY(LoginDialog)
 
     QScopedPointer<Ui::LoginDialog> ui;
+    QWeakPointer<QnWorkbenchContext> m_context;
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
 };

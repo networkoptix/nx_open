@@ -1,8 +1,16 @@
 #include "action_conditions.h"
+
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
+
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+
 #include "action_target_types.h"
+#include "action_manager.h"
 
 QnActionCondition::QnActionCondition(QObject *parent): 
     QObject(parent) 
@@ -10,26 +18,24 @@ QnActionCondition::QnActionCondition(QObject *parent):
     QnActionTargetTypes::initialize();
 }
 
-bool QnActionCondition::check(const QnResourceList &resources) { 
-    Q_UNUSED(resources);
-
-    return false; 
+Qn::ActionVisibility QnActionCondition::check(const QnResourceList &) { 
+    return Qn::InvisibleAction; 
 };
 
-bool QnActionCondition::check(const QnLayoutItemIndexList &layoutItems) { 
+Qn::ActionVisibility QnActionCondition::check(const QnLayoutItemIndexList &layoutItems) { 
     return check(QnActionTargetTypes::resources(layoutItems));
 };
 
-bool QnActionCondition::check(const QnResourceWidgetList &widgets) { 
+Qn::ActionVisibility QnActionCondition::check(const QnResourceWidgetList &widgets) { 
     return check(QnActionTargetTypes::layoutItems(widgets));
 };
 
-bool QnActionCondition::check(const QnWorkbenchLayoutList &layouts) { 
+Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layouts) { 
     return check(QnActionTargetTypes::resources(layouts));
 };
 
 
-bool QnActionCondition::check(const QVariant &items) {
+Qn::ActionVisibility QnActionCondition::check(const QVariant &items) {
     if(items.userType() == QnActionTargetTypes::resourceList()) {
         return check(items.value<QnResourceList>());
     } else if(items.userType() == QnActionTargetTypes::widgetList()) {
@@ -40,12 +46,29 @@ bool QnActionCondition::check(const QVariant &items) {
         return check(items.value<QnLayoutItemIndexList>());
     } else {
         qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
-        return false;
+        return Qn::InvisibleAction;
+    }
+}
+
+void QnActionCondition::setManager(QnActionManager *manager) {
+    m_manager = manager;
+}
+
+QnWorkbenchContext *QnActionCondition::context() const {
+    return manager() ? manager()->context() : NULL;
+}
+
+
+Qn::ActionVisibility QnTargetlessActionCondition::check(const QVariant &items) {
+    if(!items.isValid()) {
+        return check(QnResourceList());
+    } else {
+        return base_type::check(items);
     }
 }
 
 
-bool QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widgets) {
+Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widgets) {
     foreach(QGraphicsItem *item, widgets) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)
@@ -57,14 +80,14 @@ bool QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widge
 
         if(widget->isMotionGridDisplayed()) {
             if(m_condition == HasShownGrid)
-                return true;
+                return Qn::VisibleAction;
         } else {
             if(m_condition == HasHiddenGrid)
-                return true;
+                return Qn::VisibleAction;
         }
     }
 
-    return false;
+    return Qn::InvisibleAction;
 }
 
 
@@ -78,12 +101,12 @@ QnResourceActionCondition::~QnResourceActionCondition() {
     return;
 }
 
-bool QnResourceActionCondition::check(const QnResourceList &resources) {
-    return checkInternal<QnResourcePtr>(resources);
+Qn::ActionVisibility QnResourceActionCondition::check(const QnResourceList &resources) {
+    return checkInternal<QnResourcePtr>(resources) ? Qn::VisibleAction : Qn::InvisibleAction;
 }
 
-bool QnResourceActionCondition::check(const QnResourceWidgetList &widgets) {
-    return checkInternal<QnResourceWidget *>(widgets);
+Qn::ActionVisibility QnResourceActionCondition::check(const QnResourceWidgetList &widgets) {
+    return checkInternal<QnResourceWidget *>(widgets) ? Qn::VisibleAction : Qn::InvisibleAction;
 }
 
 template<class Item, class ItemSequence>
@@ -115,20 +138,68 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 }
 
 
-bool QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
+Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources) {
         if(!resource)
             continue; /* OK to remove. */
 
-        if(resource->checkFlags(QnResource::user) || resource->checkFlags(QnResource::layout))
+        if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
+            if(!context()) 
+                continue;
+
+            if(user != context()->user())
+                continue;
+
+            return Qn::InvisibleAction; /* Can't delete self from server. */
+        }
+
+        if(resource->checkFlags(QnResource::layout))
             continue; /* OK to remove. */
 
         if(resource->checkFlags(QnResource::remote_server) || resource->checkFlags(QnResource::live_cam))
             if(resource->getStatus() == QnResource::Offline)
                 continue; /* Can remove only if offline. */
 
-        return false;
+        return Qn::InvisibleAction;
     }
 
-    return true;
+    return Qn::VisibleAction;
+}
+
+Qn::ActionVisibility QnResourceSaveLayoutActionCondition::check(const QnResourceList &resources) {
+    QnLayoutResourcePtr layout;
+
+    if(m_current) {
+        if(!context())
+            return Qn::InvisibleAction;
+
+        layout = context()->workbench()->currentLayout()->resource();
+    } else {
+        if(resources.size() != 1)
+            return Qn::InvisibleAction;
+
+        layout = resources[0].dynamicCast<QnLayoutResource>();
+    }
+
+    if(!layout)
+        return Qn::InvisibleAction;
+
+    if(context() && context()->snapshotManager()->isSaveable(layout)) {
+        return Qn::VisibleAction;
+    } else {
+        return Qn::DisabledAction;
+    }
+}
+
+Qn::ActionVisibility QnResourceActionUserAccessCondition::check(const QnResourceList &resources) {
+    if(!context())
+        return Qn::InvisibleAction;
+
+    if(!context()->user())
+        return Qn::InvisibleAction;
+
+    if(m_adminRequired)
+        return context()->user()->isAdmin() ? Qn::VisibleAction : Qn::InvisibleAction;
+
+    return Qn::VisibleAction; 
 }

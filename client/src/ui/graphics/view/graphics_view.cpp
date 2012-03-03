@@ -73,14 +73,14 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
     qint64 frequency = QnPerformance::currentCpuFrequency();
-    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
     qint64 startCycles = QnPerformance::currentThreadCycles();
 #endif
 
     base_type::paintEvent(event);
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
-    qint64 deltaTime = QDateTime::currentMSecsSinceEpoch() - startTime;
+    qint64 deltaTime = qnSyncTime->currentMSecsSinceEpoch() - startTime;
     qint64 deltaCycles = QnPerformance::currentThreadCycles() - startCycles;
 
     qreal deltaCpuTime = deltaCycles / (frequency / 1000.0);

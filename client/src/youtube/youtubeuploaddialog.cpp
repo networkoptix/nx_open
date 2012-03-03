@@ -1,24 +1,30 @@
 #include "youtubeuploaddialog.h"
-#include "ui_youtubeuploaddialog.h"
 
-#include <QtCore/QFile>
+#include <QFile>
+#include <QFileDialog>
+#include <QMessageBox>
 
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <utils/common/warnings.h>
+
+#include <ui/workbench/workbench_context.h>
+#define USE_PREFERENCESWND
+#ifdef USE_PREFERENCESWND
+#include <ui/preferences/preferencesdialog.h>
+#endif
 
 #include "youtube_uploader.h"
 #include "youtubesettingswidget.h"
 #include "youtubeuploadprogressdialog_p.h"
+#include "ui_youtubeuploaddialog.h"
 
-#define USE_PREFERENCESWND
-#ifdef USE_PREFERENCESWND
-#include "ui/preferences/preferencesdialog.h"
-#endif
-
-YouTubeUploadDialog::YouTubeUploadDialog(QnResourcePtr resource, QWidget *parent) :
+YouTubeUploadDialog::YouTubeUploadDialog(QnWorkbenchContext *context, QnResourcePtr resource, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::YouTubeUploadDialog)
+    ui(new Ui::YouTubeUploadDialog),
+    m_context(context)
 {
+    if(!context)
+        qnNullWarning(context);
+
     ui->setupUi(this);
 
     connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(browseFile()));
@@ -159,7 +165,7 @@ void YouTubeUploadDialog::authFailed()
     dialogLayout->addWidget(buttonBox);
     dialog.setLayout(dialogLayout);
 #else
-    PreferencesDialog dialog(this);
+    PreferencesDialog dialog(m_context.data(), this);
     dialog.setCurrentPage(PreferencesDialog::PageYouTubeSettings);
     dialog.exec();
 #endif

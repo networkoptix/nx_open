@@ -7,6 +7,7 @@
 #include <utils/common/checked_cast.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <core/resource/resource.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include "action.h"
@@ -100,6 +101,7 @@ public:
         assert(m_action->condition() == NULL);
 
         condition->setParent(m_action);
+        condition->setManager(m_manager);
         m_action->setCondition(condition);
     }
 
@@ -230,6 +232,19 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
 
+    factory(Qn::SaveCurrentLayoutAction).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget).
+        text(tr("Save Current Layout")).
+        shortcut(tr("Ctrl+S")).
+        autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
+        condition(new QnResourceSaveLayoutActionCondition(true));
+
+    factory(Qn::SaveCurrentLayoutAsAction).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget).
+        text(tr("Save Current Layout As...")).
+        shortcut(tr("Ctrl+Alt+S")).
+        autoRepeat(false);
+
     factory(Qn::OpenMenu).
         flags(Qn::Main).
         text(tr("Open"));
@@ -312,6 +327,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layout")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
+    factory(Qn::SaveLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Save Layout")).
+        condition(new QnResourceSaveLayoutActionCondition(false));
+
+    factory(Qn::SaveLayoutAsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("Save Layout As...")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
@@ -338,12 +363,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Server Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::remote_server)));
 
+
     factory(Qn::YouTubeUploadAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Upload to YouTube...")).
-        shortcut(tr("Ctrl+Y")).
+        //shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE)));
+
 
     factory(Qn::EditTagsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
@@ -394,7 +421,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::NewUserAction).
         flags(Qn::Tree | Qn::NoTarget).
-        text(tr("New User..."));
+        text(tr("New User...")).
+        condition(new QnResourceActionUserAccessCondition(true));
 
     factory(Qn::NewLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
@@ -462,10 +490,8 @@ QnActionManager::~QnActionManager() {
     qDeleteAll(m_actionById);
 }
 
-Q_GLOBAL_STATIC(QnActionManager, qn_contextMenu);
-
-QnActionManager *QnActionManager::instance() {
-    return qn_contextMenu();
+void QnActionManager::setContext(QnWorkbenchContext *context) {
+    m_context = context;
 }
 
 void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) {
@@ -553,6 +579,19 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexLi
     return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
 }
 
+void QnActionManager::copyAction(QAction *dst, const QAction *src) {
+    dst->setText(src->text());
+    dst->setIcon(src->icon());
+    dst->setShortcuts(src->shortcuts());
+    dst->setCheckable(src->isCheckable());
+    dst->setChecked(src->isChecked());
+    dst->setFont(src->font());
+    dst->setIconText(src->iconText());
+    
+    connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
+    connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+}
+
 void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
     QnAction *action = m_actionById.value(id);
     if(action == NULL) {
@@ -560,7 +599,7 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, co
         return;
     }
 
-    if(!action->satisfiesCondition(action->scope(), items)) {
+    if(action->checkCondition(action->scope(), items) != Qn::VisibleAction) {
         qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
         return;
     }
@@ -587,27 +626,33 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     QMenu *result = new QMenu();
 
     foreach(QnAction *action, parent->children()) {
-        QAction *newAction = NULL;
-
-        if(!action->satisfiesCondition(scope, items))
+        Qn::ActionVisibility visibility = action->checkCondition(scope, items);
+        if(visibility == Qn::InvisibleAction)
             continue;
         
+        QMenu *menu = NULL;
         if(action->children().size() > 0) {
-            QMenu *menu = newMenuRecursive(action, scope, items);
+            menu = newMenuRecursive(action, scope, items);
             if(menu->isEmpty()) {
                 delete menu;
+                visibility = Qn::InvisibleAction;
             } else {
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
-                newAction = new QAction(result);
-                newAction->setMenu(menu);
-                newAction->setText(action->text());
-                newAction->setIcon(action->icon());
             }
+        }
+
+        QAction *newAction = NULL;
+        if(visibility == Qn::DisabledAction || menu != NULL) {
+            newAction = new QAction(result);
+            copyAction(newAction, action);
+            
+            newAction->setMenu(menu);
+            newAction->setDisabled(visibility == Qn::DisabledAction);
         } else {
             newAction = action;
         }
 
-        if(newAction != NULL)
+        if(visibility != Qn::InvisibleAction)
             result->addAction(newAction);
     }
 

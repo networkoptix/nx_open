@@ -38,6 +38,7 @@
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "utils/common/log.h"
 #include "camera/camera_pool.h"
+#include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
@@ -551,6 +552,9 @@ public:
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+
+        //
 
 
         //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
@@ -571,6 +575,11 @@ public:
                              m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
 
             qnResPool->addResource(camera);
+
+            QObject::disconnect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+                m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
+            QObject::connect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
+                m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
 
             //QnRecordingManager::instance()->updateCamera(camera);
         }

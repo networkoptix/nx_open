@@ -39,6 +39,7 @@
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
 #include "ui/tooltips/tool_tip.h"
+#include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -367,6 +368,9 @@ int main(int argc, char *argv[])
 
     QnPlDroidResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
+
+    QnPlIqResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 
 
 #endif

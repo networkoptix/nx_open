@@ -16,6 +16,7 @@ class QItemSelectionModel;
 class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
+class QnWorkbenchContext;
 
 class QnResourceCriterion;
 class QnResourceModel;
@@ -45,10 +46,12 @@ public:
 
     void setCurrentTab(Tab tab);
 
-    void setWorkbench(QnWorkbench *workbench);
+    void setContext(QnWorkbenchContext *context);
 
-    QnWorkbench *workbench() const {
-        return m_workbench;
+    QnWorkbench *workbench() const;
+
+    QnWorkbenchContext *context() const {
+        return m_context;
     }
 
     QnResourceList selectedResources() const;
@@ -92,10 +95,12 @@ private slots:
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
-    void at_workbench_aboutToBeDestroyed();
+    void at_context_aboutToBeDestroyed();
 
 private:
     QScopedPointer<Ui::ResourceTreeWidget> ui;
+
+    QnWorkbenchContext *m_context;
 
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
@@ -105,8 +110,6 @@ private:
     QnResourceTreeItemDelegate *m_searchDelegate;
 
     QAction *m_renameLayoutAction;
-
-    QnWorkbench *m_workbench;
 };
 
 #endif // QN_RESOURCE_TREE_WIDGET_H

@@ -15,6 +15,7 @@ public:
 
     void updateCamera(QnSecurityCamResourcePtr cameraRes);
     QnScheduleTask currentScheduleTask() const;
+    void updateScheduleInfo(qint64 timeMs);
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
 protected:
@@ -28,9 +29,9 @@ protected:
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
+    virtual void putData(QnAbstractDataPacketPtr data) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
-    void updateScheduleInfo(qint64 timeMs);
     void updateStreamParams();
 private:
     mutable QMutex m_scheduleMutex;

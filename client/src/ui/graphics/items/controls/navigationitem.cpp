@@ -21,6 +21,7 @@
 #include "ui/graphics/items/tooltipitem.h"
 
 #include "timeslider.h"
+#include "utils/common/synctime.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
@@ -215,7 +216,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_mrsButton->setPreferredSize(48, 24);
     m_mrsButton->setCheckable(true);
     m_mrsButton->setChecked(true);
-    //m_mrsButton->hide();
+    m_mrsButton->hide();
     m_mrsButton->setAnimationSpeed(4.0);
     m_mrsButton->setFocusProxy(this);
 
@@ -470,7 +471,7 @@ void NavigationItem::updateSlider()
     qint64 endTime = reader->endTime();
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
-        m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : QDateTime::currentMSecsSinceEpoch() - 10000); // if  nothing is recorded set minvalue to live-10sec
+        m_timeSlider->setMinimumValue(startTime != DATETIME_NOW ? startTime / 1000 : qnSyncTime->currentMSecsSinceEpoch() - 10000); // if  nothing is recorded set minvalue to live-10sec
         m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
         if (m_timeSlider->minimumValue() == 0)
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
@@ -575,7 +576,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchive
     if (t <= 0)
         return;  // slider range still not initialized yet
 #endif
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QnTimePeriod loadingPeriod;
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     loadingPeriod.startTimeMs = qMax(minTimeMs, t - w);
@@ -596,7 +597,7 @@ void NavigationItem::loadMotionPeriods(QnResourcePtr resource, QnAbstractArchive
 
 bool NavigationItem::updateRecPeriodList(bool force)
 {
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (!force && currentTime - m_timePeriodUpdateTime < TIME_PERIOD_UPDATE_INTERVAL)
         return true;
 
@@ -744,7 +745,8 @@ void NavigationItem::repaintMotionPeriods()
         }
         m_timeSlider->setMotionTimePeriodList(m_mergedMotionPeriods);
     }
-    m_mrsButton->setVisible(isMotionExist);
+    //m_mrsButton->setVisible(isMotionExist);
+    m_mrsButton->setVisible(false);
 }
 
 void NavigationItem::onMotionPeriodLoaded(const QnTimePeriodList& timePeriods, int handle)

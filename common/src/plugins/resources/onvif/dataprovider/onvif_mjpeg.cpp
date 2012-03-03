@@ -1,5 +1,6 @@
 #include "onvif_mjpeg.h"
 #include "core/resource/network_resource.h"
+#include "utils/common/synctime.h"
 
 /*
 inline static int findJPegStartCode(const char *data, int datalen)
@@ -87,15 +88,16 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     int headerSize = 0;
     char* headerBufferEnd = 0;
     char* realHeaderEnd = 0;
+    int readed;
     while (headerSize < sizeof(headerBuffer)-1)
     {
-        int readed = mHttpClient->read(headerBuffer+headerSize, sizeof(headerBuffer)-1 - headerSize);
+        readed = mHttpClient->read(headerBuffer+headerSize, sizeof(headerBuffer)-1 - headerSize);
         if (readed < 1)
             return QnAbstractMediaDataPtr(0);
         headerSize += readed;
         headerBufferEnd = headerBuffer + headerSize;
         *headerBufferEnd = 0;
-        realHeaderEnd = strstr(headerBuffer, "\r\n\r\n");
+        realHeaderEnd = strstr(headerBuffer + 1, "\r\n\r\n");
         if (realHeaderEnd)
             break;
     }
@@ -130,7 +132,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     videoData->height = 1088;
     videoData->flags |= AV_PKT_FLAG_KEY;
     videoData->channelNumber = 0;
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     return videoData;
 }

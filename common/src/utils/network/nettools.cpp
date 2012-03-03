@@ -39,6 +39,19 @@ QList<QHostAddress> getAllIPv4Addresses()
                             allowedInterfaces << QHostAddress(s);
                     }
                 }
+
+                // check registry
+                if (allowedInterfaces.isEmpty())
+                {
+                    QSettings settings;
+                    QStringList tmp = settings.value("if").toString().split(';');
+                    foreach(QString s, tmp) {
+                        if (!s.isEmpty())
+                            allowedInterfaces << QHostAddress(s);
+                    }
+                }
+                if (!allowedInterfaces.isEmpty())
+                    qDebug() << "Using net IF filter:" << allowedInterfaces;
                 allowedInterfaceReady = true;
             }
             if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(ipaddrs.at(i)))

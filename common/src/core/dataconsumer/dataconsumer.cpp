@@ -24,6 +24,7 @@ void QnAbstractDataConsumer::clearUnprocessedData()
 
 void QnAbstractDataConsumer::endOfRun()
 {
+    clearUnprocessedData();
 }
 
 void QnAbstractDataConsumer::run()

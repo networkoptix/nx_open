@@ -4,10 +4,17 @@
 #include <QObject>
 #include <QWeakPointer>
 #include <api/AppServerConnection.h>
+#include <ui/actions/actions.h>
 
+class QAction;
+
+class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
+class QnWorkbenchLayoutSnapshotManager;
+class QnActionManager;
+class QnAction;
 
 class QnWorkbenchActionHandler: public QObject {
     Q_OBJECT;
@@ -23,6 +30,14 @@ public:
     QnWorkbench *workbench() const;
 
     QnWorkbenchSynchronizer *synchronizer() const;
+
+    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
+
+    QnActionManager *menu() const;
+
+    QAction *action(const Qn::ActionId id);
+
+    QnResourcePool *resourcePool() const;
 
     void setContext(QnWorkbenchContext *context);
 
@@ -52,6 +67,12 @@ protected slots:
 
     void at_openLayoutAction_triggered();
     void at_openNewLayoutAction_triggered();
+    void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
+    void at_saveLayoutAction_triggered();
+    void at_saveCurrentLayoutAction_triggered();
+    void at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout);
+    void at_saveLayoutAsAction_triggered();
+    void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     
     void at_resourceDropAction_triggered();

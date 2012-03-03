@@ -48,7 +48,9 @@ public:
         gotLivePacket(false),
         lastPlayCSeq(0),
         quality(MEDIA_Quality_High),
-        qualityFastSwitch(true)
+        qualityFastSwitch(true),
+        prevStartTime(AV_NOPTS_VALUE),
+        prevEndTime(AV_NOPTS_VALUE)
     {
     }
     void deleteDP()
@@ -68,6 +70,10 @@ public:
         delete dataProcessor;
         archiveDP = 0;
         dataProcessor = 0;
+
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes);
+		if (camera)
+			camera->notInUse(this);
     }
 
     ~QnRtspConnectionProcessorPrivate()
@@ -94,6 +100,8 @@ public:
     int lastPlayCSeq;
     MediaQuality quality;
     bool qualityFastSwitch;
+    qint64 prevStartTime;
+    qint64 prevEndTime;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -188,6 +196,23 @@ void QnRtspConnectionProcessor::generateSessionId()
     d->sessionId += QString::number(rand());
 }
 
+void QnRtspConnectionProcessor::sendCurrentRangeIfUpdated()
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (!d->archiveDP)
+        return;
+
+    qint64 endTime = d->archiveDP->endTime();
+    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) 
+        endTime = DATETIME_NOW;
+
+    if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
+    {
+        addResponseRangeHeader();
+        sendResponse(CODE_OK);
+    }
+};
+
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
     QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
@@ -202,6 +227,33 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP);
     return layout ? layout->numberOfChannels() : -1;
 }
+
+void QnRtspConnectionProcessor::addResponseRangeHeader()
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (d->archiveDP) 
+    {
+        QString range = "npt=";
+        d->archiveDP->open();
+        if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+            range += "now";
+        else
+            range += QString::number(d->archiveDP->startTime());
+        d->prevStartTime = d->archiveDP->startTime();
+
+        range += "-";
+        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) {
+            range += "now";
+            d->prevEndTime = DATETIME_NOW;
+        }
+        else {
+            range += QString::number(d->archiveDP->endTime());
+            d->prevEndTime = d->archiveDP->endTime();
+        }
+        d->responseHeaders.removeValue("Range");
+        d->responseHeaders.addValue("Range", range);
+    }
+};
 
 int QnRtspConnectionProcessor::composeDescribe()
 {
@@ -223,20 +275,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
     int numAudio = audioLayout ? audioLayout->numberOfChannels() : 0;
 
-    if (d->archiveDP) {
-        QString range = "npt=";
-        d->archiveDP->open();
-        if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
-            range += "now";
-        else
-            range += QString::number(d->archiveDP->startTime());
-        range += "-";
-        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
-            range += "now";
-        else
-            range += QString::number(d->archiveDP->endTime());
-        d->responseHeaders.addValue("Range", range);
-    }
+    addResponseRangeHeader();
 
     for (int i = 0; i < numVideo + numAudio; ++i)
     {
@@ -386,12 +425,22 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
-    if (!d->liveDpHi && camera) 
-        d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    if (!d->liveDpLow && camera) 
-        d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
-    if (!d->archiveDP) 
-        d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
+	if (camera)	
+	{
+		camera->inUse(d);
+		if (!d->liveDpHi) {
+			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+			if (d->liveDpHi)
+				d->liveDpHi->start();
+		}
+		if (!d->liveDpLow)  {
+			d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+			if (d->liveDpLow)
+				d->liveDpLow->start();
+		}
+	}
+	if (!d->archiveDP) 
+		d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
 }
 
 void QnRtspConnectionProcessor::connectToLiveDataProviders()
@@ -401,19 +450,6 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
     if (d->liveDpLow)
         d->liveDpLow->addDataProcessor(d->dataProcessor);
 
-    /*
-    if (d->quality == MEDIA_Quality_High || d->liveDpLow == 0) {
-        if (d->liveDpLow)
-            d->liveDpLow->removeDataProcessor(d->dataProcessor);
-        d->liveDpHi->addDataProcessor(d->dataProcessor);
-        d->dataProcessor->setSecondaryDataProvider(0);
-    }
-    else {
-        d->liveDpHi->addDataProcessor(d->dataProcessor);
-        d->liveDpLow->addDataProcessor(d->dataProcessor);
-        d->dataProcessor->setSecondaryDataProvider(d->liveDpHi); // got data from Hi provider, but skip all data instead of motion
-    }
-    */
     d->dataProcessor->setLiveQuality(d->quality);
     d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
 }
@@ -546,6 +582,9 @@ int QnRtspConnectionProcessor::composePlay()
         d->archiveDP->unlock();
 
     }
+    addResponseRangeHeader();
+
+    d->dataProcessor->start();
 
     if (d->liveMode) {
         if (d->liveDpHi)
@@ -557,7 +596,6 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->archiveDP)
             d->archiveDP->start();
     }
-    d->dataProcessor->start();
     //d->dataProcessor->resume();
 
     return CODE_OK;
@@ -630,6 +668,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
             d->responseBody.append("position: ");
             d->responseBody.append(QString::number(getRtspTime()));
             d->responseBody.append(ENDL);
+            addResponseRangeHeader();
         }
         else {
             qWarning() << Q_FUNC_INFO << __LINE__ << "Unsupported RTSP parameter " << parameter.trimmed();

@@ -4,12 +4,14 @@
 #include <QWidget>
 #include <QScopedPointer>
 #include <core/resource/resource_fwd.h>
+#include <ui/actions/actions.h>
 
 class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
 class QToolButton;
 
+class QnActionManager;
 class QnResourcePoolUserWatcher;
 class QnBlueBackgroundPainter;
 class QnLayoutTabBar;
@@ -50,6 +52,10 @@ protected:
 #endif
 
     bool canAutoDelete(const QnResourcePtr &resource) const;
+
+    QAction *action(const Qn::ActionId id) const;
+
+    QnActionManager *menu() const;
 
 protected slots:
     void setTitleVisible(bool visible);

@@ -2,11 +2,13 @@
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
+#include <ui/actions/action_manager.h>
 #include "settings.h"
 #include "workbench.h"
 #include "workbench_synchronizer.h"
-
-Q_GLOBAL_STATIC_WITH_ARGS(QnWorkbenchContext, qn_workbenchContext, (qnResPool));
+#include "workbench_layout_snapshot_manager.h"
+#include "workbench_layout_visibility_controller.h"
+#include "workbench_access_controller.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent)
@@ -28,8 +30,20 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     at_settings_lastUsedConnectionChanged();
 
     /* Create dependent objects. */
+    m_menu = new QnActionManager(this);
+    m_menu->setContext(this);
+
     m_synchronizer = new QnWorkbenchSynchronizer(this);
     m_synchronizer->setContext(this);
+
+    m_snapshotManager = new QnWorkbenchLayoutSnapshotManager(this);
+    m_snapshotManager->setContext(this);
+
+    m_visibilityController = new QnWorkbenchLayoutVisibilityController(this);
+    m_visibilityController->setContext(this);
+
+    m_accessController = new QnWorkbenchAccessController(this);
+    m_accessController->setContext(this);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -38,12 +52,16 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     blockSignals(signalsBlocked);
 }
 
-QnWorkbenchContext *QnWorkbenchContext::instance() {
-    return qn_workbenchContext();
+QAction *QnWorkbenchContext::action(const Qn::ActionId id) {
+    return m_menu->action(id);
 }
 
 QnUserResourcePtr QnWorkbenchContext::user() {
     return m_userWatcher->user();
+}
+
+QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
+    return dynamic_cast<QnWorkbenchContext *>(workbench->parent());
 }
 
 

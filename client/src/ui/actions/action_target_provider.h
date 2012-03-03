@@ -5,6 +5,7 @@
 #include "actions.h"
 
 class QVariant;
+class QnWorkbenchContext;
 
 class QnActionTargetProvider {
 public:

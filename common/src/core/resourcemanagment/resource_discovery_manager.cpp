@@ -16,7 +16,8 @@ namespace {
 }
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
-m_server(false)
+m_server(false),
+m_foundSmth(true)
 {
 }
 
@@ -153,8 +154,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     QTime time;
     time.start();
 
-    
-    cl_log.log("looking for resources ===========...", cl_logALWAYS);
+    if (m_foundSmth)
+        cl_log.log("looking for resources ===========...", cl_logALWAYS);
 
     QnResourceList resources;
     QnResourceList::iterator it;
@@ -230,8 +231,16 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             ++it; // new resource => shouls keep it
     }
 
-
-    cl_log.log("Discovery----: after excluding existing resources we've got ", resources.size(), " new resources:", cl_logALWAYS);
+    if (resources.size())
+    {
+        cl_log.log("Discovery----: after excluding existing resources we've got ", resources.size(), " new resources:", cl_logALWAYS);
+        m_foundSmth = true;
+    }
+    else
+    {
+        m_foundSmth = false;
+    }
+    
     printInLogNetResources(resources);
 
     if (resources.size()==0)
@@ -411,8 +420,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             ++it; // nothing to do
     }
 
-    cl_log.log("Discovery---- Final result: ", cl_logALWAYS);
-    printInLogNetResources(resources);
+    if (resources.size())
+    {
+        cl_log.log("Discovery---- Final result: ", cl_logALWAYS);
+        printInLogNetResources(resources);
+    }
     
 
     return resources;

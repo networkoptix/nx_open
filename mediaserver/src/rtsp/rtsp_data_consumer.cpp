@@ -9,6 +9,7 @@
 #include "utils/common/sleep.h"
 #include "utils/network/rtpsession.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+#include "utils/common/synctime.h"
 
 static const int MAX_QUEUE_SIZE = 10;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
@@ -119,7 +120,7 @@ bool QnRtspDataConsumer::canSwitchToLowQuality()
         return false;
 
     QMutexLocker lock(&m_allConsumersMutex);
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
         return false;
@@ -135,7 +136,7 @@ bool QnRtspDataConsumer::canSwitchToHiQuality()
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
         return false;
 
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
         return false;
@@ -187,7 +188,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     }
 
     // overflow control
-    if (media->flags & AV_PKT_FLAG_KEY)
+    if ((media->flags & AV_PKT_FLAG_KEY) || m_dataQueue.size() > 100)  
     {
         bool isMainStream = true;
         if (isLive) 
@@ -196,7 +197,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             bool isLowQuality = m_liveQuality == MEDIA_Quality_Low;
             isMainStream = isSecondaryDP == isLowQuality;
         }
-        if (isMainStream && (m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)) 
+        while (isMainStream && m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)
         {
             QnAbstractDataPacketPtr tmp;
             m_dataQueue.pop(tmp);
@@ -390,6 +391,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_owner->sendBuffer();
         m_owner->clearBuffer();
     }
+
+    m_owner->sendCurrentRangeIfUpdated();
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;

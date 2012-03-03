@@ -1,5 +1,5 @@
-#ifndef QN_CONTEXT_MENU_H
-#define QN_CONTEXT_MENU_H
+#ifndef QN_ACTION_MANAGER_H
+#define QN_ACTION_MANAGER_H
 
 #include <QObject>
 #include <QHash>
@@ -16,6 +16,7 @@ class QGraphicsItem;
 
 class QnActionFactory;
 class QnActionBuilder;
+class QnWorkbenchContext;
 
 class QnActionManager: public QObject {
     Q_OBJECT;
@@ -24,7 +25,11 @@ public:
 
     virtual ~QnActionManager();
 
-    static QnActionManager *instance();
+    QnWorkbenchContext *context() {
+        return m_context.data();
+    }
+
+    void setContext(QnWorkbenchContext *context);
 
     QAction *action(Qn::ActionId id) const;
 
@@ -112,6 +117,8 @@ protected:
         QVariantMap params;
     };
 
+    void copyAction(QAction *dst, const QAction *src);
+
     void triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params);
 
     QMenu *newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items, const QVariantMap &params);
@@ -127,6 +134,9 @@ private slots:
     void at_menu_aboutToShow();
 
 private:
+    /** Associated workbench context. */
+    QWeakPointer<QnWorkbenchContext> m_context;
+
     /** Mapping from action id to action data. */ 
     QHash<Qn::ActionId, QnAction *> m_actionById;
 
@@ -154,7 +164,4 @@ private:
 };
 
 
-#define qnMenu          (QnActionManager::instance())
-#define qnAction(id)    (QnActionManager::instance()->action(id))
-
-#endif // QN_CONTEXT_MENU_H
+#endif // QN_ACTION_MANAGER_H

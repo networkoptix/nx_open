@@ -55,12 +55,12 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
     }
 }
 
-void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray& errorString, const QnResourceList& resources, int handle)
+void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle)
 {
 
-    if (status == 0 && !resources.isEmpty())
+	if (status == 0)
     {
-        qDebug() << "Successfully updated resource" << resources[0]->getName();
+		qDebug() << "Successfully updated resource status" << data;
     } else
     {
         qDebug() << "Failed to update resource";
@@ -85,5 +85,5 @@ void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status ol
         return;
     }
 
-    int handle = m_appServer->saveAsync(resource->toSharedPointer(), this, SLOT(requestFinished(int,const QByteArray&,const QnResourceList&, int)));
+	m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, SLOT(requestFinished(int,const QByteArray&,const QByteArray&, int)));
 }

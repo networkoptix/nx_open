@@ -54,6 +54,16 @@ namespace Qn {
         OpenNewLayoutAction,
 
         /**
+         * Saves current layout on appserver.
+         */
+        SaveCurrentLayoutAction,
+
+        /**
+         * Saves current layout under another name.
+         */
+        SaveCurrentLayoutAsAction,
+
+        /**
          * Submenu for 'open' commands.
          */
         OpenMenu,
@@ -110,6 +120,16 @@ namespace Qn {
          * Opens selected layout.
          */
         OpenLayoutAction,
+
+        /**
+         * Saves selected layout.
+         */
+        SaveLayoutAction,
+
+        /**
+         * Saves selected layout under another name.
+         */
+        SaveLayoutAsAction,
 
         /**
          * Shows motion search grid on an item.
@@ -456,9 +476,6 @@ namespace Qn {
         ScopelessHotkey         = 0x20000,       
 
 
-        /** Action cannot appear in any menu. */
-        Invisible               = 0,                                            
-        
         /** Action can appear in main menu. */
         Main                    = Qn::MainScope | NoTarget,                     
 
@@ -476,6 +493,12 @@ namespace Qn {
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
+
+    enum ActionVisibility {
+        InvisibleAction,
+        DisabledAction,
+        VisibleAction
+    };
 
 } // namespace Qn
 

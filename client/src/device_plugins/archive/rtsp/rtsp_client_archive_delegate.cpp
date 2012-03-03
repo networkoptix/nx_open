@@ -7,6 +7,7 @@
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/common/util.h"
 #include "utils/common/sleep.h"
+#include "utils/common/synctime.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -229,7 +230,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 
     }
 
-    m_lastReceivedTime = QDateTime::currentMSecsSinceEpoch();
+    m_lastReceivedTime = qnSyncTime->currentMSecsSinceEpoch();
     return result;
 }
 
@@ -521,7 +522,7 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
-    qint64 diff = qAbs(m_lastReceivedTime - QDateTime::currentMSecsSinceEpoch());
+    qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
     if ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250 || diff > 1000*10)
     {
         m_blockReopening = true;

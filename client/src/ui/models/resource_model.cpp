@@ -11,6 +11,8 @@
 #include <ui/view_drag_and_drop.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include "file_processor.h"
 
 namespace {
@@ -35,7 +37,7 @@ public:
     enum State {
         Normal,     /**< Normal node. */
         Invalid     /**< Invalid node that should not be displayed. 
-                     * Invalid nodes may be parts of dangling tree branches during incremental
+                     * Invalid nodes are parts of dangling tree branches during incremental
                      * tree construction. They do not emit model signals. */
     };
 
@@ -46,8 +48,10 @@ public:
         m_model(model),
         m_type(Resource),
         m_state(Invalid),
+        m_bastard(false),
         m_parent(NULL),
-        m_status(QnResource::Offline)
+        m_status(QnResource::Offline),
+        m_modified(false)
     {
         assert(model != NULL);
 
@@ -62,8 +66,10 @@ public:
         m_type(Item),
         m_uuid(uuid),
         m_state(Invalid),
+        m_bastard(false),
         m_parent(NULL),
-        m_status(QnResource::Offline)
+        m_status(QnResource::Offline),
+        m_modified(false)
     {
         assert(model != NULL);
     }
@@ -130,7 +136,7 @@ public:
     }
 
     bool isValid() const {
-        return m_state != Invalid;
+        return m_state == Normal;
     }
 
     void setState(State state) {
@@ -141,6 +147,26 @@ public:
 
         foreach(Node *node, m_children)
             node->setState(state);
+    }
+
+    bool isBastard() const {
+        return m_bastard;
+    }
+
+    void setBastard(bool bastard) {
+        if(m_bastard == bastard)
+            return;
+
+        m_bastard = bastard;
+
+        if(m_parent) {
+            if(m_bastard) {
+                m_parent->removeChildInternal(this);
+            } else {
+                setState(m_parent->state());
+                m_parent->addChildInternal(this);
+            }
+        }
     }
 
     const QList<Node *> &children() const {
@@ -159,14 +185,16 @@ public:
         if(m_parent == parent)
             return;
 
-        if(m_parent)
+        if(m_parent && !m_bastard)
             m_parent->removeChildInternal(this);
         
         m_parent = parent;
 
         if(m_parent) {
-            setState(m_parent->state());
-            m_parent->addChildInternal(this);
+            if(!m_bastard) {
+                setState(m_parent->state());
+                m_parent->addChildInternal(this);
+            }
         } else {
             setState(Invalid);
         }
@@ -214,7 +242,7 @@ public:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            return m_name;
+            return m_name + (m_modified ? QLatin1String("*") : QString());
         case Qt::DecorationRole:
             if (column == 0)
                 return m_icon;
@@ -258,11 +286,24 @@ public:
         return false;
     }
 
+    bool isModified() const {
+        return !m_modified;
+    }
+
+    void setModified(bool modified) {
+        if(m_modified == modified)
+            return;
+
+        m_modified = modified; 
+
+        changeInternal();
+    }
+
 protected:
     void removeChildInternal(Node *child) {
         assert(child->parent() == this);
 
-        if(isValid()) {
+        if(isValid() && !isBastard()) {
             QModelIndex index = this->index(0);
             int row = m_children.indexOf(child);
 
@@ -277,7 +318,7 @@ protected:
     void addChildInternal(Node *child) {
         assert(child->parent() == this);
 
-        if(isValid()) {
+        if(isValid() && !isBastard()) {
             QModelIndex index = this->index(0);
             int row = m_children.size();
 
@@ -290,7 +331,7 @@ protected:
     }
 
     void changeInternal() {
-        if(!isValid())
+        if(!isValid() || isBastard())
             return;
         
         QModelIndex index = this->index(0);
@@ -312,9 +353,12 @@ private:
     /** Resource associated with this node. */
     QnResourcePtr m_resource;
 
-    /** Whether this node is valid, i.e. represents an entity that should be
-     * visible in the view. */
+    /** State of this node. */
     State m_state;
+
+    /** Whether this node is a bastard node. Bastard nodes do not appear in
+     * their parent's children list and do not inherit their parent's state. */
+    bool m_bastard;
 
     /** Parent of this node. */
     Node *m_parent;
@@ -339,6 +383,9 @@ private:
 
     /** Icon of this node. */
     QIcon m_icon;
+
+    /** Whether this resource is modified. */
+    bool m_modified;
 };
 
 
@@ -347,7 +394,7 @@ private:
 // -------------------------------------------------------------------------- //
 QnResourceModel::QnResourceModel(QObject *parent): 
     QAbstractItemModel(parent), 
-    m_resourcePool(NULL),
+    m_context(NULL),
     m_root(NULL)
 {
     /* Init role names. */
@@ -365,24 +412,32 @@ QnResourceModel::QnResourceModel(QObject *parent):
 }
 
 QnResourceModel::~QnResourceModel() {
-    setResourcePool(NULL);
+    setContext(NULL);
     
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
 }
 
-void QnResourceModel::setResourcePool(QnResourcePool *resourcePool) {
-    if(m_resourcePool != NULL)
+void QnResourceModel::setContext(QnWorkbenchContext *context) {
+    if(m_context != NULL)
         stop();
 
-    m_resourcePool = resourcePool;
+    m_context = context;
 
-    if(m_resourcePool != NULL)
+    if(m_context != NULL)
         start();
 }
 
+QnWorkbenchContext *QnResourceModel::context() const {
+    return m_context;
+}
+
 QnResourcePool *QnResourceModel::resourcePool() const {
-    return m_resourcePool;
+    return m_context ? m_context->resourcePool() : NULL;
+}
+
+QnWorkbenchLayoutSnapshotManager *QnResourceModel::snapshotManager() const {
+    return m_context ? m_context->snapshotManager() : NULL;
 }
 
 QnResourcePtr QnResourceModel::resource(const QModelIndex &index) const {
@@ -390,12 +445,14 @@ QnResourcePtr QnResourceModel::resource(const QModelIndex &index) const {
 }
 
 void QnResourceModel::start() {
-    assert(m_resourcePool != NULL);
+    assert(m_context != NULL);
 
-    connect(m_resourcePool, SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)));
-    connect(m_resourcePool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
-    connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),           this, SLOT(at_resPool_aboutToBeDestroyed()));
-    QnResourceList resources = m_resourcePool->getResources(); 
+    connect(m_context,          SIGNAL(aboutToBeDestroyed()),           this, SLOT(at_context_aboutToBeDestroyed()));
+    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)), Qt::QueuedConnection);
+    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
+
+    QnResourceList resources = resourcePool()->getResources(); 
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
 
@@ -404,10 +461,12 @@ void QnResourceModel::start() {
 }
 
 void QnResourceModel::stop() {
-    assert(m_resourcePool != NULL);
+    assert(m_context != NULL);
     
-    QnResourceList resources = m_resourcePool->getResources(); 
-    disconnect(m_resourcePool, NULL, this, NULL);
+    QnResourceList resources = resourcePool()->getResources(); 
+    disconnect(m_context, NULL, this, NULL);
+    disconnect(resourcePool(), NULL, this, NULL);
+    disconnect(snapshotManager(), NULL, this, NULL);
 
     foreach(const QnResourcePtr &resource, resources)
         at_resPool_resourceRemoved(resource);
@@ -554,7 +613,7 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
         resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
 
         /* Insert. Resources will be inserted into this model in callbacks. */
-        m_resourcePool->addResources(resources);
+        resourcePool()->addResources(resources);
     }
 
     /* Check where we're dropping it. */
@@ -587,7 +646,7 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
 
             QnLayoutResourcePtr newLayout(new QnLayoutResource());
             newLayout->setGuid(QUuid::createUuid());
-            m_resourcePool->addResource(newLayout);
+            resourcePool()->addResource(newLayout);
             user->addLayout(newLayout);
 
             newLayout->setName(layout->getName());
@@ -627,6 +686,7 @@ void QnResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     node->setResource(resource);
 
     at_resource_parentIdChanged(resource);
+    at_resource_resourceChanged(resource);
 
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
@@ -642,13 +702,19 @@ void QnResourceModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) 
     // TODO: delete node here?
 }
 
-void QnResourceModel::at_resPool_aboutToBeDestroyed() {
-    setResourcePool(NULL);
+void QnResourceModel::at_context_aboutToBeDestroyed() {
+    setContext(NULL);
+}
+
+void QnResourceModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
+    Node *node = this->node(resource);
+
+    node->setModified(snapshotManager()->isModified(resource));
 }
 
 void QnResourceModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
     Node *node = this->node(resource);
-    Node *parentNode = this->node(m_resourcePool->getResourceById(resource->getParentId()));
+    Node *parentNode = this->node(resourcePool()->getResourceById(resource->getParentId()));
 
     node->setParent(parentNode);
 }
@@ -661,16 +727,21 @@ void QnResourceModel::at_resource_parentIdChanged() {
     at_resource_parentIdChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
+void QnResourceModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
+    QnResource::Status status = resource->getStatus();
+
+    node(resource)->update();
+    node(resource)->setBastard(status == QnResource::Disabled);
+    foreach(Node *node, m_itemNodesByResource[resource.data()])
+        node->update();
+}
+
 void QnResourceModel::at_resource_resourceChanged() {
     QObject *sender = this->sender();
     if(!sender)
         return; /* Already disconnected from this sender. */
 
-    QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender));
-
-    node(resource)->update();
-    foreach(Node *node, m_itemNodesByResource[resource.data()])
-        node->update();
+    at_resource_resourceChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnResourceModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
@@ -679,9 +750,9 @@ void QnResourceModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, c
 
     QnResourcePtr resource;
     if(item.resource.id.isValid()) {
-        resource = m_resourcePool->getResourceById(item.resource.id);
+        resource = resourcePool()->getResourceById(item.resource.id);
     } else {
-        resource = m_resourcePool->getResourceByUniqId(item.resource.path);
+        resource = resourcePool()->getResourceByUniqId(item.resource.path);
     }
 
     node->setResource(resource);
