@@ -3,15 +3,13 @@
 
 namespace Qn {
 
-    namespace {
-        /** Key for grid position action parameter. */
-        const char *GridPosition = "_qn_gridPosition";
+    inline QLatin1String qn_gridPositionParameter()    { return QLatin1String("_qn_gridPosition"); }
+    inline QLatin1String qn_userParameter()            { return QLatin1String("_qn_user"); }
+    inline QLatin1String qn_nameParameter()            { return QLatin1String("_qn_name"); }
 
-        /* Get syntax highlighting. */
-#define GridPosition GridPosition
-
-    } // anonymous namespace
-
+#define GridPositionParameter qn_gridPositionParameter()
+#define UserParameter qn_userParameter()
+#define NameParameter qn_nameParameter()
 
     /**
      * Enum of all menu actions.
@@ -45,7 +43,8 @@ namespace Qn {
         /**
          * Opens the main menu.
          */
-        MainMenuAction,
+        LightMainMenuAction,
+        DarkMainMenuAction,
 
         /**
          * Opens a new tab (layout).
@@ -79,8 +78,6 @@ namespace Qn {
              */
             OpenFolderAction,
 
-        FileSeparator,
-
         /**
          * Starts / stops screen recording.
          */
@@ -95,8 +92,6 @@ namespace Qn {
          * Opens system settings dialog.
          */
         SystemSettingsAction,
-
-        ExitSeparator,
 
         /**
          * Closes the client.
@@ -174,8 +169,6 @@ namespace Qn {
 
 
         /* Layout actions. */
-
-        ItemSeparator,
 
         /**
          * Deletes the file from disk.

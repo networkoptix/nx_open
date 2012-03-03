@@ -135,7 +135,7 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
         resources = QnFileProcessor::createResourcesForFiles(m_files);
 
     QVariantMap params;
-    params[Qn::GridPosition] = context->workbench()->mapper()->mapToGridF(event->scenePos());
+    params[Qn::GridPositionParameter] = context->workbench()->mapper()->mapToGridF(event->scenePos());
 
     context->menu()->trigger(Qn::ResourceDropAction, resources, params);
 

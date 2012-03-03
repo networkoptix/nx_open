@@ -303,7 +303,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(tabBarWidget);
 
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction));
+    m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);

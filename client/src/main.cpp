@@ -224,7 +224,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     if (defaultMsgHandler) {
         defaultMsgHandler(type, msg);
     } else { /* Default message handler. */
-#ifdef _DEBUG
+#ifndef QN_NO_STDERR_MESSAGE_OUTPUT
         QTextStream err(stderr);
         err << msg << endl << flush;
 #endif

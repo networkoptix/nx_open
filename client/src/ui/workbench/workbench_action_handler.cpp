@@ -122,6 +122,8 @@ void QnWorkbenchActionHandler::initialize() {
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
+    connect(action(Qn::LightMainMenuAction),                SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::DarkMainMenuAction),                 SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::AboutAction),                        SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
@@ -242,6 +244,13 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     action(Qn::OpenNewLayoutAction)->trigger();
 }
 
+void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
+    m_mainMenu.reset(menu()->newMenu(Qn::MainScope));
+
+    action(Qn::LightMainMenuAction)->setMenu(m_mainMenu.data());
+    action(Qn::DarkMainMenuAction)->setMenu(m_mainMenu.data());
+}
+
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     QnLayoutResourcePtr resource = menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
     if(!resource)
@@ -285,26 +294,41 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(!layout)
         return;
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
-    dialog->setWindowTitle(tr("Save Layout As"));
-    dialog->setText(tr("Enter layout name:"));
-    dialog->setName(layout->getName());
-    dialog->exec();
-    if(dialog->clickedButton() != QDialogButtonBox::Save)
-        return;
+    QnUserResourcePtr user = menu()->currentParameter(sender(), Qn::UserParameter).value<QnUserResourcePtr>();
+    if(!user)
+        user = context()->user();
+    
+    QString name = menu()->currentParameter(sender(), Qn::NameParameter).toString();
+    if(name.isEmpty()) {
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+        dialog->setWindowTitle(tr("Save Layout As"));
+        dialog->setText(tr("Enter layout name:"));
+        dialog->setName(layout->getName());
+        dialog->exec();
+        if(dialog->clickedButton() != QDialogButtonBox::Save)
+            return;
+        name = dialog->name();
+    }
 
-    QnLayoutResourcePtr newLayout(new QnLayoutResource());
-    newLayout->setGuid(QUuid::createUuid());
-    newLayout->setName(dialog->name());
+    QnLayoutResourcePtr newLayout;
+    if(snapshotManager()->isLocal(layout) && !snapshotManager()->isBeingSaved(layout)) {
+        /* Local layout that is not being saved should not be copied. */
+        newLayout = layout;
+        newLayout->setName(name);
+    } else {
+        newLayout = QnLayoutResourcePtr(new QnLayoutResource());
+        newLayout->setGuid(QUuid::createUuid());
+        newLayout->setName(name);
 
-    context()->resourcePool()->addResource(newLayout);
-    if(context()->user())
-        context()->user()->addLayout(newLayout);
+        context()->resourcePool()->addResource(newLayout);
+        if(user)
+            user->addLayout(newLayout);
 
-    QnLayoutItemDataList items = layout->getItems().values();
-    for(int i = 0; i < items.size(); i++)
-        items[i].uuid = QUuid::createUuid();
-    newLayout->setItems(items);
+        QnLayoutItemDataList items = layout->getItems().values();
+        for(int i = 0; i < items.size(); i++)
+            items[i].uuid = QUuid::createUuid();
+        newLayout->setItems(items);
+    }
 
     snapshotManager()->save(newLayout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
@@ -361,7 +385,7 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
     QnResourceList resources = menu()->currentResourcesTarget(sender());
-    QVariant position = menu()->currentParameter(sender(), Qn::GridPosition);
+    QVariant position = menu()->currentParameter(sender(), Qn::GridPositionParameter);
     QnLayoutResourceList layouts = QnResourceCriterion::filter<QnLayoutResource>(resources);
     QnMediaResourceList  medias  = QnResourceCriterion::filter<QnMediaResource>(resources);
 
