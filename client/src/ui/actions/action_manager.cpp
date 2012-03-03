@@ -7,6 +7,7 @@
 #include <utils/common/checked_cast.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <core/resource/resource.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include "action.h"
@@ -100,6 +101,7 @@ public:
         assert(m_action->condition() == NULL);
 
         condition->setParent(m_action);
+        condition->setManager(m_manager);
         m_action->setCondition(condition);
     }
 
@@ -234,7 +236,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
-        autoRepeat(false); /* There is no point in saving the same layout many times in a row. */
+        autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
+        condition(new QnResourceSaveLayoutActionCondition(true));
 
     factory(Qn::SaveCurrentLayoutAsAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
@@ -327,7 +330,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SaveLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
         text(tr("Save Layout")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+        condition(new QnResourceSaveLayoutActionCondition(false));
 
     factory(Qn::SaveLayoutAsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
@@ -418,7 +421,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::NewUserAction).
         flags(Qn::Tree | Qn::NoTarget).
-        text(tr("New User..."));
+        text(tr("New User...")).
+        condition(new QnResourceActionUserAccessCondition(true));
 
     factory(Qn::NewLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
@@ -486,10 +490,8 @@ QnActionManager::~QnActionManager() {
     qDeleteAll(m_actionById);
 }
 
-Q_GLOBAL_STATIC(QnActionManager, qn_contextMenu);
-
-QnActionManager *QnActionManager::instance() {
-    return qn_contextMenu();
+void QnActionManager::setContext(QnWorkbenchContext *context) {
+    m_context = context;
 }
 
 void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) {
@@ -597,7 +599,7 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, co
         return;
     }
 
-    if(!action->satisfiesCondition(action->scope(), items)) {
+    if(action->checkCondition(action->scope(), items) != Qn::VisibleAction) {
         qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
         return;
     }
@@ -624,26 +626,33 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     QMenu *result = new QMenu();
 
     foreach(QnAction *action, parent->children()) {
-        QAction *newAction = NULL;
-
-        if(!action->satisfiesCondition(scope, items))
+        Qn::ActionVisibility visibility = action->checkCondition(scope, items);
+        if(visibility == Qn::InvisibleAction)
             continue;
         
+        QMenu *menu = NULL;
         if(action->children().size() > 0) {
-            QMenu *menu = newMenuRecursive(action, scope, items);
+            menu = newMenuRecursive(action, scope, items);
             if(menu->isEmpty()) {
                 delete menu;
+                visibility = Qn::InvisibleAction;
             } else {
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
-                newAction = new QAction(result);
-                newAction->setMenu(menu);
-                copyAction(newAction, action);
             }
+        }
+
+        QAction *newAction = NULL;
+        if(visibility == Qn::DisabledAction || menu != NULL) {
+            newAction = new QAction(result);
+            copyAction(newAction, action);
+            
+            newAction->setMenu(menu);
+            newAction->setDisabled(visibility == Qn::DisabledAction);
         } else {
             newAction = action;
         }
 
-        if(newAction != NULL)
+        if(visibility != Qn::InvisibleAction)
             result->addAction(newAction);
     }
 

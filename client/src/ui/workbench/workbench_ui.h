@@ -31,19 +31,13 @@ class QnAbstractRenderer;
 class QnClickableWidget;
 class QnLayoutTabBar;
 class QnHelpWidget;
+class QnActionManager;
 
 class QnWorkbenchUi: public QObject, public QnActionTargetProvider, protected SceneUtility {
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 
 public:
-    QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent = NULL);
-    virtual ~QnWorkbenchUi();
-
-    virtual Qn::ActionScope currentScope() const override;
-
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
     enum Flag {
         HIDE_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */
         HIDE_WHEN_NORMAL = 0x2, /**< Whether controls should be hidden after a period without activity in normal mode. */
@@ -51,6 +45,14 @@ public:
         AFFECT_MARGINS_WHEN_NORMAL = 0x8
     };
     Q_DECLARE_FLAGS(Flags, Flag)
+
+    QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent = NULL);
+
+    virtual ~QnWorkbenchUi();
+
+    virtual Qn::ActionScope currentScope() const override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     QnWorkbenchDisplay *display() const;
 
@@ -146,6 +148,9 @@ protected:
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+
+    QAction *action(const Qn::ActionId id) const;
+    QnActionManager *menu() const;
 
 protected slots:
     void updateHelpContext();

@@ -7,6 +7,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/view_drag_and_drop.h>
 #include "file_processor.h"
 #include "destruction_guard_item.h"
@@ -67,12 +68,12 @@ private:
 };
 
 
-DropInstrument::DropInstrument(QnWorkbench *workbench, QObject *parent):
+DropInstrument::DropInstrument(QnWorkbenchContext *context, QObject *parent):
     Instrument(ITEM, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
-    m_workbench(workbench)
+    m_context(context)
 {
-    if(workbench == NULL)
-        qnNullWarning(workbench);
+    if(context == NULL)
+        qnNullWarning(context);
 
     DropSurfaceItem *surface = new DropSurfaceItem();
     surface->setDropInstrument(this);
@@ -125,8 +126,8 @@ bool DropInstrument::dragLeaveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDrag
 }
 
 bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) {
-    QnWorkbench *workbench = m_workbench.data();
-    if(workbench == NULL)
+    QnWorkbenchContext *context = m_context.data();
+    if(context == NULL)
         return true;
 
     QnResourceList resources = m_resources;
@@ -134,9 +135,9 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
         resources = QnFileProcessor::createResourcesForFiles(m_files);
 
     QVariantMap params;
-    params[Qn::GridPosition] = workbench->mapper()->mapToGridF(event->scenePos());
+    params[Qn::GridPosition] = context->workbench()->mapper()->mapToGridF(event->scenePos());
 
-    qnMenu->trigger(Qn::ResourceDropAction, resources, params);
+    context->menu()->trigger(Qn::ResourceDropAction, resources, params);
 
     return true;
 }

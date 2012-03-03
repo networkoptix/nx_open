@@ -3,20 +3,22 @@
 #include <QDir>
 #include <QToolButton>
 
-#include "ui/ui_common.h"
-#include "ui/actions/action_manager.h"
-
-#include "connectionssettingswidget.h"
-#include "licensewidget.h"
-#include "recordingsettingswidget.h"
-#include "youtube/youtubesettingswidget.h"
-
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <utils/common/util.h>
+#include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
+
+#include "ui/ui_common.h"
+#include "ui/actions/action_manager.h"
+#include "ui/workbench/workbench_context.h"
+
+#include "connectionssettingswidget.h"
+#include "licensewidget.h"
+#include "recordingsettingswidget.h"
+#include "youtube/youtubesettingswidget.h"
 
 static inline QString cameraInfoString(QnResourcePtr resource)
 {
@@ -33,10 +35,13 @@ static inline QString cameraInfoString(QnResourcePtr resource)
 }
 
 
-PreferencesDialog::PreferencesDialog(QWidget *parent)
+PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *parent)
     : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
       connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseWidget(0)
 {
+    if(!context)
+        qnNullWarning(context);
+
     setupUi(this);
 
     connect(auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
@@ -60,7 +65,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 #endif
 
     QToolButton *aboutButton = new QToolButton();
-    aboutButton->setDefaultAction(qnAction(Qn::AboutAction));
+    aboutButton->setDefaultAction(context ? context->action(Qn::AboutAction) : NULL);
     aboutButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     buttonBox->addButton(aboutButton, QDialogButtonBox::HelpRole);
 

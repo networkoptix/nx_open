@@ -7,6 +7,8 @@
 
 class YouTubeUploader;
 
+class QnWorkbenchContext;
+
 namespace Ui {
     class YouTubeUploadDialog;
 }
@@ -16,8 +18,8 @@ class YouTubeUploadDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit YouTubeUploadDialog(QnResourcePtr resource = QnResourcePtr(0), QWidget *parent = 0);
-    ~YouTubeUploadDialog();
+    explicit YouTubeUploadDialog(QnWorkbenchContext *context, QnResourcePtr resource = QnResourcePtr(0), QWidget *parent = 0);
+    virtual ~YouTubeUploadDialog();
 
 public Q_SLOTS:
     void accept();
@@ -36,6 +38,8 @@ private Q_SLOTS:
 
 private:
     Ui::YouTubeUploadDialog *ui;
+
+    QWeakPointer<QnWorkbenchContext> m_context;
 
     YouTubeUploader *m_youtubeuploader;
 };

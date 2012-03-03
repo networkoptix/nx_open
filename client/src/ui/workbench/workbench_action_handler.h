@@ -4,12 +4,17 @@
 #include <QObject>
 #include <QWeakPointer>
 #include <api/AppServerConnection.h>
+#include <ui/actions/actions.h>
+
+class QAction;
 
 class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
+class QnActionManager;
+class QnAction;
 
 class QnWorkbenchActionHandler: public QObject {
     Q_OBJECT;
@@ -27,6 +32,10 @@ public:
     QnWorkbenchSynchronizer *synchronizer() const;
 
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
+
+    QnActionManager *menu() const;
+
+    QAction *action(const Qn::ActionId id);
 
     QnResourcePool *resourcePool() const;
 

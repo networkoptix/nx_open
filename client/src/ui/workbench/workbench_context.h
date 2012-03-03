@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
+#include <ui/actions/actions.h>
+
+class QAction;
 
 class QnResourcePoolUserWatcher;
 class QnResourcePool;
@@ -11,6 +14,7 @@ class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchLayoutVisibilityController;
 class QnWorkbenchAccessController;
+class QnActionManager;
 
 class QnWorkbenchContext: public QObject {
     Q_OBJECT;
@@ -18,8 +22,6 @@ public:
     QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent = NULL);
 
     virtual ~QnWorkbenchContext();
-
-    static QnWorkbenchContext *instance();
 
     QnResourcePool *resourcePool() const {
         return m_resourcePool;
@@ -36,6 +38,12 @@ public:
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const {
         return m_snapshotManager;
     }
+
+    QnActionManager *menu() const {
+        return m_menu;
+    }
+
+    QAction *action(const Qn::ActionId id);
 
     QnUserResourcePtr user();
 
@@ -56,11 +64,9 @@ private:
     QnWorkbenchLayoutSnapshotManager *m_snapshotManager;
     QnWorkbenchLayoutVisibilityController *m_visibilityController;
     QnWorkbenchAccessController *m_accessController;
+    QnActionManager *m_menu;
     QnWorkbench *m_workbench;
 };
-
-
-#define qnContext (QnWorkbenchContext::instance())
 
 
 #endif // QN_WORKBENCH_CONTEXT_H

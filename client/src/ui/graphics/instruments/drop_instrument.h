@@ -4,14 +4,14 @@
 #include "instrument.h"
 #include <core/resource/resource.h>
 
-class QnWorkbench;
+class QnWorkbenchContext;
 class DropSurfaceItem;
 class DestructionGuardItem;
 
 class DropInstrument: public Instrument {
     Q_OBJECT;
 public:
-    DropInstrument(QnWorkbench *workbench, QObject *parent = NULL);
+    DropInstrument(QnWorkbenchContext *context, QObject *parent = NULL);
 
     /**
      * \returns                         Graphics item that serves as a surface for 
@@ -41,7 +41,7 @@ private:
     QStringList m_files;
     QnResourceList m_resources;
     
-    QWeakPointer<QnWorkbench> m_workbench;
+    QWeakPointer<QnWorkbenchContext> m_context;
     QWeakPointer<DropSurfaceItem> m_surface;
     QWeakPointer<DestructionGuardItem> m_guard;
 };
