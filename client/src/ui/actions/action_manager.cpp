@@ -117,7 +117,8 @@ private:
 class QnActionFactory {
 public:
     QnActionFactory(QnActionManager *menu, QnAction *parent): 
-        m_manager(menu)
+        m_manager(menu),
+        m_lastFreeActionId(Qn::ActionCount)
     {
         m_actionStack.push_back(parent);
         m_lastAction = parent;
@@ -145,7 +146,12 @@ public:
         return QnActionBuilder(m_manager, action);
     }
 
+    QnActionBuilder operator()() {
+        return operator()(static_cast<Qn::ActionId>(m_lastFreeActionId++));
+    }
+
 private:
+    int m_lastFreeActionId;
     QnActionManager *m_manager;
     QnAction *m_lastAction;
     QList<QnAction *> m_actionStack;
@@ -191,7 +197,10 @@ QnActionManager::QnActionManager(QObject *parent):
 
     using namespace QnResourceCriterionExpressions;
 
+
+
     /* Actions that are not assigned to any menu. */
+
     factory(Qn::AboutAction).
         flags(Qn::NoTarget).
         text(tr("About...")).
@@ -217,7 +226,18 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Drop Resources"));
 
 
-    /* Main menu actions. */
+
+    /* Tab bar actions. */
+
+    factory(Qn::CloseLayoutAction).
+        flags(Qn::TabBar | Qn::ScopelessHotkey).
+        text(tr("Close")).
+        shortcut(tr("Ctrl+W")).
+        autoRepeat(false);
+
+
+
+    /* Context menu actions. */
 
     factory(Qn::LightMainMenuAction).
         text(tr("Main Menu")).
@@ -231,12 +251,26 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
 
+    factory(Qn::NewUserAction).
+        flags(Qn::Main | Qn::Tree | Qn::NoTarget).
+        text(tr("New User...")).
+        condition(new QnResourceActionUserAccessCondition(true));
+
+    factory(Qn::NewLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("New Layout...")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
+
     factory(Qn::OpenNewLayoutAction).
         flags(Qn::Main).
         text(tr("New Layout")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
+
+    factory().
+        flags(Qn::Main | Qn::Tree).
+        separator();
 
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
@@ -268,7 +302,7 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Folder..."));
     } factory.leaveSubMenu();
 
-    factory(Qn::FileSeparator).
+    factory().
         flags(Qn::Main).
         separator();
 
@@ -303,7 +337,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/settings.png")));
 
-    factory(Qn::ExitSeparator).
+    factory().
         flags(Qn::Main).
         separator();
 
@@ -314,15 +348,6 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::QuitRole).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
-
-
-
-    /* Tab bar actions. */
-    factory(Qn::CloseLayoutAction).
-        flags(Qn::TabBar | Qn::ScopelessHotkey).
-        text(tr("Close")).
-        shortcut(tr("Ctrl+W")).
-        autoRepeat(false);
 
 
 
@@ -399,9 +424,11 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media)));
 
+
+
     /* Layout actions. */
 
-    factory(Qn::ItemSeparator).
+    factory().
         flags(Qn::Scene).
         separator();
 
@@ -424,16 +451,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F2")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
-
-    factory(Qn::NewUserAction).
-        flags(Qn::Tree | Qn::NoTarget).
-        text(tr("New User...")).
-        condition(new QnResourceActionUserAccessCondition(true));
-
-    factory(Qn::NewLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
-        text(tr("New Layout...")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);

@@ -78,8 +78,6 @@ namespace Qn {
              */
             OpenFolderAction,
 
-        FileSeparator,
-
         /**
          * Starts / stops screen recording.
          */
@@ -94,8 +92,6 @@ namespace Qn {
          * Opens system settings dialog.
          */
         SystemSettingsAction,
-
-        ExitSeparator,
 
         /**
          * Closes the client.
@@ -173,8 +169,6 @@ namespace Qn {
 
 
         /* Layout actions. */
-
-        ItemSeparator,
 
         /**
          * Deletes the file from disk.
