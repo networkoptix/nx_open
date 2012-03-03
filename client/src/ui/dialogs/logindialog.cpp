@@ -8,16 +8,21 @@
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
+#include "ui/workbench/workbench_context.h"
 #include "connectiontestingdialog.h"
 
 #include "api/AppServerConnection.h"
 
 #include "settings.h"
 
-LoginDialog::LoginDialog(QWidget *parent) :
+LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::LoginDialog)
+    ui(new Ui::LoginDialog),
+    m_context(context)
 {
+    if(!context)
+        qnNullWarning(context);
+
     ui->setupUi(this);
 
     // ### `don't save password` feature is not implemented yet
@@ -179,9 +184,9 @@ void LoginDialog::currentIndexChanged(int index)
 
 void LoginDialog::configureStoredConnections()
 {
-    PreferencesDialog dialog(this);
-    dialog.setCurrentPage(PreferencesDialog::PageConnections);
+    QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(m_context.data(), this));
+    dialog->setCurrentPage(PreferencesDialog::PageConnections);
 
-    if (dialog.exec() == QDialog::Accepted)
+    if (dialog->exec() == QDialog::Accepted)
         updateStoredConnections();
 }

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <ui/common/scene_utility.h>
+#include <ui/actions/actions.h>
 #include <core/resource/resource_fwd.h>
 #include "workbench.h"
 
@@ -30,6 +31,7 @@ class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 
+class QnActionManager;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbench;
@@ -99,6 +101,9 @@ protected:
 
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
+
+    QAction *action(const Qn::ActionId id) const;
+    QnActionManager *menu() const;
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);

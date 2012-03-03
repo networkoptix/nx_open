@@ -2,14 +2,13 @@
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
+#include <ui/actions/action_manager.h>
 #include "settings.h"
 #include "workbench.h"
 #include "workbench_synchronizer.h"
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_layout_visibility_controller.h"
 #include "workbench_access_controller.h"
-
-Q_GLOBAL_STATIC_WITH_ARGS(QnWorkbenchContext, qn_workbenchContext, (qnResPool));
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent)
@@ -31,6 +30,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     at_settings_lastUsedConnectionChanged();
 
     /* Create dependent objects. */
+    m_menu = new QnActionManager(this);
+    m_menu->setContext(this);
+
     m_synchronizer = new QnWorkbenchSynchronizer(this);
     m_synchronizer->setContext(this);
 
@@ -50,17 +52,18 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     blockSignals(signalsBlocked);
 }
 
-QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
-    return dynamic_cast<QnWorkbenchContext *>(workbench->parent());
-}
-
-QnWorkbenchContext *QnWorkbenchContext::instance() {
-    return qn_workbenchContext();
+QAction *QnWorkbenchContext::action(const Qn::ActionId id) {
+    return m_menu->action(id);
 }
 
 QnUserResourcePtr QnWorkbenchContext::user() {
     return m_userWatcher->user();
 }
+
+QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
+    return dynamic_cast<QnWorkbenchContext *>(workbench->parent());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

@@ -314,12 +314,18 @@ void QnResourceTreeWidget::updateFilter() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
-    QScopedPointer<QMenu> menu(qnMenu->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
+    if(!context() || !context()->menu()) {
+        qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
+        return;
+    }
+    QnActionManager *manager = context()->menu();
+
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
     if(menu->isEmpty())
         return;
 
     /* Add tree-local actions to the menu. */
-    qnMenu->redirectAction(menu.data(), Qn::RenameLayoutAction, m_renameLayoutAction);
+    manager->redirectAction(menu.data(), Qn::RenameLayoutAction, m_renameLayoutAction);
 
     /* Run menu. */
     QAction *action = menu->exec(QCursor::pos());

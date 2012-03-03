@@ -59,10 +59,11 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "extensions/workbench_render_watcher.h"
+#include "extensions/workbench_motion_display_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_layout.h"
-#include "extensions/workbench_motion_display_watcher.h"
+#include "workbench_context.h"
 
 
 Q_DECLARE_METATYPE(VariantAnimator *)
@@ -179,8 +180,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_fpsItem->setPalette(palette);
     }
 
-    m_display->view()->addAction(qnAction(Qn::ShowFpsAction));
-    connect(qnAction(Qn::ShowFpsAction),SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
+    m_display->view()->addAction(action(Qn::ShowFpsAction));
+    connect(action(Qn::ShowFpsAction),  SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
     setFpsVisible(false);
 
@@ -302,19 +303,19 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(tabBarWidget);
 
-    m_mainMenuButton = newActionButton(qnAction(Qn::MainMenuAction));
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction));
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(qnAction(Qn::OpenNewLayoutAction)));
+    titleLayout->addItem(newActionButton(action(Qn::OpenNewLayoutAction)));
     titleLayout->addStretch(0x1000);
-    titleLayout->addItem(newActionButton(qnAction(Qn::ConnectionSettingsAction)));
-    titleLayout->addItem(newActionButton(qnAction(Qn::SystemSettingsAction)));
-    titleLayout->addItem(newActionButton(qnAction(Qn::FullscreenAction)));
-    titleLayout->addItem(newActionButton(qnAction(Qn::ExitAction)));
+    titleLayout->addItem(newActionButton(action(Qn::ConnectionSettingsAction)));
+    titleLayout->addItem(newActionButton(action(Qn::SystemSettingsAction)));
+    titleLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
+    titleLayout->addItem(newActionButton(action(Qn::ExitAction)));
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
@@ -351,7 +352,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
-    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    qnAction(Qn::FullscreenAction), SLOT(toggle()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
 
 
     /* Help window. */
@@ -518,6 +519,14 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 QnWorkbenchUi::~QnWorkbenchUi() {
     return;
+}
+
+QAction *QnWorkbenchUi::action(const Qn::ActionId id) const {
+    return display()->context() ? display()->context()->action(id) : NULL;
+}
+
+QnActionManager *QnWorkbenchUi::menu() const {
+    return display()->context() ? display()->context()->menu() : NULL;
 }
 
 Qn::ActionScope QnWorkbenchUi::currentScope() const {
@@ -993,7 +1002,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
 
     m_fpsItem->setText(QString());
 
-    qnAction(Qn::ShowFpsAction)->setChecked(fpsVisible);
+    action(Qn::ShowFpsAction)->setChecked(fpsVisible);
 }
 
 void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
@@ -1320,7 +1329,7 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(resource.isNull())
         return;
 
-    qnMenu->trigger(Qn::ResourceDropAction, resource);
+    menu()->trigger(Qn::ResourceDropAction, resource);
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
@@ -1377,7 +1386,7 @@ void QnWorkbenchUi::at_treePinButton_toggled(bool checked) {
 void QnWorkbenchUi::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     QnWorkbenchLayoutList layouts;
     layouts.push_back(layout);
-    qnMenu->trigger(Qn::CloseLayoutAction, layouts);
+    menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
 void QnWorkbenchUi::at_titleShowButton_toggled(bool checked) {

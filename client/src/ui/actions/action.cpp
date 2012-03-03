@@ -44,29 +44,29 @@ void QnAction::removeChild(QnAction *action) {
     m_children.removeOne(action);
 }
 
-bool QnAction::satisfiesCondition(Qn::ActionScope scope, const QVariant &items) const {
+Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScope scope, const QVariant &items) const {
     if(!(this->scope() & scope) && scope != this->scope())
-        return false;
+        return Qn::InvisibleAction;
 
     int size = QnActionTargetTypes::size(items);
 
     if(size == 0 && !(m_flags & Qn::NoTarget))
-        return false;
+        return Qn::InvisibleAction;
 
     if(size == 1 && !(m_flags & Qn::SingleTarget))
-        return false;
+        return Qn::InvisibleAction;
 
     if(size > 1 && !(m_flags & Qn::MultiTarget))
-        return false;
+        return Qn::InvisibleAction;
 
     Qn::ActionTarget target = QnActionTargetTypes::target(items);
     if(!(this->target() & target) && size != 0)
-        return false;
+        return Qn::InvisibleAction;
 
-    if(!m_condition.isNull() && !m_condition.data()->check(items))
-        return false;
+    if(m_condition)
+        return m_condition.data()->check(items);
 
-    return true;
+    return Qn::VisibleAction;
 }
 
 bool QnAction::event(QEvent *event) {
@@ -110,7 +110,7 @@ bool QnAction::event(QEvent *event) {
             }
         }
 
-        if(satisfiesCondition(scope(), target)) {
+        if(checkCondition(scope(), target) == Qn::VisibleAction) {
             m_manager->m_shortcutAction = this;
             m_manager->m_parametersByMenu[NULL] = QnActionManager::ActionParameters(target, QVariantMap());
             activate(Trigger);

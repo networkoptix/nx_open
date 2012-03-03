@@ -9,6 +9,7 @@
 
 class QGraphicsItem;
 
+class QnWorkbenchContext;
 class QnActionCondition;
 class QnActionManager;
 
@@ -63,7 +64,7 @@ public:
 
     void removeChild(QnAction *action);
 
-    bool satisfiesCondition(Qn::ActionScope scope, const QVariant &items) const;
+    Qn::ActionVisibility checkCondition(Qn::ActionScope scope, const QVariant &items) const;
 
 protected:
     virtual bool event(QEvent *event) override;

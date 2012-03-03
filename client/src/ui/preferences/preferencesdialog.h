@@ -5,6 +5,8 @@
 
 #include "settings.h"
 
+class QnWorkbenchContext;
+
 class ConnectionsSettingsWidget;
 class LicenseWidget;
 class RecordingSettingsWidget;
@@ -23,7 +25,7 @@ public:
         PageLicense = 4
     };
 
-    PreferencesDialog(QWidget *parent = 0);
+    PreferencesDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     ~PreferencesDialog();
 
     void setCurrentPage(SettingsPage page);

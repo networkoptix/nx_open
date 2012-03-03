@@ -476,9 +476,6 @@ namespace Qn {
         ScopelessHotkey         = 0x20000,       
 
 
-        /** Action cannot appear in any menu. */
-        Invisible               = 0,                                            
-        
         /** Action can appear in main menu. */
         Main                    = Qn::MainScope | NoTarget,                     
 
@@ -496,6 +493,12 @@ namespace Qn {
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
+
+    enum ActionVisibility {
+        InvisibleAction,
+        DisabledAction,
+        VisibleAction
+    };
 
 } // namespace Qn
 
