@@ -193,8 +193,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
     {
         m_dataQueue.lock();
-        int lowIndex = -1;
-        int hiIndex = -1;
         QnAbstractMediaDataPtr dataLow;
         QnAbstractMediaDataPtr dataHi;
         for (int i = m_dataQueue.size()-1; i >=0; --i)
@@ -204,18 +202,12 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             {
                 if (media->flags & QnAbstractMediaData::MediaFlags_LowQuality)
                 {
-                    if (lowIndex == -1)
-                    {
-                        lowIndex = i;
+                    if (dataLow == 0)
                         dataLow = media;
-                    }
                 }
                 else {
-                    if (hiIndex == -1)
-                    {
-                        hiIndex = i;
+                    if (dataHi == 0)
                         dataHi = media;
-                    }
                 }
             }
         }
@@ -252,16 +244,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             if (!deleted)
                 ++i;
         }
-        /*
-        int removeFirst = qMin(lowIndex, hiIndex);
-        QnAbstractDataPacketPtr tmp;
-        for (int i = 0; i < removeFirst; ++i)
-            m_dataQueue.pop(tmp);
-        int removeNext = qAbs(lowIndex - hiIndex);
-        bool removeLow = lowIndex > hiIndex;
-        for (int i = 0; i < removeNext; ++i)
-        */
-
         m_dataQueue.unlock();
     }
     while(m_dataQueue.size() > 100)
@@ -270,25 +252,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         m_dataQueue.pop(tmp);
     }
 
-    /*
-    // overflow control
-    if ((media->flags & AV_PKT_FLAG_KEY) || m_dataQueue.size() > 100)  
-    {
-        bool isMainStream = true;
-        if (isLive) 
-        {
-            bool isSecondaryDP = m_owner->isSecondaryLiveDP(data->dataProvider);
-            bool isLowQuality = m_liveQuality == MEDIA_Quality_Low;
-            isMainStream = isSecondaryDP == isLowQuality;
-        }
-        while (isMainStream && m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)
-        {
-            QnAbstractDataPacketPtr tmp;
-            m_dataQueue.pop(tmp);
-            m_dataQueue.removeFrontByCondition(removeItemsCondition);
-        }
-    }
-    */
 }
 
 bool QnRtspDataConsumer::canAcceptData() const
