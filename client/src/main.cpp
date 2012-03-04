@@ -230,7 +230,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #endif
     }
 
-    clLogMsgHandler(type, msg);
+    qnLogMsgHandler(type, msg);
 }
 
 #ifndef API_TEST_MAIN
