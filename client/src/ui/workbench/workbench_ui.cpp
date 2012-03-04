@@ -1255,6 +1255,7 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
 void QnWorkbenchUi::at_exportFinished(QString fileName)
 {
     QnAviResourcePtr file(new QnAviResource(fileName));
+    file->setStatus(QnResource::Online);
     qnResPool->addResource(file);
 
     QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));
