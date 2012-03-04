@@ -304,13 +304,18 @@ begin_label:
     bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
     qint64 currentTimeHint = m_currentTimeHint;
     m_currentTimeHint = AV_NOPTS_VALUE;
+
+    bool needChangeQuality = m_oldQuality != quality || qualityFastSwitch > m_oldQualityFastSwitch;
+    if (needChangeQuality) {
+        m_oldQuality = quality;
+        m_oldQualityFastSwitch = qualityFastSwitch;
+    }
+
     m_jumpMtx.unlock();
 
     // change quality checking
-    if (m_oldQuality != quality || qualityFastSwitch > m_oldQualityFastSwitch)
+    if (needChangeQuality)
     {
-        m_oldQuality = quality;
-        m_oldQualityFastSwitch = qualityFastSwitch;
         // !m_delegate->isRealTimeSource()
         bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch);
         if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
@@ -932,8 +937,8 @@ void QnArchiveStreamReader::enableQualityChange()
 void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
 {
     QMutexLocker lock(&m_jumpMtx);
-    m_quality = quality;
-    m_qualityFastSwitch = true;
+    m_oldQuality = m_quality = quality;
+    m_oldQualityFastSwitch = m_qualityFastSwitch = true;
 }
 
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
