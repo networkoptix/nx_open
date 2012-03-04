@@ -120,6 +120,11 @@ void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
     m_localAddress = addr;
 }
 
+int QnNetworkResource::httpPort() const
+{
+    return 80;
+}
+
 QString QnNetworkResource::toString() const
 {
     QString result;

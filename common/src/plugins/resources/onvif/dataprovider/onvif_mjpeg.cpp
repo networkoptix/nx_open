@@ -145,7 +145,7 @@ void MJPEGtreamreader::openStream()
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
-    mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), 80, 2000, nres->getAuth());
+    mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
     mHttpClient->doGET(m_request);
 }
 
