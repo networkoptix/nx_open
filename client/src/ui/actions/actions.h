@@ -37,6 +37,17 @@ namespace Qn {
          */ 
         ResourceDropAction,
 
+        /**
+         * Opens next layout.
+         */
+        NextLayoutAction,
+
+        /**
+         * Opens previous layout.
+         */
+        PreviousLayoutAction,
+
+
 
         /* Main menu actions. */
 

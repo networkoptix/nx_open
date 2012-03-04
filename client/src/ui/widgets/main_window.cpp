@@ -167,6 +167,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_actionHandler->setWidget(this);
 
     /* Set up actions. */
+    addAction(action(Qn::NextLayoutAction));
+    addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::ExitAction));
