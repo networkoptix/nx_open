@@ -1305,18 +1305,24 @@ void QnWorkbenchDisplay::at_mapper_originChanged() {
     synchronizeAllGeometries(true);
 
     synchronizeSceneBounds();
+
+    fitInView();
 }
 
 void QnWorkbenchDisplay::at_mapper_cellSizeChanged() {
     synchronizeAllGeometries(true);
 
     synchronizeSceneBounds();
+
+    fitInView();
 }
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged() {
     synchronizeAllGeometries(true);
 
     synchronizeSceneBounds();
+
+    fitInView();
 
     QSizeF spacing = workbench()->mapper()->spacing();
     if(qFuzzyIsNull(spacing.width()) || qFuzzyIsNull(spacing.height())) {
