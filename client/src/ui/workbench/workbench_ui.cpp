@@ -1189,7 +1189,11 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     QString dateFormat = startTimeMs < 1000ll * 100000 ? QLatin1String("hh-mm-ss") : QLatin1String("dd-mmm-yyyy hh-mm-ss");
-    QString suggetion = camera->getDevice()->getUniqueId();
+    QString suggetion;
+
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (camera->getDevice());
+    if (netRes)
+        suggetion = netRes->getMAC().toString();
 
     QString fileName;
     while (1)
