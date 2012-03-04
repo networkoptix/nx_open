@@ -165,5 +165,21 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
     if(localOther) {
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
+
+        QnStorageResourceList otherStorages = localOther->getStorages();
+        
+        // keep index uhcnaged (app server does not provide such info
+        foreach(QnStorageResourcePtr storage, m_storages)
+        {
+            for (int i = 0; i < otherStorages.size(); ++i)
+            {
+                if (otherStorages[i]->getId() == storage->getId()) {
+                    otherStorages[i]->setIndex(storage->getIndex());
+                    break;
+                }
+            }
+        }
+
+        setStorages(otherStorages);
     }
 }

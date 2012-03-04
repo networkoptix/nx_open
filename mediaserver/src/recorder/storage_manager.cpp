@@ -264,6 +264,10 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
 QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix, QnAbstractMediaStreamDataProvider* provider)
 {
     QnStorageResourcePtr storage = getOptimalStorageRoot(provider);
+    if (!storage) {
+        qWarning() << "No disk storages";
+        return QString();
+    }
     Q_ASSERT(camera != 0);
     QString base = closeDirPath(storage->getUrl());
 
