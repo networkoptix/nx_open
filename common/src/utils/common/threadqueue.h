@@ -19,7 +19,8 @@ class CLThreadQueue
 {
 public:
     CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
-        : m_maxSize( maxSize )
+        : m_maxSize( maxSize ),
+        m_cs(QMutex::Recursive)
     {
     }
     
@@ -74,6 +75,23 @@ public:
         }
 
         return false;
+    }
+
+    void lock()
+    {
+        m_cs.lock();
+    }
+
+    void unlock()
+    {
+        m_cs.unlock();
+    }
+
+    void removeAt(int index)
+    {
+        QMutexLocker mutex(&m_cs);
+        m_sem.acquire(1);
+        m_queue.removeAt(index);
     }
 
     template <class ConditionFunc>

@@ -28,6 +28,8 @@ public:
     CLHttpStatus doGET(const QByteArray& request, bool recursive = true);
     CLHttpStatus doPOST(const QByteArray& request, const QString& body);
 
+    QHostAddress getLocalHost() const;
+
     bool isOpened()const{return m_connected;}
 
     void readAll(QByteArray& data);

@@ -226,11 +226,16 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_syncButton->setObjectName("SyncButton");
     m_syncButton->setPixmap(0, Skin::pixmap(QLatin1String("sync.png")));
     m_syncButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("sync_checked.png")));
+    m_syncButton->setPixmap(QnImageButtonWidget::DISABLED,  Skin::pixmap(QLatin1String("sync_disabled.png")));
+    m_syncButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("sync_disabled.png")));
+
     m_syncButton->setPreferredSize(48, 24);
     m_syncButton->setCheckable(true);
     m_syncButton->setChecked(true);
     m_syncButton->setAnimationSpeed(4.0);
     m_syncButton->setFocusProxy(this);
+    m_syncButton->setEnabled(false);
+
 
     //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
     connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
@@ -363,6 +368,7 @@ void NavigationItem::addReserveCamera(CLVideoCamera *camera)
     updateActualCamera();
     m_forceTimePeriodLoading = !updateRecPeriodList(true);
     m_liveButton->setEnabled(true);
+    m_syncButton->setEnabled(true);
 }
 
 void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
@@ -375,8 +381,10 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
     if (netRes)
         m_motionPeriodLoader.remove(netRes);
     repaintMotionPeriods();
-    if(m_reserveCameras.empty())
+    if(m_reserveCameras.empty()) {
         m_liveButton->setEnabled(false);
+        m_syncButton->setEnabled(false);
+    }
 }
 
 void NavigationItem::updateActualCamera()
@@ -435,7 +443,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         m_timeSlider->setScalingFactor(0);
     }
 
-    m_syncButton->setEnabled(camera != 0);
+    m_syncButton->setEnabled(camera != 0 && !m_reserveCameras.isEmpty());
 
     emit actualCameraChanged(m_camera);
 }

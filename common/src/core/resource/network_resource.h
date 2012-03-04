@@ -49,6 +49,8 @@ public:
     QHostAddress getDiscoveryAddr() const;
     void setDiscoveryAddr(QHostAddress addr);
 
+    virtual int httpPort() const;
+
     virtual QString toString() const;
     QString toSearchString() const;
 

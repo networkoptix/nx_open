@@ -34,6 +34,11 @@ CLSimpleHTTPClient::~CLSimpleHTTPClient()
 {
 }
 
+QHostAddress CLSimpleHTTPClient::getLocalHost() const
+{
+    return QHostAddress(m_sock->getLocalAddress());
+}
+
 CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body)
 {
     return doPOST(requestStr.toUtf8(), body);

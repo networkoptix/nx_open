@@ -190,22 +190,68 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     }
 
     // overflow control
-    if ((media->flags & AV_PKT_FLAG_KEY) || m_dataQueue.size() > 100)  
+    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
     {
-        bool isMainStream = true;
-        if (isLive) 
+        m_dataQueue.lock();
+        QnAbstractMediaDataPtr dataLow;
+        QnAbstractMediaDataPtr dataHi;
+        for (int i = m_dataQueue.size()-1; i >=0; --i)
         {
-            bool isSecondaryDP = m_owner->isSecondaryLiveDP(data->dataProvider);
-            bool isLowQuality = m_liveQuality == MEDIA_Quality_Low;
-            isMainStream = isSecondaryDP == isLowQuality;
+            QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
+            if (media->flags & AV_PKT_FLAG_KEY)
+            {
+                if (media->flags & QnAbstractMediaData::MediaFlags_LowQuality)
+                {
+                    if (dataLow == 0)
+                        dataLow = media;
+                }
+                else {
+                    if (dataHi == 0)
+                        dataHi = media;
+                }
+            }
         }
-        while (isMainStream && m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)
+
+        // some data need to remove
+        int i = 0;
+        while (dataHi || dataLow)
         {
-            QnAbstractDataPacketPtr tmp;
-            m_dataQueue.pop(tmp);
-            m_dataQueue.removeFrontByCondition(removeItemsCondition);
+            QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
+            bool deleted = false;
+            bool isLow = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+            if (isLow && dataLow)
+            {
+                if (media == dataLow) {
+                    // all data before dataLow removed
+                    dataLow.clear(); 
+                }
+                else {
+                    m_dataQueue.removeAt(i);
+                    deleted = true;
+                }
+            }
+            if (!isLow && dataHi)
+            {
+                if (media == dataHi) {
+                    // all data before dataHi removed
+                    dataHi.clear(); 
+                }
+                else {
+                    m_dataQueue.removeAt(i);
+                    deleted = true;
+                }
+            }
+            if (!deleted)
+                ++i;
         }
+        m_dataQueue.unlock();
     }
+    while(m_dataQueue.size() > 100)
+    {
+        QnAbstractDataPacketPtr tmp;
+        m_dataQueue.pop(tmp);
+    }
+
 }
 
 bool QnRtspDataConsumer::canAcceptData() const
