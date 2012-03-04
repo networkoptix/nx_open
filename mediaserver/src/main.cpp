@@ -283,7 +283,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     if (defaultMsgHandler)
         defaultMsgHandler(type, msg);
 
-    clLogMsgHandler(type, msg);
+    qnLogMsgHandler(type, msg);
 }
 
 int serverMain(int argc, char *argv[])

@@ -88,7 +88,8 @@ protected:
 
 private slots:
     void open();
-    void updateFilter();
+    void updateFilter(bool force = false);
+    void forceUpdateFilter() { updateFilter(true); }
     
     void at_treeView_activated(const QModelIndex &index);
     void at_tabWidget_currentChanged(int index);

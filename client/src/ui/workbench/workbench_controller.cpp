@@ -554,7 +554,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
 }
 
 void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
-    if(m_resizedWidget != item)
+    if(m_resizedWidget != item || item == NULL)
         return;
 
     QnResourceWidget *widget = m_resizedWidget;
@@ -594,28 +594,27 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     TRACE("RESIZING FINISHED");
 
-    if(m_resizedWidget != item)
-        return;
-
-    QnResourceWidget *widget = m_resizedWidget;
-
     m_display->gridItem()->animatedHide();
     opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
-    /* Resize if possible. */
-    QSet<QnWorkbenchItem *> entities = widget->item()->layout()->items(m_resizedWidgetRect);
-    entities.remove(widget->item());
-    if (entities.empty()) {
-        widget->item()->setGeometry(m_resizedWidgetRect);
-        updateGeometryDelta(widget);
+    if(m_resizedWidget == item && item != NULL) {
+        QnResourceWidget *widget = m_resizedWidget;
+
+        /* Resize if possible. */
+        QSet<QnWorkbenchItem *> entities = widget->item()->layout()->items(m_resizedWidgetRect);
+        entities.remove(widget->item());
+        if (entities.empty()) {
+            widget->item()->setGeometry(m_resizedWidgetRect);
+            updateGeometryDelta(widget);
+        }
+
+        m_display->synchronize(widget->item());
+
+        /* Un-raise the raised item if it was the one being resized. */
+        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        if(raisedItem == widget->item())
+            workbench()->setItem(QnWorkbench::RAISED, NULL);
     }
-
-    m_display->synchronize(widget->item());
-
-    /* Un-raise the raised item if it was the one being resized. */
-    QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
-    if(raisedItem == widget->item())
-        workbench()->setItem(QnWorkbench::RAISED, NULL);
 
     /* Clean up resizing state. */
     m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
@@ -734,37 +733,36 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
 void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
     TRACE("DRAG FINISHED");
 
-    if(m_draggedWorkbenchItems.empty())
-        return;
-
-    QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
-
     /* Hide grid. */
     m_display->gridItem()->animatedHide();
 
-    /* Do drag. */
-    QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
-    bool success = layout->moveItems(workbenchItems, m_dragGeometries);
+    if(!m_draggedWorkbenchItems.empty()) {
+        QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
 
-    foreach(QnWorkbenchItem *item, workbenchItems) {
-        QnResourceWidget *widget = display()->widget(item);
+        /* Do drag. */
+        QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
+        bool success = layout->moveItems(workbenchItems, m_dragGeometries);
 
-        /* Adjust geometry deltas if everything went fine. */
-        if(success)
-            updateGeometryDelta(widget);
+        foreach(QnWorkbenchItem *item, workbenchItems) {
+            QnResourceWidget *widget = display()->widget(item);
 
-        /* Animate opacity back. */
-        opacityAnimator(widget)->animateTo(1.0);
+            /* Adjust geometry deltas if everything went fine. */
+            if(success)
+                updateGeometryDelta(widget);
+
+            /* Animate opacity back. */
+            opacityAnimator(widget)->animateTo(1.0);
+        }
+
+        /* Re-sync everything. */
+        foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
+            m_display->synchronize(workbenchItem);
+
+        /* Un-raise the raised item if it was among the dragged ones. */
+        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        if(raisedItem != NULL && workbenchItems.contains(raisedItem))
+            workbench()->setItem(QnWorkbench::RAISED, NULL);
     }
-
-    /* Re-sync everything. */
-    foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
-        m_display->synchronize(workbenchItem);
-
-    /* Un-raise the raised item if it was among the dragged ones. */
-    QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
-    if(raisedItem != NULL && workbenchItems.contains(raisedItem))
-        workbench()->setItem(QnWorkbench::RAISED, NULL);
 
     /* Clean up dragging state. */
     m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
@@ -951,17 +949,27 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
 }
 
 void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->display() == NULL || widget->display()->camera() == NULL)
-        return;
-
-    widget->installEventFilter(this);
+    if(widget->display() != NULL && widget->display()->camera() != NULL)
+        widget->installEventFilter(this);
 }
 
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(widget->display() == NULL || widget->display()->camera() == NULL)
-        return;
+    if(widget == m_resizedWidget)
+        m_resizedWidget = NULL;
 
-    widget->removeEventFilter(this);
+    QnWorkbenchItem *item = widget->item();
+    if(m_draggedWorkbenchItems.contains(item)) {
+        m_draggedWorkbenchItems.removeOne(item);
+        if(m_draggedWorkbenchItems.empty()) {
+            m_dragInstrument->recursiveDisable();
+            m_dragInstrument->recursiveEnable();
+        }
+    }
+    if(m_replacedWorkbenchItems.contains(item))
+        m_replacedWorkbenchItems.removeOne(item);
+
+    if(widget->display() != NULL && widget->display()->camera() != NULL)
+        widget->removeEventFilter(this);
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
