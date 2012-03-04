@@ -104,12 +104,17 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     }
     else 
     {
-        recorderHiRes->pleaseStop();
-        if (recorderLowRes)
+        bool needStopHi = recorderHiRes && recorderHiRes->isRunning();
+        bool needStopLow = recorderLowRes && recorderLowRes->isRunning();
+
+        if (needStopHi)
+            recorderHiRes->pleaseStop();
+        if (needStopLow)
             recorderLowRes->pleaseStop();
 
-        recorderHiRes->stop();
-        if (recorderLowRes)
+        if (needStopHi)
+            recorderHiRes->stop();
+        if (needStopLow)
             recorderLowRes->stop();
         camera->stopIfNoActivity();
     }

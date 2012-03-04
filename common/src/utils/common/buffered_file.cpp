@@ -80,6 +80,8 @@ public:
                 }
             }
         }
+        if (drive.isEmpty())
+            drive = fileName.left(fileName.indexOf('/'));
 
         QMutexLocker lock(&m_mutex);
         WritersMap::iterator itr = m_writers.find(drive);

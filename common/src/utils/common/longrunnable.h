@@ -23,23 +23,18 @@ public slots:
 
     virtual void pleaseStop()
     {
-        if (!m_needStop) 
-        {
-            m_needStop = true;
-            if (m_onPause)
-                resume();
-        }
+        m_needStop = true;
+        if (m_onPause)
+            resume();
     }
 
     virtual void stop()
     {
-        if (m_runing)
-        {
-            pleaseStop();
-            wait();
-            m_runing = false;
-        }
+        pleaseStop();
+        wait();
+        m_runing = false;
     }
+
 public:
     CLLongRunnable() : m_runing(false), m_onPause(false) {}
     

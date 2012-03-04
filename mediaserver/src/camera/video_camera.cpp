@@ -197,13 +197,16 @@ void QnVideoCamera::stopIfNoActivity()
     if (!m_cameraUsers.isEmpty())
         return;
 
-    if (m_primaryReader)
+    bool needStopPrimary = m_primaryReader && m_primaryReader->isRunning();
+    bool needStopSecondary = m_secondaryReader && m_secondaryReader->isRunning();
+
+    if (needStopPrimary)
         m_primaryReader->pleaseStop();
-    if (m_secondaryReader)
+    if (needStopSecondary)
         m_secondaryReader->pleaseStop();
 
-    if (m_primaryReader)
+    if (needStopPrimary)
         m_primaryReader->stop();
-    if (m_secondaryReader)
+    if (needStopSecondary)
         m_secondaryReader->stop();
 }
