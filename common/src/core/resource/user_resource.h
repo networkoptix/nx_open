@@ -35,4 +35,7 @@ private:
     QnLayoutResourceList m_layouts;
 };
 
+Q_DECLARE_METATYPE(QnUserResourcePtr);
+Q_DECLARE_METATYPE(QnUserResourceList);
+
 #endif // QN_USER_RESOURCE_H

@@ -669,11 +669,17 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     if(widget->renderer() != NULL)
         m_widgetByRenderer.remove(widget->renderer());
 
+    /* We better clear these as soon as possible. */
+    for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
+        if(item == workbench()->item(static_cast<QnWorkbench::ItemRole>(i)))
+            workbench()->setItem(static_cast<QnWorkbench::ItemRole>(i), NULL);
+
     if(destroyWidget)
-        delete widget;
+        qnDeleteLater(widget);
 
     if(destroyItem)
-        delete item;
+        qnDeleteLater(item);
+
     return true;
 }
 
@@ -1299,18 +1305,24 @@ void QnWorkbenchDisplay::at_mapper_originChanged() {
     synchronizeAllGeometries(true);
 
     synchronizeSceneBounds();
+
+    fitInView();
 }
 
 void QnWorkbenchDisplay::at_mapper_cellSizeChanged() {
     synchronizeAllGeometries(true);
 
     synchronizeSceneBounds();
+
+    fitInView();
 }
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged() {
     synchronizeAllGeometries(true);
 
     synchronizeSceneBounds();
+
+    fitInView();
 
     QSizeF spacing = workbench()->mapper()->spacing();
     if(qFuzzyIsNull(spacing.width()) || qFuzzyIsNull(spacing.height())) {

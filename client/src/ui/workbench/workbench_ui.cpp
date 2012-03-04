@@ -303,7 +303,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(tabBarWidget);
 
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction));
+    m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
@@ -1189,7 +1189,11 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     QString dateFormat = startTimeMs < 1000ll * 100000 ? QLatin1String("hh-mm-ss") : QLatin1String("dd-mmm-yyyy hh-mm-ss");
-    QString suggetion = camera->getDevice()->getUniqueId();
+    QString suggetion;
+
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (camera->getDevice());
+    if (netRes)
+        suggetion = netRes->getMAC().toString();
 
     QString fileName;
     while (1)
@@ -1251,6 +1255,7 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
 void QnWorkbenchUi::at_exportFinished(QString fileName)
 {
     QnAviResourcePtr file(new QnAviResource(fileName));
+    file->setStatus(QnResource::Online);
     qnResPool->addResource(file);
 
     QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));

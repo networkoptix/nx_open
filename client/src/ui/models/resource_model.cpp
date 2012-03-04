@@ -8,6 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
+#include <ui/actions/action_manager.h>
 #include <ui/view_drag_and_drop.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_item.h>
@@ -644,16 +645,14 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
             if(layout->getParentId() == user->getId())
                 continue; /* Dropping layout into its owner does nothing. */
 
-            QnLayoutResourcePtr newLayout(new QnLayoutResource());
-            newLayout->setGuid(QUuid::createUuid());
-            resourcePool()->addResource(newLayout);
-            user->addLayout(newLayout);
+            QVariantMap params;
+            params[Qn::UserParameter] = QVariant::fromValue(user);
+            params[Qn::NameParameter] = layout->getName();
 
-            newLayout->setName(layout->getName());
-            QnLayoutItemDataList items = layout->getItems().values();
-            for(int i = 0; i < items.size(); i++)
-                items[i].uuid = QUuid::createUuid();
-            newLayout->setItems(items);
+            QnResourceList layouts;
+            layouts.push_back(layout);
+
+            context()->menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
         }
     }
     

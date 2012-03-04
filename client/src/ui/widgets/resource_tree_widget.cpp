@@ -105,6 +105,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
+    connect(ui->filterLineEdit,     SIGNAL(editingFinished()),          this,               SLOT(forceUpdateFilter()));
     connect(ui->clearFilterButton,  SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
     connect(ui->resourceTreeView,   SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
     connect(ui->searchTreeView,     SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
@@ -285,7 +286,7 @@ QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
     }
 }
 
-void QnResourceTreeWidget::updateFilter() {
+void QnResourceTreeWidget::updateFilter(bool force) {
     QString filter = ui->filterLineEdit->text();
 
     /* Don't allow empty filters. */
@@ -303,8 +304,12 @@ void QnResourceTreeWidget::updateFilter() {
     if(m_ignoreFilterChanges)
         return;
 
-    if (!filter.isEmpty() && filter.size() < 3) 
-        return; /* Filter too short, ignore. */
+    if(!force) {
+        /* Estimate size of the last term in filter expression. */
+        int size = filter.size() - (qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1);
+        if (size > 0 && size < 3) 
+            return; /* Filter too short, ignore. */
+    }
 
     m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
 }

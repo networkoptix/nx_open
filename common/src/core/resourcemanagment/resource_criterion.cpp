@@ -37,6 +37,7 @@ namespace {
 QnResourceCriterion::QnResourceCriterion(const QRegExp &regExp, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
+    m_nextOperation(Next),
     m_type(RegExp),
     m_propertyName(propertyName),
     m_targetValue(regExp),
@@ -46,6 +47,7 @@ QnResourceCriterion::QnResourceCriterion(const QRegExp &regExp, const char *prop
 QnResourceCriterion::QnResourceCriterion(int flags, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
+    m_nextOperation(Next),
     m_type(Containment),
     m_propertyName(propertyName),
     m_targetValue(flags),
@@ -55,6 +57,7 @@ QnResourceCriterion::QnResourceCriterion(int flags, const char *propertyName, Op
 QnResourceCriterion::QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
+    m_nextOperation(Next),
     m_type(Nothing),
     m_propertyName(NULL),
     m_targetValue(targetValue),
@@ -66,6 +69,7 @@ QnResourceCriterion::QnResourceCriterion(const CriterionFunction &function, cons
 QnResourceCriterion::QnResourceCriterion(const QVariant &targetValue, Type type, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
+    m_nextOperation(Next),
     m_type(Nothing),
     m_propertyName(propertyName),
     m_targetValue(targetValue),
@@ -77,6 +81,7 @@ QnResourceCriterion::QnResourceCriterion(const QVariant &targetValue, Type type,
 QnResourceCriterion::QnResourceCriterion():
     m_matchOperation(Accept),
     m_mismatchOperation(Next),
+    m_nextOperation(Next),
     m_type(Nothing),
     m_propertyName(NULL),
     m_targetValue(QVariant()),

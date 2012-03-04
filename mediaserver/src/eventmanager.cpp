@@ -7,6 +7,7 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "eventmanager.h"
 #include "recorder/recording_manager.h"
+#include "serverutil.h"
 
 Q_GLOBAL_STATIC(QnEventManager, static_instance)
 
@@ -43,6 +44,9 @@ void QnEventManager::eventReceived(QnEvent event)
 
     if (event.eventType == QN_EVENT_RES_CHANGE)
     {
+        if (event.objectName != "Camera" && event.objectName != "Server")
+            return;
+
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
         QByteArray errorString;
@@ -54,20 +58,30 @@ void QnEventManager::eventReceived(QnEvent event)
             {
                 if (resource->getId() == event.resourceId)
                 {
+                    QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
+
+                    QnSecurityCamResourcePtr securityCamera = resource.dynamicCast<QnSecurityCamResource>();
+                    if (securityCamera && securityCamera->getParentId() != ownVideoServer->getId())
+                        continue;
+
+                    QnVideoServerResourcePtr videoServer = resource.dynamicCast<QnVideoServerResource>();
+                    if (videoServer && videoServer->getId() != ownVideoServer->getId())
+                        continue;
+
                     QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
                     if (ownResource)
+                    {
                         ownResource->update(resource);
+                    }
                     else
                     {
                         qnResPool->addResource(resource);
                         ownResource = resource;
                     }
 
-                    QnSecurityCamResourcePtr securityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
-                    if (!securityCamera.isNull())
-                    {
-                        QnRecordingManager::instance()->updateCamera(securityCamera);
-                    }
+                    QnSecurityCamResourcePtr ownSecurityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
+                    if (ownSecurityCamera)
+                        QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
                 }
             }
         } else

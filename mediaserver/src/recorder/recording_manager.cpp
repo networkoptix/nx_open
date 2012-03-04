@@ -10,6 +10,7 @@
 #include "core/misc/scheduleTask.h"
 #include "server_stream_recorder.h"
 #include "utils/common/synctime.h"
+#include "core/resource/video_server.h"
 
 const float MIN_SECONDARY_FPS = 2.0;
 
@@ -103,12 +104,17 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     }
     else 
     {
-        recorderHiRes->pleaseStop();
-        if (recorderLowRes)
+        bool needStopHi = recorderHiRes && recorderHiRes->isRunning();
+        bool needStopLow = recorderLowRes && recorderLowRes->isRunning();
+
+        if (needStopHi)
+            recorderHiRes->pleaseStop();
+        if (needStopLow)
             recorderLowRes->pleaseStop();
 
-        recorderHiRes->stop();
-        if (recorderLowRes)
+        if (needStopHi)
+            recorderHiRes->stop();
+        if (needStopLow)
             recorderLowRes->stop();
         camera->stopIfNoActivity();
     }
@@ -160,8 +166,22 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 void QnRecordingManager::onNewResource(QnResourcePtr res)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
-    if (camera)
+    if (camera) {
         updateCamera(camera);
+        return;
+    }
+
+    QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
+    if (videoServer) {
+        connect(videoServer.data(), SIGNAL(resourceChanged()), this, SLOT(at_updateStorage()), Qt::QueuedConnection);
+    }
+}
+
+void QnRecordingManager::at_updateStorage()
+{
+    QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
+    foreach(QnStorageResourcePtr storage, videoServer->getStorages())
+        qnStorageMan->addStorage(storage);
 }
 
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)

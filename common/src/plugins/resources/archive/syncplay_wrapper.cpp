@@ -623,8 +623,13 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
             {
                 d->readers[i].reader->setNavDelegate(0);
                 qint64 currentTime = getCurrentTime();
-                d->readers[i].reader->jumpToPreviousFrame(currentTime);
-                d->readers[i].reader->setSpeed(d->speed, currentTime);
+                if (currentTime != AV_NOPTS_VALUE) {
+                    d->readers[i].reader->jumpToPreviousFrame(currentTime);
+                    d->readers[i].reader->setSpeed(d->speed, currentTime);
+                }
+                else {
+                    d->readers[i].reader->setSpeed(d->speed);
+                }
                 d->readers[i].reader->setNavDelegate(this);
             }
             d->readers[i].enabled = !value;

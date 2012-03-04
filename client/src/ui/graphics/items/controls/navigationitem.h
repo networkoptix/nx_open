@@ -33,6 +33,7 @@ public:
     void removeReserveCamera(CLVideoCamera* camera);
 
     CLVideoCamera *videoCamera() const { return m_camera; }
+    CLVideoCamera *forcedVideoCamera() const { return m_forcedCamera; }
 
     inline bool isPlaying() const { return m_playing; }
 

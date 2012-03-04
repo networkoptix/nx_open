@@ -354,7 +354,7 @@ private:
 
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
 
-    void drawFlashingText(QPainter *painter, const QStaticText& text);
+    void drawFlashingText(QPainter *painter, const QStaticText& text, int textSize = 550, int xOffs = 4, int yOffs = 16);
 private:
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
@@ -432,6 +432,7 @@ private:
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;
+    QStaticText m_unauthorizedStaticText2;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
