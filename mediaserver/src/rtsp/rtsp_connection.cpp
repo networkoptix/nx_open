@@ -505,6 +505,8 @@ int QnRtspConnectionProcessor::composePlay()
         return CODE_NOT_FOUND;
 
 
+	QnResource::Status status = getResource()->getStatus();
+
     d->dataProcessor->setLiveMode(d->liveMode);
     if (d->liveMode) {
         d->dataProcessor->lockDataQueue();
@@ -518,7 +520,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->liveMode) 
     {
         int copySize = 0;
-        if (getResource()->getStatus() == QnResource::Online) {
+        if (status == QnResource::Online) {
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, 0);
         }
 
