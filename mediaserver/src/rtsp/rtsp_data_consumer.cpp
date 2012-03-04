@@ -190,6 +190,88 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     }
 
     // overflow control
+    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
+    {
+        m_dataQueue.lock();
+        int lowIndex = -1;
+        int hiIndex = -1;
+        QnAbstractMediaDataPtr dataLow;
+        QnAbstractMediaDataPtr dataHi;
+        for (int i = m_dataQueue.size()-1; i >=0; --i)
+        {
+            QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
+            if (media->flags & AV_PKT_FLAG_KEY)
+            {
+                if (media->flags & QnAbstractMediaData::MediaFlags_LowQuality)
+                {
+                    if (lowIndex == -1)
+                    {
+                        lowIndex = i;
+                        dataLow = media;
+                    }
+                }
+                else {
+                    if (hiIndex == -1)
+                    {
+                        hiIndex = i;
+                        dataHi = media;
+                    }
+                }
+            }
+        }
+
+        // some data need to remove
+        int i = 0;
+        while (dataHi || dataLow)
+        {
+            QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
+            bool deleted = false;
+            bool isLow = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+            if (isLow && dataLow)
+            {
+                if (media == dataLow) {
+                    // all data before dataLow removed
+                    dataLow.clear(); 
+                }
+                else {
+                    m_dataQueue.removeAt(i);
+                    deleted = true;
+                }
+            }
+            if (!isLow && dataHi)
+            {
+                if (media == dataHi) {
+                    // all data before dataHi removed
+                    dataHi.clear(); 
+                }
+                else {
+                    m_dataQueue.removeAt(i);
+                    deleted = true;
+                }
+            }
+            if (!deleted)
+                ++i;
+        }
+        /*
+        int removeFirst = qMin(lowIndex, hiIndex);
+        QnAbstractDataPacketPtr tmp;
+        for (int i = 0; i < removeFirst; ++i)
+            m_dataQueue.pop(tmp);
+        int removeNext = qAbs(lowIndex - hiIndex);
+        bool removeLow = lowIndex > hiIndex;
+        for (int i = 0; i < removeNext; ++i)
+        */
+
+        m_dataQueue.unlock();
+    }
+    while(m_dataQueue.size() > 100)
+    {
+        QnAbstractDataPacketPtr tmp;
+        m_dataQueue.pop(tmp);
+    }
+
+    /*
+    // overflow control
     if ((media->flags & AV_PKT_FLAG_KEY) || m_dataQueue.size() > 100)  
     {
         bool isMainStream = true;
@@ -206,6 +288,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             m_dataQueue.removeFrontByCondition(removeItemsCondition);
         }
     }
+    */
 }
 
 bool QnRtspDataConsumer::canAcceptData() const
