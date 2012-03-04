@@ -1091,7 +1091,13 @@ void NavigationItem::onSyncButtonToggled(bool value)
 
 void NavigationItem::onExportRange(qint64 startTimeMs,qint64 endTimeMs)
 {
-    emit exportRange(videoCamera(), startTimeMs, endTimeMs);
+    if (forcedVideoCamera() == 0)
+    {
+        QMessageBox::information(0, tr("No camera selected"), tr("You should select camera to export"));
+    }
+    else {
+        emit exportRange(forcedVideoCamera(), startTimeMs, endTimeMs);
+    }
 }
 
 
