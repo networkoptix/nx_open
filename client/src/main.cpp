@@ -40,6 +40,7 @@
 #include "ui/actions/action_manager.h"
 #include "ui/tooltips/tool_tip.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
+#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -372,6 +373,9 @@ int main(int argc, char *argv[])
     QnPlIqResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 
+    QnPlIpWebCamResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    
 
 #endif
 
@@ -488,3 +492,7 @@ int main(int argc, char *argv[])
 }
 #endif // API_TEST_MAIN
 #endif
+
+
+//============================================
+
