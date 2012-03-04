@@ -62,12 +62,26 @@ protected:
         if(workbench() == NULL)
             return;
 
+        QnResourcePtr currentLayoutResource = workbench()->currentLayout()->resource();
+        if(!currentLayoutResource)
+            return;
+
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if(resource.isNull())
             return;
+        QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
+        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
 
-        if(!workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty())
-            option->font.setBold(true);
+        bool bold = false;
+        if(resource == currentLayoutResource) {
+            bold = true; /* Bold current layout. */
+        } else if(parentResource == currentLayoutResource) {
+            bold = true; /* Bold items of the current layout. */
+        } else if(uuid.isNull() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
+            bold = true; /* Bold items of the current layout in servers. */
+        }
+
+        option->font.setBold(bold);
     }
 
 private:
