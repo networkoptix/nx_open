@@ -86,7 +86,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_motionMaskBinDataValid(false),
     m_noDataStaticText("No data"),
     m_offlineStaticText("Offline"),
-    m_unauthorizedStaticText("Unauthorized")
+    m_unauthorizedStaticText("Unauthorized"),
+    m_unauthorizedStaticText2("Please check authentication information in the camera settings")
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -140,6 +141,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     
     /* Set up overlay icons. */
     m_channelState.resize(m_channelCount);
@@ -583,22 +585,20 @@ void QnResourceWidget::at_display_resourceUpdated() {
 // Painting
 // -------------------------------------------------------------------------- //
 
-void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText& text) 
+void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText& text, int textSize, int xOffs, int yOffs)
 {
-    qint64 ticks = qnSyncTime->currentMSecsSinceEpoch() / TEXT_FLASHING_PERIOD;
-
     QFont font;
-    font.setPointSizeF(550);
+    font.setPointSizeF(textSize);
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
     QnScopedPainterFontRollback fontRollback(painter, font);
     
     QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208)));
     qreal prevOpacity = painter->opacity();
-    qreal opacityF = sin(qnSyncTime->currentMSecsSinceEpoch()/qreal(TEXT_FLASHING_PERIOD) * M_PI)*0.8 + 0.2;
+    qreal opacityF = qAbs(sin(qnSyncTime->currentMSecsSinceEpoch()/qreal(TEXT_FLASHING_PERIOD*2) * M_PI)*1.0 + 0.0);
     painter->setOpacity(opacityF);
     painter->setRenderHint(QPainter::TextAntialiasing);
     painter->setRenderHint(QPainter::Antialiasing);
-    painter->drawStaticText(4, 16, text);
+    painter->drawStaticText(xOffs, yOffs, text);
     painter->setOpacity(prevOpacity);
 }
 
@@ -689,8 +689,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             drawFlashingText(painter, m_noDataStaticText);
         else if (m_channelState[i].icon == OFFLINE) 
             drawFlashingText(painter, m_offlineStaticText);
-        else if (m_channelState[i].icon == UNAUTHORIZED) 
+        else if (m_channelState[i].icon == UNAUTHORIZED) {
             drawFlashingText(painter, m_unauthorizedStaticText);
+            drawFlashingText(painter, m_unauthorizedStaticText2, 250, 16, 800);
+        }
     }
 
     /* Draw motion grid. */
