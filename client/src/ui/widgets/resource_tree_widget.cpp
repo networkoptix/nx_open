@@ -190,6 +190,8 @@ void QnResourceTreeWidget::setContext(QnWorkbenchContext *context) {
         connect(m_context,          SIGNAL(aboutToBeDestroyed()),                       this, SLOT(at_context_aboutToBeDestroyed()));
         connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
         connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
+        connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
+        connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     }
 }
 
@@ -410,6 +412,19 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
 
     QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
     ui->filterLineEdit->setText(layoutSearchString(layout));
+
+    /* Bold state has changed. */
+    currentItemView()->update();
+}
+
+void QnResourceTreeWidget::at_workbench_itemAdded(QnWorkbenchItem *) {
+    /* Bold state has changed. */
+    currentItemView()->update();
+}
+
+void QnResourceTreeWidget::at_workbench_itemRemoved(QnWorkbenchItem *) {
+    /* Bold state has changed. */
+    currentItemView()->update();
 }
 
 void QnResourceTreeWidget::at_context_aboutToBeDestroyed() {
