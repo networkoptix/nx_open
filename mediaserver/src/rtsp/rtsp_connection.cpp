@@ -199,6 +199,8 @@ void QnRtspConnectionProcessor::generateSessionId()
 void QnRtspConnectionProcessor::sendCurrentRangeIfUpdated()
 {
     Q_D(QnRtspConnectionProcessor);
+    QMutexLocker lock(&d->mutex);
+
     if (!d->archiveDP)
         return;
 
