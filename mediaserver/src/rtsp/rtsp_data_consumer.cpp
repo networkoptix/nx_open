@@ -326,11 +326,14 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             return true; // data for other live quality stream
     }
 
+    quint8 cseq = media->opaque;
+    quint16 flags = media->flags;
+
     if (m_owner->isLiveDP(media->dataProvider)) {
-        media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+        flags |= QnAbstractMediaData::MediaFlags_LIVE;
         if (!m_gotLivePacket)
-            media->flags |= QnAbstractMediaData::MediaFlags_BOF;
-        media->opaque = m_liveMarker;
+            flags |= QnAbstractMediaData::MediaFlags_BOF;
+        cseq = m_liveMarker;
         m_gotLivePacket = true;
     }
 
@@ -340,11 +343,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     //QMutexLocker lock(&m_mutex);
     m_mutex.lock();
-    if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
+    if (flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         m_ctxSended.clear();
 
-    //if (m_waitBOF && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
-    if (m_waitSCeq && media->opaque != m_waitSCeq)
+    //if (m_waitBOF && !(flags & QnAbstractMediaData::MediaFlags_BOF))
+    if (m_waitSCeq && cseq != m_waitSCeq)
     {
         m_mutex.unlock();
         return true; // ignore data
@@ -416,9 +419,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             m_owner->bufferData((const char*) &packetType, 1);
             quint32 timestampHigh = htonl(media->timestamp >> 32);
             m_owner->bufferData((const char*) &timestampHigh, 4);
-            quint8 cseq = media->opaque;
             m_owner->bufferData((const char*) &cseq, 1);
-            quint16 flags = htons(media->flags);
+            flags = htons(flags);
             m_owner->bufferData((const char*) &flags, 2);
             if (video) 
             {
