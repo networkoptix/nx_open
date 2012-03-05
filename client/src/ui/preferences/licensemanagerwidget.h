@@ -19,7 +19,9 @@ public:
 
 private slots:
     void licensesChanged();
+    void licenseDetailsButtonClicked();
     void licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
+    void gridSelectionChanged();
 
 private:
     void updateControls();

@@ -171,16 +171,6 @@ p, li { white-space: pre-wrap; }
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="licenseDetailsButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>License Details</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -194,7 +184,20 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="activateFreeLicenseButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Activate Free License</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="activateLicenseButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Activate License</string>
        </property>
@@ -218,5 +221,25 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>serialKeyEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>LicenseWidget</receiver>
+   <slot>serialKeyChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>315</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>214</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>serialKeyChanged(QString)</slot>
+ </slots>
 </ui>

@@ -4,6 +4,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUuid>
 
+#include <numeric>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
@@ -18,6 +19,8 @@ QT_STATIC_CONST char networkOptixRSAPublicKey[] =
         "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n"
         "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
+
+const QByteArray QnLicense::FREE_LICENSE_KEY = "0000-0000-0000-0001";
 
 static inline QByteArray genMachineHardwareId()
 {
@@ -236,11 +239,13 @@ void QnLicensePool::addLicense(const QnLicensePtr& license)
     m_licenses.append(license);
 }
 
-void QnLicensePool::clear()
+void QnLicensePool::reset()
 {
     QMutexLocker locker(&m_mutex);
 
-    m_licenses.clear();
+    m_licenses = QnLicenseList();
+
+    emit licensesChanged();
 }
 
 bool QnLicensePool::isEmpty() const
@@ -250,7 +255,7 @@ bool QnLicensePool::isEmpty() const
     return m_licenses.isEmpty();
 }
 
-const QList<QnLicensePtr> QnLicenseList::licenses() const
+QList<QnLicensePtr> QnLicenseList::licenses() const
 {
     return m_licenses.values();
 }
@@ -290,5 +295,19 @@ bool QnLicenseList::isEmpty() const
 void QnLicenseList::clear()
 {
     m_licenses.clear();
+}
+
+int QnLicenseList::totalCameras() const
+{
+    int n = 0;
+    foreach (QnLicensePtr license, m_licenses.values())
+        n += license->cameraCount();
+
+    return n;
+}
+
+bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
+{
+    return m_licenses.contains(key);
 }
 

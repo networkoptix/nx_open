@@ -31,11 +31,13 @@ private slots:
     void setOnlineActivation(bool online);
 
     void browseLicenseFileButtonClicked();
-    void licenseDetailsButtonClicked();
     void activateLicenseButtonClicked();
+    void activateFreeLicenseButtonClicked();
 
     void downloadError();
     void downloadFinished();
+
+    void serialKeyChanged(QString newText);
 
 private:
     void updateFromServer(const QString &licenseKey, const QString &hardwareId);
@@ -51,7 +53,8 @@ private:
     QObject* m_manager;
     QNetworkAccessManager *m_httpClient;
     QnAppServerConnectionPtr m_connection;
-    QnLicenseList m_licenses;
+
+    friend class LicenseManagerWidget;
 };
 
 #endif // LICENSEWIDGET_H

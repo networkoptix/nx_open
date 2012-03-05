@@ -26,6 +26,9 @@ public:
     QByteArray toString() const;
     static QnLicense fromString(const QByteArray &licenseString);
 
+public:
+    static const QByteArray FREE_LICENSE_KEY;
+
 private:
     QByteArray m_name;
     QByteArray m_key;
@@ -44,11 +47,14 @@ public:
     void setHardwareId(const QByteArray& hardwareId);
     QByteArray hardwareId() const;
 
-    const QList<QnLicensePtr> licenses() const;
+    QList<QnLicensePtr> licenses() const;
     void append(QnLicensePtr license);
     void append(QnLicenseList license);
     bool isEmpty() const;
     void clear();
+
+    int totalCameras() const;
+    bool haveLicenseKey(const QByteArray& key) const;
 
 private:
     QMap<QByteArray, QnLicensePtr> m_licenses;
@@ -71,7 +77,7 @@ public:
     void replaceLicenses(const QnLicenseList& licenses);
     void addLicense(const QnLicensePtr&);
 
-    void clear();
+    void reset();
     bool isEmpty() const;
 
 signals:

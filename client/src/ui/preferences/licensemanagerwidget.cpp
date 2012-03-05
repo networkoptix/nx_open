@@ -17,17 +17,40 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->detailsButton->setEnabled(false);
+    ui->gridLicenses->setSelectionBehavior(QAbstractItemView::SelectRows);
+
     m_licenses = qnLicensePool->getLicenses();
+
     ui->licenseWidget->setManager(this);
     ui->licenseWidget->setHardwareId(m_licenses.hardwareId());
 
     updateControls();
 
+    connect(ui->detailsButton, SIGNAL(clicked()), this, SLOT(licenseDetailsButtonClicked()));
     connect(qnLicensePool, SIGNAL(licensesChanged()), this, SLOT(licensesChanged()));
 }
 
 LicenseManagerWidget::~LicenseManagerWidget()
 {
+}
+
+void LicenseManagerWidget::licenseDetailsButtonClicked()
+{
+    const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->selectionModel()->selectedRows().front().row());
+
+    QString details = tr("<b>Generic:</b><br />\n"
+                         "License Qwner: %1<br />\n"
+                         "Serial Key: %2<br />\n"
+                         "Locked to Hardware ID: %3<br />\n"
+                         "<br />\n"
+                         "<b>Features:</b><br />\n"
+                         "Archive Streams Allowed: %4")
+                      .arg(license->name().constData())
+                      .arg(license->key().constData())
+                      .arg(license->hardwareId().constData())
+                      .arg(license->cameraCount());
+    QMessageBox::information(this, tr("License Details"), details);
 }
 
 void LicenseManagerWidget::licensesChanged()
@@ -38,25 +61,34 @@ void LicenseManagerWidget::licensesChanged()
 
 void LicenseManagerWidget::licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle)
 {
-    if (status != 0)
+    if (status != 0 || licenses.isEmpty())
     {
-        QMessageBox::information(this, tr("License Activation"),
-                                 tr("There was a problem activating your license."));
-
+        QMessageBox::information(this, tr("License Activation"), tr("There was a problem activating your license."));
         return;
     }
 
-    m_licenses.append(licenses);
-    qnLicensePool->addLicenses(licenses);
+    QnLicensePtr license = licenses.licenses().front();
+    QString message = m_licenses.haveLicenseKey(license->key()) ? tr("This license is already activated.") : tr("License was succesfully activated.");
+
+    m_licenses.append(license);
+    qnLicensePool->addLicense(license);
 
     updateControls();
 
-    QMessageBox::information(this, tr("License Activation"),
-                             tr("License was succesfully activated."));
+    QMessageBox::information(this, tr("License Activation"), message);
+    ui->licenseWidget->ui->serialKeyEdit->clear();
 }
 
 void LicenseManagerWidget::updateControls()
 {
+    if (m_licenses.hardwareId().isEmpty())
+    {
+        setEnabled(false);
+        return;
+    } else {
+        setEnabled(true);
+    }
+
     for (int i = 0; i < ui->gridLicenses->rowCount(); i++) {
         ui->gridLicenses->removeRow(i);
     }
@@ -73,11 +105,22 @@ void LicenseManagerWidget::updateControls()
         QPalette palette = ui->infoLabel->palette();
         palette.setColor(QPalette::Foreground, parentWidget() ? parentWidget()->palette().color(QPalette::Foreground) : Qt::black);
         ui->infoLabel->setPalette(palette);
-        ui->infoLabel->setText(tr("You have a valid License installed"));
+        ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras total.")).arg(m_licenses.totalCameras()));
     } else {
         QPalette palette = ui->infoLabel->palette();
         palette.setColor(QPalette::Foreground, Qt::red);
         ui->infoLabel->setPalette(palette);
-        ui->infoLabel->setText(tr("You do not have a valid License installed"));
+        if (m_licenses.hardwareId().isEmpty())
+            ui->infoLabel->setText(tr("Obtaining licenses from application server..."));
+        else
+            ui->infoLabel->setText(tr("You do not have a valid License installed. Please activate your commercial or free license."));
     }
+
+    ui->licenseWidget->ui->activateFreeLicenseButton->setVisible(!m_licenses.haveLicenseKey(QnLicense::FREE_LICENSE_KEY));
+    ui->licenseWidget->updateControls();
+}
+
+void LicenseManagerWidget::gridSelectionChanged()
+{
+    ui->detailsButton->setEnabled(!ui->gridLicenses->selectionModel()->selectedRows().isEmpty());
 }
