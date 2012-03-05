@@ -2,6 +2,11 @@
 #include "../dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 
+QnVirtualCameraResource::QnVirtualCameraResource()
+    : m_blocked(false)
+{
+}
+
 int QnPhysicalCameraResource::getPrimaryStreamDesiredFps() const
 {
 #ifdef _DEBUG
