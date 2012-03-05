@@ -64,15 +64,21 @@ bool QnEvent::load(const QVariant& parsed)
     eventType = dict["type"].toString();
 
     if (eventType != QN_EVENT_RES_CHANGE && eventType != QN_EVENT_RES_DELETE
-            && eventType != QN_EVENT_RES_SETPARAM && eventType != QN_EVENT_RES_STATUS_CHANGE)
+            && eventType != QN_EVENT_RES_SETPARAM && eventType != QN_EVENT_RES_STATUS_CHANGE && eventType != QN_EVENT_LICENSE_CHANGE)
     {
         return false;
+    }
+
+    if (eventType == QN_EVENT_LICENSE_CHANGE)
+    {
+        objectId = dict["id"].toString();
+        return true;
     }
 
     if (!dict.contains("resourceId"))
         return false;
 
-    resourceId = dict["resourceId"].toString();
+    objectId = dict["resourceId"].toString();
     objectName = dict["objectName"].toString();
 
     if (dict.contains("resourceGuid"))
