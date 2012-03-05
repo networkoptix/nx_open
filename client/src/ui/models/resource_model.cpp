@@ -9,10 +9,10 @@
 #include <core/resource/media_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <ui/actions/action_manager.h>
-#include <ui/view_drag_and_drop.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include "file_processor.h"
 
@@ -560,7 +560,7 @@ QVariant QnResourceModel::headerData(int section, Qt::Orientation orientation, i
 QStringList QnResourceModel::mimeTypes() const {
     QStringList mimeTypes = QAbstractItemModel::mimeTypes();
     mimeTypes.append(QLatin1String("text/uri-list"));
-    mimeTypes.append(resourcesMime());
+    mimeTypes.append(QnWorkbenchResource::resourcesMime());
 
     return mimeTypes;
 }
@@ -569,7 +569,7 @@ QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const {
     QMimeData *mimeData = QAbstractItemModel::mimeData(indexes);
     if (mimeData) {
         const QStringList types = mimeTypes();
-        const QString resourceFormat = resourcesMime();
+        const QString resourceFormat = QnWorkbenchResource::resourcesMime();
         const QString urlFormat = QLatin1String("text/uri-list");
         if (types.contains(resourceFormat) || types.contains(urlFormat)) {
             QnResourceList resources;
@@ -578,7 +578,7 @@ QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const {
                     resources.append(resource);
             }
             if (types.contains(resourceFormat))
-                mimeData->setData(resourceFormat, serializeResources(resources));
+                mimeData->setData(resourceFormat, QnWorkbenchResource::serializeResources(resources));
             if (types.contains(urlFormat)) {
                 QList<QUrl> urls;
                 foreach (const QnResourcePtr &resource, resources) {
@@ -602,14 +602,14 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
         return false;
 
     /* Check if the format is supported. */
-    const QString format = resourcesMime();
+    const QString format = QnWorkbenchResource::resourcesMime();
     if (!mimeData->hasFormat(format) && !mimeData->hasUrls())
         return QAbstractItemModel::dropMimeData(mimeData, action, row, column, parent);
 
     /* Decode. */
     QnResourceList resources;
     if (mimeData->hasFormat(format)) {
-        resources = deserializeResources(mimeData->data(format));
+        resources = QnWorkbenchResource::deserializeResources(mimeData->data(format));
     } else if (mimeData->hasUrls()) {
         resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
 

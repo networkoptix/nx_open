@@ -1,43 +1,42 @@
-#include "view_drag_and_drop.h"
+#include "workbench_resource.h"
 #include <QApplication>
 #include <core/resourcemanagment/resource_pool.h>
 #include "utils/common/synctime.h"
+#include "file_processor.h"
 
 namespace {
     enum {
-        RESOURCES_BINARY_V1_TAG = 0xE1E00001
+        RESOURCES_BINARY_V1_TAG = 0xE1E00001,
     };
 
-    // do not access to app server time for static variables!
-    // If access occured before appServer conection is initialized in main, connection is not work at all
-    quint64 localMagic = QDateTime::currentMSecsSinceEpoch();
+    Q_GLOBAL_STATIC_WITH_ARGS(quint64, qn_localMagic, (QDateTime::currentMSecsSinceEpoch()));
 
 } // anonymous namespace
 
-QString resourcesMime() {
+QString QnWorkbenchResource::resourcesMime() {
     return QLatin1String("application/x-noptix-resources");
 }
 
-QByteArray serializeResources(const QnResourceList &resources) {
+QByteArray QnWorkbenchResource::serializeResources(const QnResourceList &resources) {
     QByteArray result;
     QDataStream stream(&result, QIODevice::WriteOnly);
 
     /* Magic signature. */
     stream << static_cast<quint32>(RESOURCES_BINARY_V1_TAG);
-    
+
     /* For local D&D. */
     stream << static_cast<quint64>(QApplication::applicationPid());
-    stream << static_cast<quint64>(localMagic);
+    stream << static_cast<quint64>(*qn_localMagic());
 
     /* Data. */
     stream << static_cast<quint32>(resources.size());
     foreach(const QnResourcePtr &resource, resources)
-        stream << resource->getId().toString();
+        stream << resource->getId().toString() << resource->getUniqueId();
 
     return result;
 }
 
-QnResourceList deserializeResources(const QByteArray &data) {
+QnResourceList QnWorkbenchResource::deserializeResources(const QByteArray &data) {
     QByteArray tmp = data;
     QDataStream stream(&tmp, QIODevice::ReadOnly);
     QnResourceList result;
@@ -47,25 +46,43 @@ QnResourceList deserializeResources(const QByteArray &data) {
     if(tag != RESOURCES_BINARY_V1_TAG)
         return result;
 
+    bool fromOtherApp = false;
+
     quint64 pid;
     stream >> pid;
     if(pid != QApplication::applicationPid())
-        return result; // TODO: originated from another application.
+        fromOtherApp = true;
 
     quint64 magic;
     stream >> magic;
-    if(magic != localMagic)
-        return result; // TODO: originated from another application.
+    if(magic != *qn_localMagic())
+        fromOtherApp = true;
 
     quint32 size;
     stream >> size;
     for(int i = 0; i < size; i++) {
-        QString id;
-        stream >> id;
+        QString id, uniqueId;
+        stream >> id >> uniqueId;
 
         QnResourcePtr resource = qnResPool->getResourceById(id);
-        if(!resource.isNull())
+        if(resource && resource->getUniqueId() == uniqueId) {
             result.push_back(resource);
+            continue;
+        }
+
+        if(fromOtherApp) {
+            resource = qnResPool->getResourceByUniqId(uniqueId);
+            if(resource) {
+                result.push_back(resource);
+                continue;
+            }
+
+            resource = QnFileProcessor::createResourcesForFile(uniqueId);
+            if(resource) {
+                result.push_back(resource);
+                continue;
+            }
+        }
 
         if(stream.status() != QDataStream::Ok)
             break;
@@ -73,3 +90,4 @@ QnResourceList deserializeResources(const QByteArray &data) {
 
     return result;
 }
+
