@@ -12,7 +12,7 @@ static const QColor SELECTED_LABEL_COLOR(64,128, 192);
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     : QWidget(parent)
 {
-    m_defaultParams[FirstParam] = 1;
+    m_defaultParams[FirstParam] = 10;
     m_defaultParams[SecondParam] = QLatin1String("Lo");
     m_defaultParams[ColorParam] = QColor(COLOR_LIGHT,0, 0).rgba();
 
