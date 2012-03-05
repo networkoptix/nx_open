@@ -128,6 +128,10 @@ public:
         return m_resource;
     }
 
+    QnResource::Flags resourceFlags() const {
+        return m_flags;
+    }
+
     const QUuid &uuid() const {
         return m_uuid;
     }
@@ -619,6 +623,12 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
 
     /* Check where we're dropping it. */
     Node *node = this->node(parent);
+    
+    if(node->type() == Node::Item)
+        node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
+
+    if(node->parent() && (node->parent()->resourceFlags() & QnResource::server))
+        node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         foreach(const QnResourcePtr &resource, resources) {

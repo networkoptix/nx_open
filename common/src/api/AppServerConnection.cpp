@@ -50,7 +50,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnResourceList resources;
         qCopy(cameras.begin(), cameras.end(), std::back_inserter(resources));
         emit finished(status, errorString, resources, handle);
-    } else if (m_objectName == "user" || m_objectName == "userProfile") // TODO: Ivan, re-check this.
+    } else if (m_objectName == "user")
     {
         QnUserResourceList users;
 
