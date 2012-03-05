@@ -24,6 +24,7 @@ class MoveInstrument;
 class RubberBandInstrument;
 class ResizingInstrument;
 class DropInstrument;
+class DragInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
 class ForwardingInstrument;
@@ -179,8 +180,11 @@ private:
     /** Resizing instrument. */
     ResizingInstrument *m_resizingInstrument;
 
-    /** Archive drop instrument. */
+    /** Drop instrument. */
     DropInstrument *m_dropInstrument;
+
+    /** Drag instrument. */
+    DragInstrument *m_dragInstrument;
 
     /** Motion selection instrument. */
     MotionSelectionInstrument *m_motionSelectionInstrument;
