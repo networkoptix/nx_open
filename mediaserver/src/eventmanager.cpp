@@ -51,6 +51,18 @@ void QnEventManager::eventReceived(QnEvent event)
 
         if (appServerConnection->getLicenses(licenses, errorString) == 0)
         {
+            foreach (QnLicensePtr license, licenses.licenses())
+            {
+                // Someone wants to steal our software
+                if (!license->isValid())
+                {
+                    QnLicenseList dummy;
+                    dummy.setHardwareId("invalid");
+                    qnLicensePool->replaceLicenses(dummy);
+                    break;
+                }
+            }
+
             qnLicensePool->replaceLicenses(licenses);
         }
 

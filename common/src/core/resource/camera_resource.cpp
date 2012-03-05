@@ -86,4 +86,18 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {
     QnNetworkResource::updateInner(other);
     QnSecurityCamResource::updateInner(other);
+
+    QnVirtualCameraResourcePtr camera = other.dynamicCast<QnVirtualCameraResource>();
+    if (camera)
+        m_blocked = camera->isBlocked();
+}
+
+void QnVirtualCameraResource::setBlocked(bool blocked)
+{
+    m_blocked = blocked;
+}
+
+bool QnVirtualCameraResource::isBlocked() const
+{
+    return m_blocked;
 }

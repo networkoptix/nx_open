@@ -12,6 +12,12 @@ public:
     QnVirtualCameraResource() {}
 
     virtual void updateInner(QnResourcePtr other) override;
+
+    void setBlocked(bool blocked);
+    bool isBlocked() const;
+
+private:
+    bool m_blocked;
 };
 
 

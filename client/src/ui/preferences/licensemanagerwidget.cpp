@@ -11,6 +11,8 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include "core/resourcemanagment/resource_pool.h"
+
 LicenseManagerWidget::LicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::LicenseManagerWidget)
@@ -103,9 +105,14 @@ void LicenseManagerWidget::updateControls()
 
     if (!m_licenses.isEmpty()) {
         QPalette palette = ui->infoLabel->palette();
-        palette.setColor(QPalette::Foreground, parentWidget() ? parentWidget()->palette().color(QPalette::Foreground) : Qt::black);
+        int totalCameras = m_licenses.totalCameras();
+        int usingCameras = qnResPool->activeCameras();
+        if (usingCameras > totalCameras)
+            palette.setColor(QPalette::Foreground, Qt::red);
+        else
+            palette.setColor(QPalette::Foreground, parentWidget() ? parentWidget()->palette().color(QPalette::Foreground) : Qt::black);
         ui->infoLabel->setPalette(palette);
-        ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras total.")).arg(m_licenses.totalCameras()));
+        ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras. Currently using %2.")).arg(totalCameras).arg(usingCameras));
     } else {
         QPalette palette = ui->infoLabel->palette();
         palette.setColor(QPalette::Foreground, Qt::red);

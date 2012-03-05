@@ -502,6 +502,21 @@ bool initLicenses(QnAppServerConnectionPtr appServerConnection)
         return false;
     }
 
+    foreach (QnLicensePtr license, licenses.licenses())
+    {
+        // If some license is invalid set hardwareId to some invalid value and clear licenses
+        if (!license->isValid())
+        {
+            // Returning true to stop asking for licenses
+
+            QnLicenseList dummy;
+            dummy.setHardwareId("invalid");
+            qnLicensePool->replaceLicenses(dummy);
+
+            return true;
+        }
+    }
+
     qnLicensePool->replaceLicenses(licenses);
 
     return true;
