@@ -19,29 +19,23 @@ CameraSettingsDialog::CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QW
     QDialog(parent),
     ui(new Ui::CameraSettingsDialog),
     m_camera(camera),
-    m_connection (QnAppServerConnectionFactory::createConnection())
+    m_connection (QnAppServerConnectionFactory::createConnection()),
+    m_motionWidget(NULL)
 {
     ui->setupUi(this);
-    ui->motionWidget->setCamera(m_camera);
     
-    // Do not block editing by default it schedule task list is empty
+    // Do not block editing by default if schedule task list is empty
     ui->cameraScheduleWidget->setDoNotChange(false);
+
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged()));
+    
+    at_tabWidget_currentChanged();
 
     updateView();
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()
 {
-}
-
-void CameraSettingsDialog::requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle)
-{
-    if (status == 0) {
-        QDialog::accept();
-    } else {
-        QMessageBox::warning(this, "Can't save camera", "Can't save camera. Please try again later.");
-        ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
-    }
 }
 
 void CameraSettingsDialog::accept()
@@ -72,7 +66,8 @@ void CameraSettingsDialog::saveToModel()
         m_camera->setScheduleTasks(scheduleTasks);
     }
 
-	m_camera->setMotionMaskList(ui->motionWidget->motionMaskList(), QnDomainMemory);
+    if(m_motionWidget)
+	    m_camera->setMotionMaskList(m_motionWidget->motionMaskList(), QnDomainMemory);
 }
 
 void CameraSettingsDialog::updateView()
@@ -93,6 +88,31 @@ void CameraSettingsDialog::updateView()
 
 void CameraSettingsDialog::save()
 {
-    m_connection->saveAsync(m_camera, this, SLOT(requestFinished(int,QByteArray,QnResourceList,int)));
+    m_connection->saveAsync(m_camera, this, SLOT(at_requestFinished(int,QByteArray,QnResourceList,int)));
 }
 
+void CameraSettingsDialog::at_requestFinished(int status, const QByteArray &/*errorString*/, QnResourceList resources, int /*handle*/)
+{
+    if (status == 0) {
+        QDialog::accept();
+    } else {
+        QMessageBox::warning(this, "Can't save camera", "Can't save camera. Please try again later.");
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
+    }
+}
+
+void CameraSettingsDialog::at_tabWidget_currentChanged() 
+{
+    if(m_motionWidget != NULL)
+        return;
+
+    QWidget *motionWidget = ui->tabWidget->currentWidget()->findChild<QWidget *>(QLatin1String("motionWidget"));
+    if(motionWidget == NULL)
+        return;
+
+    m_motionWidget = new QnCameraMotionMaskWidget(m_camera, this);
+
+    QVBoxLayout *layout = new QVBoxLayout(motionWidget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_motionWidget);
+}

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabNetwork">
       <attribute name="title">
@@ -81,7 +81,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="CameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
+        <widget class="QnCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -98,7 +98,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CameraScheduleWidget</class>
+   <class>QnCameraScheduleWidget</class>
    <extends>QWidget</extends>
    <header>ui/device_settings/camera_schedule_widget.h</header>
    <container>1</container>

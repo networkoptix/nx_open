@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -165,7 +165,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="CameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
+        <widget class="QnCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -175,7 +175,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
-        <widget class="QnCameraMotionMaskWidget" name="motionWidget" native="true"/>
+        <widget class="QWidget" name="motionWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -192,15 +192,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CameraScheduleWidget</class>
+   <class>QnCameraScheduleWidget</class>
    <extends>QWidget</extends>
    <header>ui/device_settings/camera_schedule_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnCameraMotionMaskWidget</class>
-   <extends>QWidget</extends>
-   <header>ui/device_settings/camera_motionmask_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

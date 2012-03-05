@@ -9,7 +9,7 @@ namespace Ui {
     class MultipleCameraSettingsDialog;
 }
 
-class CameraScheduleWidget;
+class QnCameraScheduleWidget;
 
 class MultipleCameraSettingsDialog : public QDialog
 {

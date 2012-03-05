@@ -9,7 +9,8 @@ namespace Ui {
     class CameraSettingsDialog;
 }
 
-class CameraScheduleWidget;
+class QnCameraScheduleWidget;
+class QnCameraMotionMaskWidget;
 
 class CameraSettingsDialog : public QDialog
 {
@@ -23,7 +24,8 @@ public slots:
     virtual void accept() override;
     virtual void reject() override;
 
-    void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
+    void at_requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
+    void at_tabWidget_currentChanged();
 
 private:
     void updateView();
@@ -37,6 +39,8 @@ private:
     QScopedPointer<Ui::CameraSettingsDialog> ui;
 
     QnAppServerConnectionPtr m_connection;
+
+    QnCameraMotionMaskWidget *m_motionWidget;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

@@ -1,7 +1,7 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule.h"
 
-CameraScheduleWidget::CameraScheduleWidget(QWidget *parent)
+QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent)
     : QWidget(parent), ui(new Ui::CameraSchedule)
 {
     ui->setupUi(this);
@@ -30,18 +30,18 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget *parent)
     doNotChangeStateChanged(2);
 }
 
-void CameraScheduleWidget::setDoNotChange(bool val)
+void QnCameraScheduleWidget::setDoNotChange(bool val)
 {
     ui->chkBoxDontChange->setChecked(val);
     doNotChangeStateChanged(val ? 2 : 0);
 }
 
-bool CameraScheduleWidget::isDoNotChange() const
+bool QnCameraScheduleWidget::isDoNotChange() const
 {
     return ui->chkBoxDontChange->isChecked();
 }
 
-QList<QnScheduleTask::Data> CameraScheduleWidget::scheduleTasks() const
+QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
 {
     QList<QnScheduleTask::Data> tasks;
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
@@ -107,7 +107,7 @@ QList<QnScheduleTask::Data> CameraScheduleWidget::scheduleTasks() const
     return tasks;
 }
 
-void CameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> &tasksFrom)
+void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> &tasksFrom)
 {
     if (!tasksFrom.isEmpty())
         doNotChangeStateChanged(0);
@@ -138,7 +138,7 @@ void CameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> &t
         case QnScheduleTask::RecordingType_MotionOnly: color = ui->btnRecordMotion->color(); break;
         case QnScheduleTask::RecordingType_Never: color = ui->btnNoRecord->color(); break;
         default:
-            qWarning("CameraScheduleWidget::setScheduleTasks(): Unhandled RecordingType value %d", task.m_recordType);
+            qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled RecordingType value %d", task.m_recordType);
             break;
         }
 
@@ -149,7 +149,7 @@ void CameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> &t
         case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
         case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
         default:
-            qWarning("CameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d", task.m_streamQuality);
+            qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d", task.m_streamQuality);
             break;
         }
 
@@ -191,7 +191,7 @@ static inline QString getLongText(const QString &text)
     return QLatin1String("-");
 }
 
-int CameraScheduleWidget::qualityTextToIndex(const QString &text)
+int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
 {
     for (int i = 0; i < ui->comboBoxQuality->count(); ++i)
     {
@@ -201,7 +201,7 @@ int CameraScheduleWidget::qualityTextToIndex(const QString &text)
     return 0;
 }
 
-void CameraScheduleWidget::updateGridParams()
+void QnCameraScheduleWidget::updateGridParams()
 {
     if (m_disableUpdateGridParams)
         return;
@@ -227,7 +227,7 @@ void CameraScheduleWidget::updateGridParams()
     }
 }
 
-void CameraScheduleWidget::onNeedReadCellParams(const QPoint &cell)
+void QnCameraScheduleWidget::onNeedReadCellParams(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
     QColor color(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
@@ -249,12 +249,12 @@ void CameraScheduleWidget::onNeedReadCellParams(const QPoint &cell)
     updateGridParams();
 }
 
-void CameraScheduleWidget::onDisplayQualityChanged(int state)
+void QnCameraScheduleWidget::onDisplayQualityChanged(int state)
 {
     ui->gridWidget->setShowSecondParam(state);
 }
 
-void CameraScheduleWidget::doNotChangeStateChanged(int state)
+void QnCameraScheduleWidget::doNotChangeStateChanged(int state)
 {
     bool enabled = state == 0;
     ui->gridWidget->setEnabled(enabled);
@@ -267,12 +267,12 @@ void CameraScheduleWidget::doNotChangeStateChanged(int state)
     ui->spinBoxRecordAfter->setEnabled(enabled);
 }
 
-void CameraScheduleWidget::onDisplayFPSChanged(int state)
+void QnCameraScheduleWidget::onDisplayFPSChanged(int state)
 {
     ui->gridWidget->setShowFirstParam(state);
 }
 
-void CameraScheduleWidget::setMaxFps(int value)
+void QnCameraScheduleWidget::setMaxFps(int value)
 {
     ui->fpsSpinBox->setMaximum(value);
 }

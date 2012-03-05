@@ -9,13 +9,13 @@ namespace Ui {
     class CameraSchedule;
 }
 
-class CameraScheduleWidget : public QWidget
+class QnCameraScheduleWidget : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks USER true DESIGNABLE false)
 
 public:
-    CameraScheduleWidget(QWidget *parent = 0);
+    QnCameraScheduleWidget(QWidget *parent = 0);
 
     void setDoNotChange(bool);
     bool isDoNotChange() const;
@@ -36,7 +36,7 @@ private:
     int qualityTextToIndex(const QString &text);
 
 private:
-    Q_DISABLE_COPY(CameraScheduleWidget)
+    Q_DISABLE_COPY(QnCameraScheduleWidget)
 
     Ui::CameraSchedule *const ui;
     bool m_disableUpdateGridParams;
