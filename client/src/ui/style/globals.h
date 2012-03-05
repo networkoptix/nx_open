@@ -21,6 +21,10 @@ public:
         SELECTED_FRAME_COLOR,
         OPACITY_CHANGE_PERIOD,
 
+        /** Size of a single unit of workbench grid coordinates, in scene coordinates.
+         * This basically is the width of a single video item in scene coordinates. */
+        WORKBENCH_UNIT_SIZE,
+
         VARIABLE_COUNT
     };
 
@@ -50,6 +54,7 @@ public:
 	QN_DECLARE_GLOBAL_ACCESSOR(QColor,  frameColor,                     FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  selectedFrameColor,             SELECTED_FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(int,     opacityChangePeriod,            OPACITY_CHANGE_PERIOD);
+    QN_DECLARE_GLOBAL_ACCESSOR(qreal,   workbenchUnitSize,              WORKBENCH_UNIT_SIZE);
 #undef QN_DECLARE_GLOBAL_ACCESSOR
 
 private:

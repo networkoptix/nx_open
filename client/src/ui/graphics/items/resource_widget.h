@@ -288,6 +288,7 @@ protected:
     void updateShadowZ();
     void updateShadowPos();
     void updateShadowOpacity();
+    void updateShadowVisibility();
     void invalidateShadowShape();
 
     void ensureAboutToBeDestroyedEmitted();

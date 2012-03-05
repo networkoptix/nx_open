@@ -524,3 +524,4 @@ void QnWorkbenchLayout::initCellParameters() {
     m_cellAspectRatio = 4.0 / 3.0;
     m_cellSpacing = QSizeF(0.1, 0.1);
 }
+

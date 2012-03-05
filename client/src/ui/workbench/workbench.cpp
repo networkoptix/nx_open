@@ -2,6 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <ui/style/globals.h>
 #include "workbench_layout.h"
 #include "workbench_grid_mapper.h"
 #include "workbench_item.h"
@@ -136,19 +137,26 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         addLayout(layout);
 
     QRect oldBoundingRect, newBoundingRect;
+    qreal oldCellAspectRatio = 0.0, newCellAspectRatio = 0.0;
+    QSizeF oldCellSpacing, newCellSpacing;
+
 
     emit currentLayoutAboutToBeChanged();
     /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
     if(m_currentLayout != NULL) {
         oldBoundingRect = m_currentLayout->boundingRect();
+        oldCellAspectRatio = m_currentLayout->cellAspectRatio();
+        oldCellSpacing = m_currentLayout->cellSpacing();
 
         foreach(QnWorkbenchItem *item, m_currentLayout->items())
             at_layout_itemRemoved(item);
 
-        disconnect(m_currentLayout, SIGNAL(itemAdded(QnWorkbenchItem *)),             this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-        disconnect(m_currentLayout, SIGNAL(itemRemoved(QnWorkbenchItem *)),           this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-        disconnect(m_currentLayout, SIGNAL(boundingRectChanged()),                    this, SIGNAL(boundingRectChanged()));
+        disconnect(m_currentLayout, SIGNAL(itemAdded(QnWorkbenchItem *)),           this, NULL);
+        disconnect(m_currentLayout, SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, NULL);
+        disconnect(m_currentLayout, SIGNAL(boundingRectChanged()),                  this, NULL);
+        disconnect(m_currentLayout, SIGNAL(cellAspectRatioChanged()),               this, NULL);
+        disconnect(m_currentLayout, SIGNAL(cellSpacingChanged()),                   this, NULL);
     }
 
     /* Prepare new layout. */
@@ -165,17 +173,27 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     if(m_currentLayout != NULL) {
         emit currentLayoutChanged();
 
-        connect(m_currentLayout, SIGNAL(itemAdded(QnWorkbenchItem *)),             this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-        connect(m_currentLayout, SIGNAL(itemRemoved(QnWorkbenchItem *)),           this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-        connect(m_currentLayout, SIGNAL(boundingRectChanged()),                    this, SIGNAL(boundingRectChanged()));
-
-        foreach(QnWorkbenchItem *item, m_currentLayout->items())
-            at_layout_itemAdded(item);
+        connect(m_currentLayout,    SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+        connect(m_currentLayout,    SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
+        connect(m_currentLayout,    SIGNAL(boundingRectChanged()),                  this, SIGNAL(boundingRectChanged()));
+        connect(m_currentLayout,    SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
+        connect(m_currentLayout,    SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
 
         newBoundingRect = m_currentLayout->boundingRect();
+        newCellAspectRatio = m_currentLayout->cellAspectRatio();
+        newCellSpacing = m_currentLayout->cellSpacing();
+
+        if(!qFuzzyCompare(newCellAspectRatio, oldCellAspectRatio))
+            at_layout_cellAspectRatioChanged();
+
+        if(!qFuzzyCompare(newCellSpacing, oldCellSpacing))
+            at_layout_cellSpacingChanged();
 
         if (newBoundingRect != oldBoundingRect)
             emit boundingRectChanged();
+
+        foreach(QnWorkbenchItem *item, m_currentLayout->items())
+            at_layout_itemAdded(item);
     }
 }
 
@@ -224,4 +242,16 @@ void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
 
 void QnWorkbench::at_layout_aboutToBeDestroyed() {
     removeLayout(checked_cast<QnWorkbenchLayout *>(sender()));
+}
+
+void QnWorkbench::at_layout_cellAspectRatioChanged() {
+    qreal unit = qnGlobals->workbenchUnitSize();
+
+    m_mapper->setCellSize(unit, unit / m_currentLayout->cellAspectRatio());
+}
+
+void QnWorkbench::at_layout_cellSpacingChanged() {
+    qreal unit = qnGlobals->workbenchUnitSize();
+
+    m_mapper->setSpacing(m_currentLayout->cellSpacing() * unit);
 }

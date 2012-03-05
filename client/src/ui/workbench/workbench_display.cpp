@@ -674,8 +674,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         if(item == workbench()->item(static_cast<QnWorkbench::ItemRole>(i)))
             workbench()->setItem(static_cast<QnWorkbench::ItemRole>(i), NULL);
 
-    if(destroyWidget)
+    if(destroyWidget) {
+        widget->hide();
         qnDeleteLater(widget);
+    }
 
     if(destroyItem)
         qnDeleteLater(item);

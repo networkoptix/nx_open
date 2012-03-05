@@ -501,6 +501,11 @@ void QnResourceWidget::updateShadowOpacity() {
         m_shadow.data()->setOpacity(opacity());
 }
 
+void QnResourceWidget::updateShadowVisibility() {
+    if(!m_shadow.isNull())
+        m_shadow.data()->setVisible(isVisible());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -529,6 +534,9 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
         break;
     case ItemZValueHasChanged:
         updateShadowZ();
+        break;
+    case ItemVisibleHasChanged:
+        updateShadowVisibility();
         break;
     default:
         break;
