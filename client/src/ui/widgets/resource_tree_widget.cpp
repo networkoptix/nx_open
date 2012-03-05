@@ -321,8 +321,14 @@ void QnResourceTreeWidget::updateFilter(bool force) {
         return;
 
     if(!force) {
+        int pos = qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1;
+        
         /* Estimate size of the last term in filter expression. */
-        int size = filter.size() - (qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1);
+        int size = 0;
+        for(;pos < filter.size(); pos++)
+            if(!filter[pos].isSpace())
+                size++;
+
         if (size > 0 && size < 3) 
             return; /* Filter too short, ignore. */
     }
