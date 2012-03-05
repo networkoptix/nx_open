@@ -228,8 +228,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectionSettingsAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::SystemSettingsAction)));
-    m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Layouts. */

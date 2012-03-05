@@ -112,6 +112,11 @@ namespace Qn {
         MinimizeAction,
 
         /**
+         * Maximizes client's main window.
+         */ 
+        MaximizeAction,
+
+        /**
          * Opens system settings dialog.
          */
         SystemSettingsAction,

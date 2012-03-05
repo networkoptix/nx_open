@@ -74,6 +74,8 @@ bool QnToolTip::toolTipEventFilter(QObject *watched, QEvent *event) {
         /* Simply kill all tooltips for now. */
         label->hide();
         label->deleteLater();
+        return true;
+    default:
         break;
     }
 

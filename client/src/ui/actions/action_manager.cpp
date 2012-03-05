@@ -379,6 +379,12 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(Skin::icon(QLatin1String("decorations/minimize.png"))).
         hoverIcon(Skin::icon(QLatin1String("decorations/minimize_hovered.png")));
 
+    factory(Qn::MaximizeAction).
+        flags(Qn::NoTarget).
+        text(tr("Maximize")).
+        icon(Skin::icon(QLatin1String("decorations/maximize.png"))).
+        hoverIcon(Skin::icon(QLatin1String("decorations/maximize_hovered.png")));
+
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings")).
