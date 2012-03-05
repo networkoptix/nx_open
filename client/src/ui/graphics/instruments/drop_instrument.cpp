@@ -100,10 +100,8 @@ void DropInstrument::aboutToBeUninstalledNotify() {
 }
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
-    m_files = QnFileProcessor::findAcceptedFiles(event->mimeData()->urls());
-    m_resources = QnWorkbenchResource::deserializeResources(event->mimeData()->data(QnWorkbenchResource::resourcesMime()));
-
-    if (m_files.empty() && m_resources.empty())
+    m_resources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    if (m_resources.empty())
         return false;
 
     event->acceptProposedAction();
@@ -111,7 +109,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem * /*item*/, QGraphicsSceneDrag
 }
 
 bool DropInstrument::dragMoveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
-    if(m_files.empty() && m_resources.empty())
+    if(m_resources.empty())
         return false;
 
     event->acceptProposedAction();
@@ -119,7 +117,7 @@ bool DropInstrument::dragMoveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragD
 }
 
 bool DropInstrument::dragLeaveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent * /*event*/) {
-    if(m_files.empty() && m_resources.empty())
+    if(m_resources.empty())
         return false;
 
     return true;
@@ -130,14 +128,10 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
     if(context == NULL)
         return true;
 
-    QnResourceList resources = m_resources;
-    if(resources.empty())
-        resources = QnFileProcessor::createResourcesForFiles(m_files);
-
     QVariantMap params;
     params[Qn::GridPositionParameter] = context->workbench()->mapper()->mapToGridF(event->scenePos());
 
-    context->menu()->trigger(Qn::ResourceDropAction, resources, params);
+    context->menu()->trigger(Qn::ResourceDropAction, m_resources, params);
 
     return true;
 }

@@ -38,7 +38,6 @@ private:
     bool dropInternal(QGraphicsView *view, const QStringList &files, const QPoint &pos);
 
 private:
-    QStringList m_files;
     QnResourceList m_resources;
     
     QWeakPointer<QnWorkbenchContext> m_context;

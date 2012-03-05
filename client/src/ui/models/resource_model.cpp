@@ -22,6 +22,13 @@ namespace {
         ColumnCount
     };
 
+    bool intersects(const QStringList &l, const QStringList &r) {
+        foreach(const QString &s, l)
+            if(r.contains(s))
+                return true;
+        return false;
+    }
+
 } // namespace
 
 
@@ -558,39 +565,28 @@ bool QnResourceModel::setData(const QModelIndex &index, const QVariant &value, i
 }
 
 QVariant QnResourceModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    Q_UNUSED(section);
+    Q_UNUSED(orientation);
+    Q_UNUSED(role);
+
     return QVariant(); /* No headers needed. */
 }
 
 QStringList QnResourceModel::mimeTypes() const {
-    QStringList mimeTypes = QAbstractItemModel::mimeTypes();
-    mimeTypes.append(QLatin1String("text/uri-list"));
-    mimeTypes.append(QnWorkbenchResource::resourcesMime());
-
-    return mimeTypes;
+    return QnWorkbenchResource::resourceMimeTypes();
 }
 
 QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const {
     QMimeData *mimeData = QAbstractItemModel::mimeData(indexes);
     if (mimeData) {
         const QStringList types = mimeTypes();
-        const QString resourceFormat = QnWorkbenchResource::resourcesMime();
-        const QString urlFormat = QLatin1String("text/uri-list");
-        if (types.contains(resourceFormat) || types.contains(urlFormat)) {
+        if (intersects(types, QnWorkbenchResource::resourceMimeTypes())) {
             QnResourceList resources;
-            foreach (const QModelIndex &index, indexes) {
+            foreach (const QModelIndex &index, indexes)
                 if (QnResourcePtr resource = this->resource(index))
                     resources.append(resource);
-            }
-            if (types.contains(resourceFormat))
-                mimeData->setData(resourceFormat, QnWorkbenchResource::serializeResources(resources));
-            if (types.contains(urlFormat)) {
-                QList<QUrl> urls;
-                foreach (const QnResourcePtr &resource, resources) {
-                    if (resource->checkFlags(QnResource::url))
-                        urls.append(QUrl::fromLocalFile(resource->getUrl()));
-                }
-                mimeData->setUrls(urls);
-            }
+            
+            QnWorkbenchResource::serializeResources(resources, types, mimeData);
         }
     }
 
@@ -606,20 +602,11 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
         return false;
 
     /* Check if the format is supported. */
-    const QString format = QnWorkbenchResource::resourcesMime();
-    if (!mimeData->hasFormat(format) && !mimeData->hasUrls())
+    if(!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes()))
         return QAbstractItemModel::dropMimeData(mimeData, action, row, column, parent);
 
     /* Decode. */
-    QnResourceList resources;
-    if (mimeData->hasFormat(format)) {
-        resources = QnWorkbenchResource::deserializeResources(mimeData->data(format));
-    } else if (mimeData->hasUrls()) {
-        resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
-
-        /* Insert. Resources will be inserted into this model in callbacks. */
-        resourcePool()->addResources(resources);
-    }
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
 
     /* Check where we're dropping it. */
     Node *node = this->node(parent);

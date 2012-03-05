@@ -5,14 +5,15 @@
 #include <QByteArray>
 #include <core/resource/resource_fwd.h>
 
+class QMimeData;
+
 class QnWorkbenchResource {
 public:
-    static QString resourcesMime();
+    static QStringList resourceMimeTypes();
 
-    static QByteArray serializeResources(const QnResourceList &resources);
+    static void serializeResources(const QnResourceList &resources, const QStringList &mimeTypes, QMimeData *mimeData);
 
-    static QnResourceList deserializeResources(const QByteArray &data);
-
+    static QnResourceList deserializeResources(const QMimeData *mimeData);
 };
 
 
