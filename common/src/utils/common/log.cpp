@@ -11,6 +11,10 @@ char *cl_log_msg[] = { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" 
 // -------------------------------------------------------------------------- //
 class QnLogPrivate {
 public:
+    QnLogPrivate():
+        m_logLevel(static_cast<QnLogLevel>(0)) /* Log nothing by default. */
+    {}
+
     bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) 
     {
         m_baseName = baseName;
