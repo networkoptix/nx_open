@@ -9,6 +9,7 @@
 #include "workbench.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
+#include "ui/style/globals.h"
 
 namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
@@ -94,9 +95,13 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_layout,           SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(m_layout,           SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
     connect(m_layout,           SIGNAL(nameChanged()),                          this, SLOT(at_layout_nameChanged()));
+    connect(m_layout,           SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
+    connect(m_layout,           SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
     connect(m_layout,           SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_layout_aboutToBeDestroyed()));
     connect(m_resource.data(),  SIGNAL(resourceChanged()),                      this, SLOT(at_resource_resourceChanged()));
     connect(m_resource.data(),  SIGNAL(nameChanged()),                          this, SLOT(at_resource_nameChanged()));
+    connect(m_resource.data(),  SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_resource_cellAspectRatioChanged()));
+    connect(m_resource.data(),  SIGNAL(cellSpacingChanged()),                   this, SLOT(at_resource_cellSpacingChanged()));
     connect(m_resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this, SLOT(at_resource_itemAdded(const QnLayoutItemData &)));
     connect(m_resource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutItemData &)));
     connect(m_resource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),  this, SLOT(at_resource_itemChanged(const QnLayoutItemData &)));
@@ -269,6 +274,22 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemDa
     m_layout->item(itemData.uuid)->load(itemData);
 }
 
+void QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged() {
+    if(!m_update)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_submit, false);
+    m_layout->setCellAspectRatio(m_resource->cellAspectRatio());
+}
+
+void QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged() {
+    if(!m_update)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_submit, false);
+    m_layout->setCellSpacing(m_resource->cellSpacing());
+}
+
 void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_changed()));
     connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_changed()));
@@ -314,6 +335,22 @@ void QnWorkbenchLayoutSynchronizer::at_layout_nameChanged() {
 
     QnScopedValueRollback<bool> guard(&m_update, false);
     m_resource->setName(m_layout->name());
+}
+
+void QnWorkbenchLayoutSynchronizer::at_layout_cellAspectRatioChanged() {
+    if(!m_submit)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    m_resource->setCellAspectRatio(m_layout->cellAspectRatio());
+}
+
+void QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged() {
+    if(!m_submit)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_update, false);
+    m_resource->setCellSpacing(m_layout->cellSpacing());
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed() {

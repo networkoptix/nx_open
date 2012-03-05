@@ -23,6 +23,10 @@ QnGlobals::QnGlobals(QObject *parent):
 
     /* Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
     setValue(WORKBENCH_UNIT_SIZE,                   10000.0);
+
+
+    setValue(DEFAULT_LAYOUT_CELL_ASPECT_RATIO,      4.0 / 3.0);
+    setValue(DEFAULT_LAYOUT_CELL_SPACING,           QSizeF(0.1, 0.1));
 }
 
 QnGlobals::~QnGlobals() {

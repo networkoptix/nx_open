@@ -5,6 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
 #include <ui/common/scene_utility.h>
+#include <ui/style/globals.h>
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
 #include "workbench_layout_synchronizer.h"
@@ -83,6 +84,8 @@ void QnWorkbenchLayout::setName(const QString &name) {
 
 bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &resource) {
     setName(resource->getName());
+    setCellAspectRatio(resource->cellAspectRatio());
+    setCellSpacing(resource->cellSpacing());
 
     bool result = true;
 
@@ -138,6 +141,8 @@ bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &resource) {
 
 void QnWorkbenchLayout::save(const QnLayoutResourcePtr &resource) const {
     resource->setName(name());
+    resource->setCellAspectRatio(cellAspectRatio());
+    resource->setCellSpacing(cellSpacing());
 
     QnLayoutItemDataList resources;
     resources.reserve(items().size());
@@ -503,6 +508,9 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
 }
 
 void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
+    if(cellAspectRatio < 0.0) /* Negative means 'use default value'. */
+        cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio(); 
+
     if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
         return;
 
@@ -512,6 +520,11 @@ void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
 }
 
 void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
+    if(cellSpacing.width() < 0.0 || cellSpacing.height() < 0.0) { /* Negative means 'use default value'. */
+        setCellSpacing(qnGlobals->defaultLayoutCellSpacing());
+        return;
+    }
+
     if(qFuzzyCompare(m_cellSpacing, cellSpacing))
         return;
 
@@ -521,7 +534,7 @@ void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
 }
 
 void QnWorkbenchLayout::initCellParameters() {
-    m_cellAspectRatio = 4.0 / 3.0;
-    m_cellSpacing = QSizeF(0.1, 0.1);
+    m_cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+    m_cellSpacing = qnGlobals->defaultLayoutCellSpacing();
 }
 

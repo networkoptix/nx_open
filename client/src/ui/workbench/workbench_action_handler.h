@@ -17,6 +17,9 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnActionManager;
 class QnAction;
 
+/**
+ * This class implements logic for client actions.
+ */
 class QnWorkbenchActionHandler: public QObject {
     Q_OBJECT;
 public:
