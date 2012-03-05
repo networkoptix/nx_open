@@ -40,6 +40,8 @@
 #include "camera/camera_pool.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "serverutil.h"
+#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
+
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
@@ -534,6 +536,7 @@ public:
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
 
         //
 

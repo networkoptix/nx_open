@@ -24,6 +24,7 @@ private:
     bool m_requestSended;
     QnSyncTimeTask* m_gotTimeTask;
     QMutex m_mutex;
+    qint64 m_lastWarnTime;
 
     friend class QnSyncTimeTask;
 };
