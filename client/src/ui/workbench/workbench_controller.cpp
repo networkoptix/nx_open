@@ -172,7 +172,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
 
-    gridAdjustmentInstrument->setSpeed(QSizeF(display->workbench()->mapper()->spacing() / 90.0));
+    gridAdjustmentInstrument->setSpeed(QSizeF(1.0 / 360.0, 1.0 / 360.0));
 
     display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 

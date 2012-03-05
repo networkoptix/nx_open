@@ -3,6 +3,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QWheelEvent>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 
 GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObject *parent):
@@ -43,7 +44,7 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
     if(workbench()) {
         QPointF gridMousePos = workbench()->mapper()->mapToGridF(event->scenePos());
 
-        QSizeF spacing = workbench()->mapper()->spacing();
+        QSizeF spacing = workbench()->currentLayout()->cellSpacing();
         QSizeF delta = m_speed * -degrees;
         
         qreal k = 1.0;
@@ -52,7 +53,7 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
         if(delta.height() < 0)
             k = qMin(k, spacing.height() / -delta.height());
 
-        workbench()->mapper()->setSpacing(spacing + k * delta);
+        workbench()->currentLayout()->setCellSpacing(spacing + k * delta);
 
         SceneUtility::moveViewportScene(this->view(viewport), workbench()->mapper()->mapFromGridF(gridMousePos) - event->scenePos());
     }
