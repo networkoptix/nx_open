@@ -2,6 +2,7 @@
 #include <cassert>
 #include <QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QMessageBox>
+#include <QErrorMessage>
 #include <QScopedPointer>
 #include <QMutex>
 #include <utils/common/warnings.h>
@@ -41,6 +42,17 @@ namespace {
 
     static bool qn_openGlInfoWrittenOut = false;
 
+    class OpenGlErrorMessageDisplay: public QObject {
+    public:
+        virtual ~OpenGlErrorMessageDisplay() {
+            const QString message = tr("We have detected that your video card drivers may be not installed or out of date.\n"
+                "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
+                "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
+
+            QMessageBox::critical(NULL, tr("Important Performance Tip"), message, QMessageBox::Ok);
+        }
+    };
+
 } // anonymous namespace
 
 
@@ -73,27 +85,26 @@ public:
             cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
             cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
 
-            bool messageBoxShown = false;
+            bool showMessageBox = false;
 
-            if (!(features() & QnGlFunctions::OpenGL1_3))
+            if (!(features() & QnGlFunctions::OpenGL1_3)) {
                 qnWarning("Multitexturing is not supported.");
-
-            if (version <= QByteArray("1.1.0") && !messageBoxShown) {
-                qnWarning("OpenGL version %1 is not supported.", version);
-
-                const QString message = tr("OpenGL driver is not installed or outdated. Please update video driver for better perfomance.");
-                QMessageBox::warning(0, tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
-                messageBoxShown = true;
+                showMessageBox = true;
             }
 
-            if (!(features() & QnGlFunctions::ArbPrograms) && !messageBoxShown) {
-                qnWarning("OpenGL ARB shaders not supported, using software YUV to RGB conversion.");
+            if (version <= QByteArray("1.1.0")) {
+                qnWarning("OpenGL version %1 is not supported.", version);
+                showMessageBox = true;
+            }
 
-                const QString message = tr("We have detected that your video card drivers may be not installed or out of date.\n"
-                    "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
-                    "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
-                QMessageBox::warning(0, tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
-                messageBoxShown = true;
+            if (!(features() & QnGlFunctions::ArbPrograms)) {
+                qnWarning("OpenGL ARB shaders not supported, using software YUV to RGB conversion.");
+                showMessageBox = true;
+            }
+
+            if(showMessageBox) {
+                OpenGlErrorMessageDisplay *messageDisplay = new OpenGlErrorMessageDisplay();
+                messageDisplay->deleteLater(); /* Message will be shown in destructor, close to the event loop. */
             }
         }
 
