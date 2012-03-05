@@ -1,5 +1,5 @@
-#include "tagseditdialog.h"
-#include "ui_tagseditdialog.h"
+#include "tags_edit_dialog.h"
+#include "ui_tags_edit_dialog.h"
 
 #include <QtCore/QSet>
 

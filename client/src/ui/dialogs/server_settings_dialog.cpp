@@ -1,5 +1,5 @@
-#include "logindialog.h"
-#include "ui_serversettingsdialog.h"
+#include "login_dialog.h"
+#include "ui_server_settings_dialog.h"
 
 #include <set>
 
@@ -10,7 +10,7 @@
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
-#include "serversettingsdialog.h"
+#include "server_settings_dialog.h"
 
 #include "settings.h"
 

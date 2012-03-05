@@ -1,5 +1,5 @@
-#include "logindialog.h"
-#include "ui_logindialog.h"
+#include "login_dialog.h"
+#include "ui_login_dialog.h"
 
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
@@ -9,7 +9,7 @@
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench_context.h"
-#include "connectiontestingdialog.h"
+#include "connection_testing_dialog.h"
 
 #include "api/AppServerConnection.h"
 

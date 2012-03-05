@@ -1,4 +1,4 @@
-#include "aboutdialog.h"
+#include "about_dialog.h"
 
 #include <QtGui/QBoxLayout>
 #include <QtGui/QDialogButtonBox>

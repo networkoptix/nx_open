@@ -1,5 +1,5 @@
-#include "logindialog.h"
-#include "ui_multiplecamerasettingsdialog.h"
+#include "login_dialog.h"
+#include "ui_multiple_camera_settings_dialog.h"
 
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
@@ -9,7 +9,7 @@
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
 #include "ui/device_settings/camera_schedule_widget.h"
-#include "multiplecamerasettingsdialog.h"
+#include "multiple_camera_settings_dialog.h"
 #include "ui/device_settings/camera_motionmask_widget.h"
 #include "ui/graphics/items/resource_widget.h"
 

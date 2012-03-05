@@ -16,13 +16,13 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 
-#include <ui/dialogs/aboutdialog.h>
-#include <ui/dialogs/logindialog.h>
-#include <ui/dialogs/tagseditdialog.h>
-#include <ui/dialogs/serversettingsdialog.h>
-#include <ui/dialogs/camerasettingsdialog.h>
-#include <ui/dialogs/connectiontestingdialog.h>
-#include <ui/dialogs/multiplecamerasettingsdialog.h>
+#include <ui/dialogs/about_dialog.h>
+#include <ui/dialogs/login_dialog.h>
+#include <ui/dialogs/tags_edit_dialog.h>
+#include <ui/dialogs/server_settings_dialog.h>
+#include <ui/dialogs/camera_settings_dialog.h>
+#include <ui/dialogs/connection_testing_dialog.h>
+#include <ui/dialogs/multiple_camera_settings_dialog.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/new_user_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
