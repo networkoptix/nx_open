@@ -2,7 +2,9 @@
 #include <utils/common/warnings.h>
 
 QnLayoutResource::QnLayoutResource(): 
-    base_type() 
+    base_type(),
+    m_cellAspectRatio(-1.0),
+    m_cellSpacing(-1.0, -1.0)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -115,3 +117,42 @@ void QnLayoutResource::updateItem(const QUuid &itemUuid, const QnLayoutItemData 
 
     emit itemChanged(item);
 }
+
+qreal QnLayoutResource::cellAspectRatio() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_cellAspectRatio;
+}
+
+void QnLayoutResource::setCellAspectRatio(qreal cellAspectRatio) {
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
+            return;
+
+        m_cellAspectRatio = cellAspectRatio;
+    }
+
+    emit cellAspectRatioChanged();
+}
+
+QSizeF QnLayoutResource::cellSpacing() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_cellSpacing;
+}
+
+void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+            return;
+
+        m_cellSpacing = cellSpacing;
+    }
+
+    emit cellSpacingChanged();
+}
+

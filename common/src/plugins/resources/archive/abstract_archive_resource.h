@@ -12,6 +12,8 @@ public:
 	~QnAbstractArchiveResource();
 
     virtual QString getUniqueId() const;
+
+    virtual void setStatus(Status newStatus, bool silenceMode = false) override;
 };
 
 #endif //abstract_archive_device_h1838

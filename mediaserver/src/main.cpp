@@ -39,6 +39,9 @@
 #include "utils/common/log.h"
 #include "camera/camera_pool.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
+#include "serverutil.h"
+#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
+
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
@@ -135,7 +138,7 @@ QString defaultLocalAddress(const QHostAddress& target)
         socket.connectToHost(target, 53);
 
         if (socket.localAddress() != QHostAddress::LocalHost)
-            return socket.localAddress().toString(); // if app server is on other computer we use same address as used to connect to app server 
+            return socket.localAddress().toString(); // if app server is on other computer we use same address as used to connect to app server
     }
 
     {
@@ -189,25 +192,6 @@ void ffmpegInit()
 
     extern URLProtocol ufile_protocol;
     av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
-}
-
-QString serverGuid()
-{
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-    QString guid = settings.value("serverGuid").toString();
-
-    if (guid.isEmpty())
-    {
-        if (!settings.isWritable())
-        {
-            return guid;
-        }
-
-        guid = QUuid::createUuid().toString();
-        settings.setValue("serverGuid", guid);
-    }
-
-    return guid;
 }
 
 QnStorageResourcePtr createDefaultStorage()
@@ -301,7 +285,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     if (defaultMsgHandler)
         defaultMsgHandler(type, msg);
 
-    clLogMsgHandler(type, msg);
+    qnLogMsgHandler(type, msg);
 }
 
 int serverMain(int argc, char *argv[])
@@ -521,6 +505,8 @@ public:
         QnEventManager* eventManager = QnEventManager::instance();
         eventManager->run();
 
+        qnResPool->addResource(videoServer);
+
         m_processor = new QnAppserverResourceProcessor(videoServer->getId());
 
         QUrl rtspUrl(videoServer->getUrl());
@@ -540,6 +526,8 @@ public:
         qnStorageMan->loadFullFileCatalog();
 
         QnRecordingManager::instance()->start();
+        qnResPool->addResource(videoServer);
+
         // ------------------------------------------
 
 
@@ -553,6 +541,7 @@ public:
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
 
         //
 
@@ -741,7 +730,7 @@ int main(int argc, char* argv[])
     QnTimePeriodList tpl = vc.recordedTimePeriods(nrl); */
     app.exec();
     return 0;
- #endif   
+ #endif
 
     QnVideoService service(argc, argv);
 

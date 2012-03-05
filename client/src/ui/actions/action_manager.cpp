@@ -117,7 +117,8 @@ private:
 class QnActionFactory {
 public:
     QnActionFactory(QnActionManager *menu, QnAction *parent): 
-        m_manager(menu)
+        m_manager(menu),
+        m_lastFreeActionId(Qn::ActionCount)
     {
         m_actionStack.push_back(parent);
         m_lastAction = parent;
@@ -145,7 +146,12 @@ public:
         return QnActionBuilder(m_manager, action);
     }
 
+    QnActionBuilder operator()() {
+        return operator()(static_cast<Qn::ActionId>(m_lastFreeActionId++));
+    }
+
 private:
+    int m_lastFreeActionId;
     QnActionManager *m_manager;
     QnAction *m_lastAction;
     QList<QnAction *> m_actionStack;
@@ -191,7 +197,10 @@ QnActionManager::QnActionManager(QObject *parent):
 
     using namespace QnResourceCriterionExpressions;
 
+
+
     /* Actions that are not assigned to any menu. */
+
     factory(Qn::AboutAction).
         flags(Qn::NoTarget).
         text(tr("About...")).
@@ -216,14 +225,51 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
 
+    factory(Qn::NextLayoutAction).
+        flags(Qn::NoTarget).
+        text(tr("Next Layout")).
+        shortcut(tr("Ctrl+Tab")).
+        autoRepeat(false);
 
-    /* Main menu actions. */
+    factory(Qn::PreviousLayoutAction).
+        flags(Qn::NoTarget).
+        text(tr("Previous Layout")).
+        shortcut(tr("Ctrl+Shift+Tab")).
+        autoRepeat(false);
 
-    factory(Qn::MainMenuAction).
+    /* Tab bar actions. */
+
+    factory(Qn::CloseLayoutAction).
+        flags(Qn::TabBar | Qn::ScopelessHotkey).
+        text(tr("Close")).
+        shortcut(tr("Ctrl+W")).
+        autoRepeat(false);
+
+
+
+    /* Context menu actions. */
+
+    factory(Qn::LightMainMenuAction).
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
+
+    factory(Qn::DarkMainMenuAction).
+        text(tr("Main Menu")).
+        shortcut(tr("Alt+Space")).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
+
+    factory(Qn::NewUserAction).
+        flags(Qn::Main | Qn::Tree | Qn::NoTarget).
+        text(tr("New User...")).
+        condition(new QnResourceActionUserAccessCondition(true));
+
+    factory(Qn::NewLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("New Layout...")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
 
     factory(Qn::OpenNewLayoutAction).
         flags(Qn::Main).
@@ -231,6 +277,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("plus.png")));
+
+    factory().
+        flags(Qn::Main | Qn::Tree).
+        separator();
 
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
@@ -262,7 +312,7 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Folder..."));
     } factory.leaveSubMenu();
 
-    factory(Qn::FileSeparator).
+    factory().
         flags(Qn::Main).
         separator();
 
@@ -297,7 +347,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/settings.png")));
 
-    factory(Qn::ExitSeparator).
+    factory().
         flags(Qn::Main).
         separator();
 
@@ -308,15 +358,6 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::QuitRole).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
-
-
-
-    /* Tab bar actions. */
-    factory(Qn::CloseLayoutAction).
-        flags(Qn::TabBar | Qn::ScopelessHotkey).
-        text(tr("Close")).
-        shortcut(tr("Ctrl+W")).
-        autoRepeat(false);
 
 
 
@@ -393,9 +434,11 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media)));
 
+
+
     /* Layout actions. */
 
-    factory(Qn::ItemSeparator).
+    factory().
         flags(Qn::Scene).
         separator();
 
@@ -418,19 +461,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F2")).
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
-
-    factory(Qn::NewUserAction).
-        flags(Qn::Tree | Qn::NoTarget).
-        text(tr("New User...")).
-        condition(new QnResourceActionUserAccessCondition(true));
-
-    factory(Qn::NewLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
-        text(tr("New Layout...")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
-
-
-    action(Qn::MainMenuAction)->setMenu(newMenu(Qn::MainScope));
 
 #if 0
     //factory(ITEM_OPEN,                      tr("Open"),                         tr(""),                 TREE_SCOPE);
@@ -673,8 +703,8 @@ Qn::ActionTarget QnActionManager::currentTargetType(QnAction *action) const {
     return QnActionTargetTypes::target(currentTarget(action));
 }
 
-QVariant QnActionManager::currentParameter(QnAction *action, const char *name) const {
-    return currentParametersInternal(action).params.value(QLatin1String(name));
+QVariant QnActionManager::currentParameter(QnAction *action, const QString &name) const {
+    return currentParametersInternal(action).params.value(name);
 }
 
 QVariant QnActionManager::currentTarget(QnAction *action) const {
@@ -710,7 +740,7 @@ Qn::ActionTarget QnActionManager::currentTargetType(QObject *sender) const {
     return QnActionTargetTypes::target(currentTarget(sender));
 }
 
-QVariant QnActionManager::currentParameter(QObject *sender, const char *name) const {
+QVariant QnActionManager::currentParameter(QObject *sender, const QString &name) const {
     if(QnAction *action = checkSender(sender)) {
         return currentParameter(action, name);
     } else {

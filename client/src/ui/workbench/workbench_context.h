@@ -16,6 +16,10 @@ class QnWorkbenchLayoutVisibilityController;
 class QnWorkbenchAccessController;
 class QnActionManager;
 
+/**
+ * This is a class that ties together all objects comprising the global state 
+ * and works as an application context.
+ */
 class QnWorkbenchContext: public QObject {
     Q_OBJECT;
 public:

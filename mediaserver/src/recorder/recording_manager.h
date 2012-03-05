@@ -44,6 +44,7 @@ private slots:
     void onFpsChanged(QnServerStreamRecorder* recorder, float value);
     void onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void onTimer();
+    void at_updateStorage();
 private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
     void startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);

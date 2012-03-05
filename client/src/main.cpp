@@ -40,6 +40,7 @@
 #include "ui/actions/action_manager.h"
 #include "ui/tooltips/tool_tip.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
+#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -224,13 +225,13 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     if (defaultMsgHandler) {
         defaultMsgHandler(type, msg);
     } else { /* Default message handler. */
-#ifdef _DEBUG
+#ifndef QN_NO_STDERR_MESSAGE_OUTPUT
         QTextStream err(stderr);
         err << msg << endl << flush;
 #endif
     }
 
-    clLogMsgHandler(type, msg);
+    qnLogMsgHandler(type, msg);
 }
 
 #ifndef API_TEST_MAIN
@@ -268,7 +269,7 @@ int main(int argc, char *argv[])
         application.reset(singleApplication);
     }
     application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(Skin::icon(QLatin1String("appicon.png")));
+    application->setWindowIcon(Skin::icon(QLatin1String("hdw_logo.png")));
 
     if(singleApplication) {
         QString argsMessage;
@@ -372,6 +373,9 @@ int main(int argc, char *argv[])
     QnPlIqResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 
+    QnPlIpWebCamResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    
 
 #endif
 
@@ -488,3 +492,7 @@ int main(int argc, char *argv[])
 }
 #endif // API_TEST_MAIN
 #endif
+
+
+//============================================
+

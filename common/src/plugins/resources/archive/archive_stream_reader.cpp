@@ -293,6 +293,8 @@ begin_label:
         }
     }
 
+    int channelCount = m_delegate->getVideoLayout()->numberOfChannels();
+
     m_jumpMtx.lock();
     bool reverseMode = m_reverseMode;
     qint64 jumpTime = m_requiredJumpTime;
@@ -304,13 +306,18 @@ begin_label:
     bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
     qint64 currentTimeHint = m_currentTimeHint;
     m_currentTimeHint = AV_NOPTS_VALUE;
+
+    bool needChangeQuality = m_oldQuality != quality || qualityFastSwitch > m_oldQualityFastSwitch;
+    if (needChangeQuality) {
+        m_oldQuality = quality;
+        m_oldQualityFastSwitch = qualityFastSwitch;
+    }
+
     m_jumpMtx.unlock();
 
     // change quality checking
-    if (m_oldQuality != quality || qualityFastSwitch > m_oldQualityFastSwitch)
+    if (needChangeQuality)
     {
-        m_oldQuality = quality;
-        m_oldQualityFastSwitch = qualityFastSwitch;
         // !m_delegate->isRealTimeSource()
         bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch);
         if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
@@ -318,7 +325,7 @@ begin_label:
             qint64 displayTime = determineDisplayTime(reverseMode);
             beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
-				if (!exactJumpToSpecifiedFrame)
+				if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 	needKeyData();
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
@@ -345,7 +352,7 @@ begin_label:
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
         m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
-        if (!exactJumpToSpecifiedFrame)
+        if (!exactJumpToSpecifiedFrame && channelCount > 1)
             setNeedKeyData();
         internalJumpTo(jumpTime);
         emit jumpOccured(jumpTime);
@@ -364,7 +371,7 @@ begin_label:
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
         if (!delegateForNegativeSpeed) {
-            if (!exactJumpToSpecifiedFrame)
+            if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 setNeedKeyData();
             internalJumpTo(displayTime);
             if (reverseMode) {
@@ -641,7 +648,7 @@ begin_label:
         m_playbackMaskSync.unlock();
         if (newTime != m_currentData->timestamp)
         {
-            if (!exactJumpToSpecifiedFrame)
+            if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 setNeedKeyData();
             internalJumpTo(newTime);
             setSkipFramesToTime(newTime, true);
@@ -932,8 +939,8 @@ void QnArchiveStreamReader::enableQualityChange()
 void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
 {
     QMutexLocker lock(&m_jumpMtx);
-    m_quality = quality;
-    m_qualityFastSwitch = true;
+    m_oldQuality = m_quality = quality;
+    m_oldQualityFastSwitch = m_qualityFastSwitch = true;
 }
 
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)

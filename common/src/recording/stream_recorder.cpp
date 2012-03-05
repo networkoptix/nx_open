@@ -255,8 +255,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
 
     QString fileExt = QString(outputCtx->extensions).split(',')[0];
-
     m_fileName = fillFileName(m_mediaProvider);
+    if (m_fileName.isEmpty()) 
+        return false;
+
     m_fileName += QString(".") + fileExt;
     QString url = QString("ufile:") + m_fileName;
 

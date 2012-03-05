@@ -73,7 +73,7 @@ public:
 
     Qn::ActionTarget currentTargetType(QnAction *action) const;
 
-    QVariant currentParameter(QnAction *action, const char *name) const;
+    QVariant currentParameter(QnAction *action, const QString &name) const;
 
     QVariant currentTarget(QnAction *action) const;
 
@@ -89,7 +89,7 @@ public:
 
     Qn::ActionTarget currentTargetType(QObject *sender) const;
 
-    QVariant currentParameter(QObject *sender, const char *name) const;
+    QVariant currentParameter(QObject *sender, const QString &name) const;
 
     QVariant currentTarget(QObject *sender) const;
 

@@ -88,13 +88,18 @@ protected:
 
 private slots:
     void open();
-    void updateFilter();
+    void updateFilter(bool force = false);
+    void forceUpdateFilter() { updateFilter(true); }
     
     void at_treeView_activated(const QModelIndex &index);
     void at_tabWidget_currentChanged(int index);
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
+    
+    void at_workbench_itemAdded(QnWorkbenchItem *item);
+    void at_workbench_itemRemoved(QnWorkbenchItem *item);
+
     void at_context_aboutToBeDestroyed();
 
 private:

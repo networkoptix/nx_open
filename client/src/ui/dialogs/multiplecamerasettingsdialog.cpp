@@ -122,6 +122,7 @@ void MultipleCameraSettingsDialog::updateView()
 
             if (cameraScheduleTasksData != scheduleTasksData)
                 needSetScheduleTasks = false;
+
         }
     }
 
@@ -131,7 +132,10 @@ void MultipleCameraSettingsDialog::updateView()
     ui->cameraScheduleWidget->setMaxFps(maxFps);
 
     if (needSetScheduleTasks)
+    {
         ui->cameraScheduleWidget->setScheduleTasks(scheduleTasksData.toList());
+        ui->cameraScheduleWidget->setDoNotChange(false);
+    }
 }
 
 void MultipleCameraSettingsDialog::buttonClicked(QAbstractButton *button)

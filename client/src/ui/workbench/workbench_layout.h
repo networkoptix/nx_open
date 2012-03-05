@@ -170,6 +170,18 @@ public:
         return m_items.isEmpty();
     }
 
+    qreal cellAspectRatio() const {
+        return m_cellAspectRatio;
+    }
+
+    void setCellAspectRatio(qreal cellAspectRatio);
+
+    const QSizeF &cellSpacing() const {
+        return m_cellSpacing;
+    }
+
+    void setCellSpacing(const QSizeF &cellSpacing);
+
     /**
      * \returns                         Bounding rectangle of all pinned items in this layout.
      */
@@ -249,12 +261,24 @@ signals:
      */
     void nameChanged();
 
+    /**
+     * This signal is emitted whenever cell aspect ratio of this layout changes. 
+     */
+    void cellAspectRatioChanged();
+
+    /**
+     * This signal is emitted whenever cell spacing of this layout changes.
+     */
+    void cellSpacingChanged();
+
 private:
     template<bool returnEarly>
     bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition);
 
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
     void updateBoundingRectInternal();
+
+    void initCellParameters();
 
 private:
     /** Name of this layout. */
@@ -274,6 +298,12 @@ private:
 
     /** Map from resource unique id to a set of items. */
     QHash<QString, QSet<QnWorkbenchItem *> > m_itemsByUid;
+
+    /** Aspect ratio of a single cell. */
+    qreal m_cellAspectRatio;
+
+    /** Spacing between cells, relative to cell width. */
+    QSizeF m_cellSpacing;
 
     /** Map from item's universally unique identifier to item. */
     QHash<QUuid, QnWorkbenchItem *> m_itemByUuid;

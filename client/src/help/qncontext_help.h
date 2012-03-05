@@ -1,5 +1,5 @@
-#ifndef __QNCONTEXT_HELP_H_
-#define __QNCONTEXT_HELP_H_
+#ifndef QN_CONTEXT_HELP_H
+#define QN_CONTEXT_HELP_H
 
 #include <QCoreApplication>
 #include <QSettings>
@@ -51,4 +51,4 @@ private:
 #define qnHelp (QnContextHelp::instance())
 
 
-#endif // __QNCONTEXT_HELP_H_
+#endif // QN_CONTEXT_HELP_H

@@ -7,6 +7,7 @@
 #include <ui/actions/actions.h>
 
 class QAction;
+class QMenu;
 
 class QnResourcePool;
 class QnWorkbench;
@@ -16,6 +17,9 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnActionManager;
 class QnAction;
 
+/**
+ * This class implements logic for client actions.
+ */
 class QnWorkbenchActionHandler: public QObject {
     Q_OBJECT;
 public:
@@ -65,6 +69,10 @@ protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
 
+    void at_mainMenuAction_triggered();
+
+    void at_nextLayoutAction_triggered();
+    void at_previousLayoutAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openNewLayoutAction_triggered();
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
@@ -104,6 +112,8 @@ private:
     QnWorkbenchContext *m_context;
     QWeakPointer<QWidget> m_widget;
     QnAppServerConnectionPtr m_connection;
+
+    QScopedPointer<QMenu> m_mainMenu;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

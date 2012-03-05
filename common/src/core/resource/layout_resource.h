@@ -33,16 +33,28 @@ public:
 
     void updateItem(const QUuid &itemUuid, const QnLayoutItemData &item);
 
+    qreal cellAspectRatio() const;
+
+    void setCellAspectRatio(qreal cellAspectRatio);
+
+    QSizeF cellSpacing() const;
+
+    void setCellSpacing(const QSizeF &cellSpacing);
+
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);
     void itemChanged(const QnLayoutItemData &item);
+    void cellAspectRatioChanged();
+    void cellSpacingChanged();
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
     QnLayoutItemDataMap m_itemByUuid;
+    qreal m_cellAspectRatio;
+    QSizeF m_cellSpacing;
 };
 
 

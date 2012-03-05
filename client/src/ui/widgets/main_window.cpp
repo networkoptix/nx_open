@@ -145,12 +145,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
 
     /* Set up model & control machinery. */
-    const QSizeF defaultCellSize = QSizeF(16000.0, 12000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
-    const QSizeF defaultSpacing = QSizeF(2500.0, 2500.0);
     m_context = new QnWorkbenchContext(qnResPool, this);
-
-    m_context->workbench()->mapper()->setCellSize(defaultCellSize);
-    m_context->workbench()->mapper()->setSpacing(defaultSpacing);
 
     m_display = new QnWorkbenchDisplay(m_context, this);
 	m_display->initSyncPlay();
@@ -167,6 +162,8 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_actionHandler->setWidget(this);
 
     /* Set up actions. */
+    addAction(action(Qn::NextLayoutAction));
+    addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::ExitAction));
@@ -177,7 +174,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(action(Qn::ConnectionSettingsAction));
     addAction(action(Qn::OpenNewLayoutAction));
     addAction(action(Qn::CloseLayoutAction));
-    addAction(action(Qn::MainMenuAction));
+    addAction(action(Qn::DarkMainMenuAction));
     addAction(action(Qn::YouTubeUploadAction));
     addAction(action(Qn::EditTagsAction));
     addAction(action(Qn::OpenInFolderAction));
@@ -207,12 +204,19 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     tabBarLayout->addStretch(0x1000);
     tabBarLayout->addWidget(m_tabBar);
 
-    /* Title layout. We cannot create a widget for title bar since there appears to be
-     * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction));
+    /* We want the main menu button to activate the corresponding action so that
+     * main menu is updated. However, menu buttons do not activate their corresponding 
+     * actions as they do not receive release events. We work this around by making
+     * some hacky connections. */
+    m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction));
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
-    m_mainMenuButton->setIcon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
+    disconnect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton, SLOT(_q_buttonPressed()));
+    connect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton->defaultAction(), SLOT(trigger()));
+    connect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton, SLOT(_q_buttonPressed()));
+
+    /* Title layout. We cannot create a widget for title bar since there appears to be
+     * no way to make it transparent for non-client area windows messages. */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(0);
@@ -443,7 +447,7 @@ bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
     if(event->type() == QnSystemMenuEvent::SystemMenu) {
-        menu()->trigger(Qn::MainMenuAction);
+        menu()->trigger(Qn::LightMainMenuAction);
         return true;
     }
 

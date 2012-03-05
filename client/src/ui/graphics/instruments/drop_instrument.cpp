@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/view_drag_and_drop.h>
+#include <ui/workbench/workbench_resource.h>
 #include "file_processor.h"
 #include "destruction_guard_item.h"
 
@@ -101,7 +101,7 @@ void DropInstrument::aboutToBeUninstalledNotify() {
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
     m_files = QnFileProcessor::findAcceptedFiles(event->mimeData()->urls());
-    m_resources = deserializeResources(event->mimeData()->data(resourcesMime()));
+    m_resources = QnWorkbenchResource::deserializeResources(event->mimeData()->data(QnWorkbenchResource::resourcesMime()));
 
     if (m_files.empty() && m_resources.empty())
         return false;
@@ -135,7 +135,7 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
         resources = QnFileProcessor::createResourcesForFiles(m_files);
 
     QVariantMap params;
-    params[Qn::GridPosition] = context->workbench()->mapper()->mapToGridF(event->scenePos());
+    params[Qn::GridPositionParameter] = context->workbench()->mapper()->mapToGridF(event->scenePos());
 
     context->menu()->trigger(Qn::ResourceDropAction, resources, params);
 

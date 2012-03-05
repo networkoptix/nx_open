@@ -72,6 +72,13 @@ public:
     }
 
     /**
+     * \returns                         Index of the current layout. May return -1 if dummy layout is currently in use.
+     */
+    int currentLayoutIndex() const {
+        return layoutIndex(currentLayout());
+    }
+
+    /**
      * \returns                         All layouts of this workbench. May be empty. 
      */
     const QList<QnWorkbenchLayout *> &layouts() const {
@@ -104,7 +111,7 @@ public:
      * \param layout                    Layout to find in the list of this workbench's layouts.
      * \returns                         Index of the given layout in the list of this workbench's layouts, or -1 if it is not there.
      */
-    int layoutIndex(QnWorkbenchLayout *layout);
+    int layoutIndex(QnWorkbenchLayout *layout) const;
 
     /**
      * Note that workbench does not take ownership of the supplied layout.
@@ -116,6 +123,8 @@ public:
      *                                  this workbench will be used.
      */
     void setCurrentLayout(QnWorkbenchLayout *layout);
+
+    void setCurrentLayoutIndex(int index);
 
     /**
      * \returns                         Grid mapper for this workbench.
@@ -213,6 +222,8 @@ private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_aboutToBeDestroyed();
+    void at_layout_cellAspectRatioChanged();
+    void at_layout_cellSpacingChanged();
 
 private:
     /** Current layout. */

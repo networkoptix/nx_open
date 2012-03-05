@@ -7,6 +7,9 @@
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 
+/**
+ * This class implements hiding of layouts that are not saved to application server. 
+ */
 class QnWorkbenchLayoutVisibilityController: public QObject {
     Q_OBJECT;
 public:

@@ -102,7 +102,8 @@ qint64 QnRtspClientArchiveDelegate::startTime()
 
 qint64 QnRtspClientArchiveDelegate::endTime()
 {
-    return m_rtspSession.endTime();
+    return DATETIME_NOW; // always use LIVE as right edge for server video
+    //return m_rtspSession.endTime();
 }
 
 void QnRtspClientArchiveDelegate::reopen()
@@ -217,17 +218,18 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     {
         // Media server can change quality for LIVE stream (for archive quality controlled by client only)
         // So, if server is changed quality, update current quality variables
-
-        bool isLowPacket = result->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-        bool isLowQuality = m_quality == MEDIA_Quality_Low;
-        if (isLowPacket != isLowQuality) 
+        if (qSharedPointerDynamicCast<QnCompressedVideoData>(result))
         {
-            m_rtspSession.setAdditionAttribute("x-media-quality", isLowPacket ? "low" : "high");
-            m_qualityFastSwitch = true; // We already have got new quality. So, it is "fast" switch
-            m_quality = isLowPacket ? MEDIA_Quality_Low : MEDIA_Quality_High;
-            emit qualityChanged(m_quality);
+            bool isLowPacket = result->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+            bool isLowQuality = m_quality == MEDIA_Quality_Low;
+            if (isLowPacket != isLowQuality) 
+            {
+                m_rtspSession.setAdditionAttribute("x-media-quality", isLowPacket ? "low" : "high");
+                m_qualityFastSwitch = true; // We already have got new quality. So, it is "fast" switch
+                m_quality = isLowPacket ? MEDIA_Quality_Low : MEDIA_Quality_High;
+                emit qualityChanged(m_quality);
+            }
         }
-
     }
 
     m_lastReceivedTime = qnSyncTime->currentMSecsSinceEpoch();

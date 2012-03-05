@@ -8,6 +8,9 @@
 #include <QGraphicsLinearLayout>
 #include <QStyle>
 #include <QApplication>
+#include <QFileDialog>
+#include <QProgressDialog>
+#include <QMessageBox>
 #include <QSettings>
 #include <QMenu>
 #include <QLabel>
@@ -55,7 +58,6 @@
 #include "camera/camera.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "ui/ui_common.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "extensions/workbench_render_watcher.h"
@@ -303,7 +305,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(tabBarWidget);
 
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction));
+    m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
@@ -1189,7 +1191,11 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     QString dateFormat = startTimeMs < 1000ll * 100000 ? QLatin1String("hh-mm-ss") : QLatin1String("dd-mmm-yyyy hh-mm-ss");
-    QString suggetion = camera->getDevice()->getUniqueId();
+    QString suggetion;
+
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (camera->getDevice());
+    if (netRes)
+        suggetion = netRes->getMAC().toString();
 
     QString fileName;
     while (1)
@@ -1207,13 +1213,13 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
         if (QFile::exists(fullName))
         {
             QString shortName = QFileInfo(fullName).baseName();
-            QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), QString("File '%1' already exists. Overwrite?").arg(shortName),
+            QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), tr("File '%1' already exists. Overwrite?").arg(shortName),
                                QMessageBox::Yes | QMessageBox::No, m_display->view());
             if (msgBox.exec() == QMessageBox::Yes)
             {
                 if (!QFile::remove(fullName))
                 {
-                    UIOKMessage(m_display->view(), "Can't overwrite file", QString("File '%1' is used by another process. Try another name.").arg(shortName));
+                    QMessageBox::information(m_display->view(), tr("Can't overwrite file"), tr("File '%1' is used by another process. Try another name.").arg(shortName), QMessageBox::Ok);
                     continue;
                 }
                 break;
@@ -1251,6 +1257,7 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
 void QnWorkbenchUi::at_exportFinished(QString fileName)
 {
     QnAviResourcePtr file(new QnAviResource(fileName));
+    file->setStatus(QnResource::Online);
     qnResPool->addResource(file);
 
     QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));

@@ -79,7 +79,7 @@
 #include "help/qncontext_help.h"
 
 
-#define QN_WORKBENCH_CONTROLLER_DEBUG
+//#define QN_WORKBENCH_CONTROLLER_DEBUG
 
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
@@ -172,7 +172,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
 
-    gridAdjustmentInstrument->setSpeed(QSizeF(display->workbench()->mapper()->spacing() / 90.0));
+    gridAdjustmentInstrument->setSpeed(QSizeF(1.0 / 360.0, 1.0 / 360.0));
 
     display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
@@ -235,8 +235,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),                               this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),                              this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      this,                           SLOT(at_motionSelectionProcessStarted(QGraphicsView *, QnResourceWidget *)));
-    connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
-    connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
+    connect(m_motionSelectionInstrument, SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),          this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
+    connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                          this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -256,8 +256,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                                             m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                                          m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessFinished(QGraphicsView *)),                                         m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
 
     connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               selectionOverlayHackInstrument, SLOT(recursiveDisable()));
     connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              selectionOverlayHackInstrument, SLOT(recursiveEnable()));
@@ -278,10 +278,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveEnable()));
 
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_dragInstrument,               SLOT(recursiveEnable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_dragInstrument,               SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Connect to display. */
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
@@ -554,7 +554,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
 }
 
 void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
-    if(m_resizedWidget != item)
+    if(m_resizedWidget != item || item == NULL)
         return;
 
     QnResourceWidget *widget = m_resizedWidget;
@@ -594,28 +594,27 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     TRACE("RESIZING FINISHED");
 
-    if(m_resizedWidget != item)
-        return;
-
-    QnResourceWidget *widget = m_resizedWidget;
-
     m_display->gridItem()->animatedHide();
     opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
-    /* Resize if possible. */
-    QSet<QnWorkbenchItem *> entities = widget->item()->layout()->items(m_resizedWidgetRect);
-    entities.remove(widget->item());
-    if (entities.empty()) {
-        widget->item()->setGeometry(m_resizedWidgetRect);
-        updateGeometryDelta(widget);
+    if(m_resizedWidget == item && item != NULL) {
+        QnResourceWidget *widget = m_resizedWidget;
+
+        /* Resize if possible. */
+        QSet<QnWorkbenchItem *> entities = widget->item()->layout()->items(m_resizedWidgetRect);
+        entities.remove(widget->item());
+        if (entities.empty()) {
+            widget->item()->setGeometry(m_resizedWidgetRect);
+            updateGeometryDelta(widget);
+        }
+
+        m_display->synchronize(widget->item());
+
+        /* Un-raise the raised item if it was the one being resized. */
+        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        if(raisedItem == widget->item())
+            workbench()->setItem(QnWorkbench::RAISED, NULL);
     }
-
-    m_display->synchronize(widget->item());
-
-    /* Un-raise the raised item if it was the one being resized. */
-    QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
-    if(raisedItem == widget->item())
-        workbench()->setItem(QnWorkbench::RAISED, NULL);
 
     /* Clean up resizing state. */
     m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
@@ -734,37 +733,36 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
 void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
     TRACE("DRAG FINISHED");
 
-    if(m_draggedWorkbenchItems.empty())
-        return;
-
-    QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
-
     /* Hide grid. */
     m_display->gridItem()->animatedHide();
 
-    /* Do drag. */
-    QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
-    bool success = layout->moveItems(workbenchItems, m_dragGeometries);
+    if(!m_draggedWorkbenchItems.empty()) {
+        QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
 
-    foreach(QnWorkbenchItem *item, workbenchItems) {
-        QnResourceWidget *widget = display()->widget(item);
+        /* Do drag. */
+        QList<QnWorkbenchItem *> workbenchItems = m_draggedWorkbenchItems + m_replacedWorkbenchItems;
+        bool success = layout->moveItems(workbenchItems, m_dragGeometries);
 
-        /* Adjust geometry deltas if everything went fine. */
-        if(success)
-            updateGeometryDelta(widget);
+        foreach(QnWorkbenchItem *item, workbenchItems) {
+            QnResourceWidget *widget = display()->widget(item);
 
-        /* Animate opacity back. */
-        opacityAnimator(widget)->animateTo(1.0);
+            /* Adjust geometry deltas if everything went fine. */
+            if(success)
+                updateGeometryDelta(widget);
+
+            /* Animate opacity back. */
+            opacityAnimator(widget)->animateTo(1.0);
+        }
+
+        /* Re-sync everything. */
+        foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
+            m_display->synchronize(workbenchItem);
+
+        /* Un-raise the raised item if it was among the dragged ones. */
+        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        if(raisedItem != NULL && workbenchItems.contains(raisedItem))
+            workbench()->setItem(QnWorkbench::RAISED, NULL);
     }
-
-    /* Re-sync everything. */
-    foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
-        m_display->synchronize(workbenchItem);
-
-    /* Un-raise the raised item if it was among the dragged ones. */
-    QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
-    if(raisedItem != NULL && workbenchItems.contains(raisedItem))
-        workbench()->setItem(QnWorkbench::RAISED, NULL);
 
     /* Clean up dragging state. */
     m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
@@ -951,17 +949,27 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
 }
 
 void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->display() == NULL || widget->display()->camera() == NULL)
-        return;
-
-    widget->installEventFilter(this);
+    if(widget->display() != NULL && widget->display()->camera() != NULL)
+        widget->installEventFilter(this);
 }
 
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(widget->display() == NULL || widget->display()->camera() == NULL)
-        return;
+    if(widget == m_resizedWidget)
+        m_resizedWidget = NULL;
 
-    widget->removeEventFilter(this);
+    QnWorkbenchItem *item = widget->item();
+    if(m_draggedWorkbenchItems.contains(item)) {
+        m_draggedWorkbenchItems.removeOne(item);
+        if(m_draggedWorkbenchItems.empty()) {
+            m_dragInstrument->recursiveDisable();
+            m_dragInstrument->recursiveEnable();
+        }
+    }
+    if(m_replacedWorkbenchItems.contains(item))
+        m_replacedWorkbenchItems.removeOne(item);
+
+    if(widget->display() != NULL && widget->display()->camera() != NULL)
+        widget->removeEventFilter(this);
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
