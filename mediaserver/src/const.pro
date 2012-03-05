@@ -126,7 +126,7 @@ win32 {
 DEFINES += __STDC_CONSTANT_MACROS
 
 unix {
-  LIBS += -lz
+  LIBS += -lz -lcrypto
   QMAKE_CXXFLAGS += -msse4.1
   DEFINES += QN_EXPORT=
 }

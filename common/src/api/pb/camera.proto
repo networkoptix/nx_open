@@ -44,12 +44,13 @@ message Camera {
     required string       url           = 5;
     required Status       status        = 6;
 
-    optional string       region        = 7;
-    optional string       mac           = 8;
-    optional string       login         = 9;
-    optional string       password      = 10;
-    repeated Property     property    = 11;
-    repeated ScheduleTask scheduleTask = 12;
+    required bool         blocked       = 7;
+    optional string       region        = 8;
+    optional string       mac           = 9;
+    optional string       login         = 10;
+    optional string       password      = 11;
+    repeated Property     property    = 12;
+    repeated ScheduleTask scheduleTask = 13;
 }
 
 message Cameras {
