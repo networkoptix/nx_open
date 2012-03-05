@@ -243,17 +243,41 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     bool sunken = option->state & State_Sunken;
     if(sunken)
         setHoverProgress(widget, 0.0);
-    qreal d = sunken ? 0.1 : (0.1 - hoverProgress(option, widget, 4.0) * 0.1);
+    qreal k = hoverProgress(option, widget, 4.0);
+    qreal d = sunken ? 0.1 : (0.1 - k * 0.1);
     QRectF rect = option->rect;
     rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
 
-    QIcon::Mode mode = option->state & State_Enabled ? QIcon::Normal : QIcon::Disabled;
+    QIcon::Mode mode;
+    if(!(option->state & State_Enabled)) {
+        mode = QIcon::Disabled;
+    } else if(option->state & State_Selected) {
+        mode = QIcon::Selected;
+    } else if(option->state & State_Sunken) {
+        mode = QIcon::Active;
+        k = 1.0;
+    } else if(option->state & State_MouseOver) {
+        mode = QIcon::Active;
+    } else {
+        mode = QIcon::Normal;
+    }
     QIcon::State state = option->state & State_On ? QIcon::On : QIcon::Off;
-    QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QnScopedPainterSmoothPixmapTransformRollback pixmapRollback(painter, true);
-    painter->drawPixmap(rect, pixmap, pixmap.rect());
+    if(mode == QIcon::Active || (mode == QIcon::Normal && !qFuzzyIsNull(k))) {
+        QPixmap pixmap0 = buttonOption->icon.pixmap(rect.toAlignedRect().size(), QIcon::Normal, state);
+        QPixmap pixmap1 = buttonOption->icon.pixmap(rect.toAlignedRect().size(), QIcon::Active, state);
+
+        qreal o = painter->opacity();
+        painter->drawPixmap(rect, pixmap0, pixmap0.rect());
+        painter->setOpacity(o * k);
+        painter->drawPixmap(rect, pixmap1, pixmap1.rect());
+        painter->setOpacity(o);
+    } else {
+        QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
+        painter->drawPixmap(rect, pixmap, pixmap.rect());
+    }
     return true;
 }
 

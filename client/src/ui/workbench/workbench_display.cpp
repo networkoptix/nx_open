@@ -619,8 +619,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
 #endif
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("close.png")));
-    closeButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("close_hover.png")));
+    closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("decorations/close_item.png")));
+    closeButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("decorations/close_item_hovered.png")));
     closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
     closeButton->setAnimationSpeed(4.0);
     connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
