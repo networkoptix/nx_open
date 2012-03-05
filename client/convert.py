@@ -18,7 +18,7 @@ import re
 sys.path.insert(0, os.path.join('..', 'common'))
 
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB
-from convert import qt_path, copy_files, setup_tools, setup_qjson, platform, gen_env_sh
+from convert import qt_path, copy_files, setup_tools, setup_qjson, setup_openssl, platform, gen_env_sh
 from convert import convert as convert_common
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
@@ -45,11 +45,6 @@ def setup_openal():
     openal_path += sys.platform
 
     return openal_path
-
-def setup_openssl():
-    openssl_path = 'contrib/openssl/bin/'
-
-    return openssl_path
 
 def generate_info_plist():
     def gen_association(ext):
@@ -175,8 +170,8 @@ copy_files(openal_path + '/*.dll', 'bin/release')
 copy_files(openal_path + '/*.dll', 'bin/debug')
 
 if platform() == 'win32':
-    copy_files(openssl_path + '/*.dll', 'bin/debug')
-    copy_files(openssl_path + '/*.dll', 'bin/release')
+    copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
+    copy_files(openssl_path + '/bin/*.dll', 'bin/release')
 
     copy_files(tools_path + '/bin/*.dll', 'bin/release')
     copy_files(tools_path + '/bin/*.dll', 'bin/debug')

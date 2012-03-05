@@ -82,8 +82,8 @@ win* {
     INCLUDEPATH += $$PWD/../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
 
-    INCLUDEPATH += $$PWD/../contrib/openssl/include
-    LIBS += -L$$PWD/../contrib/openssl/bin -llibeay32
+    INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
 }
 
 mac {

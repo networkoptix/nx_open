@@ -5,6 +5,9 @@ CONFIG -= flat
 
 win32 {
   CONFIG += x86
+
+  INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+  LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
 }
 
 FFMPEG = %FFMPEG
