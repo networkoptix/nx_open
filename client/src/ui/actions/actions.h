@@ -107,6 +107,11 @@ namespace Qn {
         FullscreenAction,
 
         /**
+         * Minimizes client's main window.
+         */ 
+        MinimizeAction,
+
+        /**
          * Opens system settings dialog.
          */
         SystemSettingsAction,

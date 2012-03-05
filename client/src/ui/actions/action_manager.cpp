@@ -373,6 +373,12 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png"))).
         toggledHoverIcon(Skin::icon(QLatin1String("decorations/unfullscreen_hovered.png")));
 
+    factory(Qn::MinimizeAction).
+        flags(Qn::NoTarget).
+        text(tr("Minimize")).
+        icon(Skin::icon(QLatin1String("decorations/minimize.png"))).
+        hoverIcon(Skin::icon(QLatin1String("decorations/minimize_hovered.png")));
+
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings")).

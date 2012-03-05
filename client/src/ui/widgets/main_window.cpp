@@ -35,18 +35,19 @@
 #include "ui/workbench/workbench_action_handler.h"
 #include "ui/workbench/workbench_context.h"
 
-#include "ui/widgets/resource_tree_widget.h"
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
 
+#include "ui/events/system_menu_event.h"
+
 #include "file_processor.h"
 #include "settings.h"
 
+#include "resource_tree_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
-#include "system_menu_event.h"
 
 #include "eventmanager.h"
 
@@ -183,6 +184,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
 
     connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
+    connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
 
     menu()->setTargetProvider(m_ui);
 
@@ -227,6 +229,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectionSettingsAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::SystemSettingsAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Layouts. */
@@ -300,6 +303,11 @@ void QnMainWindow::setFullScreen(bool fullScreen)
 void QnMainWindow::toggleFullScreen() 
 {
     setFullScreen(!isFullScreen());
+}
+
+void QnMainWindow::minimize() 
+{
+    setWindowState(Qt::WindowMinimized | windowState());
 }
 
 void QnMainWindow::toggleTitleVisibility() 

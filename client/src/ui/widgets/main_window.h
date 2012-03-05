@@ -60,6 +60,7 @@ protected:
 protected slots:
     void setTitleVisible(bool visible);
     void setFullScreen(bool fullScreen);
+    void minimize();
 
     void toggleFullScreen();
     void toggleTitleVisibility();

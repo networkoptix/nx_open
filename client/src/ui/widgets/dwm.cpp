@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <utils/common/warnings.h>
 #include <utils/common/mpl.h>
+#include <ui/events/invocation_event.h>
 
 #ifdef Q_OS_WIN
 #include <QtGui/private/qwidget_p.h>
@@ -67,6 +68,9 @@ typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, L
 typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
 #endif // Q_OS_WIN
 
+enum QnDwmInvocation {
+    AdjustPositionInvocation
+};
 
 class QnDwmPrivate {
 public:
@@ -517,8 +521,13 @@ bool QnDwm::widgetEvent(QEvent *event) {
             d->updateFrameStrut();
 
         /* This is needed because when going out of full screen, position calculation 
-         * breaks despite the fact that frame struts are set. Moving the widget fixes that. */
+         * breaks despite the fact that frame struts are set. Moving the widget fixes that. 
+         * However, we cannot move it right away, because if was restored from minimized state,
+         * then its position is not yet initialized. */
         if(event->type() == QEvent::WindowStateChange && !d->widget->isFullScreen())
+            QApplication::postEvent(d->widget, new QnInvocationEvent(AdjustPositionInvocation), Qt::LowEventPriority);
+
+        if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
             d->widget->move(d->widget->pos()); 
     }
 #endif
