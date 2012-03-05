@@ -2,6 +2,8 @@
 
 #include <QDir>
 #include <QToolButton>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/network_resource.h>
@@ -11,7 +13,6 @@
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
 
-#include "ui/ui_common.h"
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
 
@@ -204,7 +205,7 @@ void PreferencesDialog::auxMediaFolderBrowse()
     xdir = fromNativePath(xdir);
     if (m_settingsData.auxMediaRoots.contains(xdir) || xdir == m_settingsData.mediaRoot)
     {
-        UIOKMessage(this, tr("Folder is already added"), tr("This folder is already added."));
+        QMessageBox::information(this, tr("Folder is already added"), tr("This folder is already added."), QMessageBox::Ok);
         return;
     }
 

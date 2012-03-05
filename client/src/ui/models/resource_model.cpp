@@ -675,6 +675,8 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
             if(replacedNetwork) {
                 replacedNetwork->setStatus(QnResource::Offline);
                 network->setStatus(QnResource::Disabled);
+
+                // TODO: should we save it here?
             }
         }
     }
