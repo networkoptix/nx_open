@@ -104,7 +104,7 @@ public:
     void setTypeId(QnId id);
 
     Status getStatus() const;
-    void setStatus(Status newStatus, bool silenceMode = false);
+    virtual void setStatus(Status newStatus, bool silenceMode = false);
 
     // this function is called if resourse changes state from offline to online or so 
     virtual void init(){};

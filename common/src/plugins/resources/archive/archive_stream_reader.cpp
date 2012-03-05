@@ -293,6 +293,8 @@ begin_label:
         }
     }
 
+    int channelCount = m_delegate->getVideoLayout()->numberOfChannels();
+
     m_jumpMtx.lock();
     bool reverseMode = m_reverseMode;
     qint64 jumpTime = m_requiredJumpTime;
@@ -323,7 +325,7 @@ begin_label:
             qint64 displayTime = determineDisplayTime(reverseMode);
             beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
-				if (!exactJumpToSpecifiedFrame)
+				if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 	needKeyData();
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
@@ -350,7 +352,7 @@ begin_label:
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
         m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
-        if (!exactJumpToSpecifiedFrame)
+        if (!exactJumpToSpecifiedFrame && channelCount > 1)
             setNeedKeyData();
         internalJumpTo(jumpTime);
         emit jumpOccured(jumpTime);
@@ -369,7 +371,7 @@ begin_label:
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
         if (!delegateForNegativeSpeed) {
-            if (!exactJumpToSpecifiedFrame)
+            if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 setNeedKeyData();
             internalJumpTo(displayTime);
             if (reverseMode) {
@@ -646,7 +648,7 @@ begin_label:
         m_playbackMaskSync.unlock();
         if (newTime != m_currentData->timestamp)
         {
-            if (!exactJumpToSpecifiedFrame)
+            if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 setNeedKeyData();
             internalJumpTo(newTime);
             setSkipFramesToTime(newTime, true);
