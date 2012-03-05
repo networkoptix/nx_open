@@ -68,6 +68,8 @@ protected slots:
 
     void at_mainMenuAction_triggered();
 
+    void at_nextLayoutAction_triggered();
+    void at_previousLayoutAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openNewLayoutAction_triggered();
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);

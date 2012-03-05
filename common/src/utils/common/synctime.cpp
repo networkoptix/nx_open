@@ -26,6 +26,7 @@ QnSyncTime::QnSyncTime()
 {
     m_lastReceivedTime = 0;
     m_gotTimeTask = 0;
+    m_lastWarnTime = 0;
 }
 
 void QnSyncTime::updateTime(qint64 newTime)
@@ -44,8 +45,17 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         m_gotTimeTask = new QnSyncTimeTask(this);
         QThreadPool::globalInstance()->start(m_gotTimeTask);
     }
-    if (m_lastReceivedTime)
-        return m_lastReceivedTime + m_timer.elapsed();
+    if (m_lastReceivedTime) {
+        qint64 time = m_lastReceivedTime + m_timer.elapsed();
+        qint64 localTime = QDateTime::currentMSecsSinceEpoch();
+        if (qAbs(time - localTime) > 1000 * 10 && localTime - m_lastWarnTime > 1000*10)
+        {
+            m_lastWarnTime = localTime;
+            qWarning() << "Local time differs from server! local time=" << QDateTime::fromMSecsSinceEpoch(localTime).toString() <<
+                          "server time=" << QDateTime::fromMSecsSinceEpoch(time).toString();
+        }
+        return time;
+    }
     else
         return QDateTime::currentMSecsSinceEpoch();
 }

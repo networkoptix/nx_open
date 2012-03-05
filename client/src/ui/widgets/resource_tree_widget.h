@@ -96,6 +96,10 @@ private slots:
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
+    
+    void at_workbench_itemAdded(QnWorkbenchItem *item);
+    void at_workbench_itemRemoved(QnWorkbenchItem *item);
+
     void at_context_aboutToBeDestroyed();
 
 private:

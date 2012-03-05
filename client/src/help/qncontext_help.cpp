@@ -1,4 +1,7 @@
 #include "qncontext_help.h"
+#include <QTranslator>
+#include <QStringList>
+#include <QFile>
 
 Q_GLOBAL_STATIC(QnContextHelp, getInstance)
 
@@ -80,8 +83,6 @@ void QnContextHelp::setHelpContext(ContextId id)
 
     m_currentId = id;
     emit helpContextChanged(id);
-
-    qDebug() << "HELP CONTEXT" << id;
 }
 
 void QnContextHelp::setNeedAutoShow(ContextId id, bool value)

@@ -62,12 +62,26 @@ protected:
         if(workbench() == NULL)
             return;
 
+        QnResourcePtr currentLayoutResource = workbench()->currentLayout()->resource();
+        if(!currentLayoutResource)
+            return;
+
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if(resource.isNull())
             return;
+        QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
+        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
 
-        if(!workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty())
-            option->font.setBold(true);
+        bool bold = false;
+        if(resource == currentLayoutResource) {
+            bold = true; /* Bold current layout. */
+        } else if(parentResource == currentLayoutResource) {
+            bold = true; /* Bold items of the current layout. */
+        } else if(uuid.isNull() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
+            bold = true; /* Bold items of the current layout in servers. */
+        }
+
+        option->font.setBold(bold);
     }
 
 private:
@@ -176,6 +190,8 @@ void QnResourceTreeWidget::setContext(QnWorkbenchContext *context) {
         connect(m_context,          SIGNAL(aboutToBeDestroyed()),                       this, SLOT(at_context_aboutToBeDestroyed()));
         connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
         connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
+        connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
+        connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     }
 }
 
@@ -305,8 +321,14 @@ void QnResourceTreeWidget::updateFilter(bool force) {
         return;
 
     if(!force) {
+        int pos = qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1;
+        
         /* Estimate size of the last term in filter expression. */
-        int size = filter.size() - (qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1);
+        int size = 0;
+        for(;pos < filter.size(); pos++)
+            if(!filter[pos].isSpace())
+                size++;
+
         if (size > 0 && size < 3) 
             return; /* Filter too short, ignore. */
     }
@@ -396,6 +418,19 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
 
     QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
     ui->filterLineEdit->setText(layoutSearchString(layout));
+
+    /* Bold state has changed. */
+    currentItemView()->update();
+}
+
+void QnResourceTreeWidget::at_workbench_itemAdded(QnWorkbenchItem *) {
+    /* Bold state has changed. */
+    currentItemView()->update();
+}
+
+void QnResourceTreeWidget::at_workbench_itemRemoved(QnWorkbenchItem *) {
+    /* Bold state has changed. */
+    currentItemView()->update();
 }
 
 void QnResourceTreeWidget::at_context_aboutToBeDestroyed() {

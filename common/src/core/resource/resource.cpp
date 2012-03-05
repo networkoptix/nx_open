@@ -311,22 +311,17 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
         return false;
     }
 
-    m_mutex.lock();
-    QnParam &param = m_resourceParamList[name];
-    val = param.value();
-    m_mutex.unlock();
+    //m_mutex.lock();
+    //QnParam &param = m_resourceParamList[name];
+    //val = param.value();
+    //m_mutex.unlock();
+	m_mutex.lock();
+	QnParam param = m_resourceParamList[name];
+	val = param.value();
+	m_mutex.unlock();
+
     if (domain == QnDomainMemory)
     {
-        if (!param.isPhysical()) {
-            QVariant newValue = property(param.name().toLatin1().constData());
-            if (val != newValue) {
-                val = newValue;
-                m_mutex.lock();
-                param.setValue(newValue);
-                m_mutex.unlock();
-                QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
-            }
-        }
         return true;
     }
     else if (domain == QnDomainPhysical)
@@ -336,7 +331,8 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
             if (val != newValue) {
                 val = newValue;
                 m_mutex.lock();
-                param.setValue(newValue);
+                //param.setValue(newValue);
+				m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
                 QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
             }
@@ -365,7 +361,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     m_mutex.lock();
-    QnParam &param = m_resourceParamList[name];
+    QnParam param = m_resourceParamList[name];
     if (param.isReadOnly())
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
@@ -386,15 +382,13 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     //QnDomainMemory should changed anyway
     {
         QMutexLocker locker(&m_mutex); // block paramList changing
-        if (!param.setValue(val))
+        if (!m_resourceParamList[name].setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
             return false;
 
         }
 
-        if (!param.isPhysical())
-            setProperty(param.name().toLatin1().constData(), val);
     }
 
     if (oldValue != val)

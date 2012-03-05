@@ -114,8 +114,15 @@ void QnWorkbench::moveLayout(QnWorkbenchLayout *layout, int index) {
     emit layoutsChanged();
 }
 
-int QnWorkbench::layoutIndex(QnWorkbenchLayout *layout) {
+int QnWorkbench::layoutIndex(QnWorkbenchLayout *layout) const {
     return m_layouts.indexOf(layout);
+}
+
+void QnWorkbench::setCurrentLayoutIndex(int index) {
+    if(m_layouts.empty())
+        return;
+
+    setCurrentLayout(m_layouts[qBound(0, index, m_layouts.size())]);
 }
 
 void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {

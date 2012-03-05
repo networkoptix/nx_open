@@ -225,7 +225,17 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
 
+    factory(Qn::NextLayoutAction).
+        flags(Qn::NoTarget).
+        text(tr("Next Layout")).
+        shortcut(tr("Ctrl+Tab")).
+        autoRepeat(false);
 
+    factory(Qn::PreviousLayoutAction).
+        flags(Qn::NoTarget).
+        text(tr("Previous Layout")).
+        shortcut(tr("Ctrl+Shift+Tab")).
+        autoRepeat(false);
 
     /* Tab bar actions. */
 

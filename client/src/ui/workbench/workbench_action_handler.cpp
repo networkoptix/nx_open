@@ -129,6 +129,8 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenFolderAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectionSettingsAction),           SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
+    connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
+    connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenNewLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -249,6 +251,14 @@ void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
 
     action(Qn::LightMainMenuAction)->setMenu(m_mainMenu.data());
     action(Qn::DarkMainMenuAction)->setMenu(m_mainMenu.data());
+}
+
+void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
+    workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() + 1) % workbench()->layouts().size());
+}
+
+void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
+    workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + workbench()->layouts().size()) % workbench()->layouts().size());
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {

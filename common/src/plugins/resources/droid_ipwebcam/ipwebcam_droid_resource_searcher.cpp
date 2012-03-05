@@ -70,6 +70,10 @@ struct AnDroidDev
         android = false;
         QString request;
 
+        QString t = QHostAddress(ip).toString();
+        if (t=="192.168.1.135")
+            t = t;
+
         CLSimpleHTTPClient httpClient(QHostAddress(ip), 8080, 2000, QAuthenticator());
         httpClient.doGET(request);
 
@@ -86,6 +90,8 @@ struct AnDroidDev
 QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 {
     QnResourceList result;
+
+
 
     QFile file(QLatin1String("android.txt")); // Create a file handle for the file named
     if (!file.exists())

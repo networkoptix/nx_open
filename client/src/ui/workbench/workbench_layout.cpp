@@ -25,7 +25,9 @@ namespace {
 
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
     QObject(parent)
-{}
+{
+    initCellParameters();
+}
 
 QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent)
@@ -34,6 +36,8 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
         qnNullWarning(resource);
         return;
     }
+
+    initCellParameters();
 
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
     synchronizer->setAutoDeleting(true);
@@ -498,3 +502,25 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
     emit boundingRectChanged();
 }
 
+void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
+    if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
+        return;
+
+    m_cellAspectRatio = cellAspectRatio;
+    
+    emit cellAspectRatioChanged();
+}
+
+void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
+    if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+        return;
+
+    m_cellSpacing = cellSpacing;
+    
+    emit cellSpacingChanged();
+}
+
+void QnWorkbenchLayout::initCellParameters() {
+    m_cellAspectRatio = 4.0 / 3.0;
+    m_cellSpacing = QSizeF(0.1, 0.1);
+}
