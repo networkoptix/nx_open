@@ -250,6 +250,11 @@ bool QnLicensePool::isEmpty() const
     return m_licenses.isEmpty();
 }
 
+const QList<QnLicensePtr> QnLicenseList::licenses() const
+{
+    return m_licenses.values();
+}
+
 void QnLicenseList::setHardwareId(const QByteArray &hardwareId)
 {
     m_hardwareId = hardwareId;

@@ -61,7 +61,7 @@ void LicenseManagerWidget::updateControls()
         ui->gridLicenses->removeRow(i);
     }
 
-    foreach(const QnLicensePtr& license, m_licenses) {
+    foreach(const QnLicensePtr& license, m_licenses.licenses()) {
         int row = ui->gridLicenses->rowCount();
         ui->gridLicenses->insertRow(row);
         ui->gridLicenses->setItem(row, 0, new QTableWidgetItem(license->name(), QTableWidgetItem::Type));

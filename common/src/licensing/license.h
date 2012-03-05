@@ -44,6 +44,7 @@ public:
     void setHardwareId(const QByteArray& hardwareId);
     QByteArray hardwareId() const;
 
+    const QList<QnLicensePtr> licenses() const;
     void append(QnLicensePtr license);
     void append(QnLicenseList license);
     bool isEmpty() const;
