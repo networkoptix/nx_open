@@ -619,9 +619,6 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
 
     /* Check where we're dropping it. */
     Node *node = this->node(parent);
-    
-    if(node->type() == Node::Item) 
-        node = node->parent(); /* Dropping into layout item == dropping into layout. */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
@@ -638,13 +635,13 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
         }
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
+            if(resource->getParentId() == user->getId())
+                continue; /* Dropping resource into its owner does nothing. */
+
             QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
             if(!layout)
                 continue; /* Can drop only layout resources on user. */
             
-            if(layout->getParentId() == user->getId())
-                continue; /* Dropping layout into its owner does nothing. */
-
             QVariantMap params;
             params[Qn::UserParameter] = QVariant::fromValue(user);
             params[Qn::NameParameter] = layout->getName();
@@ -653,6 +650,32 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
             layouts.push_back(layout);
 
             context()->menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
+        }
+    } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
+        foreach(const QnResourcePtr &resource, resources) {
+            if(resource->getParentId() == server->getId())
+                continue; /* Dropping resource into its owner does nothing. */
+
+            QnNetworkResourcePtr network = resource.dynamicCast<QnNetworkResource>();
+            if(!network)
+                continue;
+
+            QnMacAddress mac = network->getMAC();
+
+            QnNetworkResourcePtr replacedNetwork;
+            foreach(const QnResourcePtr otherResource, resourcePool()->getResourcesWithParentId(server->getId())) {
+                if(QnNetworkResourcePtr otherNetwork = otherResource.dynamicCast<QnNetworkResource>()) {
+                    if(otherNetwork->getMAC() == mac) {
+                        replacedNetwork = otherNetwork;
+                        break;
+                    }
+                }
+            }
+
+            if(replacedNetwork) {
+                replacedNetwork->setStatus(QnResource::Offline);
+                network->setStatus(QnResource::Disabled);
+            }
         }
     }
     
