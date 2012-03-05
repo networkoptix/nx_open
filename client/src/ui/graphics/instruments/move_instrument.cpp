@@ -1,4 +1,4 @@
-#include "drag_instrument.h"
+#include "move_instrument.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QMouseEvent>
@@ -13,16 +13,16 @@ namespace {
 
 } // anonymous namespace
 
-DragInstrument::DragInstrument(QObject *parent): 
+MoveInstrument::MoveInstrument(QObject *parent): 
     DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_effective(true)
 {}
 
-DragInstrument::~DragInstrument() {
+MoveInstrument::~MoveInstrument() {
     ensureUninstalled();
 }
 
-bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
+bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(!dragProcessor()->isWaiting())
         return false;
 
@@ -51,11 +51,11 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     return false;
 }
 
-void DragInstrument::startDragProcess(DragInfo *info) {
-    emit dragProcessStarted(info->view());
+void MoveInstrument::startDragProcess(DragInfo *info) {
+    emit moveProcessStarted(info->view());
 }
 
-void DragInstrument::startDrag(DragInfo *info) {
+void MoveInstrument::startDrag(DragInfo *info) {
     if(!m_effective)
         return;
 
@@ -64,10 +64,10 @@ void DragInstrument::startDrag(DragInfo *info) {
         m_itemToSelect.clear();
     }
 
-    emit dragStarted(info->view(), scene()->selectedItems());
+    emit moveStarted(info->view(), scene()->selectedItems());
 }
 
-void DragInstrument::dragMove(DragInfo *info) {
+void MoveInstrument::dragMove(DragInfo *info) {
     if(!m_effective)
         return;
 
@@ -77,16 +77,16 @@ void DragInstrument::dragMove(DragInfo *info) {
     foreach (QGraphicsItem *item, scene()->selectedItems())
         item->setPos(item->pos() + delta);
 
-    emit drag(info->view(), scene()->selectedItems());
+    emit move(info->view(), scene()->selectedItems());
 }
 
-void DragInstrument::finishDrag(DragInfo *info) {
+void MoveInstrument::finishDrag(DragInfo *info) {
     if(!m_effective)
         return;
 
-    emit dragFinished(info->view(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
+    emit moveFinished(info->view(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
 }
 
-void DragInstrument::finishDragProcess(DragInfo *info) {
-    emit dragProcessFinished(info->view());
+void MoveInstrument::finishDragProcess(DragInfo *info) {
+    emit moveProcessFinished(info->view());
 }

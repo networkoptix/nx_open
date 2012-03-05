@@ -44,7 +44,7 @@
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/wheel_zoom_instrument.h>
 #include <ui/graphics/instruments/rubber_band_instrument.h>
-#include <ui/graphics/instruments/drag_instrument.h>
+#include <ui/graphics/instruments/move_instrument.h>
 #include <ui/graphics/instruments/rotation_instrument.h>
 #include <ui/graphics/instruments/click_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
@@ -166,7 +166,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_dropInstrument = new DropInstrument(display->context(), this);
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
-    m_dragInstrument = new DragInstrument(this);
+    m_moveInstrument = new MoveInstrument(this);
     m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
@@ -215,7 +215,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* View/viewport instruments. */
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::INSTALL_AFTER, m_display->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
-    m_manager->installInstrument(m_dragInstrument);
+    m_manager->installInstrument(m_moveInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
@@ -226,9 +226,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
-    connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_dragStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_dragInstrument,           SIGNAL(drag(QGraphicsView *, QList<QGraphicsItem *>)),                                      this,                           SLOT(at_drag(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_dragFinished(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_moveStarted(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, QList<QGraphicsItem *>)),                                      this,                           SLOT(at_move(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_moveFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_resizingInstrument,       SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),                 this,                           SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
@@ -248,8 +248,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                                m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessFinished(QGraphicsView *)),                                               m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
+    connect(m_moveInstrument,           SIGNAL(moveProcessStarted(QGraphicsView *)),                                                m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
+    connect(m_moveInstrument,           SIGNAL(moveProcessFinished(QGraphicsView *)),                                               m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
     connect(m_handScrollInstrument,     SIGNAL(scrollProcessStarted(QGraphicsView *)),                                              m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
@@ -259,27 +259,27 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
 
-    connect(m_dragInstrument,           SIGNAL(dragStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               selectionOverlayHackInstrument, SLOT(recursiveDisable()));
-    connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              selectionOverlayHackInstrument, SLOT(recursiveEnable()));
+    connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               selectionOverlayHackInstrument, SLOT(recursiveDisable()));
+    connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              selectionOverlayHackInstrument, SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandStarted(QGraphicsView *)),                                                 selectionOverlayHackInstrument, SLOT(recursiveDisable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandFinished(QGraphicsView *)),                                                selectionOverlayHackInstrument, SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          selectionOverlayHackInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),         selectionOverlayHackInstrument, SLOT(recursiveEnable()));
 
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_moveInstrument,               SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_rubberBandInstrument,         SLOT(recursiveEnable()));
 
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_moveInstrument,               SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_rubberBandInstrument,         SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveEnable()));
 
-    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_dragInstrument,               SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_dragInstrument,               SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_moveInstrument,               SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveEnable()));
 
@@ -622,7 +622,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     m_resizedWidget = NULL;
 }
 
-void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
+void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
     TRACE("DRAG STARTED");
 
     /* Bring to front preserving relative order. */
@@ -649,7 +649,7 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
     //    workbench()->setRaisedItem(NULL);
 }
 
-void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *> &) {
+void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *> &) {
     if(m_draggedWorkbenchItems.empty())
         return;
 
@@ -730,7 +730,7 @@ void QnWorkbenchController::at_drag(QGraphicsView *, const QList<QGraphicsItem *
     }
 }
 
-void QnWorkbenchController::at_dragFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
+void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
     TRACE("DRAG FINISHED");
 
     /* Hide grid. */
@@ -937,7 +937,7 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         bool effective = widget == NULL;
         m_resizingInstrument->setEffective(effective);
         m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
-        m_dragInstrument->setEffective(effective);
+        m_moveInstrument->setEffective(effective);
 
         if(widget == NULL) /* Un-raise on un-zoom. */
             m_display->workbench()->setItem(QnWorkbench::RAISED, NULL);
@@ -961,8 +961,8 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
     if(m_draggedWorkbenchItems.contains(item)) {
         m_draggedWorkbenchItems.removeOne(item);
         if(m_draggedWorkbenchItems.empty()) {
-            m_dragInstrument->recursiveDisable();
-            m_dragInstrument->recursiveEnable();
+            m_moveInstrument->recursiveDisable();
+            m_moveInstrument->recursiveEnable();
         }
     }
     if(m_replacedWorkbenchItems.contains(item))

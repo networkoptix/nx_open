@@ -1,22 +1,22 @@
-#ifndef QN_DRAG_INSTRUMENT_H
-#define QN_DRAG_INSTRUMENT_H
+#ifndef QN_MOVE_INSTRUMENT_H
+#define QN_MOVE_INSTRUMENT_H
 
 #include <QPoint>
 #include "drag_processing_instrument.h"
 #include <ui/common/weak_graphics_item_pointer.h>
 
-class DragInstrument: public DragProcessingInstrument {
+class MoveInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
-    DragInstrument(QObject *parent);
+    MoveInstrument(QObject *parent);
 
-    virtual ~DragInstrument();
+    virtual ~MoveInstrument();
 
     /**
      * Whether the instrument is effective.
      * 
      * When dragging instrument is not effective it never starts the actual
-     * drag. However, drag process is still handled and <tt>dragProcessStarted</tt>
+     * drag. However, drag process is still handled and <tt>moveProcessStarted</tt>
      * signal is emitted.
      */
     bool isEffective() const {
@@ -28,11 +28,11 @@ public:
     }
 
 signals:
-    void dragProcessStarted(QGraphicsView *view);
-    void dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void drag(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void dragProcessFinished(QGraphicsView *view);
+    void moveProcessStarted(QGraphicsView *view);
+    void moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void move(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void moveProcessFinished(QGraphicsView *view);
 
 protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
@@ -48,4 +48,4 @@ private:
     WeakGraphicsItemPointer m_itemToSelect;
 };
 
-#endif // QN_DRAG_INSTRUMENT_H
+#endif // QN_MOVE_INSTRUMENT_H

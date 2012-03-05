@@ -20,7 +20,7 @@ class CLVideoCamera;
 class InstrumentManager;
 class HandScrollInstrument;
 class WheelZoomInstrument;
-class DragInstrument;
+class MoveInstrument;
 class RubberBandInstrument;
 class ResizingInstrument;
 class DropInstrument;
@@ -76,8 +76,8 @@ public:
         return m_itemRightClickInstrument;
     }
 
-    DragInstrument *dragInstrument() const {
-        return m_dragInstrument;
+    MoveInstrument *moveInstrument() const {
+        return m_moveInstrument;
     }
 
     ForwardingInstrument *itemMouseForwardingInstrument() const {
@@ -110,9 +110,9 @@ protected slots:
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
-    void at_dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void at_drag(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_move(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
 
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
@@ -168,7 +168,7 @@ private:
     WheelZoomInstrument *m_wheelZoomInstrument;
 
     /** Dragging instrument. */
-    DragInstrument *m_dragInstrument;
+    MoveInstrument *m_moveInstrument;
 
     /** Rotation instrument. */
     RotationInstrument *m_rotationInstrument;

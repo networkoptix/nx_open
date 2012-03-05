@@ -7,7 +7,7 @@
 #include "ui/graphics/instruments/instrument_manager.h"
 #include "ui/graphics/instruments/motion_selection_instrument.h"
 #include "ui/graphics/instruments/click_instrument.h"
-#include "ui/graphics/instruments/drag_instrument.h"
+#include "ui/graphics/instruments/move_instrument.h"
 #include "ui/graphics/instruments/resizing_instrument.h"
 #include "ui/graphics/instruments/forwarding_instrument.h"
 #include "ui/graphics/instruments/rubber_band_instrument.h"
@@ -67,7 +67,7 @@ void QnCameraMotionMaskWidget::init()
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();
     m_controller->itemRightClickInstrument()->disable();
-    m_controller->dragInstrument()->setEffective(false);
+    m_controller->moveInstrument()->setEffective(false);
     m_controller->resizingInstrument()->setEffective(false);
     m_controller->rubberBandInstrument()->disable();
 
