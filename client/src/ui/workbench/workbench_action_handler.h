@@ -83,6 +83,7 @@ protected slots:
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     
+    void at_moveCameraAction_triggered();
     void at_resourceDropAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();

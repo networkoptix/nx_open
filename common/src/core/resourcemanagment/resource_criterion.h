@@ -101,13 +101,18 @@ public:
 
     static QnResourceList filter(const QnResourceList &resources, const QnResourceCriterion &criterion);
 
-    template<class Resource>
-    static QList<QnSharedResourcePointer<Resource> > filter(const QnResourceList &resources) {
-        QList<QnSharedResourcePointer<Resource> > result;
+    template<class Resource, class Result>
+    static Result filter(const QnResourceList &resources) {
+        Result result;
         foreach(const QnResourcePtr &resource, resources)
             if(QnSharedResourcePointer<Resource> derived = resource.dynamicCast<Resource>())
                 result.push_back(derived);
         return result;
+    }
+
+    template<class Resource>
+    static QList<QnSharedResourcePointer<Resource> > filter(const QnResourceList &resources) {
+        return filter<Resource, QList<QnSharedResourcePointer<Resource> > >(resources);
     }
 
     friend bool operator==(const QnResourceCriterion &l, const QnResourceCriterion &r);

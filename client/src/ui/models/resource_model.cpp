@@ -662,32 +662,12 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
             context()->menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
         }
     } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
-        foreach(const QnResourcePtr &resource, resources) {
-            if(resource->getParentId() == server->getId())
-                continue; /* Dropping resource into its owner does nothing. */
+        QnResourceList cameras = QnResourceCriterion::filter<QnNetworkResource, QnResourceList>(resources);
+        if(!cameras.empty()) {
+            QVariantMap params;
+            params[Qn::ServerParameter] = QVariant::fromValue(server);
 
-            QnNetworkResourcePtr network = resource.dynamicCast<QnNetworkResource>();
-            if(!network)
-                continue;
-
-            QnMacAddress mac = network->getMAC();
-
-            QnNetworkResourcePtr replacedNetwork;
-            foreach(const QnResourcePtr otherResource, resourcePool()->getResourcesWithParentId(server->getId())) {
-                if(QnNetworkResourcePtr otherNetwork = otherResource.dynamicCast<QnNetworkResource>()) {
-                    if(otherNetwork->getMAC() == mac) {
-                        replacedNetwork = otherNetwork;
-                        break;
-                    }
-                }
-            }
-
-            if(replacedNetwork) {
-                replacedNetwork->setStatus(QnResource::Offline);
-                network->setStatus(QnResource::Disabled);
-
-                // TODO: should we save it here?
-            }
+            context()->menu()->trigger(Qn::MoveCameraAction, cameras, params);
         }
     }
     

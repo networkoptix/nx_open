@@ -6,10 +6,12 @@ namespace Qn {
     inline QLatin1String qn_gridPositionParameter()    { return QLatin1String("_qn_gridPosition"); }
     inline QLatin1String qn_userParameter()            { return QLatin1String("_qn_user"); }
     inline QLatin1String qn_nameParameter()            { return QLatin1String("_qn_name"); }
+    inline QLatin1String qn_serverParameter()          { return QLatin1String("_qn_server"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
 #define UserParameter qn_userParameter()
 #define NameParameter qn_nameParameter()
+#define ServerParameter qn_serverParameter()
 
     /**
      * Enum of all menu actions.
@@ -36,6 +38,11 @@ namespace Qn {
          * Drops provided resources on the current layout.
          */ 
         ResourceDropAction,
+
+        /**
+         * Moves cameras from one server to another.
+         */
+        MoveCameraAction,
 
         /**
          * Opens next layout.

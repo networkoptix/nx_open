@@ -151,6 +151,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::NewLayoutAction),                    SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
     connect(action(Qn::RenameLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_renameLayoutAction_triggered()));
     connect(action(Qn::ResourceDropAction),                 SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
+    connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::deinitialize() {
@@ -390,6 +391,41 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
 
         if(isLocal)
             resourcePool()->removeResource(resource);
+    }
+}
+
+void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
+    QnResourceList resources = menu()->currentResourcesTarget(sender());
+    QnVideoServerResourcePtr server = menu()->currentParameter(sender(), Qn::ServerParameter).value<QnVideoServerResourcePtr>();
+    if(!server)
+        return;
+
+    foreach(const QnResourcePtr &resource, resources) {
+        if(resource->getParentId() == server->getId())
+            continue; /* Moving resource into its owner does nothing. */
+
+        QnNetworkResourcePtr network = resource.dynamicCast<QnNetworkResource>();
+        if(!network)
+            continue;
+
+        QnMacAddress mac = network->getMAC();
+
+        QnNetworkResourcePtr replacedNetwork;
+        foreach(const QnResourcePtr otherResource, resourcePool()->getResourcesWithParentId(server->getId())) {
+            if(QnNetworkResourcePtr otherNetwork = otherResource.dynamicCast<QnNetworkResource>()) {
+                if(otherNetwork->getMAC() == mac) {
+                    replacedNetwork = otherNetwork;
+                    break;
+                }
+            }
+        }
+
+        if(replacedNetwork) {
+            replacedNetwork->setStatus(QnResource::Offline);
+            network->setStatus(QnResource::Disabled);
+
+            // TODO: we should save it here.
+        }
     }
 }
 

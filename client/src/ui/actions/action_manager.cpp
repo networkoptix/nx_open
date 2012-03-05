@@ -225,6 +225,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
 
+    factory(Qn::MoveCameraAction).
+        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Move Cameras")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::network)));
+
     factory(Qn::NextLayoutAction).
         flags(Qn::NoTarget).
         text(tr("Next Layout")).
