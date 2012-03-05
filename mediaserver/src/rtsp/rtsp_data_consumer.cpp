@@ -326,7 +326,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             return true; // data for other live quality stream
     }
 
-    quint8 cseq = media->opaque;
+    int cseq = media->opaque;
     quint16 flags = media->flags;
 
     if (m_owner->isLiveDP(media->dataProvider)) {
@@ -419,7 +419,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             m_owner->bufferData((const char*) &packetType, 1);
             quint32 timestampHigh = htonl(media->timestamp >> 32);
             m_owner->bufferData((const char*) &timestampHigh, 4);
-            m_owner->bufferData((const char*) &cseq, 1);
+            quint8 cseq8 = cseq;
+            m_owner->bufferData((const char*) &cseq8, 1);
             flags = htons(flags);
             m_owner->bufferData((const char*) &flags, 2);
             if (video) 
