@@ -86,7 +86,7 @@ namespace {
     const qreal maxExpandedSize = 0.5;
 
     /** Viewport lower size boundary, in scene coordinates. */
-    const QSizeF viewportLowerSizeBound = QSizeF(800.0, 800.0);
+    const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
@@ -605,13 +605,15 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
         widget->setPalette(palette);
     }
 
+    qreal buttonSize = qnGlobals->workbenchUnitSize() * 0.05;
+
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
     togglePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("pin.png")));
     togglePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("unpin.png")));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
-    togglePinButton->setPreferredSize(QSizeF(1000.0, 1000.0));
+    togglePinButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
     connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
     widget->addButton(togglePinButton);
 #endif
@@ -619,7 +621,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("close.png")));
     closeButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("close_hover.png")));
-    closeButton->setPreferredSize(QSizeF(1000.0, 1000.0));
+    closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
     closeButton->setAnimationSpeed(4.0);
     connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
     widget->addButton(closeButton);
@@ -674,8 +676,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         if(item == workbench()->item(static_cast<QnWorkbench::ItemRole>(i)))
             workbench()->setItem(static_cast<QnWorkbench::ItemRole>(i), NULL);
 
-    if(destroyWidget)
+    if(destroyWidget) {
+        widget->hide();
         qnDeleteLater(widget);
+    }
 
     if(destroyItem)
         qnDeleteLater(item);

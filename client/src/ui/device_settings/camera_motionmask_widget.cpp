@@ -55,12 +55,7 @@ void QnCameraMotionMaskWidget::init()
     }
 
     /* Set up model & control machinery. */
-    const QSizeF defaultCellSize = QSizeF(15000.0, 10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger these numbers, the better. */
-    const QSizeF defaultSpacing = QSizeF(2500.0, 2500.0);
-    
     m_context = new QnWorkbenchContext(NULL, this);
-    m_context->workbench()->mapper()->setCellSize(defaultCellSize);
-    m_context->workbench()->mapper()->setSpacing(defaultSpacing);
 
     m_display = new QnWorkbenchDisplay(m_context, this);
     m_display->setScene(m_scene);

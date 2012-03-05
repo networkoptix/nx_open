@@ -261,8 +261,14 @@ signals:
      */
     void nameChanged();
 
+    /**
+     * This signal is emitted whenever cell aspect ratio of this layout changes. 
+     */
     void cellAspectRatioChanged();
 
+    /**
+     * This signal is emitted whenever cell spacing of this layout changes.
+     */
     void cellSpacingChanged();
 
 private:

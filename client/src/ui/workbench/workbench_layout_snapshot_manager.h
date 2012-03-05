@@ -52,6 +52,12 @@ namespace Qn {
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::LayoutFlags);
 
 
+/**
+ * This class maintains a storage of layout snapshots and tracks the state of
+ * each layout.
+ * 
+ * It also provides some functions for layout and snapshot manipulation.
+ */
 class QnWorkbenchLayoutSnapshotManager: public QObject {
     Q_OBJECT;
 public:

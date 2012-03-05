@@ -63,10 +63,14 @@ protected slots:
     void at_resource_itemAdded(const QnLayoutItemData &itemData);
     void at_resource_itemRemoved(const QnLayoutItemData &itemData);
     void at_resource_itemChanged(const QnLayoutItemData &itemData);
+    void at_resource_cellAspectRatioChanged();
+    void at_resource_cellSpacingChanged();
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_nameChanged();
+    void at_layout_cellAspectRatioChanged();
+    void at_layout_cellSpacingChanged();
     void at_layout_aboutToBeDestroyed();
 
     void at_item_changed();

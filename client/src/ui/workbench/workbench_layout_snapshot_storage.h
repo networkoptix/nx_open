@@ -9,15 +9,21 @@
 
 class QnWorkbenchLayoutSnapshot {
 public:
-    QnWorkbenchLayoutSnapshot() {}
+    QnWorkbenchLayoutSnapshot(): cellAspectRatio(-1.0), cellSpacing(-1.0, -1.0) {}
 
     QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &resource);
 
     QnLayoutItemDataMap items;
     QString name;
+    qreal cellAspectRatio;
+    QSizeF cellSpacing;
+
+    friend bool operator==(const QnWorkbenchLayoutSnapshot &l, const QnWorkbenchLayoutSnapshot &r);
 };
 
-
+/**
+ * This class provides easy access to snapshots of workbench layouts. 
+ */
 class QnWorkbenchLayoutSnapshotStorage: public QObject {
     Q_OBJECT;
 public:

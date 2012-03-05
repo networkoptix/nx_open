@@ -222,6 +222,8 @@ private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
     void at_layout_aboutToBeDestroyed();
+    void at_layout_cellAspectRatioChanged();
+    void at_layout_cellSpacingChanged();
 
 private:
     /** Current layout. */
