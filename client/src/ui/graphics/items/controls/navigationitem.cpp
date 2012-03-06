@@ -1,9 +1,9 @@
 #include "navigationitem.h"
 
-#include <QtCore/QEvent>
-
-#include <QtGui/QAction>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QEvent>
+#include <QCoreApplication>
+#include <QAction>
+#include <QGraphicsLinearLayout>
 
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/video_server.h>
@@ -412,7 +412,7 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
     m_timeSlider->resetSelectionRange();
 
-    bool clearZoomNeeded = !camera || !m_camera || camera->getCamDisplay()->isRealTimeSource() != m_camera->getCamDisplay()->isRealTimeSource();
+    bool clearZoomNeeded = m_reserveCameras.contains(camera) != m_reserveCameras.contains(m_camera);
 
     if (m_camera)
         disconnect(m_camera->getCamDisplay(), 0, this, 0);
@@ -876,11 +876,53 @@ void NavigationItem::rewindBackward()
         return;
 
     setActive(true);
+
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    reader->jumpTo(0, true);
+    if(!m_reserveCameras.contains(m_camera)) {
+        reader->jumpTo(0, true);
+        reader->resumeDataProcessors();
+    } else {
+        qint64 currentTime = m_timeSlider->currentValue();
+        qint64 pos = -1;
+        bool jumped = false;
+
+        for(int attempt = 0; attempt < 5; attempt++) {
+            const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
+            qint64 precision = m_timeSlider->getMsInPixel() * 3;
+            for(int i = periods.size() - 1; i >= 0; i--) {
+                if(periods[i].durationMs < precision && periods[i].durationMs != -1)
+                    continue;
+
+                if(periods[i].startTimeMs < currentTime - precision) {
+                    pos = periods[i].startTimeMs * 1000;
+                    break;
+                }
+            }
+            if(pos == -1) {
+                if(!periods.empty()) {
+                    pos = periods[0].startTimeMs * 1000;
+                } else {
+                    pos = DATETIME_NOW;
+                }
+            }
+
+            foreach(CLVideoCamera *camera, m_reserveCameras) {
+                QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(camera->getStreamreader());
+                if(static_cast<QnAbstractArchiveReader*>(camera->getStreamreader())->jumpTo(pos, true)) {
+                    reader->resumeDataProcessors();
+                    jumped = true;
+                    break;
+                }
+            }
+            if(jumped)
+                break;
+            currentTime = pos / 1000;
+        }
+    }
+
+    
     //m_camera->streamJump(0);
-    reader->resumeDataProcessors();
 }
 
 void NavigationItem::rewindForward()
@@ -895,9 +937,33 @@ void NavigationItem::rewindForward()
     if (stopped)
         play();
 
-    reader->jumpTo(reader->lengthMksec(), false);
-    //m_camera->streamJump(reader->lengthMksec());
-    reader->resumeDataProcessors();
+    qint64 pos = -1;
+    if(!m_reserveCameras.contains(m_camera)) {
+        reader->jumpTo(reader->lengthMksec(), false);
+        reader->resumeDataProcessors();
+    } else {
+        qint64 pos = -1;
+
+        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
+        qint64 currentTime = m_timeSlider->currentValue();
+        for(int i = 0; i < periods.size(); i++) {
+            if(periods[i].startTimeMs > currentTime) {
+                pos = periods[i].startTimeMs * 1000;
+                break;
+            }
+        }
+        if(pos == -1)
+            pos = DATETIME_NOW;
+
+        foreach(CLVideoCamera *camera, m_reserveCameras) {
+            QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(camera->getStreamreader());
+            if(static_cast<QnAbstractArchiveReader*>(camera->getStreamreader())->jumpTo(pos, false)) {
+                reader->resumeDataProcessors();
+                break;
+            }
+        }
+    }
+
     if (stopped)
     {
         qApp->processEvents();
@@ -1074,7 +1140,6 @@ void NavigationItem::at_liveButton_clicked(bool checked)
     m_timeSlider->setLiveMode(true);
     m_timeSlider->setCurrentValue(m_timeSlider->maximumValue());
     smartSeek(DATETIME_NOW);
-    //m_timeSlider->setCurrentValue(checked ? DATETIME_NOW : m_timeSlider->minimumValue());
 }
 
 void NavigationItem::onSyncButtonToggled(bool value)

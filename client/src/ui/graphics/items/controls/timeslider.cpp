@@ -95,6 +95,8 @@ public:
 
     void setEndSize(int size);
 
+    qreal getMsInPixel() const;
+
 protected:
     void sliderChange(SliderChange change);
 
@@ -107,7 +109,6 @@ protected:
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
-    qreal getMsInPixel() const;
     void drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color);
     void createEndPixmap();
 private:
@@ -1341,4 +1342,9 @@ void TimeSlider::setMotionTimePeriodList(const QnTimePeriodList &timePeriodList)
 { 
     m_motionTimePeriodList = timePeriodList; 
     m_aggregatedMsInPixel = -1;
+}
+
+qreal TimeSlider::getMsInPixel() const 
+{
+    return m_slider->getMsInPixel();
 }
