@@ -212,7 +212,7 @@
                                 <File Id="ServerAvformatDll" Name="avformat-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avformat-53.dll"/>
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="../mediaserver/bin/$(env.CONFIG)/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="../mediaserver/bin/$(env.CONFIG)/swscale-2.dll"/>
-								<File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="../mediaserver/bin/$(env.CONFIG)/libmp3lame-0.dll"/>
+                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="../mediaserver/bin/$(env.CONFIG)/libmp3lame-0.dll"/>
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -224,6 +224,11 @@
                                 <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll"/>
                                 <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
                                 <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
+                            </Component>
+
+                            <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
+                                <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="..\common\contrib\openssl\bin\libeay32.dll"/>
+                                <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="..\common\contrib\openssl\bin\ssleay32.dll"/>
                             </Component>
                             
                             <Component Id="ServerXerces" Guid="{B81B02A6-9CC1-4b16-9E03-A4AD91624B5E}">
@@ -277,7 +282,7 @@
                                 <File Id="ClientAvformatDll" Name="avformat-53.dll" Source="../client/bin/$(env.CONFIG)/avformat-53.dll"/>
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="../client/bin/$(env.CONFIG)/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="../client/bin/$(env.CONFIG)/swscale-2.dll"/>
-								<File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="../client/bin/$(env.CONFIG)/libmp3lame-0.dll"/>
+                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="../client/bin/$(env.CONFIG)/libmp3lame-0.dll"/>
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
@@ -297,8 +302,8 @@
                             </Component>
                             
                             <Component Id="ClientOpenSSL" Guid="{D7E994B3-B437-4993-A04E-C15AF9DF8312}">
-                                <File Id="libeay32.dll" Name="libeay32.dll" Source="..\client\contrib\openssl\bin\libeay32.dll"/>
-                                <File Id="ssleay32.dll" Name="ssleay32.dll" Source="..\client\contrib\openssl\bin\ssleay32.dll"/>
+                                <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="..\common\contrib\openssl\bin\libeay32.dll"/>
+                                <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="..\common\contrib\openssl\bin\ssleay32.dll"/>
                             </Component>
                             
                             <Component Id="ClientXerces" Guid="{50CE2C40-DE8E-4619-979F-2C227009D4BB}">
@@ -387,6 +392,7 @@
             <ComponentRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerXerces"/>
+            <ComponentRef Id="ServerOpenSSL"/>
             <ComponentRef Id="ServerQjson"/>
             
             <ComponentRef Id='ProgramMenuMediaServerDir' />
