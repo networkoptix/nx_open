@@ -121,6 +121,7 @@ namespace {
     const qreal hoverHelpBackgroundOpacity = 1.0;
 
     const int hideConstrolsTimeoutMSec = 2000;
+    const int closeConstrolsTimeoutMSec = 2000;
 
 } // anonymous namespace
 
@@ -243,8 +244,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeHidingProcessor->addTargetItem(m_treeItem);
     m_treeHidingProcessor->addTargetItem(m_treeShowButton);
-    m_treeHidingProcessor->setHoverLeaveDelay(1000);
-    m_treeHidingProcessor->setFocusLeaveDelay(1000);
+    m_treeHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
+    m_treeHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
 
     m_treeShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeShowingProcessor->addTargetItem(m_treeShowButton);
@@ -410,8 +411,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_helpHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_helpHidingProcessor->addTargetItem(m_helpItem);
     m_helpHidingProcessor->addTargetItem(m_helpShowButton);
-    m_helpHidingProcessor->setHoverLeaveDelay(1000);
-    m_helpHidingProcessor->setFocusLeaveDelay(1000);
+    m_helpHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
+    m_helpHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
 
     m_helpShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_helpShowingProcessor->addTargetItem(m_helpShowButton);
