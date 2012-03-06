@@ -80,7 +80,7 @@
 #include "help/qncontext_help.h"
 
 
-//#define QN_WORKBENCH_CONTROLLER_DEBUG
+#define QN_WORKBENCH_CONTROLLER_DEBUG
 
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
@@ -637,7 +637,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 }
 
 void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
-    TRACE("DRAG STARTED");
+    TRACE("MOVE STARTED");
 
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
@@ -745,7 +745,7 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *
 }
 
 void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphicsItem *> &) {
-    TRACE("DRAG FINISHED");
+    TRACE("MOVE FINISHED");
 
     /* Hide grid. */
     m_display->gridItem()->animatedHide();
