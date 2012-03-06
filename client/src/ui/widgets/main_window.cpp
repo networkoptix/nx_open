@@ -34,7 +34,7 @@
 #include "ui/workbench/workbench_synchronizer.h"
 #include "ui/workbench/workbench_action_handler.h"
 #include "ui/workbench/workbench_context.h"
-
+#include "ui/workbench/workbench_resource.h"
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
@@ -504,6 +504,31 @@ void QnMainWindow::resizeEvent(QResizeEvent *event) {
     ));
 
     base_type::resizeEvent(event);
+}
+
+void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
+    m_dropResources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    if (m_dropResources.empty())
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnMainWindow::dragMoveEvent(QDragMoveEvent *event) {
+    if(m_dropResources.empty())
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnMainWindow::dragLeaveEvent(QDragLeaveEvent *event) {
+    m_dropResources = QnResourceList();
+}
+
+void QnMainWindow::dropEvent(QDropEvent *event) {
+    m_context->menu()->trigger(Qn::ResourceDropIntoNewLayoutAction, m_dropResources);
+
+    event->acceptProposedAction();
 }
 
 #ifdef Q_OS_WIN

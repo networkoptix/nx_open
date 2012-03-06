@@ -46,6 +46,10 @@ protected:
     virtual void changeEvent(QEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
+    virtual void dragEnterEvent(QDragEnterEvent *event) override;
+    virtual void dragMoveEvent(QDragMoveEvent *event) override;
+    virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
+    virtual void dropEvent(QDropEvent *event) override;
 
 #ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
@@ -92,6 +96,8 @@ private:
     QBoxLayout *m_globalLayout;
 
     bool m_titleVisible;
+
+    QnResourceList m_dropResources;
 
     QnDwm *m_dwm;
     bool m_drawCustomFrame;

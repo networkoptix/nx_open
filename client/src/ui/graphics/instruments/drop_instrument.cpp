@@ -135,5 +135,6 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
         context->menu()->trigger(Qn::ResourceDropIntoNewLayoutAction, m_resources);
     }
 
+    event->acceptProposedAction();
     return true;
 }
