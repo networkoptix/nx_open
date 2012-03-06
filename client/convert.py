@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import shutil
@@ -18,7 +18,7 @@ import re
 sys.path.insert(0, os.path.join('..', 'common'))
 
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB
-from convert import qt_path, copy_files, setup_tools, setup_qjson, platform, gen_env_sh
+from convert import qt_path, copy_files, setup_tools, setup_qjson, setup_openssl, platform, gen_env_sh
 from convert import convert as convert_common
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
@@ -45,11 +45,6 @@ def setup_openal():
     openal_path += sys.platform
 
     return openal_path
-
-def setup_openssl():
-    openssl_path = 'contrib/openssl/bin/'
-
-    return openssl_path
 
 def generate_info_plist():
     def gen_association(ext):
@@ -82,10 +77,25 @@ def generate_info_plist():
     strings_template = Template(xin)
     print >> xout, strings_template.substitute(associations=associations.getvalue(), version=APPLICATION_VERSION)
 
+def get_library_path():
+    if platform() == 'mac':
+        return os.getenv('DYLD_LIBRARY_PATH')
+    
+    return None
+
+def set_library_path(value):
+    if platform() == 'mac':
+        os.putenv('DYLD_LIBRARY_PATH', value)
+
 def gen_version_h():
     revision = os.popen('hg id -i').read().strip()
 
+    library_path = get_library_path()
+    set_library_path(os.path.join(ffmpeg_path_release, 'lib'))
     ffmpeg_output = os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()
+    if library_path:
+        set_library_path(library_path)
+    
     ffmpeg_version = re.search(r'(N-[^\s]*)', ffmpeg_output).groups()[0]
 
     version_h = open('src/version.h', 'w')
@@ -160,8 +170,8 @@ copy_files(openal_path + '/*.dll', 'bin/release')
 copy_files(openal_path + '/*.dll', 'bin/debug')
 
 if platform() == 'win32':
-    copy_files(openssl_path + '/*.dll', 'bin/debug')
-    copy_files(openssl_path + '/*.dll', 'bin/release')
+    copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
+    copy_files(openssl_path + '/bin/*.dll', 'bin/release')
 
     copy_files(tools_path + '/bin/*.dll', 'bin/release')
     copy_files(tools_path + '/bin/*.dll', 'bin/debug')

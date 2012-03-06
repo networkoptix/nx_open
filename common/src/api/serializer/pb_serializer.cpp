@@ -3,6 +3,7 @@
 #include "user.pb.h"
 #include "resource.pb.h"
 #include "resourceType.pb.h"
+#include "license.pb.h"
 
 #include "api/QStdIStream.h"
 
@@ -15,6 +16,7 @@ typedef google::protobuf::RepeatedPtrField<proto::pb::Server>         PbServerLi
 typedef google::protobuf::RepeatedPtrField<proto::pb::Layout>         PbLayoutList;
 typedef google::protobuf::RepeatedPtrField<proto::pb::User>           PbUserList;
 typedef google::protobuf::RepeatedPtrField<proto::pb::ResourceType>   PbResourceTypeList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::License>        PbLicenseList;
 
 QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 {
@@ -62,6 +64,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
         if (camera.isNull())
             continue;
 
+        camera->setBlocked(pb_camera.blocked());
         camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
 
         if (pb_camera.has_region())
@@ -333,6 +336,24 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
     }
 }
 
+void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
+{
+    for (PbLicenseList::const_iterator ci = pb_licenses.begin(); ci != pb_licenses.end(); ++ci)
+    {
+        const proto::pb::License& pb_license = *ci;
+
+        QnLicensePtr license(new QnLicense(
+                                 pb_license.name().c_str(),
+                                 pb_license.key().c_str(),
+                                 pb_license.cameracount(),
+                                 pb_license.hwid().c_str(),
+                                 pb_license.signature().c_str()
+                                 ));
+        licenses.append(license);
+
+    }
+}
+
 void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResourcePtr& cameraPtr)
 {
     pb_camera.set_id(cameraPtr->getId().toInt());
@@ -345,6 +366,7 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
     pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
     pb_camera.set_region(serializeRegionList(cameraPtr->getMotionMaskList()).toUtf8().constData());
+    pb_camera.set_blocked(cameraPtr->isBlocked());
 
     foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
         proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();
@@ -466,11 +488,24 @@ void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTyp
     proto::pb::ResourceTypes pb_resourceTypes;
     if (!pb_resourceTypes.ParseFromArray(data.data(), data.size())) {
         QByteArray errorString;
-        errorString = "QnApiPbSerializer::deserializeCameras(): Can't parse message";
+        errorString = "QnApiPbSerializer::deserializeResourceTypes(): Can't parse message";
         throw QnSerializeException(errorString);
     }
 
     parseResourceTypes(resourceTypes, pb_resourceTypes.resourcetype());
+}
+
+void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByteArray &data)
+{
+    proto::pb::Licenses pb_licenses;
+    if (!pb_licenses.ParseFromArray(data.data(), data.size())) {
+        QByteArray errorString;
+        errorString = "QnApiPbSerializer::deserializeLicenses(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+
+    licenses.setHardwareId(pb_licenses.hwid().c_str());
+    parseLicenses(licenses, pb_licenses.license());
 }
 
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)
@@ -482,6 +517,22 @@ void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& came
 
     std::string str;
     pb_cameras.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray& data)
+{
+    proto::pb::Licenses pb_licenses;
+
+    proto::pb::License& pb_license = *(pb_licenses.add_license());
+    pb_license.set_name(license->name().constData());
+    pb_license.set_key(license->key().constData());
+    pb_license.set_cameracount(license->cameraCount());
+    pb_license.set_hwid(license->hardwareId().constData());
+    pb_license.set_signature(license->signature().constData());
+
+    std::string str;
+    pb_licenses.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 

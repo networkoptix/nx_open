@@ -40,9 +40,34 @@ void QnEventManager::stop()
 
 void QnEventManager::eventReceived(QnEvent event)
 {
-    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
+    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
 
-    if (event.eventType == QN_EVENT_RES_CHANGE)
+    if (event.eventType == QN_EVENT_LICENSE_CHANGE)
+    {
+        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+
+        QnLicenseList licenses;
+        QByteArray errorString;
+
+        if (appServerConnection->getLicenses(licenses, errorString) == 0)
+        {
+            foreach (QnLicensePtr license, licenses.licenses())
+            {
+                // Someone wants to steal our software
+                if (!license->isValid())
+                {
+                    QnLicenseList dummy;
+                    dummy.setHardwareId("invalid");
+                    qnLicensePool->replaceLicenses(dummy);
+                    break;
+                }
+            }
+
+            qnLicensePool->replaceLicenses(licenses);
+        }
+
+    }
+    else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         if (event.objectName != "Camera" && event.objectName != "Server")
             return;
@@ -56,7 +81,7 @@ void QnEventManager::eventReceived(QnEvent event)
         {
             foreach(const QnResourcePtr& resource, resources)
             {
-                if (resource->getId() == event.resourceId)
+                if (resource->getId() == event.objectId)
                 {
                     QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
 
@@ -87,7 +112,7 @@ void QnEventManager::eventReceived(QnEvent event)
         } else
         {
             qDebug()  << "QnEventManager::eventReceived(): Can't get resource from appserver. Reason: "
-                      << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.resourceId;
+                      << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.objectId;
         }
     }
 }

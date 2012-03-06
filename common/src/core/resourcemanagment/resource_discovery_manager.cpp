@@ -109,6 +109,11 @@ void QnResourceDiscoveryManager::run()
         QnSleep::msleep(1000);
     }
 
+    while (!needToStop() && !initLicenses(appServerConnection))
+    {
+        QnSleep::msleep(1000);
+    }
+
     while (!needToStop())
     {
         bool ip_finished;

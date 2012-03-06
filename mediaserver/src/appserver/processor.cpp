@@ -44,6 +44,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
             continue;
         }
+
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());
 

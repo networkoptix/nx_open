@@ -540,6 +540,8 @@ void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
             const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
             resourcePool()->removeResources(remoteResources);
 
+            qnLicensePool->reset();
+
             SessionManager::instance()->start();
             QnEventManager::instance()->run();
 
