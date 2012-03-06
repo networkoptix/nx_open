@@ -356,6 +356,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
+    connect(action(Qn::MainMenuAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_mainMenuAction_triggered()));
 
 
     /* Help window. */
@@ -1121,6 +1122,24 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchUi::at_mainMenuAction_triggered() {
+    if(!m_mainMenuButton->isVisible())
+        return;
+
+    const char *inShowMenuPropertyName = "_qn_inShowMenu";
+
+    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
+    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
+        if(menu)
+            menu->hide();
+    } else {
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
+        m_mainMenuButton->click(); /* This call starts event loop. */
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
+    }
+}
+
+
 void QnWorkbenchUi::at_fpsChanged(qreal fps) {
     m_fpsItem->setText(QString::number(fps, 'g', 4));
     m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));

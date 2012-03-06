@@ -280,17 +280,20 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     /* Context menu actions. */
-
-    factory(Qn::LightMainMenuAction).
+    factory(Qn::MainMenuAction).
+        flags(Qn::NoTarget).
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
-        autoRepeat(false).
+        autoRepeat(false);
+
+    factory(Qn::LightMainMenuAction).
+        flags(Qn::NoTarget).
+        text(tr("Main Menu")).
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
 
     factory(Qn::DarkMainMenuAction).
+        flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        shortcut(tr("Alt+Space")).
-        autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
 
     factory(Qn::NewUserAction).

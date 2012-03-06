@@ -112,6 +112,8 @@ protected:
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
     bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
 
+    void clickInternal(QGraphicsSceneMouseEvent *event);
+
 private:
     friend class QnImageButtonHoverProgressAccessor;
 

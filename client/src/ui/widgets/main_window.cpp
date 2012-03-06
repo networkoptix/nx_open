@@ -175,7 +175,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(action(Qn::ConnectionSettingsAction));
     addAction(action(Qn::OpenNewLayoutAction));
     addAction(action(Qn::CloseLayoutAction));
-    addAction(action(Qn::DarkMainMenuAction));
+    addAction(action(Qn::MainMenuAction));
     addAction(action(Qn::YouTubeUploadAction));
     addAction(action(Qn::EditTagsAction));
     addAction(action(Qn::OpenInFolderAction));
@@ -185,6 +185,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
+    connect(action(Qn::MainMenuAction),     SIGNAL(triggered()),                            this,                                   SLOT(at_mainMenuAction_triggered()));
 
     menu()->setTargetProvider(m_ui);
 
@@ -213,9 +214,10 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction));
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
-    disconnect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton, SLOT(_q_buttonPressed()));
-    connect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton->defaultAction(), SLOT(trigger()));
-    connect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton, SLOT(_q_buttonPressed()));
+    disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
+    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton->defaultAction(),      SLOT(trigger()));
+    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
+
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
@@ -455,7 +457,7 @@ bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
     if(event->type() == QnSystemMenuEvent::SystemMenu) {
-        menu()->trigger(Qn::LightMainMenuAction);
+        menu()->trigger(Qn::MainMenuAction);
         return true;
     }
 
@@ -549,3 +551,19 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
+void QnMainWindow::at_mainMenuAction_triggered() {
+    if(!m_mainMenuButton->isVisible())
+        return;
+
+    const char *inShowMenuPropertyName = "_qn_inShowMenu";
+
+    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
+    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
+        if(menu)
+            menu->hide();
+    } else {
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
+        m_mainMenuButton->click(); /* This call starts event loop. */
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
+    }
+}

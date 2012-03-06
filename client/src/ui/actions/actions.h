@@ -61,6 +61,7 @@ namespace Qn {
         /**
          * Opens the main menu.
          */
+        MainMenuAction,
         LightMainMenuAction,
         DarkMainMenuAction,
 
