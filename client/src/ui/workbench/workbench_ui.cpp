@@ -1156,6 +1156,9 @@ void QnWorkbenchUi::at_activityStopped() {
     m_inactive = true;
 
     updateControlsVisibility(true);
+
+    foreach(QnResourceWidget *widget, m_display->widgets())
+        widget->fadeOutButtons();
 }
 
 void QnWorkbenchUi::at_activityStarted() {
