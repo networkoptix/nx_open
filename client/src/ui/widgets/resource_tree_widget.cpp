@@ -68,16 +68,9 @@ protected:
         if(resource && resource->getStatus() == QnResource::Offline) {
             QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 0, 0, 128), 0));
 
-            QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4, optionV4.widget);
-            int textMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, optionV4.widget) + 1;
-            textRect = textRect.adjusted(textMargin, 0, -textMargin, 0);
-
-            QFontMetrics metrics(optionV4.font);
-            int width = metrics.width(optionV4.text);
-
-            int y = (option.rect.top() + option.rect.bottom() + 1) / 2;
-
-            painter->drawLine(option.rect.left(), y, textRect.left() + width, y);
+            QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+            painter->drawLine(iconRect.topLeft() + QPoint(1, 1), iconRect.bottomRight() - QPoint(1, 1));
+            painter->drawLine(iconRect.topRight() + QPoint(-1, 1), iconRect.bottomLeft() - QPoint(-1, 1));
         }
     }
 
