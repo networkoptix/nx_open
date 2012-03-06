@@ -586,7 +586,7 @@ void QnGLRenderer::updateTexture()
         case PIX_FMT_YUV420P:
             if (useSSE2())
             {
-                yuv420_argb32_sse_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                yuv420_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
                     roundUp(r_w[0],ROUND_COEFF),
                     h[0],
                     4 * m_curImg->linesize[0],
@@ -600,7 +600,7 @@ void QnGLRenderer::updateTexture()
         case PIX_FMT_YUV422P:
             if (useSSE2())
             {
-                yuv422_argb32_sse_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                yuv422_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
                     roundUp(r_w[0],ROUND_COEFF),
                     h[0],
                     4 * m_curImg->linesize[0],
@@ -614,7 +614,7 @@ void QnGLRenderer::updateTexture()
         case PIX_FMT_YUV444P:
             if (useSSE2())
             {
-                yuv444_argb32_sse_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                yuv444_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
                     roundUp(r_w[0],ROUND_COEFF),
                     h[0],
                     4 * m_curImg->linesize[0],

@@ -38,7 +38,7 @@ void stereoAudioMux(qint16* a1, qint16* a2, int lenInShort)
     for (int i = 0; i < lenInShort/8; ++i)
     {
         //*audio1 = _mm_avg_epu16(*audio1, *audio2);
-        *audio1 = _mm_add_epi16(*audio1, *audio2);
+        *audio1 = _mm_add_epi16(*audio1, *audio2); /* SSE2. */
         audio1++;
         audio2++;
     }

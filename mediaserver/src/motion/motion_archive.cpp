@@ -167,7 +167,7 @@ bool QnMotionArchive::mathImage(const __m128i* data, const __m128i* mask, int ma
     {
         for (int i = maskStart; i <= maskEnd; ++i)
         {
-            if (_mm_testz_si128(mask[i], data[i]) == 0)
+            if (_mm_testz_si128(mask[i], data[i]) == 0) /* SSE4. */
                 return true;
         }
     }
@@ -176,7 +176,7 @@ bool QnMotionArchive::mathImage(const __m128i* data, const __m128i* mask, int ma
         static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0);
         for (int i = maskStart; i <= maskEnd; ++i)
         {
-            if (_mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(mask[i], data[i]), zerroValue)) != 0xffff)
+            if (_mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(mask[i], data[i]), zerroValue)) != 0xffff) /* SSE2. */
                 return true;
         }
     }
