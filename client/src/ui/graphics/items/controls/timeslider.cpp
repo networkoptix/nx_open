@@ -1313,8 +1313,8 @@ const QnTimePeriodList& TimeSlider::recTimePeriodList(int msInPixel)
 {
     if (m_aggregatedMsInPixel != msInPixel)
     {
-        m_agregatedRecTimePeriodList = QnTimePeriod::agregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
-        m_agregatedMotionTimePeriodList = QnTimePeriod::agregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
+        m_agregatedRecTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
+        m_agregatedMotionTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
         m_aggregatedMsInPixel = msInPixel;
     }
     return m_agregatedRecTimePeriodList;
@@ -1324,8 +1324,8 @@ const QnTimePeriodList& TimeSlider::motionTimePeriodList(int msInPixel)
 {
     if (m_aggregatedMsInPixel != msInPixel)
     {
-        m_agregatedRecTimePeriodList = QnTimePeriod::agregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
-        m_agregatedMotionTimePeriodList = QnTimePeriod::agregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
+        m_agregatedRecTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
+        m_agregatedMotionTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
         m_aggregatedMsInPixel = msInPixel;
     }
     return m_agregatedMotionTimePeriodList;
