@@ -67,6 +67,21 @@ namespace {
 
 } // anonymous namespace
 
+detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldStatuses):
+    m_handler(handler),
+    m_resources(resources),
+    m_oldStatuses(oldStatuses)
+{
+    assert(oldStatuses.size() == resources.size());
+}
+
+void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle) {
+    if(m_handler)
+        m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldStatuses);
+    
+    deleteLater();
+}
+
 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
@@ -432,6 +447,9 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     if(!server)
         return;
 
+    QnResourceList modifiedResources;
+    QList<int> oldStatuses;
+
     foreach(const QnResourcePtr &resource, resources) {
         if(resource->getParentId() == server->getId())
             continue; /* Moving resource into its owner does nothing. */
@@ -453,11 +471,19 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         }
 
         if(replacedNetwork) {
+            oldStatuses.push_back(replacedNetwork->getStatus());
+            modifiedResources.push_back(replacedNetwork);
             replacedNetwork->setStatus(QnResource::Offline);
-            network->setStatus(QnResource::Disabled);
 
-            // TODO: we should save it here.
+            oldStatuses.push_back(network->getStatus());
+            modifiedResources.push_back(network);
+            network->setStatus(QnResource::Disabled);
         }
+    }
+
+    if(!modifiedResources.empty()) {
+        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldStatuses);
+        m_connection->setResourcesStatusAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
     }
 }
 
@@ -857,3 +883,27 @@ void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &err
     }
 }
 
+void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses) {
+    if(status == 0 || resources.isEmpty())
+        return;
+
+    QString message;
+    if(resources.size() == 1) {
+        message = tr("Could not save changes made to resource '%1'.").arg(resources[0]->getName());
+    } else {
+        QString resourceList;
+        for(int i = 0; i < resources.size(); i++) {
+            if(i < resources.size() - 1) {
+                resourceList += tr("%1;\n").arg(resources[i]->getName());
+            } else {
+                resourceList += tr("%1.").arg(resources[i]->getName());
+            }
+        }
+        message = tr("Could not save changes made to the following resources:\n\n%1").arg(resourceList);
+    }
+
+    QMessageBox::critical(widget(), tr(""), message, QMessageBox::Ok);
+
+    for(int i = 0; i < resources.size(); i++)
+        resources[i]->setStatus(static_cast<QnResource::Status>(oldStatuses[i]));
+}

@@ -508,7 +508,7 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
 }
 
 void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
-    if(cellAspectRatio < 0.0) /* Negative means 'use default value'. */
+    if(cellAspectRatio < 0.0 || qFuzzyIsNull(cellAspectRatio)) /* Negative means 'use default value'. */
         cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio(); 
 
     if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
