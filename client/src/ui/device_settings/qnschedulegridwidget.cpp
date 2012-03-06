@@ -8,6 +8,8 @@
 static const QColor NORMAL_LABEL_COLOR(255,255,255);
 static const QColor WEEKEND_LABEL_COLOR(255,128,128);
 static const QColor SELECTED_LABEL_COLOR(64,128, 192);
+//static const QColor DISABLED_LABEL_COLOR(64,64,64);
+static const int DISABLED_COLOR_SHIFT = -56;
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     : QWidget(parent)
@@ -100,6 +102,11 @@ QSize QnScheduleGridWidget::minimumSizeHint() const
     return sz.expandedTo(QApplication::globalStrut());
 }
 
+void shiftColor(QColor& color, int deltaR, int deltaG, int deltaB)
+{
+    color = QColor(qMax(0,qMin(255,color.red()+deltaR)), qMax(0,qMin(255,color.green()+deltaG)), qMax(0,qMin(255,color.blue()+deltaR)), color.alpha());
+}
+
 void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
@@ -108,20 +115,30 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
     qreal cellSize = getCellSize();
 
     p.setFont(m_labelsFont);
-    for (int y = 0; y < rowCount(); ++y) {
+    for (int y = 0; y < rowCount(); ++y) 
+    {
+        QColor penClr;
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
-            p.setPen(SELECTED_LABEL_COLOR);
+            penClr = SELECTED_LABEL_COLOR;
         else if (y < 5)
-            p.setPen(NORMAL_LABEL_COLOR);
+            penClr = NORMAL_LABEL_COLOR;
         else
-            p.setPen(WEEKEND_LABEL_COLOR);
+            penClr = WEEKEND_LABEL_COLOR;
+        if (!isEnabled())
+            shiftColor(penClr, DISABLED_COLOR_SHIFT,  DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+        p.setPen(penClr);
         p.drawText(QRect(0, cellSize*y+m_gridTopOffset, m_gridLeftOffset-TEXT_SPACING, cellSize), Qt::AlignRight | Qt::AlignVCenter, m_weekDays[y]);
     }
-    for (int x = 0; x < columnCount(); ++x) {
+    for (int x = 0; x < columnCount(); ++x) 
+    {
+        QColor penClr;
         if (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == x)
-            p.setPen(SELECTED_LABEL_COLOR);
+            penClr = SELECTED_LABEL_COLOR;
         else
-            p.setPen(NORMAL_LABEL_COLOR);
+            penClr = NORMAL_LABEL_COLOR;
+        if (!isEnabled())
+            shiftColor(penClr, DISABLED_COLOR_SHIFT,  DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+        p.setPen(penClr);
         p.drawText(QRect(m_gridLeftOffset + cellSize*x, 0, cellSize, m_gridTopOffset), Qt::AlignCenter | Qt::AlignVCenter, QString::number(x));
     }
 
@@ -141,9 +158,11 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
                     m_mouseMoveCell.x() == -1 && y == m_mouseMoveCell.y() ||
                     m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == -1)
                 {
-                    color = QColor(qMin(255,color.red()+SEL_CELL_CLR_DELTA), qMin(255,color.green()+SEL_CELL_CLR_DELTA), qMin(255,color.blue()+SEL_CELL_CLR_DELTA));
+                    shiftColor(color, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA);
                 }
             }
+            if (!isEnabled())
+                shiftColor(color, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
 
             QPointF leftTop(cellSize*x, cellSize*y);
             QPointF rightBottom(leftTop.x() + cellSize, leftTop.y() + cellSize);
@@ -152,7 +171,10 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
             p.fillRect(QRectF(leftTop.x(), leftTop.y(), cellSize, cellSize), color);
 
             // draw text parameters
-            p.setPen(QColor(255,255,255, 128));
+            QColor penClr(255,255,255, 128);
+            if (!isEnabled())
+                shiftColor(penClr, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+            p.setPen(penClr);
             if (m_showFirstParam && m_showSecondParam)
             {
                 QPoint p1 = QPointF(leftTop.x(), rightBottom.y()).toPoint();
@@ -171,7 +193,10 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
     }
 
     // draw grid lines
-    p.setPen(QColor(255, 255, 255));
+    QColor penClr(255, 255, 255);
+    if (!isEnabled())
+        shiftColor(penClr, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+    p.setPen(penClr);
     for (int x = 0; x <= columnCount(); ++x)
         p.drawLine(QPointF(cellSize*x, 0), QPointF(cellSize * x, cellSize * rowCount()));
     for (int y = 0; y <= rowCount(); ++y)
@@ -179,7 +204,10 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
 
     p.translate(-m_gridLeftOffset, -m_gridTopOffset);
 
-    p.setPen(QColor(255,255,255, 128));
+    penClr = QColor(255,255,255, 128);
+    if (!isEnabled())
+        shiftColor(penClr, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+    p.setPen(penClr);
     p.drawLine(QPoint(4, m_gridTopOffset), QPoint(m_gridLeftOffset, m_gridTopOffset));
     p.drawLine(QPoint(m_gridLeftOffset, 4), QPoint(m_gridLeftOffset, m_gridTopOffset));
     if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
@@ -187,8 +215,14 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
 
 
     // draw selection
-    p.setPen(qnGlobals->motionRubberBandBorderColor());
-    p.setBrush(qnGlobals->motionRubberBandColor());
+    penClr = QColor(qnGlobals->motionRubberBandBorderColor());
+    if (!isEnabled())
+        shiftColor(penClr, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+    p.setPen(penClr);
+    QColor brushClr(qnGlobals->motionRubberBandColor());
+    if (!isEnabled())
+        shiftColor(brushClr, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+    p.setBrush(brushClr);
     if (!m_selectedRect.isEmpty())
         p.drawRect(m_selectedRect);
 }

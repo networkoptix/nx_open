@@ -214,6 +214,15 @@ void CameraScheduleWidget::updateGridParams()
     else if (ui->btnNoRecord->isChecked())
         color = ui->btnNoRecord->color();
 
+    bool enabled = !ui->btnNoRecord->isChecked() && !ui->chkBoxDontChange->isChecked();
+    bool motionEnabled = ui->btnRecordMotion->isChecked() && !ui->chkBoxDontChange->isChecked();
+
+    ui->fpsSpinBox->setEnabled(enabled);
+    ui->comboBoxQuality->setEnabled(enabled);
+    ui->spinBoxRecordBefore->setEnabled(motionEnabled);
+    ui->spinBoxRecordAfter->setEnabled(motionEnabled);
+
+
     ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorParam, color.rgba());
     if (ui->btnNoRecord->isChecked())
     {
