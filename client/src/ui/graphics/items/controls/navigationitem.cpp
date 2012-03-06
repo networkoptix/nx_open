@@ -411,7 +411,8 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         return;
 
     m_timeSlider->resetSelectionRange();
-    //restoreInfoText();
+
+    bool clearZoomNeeded = !camera || !m_camera || camera->getCamDisplay()->isRealTimeSource() != m_camera->getCamDisplay()->isRealTimeSource();
 
     if (m_camera)
         disconnect(m_camera->getCamDisplay(), 0, this, 0);
@@ -444,6 +445,9 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     }
 
     m_syncButton->setEnabled(camera != 0 && !m_reserveCameras.isEmpty());
+
+    if(clearZoomNeeded)
+        m_timeSlider->setScalingFactor(0.0);
 
     emit actualCameraChanged(m_camera);
 }
