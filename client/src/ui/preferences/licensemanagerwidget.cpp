@@ -86,7 +86,6 @@ void LicenseManagerWidget::updateControls()
     if (m_licenses.hardwareId().isEmpty())
     {
         setEnabled(false);
-        return;
     } else {
         setEnabled(true);
     }
