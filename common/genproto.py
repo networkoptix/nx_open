@@ -31,6 +31,7 @@ def generate_pb(toolsdir, outdir):
                 'src/api/pb/resourceType.proto',
                 'src/api/pb/resource.proto',
                 'src/api/pb/server.proto',
+                'src/api/pb/license.proto',
                 'src/api/pb/ms_recordedTimePeriod.proto')
 
     output_files = []

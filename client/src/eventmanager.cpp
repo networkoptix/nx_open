@@ -67,7 +67,7 @@ void QnEventManager::resourcesReceived(int status, const QByteArray& errorString
 
 void QnEventManager::eventReceived(QnEvent event)
 {
-    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.resourceId << event.resourceGuid;
+    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
 
     if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
     {
@@ -75,7 +75,7 @@ void QnEventManager::eventReceived(QnEvent event)
         if (!event.resourceGuid.isEmpty())
             resource = qnResPool->getResourceByGuid(event.resourceGuid);
         else
-            resource = qnResPool->getResourceById(event.resourceId);
+            resource = qnResPool->getResourceById(event.objectId);
 
         if (resource)
         {
@@ -85,10 +85,10 @@ void QnEventManager::eventReceived(QnEvent event)
     }
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
-        m_connection->getResourcesAsync(QString::number(event.resourceId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
+        m_connection->getResourcesAsync(QString::number(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
-        QnResourcePtr ownResource = qnResPool->getResourceById(event.resourceId);
+        QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);
         qnResPool->removeResource(ownResource);
     }
 }

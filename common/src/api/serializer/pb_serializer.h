@@ -17,9 +17,11 @@ public:
     void deserializeUsers(QnUserResourceList& users, const QByteArray& data);
     void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data);
+    void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data);
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data);
     void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data);
+    void serializeLicense(const QnLicensePtr& license, QByteArray& data);
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data);
     void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data);

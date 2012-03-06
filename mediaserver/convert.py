@@ -13,7 +13,7 @@ from string import Template
 
 sys.path.insert(0, '../common')
 
-from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
+from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, setup_openssl, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
 from convert import gen_env_sh
 from convert import convert as convert_common
 
@@ -59,6 +59,7 @@ if len(sys.argv) == 2 and sys.argv[1] == '-parents':
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 tools_path = setup_tools()
 qjson_path = setup_qjson()
+openssl_path = setup_openssl()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -103,6 +104,11 @@ elif platform() == 'mac':
 elif platform() == 'linux':
     copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
     copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
+
+if platform() == 'win32':
+    copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
+    copy_files(openssl_path + '/bin/*.dll', 'bin/release')
+    print openssl_path
 
 if platform() == 'mac':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
