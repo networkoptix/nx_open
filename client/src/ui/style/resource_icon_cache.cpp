@@ -15,7 +15,8 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent) {
     m_cache.insert(Media,           Skin::icon(QLatin1String("media.png")));
     m_cache.insert(User,            Skin::icon(QLatin1String("unauthorized.png")));
 
-    m_cache.insert(Offline,         Skin::icon(QLatin1String("offline.png")));
+    //m_cache.insert(Offline,         Skin::icon(QLatin1String("offline.png")));
+    m_cache.insert(Offline,         QIcon());
     m_cache.insert(Unauthorized,    Skin::icon(QLatin1String("unauthorized.png")));
 }
 

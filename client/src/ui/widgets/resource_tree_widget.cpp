@@ -13,6 +13,7 @@
 #include <QStyledItemDelegate>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
@@ -56,6 +57,30 @@ public:
     }
 
 protected:
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+        QStyleOptionViewItemV4 optionV4 = option;
+        initStyleOption(&optionV4, index);
+
+        QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
+        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
+
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if(resource && resource->getStatus() == QnResource::Offline) {
+            QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 0, 0, 128), 0));
+
+            QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4, optionV4.widget);
+            int textMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, optionV4.widget) + 1;
+            textRect = textRect.adjusted(textMargin, 0, -textMargin, 0);
+
+            QFontMetrics metrics(optionV4.font);
+            int width = metrics.width(optionV4.text);
+
+            int y = (option.rect.top() + option.rect.bottom() + 1) / 2;
+
+            painter->drawLine(option.rect.left(), y, textRect.left() + width, y);
+        }
+    }
+
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
         base_type::initStyleOption(option, index);
 
