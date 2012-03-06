@@ -38,6 +38,11 @@ namespace Qn {
          * Drops provided resources on the current layout.
          */ 
         ResourceDropAction,
+        
+        /**
+         * Drops provided resources into a new layout.
+         */ 
+        ResourceDropIntoNewLayoutAction,
 
         /**
          * Moves cameras from one server to another.

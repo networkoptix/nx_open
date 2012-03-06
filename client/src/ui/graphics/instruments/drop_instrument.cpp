@@ -25,14 +25,6 @@ public:
         /* Don't disable this item here or it will swallow mouse wheel events. */
     }
 
-    DropInstrument *dropInstrument() const {
-        return m_dropInstrument.data();
-    }
-
-    void setDropInstrument(DropInstrument *dropInstrument) {
-        m_dropInstrument = dropInstrument;
-    }
-
     virtual QRectF boundingRect() const override {
         return m_boundingRect;
     }
@@ -41,55 +33,55 @@ public:
         return;
     }
 
-protected:
-    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override {
-        if(m_dropInstrument)
-            m_dropInstrument.data()->sceneEvent(this, event);
-    }
-
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override {
-        if(m_dropInstrument)
-            m_dropInstrument.data()->sceneEvent(this, event);
-    }
-
-    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override {
-        if(m_dropInstrument)
-            m_dropInstrument.data()->sceneEvent(this, event);
-    }
-
-    virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override {
-        if(m_dropInstrument)
-            m_dropInstrument.data()->sceneEvent(this, event);
-    }
-    
 private:
-    QWeakPointer<DropInstrument> m_dropInstrument;
     QRectF m_boundingRect;
 };
 
 
-DropInstrument::DropInstrument(QnWorkbenchContext *context, QObject *parent):
+DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent):
     Instrument(ITEM, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
-    m_context(context)
+    m_context(context),
+    m_intoNewLayout(intoNewLayout)
 {
     if(context == NULL)
         qnNullWarning(context);
 
-    DropSurfaceItem *surface = new DropSurfaceItem();
-    surface->setDropInstrument(this);
-    surface->setParent(this);
-    m_surface = surface;
+    m_filterItem = new SceneEventFilterItem();
+    m_filterItem->setEventFilter(this);
 }
 
 QGraphicsObject *DropInstrument::surface() const {
     return m_surface.data();
 }
 
+void DropInstrument::setSurface(QGraphicsObject *surface) {
+    if(this->surface()) {
+        this->surface()->removeSceneEventFilter(m_filterItem);
+
+        if(this->surface()->parent() == this)
+            delete this->surface();
+    }
+
+    m_surface = surface;
+
+    if(this->surface()) {
+        this->surface()->setAcceptDrops(true);
+        this->surface()->installSceneEventFilter(m_filterItem);
+    }
+}
+
 void DropInstrument::installedNotify() {
     DestructionGuardItem *guard = new DestructionGuardItem();
-    guard->setGuarded(surface());
+    guard->setGuarded(m_filterItem);
     guard->setPos(0.0, 0.0);
     scene()->addItem(guard);
+
+    if(surface() == NULL) {
+        DropSurfaceItem *surface = new DropSurfaceItem();
+        surface->setParent(this);
+        scene()->addItem(surface);
+        setSurface(surface);
+    }
 
     m_guard = guard;
 }
@@ -97,6 +89,12 @@ void DropInstrument::installedNotify() {
 void DropInstrument::aboutToBeUninstalledNotify() {
     if(guard() != NULL)
         delete guard();
+
+    setSurface(NULL);
+}
+
+bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
+    return this->sceneEvent(watched, event);
 }
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
@@ -128,10 +126,14 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
     if(context == NULL)
         return true;
 
-    QVariantMap params;
-    params[Qn::GridPositionParameter] = context->workbench()->mapper()->mapToGridF(event->scenePos());
+    if(!m_intoNewLayout) {
+        QVariantMap params;
+        params[Qn::GridPositionParameter] = context->workbench()->mapper()->mapToGridF(event->scenePos());
 
-    context->menu()->trigger(Qn::ResourceDropAction, m_resources, params);
+        context->menu()->trigger(Qn::ResourceDropAction, m_resources, params);
+    } else {
+        context->menu()->trigger(Qn::ResourceDropIntoNewLayoutAction, m_resources);
+    }
 
     return true;
 }

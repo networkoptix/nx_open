@@ -85,6 +85,7 @@ protected slots:
     
     void at_moveCameraAction_triggered();
     void at_resourceDropAction_triggered();
+    void at_resourceDropIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();

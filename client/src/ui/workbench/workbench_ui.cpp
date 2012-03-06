@@ -36,6 +36,7 @@
 #include <ui/graphics/instruments/bounding_instrument.h>
 #include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/fps_counting_instrument.h>
+#include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
@@ -502,6 +503,11 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     /* Tree is pinned by default. */
     m_treePinButton->setChecked(true);
+
+    /* Set up title D&D. */
+    DropInstrument *dropInstrument = new DropInstrument(true, display->context(), this);
+    display->instrumentManager()->installInstrument(dropInstrument);
+    dropInstrument->setSurface(m_titleBackgroundItem);
 
     /* Set up help context processing. */
     QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display, this);

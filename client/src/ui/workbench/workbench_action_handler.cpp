@@ -154,6 +154,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::NewLayoutAction),                    SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
     connect(action(Qn::RenameLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_renameLayoutAction_triggered()));
     connect(action(Qn::ResourceDropAction),                 SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
+    connect(action(Qn::ResourceDropIntoNewLayoutAction),    SIGNAL(triggered()),    this,   SLOT(at_resourceDropIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
 }
 
@@ -267,29 +268,29 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
-    
-    QnResourceList mediaResources;
-    if(widgets.empty()) {
-        mediaResources = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
-        if(mediaResources.empty())
-            return;
-    }
-
-    menu()->trigger(Qn::OpenNewLayoutAction);
-
     if(!widgets.empty()) {
+        menu()->trigger(Qn::OpenNewLayoutAction);
+
         foreach(const QnResourceWidget *widget, widgets) {
             QnWorkbenchItem *oldItem = widget->item();
 
             QnWorkbenchItem *newItem = new QnWorkbenchItem(oldItem->resourceUid(), QUuid::createUuid(), this);
             workbench()->currentLayout()->addItem(newItem);
-            
+
             newItem->setCombinedGeometry(oldItem->combinedGeometry());
             newItem->setFlags(oldItem->flags());
             newItem->setRotation(oldItem->rotation());
         }
-    } else {
-        menu()->trigger(Qn::ResourceDropAction, mediaResources);
+
+        return;
+    }
+
+    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    if(!medias.isEmpty()) {
+        menu()->trigger(Qn::OpenNewLayoutAction);
+        menu()->trigger(Qn::ResourceDropAction, medias);
+
+        return;
     }
 }
 
@@ -473,6 +474,25 @@ void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
     } else {
         /* Open dropped media resources in current layout. */
         addToWorkbench(medias, position.canConvert(QVariant::PointF), position.toPointF());
+    }
+}
+
+void QnWorkbenchActionHandler::at_resourceDropIntoNewLayoutAction_triggered() {
+    QVariant target = menu()->currentTarget(sender());
+    QnResourceList resources = menu()->currentResourcesTarget(sender());
+
+    QnLayoutResourceList layouts = QnResourceCriterion::filter<QnLayoutResource>(resources);
+    if(!layouts.empty()) {
+        /* Open dropped layouts.  */
+        foreach(const QnLayoutResourcePtr &resource, layouts)
+            menu()->trigger(Qn::OpenLayoutAction, resource);
+
+        QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layouts.back().staticCast<QnLayoutResource>());
+        if(layout)
+            workbench()->setCurrentLayout(layout);
+    } else {
+        /* No layouts? Just open dropped media in a new layout. */
+        menu()->trigger(Qn::OpenInNewLayoutAction, target);
     }
 }
 

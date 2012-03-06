@@ -252,6 +252,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
 
+    factory(Qn::ResourceDropIntoNewLayoutAction).
+        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Drop into New Layout"));
+
     factory(Qn::MoveCameraAction).
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Move Cameras")).
