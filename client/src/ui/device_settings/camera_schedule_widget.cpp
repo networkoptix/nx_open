@@ -126,7 +126,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
         ui->spinBoxRecordAfter->setValue(task.m_afterThreshold);
     } else {
         for (int nDay = 1; nDay <= 7; ++nDay)
-            tasks.append(QnScheduleTask::Data(nDay, 0, 86400, QnScheduleTask::RecordingType_Run, 10, 10));
+            tasks.append(QnScheduleTask::Data(nDay, 0, 86400, QnScheduleTask::RecordingType_Never, 10, 10));
     }
 
     foreach (const QnScheduleTask::Data &task, tasks) {
