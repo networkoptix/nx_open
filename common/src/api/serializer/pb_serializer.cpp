@@ -186,6 +186,9 @@ void parseLayouts(QList<T>& layouts, const PbLayoutList& pb_layouts)
         layout->setName(QString::fromUtf8(pb_layout.name().c_str()));
         parameters["name"] = QString::fromUtf8(pb_layout.name().c_str());
 
+        layout->setCellAspectRatio(pb_layout.cellaspectratio());
+        layout->setCellSpacing(QSizeF(pb_layout.cellspacingwidth(), pb_layout.cellspacingheight()));
+
         if (pb_layout.item_size() > 0)
         {
             QnLayoutItemDataList items;
@@ -390,6 +393,10 @@ void serializeLayout_i(proto::pb::Layout& pb_layout, const QnLayoutResourcePtr& 
     pb_layout.set_parentid(layoutIn->getParentId().toInt());
     pb_layout.set_name(layoutIn->getName().toUtf8().constData());
     pb_layout.set_guid(layoutIn->getGuid().toAscii().constData());
+
+    pb_layout.set_cellaspectratio(layoutIn->cellAspectRatio());
+    pb_layout.set_cellspacingwidth(layoutIn->cellSpacing().width());
+    pb_layout.set_cellspacingheight(layoutIn->cellSpacing().height());
 
     if (!layoutIn->getItems().isEmpty()) {
         foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
