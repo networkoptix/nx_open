@@ -140,6 +140,11 @@ namespace Qn {
         /* Resource actions. */
 
         /**
+         * Opens selected resources in a new layout.
+         */
+        OpenInNewLayoutAction,
+
+        /**
          * Opens selected layout.
          */
         OpenLayoutAction,

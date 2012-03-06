@@ -96,6 +96,7 @@ protected slots:
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
 
+    void at_openInNewLayoutAction_triggered();
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
     void at_removeLayoutItemAction_triggered();

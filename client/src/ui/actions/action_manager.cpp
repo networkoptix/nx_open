@@ -411,6 +411,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Resource actions. */
 
+    factory(Qn::OpenInNewLayoutAction).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
+        text(tr("Open in a New Layout")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
+
     factory(Qn::OpenLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
         text(tr("Open Layout")).

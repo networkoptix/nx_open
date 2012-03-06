@@ -803,8 +803,7 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidge
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnResourceWidget *widget) {
     if(!(widget->resource()->flags() & QnResource::network)) {
-        m_motionSelectionInstrument->recursiveDisable();
-        m_motionSelectionInstrument->recursiveEnable();
+        m_motionSelectionInstrument->resetLater();
         return;
     }
 
@@ -815,11 +814,13 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
 }
 
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnResourceWidget *widget) {
-    widget->clearMotionSelection();
+    if(widget->resource()->flags() & QnResource::network)
+        widget->clearMotionSelection();
 }
 
 void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnResourceWidget *widget, const QRect &region) {
-    widget->addToMotionSelection(region);
+    if(widget->resource()->flags() & QnResource::network)
+        widget->addToMotionSelection(region);
 }
 
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -974,10 +975,8 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
     QnWorkbenchItem *item = widget->item();
     if(m_draggedWorkbenchItems.contains(item)) {
         m_draggedWorkbenchItems.removeOne(item);
-        if(m_draggedWorkbenchItems.empty()) {
-            m_moveInstrument->recursiveDisable();
-            m_moveInstrument->recursiveEnable();
-        }
+        if(m_draggedWorkbenchItems.empty())
+            m_moveInstrument->resetLater();
     }
     if(m_replacedWorkbenchItems.contains(item))
         m_replacedWorkbenchItems.removeOne(item);

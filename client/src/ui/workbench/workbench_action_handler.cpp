@@ -28,6 +28,8 @@
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
+#include <ui/graphics/items/resource_widget.h>
+
 #include "eventmanager.h"
 #include "file_processor.h"
 
@@ -131,6 +133,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::ConnectionSettingsAction),           SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
+    connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenNewLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -262,6 +265,34 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + workbench()->layouts().size()) % workbench()->layouts().size());
 }
 
+void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    
+    QnResourceList mediaResources;
+    if(widgets.empty()) {
+        mediaResources = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+        if(mediaResources.empty())
+            return;
+    }
+
+    menu()->trigger(Qn::OpenNewLayoutAction);
+
+    if(!widgets.empty()) {
+        foreach(const QnResourceWidget *widget, widgets) {
+            QnWorkbenchItem *oldItem = widget->item();
+
+            QnWorkbenchItem *newItem = new QnWorkbenchItem(oldItem->resourceUid(), QUuid::createUuid(), this);
+            workbench()->currentLayout()->addItem(newItem);
+            
+            newItem->setCombinedGeometry(oldItem->combinedGeometry());
+            newItem->setFlags(oldItem->flags());
+            newItem->setRotation(oldItem->rotation());
+        }
+    } else {
+        menu()->trigger(Qn::ResourceDropAction, mediaResources);
+    }
+}
+
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     QnLayoutResourcePtr resource = menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
     if(!resource)
@@ -280,7 +311,7 @@ void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
     layout->setName(newLayoutName());
 
     workbench()->addLayout(layout);
-    workbench()->setCurrentLayout(workbench()->layouts().back());
+    workbench()->setCurrentLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout) {

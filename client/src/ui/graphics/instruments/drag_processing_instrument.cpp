@@ -7,6 +7,14 @@ void DragProcessingInstrument::initialize() {
     processor->setHandler(this);
 }
 
+void DragProcessingInstrument::reset() {
+    dragProcessor()->reset();
+}
+
+void DragProcessingInstrument::resetLater() {
+    QMetaObject::invokeMethod(this, "reset", Qt::QueuedConnection);
+}
+
 void DragProcessingInstrument::aboutToBeDisabledNotify() {
     dragProcessor()->reset();
 }
