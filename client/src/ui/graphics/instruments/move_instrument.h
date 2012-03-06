@@ -43,6 +43,10 @@ protected:
     virtual void finishDrag(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
+    virtual void aboutToBeDisabledNotify() override {}
+
+    virtual void enabledNotify() override {}
+
 private:
     bool m_effective;
     WeakGraphicsItemPointer m_itemToSelect;
