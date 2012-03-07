@@ -39,9 +39,7 @@ void QnSyncTime::updateTime(qint64 newTime)
 
 QDateTime QnSyncTime::currentDateTime()
 {
-    QDateTime t;
-    t.setMSecsSinceEpoch(currentMSecsSinceEpoch());
-    return t;
+    return QDateTime::fromMSecsSinceEpoch(currentMSecsSinceEpoch());
 }
 
 qint64 QnSyncTime::currentMSecsSinceEpoch()
