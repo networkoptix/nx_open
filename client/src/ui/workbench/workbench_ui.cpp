@@ -309,6 +309,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
+    QGraphicsWidget *titleSpacer = new QGraphicsWidget();
+    titleSpacer->setMinimumSize(QSizeF(12.0, 12.0));
+    titleSpacer->setMaximumSize(QSizeF(12.0, 12.0));
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -316,8 +320,9 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->addItem(m_tabBarItem);
     titleLayout->addItem(newActionButton(action(Qn::OpenNewLayoutAction)));
     titleLayout->addStretch(0x1000);
-    titleLayout->addItem(newActionButton(action(Qn::ConnectionSettingsAction)));
     titleLayout->addItem(newActionButton(action(Qn::ScreenRecordingAction)));
+    titleLayout->addItem(newActionButton(action(Qn::ConnectionSettingsAction)));
+    titleLayout->addItem(titleSpacer);
     titleLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     titleLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
     titleLayout->addItem(newActionButton(action(Qn::ExitAction)));
