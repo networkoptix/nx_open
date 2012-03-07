@@ -273,6 +273,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Shift+Tab")).
         autoRepeat(false);
 
+    factory(Qn::SelectAllAction).
+        flags(Qn::NoTarget).
+        text(tr("Select All")).
+        shortcut(tr("Ctrl+A")).
+        autoRepeat(false);
+
+
     /* Tab bar actions. */
 
     factory(Qn::CloseLayoutAction).

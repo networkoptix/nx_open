@@ -20,6 +20,14 @@ public:
         m_speed = speed;
     }
 
+    const QSizeF &maxSpacing() const {
+        return m_maxSpacing;
+    }
+
+    void setMaxSpacing(const QSizeF &maxSpacing) {
+        m_maxSpacing = maxSpacing;
+    }
+
 protected:
     virtual bool wheelEvent(QWidget *viewport, QWheelEvent *event) override;
     virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
@@ -31,6 +39,7 @@ private:
 
 private:
     QSizeF m_speed;
+    QSizeF m_maxSpacing;
     QWeakPointer<QWidget> m_currentViewport;
     QWeakPointer<QnWorkbench> m_workbench;
 };

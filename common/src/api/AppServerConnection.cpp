@@ -191,6 +191,7 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources, QByteAr
 
     if (status == 0)
     {
+        errorString.clear();
         try {
             m_serializer.deserializeResources(resources, data, m_resourceFactory);
         } catch (const QnSerializeException& e) {

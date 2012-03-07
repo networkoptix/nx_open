@@ -48,7 +48,7 @@ class QN_EXPORT QnResource : public QObject
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
-    enum Status { Offline, Unauthorized, Online, Disabled };
+    enum Status { Offline, Unauthorized, Online, Disabled, Recording };
 
     enum Flag {
         network = 0x01,         /**< Has ip and mac. */

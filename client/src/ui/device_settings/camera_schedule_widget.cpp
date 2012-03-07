@@ -26,19 +26,17 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent)
     connect(ui->gridWidget, SIGNAL(needReadCellParams(QPoint)), this, SLOT(onNeedReadCellParams(QPoint)));
 
     m_disableUpdateGridParams = false;
-
-    doNotChangeStateChanged(2);
+    ui->gridWidget->setEnabled(true);
 }
 
 void QnCameraScheduleWidget::setDoNotChange(bool val)
 {
-    ui->chkBoxDontChange->setChecked(val);
-    doNotChangeStateChanged(val ? 2 : 0);
+    ui->gridWidget->setEnabled(!val);
 }
 
 bool QnCameraScheduleWidget::isDoNotChange() const
 {
-    return ui->chkBoxDontChange->isChecked();
+    return !ui->gridWidget->isEnabled();
 }
 
 QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
@@ -107,10 +105,18 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
     return tasks;
 }
 
+void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList taskFrom)
+{
+    QList<QnScheduleTask::Data> rez;
+    foreach(const QnScheduleTask& task, taskFrom)
+        rez << task.getData();
+    setScheduleTasks(rez);
+}
+
 void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> &tasksFrom)
 {
-    if (!tasksFrom.isEmpty())
-        doNotChangeStateChanged(0);
+    //if (!tasksFrom.isEmpty())
+    //    doNotChangeStateChanged(0);
 
     QList<QnScheduleTask::Data> tasks = tasksFrom;
 
@@ -142,18 +148,25 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             break;
         }
 
-        QString shortQuality;
-        switch (task.m_streamQuality) {
-        case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
-        case QnQualityNormal: shortQuality = QLatin1String("Md"); break;
-        case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
-        case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
-        default:
+        QString shortQuality("-");
+        if (task.m_recordType != QnScheduleTask::RecordingType_Never)
+        {
+            switch (task.m_streamQuality) 
+            {
+                case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
+                case QnQualityNormal: shortQuality = QLatin1String("Md"); break;
+                case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
+                case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
+                default:
             qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d", task.m_streamQuality);
-            break;
+                    break;
+            }
         }
 
-        int fps = task.m_fps;
+        //int fps = task.m_fps;
+        QString fps("-");
+        if (task.m_recordType != QnScheduleTask::RecordingType_Never)
+            fps = QString::number(task.m_fps);
 
         for (int col = task.m_startTime / 3600; col < task.m_endTime / 3600; ++col) {
             const QPoint cell(col, row);
@@ -214,6 +227,15 @@ void QnCameraScheduleWidget::updateGridParams()
     else if (ui->btnNoRecord->isChecked())
         color = ui->btnNoRecord->color();
 
+    bool enabled = !ui->btnNoRecord->isChecked();
+    bool motionEnabled = ui->btnRecordMotion->isChecked();
+
+    ui->fpsSpinBox->setEnabled(enabled);
+    ui->comboBoxQuality->setEnabled(enabled);
+    ui->spinBoxRecordBefore->setEnabled(motionEnabled);
+    ui->spinBoxRecordAfter->setEnabled(motionEnabled);
+
+
     ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorParam, color.rgba());
     if (ui->btnNoRecord->isChecked())
     {
@@ -252,19 +274,6 @@ void QnCameraScheduleWidget::onNeedReadCellParams(const QPoint &cell)
 void QnCameraScheduleWidget::onDisplayQualityChanged(int state)
 {
     ui->gridWidget->setShowSecondParam(state);
-}
-
-void QnCameraScheduleWidget::doNotChangeStateChanged(int state)
-{
-    bool enabled = state == 0;
-    ui->gridWidget->setEnabled(enabled);
-    ui->fpsSpinBox->setEnabled(enabled);
-    ui->btnRecordAlways->setEnabled(enabled);
-    ui->btnRecordMotion->setEnabled(enabled);
-    ui->btnNoRecord->setEnabled(enabled);
-    ui->comboBoxQuality->setEnabled(enabled);
-    ui->spinBoxRecordBefore->setEnabled(enabled);
-    ui->spinBoxRecordAfter->setEnabled(enabled);
 }
 
 void QnCameraScheduleWidget::onDisplayFPSChanged(int state)

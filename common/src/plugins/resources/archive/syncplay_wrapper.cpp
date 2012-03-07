@@ -189,6 +189,8 @@ void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
+    qDebug() << "jumpTo=" << QDateTime::fromMSecsSinceEpoch(mksec).toString();
+
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     setJumpTime(skipTime ? skipTime : mksec);

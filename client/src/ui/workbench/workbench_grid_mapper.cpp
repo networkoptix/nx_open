@@ -110,3 +110,7 @@ QRect QnWorkbenchGridMapper::mapToGrid(const QRectF &rect) const {
 QRectF QnWorkbenchGridMapper::mapFromGrid(const QRect &gridRect) const {
     return mapFromGridF(QRectF(gridRect));
 }
+
+QPointF QnWorkbenchGridMapper::mapDeltaToGridF(const QPointF &delta) const {
+    return cwiseDiv(delta, toPoint(m_cellSize + m_spacing));
+}

@@ -30,6 +30,8 @@ protected:
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
+
+    virtual void endOfRun() override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();

@@ -6,6 +6,7 @@ message Camera {
        Unauthorized = 1;
        Online       = 2;
        Disabled     = 3;
+       Recording    = 4;
     }
 
     enum Quality {

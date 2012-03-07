@@ -86,7 +86,6 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_lastSleepInterval(0),
       //m_previousVideoDisplayedTime(0),
       m_afterJump(false),
-      m_bofReceived(false),
       m_displayLasts(0),
       m_ignoringVideo(false),
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
@@ -537,17 +536,16 @@ void CLCamDisplay::onJumpOccured(qint64 time)
 
     QMutexLocker lock(&m_timeMutex);
     m_afterJump = true;
-    m_bofReceived = false;
     m_buffering = getBufferingMask();
     m_lastDecodedTime = AV_NOPTS_VALUE;
-    //clearUnprocessedData();
+    clearUnprocessedData();
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
         m_display[i]->blockTimeValue(time);
     }
     m_singleShotMode = false;
     m_jumpTime = time;
-
+    m_emptyPacketCounter = 0;
     m_executingJump--;
     m_processedPackets = 0;
     m_delayedFrameCnt = 0;
@@ -755,21 +753,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     if( m_afterJump)
     {
-        //if (!(media->flags & QnAbstractMediaData::MediaFlags_BOF)) // jump finished, but old data received)
-        //    return true; // jump finished, but old data received
-        if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
-            m_bofReceived = true;
-        else if(m_display[0]->getLastDisplayedTime() == DATETIME_NOW && (media->flags & QnAbstractMediaData::MediaFlags_LIVE))
-            m_bofReceived = true;
-
-        if (!m_bofReceived)
-            return true; // jump finished, but old data received
-
         // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
         if (ad && ad->timestamp < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
             return true; // skip packet
         // clear everything we can
-        m_bofReceived = false;
         afterJump(media);
         QMutexLocker lock(&m_timeMutex);
         if (m_executingJump == 0) 
@@ -783,7 +770,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        if (m_emptyPacketCounter >= 3)
+        if (m_emptyPacketCounter >= 3 && m_executingJump == 0)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
 			if (m_extTimeSrc && !isLive)

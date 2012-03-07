@@ -168,6 +168,9 @@ public:
      */
     QRectF mapFromGridF(const QRectF &gridRect) const;
 
+
+    QPointF mapDeltaToGridF(const QPointF &delta) const;
+
 signals:
     void originChanged();
     void cellSizeChanged();

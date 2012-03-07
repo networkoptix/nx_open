@@ -21,12 +21,12 @@ public:
     bool isDoNotChange() const;
 
     QList<QnScheduleTask::Data> scheduleTasks() const;
+    void setScheduleTasks(const QnScheduleTaskList taskFrom);
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
 
     void setMaxFps(int value);
 
 private Q_SLOTS:
-    void doNotChangeStateChanged(int state);
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
     void updateGridParams();

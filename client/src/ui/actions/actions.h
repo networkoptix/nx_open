@@ -59,6 +59,10 @@ namespace Qn {
          */
         PreviousLayoutAction,
 
+        /**
+         * Selects all widgets on the scene.
+         */
+        SelectAllAction,
 
 
         /* Main menu actions. */

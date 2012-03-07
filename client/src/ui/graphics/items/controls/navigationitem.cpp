@@ -22,6 +22,7 @@
 
 #include "timeslider.h"
 #include "utils/common/synctime.h"
+#include "core/resource/security_cam_resource.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
@@ -809,8 +810,8 @@ void NavigationItem::onValueChanged(qint64 time)
     //if (reader->isSkippingFrames())
     //    return;
 
-    if (reader->isRealTimeSource())
-        return;
+    //if (reader->isRealTimeSource())
+    //    return;
 
     smartSeek(time);
 
@@ -888,40 +889,25 @@ void NavigationItem::rewindBackward()
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    if(!m_reserveCameras.contains(m_camera)) {
-        reader->jumpTo(0, true);
-        reader->resumeDataProcessors();
-    } else {
-        qint64 pos = -1;
-
-        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
-        qint64 currentTime = m_timeSlider->currentValue();
-        qint64 precision = m_timeSlider->getMsInPixel() * 3;
-        
-        for(int i = qUpperBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin() - 1; i >= 0; i--) {
-            if(periods[i].durationMs < precision && periods[i].durationMs != -1)
-                continue;
-
-            if(periods[i].startTimeMs < currentTime - precision) {
-                pos = periods[i].startTimeMs * 1000;
-                break;
+    qint64 pos = 0;
+    if(m_reserveCameras.contains(m_camera))
+    {
+        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(m_timeSlider->fullRecTimePeriodList(), MAX_FRAME_DURATION);
+        if (!periods.isEmpty())
+        {
+            if (m_camera->getCurrentTime() == DATETIME_NOW) {
+                pos = periods.last().startTimeMs*1000;
+            }
+            else {
+                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_camera->getCurrentTime()/1000);
+                itr = qMax(itr-2, periods.begin());
+                pos = itr->startTimeMs*1000ll;
+                if (reader->isReverseMode() && itr->durationMs != -1)
+                    pos += itr->durationMs*1000ll;
             }
         }
-
-        if(pos == -1) {
-            if(!periods.empty()) {
-                pos = periods[0].startTimeMs * 1000;
-            } else {
-                pos = DATETIME_NOW;
-            }
-        }
-
-        reader->jumpTo(pos, true);
-        reader->resumeDataProcessors();
     }
-
-    
-    //m_camera->streamJump(0);
+    reader->jumpTo(pos, 0);
 }
 
 void NavigationItem::rewindForward()
@@ -932,37 +918,17 @@ void NavigationItem::rewindForward()
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    bool stopped = reader->isMediaPaused();
-    if (stopped)
-        play();
-
-    qint64 pos = -1;
-    if(!m_reserveCameras.contains(m_camera)) {
-        reader->jumpTo(reader->lengthMksec(), false);
-        reader->resumeDataProcessors();
-    } else {
-        qint64 pos = -1;
-
-        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
-        qint64 currentTime = m_timeSlider->currentValue();
-        for(int i = qLowerBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin(); i < periods.size(); i++) {
-            if(periods[i].startTimeMs > currentTime) {
-                pos = periods[i].startTimeMs * 1000;
-                break;
-            }
-        }
-        if(pos == -1)
-            pos = DATETIME_NOW;
-
-        reader->jumpTo(pos, false);
-        reader->resumeDataProcessors();
-    }
-
-    if (stopped)
+    qint64 pos = reader->endTime();
+    if(m_reserveCameras.contains(m_camera)) 
     {
-        qApp->processEvents();
-        pause();
+        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(m_timeSlider->fullRecTimePeriodList(), MAX_FRAME_DURATION);
+        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_camera->getCurrentTime()/1000);
+        if (itr == periods.end() || reader->isReverseMode() && itr->durationMs == -1)
+            pos = DATETIME_NOW;
+        else
+            pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000ll;
     }
+    reader->jumpTo(pos, 0);
 }
 
 void NavigationItem::stepBackward()
@@ -1032,7 +998,11 @@ void NavigationItem::onSliderReleased()
 
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    smartSeek(m_timeSlider->currentValue());
+    bool isCamera = dynamic_cast<QnSecurityCamResource*>(reader->getResource().data());
+    if (!isCamera) {
+        // Disable precise seek via network to reduce network flood
+        smartSeek(m_timeSlider->currentValue());
+    }
     if (isPlaying())
     {
         reader->setSingleShotMode(false);

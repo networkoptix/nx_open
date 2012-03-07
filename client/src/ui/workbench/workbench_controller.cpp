@@ -174,7 +174,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
 
-    gridAdjustmentInstrument->setSpeed(QSizeF(1.0 / 360.0, 1.0 / 360.0));
+    gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
+    gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.35, 0.35));
 
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());
@@ -230,7 +231,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_moveStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, QList<QGraphicsItem *>)),                                      this,                           SLOT(at_move(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, QList<QGraphicsItem *>, const QPointF &)),                     this,                           SLOT(at_move(QGraphicsView *, QList<QGraphicsItem *>, const QPointF &)));
     connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_moveFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_resizingInstrument,       SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),                 this,                           SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
@@ -306,6 +307,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QWidget *window = m_display->view()->window();
     window->addAction(action(Qn::ScreenRecordingAction));
 
+    connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
     connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
     connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
@@ -663,13 +665,13 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
     //    workbench()->setRaisedItem(NULL);
 }
 
-void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *> &) {
+void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *> &, const QPointF &totalDelta) {
     if(m_draggedWorkbenchItems.empty())
         return;
 
     QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
 
-    QPoint newDragDelta = mapper()->mapToGrid(display()->widget(m_draggedWorkbenchItems[0])->geometry()).topLeft() - m_draggedWorkbenchItems[0]->geometry().topLeft();
+    QPoint newDragDelta = mapper()->mapDeltaToGridF(totalDelta).toPoint();
     if(newDragDelta != m_dragDelta) {
         m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
 
@@ -983,6 +985,11 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 
     if(widget->display() != NULL && widget->display()->camera() != NULL)
         widget->removeEventFilter(this);
+}
+
+void QnWorkbenchController::at_selectAllAction_triggered() {
+    foreach(QnResourceWidget *widget, m_display->widgets())
+        widget->setSelected(true);
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {

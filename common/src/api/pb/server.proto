@@ -6,6 +6,7 @@ message Server {
        Unauthorized = 1;
        Online       = 2;
        Disabled     = 3;
+       Recording    = 4;
     }
 
     message Storage {

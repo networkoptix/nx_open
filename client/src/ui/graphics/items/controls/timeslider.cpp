@@ -1013,6 +1013,7 @@ TimeSlider::~TimeSlider()
 void TimeSlider::setLiveMode(bool value)
 {
     m_isLiveMode = value;
+    updateSlider();
 }
 
 ToolTipItem *TimeSlider::toolTipItem() const
@@ -1308,6 +1309,11 @@ void TimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     m_slider->setEndSize(m_endSize * (m_slider->maximum() - m_slider->minimum()) / (m_slider->size().width())); // Hack hack hack
 
     GraphicsWidget::paint(painter, option, widget);
+}
+
+const QnTimePeriodList& TimeSlider::fullRecTimePeriodList()
+{
+    return m_recTimePeriodList;
 }
 
 const QnTimePeriodList& TimeSlider::recTimePeriodList(int msInPixel)

@@ -98,31 +98,25 @@ void MultipleCameraSettingsDialog::updateView()
 {
     int maxFps = 0;
 
-    bool needSetScheduleTasks = true;
+    bool isScheduleEqual = true;
 
-    QSet<QnScheduleTask::Data> scheduleTasksData;
+    QList<QnScheduleTask::Data> scheduleTasksData;
 
     foreach (const QnScheduleTask& scheduleTask, m_cameras.front()->getScheduleTasks())
-    {
-        scheduleTasksData.insert(scheduleTask.getData());
-    }
+        scheduleTasksData << scheduleTask.getData();
 
     foreach (QnVirtualCameraResourcePtr camera, m_cameras)
     {
         if (camera->getMaxFps() > maxFps)
             maxFps = camera->getMaxFps();
 
-        if (needSetScheduleTasks)
-        {
-            QSet<QnScheduleTask::Data> cameraScheduleTasksData;
-            foreach (const QnScheduleTask& scheduleTask, camera->getScheduleTasks())
-            {
-                cameraScheduleTasksData.insert(scheduleTask.getData());
-            }
+        QList<QnScheduleTask::Data> cameraScheduleTasksData;
+        foreach (const QnScheduleTask& scheduleTask, camera->getScheduleTasks())
+            cameraScheduleTasksData << scheduleTask.getData();
 
-            if (cameraScheduleTasksData != scheduleTasksData)
-                needSetScheduleTasks = false;
-
+        if (cameraScheduleTasksData != scheduleTasksData) {
+            isScheduleEqual = false;
+            break;
         }
     }
 
@@ -131,11 +125,16 @@ void MultipleCameraSettingsDialog::updateView()
 
     ui->cameraScheduleWidget->setMaxFps(maxFps);
 
+    /*
     if (needSetScheduleTasks)
     {
         ui->cameraScheduleWidget->setScheduleTasks(scheduleTasksData.toList());
-        ui->cameraScheduleWidget->setDoNotChange(false);
     }
+    else
+        ui->cameraScheduleWidget->setScheduleTasks(QList<QnScheduleTask::Data>());
+    */
+    ui->cameraScheduleWidget->setScheduleTasks(m_cameras.front()->getScheduleTasks());
+    ui->cameraScheduleWidget->setDoNotChange(!isScheduleEqual);
 }
 
 void MultipleCameraSettingsDialog::buttonClicked(QAbstractButton *button)
