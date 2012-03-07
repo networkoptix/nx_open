@@ -11,7 +11,8 @@ QnNetworkResource::QnNetworkResource()
     : QnResource(),
       m_networkStatus(0),
       m_networkTimeout(2000),
-      m_authenticated(true)
+      m_authenticated(true),
+      m_probablyNeedToUpdateStatus(false)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -26,6 +27,28 @@ QnNetworkResource::QnNetworkResource()
 
 QnNetworkResource::~QnNetworkResource()
 {
+}
+
+void QnNetworkResource::setStatus(QnResource::Status newStatus, bool silenceMode)
+{
+    Status oldStatus = getStatus();
+
+    QnResource::setStatus(newStatus, silenceMode);
+
+    m_probablyNeedToUpdateStatus = false;
+
+    if (oldStatus == Disabled && newStatus == Offline) 
+    {
+        // we droped this camera from one server to another. so on a new one originally camera is offline and if there is no recording or live view
+        // the Offline status will not be updated by itself to onlinr even if the camera is online 
+        // so discovery thread should do it
+        m_probablyNeedToUpdateStatus = true;
+    }
+}
+
+bool QnNetworkResource::needUpdateStatus() const
+{
+    return m_probablyNeedToUpdateStatus;
 }
 
 void QnNetworkResource::deserialize(const QnResourceParameters& parameters)

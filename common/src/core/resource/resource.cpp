@@ -15,6 +15,7 @@
 
 #include <typeinfo>
 #include <limits.h>
+#include "utils/common/synctime.h"
 
 QnResource::QnResource()
     : QObject(),
@@ -510,6 +511,15 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         init();
 
     emit statusChanged(oldStatus, newStatus);
+
+    QMutexLocker mutexLocker(&m_mutex);
+    m_lastStatusUpdateTime = qnSyncTime->currentDateTime();
+}
+
+QDateTime QnResource::getLastStatusUpdateTime() const
+{
+    QMutexLocker mutexLocker(&m_mutex);
+    return m_lastStatusUpdateTime;
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const

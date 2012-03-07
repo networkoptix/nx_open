@@ -105,6 +105,7 @@ public:
 
     Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
+    QDateTime getLastStatusUpdateTime() const;
 
     // this function is called if resourse changes state from offline to online or so 
     virtual void init(){};
@@ -276,6 +277,7 @@ private:
     QString m_url; 
 
     QDateTime m_lastDiscoveredTime;
+    QDateTime m_lastStatusUpdateTime;
 
     QStringList m_tags;
 
