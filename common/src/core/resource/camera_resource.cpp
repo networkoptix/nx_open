@@ -3,7 +3,7 @@
 #include "resource_consumer.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource()
-    : m_blocked(false)
+    : m_scheduleDisabled(false)
 {
 }
 
@@ -94,15 +94,15 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 
     QnVirtualCameraResourcePtr camera = other.dynamicCast<QnVirtualCameraResource>();
     if (camera)
-        m_blocked = camera->isBlocked();
+        m_scheduleDisabled = camera->isScheduleDisabled();
 }
 
-void QnVirtualCameraResource::setBlocked(bool blocked)
+void QnVirtualCameraResource::setScheduleDisabled(bool blocked)
 {
-    m_blocked = blocked;
+    m_scheduleDisabled = blocked;
 }
 
-bool QnVirtualCameraResource::isBlocked() const
+bool QnVirtualCameraResource::isScheduleDisabled() const
 {
-    return m_blocked;
+    return m_scheduleDisabled;
 }

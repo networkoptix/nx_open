@@ -31,6 +31,8 @@ CameraSettingsDialog::CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QW
     
     at_tabWidget_currentChanged();
 
+    ui->cameraScheduleWidget->setScheduleDisabled(m_camera->isScheduleDisabled() ? 2 : 0);
+
     updateView();
 }
 

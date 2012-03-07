@@ -13,11 +13,11 @@ public:
 
     virtual void updateInner(QnResourcePtr other) override;
 
-    void setBlocked(bool blocked);
-    bool isBlocked() const;
+    void setScheduleDisabled(bool blocked);
+    bool isScheduleDisabled() const;
 
 private:
-    bool m_blocked;
+    bool m_scheduleDisabled;
 };
 
 

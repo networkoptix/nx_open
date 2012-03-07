@@ -38,20 +38,19 @@ message Camera {
         required int32   fps             = 11;
     }
 
-    optional int32        id            = 1;
-    required int32        typeId        = 2;
-    required int32        parentId      = 3;
-    required string       name          = 4;
-    required string       url           = 5;
-    required Status       status        = 6;
-
-    required bool         blocked       = 7;
-    optional string       region        = 8;
-    optional string       mac           = 9;
-    optional string       login         = 10;
-    optional string       password      = 11;
-    repeated Property     property    = 12;
-    repeated ScheduleTask scheduleTask = 13;
+    optional int32        id               = 1;
+    required int32        typeId           = 2;
+    required int32        parentId         = 3;
+    required string       name             = 4;
+    required string       url              = 5;
+    required Status       status           = 6;
+    required bool         scheduleDisabled = 7;
+    optional string       region           = 8;
+    optional string       mac              = 9;
+    optional string       login            = 10;
+    optional string       password         = 11;
+    repeated Property     property         = 12;
+    repeated ScheduleTask scheduleTask     = 13;
 }
 
 message Cameras {

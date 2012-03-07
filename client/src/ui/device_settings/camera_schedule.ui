@@ -68,6 +68,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="chkBoxDisableSchedule">
+          <property name="text">
+           <string>Disable schedule</string>
+          </property>
+          <property name="tristate">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

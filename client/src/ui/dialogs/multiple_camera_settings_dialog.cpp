@@ -23,9 +23,19 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
 {
     ui->setupUi(this);
 
+    // -1 - uninitialized, 0  - schedule enabled for all cameras,
+    // 1 - flag is not equal for all cameras, 2 - schedule disabled for all cameras
+    int scheduleDisabled = -1;
+
     QSet<QString> logins, passwords;
     foreach (QnVirtualCameraResourcePtr camera, m_cameras)
     {
+        if (scheduleDisabled == -1) {
+            scheduleDisabled = camera->isScheduleDisabled() ? 2 : 0;
+        } else if (scheduleDisabled != (camera->isScheduleDisabled() ? 2 : 0)) {
+            scheduleDisabled = 1;
+        }
+
         logins.insert(camera->getAuth().user());
         passwords.insert(camera->getAuth().password());
     }
@@ -35,6 +45,8 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
 
     if (passwords.size() == 1)
         m_password = *passwords.begin();
+
+    ui->cameraScheduleWidget->setScheduleDisabled(scheduleDisabled);
 
     updateView();
 }

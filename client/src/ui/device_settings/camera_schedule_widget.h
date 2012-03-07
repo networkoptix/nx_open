@@ -23,12 +23,13 @@ public:
     QList<QnScheduleTask::Data> scheduleTasks() const;
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
-
+    void setScheduleDisabled(int checkedState);
     void setMaxFps(int value);
 
 private Q_SLOTS:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
+    void onDisableScheduleChanged(int state);
     void updateGridParams();
     void onNeedReadCellParams(const QPoint &cell);
 
