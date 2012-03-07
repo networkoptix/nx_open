@@ -41,6 +41,9 @@
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
+         <property name="autoExpandDelay">
+          <number>500</number>
+         </property>
          <property name="uniformRowHeights">
           <bool>true</bool>
          </property>
@@ -49,6 +52,9 @@
          </property>
          <property name="headerHidden">
           <bool>true</bool>
+         </property>
+         <property name="expandsOnDoubleClick">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -100,6 +106,9 @@
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
+         <property name="autoExpandDelay">
+          <number>500</number>
+         </property>
          <property name="uniformRowHeights">
           <bool>true</bool>
          </property>
@@ -111,6 +120,9 @@
          </property>
          <property name="headerHidden">
           <bool>true</bool>
+         </property>
+         <property name="expandsOnDoubleClick">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
