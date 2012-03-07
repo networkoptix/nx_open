@@ -46,7 +46,9 @@ class QnResourceTreeItemDelegate: public QStyledItemDelegate {
 public:
     explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
         base_type(parent)
-    {}
+    {
+        m_recIcon = Skin::icon(QLatin1String("decorations/recording.png"));
+    }
 
     QnWorkbench *workbench() const {
         return m_workbench.data();
@@ -63,6 +65,26 @@ protected:
 
         QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
         style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
+
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+        if(resource && resource->getStatus() == QnResource::Recording) {
+            QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4, optionV4.widget);
+            int textMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, optionV4.widget) + 1;
+            textRect = textRect.adjusted(textMargin, 0, -textMargin, 0);
+
+            QFontMetrics metrics(optionV4.font);
+            int textWidth = metrics.width(optionV4.text);
+
+            QRect iconRect = QRect(
+                textRect.left() + textWidth + textMargin,
+                textRect.top() + 2,
+                textRect.height() - 4,
+                textRect.height() - 4
+            );
+
+            m_recIcon.paint(painter, iconRect);
+        }
     }
 
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
@@ -95,6 +117,7 @@ protected:
 
 private:
     QWeakPointer<QnWorkbench> m_workbench;
+    QIcon m_recIcon;
 };
 
 

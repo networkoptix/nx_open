@@ -37,7 +37,7 @@ QnResourceIconCache *QnResourceIconCache::instance() {
 
 QIcon QnResourceIconCache::icon(Key key) {
     /* This function will be called from GUI thread only, 
-        * so no synchronization is needed. */
+     * so no synchronization is needed. */
 
     if((key & TypeMask) == Unknown)
         key = Unknown;
