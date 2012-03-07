@@ -16,6 +16,8 @@ public:
 
     static QnSyncTime* instance();
     qint64 currentMSecsSinceEpoch();
+
+    QDateTime currentDateTime();
 private:
     void updateTime(qint64 newTime);
 private:

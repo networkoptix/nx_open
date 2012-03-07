@@ -8,6 +8,7 @@
 #include "utils/common/util.h"
 #include "api/AppServerConnection.h"
 #include "core/resource/resource_directory_browser.h"
+#include "utils/common/synctime.h"
 
 namespace {
     class QnResourceDiscoveryManagerInstance: public QnResourceDiscoveryManager {};
@@ -196,6 +197,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     while (it != resources.end())
     {
         QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
+        QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
+
         if (rpResource)
         {
             // if such res in ResourcePool
@@ -213,7 +216,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 }
 
 
-                QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
+                
                 bool diffAddr = rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress(); //if such network resource is in pool and has diff IP 
                 bool diffNet = !m_netState.isResourceInMachineSubnet(newNetRes->getHostAddress(), newNetRes->getDiscoveryAddr()); // or is diff subnet NET
                 if ( diffAddr || diffNet)
@@ -224,12 +227,36 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 }
             }
 
+            // seems like resource is in the pool and has OK ip
+            if (rpNetRes)
+            {
+                if (rpNetRes->getStatus() == QnResource::Offline) 
+                {
+                     if (rpNetRes->needUpdateStatus())// if this net resource in the pool and must be after DISABLE => OFFLINE STATE after D&D from one server to another
+                        rpNetRes->setStatus(QnResource::Online);
 
-            it = resources.erase(it);
+                     if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
+                         rpNetRes->setStatus(QnResource::Online);
+
+                }
+                
+
+                rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
+            }
+
+
+
+            it = resources.erase(it); // do not need to investigate OK resources
+
+
         }
         else
             ++it; // new resource => shouls keep it
     }
+
+    //==========if resource is not discover last minute and we do not record it and do not see live => readers not runing 
+    markOfflineIfNeeded();
+    //======================
 
     if (resources.size())
     {
@@ -467,6 +494,29 @@ struct check_if_accessible_STRUCT
 
     }
 };
+
+void QnResourceDiscoveryManager::markOfflineIfNeeded()
+{
+    QnResourceList resources = qnResPool->getResources();
+
+    foreach(QnResourcePtr res, resources)
+    {
+        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+        if (!netRes)
+            continue;
+
+        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
+            continue;
+
+        QDateTime ldt = netRes->getLastDiscoveredTime();
+        QDateTime currentT = qnSyncTime->currentDateTime();
+
+        if (ldt.secsTo(currentT) > 30) // if resource is not discovered last 30 sec
+            res->setStatus(QnResource::Offline);
+
+    }
+    
+}
 
 void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundList, int threads)
 {

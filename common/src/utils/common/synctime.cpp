@@ -37,6 +37,13 @@ void QnSyncTime::updateTime(qint64 newTime)
     m_gotTimeTask = 0;
 }
 
+QDateTime QnSyncTime::currentDateTime()
+{
+    QDateTime t;
+    t.setMSecsSinceEpoch(currentMSecsSinceEpoch());
+    return t;
+}
+
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);

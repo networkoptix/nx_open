@@ -54,6 +54,8 @@ private:
 
     void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool *ip_finished);
 
+    void markOfflineIfNeeded();
+
 private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
