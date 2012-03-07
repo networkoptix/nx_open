@@ -361,6 +361,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Screen Recording")).
         shortcut(tr("Alt+R")).
         shortcut(Qt::Key_MediaRecord).
+        icon(Skin::icon(QLatin1String("decorations/recording.png"))).
         autoRepeat(false);
 
     factory(Qn::FullscreenAction).
