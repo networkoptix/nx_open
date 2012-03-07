@@ -22,6 +22,7 @@
 
 #include "timeslider.h"
 #include "utils/common/synctime.h"
+#include "core/resource/security_cam_resource.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
@@ -809,8 +810,8 @@ void NavigationItem::onValueChanged(qint64 time)
     //if (reader->isSkippingFrames())
     //    return;
 
-    if (reader->isRealTimeSource())
-        return;
+    //if (reader->isRealTimeSource())
+    //    return;
 
     smartSeek(time);
 
@@ -997,7 +998,11 @@ void NavigationItem::onSliderReleased()
 
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    smartSeek(m_timeSlider->currentValue());
+    bool isCamera = dynamic_cast<QnSecurityCamResource*>(reader->getResource().data());
+    if (!isCamera) {
+        // Disable precise seek via network to reduce network flood
+        smartSeek(m_timeSlider->currentValue());
+    }
     if (isPlaying())
     {
         reader->setSingleShotMode(false);

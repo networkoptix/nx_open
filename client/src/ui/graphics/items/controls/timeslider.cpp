@@ -1013,6 +1013,7 @@ TimeSlider::~TimeSlider()
 void TimeSlider::setLiveMode(bool value)
 {
     m_isLiveMode = value;
+    updateSlider();
 }
 
 ToolTipItem *TimeSlider::toolTipItem() const
