@@ -14,6 +14,7 @@ static const int DISABLED_COLOR_SHIFT = -72;
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     : QWidget(parent)
 {
+    m_mouseMoveCell = QPoint(-2, -2);
     m_enabled = true;
     m_defaultParams[FirstParam] = 10;
     m_defaultParams[SecondParam] = QLatin1String("Lo");

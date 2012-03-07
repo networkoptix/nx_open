@@ -169,6 +169,7 @@ private:
     int skipPrevJumpSignal;
     int m_processedPackets;
     QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
+    bool m_bofReceived;
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     float m_toLowQSpeed; // speed then switching to low quality for camera
     //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
@@ -182,7 +183,7 @@ private:
     static QMutex m_qualityMutex;
     static qint64 m_lastQualitySwitchTime;
     bool m_executingChangeSpeed;
-    bool m_EOFSignalSended;
+    bool m_eofSignalSended;
 };
 
 #endif //clcam_display_h_1211
