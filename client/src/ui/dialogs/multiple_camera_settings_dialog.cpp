@@ -96,6 +96,10 @@ void MultipleCameraSettingsDialog::saveToModel()
             password = m_password;
 
         camera->setAuth(login, password);
+
+        if (ui->cameraScheduleWidget->getScheduleDisabled() != 1)
+            camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleDisabled() == 2);
+
         if (!ui->cameraScheduleWidget->isDoNotChange() && !ui->cameraScheduleWidget->scheduleTasks().isEmpty())
         {
             QnScheduleTaskList scheduleTasks;

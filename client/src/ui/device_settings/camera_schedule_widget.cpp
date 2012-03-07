@@ -298,3 +298,8 @@ void QnCameraScheduleWidget::setScheduleDisabled(int checkedState)
 {
     ui->chkBoxDisableSchedule->setCheckState((Qt::CheckState)checkedState);
 }
+
+int QnCameraScheduleWidget::getScheduleDisabled() const
+{
+    return (int) ui->chkBoxDisableSchedule->checkState();
+}

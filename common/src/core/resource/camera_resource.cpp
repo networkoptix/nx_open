@@ -97,9 +97,9 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
         m_scheduleDisabled = camera->isScheduleDisabled();
 }
 
-void QnVirtualCameraResource::setScheduleDisabled(bool blocked)
+void QnVirtualCameraResource::setScheduleDisabled(bool disabled)
 {
-    m_scheduleDisabled = blocked;
+    m_scheduleDisabled = disabled;
 }
 
 bool QnVirtualCameraResource::isScheduleDisabled() const

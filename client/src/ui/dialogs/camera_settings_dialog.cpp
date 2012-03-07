@@ -60,6 +60,8 @@ void CameraSettingsDialog::saveToModel()
     m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
+    m_camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleDisabled() == 2);
+
     if (!ui->cameraScheduleWidget->isDoNotChange())
     {
         QnScheduleTaskList scheduleTasks;

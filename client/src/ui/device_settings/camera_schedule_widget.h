@@ -26,6 +26,8 @@ public:
     void setScheduleDisabled(int checkedState);
     void setMaxFps(int value);
 
+    int getScheduleDisabled() const;
+
 private Q_SLOTS:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
