@@ -538,7 +538,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_afterJump = true;
     m_buffering = getBufferingMask();
     m_lastDecodedTime = AV_NOPTS_VALUE;
-    //clearUnprocessedData();
+    clearUnprocessedData();
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
         m_display[i]->blockTimeValue(time);
