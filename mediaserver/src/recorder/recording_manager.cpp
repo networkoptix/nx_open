@@ -152,7 +152,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 
             startOrStopRecording(res, camera, recorders.recorderHiRes, recorders.recorderLowRes);
         }
-        else if (!isResourceDisabled(res))
+        else if (res->getStatus() != QnResource::Disabled)
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
