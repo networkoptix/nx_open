@@ -16,17 +16,19 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 
-#include <ui/dialogs/aboutdialog.h>
-#include <ui/dialogs/logindialog.h>
-#include <ui/dialogs/tagseditdialog.h>
-#include <ui/dialogs/serversettingsdialog.h>
-#include <ui/dialogs/camerasettingsdialog.h>
-#include <ui/dialogs/connectiontestingdialog.h>
-#include <ui/dialogs/multiplecamerasettingsdialog.h>
+#include <ui/dialogs/about_dialog.h>
+#include <ui/dialogs/login_dialog.h>
+#include <ui/dialogs/tags_edit_dialog.h>
+#include <ui/dialogs/server_settings_dialog.h>
+#include <ui/dialogs/camera_settings_dialog.h>
+#include <ui/dialogs/connection_testing_dialog.h>
+#include <ui/dialogs/multiple_camera_settings_dialog.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/new_user_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
+
+#include <ui/graphics/items/resource_widget.h>
 
 #include "eventmanager.h"
 #include "file_processor.h"
@@ -64,6 +66,21 @@ namespace {
     }
 
 } // anonymous namespace
+
+detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldStatuses):
+    m_handler(handler),
+    m_resources(resources),
+    m_oldStatuses(oldStatuses)
+{
+    assert(oldStatuses.size() == resources.size());
+}
+
+void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle) {
+    if(m_handler)
+        m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldStatuses);
+    
+    deleteLater();
+}
 
 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
@@ -131,6 +148,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::ConnectionSettingsAction),           SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
+    connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenNewLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -151,6 +169,8 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::NewLayoutAction),                    SIGNAL(triggered()),    this,   SLOT(at_newLayoutAction_triggered()));
     connect(action(Qn::RenameLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_renameLayoutAction_triggered()));
     connect(action(Qn::ResourceDropAction),                 SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
+    connect(action(Qn::ResourceDropIntoNewLayoutAction),    SIGNAL(triggered()),    this,   SLOT(at_resourceDropIntoNewLayoutAction_triggered()));
+    connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::deinitialize() {
@@ -261,6 +281,34 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + workbench()->layouts().size()) % workbench()->layouts().size());
 }
 
+void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    if(!widgets.empty()) {
+        menu()->trigger(Qn::OpenNewLayoutAction);
+
+        foreach(const QnResourceWidget *widget, widgets) {
+            QnWorkbenchItem *oldItem = widget->item();
+
+            QnWorkbenchItem *newItem = new QnWorkbenchItem(oldItem->resourceUid(), QUuid::createUuid(), this);
+            workbench()->currentLayout()->addItem(newItem);
+
+            newItem->setCombinedGeometry(oldItem->combinedGeometry());
+            newItem->setFlags(oldItem->flags());
+            newItem->setRotation(oldItem->rotation());
+        }
+
+        return;
+    }
+
+    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    if(!medias.isEmpty()) {
+        menu()->trigger(Qn::OpenNewLayoutAction);
+        menu()->trigger(Qn::ResourceDropAction, medias);
+
+        return;
+    }
+}
+
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     QnLayoutResourcePtr resource = menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
     if(!resource)
@@ -279,7 +327,7 @@ void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
     layout->setName(newLayoutName());
 
     workbench()->addLayout(layout);
-    workbench()->setCurrentLayout(workbench()->layouts().back());
+    workbench()->setCurrentLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout) {
@@ -393,6 +441,52 @@ void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
     }
 }
 
+void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
+    QnResourceList resources = menu()->currentResourcesTarget(sender());
+    QnVideoServerResourcePtr server = menu()->currentParameter(sender(), Qn::ServerParameter).value<QnVideoServerResourcePtr>();
+    if(!server)
+        return;
+
+    QnResourceList modifiedResources;
+    QList<int> oldStatuses;
+
+    foreach(const QnResourcePtr &resource, resources) {
+        if(resource->getParentId() == server->getId())
+            continue; /* Moving resource into its owner does nothing. */
+
+        QnNetworkResourcePtr network = resource.dynamicCast<QnNetworkResource>();
+        if(!network)
+            continue;
+
+        QnMacAddress mac = network->getMAC();
+
+        QnNetworkResourcePtr replacedNetwork;
+        foreach(const QnResourcePtr otherResource, resourcePool()->getResourcesWithParentId(server->getId())) {
+            if(QnNetworkResourcePtr otherNetwork = otherResource.dynamicCast<QnNetworkResource>()) {
+                if(otherNetwork->getMAC() == mac) {
+                    replacedNetwork = otherNetwork;
+                    break;
+                }
+            }
+        }
+
+        if(replacedNetwork) {
+            oldStatuses.push_back(replacedNetwork->getStatus());
+            modifiedResources.push_back(replacedNetwork);
+            replacedNetwork->setStatus(QnResource::Offline);
+
+            oldStatuses.push_back(network->getStatus());
+            modifiedResources.push_back(network);
+            network->setStatus(QnResource::Disabled);
+        }
+    }
+
+    if(!modifiedResources.empty()) {
+        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldStatuses);
+        m_connection->setResourcesStatusAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
+    }
+}
+
 void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
     QnResourceList resources = menu()->currentResourcesTarget(sender());
     QVariant position = menu()->currentParameter(sender(), Qn::GridPositionParameter);
@@ -406,6 +500,25 @@ void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
     } else {
         /* Open dropped media resources in current layout. */
         addToWorkbench(medias, position.canConvert(QVariant::PointF), position.toPointF());
+    }
+}
+
+void QnWorkbenchActionHandler::at_resourceDropIntoNewLayoutAction_triggered() {
+    QVariant target = menu()->currentTarget(sender());
+    QnResourceList resources = menu()->currentResourcesTarget(sender());
+
+    QnLayoutResourceList layouts = QnResourceCriterion::filter<QnLayoutResource>(resources);
+    if(!layouts.empty()) {
+        /* Open dropped layouts.  */
+        foreach(const QnLayoutResourcePtr &resource, layouts)
+            menu()->trigger(Qn::OpenLayoutAction, resource);
+
+        QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layouts.back().staticCast<QnLayoutResource>());
+        if(layout)
+            workbench()->setCurrentLayout(layout);
+    } else {
+        /* No layouts? Just open dropped media in a new layout. */
+        menu()->trigger(Qn::OpenInNewLayoutAction, target);
     }
 }
 
@@ -472,6 +585,8 @@ void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
             // don't remove local resources
             const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
             resourcePool()->removeResources(remoteResources);
+
+            qnLicensePool->reset();
 
             SessionManager::instance()->start();
             QnEventManager::instance()->run();
@@ -768,3 +883,27 @@ void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &err
     }
 }
 
+void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses) {
+    if(status == 0 || resources.isEmpty())
+        return;
+
+    QString message;
+    if(resources.size() == 1) {
+        message = tr("Could not save changes made to resource '%1'.").arg(resources[0]->getName());
+    } else {
+        QString resourceList;
+        for(int i = 0; i < resources.size(); i++) {
+            if(i < resources.size() - 1) {
+                resourceList += tr("%1;\n").arg(resources[i]->getName());
+            } else {
+                resourceList += tr("%1.").arg(resources[i]->getName());
+            }
+        }
+        message = tr("Could not save changes made to the following resources:\n\n%1").arg(resourceList);
+    }
+
+    QMessageBox::critical(widget(), tr(""), message, QMessageBox::Ok);
+
+    for(int i = 0; i < resources.size(); i++)
+        resources[i]->setStatus(static_cast<QnResource::Status>(oldStatuses[i]));
+}

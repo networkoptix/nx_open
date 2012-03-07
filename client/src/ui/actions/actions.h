@@ -6,10 +6,12 @@ namespace Qn {
     inline QLatin1String qn_gridPositionParameter()    { return QLatin1String("_qn_gridPosition"); }
     inline QLatin1String qn_userParameter()            { return QLatin1String("_qn_user"); }
     inline QLatin1String qn_nameParameter()            { return QLatin1String("_qn_name"); }
+    inline QLatin1String qn_serverParameter()          { return QLatin1String("_qn_server"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
 #define UserParameter qn_userParameter()
 #define NameParameter qn_nameParameter()
+#define ServerParameter qn_serverParameter()
 
     /**
      * Enum of all menu actions.
@@ -36,6 +38,16 @@ namespace Qn {
          * Drops provided resources on the current layout.
          */ 
         ResourceDropAction,
+        
+        /**
+         * Drops provided resources into a new layout.
+         */ 
+        ResourceDropIntoNewLayoutAction,
+
+        /**
+         * Moves cameras from one server to another.
+         */
+        MoveCameraAction,
 
         /**
          * Opens next layout.
@@ -47,6 +59,10 @@ namespace Qn {
          */
         PreviousLayoutAction,
 
+        /**
+         * Selects all widgets on the scene.
+         */
+        SelectAllAction,
 
 
         /* Main menu actions. */
@@ -54,6 +70,7 @@ namespace Qn {
         /**
          * Opens the main menu.
          */
+        MainMenuAction,
         LightMainMenuAction,
         DarkMainMenuAction,
 
@@ -100,6 +117,16 @@ namespace Qn {
         FullscreenAction,
 
         /**
+         * Minimizes client's main window.
+         */ 
+        MinimizeAction,
+
+        /**
+         * Maximizes client's main window.
+         */ 
+        MaximizeAction,
+
+        /**
          * Opens system settings dialog.
          */
         SystemSettingsAction,
@@ -121,6 +148,11 @@ namespace Qn {
 
 
         /* Resource actions. */
+
+        /**
+         * Opens selected resources in a new layout.
+         */
+        OpenInNewLayoutAction,
 
         /**
          * Opens selected layout.

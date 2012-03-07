@@ -7,6 +7,7 @@
 #include "core/resource/video_server.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
+#include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
@@ -247,5 +248,22 @@ QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
     }
 
     return QnNetworkResourcePtr(0);
+}
+
+int QnResourcePool::activeCameras() const
+{
+    int count = 0;
+
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+
+        if (camera->getStatus() != QnResource::Disabled && !camera->getScheduleTasks().isEmpty())
+            count++;
+    }
+
+    return count;
 }
 

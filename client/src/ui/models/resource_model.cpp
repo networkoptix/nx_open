@@ -9,10 +9,10 @@
 #include <core/resource/media_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <ui/actions/action_manager.h>
-#include <ui/view_drag_and_drop.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include "file_processor.h"
 
@@ -21,6 +21,15 @@ namespace {
         NameColumn,
         ColumnCount
     };
+
+    const char *pureTreeResourcesOnlyMimeType = "application/x-noptix-pure-tree-resources-only";
+
+    bool intersects(const QStringList &l, const QStringList &r) {
+        foreach(const QString &s, l)
+            if(r.contains(s))
+                return true;
+        return false;
+    }
 
 } // namespace
 
@@ -126,6 +135,10 @@ public:
 
     const QnResourcePtr &resource() const {
         return m_resource;
+    }
+
+    QnResource::Flags resourceFlags() const {
+        return m_flags;
     }
 
     const QUuid &uuid() const {
@@ -554,40 +567,41 @@ bool QnResourceModel::setData(const QModelIndex &index, const QVariant &value, i
 }
 
 QVariant QnResourceModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    Q_UNUSED(section);
+    Q_UNUSED(orientation);
+    Q_UNUSED(role);
+
     return QVariant(); /* No headers needed. */
 }
 
 QStringList QnResourceModel::mimeTypes() const {
-    QStringList mimeTypes = QAbstractItemModel::mimeTypes();
-    mimeTypes.append(QLatin1String("text/uri-list"));
-    mimeTypes.append(resourcesMime());
-
-    return mimeTypes;
+    QStringList result = QnWorkbenchResource::resourceMimeTypes();
+    result.append(QLatin1String(pureTreeResourcesOnlyMimeType));
+    return result;
 }
 
 QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const {
     QMimeData *mimeData = QAbstractItemModel::mimeData(indexes);
     if (mimeData) {
         const QStringList types = mimeTypes();
-        const QString resourceFormat = resourcesMime();
-        const QString urlFormat = QLatin1String("text/uri-list");
-        if (types.contains(resourceFormat) || types.contains(urlFormat)) {
+
+        bool pureTreeResourcesOnly = true;
+        if (intersects(types, QnWorkbenchResource::resourceMimeTypes())) {
             QnResourceList resources;
             foreach (const QModelIndex &index, indexes) {
-                if (QnResourcePtr resource = this->resource(index))
-                    resources.append(resource);
+                Node *node = this->node(index);
+                if(node && node->resource())
+                    resources.append(node->resource());
+
+                if(node && node->type() == Node::Item)
+                    pureTreeResourcesOnly = false;
             }
-            if (types.contains(resourceFormat))
-                mimeData->setData(resourceFormat, serializeResources(resources));
-            if (types.contains(urlFormat)) {
-                QList<QUrl> urls;
-                foreach (const QnResourcePtr &resource, resources) {
-                    if (resource->checkFlags(QnResource::url))
-                        urls.append(QUrl::fromLocalFile(resource->getUrl()));
-                }
-                mimeData->setUrls(urls);
-            }
+
+            QnWorkbenchResource::serializeResources(resources, types, mimeData);
         }
+
+        if(types.contains(QLatin1String(pureTreeResourcesOnlyMimeType)))
+            mimeData->setData(QLatin1String(pureTreeResourcesOnlyMimeType), QByteArray(pureTreeResourcesOnly ? "1" : "0"));
     }
 
     return mimeData;
@@ -602,26 +616,20 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
         return false;
 
     /* Check if the format is supported. */
-    const QString format = resourcesMime();
-    if (!mimeData->hasFormat(format) && !mimeData->hasUrls())
+    if(!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes()))
         return QAbstractItemModel::dropMimeData(mimeData, action, row, column, parent);
 
     /* Decode. */
-    QnResourceList resources;
-    if (mimeData->hasFormat(format)) {
-        resources = deserializeResources(mimeData->data(format));
-    } else if (mimeData->hasUrls()) {
-        resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(mimeData->urls()));
-
-        /* Insert. Resources will be inserted into this model in callbacks. */
-        resourcePool()->addResources(resources);
-    }
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
 
     /* Check where we're dropping it. */
     Node *node = this->node(parent);
     
-    if(node->type() == Node::Item) 
-        node = node->parent(); /* Dropping into layout item == dropping into layout. */
+    if(node->type() == Node::Item)
+        node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
+
+    if(node->parent() && (node->parent()->resourceFlags() & QnResource::server))
+        node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
@@ -638,13 +646,13 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
         }
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
+            if(resource->getParentId() == user->getId())
+                continue; /* Dropping resource into its owner does nothing. */
+
             QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
             if(!layout)
                 continue; /* Can drop only layout resources on user. */
             
-            if(layout->getParentId() == user->getId())
-                continue; /* Dropping layout into its owner does nothing. */
-
             QVariantMap params;
             params[Qn::UserParameter] = QVariant::fromValue(user);
             params[Qn::NameParameter] = layout->getName();
@@ -653,6 +661,18 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
             layouts.push_back(layout);
 
             context()->menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
+        }
+    } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
+        if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
+            /* Allow drop of non-layout item data, from tree only. */
+
+            QnResourceList cameras = QnResourceCriterion::filter<QnNetworkResource, QnResourceList>(resources);
+            if(!cameras.empty()) {
+                QVariantMap params;
+                params[Qn::ServerParameter] = QVariant::fromValue(server);
+
+                context()->menu()->trigger(Qn::MoveCameraAction, cameras, params);
+            }
         }
     }
     

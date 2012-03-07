@@ -13,6 +13,7 @@
 #include <QStyledItemDelegate>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/video_server.h>
@@ -56,6 +57,23 @@ public:
     }
 
 protected:
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+        QStyleOptionViewItemV4 optionV4 = option;
+        initStyleOption(&optionV4, index);
+
+        QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
+        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
+
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if(resource && resource->getStatus() == QnResource::Offline) {
+            QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 0, 0, 128), 3));
+
+            QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+            painter->drawLine(iconRect.topLeft() + QPoint(2, 2), iconRect.bottomRight() - QPoint(2, 2));
+            painter->drawLine(iconRect.topRight() + QPoint(-2, 2), iconRect.bottomLeft() - QPoint(-2, 2));
+        }
+    }
+
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
         base_type::initStyleOption(option, index);
 

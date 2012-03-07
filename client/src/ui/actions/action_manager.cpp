@@ -15,6 +15,14 @@
 #include "action_target_provider.h"
 #include "action_target_types.h"
 
+namespace {
+    void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
+        dst->addPixmap(src.pixmap(src.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
+    }
+
+} // anonymous namespace
+
+
 // -------------------------------------------------------------------------- //
 // QnActionBuilder 
 // -------------------------------------------------------------------------- //
@@ -40,15 +48,34 @@ public:
     QnActionBuilder toggledIcon(const QIcon &toggledIcon) {
         QIcon icon = m_action->icon();
         
-        for(int i = 0; i <= QIcon::Selected; i++) {
-            QIcon::Mode mode = static_cast<QIcon::Mode>(i);
-            QIcon::State state = QIcon::On;
-
-            icon.addPixmap(toggledIcon.pixmap(toggledIcon.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
-        }
+        copyIconPixmap(toggledIcon, QIcon::Normal,      QIcon::On, &icon);
+        copyIconPixmap(toggledIcon, QIcon::Disabled,    QIcon::On, &icon);
+        copyIconPixmap(toggledIcon, QIcon::Active,      QIcon::On, &icon);
+        copyIconPixmap(toggledIcon, QIcon::Selected,    QIcon::On, &icon);
 
         m_action->setIcon(icon);
         m_action->setCheckable(true);
+
+        return *this;
+    }
+
+    QnActionBuilder hoverIcon(const QIcon &hoverIcon) {
+        QIcon icon = m_action->icon();
+
+        copyIconPixmap(hoverIcon,   QIcon::Active,      QIcon::On, &icon);
+        copyIconPixmap(hoverIcon,   QIcon::Active,      QIcon::Off, &icon);
+
+        m_action->setIcon(icon);
+
+        return *this;
+    }
+
+    QnActionBuilder toggledHoverIcon(const QIcon &hoverIcon) {
+        QIcon icon = m_action->icon();
+
+        copyIconPixmap(hoverIcon,   QIcon::Active,      QIcon::On, &icon);
+
+        m_action->setIcon(icon);
 
         return *this;
     }
@@ -225,6 +252,15 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
 
+    factory(Qn::ResourceDropIntoNewLayoutAction).
+        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Drop into New Layout"));
+
+    factory(Qn::MoveCameraAction).
+        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Move Cameras")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::network)));
+
     factory(Qn::NextLayoutAction).
         flags(Qn::NoTarget).
         text(tr("Next Layout")).
@@ -237,6 +273,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Shift+Tab")).
         autoRepeat(false);
 
+    factory(Qn::SelectAllAction).
+        flags(Qn::NoTarget).
+        text(tr("Select All")).
+        shortcut(tr("Ctrl+A")).
+        autoRepeat(false);
+
+
     /* Tab bar actions. */
 
     factory(Qn::CloseLayoutAction).
@@ -248,17 +291,20 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     /* Context menu actions. */
-
-    factory(Qn::LightMainMenuAction).
+    factory(Qn::MainMenuAction).
+        flags(Qn::NoTarget).
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
-        autoRepeat(false).
+        autoRepeat(false);
+
+    factory(Qn::LightMainMenuAction).
+        flags(Qn::NoTarget).
+        text(tr("Main Menu")).
         icon(Skin::icon(QLatin1String("logo_icon2.png")));
 
     factory(Qn::DarkMainMenuAction).
+        flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        shortcut(tr("Alt+Space")).
-        autoRepeat(false).
         icon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
 
     factory(Qn::NewUserAction).
@@ -276,7 +322,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("New Layout")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-        icon(Skin::icon(QLatin1String("plus.png")));
+        icon(Skin::icon(QLatin1String("decorations/new_layout.png")));
 
     factory().
         flags(Qn::Main | Qn::Tree).
@@ -322,6 +368,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Screen Recording")).
         shortcut(tr("Alt+R")).
         shortcut(Qt::Key_MediaRecord).
+        icon(Skin::icon(QLatin1String("decorations/recording.png"))).
         autoRepeat(false);
 
     factory(Qn::FullscreenAction).
@@ -337,7 +384,21 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Esc")).
 #endif
         icon(Skin::icon(QLatin1String("decorations/fullscreen.png"))).
-        toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png")));
+        hoverIcon(Skin::icon(QLatin1String("decorations/fullscreen_hovered.png"))).
+        toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png"))).
+        toggledHoverIcon(Skin::icon(QLatin1String("decorations/unfullscreen_hovered.png")));
+
+    factory(Qn::MinimizeAction).
+        flags(Qn::NoTarget).
+        text(tr("Minimize")).
+        icon(Skin::icon(QLatin1String("decorations/minimize.png"))).
+        hoverIcon(Skin::icon(QLatin1String("decorations/minimize_hovered.png")));
+
+    factory(Qn::MaximizeAction).
+        flags(Qn::NoTarget).
+        text(tr("Maximize")).
+        icon(Skin::icon(QLatin1String("decorations/maximize.png"))).
+        hoverIcon(Skin::icon(QLatin1String("decorations/maximize_hovered.png")));
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
@@ -345,7 +406,8 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/settings.png")));
+        icon(Skin::icon(QLatin1String("decorations/settings.png"))).
+        hoverIcon(Skin::icon(QLatin1String("decorations/settings_hovered.png")));
 
     factory().
         flags(Qn::Main).
@@ -357,11 +419,17 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+F4")).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/exit-application.png")));
+        icon(Skin::icon(QLatin1String("decorations/exit.png"))).
+        hoverIcon(Skin::icon(QLatin1String("decorations/exit_hovered.png")));
 
 
 
     /* Resource actions. */
+
+    factory(Qn::OpenInNewLayoutAction).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
+        text(tr("Open in a New Layout")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
 
     factory(Qn::OpenLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).

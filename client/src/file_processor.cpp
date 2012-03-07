@@ -59,7 +59,8 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file)
 {
     QnResourcePtr result = QnResourceDirectoryBrowser::instance().checkFile(file);
 
-    qnResPool->addResource(result);
+    if(result)
+        qnResPool->addResource(result);
 
     return result;
 }

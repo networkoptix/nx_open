@@ -1,18 +1,19 @@
 #ifndef QN_WORKBENCH_RESOURCE_H
 #define QN_WORKBENCH_RESOURCE_H
 
+#include <QString>
+#include <QByteArray>
 #include <core/resource/resource_fwd.h>
+
+class QMimeData;
 
 class QnWorkbenchResource {
 public:
-    static bool isSceneDroppable(const QnResourcePtr &resource);
+    static QStringList resourceMimeTypes();
 
-    //static bool isSceneDroppable(const QnResourcePtr &resource, const QVariant &targetValue);
+    static void serializeResources(const QnResourceList &resources, const QStringList &mimeTypes, QMimeData *mimeData);
 
-    static 
-
-private:
-
+    static QnResourceList deserializeResources(const QMimeData *mimeData);
 };
 
 

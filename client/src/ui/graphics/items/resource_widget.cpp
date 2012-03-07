@@ -5,6 +5,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
+#include <ui/animation/widget_opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/workbench/workbench_item.h>
@@ -110,6 +111,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_buttonsWidget = new QGraphicsWidget(this);
     m_buttonsWidget->setLayout(m_buttonsLayout);
     m_buttonsWidget->setAcceptedMouseButtons(0);
+    m_buttonsWidget->setOpacity(0.0); /* Transparent by default. */
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -280,6 +282,14 @@ void QnResourceWidget::showActivityDecorations() {
 
 void QnResourceWidget::hideActivityDecorations() {
     setDisplayFlag(DISPLAY_ACTIVITY_OVERLAY, false);
+}
+
+void QnResourceWidget::fadeOutButtons() {
+    opacityAnimator(m_buttonsWidget, 1.0)->animateTo(0.0);
+}
+
+void QnResourceWidget::fadeInButtons() {
+    opacityAnimator(m_buttonsWidget, 1.0)->animateTo(1.0);
 }
 
 void QnResourceWidget::invalidateMotionMask() {
@@ -567,6 +577,25 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
     }
 
     return result;
+}
+
+void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+    fadeInButtons();
+
+    base_type::hoverEnterEvent(event);
+}
+
+void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+    if(qFuzzyIsNull(m_buttonsWidget->opacity()))
+        fadeInButtons();
+
+    base_type::hoverMoveEvent(event);
+}
+
+void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    fadeOutButtons();
+
+    base_type::hoverLeaveEvent(event);
 }
 
 void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {

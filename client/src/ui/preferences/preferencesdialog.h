@@ -8,7 +8,7 @@
 class QnWorkbenchContext;
 
 class ConnectionsSettingsWidget;
-class LicenseWidget;
+class LicenseManagerWidget;
 class RecordingSettingsWidget;
 class YouTubeSettingsWidget;
 
@@ -51,7 +51,7 @@ private:
     ConnectionsSettingsWidget *connectionsSettingsWidget;
     RecordingSettingsWidget *videoRecorderWidget;
     YouTubeSettingsWidget *youTubeSettingsWidget;
-    LicenseWidget *licenseWidget;
+    LicenseManagerWidget *licenseManagerWidget;
 
     typedef QPair<QString, QString> CameraNameAndInfo;
 

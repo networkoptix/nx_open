@@ -24,6 +24,14 @@ public:
         initialize();
     }
 
+public slots:
+    /**
+     * Resets the drag process. 
+     */
+    void reset();
+
+    void resetLater();
+
 protected:
     virtual void aboutToBeDisabledNotify() override;
 

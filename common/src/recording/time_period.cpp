@@ -55,7 +55,7 @@ QnTimePeriod QnTimePeriod::intersect(const QnTimePeriod& other) const
     return QnTimePeriod(start, end - start);
 }
 
-QnTimePeriodList QnTimePeriod::agregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs)
+QnTimePeriodList QnTimePeriod::aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs)
 {
     QnTimePeriodList result;
     if (periods.isEmpty())
@@ -65,10 +65,18 @@ QnTimePeriodList QnTimePeriod::agregateTimePeriods(const QnTimePeriodList& perio
     for (int i = 1; i < periods.size(); ++i)
     {
         QnTimePeriod& last = result.last();
-        if (periods[i].durationMs != -1 && last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs)
-            last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
-        else
+        if(last.durationMs == -1)
+            break;
+
+        if (last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs) {
+            if(periods[i].durationMs == -1) {
+                last.durationMs = -1;
+            } else {
+                last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
+            }
+        } else {
             result << periods[i];
+        }
     }
 
     return result;

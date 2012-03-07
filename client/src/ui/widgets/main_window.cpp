@@ -34,19 +34,20 @@
 #include "ui/workbench/workbench_synchronizer.h"
 #include "ui/workbench/workbench_action_handler.h"
 #include "ui/workbench/workbench_context.h"
-
-#include "ui/widgets/resource_tree_widget.h"
+#include "ui/workbench/workbench_resource.h"
 
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
 
+#include "ui/events/system_menu_event.h"
+
 #include "file_processor.h"
 #include "settings.h"
 
+#include "resource_tree_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
-#include "system_menu_event.h"
 
 #include "eventmanager.h"
 
@@ -174,15 +175,18 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(action(Qn::ConnectionSettingsAction));
     addAction(action(Qn::OpenNewLayoutAction));
     addAction(action(Qn::CloseLayoutAction));
-    addAction(action(Qn::DarkMainMenuAction));
+    addAction(action(Qn::MainMenuAction));
     addAction(action(Qn::YouTubeUploadAction));
     addAction(action(Qn::EditTagsAction));
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
+    addAction(action(Qn::SelectAllAction));
 
     connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
+    connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
+    connect(action(Qn::MainMenuAction),     SIGNAL(triggered()),                            this,                                   SLOT(at_mainMenuAction_triggered()));
 
     menu()->setTargetProvider(m_ui);
 
@@ -211,9 +215,10 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction));
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
-    disconnect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton, SLOT(_q_buttonPressed()));
-    connect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton->defaultAction(), SLOT(trigger()));
-    connect(m_mainMenuButton, SIGNAL(pressed()), m_mainMenuButton, SLOT(_q_buttonPressed()));
+    disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
+    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton->defaultAction(),      SLOT(trigger()));
+    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
+
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
@@ -224,8 +229,10 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewLayoutAction)));
     m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(newActionButton(action(Qn::ScreenRecordingAction)));    
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectionSettingsAction)));
-    m_titleLayout->addWidget(newActionButton(action(Qn::SystemSettingsAction)));
+    m_titleLayout->addSpacing(12);
+    m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
@@ -300,6 +307,11 @@ void QnMainWindow::setFullScreen(bool fullScreen)
 void QnMainWindow::toggleFullScreen() 
 {
     setFullScreen(!isFullScreen());
+}
+
+void QnMainWindow::minimize() 
+{
+    setWindowState(Qt::WindowMinimized | windowState());
 }
 
 void QnMainWindow::toggleTitleVisibility() 
@@ -447,7 +459,7 @@ bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
     if(event->type() == QnSystemMenuEvent::SystemMenu) {
-        menu()->trigger(Qn::LightMainMenuAction);
+        menu()->trigger(Qn::MainMenuAction);
         return true;
     }
 
@@ -496,6 +508,31 @@ void QnMainWindow::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
 }
 
+void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
+    m_dropResources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    if (m_dropResources.empty())
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnMainWindow::dragMoveEvent(QDragMoveEvent *event) {
+    if(m_dropResources.empty())
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnMainWindow::dragLeaveEvent(QDragLeaveEvent *event) {
+    m_dropResources = QnResourceList();
+}
+
+void QnMainWindow::dropEvent(QDropEvent *event) {
+    m_context->menu()->trigger(Qn::ResourceDropIntoNewLayoutAction, m_dropResources);
+
+    event->acceptProposedAction();
+}
+
 #ifdef Q_OS_WIN
 bool QnMainWindow::winEvent(MSG *message, long *result)
 {
@@ -541,3 +578,19 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
+void QnMainWindow::at_mainMenuAction_triggered() {
+    if(!m_mainMenuButton->isVisible())
+        return;
+
+    const char *inShowMenuPropertyName = "_qn_inShowMenu";
+
+    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
+    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
+        if(menu)
+            menu->hide();
+    } else {
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
+        m_mainMenuButton->click(); /* This call starts event loop. */
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
+    }
+}

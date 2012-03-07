@@ -2,6 +2,11 @@
 #include "../dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 
+QnVirtualCameraResource::QnVirtualCameraResource()
+    : m_blocked(false)
+{
+}
+
 int QnPhysicalCameraResource::getPrimaryStreamDesiredFps() const
 {
 #ifdef _DEBUG
@@ -86,4 +91,18 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {
     QnNetworkResource::updateInner(other);
     QnSecurityCamResource::updateInner(other);
+
+    QnVirtualCameraResourcePtr camera = other.dynamicCast<QnVirtualCameraResource>();
+    if (camera)
+        m_blocked = camera->isBlocked();
+}
+
+void QnVirtualCameraResource::setBlocked(bool blocked)
+{
+    m_blocked = blocked;
+}
+
+bool QnVirtualCameraResource::isBlocked() const
+{
+    return m_blocked;
 }

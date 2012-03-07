@@ -8,6 +8,9 @@
 #include <QGraphicsLinearLayout>
 #include <QStyle>
 #include <QApplication>
+#include <QFileDialog>
+#include <QProgressDialog>
+#include <QMessageBox>
 #include <QSettings>
 #include <QMenu>
 #include <QLabel>
@@ -33,6 +36,7 @@
 #include <ui/graphics/instruments/bounding_instrument.h>
 #include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/fps_counting_instrument.h>
+#include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
@@ -55,7 +59,6 @@
 #include "camera/camera.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "ui/ui_common.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "extensions/workbench_render_watcher.h"
@@ -118,6 +121,7 @@ namespace {
     const qreal hoverHelpBackgroundOpacity = 1.0;
 
     const int hideConstrolsTimeoutMSec = 2000;
+    const int closeConstrolsTimeoutMSec = 2000;
 
 } // anonymous namespace
 
@@ -240,8 +244,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeHidingProcessor->addTargetItem(m_treeItem);
     m_treeHidingProcessor->addTargetItem(m_treeShowButton);
-    m_treeHidingProcessor->setHoverLeaveDelay(1000);
-    m_treeHidingProcessor->setFocusLeaveDelay(1000);
+    m_treeHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
+    m_treeHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
 
     m_treeShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeShowingProcessor->addTargetItem(m_treeShowButton);
@@ -305,6 +309,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
+    QGraphicsWidget *titleSpacer = new QGraphicsWidget();
+    titleSpacer->setMinimumSize(QSizeF(12.0, 12.0));
+    titleSpacer->setMaximumSize(QSizeF(12.0, 12.0));
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -312,8 +320,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->addItem(m_tabBarItem);
     titleLayout->addItem(newActionButton(action(Qn::OpenNewLayoutAction)));
     titleLayout->addStretch(0x1000);
+    titleLayout->addItem(newActionButton(action(Qn::ScreenRecordingAction)));
     titleLayout->addItem(newActionButton(action(Qn::ConnectionSettingsAction)));
-    titleLayout->addItem(newActionButton(action(Qn::SystemSettingsAction)));
+    titleLayout->addItem(titleSpacer);
+    titleLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     titleLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
     titleLayout->addItem(newActionButton(action(Qn::ExitAction)));
     m_titleItem->setLayout(titleLayout);
@@ -353,6 +363,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
+    connect(action(Qn::MainMenuAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_mainMenuAction_triggered()));
 
 
     /* Help window. */
@@ -405,8 +416,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_helpHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_helpHidingProcessor->addTargetItem(m_helpItem);
     m_helpHidingProcessor->addTargetItem(m_helpShowButton);
-    m_helpHidingProcessor->setHoverLeaveDelay(1000);
-    m_helpHidingProcessor->setFocusLeaveDelay(1000);
+    m_helpHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
+    m_helpHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
 
     m_helpShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_helpShowingProcessor->addTargetItem(m_helpShowButton);
@@ -498,6 +509,11 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     /* Tree is pinned by default. */
     m_treePinButton->setChecked(true);
+
+    /* Set up title D&D. */
+    DropInstrument *dropInstrument = new DropInstrument(true, display->context(), this);
+    display->instrumentManager()->installInstrument(dropInstrument);
+    dropInstrument->setSurface(m_titleBackgroundItem);
 
     /* Set up help context processing. */
     QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display, this);
@@ -1118,6 +1134,24 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchUi::at_mainMenuAction_triggered() {
+    if(!m_mainMenuButton->isVisible())
+        return;
+
+    const char *inShowMenuPropertyName = "_qn_inShowMenu";
+
+    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
+    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
+        if(menu)
+            menu->hide();
+    } else {
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
+        m_mainMenuButton->click(); /* This call starts event loop. */
+        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
+    }
+}
+
+
 void QnWorkbenchUi::at_fpsChanged(qreal fps) {
     m_fpsItem->setText(QString::number(fps, 'g', 4));
     m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
@@ -1127,6 +1161,9 @@ void QnWorkbenchUi::at_activityStopped() {
     m_inactive = true;
 
     updateControlsVisibility(true);
+
+    foreach(QnResourceWidget *widget, m_display->widgets())
+        widget->fadeOutButtons();
 }
 
 void QnWorkbenchUi::at_activityStarted() {
@@ -1211,13 +1248,13 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
         if (QFile::exists(fullName))
         {
             QString shortName = QFileInfo(fullName).baseName();
-            QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), QString("File '%1' already exists. Overwrite?").arg(shortName),
+            QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), tr("File '%1' already exists. Overwrite?").arg(shortName),
                                QMessageBox::Yes | QMessageBox::No, m_display->view());
             if (msgBox.exec() == QMessageBox::Yes)
             {
                 if (!QFile::remove(fullName))
                 {
-                    UIOKMessage(m_display->view(), "Can't overwrite file", QString("File '%1' is used by another process. Try another name.").arg(shortName));
+                    QMessageBox::information(m_display->view(), tr("Can't overwrite file"), tr("File '%1' is used by another process. Try another name.").arg(shortName), QMessageBox::Ok);
                     continue;
                 }
                 break;

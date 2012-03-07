@@ -14,8 +14,27 @@ class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
+class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
+
+namespace detail {
+    class QnResourceStatusReplyProcessor: public QObject {
+        Q_OBJECT;
+    public:
+        QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldStatuses);
+
+    public slots:
+        void at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle);
+
+    private:
+        QWeakPointer<QnWorkbenchActionHandler> m_handler;
+        QnResourceList m_resources;
+        QList<int> m_oldStatuses;
+    };
+
+} // namespace detail
+
 
 /**
  * This class implements logic for client actions.
@@ -83,7 +102,9 @@ protected slots:
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     
+    void at_moveCameraAction_triggered();
     void at_resourceDropAction_triggered();
+    void at_resourceDropIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
@@ -95,6 +116,7 @@ protected slots:
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
 
+    void at_openInNewLayoutAction_triggered();
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
     void at_removeLayoutItemAction_triggered();
@@ -107,8 +129,11 @@ protected slots:
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
     void at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
+    void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses);
 
 private:
+    friend class detail::QnResourceStatusReplyProcessor;
+
     QnWorkbenchContext *m_context;
     QWeakPointer<QWidget> m_widget;
     QnAppServerConnectionPtr m_connection;

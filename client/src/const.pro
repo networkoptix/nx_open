@@ -82,8 +82,8 @@ win* {
     INCLUDEPATH += $$PWD/../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
 
-    INCLUDEPATH += $$PWD/../contrib/openssl/include
-    LIBS += -L$$PWD/../contrib/openssl/bin -llibeay32
+    INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
 }
 
 mac {
@@ -183,23 +183,25 @@ RESOURCES += ../build/skin.qrc
 FORMS += \
     ui/preferences/connectionssettingswidget.ui \
     ui/preferences/licensewidget.ui \
+    ui/preferences/licensemanagerwidget.ui \
     ui/preferences/preferences.ui \
     ui/preferences/recordingsettingswidget.ui \
-    ui/dialogs/logindialog.ui \
-    ui/dialogs/tagseditdialog.ui \
-    ui/dialogs/camerasettingsdialog.ui \
-    ui/dialogs/multiplecamerasettingsdialog.ui \
-    ui/dialogs/serversettingsdialog.ui \
+    ui/dialogs/login_dialog.ui \
+    ui/dialogs/tags_edit_dialog.ui \
+    ui/dialogs/camera_settings_dialog.ui \
+    ui/dialogs/multiple_camera_settings_dialog.ui \
+    ui/dialogs/server_settings_dialog.ui \
     ui/dialogs/layout_name_dialog.ui \
     ui/dialogs/new_user_dialog.ui \
+    ui/dialogs/connection_testing_dialog.ui \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
     ui/device_settings/camera_schedule.ui \
-    ui/dialogs/connectiontestingdialog.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
 
-DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
+# CL_TRIAL_MODE 
+DEFINES += CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"
 # or
 #DEFINES += CL_SKIN_PATH=\\\"./trinity\\\"

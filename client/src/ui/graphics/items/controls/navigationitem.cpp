@@ -1,9 +1,9 @@
 #include "navigationitem.h"
 
-#include <QtCore/QEvent>
-
-#include <QtGui/QAction>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QEvent>
+#include <QCoreApplication>
+#include <QAction>
+#include <QGraphicsLinearLayout>
 
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/video_server.h>
@@ -105,36 +105,38 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
     m_backwardButton = new QnImageButtonWidget(this);
-    m_backwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_backward_grey.png")));
-    m_backwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_backward_blue.png")));
+    m_backwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_backward.png")));
+    m_backwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_backward_hovered.png")));
     m_backwardButton->setPreferredSize(32, 18);
     m_backwardButton->setAnimationSpeed(4.0);
     m_backwardButton->setFocusProxy(this);
 
     m_stepBackwardButton = new QnImageButtonWidget(this);
-    m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward_grey.png")));
-    m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_blue.png")));
+    m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward.png")));
+    m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_hovered.png")));
     m_stepBackwardButton->setPreferredSize(32, 18);
     m_stepBackwardButton->setAnimationSpeed(4.0);
     m_stepBackwardButton->setFocusProxy(this);
 
     m_playButton = new QnImageButtonWidget(this);
-    m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play_grey.png")));
-    m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_blue.png")));
+    m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play.png")));
+    m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_hovered.png")));
     m_playButton->setPreferredSize(32, 30);
     m_playButton->setAnimationSpeed(4.0);
     m_playButton->setFocusProxy(this);
 
     m_stepForwardButton = new QnImageButtonWidget(this);
-    m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward_grey.png")));
-    m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_blue.png")));
+    m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward.png")));
+    m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_hovered.png")));
+    m_stepForwardButton->setPixmap(QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("step_forward_disabled.png")));
     m_stepForwardButton->setPreferredSize(32, 18);
     m_stepForwardButton->setAnimationSpeed(4.0);
     m_stepForwardButton->setFocusProxy(this);
 
     m_forwardButton = new QnImageButtonWidget(this);
-    m_forwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_forward_grey.png")));
-    m_forwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_forward_blue.png")));
+    m_forwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_forward.png")));
+    m_forwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_forward_hovered.png")));
+    m_forwardButton->setPixmap(QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("rewind_forward_disabled.png")));
     m_forwardButton->setPreferredSize(32, 18);
     m_forwardButton->setAnimationSpeed(4.0);
     m_forwardButton->setFocusProxy(this);
@@ -411,7 +413,8 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         return;
 
     m_timeSlider->resetSelectionRange();
-    //restoreInfoText();
+
+    bool clearZoomNeeded = m_reserveCameras.contains(camera) != m_reserveCameras.contains(m_camera);
 
     if (m_camera)
         disconnect(m_camera->getCamDisplay(), 0, this, 0);
@@ -444,6 +447,9 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
     }
 
     m_syncButton->setEnabled(camera != 0 && !m_reserveCameras.isEmpty());
+
+    if(clearZoomNeeded)
+        m_timeSlider->setScalingFactor(0.0);
 
     emit actualCameraChanged(m_camera);
 }
@@ -497,7 +503,14 @@ void NavigationItem::updateSlider()
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    m_liveButton->setChecked(!reader->isMediaPaused() && m_camera->getCamDisplay()->isRealTimeSource());
+    if(!reader->isMediaPaused() && (m_camera->getCamDisplay()->isRealTimeSource() || m_timeSlider->currentValue() == DATETIME_NOW)) {
+        m_liveButton->setChecked(true);
+        m_forwardButton->setEnabled(false);
+        m_stepForwardButton->setEnabled(false);
+    } else {
+        m_forwardButton->setEnabled(true);
+        m_stepForwardButton->setEnabled(true);
+    }
 }
 
 void NavigationItem::updateMotionPeriods(const QnTimePeriod& period)
@@ -872,11 +885,43 @@ void NavigationItem::rewindBackward()
         return;
 
     setActive(true);
+
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    reader->jumpTo(0, true);
+    if(!m_reserveCameras.contains(m_camera)) {
+        reader->jumpTo(0, true);
+        reader->resumeDataProcessors();
+    } else {
+        qint64 pos = -1;
+
+        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
+        qint64 currentTime = m_timeSlider->currentValue();
+        qint64 precision = m_timeSlider->getMsInPixel() * 3;
+        
+        for(int i = qUpperBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin() - 1; i >= 0; i--) {
+            if(periods[i].durationMs < precision && periods[i].durationMs != -1)
+                continue;
+
+            if(periods[i].startTimeMs < currentTime - precision) {
+                pos = periods[i].startTimeMs * 1000;
+                break;
+            }
+        }
+
+        if(pos == -1) {
+            if(!periods.empty()) {
+                pos = periods[0].startTimeMs * 1000;
+            } else {
+                pos = DATETIME_NOW;
+            }
+        }
+
+        reader->jumpTo(pos, true);
+        reader->resumeDataProcessors();
+    }
+
+    
     //m_camera->streamJump(0);
-    reader->resumeDataProcessors();
 }
 
 void NavigationItem::rewindForward()
@@ -891,9 +936,28 @@ void NavigationItem::rewindForward()
     if (stopped)
         play();
 
-    reader->jumpTo(reader->lengthMksec(), false);
-    //m_camera->streamJump(reader->lengthMksec());
-    reader->resumeDataProcessors();
+    qint64 pos = -1;
+    if(!m_reserveCameras.contains(m_camera)) {
+        reader->jumpTo(reader->lengthMksec(), false);
+        reader->resumeDataProcessors();
+    } else {
+        qint64 pos = -1;
+
+        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
+        qint64 currentTime = m_timeSlider->currentValue();
+        for(int i = qLowerBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin(); i < periods.size(); i++) {
+            if(periods[i].startTimeMs > currentTime) {
+                pos = periods[i].startTimeMs * 1000;
+                break;
+            }
+        }
+        if(pos == -1)
+            pos = DATETIME_NOW;
+
+        reader->jumpTo(pos, false);
+        reader->resumeDataProcessors();
+    }
+
     if (stopped)
     {
         qApp->processEvents();
@@ -1021,27 +1085,27 @@ void NavigationItem::setPlaying(bool playing)
     m_playing = playing;
 
     if (m_playing) {
-        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("backward_grey.png")));
-        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("backward_blue.png")));
+        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("backward.png")));
+        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("backward_hovered.png")));
 
-        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("pause_grey.png")));
-        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("pause_blue.png")));
+        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("pause.png")));
+        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("pause_hovered.png")));
 
-        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("forward_grey.png")));
-        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("forward_blue.png")));
+        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("forward.png")));
+        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("forward_hovered.png")));
 
         m_speedSlider->setPrecision(SpeedSlider::LowPrecision);
 
         play();
     } else {
-        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward_grey.png")));
-        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_blue.png")));
+        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward.png")));
+        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_hovered.png")));
 
-        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play_grey.png")));
-        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_blue.png")));
+        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play.png")));
+        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_hovered.png")));
 
-        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward_grey.png")));
-        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_blue.png")));
+        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward.png")));
+        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_hovered.png")));
 
         m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
 
@@ -1070,7 +1134,6 @@ void NavigationItem::at_liveButton_clicked(bool checked)
     m_timeSlider->setLiveMode(true);
     m_timeSlider->setCurrentValue(m_timeSlider->maximumValue());
     smartSeek(DATETIME_NOW);
-    //m_timeSlider->setCurrentValue(checked ? DATETIME_NOW : m_timeSlider->minimumValue());
 }
 
 void NavigationItem::onSyncButtonToggled(bool value)

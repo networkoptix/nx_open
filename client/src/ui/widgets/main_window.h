@@ -46,6 +46,10 @@ protected:
     virtual void changeEvent(QEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
+    virtual void dragEnterEvent(QDragEnterEvent *event) override;
+    virtual void dragMoveEvent(QDragMoveEvent *event) override;
+    virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
+    virtual void dropEvent(QDropEvent *event) override;
 
 #ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
@@ -60,6 +64,7 @@ protected:
 protected slots:
     void setTitleVisible(bool visible);
     void setFullScreen(bool fullScreen);
+    void minimize();
 
     void toggleFullScreen();
     void toggleTitleVisibility();
@@ -70,10 +75,9 @@ protected slots:
     void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
-
     void at_sessionManager_error(int error);
-
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
+    void at_mainMenuAction_triggered();
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
@@ -92,6 +96,8 @@ private:
     QBoxLayout *m_globalLayout;
 
     bool m_titleVisible;
+
+    QnResourceList m_dropResources;
 
     QnDwm *m_dwm;
     bool m_drawCustomFrame;

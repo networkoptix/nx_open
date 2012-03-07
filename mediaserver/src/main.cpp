@@ -460,6 +460,11 @@ public:
         }
 
 
+        while (!needToStop() && !initLicenses(appServerConnection))
+        {
+            QnSleep::msleep(1000);
+        }
+
         if (needToStop())
             return;
 

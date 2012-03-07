@@ -56,5 +56,12 @@ class QnUserResource;
 typedef QnSharedResourcePointer<QnUserResource> QnUserResourcePtr;
 typedef QList<QnUserResourcePtr> QnUserResourceList;
 
+class QnVideoServerResource;
+typedef QnSharedResourcePointer<QnVideoServerResource> QnVideoServerResourcePtr;
+typedef QList<QnVideoServerResourcePtr> QnVideoServerResourceList;
+
+class QnLocalVideoServerResource;
+typedef QnSharedResourcePointer<QnLocalVideoServerResource> QnLocalVideoServerResourcePtr;
+typedef QList<QnLocalVideoServerResourcePtr> QnLocalVideoServerResourceList;
 
 #endif // QN_RESOURCE_FWD_H

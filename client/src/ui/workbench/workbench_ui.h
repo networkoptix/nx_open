@@ -165,6 +165,7 @@ protected slots:
     void setTreeShowButtonUsed(bool used = true);
     void setHelpShowButtonUsed(bool used = true);
 
+    void at_mainMenuAction_triggered();
     void at_activityStopped();
     void at_activityStarted();
     void at_fpsChanged(qreal fps);

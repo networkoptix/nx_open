@@ -20,10 +20,11 @@ class CLVideoCamera;
 class InstrumentManager;
 class HandScrollInstrument;
 class WheelZoomInstrument;
-class DragInstrument;
+class MoveInstrument;
 class RubberBandInstrument;
 class ResizingInstrument;
 class DropInstrument;
+class DragInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
 class ForwardingInstrument;
@@ -76,8 +77,8 @@ public:
         return m_itemRightClickInstrument;
     }
 
-    DragInstrument *dragInstrument() const {
-        return m_dragInstrument;
+    MoveInstrument *moveInstrument() const {
+        return m_moveInstrument;
     }
 
     ForwardingInstrument *itemMouseForwardingInstrument() const {
@@ -110,9 +111,9 @@ protected slots:
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
-    void at_dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void at_drag(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_move(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
 
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
@@ -135,6 +136,7 @@ protected slots:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
+    void at_selectAllAction_triggered();
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
     void at_recordingAction_triggered(bool checked);
@@ -168,7 +170,7 @@ private:
     WheelZoomInstrument *m_wheelZoomInstrument;
 
     /** Dragging instrument. */
-    DragInstrument *m_dragInstrument;
+    MoveInstrument *m_moveInstrument;
 
     /** Rotation instrument. */
     RotationInstrument *m_rotationInstrument;
@@ -179,8 +181,11 @@ private:
     /** Resizing instrument. */
     ResizingInstrument *m_resizingInstrument;
 
-    /** Archive drop instrument. */
+    /** Drop instrument. */
     DropInstrument *m_dropInstrument;
+
+    /** Drag instrument. */
+    DragInstrument *m_dragInstrument;
 
     /** Motion selection instrument. */
     MotionSelectionInstrument *m_motionSelectionInstrument;

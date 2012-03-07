@@ -170,12 +170,46 @@ void QnImageButtonWidget::setAnimationSpeed(qreal animationSpeed) {
     m_animator->setSpeed(animationSpeed);
 }
 
-void QnImageButtonWidget::click() {
-    if(m_action != NULL)
+void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
+    QWeakPointer<QObject> self(this);
+
+    if(m_action != NULL) {
         m_action->trigger();
-    else
+    } else {
         toggle();
+    }
+    if(!self)
+        return;
+    
     emit clicked(isChecked());
+    if(!self)
+        return;
+
+    if(m_action && m_action->menu() && (!event || !skipMenuEvent(event))) {
+        QGraphicsView *view = NULL;
+        if(event)
+            view = qobject_cast<QGraphicsView *>(event->widget() ? event->widget()->parent() : NULL);
+        if(!view && scene() && !scene()->views().empty())
+            view = scene()->views()[0];
+        if(!view) {
+            qnWarning("No graphics view in scope, cannot show menu for an image button widget.");
+            return;
+        }
+
+        QMenu *menu = m_action->menu();
+        QPoint pos = view->mapToGlobal(view->mapFromScene(mapToScene(rect().bottomLeft())));
+
+        menu->exec(pos);
+
+        /* Cannot use QMenu::setNoReplayFor, as it will block click events for the whole scene. 
+         * This is why we resort to nasty hacks with mouse position comparisons. */
+        m_skipNextMenuEvents = 1;
+        m_nextMenuEventPos = QCursor::pos();
+    }
+}
+
+void QnImageButtonWidget::click() {
+    clickInternal(NULL);
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
@@ -228,27 +262,7 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     if(isDisabled())
         return;
 
-    QWeakPointer<QObject> self(this);
-
-    click();
-
-    if(self && m_action && m_action->menu() && !skipMenuEvent(event)) {
-        QGraphicsView *view = qobject_cast<QGraphicsView *>(event->widget() ? event->widget()->parent() : NULL);
-        if(!view) {
-            qnWarning("No graphics view in scope, cannot show menu for an image button widget.");
-            return;
-        }
-
-        QMenu *menu = m_action->menu();
-        QPoint pos = view->mapToGlobal(view->mapFromScene(mapToScene(rect().bottomLeft())));
-
-        menu->exec(pos);
-
-        /* Cannot use QMenu::setNoReplayFor, as it will block clicks events for the whole scene. 
-         * This is why we resort to nasty hacks with mouse position compares. */
-        m_skipNextMenuEvents = 1;
-        m_nextMenuEventPos = QCursor::pos();
-    }
+    clickInternal(event);
 }
 
 void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *) {
@@ -488,6 +502,10 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     } else {
         m_animator->animateTo(hoverProgress);
     }
+}
+
+QAction *QnImageButtonWidget::defaultAction() const {
+    return m_action;
 }
 
 void QnImageButtonWidget::setDefaultAction(QAction *action) {

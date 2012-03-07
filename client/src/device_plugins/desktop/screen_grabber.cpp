@@ -287,21 +287,21 @@ CLScreenGrabber::CaptureInfo CLScreenGrabber::captureFrame()
     return rez;
 }
 
-void bgra_to_yv12_sse_intr(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
+void bgra_to_yv12_sse2_intr(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
-    static const __m128i sse_2000         = _mm_setr_epi16( 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 );
-    static const __m128i sse_00a0         = _mm_setr_epi16( 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 );
-    static const __m128i sse_mask_color   = _mm_setr_epi32( 0x00003fc0, 0x00003fc0, 0x00003fc0, 0x00003fc0);
-    static const __m128i sse_01           = _mm_setr_epi16(0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001);
+    static const __m128i sse_2000         = _mm_setr_epi16( 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 ); /* SSE2. */
+    static const __m128i sse_00a0         = _mm_setr_epi16( 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 ); /* SSE2. */
+    static const __m128i sse_mask_color   = _mm_setr_epi32( 0x00003fc0, 0x00003fc0, 0x00003fc0, 0x00003fc0); /* SSE2. */
+    static const __m128i sse_01           = _mm_setr_epi16(0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001); /* SSE2. */
 
     static const int K = 32768;
-    static const __m128i y_r_coeff =  _mm_setr_epi16( 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K );
-    static const __m128i y_g_coeff =  _mm_setr_epi16( 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K );
-    static const __m128i y_b_coeff =  _mm_setr_epi16( 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K );
+    static const __m128i y_r_coeff =  _mm_setr_epi16( 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K ); /* SSE2. */
+    static const __m128i y_g_coeff =  _mm_setr_epi16( 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K ); /* SSE2. */
+    static const __m128i y_b_coeff =  _mm_setr_epi16( 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K ); /* SSE2. */
 
-    static const __m128i uv_r_coeff = _mm_setr_epi16( 0.439*K,  0.439*K,  0.439*K,  0.439*K,    -0.148*K, -0.148*K, -0.148*K, -0.148*K );
-    static const __m128i uv_g_coeff = _mm_setr_epi16(-0.368*K, -0.368*K, -0.368*K, -0.368*K,    -0.291*K, -0.291*K, -0.291*K, -0.291*K );
-    static const __m128i uv_b_coeff = _mm_setr_epi16(-0.071*K, -0.071*K, -0.071*K, -0.071*K,     0.439*K,  0.439*K,  0.439*K,  0.439*K );
+    static const __m128i uv_r_coeff = _mm_setr_epi16( 0.439*K,  0.439*K,  0.439*K,  0.439*K,    -0.148*K, -0.148*K, -0.148*K, -0.148*K ); /* SSE2. */
+    static const __m128i uv_g_coeff = _mm_setr_epi16(-0.368*K, -0.368*K, -0.368*K, -0.368*K,    -0.291*K, -0.291*K, -0.291*K, -0.291*K ); /* SSE2. */
+    static const __m128i uv_b_coeff = _mm_setr_epi16(-0.071*K, -0.071*K, -0.071*K, -0.071*K,     0.439*K,  0.439*K,  0.439*K,  0.439*K ); /* SSE2. */
 
     int xSteps = width / 8;
     if (flip)
@@ -324,39 +324,39 @@ void bgra_to_yv12_sse_intr(quint8* rgba, int xStride, quint8* y, quint8* u, quin
         for (int x = xSteps; x > 0; --x)
         {
             // prepare first line
-            __m128i rgbaB0 = _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine1),6), sse_mask_color);
-            rgbaB0 = _mm_packs_epi32(rgbaB0, _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine1+1),6), sse_mask_color));
-            __m128i rgbaG0 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1),2), sse_mask_color);
-            rgbaG0 = _mm_packs_epi32(rgbaG0, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1+1),2), sse_mask_color));
-            __m128i rgbaR0 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1),10), sse_mask_color);
-            rgbaR0 = _mm_packs_epi32(rgbaR0, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1+1),10), sse_mask_color));
+            __m128i rgbaB0 = _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine1),6), sse_mask_color); /* SSE2. */
+            rgbaB0 = _mm_packs_epi32(rgbaB0, _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine1+1),6), sse_mask_color)); /* SSE2. */
+            __m128i rgbaG0 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1),2), sse_mask_color); /* SSE2. */
+            rgbaG0 = _mm_packs_epi32(rgbaG0, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1+1),2), sse_mask_color)); /* SSE2. */
+            __m128i rgbaR0 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1),10), sse_mask_color); /* SSE2. */
+            rgbaR0 = _mm_packs_epi32(rgbaR0, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1+1),10), sse_mask_color)); /* SSE2. */
             // prepare second line
-            __m128i rgbaB1 = _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine2),6), sse_mask_color);
-            rgbaB1 = _mm_packs_epi32(rgbaB1, _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine2+1),6), sse_mask_color));
-            __m128i rgbaG1 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2),2), sse_mask_color);
-            rgbaG1 = _mm_packs_epi32(rgbaG1, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2+1),2), sse_mask_color));
-            __m128i rgbaR1 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2),10), sse_mask_color);
-            rgbaR1 = _mm_packs_epi32(rgbaR1, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2+1),10), sse_mask_color));
+            __m128i rgbaB1 = _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine2),6), sse_mask_color); /* SSE2. */
+            rgbaB1 = _mm_packs_epi32(rgbaB1, _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine2+1),6), sse_mask_color)); /* SSE2. */
+            __m128i rgbaG1 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2),2), sse_mask_color); /* SSE2. */
+            rgbaG1 = _mm_packs_epi32(rgbaG1, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2+1),2), sse_mask_color)); /* SSE2. */
+            __m128i rgbaR1 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2),10), sse_mask_color); /* SSE2. */
+            rgbaR1 = _mm_packs_epi32(rgbaR1, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2+1),10), sse_mask_color)); /* SSE2. */
             // calc Y vector
-            __m128i yData = _mm_add_epi16(_mm_mulhi_epi16(rgbaB0, y_b_coeff), _mm_add_epi16(_mm_mulhi_epi16(rgbaG0, y_g_coeff), _mm_mulhi_epi16(rgbaR0, y_r_coeff)));
-            yData = _mm_srli_epi16(_mm_add_epi16(yData, sse_00a0), 5);
-            _mm_storel_epi64((__m128i*) dstY, _mm_packus_epi16(yData, yData));
-            yData = _mm_add_epi16(_mm_mulhi_epi16(rgbaB1, y_b_coeff), _mm_add_epi16(_mm_mulhi_epi16(rgbaG1, y_g_coeff), _mm_mulhi_epi16(rgbaR1, y_r_coeff)));
-            yData = _mm_srli_epi16(_mm_add_epi16(yData, sse_00a0), 5);
+            __m128i yData = _mm_add_epi16(_mm_mulhi_epi16(rgbaB0, y_b_coeff), _mm_add_epi16(_mm_mulhi_epi16(rgbaG0, y_g_coeff), _mm_mulhi_epi16(rgbaR0, y_r_coeff))); /* SSE2. */
+            yData = _mm_srli_epi16(_mm_add_epi16(yData, sse_00a0), 5); /* SSE2. */
+            _mm_storel_epi64((__m128i*) dstY, _mm_packus_epi16(yData, yData)); /* SSE2. */
+            yData = _mm_add_epi16(_mm_mulhi_epi16(rgbaB1, y_b_coeff), _mm_add_epi16(_mm_mulhi_epi16(rgbaG1, y_g_coeff), _mm_mulhi_epi16(rgbaR1, y_r_coeff))); /* SSE2. */
+            yData = _mm_srli_epi16(_mm_add_epi16(yData, sse_00a0), 5); /* SSE2. */
             _mm_storel_epi64((__m128i*) (dstY+yStride), _mm_packus_epi16(yData, yData));
             // calc avarage for UV
-            __m128i bAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaB0, rgbaB1), sse_01); // use madd instead of "horizontal add" to prevent SSSE3 requirement
-            __m128i gAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaG0, rgbaG1), sse_01);
-            __m128i rAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaR0, rgbaR1), sse_01);
+            __m128i bAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaB0, rgbaB1), sse_01); /* SSE2. */ // use madd instead of "horizontal add" to prevent SSSE3 requirement
+            __m128i gAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaG0, rgbaG1), sse_01); /* SSE2. */
+            __m128i rAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaR0, rgbaR1), sse_01); /* SSE2. */
             // calc UV vector
             __m128i uv = sse_2000;
-            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(rAvg, rAvg), uv_r_coeff));
-            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(gAvg, gAvg), uv_g_coeff));
-            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(bAvg, bAvg), uv_b_coeff));
-            uv = _mm_srli_epi16(uv, 6);
-            uv = _mm_packus_epi16(uv, uv);
-            *dstV++ = _mm_cvtsi128_si32(uv);
-            *dstU++ = _mm_cvtsi128_si32(_mm_srli_epi64(uv, 32));
+            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(rAvg, rAvg), uv_r_coeff)); /* SSE2. */
+            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(gAvg, gAvg), uv_g_coeff)); /* SSE2. */
+            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(bAvg, bAvg), uv_b_coeff)); /* SSE2. */
+            uv = _mm_srli_epi16(uv, 6); /* SSE2. */
+            uv = _mm_packus_epi16(uv, uv); /* SSE2. */
+            *dstV++ = _mm_cvtsi128_si32(uv); /* SSE2. */
+            *dstU++ = _mm_cvtsi128_si32(_mm_srli_epi64(uv, 32)); /* SSE2. */
 
             dstY += 8;
             srcLine1 += 2;
@@ -696,7 +696,7 @@ bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
 #else
         if (useSSE3())
         {
-            bgra_to_yv12_sse_intr(data, width * 4,
+            bgra_to_yv12_sse2_intr(data, width * 4,
                 m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
                 m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
         }
@@ -713,7 +713,7 @@ bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
     {
         if (useSSE3())
         {
-            bgra_to_yv12_sse_intr(data, width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
+            bgra_to_yv12_sse2_intr(data, width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
                              pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
         }
         else {

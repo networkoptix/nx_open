@@ -197,7 +197,7 @@ void SettingsButtonWidget::updateParam(const QVariant &/*value*/)
 SettingsEditorFactory::SettingsEditorFactory() : QItemEditorFactory()
 {
     //registerEditor(QVariant::Type(qMetaTypeId<QRegion>()), new QStandardItemEditorCreator<QnCameraMotionMaskWidget>());
-    registerEditor(QVariant::Type(qMetaTypeId<QnScheduleTaskList>()), new QStandardItemEditorCreator<CameraScheduleWidget>());
+    registerEditor(QVariant::Type(qMetaTypeId<QnScheduleTaskList>()), new QStandardItemEditorCreator<QnCameraScheduleWidget>());
 }
 
 QWidget *SettingsEditorFactory::createEditor(const QnParam &param, QWidget *parent) const

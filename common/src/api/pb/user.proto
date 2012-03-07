@@ -18,11 +18,15 @@ message Layout {
         required Resource resource = 8;
     }
 
-    optional int32 id       = 1;
-    optional string guid    = 2;
-    required string name    = 3;
-    required int32 parentId = 4;
-    repeated Item item      = 5;
+    optional int32  id                = 1;
+    optional string guid              = 2;
+    required string name              = 3;
+    required int32  parentId          = 4;
+    required double cellAspectRatio   = 5;
+    required double cellSpacingWidth  = 6;
+    required double cellSpacingHeight = 7;
+
+    repeated Item   item              = 8;
 }
 
 message Layouts {

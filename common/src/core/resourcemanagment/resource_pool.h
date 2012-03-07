@@ -67,6 +67,7 @@ public:
 
     QStringList allTags() const;
 
+    int activeCameras() const;
 signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);

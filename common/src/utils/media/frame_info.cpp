@@ -23,12 +23,12 @@ extern "C" {
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);
 
-void downscalePlate_factor2_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                 const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
 {
     Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/2,16) <= dst_stride);
 
-    const __m128i color_const_intrs = _mm_setr_epi16(fillter, fillter, fillter, fillter, fillter, fillter, fillter, fillter);
+    const __m128i color_const_intrs = _mm_setr_epi16(fillter, fillter, fillter, fillter, fillter, fillter, fillter, fillter); /* SSE2. */
     int xSteps = roundUp(width, 16) / 16;
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src_line1 + src_stride;
@@ -41,34 +41,34 @@ void downscalePlate_factor2_ssse3_intr(unsigned char * dst, const unsigned int d
 
         for (int x = xSteps/2; x > 0; --x)
         {
-            _mm_prefetch((const char*) (src1+2), _MM_HINT_NTA);
-            _mm_prefetch((const char*) (src2+2), _MM_HINT_NTA);
+            _mm_prefetch((const char*) (src1+2), _MM_HINT_NTA); /* SSE. */
+            _mm_prefetch((const char*) (src2+2), _MM_HINT_NTA); /* SSE. */
 
-            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs);
-            __m128i s01 = _mm_srli_epi16(_mm_loadu_si128(src1), 8);
-            __m128i s02 = _mm_and_si128(_mm_loadu_si128(src1+1), sse_00ffw_intrs);
-            __m128i s03 = _mm_srli_epi16(_mm_loadu_si128(src1+1), 8);
+            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s01 = _mm_srli_epi16(_mm_loadu_si128(src1), 8); /* SSE2. */
+            __m128i s02 = _mm_and_si128(_mm_loadu_si128(src1+1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s03 = _mm_srli_epi16(_mm_loadu_si128(src1+1), 8); /* SSE2. */
 
-            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs);
-            __m128i s11 = _mm_srli_epi16(_mm_loadu_si128(src2), 8);
-            __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_00ffw_intrs);
-            __m128i s13 = _mm_srli_epi16(_mm_loadu_si128(src2+1), 8);
+            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
+            __m128i s11 = _mm_srli_epi16(_mm_loadu_si128(src2), 8); /* SSE2. */
+            __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s13 = _mm_srli_epi16(_mm_loadu_si128(src2+1), 8); /* SSE2. */
 
-            __m128i rez1 = _mm_avg_epu16(_mm_avg_epu16(s00, s01), _mm_avg_epu16(s10, s11));
-            __m128i rez2 = _mm_avg_epu16(_mm_avg_epu16(s02, s03), _mm_avg_epu16(s12, s13));
-            *dstIntr++ = _mm_packus_epi16(rez1, rez2);
+            __m128i rez1 = _mm_avg_epu16(_mm_avg_epu16(s00, s01), _mm_avg_epu16(s10, s11)); /* SSE2. */
+            __m128i rez2 = _mm_avg_epu16(_mm_avg_epu16(s02, s03), _mm_avg_epu16(s12, s13)); /* SSE2. */
+            *dstIntr++ = _mm_packus_epi16(rez1, rez2); /* SSE2. */
             src1 += 2;
             src2 += 2;
         }
         if (xSteps & 1)
         {
-            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs);
-            __m128i s01 = _mm_srli_epi16(_mm_loadu_si128(src1), 8);
-            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs);
-            __m128i s11 = _mm_srli_epi16(_mm_loadu_si128(src2), 8);
+            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s01 = _mm_srli_epi16(_mm_loadu_si128(src1), 8); /* SSE2. */
+            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
+            __m128i s11 = _mm_srli_epi16(_mm_loadu_si128(src2), 8); /* SSE2. */
 
-            __m128i rez1 = _mm_avg_epu16(_mm_avg_epu16(s00, s01), _mm_avg_epu16(s10, s11));
-            *dstIntr = _mm_packus_epi16(rez1, color_const_intrs);
+            __m128i rez1 = _mm_avg_epu16(_mm_avg_epu16(s00, s01), _mm_avg_epu16(s10, s11)); /* SSE2. */
+            *dstIntr = _mm_packus_epi16(rez1, color_const_intrs); /* SSE2. */
         }
         dst += dst_stride;
         src_line1 += src_stride*2;
@@ -81,7 +81,7 @@ void downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int d
 {
     Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/4,8) <= dst_stride);
 
-    const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler);
+    const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = roundUp(width, 16) / 16;
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src_line1 + src_stride*3;
@@ -94,28 +94,28 @@ void downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int d
 
         for (int x = xSteps/2; x > 0; --x)
         {
-            _mm_prefetch((const char*) (src1+2), _MM_HINT_NTA);
-            _mm_prefetch((const char*) (src2+2), _MM_HINT_NTA);
+            _mm_prefetch((const char*) (src1+2), _MM_HINT_NTA); /* SSE. */
+            _mm_prefetch((const char*) (src2+2), _MM_HINT_NTA); /* SSE. */
 
-            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs);
-            __m128i s02 = _mm_and_si128(_mm_loadu_si128(src1+1), sse_00ffw_intrs);
-            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs);
-            __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_00ffw_intrs);
+            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s02 = _mm_and_si128(_mm_loadu_si128(src1+1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
+            __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_00ffw_intrs); /* SSE2. */
 
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, s02), _mm_hadd_epi16(s10, s12)),1);
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, s02), _mm_hadd_epi16(s10, s12)),1); /* SSSE3. */
 
-             _mm_storel_epi64((__m128i*) dstCur, _mm_packus_epi16(rez1, rez1));
+             _mm_storel_epi64((__m128i*) dstCur, _mm_packus_epi16(rez1, rez1)); /* SSE2. */
             src1 += 2;
             src2 += 2;
             dstCur += 8;
         }
         if (xSteps & 1)
         {
-            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs);
-            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs);
+            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
 
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1);
-            _mm_storel_epi64((__m128i*) dstCur, _mm_packus_epi16(rez1, rez1));
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1); /* SSSE3. */
+            _mm_storel_epi64((__m128i*) dstCur, _mm_packus_epi16(rez1, rez1)); /* SSE2. */
         }
         dst += dst_stride;
         src_line1 += src_stride*4;
@@ -128,7 +128,7 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
 {
     Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/8,4) <= dst_stride);
 
-    const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler);
+    const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = roundUp(width, 16) / 16;
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src_line1 + src_stride*7;
@@ -142,34 +142,34 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
         
         for (int x = xSteps/2; x > 0; --x)
         {
-            _mm_prefetch((const char*) (src1+2), _MM_HINT_NTA);
-            _mm_prefetch((const char*) (src2+2), _MM_HINT_NTA);
+            _mm_prefetch((const char*) (src1+2), _MM_HINT_NTA); /* SSE. */
+            _mm_prefetch((const char*) (src2+2), _MM_HINT_NTA); /* SSE. */
 
-            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_000000ffw_intrs);
-            __m128i s02 = _mm_and_si128(_mm_loadu_si128(src1+1), sse_000000ffw_intrs);
-            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_000000ffw_intrs);
-            __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_000000ffw_intrs);
+            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_000000ffw_intrs); /* SSE2. */
+            __m128i s02 = _mm_and_si128(_mm_loadu_si128(src1+1), sse_000000ffw_intrs); /* SSE2. */
+            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_000000ffw_intrs); /* SSE2. */
+            __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_000000ffw_intrs); /* SSE2. */
 
-            s00 = _mm_packus_epi32(s00, s02);
-            s10 = _mm_packus_epi32(s10, s12);
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, s00), _mm_hadd_epi16(s10, s10)),1);
+            s00 = _mm_packus_epi32(s00, s02); /* SSE4. */
+            s10 = _mm_packus_epi32(s10, s12); /* SSE4. */
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, s00), _mm_hadd_epi16(s10, s10)),1); /* SSSE3. */
 
-            __m128i tmp = _mm_packus_epi16(rez1, rez1);
-            _mm_store_ss((float*) dstCur, *(__m128*)(&tmp));
+            __m128i tmp = _mm_packus_epi16(rez1, rez1); /* SSE2. */
+            _mm_store_ss((float*) dstCur, *(__m128*)(&tmp)); /* SSE. */
             src1 += 2;
             src2 += 2;
             dstCur += 4;
         }
         if (xSteps & 1)
         {
-            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs);
-            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs);
-            s00 = _mm_packus_epi32(s00, color_const_intrs);
-            s10 = _mm_packus_epi32(s10, color_const_intrs);
+            __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
+            __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
+            s00 = _mm_packus_epi32(s00, color_const_intrs); /* SSE2. */
+            s10 = _mm_packus_epi32(s10, color_const_intrs); /* SSE2. */
 
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1);
-            __m128i tmp = _mm_packus_epi16(rez1, color_const_intrs);
-            _mm_store_ss((float*) dstCur, *(__m128*)(&tmp));
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1); /* SSSE3. */
+            __m128i tmp = _mm_packus_epi16(rez1, color_const_intrs); /* SSE2. */
+            _mm_store_ss((float*) dstCur, *(__m128*)(&tmp)); /* SSE. */
         }
         dst += dst_stride;
         src_line1 += src_stride*8;
@@ -381,10 +381,10 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		cl_log.log("scale factor 2. sse time:", e2, cl_logALWAYS);
 		cl_log.log("-------------------------",  g, cl_logALWAYS);
 		*/
-        if (useSSE3()) {
-            downscalePlate_factor2_ssse3_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);
-		    downscalePlate_factor2_ssse3_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-		    downscalePlate_factor2_ssse3_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
+        if (useSSE2()) {
+            downscalePlate_factor2_sse2_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);
+		    downscalePlate_factor2_sse2_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
+		    downscalePlate_factor2_sse2_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
         }
         else {
             downscalePlate_factor2(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);

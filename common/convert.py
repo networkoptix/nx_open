@@ -103,6 +103,11 @@ def setup_qjson():
 
     return qjson_path + '/lib/' + platform()
 
+def setup_openssl():
+    openssl_path = '../common/contrib/openssl'
+
+    return openssl_path
+
 def setup_tools():
     if platform() == 'linux':
         return '/usr'

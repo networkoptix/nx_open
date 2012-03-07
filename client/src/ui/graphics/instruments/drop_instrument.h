@@ -3,15 +3,16 @@
 
 #include "instrument.h"
 #include <core/resource/resource.h>
+#include "scene_event_filter.h"
 
 class QnWorkbenchContext;
 class DropSurfaceItem;
 class DestructionGuardItem;
 
-class DropInstrument: public Instrument {
+class DropInstrument: public Instrument, public SceneEventFilter {
     Q_OBJECT;
 public:
-    DropInstrument(QnWorkbenchContext *context, QObject *parent = NULL);
+    DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent = NULL);
 
     /**
      * \returns                         Graphics item that serves as a surface for 
@@ -19,11 +20,15 @@ public:
      */
     QGraphicsObject *surface() const;
 
+    void setSurface(QGraphicsObject *surface);
+
 protected:
     friend class DropSurfaceItem;
 
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
+
+    virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
     virtual bool dragEnterEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
     virtual bool dragMoveEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
@@ -35,15 +40,13 @@ protected:
     }
 
 private:
-    bool dropInternal(QGraphicsView *view, const QStringList &files, const QPoint &pos);
-
-private:
-    QStringList m_files;
     QnResourceList m_resources;
     
     QWeakPointer<QnWorkbenchContext> m_context;
-    QWeakPointer<DropSurfaceItem> m_surface;
+    SceneEventFilterItem *m_filterItem;
     QWeakPointer<DestructionGuardItem> m_guard;
+    QWeakPointer<QGraphicsObject> m_surface;
+    bool m_intoNewLayout;
 };
 
 #endif // QN_DROP_INSTRUMENT_H

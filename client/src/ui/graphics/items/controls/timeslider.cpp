@@ -95,6 +95,8 @@ public:
 
     void setEndSize(int size);
 
+    qreal getMsInPixel() const;
+
 protected:
     void sliderChange(SliderChange change);
 
@@ -107,7 +109,6 @@ protected:
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
-    qreal getMsInPixel() const;
     void drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePeriods, QColor color);
     void createEndPixmap();
 private:
@@ -1313,8 +1314,8 @@ const QnTimePeriodList& TimeSlider::recTimePeriodList(int msInPixel)
 {
     if (m_aggregatedMsInPixel != msInPixel)
     {
-        m_agregatedRecTimePeriodList = QnTimePeriod::agregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
-        m_agregatedMotionTimePeriodList = QnTimePeriod::agregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
+        m_agregatedRecTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
+        m_agregatedMotionTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
         m_aggregatedMsInPixel = msInPixel;
     }
     return m_agregatedRecTimePeriodList;
@@ -1324,8 +1325,8 @@ const QnTimePeriodList& TimeSlider::motionTimePeriodList(int msInPixel)
 {
     if (m_aggregatedMsInPixel != msInPixel)
     {
-        m_agregatedRecTimePeriodList = QnTimePeriod::agregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
-        m_agregatedMotionTimePeriodList = QnTimePeriod::agregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
+        m_agregatedRecTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_recTimePeriodList, (int) msInPixel);
+        m_agregatedMotionTimePeriodList = QnTimePeriod::aggregateTimePeriods(m_motionTimePeriodList, (int) msInPixel);
         m_aggregatedMsInPixel = msInPixel;
     }
     return m_agregatedMotionTimePeriodList;
@@ -1341,4 +1342,9 @@ void TimeSlider::setMotionTimePeriodList(const QnTimePeriodList &timePeriodList)
 { 
     m_motionTimePeriodList = timePeriodList; 
     m_aggregatedMsInPixel = -1;
+}
+
+qreal TimeSlider::getMsInPixel() const 
+{
+    return m_slider->getMsInPixel();
 }

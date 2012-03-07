@@ -1,8 +1,8 @@
 #include "drag_instrument.h"
-#include <QGraphicsView>
-#include <QGraphicsItem>
 #include <QMouseEvent>
-#include <QApplication>
+#include <QDrag>
+#include <ui/graphics/items/resource_widget.h>
+#include <ui/workbench/workbench_resource.h>
 
 namespace {
     struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {
@@ -13,9 +13,8 @@ namespace {
 
 } // anonymous namespace
 
-DragInstrument::DragInstrument(QObject *parent): 
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
-    m_effective(true)
+DragInstrument::DragInstrument(QObject *parent):
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {}
 
 DragInstrument::~DragInstrument() {
@@ -33,18 +32,21 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if (event->button() != Qt::LeftButton)
         return false;
 
-    /* Find the item to drag. */
-    QGraphicsItem *draggedItem = item(view, event->pos(), ItemAcceptsLeftMouseButton());
-    if (draggedItem == NULL || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable))
+    if(!(event->modifiers() & Qt::ControlModifier))
         return false;
 
-    /* If a user tries to ctrl-drag an item, we should select it when dragging starts. */
+    /* Find the item to drag. */
+    QnResourceWidget *target = this->item<QnResourceWidget>(view, event->pos());
+    if(target == NULL)
+        return false;
+
+    /* If a user ctrl-drags an item that is not selected, we should select it when dragging starts. */
     if (event->modifiers() & Qt::ControlModifier) {
-        m_itemToSelect = draggedItem;
+        m_itemToSelect = target;
     } else {
         m_itemToSelect.clear();
     }
-    
+
     dragProcessor()->mousePressEvent(viewport, event);
 
     event->accept();
@@ -56,37 +58,44 @@ void DragInstrument::startDragProcess(DragInfo *info) {
 }
 
 void DragInstrument::startDrag(DragInfo *info) {
-    if(!m_effective)
-        return;
-
     if(!m_itemToSelect.isNull()) {
         m_itemToSelect.data()->setSelected(true);
         m_itemToSelect.clear();
     }
 
-    emit dragStarted(info->view(), scene()->selectedItems());
+    QnResourceList resources;
+    foreach(QGraphicsItem *item, scene()->selectedItems())
+        if(QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item))
+            resources.push_back(widget->resource());
+    
+    if(resources.isEmpty()) {
+        dragProcessor()->reset();
+        return;
+    }
+
+    emit dragStarted(info->view());
+
+    QDrag *drag = new QDrag(info->view());
+    QMimeData *mimeData = new QMimeData();
+    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), mimeData);
+    drag->setMimeData(mimeData);
+
+    Qt::DropAction dropAction = drag->exec();
+
+    emit dragFinished(info->view());
+
+    dragProcessor()->reset();
 }
 
-void DragInstrument::dragMove(DragInfo *info) {
-    if(!m_effective)
-        return;
-
-    QPointF delta = info->mouseScenePos() - info->lastMouseScenePos();
-
-    /* Drag selected items. */
-    foreach (QGraphicsItem *item, scene()->selectedItems())
-        item->setPos(item->pos() + delta);
-
-    emit drag(info->view(), scene()->selectedItems());
+void DragInstrument::dragMove(DragInfo *) {
+    return;
 }
 
 void DragInstrument::finishDrag(DragInfo *info) {
-    if(!m_effective)
-        return;
-
-    emit dragFinished(info->view(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
+    return;
 }
 
 void DragInstrument::finishDragProcess(DragInfo *info) {
     emit dragProcessFinished(info->view());
 }
+

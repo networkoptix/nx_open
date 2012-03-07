@@ -7,7 +7,7 @@
 #include "api/AppServerConnection.h"
 
 #include "ui/style/skin.h"
-#include "ui/dialogs/connectiontestingdialog.h"
+#include "ui/dialogs/connection_testing_dialog.h"
 
 ConnectionsSettingsWidget::ConnectionsSettingsWidget(QWidget *parent) :
     QWidget(parent),

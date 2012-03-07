@@ -259,6 +259,8 @@ public:
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
+    void fadeOutButtons();
+    void fadeInButtons();
 
     /**
      * Clears this widget's motion selection region.
@@ -279,6 +281,9 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual bool windowFrameEvent(QEvent *event) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
     virtual QPolygonF provideShape() override;
 

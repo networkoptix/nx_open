@@ -57,12 +57,10 @@ public:
     QList<ConnectionData> connections();
     void setConnections(const QList<ConnectionData> &connections);
 
-    bool haveValidLicense();
-
 signals:
     /**
      * This signal is emitted whenever last used connection changes.
-     * 
+     *
      * Note that due to implementation limitations, this signal may get emitted
      * even if the actual connection parameters didn't change.
      */

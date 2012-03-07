@@ -25,6 +25,8 @@ public:
     ToolTipItem *toolTipItem() const;
     void setToolTipItem(ToolTipItem *toolTip);
 
+    qreal getMsInPixel() const;
+
     qint64 length() const;
     qint64 minimumValue() const;
     qint64 maximumValue() const;
@@ -50,8 +52,6 @@ public:
     inline void resetSelectionRange()
     { setSelectionRange(0, 0); }
 
-    //const QnTimePeriodList &recTimePeriodList() const { return m_recTimePeriodList; }
-    //const QnTimePeriodList &motionTimePeriodList() const { return m_motionTimePeriodList; }
     const QnTimePeriodList &recTimePeriodList(int msInPixel);
     const QnTimePeriodList &motionTimePeriodList(int msInPixel);
     void setRecTimePeriodList(const QnTimePeriodList &timePeriodList);
