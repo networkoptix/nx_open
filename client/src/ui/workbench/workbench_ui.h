@@ -32,6 +32,7 @@ class QnClickableWidget;
 class QnLayoutTabBar;
 class QnHelpWidget;
 class QnActionManager;
+class QnLayoutTabBar;
 
 class QnWorkbenchUi: public QObject, public QnActionTargetProvider, protected SceneUtility {
     Q_OBJECT;
@@ -326,6 +327,8 @@ private:
     QnImageButtonWidget *m_titleShowButton;
 
     QnImageButtonWidget *m_mainMenuButton;
+
+    QnLayoutTabBar *m_tabBarWidget;
 
     QGraphicsProxyWidget *m_tabBarItem;
 

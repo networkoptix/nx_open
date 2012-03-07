@@ -280,16 +280,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false);
 
 
-    /* Tab bar actions. */
-
-    factory(Qn::CloseLayoutAction).
-        flags(Qn::TabBar | Qn::ScopelessHotkey).
-        text(tr("Close")).
-        shortcut(tr("Ctrl+W")).
-        autoRepeat(false);
-
-
-
     /* Context menu actions. */
     factory(Qn::MainMenuAction).
         flags(Qn::NoTarget).
@@ -312,13 +302,13 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("New User...")).
         condition(new QnResourceActionUserAccessCondition(true));
 
-    factory(Qn::NewLayoutAction).
+    factory(Qn::NewUserLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
         text(tr("New Layout...")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
 
     factory(Qn::OpenNewLayoutAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::TabBar).
         text(tr("New Layout")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
@@ -412,7 +402,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Main).
         separator();
-
+    
     factory(Qn::ExitAction).
         flags(Qn::Main).
         text(tr("Exit")).
@@ -422,6 +412,22 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(Skin::icon(QLatin1String("decorations/exit.png"))).
         hoverIcon(Skin::icon(QLatin1String("decorations/exit_hovered.png")));
 
+
+    /* Tab bar actions. */
+    factory().
+        flags(Qn::TabBar).
+        separator();
+
+    factory(Qn::CloseLayoutAction).
+        flags(Qn::TabBar | Qn::ScopelessHotkey).
+        text(tr("Close")).
+        shortcut(tr("Ctrl+W")).
+        autoRepeat(false);
+
+    factory(Qn::CloseAllButThisLayoutAction).
+        flags(Qn::TabBar).
+        text(tr("Close All But This")).
+        condition(new QnResourceActionLayoutCountCondition(2));
 
 
     /* Resource actions. */

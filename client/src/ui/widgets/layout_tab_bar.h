@@ -2,19 +2,23 @@
 #define QN_LAYOUT_TAB_BAR_H
 
 #include <QTabBar>
-#include <core/resource/layout_resource.h>
+#include <core/resource/resource_fwd.h>
+#include <ui/actions/action_target_provider.h>
 
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchContext;
 class QnWorkbenchLayout;
 class QnWorkbench;
 
-class QnLayoutTabBar: public QTabBar {
+class QnLayoutTabBar: public QTabBar, public QnActionTargetProvider {
     Q_OBJECT;
 public:
     QnLayoutTabBar(QWidget *parent = NULL);
 
     virtual ~QnLayoutTabBar();
+
+    virtual Qn::ActionScope currentScope() const override;
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     void setContext(QnWorkbenchContext *context);
     QnWorkbenchContext *context() const;
@@ -25,6 +29,8 @@ signals:
     void closeRequested(QnWorkbenchLayout *layout);
 
 protected:
+    virtual void contextMenuEvent(QContextMenuEvent *event) override;
+
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
 

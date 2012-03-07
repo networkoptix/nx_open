@@ -206,3 +206,15 @@ Qn::ActionVisibility QnResourceActionUserAccessCondition::check(const QnResource
 
     return Qn::VisibleAction; 
 }
+
+Qn::ActionVisibility QnResourceActionLayoutCountCondition::check(const QnWorkbenchLayoutList &layouts) {
+    if(!context())
+        return Qn::InvisibleAction;
+
+    if(context()->workbench()->layouts().size() < m_requiredCount)
+        return Qn::DisabledAction;
+
+    return Qn::VisibleAction;
+}
+
+
