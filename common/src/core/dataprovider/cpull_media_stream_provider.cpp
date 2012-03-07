@@ -116,7 +116,10 @@ void QnClientPullMediaStreamProvider::run()
         checkTime(data);
 
         if (getResource().dynamicCast<QnPhysicalCameraResource>())
-            getResource()->setStatus(QnResource::Online);
+        {
+            if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
+                getResource()->setStatus(QnResource::Online);
+        }
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
         

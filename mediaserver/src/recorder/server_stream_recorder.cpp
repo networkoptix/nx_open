@@ -92,6 +92,16 @@ void QnServerStreamRecorder::updateStreamParams()
 
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 {
+    bool isRecording = m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never;
+    if (isRecording) {
+        if(m_device->getStatus() == QnResource::Online)
+            m_device->setStatus(QnResource::Recording);
+    }
+    else {
+        if(m_device->getStatus() == QnResource::Recording)
+            m_device->setStatus(QnResource::Online);
+    }
+
     if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly) {
         return;
     }
@@ -238,4 +248,11 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, const QString& file
     if (m_truncateInterval > 0) {
         qnStorageMan->fileStarted(startTimeMs, fileName, provider);
     }
+}
+
+void QnServerStreamRecorder::endOfRun()
+{
+    QnStreamRecorder::endOfRun();
+    if(m_device->getStatus() == QnResource::Recording)
+        m_device->setStatus(QnResource::Online);
 }

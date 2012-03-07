@@ -126,7 +126,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
             QnResourcePtr res = createArchiveResource(absoluteFilePath);
             if (res)
             {
-                cl_log.log("created local resource: ", absoluteFilePath, cl_logALWAYS);
+                //cl_log.log("created local resource: ", absoluteFilePath, cl_logALWAYS);
                 result.append(res);
             }
         }
