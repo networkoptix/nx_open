@@ -105,7 +105,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
     return tasks;
 }
 
-void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList taskFrom)
+void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList taskFrom)
 {
     QList<QnScheduleTask::Data> rez;
     foreach(const QnScheduleTask& task, taskFrom)
@@ -276,7 +276,6 @@ void QnCameraScheduleWidget::onDisplayQualityChanged(int state)
     ui->gridWidget->setShowSecondParam(state);
 }
 
-void CameraScheduleWidget::doNotChangeStateChanged(int state)
 void QnCameraScheduleWidget::onDisplayFPSChanged(int state)
 {
     ui->gridWidget->setShowFirstParam(state);

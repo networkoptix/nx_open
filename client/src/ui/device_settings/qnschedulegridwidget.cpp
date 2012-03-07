@@ -130,7 +130,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
     {
         QColor penClr;
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
-            penClr = SELECTED_LABEL_COLOR;
+            penClr = m_enabled ? SELECTED_LABEL_COLOR : NORMAL_LABEL_COLOR;
         else if (y < 5)
             penClr = NORMAL_LABEL_COLOR;
         else
@@ -146,7 +146,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
     {
         QColor penClr;
         if (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == x)
-            penClr = SELECTED_LABEL_COLOR;
+            penClr = m_enabled ? SELECTED_LABEL_COLOR : NORMAL_LABEL_COLOR;
         else
             penClr = NORMAL_LABEL_COLOR;
         if (!m_enabled) {
