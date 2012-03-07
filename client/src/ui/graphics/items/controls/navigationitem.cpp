@@ -503,7 +503,7 @@ void NavigationItem::updateSlider()
         m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    if(!reader->isMediaPaused() && m_camera->getCamDisplay()->isRealTimeSource()) {
+    if(!reader->isMediaPaused() && (m_camera->getCamDisplay()->isRealTimeSource() || m_timeSlider->currentValue() == DATETIME_NOW)) {
         m_liveButton->setChecked(true);
         m_forwardButton->setEnabled(false);
         m_stepForwardButton->setEnabled(false);
@@ -892,42 +892,32 @@ void NavigationItem::rewindBackward()
         reader->jumpTo(0, true);
         reader->resumeDataProcessors();
     } else {
-        qint64 currentTime = m_timeSlider->currentValue();
         qint64 pos = -1;
-        bool jumped = false;
 
-        for(int attempt = 0; attempt < 5; attempt++) {
-            const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
-            qint64 precision = m_timeSlider->getMsInPixel() * 3;
-            for(int i = periods.size() - 1; i >= 0; i--) {
-                if(periods[i].durationMs < precision && periods[i].durationMs != -1)
-                    continue;
+        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
+        qint64 currentTime = m_timeSlider->currentValue();
+        qint64 precision = m_timeSlider->getMsInPixel() * 3;
+        
+        for(int i = qUpperBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin() - 1; i >= 0; i--) {
+            if(periods[i].durationMs < precision && periods[i].durationMs != -1)
+                continue;
 
-                if(periods[i].startTimeMs < currentTime - precision) {
-                    pos = periods[i].startTimeMs * 1000;
-                    break;
-                }
-            }
-            if(pos == -1) {
-                if(!periods.empty()) {
-                    pos = periods[0].startTimeMs * 1000;
-                } else {
-                    pos = DATETIME_NOW;
-                }
-            }
-
-            foreach(CLVideoCamera *camera, m_reserveCameras) {
-                QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(camera->getStreamreader());
-                if(static_cast<QnAbstractArchiveReader*>(camera->getStreamreader())->jumpTo(pos, true)) {
-                    reader->resumeDataProcessors();
-                    jumped = true;
-                    break;
-                }
-            }
-            if(jumped)
+            if(periods[i].startTimeMs < currentTime - precision) {
+                pos = periods[i].startTimeMs * 1000;
                 break;
-            currentTime = pos / 1000;
+            }
         }
+
+        if(pos == -1) {
+            if(!periods.empty()) {
+                pos = periods[0].startTimeMs * 1000;
+            } else {
+                pos = DATETIME_NOW;
+            }
+        }
+
+        reader->jumpTo(pos, true);
+        reader->resumeDataProcessors();
     }
 
     
@@ -955,7 +945,7 @@ void NavigationItem::rewindForward()
 
         const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
         qint64 currentTime = m_timeSlider->currentValue();
-        for(int i = 0; i < periods.size(); i++) {
+        for(int i = qLowerBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin(); i < periods.size(); i++) {
             if(periods[i].startTimeMs > currentTime) {
                 pos = periods[i].startTimeMs * 1000;
                 break;
@@ -964,13 +954,8 @@ void NavigationItem::rewindForward()
         if(pos == -1)
             pos = DATETIME_NOW;
 
-        foreach(CLVideoCamera *camera, m_reserveCameras) {
-            QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(camera->getStreamreader());
-            if(static_cast<QnAbstractArchiveReader*>(camera->getStreamreader())->jumpTo(pos, false)) {
-                reader->resumeDataProcessors();
-                break;
-            }
-        }
+        reader->jumpTo(pos, false);
+        reader->resumeDataProcessors();
     }
 
     if (stopped)
