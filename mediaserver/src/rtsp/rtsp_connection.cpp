@@ -512,7 +512,6 @@ int QnRtspConnectionProcessor::composePlay()
     d->dataProcessor->setLiveMode(d->liveMode);
     if (d->liveMode) {
         d->dataProcessor->lockDataQueue();
-        connectToLiveDataProviders();
     }
     else {
         d->archiveDP->addDataProcessor(d->dataProcessor);
@@ -543,6 +542,7 @@ int QnRtspConnectionProcessor::composePlay()
 
         d->dataProcessor->unlockDataQueue();
         d->dataProcessor->setWaitCSeq(d->startTime, 0); // ignore rest packets before new position
+        connectToLiveDataProviders();
     }
     else if (d->archiveDP) 
     {
