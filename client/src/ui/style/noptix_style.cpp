@@ -33,7 +33,10 @@ namespace {
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
     m_animator(new QnNoptixStyleAnimator(this))
-{}
+{
+    m_branchClosed = Skin::icon(QLatin1String("branch_closed.png"));
+    m_branchOpen = Skin::icon(QLatin1String("branch_open.png"));
+}
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     switch (control) {
@@ -83,6 +86,10 @@ void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *
     switch(element) {
     case PE_IndicatorTabClose:
         if(drawTabClosePrimitive(option, painter, widget))
+            return;
+        break;
+    case PE_IndicatorBranch:
+        if(drawBranchPrimitive(option, painter, widget))
             return;
         break;
     default:
@@ -217,6 +224,18 @@ bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QnScopedPainterPenRollback penRollback(painter, QPen(brush, qMin(rect.width(), rect.height()) * 0.2));
     painter->drawEllipse(rect);
+    return true;
+}
+
+bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+    if(!option->rect.isValid())
+        return false;
+
+    if (option->state & State_Children) {
+        const QIcon &icon = (option->state & State_Open) ? m_branchOpen : m_branchClosed;
+        icon.paint(painter, option->rect);
+    }
+
     return true;
 }
 
