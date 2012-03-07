@@ -31,6 +31,8 @@ public:
 
     virtual QSize minimumSizeHint() const;
 
+    void setEnabled(bool val);
+    bool isEnabled() const;
 Q_SIGNALS:
     void needReadCellParams(const QPoint &cell);
 
@@ -66,6 +68,8 @@ private:
     bool m_mousePressed;
     QFont m_labelsFont;
     QFont m_gridFont;
+
+    bool m_enabled;
 };
 
 #endif // __SCHEDULE_GRID_WIDGET_H_
