@@ -22,6 +22,8 @@ namespace {
         ColumnCount
     };
 
+    const char *pureTreeResourcesOnlyMimeType = "application/x-noptix-pure-tree-resources-only";
+
     bool intersects(const QStringList &l, const QStringList &r) {
         foreach(const QString &s, l)
             if(r.contains(s))
@@ -573,21 +575,33 @@ QVariant QnResourceModel::headerData(int section, Qt::Orientation orientation, i
 }
 
 QStringList QnResourceModel::mimeTypes() const {
-    return QnWorkbenchResource::resourceMimeTypes();
+    QStringList result = QnWorkbenchResource::resourceMimeTypes();
+    result.append(QLatin1String(pureTreeResourcesOnlyMimeType));
+    return result;
 }
 
 QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const {
     QMimeData *mimeData = QAbstractItemModel::mimeData(indexes);
     if (mimeData) {
         const QStringList types = mimeTypes();
+
+        bool pureTreeResourcesOnly = true;
         if (intersects(types, QnWorkbenchResource::resourceMimeTypes())) {
             QnResourceList resources;
-            foreach (const QModelIndex &index, indexes)
-                if (QnResourcePtr resource = this->resource(index))
-                    resources.append(resource);
-            
+            foreach (const QModelIndex &index, indexes) {
+                Node *node = this->node(index);
+                if(node && node->resource())
+                    resources.append(node->resource());
+
+                if(node && node->type() == Node::Item)
+                    pureTreeResourcesOnly = false;
+            }
+
             QnWorkbenchResource::serializeResources(resources, types, mimeData);
         }
+
+        if(types.contains(QLatin1String(pureTreeResourcesOnlyMimeType)))
+            mimeData->setData(QLatin1String(pureTreeResourcesOnlyMimeType), QByteArray(pureTreeResourcesOnly ? "1" : "0"));
     }
 
     return mimeData;
@@ -649,12 +663,16 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
             context()->menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
         }
     } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
-        QnResourceList cameras = QnResourceCriterion::filter<QnNetworkResource, QnResourceList>(resources);
-        if(!cameras.empty()) {
-            QVariantMap params;
-            params[Qn::ServerParameter] = QVariant::fromValue(server);
+        if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
+            /* Allow drop of non-layout item data, from tree only. */
 
-            context()->menu()->trigger(Qn::MoveCameraAction, cameras, params);
+            QnResourceList cameras = QnResourceCriterion::filter<QnNetworkResource, QnResourceList>(resources);
+            if(!cameras.empty()) {
+                QVariantMap params;
+                params[Qn::ServerParameter] = QVariant::fromValue(server);
+
+                context()->menu()->trigger(Qn::MoveCameraAction, cameras, params);
+            }
         }
     }
     
