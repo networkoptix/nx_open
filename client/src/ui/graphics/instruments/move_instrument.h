@@ -30,7 +30,7 @@ public:
 signals:
     void moveProcessStarted(QGraphicsView *view);
     void moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void move(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void move(QGraphicsView *view, const QList<QGraphicsItem *> &items, const QPointF &totalDelta);
     void moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void moveProcessFinished(QGraphicsView *view);
 

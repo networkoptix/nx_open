@@ -93,6 +93,22 @@ public:
     }
 
     /**
+     * \param                           Point.
+     * \returns                         Given point converted to a size.
+     */
+    static QSizeF toSize(const QPointF &point) {
+        return QSizeF(point.x(), point.y());
+    }
+
+    /**
+     * \param                           Point.
+     * \returns                         Given point converted to a size.
+     */
+    static QSize toSize(const QPoint &point) {
+        return QSize(point.x(), point.y());
+    }
+
+    /**
      * \param point                     Point, treated as a vector.
      * \returns                         Length of the given vector.
      */

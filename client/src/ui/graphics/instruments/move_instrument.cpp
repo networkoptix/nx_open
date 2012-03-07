@@ -77,7 +77,7 @@ void MoveInstrument::dragMove(DragInfo *info) {
     foreach (QGraphicsItem *item, scene()->selectedItems())
         item->setPos(item->pos() + delta);
 
-    emit move(info->view(), scene()->selectedItems());
+    emit move(info->view(), scene()->selectedItems(), info->mouseScenePos() - info->mousePressScenePos());
 }
 
 void MoveInstrument::finishDrag(DragInfo *info) {
