@@ -63,15 +63,6 @@ protected:
 
         QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
         style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
-
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource && resource->getStatus() == QnResource::Offline) {
-            QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 0, 0, 128), 3));
-
-            QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
-            painter->drawLine(iconRect.topLeft() + QPoint(2, 2), iconRect.bottomRight() - QPoint(2, 2));
-            painter->drawLine(iconRect.topRight() + QPoint(-2, 2), iconRect.bottomLeft() - QPoint(-2, 2));
-        }
     }
 
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
