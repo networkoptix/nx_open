@@ -66,11 +66,11 @@ protected:
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if(resource && resource->getStatus() == QnResource::Offline) {
-            QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 0, 0, 128), 0));
+            QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 0, 0, 128), 3));
 
             QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
-            painter->drawLine(iconRect.topLeft() + QPoint(1, 1), iconRect.bottomRight() - QPoint(1, 1));
-            painter->drawLine(iconRect.topRight() + QPoint(-1, 1), iconRect.bottomLeft() - QPoint(-1, 1));
+            painter->drawLine(iconRect.topLeft() + QPoint(2, 2), iconRect.bottomRight() - QPoint(2, 2));
+            painter->drawLine(iconRect.topRight() + QPoint(-2, 2), iconRect.bottomLeft() - QPoint(-2, 2));
         }
     }
 
