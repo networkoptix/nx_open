@@ -92,7 +92,7 @@ bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
     if (res->getStatus() == QnResource::Disabled)
         return true;
     QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
-    return  cameraRes && cameraRes->isBlocked();
+    return  cameraRes && cameraRes->isScheduleDisabled();
 }
 
 void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)

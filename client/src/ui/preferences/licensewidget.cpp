@@ -21,7 +21,7 @@ LicenseWidget::LicenseWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->serialKeyEdit->setInputMask(QLatin1String(">9999-9999-9999-9999"));
+    ui->serialKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
 
     connect(ui->licenseGoupBox, SIGNAL(toggled(bool)), this, SLOT(setOnlineActivation(bool)));
     connect(ui->browseLicenseFileButton, SIGNAL(clicked()), this, SLOT(browseLicenseFileButtonClicked()));

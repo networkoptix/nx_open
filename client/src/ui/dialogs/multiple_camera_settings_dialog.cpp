@@ -5,6 +5,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
+#include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
@@ -23,9 +24,19 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
 {
     ui->setupUi(this);
 
+    // -1 - uninitialized, 0  - schedule enabled for all cameras,
+    // 1 - flag is not equal for all cameras, 2 - schedule disabled for all cameras
+    int scheduleDisabled = -1;
+
     QSet<QString> logins, passwords;
     foreach (QnVirtualCameraResourcePtr camera, m_cameras)
     {
+        if (scheduleDisabled == -1) {
+            scheduleDisabled = camera->isScheduleDisabled() ? 2 : 0;
+        } else if (scheduleDisabled != (camera->isScheduleDisabled() ? 2 : 0)) {
+            scheduleDisabled = 1;
+        }
+
         logins.insert(camera->getAuth().user());
         passwords.insert(camera->getAuth().password());
     }
@@ -35,6 +46,8 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
 
     if (passwords.size() == 1)
         m_password = *passwords.begin();
+
+    ui->cameraScheduleWidget->setScheduleDisabled(scheduleDisabled);
 
     updateView();
 }
@@ -55,6 +68,21 @@ void MultipleCameraSettingsDialog::requestFinished(int status, const QByteArray&
 
 void MultipleCameraSettingsDialog::accept()
 {
+    int totalActiveCount = qnResPool->activeCameras();
+    int editedCount = m_cameras.size();
+    int activeCount = 0;
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
+    {
+        if (!camera->isScheduleDisabled())
+            activeCount++;
+    }
+
+    if (totalActiveCount - activeCount + editedCount > qnLicensePool->getLicenses().totalCameras() && ui->cameraScheduleWidget->getScheduleDisabled() == 0)
+    {
+        QMessageBox::warning(this, "Can't save cameras", "Licensed cameras limit exceeded. Please disable schedule.");
+        return;
+    }
+
     ui->buttonBox->setEnabled(false);
 
     saveToModel();
@@ -84,6 +112,10 @@ void MultipleCameraSettingsDialog::saveToModel()
             password = m_password;
 
         camera->setAuth(login, password);
+
+        if (ui->cameraScheduleWidget->getScheduleDisabled() != 1)
+            camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleDisabled() == 2);
+
         if (!ui->cameraScheduleWidget->isDoNotChange() && !ui->cameraScheduleWidget->scheduleTasks().isEmpty())
         {
             QnScheduleTaskList scheduleTasks;

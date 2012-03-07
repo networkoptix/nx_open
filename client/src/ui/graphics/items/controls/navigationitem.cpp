@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QAction>
 #include <QGraphicsLinearLayout>
+#include <QMessageBox>
 
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/video_server.h>
@@ -415,10 +416,13 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
     m_timeSlider->resetSelectionRange();
 
-    bool clearZoomNeeded = m_reserveCameras.contains(camera) != m_reserveCameras.contains(m_camera);
+    bool zoomResetNeeded = !(m_reserveCameras.contains(camera) && m_reserveCameras.contains(m_camera) && m_syncButton->isChecked());
 
-    if (m_camera)
+    if (m_camera) {
         disconnect(m_camera->getCamDisplay(), 0, this, 0);
+        
+        m_zoomByCamera[m_camera] = m_timeSlider->scalingFactor();
+    }
 
     m_camera = camera;
 
@@ -449,8 +453,11 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
     m_syncButton->setEnabled(camera != 0 && !m_reserveCameras.isEmpty());
 
-    if(clearZoomNeeded)
-        m_timeSlider->setScalingFactor(0.0);
+    if(zoomResetNeeded) {
+        updateSlider();
+
+        m_timeSlider->setScalingFactor(m_zoomByCamera.value(m_camera, 0.0));
+    }
 
     emit actualCameraChanged(m_camera);
 }

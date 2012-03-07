@@ -132,6 +132,7 @@ private:
     VolumeSlider *m_volumeSlider;
     GraphicsLabel *m_timeLabel;
 
+    QHash<CLVideoCamera *, qreal> m_zoomByCamera;
     CLVideoCamera *m_camera;
     CLVideoCamera *m_forcedCamera;
     QSet<CLVideoCamera *> m_reserveCameras;

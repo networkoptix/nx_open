@@ -42,7 +42,7 @@ void LicenseManagerWidget::licenseDetailsButtonClicked()
     const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->selectionModel()->selectedRows().front().row());
 
     QString details = tr("<b>Generic:</b><br />\n"
-                         "License Qwner: %1<br />\n"
+                         "License Owner: %1<br />\n"
                          "Serial Key: %2<br />\n"
                          "Locked to Hardware ID: %3<br />\n"
                          "<br />\n"
@@ -90,8 +90,9 @@ void LicenseManagerWidget::updateControls()
         setEnabled(true);
     }
 
-    for (int i = 0; i < ui->gridLicenses->rowCount(); i++) {
-        ui->gridLicenses->removeRow(i);
+    int rowCount = ui->gridLicenses->rowCount();
+    for (int i = 0; i < rowCount; i++) {
+        ui->gridLicenses->removeRow(0);
     }
 
     foreach(const QnLicensePtr& license, m_licenses.licenses()) {
