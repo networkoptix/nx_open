@@ -231,7 +231,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_moveStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, QList<QGraphicsItem *>)),                                      this,                           SLOT(at_move(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, QList<QGraphicsItem *>, const QPointF &)),                     this,                           SLOT(at_move(QGraphicsView *, QList<QGraphicsItem *>, const QPointF &)));
     connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_moveFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_resizingInstrument,       SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),                 this,                           SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
@@ -665,13 +665,13 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
     //    workbench()->setRaisedItem(NULL);
 }
 
-void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *> &) {
+void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *> &, const QPointF &totalDelta) {
     if(m_draggedWorkbenchItems.empty())
         return;
 
     QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
 
-    QPoint newDragDelta = mapper()->mapToGrid(display()->widget(m_draggedWorkbenchItems[0])->geometry()).topLeft() - m_draggedWorkbenchItems[0]->geometry().topLeft();
+    QPoint newDragDelta = mapper()->mapDeltaToGridF(totalDelta).toPoint();
     if(newDragDelta != m_dragDelta) {
         m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
 
