@@ -6,6 +6,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "core/resource/resource.h"
+#include "core/resourcemanagment/resource_pool.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
 #include "ui/device_settings/camera_schedule_widget.h"
@@ -42,6 +43,13 @@ CameraSettingsDialog::~CameraSettingsDialog()
 
 void CameraSettingsDialog::accept()
 {
+    if (m_camera->isScheduleDisabled() && ui->cameraScheduleWidget->getScheduleDisabled() == 0
+            && qnResPool->activeCameras() + 1 > qnLicensePool->getLicenses().totalCameras())
+    {
+        QMessageBox::warning(this, "Can't save camera", "Licensed cameras limit exceeded. Please disable schedule.");
+        return;
+    }
+
     ui->buttonBox->setEnabled(false);
 
     saveToModel();

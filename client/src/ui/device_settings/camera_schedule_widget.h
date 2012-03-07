@@ -31,7 +31,7 @@ public:
 private Q_SLOTS:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
-    void onDisableScheduleChanged(int state);
+    void onDisableScheduleClicked();
     void updateGridParams();
     void onNeedReadCellParams(const QPoint &cell);
 

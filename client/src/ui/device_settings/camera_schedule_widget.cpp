@@ -7,7 +7,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent)
     ui->setupUi(this);
     connect(ui->chkBoxDisplayQuality, SIGNAL(stateChanged(int)), this, SLOT(onDisplayQualityChanged(int)));
     connect(ui->chkBoxDisplayFPS, SIGNAL(stateChanged(int)), this, SLOT(onDisplayFPSChanged(int)));
-    connect(ui->chkBoxDisableSchedule, SIGNAL(stateChanged(int)), this, SLOT(onDisableScheduleChanged(int)));
+    connect(ui->chkBoxDisableSchedule, SIGNAL(clicked()), this, SLOT(onDisableScheduleClicked()));
 
     // init buttons
     ui->btnRecordAlways->setColor(QColor(COLOR_LIGHT,0,0));
@@ -287,8 +287,10 @@ void QnCameraScheduleWidget::setMaxFps(int value)
     ui->fpsSpinBox->setMaximum(value);
 }
 
-void QnCameraScheduleWidget::onDisableScheduleChanged(int state)
+void QnCameraScheduleWidget::onDisableScheduleClicked()
 {
+    Qt::CheckState state = ui->chkBoxDisableSchedule->checkState();
+
     ui->chkBoxDisableSchedule->setTristate(false);
     if (state == Qt::PartiallyChecked)
         ui->chkBoxDisableSchedule->setCheckState(Qt::Checked);

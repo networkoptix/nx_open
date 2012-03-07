@@ -3,7 +3,7 @@
 #include "resource_consumer.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource()
-    : m_scheduleDisabled(false)
+    : m_scheduleDisabled(true)
 {
 }
 

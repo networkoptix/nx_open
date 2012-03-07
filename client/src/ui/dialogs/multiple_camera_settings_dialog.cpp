@@ -5,6 +5,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
+#include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
@@ -67,6 +68,21 @@ void MultipleCameraSettingsDialog::requestFinished(int status, const QByteArray&
 
 void MultipleCameraSettingsDialog::accept()
 {
+    int totalActiveCount = qnResPool->activeCameras();
+    int editedCount = m_cameras.size();
+    int activeCount = 0;
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
+    {
+        if (!camera->isScheduleDisabled())
+            activeCount++;
+    }
+
+    if (totalActiveCount - activeCount + editedCount > qnLicensePool->getLicenses().totalCameras() && ui->cameraScheduleWidget->getScheduleDisabled() == 0)
+    {
+        QMessageBox::warning(this, "Can't save cameras", "Licensed cameras limit exceeded. Please disable schedule.");
+        return;
+    }
+
     ui->buttonBox->setEnabled(false);
 
     saveToModel();
