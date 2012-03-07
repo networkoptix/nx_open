@@ -113,7 +113,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_hiQualityRetryCounter(0),
       m_isStillImage(false),
       m_isLongWaiting(false),
-      m_executingChangeSpeed(false)
+      m_executingChangeSpeed(false),
+      m_eofSignalSended(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -506,6 +507,8 @@ void CLCamDisplay::onBeforeJump(qint64 time)
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
         m_display[i]->blockTimeValue(time);
     }
+
+    m_emptyPacketCounter = 0;
     clearUnprocessedData();
 
     if (skipPrevJumpSignal > 0) {
@@ -759,8 +762,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         //    return true; // jump finished, but old data received
         if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
             m_bofReceived = true;
-        else if(m_display[0]->getLastDisplayedTime() == DATETIME_NOW && (media->flags & QnAbstractMediaData::MediaFlags_LIVE))
-            m_bofReceived = true;
 
         if (!m_bofReceived)
             return true; // jump finished, but old data received
@@ -786,8 +787,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_emptyPacketCounter >= 3)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-			if (m_extTimeSrc && !isLive)
+            if (m_extTimeSrc && !isLive) {
             	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
+                m_eofSignalSended = true;
+            }
 
             /*
             // One camera from several sync cameras may reach BOF/EOF
@@ -816,9 +819,12 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         }
         return true;
     }
-    else if (m_emptyPacketCounter > 0) {
-		if (m_extTimeSrc)
-        	m_extTimeSrc->onEofReached(this, false); // jump to live if needed
+    else 
+    {
+        if (m_extTimeSrc && m_eofSignalSended) {
+        	m_extTimeSrc->onEofReached(this, false);
+            m_eofSignalSended = false;
+        }
         m_emptyPacketCounter = 0;
     }
 
