@@ -661,8 +661,8 @@ begin_label:
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_StillImage;
 
     QMutexLocker mutex(&m_jumpMtx);
-    if (m_lastJumpTime == DATETIME_NOW)
-        m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to live
+    if (jumpTime != DATETIME_NOW)
+        m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     return m_currentData;
 }

@@ -891,16 +891,18 @@ void NavigationItem::rewindBackward()
     qint64 pos = 0;
     if(m_reserveCameras.contains(m_camera))
     {
-        const QnTimePeriodList &periods = m_timeSlider->fullRecTimePeriodList();
+        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(m_timeSlider->fullRecTimePeriodList(), 1);
         if (!periods.isEmpty())
         {
             if (m_camera->getCurrentTime() == DATETIME_NOW) {
                 pos = periods.last().startTimeMs*1000;
             }
             else {
-                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_timeSlider->currentValue());
+                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_camera->getCurrentTime()/1000);
                 itr = qMax(itr-2, periods.begin());
-                pos = itr->startTimeMs*1000;
+                pos = itr->startTimeMs*1000ll;
+                if (reader->isReverseMode() && itr->durationMs != -1)
+                    pos += itr->durationMs*1000ll;
             }
         }
     }
@@ -918,9 +920,12 @@ void NavigationItem::rewindForward()
     qint64 pos = reader->endTime();
     if(m_reserveCameras.contains(m_camera)) 
     {
-        const QnTimePeriodList &periods = m_timeSlider->fullRecTimePeriodList();
-        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_timeSlider->currentValue());
-        pos = itr == periods.end() ? DATETIME_NOW : itr->startTimeMs*1000;
+        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(m_timeSlider->fullRecTimePeriodList(), 1);
+        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_camera->getCurrentTime()/1000);
+        if (itr == periods.end() || reader->isReverseMode() && itr->durationMs == -1)
+            pos = DATETIME_NOW;
+        else
+            pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000ll;
     }
     reader->jumpTo(pos, 0);
 }
