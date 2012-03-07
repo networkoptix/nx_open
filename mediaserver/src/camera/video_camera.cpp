@@ -194,7 +194,7 @@ void QnVideoCamera::notInUse(void* user)
 void QnVideoCamera::stopIfNoActivity()
 {
     QMutexLocker lock(&m_getReaderMutex);
-    if (!m_cameraUsers.isEmpty())
+    if (!m_cameraUsers.isEmpty() && m_resource->getStatus() != QnResource::Disabled)
         return;
 
     bool needStopPrimary = m_primaryReader && m_primaryReader->isRunning();

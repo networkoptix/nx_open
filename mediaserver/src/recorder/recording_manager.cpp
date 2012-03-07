@@ -11,6 +11,8 @@
 #include "server_stream_recorder.h"
 #include "utils/common/synctime.h"
 #include "core/resource/video_server.h"
+#include "core/resource/resource_fwd.h"
+#include "core/resource/camera_resource.h"
 
 const float MIN_SECONDARY_FPS = 2.0;
 
@@ -85,12 +87,20 @@ QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, Qn
     return recorder;
 }
 
+bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
+{
+    if (res->getStatus() == QnResource::Disabled)
+        return true;
+    QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
+    return  cameraRes && cameraRes->isBlocked();
+}
+
 void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     QnAbstractMediaStreamDataProvider* providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProvider* providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
-    if (res->getStatus() != QnResource::Disabled && recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
+    if (!isResourceDisabled(res) && recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
     {
         if (providerHi)
             providerHi->start();
@@ -142,7 +152,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 
             startOrStopRecording(res, camera, recorders.recorderHiRes, recorders.recorderLowRes);
         }
-        else if (res->getStatus() != QnResource::Disabled)
+        else if (!isResourceDisabled(res))
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
@@ -213,7 +223,7 @@ void QnRecordingManager::onFpsChanged(QnServerStreamRecorder* recorder, float va
         QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource> (recorder->getResource());
         if (cameraRes && providerLow)
         {
-            if (recorder->getResource()->getStatus() == QnResource::Disabled ||
+            if (isResourceDisabled(recorder->getResource()) ||
                 cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS || 
                 recorder->currentScheduleTask().getRecordingType() == QnScheduleTask::RecordingType_Never) 
                 providerLow->stop();

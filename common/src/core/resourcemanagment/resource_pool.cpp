@@ -260,7 +260,7 @@ int QnResourcePool::activeCameras() const
         if (!camera)
             continue;
 
-        if (camera->getStatus() != QnResource::Disabled && !camera->getScheduleTasks().isEmpty())
+        if (camera->getStatus() != QnResource::Disabled && !camera->isBlocked())
             count++;
     }
 

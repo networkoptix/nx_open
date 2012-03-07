@@ -48,6 +48,7 @@ private slots:
 private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
     void startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
+    bool isResourceDisabled(QnResourcePtr res) const;
 private:
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
