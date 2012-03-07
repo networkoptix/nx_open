@@ -82,6 +82,7 @@ protected:
     void addToWorkbench(const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
     void addToWorkbench(const QnMediaResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
     void addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
+    void closeLayouts(const QnWorkbenchLayoutList &layouts);
 
 protected slots:
     void at_context_aboutToBeDestroyed();
@@ -101,6 +102,7 @@ protected slots:
     void at_saveLayoutAsAction_triggered();
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
+    void at_closeAllButThisLayoutAction_triggered();
     
     void at_moveCameraAction_triggered();
     void at_resourceDropAction_triggered();
@@ -124,7 +126,7 @@ protected slots:
     void at_removeFromServerAction_triggered();
 
     void at_newUserAction_triggered();
-    void at_newLayoutAction_triggered();
+    void at_newUserLayoutAction_triggered();
 
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
     void at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);

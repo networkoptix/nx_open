@@ -6,6 +6,8 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_target_types.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -43,6 +45,23 @@ void QnLayoutTabBar::checkInvariants() const {
         assert(workbench()->layouts() == m_layouts);
         assert(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex() || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
     }
+}
+
+Qn::ActionScope QnLayoutTabBar::currentScope() const {
+    return Qn::TabBarScope;
+}
+
+QVariant QnLayoutTabBar::currentTarget(Qn::ActionScope scope) const {
+    if(scope != Qn::TabBarScope)
+        return QVariant();
+
+    QnWorkbenchLayoutList result;
+
+    int currentIndex = this->currentIndex();
+    if(currentIndex >= 0 && currentIndex < m_layouts.size())
+        result.push_back(m_layouts[currentIndex]);
+
+    return QVariant::fromValue(result);
 }
 
 QnWorkbenchContext *QnLayoutTabBar::context() const {
@@ -114,6 +133,28 @@ void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
+    if(!context() || !context()->menu()) {
+        qnWarning("Requesting context menu for a layout tab bar while no menu manager instance is available.");
+        return;
+    }
+
+    int index = tabAt(event->pos());
+    if(index < 0 || index >= m_layouts.size())
+        return;
+    
+    QnWorkbenchLayoutList target;
+    target.push_back(m_layouts[index]);
+    
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TabBarScope, QVariant::fromValue(target)));
+    if(menu->isEmpty())
+        return;
+
+    /* Run menu. */
+    menu->exec(QCursor::pos());
+}
+
+
 void QnLayoutTabBar::at_context_aboutToBeDestroyed() {
     setContext(NULL);
 }

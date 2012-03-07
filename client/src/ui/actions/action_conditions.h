@@ -126,5 +126,15 @@ private:
 };
 
 
+class QnResourceActionLayoutCountCondition: public QnActionCondition {
+public:
+    QnResourceActionLayoutCountCondition(int requiredCount): m_requiredCount(requiredCount) {}
+
+    virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
+
+private:
+    int m_requiredCount;
+};
+
 
 #endif // QN_ACTION_CONDITIONS_H

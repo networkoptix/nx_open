@@ -1,6 +1,8 @@
 #ifndef QN_ACTIONS_H
 #define QN_ACTIONS_H
 
+#include "action_fwd.h"
+
 namespace Qn {
 
     inline QLatin1String qn_gridPositionParameter()    { return QLatin1String("_qn_gridPosition"); }
@@ -145,6 +147,11 @@ namespace Qn {
          */
         CloseLayoutAction,
 
+        /**
+         * Closes all layouts but selected.
+         */
+        CloseAllButThisLayoutAction,
+
 
 
         /* Resource actions. */
@@ -241,7 +248,7 @@ namespace Qn {
         /**
          * Opens a layout creation dialog.
          */
-        NewLayoutAction,
+        NewUserLayoutAction,
 
 
 #if 0
@@ -529,7 +536,7 @@ namespace Qn {
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
-
+    
     enum ActionVisibility {
         InvisibleAction,
         DisabledAction,

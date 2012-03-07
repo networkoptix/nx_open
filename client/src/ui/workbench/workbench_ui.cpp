@@ -302,10 +302,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     
-    QnLayoutTabBar *tabBarWidget = new QnLayoutTabBar();
-    tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
-    tabBarWidget->setContext(display->context());
-    m_tabBarItem->setWidget(tabBarWidget);
+    m_tabBarWidget = new QnLayoutTabBar();
+    m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
+    m_tabBarWidget->setContext(display->context());
+    m_tabBarItem->setWidget(m_tabBarWidget);
 
     m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
@@ -355,7 +355,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
 
-    connect(tabBarWidget,               SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
+    connect(m_tabBarWidget,             SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
     connect(m_titleShowButton,          SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_titleShowButton_toggled(bool)));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateTitleOpacity()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateTitleOpacity()));
@@ -563,11 +563,8 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const {
 QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     /* Get items. */
     switch(scope) {
-    case Qn::TabBarScope: {
-        QnWorkbenchLayoutList result;
-        result.push_back(m_display->workbench()->currentLayout());
-        return QVariant::fromValue(result);
-                          }
+    case Qn::TabBarScope: 
+        return m_tabBarWidget->currentTarget(scope);
     case Qn::TreeScope:
         return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope: {
@@ -577,7 +574,7 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
             result.push_back(camera->resource());
 
         return QVariant::fromValue(result);
-                          }
+    }
     case Qn::SceneScope:
         return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
