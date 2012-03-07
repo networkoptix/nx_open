@@ -6,6 +6,10 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 
+namespace {
+
+}
+
 GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObject *parent):
     Instrument(
         makeSet(QEvent::Wheel), 
@@ -14,7 +18,9 @@ GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObje
         makeSet(),
         parent
     ),
-    m_workbench(workbench)
+    m_workbench(workbench),
+    m_speed(1.0, 1.0),
+    m_maxSpacing(1.0, 1.0)
 {
     assert(workbench != NULL);
 }
@@ -48,10 +54,17 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
         QSizeF delta = m_speed * -degrees;
         
         qreal k = 1.0;
-        if(delta.width() < 0)
+        if(delta.width() < 0) {
             k = qMin(k, spacing.width() / -delta.width());
-        if(delta.height() < 0)
+        } else {
+            k = qMin(k, (m_maxSpacing.width() - spacing.width()) / delta.width());
+        }
+        
+        if(delta.height() < 0) {
             k = qMin(k, spacing.height() / -delta.height());
+        } else {
+            k = qMin(k, (m_maxSpacing.height() - spacing.height()) / delta.height());
+        }
 
         workbench()->currentLayout()->setCellSpacing(spacing + k * delta);
 
