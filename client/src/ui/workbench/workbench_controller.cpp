@@ -307,6 +307,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     QWidget *window = m_display->view()->window();
     window->addAction(action(Qn::ScreenRecordingAction));
 
+    connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
     connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
     connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
@@ -984,6 +985,11 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 
     if(widget->display() != NULL && widget->display()->camera() != NULL)
         widget->removeEventFilter(this);
+}
+
+void QnWorkbenchController::at_selectAllAction_triggered() {
+    foreach(QnResourceWidget *widget, m_display->widgets())
+        widget->setSelected(true);
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {

@@ -136,6 +136,7 @@ protected slots:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
+    void at_selectAllAction_triggered();
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
     void at_recordingAction_triggered(bool checked);

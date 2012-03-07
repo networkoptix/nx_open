@@ -181,6 +181,7 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
+    addAction(action(Qn::SelectAllAction));
 
     connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
