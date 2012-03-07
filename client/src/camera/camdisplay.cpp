@@ -112,7 +112,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_hiQualityRetryCounter(0),
       m_isStillImage(false),
       m_isLongWaiting(false),
-      m_executingChangeSpeed(false)
+      m_executingChangeSpeed(false),
+      m_EOFSignalSended(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -773,8 +774,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_emptyPacketCounter >= 3 && m_executingJump == 0)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-			if (m_extTimeSrc && !isLive)
+            if (m_extTimeSrc && !isLive) {
             	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
+                m_EOFSignalSended = true;
+            }
 
             /*
             // One camera from several sync cameras may reach BOF/EOF
@@ -803,10 +806,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         }
         return true;
     }
-    else if (m_emptyPacketCounter > 0) {
+    else if (m_EOFSignalSended) {
 		if (m_extTimeSrc)
         	m_extTimeSrc->onEofReached(this, false); // jump to live if needed
         m_emptyPacketCounter = 0;
+        m_EOFSignalSended = false;
     }
 
     bool flushCurrentBuffer = false;
