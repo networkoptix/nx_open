@@ -545,7 +545,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     }
     m_singleShotMode = false;
     m_jumpTime = time;
-
+    m_emptyPacketCounter = 0;
     m_executingJump--;
     m_processedPackets = 0;
     m_delayedFrameCnt = 0;
@@ -770,7 +770,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        if (m_emptyPacketCounter >= 3)
+        if (m_emptyPacketCounter >= 3 && m_executingJump == 0)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
 			if (m_extTimeSrc && !isLive)
