@@ -46,7 +46,9 @@ class QnResourceTreeItemDelegate: public QStyledItemDelegate {
 public:
     explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
         base_type(parent)
-    {}
+    {
+        m_recIcon = Skin::icon(QLatin1String("decorations/recording.png"));
+    }
 
     QnWorkbench *workbench() const {
         return m_workbench.data();
@@ -65,12 +67,23 @@ protected:
         style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource && resource->getStatus() == QnResource::Offline) {
-            QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 0, 0, 128), 3));
 
-            QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
-            painter->drawLine(iconRect.topLeft() + QPoint(2, 2), iconRect.bottomRight() - QPoint(2, 2));
-            painter->drawLine(iconRect.topRight() + QPoint(-2, 2), iconRect.bottomLeft() - QPoint(-2, 2));
+        if(resource && resource->getStatus() == QnResource::Recording) {
+            QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4, optionV4.widget);
+            int textMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, optionV4.widget) + 1;
+            textRect = textRect.adjusted(textMargin, 0, -textMargin, 0);
+
+            QFontMetrics metrics(optionV4.font);
+            int textWidth = metrics.width(optionV4.text);
+
+            QRect iconRect = QRect(
+                textRect.left() + textWidth + textMargin,
+                textRect.top() + 2,
+                textRect.height() - 4,
+                textRect.height() - 4
+            );
+
+            m_recIcon.paint(painter, iconRect);
         }
     }
 
@@ -104,6 +117,7 @@ protected:
 
 private:
     QWeakPointer<QnWorkbench> m_workbench;
+    QIcon m_recIcon;
 };
 
 

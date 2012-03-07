@@ -51,6 +51,7 @@ common/src/common.mak*
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
+client/contrib/bespin/Makefile* 
 
 mediaserver/src/server.pro
 mediaserver/src/version.h

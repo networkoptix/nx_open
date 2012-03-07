@@ -31,7 +31,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QTreeView" name="resourceTreeView">
+        <widget class="QnTreeView" name="resourceTreeView">
          <property name="editTriggers">
           <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
          </property>
@@ -41,6 +41,9 @@
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
+         <property name="autoExpandDelay">
+          <number>500</number>
+         </property>
          <property name="uniformRowHeights">
           <bool>true</bool>
          </property>
@@ -49,6 +52,9 @@
          </property>
          <property name="headerHidden">
           <bool>true</bool>
+         </property>
+         <property name="expandsOnDoubleClick">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -90,7 +96,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTreeView" name="searchTreeView">
+        <widget class="QnTreeView" name="searchTreeView">
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
@@ -99,6 +105,9 @@
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="autoExpandDelay">
+          <number>500</number>
          </property>
          <property name="uniformRowHeights">
           <bool>true</bool>
@@ -112,6 +121,9 @@
          <property name="headerHidden">
           <bool>true</bool>
          </property>
+         <property name="expandsOnDoubleClick">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -120,6 +132,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnTreeView</class>
+   <extends>QTreeView</extends>
+   <header location="global">ui/widgets/tree_view.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

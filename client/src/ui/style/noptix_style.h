@@ -30,6 +30,7 @@ protected:
     bool drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+    bool drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
 
 private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
@@ -37,6 +38,7 @@ private:
 
 private:
     QnNoptixStyleAnimator *m_animator;
+    QIcon m_branchClosed, m_branchOpen;
 };
 
 
