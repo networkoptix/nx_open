@@ -1187,6 +1187,8 @@ bool CLCamDisplay::isNoData() const
         return false;
     if (m_executingJump > 0 || m_executingChangeSpeed || m_buffering)
         return false;
+    if (isRealTimeSource())
+        return false;
     if (m_isLongWaiting)
         return true;
 
