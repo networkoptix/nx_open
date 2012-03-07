@@ -888,40 +888,23 @@ void NavigationItem::rewindBackward()
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    if(!m_reserveCameras.contains(m_camera)) {
-        reader->jumpTo(0, true);
-        reader->resumeDataProcessors();
-    } else {
-        qint64 pos = -1;
-
-        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
-        qint64 currentTime = m_timeSlider->currentValue();
-        qint64 precision = m_timeSlider->getMsInPixel() * 3;
-        
-        for(int i = qUpperBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin() - 1; i >= 0; i--) {
-            if(periods[i].durationMs < precision && periods[i].durationMs != -1)
-                continue;
-
-            if(periods[i].startTimeMs < currentTime - precision) {
-                pos = periods[i].startTimeMs * 1000;
-                break;
+    qint64 pos = 0;
+    if(m_reserveCameras.contains(m_camera))
+    {
+        const QnTimePeriodList &periods = m_timeSlider->fullRecTimePeriodList();
+        if (!periods.isEmpty())
+        {
+            if (m_camera->getCurrentTime() == DATETIME_NOW) {
+                pos = periods.last().startTimeMs*1000;
+            }
+            else {
+                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_timeSlider->currentValue());
+                itr = qMax(itr-2, periods.begin());
+                pos = itr->startTimeMs*1000;
             }
         }
-
-        if(pos == -1) {
-            if(!periods.empty()) {
-                pos = periods[0].startTimeMs * 1000;
-            } else {
-                pos = DATETIME_NOW;
-            }
-        }
-
-        reader->jumpTo(pos, true);
-        reader->resumeDataProcessors();
     }
-
-    
-    //m_camera->streamJump(0);
+    reader->jumpTo(pos, 0);
 }
 
 void NavigationItem::rewindForward()
@@ -932,37 +915,14 @@ void NavigationItem::rewindForward()
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    bool stopped = reader->isMediaPaused();
-    if (stopped)
-        play();
-
-    qint64 pos = -1;
-    if(!m_reserveCameras.contains(m_camera)) {
-        reader->jumpTo(reader->lengthMksec(), false);
-        reader->resumeDataProcessors();
-    } else {
-        qint64 pos = -1;
-
-        const QnTimePeriodList &periods = m_timeSlider->recTimePeriodList(m_timeSlider->getMsInPixel());
-        qint64 currentTime = m_timeSlider->currentValue();
-        for(int i = qLowerBound(periods, QnTimePeriod(currentTime, 0)) - periods.begin(); i < periods.size(); i++) {
-            if(periods[i].startTimeMs > currentTime) {
-                pos = periods[i].startTimeMs * 1000;
-                break;
-            }
-        }
-        if(pos == -1)
-            pos = DATETIME_NOW;
-
-        reader->jumpTo(pos, false);
-        reader->resumeDataProcessors();
-    }
-
-    if (stopped)
+    qint64 pos = reader->endTime();
+    if(m_reserveCameras.contains(m_camera)) 
     {
-        qApp->processEvents();
-        pause();
+        const QnTimePeriodList &periods = m_timeSlider->fullRecTimePeriodList();
+        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_timeSlider->currentValue());
+        pos = itr == periods.end() ? DATETIME_NOW : itr->startTimeMs*1000;
     }
+    reader->jumpTo(pos, 0);
 }
 
 void NavigationItem::stepBackward()

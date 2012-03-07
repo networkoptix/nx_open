@@ -53,6 +53,7 @@ public:
     { setSelectionRange(0, 0); }
 
     const QnTimePeriodList &recTimePeriodList(int msInPixel);
+    const QnTimePeriodList& fullRecTimePeriodList();
     const QnTimePeriodList &motionTimePeriodList(int msInPixel);
     void setRecTimePeriodList(const QnTimePeriodList &timePeriodList);
     void setMotionTimePeriodList(const QnTimePeriodList &timePeriodList);

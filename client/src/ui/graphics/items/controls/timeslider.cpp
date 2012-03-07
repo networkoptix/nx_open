@@ -1310,6 +1310,11 @@ void TimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     GraphicsWidget::paint(painter, option, widget);
 }
 
+const QnTimePeriodList& TimeSlider::fullRecTimePeriodList()
+{
+    return m_recTimePeriodList;
+}
+
 const QnTimePeriodList& TimeSlider::recTimePeriodList(int msInPixel)
 {
     if (m_aggregatedMsInPixel != msInPixel)
