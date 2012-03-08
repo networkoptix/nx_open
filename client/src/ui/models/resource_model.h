@@ -14,6 +14,17 @@ class QnLayoutItemData;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 
+namespace Qn {
+    enum NodeType {
+        LocalNode,
+        ServersNode,
+        UsersNode,
+        ResourceNode,   /**< Node that represents a resource. */
+        ItemNode,       /**< Node that represents a layout item. */
+    };
+
+} // namespace Qn
+
 class QnResourceModel : public QAbstractItemModel {
     Q_OBJECT;
     Q_ENUMS(ItemDataRole);
@@ -54,6 +65,8 @@ private:
     Node *node(const QnResourcePtr &resource);
     Node *node(const QUuid &uuid);
     Node *node(const QModelIndex &index) const;
+    Node *expectedParent(Node *node);
+    bool isIgnored(const QnResourcePtr &resource) const;
 
 private slots:
     void at_context_aboutToBeDestroyed();
@@ -78,6 +91,8 @@ private:
 
     /** Root node. Considered a resource node for NULL resource. */
     Node *m_root;
+
+    Node *m_serversNode, *m_localNode, *m_usersNode;
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResource *, Node *> m_resourceNodeByResource;

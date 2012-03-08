@@ -68,6 +68,8 @@ public:
         layout = 0x1000,        /**< Layout resource. */
         user = 0x2000,          /**< User resource. */
 
+        local_media = local | media,
+
         local_server = local | server,
         remote_server = remote | server,
         live_cam = live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
