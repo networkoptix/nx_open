@@ -79,7 +79,7 @@ void MultipleCameraSettingsDialog::accept()
 
     if (totalActiveCount - activeCount + editedCount > qnLicensePool->getLicenses().totalCameras() && ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Checked)
     {
-        QString message = QString("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved.").arg(activeCount + editedCount).arg(qnLicensePool->getLicenses().totalCameras());
+        QString message = QString("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved.").arg(totalActiveCount - activeCount + editedCount).arg(qnLicensePool->getLicenses().totalCameras());
         QMessageBox::warning(this, "Can't enable recording", message);
         ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
         return;
