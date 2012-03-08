@@ -25,14 +25,14 @@ CameraSettingsDialog::CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QW
 {
     ui->setupUi(this);
     
-    // Do not block editing by default if schedule task list is empty
+    /* Do not block editing by default if schedule task list is empty. */
     ui->cameraScheduleWidget->setDoNotChange(false);
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged()));
     
     at_tabWidget_currentChanged();
 
-    ui->cameraScheduleWidget->setScheduleDisabled(m_camera->isScheduleDisabled() ? 2 : 0);
+    ui->cameraScheduleWidget->setScheduleDisabled(m_camera->isScheduleDisabled() ? Qt::Checked : Qt::Unchecked);
 
     updateView();
 }
@@ -84,9 +84,12 @@ void CameraSettingsDialog::saveToModel()
 
 void CameraSettingsDialog::updateView()
 {
+    QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
+
     ui->nameEdit->setText(m_camera->getName());
     ui->macAddressEdit->setText(m_camera->getMAC().toString());
     ui->ipAddressEdit->setText(m_camera->getHostAddress().toString());
+    ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
     ui->loginEdit->setText(m_camera->getAuth().user());
     ui->passwordEdit->setText(m_camera->getAuth().password());
 

@@ -23,10 +23,10 @@ public:
     QList<QnScheduleTask::Data> scheduleTasks() const;
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
-    void setScheduleDisabled(int checkedState);
+    void setScheduleDisabled(Qt::CheckState checkState);
     void setMaxFps(int value);
 
-    int getScheduleDisabled() const;
+    Qt::CheckState getScheduleDisabled() const;
 
 private Q_SLOTS:
     void onDisplayQualityChanged(int state);
