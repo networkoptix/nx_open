@@ -344,10 +344,15 @@ void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent *event)
     {
         QPoint cell1 = getCell(m_mousePressPos, true);
         QPoint cell2 = getCell(event->pos(), true);
-        QRect r = QRect(cell1, cell2).normalized();
-        for (int x = r.left(); x <= r.right(); ++x)
+        //QRect r = QRect(cell1, cell2).normalized();
+        // avoid QT bug. normalized() rect is not correct for size <2
+        int x1 = qMin(cell1.x(), cell2.x());
+        int x2 = qMax(cell1.x(), cell2.x());
+        int y1 = qMin(cell1.y(), cell2.y());
+        int y2 = qMax(cell1.y(), cell2.y());
+        for (int x = x1; x <= x2; ++x)
         {
-            for (int y = r.top(); y <= r.bottom(); ++y)
+            for (int y = y1; y <= y2; ++y)
                 updateCellValues(QPoint(x,y));
         }
     }
