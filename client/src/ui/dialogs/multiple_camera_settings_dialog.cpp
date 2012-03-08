@@ -32,9 +32,9 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
     foreach (QnVirtualCameraResourcePtr camera, m_cameras)
     {
         if (scheduleDisabled == -1) {
-            scheduleDisabled = camera->isScheduleDisabled() ? 2 : 0;
-        } else if (scheduleDisabled != (camera->isScheduleDisabled() ? 2 : 0)) {
-            scheduleDisabled = 1;
+            scheduleDisabled = camera->isScheduleDisabled() ? Qt::Checked : Qt::Unchecked;
+        } else if (scheduleDisabled != (camera->isScheduleDisabled() ? Qt::Checked : Qt::Unchecked)) {
+            scheduleDisabled = Qt::PartiallyChecked;
         }
 
         logins.insert(camera->getAuth().user());
@@ -47,7 +47,7 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
     if (passwords.size() == 1)
         m_password = *passwords.begin();
 
-    ui->cameraScheduleWidget->setScheduleDisabled(scheduleDisabled);
+    ui->cameraScheduleWidget->setScheduleDisabled(static_cast<Qt::CheckState>(scheduleDisabled));
 
     updateView();
 }
