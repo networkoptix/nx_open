@@ -120,10 +120,52 @@ private:
     QIcon m_recIcon;
 };
 
-/*class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
+class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
 public:
+    QnResourceTreeSortProxyModel(QObject *parent = NULL): 
+        QSortFilterProxyModel(parent) 
+    {}
 
-};*/
+private:
+    enum ResourceType {
+        Local,
+        User,
+        Server,
+        Other
+    };
+
+    ResourceType type(const QnResourcePtr &resource) const {
+        QnResource::Flags flags = resource->flags();
+
+        if ((flags & QnResource::local_server) == QnResource::local_server) {
+            return Local;
+        } else if ((flags & QnResource::server) == QnResource::server) {
+            return Server;
+        } else if ((flags & QnResource::user) == QnResource::user) {
+            return User;
+        } else {
+            return Other;
+        }
+    }
+
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+        /* Use default sorting for non-toplevel items. */
+        if(left.parent().isValid() || right.parent().isValid())
+            return QSortFilterProxyModel::lessThan(left, right);
+
+        QnResourcePtr leftResource  =  left.data(Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if(!leftResource || !rightResource)
+            return QSortFilterProxyModel::lessThan(left, right);
+
+        ResourceType leftType  = type(leftResource);
+        ResourceType rightType = type(rightResource);
+        if(leftType == rightType)
+            return QSortFilterProxyModel::lessThan(left, right);
+        return leftType < rightType;
+    }
+
+};
 
 
 
@@ -145,11 +187,14 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourceModel(this);
-    QSortFilterProxyModel *model = new QSortFilterProxyModel();
-    model->setDynamicSortFilter(true);
+    QnResourceTreeSortProxyModel *model = new QnResourceTreeSortProxyModel(this);
     model->setSourceModel(m_resourceModel);
-    //model->
-    ui->resourceTreeView->setModel(m_resourceModel);
+    model->setSupportedDragActions(m_resourceModel->supportedDragActions());
+    model->setDynamicSortFilter(true);
+    model->setSortRole(Qt::DisplayRole);
+    model->setSortCaseSensitivity(Qt::CaseInsensitive);
+    model->sort(0);
+    ui->resourceTreeView->setModel(model);
 
     m_resourceDelegate = new QnResourceTreeItemDelegate(this);
     ui->resourceTreeView->setItemDelegate(m_resourceDelegate);
