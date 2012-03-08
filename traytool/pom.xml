@@ -1,0 +1,75 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+	<parent>
+		<artifactId>hdwitness-vms</artifactId>
+		<groupId>com.networkoptix.hdwitness-vms</groupId>
+		<version>0.1-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>${pom.parent.groupId}</groupId>
+	<version>${pom.parent.version}</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>traytool</artifactId>
+	<packaging>pom</packaging>
+	<name>VMS Tray Assistant</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1</version>
+				<configuration>
+
+				</configuration>
+
+			</plugin>		
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<id>initialize</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>python</executable>
+							<workingDirectory>${baseDir}</workingDirectory>
+							<arguments>
+								<argument>convert.py</argument>
+							</arguments>							
+						</configuration>					
+					</execution>
+					<execution>
+						<id>package-with-msbuild</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${msbuild.exe}</executable>
+							<workingDirectory>${basedir}/src</workingDirectory>		
+							<arguments>
+								<argument>${artifactId}.vcproj</argument>
+								<argument>/t:Rebuild</argument>
+								<argument>/p:Configuration=${msbuild.configuration}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>
