@@ -1,10 +1,8 @@
 #ifndef CAMERA_SETTINGS_DIALOG_H
 #define CAMERA_SETTINGS_DIALOG_H
 
-#include <QtGui/QDialog>
-
-#include "api/AppServerConnection.h"
-
+#include <QtGui/QWidget>
+#include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 
 namespace Ui {
@@ -13,9 +11,8 @@ namespace Ui {
 
 class QnCameraMotionMaskWidget;
 
-class QnSingleCameraSettingsWidget : public QDialog
-{
-    Q_OBJECT
+class QnSingleCameraSettingsWidget : public QWidget {
+    Q_OBJECT;
 
 public:
     explicit QnSingleCameraSettingsWidget(QWidget *parent = NULL);
@@ -39,11 +36,10 @@ private slots:
     void at_dataChanged();
 
 private:
-    Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
+    Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
-    QnVirtualCameraResourcePtr m_camera;
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-    QnAppServerConnectionPtr m_connection;
+    QnVirtualCameraResourcePtr m_camera;
     bool m_hasUnsubmittedData;
 
     QnCameraMotionMaskWidget *m_motionWidget;

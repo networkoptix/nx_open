@@ -10,9 +10,8 @@
 #include "ui/graphics/items/resource_widget.h"
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::SingleCameraSettingsWidget),
-    m_connection(QnAppServerConnectionFactory::createConnection()),
     m_motionWidget(NULL),
     m_hasUnsubmittedData(false)
 {
@@ -196,6 +195,7 @@ void QnSingleCameraSettingsWidget::at_requestFinished(int status, const QByteArr
     }
 }
 #endif
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

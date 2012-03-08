@@ -2,16 +2,15 @@
 #define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
-
-#include "api/AppServerConnection.h"
+#include <core/resource/resource_fwd.h>
+#include "camera_settings_tab.h"
 
 namespace Ui {
     class MultipleCameraSettingsWidget;
 }
 
-class QnMultipleCameraSettingsWidget : public QWidget
-{
-    Q_OBJECT
+class QnMultipleCameraSettingsWidget : public QWidget {
+    Q_OBJECT;
 
 public:
     explicit QnMultipleCameraSettingsWidget(QWidget *parent);
@@ -20,19 +19,25 @@ public:
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
+    Qn::CameraSettingsTab currentTab() const;
+    void setCurrentTab(Qn::CameraSettingsTab tab);
+
     void updateFromResources();
     void submitToResources();
 
+    bool hasUnsubmittedData() const {
+        return m_hasUnsubmittedData;
+    }
+
+private slots:
+    void at_dataChanged();
+
 private:
-    Q_DISABLE_COPY(QnMultipleCameraSettingsWidget)
+    Q_DISABLE_COPY(QnMultipleCameraSettingsWidget);
 
-    QnVirtualCameraResourceList m_cameras;
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
-
-    QString m_login;
-    QString m_password;
-
-    QnAppServerConnectionPtr m_connection;
+    QnVirtualCameraResourceList m_cameras;
+    bool m_hasUnsubmittedData;
 };
 
 #endif // QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
