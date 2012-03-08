@@ -22,6 +22,7 @@
 		<module>common</module>
 		<module>mediaserver</module>
 		<module>client</module>
+		<module>traytool</module>
 		<module>wixsetup</module>
     </modules>
 	<build>
