@@ -19,11 +19,8 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_defaultParams[FirstParam] = 10;
     m_defaultParams[SecondParam] = QLatin1String("Lo");
     m_defaultParams[ColorParam] = QColor(COLOR_LIGHT,0, 0).rgba();
+    resetCellValues();
 
-    for (int col = 0; col < columnCount(); ++col) {
-        for (int row = 0; row < rowCount(); ++row)
-            qCopy(m_defaultParams, &m_defaultParams[ParamType_Count], m_gridParams[col][row]);
-    }
 
     QDate date(2010,1,1);
     date = date.addDays(1 - date.dayOfWeek());
@@ -395,16 +392,17 @@ void QnScheduleGridWidget::setCellValue(const QPoint &cell, ParamType paramType,
     update();
 }
 
-void QnScheduleGridWidget::resetCellValues(const QPoint& cell)
+void QnScheduleGridWidget::resetCellValues()
 {
-    if (cell.x() < 0 || cell.y() < 0 || cell.x() >= columnCount() || cell.y() >= rowCount())
-        return;
+    CellParams emptyParams;
+    emptyParams[FirstParam] = QLatin1String("-");
+    emptyParams[SecondParam] = QLatin1String("-");
+    emptyParams[ColorParam] = QColor(NO_REC_COLOR, NO_REC_COLOR, NO_REC_COLOR).rgba();
 
-    QVariant *p = m_gridParams[cell.x()][cell.y()];
-    QVariant *e = p + ParamType_Count;
-    while (p != e)
-        *p++ = QVariant();
-    update();
+    for (int col = 0; col < columnCount(); ++col) {
+        for (int row = 0; row < rowCount(); ++row)
+            qCopy(emptyParams, &emptyParams[ParamType_Count], m_gridParams[col][row]);
+    }
 }
 
 void QnScheduleGridWidget::setEnabled(bool val)
