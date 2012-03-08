@@ -187,6 +187,11 @@ namespace Qn {
         HideMotionAction,
 
         /**
+         * Takes screenshot of an item.
+         */
+        TakeScreenshotAction,
+
+        /**
          * Opens camera settings dialog.
          */
         CameraSettingsAction,

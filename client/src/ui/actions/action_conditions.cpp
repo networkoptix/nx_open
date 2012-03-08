@@ -218,3 +218,13 @@ Qn::ActionVisibility QnResourceActionLayoutCountCondition::check(const QnWorkben
 }
 
 
+Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidgetList &widgets) {
+    if(widgets.size() != 1)
+        return Qn::InvisibleAction;
+
+    Qn::RenderStatus renderStatus = widgets[0]->currentRenderStatus();
+    if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
+        return Qn::DisabledAction;
+
+    return Qn::VisibleAction;
+}

@@ -91,7 +91,9 @@
               Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
               Execute="deferred" Return="check" Impersonate="no" />
-        
+
+        <CustomAction Id="LaunchApplication" FileKey="TrayToolExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/> 
+
         <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
         <Upgrade Id="CE572797-45BF-4f1c-A783-369EA79C597E">
@@ -118,6 +120,7 @@
         <InstallExecuteSequence>
             <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
+            <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[&ServerFeature=3]]></Custom>
             <RemoveExistingProducts Before="InstallInitialize" />
         </InstallExecuteSequence>
         
@@ -169,6 +172,18 @@
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
+                            </Component>
+                        </Directory>
+
+                        <Directory Id="VmsTrayToolDir" Name="TrayTool">
+                            <Component Id="TrayToolExecutable" Guid="{11772981-5229-4D14-B126-66906570AD57}">
+                                <File Id="TrayToolExe" Name="traytool.exe" Source="../traytool/bin/$(env.CONFIG)/traytool.exe" KeyPath="yes">
+                                    <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>                                    
+                                    
+                                    <Shortcut Id="StartmenuTrayTool" Directory="StartupFolder" Name="$(env.APPLICATION_NAME) Tray Tool"
+                                              WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                    </Shortcut>
+                                </File>
                             </Component>
                         </Directory>
 
@@ -354,6 +369,7 @@
             </Directory>
             
             <Directory Id="DesktopFolder" Name="Desktop"/>
+            <Directory Id="StartupFolder" Name="Startup"/>
         </Directory>
         
         <DirectoryRef Id="TARGETDIR">
@@ -394,7 +410,7 @@
             <ComponentRef Id="ServerXerces"/>
             <ComponentRef Id="ServerOpenSSL"/>
             <ComponentRef Id="ServerQjson"/>
-            
+            <ComponentRef Id="TrayToolExecutable"/>
             <ComponentRef Id='ProgramMenuMediaServerDir' />
         </Feature>
         

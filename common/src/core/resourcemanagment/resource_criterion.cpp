@@ -186,6 +186,11 @@ void QnResourceCriterion::setCustomType(const CriterionFunction &function) {
 }
 
 QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &resource) const {
+    if(!resource) {
+        qnNullWarning(resource);
+        return m_mismatchOperation;
+    }
+
     Operation result = Reject;
 
     switch(m_type) {

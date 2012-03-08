@@ -23,21 +23,21 @@ public:
     QList<QnScheduleTask::Data> scheduleTasks() const;
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
-    void setScheduleDisabled(Qt::CheckState checkState);
+    void setScheduleEnabled(Qt::CheckState checkState);
     void setMaxFps(int value);
 
-    Qt::CheckState getScheduleDisabled() const;
+    Qt::CheckState getScheduleEnabled() const;
 
 private Q_SLOTS:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
-    void onDisableScheduleClicked();
+    void onEnableScheduleClicked();
     void updateGridParams();
     void onNeedReadCellParams(const QPoint &cell);
 
 private:
     int qualityTextToIndex(const QString &text);
-
+    void enableGrid(bool value);
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 

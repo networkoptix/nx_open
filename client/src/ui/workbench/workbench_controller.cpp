@@ -175,7 +175,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
-    gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.35, 0.35));
+    gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
 
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());

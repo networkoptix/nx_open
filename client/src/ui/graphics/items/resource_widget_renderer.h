@@ -10,7 +10,7 @@ class QThread;
 
 class QnGLRenderer;
 
-class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer, public QnRenderStatus {
+class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
     Q_OBJECT;
 public:
     QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL);
@@ -31,7 +31,7 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
-    RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
+    Qn::RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
 
     qint64 lastDisplayedTime(int channel) const;
 
