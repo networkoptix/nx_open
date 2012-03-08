@@ -3,11 +3,15 @@
 #include "settings.h"
 
 #include <QtSingleApplication>
+#include <QFileInfo>
+#include <QDir>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
 #include <utils/common/command_line_parser.h>
 #include "ui/device_settings/dlg_factory.h"
+#include "ui/workbench/workbench_context.h"
+#include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
@@ -321,7 +325,6 @@ int main(int argc, char *argv[])
 
     cl_log.log(QLatin1String("Using ") + settings->mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
-    //qApp->exit();
 
     // Create and start SessionManager
     SessionManager* sm = SessionManager::instance();
@@ -375,8 +378,6 @@ int main(int argc, char *argv[])
 
     QnPlIpWebCamResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
-    
-
 #endif
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
@@ -394,74 +395,22 @@ int main(int argc, char *argv[])
 
     CLDeviceSettingsDlgFactory::initialize();
 
-    //============================
-    /*
-    QnStorageResourcePtr storage0(new QnStorageResource());
-    storage0->setUrl(getRecordingDir());
-    storage0->setIndex(0);
-    qnResPool->addResource(storage0);
-    qnStorageMan->addStorage(storage0);
-    */
-    //=========================================================
-
     qApp->setStyle(Skin::style());
 
-    /*qApp->setStyleSheet(QLatin1String(
-            "QMenu {\n"
-            "font-family: Bodoni MT;\n"
-            "font-size: 18px;\n"
-            "}"));*/
+    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow());
+    mainWindow->setAttribute(Qt::WA_QuitOnClose);
+    mainWindow->showFullScreen();
+    mainWindow->show();
 
-    /*qApp->setStyleSheet(QLatin1String(
-        "QMenu {\n"
-        "background-color: black;\n"
-        "font-family: Bodoni MT;\n"
-        "font-size: 18px;\n"
-        "border: 1px solid rgb(110, 110, 110);\n"
-        "}\n"
-        "QMenu::item{\n"
-        "color: white;\n"
-        "padding-top: 4px;\n"
-        "padding-left: 5px;\n"
-        "padding-right: 15px;\n"
-        "padding-bottom: 4px;\n"
-        "}\n"
-        "QMenu::item:disabled{\n"
-        "color: rgb(110, 110, 110);\n"
-        "}\n"
-        "QMenu::item:selected {\n"
-        "background: rgb(40, 40, 40);\n"
-        "}\n"
-        "QMenu::separator {\n"
-        "height: 3px;\n"
-        "background: rgb(20, 20, 20);\n"
-        "}"));
-
-    */
-    //=========================================================
-
-    /*
-    QList<QSharedPointer<QnRecorder> > recorders =  qnResPool->getResourcesByType<QnRecorder>();
-    foreach(QnResourcePtr dev, recorders)
-    {
-        QString id = dev->getUniqueId();
-        CLSceneLayoutManager::instance().addRecorderLayoutContent(id);
-    }
-    */
-
-    //=========================================================
-
-    QnMainWindow mainWindow(argc, argv);
-    mainWindow.setAttribute(Qt::WA_QuitOnClose);
-    mainWindow.showFullScreen();
-    mainWindow.show();
+    /* Process input files. */
+    for (int i = 1; i < argc; ++i)
+        mainWindow->handleMessage(QFile::decodeName(argv[i]));
+    if(singleApplication)
+        QObject::connect(singleApplication, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif
-
-    if(singleApplication)
-        QObject::connect(singleApplication, SIGNAL(messageReceived(const QString&)), &mainWindow, SLOT(handleMessage(const QString&)));
 
     QnEventManager::instance()->run();
 
@@ -469,6 +418,9 @@ int main(int argc, char *argv[])
         QObject::connect(&autoTester, SIGNAL(finished()), application.data(), SLOT(quit()));
         autoTester.start();
     }
+
+    /* Open connection settings dialog. */
+    QMetaObject::invokeMethod(mainWindow->context()->menu()->action(Qn::ConnectionSettingsAction), "trigger", Qt::QueuedConnection);
 
     int result = application->exec();
 
