@@ -89,6 +89,8 @@ public:
 
     virtual void updateInner(QnResourcePtr other) override;
 
+    bool hasLiveProvider() const;
+
 private:
     QAuthenticator m_auth;
     bool m_authenticated;
