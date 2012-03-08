@@ -462,6 +462,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Hide Motion Grid")).
         condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasShownGrid));
 
+    factory(Qn::TakeScreenshotAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Take Screenshot")).
+        condition(new QnTakeScreenshotActionCondition());
+
     // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).

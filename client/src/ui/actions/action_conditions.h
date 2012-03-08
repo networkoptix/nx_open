@@ -137,4 +137,9 @@ private:
 };
 
 
+class QnTakeScreenshotActionCondition: public QnActionCondition {
+public:
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
 #endif // QN_ACTION_CONDITIONS_H
