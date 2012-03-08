@@ -671,6 +671,10 @@ bool NavigationItem::updateRecPeriodList(bool force)
     /* It is important to update the stored interval BEFORE sending request to
      * the server. Request is blocking and starts an event loop, so we may get
      * into this method again. */
+    if (reader->startTime() == AV_NOPTS_VALUE)
+        return false;  // reader is not initialized yet
+
+
     qint64 minTimeMs = reader ? reader->startTime()/1000 : 0;
     m_timePeriod.startTimeMs = qMax(minTimeMs, t - w);
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
