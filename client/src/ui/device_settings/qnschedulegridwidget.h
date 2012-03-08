@@ -1,5 +1,5 @@
-#ifndef __SCHEDULE_GRID_WIDGET_H_
-#define __SCHEDULE_GRID_WIDGET_H_
+#ifndef QN_SCHEDULE_GRID_WIDGET_H
+#define QN_SCHEDULE_GRID_WIDGET_H
 
 #include <QtGui/QWidget>
 
@@ -16,6 +16,7 @@ class QnScheduleGridWidget : public QWidget
 
 public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
+    virtual ~QnScheduleGridWidget();
 
     enum ParamType{ FirstParam, SecondParam, ColorParam, ParamType_Count };
 
@@ -26,7 +27,7 @@ public:
     inline int rowCount() const { return ROW_COUNT; }
     inline int columnCount() const { return COL_COUNT; }
 
-    QVariant getCellValue(const QPoint &cell, ParamType paramType) const;
+    QVariant cellValue(const QPoint &cell, ParamType paramType) const;
     void setCellValue(const QPoint &cell, ParamType paramType, const QVariant &value);
     void resetCellValues();
 
@@ -36,26 +37,33 @@ public:
     bool isEnabled() const;
 
 signals:
-    void needReadCellParams(const QPoint &cell);
-    //void 
+    void cellActivated(const QPoint &cell);
+    void cellValueChanged(const QPoint &cell);
 
 protected:
-    virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseReleaseEvent(QMouseEvent *event);
-    virtual void leaveEvent(QEvent *event);
-    virtual void paintEvent(QPaintEvent *event);
-    virtual void resizeEvent(QResizeEvent *event);
-
-private:
-    qreal getCellSize() const;
-    QPoint getCell(const QPoint &p, bool doTruncate) const;
-    void initMetrics();
-    void updateCellValues(const QPoint &cell);
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void leaveEvent(QEvent *event) override;
+    virtual void paintEvent(QPaintEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
     typedef QVariant CellParams[ParamType_Count];
 
+    void setCellValueInternal(const QPoint &cell, const CellParams &value);
+    void updateCellValueInternal(const QPoint &cell);
+
+    QPoint mapToGrid(const QPoint &pos, bool doTruncate) const;
+
+    qreal cellSize() const;
+    void initMetrics();
+
+    bool isValidCell(const QPoint &cell) const;
+    bool isValidRow(int row) const;
+    bool isValidColumn(int column) const;
+
+private:
     CellParams m_defaultParams;
     CellParams m_gridParams[COL_COUNT][ROW_COUNT];
     bool m_showFirstParam;
@@ -75,4 +83,4 @@ private:
     bool m_enabled;
 };
 
-#endif // __SCHEDULE_GRID_WIDGET_H_
+#endif // QN_SCHEDULE_GRID_WIDGET_H

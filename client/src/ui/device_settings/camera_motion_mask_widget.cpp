@@ -1,4 +1,4 @@
-#include "camera_motionmask_widget.h"
+#include "camera_motion_mask_widget.h"
 #include <QVBoxLayout>
 #include <QGLWidget>
 #include "utils/common/checked_cast.h"
@@ -21,23 +21,28 @@
 #include "ui/style/globals.h"
 #include "ui/workbench/workbench_context.h"
 
+namespace {
+    QList<QRegion> emptyMotionMaskList() {
+        QList<QRegion> result;
+
+        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+            result.push_back(QRegion());
+
+        return result;
+    }
+
+} // anonymous namespace
+
+
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent)
 	: QWidget(parent)
 {
 	init();
 }
 
-QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(const QnResourcePtr &resource, QWidget *parent)
-	: QWidget(parent)
-{
-	init();
-	setCamera(resource);
-}
-
 void QnCameraMotionMaskWidget::init()
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionMaskList << QRegion();
+    m_motionMaskList = emptyMotionMaskList();
 
     /* Set up scene & view. */
     m_scene = new QGraphicsScene(this);
@@ -105,27 +110,46 @@ void QnCameraMotionMaskWidget::at_viewport_resized() {
     m_display->fitInView(false);
 }
 
+const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
+    return m_camera;
+}
+
 void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 {
-	m_camera = resource.dynamicCast<QnVirtualCameraResource>();
-	m_motionMaskList = m_camera->getMotionMaskList();
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if(m_camera == camera)
+        return;
 
-    /* Add single item to the layout. */
-	QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
-	item->setPinned(true);
-	item->setGeometry(QRect(0, 0, 1, 1));
-	m_context->workbench()->currentLayout()->addItem(item);
-	m_context->workbench()->setItem(QnWorkbench::ZOOMED, item);
+	m_camera = camera;
 
-    /* Set up the corresponding widget. */
-    m_widget = m_display->widget(item);
-    widget()->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
-    widget()->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+    if(!m_camera) {
+        m_motionMaskList = emptyMotionMaskList();
+
+        m_context->workbench()->clear();
+    } else {
+        m_motionMaskList = m_camera->getMotionMaskList();
+
+        /* Add single item to the layout. */
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
+        item->setPinned(true);
+        item->setGeometry(QRect(0, 0, 1, 1));
+        m_context->workbench()->currentLayout()->addItem(item);
+        m_context->workbench()->setItem(QnWorkbench::ZOOMED, item);
+
+        /* Set up the corresponding widget. */
+        m_widget = m_display->widget(item);
+        widget()->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
+        widget()->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+    }
+
+    /* Consider motion mask list changed. */
+    emit motionMaskListChanged();
 }
 
 void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &gridRect)
 {
     const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+    bool changed = false;
 
     int numChannels = layout->numberOfChannels();
     for (int i = 0; i < numChannels; ++i)
@@ -135,19 +159,32 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
         r = gridRect.intersected(r);
         r.translate(-layout->h_position(i)*MD_WIDTH, -layout->v_position(i)*MD_HEIGHT);
 
-        if (!r.isEmpty()) 
+        if (!r.isEmpty() && !m_motionMaskList[i].contains(r)) 
         {
             widget->addToMotionMask(r, i);
             m_motionMaskList[i] += r;
+            changed = true;
         }
     }
+
+    if(changed)
+        emit motionMaskListChanged();
 }
 
 void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget)
 {
+    bool changed = false;
+
     widget->clearMotionMask();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-	    m_motionMaskList[i] = QRegion();
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        if(!m_motionMaskList[i].isEmpty()) {
+	        m_motionMaskList[i] = QRegion();
+            changed = true;
+        }
+    }
+
+    if(changed)
+        emit motionMaskListChanged();
 }
 
 const QList<QRegion>& QnCameraMotionMaskWidget::motionMaskList() const

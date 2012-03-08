@@ -24,22 +24,17 @@ public:
     const QnVirtualCameraResourcePtr &camera() const;
     void setCamera(const QnVirtualCameraResourcePtr &camera);
 
+    Qn::CameraSettingsTab currentTab() const;
+    void setCurrentTab(Qn::CameraSettingsTab tab);
+
     bool hasUnsubmittedData() const {
         return m_hasUnsubmittedData;
     }
 
-
-public slots:
-    virtual void accept() override;
-    virtual void reject() override;
-
-private:
-    void updateData();
-    void submitData();
-    void saveData();
+    void updateFromResource();
+    void submitToResource();
 
 private slots:
-    void at_requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
     void at_tabWidget_currentChanged();
     void at_dataChanged();
 

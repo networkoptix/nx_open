@@ -194,7 +194,7 @@ FORMS += \
     ui/dialogs/connection_testing_dialog.ui \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
-    ui/device_settings/camera_schedule.ui \
+    ui/device_settings/camera_schedule_widget.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
     ui/widgets/single_camera_settings_widget.ui \

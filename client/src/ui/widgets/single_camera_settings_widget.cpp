@@ -1,19 +1,13 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
 
-#include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
-#include <QtGui/QStandardItemModel>
 
 #include "core/resource/resource.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "ui/preferences/preferencesdialog.h"
-#include "ui/style/skin.h"
 #include "ui/device_settings/camera_schedule_widget.h"
-#include "ui/device_settings/camera_motionmask_widget.h"
+#include "ui/device_settings/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource_widget.h"
-
-#include "settings.h"
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QDialog(parent),
@@ -24,17 +18,16 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 {
     ui->setupUi(this);
     
-    connect(ui->tabWidget,      SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
+    connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
 
-    connect(ui->nameEdit,       SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->loginEdit,      SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->passwordEdit,   SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->passwordEdit,   SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_dataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
 
-    ui->
-
-    updateData();
+    updateFromResource();
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
@@ -46,12 +39,59 @@ const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
 }
 
 void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
-    m_camera = camera;
+    if(m_camera == camera)
+        return;
 
-    updateData();
+    m_camera = camera;
+    
+    if(m_motionWidget)
+        m_motionWidget->setCamera(m_camera);
+
+    updateFromResource();
 }
 
+Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
+    /* Using field names here so that changes in UI file will lead to compilation errors. */
 
+    QWidget *tab = ui->tabWidget->currentWidget();
+    
+    if(tab == ui->tabGeneral) {
+        return Qn::GeneralSettingsTab;
+    } else if(tab == ui->tabNetwork) {
+        return Qn::NetworkSettingsTab;
+    } else if(tab == ui->tabRecording) {
+        return Qn::RecordingSettingsTab;
+    } else if(tab == ui->tabMotion) {
+        return Qn::MotionSettingsTab;
+    } else {
+        qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
+        return Qn::GeneralSettingsTab;
+    }
+}
+
+void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
+    /* Using field names here so that changes in UI file will lead to compilation errors. */
+
+    switch(tab) {
+    case Qn::GeneralSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabGeneral);
+        break;
+    case Qn::NetworkSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabNetwork);
+        break;
+    case Qn::RecordingSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabRecording);
+        break;
+    case Qn::MotionSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabMotion);
+        break;
+    default:
+        qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
+        break;
+    }
+}
+
+#if 0
 void QnSingleCameraSettingsWidget::accept()
 {
     if (m_camera->isScheduleDisabled() && ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Checked
@@ -65,7 +105,7 @@ void QnSingleCameraSettingsWidget::accept()
 
     ui->buttonBox->setEnabled(false);
 
-    submitData();
+    submitToResource();
     saveData();
 }
 
@@ -74,8 +114,9 @@ void QnSingleCameraSettingsWidget::reject()
 {
     QDialog::reject();
 }
+#endif
 
-void QnSingleCameraSettingsWidget::submitData()
+void QnSingleCameraSettingsWidget::submitToResource()
 {
     if(!m_camera)
         return;
@@ -100,7 +141,7 @@ void QnSingleCameraSettingsWidget::submitData()
     m_hasUnsubmittedData = false;
 }
 
-void QnSingleCameraSettingsWidget::updateData()
+void QnSingleCameraSettingsWidget::updateFromResource()
 {
     if(!m_camera) {
         ui->nameEdit->setText(QString());
@@ -139,6 +180,7 @@ void QnSingleCameraSettingsWidget::updateData()
     m_hasUnsubmittedData = false;
 }
 
+#if 0
 void QnSingleCameraSettingsWidget::saveData()
 {
     m_connection->saveAsync(m_camera, this, SLOT(at_requestFinished(int,QByteArray,QnResourceList,int)));
@@ -153,7 +195,11 @@ void QnSingleCameraSettingsWidget::at_requestFinished(int status, const QByteArr
         ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
     }
 }
+#endif
 
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
 void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() 
 {
     if(m_motionWidget != NULL)
@@ -163,11 +209,14 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
     if(motionWidget == NULL)
         return;
 
-    m_motionWidget = new QnCameraMotionMaskWidget(m_camera, this);
-
+    m_motionWidget = new QnCameraMotionMaskWidget(this);
+    m_motionWidget->setCamera(m_camera);
+    
     QVBoxLayout *layout = new QVBoxLayout(motionWidget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_motionWidget);
+
+    connect(m_motionWidget, SIGNAL(motionMaskListChanged()), this, SLOT(at_dataChanged()));
 }
 
 void QnSingleCameraSettingsWidget::at_dataChanged() 

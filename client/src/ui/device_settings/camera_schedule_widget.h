@@ -1,12 +1,12 @@
-#ifndef __CAMERA_SCHEDULE_H_
-#define __CAMERA_SCHEDULE_H_
+#ifndef QN_CAMERA_SCHEDULE_WIDGET_H
+#define QN_CAMERA_SCHEDULE_WIDGET_H
 
 #include <QtGui/QWidget>
 
 #include <core/misc/scheduleTask.h>
 
 namespace Ui {
-    class CameraSchedule;
+    class CameraScheduleWidget;
 }
 
 class QnCameraScheduleWidget : public QWidget
@@ -16,6 +16,7 @@ class QnCameraScheduleWidget : public QWidget
 
 public:
     QnCameraScheduleWidget(QWidget *parent = 0);
+    virtual ~QnCameraScheduleWidget();
 
     void setChangesDisabled(bool);
     bool isChangesDisabled() const;
@@ -30,24 +31,28 @@ public:
 
 signals:
     void scheduleTasksChanged();
+    void scheduleEnabledChanged();
 
 private slots:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
     void onEnableScheduleClicked();
     void updateGridParams();
-    void onNeedReadCellParams(const QPoint &cell);
+    void onCellActivated(const QPoint &cell);
 
 private:
     int qualityTextToIndex(const QString &text);
     void enableGrid(bool value);
 
+    void connectToGridWidget();
+    void disconnectFromGridWidget();
+
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 
-    QScopedPointer<Ui::CameraSchedule> ui;
+    QScopedPointer<Ui::CameraScheduleWidget> ui;
     bool m_disableUpdateGridParams;
 };
 
 
-#endif // __CAMERA_SCHEDULE_H_
+#endif // QN_CAMERA_SCHEDULE_WIDGET_H

@@ -14,21 +14,14 @@ class QnMultipleCameraSettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit QnMultipleCameraSettingsWidget(QWidget *parent, QnVirtualCameraResourceList cameras);
+    explicit QnMultipleCameraSettingsWidget(QWidget *parent);
     ~QnMultipleCameraSettingsWidget();
 
-public slots:
-    virtual void accept();
-    virtual void reject();
-    virtual void buttonClicked(QAbstractButton *button);
+    const QnVirtualCameraResourceList &cameras() const;
+    void setCameras(const QnVirtualCameraResourceList &cameras);
 
-    void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
-
-private:
-    void updateView();
-    void saveToModel();
-
-    void save();
+    void updateFromResources();
+    void submitToResources();
 
 private:
     Q_DISABLE_COPY(QnMultipleCameraSettingsWidget)

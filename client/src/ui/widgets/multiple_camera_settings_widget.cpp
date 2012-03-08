@@ -1,61 +1,42 @@
-#include "login_dialog.h"
-#include "ui_multiple_camera_settings_dialog.h"
+#include "multiple_camera_settings_widget.h"
+#include "ui_multiple_camera_settings_widget.h"
 
-#include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
-#include <QtGui/QStandardItemModel>
 
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/resource.h"
-#include "ui/preferences/preferencesdialog.h"
-#include "ui/style/skin.h"
 #include "ui/device_settings/camera_schedule_widget.h"
-#include "multiple_camera_settings_dialog.h"
-#include "ui/device_settings/camera_motionmask_widget.h"
+#include "ui/device_settings/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource_widget.h"
 
-#include "settings.h"
-
-QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent, QnVirtualCameraResourceList cameras)
+QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent)
   : QWidget(parent),
-    ui(new Ui::MultipleCameraSettingsDialog),
-    m_cameras(cameras),
-    m_connection (QnAppServerConnectionFactory::createConnection())
+    ui(new Ui::MultipleCameraSettingsWidget),
+    m_connection(QnAppServerConnectionFactory::createConnection())
 {
     ui->setupUi(this);
 
-    // -1 - uninitialized, 0  - schedule enabled for all cameras,
-    // 1 - flag is not equal for all cameras, 2 - schedule disabled for all cameras
-    int scheduleEnabled = -1;
-
-    QSet<QString> logins, passwords;
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
-    {
-        if (scheduleEnabled == -1) {
-            scheduleEnabled = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
-        } else if (scheduleEnabled != (camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked)) {
-            scheduleEnabled = Qt::PartiallyChecked;
-        }
-
-        logins.insert(camera->getAuth().user());
-        passwords.insert(camera->getAuth().password());
-    }
-
-    if (logins.size() == 1)
-        m_login = *logins.begin();
-
-    if (passwords.size() == 1)
-        m_password = *passwords.begin();
-
-    ui->cameraScheduleWidget->setScheduleEnabled(static_cast<Qt::CheckState>(scheduleEnabled));
-
-    updateView();
+    updateFromResources();
 }
 
 QnMultipleCameraSettingsWidget::~QnMultipleCameraSettingsWidget()
 {
 }
 
+const QnVirtualCameraResourceList &QnMultipleCameraSettingsWidget::cameras() const {
+    return m_cameras;
+}
+
+void QnMultipleCameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &cameras) {
+    if(m_cameras == cameras)
+        return;
+
+    m_cameras = cameras;
+
+    updateFromResources();
+}
+
+#if 0
 void QnMultipleCameraSettingsWidget::requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle)
 {
     if (status == 0) {
@@ -96,8 +77,9 @@ void QnMultipleCameraSettingsWidget::reject()
 {
     QDialog::reject();
 }
+#endif
 
-void QnMultipleCameraSettingsWidget::saveToModel()
+void QnMultipleCameraSettingsWidget::submitToResources()
 {
     m_login = ui->loginEdit->text().trimmed();
     m_password = ui->loginEdit->text().trimmed();
@@ -128,8 +110,37 @@ void QnMultipleCameraSettingsWidget::saveToModel()
     }
 }
 
-void QnMultipleCameraSettingsWidget::updateView()
+void QnMultipleCameraSettingsWidget::updateFromResources()
 {
+
+    // -1 - uninitialized, 0  - schedule enabled for all cameras,
+    // 1 - flag is not equal for all cameras, 2 - schedule disabled for all cameras
+    int scheduleEnabled = -1;
+
+    QSet<QString> logins, passwords;
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
+    {
+        if (scheduleEnabled == -1) {
+            scheduleEnabled = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
+        } else if (scheduleEnabled != (camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked)) {
+            scheduleEnabled = Qt::PartiallyChecked;
+        }
+
+        logins.insert(camera->getAuth().user());
+        passwords.insert(camera->getAuth().password());
+    }
+
+    if (logins.size() == 1)
+        m_login = *logins.begin();
+
+    if (passwords.size() == 1)
+        m_password = *passwords.begin();
+
+    ui->cameraScheduleWidget->setScheduleEnabled(static_cast<Qt::CheckState>(scheduleEnabled));
+
+
+
+
     int maxFps = 0;
 
     bool isScheduleEqual = true;
