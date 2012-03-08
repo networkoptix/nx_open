@@ -29,12 +29,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent)
     ui->gridWidget->setEnabled(true);
 }
 
-void QnCameraScheduleWidget::setDoNotChange(bool val)
+void QnCameraScheduleWidget::setChangesDisabled(bool val)
 {
     ui->gridWidget->setEnabled(!val);
 }
 
-bool QnCameraScheduleWidget::isDoNotChange() const
+bool QnCameraScheduleWidget::isChangesDisabled() const
 {
     return !ui->gridWidget->isEnabled();
 }
@@ -173,6 +173,8 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
         }
     }
+
+    emit scheduleTasksChanged();
 }
 
 static inline QString getShortText(const QString &text)

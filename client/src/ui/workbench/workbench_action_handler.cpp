@@ -675,7 +675,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     if(resource.isNull())
         return;
 
-    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(resource.dynamicCast<QnVirtualCameraResource>(), widget()));
+    QScopedPointer<QnSingleCameraSettingsWidget> dialog(new QnSingleCameraSettingsWidget(resource.dynamicCast<QnVirtualCameraResource>(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -690,7 +690,7 @@ void QnWorkbenchActionHandler::at_multipleCamerasSettingsAction_triggered() {
     if(cameras.empty())
         return;
 
-    QScopedPointer<MultipleCameraSettingsDialog> dialog(new MultipleCameraSettingsDialog(widget(), cameras));
+    QScopedPointer<QnMultipleCameraSettingsWidget> dialog(new QnMultipleCameraSettingsWidget(widget(), cameras));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }

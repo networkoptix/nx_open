@@ -12,13 +12,13 @@ namespace Ui {
 class QnCameraScheduleWidget : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks USER true DESIGNABLE false)
+    Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks NOTIFY scheduleTasksChanged USER true DESIGNABLE false)
 
 public:
     QnCameraScheduleWidget(QWidget *parent = 0);
 
-    void setDoNotChange(bool);
-    bool isDoNotChange() const;
+    void setChangesDisabled(bool);
+    bool isChangesDisabled() const;
 
     QList<QnScheduleTask::Data> scheduleTasks() const;
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
@@ -28,7 +28,10 @@ public:
 
     Qt::CheckState getScheduleEnabled() const;
 
-private Q_SLOTS:
+signals:
+    void scheduleTasksChanged();
+
+private slots:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
     void onEnableScheduleClicked();
@@ -38,10 +41,11 @@ private Q_SLOTS:
 private:
     int qualityTextToIndex(const QString &text);
     void enableGrid(bool value);
+
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 
-    Ui::CameraSchedule *const ui;
+    QScopedPointer<Ui::CameraSchedule> ui;
     bool m_disableUpdateGridParams;
 };
 

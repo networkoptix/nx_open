@@ -34,8 +34,10 @@ public:
 
     void setEnabled(bool val);
     bool isEnabled() const;
-Q_SIGNALS:
+
+signals:
     void needReadCellParams(const QPoint &cell);
+    //void 
 
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event);

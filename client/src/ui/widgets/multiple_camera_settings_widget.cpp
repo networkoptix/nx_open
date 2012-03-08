@@ -16,8 +16,8 @@
 
 #include "settings.h"
 
-MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVirtualCameraResourceList cameras)
-  : QDialog(parent),
+QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent, QnVirtualCameraResourceList cameras)
+  : QWidget(parent),
     ui(new Ui::MultipleCameraSettingsDialog),
     m_cameras(cameras),
     m_connection (QnAppServerConnectionFactory::createConnection())
@@ -52,11 +52,11 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
     updateView();
 }
 
-MultipleCameraSettingsDialog::~MultipleCameraSettingsDialog()
+QnMultipleCameraSettingsWidget::~QnMultipleCameraSettingsWidget()
 {
 }
 
-void MultipleCameraSettingsDialog::requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle)
+void QnMultipleCameraSettingsWidget::requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle)
 {
     if (status == 0) {
         QDialog::accept();
@@ -66,7 +66,7 @@ void MultipleCameraSettingsDialog::requestFinished(int status, const QByteArray&
     }
 }
 
-void MultipleCameraSettingsDialog::accept()
+void QnMultipleCameraSettingsWidget::accept()
 {
     int totalActiveCount = qnResPool->activeCameras();
     int editedCount = m_cameras.size();
@@ -92,12 +92,12 @@ void MultipleCameraSettingsDialog::accept()
 }
 
 
-void MultipleCameraSettingsDialog::reject()
+void QnMultipleCameraSettingsWidget::reject()
 {
     QDialog::reject();
 }
 
-void MultipleCameraSettingsDialog::saveToModel()
+void QnMultipleCameraSettingsWidget::saveToModel()
 {
     m_login = ui->loginEdit->text().trimmed();
     m_password = ui->loginEdit->text().trimmed();
@@ -118,7 +118,7 @@ void MultipleCameraSettingsDialog::saveToModel()
         if (ui->cameraScheduleWidget->getScheduleEnabled() != Qt::PartiallyChecked)
             camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
 
-        if (!ui->cameraScheduleWidget->isDoNotChange() && !ui->cameraScheduleWidget->scheduleTasks().isEmpty())
+        if (!ui->cameraScheduleWidget->isChangesDisabled() && !ui->cameraScheduleWidget->scheduleTasks().isEmpty())
         {
             QnScheduleTaskList scheduleTasks;
             foreach(const QnScheduleTask::Data& data, ui->cameraScheduleWidget->scheduleTasks())
@@ -128,7 +128,7 @@ void MultipleCameraSettingsDialog::saveToModel()
     }
 }
 
-void MultipleCameraSettingsDialog::updateView()
+void QnMultipleCameraSettingsWidget::updateView()
 {
     int maxFps = 0;
 
@@ -171,7 +171,7 @@ void MultipleCameraSettingsDialog::updateView()
     ui->cameraScheduleWidget->setDoNotChange(!isScheduleEqual);
 }
 
-void MultipleCameraSettingsDialog::buttonClicked(QAbstractButton *button)
+void QnMultipleCameraSettingsWidget::buttonClicked(QAbstractButton *button)
 {
     if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Apply)
     {
@@ -180,7 +180,7 @@ void MultipleCameraSettingsDialog::buttonClicked(QAbstractButton *button)
     }
 }
 
-void MultipleCameraSettingsDialog::save()
+void QnMultipleCameraSettingsWidget::save()
 {
     m_connection->saveAsync(m_cameras, this, SLOT(requestFinished(int,QByteArray,QnResourceList,int)));
 }

@@ -1,23 +1,21 @@
-#ifndef MULTIPLE_CAMERA_SETTINGS_DIALOG_H
-#define MULTIPLE_CAMERA_SETTINGS_DIALOG_H
+#ifndef QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
+#define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtGui/QWidget>
 
 #include "api/AppServerConnection.h"
 
 namespace Ui {
-    class MultipleCameraSettingsDialog;
+    class MultipleCameraSettingsWidget;
 }
 
-class QnCameraScheduleWidget;
-
-class MultipleCameraSettingsDialog : public QDialog
+class QnMultipleCameraSettingsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MultipleCameraSettingsDialog(QWidget *parent, QnVirtualCameraResourceList cameras);
-    ~MultipleCameraSettingsDialog();
+    explicit QnMultipleCameraSettingsWidget(QWidget *parent, QnVirtualCameraResourceList cameras);
+    ~QnMultipleCameraSettingsWidget();
 
 public slots:
     virtual void accept();
@@ -33,10 +31,10 @@ private:
     void save();
 
 private:
-    Q_DISABLE_COPY(MultipleCameraSettingsDialog)
+    Q_DISABLE_COPY(QnMultipleCameraSettingsWidget)
 
     QnVirtualCameraResourceList m_cameras;
-    QScopedPointer<Ui::MultipleCameraSettingsDialog> ui;
+    QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
 
     QString m_login;
     QString m_password;
@@ -44,4 +42,4 @@ private:
     QnAppServerConnectionPtr m_connection;
 };
 
-#endif // MULTIPLE_CAMERA_SETTINGS_DIALOG_H
+#endif // QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H

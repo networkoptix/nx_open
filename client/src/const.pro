@@ -188,8 +188,6 @@ FORMS += \
     ui/preferences/recordingsettingswidget.ui \
     ui/dialogs/login_dialog.ui \
     ui/dialogs/tags_edit_dialog.ui \
-    ui/dialogs/camera_settings_dialog.ui \
-    ui/dialogs/multiple_camera_settings_dialog.ui \
     ui/dialogs/server_settings_dialog.ui \
     ui/dialogs/layout_name_dialog.ui \
     ui/dialogs/new_user_dialog.ui \
@@ -199,6 +197,8 @@ FORMS += \
     ui/device_settings/camera_schedule.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
+    ui/widgets/single_camera_settings_widget.ui \
+    ui/widgets/multiple_camera_settings_widget.ui \
 
 # CL_TRIAL_MODE 
 DEFINES += CL_FORCE_LOGO
