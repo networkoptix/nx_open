@@ -13,7 +13,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::SingleCameraSettingsWidget),
     m_motionWidget(NULL),
-    m_hasUnsubmittedData(false)
+    m_hasChanges(false)
 {
     ui->setupUi(this);
     
@@ -137,7 +137,7 @@ void QnSingleCameraSettingsWidget::submitToResource()
     if(m_motionWidget)
 	    m_camera->setMotionMaskList(m_motionWidget->motionMaskList(), QnDomainMemory);
 
-    m_hasUnsubmittedData = false;
+    setHasChanges(false);
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource()
@@ -176,7 +176,16 @@ void QnSingleCameraSettingsWidget::updateFromResource()
         ui->cameraScheduleWidget->setScheduleEnabled(m_camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked);
     }
 
-    m_hasUnsubmittedData = false;
+    setHasChanges(false);
+}
+
+void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
+    if(m_hasChanges == hasChanges)
+        return;
+
+    m_hasChanges = hasChanges;
+
+    emit hasChangesChanged();
 }
 
 #if 0
@@ -221,6 +230,6 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
 
 void QnSingleCameraSettingsWidget::at_dataChanged() 
 {
-    m_hasUnsubmittedData = true;
+    setHasChanges(true);
 }
 

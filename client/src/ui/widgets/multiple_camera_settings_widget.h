@@ -25,19 +25,25 @@ public:
     void updateFromResources();
     void submitToResources();
 
-    bool hasUnsubmittedData() const {
-        return m_hasUnsubmittedData;
+    bool hasChanges() const {
+        return m_hasChanges;
     }
+
+signals:
+    void hasChangesChanged();
 
 private slots:
     void at_dataChanged();
+
+private:
+    void setHasChanges(bool hasChanges);
 
 private:
     Q_DISABLE_COPY(QnMultipleCameraSettingsWidget);
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
     QnVirtualCameraResourceList m_cameras;
-    bool m_hasUnsubmittedData;
+    bool m_hasChanges;
 };
 
 #endif // QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H

@@ -24,23 +24,29 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    bool hasUnsubmittedData() const {
-        return m_hasUnsubmittedData;
+    bool hasChanges() const {
+        return m_hasChanges;
     }
 
     void updateFromResource();
     void submitToResource();
+
+signals:
+    void hasChangesChanged();
 
 private slots:
     void at_tabWidget_currentChanged();
     void at_dataChanged();
 
 private:
+    void setHasChanges(bool hasChanges);
+
+private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
-    bool m_hasUnsubmittedData;
+    bool m_hasChanges;
 
     QnCameraMotionMaskWidget *m_motionWidget;
 };

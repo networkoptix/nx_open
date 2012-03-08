@@ -12,7 +12,7 @@
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent)
   : QWidget(parent),
     ui(new Ui::MultipleCameraSettingsWidget),
-    m_hasUnsubmittedData(false)
+    m_hasChanges(false)
 {
     ui->setupUi(this);
 
@@ -143,7 +143,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         }
     }
 
-    m_hasUnsubmittedData = false;
+    setHasChanges(false);
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {
@@ -219,7 +219,16 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
     }
 
-    m_hasUnsubmittedData = false;
+    setHasChanges(false);
+}
+
+void QnMultipleCameraSettingsWidget::setHasChanges(bool hasChanges) {
+    if(m_hasChanges == hasChanges)
+        return;
+
+    m_hasChanges = hasChanges;
+
+    emit hasChangesChanged();
 }
 
 /*
@@ -245,6 +254,6 @@ void QnMultipleCameraSettingsWidget::save()
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnMultipleCameraSettingsWidget::at_dataChanged() {
-    m_hasUnsubmittedData = true;
+    setHasChanges(true);
 }
 
