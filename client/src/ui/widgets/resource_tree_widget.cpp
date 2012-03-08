@@ -120,6 +120,12 @@ private:
     QIcon m_recIcon;
 };
 
+/*class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
+public:
+
+};*/
+
+
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent): 
     QWidget(parent),
@@ -139,6 +145,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourceModel(this);
+    QSortFilterProxyModel *model = new QSortFilterProxyModel();
+    model->setDynamicSortFilter(true);
+    model->setSourceModel(m_resourceModel);
+    //model->
     ui->resourceTreeView->setModel(m_resourceModel);
 
     m_resourceDelegate = new QnResourceTreeItemDelegate(this);

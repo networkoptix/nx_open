@@ -7,7 +7,8 @@ Q_GLOBAL_STATIC(QnContextHelp, getInstance)
 
 QnContextHelp::QnContextHelp(): 
     m_translator(0),
-    m_currentId(ContextId_Invalid)
+    m_currentId(ContextId_Invalid),
+    m_autoShowNeeded(true)
 {
     installHelpContext("en");
     
@@ -27,27 +28,14 @@ QnContextHelp::~QnContextHelp()
 
 void QnContextHelp::deserializeShownContext()
 {
-    QStringList data = m_settings.value("shownContext").toString().split(';');
-    foreach(const QString& contextId, data)
-    {
-        if (!contextId.isEmpty())
-            m_shownContext[(ContextId) contextId.toInt()] = true;
-    }
+    QVariant value = m_settings.value("autoShowNeeded");
+    if(value.isValid())
+        m_autoShowNeeded = value.toBool();
 }
 
 void QnContextHelp::serializeShownContext()
 {
-    QString rez;
-    for(QMap<ContextId, bool>::const_iterator itr = m_shownContext.begin(); itr != m_shownContext.end(); ++itr)
-    {
-        if (itr.value()) 
-        {
-            if (!rez.isEmpty())
-                rez += ';';
-            rez += QString::number((int) itr.key());
-        }
-    }
-    m_settings.setValue("shownContext", rez);
+    m_settings.setValue("autoShowNeeded", m_autoShowNeeded);
 }
 
 void QnContextHelp::installHelpContext(const QString& lang)
@@ -71,9 +59,9 @@ void QnContextHelp::installHelpContext(const QString& lang)
     }
 }
 
-bool QnContextHelp::isNeedAutoShow(ContextId id) const
+bool QnContextHelp::isAutoShowNeeded() const
 {
-    return !m_shownContext[id];
+    return m_autoShowNeeded;
 }
 
 void QnContextHelp::setHelpContext(ContextId id)
@@ -85,15 +73,9 @@ void QnContextHelp::setHelpContext(ContextId id)
     emit helpContextChanged(id);
 }
 
-void QnContextHelp::setNeedAutoShow(ContextId id, bool value)
+void QnContextHelp::setAutoShowNeeded(bool value)
 {
-    m_shownContext[id] = !value;
-    serializeShownContext();
-}
-
-void QnContextHelp::resetShownInfo()
-{
-    m_shownContext.clear();
+    m_autoShowNeeded = value;
     serializeShownContext();
 }
 

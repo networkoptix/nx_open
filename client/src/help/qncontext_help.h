@@ -23,14 +23,12 @@ public:
     ~QnContextHelp();
     void setHelpContext(ContextId id);
     
-    void setNeedAutoShow(ContextId id, bool value);
-    bool isNeedAutoShow(ContextId id) const;
+    void setAutoShowNeeded(bool value);
+    bool isAutoShowNeeded() const;
 
     QString text(ContextId id) const;
 
     ContextId currentId() const;
-
-    void resetShownInfo();
 
 signals:
     void helpContextChanged(QnContextHelp::ContextId id);
@@ -44,7 +42,7 @@ private:
     ContextId m_currentId;
     QTranslator* m_translator;
     QSettings m_settings;
-    QMap<ContextId, bool> m_shownContext;
+    bool m_autoShowNeeded;
 };
 
 

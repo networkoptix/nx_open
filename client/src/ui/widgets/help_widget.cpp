@@ -25,14 +25,14 @@ void QnHelpWidget::wheelEvent(QWheelEvent *event) {
 void QnHelpWidget::at_contextHelp_helpContextChanged(QnContextHelp::ContextId id) {
     m_id = id;
     ui->textEdit->setText(contextHelp()->text(id));
-    ui->checkBox->setCheckState(contextHelp()->isNeedAutoShow(id) ? Qt::Unchecked : Qt::Checked);
+    ui->checkBox->setCheckState(contextHelp()->isAutoShowNeeded() ? Qt::Unchecked : Qt::Checked);
 
-    if(contextHelp()->isNeedAutoShow(id))
+    if(contextHelp()->isAutoShowNeeded())
         emit showRequested();
 }
 
 void QnHelpWidget::at_checkBox_clicked(bool checked) {
-    contextHelp()->setNeedAutoShow(m_id, !checked);
+    contextHelp()->setAutoShowNeeded(!checked);
 
     if(checked)
         emit hideRequested();
