@@ -15,7 +15,17 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QCheckBox" name="chkBoxEnableSchedule">
+     <property name="text">
+      <string>Enable recording</string>
+     </property>
+     <property name="tristate">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="ScheduleGridGroupBox">
      <property name="title">
       <string>Schedule grid</string>
      </property>
@@ -51,7 +61,7 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>6</width>
+            <width>12</width>
             <height>20</height>
            </size>
           </property>
@@ -63,16 +73,6 @@
            <string>Display fps on grid</string>
           </property>
           <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="chkBoxDisableSchedule">
-          <property name="text">
-           <string>Disable schedule</string>
-          </property>
-          <property name="tristate">
            <bool>true</bool>
           </property>
          </widget>
@@ -111,7 +111,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="groupBoxSettings">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -392,7 +392,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_3">
+      <widget class="QGroupBox" name="groupBoxMotion">
        <property name="title">
         <string>Motion recording</string>
        </property>

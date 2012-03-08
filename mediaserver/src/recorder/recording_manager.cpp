@@ -105,8 +105,14 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (providerHi)
             providerHi->start();
 
-        if (providerLow)
-            onFpsChanged(recorderHiRes, recorderHiRes->currentScheduleTask().getFps()); // start or stop secondary recorder
+        if (providerLow) {
+            QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
+            float currentFps = recorderHiRes->currentScheduleTask().getFps();
+            if (cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS)
+                providerLow->start();
+            else
+                providerLow->stop();
+        }
 
         recorderHiRes->start();
         if (recorderLowRes)
@@ -156,8 +162,8 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
-            if (recorderHiRes)
-                connect(recorderHiRes, SIGNAL(fpsChanged(QnServerStreamRecorder*, float)), this, SLOT(onFpsChanged(QnServerStreamRecorder*, float)));
+            //if (recorderHiRes)
+            //    connect(recorderHiRes, SIGNAL(fpsChanged(QnServerStreamRecorder*, float)), this, SLOT(onFpsChanged(QnServerStreamRecorder*, float)));
             if (recorderLowRes) 
                 connect(camera->getLiveReader(QnResource::Role_SecondaryLiveVideo), SIGNAL(threadPaused()), recorderLowRes, SLOT(closeOnEOF()), Qt::DirectConnection);
             connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)), Qt::QueuedConnection);
@@ -211,26 +217,6 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 {
     QMutexLocker lock(&m_mutex);
     return m_recordMap.contains(camera) && m_recordMap.value(camera).recorderHiRes->isRunning();
-}
-
-void QnRecordingManager::onFpsChanged(QnServerStreamRecorder* recorder, float value)
-{
-    //QnServerStreamRecorder* recorder = dynamic_cast<QnServerStreamRecorder*>(sender());
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorder->getResource());
-    if (camera)
-    {
-        QnAbstractMediaStreamDataProvider* providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
-        QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource> (recorder->getResource());
-        if (cameraRes && providerLow)
-        {
-            if (isResourceDisabled(recorder->getResource()) ||
-                cameraRes->getMaxFps() - value < MIN_SECONDARY_FPS || 
-                recorder->currentScheduleTask().getRecordingType() == QnScheduleTask::RecordingType_Never) 
-                providerLow->stop();
-            else 
-                providerLow->start();
-        }
-    }
 }
 
 void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)

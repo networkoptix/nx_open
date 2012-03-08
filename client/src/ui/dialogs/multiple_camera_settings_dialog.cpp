@@ -26,15 +26,15 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
 
     // -1 - uninitialized, 0  - schedule enabled for all cameras,
     // 1 - flag is not equal for all cameras, 2 - schedule disabled for all cameras
-    int scheduleDisabled = -1;
+    int scheduleEnabled = -1;
 
     QSet<QString> logins, passwords;
     foreach (QnVirtualCameraResourcePtr camera, m_cameras)
     {
-        if (scheduleDisabled == -1) {
-            scheduleDisabled = camera->isScheduleDisabled() ? Qt::Checked : Qt::Unchecked;
-        } else if (scheduleDisabled != (camera->isScheduleDisabled() ? Qt::Checked : Qt::Unchecked)) {
-            scheduleDisabled = Qt::PartiallyChecked;
+        if (scheduleEnabled == -1) {
+            scheduleEnabled = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
+        } else if (scheduleEnabled != (camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked)) {
+            scheduleEnabled = Qt::PartiallyChecked;
         }
 
         logins.insert(camera->getAuth().user());
@@ -47,7 +47,7 @@ MultipleCameraSettingsDialog::MultipleCameraSettingsDialog(QWidget *parent, QnVi
     if (passwords.size() == 1)
         m_password = *passwords.begin();
 
-    ui->cameraScheduleWidget->setScheduleDisabled(static_cast<Qt::CheckState>(scheduleDisabled));
+    ui->cameraScheduleWidget->setScheduleEnabled(static_cast<Qt::CheckState>(scheduleEnabled));
 
     updateView();
 }
@@ -77,9 +77,11 @@ void MultipleCameraSettingsDialog::accept()
             activeCount++;
     }
 
-    if (totalActiveCount - activeCount + editedCount > qnLicensePool->getLicenses().totalCameras() && ui->cameraScheduleWidget->getScheduleDisabled() == 0)
+    if (totalActiveCount - activeCount + editedCount > qnLicensePool->getLicenses().totalCameras() && ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Checked)
     {
-        QMessageBox::warning(this, "Can't save cameras", "Licensed cameras limit exceeded. Please disable schedule.");
+        QString message = QString("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved.").arg(totalActiveCount - activeCount + editedCount).arg(qnLicensePool->getLicenses().totalCameras());
+        QMessageBox::warning(this, "Can't enable recording", message);
+        ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
         return;
     }
 
@@ -113,8 +115,8 @@ void MultipleCameraSettingsDialog::saveToModel()
 
         camera->setAuth(login, password);
 
-        if (ui->cameraScheduleWidget->getScheduleDisabled() != 1)
-            camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleDisabled() == 2);
+        if (ui->cameraScheduleWidget->getScheduleEnabled() != Qt::PartiallyChecked)
+            camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
 
         if (!ui->cameraScheduleWidget->isDoNotChange() && !ui->cameraScheduleWidget->scheduleTasks().isEmpty())
         {

@@ -7,16 +7,15 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent)
     ui->setupUi(this);
     connect(ui->chkBoxDisplayQuality, SIGNAL(stateChanged(int)), this, SLOT(onDisplayQualityChanged(int)));
     connect(ui->chkBoxDisplayFPS, SIGNAL(stateChanged(int)), this, SLOT(onDisplayFPSChanged(int)));
-    connect(ui->chkBoxDisableSchedule, SIGNAL(clicked()), this, SLOT(onDisableScheduleClicked()));
+    connect(ui->chkBoxEnableSchedule, SIGNAL(clicked()), this, SLOT(onEnableScheduleClicked()));
 
     // init buttons
     ui->btnRecordAlways->setColor(QColor(COLOR_LIGHT,0,0));
     ui->btnRecordAlways->setCheckedColor(QColor(COLOR_LIGHT+SEL_CELL_CLR_DELTA,0,0));
     ui->btnRecordMotion->setColor(QColor(0, COLOR_LIGHT, 0));
     ui->btnRecordMotion->setCheckedColor(QColor(0, COLOR_LIGHT+SEL_CELL_CLR_DELTA, 0));
-    int noRecClr = COLOR_LIGHT - 24;
-    ui->btnNoRecord->setColor(QColor(noRecClr, noRecClr, noRecClr));
-    ui->btnNoRecord->setCheckedColor(QColor(noRecClr+SEL_CELL_CLR_DELTA, noRecClr+SEL_CELL_CLR_DELTA, noRecClr+SEL_CELL_CLR_DELTA));
+    ui->btnNoRecord->setColor(QColor(NO_REC_COLOR, NO_REC_COLOR, NO_REC_COLOR));
+    ui->btnNoRecord->setCheckedColor(QColor(NO_REC_COLOR+SEL_CELL_CLR_DELTA, NO_REC_COLOR+SEL_CELL_CLR_DELTA, NO_REC_COLOR+SEL_CELL_CLR_DELTA));
 
     connect(ui->btnRecordAlways, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
     connect(ui->btnRecordMotion, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
@@ -121,10 +120,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
 
     QList<QnScheduleTask::Data> tasks = tasksFrom;
 
-    for (int y = 0; y < ui->gridWidget->rowCount(); ++y) {
-        for (int x = 0; x < ui->gridWidget->columnCount(); ++x)
-            ui->gridWidget->resetCellValues(QPoint(x, y));
-    }
+    ui->gridWidget->resetCellValues();
 
     if (!tasks.isEmpty()) {
         const QnScheduleTask::Data &task = tasks.first();
@@ -287,21 +283,31 @@ void QnCameraScheduleWidget::setMaxFps(int value)
     ui->fpsSpinBox->setMaximum(value);
 }
 
-void QnCameraScheduleWidget::onDisableScheduleClicked()
+void QnCameraScheduleWidget::onEnableScheduleClicked()
 {
-    Qt::CheckState state = ui->chkBoxDisableSchedule->checkState();
+    Qt::CheckState state = ui->chkBoxEnableSchedule->checkState();
 
-    ui->chkBoxDisableSchedule->setTristate(false);
+    ui->chkBoxEnableSchedule->setTristate(false);
     if (state == Qt::PartiallyChecked)
-        ui->chkBoxDisableSchedule->setCheckState(Qt::Checked);
+        ui->chkBoxEnableSchedule->setCheckState(Qt::Checked);
+    enableGrid(ui->chkBoxEnableSchedule->checkState() == Qt::Checked);
 }
 
-void QnCameraScheduleWidget::setScheduleDisabled(Qt::CheckState checkState)
+void QnCameraScheduleWidget::setScheduleEnabled(Qt::CheckState checkState)
 {
-    ui->chkBoxDisableSchedule->setCheckState(checkState);
+    ui->chkBoxEnableSchedule->setCheckState(checkState);
+    enableGrid(checkState == Qt::Checked);
 }
 
-Qt::CheckState QnCameraScheduleWidget::getScheduleDisabled() const
+void QnCameraScheduleWidget::enableGrid(bool value)
 {
-    return ui->chkBoxDisableSchedule->checkState();
+    ui->ScheduleGridGroupBox->setEnabled(value);
+    ui->groupBoxSettings->setEnabled(value);
+    ui->groupBoxMotion->setEnabled(value);
+    ui->gridWidget->setEnabled(value);
+}
+
+Qt::CheckState QnCameraScheduleWidget::getScheduleEnabled() const
+{
+    return ui->chkBoxEnableSchedule->checkState();
 }

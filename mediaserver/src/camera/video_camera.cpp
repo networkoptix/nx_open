@@ -191,10 +191,15 @@ void QnVideoCamera::notInUse(void* user)
     m_cameraUsers.remove(user);
 }
 
+bool QnVideoCamera::isSomeActivity() const
+{
+    return !m_cameraUsers.isEmpty() && m_resource->getStatus() != QnResource::Disabled;
+}
+
 void QnVideoCamera::stopIfNoActivity()
 {
     QMutexLocker lock(&m_getReaderMutex);
-    if (!m_cameraUsers.isEmpty() && m_resource->getStatus() != QnResource::Disabled)
+    if (isSomeActivity())
         return;
 
     bool needStopPrimary = m_primaryReader && m_primaryReader->isRunning();

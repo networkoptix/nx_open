@@ -18,6 +18,8 @@ public:
 
     void beforeStop();
 
+    bool isSomeActivity() const;
+
     /* stop reading from camera if no active DataConsumers left */
     void stopIfNoActivity();
 
