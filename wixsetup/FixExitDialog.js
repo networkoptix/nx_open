@@ -10,8 +10,8 @@ var view = database.OpenView(sql);
 view.Execute();
 view.Close();
 
-sql = "DELETE FROM `Property` WHERE `Property`='ALLUSERS'";
-view = database.OpenView(sql);
-view.Execute();
-view.Close();
+// sql = "DELETE FROM `Property` WHERE `Property`='ALLUSERS'";
+// view = database.OpenView(sql);
+// view.Execute();
+// view.Close();
 database.Commit();

@@ -41,7 +41,7 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
     return m_channelRenderers[channel]->lastFrameMetadata(channel);
 }
 
-QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect, qreal opacity) {
+Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect, qreal opacity) {
     frameDisplayed();
 
     QnGLRenderer *renderer = m_channelRenderers[channel];

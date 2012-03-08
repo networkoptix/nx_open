@@ -19,8 +19,8 @@ QnSystrayWindow::QnSystrayWindow():
 {
     ui->setupUi(this);
 
-    m_iconOK = QIcon(":/traytool.ico"); //QIcon(":/images/heart.png");
-    m_iconBad = QIcon(":/traytool.ico");
+    m_iconOK = QIcon(":/images/traytool.png");
+    m_iconBad = QIcon(":/images/traytool.png");
 
     m_mediaServerHandle = 0;
     m_appServerHandle = 0;
@@ -74,10 +74,21 @@ QnSystrayWindow::~QnSystrayWindow()
         CloseServiceHandle(m_scManager);
 }
 
+void QnSystrayWindow::executeAction(QString actionName)
+{
+    QAction* action = actionByName(actionName);
+    if (action)
+        action->activate(QAction::Trigger);
+}
+
 void QnSystrayWindow::findServiceInfo()
 {
     if (m_scManager == NULL)
         m_scManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+    
+    if (m_scManager == NULL)
+        m_scManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+
     if (m_scManager == NULL) 
     {
         int error = GetLastError();
@@ -100,11 +111,16 @@ void QnSystrayWindow::findServiceInfo()
         }
         return;
     }
-
+    
     if (m_mediaServerHandle == 0)
         m_mediaServerHandle = OpenService(m_scManager, L"VmsMediaServer", SERVICE_ALL_ACCESS);
+    if (m_mediaServerHandle == 0)
+        m_mediaServerHandle = OpenService(m_scManager, L"VmsMediaServer", SERVICE_QUERY_STATUS);
+
     if (m_appServerHandle == 0)
         m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_ALL_ACCESS);
+    if (m_appServerHandle == 0)
+        m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_QUERY_STATUS);
 }
 
  void QnSystrayWindow::setVisible(bool visible)
@@ -360,63 +376,158 @@ void QnSystrayWindow::at_appServerStopAction()
     }
 }
 
- void QnSystrayWindow::createActions()
+bool MyIsUserAnAdmin()
+{
+   bool isAdmin = false;
+
+   DWORD bytesUsed = 0;
+
+   TOKEN_ELEVATION_TYPE tokenElevationType;
+
+   HANDLE m_hToken;
+   OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &m_hToken);
+
+   ::GetTokenInformation(m_hToken, TokenElevationType, &tokenElevationType, sizeof(tokenElevationType), &bytesUsed);
+
+   if (tokenElevationType == TokenElevationTypeFull)
+       isAdmin = true;
+
+   if (m_hToken)
+       CloseHandle(m_hToken);
+
+   return isAdmin;
+}
+
+QnElevationChecker::QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot)
+    : QObject(parent),
+    m_actionName(actionName),
+    m_target(target),
+    m_slot(slot)
+{
+    connect(this, SIGNAL(elevationCheckPassed()), target, slot);
+}
+
+void QnElevationChecker::triggered()
+{
+    if (MyIsUserAnAdmin())
+    {
+        emit elevationCheckPassed();
+    }
+    else
+    {
+        wchar_t name[1024];
+        wchar_t args[1024];
+
+        int size = qApp->arguments()[0].toWCharArray(name);
+        name[size] = 0;
+
+        size = m_actionName.toWCharArray(args);
+        args[size] = 0;
+
+        SHELLEXECUTEINFO shExecInfo;
+
+        shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+        shExecInfo.fMask = NULL;
+        shExecInfo.hwnd = NULL;
+        shExecInfo.lpVerb = L"runas";
+        shExecInfo.lpFile = name;
+        shExecInfo.lpParameters = args;
+        shExecInfo.lpDirectory = NULL;
+        shExecInfo.nShow = SW_NORMAL;
+        shExecInfo.hInstApp = NULL;
+
+        ShellExecuteEx(&shExecInfo);
+        qApp->exit();
+    }
+}
+
+void QnSystrayWindow::connectElevatedAction(QAction* source, const char* signal, QObject* target, const char* slot)
+{
+    QnElevationChecker* checker = new QnElevationChecker(this, nameByAction(source), target, slot);
+    connect(source, signal, checker, SLOT(triggered()));
+}
+
+void QnSystrayWindow::createActions()
+{
+    settingsAction = new QAction(tr("&Settings"), this);
+    m_actionList.append(NameAndAction("showSettings", settingsAction));
+    connectElevatedAction(settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
+
+    m_showMediaServerLogAction = new QAction(tr("&Show Media server log"), this);
+    m_actionList.append(NameAndAction("showMediaServerLog", m_showMediaServerLogAction));
+    connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
+
+    m_showAppLogAction = new QAction(tr("&Show Application server log"), this);
+    m_actionList.append(NameAndAction("showAppServerLog", m_showAppLogAction));
+    connectElevatedAction(m_showAppLogAction, SIGNAL(triggered()), this, SLOT(onShowAppServerLogAction()));
+
+    quitAction = new QAction(tr("&Quit"), this);
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    m_mediaServerStartAction = new QAction(QString(tr("Start ") + MEDIA_SERVER_NAME), this);
+    m_actionList.append(NameAndAction("startMediaServer",m_mediaServerStartAction));
+    connectElevatedAction(m_mediaServerStartAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStartAction()));
+
+    m_mediaServerStopAction = new QAction(QString(tr("Stop ") + MEDIA_SERVER_NAME), this);
+    m_actionList.append(NameAndAction("stopMediaServer", m_mediaServerStopAction));
+    connectElevatedAction(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStopAction()));
+
+    m_appServerStartAction = new QAction(QString(tr("Start ") + APP_SERVER_NAME), this);
+    m_actionList.append(NameAndAction("startAppServer", m_appServerStartAction));
+    connectElevatedAction(m_appServerStartAction, SIGNAL(triggered()), this, SLOT(at_appServerStartAction()));
+
+    m_appServerStopAction = new QAction(QString(tr("Stop ") + APP_SERVER_NAME), this);
+    m_actionList.append(NameAndAction("stopAppServer", m_appServerStopAction));
+    connectElevatedAction(m_appServerStopAction, SIGNAL(triggered()), this, SLOT(at_appServerStopAction()));
+
+    updateServiceInfo();
+}
+
+ QAction* QnSystrayWindow::actionByName(const QString& name)
  {
-     //minimizeAction = new QAction(tr("Mi&nimize"), this);
-     //connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
+     foreach(NameAndAction nameAction, m_actionList)
+     {
+        if (nameAction.first == name)
+            return nameAction.second;
+     }
 
-     //maximizeAction = new QAction(tr("Ma&ximize"), this);
-     //connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
+     return 0;
+ }
 
-     settingsAction = new QAction(tr("&Settings"), this);
-     connect(settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
+ QString QnSystrayWindow::nameByAction(QAction* action)
+ {
+     foreach(NameAndAction nameAction, m_actionList)
+     {
+        if (nameAction.second == action)
+            return nameAction.first;
+     }
 
-     m_showMediaServerLogAction = new QAction(tr("&Show Media server log"), this);
-     connect(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
-
-     m_showAppLogAction = new QAction(tr("&Show Application server log"), this);
-     connect(m_showAppLogAction, SIGNAL(triggered()), this, SLOT(onShowAppServerLogAction()));
-
-     quitAction = new QAction(tr("&Quit"), this);
-     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
-
-     m_mediaServerStartAction = new QAction(QString(tr("Start ") + MEDIA_SERVER_NAME), this);
-     connect(m_mediaServerStartAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStartAction()));
-
-     m_mediaServerStopAction = new QAction(QString(tr("Stop ") + MEDIA_SERVER_NAME), this);
-     connect(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStopAction()));
-
-     m_appServerStartAction = new QAction(QString(tr("Start ") + APP_SERVER_NAME), this);
-     connect(m_appServerStartAction, SIGNAL(triggered()), this, SLOT(at_appServerStartAction()));
-
-     m_appServerStopAction = new QAction(QString(tr("Stop ") + APP_SERVER_NAME), this);
-     connect(m_appServerStopAction, SIGNAL(triggered()), this, SLOT(at_appServerStopAction()));
-
-     updateServiceInfo();
+     return "";
  }
 
 void QnSystrayWindow::createTrayIcon()
 {
-     trayIconMenu = new QMenu(this);
+    trayIconMenu = new QMenu(this);
 
-     trayIconMenu->addAction(m_mediaServerStartAction);
-     trayIconMenu->addAction(m_mediaServerStopAction);
-     trayIconMenu->addAction(m_appServerStartAction);
-     trayIconMenu->addAction(m_appServerStopAction);
-     trayIconMenu->addSeparator();
+    trayIconMenu->addAction(m_mediaServerStartAction);
+    trayIconMenu->addAction(m_mediaServerStopAction);
+    trayIconMenu->addAction(m_appServerStartAction);
+    trayIconMenu->addAction(m_appServerStopAction);
+    trayIconMenu->addSeparator();
 
-     trayIconMenu->addAction(settingsAction);
-     trayIconMenu->addSeparator();
+    trayIconMenu->addAction(settingsAction);
+    trayIconMenu->addSeparator();
 
-     trayIconMenu->addAction(m_showMediaServerLogAction);
-     trayIconMenu->addAction(m_showAppLogAction);
-     trayIconMenu->addSeparator();
+    trayIconMenu->addAction(m_showMediaServerLogAction);
+    trayIconMenu->addAction(m_showAppLogAction);
+    trayIconMenu->addSeparator();
 
-     trayIconMenu->addAction(quitAction);
+    trayIconMenu->addAction(quitAction);
 
-     trayIcon = new QSystemTrayIcon(this);
-     trayIcon->setContextMenu(trayIconMenu);    
-     trayIcon->setIcon(m_iconOK);
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);    
+    trayIcon->setIcon(m_iconOK);
 }
 
 QUrl QnSystrayWindow::getAppServerURL() const

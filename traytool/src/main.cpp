@@ -20,18 +20,15 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
-    QtSingleApplication* singleApplication = new QtSingleApplication(argc, argv);
-    singleApplication->setQuitOnLastWindowClosed(false);
-
-    //singleApplication->setWindowIcon(Skin::icon(QLatin1String("appicon.png")));
-
-    if (singleApplication->isRunning()) {
-        return 0;
-    }
+    QtSingleApplication app(argc, argv);
+    QApplication::setQuitOnLastWindowClosed(false);
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     QnSystrayWindow window;
+
+    if (argc > 1)
+        window.executeAction(argv[1]);
     //window.show();
-    return singleApplication->exec();
+    return app.exec();
 }

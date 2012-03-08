@@ -4,6 +4,8 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QImage>
+#include <QSettings>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -12,6 +14,9 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <api/SessionManager.h>
+
+#include <camera/resource_display.h>
+#include <camera/camdisplay.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -172,6 +177,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::ResourceDropAction),                 SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
     connect(action(Qn::ResourceDropIntoNewLayoutAction),    SIGNAL(triggered()),    this,   SLOT(at_resourceDropIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
+    connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::deinitialize() {
@@ -237,8 +243,16 @@ void QnWorkbenchActionHandler::addToWorkbench(const QnMediaResourceList &resourc
         addToWorkbench(resource, usePosition, position);
 }
 
+QnResourceList QnWorkbenchActionHandler::addToResourcePool(const QList<QString> &files) const {
+    return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
+}
+
+QnResourceList QnWorkbenchActionHandler::addToResourcePool(const QString &file) const {
+    return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(file));
+}
+
 void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position) const {
-    addToWorkbench(QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)), usePosition, position);
+    addToWorkbench(addToResourcePool(files), usePosition, position);
 }
 
 void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts) {
@@ -877,6 +891,63 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     user->addLayout(layout);
 
     snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+}
+
+void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    if(widgets.size() != 1)
+        return;
+    QnResourceWidget *widget = widgets[0];
+    QnResourceDisplay *display = widget->display();
+    const QnVideoResourceLayout *layout = display->videoLayout();
+
+    QImage screenshot;
+    if (layout->numberOfChannels() > 0) {
+        QList<QImage> images;
+        for (int i = 0; i < layout->numberOfChannels(); ++i)
+            images.push_back(display->camDisplay()->getScreenshot(i));
+        QSize size = images[0].size();
+        screenshot = QImage(size.width() * layout->width(), size.height() * layout->height(), QImage::Format_ARGB32);
+        screenshot.fill(0);
+        
+        QPainter p(&screenshot);
+        p.setCompositionMode(QPainter::CompositionMode_Source);
+        for (int i = 0; i < layout->numberOfChannels(); ++i)
+            p.drawImage(QPoint(layout->h_position(i) * size.width(), layout->v_position(i) * size.height()), images[i]);
+    } else {
+        qnWarning("No channels in resource '%1' of type '%2'.", widget->resource()->getName(), widget->resource()->metaObject()->className());
+        return;
+    }
+
+    QString suggetion = tr("screenshot");
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("screenshots"));
+
+    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString selectedFilter;
+    QString filePath = QFileDialog::getSaveFileName(
+        this->widget(), 
+        tr("Save Video Screenshot As..."),
+        previousDir + QDir::separator() + suggetion,
+        tr("PNG Image (*.png);;JPEG Image(*.jpg)"),
+        &selectedFilter,
+        QFileDialog::DontUseNativeDialog
+    );
+    if (!filePath.isEmpty()) {
+        if (!filePath.endsWith(QLatin1String(".png"), Qt::CaseInsensitive) && !filePath.endsWith(QLatin1String(".jpg"), Qt::CaseInsensitive))
+            filePath += selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        QFile::remove(filePath);
+        if (!screenshot.save(filePath)) {
+            QMessageBox::critical(this->widget(), tr("Error"), tr("Could not save screenshot '%1'.").arg(filePath));
+        } else {
+            addToResourcePool(filePath);
+        }
+        
+        settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+    }
+
+    settings.endGroup();
 }
 
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {

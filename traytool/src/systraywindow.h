@@ -1,108 +1,138 @@
- #ifndef WINDOW_H
- #define WINDOW_H
+#ifndef WINDOW_H
+#define WINDOW_H
 
- #include <QSystemTrayIcon>
- #include <QDialog>
+#include <QSystemTrayIcon>
+#include <QDialog>
+#include <QString>
 
- class QAction;
- class QCheckBox;
- class QComboBox;
- class QGroupBox;
- class QLabel;
- class QLineEdit;
- class QMenu;
- class QPushButton;
- class QSpinBox;
- class QTextEdit;
+class QAction;
+class QCheckBox;
+class QComboBox;
+class QGroupBox;
+class QLabel;
+class QLineEdit;
+class QMenu;
+class QPushButton;
+class QSpinBox;
+class QTextEdit;
 
- namespace Ui {
-     class SettingsDialog;
- }
+namespace Ui {
+    class SettingsDialog;
+}
 
+class QnElevationChecker : public QObject
+{
+    Q_OBJECT
 
- class QnSystrayWindow : public QDialog
- {
-     Q_OBJECT
+public:
+    QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot);
 
- public:
-     QnSystrayWindow();
-     virtual ~QnSystrayWindow();
+signals:
+    void elevationCheckPassed();
 
-     void setVisible(bool visible);
+private slots:
+    void triggered();
 
- protected:
-     virtual void closeEvent(QCloseEvent *event) override;
+private:
+    QString m_actionName;
+    QObject* m_target;
+    const char* m_slot;
+};
 
- private slots:
-     void setIcon(int index);
-     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-     void showMessage();
-     void messageClicked();
+class QnSystrayWindow : public QDialog
+{
+    Q_OBJECT
 
-     void at_mediaServerStartAction();
-     void at_mediaServerStopAction();
-     void at_appServerStartAction();
-     void at_appServerStopAction();
+public:
+    QnSystrayWindow();
+    virtual ~QnSystrayWindow();
 
-     void findServiceInfo();
-     void updateServiceInfo();
+    void executeAction(QString cmd);
+    void setVisible(bool visible);
 
-     void buttonClicked(QAbstractButton * button);
-     void onSettingsAction();
-     void onShowMediaServerLogAction();
-     void onShowAppServerLogAction();
+protected:
+    virtual void closeEvent(QCloseEvent *event) override;
 
-     void onTestButtonClicked();
- private:
-     void createActions();
-     void createTrayIcon();
+private slots:
+    void setIcon(int index);
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+    void showMessage();
+    void messageClicked();
 
-     int updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
-     bool validateData();
-     void saveData();
-     bool checkPort(const QString& text, const QString& message);
-     QUrl getAppServerURL() const;
-     void setAppServerURL(const QUrl& url);
-     bool isAppServerParamChanged() const;
-     bool isMediaServerParamChanged() const;
+    void at_mediaServerStartAction();
+    void at_mediaServerStopAction();
+    void at_appServerStartAction();
+    void at_appServerStopAction();
 
-     QScopedPointer<Ui::SettingsDialog> ui;
+    void findServiceInfo();
+    void updateServiceInfo();
 
-     QSettings m_settings;
-     QSettings m_mServerSettings;
-     QSettings m_appServerSettings;
+    void buttonClicked(QAbstractButton * button);
+    void onSettingsAction();
+    void onShowMediaServerLogAction();
+    void onShowAppServerLogAction();
 
-     QAction *m_showMediaServerLogAction;
-     QAction *m_showAppLogAction;
-     QAction *settingsAction;
-     QAction *quitAction;
+    void onTestButtonClicked();
+private:
+    QAction* actionByName(const QString& name);
+    QString nameByAction(QAction* action);
 
-     QSystemTrayIcon *trayIcon;
-     QMenu *trayIconMenu;
+    void connectElevatedAction(QAction* source, const char* signal, QObject* target, const char* slot);
 
-     QString m_detailedErrorText;
-     QIcon m_iconOK;
-     QIcon m_iconBad;
+    void createActions();
+    void createTrayIcon();
 
-     SC_HANDLE m_scManager;
-     SC_HANDLE m_mediaServerHandle;
-     SC_HANDLE m_appServerHandle;
-     
-     QAction* m_mediaServerStartAction;
-     QAction* m_mediaServerStopAction;
-     QAction* m_appServerStartAction;
-     QAction* m_appServerStopAction;
-     bool m_firstTimeToolTipError;
-     QTimer m_findServices;
-     QTimer m_updateServiceStatus;
+    int updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
+    bool validateData();
+    void saveData();
+    bool checkPort(const QString& text, const QString& message);
+    QUrl getAppServerURL() const;
+    void setAppServerURL(const QUrl& url);
+    bool isAppServerParamChanged() const;
+    bool isMediaServerParamChanged() const;
 
-     bool m_needStartMediaServer;
-     bool m_needStartAppServer;
-     bool m_waitingMediaServerStopping;
-     bool m_waitingAppServerStopping;
-     bool m_waitingMediaServerStarted;
-     bool m_waitingAppServerStarted;
-     int m_skipTicks;
- };
+    QScopedPointer<Ui::SettingsDialog> ui;
 
- #endif
+    QSettings m_settings;
+    QSettings m_mServerSettings;
+    QSettings m_appServerSettings;
+
+    QAction *m_showMediaServerLogAction;
+    QAction *m_showAppLogAction;
+    QAction *settingsAction;
+    QAction *quitAction;
+
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayIconMenu;
+
+    QString m_detailedErrorText;
+    QIcon m_iconOK;
+    QIcon m_iconBad;
+
+    SC_HANDLE m_scManager;
+    SC_HANDLE m_mediaServerHandle;
+    SC_HANDLE m_appServerHandle;
+    
+    QAction* m_mediaServerStartAction;
+    QAction* m_mediaServerStopAction;
+    QAction* m_appServerStartAction;
+    QAction* m_appServerStopAction;
+    bool m_firstTimeToolTipError;
+    QTimer m_findServices;
+    QTimer m_updateServiceStatus;
+
+    bool m_needStartMediaServer;
+    bool m_needStartAppServer;
+    bool m_waitingMediaServerStopping;
+    bool m_waitingAppServerStopping;
+    bool m_waitingMediaServerStarted;
+    bool m_waitingAppServerStarted;
+    int m_skipTicks;
+
+    typedef QPair<QString, QAction*> NameAndAction;
+    typedef QList<NameAndAction> NameActionList;
+
+    NameActionList m_actionList;
+};
+
+#endif
