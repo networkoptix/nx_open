@@ -64,9 +64,6 @@ CONFIG(release, debug|release) {
 win32: RC_FILE = traytool.rc
 
 win32 {
-    QMAKE_CXXFLAGS += -Zc:wchar_t
-    QMAKE_CXXFLAGS -= -Zc:wchar_t-
-
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
     !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
