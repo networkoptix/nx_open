@@ -195,6 +195,10 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
             }
         }
     }
+    else if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never) 
+    {
+        updateRecordingType(QnScheduleTask());
+    }
 }
 
 bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)

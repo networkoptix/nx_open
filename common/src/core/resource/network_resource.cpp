@@ -5,6 +5,7 @@
 #include "utils/network/ping.h"
 #include "../dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
+#include "utils/common/longrunnable.h"
 
 Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
@@ -211,14 +212,18 @@ void QnNetworkResource::updateInner(QnResourcePtr other)
     }
 }
 
-bool QnNetworkResource::hasLiveProvider() const
+bool QnNetworkResource::hasRunningLiveProvider() const
 {
     QMutexLocker locker(&m_consumersMtx);
     foreach(QnResourceConsumer* consumer, m_consumers)
     {
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
         if (lp)
-            return true;
+        {
+            CLLongRunnable* lr = dynamic_cast<CLLongRunnable*>(lp);
+            if (lr && lr->isRunning())
+                return true;
+        }
     }
 
 
