@@ -346,6 +346,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_fullTimePeriodHandle = 0;
     m_timePeriodUpdateTime = 0;
     m_forceTimePeriodLoading = false;
+    m_timePeriodLoadErrors = 0;
 }
 
 NavigationItem::~NavigationItem()
@@ -702,13 +703,30 @@ void NavigationItem::onMotionPeriodLoadFailed(int status, int handle)
 
 void NavigationItem::onTimePeriodLoadFailed(int status, int handle)
 {
-
+    if (handle == m_fullTimePeriodHandle)
+    {
+        m_timePeriodLoadErrors++;
+        if (m_timePeriodLoadErrors < 2)
+            m_timePeriodUpdateTime = 0;
+        else if (m_timePeriodLoadErrors == 2)
+        {
+            QnTimePeriodList periods = m_timeSlider->fullRecTimePeriodList();
+            if (!periods.isEmpty() && periods.last().durationMs == -1)
+            {
+                qint64 diff = qnSyncTime->currentMSecsSinceEpoch() - periods.last().startTimeMs;
+                periods.last().durationMs = qMax(0ll, diff);
+                m_timeSlider->setRecTimePeriodList(periods);
+            }
+        }
+    }
 }
 
 void NavigationItem::onTimePeriodLoaded(const QnTimePeriodList& timePeriods, int handle)
 {
-    if (handle == m_fullTimePeriodHandle)
+    if (handle == m_fullTimePeriodHandle) {
+        m_timePeriodLoadErrors = 0;
         m_timeSlider->setRecTimePeriodList(timePeriods);
+    }
 }
 
 CLVideoCamera* NavigationItem::findCameraByResource(QnResourcePtr resource)
