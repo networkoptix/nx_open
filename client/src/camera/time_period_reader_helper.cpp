@@ -72,13 +72,12 @@ void QnTimePeriodReaderHelper::onDataLoaded(const QnTimePeriodList& periods, int
                     result = QnTimePeriod::mergeTimePeriods(m_multiLoadPeriod[multiHandle]);
                     m_multiLoadPeriod.remove(multiHandle);
                     m_multiLoadProgress.erase(itr);
+                    emit ready(result, multiHandle);
                 }
                 break;
             }
         }
     }
-    if (!result.isEmpty())
-        emit ready(result, multiHandle);
 }
 
 void QnTimePeriodReaderHelper::onLoadingFailed(int status, int handle)
