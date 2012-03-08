@@ -84,11 +84,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_aboutToBeDestroyedEmitted(false),
     m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
     m_motionMaskValid(false),
-    m_motionMaskBinDataValid(false),
-    m_noDataStaticText("No data"),
-    m_offlineStaticText("Offline"),
-    m_unauthorizedStaticText("Unauthorized"),
-    m_unauthorizedStaticText2("Please check authentication information in the camera settings")
+    m_motionMaskBinDataValid(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -106,12 +102,12 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     /* Set up buttons layout. */
     m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_buttonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the item to be placed in right end of the layout. */
+    m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the buttons to be placed in right end of the layout. */
 
     m_buttonsWidget = new QGraphicsWidget(this);
     m_buttonsWidget->setLayout(m_buttonsLayout);
     m_buttonsWidget->setAcceptedMouseButtons(0);
-    m_buttonsWidget->setOpacity(0.0); /* Transparent by default. */
+    m_buttonsWidget->setOpacity(0.0); /* Buttons are transparent by default. */
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -140,9 +136,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_display->addRenderer(m_renderer);
 
     /* Init static text. */
+    m_noDataStaticText.setText(tr("No data"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_offlineStaticText.setText(tr("Offline"));
     m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_unauthorizedStaticText.setText(tr("Unauthorized"));
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_unauthorizedStaticText2.setText(tr("Please check authentication information in the camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     
     /* Set up overlay icons. */
@@ -679,10 +679,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     for(int i = 0; i < m_channelCount; i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
-        QnRenderStatus::RenderStatus status = m_renderer->paint(i, rect, effectiveOpacity());
+        m_renderStatus = m_renderer->paint(i, rect, effectiveOpacity());
 
         /* Draw black rectangle if nothing was drawn. */
-        if(status != QnRenderStatus::RENDERED_OLD_FRAME && status != QnRenderStatus::RENDERED_NEW_FRAME) {
+        if(m_renderStatus != Qn::OldFrameRendered && m_renderStatus != Qn::NewFrameRendered) {
             glColor4f(0.0, 0.0, 0.0, effectiveOpacity());
             glBegin(GL_QUADS);
             glVertices(rect);
@@ -690,7 +690,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         }
 
         /* Update channel state. */
-        if(status == QnRenderStatus::RENDERED_NEW_FRAME)
+        if(m_renderStatus == Qn::NewFrameRendered)
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
 
         /* Set overlay icon. */
@@ -704,7 +704,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             setOverlayIcon(i, UNAUTHORIZED);
         } else if (m_display->camDisplay()->isNoData()) {
             setOverlayIcon(i, NO_DATA); 
-        } else if(status != QnRenderStatus::RENDERED_NEW_FRAME && (status != QnRenderStatus::RENDERED_OLD_FRAME || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
+        } else if(m_renderStatus != Qn::NewFrameRendered && (m_renderStatus != Qn::OldFrameRendered || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
             setOverlayIcon(i, LOADING);
         } else {
             setOverlayIcon(i, NO_ICON);
@@ -722,11 +722,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     for(int i = 0; i < m_channelCount; i++) 
     {
-        if (m_channelState[i].icon == NO_DATA) 
+        if (m_channelState[i].icon == NO_DATA) {
             drawFlashingText(painter, m_noDataStaticText);
-        else if (m_channelState[i].icon == OFFLINE) 
+        } else if (m_channelState[i].icon == OFFLINE) {
             drawFlashingText(painter, m_offlineStaticText);
-        else if (m_channelState[i].icon == UNAUTHORIZED) {
+        } else if (m_channelState[i].icon == UNAUTHORIZED) {
             drawFlashingText(painter, m_unauthorizedStaticText);
             drawFlashingText(painter, m_unauthorizedStaticText2, 250, 16, 800);
         }

@@ -727,7 +727,7 @@ CLVideoDecoderOutput *QnGLRenderer::update()
     return m_curImg;
 }
 
-QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
+Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
 {
     ensureGlInitialized();
 
@@ -738,20 +738,20 @@ QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    RenderStatus result;
+    Qn::RenderStatus result;
 
     CLVideoDecoderOutput *curImg = update();
     if(m_newtexture) {
-        result = RENDERED_NEW_FRAME;
+        result = Qn::NewFrameRendered;
     } else {
-        result = RENDERED_OLD_FRAME;
+        result = Qn::OldFrameRendered;
     }
     m_newtexture = false;
 
     bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
     if(!draw) 
     {
-        result = CANNOT_RENDER;
+        result = Qn::CannotRender;
     } 
     else if(m_videoWidth > 0 && m_videoHeight > 0)
     {
@@ -761,7 +761,7 @@ QnGLRenderer::RenderStatus QnGLRenderer::paint(const QRectF &r)
     }
     else
     {
-        result = NOTHING_RENDERED;
+        result = Qn::NothingRendered;
     }
 
     QMutexLocker locker(&m_displaySync);
