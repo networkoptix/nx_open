@@ -300,8 +300,11 @@ QItemSelectionModel *QnResourceTreeWidget::currentSelectionModel() const {
 QnResourceList QnResourceTreeWidget::selectedResources() const {
     QnResourceList result;
 
-    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows())
-        result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if(resource)
+            result.append(resource);
+    }
 
     return result;
 }

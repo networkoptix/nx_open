@@ -58,8 +58,10 @@ PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *paren
     videoRecorderWidget = new RecordingSettingsWidget(this);
     tabWidget->insertTab(2, videoRecorderWidget, tr("Screen Recorder"));
 
+#if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
     tabWidget->insertTab(3, youTubeSettingsWidget, tr("YouTube"));
+#endif
 
 #ifndef CL_TRIAL_MODE
     licenseManagerWidget = new LicenseManagerWidget(this);
@@ -111,7 +113,7 @@ void PreferencesDialog::accept()
     if (videoRecorderWidget)
         videoRecorderWidget->accept();
 
-    youTubeSettingsWidget->accept();
+    //youTubeSettingsWidget->accept();
 
     QDialog::accept();
 }

@@ -1327,6 +1327,11 @@ const QnTimePeriodList& TimeSlider::recTimePeriodList(int msInPixel)
     return m_agregatedRecTimePeriodList;
 }
 
+const QnTimePeriodList& TimeSlider::fullMotionTimePeriodList()
+{
+    return m_motionTimePeriodList;
+}
+
 const QnTimePeriodList& TimeSlider::motionTimePeriodList(int msInPixel)
 {
     if (m_aggregatedMsInPixel != msInPixel)
