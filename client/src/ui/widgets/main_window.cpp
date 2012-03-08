@@ -92,7 +92,7 @@ namespace {
 } // anonymous namespace
 
 
-QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
+QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags | Qt::CustomizeWindowHint),
       m_controller(0),
       m_drawCustomFrame(false),
@@ -249,10 +249,6 @@ QnMainWindow::QnMainWindow(int argc, char* argv[], QWidget *parent, Qt::WindowFl
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
     setLayout(m_globalLayout);
-
-    /* Process input files. */
-    for (int i = 1; i < argc; ++i)
-        handleMessage(QFile::decodeName(argv[i]));
 
     /* Update state. */
     updateDwmState();

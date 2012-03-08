@@ -38,12 +38,8 @@ namespace {
 // Node
 // -------------------------------------------------------------------------- //
 class QnResourceModel::Node {
+    Q_DECLARE_TR_FUNCTIONS(Node);
 public:
-    enum Type {
-        Resource,   /**< Node that represents a resource. */
-        Item,       /**< Node that represents a layout item. */
-    };
-
     enum State {
         Normal,     /**< Normal node. */
         Invalid     /**< Invalid node that should not be displayed. 
@@ -52,11 +48,43 @@ public:
     };
 
     /**
+     * Constructor for toplevel nodes. 
+     */
+    Node(QnResourceModel *model, Qn::NodeType type):
+        m_model(model),
+        m_type(type),
+        m_state(Invalid),
+        m_bastard(false),
+        m_parent(NULL),
+        m_status(QnResource::Online),
+        m_modified(false)
+    {
+        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode);
+
+        switch(type) {
+        case Qn::LocalNode:
+            m_name = tr("Local");
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
+            break;
+        case Qn::ServersNode:
+            m_name = tr("Servers");
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Server);
+            break;
+        case Qn::UsersNode:
+            m_name = tr("Users");
+            m_icon = qnResIconCache->icon(QnResourceIconCache::User);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
      * Constructor for resource nodes. 
      */
     Node(QnResourceModel *model, const QnResourcePtr &resource): 
         m_model(model),
-        m_type(Resource),
+        m_type(Qn::ResourceNode),
         m_state(Invalid),
         m_bastard(false),
         m_parent(NULL),
@@ -73,7 +101,7 @@ public:
      */
     Node(QnResourceModel *model, const QUuid &uuid):
         m_model(model),
-        m_type(Item),
+        m_type(Qn::ItemNode),
         m_uuid(uuid),
         m_state(Invalid),
         m_bastard(false),
@@ -93,25 +121,31 @@ public:
 
     void clear() {
         setParent(NULL);
-        setResource(QnResourcePtr());
+
+        if(m_type == Qn::ItemNode || m_type == Qn::ResourceNode)
+            setResource(QnResourcePtr());
     }
 
     void setResource(const QnResourcePtr &resource) {
+        assert(m_type == Qn::ItemNode || m_type == Qn::ResourceNode);
+
         if(m_resource == resource)
             return;
 
-        if(m_resource && m_type == Item)
+        if(m_resource && m_type == Qn::ItemNode)
             m_model->m_itemNodesByResource[m_resource.data()].removeOne(this);
 
         m_resource = resource;
 
-        if(m_resource && m_type == Item)
+        if(m_resource && m_type == Qn::ItemNode)
             m_model->m_itemNodesByResource[m_resource.data()].push_back(this);
         
         update();
     }
 
     void update() {
+        assert(m_type == Qn::ItemNode || m_type == Qn::ResourceNode);
+
         if(m_resource.isNull()) {
             m_name = QString();
             m_flags = 0;
@@ -129,7 +163,7 @@ public:
         changeInternal();
     }
 
-    Type type() const {
+    Qn::NodeType type() const {
         return m_type;
     }
 
@@ -234,8 +268,8 @@ public:
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         
         switch(m_type) {
-        case Resource:
-        case Item:
+        case Qn::ResourceNode:
+        case Qn::ItemNode:
             if(m_flags & QnResource::layout)
                 result |= Qt::ItemIsEditable; /* Only layouts are currently editable - user can change layout's name. */
             if(m_flags & (QnResource::media | QnResource::layout))
@@ -272,13 +306,15 @@ public:
                 return static_cast<int>(m_flags);
             break;
         case Qn::UuidRole:
-            if(m_type == Item)
+            if(m_type == Qn::ItemNode)
                 return QVariant::fromValue<QUuid>(m_uuid);
             break;
         case Qn::SearchStringRole: 
             return m_searchString;
         case Qn::StatusRole: 
             return static_cast<int>(m_status);
+        case Qn::NodeTypeRole:
+            return static_cast<int>(m_type);
         default:
             break;
         }
@@ -359,7 +395,7 @@ private:
     QnResourceModel *const m_model;
 
     /** Type of this node. */
-    const Type m_type;
+    const Qn::NodeType m_type;
 
     /** Uuid that this node represents. */
     const QUuid m_uuid;
@@ -418,11 +454,22 @@ QnResourceModel::QnResourceModel(QObject *parent):
     roles.insert(Qn::UuidRole,          "uuid");
     roles.insert(Qn::SearchStringRole,  "searchString");
     roles.insert(Qn::StatusRole,        "status");
+    roles.insert(Qn::NodeTypeRole,      "nodeType");
     setRoleNames(roles);
 
     /* Create root. */
     m_root = this->node(QnResourcePtr());
     m_root->setState(Node::Normal);
+
+    /* Create top-level nodes. */
+    m_localNode = new Node(this, Qn::LocalNode);
+    m_localNode->setParent(m_root);
+
+    m_usersNode = new Node(this, Qn::UsersNode);
+    m_usersNode->setParent(m_root);
+
+    m_serversNode = new Node(this, Qn::ServersNode);
+    m_serversNode->setParent(m_root);
 }
 
 QnResourceModel::~QnResourceModel() {
@@ -430,6 +477,10 @@ QnResourceModel::~QnResourceModel() {
     
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
+
+    delete m_localNode;
+    delete m_serversNode;
+    delete m_usersNode;
 }
 
 void QnResourceModel::setContext(QnWorkbenchContext *context) {
@@ -506,6 +557,31 @@ QnResourceModel::Node *QnResourceModel::node(const QModelIndex &index) const {
         return m_root;
 
     return static_cast<Node *>(index.internalPointer());
+}
+
+QnResourceModel::Node *QnResourceModel::expectedParent(Node *node) {
+    assert(node->type() == Qn::ResourceNode);
+
+    if(!node->resource())
+        return m_root;
+
+    if(node->resourceFlags() & QnResource::user)
+        return m_usersNode;
+
+    if(node->resourceFlags() & QnResource::server)
+        return m_serversNode;
+
+    if((node->resourceFlags() & QnResource::local_media) == QnResource::local_media)
+        return m_localNode;
+
+    return this->node(resourcePool()->getResourceById(node->resource()->getParentId()));
+}
+
+bool QnResourceModel::isIgnored(const QnResourcePtr &resource) const {
+    if((resource->flags() & QnResource::local_server) == QnResource::local_server)
+        return true; /* Local server resource is ignored. */
+
+    return false;
 }
 
 
@@ -593,7 +669,7 @@ QMimeData *QnResourceModel::mimeData(const QModelIndexList &indexes) const {
                 if(node && node->resource())
                     resources.append(node->resource());
 
-                if(node && node->type() == Node::Item)
+                if(node && node->type() == Qn::ItemNode)
                     pureTreeResourcesOnly = false;
             }
 
@@ -625,7 +701,7 @@ bool QnResourceModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction act
     /* Check where we're dropping it. */
     Node *node = this->node(parent);
     
-    if(node->type() == Node::Item)
+    if(node->type() == Qn::ItemNode)
         node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
 
     if(node->parent() && (node->parent()->resourceFlags() & QnResource::server))
@@ -690,6 +766,9 @@ Qt::DropActions QnResourceModel::supportedDropActions() const {
 void QnResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     assert(resource && resource->getId().isValid());
 
+    if(isIgnored(resource))
+        return;
+
     connect(resource.data(), SIGNAL(parentIdChanged()),                                     this, SLOT(at_resource_parentIdChanged()));
     connect(resource.data(), SIGNAL(nameChanged()),                                         this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_resource_resourceChanged()));
@@ -713,6 +792,9 @@ void QnResourceModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
 }
 
 void QnResourceModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
+    if(isIgnored(resource))
+        return;
+
     disconnect(resource.data(), NULL, this, NULL);
 
     Node *node = this->node(resource);
@@ -733,9 +815,8 @@ void QnResourceModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr 
 
 void QnResourceModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
     Node *node = this->node(resource);
-    Node *parentNode = this->node(resourcePool()->getResourceById(resource->getParentId()));
 
-    node->setParent(parentNode);
+    node->setParent(expectedParent(node));
 }
 
 void QnResourceModel::at_resource_parentIdChanged() {

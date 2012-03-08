@@ -33,13 +33,20 @@ class QnMainWindow : public QWidget
     typedef QWidget base_type;
 
 public:
-    QnMainWindow(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
+    QnMainWindow(QWidget *parent = 0, Qt::WFlags flags = 0);
 
     virtual ~QnMainWindow();
 
     bool isTitleVisible() const {
         return m_titleVisible;
     }
+
+    QnWorkbenchContext *context() const {
+        return m_context;
+    }
+
+public slots:
+    void handleMessage(const QString &message);
 
 protected:
     virtual bool event(QEvent *event) override;
@@ -68,8 +75,6 @@ protected slots:
 
     void toggleFullScreen();
     void toggleTitleVisibility();
-
-    void handleMessage(const QString &message);
 
     void updateFullScreenState();
     void updateDwmState();
