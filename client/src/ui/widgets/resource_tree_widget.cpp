@@ -20,7 +20,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/models/resource_model.h>
+#include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/style/skin.h>
@@ -138,7 +138,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->clearFilterButton->setIcon(Skin::icon(QLatin1String("clear.png")));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourceModel(this);
+    m_resourceModel = new QnResourcePoolModel(this);
     QSortFilterProxyModel *model = new QSortFilterProxyModel(this);
     model->setSourceModel(m_resourceModel);
     model->setSupportedDragActions(m_resourceModel->supportedDragActions());
@@ -163,6 +163,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     connect(ui->resourceTreeView,   SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
     connect(ui->searchTreeView,     SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
+    connect(ui->resourceTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
     updateFilter();
 }
@@ -488,6 +489,10 @@ void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
 
         ui->searchTreeView->setModel(model);
         ui->searchTreeView->expandAll();
+
+        /* View re-creates selection model for each model that is supplied to it, 
+         * so we have to re-connect each time the model changes. */
+        connect(ui->searchTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()), Qt::UniqueConnection);
     }
 
     emit currentTabChanged();

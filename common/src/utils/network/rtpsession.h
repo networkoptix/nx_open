@@ -92,6 +92,8 @@ public:
     void removeAdditionAttribute(const QByteArray& name);
 
     void setTCPTimeout(int timeout);
+
+    void parseRangeHeader(const QString& rangeStr);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -113,7 +115,6 @@ private:
 
     void parseSDP();
     int buildRTCPReport(quint8 *dstBuffer, const RtspStatistic *stats);
-    void parseRangeHeader(const QString& rangeStr);
     void addAdditionAttrs(QByteArray& request);
 
 private:

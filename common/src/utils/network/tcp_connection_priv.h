@@ -51,6 +51,7 @@ public:
       QByteArray requestBody;
       QByteArray responseBody;
       QByteArray clientRequest;
+      QByteArray receiveBuffer;
       QMutex sockMutex;
       quint8* tcpReadBuffer;
       QnTcpListener* owner;

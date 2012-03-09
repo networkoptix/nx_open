@@ -3,7 +3,7 @@
 #include "ui_layout_name_dialog.h"
 
 QnLayoutNameDialog::QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent):
-    QDialog(parent)
+    QnButtonBoxDialog(parent)
 {
     init(buttons);
 
@@ -13,21 +13,20 @@ QnLayoutNameDialog::QnLayoutNameDialog(const QString &caption, const QString &te
 }
 
 QnLayoutNameDialog::QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons, QWidget *parent):
-    QDialog(parent)
+    QnButtonBoxDialog(parent)
 {
     init(buttons);
 }
 
 void QnLayoutNameDialog::init(QDialogButtonBox::StandardButtons buttons) {
     ui.reset(new Ui::LayoutNameDialog());
-    m_clickedButton = QDialogButtonBox::Cancel;
 
     ui->setupUi(this);
 
     ui->buttonBox->setStandardButtons(buttons);
+    setButtonBox(ui->buttonBox);
 
     connect(ui->nameLineEdit,   SIGNAL(textChanged(const QString &)),   this,   SLOT(at_nameLineEdit_textChanged(const QString &)));
-    connect(ui->buttonBox,      SIGNAL(clicked(QAbstractButton *)),     this,   SLOT(at_buttonBox_clicked(QAbstractButton *)));
     at_nameLineEdit_textChanged(ui->nameLineEdit->text());
 }
 
@@ -58,8 +57,4 @@ void QnLayoutNameDialog::at_nameLineEdit_textChanged(const QString &text) {
         if(role == QDialogButtonBox::AcceptRole || role == QDialogButtonBox::YesRole || role == QDialogButtonBox::ApplyRole)
             button->setEnabled(!text.isEmpty());
     }
-}
-
-void QnLayoutNameDialog::at_buttonBox_clicked(QAbstractButton *button) {
-    m_clickedButton = ui->buttonBox->standardButton(button);
 }

@@ -180,6 +180,9 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         else if (format == QLatin1String("ffmpeg")) {
             result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize));
         }
+        else if (format == QLatin1String("ffmpeg-metadata")) {
+            processMetadata(data, blockSize);
+        }
         else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
 
@@ -295,6 +298,15 @@ QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
     // todo: implement me
     static QnEmptyAudioLayout emptyAudioLayout;
     return &emptyAudioLayout;
+}
+
+void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSize)
+{
+    RtpHeader* rtpHeader = (RtpHeader*) data;
+    const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
+    QByteArray ba((const char*)payload, data + dataSize - payload);
+    if (ba.startsWith("npt="))
+        m_rtspSession.parseRangeHeader(ba);
 }
 
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize)

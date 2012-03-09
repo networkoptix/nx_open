@@ -20,16 +20,18 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
+#include <ui/actions/action_target_types.h>
+#include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/tags_edit_dialog.h>
 #include <ui/dialogs/server_settings_dialog.h>
-#include <ui/dialogs/camera_settings_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/dialogs/multiple_camera_settings_dialog.h>
+#include <ui/dialogs/camera_settings_dialog.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/new_user_dialog.h>
+#include <ui/dialogs/resource_list_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
@@ -44,33 +46,6 @@
 #include "workbench_item.h"
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
-
-namespace {
-    enum RemovedResourceType {
-        Layout,
-        User,
-        Server,
-        Camera,
-        Other,
-        Count
-    };
-
-    RemovedResourceType removedResourceType(const QnResourcePtr &resource) {
-        if(resource->checkFlags(QnResource::layout)) {
-            return Layout;
-        } else if(resource->checkFlags(QnResource::user)) {
-            return User;
-        } else if(resource->checkFlags(QnResource::server)) {
-            return Server;
-        } else if(resource->checkFlags(QnResource::live_cam)) {
-            return Camera;
-        } else {
-            qnWarning("Getting removal type for an unrecognized resource '%1' of type '%2'", resource->getName(), resource->metaObject()->className());
-            return Other;
-        }
-    }
-
-} // anonymous namespace
 
 detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldStatuses):
     m_handler(handler),
@@ -91,7 +66,9 @@ void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
     m_context(NULL),
-    m_connection(QnAppServerConnectionFactory::createConnection())
+    m_connection(QnAppServerConnectionFactory::createConnection()),
+    m_selectionUpdatePending(false),
+    m_selectionScope(Qn::SceneScope)
 {}
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -163,7 +140,8 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::CloseLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(action(Qn::CloseAllButThisLayoutAction),        SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
     connect(action(Qn::CameraSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(action(Qn::MultipleCameraSettingsAction),       SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
+    connect(action(Qn::OpenInCameraSettingsDialogAction),   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::SelectionChangeAction),              SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
     connect(action(Qn::ServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::EditTagsAction),                     SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
@@ -188,6 +166,19 @@ void QnWorkbenchActionHandler::deinitialize() {
 
     foreach(QAction *action, menu()->actions())
         disconnect(action, NULL, this, NULL);
+}
+
+const QnAppServerConnectionPtr &QnWorkbenchActionHandler::connection() const {
+    return m_connection;
+}
+
+QWidget *QnWorkbenchActionHandler::widget() const {
+    /* Camera settings dialog stays on top. In order for it not to hide
+     * modal dialogs, it must be used as parent for such dialogs. */
+    if(m_cameraSettingsDialog && m_cameraSettingsDialog->isVisible())
+        return m_cameraSettingsDialog.data();
+
+    return m_widget.data();
 }
 
 QString QnWorkbenchActionHandler::newLayoutName() const {
@@ -273,7 +264,7 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
     bool closeAll = true;
     bool saveAll = false;
     if(needToAsk) {
-        int button;
+        QDialogButtonBox::StandardButton button;
         QString name;
         if(changedResources.size() == 1) {
             QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
@@ -284,19 +275,20 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
             button = dialog->clickedButton();
             name = dialog->name();
         } else {
-            QString message;
-            foreach(const QnLayoutResourcePtr &resource, changedResources)
-                message += tr("Layout '%1'.\n").arg(resource->getName());
-            message = tr("The following %n layouts are not saved. Do you want to save them?\n\n%1", NULL, changedResources.size()).arg(message);
-
-            button = QMessageBox::question(widget(), tr("Close Layouts"), message, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            button = QnResourceListDialog::exec(
+                widget(),
+                QnResourceList(changedResources),
+                tr("Close Layouts"),
+                tr("The following %n layouts are not saved. Do you want to save them?", NULL, changedResources.size()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+            );
         }
 
 
-        if(button == QMessageBox::Cancel) {
+        if(button == QDialogButtonBox::Cancel) {
             closeAll = false;
             saveAll = false;
-        } else if(button == QMessageBox::No) {
+        } else if(button == QDialogButtonBox::No) {
             closeAll = true;
             saveAll = false;
         } else {
@@ -325,6 +317,55 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
                 resourcePool()->removeResource(layout->resource());
         }
     }
+}
+
+void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
+    if(!m_cameraSettingsDialog)
+        return;
+
+    if(!m_cameraSettingsDialog->widget()->hasChanges())
+        return;
+
+    QnVirtualCameraResourceList cameras = m_cameraSettingsDialog->widget()->cameras();
+    if(cameras.empty())
+        return;
+
+    /* Limit the number of active cameras. */
+    int activeCameras = resourcePool()->activeCameras() + m_cameraSettingsDialog->widget()->activeCameraCount();
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras)
+        if (!camera->isScheduleDisabled())
+            activeCameras--;
+
+    if (activeCameras > qnLicensePool->getLicenses().totalCameras()) {
+        QString message = tr("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.").arg(activeCameras).arg(qnLicensePool->getLicenses().totalCameras());
+        QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
+        m_cameraSettingsDialog->widget()->setCamerasActive(false);
+    }
+
+    /* Submit and save it. */
+    m_cameraSettingsDialog->widget()->submitToResources();
+    connection()->saveAsync(cameras, this, SLOT(at_cameras_saved(int, const QByteArray &, const QnResourceList &, int)));
+}
+
+void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
+    if(!m_cameraSettingsDialog || m_cameraSettingsDialog->isHidden() || !m_selectionUpdatePending)
+        return;
+
+    m_selectionUpdatePending = false;
+
+    QnActionTargetProvider *provider = menu()->targetProvider();
+    if(!provider)
+        return;
+
+    Qn::ActionScope scope = provider->currentScope();
+    if(scope != Qn::SceneScope && scope != Qn::TreeScope) {
+        scope = m_selectionScope;
+    } else {
+        m_selectionScope = scope;
+    }
+
+    QnResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(QnActionTargetTypes::resources(provider->currentTarget(scope)));
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, cameras);
 }
 
 
@@ -544,7 +585,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldStatuses);
-        m_connection->setResourcesStatusAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
+        connection()->setResourcesStatusAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
     }
 }
 
@@ -671,28 +712,53 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
-    if(resource.isNull())
-        return;
+    QnVirtualCameraResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(menu()->currentResourcesTarget(sender()).toSet().toList());
 
-    QScopedPointer<CameraSettingsDialog> dialog(new CameraSettingsDialog(resource.dynamicCast<QnVirtualCameraResource>(), widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    if(!m_cameraSettingsDialog) {
+        m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget(), Qt::WindowStaysOnTopHint));
+
+        connect(m_cameraSettingsDialog.data(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+    }
+
+    if(m_cameraSettingsDialog->widget()->cameras() != cameras) {
+        if(m_cameraSettingsDialog->widget()->hasChanges()) {
+            QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+                widget(), 
+                QnResourceList(m_cameraSettingsDialog->widget()->cameras()),
+                tr("Cameras Not Saved"), 
+                tr("Save changes to the following %n camera(s)?", NULL, m_cameraSettingsDialog->widget()->cameras().size()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No
+            );
+            if(button == QDialogButtonBox::Yes)
+                saveCameraSettingsFromDialog();
+        }
+
+        m_cameraSettingsDialog->widget()->setCameras(cameras);
+    }
+
+    m_cameraSettingsDialog->show();
 }
 
-void QnWorkbenchActionHandler::at_multipleCamerasSettingsAction_triggered() {
-    QnVirtualCameraResourceList cameras;
-    foreach(QnResourcePtr resource, menu()->currentResourcesTarget(sender())) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camera)
-            cameras.append(camera);
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
+    switch(button) {
+    case QDialogButtonBox::Ok:
+    case QDialogButtonBox::Apply:
+        saveCameraSettingsFromDialog();
+        break;
+    case QDialogButtonBox::Cancel:
+        m_cameraSettingsDialog->widget()->updateFromResources();
+        break;
+    default:
+        break;
     }
-    if(cameras.empty())
+}
+
+void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
+    if(!m_cameraSettingsDialog || m_cameraSettingsDialog->isHidden() || m_selectionUpdatePending)
         return;
 
-    QScopedPointer<MultipleCameraSettingsDialog> dialog(new MultipleCameraSettingsDialog(widget(), cameras));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    m_selectionUpdatePending = true;
+    QTimer::singleShot(50, this, SLOT(updateCameraSettingsFromSelection()));
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
@@ -726,8 +792,14 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
 void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
     QSet<QnResourcePtr> resources = menu()->currentResourcesTarget(sender()).toSet();
 
-    QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Delete Files"), tr("Are you sure you want to permanently delete these %n file(s)?", 0, resources.size()), QMessageBox::Yes | QMessageBox::No);
-    if(button != QMessageBox::Yes)
+    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+        widget(), 
+        resources.toList(),
+        tr("Delete Files"), 
+        tr("Are you sure you want to permanently delete these %n file(s)?", 0, resources.size()), 
+        QDialogButtonBox::Yes | QDialogButtonBox::Cancel
+    );
+    if(button != QDialogButtonBox::Yes)
         return;
     
     QnFileProcessor::deleteLocalResources(resources.toList());
@@ -737,7 +809,13 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     QnLayoutItemIndexList items = menu()->currentLayoutItemsTarget(sender());
 
     if(items.size() > 1) {
-        QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Remove Items"), tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()), QMessageBox::Yes | QMessageBox::No);
+        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+            widget(),
+            QnActionTargetTypes::resources(items),
+            tr("Remove Items"),
+            tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()),
+            QDialogButtonBox::Yes | QDialogButtonBox::No
+        );
         if(button != QMessageBox::Yes)
             return;
     }
@@ -801,34 +879,13 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     /* Ask if needed. */
     if(!okToDelete) {
-        QString message;
-
-        if(resources.size() == 1) {
-            switch(removedResourceType(resources[0])) {
-            case Layout:    message = tr("Do you really want to delete layout '%1'?");      break;
-            case User:      message = tr("Do you really want to delete user '%1'?");        break;
-            case Server:    message = tr("Do you really want to delete server '%1'?");      break;
-            case Camera:    message = tr("Do you really want to delete camera '%1'?");      break;
-            default:        message = tr("Do you really want to delete resource '%1'?");    break;
-            }
-            message = message.arg(resources[0]->getName());
-        } else {
-            foreach(const QnResourcePtr &resource, resources) {
-                QString subMessage;
-                switch(removedResourceType(resource)) {
-                case Layout:    subMessage = tr("Layout '%1'");      break;
-                case User:      subMessage = tr("User '%1'");        break;
-                case Server:    subMessage = tr("Server '%1'");      break;
-                case Camera:    subMessage = tr("Camera '%1'");      break;
-                default:        subMessage = tr("Resource '%1'");    break;
-                }
-                message += subMessage.arg(resource->getName()) + QLatin1String("\n");
-            }
-
-            message = tr("You are about to delete the following objects:\n\n%1\nAre you sure you want to delete them?").arg(message);
-        }
-
-        QMessageBox::StandardButton button = QMessageBox::question(widget(), tr("Delete resources"), message, QMessageBox::Yes | QMessageBox::Cancel);
+        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+            widget(), 
+            resources, 
+            tr("Delete Resources"), 
+            tr("Do you really want to delete the following %n item(s)?", NULL, resources.size()), 
+            QDialogButtonBox::Yes | QDialogButtonBox::Cancel
+        );
         okToDelete = button == QMessageBox::Yes;
     }
 
@@ -836,23 +893,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return; /* User does not want it deleted. */
 
     foreach(const QnResourcePtr &resource, resources) {
-        RemovedResourceType type = removedResourceType(resource);
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+            if(snapshotManager()->isLocal(layout))
+                resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
 
-        switch(type) {
-        case Layout: {
-            QnLayoutResourcePtr layout = resource.staticCast<QnLayoutResource>();
-            if(snapshotManager()->isLocal(layout)) { 
-                /* This one can be simply deleted from resource pool. */
-                resourcePool()->removeResource(resource);
-                break;
-            }
-            /* FALL THROUGH */
-        }
-        default: {
-            QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
-            connection->deleteAsync(resource, this, SLOT(at_resource_deleted(int, const QByteArray &, const QByteArray &, int)));
-        }
-        }
+        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(int, const QByteArray &, const QByteArray &, int)));
     }
 }
 
@@ -867,7 +912,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setPassword(dialog->password());
     user->setAdmin(dialog->isAdmin());
 
-    m_connection->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, QnResourceList, int)));
+    connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
@@ -963,6 +1008,20 @@ void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &error
     }
 }
 
+void QnWorkbenchActionHandler::at_cameras_saved(int status, const QByteArray& errorString, QnResourceList resources, int handle) {
+    if (status == 0)
+        return;
+
+    QnResourceListDialog::exec(
+        widget(),
+        resources,
+        tr("Error"),
+        tr("Could not save the following %n cameras to application server.", NULL, resources.size()),
+        tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
+        QDialogButtonBox::Ok
+    );
+}
+
 void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
     if(status == 0)   
         return;
@@ -979,8 +1038,8 @@ void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &err
     if(needReopening) {
         QMessageBox::StandardButton button = QMessageBox::critical(
             widget(), 
-            tr(""), 
-            tr("Could not save layout '%1' to application server. \n\nError description: '%2'. \n\nDo you want to restore this layout?").arg(resource->getName()).arg(QLatin1String(errorString.data())),
+            tr("Error"), 
+            tr("Could not save layout '%1' to application server. \n\nError description: \n%2. \n\nDo you want to restore this layout?").arg(resource->getName()).arg(QLatin1String(errorString.data())),
             QMessageBox::Yes | QMessageBox::No
         );
         if(button == QMessageBox::Yes) {
@@ -993,8 +1052,8 @@ void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &err
     } else {
         QMessageBox::critical(
             widget(), 
-            tr(""), 
-            tr("Could not save layout '%1' to application server. \n\nError description: '%2'.").arg(resource->getName()).arg(QLatin1String(errorString.data()))
+            tr("Error"), 
+            tr("Could not save layout '%1' to application server. \n\nError description: \n%2.").arg(resource->getName()).arg(QLatin1String(errorString.data()))
         );
     }
 }
@@ -1003,22 +1062,14 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
     if(status == 0 || resources.isEmpty())
         return;
 
-    QString message;
-    if(resources.size() == 1) {
-        message = tr("Could not save changes made to resource '%1'.").arg(resources[0]->getName());
-    } else {
-        QString resourceList;
-        for(int i = 0; i < resources.size(); i++) {
-            if(i < resources.size() - 1) {
-                resourceList += tr("%1;\n").arg(resources[i]->getName());
-            } else {
-                resourceList += tr("%1.").arg(resources[i]->getName());
-            }
-        }
-        message = tr("Could not save changes made to the following resources:\n\n%1").arg(resourceList);
-    }
-
-    QMessageBox::critical(widget(), tr(""), message, QMessageBox::Ok);
+    QnResourceListDialog::exec(
+        widget(),
+        resources,
+        tr("Error"),
+        tr("Could not save changes made to the following %n resource(s).", NULL, resources.size()),
+        tr("Error description:\n%1").arg(QLatin1String(errorString.constData())),
+        QDialogButtonBox::Ok
+    );
 
     for(int i = 0; i < resources.size(); i++)
         resources[i]->setStatus(static_cast<QnResource::Status>(oldStatuses[i]));

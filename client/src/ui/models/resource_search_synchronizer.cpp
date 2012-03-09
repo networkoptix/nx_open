@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include "resource_search_proxy_model.h"
-#include "resource_model.h"
+#include "resource_pool_model.h"
 
 QnResourceSearchSynchronizer::QnResourceSearchSynchronizer(QObject *parent):
     QObject(parent),

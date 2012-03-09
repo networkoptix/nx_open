@@ -50,7 +50,8 @@ public:
         quality(MEDIA_Quality_High),
         qualityFastSwitch(true),
         prevStartTime(AV_NOPTS_VALUE),
-        prevEndTime(AV_NOPTS_VALUE)
+        prevEndTime(AV_NOPTS_VALUE),
+        metadataChannelNum(2)
     {
     }
     void deleteDP()
@@ -102,6 +103,7 @@ public:
     bool qualityFastSwitch;
     qint64 prevStartTime;
     qint64 prevEndTime;
+    int metadataChannelNum;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -196,13 +198,13 @@ void QnRtspConnectionProcessor::generateSessionId()
     d->sessionId += QString::number(rand());
 }
 
-void QnRtspConnectionProcessor::sendCurrentRangeIfUpdated()
+QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
 {
     Q_D(QnRtspConnectionProcessor);
     QMutexLocker lock(&d->mutex);
 
     if (!d->archiveDP)
-        return;
+        return QString();
 
     qint64 endTime = d->archiveDP->endTime();
     if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) 
@@ -210,14 +212,22 @@ void QnRtspConnectionProcessor::sendCurrentRangeIfUpdated()
 
     if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
     {
-        addResponseRangeHeader();
-        sendResponse(CODE_OK);
+        return getRangeStr();
+    }
+    else {
+        return QString();
     }
 };
 
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
     QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
+}
+
+int QnRtspConnectionProcessor::getMetadataChannelNum() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->metadataChannelNum;
 }
 
 int QnRtspConnectionProcessor::numOfVideoChannels()
@@ -230,12 +240,13 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     return layout ? layout->numberOfChannels() : -1;
 }
 
-void QnRtspConnectionProcessor::addResponseRangeHeader()
+QString QnRtspConnectionProcessor::getRangeStr()
 {
     Q_D(QnRtspConnectionProcessor);
+    QString range;
     if (d->archiveDP) 
     {
-        QString range = "npt=";
+        range = "npt=";
         d->archiveDP->open();
         if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
             range += "now";
@@ -252,6 +263,16 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
             range += QString::number(d->archiveDP->endTime());
             d->prevEndTime = d->archiveDP->endTime();
         }
+    }
+    return range;
+};
+
+void QnRtspConnectionProcessor::addResponseRangeHeader()
+{
+    Q_D(QnRtspConnectionProcessor);
+    QString range = getRangeStr();
+    if (!range.isEmpty())
+    {
         d->responseHeaders.removeValue("Range");
         d->responseHeaders.addValue("Range", range);
     }
@@ -279,12 +300,19 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     addResponseRangeHeader();
 
-    for (int i = 0; i < numVideo + numAudio; ++i)
+    int i = 0;
+    for (; i < numVideo + numAudio; ++i)
     {
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << RTP_FFMPEG_GENERIC_CODE << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
         sdp << "a=rtpmap:" << RTP_FFMPEG_GENERIC_CODE << ' ' << RTP_FFMPEG_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
     }
+
+    d->metadataChannelNum = i;
+    sdp << "m=metadata " << d->metadataChannelNum << " RTP/AVP " << RTP_METADATA_CODE << ENDL;
+    sdp << "a=control:trackID=" << i << ENDL;
+    sdp << "a=rtpmap:" << RTP_METADATA_CODE << ' ' << RTP_METADATA_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
+
     return CODE_OK;
 }
 
@@ -743,9 +771,12 @@ void QnRtspConnectionProcessor::run()
         t.restart();
         int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) {
-            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-            if (isFullMessage(d->clientRequest))
+            d->receiveBuffer.append((const char*) d->tcpReadBuffer, readed);
+            int msgLen = isFullMessage(d->receiveBuffer);
+            if (msgLen)
             {
+                d->clientRequest = d->receiveBuffer.left(msgLen);
+                d->receiveBuffer.remove(0, msgLen);
                 parseRequest();
                 processRequest();
             }

@@ -30,13 +30,13 @@ QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
     delete d_ptr;
 }
 
-bool QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
+int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 {
     QByteArray lRequest = message.toLower();
     QByteArray delimiter = "\n";
     int pos = lRequest.indexOf(delimiter);
     if (pos == -1)
-        return false;
+        return 0;
     if (pos > 0 && lRequest[pos-1] == '\r')
         delimiter = "\r\n";
     int contentLen = 0;
@@ -62,9 +62,12 @@ bool QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
     QByteArray dblDelim = delimiter + delimiter;
     //return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());
     if (lRequest.indexOf(dblDelim) == -1)
-        return false;
+        return 0;
     int expectedSize = lRequest.indexOf(dblDelim) + dblDelim.size() + contentLen;
-    return lRequest.size() >= expectedSize;
+    if (expectedSize > lRequest.size())
+        return 0;
+    else 
+        return expectedSize;
 }
 
 void QnTCPConnectionProcessor::parseRequest()

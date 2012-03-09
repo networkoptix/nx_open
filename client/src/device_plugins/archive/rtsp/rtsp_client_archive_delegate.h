@@ -45,6 +45,7 @@ public:
     virtual void beforeChangeReverseMode(bool reverseMode);
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
+    void processMetadata(const quint8* data, int dataSize);
     void reopen();
 private:
     QMutex m_mutex;
