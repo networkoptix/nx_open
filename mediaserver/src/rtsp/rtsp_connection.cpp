@@ -771,9 +771,12 @@ void QnRtspConnectionProcessor::run()
         t.restart();
         int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) {
-            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-            if (isFullMessage(d->clientRequest))
+            d->receiveBuffer.append((const char*) d->tcpReadBuffer, readed);
+            int msgLen = isFullMessage(d->receiveBuffer);
+            if (msgLen)
             {
+                d->clientRequest = d->receiveBuffer.left(msgLen);
+                d->receiveBuffer.remove(0, msgLen);
                 parseRequest();
                 processRequest();
             }
