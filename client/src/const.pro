@@ -192,6 +192,7 @@ FORMS += \
     ui/dialogs/layout_name_dialog.ui \
     ui/dialogs/new_user_dialog.ui \
     ui/dialogs/connection_testing_dialog.ui \
+    ui/dialogs/resource_list_dialog.ui \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
     ui/device_settings/camera_schedule_widget.ui \

@@ -78,6 +78,8 @@ protected:
     void initialize();
     void deinitialize();
 
+    const QnAppServerConnectionPtr &connection() const;
+
     QString newLayoutName() const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
     void addToWorkbench(const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;

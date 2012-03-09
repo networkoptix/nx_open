@@ -80,7 +80,7 @@ public:
 
     int getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString);
 
-    int getResources(QList<QnResourcePtr>& resources, QByteArray& errorString);
+    int getResources(QnResourceList& resources, QByteArray& errorString);
 
     /**
       get resources synchronously

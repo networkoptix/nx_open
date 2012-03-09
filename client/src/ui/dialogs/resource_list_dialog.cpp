@@ -1,25 +1,26 @@
 #include "resource_list_dialog.h"
 
 #include <QtGui/QLabel>
-#include <QtGui/QTableWidget>
+#include <QtGui/QTableView>
 #include <QtGui/QVBoxLayout>
 
+#include <ui/models/resource_list_model.h>
+
+#include "ui_resource_list_dialog.h"
+
 QnResourceListDialog::QnResourceListDialog(QWidget *parent):
-    QnButtonBoxDialog(parent)
+    QnButtonBoxDialog(parent),
+    ui(new Ui::ResourceListDialog())
 {
-    m_label = new QLabel(this);
+    ui->setupUi(this);
 
-    m_tableWidget = new QTableWidget(this);
-    m_tableWidget->setColumnCount(2);
+    m_model = new QnResourceListModel(this);
 
-    m_buttonBox = new QDialogButtonBox(this);
-    m_buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    setButtonBox(m_buttonBox);
+    ui->treeView->setModel(m_model);
+    ui->topLabel->hide();
+    ui->bottomLabel->hide();
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(m_label);
-    layout->addWidget(m_tableWidget);
-    layout->addWidget(m_buttonBox);
+    setButtonBox(ui->buttonBox);
 }
 
 QnResourceListDialog::~QnResourceListDialog() {
@@ -27,25 +28,55 @@ QnResourceListDialog::~QnResourceListDialog() {
 }
 
 void QnResourceListDialog::setText(const QString &text) {
-    m_label->setText(text);
+    ui->topLabel->setText(text);
+
+    ui->topLabel->setVisible(!text.isEmpty());
 }
 
 QString QnResourceListDialog::text() const {
-    return m_label->text();
+    return ui->topLabel->text();
+}
+
+void QnResourceListDialog::setBottomText(const QString &bottomText) {
+    ui->bottomLabel->setText(bottomText);
+
+    ui->bottomLabel->setVisible(!bottomText.isEmpty());
+}
+
+QString QnResourceListDialog::bottomText() const {
+    return ui->bottomLabel->text();
 }
 
 void QnResourceListDialog::setStandardButtons(QDialogButtonBox::StandardButtons standardButtons) {
-    m_buttonBox->setStandardButtons(standardButtons);
+    ui->buttonBox->setStandardButtons(standardButtons);
 }
 
 QDialogButtonBox::StandardButtons QnResourceListDialog::standardButtons() const {
-    return m_buttonBox->standardButtons();
+    return ui->buttonBox->standardButtons();
 }
 
 void QnResourceListDialog::setResources(const QnResourceList &resources) {
-    
+    m_model->setResources(resources);
 }
 
 const QnResourceList &QnResourceListDialog::resources() const {
-    return m_resources;
+    return m_model->resouces();
 }
+
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons) {
+    QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(parent));
+    dialog->setResources(resources);
+    dialog->setWindowTitle(title);
+    dialog->setText(text);
+    dialog->setBottomText(bottomText);
+    dialog->setStandardButtons(buttons);
+    dialog->exec();
+    return dialog->clickedButton();
+}
+
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons) {
+    return exec(parent, resources, title, text, QString(), buttons);
+}
+
+
+

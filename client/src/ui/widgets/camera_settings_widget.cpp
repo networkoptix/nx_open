@@ -4,6 +4,8 @@
 #include <QtGui/QStackedWidget>
 #include <QtGui/QVBoxLayout>
 
+#include <core/resource/camera_resource.h>
+
 #include "multiple_camera_settings_widget.h"
 #include "single_camera_settings_widget.h"
 

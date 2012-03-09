@@ -298,11 +298,11 @@ public:
         case Qt::EditRole:
             return m_name;
         case Qn::ResourceRole:
-            if(!m_resource.isNull())
+            if(m_resource)
                 return QVariant::fromValue<QnResourcePtr>(m_resource);
             break;
         case Qn::ResourceFlagsRole:
-            if(!m_resource.isNull())
+            if(m_resource)
                 return static_cast<int>(m_flags);
             break;
         case Qn::UuidRole:

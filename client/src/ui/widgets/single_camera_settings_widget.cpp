@@ -4,6 +4,7 @@
 #include <QtGui/QMessageBox>
 
 #include "core/resource/resource.h"
+#include "core/resource/camera_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motion_mask_widget.h"
