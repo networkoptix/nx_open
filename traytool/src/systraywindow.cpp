@@ -389,7 +389,7 @@ bool MyIsUserAnAdmin()
 
    ::GetTokenInformation(m_hToken, TokenElevationType, &tokenElevationType, sizeof(tokenElevationType), &bytesUsed);
 
-   isAdmin = tokenElevationType == TokenElevationTypeFull || IsUserAnAdmin();
+   isAdmin = tokenElevationType == TokenElevationTypeFull || tokenElevationType == TokenElevationTypeDefault && IsUserAnAdmin();
 
    if (m_hToken)
        CloseHandle(m_hToken);
