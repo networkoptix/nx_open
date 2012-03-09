@@ -6,7 +6,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QRadioButton>
 
-#include "camera_motionmask_widget.h"
+#include "camera_motion_mask_widget.h"
 #include "camera_schedule_widget.h"
 
 #include "settings.h"

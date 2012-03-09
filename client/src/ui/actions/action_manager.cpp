@@ -20,6 +20,8 @@ namespace {
         dst->addPixmap(src.pixmap(src.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
     }
 
+    const char *shortcutContextSetPropertyName = "_qn_shortcutContextSet";
+
 } // anonymous namespace
 
 
@@ -30,11 +32,20 @@ class QnActionBuilder {
 public:
     QnActionBuilder(QnActionManager *manager, QnAction *action): m_manager(manager), m_action(action) {}
 
-    QnActionBuilder shortcut(const QKeySequence &shortcut, Qt::ShortcutContext context = Qt::ApplicationShortcut) {
+    QnActionBuilder shortcut(const QKeySequence &shortcut) {
         QList<QKeySequence> shortcuts = m_action->shortcuts();
         shortcuts.push_back(shortcut);
         m_action->setShortcuts(shortcuts);
+
+        if(!m_action->property(shortcutContextSetPropertyName).isValid())
+            m_action->setShortcutContext(Qt::ApplicationShortcut);
+
+        return *this;
+    }
+
+    QnActionBuilder shortcutContext(Qt::ShortcutContext context) {
         m_action->setShortcutContext(context);
+        m_action->setProperty(shortcutContextSetPropertyName, true);
 
         return *this;
     }
@@ -279,6 +290,11 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+A")).
         autoRepeat(false);
 
+    factory(Qn::SelectionChangeAction).
+        flags(Qn::NoTarget).
+        text(tr("Selection Changed"));
+
+
 
     /* Context menu actions. */
     factory(Qn::MainMenuAction).
@@ -372,6 +388,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
         shortcut(tr("Esc")).
+        shortcutContext(Qt::WindowShortcut).
 #endif
         icon(Skin::icon(QLatin1String("decorations/fullscreen.png"))).
         hoverIcon(Skin::icon(QLatin1String("decorations/fullscreen_hovered.png"))).
@@ -430,6 +447,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionLayoutCountCondition(2));
 
 
+
     /* Resource actions. */
 
     factory(Qn::OpenInNewLayoutAction).
@@ -469,13 +487,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
     factory(Qn::CameraSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Camera Settings")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
 
-    factory(Qn::MultipleCameraSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).
-        text(tr("Multiple Camera Settings")).
+    factory(Qn::OpenInCameraSettingsDialogAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource).
+        text(tr("Open in Camera Settings Dialog")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
 
     factory(Qn::ServerSettingsAction).

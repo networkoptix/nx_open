@@ -1,24 +1,25 @@
-#ifndef __CAMERA_SCHEDULE_H_
-#define __CAMERA_SCHEDULE_H_
+#ifndef QN_CAMERA_SCHEDULE_WIDGET_H
+#define QN_CAMERA_SCHEDULE_WIDGET_H
 
 #include <QtGui/QWidget>
 
 #include <core/misc/scheduleTask.h>
 
 namespace Ui {
-    class CameraSchedule;
+    class CameraScheduleWidget;
 }
 
 class QnCameraScheduleWidget : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks USER true DESIGNABLE false)
+    Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks NOTIFY scheduleTasksChanged USER true DESIGNABLE false)
 
 public:
     QnCameraScheduleWidget(QWidget *parent = 0);
+    virtual ~QnCameraScheduleWidget();
 
-    void setDoNotChange(bool);
-    bool isDoNotChange() const;
+    void setChangesDisabled(bool);
+    bool isChangesDisabled() const;
 
     QList<QnScheduleTask::Data> scheduleTasks() const;
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
@@ -28,22 +29,30 @@ public:
 
     Qt::CheckState getScheduleEnabled() const;
 
-private Q_SLOTS:
+signals:
+    void scheduleTasksChanged();
+    void scheduleEnabledChanged();
+
+private slots:
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
     void onEnableScheduleClicked();
     void updateGridParams();
-    void onNeedReadCellParams(const QPoint &cell);
+    void onCellActivated(const QPoint &cell);
 
 private:
     int qualityTextToIndex(const QString &text);
     void enableGrid(bool value);
+
+    void connectToGridWidget();
+    void disconnectFromGridWidget();
+
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 
-    Ui::CameraSchedule *const ui;
+    QScopedPointer<Ui::CameraScheduleWidget> ui;
     bool m_disableUpdateGridParams;
 };
 
 
-#endif // __CAMERA_SCHEDULE_H_
+#endif // QN_CAMERA_SCHEDULE_WIDGET_H

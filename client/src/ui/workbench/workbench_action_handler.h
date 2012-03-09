@@ -1,8 +1,11 @@
 #ifndef QN_WORKBENCH_ACTION_HANDLER_H
 #define QN_WORKBENCH_ACTION_HANDLER_H
 
-#include <QObject>
-#include <QWeakPointer>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
+
+#include <QtGui/QDialogButtonBox>
+
 #include <api/AppServerConnection.h>
 #include <ui/actions/actions.h>
 
@@ -17,6 +20,7 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
+class QnCameraSettingsDialog;
 
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
@@ -64,9 +68,7 @@ public:
 
     void setContext(QnWorkbenchContext *context);
 
-    QWidget *widget() const {
-        return m_widget.data();
-    }
+    QWidget *widget() const;
 
     void setWidget(QWidget *widget) {
         m_widget = widget;
@@ -75,6 +77,8 @@ public:
 protected:
     void initialize();
     void deinitialize();
+
+    const QnAppServerConnectionPtr &connection() const;
 
     QString newLayoutName() const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
@@ -87,6 +91,9 @@ protected:
     void addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
     
     void closeLayouts(const QnWorkbenchLayoutList &layouts);
+
+    void saveCameraSettingsFromDialog();
+    Q_SLOT void updateCameraSettingsFromSelection();
 
 protected slots:
     void at_context_aboutToBeDestroyed();
@@ -117,7 +124,8 @@ protected slots:
     void at_systemSettingsAction_triggered();
     void at_connectionSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
-    void at_multipleCamerasSettingsAction_triggered();
+    void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
+    void at_selectionChangeAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
@@ -128,7 +136,7 @@ protected slots:
     void at_removeLayoutItemAction_triggered();
     void at_renameLayoutAction_triggered();
     void at_removeFromServerAction_triggered();
-
+    
     void at_newUserAction_triggered();
     void at_newUserLayoutAction_triggered();
 
@@ -136,6 +144,7 @@ protected slots:
 
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
     void at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
+    void at_cameras_saved(int status, const QByteArray& errorString, QnResourceList resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses);
 
@@ -147,6 +156,9 @@ private:
     QnAppServerConnectionPtr m_connection;
 
     QScopedPointer<QMenu> m_mainMenu;
+    QScopedPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    bool m_selectionUpdatePending;
+    Qn::ActionScope m_selectionScope;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

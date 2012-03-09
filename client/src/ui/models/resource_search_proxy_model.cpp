@@ -1,5 +1,5 @@
 #include "resource_search_proxy_model.h"
-#include "resource_model.h"
+#include "resource_pool_model.h"
 #include <core/resourcemanagment/resource_criterion.h>
 #include <core/resource/resource.h>
 #include <utils/common/delete_later.h>

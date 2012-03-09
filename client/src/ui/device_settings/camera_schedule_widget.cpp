@@ -1,13 +1,14 @@
 #include "camera_schedule_widget.h"
-#include "ui_camera_schedule.h"
+#include "ui_camera_schedule_widget.h"
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent)
-    : QWidget(parent), ui(new Ui::CameraSchedule)
+    : QWidget(parent), ui(new Ui::CameraScheduleWidget)
 {
     ui->setupUi(this);
     connect(ui->chkBoxDisplayQuality, SIGNAL(stateChanged(int)), this, SLOT(onDisplayQualityChanged(int)));
     connect(ui->chkBoxDisplayFPS, SIGNAL(stateChanged(int)), this, SLOT(onDisplayFPSChanged(int)));
     connect(ui->chkBoxEnableSchedule, SIGNAL(clicked()), this, SLOT(onEnableScheduleClicked()));
+    connect(ui->chkBoxEnableSchedule, SIGNAL(stateChanged(int)), this, SIGNAL(scheduleEnabledChanged()));
 
     // init buttons
     ui->btnRecordAlways->setColor(QColor(COLOR_LIGHT,0,0));
@@ -23,18 +24,34 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent)
     connect(ui->comboBoxQuality, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGridParams()));
     connect(ui->fpsSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateGridParams()));
 
-    connect(ui->gridWidget, SIGNAL(needReadCellParams(QPoint)), this, SLOT(onNeedReadCellParams(QPoint)));
+    connect(ui->gridWidget, SIGNAL(cellActivated(QPoint)), this, SLOT(onCellActivated(QPoint)));
+    connectToGridWidget();
 
     m_disableUpdateGridParams = false;
     ui->gridWidget->setEnabled(true);
+
 }
 
-void QnCameraScheduleWidget::setDoNotChange(bool val)
+QnCameraScheduleWidget::~QnCameraScheduleWidget() {
+    return;
+}
+
+void QnCameraScheduleWidget::connectToGridWidget() 
+{
+    connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
+}
+
+void QnCameraScheduleWidget::disconnectFromGridWidget() 
+{
+    disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
+}
+
+void QnCameraScheduleWidget::setChangesDisabled(bool val)
 {
     ui->gridWidget->setEnabled(!val);
 }
 
-bool QnCameraScheduleWidget::isDoNotChange() const
+bool QnCameraScheduleWidget::isChangesDisabled() const
 {
     return !ui->gridWidget->isEnabled();
 }
@@ -50,7 +67,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
 
             QnScheduleTask::RecordingType recordType = QnScheduleTask::RecordingType_Run;
             {
-                QColor color(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
+                QColor color(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
                 if (color == ui->btnRecordAlways->color())
                     recordType = QnScheduleTask::RecordingType_Run;
                 else if (color == ui->btnRecordMotion->color())
@@ -62,7 +79,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             }
             QnStreamQuality streamQuality = QnQualityHighest;
             {
-                QString shortQuality(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::SecondParam).toString());
+                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString());
                 if (shortQuality == QLatin1String("Lo"))
                     streamQuality = QnQualityLow;
                 else if (shortQuality == QLatin1String("Md"))
@@ -74,7 +91,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
                 else
                     qWarning("SecondParam wasn't acknowledged. fallback to 'Highest'");
             }
-            int fps = fps = ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
+            int fps = fps = ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
             if (fps == 0 && recordType != QnScheduleTask::RecordingType_Never)
                 fps = 10;
 
@@ -117,6 +134,8 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
 {
     //if (!tasksFrom.isEmpty())
     //    doNotChangeStateChanged(0);
+
+    disconnectFromGridWidget(); /* We don't want to get 100500 notifications. */
 
     QList<QnScheduleTask::Data> tasks = tasksFrom;
 
@@ -173,6 +192,10 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
         }
     }
+
+    connectToGridWidget();
+
+    emit scheduleTasksChanged();
 }
 
 static inline QString getShortText(const QString &text)
@@ -246,12 +269,12 @@ void QnCameraScheduleWidget::updateGridParams()
     }
 }
 
-void QnCameraScheduleWidget::onNeedReadCellParams(const QPoint &cell)
+void QnCameraScheduleWidget::onCellActivated(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
-    QColor color(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
-    double fps(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
-    QString shortQuality(ui->gridWidget->getCellValue(cell, QnScheduleGridWidget::SecondParam).toString());
+    QColor color(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
+    double fps(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
+    QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString());
 
     if (color == ui->btnRecordAlways->color())
         ui->btnRecordAlways->setChecked(true);

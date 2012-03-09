@@ -1,5 +1,5 @@
-#ifndef __CAMERA_MOTIONMASK_WIDGET_H__
-#define __CAMERA_MOTIONMASK_WIDGET_H__
+#ifndef __CAMERA_MOTION_MASK_WIDGET_H__
+#define __CAMERA_MOTION_MASK_WIDGET_H__
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -19,17 +19,19 @@ class QnCameraMotionMaskWidget: public QWidget
     Q_OBJECT;
         
 public:
-    QnCameraMotionMaskWidget(const QnResourcePtr &resource, QWidget *parent = 0);
     QnCameraMotionMaskWidget(QWidget *parent = 0);
     virtual ~QnCameraMotionMaskWidget();
 
+    const QnResourcePtr &camera() const;
 	void setCamera(const QnResourcePtr &resource);
 
-    const QList<QRegion>& motionMaskList() const;
+    const QList<QRegion> &motionMaskList() const;
+
+signals:
+    void motionMaskListChanged();
 
 protected slots:
     void at_viewport_resized();
-
 	void at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &);
 	void at_motionRegionCleared(QGraphicsView *, QnResourceWidget *);
 
@@ -54,4 +56,4 @@ private:
 	QWeakPointer<QnResourceWidget> m_widget;
 };
 
-#endif // __CAMERA_MOTIONMASK_WIDGET_H__
+#endif // __CAMERA_MOTION_MASK_WIDGET_H__
