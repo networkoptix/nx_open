@@ -515,7 +515,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE)));
 
-
     factory(Qn::EditTagsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Edit tags...")).

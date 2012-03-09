@@ -260,6 +260,7 @@ int main(int argc, char *argv[])
 
     QnCommandLineParser commandLinePreParser;
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--no-single-application", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--auth", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
     
 
@@ -274,6 +275,14 @@ int main(int argc, char *argv[])
     }
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(Skin::icon(QLatin1String("hdw_logo.png")));
+
+    /* Set authentication parameters from command line. */
+    QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
+    if(authentication.isValid()) {
+        QnSettings::ConnectionData connection;
+        connection.url = authentication;
+        qnSettings->setLastUsedConnection(connection);
+    }
 
     if(singleApplication) {
         QString argsMessage;
@@ -422,7 +431,8 @@ int main(int argc, char *argv[])
     }
 
     /* Open connection settings dialog. */
-    QMetaObject::invokeMethod(mainWindow->context()->menu()->action(Qn::ConnectionSettingsAction), "trigger", Qt::QueuedConnection);
+    if(!authentication.isValid())
+        QMetaObject::invokeMethod(mainWindow->context()->menu()->action(Qn::ConnectionSettingsAction), "trigger", Qt::QueuedConnection);
 
     int result = application->exec();
 
