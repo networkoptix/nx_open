@@ -1039,6 +1039,9 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
         synchronizeGeometry(widget, false);
     } else {
         newPos = item->combinedGeometry().center();
+
+        if(qFuzzyIsNull(item->combinedGeometry().size()))
+            synchronizeGeometry(widget, false);
     }
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
