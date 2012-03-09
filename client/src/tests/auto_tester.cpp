@@ -25,9 +25,9 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     m_succeeded(false)
 {
     QnCommandLineParser parser;
-    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::INTEGER, "--test-timeout", NULL, tr("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout)));
-    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::STRING, "--test-resource-substring", NULL, tr("Substring that must be present in one of the resources.")));
-    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::FLAG, "--test-help", NULL, tr("Show this help screen.")));
+    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--test-timeout", NULL, tr("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout)));
+    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--test-resource-substring", NULL, tr("Substring that must be present in one of the resources.")));
+    parser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--test-help", NULL, tr("Show this help screen.")));
 
     bool valid = parser.parse(argc, argv);
     bool showHelp = false;

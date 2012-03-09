@@ -12,9 +12,9 @@ class QTextStream;
 class QN_EXPORT QnCommandLineParameter {
 public:
     enum Type {
-        STRING,
-        INTEGER,
-        FLAG,
+        String,
+        Integer,
+        Flag,
     };
 
     QnCommandLineParameter(Type type, const QString &name, const QString &shortName, const QString &description):
@@ -42,7 +42,7 @@ public:
     }
 
     bool hasValue() const {
-        return m_type != FLAG;
+        return m_type != Flag;
     }
 
 private:
