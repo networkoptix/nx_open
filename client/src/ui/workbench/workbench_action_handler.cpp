@@ -25,9 +25,8 @@
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/tags_edit_dialog.h>
 #include <ui/dialogs/server_settings_dialog.h>
-#include <ui/dialogs/camera_settings_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/dialogs/multiple_camera_settings_dialog.h>
+#include <ui/dialogs/camera_settings_dialog.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/new_user_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
@@ -163,7 +162,6 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::CloseLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(action(Qn::CloseAllButThisLayoutAction),        SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
     connect(action(Qn::CameraSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(action(Qn::MultipleCameraSettingsAction),       SIGNAL(triggered()),    this,   SLOT(at_multipleCamerasSettingsAction_triggered()));
     connect(action(Qn::ServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::EditTagsAction),                     SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
@@ -188,6 +186,15 @@ void QnWorkbenchActionHandler::deinitialize() {
 
     foreach(QAction *action, menu()->actions())
         disconnect(action, NULL, this, NULL);
+}
+
+QWidget *QnWorkbenchActionHandler::widget() const {
+    /* Camera settings dialog stays on top. In order for it not to hide
+     * modal dialogs, it must be used as parent for such dialogs. */
+    if(m_cameraSettingsDialog && m_cameraSettingsDialog->isVisible())
+        return m_cameraSettingsDialog.data();
+
+    return m_widget.data();
 }
 
 QString QnWorkbenchActionHandler::newLayoutName() const {
@@ -325,6 +332,34 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
                 resourcePool()->removeResource(layout->resource());
         }
     }
+}
+
+void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
+    if(!m_cameraSettingsDialog)
+        return;
+
+    if(!m_cameraSettingsDialog->widget()->hasChanges())
+        return;
+
+    QnVirtualCameraResourceList cameras = m_cameraSettingsDialog->widget()->cameras();
+    if(cameras.empty())
+        return;
+
+    /* Limit the number of active cameras. */
+    int activeCameras = resourcePool()->activeCameras() + m_cameraSettingsDialog->widget()->activeCameraCount();
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras)
+        if (!camera->isScheduleDisabled())
+            activeCameras--;
+
+    if (activeCameras > qnLicensePool->getLicenses().totalCameras()) {
+        QString message = tr("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.").arg(activeCameras).arg(qnLicensePool->getLicenses().totalCameras());
+        QMessageBox::warning(widget(), tr("Could Not Enable Recording"), message);
+        m_cameraSettingsDialog->widget()->setCamerasActive(false);
+    }
+
+    /* Submit and save it. */
+    m_cameraSettingsDialog->widget()->submitToResources();
+    m_connection->saveAsync(cameras, this, SLOT(at_cameras_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 
@@ -671,28 +706,37 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
-    if(resource.isNull())
-        return;
+    QnVirtualCameraResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(menu()->currentResourcesTarget(sender()));
 
-    QScopedPointer<QnSingleCameraSettingsWidget> dialog(new QnSingleCameraSettingsWidget(resource.dynamicCast<QnVirtualCameraResource>(), widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    if(!m_cameraSettingsDialog) {
+        m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget(), Qt::WindowStaysOnTopHint));
+
+        connect(m_cameraSettingsDialog.data(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+    }
+
+    if(m_cameraSettingsDialog->widget()->cameras() != cameras) {
+        if(m_cameraSettingsDialog->widget()->hasChanges()) {
+            int button = QMessageBox::question(widget(), tr(""), tr("Save changes to the following "))
+        }
+
+        m_cameraSettingsDialog->widget()->setCameras(cameras);
+    }
+
+    m_cameraSettingsDialog->show();
 }
 
-void QnWorkbenchActionHandler::at_multipleCamerasSettingsAction_triggered() {
-    QnVirtualCameraResourceList cameras;
-    foreach(QnResourcePtr resource, menu()->currentResourcesTarget(sender())) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camera)
-            cameras.append(camera);
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
+    switch(button) {
+    case QDialogButtonBox::Ok:
+    case QDialogButtonBox::Apply:
+        saveCameraSettingsFromDialog();
+        break;
+    case QDialogButtonBox::Cancel:
+        m_cameraSettingsDialog->widget()->updateFromResources();
+        break;
+    default:
+        break;
     }
-    if(cameras.empty())
-        return;
-
-    QScopedPointer<QnMultipleCameraSettingsWidget> dialog(new QnMultipleCameraSettingsWidget(widget(), cameras));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
@@ -867,7 +911,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setPassword(dialog->password());
     user->setAdmin(dialog->isAdmin());
 
-    m_connection->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, QnResourceList, int)));
+    m_connection->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
@@ -961,6 +1005,13 @@ void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &error
     } else {
         QMessageBox::critical(widget(), tr(""), tr("Could not save user '%1' to application server. \n\nError description: '%2'").arg(resources[0]->getName()).arg(QLatin1String(errorString.data())));
     }
+}
+
+void QnWorkbenchActionHandler::at_cameras_saved(int status, const QByteArray& errorString, QnResourceList resources, int handle) {
+    if (status == 0)
+        return;
+
+    QMessageBox::critical(widget(), tr(""), tr("Could not save cameras to application server. \n\nError description: '%1'").arg(QLatin1String(errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {

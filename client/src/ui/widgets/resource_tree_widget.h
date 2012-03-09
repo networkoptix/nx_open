@@ -19,7 +19,7 @@ class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
 class QnResourceCriterion;
-class QnResourceModel;
+class QnResourcePoolModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeItemDelegate;
@@ -110,7 +110,7 @@ private:
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
 
-    QnResourceModel *m_resourceModel;
+    QnResourcePoolModel *m_resourceModel;
     QnResourceTreeItemDelegate *m_resourceDelegate;
     QnResourceTreeItemDelegate *m_searchDelegate;
 

@@ -67,6 +67,7 @@ namespace Qn {
         SelectAllAction,
 
 
+
         /* Main menu actions. */
 
         /**
@@ -195,11 +196,6 @@ namespace Qn {
          * Opens camera settings dialog.
          */
         CameraSettingsAction,
-
-        /**
-         * Opens multiple cameras settings dialog.
-         */
-        MultipleCameraSettingsAction,
 
         /**
          * Opens server settings dialog.

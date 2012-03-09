@@ -11,6 +11,7 @@ class QnSingleCameraSettingsWidget;
 class QnMultipleCameraSettingsWidget;
 
 class QnCameraSettingsWidget: public QWidget {
+    Q_OBJECT;
 public:
     enum Mode {
         EmptyMode,
@@ -27,6 +28,9 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
+    int activeCameraCount() const;
+    void setCamerasActive(bool active);
+
     bool hasChanges() const;
 
     void updateFromResources();
@@ -36,9 +40,11 @@ public:
 
 signals:
     void hasChangesChanged();
+    void modeChanged();
 
 private:
     void setMode(Mode mode);
+    void setCurrentTab(Mode mode, Qn::CameraSettingsTab tab);
 
 private:
     QnVirtualCameraResourceList m_cameras;

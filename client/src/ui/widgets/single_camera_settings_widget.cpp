@@ -90,6 +90,14 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     }
 }
 
+bool QnSingleCameraSettingsWidget::isCameraActive() const {
+    return ui->cameraScheduleWidget->getScheduleEnabled() != Qt::Unchecked;
+}
+
+void QnSingleCameraSettingsWidget::setCameraActive(bool active) {
+    ui->cameraScheduleWidget->setScheduleEnabled(active ? Qt::Checked : Qt::Unchecked);
+}
+
 #if 0
 void QnSingleCameraSettingsWidget::accept()
 {

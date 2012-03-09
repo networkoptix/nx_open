@@ -1,5 +1,5 @@
-#ifndef QN_RESOURCE_MODEL_H
-#define QN_RESOURCE_MODEL_H
+#ifndef QN_RESOURCE_POOL_MODEL_H
+#define QN_RESOURCE_POOL_MODEL_H
 
 #include <QAbstractItemModel>
 #include <QScopedPointer>
@@ -25,13 +25,13 @@ namespace Qn {
 
 } // namespace Qn
 
-class QnResourceModel : public QAbstractItemModel {
+class QnResourcePoolModel : public QAbstractItemModel {
     Q_OBJECT;
     Q_ENUMS(ItemDataRole);
 
 public:
-    explicit QnResourceModel(QObject *parent = 0);
-    virtual ~QnResourceModel();
+    explicit QnResourcePoolModel(QObject *parent = 0);
+    virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     virtual QModelIndex buddy(const QModelIndex &index) const override;
@@ -107,4 +107,4 @@ private:
 Q_DECLARE_METATYPE(QUuid);
 
 
-#endif // QN_RESOURCE_MODEL_H
+#endif // QN_RESOURCE_POOL_MODEL_H

@@ -24,6 +24,9 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
+    bool isCameraActive() const;
+    void setCameraActive(bool active);
+
     bool hasChanges() const {
         return m_hasChanges;
     }

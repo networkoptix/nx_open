@@ -20,7 +20,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/models/resource_model.h>
+#include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/style/skin.h>
@@ -138,7 +138,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->clearFilterButton->setIcon(Skin::icon(QLatin1String("clear.png")));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourceModel(this);
+    m_resourceModel = new QnResourcePoolModel(this);
     QSortFilterProxyModel *model = new QSortFilterProxyModel(this);
     model->setSourceModel(m_resourceModel);
     model->setSupportedDragActions(m_resourceModel->supportedDragActions());

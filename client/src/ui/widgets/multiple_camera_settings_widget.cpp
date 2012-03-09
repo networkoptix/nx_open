@@ -74,6 +74,28 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     }
 }
 
+int QnMultipleCameraSettingsWidget::activeCameraCount() const {
+    switch(ui->cameraScheduleWidget->getScheduleEnabled()) {
+    case Qt::Checked:
+        return m_cameras.size();
+    case Qt::Unchecked:
+        return 0;
+    case Qt::PartiallyChecked: {
+        int result;
+        foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
+            if (!camera->isScheduleDisabled())
+                result++;
+        return result;
+    }
+    default:
+        return 0;
+    }
+}
+
+void QnMultipleCameraSettingsWidget::setCamerasActive(bool active) {
+    ui->cameraScheduleWidget->setScheduleEnabled(active ? Qt::Checked : Qt::Unchecked);
+}
+
 #if 0
 void QnMultipleCameraSettingsWidget::requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle)
 {

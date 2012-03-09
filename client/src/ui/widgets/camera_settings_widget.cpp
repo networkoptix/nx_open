@@ -56,9 +56,11 @@ void QnCameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &camer
         setMode(EmptyMode);
         break;
     case 1: 
+        m_singleWidget->setCamera(m_cameras.front());
         setMode(SingleMode);
         break;
     default: 
+        m_multiWidget->setCameras(m_cameras);
         setMode(MultiMode);
         break;
     }
@@ -72,8 +74,8 @@ Qn::CameraSettingsTab QnCameraSettingsWidget::currentTab() const {
     }
 }
 
-void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
-    switch(mode()) {
+void QnCameraSettingsWidget::setCurrentTab(Mode mode, Qn::CameraSettingsTab tab) {
+    switch(mode) {
     case SingleMode: 
         m_singleWidget->setCurrentTab(tab);
         break;
@@ -82,6 +84,34 @@ void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
         break;
     default:
         m_emptyTab = tab;
+        break;
+    }
+}
+
+void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
+    setCurrentTab(mode(), tab);
+}
+
+int QnCameraSettingsWidget::activeCameraCount() const {
+    switch(mode()) {
+    case SingleMode:
+        return m_singleWidget->isCameraActive() ? 1 : 0;
+    case MultiMode:
+        return m_multiWidget->activeCameraCount();
+    default:
+        return 0;
+    }
+}
+
+void QnCameraSettingsWidget::setCamerasActive(bool active) {
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->setCameraActive(active);
+        break;
+    case MultiMode:
+        m_multiWidget->setCamerasActive(active);
+        break;
+    default:
         break;
     }
 }
@@ -121,7 +151,8 @@ void QnCameraSettingsWidget::submitToResources() {
 }
 
 void QnCameraSettingsWidget::setMode(Mode mode) {
-    if(mode == this->mode())
+    Mode oldMode = this->mode();
+    if(mode == oldMode)
         return;
 
     bool oldHasChanges = hasChanges();
@@ -130,7 +161,9 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
     if(m_stackedWidget->currentIndex() != EmptyMode)
         disconnect(m_stackedWidget->currentWidget(), SIGNAL(hasChangesChanged()), this, SIGNAL(hasChangesChanged()));
 
-    switch(m_stackedWidget->currentIndex()) {
+    setCurrentTab(mode, oldTab);
+
+    switch(oldMode) {
     case SingleMode:
         m_singleWidget->setCamera(QnVirtualCameraResourcePtr());
         break;
@@ -143,24 +176,13 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
 
     m_stackedWidget->setCurrentIndex(mode);
 
-    switch(m_stackedWidget->currentIndex()) {
-    case SingleMode:
-        m_singleWidget->setCamera(m_cameras.front());
-        break;
-    case MultiMode:
-        m_multiWidget->setCameras(m_cameras);
-        break;
-    default:
-        break;
-    }
-
     if(m_stackedWidget->currentIndex() != EmptyMode)
         connect(m_stackedWidget->currentWidget(), SIGNAL(hasChangesChanged()), this, SIGNAL(hasChangesChanged()));
-
-    setCurrentTab(oldTab);
 
     bool newHasChanges = hasChanges();
     if(oldHasChanges != newHasChanges)
         emit hasChangesChanged();
+
+    emit modeChanged();
 }
 

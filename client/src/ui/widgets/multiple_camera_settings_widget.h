@@ -22,6 +22,9 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
+    int activeCameraCount() const;
+    void setCamerasActive(bool active);
+
     void updateFromResources();
     void submitToResources();
 
