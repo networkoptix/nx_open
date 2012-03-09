@@ -6,7 +6,7 @@ QnUserResource::QnUserResource()
       m_isAdmin(false)
 {
     setStatus(Online, true);
-    addFlags(QnResource::user);
+    addFlags(QnResource::user | QnResource::remote);
 }
 
 void QnUserResource::setLayouts(const QnLayoutResourceList &layouts)
