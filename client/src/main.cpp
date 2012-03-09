@@ -2,9 +2,11 @@
 #include "ui/widgets/main_window.h"
 #include "settings.h"
 
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtGui/QDesktopWidget>
+
 #include <QtSingleApplication>
-#include <QFileInfo>
-#include <QDir>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -260,6 +262,8 @@ int main(int argc, char *argv[])
 
     QnCommandLineParser commandLinePreParser;
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--no-single-application", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--auth", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--screen", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
     
 
@@ -274,6 +278,14 @@ int main(int argc, char *argv[])
     }
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(Skin::icon(QLatin1String("hdw_logo.png")));
+
+    /* Set authentication parameters from command line. */
+    QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
+    if(authentication.isValid()) {
+        QnSettings::ConnectionData connection;
+        connection.url = authentication;
+        qnSettings->setLastUsedConnection(connection);
+    }
 
     if(singleApplication) {
         QString argsMessage;
@@ -401,8 +413,20 @@ int main(int argc, char *argv[])
 
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
-    mainWindow->showFullScreen();
+
+    QVariant screen = commandLinePreParser.value("--screen");
+    if(screen.isValid()) {
+        int screenNumber = screen.toInt();
+        QDesktopWidget *desktop = qApp->desktop();
+        if(screenNumber >= 0 && screenNumber < desktop->screenCount()) {
+            QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
+
+            mainWindow->move(desktop->screenGeometry(screenNumber).topLeft() + screenDelta);
+        }
+    }
+
     mainWindow->show();
+    mainWindow->showFullScreen();
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -422,7 +446,8 @@ int main(int argc, char *argv[])
     }
 
     /* Open connection settings dialog. */
-    QMetaObject::invokeMethod(mainWindow->context()->menu()->action(Qn::ConnectionSettingsAction), "trigger", Qt::QueuedConnection);
+    if(!authentication.isValid())
+        QMetaObject::invokeMethod(mainWindow->context()->menu()->action(Qn::ConnectionSettingsAction), "trigger", Qt::QueuedConnection);
 
     int result = application->exec();
 

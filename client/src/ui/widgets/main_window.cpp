@@ -174,6 +174,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::ConnectionSettingsAction));
     addAction(action(Qn::OpenNewLayoutAction));
+    addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
     addAction(action(Qn::YouTubeUploadAction));

@@ -2,10 +2,14 @@
 
 #include <cassert>
 
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QImage>
-#include <QSettings>
+#include <QtCore/QProcess>
+#include <QtCore/QSettings>
+
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
+#include <QtGui/QImage>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -133,6 +137,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenNewLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
+    connect(action(Qn::OpenNewWindowAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAsAction),                 SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
     connect(action(Qn::SaveCurrentLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
@@ -173,11 +178,6 @@ const QnAppServerConnectionPtr &QnWorkbenchActionHandler::connection() const {
 }
 
 QWidget *QnWorkbenchActionHandler::widget() const {
-    /* Camera settings dialog stays on top. In order for it not to hide
-     * modal dialogs, it must be used as parent for such dialogs. */
-    if(m_cameraSettingsDialog && m_cameraSettingsDialog->isVisible())
-        return m_cameraSettingsDialog.data();
-
     return m_widget.data();
 }
 
@@ -458,6 +458,24 @@ void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
     workbench()->setCurrentLayout(layout);
 }
 
+void QnWorkbenchActionHandler::at_openNewWindowAction_triggered() {
+    QStringList arguments;
+    arguments << QLatin1String("--no-single-application");
+    arguments << QLatin1String("--auth");
+    arguments << qnSettings->lastUsedConnection().url.toEncoded();
+
+    /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
+    if(widget()) {
+        int screen = qApp->desktop()->screenNumber(widget());
+        screen = (screen + 1) % qApp->desktop()->screenCount();
+
+        arguments << QLatin1String("--screen");
+        arguments << QString::number(screen);
+    }
+
+    QProcess::startDetached(qApp->applicationFilePath(), arguments);
+}
+
 void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout) {
     if(!layout)
         return;
@@ -715,7 +733,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnVirtualCameraResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(menu()->currentResourcesTarget(sender()).toSet().toList());
 
     if(!m_cameraSettingsDialog) {
-        m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget(), Qt::WindowStaysOnTopHint));
+        m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget()));
 
         connect(m_cameraSettingsDialog.data(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
