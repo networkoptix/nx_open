@@ -25,22 +25,22 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QTableWidget" name="gridLicenses">
-            <property name="enabled">
+           <widget class="QTreeWidget" name="gridLicenses">
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
+            <property name="sortingEnabled">
              <bool>true</bool>
             </property>
-            <property name="editTriggers">
-             <set>QAbstractItemView::NoEditTriggers</set>
+            <property name="columnCount">
+             <number>3</number>
             </property>
-            <attribute name="horizontalHeaderCascadingSectionResizes">
-             <bool>false</bool>
-            </attribute>
-            <attribute name="horizontalHeaderStretchLastSection">
+            <attribute name="headerStretchLastSection">
              <bool>true</bool>
             </attribute>
             <column>
              <property name="text">
-              <string>Licensed to</string>
+              <string>Licensed To</string>
              </property>
             </column>
             <column>
@@ -60,7 +60,7 @@
             <item>
              <widget class="QLabel" name="infoLabel">
               <property name="text">
-               <string>TextLabel</string>
+               <string>...</string>
               </property>
              </widget>
             </item>
@@ -116,24 +116,7 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>gridLicenses</sender>
-   <signal>itemSelectionChanged()</signal>
-   <receiver>LicenseManagerWidget</receiver>
-   <slot>gridSelectionChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>368</x>
-     <y>234</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>368</x>
-     <y>270</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>gridSelectionChanged()</slot>
  </slots>

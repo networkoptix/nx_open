@@ -13,6 +13,10 @@
 
 #include "core/resourcemanagment/resource_pool.h"
 
+namespace {
+    QColor redText = QColor(255, 64, 64);
+}
+
 LicenseManagerWidget::LicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::LicenseManagerWidget)
@@ -90,37 +94,39 @@ void LicenseManagerWidget::updateControls()
         setEnabled(true);
     }
 
-    int rowCount = ui->gridLicenses->rowCount();
-    for (int i = 0; i < rowCount; i++) {
-        ui->gridLicenses->removeRow(0);
-    }
+    ui->gridLicenses->clear();
 
     foreach(const QnLicensePtr& license, m_licenses.licenses()) {
-        int row = ui->gridLicenses->rowCount();
-        ui->gridLicenses->insertRow(row);
-        ui->gridLicenses->setItem(row, 0, new QTableWidgetItem(license->name(), QTableWidgetItem::Type));
-        ui->gridLicenses->setItem(row, 1, new QTableWidgetItem(QString::number(license->cameraCount()), QTableWidgetItem::Type));
-        ui->gridLicenses->setItem(row, 2, new QTableWidgetItem(license->key(), QTableWidgetItem::Type));
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setData(0, Qt::DisplayRole, license->name());
+        item->setData(1, Qt::DisplayRole, license->cameraCount());
+        item->setData(2, Qt::DisplayRole, license->key());
+        ui->gridLicenses->addTopLevelItem(item);
     }
 
+    bool useRedLabel = false;
+
     if (!m_licenses.isEmpty()) {
-        QPalette palette = ui->infoLabel->palette();
         int totalCameras = m_licenses.totalCameras();
         int usingCameras = qnResPool->activeCameras();
-        if (usingCameras > totalCameras)
-            palette.setColor(QPalette::Foreground, Qt::red);
-        else
-            palette.setColor(QPalette::Foreground, parentWidget() ? parentWidget()->palette().color(QPalette::Foreground) : Qt::black);
-        ui->infoLabel->setPalette(palette);
         ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras. Currently using %2.")).arg(totalCameras).arg(usingCameras));
+        useRedLabel = usingCameras > totalCameras;
     } else {
-        QPalette palette = ui->infoLabel->palette();
-        palette.setColor(QPalette::Foreground, Qt::red);
-        ui->infoLabel->setPalette(palette);
-        if (m_licenses.hardwareId().isEmpty())
+        if (m_licenses.hardwareId().isEmpty()) {
             ui->infoLabel->setText(tr("Obtaining licenses from application server..."));
-        else
+            useRedLabel = false;
+        } else {
             ui->infoLabel->setText(tr("You do not have a valid License installed. Please activate your commercial or free license."));
+            useRedLabel = true;
+        }
+    }
+
+    if(useRedLabel) {
+        QPalette palette = ui->infoLabel->palette();
+        palette.setColor(QPalette::WindowText, redText);
+        ui->infoLabel->setPalette(palette);
+    } else {
+        ui->infoLabel->setPalette(palette());
     }
 
     ui->licenseWidget->ui->activateFreeLicenseButton->setVisible(!m_licenses.haveLicenseKey(QnLicense::FREE_LICENSE_KEY));
