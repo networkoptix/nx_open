@@ -1,8 +1,7 @@
 #include "settings.h"
 
-#include <QMutex>
-#include <QSettings>
-#include <QDir>
+#include <QtCore/QSettings>
+#include <QtCore/QDir>
 
 #include "licensing/license.h"
 #include "utils/common/util.h"
@@ -35,7 +34,8 @@ namespace {
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
 
 QnSettings::QnSettings():
-    m_lock(QMutex::Recursive)
+    m_lock(QMutex::Recursive),
+    m_settings(new QSettings())
 {}
 
 QnSettings *QnSettings::instance()
@@ -72,42 +72,48 @@ void QnSettings::load()
 
     reset();
 
-    m_data.mediaRoot = fromNativePath(m_settings.value("mediaRoot").toString());
+    m_data.mediaRoot = fromNativePath(m_settings->value("mediaRoot").toString());
 
-    int size = m_settings.beginReadArray("auxMediaRoot");
+    int size = m_settings->beginReadArray("auxMediaRoot");
     for (int i = 0; i < size; ++i)
     {
-        m_settings.setArrayIndex(i);
-        m_data.auxMediaRoots.push_back(fromNativePath(m_settings.value("path").toString()));
+        m_settings->setArrayIndex(i);
+        m_data.auxMediaRoots.push_back(fromNativePath(m_settings->value("path").toString()));
     }
-    m_settings.endArray();
+    m_settings->endArray();
 
-    m_data.afterFirstRun = (m_settings.value("afterFirstRun").toString() == "true");
-    m_data.maxVideoItems = m_settings.value("maxVideoItems", 32).toInt();
-    m_data.downmixAudio = (m_settings.value("downmixAudio") == "true");
+    m_data.afterFirstRun = (m_settings->value("afterFirstRun").toString() == "true");
+    m_data.maxVideoItems = m_settings->value("maxVideoItems", 32).toInt();
+    m_data.downmixAudio = (m_settings->value("downmixAudio") == "true");
 
     if (m_data.mediaRoot.isEmpty())
         m_data.mediaRoot = getMoviesDirectory() + QLatin1String("/EVE Media/");
+
+    m_settings->beginGroup(QLatin1String("AppServerConnections"));
+    m_settings->beginGroup(QLatin1String("lastUsed"));
+    m_lastUsed = readConnectionData(m_settings);
+    m_settings->endGroup();
+    m_settings->endGroup();
 }
 
 void QnSettings::save()
 {
     QMutexLocker locker(&m_lock);
 
-    m_settings.setValue("mediaRoot", QDir::toNativeSeparators(m_data.mediaRoot));
+    m_settings->setValue("mediaRoot", QDir::toNativeSeparators(m_data.mediaRoot));
 
-    m_settings.beginWriteArray("auxMediaRoot", m_data.auxMediaRoots.size());
+    m_settings->beginWriteArray("auxMediaRoot", m_data.auxMediaRoots.size());
     int size = m_data.auxMediaRoots.size();
     for (int i = 0; i < size; ++i)
     {
-        m_settings.setArrayIndex(i);
-        m_settings.setValue("path", m_data.auxMediaRoots[i]);
+        m_settings->setArrayIndex(i);
+        m_settings->setValue("path", m_data.auxMediaRoots[i]);
     }
-    m_settings.endArray();
+    m_settings->endArray();
 
-    m_settings.setValue("afterFirstRun", "true");
-    m_settings.setValue("maxVideoItems", QString::number(m_data.maxVideoItems));
-    m_settings.setValue("downmixAudio", m_data.downmixAudio ? "true" : "false");
+    m_settings->setValue("afterFirstRun", "true");
+    m_settings->setValue("maxVideoItems", QString::number(m_data.maxVideoItems));
+    m_settings->setValue("downmixAudio", m_data.downmixAudio ? "true" : "false");
 }
 
 int QnSettings::maxVideoItems() const
@@ -167,28 +173,20 @@ QnSettings::ConnectionData QnSettings::lastUsedConnection()
 {
     QMutexLocker locker(&m_lock);
 
-    ConnectionData connection;
-
-    QSettings settings;
-    settings.beginGroup(QLatin1String("AppServerConnections"));
-    settings.beginGroup(QLatin1String("lastUsed"));
-    connection = readConnectionData(&settings);
-    settings.endGroup();
-    settings.endGroup();
-
-    return connection;
+    return m_lastUsed;
 }
 
 void QnSettings::setLastUsedConnection(const QnSettings::ConnectionData &connection)
 {
     QMutexLocker locker(&m_lock);
 
-    QSettings settings;
-    settings.beginGroup(QLatin1String("AppServerConnections"));
-    settings.beginGroup(QLatin1String("lastUsed"));
-    writeConnectionData(&settings, connection);
-    settings.endGroup();
-    settings.endGroup();
+    m_lastUsed = connection;
+
+    m_settings->beginGroup(QLatin1String("AppServerConnections"));
+    m_settings->beginGroup(QLatin1String("lastUsed"));
+    writeConnectionData(m_settings, connection);
+    m_settings->endGroup();
+    m_settings->endGroup();
 
     emit lastUsedConnectionChanged();
 }
@@ -199,15 +197,14 @@ QList<QnSettings::ConnectionData> QnSettings::connections()
 
     QList<ConnectionData> connections;
 
-    QSettings settings;
-    const int size = settings.beginReadArray(QLatin1String("AppServerConnections"));
+    const int size = m_settings->beginReadArray(QLatin1String("AppServerConnections"));
     for (int i = 0; i < size; ++i) {
-        settings.setArrayIndex(i);
-        ConnectionData connection = readConnectionData(&settings);
+        m_settings->setArrayIndex(i);
+        ConnectionData connection = readConnectionData(m_settings);
         if (connection.url.isValid())
             connections.append(connection);
     }
-    settings.endArray();
+    m_settings->endArray();
 
     return connections;
 }
@@ -218,9 +215,8 @@ void QnSettings::setConnections(const QList<QnSettings::ConnectionData> &connect
 
     ConnectionData lastUsed = lastUsedConnection();
 
-    QSettings settings;
-    settings.beginWriteArray(QLatin1String("AppServerConnections"));
-    settings.remove(QLatin1String("")); // clear
+    m_settings->beginWriteArray(QLatin1String("AppServerConnections"));
+    m_settings->remove(QLatin1String("")); // clear
     int i = 0;
     foreach (const ConnectionData &connection, connections) {
         if (!connection.url.isValid())
@@ -230,11 +226,11 @@ void QnSettings::setConnections(const QList<QnSettings::ConnectionData> &connect
             // special case: the last used connection
             lastUsed = connection;
         } else {
-            settings.setArrayIndex(i++);
-            writeConnectionData(&settings, connection);
+            m_settings->setArrayIndex(i++);
+            writeConnectionData(m_settings, connection);
         }
     }
-    settings.endArray();
+    m_settings->endArray();
 
     setLastUsedConnection(lastUsed);
 }

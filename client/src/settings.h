@@ -1,11 +1,12 @@
 #ifndef QN_SETTINGS_H
 #define QN_SETTINGS_H
 
-#include <QObject>
-#include <QUrl>
-#include <QSettings>
-#include <QStringList>
-#include <QReadWriteLock>
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
+#include <QtCore/QStringList>
+#include <QtCore/QMutex>
+
+class QSettings;
 
 class QnSettings: public QObject {
     Q_OBJECT;
@@ -75,7 +76,8 @@ private:
 
 private:
     mutable QMutex m_lock;
-    QSettings m_settings;
+    QSettings *m_settings;
+    ConnectionData m_lastUsed;
     Data m_data;
 };
 
