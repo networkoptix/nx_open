@@ -11,6 +11,7 @@
 #include <QtGui/QGraphicsLinearLayout>
 #include <QtGui/QMenu>
 #include <QtGui/QPainter>
+#include <QtGui/QGraphicsSceneMouseEvent>
 
 #include <utils/common/util.h>
 
@@ -773,7 +774,9 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 qint64 TimeLine::posToValue(qreal pos) const
 {
-    return m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * pos);
+    qreal d = m_parent->m_slider->handleRect().width();
+
+    return m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / (m_parent->rect().width() - d)) * (pos - d / 2));
 }
 
 qreal TimeLine::valueToPos(qint64 value) const
@@ -873,7 +876,8 @@ void TimeLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         qint64 dtime = qRound64((double(m_parent->sliderRange()) / rect().width()) * dpos.x());
         if (bUnscaled) {
-            m_parent->setCurrentValue(qBound(m_parent->viewPortPos(), m_parent->currentValue() + dtime, m_parent->viewPortPos() + m_parent->sliderRange()));
+            m_parent->setCurrentValue(posToValue(event->pos().x()));
+            //m_parent->setCurrentValue(qBound(m_parent->viewPortPos(), m_parent->currentValue() + dtime, m_parent->viewPortPos() + m_parent->sliderRange()));
         } else if (m_parent->centralise()) {
             dtime = dtime < 0 ? qMax(dtime, -m_parent->viewPortPos())
                               : qMin(dtime, m_parent->maximumValue() - (m_parent->viewPortPos() + m_parent->sliderRange()));

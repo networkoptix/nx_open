@@ -385,7 +385,7 @@ protected:
             return;
         
         QModelIndex index = this->index(0);
-        emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount));
+        emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
     }
 
 private:
