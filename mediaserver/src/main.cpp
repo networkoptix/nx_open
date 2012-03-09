@@ -545,6 +545,7 @@ public:
 
         //
 
+        connect(qnResPool, SIGNAL(statusChanged(QnResourcePtr)), m_processor, SLOT(onResourceStatusChanged(QnResourcePtr)));
 
         //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
         //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
@@ -564,11 +565,6 @@ public:
                              m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
 
             qnResPool->addResource(camera);
-
-            QObject::disconnect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-                m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
-            QObject::connect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-                m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
 
             //QnRecordingManager::instance()->updateCamera(camera);
         }

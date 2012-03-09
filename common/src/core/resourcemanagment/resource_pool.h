@@ -72,9 +72,12 @@ signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
+    void statusChanged(const QnResourcePtr &resource);
+
     void aboutToBeDestroyed();
 
 private slots:
+    void handleStatusChange();
     void handleResourceChange();
 
 private:
