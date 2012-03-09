@@ -202,6 +202,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         m_tftp_client = new CLSimpleTFTPClient(netRes->getHostAddress(),  m_timeout, 3);
     }
 
+    m_videoFrameBuff.clear();
     
     CLByteArray& img = m_videoFrameBuff;
 
@@ -375,7 +376,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     CLByteArray& imgToSend = videoData->data;
     imgToSend.write(m_videoFrameBuff);
-    m_videoFrameBuff.clear();
+    
 
     if (iFrame)
         videoData->flags |= AV_PKT_FLAG_KEY;
