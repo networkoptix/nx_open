@@ -1,9 +1,11 @@
 #include "about_dialog.h"
 
-#include <QtGui/QBoxLayout>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QGroupBox>
-#include <QtGui/QLabel>
+#include <QBoxLayout>
+#include <QDialogButtonBox>
+#include <QGroupBox>
+#include <QLabel>
+#include <QEvent>
+#include <QPushButton>
 
 #include "version.h"
 

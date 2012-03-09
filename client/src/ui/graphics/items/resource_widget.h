@@ -256,6 +256,10 @@ public:
 
     using base_type::mapRectToScene;
 
+    Qn::RenderStatus currentRenderStatus() const {
+        return m_renderStatus;
+    }
+
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
@@ -305,7 +309,8 @@ protected:
 
     int motionGridWidth() const;
     int motionGridHeight() const;
-private Q_SLOTS:
+
+private slots:
     void at_sourceSizeChanged(const QSize &size);
     void at_display_resourceUpdated();
 
@@ -361,6 +366,7 @@ private:
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
 
     void drawFlashingText(QPainter *painter, const QStaticText& text, int textSize = 550, int xOffs = 4, int yOffs = 16);
+
 private:
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
@@ -385,7 +391,6 @@ private:
 
     /** Paused painter. */
     QSharedPointer<QnPausedPainter> m_pausedPainter;
-
 
     /** Loading progress painter. */
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
@@ -434,6 +439,10 @@ private:
 
     /** Whether motion mask binary data is valid. */
     bool m_motionMaskBinDataValid;
+
+    /** Status of the last painting operation. */
+    Qn::RenderStatus m_renderStatus;
+
 
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;

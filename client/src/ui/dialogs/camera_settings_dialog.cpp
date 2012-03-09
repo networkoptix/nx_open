@@ -32,7 +32,7 @@ CameraSettingsDialog::CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QW
     
     at_tabWidget_currentChanged();
 
-    ui->cameraScheduleWidget->setScheduleDisabled(m_camera->isScheduleDisabled() ? Qt::Checked : Qt::Unchecked);
+    ui->cameraScheduleWidget->setScheduleEnabled(m_camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked);
 
     updateView();
 }
@@ -43,10 +43,12 @@ CameraSettingsDialog::~CameraSettingsDialog()
 
 void CameraSettingsDialog::accept()
 {
-    if (m_camera->isScheduleDisabled() && ui->cameraScheduleWidget->getScheduleDisabled() == 0
+    if (m_camera->isScheduleDisabled() && ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Checked
             && qnResPool->activeCameras() + 1 > qnLicensePool->getLicenses().totalCameras())
     {
-        QMessageBox::warning(this, "Can't save camera", "Licensed cameras limit exceeded. Please disable schedule.");
+        QString message = QString("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved.").arg(qnResPool->activeCameras() + 1).arg(qnLicensePool->getLicenses().totalCameras());
+        QMessageBox::warning(this, "Can't enable recording", message);
+        ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
         return;
     }
 
@@ -68,7 +70,7 @@ void CameraSettingsDialog::saveToModel()
     m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-    m_camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleDisabled() == 2);
+    m_camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
 
     if (!ui->cameraScheduleWidget->isDoNotChange())
     {

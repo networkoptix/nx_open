@@ -286,6 +286,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    application->setStartDragDistance(7);
+
     QnToolTip::instance();
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());

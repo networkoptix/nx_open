@@ -15,7 +15,7 @@ class CLVideoDecoderOutput;
 class QnGLRendererPrivate;
 class QnGlRendererTexture;
 
-class QnGLRenderer: public QnRenderStatus
+class QnGLRenderer
 {
 public:
     enum HardwareStatus {
@@ -37,7 +37,7 @@ public:
     
     
     CLVideoDecoderOutput *update();
-    RenderStatus paint(const QRectF &r);
+    Qn::RenderStatus paint(const QRectF &r);
 
     qreal opacity() const;
     void setOpacity(qreal opacity);
