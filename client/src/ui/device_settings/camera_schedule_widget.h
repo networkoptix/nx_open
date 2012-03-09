@@ -34,15 +34,16 @@ signals:
     void scheduleEnabledChanged();
 
 private slots:
+    void updateGridParams();
+    void updateGridEnabledState();
+
     void onDisplayQualityChanged(int state);
     void onDisplayFPSChanged(int state);
     void onEnableScheduleClicked();
-    void updateGridParams();
     void onCellActivated(const QPoint &cell);
 
 private:
     int qualityTextToIndex(const QString &text);
-    void enableGrid(bool value);
 
     void connectToGridWidget();
     void disconnectFromGridWidget();
@@ -52,6 +53,7 @@ private:
 
     QScopedPointer<Ui::CameraScheduleWidget> ui;
     bool m_disableUpdateGridParams;
+    bool m_changesDisabled;
 };
 
 
