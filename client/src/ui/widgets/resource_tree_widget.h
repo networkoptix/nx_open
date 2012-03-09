@@ -69,6 +69,7 @@ public:
 signals:
     void activated(const QnResourcePtr &resource);
     void currentTabChanged();
+    void selectionChanged();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event) override;

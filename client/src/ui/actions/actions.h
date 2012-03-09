@@ -66,6 +66,11 @@ namespace Qn {
          */
         SelectAllAction,
 
+        /**
+         * Notifies action handler about selectin changes.
+         */
+        SelectionChangeAction,
+
 
 
         /* Main menu actions. */
@@ -196,6 +201,11 @@ namespace Qn {
          * Opens camera settings dialog.
          */
         CameraSettingsAction,
+
+        /**
+         * Opens provided cameras in an existing camera settings dialog.
+         */
+        OpenInCameraSettingsDialogAction,
 
         /**
          * Opens server settings dialog.

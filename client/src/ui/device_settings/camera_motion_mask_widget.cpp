@@ -122,10 +122,10 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 
 	m_camera = camera;
 
+    m_context->workbench()->currentLayout()->clear();
+
     if(!m_camera) {
         m_motionMaskList = emptyMotionMaskList();
-
-        m_context->workbench()->clear();
     } else {
         m_motionMaskList = m_camera->getMotionMaskList();
 

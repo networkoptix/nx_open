@@ -93,6 +93,7 @@ protected:
     void closeLayouts(const QnWorkbenchLayoutList &layouts);
 
     void saveCameraSettingsFromDialog();
+    Q_SLOT void updateCameraSettingsFromSelection();
 
 protected slots:
     void at_context_aboutToBeDestroyed();
@@ -124,6 +125,7 @@ protected slots:
     void at_connectionSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
+    void at_selectionChangeAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
@@ -155,6 +157,8 @@ private:
 
     QScopedPointer<QMenu> m_mainMenu;
     QScopedPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    bool m_selectionUpdatePending;
+    Qn::ActionScope m_selectionScope;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

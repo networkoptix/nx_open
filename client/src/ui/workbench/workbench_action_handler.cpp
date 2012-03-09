@@ -21,6 +21,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_target_types.h>
+#include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/login_dialog.h>
@@ -65,7 +66,9 @@ void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
     m_context(NULL),
-    m_connection(QnAppServerConnectionFactory::createConnection())
+    m_connection(QnAppServerConnectionFactory::createConnection()),
+    m_selectionUpdatePending(false),
+    m_selectionScope(Qn::SceneScope)
 {}
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -137,6 +140,8 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::CloseLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(action(Qn::CloseAllButThisLayoutAction),        SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
     connect(action(Qn::CameraSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::OpenInCameraSettingsDialogAction),   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::SelectionChangeAction),              SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
     connect(action(Qn::ServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::EditTagsAction),                     SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
@@ -340,6 +345,27 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     /* Submit and save it. */
     m_cameraSettingsDialog->widget()->submitToResources();
     connection()->saveAsync(cameras, this, SLOT(at_cameras_saved(int, const QByteArray &, const QnResourceList &, int)));
+}
+
+void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
+    if(!m_cameraSettingsDialog || m_cameraSettingsDialog->isHidden() || !m_selectionUpdatePending)
+        return;
+
+    m_selectionUpdatePending = false;
+
+    QnActionTargetProvider *provider = menu()->targetProvider();
+    if(!provider)
+        return;
+
+    Qn::ActionScope scope = provider->currentScope();
+    if(scope != Qn::SceneScope && scope != Qn::TreeScope) {
+        scope = m_selectionScope;
+    } else {
+        m_selectionScope = scope;
+    }
+
+    QnResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(QnActionTargetTypes::resources(provider->currentTarget(scope)));
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, cameras);
 }
 
 
@@ -686,7 +712,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnVirtualCameraResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(menu()->currentResourcesTarget(sender()));
+    QnVirtualCameraResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(menu()->currentResourcesTarget(sender()).toSet().toList());
 
     if(!m_cameraSettingsDialog) {
         m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget(), Qt::WindowStaysOnTopHint));
@@ -725,6 +751,14 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
     default:
         break;
     }
+}
+
+void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
+    if(!m_cameraSettingsDialog || m_cameraSettingsDialog->isHidden() || m_selectionUpdatePending)
+        return;
+
+    m_selectionUpdatePending = true;
+    QTimer::singleShot(50, this, SLOT(updateCameraSettingsFromSelection()));
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {

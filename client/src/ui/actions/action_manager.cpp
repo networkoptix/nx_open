@@ -290,6 +290,11 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+A")).
         autoRepeat(false);
 
+    factory(Qn::SelectionChangeAction).
+        flags(Qn::NoTarget).
+        text(tr("Selection Changed"));
+
+
 
     /* Context menu actions. */
     factory(Qn::MainMenuAction).
@@ -484,6 +489,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Camera Settings")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
+
+    factory(Qn::OpenInCameraSettingsDialogAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource).
+        text(tr("Open in Camera Settings Dialog")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
 
     factory(Qn::ServerSettingsAction).
