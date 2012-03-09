@@ -50,7 +50,7 @@ private:
     //int m_NumaberOfVideoChannels;
     QnStreamQuality m_quality;
 
-    float m_fps; //used only for live providers
+    mutable float m_fps; //used only for live providers
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 

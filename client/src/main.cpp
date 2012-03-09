@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    application->setStartDragDistance(7);
+    application->setStartDragDistance(20);
 
     QnToolTip::instance();
 

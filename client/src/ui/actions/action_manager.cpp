@@ -364,7 +364,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::FullscreenAction).
         flags(Qn::Main).
         text(tr("Go to Fullscreen")).
-        toggledText(tr("Restore Down")).
+        toggledText(tr("Exit Fullscreen")).
         autoRepeat(false).
 #ifdef Q_OS_MAC
         shortcut(tr("Ctrl+F")).
