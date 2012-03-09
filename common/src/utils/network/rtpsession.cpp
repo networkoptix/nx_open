@@ -294,6 +294,10 @@ RTPIODevice*  RTPSession::sendSetup()
             if (audioNum++ != m_selectedAudioChannel)
                 continue;
         }
+        else if (getTrackType(itr.key()) != "video")
+        {
+            continue; // skip metadata e.t.c
+        }
 
         QByteArray request;
         request += "SETUP ";
@@ -587,7 +591,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     *curBuffer++ = (RtpHeader::RTP_VERSION << 6) + 1;  // source count = 1
     *curBuffer++ = RTCP_SOURCE_DESCRIPTION;  // packet type
     *curBuffer++ = 0; // len field = 6 (hi)
-    *curBuffer++ = 6; // len field = 6 (low)
+    *curBuffer++ = 4; // len field = 6 (low), (4+1)*4=20 bytes
     curBuf32 = (quint32*) curBuffer;
     *curBuf32 = htonl(CSRC_CONST);
     curBuffer+=4;
@@ -914,7 +918,7 @@ void RTPSession::removeAdditionAttribute(const QByteArray& name)
     m_additionAttrs.remove(name);
 }
 
-void RTPSession::setTimeout(int timeout)
+void RTPSession::setTCPTimeout(int timeout)
 {
     m_tcpTimeout = timeout;
 }

@@ -64,7 +64,7 @@ bool QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
     if (lRequest.indexOf(dblDelim) == -1)
         return false;
     int expectedSize = lRequest.indexOf(dblDelim) + dblDelim.size() + contentLen;
-    return expectedSize == lRequest.size();
+    return lRequest.size() >= expectedSize;
 }
 
 void QnTCPConnectionProcessor::parseRequest()

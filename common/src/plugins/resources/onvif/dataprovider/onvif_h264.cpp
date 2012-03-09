@@ -10,9 +10,9 @@ m_streamParser(0)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
-        m_RtpSession.setTimeout(netRes->getNetworkTimeout());
+        m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
-        m_RtpSession.setTimeout(1000 * 2);
+        m_RtpSession.setTCPTimeout(1000 * 2);
 }
 
 RTPH264Streamreader::~RTPH264Streamreader()
@@ -28,9 +28,12 @@ QnAbstractMediaDataPtr RTPH264Streamreader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if(m_streamParser)
-        return m_streamParser->getNextData();
-
+    if(m_streamParser) {
+        QnAbstractMediaDataPtr rez = m_streamParser->getNextData();
+        if (rez)
+            return rez;
+    }
+    closeStream();
     return QnAbstractMediaDataPtr(0);
 
 
@@ -62,6 +65,8 @@ void RTPH264Streamreader::openStream()
 void RTPH264Streamreader::closeStream()
 {
     m_RtpSession.stop();
+    delete m_streamParser;
+    m_streamParser = 0;
 }
 
 bool RTPH264Streamreader::isStreamOpened() const

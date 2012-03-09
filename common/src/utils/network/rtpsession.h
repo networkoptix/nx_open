@@ -91,7 +91,7 @@ public:
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
 
-    void setTimeout(int timeout);
+    void setTCPTimeout(int timeout);
 signals:
     void gotTextResponse(QByteArray text);
 private:
