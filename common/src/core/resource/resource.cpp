@@ -488,6 +488,16 @@ QnResource::Status QnResource::getStatus() const
     return m_status;
 }
 
+void QnResource::setStatusIfNotDisabled(QnResource::Status newStatus, bool silenceMode)
+{
+    // If resource is disabled, do not change status. This function introduced to prevent race condition
+    QMutexLocker mutexLocker(&m_mutex);
+    if (m_status == Disabled)
+        return;
+    setStatus(newStatus, silenceMode);
+}
+
+
 void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 {
     Status oldStatus;
