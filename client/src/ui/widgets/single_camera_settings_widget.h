@@ -40,6 +40,7 @@ signals:
 private slots:
     void at_tabWidget_currentChanged();
     void at_dataChanged();
+    void at_cameraScheduleWidget_scheduleTasksChanged();
 
 private:
     void setHasChanges(bool hasChanges);
@@ -50,6 +51,7 @@ private:
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
     bool m_hasChanges;
+    bool m_hasScheduleChanges;
 
     QnCameraMotionMaskWidget *m_motionWidget;
 };

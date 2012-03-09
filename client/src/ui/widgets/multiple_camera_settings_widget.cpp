@@ -10,16 +10,17 @@
 #include "ui/device_settings/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource_widget.h"
 
-QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent)
-  : QWidget(parent),
+QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
+    QWidget(parent),
     ui(new Ui::MultipleCameraSettingsWidget),
-    m_hasChanges(false)
+    m_hasChanges(false),
+    m_hasScheduleChanges(false)
 {
     ui->setupUi(this);
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_dataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
 
     updateFromResources();
@@ -115,7 +116,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (ui->cameraScheduleWidget->getScheduleEnabled() != Qt::PartiallyChecked)
             camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
 
-        if (!ui->cameraScheduleWidget->isChangesDisabled() && !ui->cameraScheduleWidget->scheduleTasks().isEmpty()) {
+        if (m_hasScheduleChanges) {
             QnScheduleTaskList scheduleTasks;
             foreach(const QnScheduleTask::Data& data, ui->cameraScheduleWidget->scheduleTasks())
                 scheduleTasks.append(QnScheduleTask(data));
@@ -207,6 +208,8 @@ void QnMultipleCameraSettingsWidget::setHasChanges(bool hasChanges) {
         return;
 
     m_hasChanges = hasChanges;
+    if(!m_hasChanges)
+        m_hasScheduleChanges = false;
 
     emit hasChangesChanged();
 }
@@ -219,3 +222,8 @@ void QnMultipleCameraSettingsWidget::at_dataChanged() {
     setHasChanges(true);
 }
 
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged() {
+    at_dataChanged();
+
+    m_hasScheduleChanges = true;
+}

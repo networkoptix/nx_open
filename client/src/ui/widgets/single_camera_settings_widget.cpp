@@ -14,7 +14,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::SingleCameraSettingsWidget),
     m_motionWidget(NULL),
-    m_hasChanges(false)
+    m_hasChanges(false),
+    m_hasScheduleChanges(false)
 {
     ui->setupUi(this);
     
@@ -24,14 +25,14 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_dataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
 
     updateFromResource();
 }
 
-QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
-{
+QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
+    return;
 }
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
@@ -99,8 +100,7 @@ void QnSingleCameraSettingsWidget::setCameraActive(bool active) {
     ui->cameraScheduleWidget->setScheduleEnabled(active ? Qt::Checked : Qt::Unchecked);
 }
 
-void QnSingleCameraSettingsWidget::submitToResource()
-{
+void QnSingleCameraSettingsWidget::submitToResource() {
     if(!m_camera)
         return;
 
@@ -110,8 +110,7 @@ void QnSingleCameraSettingsWidget::submitToResource()
 
     m_camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
 
-    if (!ui->cameraScheduleWidget->isChangesDisabled())
-    {
+    if (m_hasScheduleChanges) {
         QnScheduleTaskList scheduleTasks;
         foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
             scheduleTasks.append(QnScheduleTask(scheduleTaskData));
@@ -124,8 +123,7 @@ void QnSingleCameraSettingsWidget::submitToResource()
     setHasChanges(false);
 }
 
-void QnSingleCameraSettingsWidget::updateFromResource()
-{
+void QnSingleCameraSettingsWidget::updateFromResource() {
     if(!m_camera) {
         ui->nameEdit->setText(QString());
         ui->macAddressEdit->setText(QString());
@@ -168,6 +166,8 @@ void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
         return;
 
     m_hasChanges = hasChanges;
+    if(!m_hasScheduleChanges)
+        m_hasScheduleChanges = false;
 
     emit hasChangesChanged();
 }
@@ -176,8 +176,7 @@ void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() 
-{
+void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     if(m_motionWidget != NULL)
         return;
 
@@ -195,8 +194,12 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
     connect(m_motionWidget, SIGNAL(motionMaskListChanged()), this, SLOT(at_dataChanged()));
 }
 
-void QnSingleCameraSettingsWidget::at_dataChanged() 
-{
+void QnSingleCameraSettingsWidget::at_dataChanged() {
     setHasChanges(true);
 }
 
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged() {
+    at_dataChanged();
+
+    m_hasScheduleChanges = true;
+}

@@ -37,6 +37,7 @@ signals:
 
 private slots:
     void at_dataChanged();
+    void at_cameraScheduleWidget_scheduleTasksChanged();
 
 private:
     void setHasChanges(bool hasChanges);
@@ -47,6 +48,7 @@ private:
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
     QnVirtualCameraResourceList m_cameras;
     bool m_hasChanges;
+    bool m_hasScheduleChanges;
 };
 
 #endif // QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
