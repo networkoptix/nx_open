@@ -246,12 +246,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("info.png")));
 
-    factory(Qn::ConnectionSettingsAction).
-        flags(Qn::NoTarget).
-        text(tr("Connection Settings")).
-        autoRepeat(false).
-        icon(Skin::icon(QLatin1String("connect.png")));
-
     factory(Qn::ShowFpsAction).
         flags(Qn::NoTarget).
         text(tr("Show FPS")).
@@ -407,6 +401,10 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(Skin::icon(QLatin1String("decorations/maximize.png"))).
         hoverIcon(Skin::icon(QLatin1String("decorations/maximize_hovered.png")));
 
+    factory().
+        flags(Qn::Main).
+        separator();
+
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings")).
@@ -415,6 +413,12 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/settings.png"))).
         hoverIcon(Skin::icon(QLatin1String("decorations/settings_hovered.png")));
+
+    factory(Qn::ConnectionSettingsAction).
+        flags(Qn::Main).
+        text(tr("Connect to Server...")).
+        autoRepeat(false).
+        icon(Skin::icon(QLatin1String("connect.png")));
 
     factory().
         flags(Qn::Main).
