@@ -1,6 +1,8 @@
 #include <QtNetwork>
 #include "EventSource.h"
 
+#include <utils/common/warnings.h>
+
 #define QN_EVENT_SOURCE_DEBUG
 
 void QnJsonStreamParser::addData(const QByteArray& data)

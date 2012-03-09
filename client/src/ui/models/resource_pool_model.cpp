@@ -175,6 +175,10 @@ public:
         return m_flags;
     }
 
+    QnResource::Status resourceStatus() const {
+        return m_status;
+    }
+
     const QUuid &uuid() const {
         return m_uuid;
     }
@@ -829,7 +833,10 @@ void QnResourcePoolModel::at_resource_parentIdChanged() {
 
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
     QnResource::Status status = resource->getStatus();
-
+    /*
+    if(node(resource)->resourceStatus() != resource->getStatus())
+        qDebug() << "Status of resource" << resource->getName() << "changed from" << node(resource)->resourceStatus() << "to" << resource->getStatus();
+    */
     node(resource)->update();
     node(resource)->setBastard(status == QnResource::Disabled);
     foreach(Node *node, m_itemNodesByResource[resource.data()])
