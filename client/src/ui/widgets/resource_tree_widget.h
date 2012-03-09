@@ -19,7 +19,7 @@ class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
 class QnResourceCriterion;
-class QnResourceModel;
+class QnResourcePoolModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeItemDelegate;
@@ -69,6 +69,7 @@ public:
 signals:
     void activated(const QnResourcePtr &resource);
     void currentTabChanged();
+    void selectionChanged();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event) override;
@@ -110,7 +111,7 @@ private:
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
 
-    QnResourceModel *m_resourceModel;
+    QnResourcePoolModel *m_resourceModel;
     QnResourceTreeItemDelegate *m_resourceDelegate;
     QnResourceTreeItemDelegate *m_searchDelegate;
 

@@ -1,46 +1,42 @@
-#ifndef CAMERA_SETTINGS_DIALOG_H
-#define CAMERA_SETTINGS_DIALOG_H
+#ifndef QN_CAMERA_SETTINGS_DIALOG_H
+#define QN_CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
 
-#include "api/AppServerConnection.h"
+#include <core/resource/resource_fwd.h>
 
-namespace Ui {
-    class CameraSettingsDialog;
-}
+#include <ui/widgets/camera_settings_widget.h>
 
-class QnCameraScheduleWidget;
-class QnCameraMotionMaskWidget;
+class QAbstractButton;
 
-class CameraSettingsDialog : public QDialog
-{
-    Q_OBJECT
+class QnCameraSettingsWidget;
+class QnWorkbenchContext;
 
+class QnCameraSettingsDialog: public QDialog {
+    Q_OBJECT;
 public:
-    explicit CameraSettingsDialog(QnVirtualCameraResourcePtr camera, QWidget *parent = NULL);
-    virtual ~CameraSettingsDialog();
+    QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    virtual ~QnCameraSettingsDialog();
 
-public slots:
-    virtual void accept() override;
-    virtual void reject() override;
+    QnCameraSettingsWidget *widget() const {
+        return m_settingsWidget;
+    }
 
-    void at_requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
-    void at_tabWidget_currentChanged();
+signals:
+    void buttonClicked(QDialogButtonBox::StandardButton button);
+
+private slots:
+    void at_buttonBox_clicked(QAbstractButton *button);
+    void at_settingsWidget_hasChangesChanged();
+    void at_settingsWidget_modeChanged();
 
 private:
-    void updateView();
-    void saveToModel();
-    void save();
-
-private:
-    Q_DISABLE_COPY(CameraSettingsDialog)
-
-    QnVirtualCameraResourcePtr m_camera;
-    QScopedPointer<Ui::CameraSettingsDialog> ui;
-
-    QnAppServerConnectionPtr m_connection;
-
-    QnCameraMotionMaskWidget *m_motionWidget;
+    QWeakPointer<QnWorkbenchContext> m_context;
+    QnCameraSettingsWidget *m_settingsWidget;
+    QDialogButtonBox *m_buttonBox;
+    QPushButton *m_applyButton, *m_okButton;
 };
 
-#endif // CAMERA_SETTINGS_DIALOG_H
+
+#endif // QN_CAMERA_SETTINGS_DIALOG_H

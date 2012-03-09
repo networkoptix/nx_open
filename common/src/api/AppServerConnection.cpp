@@ -184,7 +184,7 @@ int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, Q
     return status;
 }
 
-int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources, QByteArray& errorString)
+int QnAppServerConnection::getResources(QnResourceList& resources, QByteArray& errorString)
 {
     QByteArray data;
     int status = getObjects("resourceEx", "", data, errorString);

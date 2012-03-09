@@ -117,7 +117,6 @@ inline uint qHash(const QnScheduleTask::Data &key)
     return qHash(key.m_dayOfWeek ^ key.m_startTime ^ key.m_endTime);
 }
 
-//typedef QSharedPointer<QnScheduleTask> QnScheduleTaskPtr;
 typedef QList<QnScheduleTask> QnScheduleTaskList;
 
 Q_DECLARE_TYPEINFO(QnScheduleTask, Q_MOVABLE_TYPE);

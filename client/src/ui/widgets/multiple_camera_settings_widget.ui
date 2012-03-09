@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MultipleCameraSettingsDialog</class>
- <widget class="QDialog" name="MultipleCameraSettingsDialog">
+ <class>MultipleCameraSettingsWidget</class>
+ <widget class="QWidget" name="MultipleCameraSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -87,13 +87,6 @@
      </widget>
     </widget>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -105,40 +98,7 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>MultipleCameraSettingsDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>227</x>
-     <y>311</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>227</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>MultipleCameraSettingsDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>227</x>
-     <y>311</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>227</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>buttonClicked(QAbstractButton*)</slot>
  </slots>

@@ -8,6 +8,7 @@
 #include <QtAlgorithms>
 #include <QGLContext>
 #include <QGLWidget>
+#include <QAction>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -245,6 +246,7 @@ void QnWorkbenchDisplay::deinitSceneContext() {
     m_instrumentManager->unregisterScene(m_scene);
 
     disconnect(m_scene, NULL, this, NULL);
+    disconnect(m_scene, NULL, context()->action(Qn::SelectionChangeAction), NULL);
 
     /* Clear curtain. */
     if(!m_curtainItem.isNull()) {
@@ -282,7 +284,8 @@ void QnWorkbenchDisplay::initSceneContext() {
         initBoundingInstrument();
     }
 
-    connect(m_scene, SIGNAL(destroyed()),           this, SLOT(at_scene_destroyed()));
+    connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
+    connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
