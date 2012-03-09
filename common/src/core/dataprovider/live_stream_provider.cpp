@@ -41,7 +41,7 @@ int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps)
 
 QnLiveStreamProvider::QnLiveStreamProvider():
 m_quality(QnQualityNormal),
-m_fps(MAX_LIVE_FPS),
+m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_livemutex(QMutex::Recursive),
 m_role(QnResource::Role_LiveVideo)
@@ -157,7 +157,15 @@ float QnLiveStreamProvider::getFps() const
     QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(res);
 
-    return qMin((int)m_fps, res->getMaxFps());
+    int maxFps = res->getMaxFps();
+    if (m_fps < 0) // setfps never been called
+        m_fps = res->getMaxFps() - 4;
+
+    m_fps = qMin((int)m_fps, res->getMaxFps());
+    m_fps = qMax((int)m_fps, 1);
+
+
+    return m_fps;
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
