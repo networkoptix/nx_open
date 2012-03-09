@@ -412,7 +412,6 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
     if (!requestBody.isEmpty())
     {
         request += requestBody;
-        request += "\r\n";
     }
 
     if (!m_tcpSock.send(request.data(), request.size()))

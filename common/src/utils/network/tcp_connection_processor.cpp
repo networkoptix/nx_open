@@ -185,7 +185,6 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     if (!d->responseBody.isEmpty())
     {
         response += d->responseBody;
-        response += ENDL;
     }
 
     qDebug() << "Server response to " << d->socket->getPeerAddress();
