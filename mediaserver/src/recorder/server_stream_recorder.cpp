@@ -95,11 +95,11 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     bool isRecording = m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never;
     if (isRecording) {
         if(m_device->getStatus() == QnResource::Online)
-            m_device->setStatus(QnResource::Recording);
+            m_device->setStatusIfNotDisabled(QnResource::Recording);
     }
     else {
         if(m_device->getStatus() == QnResource::Recording)
-            m_device->setStatus(QnResource::Online);
+            m_device->setStatusIfNotDisabled(QnResource::Online);
     }
 
     if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly) {
@@ -258,5 +258,5 @@ void QnServerStreamRecorder::endOfRun()
 {
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
-        m_device->setStatus(QnResource::Online);
+        m_device->setStatusIfNotDisabled(QnResource::Online);
 }

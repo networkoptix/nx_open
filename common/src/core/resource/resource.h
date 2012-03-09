@@ -107,6 +107,7 @@ public:
 
     Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
+    void setStatusIfNotDisabled(QnResource::Status newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
 
     // this function is called if resourse changes state from offline to online or so 
