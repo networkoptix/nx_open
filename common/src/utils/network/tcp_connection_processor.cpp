@@ -60,7 +60,11 @@ bool QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
             contentLen = lRequest.mid(posStart, posEnd - posStart+1).toInt();
     }
     QByteArray dblDelim = delimiter + delimiter;
-    return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());
+    //return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());
+    if (lRequest.indexOf(dblDelim) == -1)
+        return false;
+    int expectedSize = lRequest.indexOf(dblDelim) + dblDelim.size() + contentLen;
+    return expectedSize == lRequest.size();
 }
 
 void QnTCPConnectionProcessor::parseRequest()
