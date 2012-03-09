@@ -3,7 +3,7 @@
 
 #include <utils/common/warnings.h>
 
-#define QN_EVENT_SOURCE_DEBUG
+//#define QN_EVENT_SOURCE_DEBUG
 
 void QnJsonStreamParser::addData(const QByteArray& data)
 {

@@ -182,6 +182,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::SelectAllAction));
+    addAction(action(Qn::TakeScreenshotAction));
 
     connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));

@@ -487,6 +487,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::TakeScreenshotAction).
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Take Screenshot")).
+        shortcut(tr("Alt+S")).
+        autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition());
 
     // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?

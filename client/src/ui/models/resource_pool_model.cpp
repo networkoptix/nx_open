@@ -835,7 +835,7 @@ void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resou
     QnResource::Status status = resource->getStatus();
 
     if(node(resource)->resourceStatus() != resource->getStatus())
-        qDebug() << "Status of resource" << resource->getName() << "changed from" << node(resource)->resourceStatus() << "to" << resource->getStatus();
+        qDebug() << "Status of resource" << resource->getName() << "(" << resource->getId().toInt() << ")" << "changed from" << node(resource)->resourceStatus() << "to" << resource->getStatus();
 
     node(resource)->update();
     node(resource)->setBastard(status == QnResource::Disabled);
