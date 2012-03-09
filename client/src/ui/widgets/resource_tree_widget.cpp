@@ -164,7 +164,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     connect(ui->searchTreeView,     SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
-    connect(ui->searchTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
     updateFilter();
 }
@@ -490,6 +489,10 @@ void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
 
         ui->searchTreeView->setModel(model);
         ui->searchTreeView->expandAll();
+
+        /* View re-creates selection model for each model that is supplied to it, 
+         * so we have to re-connect each time the model changes. */
+        connect(ui->searchTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()), Qt::UniqueConnection);
     }
 
     emit currentTabChanged();
