@@ -18,7 +18,7 @@ public:
     /*
     * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
     */
-    static bool isFullMessage(const QByteArray& message);
+    static int isFullMessage(const QByteArray& message);
 
     int getSocketTimeout();
 protected:

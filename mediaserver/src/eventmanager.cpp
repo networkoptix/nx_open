@@ -115,6 +115,18 @@ void QnEventManager::eventReceived(QnEvent event)
                       << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.objectId;
         }
     }
+    else if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
+    {
+        QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
+
+        if (resource)
+        {
+            QnResource::Status status = (QnResource::Status)event.data.toInt();
+            resource->setStatus(status);
+        }
+    }
+
+
 }
 
 void QnEventManager::connectionClosed(QString errorString)

@@ -274,7 +274,7 @@ void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
     m_liveQuality = liveQuality;
 }
 
-void QnRtspDataConsumer::buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp)
+void QnRtspDataConsumer::buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType)
 {
     m_rtspTcpHeader[0] = '$';
     m_rtspTcpHeader[1] = channelNum;
@@ -286,7 +286,7 @@ void QnRtspDataConsumer::buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, qui
     rtp->extension = 0;
     rtp->CSRCCount = 0;
     rtp->marker  =  markerBit;
-    rtp->payloadType = RTP_FFMPEG_GENERIC_CODE;
+    rtp->payloadType = payloadType;
     rtp->sequence = htons(m_sequence[channelNum]++);
     //rtp->timestamp = htonl(m_timer.elapsed());
     rtp->timestamp = htonl(timestamp);
@@ -379,7 +379,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             ctxData[subChannelNumber] = currentContext;
             QByteArray codecCtxData;
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
-            buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
+            buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
             m_owner->bufferData(m_rtspTcpHeader, rtpHeaderSize);
             Q_ASSERT(!codecCtxData.isEmpty());
             m_owner->bufferData(codecCtxData);
@@ -410,7 +410,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         }
 
         sendLen = qMin(MAX_RTSP_DATA_LEN - ffHeaderSize, dataRest);
-        buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp);
+        buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
         //QMutexLocker lock(&m_owner->getSockMutex());
         m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         if (ffHeaderSize) 
@@ -443,7 +443,17 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_owner->clearBuffer();
     }
 
-    m_owner->sendCurrentRangeIfUpdated();
+    //m_owner->sendCurrentRangeIfUpdated();
+    QByteArray newRange = m_owner->getRangeHeaderIfChanged().toUtf8();
+    if (!newRange.isEmpty())
+    {
+        sendLen = newRange.size();
+        buildRtspTcpHeader(m_owner->getMetadataChannelNum(), METADATA_SSRC, sendLen, 0, qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE);
+        m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        m_owner->bufferData(newRange);
+        m_owner->sendBuffer();
+        m_owner->clearBuffer();
+    }
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;

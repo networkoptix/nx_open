@@ -14,6 +14,10 @@ class QnRtspConnectionProcessor;
 static const int CLOCK_FREQUENCY = 1000000;
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
+
+static const quint8 RTP_METADATA_CODE = 126;
+static const QString RTP_METADATA_GENERIC_STR("ffmpeg-metadata");
+
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
 
 class QnRtspDataConsumer: public QnAbstractDataConsumer, public QnlTimeSource
@@ -51,7 +55,7 @@ public:
     // put data without mutex. Used for RTSP connection after lockDataQueue
     void addData(QnAbstractMediaDataPtr data);
 protected:
-    void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
+    void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
     bool canSwitchToHiQuality();
