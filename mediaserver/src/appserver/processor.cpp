@@ -20,7 +20,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
-        
+
         cameraResource->setParentId(m_serverId);
     }
 
@@ -47,21 +47,15 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());
-
-        qDebug() << "Connecting resource: " << resource->getName();
-        QObject::disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-            this, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
-        QObject::connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-            this, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
     }
 }
 
 void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle)
 {
 
-	if (status == 0)
+    if (status == 0)
     {
-		qDebug() << "Successfully updated resource status" << data;
+        qDebug() << "Successfully updated resource status" << data;
     } else
     {
         qDebug() << "Failed to update resource";
@@ -69,22 +63,7 @@ void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray 
 
 }
 
-void QnAppserverResourceProcessor::onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+void QnAppserverResourceProcessor::onResourceStatusChanged(const QnResourcePtr &resource)
 {
-    QObject* xsender = sender();
-
-    if (!xsender)
-    {
-        qDebug() << "QnAppserverResourceProcessor::onResourceStatusChanged() is not indended to be called directly";
-        return;
-    }
-
-    QnResource* resource = dynamic_cast<QnResource*>(xsender);
-    if (!resource)
-    {
-        qDebug() << "QnAppserverResourceProcessor::onResourceStatusChanged() should be connected to QnResource::onResourceStatusChanged() signal";
-        return;
-    }
-
-	m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, SLOT(requestFinished(int,const QByteArray&,const QByteArray&, int)));
+    m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, SLOT(requestFinished(int,const QByteArray&,const QByteArray&, int)));
 }

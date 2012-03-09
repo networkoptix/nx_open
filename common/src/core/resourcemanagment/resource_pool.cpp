@@ -41,32 +41,32 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 {
     QMutexLocker locker(&m_resourcesMtx);
 
-    foreach (const QnResourcePtr &resource, resources) 
+    foreach (const QnResourcePtr &resource, resources)
     {
-        if (!resource->toSharedPointer()) 
+        if (!resource->toSharedPointer())
         {
             qnWarning("Resource '%1' does not have an associated shared pointer. Did you forget to use QnSharedResourcePointer?", resource->metaObject()->className());
             QnSharedResourcePointer<QnResource>::initialize(resource);
         }
 
         // if resources are local assign localserver as parent
-        if (!resource->getParentId().isValid()) 
+        if (!resource->getParentId().isValid())
         {
             if (resource->checkFlags(QnResource::local))
                 resource->setParentId(localServer->getId());
         }
 
-        if (!resource->getId().isValid()) 
+        if (!resource->getId().isValid())
         {
-            // must be just found local resource; => shold not be in the pool already 
+            // must be just found local resource; => shold not be in the pool already
 
-            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId())) 
+            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
             {
                 qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.", resource->getUniqueId());
 
                 resource->setId(existing->getId());
-            } 
-            else 
+            }
+            else
             {
                 resource->setId(QnId::generateSpecialId());
             }
@@ -76,27 +76,30 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     QMap<QnId, QnResourcePtr> newResources; // sort by id
 
-    foreach (const QnResourcePtr &resource, resources) 
+    foreach (const QnResourcePtr &resource, resources)
     {
         const QnId resId = resource->getId();
         QString uniqueId = resource->getUniqueId();
 
-        if (m_resources.contains(uniqueId)) 
+        if (m_resources.contains(uniqueId))
         {
             // if we already have such resource in the pool
             m_resources[uniqueId]->update(resource);
         }
         else
         {
-            // new resource 
+            // new resource
             m_resources[uniqueId] = resource;
             newResources.insert(resId, resource);
         }
 
     }
 
-    foreach (const QnResourcePtr &resource, newResources.values()) 
+    foreach (const QnResourcePtr &resource, newResources.values())
     {
+        disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()));
+        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
+
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 
@@ -111,7 +114,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
     QMutexLocker locker(&m_resourcesMtx);
 
-    foreach (const QnResourcePtr &resource, resources) 
+    foreach (const QnResourcePtr &resource, resources)
     {
         if (!resource)
             continue;
@@ -121,7 +124,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         QString uniqueId = resource->getUniqueId();
 
-        if (m_resources.remove(uniqueId) != 0) 
+        if (m_resources.remove(uniqueId) != 0)
         {
             removedResources.append(resource);
         }
@@ -138,6 +141,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
             if(QnUserResourcePtr user = getResourceById(layout->getParentId()).dynamicCast<QnUserResource>())
                 user->removeLayout(layout);
+}
+
+void QnResourcePool::handleStatusChange()
+{
+    const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
+
+    emit statusChanged(resource);
 }
 
 void QnResourcePool::handleResourceChange()
@@ -216,8 +226,8 @@ QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
 
-    // TODO: 
-    // cache it, but remember that id and parentId of a resource may change 
+    // TODO:
+    // cache it, but remember that id and parentId of a resource may change
     // while it's in the pool.
 
     QnResourceList result;

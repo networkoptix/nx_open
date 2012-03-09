@@ -18,8 +18,8 @@ private:
     QnId m_serverId;
 
 private slots:
-    void onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-	void requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle);
+    void onResourceStatusChanged(const QnResourcePtr& resource);
+    void requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle);
 };
 
 #endif //_server_appserver_processor_h_
