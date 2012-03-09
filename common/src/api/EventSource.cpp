@@ -1,6 +1,10 @@
 #include <QtNetwork>
 #include "EventSource.h"
 
+#include <utils/common/warnings.h>
+
+//#define QN_EVENT_SOURCE_DEBUG
+
 void QnJsonStreamParser::addData(const QByteArray& data)
 {
     if (!incomplete.isEmpty())
@@ -41,7 +45,7 @@ bool QnJsonStreamParser::nextMessage(QVariant& parsed)
     parsed = parser.parse(block, &ok);
 
     if (!ok)
-        qDebug() << "QnJsonStreamParser::nextMessage(): Error parse block: " << block;
+        qnWarning("Error parsing JSON block: %1.", block);
 
     return ok;
 }
@@ -172,7 +176,9 @@ void QnEventSource::httpReadyRead()
 {
     QByteArray data = reply->readAll().data();
 
+#ifdef QN_EVENT_SOURCE_DEBUG
     qDebug() << "Event data: " << data;
+#endif
 
     streamParser.addData(data);
 
@@ -202,8 +208,8 @@ void QnEventSource::sslErrors(QNetworkReply*,const QList<QSslError> &errors)
             errorString += ", ";
         errorString += error.errorString();
     }
+    qnWarning("SSL errors: %1.", errorString);
 
-    qDebug() << "One or more SSL errors has occurred";
     reply->ignoreSslErrors();
 }
 #endif

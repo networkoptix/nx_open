@@ -92,10 +92,10 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
         /* Convert to typed value. */
         QVariant value;
         switch(parameter.type()) {
-        case QnCommandLineParameter::STRING:
+        case QnCommandLineParameter::String:
             value = stringValue;
             break;
-        case QnCommandLineParameter::INTEGER: {
+        case QnCommandLineParameter::Integer: {
             bool ok;
             qint64 intValue = stringValue.toLongLong(&ok);
             if(!ok) {
@@ -106,7 +106,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
             }
             break;
                                               }
-        case QnCommandLineParameter::FLAG:
+        case QnCommandLineParameter::Flag:
             value = true;
             break;
         default:

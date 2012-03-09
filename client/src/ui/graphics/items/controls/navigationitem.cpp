@@ -831,7 +831,7 @@ void NavigationItem::onValueChanged(qint64 time)
         return;
     }
 
-    if (m_currentTime == time || !m_timeSlider->isUserInput()) {
+    if (m_currentTime == time || (!m_timeSlider->isUserInput() && !m_timeSlider->isMoving())) {
         updateRecPeriodList(false);
         return;
     }

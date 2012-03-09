@@ -182,6 +182,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::SelectAllAction));
+    addAction(action(Qn::TakeScreenshotAction));
 
     connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
@@ -229,9 +230,6 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewLayoutAction)));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(action(Qn::ScreenRecordingAction)));    
-    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectionSettingsAction)));
-    m_titleLayout->addSpacing(12);
     m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));

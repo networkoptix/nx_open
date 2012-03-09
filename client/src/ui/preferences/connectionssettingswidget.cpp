@@ -205,7 +205,7 @@ void ConnectionsSettingsWidget::testConnection()
     
     if (!url.isValid())
     {
-        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("The information you have entered is not valid."));
         return;
     }
 

@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
     QnAutoTester autoTester(argc, argv);
 
     QnCommandLineParser commandLinePreParser;
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::FLAG, "--no-single-application", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--no-single-application", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
     
 
