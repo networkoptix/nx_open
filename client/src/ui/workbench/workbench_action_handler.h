@@ -106,6 +106,7 @@ protected slots:
     void at_previousLayoutAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openNewLayoutAction_triggered();
+    void at_openNewWindowAction_triggered();
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();

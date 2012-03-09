@@ -324,6 +324,12 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("decorations/new_layout.png")));
 
+    factory(Qn::OpenNewWindowAction).
+        flags(Qn::Main).
+        text(tr("New Window")).
+        shortcut(tr("Ctrl+N")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Main | Qn::Tree).
         separator();

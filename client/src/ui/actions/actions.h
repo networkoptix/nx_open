@@ -89,6 +89,11 @@ namespace Qn {
         OpenNewLayoutAction,
 
         /**
+         * Opens a new window (client instance).
+         */
+        OpenNewWindowAction,
+
+        /**
          * Saves current layout on appserver.
          */
         SaveCurrentLayoutAction,
