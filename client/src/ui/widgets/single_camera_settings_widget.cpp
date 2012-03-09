@@ -99,31 +99,6 @@ void QnSingleCameraSettingsWidget::setCameraActive(bool active) {
     ui->cameraScheduleWidget->setScheduleEnabled(active ? Qt::Checked : Qt::Unchecked);
 }
 
-#if 0
-void QnSingleCameraSettingsWidget::accept()
-{
-    if (m_camera->isScheduleDisabled() && ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Checked
-            && qnResPool->activeCameras() + 1 > qnLicensePool->getLicenses().totalCameras())
-    {
-        QString message = QString("Licenses limit exceeded (%1 of %2 used). Your schedule will not be saved.").arg(qnResPool->activeCameras() + 1).arg(qnLicensePool->getLicenses().totalCameras());
-        QMessageBox::warning(this, "Can't enable recording", message);
-        ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
-        return;
-    }
-
-    ui->buttonBox->setEnabled(false);
-
-    submitToResource();
-    saveData();
-}
-
-
-void QnSingleCameraSettingsWidget::reject()
-{
-    QDialog::reject();
-}
-#endif
-
 void QnSingleCameraSettingsWidget::submitToResource()
 {
     if(!m_camera)
@@ -196,23 +171,6 @@ void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
 
     emit hasChangesChanged();
 }
-
-#if 0
-void QnSingleCameraSettingsWidget::saveData()
-{
-    m_connection->saveAsync(m_camera, this, SLOT(at_requestFinished(int,QByteArray,QnResourceList,int)));
-}
-
-void QnSingleCameraSettingsWidget::at_requestFinished(int status, const QByteArray &/*errorString*/, QnResourceList resources, int /*handle*/)
-{
-    if (status == 0) {
-        QDialog::accept();
-    } else {
-        QMessageBox::warning(this, "Can't save camera", "Can't save camera. Please try again later.");
-        ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
-    }
-}
-#endif
 
 
 // -------------------------------------------------------------------------- //

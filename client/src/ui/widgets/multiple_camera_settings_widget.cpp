@@ -97,52 +97,9 @@ void QnMultipleCameraSettingsWidget::setCamerasActive(bool active) {
     ui->cameraScheduleWidget->setScheduleEnabled(active ? Qt::Checked : Qt::Unchecked);
 }
 
-#if 0
-void QnMultipleCameraSettingsWidget::requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle)
-{
-    if (status == 0) {
-        QDialog::accept();
-    } else {
-        QMessageBox::warning(this, "Can't save camera", "Can't save camera. Please try again later.");
-        ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
-    }
-}
-
-void QnMultipleCameraSettingsWidget::accept()
-{
-    int totalActiveCount = qnResPool->activeCameras();
-    int editedCount = m_cameras.size();
-    int activeCount = 0;
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
-    {
-        if (!camera->isScheduleDisabled())
-            activeCount++;
-    }
-
-    if (totalActiveCount - activeCount + editedCount > qnLicensePool->getLicenses().totalCameras() && ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Checked)
-    {
-        QString message = QString("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved.").arg(totalActiveCount - activeCount + editedCount).arg(qnLicensePool->getLicenses().totalCameras());
-        QMessageBox::warning(this, "Can't enable recording", message);
-        ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
-        return;
-    }
-
-    ui->buttonBox->setEnabled(false);
-
-    saveToModel();
-    save();
-}
-
-
-void QnMultipleCameraSettingsWidget::reject()
-{
-    QDialog::reject();
-}
-#endif
-
 void QnMultipleCameraSettingsWidget::submitToResources() {
     QString login = ui->loginEdit->text().trimmed();
-    QString password = ui->loginEdit->text().trimmed();
+    QString password = ui->passwordEdit->text().trimmed();
 
     foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
         QString cameraLogin = camera->getAuth().user();
@@ -253,24 +210,6 @@ void QnMultipleCameraSettingsWidget::setHasChanges(bool hasChanges) {
 
     emit hasChangesChanged();
 }
-
-/*
-void QnMultipleCameraSettingsWidget::buttonClicked(QAbstractButton *button)
-{
-    if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Apply)
-    {
-        saveToModel();
-        save();
-    }
-}
-*/
-
-/*
-void QnMultipleCameraSettingsWidget::save()
-{
-    m_connection->saveAsync(m_cameras, this, SLOT(requestFinished(int,QByteArray,QnResourceList,int)));
-}
-*/
 
 
 // -------------------------------------------------------------------------- //
