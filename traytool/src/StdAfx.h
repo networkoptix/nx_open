@@ -1,6 +1,7 @@
 #ifdef _WIN32
 #define __STDC_CONSTANT_MACROS
 #define NOMINMAX 
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
@@ -11,10 +12,6 @@
 
 // QT headers
 #include <QAction>
-#include <QAudio>
-#include <QAudioFormat>
-#include <QAudioOutput>
-#include <QAuthenticator>
 #include <QBuffer>
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -26,8 +23,6 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
-#include <QDomDocument>
-#include <QDomElement>
 #include <QEasingCurve>
 #include <QFile>
 #include <QFileInfo>
@@ -42,7 +37,6 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHostAddress>
-#include <QHttp>
 #include <QIODevice>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -92,20 +86,12 @@
 #include <QThreadPool>
 #include <QTime>
 #include <QTimer>
-#include <QUdpSocket>
 #include <QVBoxLayout>
 #include <QWaitCondition>
 #include <QWheelEvent>
 #include <QWidget>
 #include <QtConcurrentMap>
-#include <QtCore/qmath.h>
 #include <QtDebug>
-#include <QtGui/QApplication>
-#include <QtGui/QMainWindow>
-#include <QtGui/QPainter>
-#include <QtGui/QResizeEvent>
 #include <QtGui>
-#include <QtOpenGL/QGLWidget>
-#include <QFileSystemWatcher>
 
 #endif
