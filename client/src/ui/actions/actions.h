@@ -86,7 +86,7 @@ namespace Qn {
          * Opens a new tab (layout).
          * This action is executed every time the last layout on a workbench is closed.
          */
-        OpenNewLayoutAction,
+        OpenNewTabAction,
 
         /**
          * Opens a new window (client instance).

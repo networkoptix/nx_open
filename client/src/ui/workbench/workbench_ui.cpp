@@ -315,7 +315,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(action(Qn::OpenNewLayoutAction)));
+    titleLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     titleLayout->addStretch(0x1000);
     titleLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     titleLayout->addItem(newActionButton(action(Qn::FullscreenAction)));

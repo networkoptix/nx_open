@@ -136,7 +136,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
-    connect(action(Qn::OpenNewLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
+    connect(action(Qn::OpenNewTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAsAction),                 SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
@@ -391,7 +391,7 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     if(!workbench()->layouts().empty())
         return;
 
-    action(Qn::OpenNewLayoutAction)->trigger();
+    action(Qn::OpenNewTabAction)->trigger();
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -412,7 +412,7 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
     if(!widgets.empty()) {
-        menu()->trigger(Qn::OpenNewLayoutAction);
+        menu()->trigger(Qn::OpenNewTabAction);
 
         foreach(const QnResourceWidget *widget, widgets) {
             QnWorkbenchItem *oldItem = widget->item();
@@ -430,7 +430,7 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
 
     QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
     if(!medias.isEmpty()) {
-        menu()->trigger(Qn::OpenNewLayoutAction);
+        menu()->trigger(Qn::OpenNewTabAction);
         menu()->trigger(Qn::ResourceDropAction, medias);
 
         return;

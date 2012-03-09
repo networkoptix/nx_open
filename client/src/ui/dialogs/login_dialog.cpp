@@ -24,34 +24,36 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
         qnNullWarning(context);
 
     ui->setupUi(this);
+    QPushButton *resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
 
-    // ### `don't save password` feature is not implemented yet
+    /* Don't allow to save passwords, at least for now. */
     ui->savePasswordCheckBox->hide();
 
     ui->titleLabel->setAlignment(Qt::AlignCenter);
     ui->titleLabel->setPixmap(Skin::pixmap(QLatin1String("logo_1920_1080.png")).scaledToWidth(250)); // ###
 
+    resetButton->setText(tr("&Reset"));
+
     m_connectionsModel = new QStandardItemModel(this);
+    ui->connectionsComboBox->setModel(m_connectionsModel);
 
-    ui->storedConnectionsComboBox->setModel(m_connectionsModel);
-
-    connect(ui->storedConnectionsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
+    connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_connectionsComboBox_currentIndexChanged(int)));
+    connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
+    connect(ui->configureConnectionsButton, SIGNAL(clicked()),                      this,   SLOT(at_configureConnectionsButton_clicked()));
+    connect(ui->passwordLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
+    connect(ui->loginLineEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
+    connect(ui->hostnameLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
+    connect(ui->portSpinBox,                SIGNAL(valueChanged(int)),              this,   SLOT(updateAcceptibility()));
+    connect(resetButton,                    SIGNAL(clicked()),                      this,   SLOT(reset()));
 
     m_dataWidgetMapper = new QDataWidgetMapper(this);
     m_dataWidgetMapper->setModel(m_connectionsModel);
     m_dataWidgetMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
     m_dataWidgetMapper->setOrientation(Qt::Horizontal);
     m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
-    m_dataWidgetMapper->addMapping(ui->portLineEdit, 2);
-    m_dataWidgetMapper->addMapping(ui->usernameLineEdit, 3);
+    m_dataWidgetMapper->addMapping(ui->portSpinBox, 2);
+    m_dataWidgetMapper->addMapping(ui->loginLineEdit, 3);
     m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
-
-    connect(ui->configureStoredConnectionsButton, SIGNAL(clicked()), this, SLOT(configureStoredConnections()));
-
-    ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("&Reset"));
-
-    if (QPushButton *button = ui->buttonBox->button(QDialogButtonBox::Reset))
-        connect(button, SIGNAL(clicked()), this, SLOT(reset()));
 
     updateStoredConnections();
 }
@@ -60,24 +62,9 @@ LoginDialog::~LoginDialog()
 {
 }
 
-void LoginDialog::testSettings()
-{
-    QUrl url = currentUrl();
-
-    if (!url.isValid())
-    {
-        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
-        return;
-    }
-
-    ConnectionTestingDialog dialog(this, url);
-    dialog.setModal(true);
-    dialog.exec();
-}
-
 QUrl LoginDialog::currentUrl()
 {
-    const int row = ui->storedConnectionsComboBox->currentIndex();
+    const int row = ui->connectionsComboBox->currentIndex();
 
     QUrl url;
 
@@ -114,8 +101,8 @@ void LoginDialog::accept()
 void LoginDialog::reset()
 {
     ui->hostnameLineEdit->clear();
-    ui->portLineEdit->clear();
-    ui->usernameLineEdit->clear();
+    ui->portSpinBox->setValue(0);
+    ui->loginLineEdit->clear();
     ui->passwordLineEdit->clear();
 
     updateStoredConnections();
@@ -128,7 +115,6 @@ void LoginDialog::changeEvent(QEvent *event)
     switch (event->type()) {
     case QEvent::LanguageChange:
         ui->retranslateUi(this);
-        //retranslateUi();
         break;
     default:
         break;
@@ -174,15 +160,46 @@ void LoginDialog::updateStoredConnections()
         m_connectionsModel->insertRow(0, row);
     }
 
-    ui->storedConnectionsComboBox->setCurrentIndex(index);
+    ui->connectionsComboBox->setCurrentIndex(index);
 }
 
-void LoginDialog::currentIndexChanged(int index)
+void LoginDialog::updateAcceptibility() 
+{
+    bool acceptable = 
+        !ui->passwordLineEdit->text().isEmpty() &&
+        !ui->loginLineEdit->text().trimmed().isEmpty() &&
+        !ui->hostnameLineEdit->text().trimmed().isEmpty() &&
+        ui->portSpinBox->value() != 0;
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(acceptable);
+    ui->testButton->setEnabled(acceptable);
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index)
 {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
 }
 
-void LoginDialog::configureStoredConnections()
+void LoginDialog::at_testButton_clicked()
+{
+    QUrl url = currentUrl();
+
+    if (!url.isValid())
+    {
+        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
+        return;
+    }
+
+    ConnectionTestingDialog dialog(this, url);
+    dialog.setModal(true);
+    dialog.exec();
+}
+
+void LoginDialog::at_configureConnectionsButton_clicked()
 {
     QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(m_context.data(), this));
     dialog->setCurrentPage(PreferencesDialog::PageConnections);

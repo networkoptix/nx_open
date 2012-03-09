@@ -173,7 +173,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     addAction(action(Qn::SystemSettingsAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::ConnectionSettingsAction));
-    addAction(action(Qn::OpenNewLayoutAction));
+    addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
@@ -229,7 +229,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     m_titleLayout->setSpacing(0);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewLayoutAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
@@ -253,7 +253,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     updateDwmState();
 
     /* Open single tab. */
-    action(Qn::OpenNewLayoutAction)->trigger();
+    action(Qn::OpenNewTabAction)->trigger();
 }
 
 QnMainWindow::~QnMainWindow()

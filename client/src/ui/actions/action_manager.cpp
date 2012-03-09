@@ -317,9 +317,9 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("New Layout...")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
 
-    factory(Qn::OpenNewLayoutAction).
+    factory(Qn::OpenNewTabAction).
         flags(Qn::Main | Qn::TabBar).
-        text(tr("New Layout")).
+        text(tr("New Tab")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
         icon(Skin::icon(QLatin1String("decorations/new_layout.png")));
@@ -462,7 +462,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
-        text(tr("Open in a New Layout")).
+        text(tr("Open in a New Tab")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
 
     factory(Qn::OpenLayoutAction).

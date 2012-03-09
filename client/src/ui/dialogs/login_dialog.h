@@ -5,6 +5,8 @@
 
 class QDataWidgetMapper;
 class QStandardItemModel;
+class QUrl;
+
 class QnWorkbenchContext;
 
 namespace Ui {
@@ -27,11 +29,14 @@ protected:
 
     QUrl currentUrl();
 
-private slots:
-    void testSettings();
     void updateStoredConnections();
-    void currentIndexChanged(int index);
-    void configureStoredConnections();
+
+private slots:
+    void updateAcceptibility();
+
+    void at_configureConnectionsButton_clicked();
+    void at_testButton_clicked();
+    void at_connectionsComboBox_currentIndexChanged(int index);
 
 private:
     Q_DISABLE_COPY(LoginDialog)

@@ -21,8 +21,11 @@ namespace {
 
     void writeConnectionData(QSettings *settings, const QnSettings::ConnectionData &connection)
     {
+        QUrl url = connection.url;
+        url.setPassword(QString()); /* Don't store password. */
+
         settings->setValue(QLatin1String("name"), connection.name);
-        settings->setValue(QLatin1String("url"), connection.url.toString());
+        settings->setValue(QLatin1String("url"), url.toString());
         settings->setValue(QLatin1String("readOnly"), connection.readOnly);
     }
 
