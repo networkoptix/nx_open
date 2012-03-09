@@ -90,6 +90,8 @@ public:
 
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
+
+    void setTimeout(int timeout);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -113,6 +115,7 @@ private:
     int buildRTCPReport(quint8 *dstBuffer, const RtspStatistic *stats);
     void parseRangeHeader(const QString& rangeStr);
     void addAdditionAttrs(QByteArray& request);
+
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
@@ -143,6 +146,7 @@ private:
 
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
+    int m_tcpTimeout;
 };
 
 #endif //rtp_session_h_1935_h

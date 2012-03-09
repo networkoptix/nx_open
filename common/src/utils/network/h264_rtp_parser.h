@@ -16,8 +16,6 @@ public:
     virtual ~CLH264RtpParser();
     virtual void setSDPInfo(const QByteArray& data);
 private:
-    //QByteArray m_sliceBuffer;
-    int m_readBufferActualSize;
     QMap <int, QByteArray> m_allNonSliceNal;
     QByteArray m_sdpSpsPps;
     SPSUnit m_sps;

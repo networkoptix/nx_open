@@ -18,7 +18,6 @@ static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
 static const int TCP_CONNECT_TIMEOUT = 1000*3;
-static const int TCP_TIMEOUT = 5 * 1000 * 1000;
 
 //#define DEBUG_RTSP
 
@@ -67,7 +66,8 @@ RTPSession::RTPSession():
     m_selectedAudioChannel(0),
     m_startTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
-    m_scale(1.0)
+    m_scale(1.0),
+    m_tcpTimeout(5 * 1000 * 1000)
 {
     m_udpSock.setReadTimeOut(500);
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
@@ -166,8 +166,8 @@ bool RTPSession::open(const QString& url)
     if (!m_tcpSock.connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
         return false;
 
-    m_tcpSock.setReadTimeOut(TCP_TIMEOUT);
-    m_tcpSock.setWriteTimeOut(TCP_TIMEOUT);
+    m_tcpSock.setReadTimeOut(m_tcpTimeout);
+    m_tcpSock.setWriteTimeOut(m_tcpTimeout);
 
     m_tcpSock.setNoDelay(true);
 
@@ -912,4 +912,9 @@ void RTPSession::setAdditionAttribute(const QByteArray& name, const QByteArray& 
 void RTPSession::removeAdditionAttribute(const QByteArray& name)
 {
     m_additionAttrs.remove(name);
+}
+
+void RTPSession::setTimeout(int timeout)
+{
+    m_tcpTimeout = timeout;
 }

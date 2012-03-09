@@ -123,7 +123,7 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
     quint16 lastSeqNum = 0;
 
     bool lastPacketReceived = false;
-    QnCompressedVideoData* videoData = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE);
+    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE));
 
     while(!lastPacketReceived) // todo: add termination code here
     {
@@ -287,8 +287,10 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
                     break;
                 case MTAP16_PACKET:
                 case MTAP24_PACKET:
-                default:
                     return QnAbstractMediaDataPtr();
+                default:
+                    bytesLeft = 0;
+                    break; // ignore unknown data
             }
         }
     }
@@ -316,7 +318,6 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
         //videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
         videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
     }
-
-    return QnAbstractMediaDataPtr(videoData);
+    return videoData;
 }
 

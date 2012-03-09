@@ -35,7 +35,6 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
     //return new MJPEGtreamreader(toSharedPointer(), "mjpg/video.mjpg");
     QString name = getName();
-    /*
     if (name == QLatin1String("IQA35") ||
         name == QLatin1String("IQA33N") ||
         name == QLatin1String("IQA32N") ||

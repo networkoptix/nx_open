@@ -8,7 +8,11 @@ RTPH264Streamreader::RTPH264Streamreader(QnResourcePtr res)
 :CLServerPushStreamreader(res),
 m_streamParser(0)
 {
-
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
+    if (netRes)
+        m_RtpSession.setTimeout(netRes->getNetworkTimeout());
+    else
+        m_RtpSession.setTimeout(1000 * 2);
 }
 
 RTPH264Streamreader::~RTPH264Streamreader()
