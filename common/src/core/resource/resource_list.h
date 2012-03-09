@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QtAlgorithms>
+#include <iterator>
 
 template<class T>
 class QnList: public QList<T> {
@@ -16,7 +17,7 @@ public:
     template<class Y>
     explicit QnList(const QList<Y> &other) {
         reserve(other.size());
-        qCopy(other.begin(), other.end(), begin());
+        qCopy(other.begin(), other.end(), std::back_inserter(*this));
     }
 };
 

@@ -698,9 +698,9 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         if(m_cameraSettingsDialog->widget()->hasChanges()) {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
-                QnResourceList(cameras),
+                QnResourceList(m_cameraSettingsDialog->widget()->cameras()),
                 tr("Cameras Not Saved"), 
-                tr("Save changes to the following %n camera(s)?", NULL, cameras.size()),
+                tr("Save changes to the following %n camera(s)?", NULL, m_cameraSettingsDialog->widget()->cameras().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
             if(button == QDialogButtonBox::Yes)
