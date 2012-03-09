@@ -13,8 +13,8 @@ HandScrollInstrument::HandScrollInstrument(QObject *parent):
     KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QPointF, this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.01);
-    processor->setSpeedCuttingThreshold(128); /* In pixels per second. */
-    processor->setFriction(256);
+    processor->setSpeedCuttingThreshold(56); /* In pixels per second. */
+    processor->setFriction(384);
     animationTimer()->addListener(processor);
 }
 
