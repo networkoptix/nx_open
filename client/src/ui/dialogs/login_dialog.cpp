@@ -56,10 +56,37 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
 
     updateStoredConnections();
+    updateFocus();
 }
 
 LoginDialog::~LoginDialog()
 {
+}
+
+void LoginDialog::updateFocus() 
+{
+    int size = m_dataWidgetMapper->model()->columnCount();
+
+    int i;
+    for(i = 0; i < size; i++) {
+        QWidget *widget = m_dataWidgetMapper->mappedWidgetAt(i);
+        if(!widget)
+            continue;
+
+        QByteArray propertyName = m_dataWidgetMapper->mappedPropertyName(widget);
+        QVariant value = widget->property(propertyName.constData());
+        if(!value.isValid())
+            continue;
+
+        if(value.toString().isEmpty())
+            break;
+
+        if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
+            break;
+    }
+
+    if(i < size)
+        m_dataWidgetMapper->mappedWidgetAt(i)->setFocus();
 }
 
 QUrl LoginDialog::currentUrl()
