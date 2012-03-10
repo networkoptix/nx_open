@@ -5,6 +5,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
+#include <api/SessionManager.h>
+
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
@@ -76,6 +78,8 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, co
 
 void ConnectionTestingDialog::testSettings()
 {
+    SessionManager::instance()->start();
+
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
     m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
 }
