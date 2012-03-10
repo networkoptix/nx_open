@@ -1,6 +1,7 @@
 #include "layout_tab_bar.h"
 
 #include <QVariant>
+#include <QContextMenuEvent>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -139,12 +140,11 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
         return;
     }
 
-    int index = tabAt(event->pos());
-    if(index < 0 || index >= m_layouts.size())
-        return;
-    
     QnWorkbenchLayoutList target;
-    target.push_back(m_layouts[index]);
+
+    int index = tabAt(event->pos());
+    if(index >= 0 && index < m_layouts.size())
+        target.push_back(m_layouts[index]);
     
     QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TabBarScope, QVariant::fromValue(target)));
     if(menu->isEmpty())

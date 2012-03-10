@@ -192,6 +192,7 @@ protected slots:
 
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_titleItem_geometryChanged();
+    void at_titleItem_contextMenuRequested(QObject *target, QEvent *event);
     void at_titleShowButton_toggled(bool checked);
 
     void at_helpPinButton_toggled(bool checked);

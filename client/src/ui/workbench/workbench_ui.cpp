@@ -189,6 +189,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
     setFpsVisible(false);
 
+
     /* Tree widget. */
     m_treeWidget = new QnResourceTreeWidget();
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
@@ -300,6 +301,10 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleItem->setPos(0.0, 0.0);
     m_titleItem->setClickableButtons(Qt::LeftButton);
 
+    QnSingleEventSignalizer *titleMenuSignalizer = new QnSingleEventSignalizer(this);
+    titleMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
+    m_titleItem->installEventFilter(titleMenuSignalizer);
+
     m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     
@@ -357,6 +362,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
+    connect(titleMenuSignalizer,        SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_contextMenuRequested(QObject *, QEvent *)));
     connect(action(Qn::MainMenuAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_mainMenuAction_triggered()));
 
 
@@ -1443,6 +1449,12 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
         (geometry.left() + geometry.right() - m_titleShowButton->size().height()) / 2,
         qMax(m_controlsWidget->rect().top(), geometry.bottom())
     ));
+}
+
+void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *target, QEvent *event) {
+    m_tabBarItem->setFocus();
+
+    display()->scene()->sendEvent(m_tabBarItem, event);
 }
 
 void QnWorkbenchUi::at_fpsItem_geometryChanged() {

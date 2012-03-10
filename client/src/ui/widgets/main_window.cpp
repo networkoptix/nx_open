@@ -456,6 +456,8 @@ bool QnMainWindow::event(QEvent *event) {
     if(event->type() == QnSystemMenuEvent::SystemMenu) {
         menu()->trigger(Qn::MainMenuAction);
         return true;
+    } else if(event->type() == QEvent::NonClientAreaMouseButtonRelease) {
+        ncMouseReleaseEvent(static_cast<QMouseEvent *>(event));
     }
 
     if(m_dwm != NULL)
@@ -464,8 +466,18 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-void QnMainWindow::changeEvent(QEvent *event) 
-{
+void QnMainWindow::ncMouseReleaseEvent(QMouseEvent *event) {
+    if(event->button() != Qt::RightButton)
+        return;
+
+    if(event->pos().y() > m_tabBar->mapTo(this, m_tabBar->rect().bottomRight()).y())
+        return;
+
+    QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
+    QApplication::sendEvent(m_tabBar, &e);
+}
+
+void QnMainWindow::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange)
         updateFullScreenState();
 

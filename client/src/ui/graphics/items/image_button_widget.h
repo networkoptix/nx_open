@@ -97,6 +97,7 @@ protected:
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
+    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
     virtual bool event(QEvent *event) override;
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;

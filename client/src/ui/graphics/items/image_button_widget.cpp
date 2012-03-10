@@ -366,6 +366,11 @@ void QnImageButtonWidget::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 }
 
+void QnImageButtonWidget::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
+    return;
+}
+
 bool QnImageButtonWidget::event(QEvent *event) {
     QActionEvent *actionEvent = static_cast<QActionEvent *>(event);
 
