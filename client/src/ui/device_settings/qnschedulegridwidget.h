@@ -4,11 +4,10 @@
 #include <QtGui/QWidget>
 
 static const int SEL_CELL_CLR_DELTA = 40;
-static const int COLOR_LIGHT = 100;
-static const int NO_REC_COLOR = COLOR_LIGHT - 24;
 static const int TEXT_SPACING = 4;
 static const int COL_COUNT = 24;
 static const int ROW_COUNT = 7;
+
 
 class QnScheduleGridWidget : public QWidget
 {

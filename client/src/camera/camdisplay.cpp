@@ -1202,8 +1202,6 @@ bool CLCamDisplay::isNoData() const
 {
     if (isRealTimeSource())
         return false;
-    if (m_emptyPacketCounter >= 3)
-        return true;
     if (!m_extTimeSrc)
         return false;
     if (m_executingJump > 0 || m_executingChangeSpeed || m_buffering)
@@ -1215,6 +1213,9 @@ bool CLCamDisplay::isNoData() const
     bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_jumpTime != DATETIME_NOW;
     if (!useSync || ct == DATETIME_NOW)
         return false;
+
+    if (m_emptyPacketCounter >= 3)
+        return true;
 
     int sign = m_speed >= 0 ? 1 : -1;
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;

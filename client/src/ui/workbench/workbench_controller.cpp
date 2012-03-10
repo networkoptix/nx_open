@@ -78,7 +78,7 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
-
+#include "ui/common/color_transform.h"
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -177,8 +177,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
 
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionRubberBandColor());
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionRubberBandBorderColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));

@@ -24,6 +24,7 @@
 #include "math.h"
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
+#include "ui/common/color_transform.h"
 
 namespace {
 
@@ -744,7 +745,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
             /* Selection. */
             if(!m_channelState[i].motionSelection.isEmpty()) 
-				drawFilledRegion(painter, rect, m_channelState[i].motionSelection, qnGlobals->motionSelectionColor());
+				//drawFilledRegion(painter, rect, m_channelState[i].motionSelection, subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
+                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, subColor(qnGlobals->mrsColor(), QColor(0,0,0, 0xa0)));
         }
     }
 
@@ -890,7 +892,10 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
         for (int x = 0; x < MD_WIDTH; ++x)
             if(motion->isMotionAt(x, y))
                 motionPath.addRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
-    painter->setPen(QPen(QColor(255, 0, 0, 80)));
+    //QPen pen(QColor(0xCD, 0x7F, 0x32, 255));
+    QPen pen(QColor(0xff, 0, 0, 128));
+    pen.setWidth(9);
+    painter->setPen(pen);
     painter->drawPath(motionPath);
 }
 
