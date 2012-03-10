@@ -450,8 +450,11 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             */
             updateActivity();
         }
-        if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
+        if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore)) 
+        {
+            QMutexLocker lock(&m_timeMutex);
             m_lastDecodedTime = vd->timestamp;
+        }
 
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
 
@@ -652,6 +655,7 @@ void CLCamDisplay::processNewSpeed(float speed)
     {
         m_dataQueue.clear();
         clearVideoQueue();
+        QMutexLocker lock(&m_timeMutex);
         m_lastDecodedTime = AV_NOPTS_VALUE;
         for (int i = 0; i < CL_MAX_CHANNELS; ++i)
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
@@ -800,13 +804,13 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                 m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
             }
             */
+            m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
                 m_display[i]->setLastDisplayedTime(AV_NOPTS_VALUE);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }
 
-            m_timeMutex.lock();
             if (m_buffering && m_executingJump == 0) 
             {
                 m_buffering = 0;
@@ -971,8 +975,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             incoming = QnCompressedVideoDataPtr();
             if (vd) {
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-                if (!ignoreVideo)
+                if (!ignoreVideo) {
+                    QMutexLocker lock(&m_timeMutex);
                     m_lastDecodedTime = vd->timestamp;
+                }
                 if (m_lastAudioPacketTime != m_syncAudioTime) {
                     qint64 currentAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
                     if(m_display[channel])
