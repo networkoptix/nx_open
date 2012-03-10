@@ -4,9 +4,10 @@
 #include "utils/network/h264_rtp_parser.h"
 
 
-RTPH264Streamreader::RTPH264Streamreader(QnResourcePtr res)
-:CLServerPushStreamreader(res),
-m_streamParser(0)
+RTPH264StreamreaderDelegate::RTPH264StreamreaderDelegate(QnResourcePtr res, QString request):
+QnResourceConsumer(res),
+m_streamParser(0),
+m_request(request)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -15,14 +16,12 @@ m_streamParser(0)
         m_RtpSession.setTCPTimeout(1000 * 2);
 }
 
-RTPH264Streamreader::~RTPH264Streamreader()
+RTPH264StreamreaderDelegate::~RTPH264StreamreaderDelegate()
 {
-    stop();
-
     delete m_streamParser;    
 }
 
-QnAbstractMediaDataPtr RTPH264Streamreader::getNextData()
+QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
 {
 
     if (!isStreamOpened())
@@ -40,7 +39,7 @@ QnAbstractMediaDataPtr RTPH264Streamreader::getNextData()
 
 }
 
-void RTPH264Streamreader::openStream()
+void RTPH264StreamreaderDelegate::openStream()
 {
     if (isStreamOpened())
         return;
@@ -48,7 +47,7 @@ void RTPH264Streamreader::openStream()
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
     QString url;
-    QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+    QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString() << "/" << m_request;
 
     if (m_RtpSession.open(url))
     {
@@ -62,14 +61,14 @@ void RTPH264Streamreader::openStream()
 
 }
 
-void RTPH264Streamreader::closeStream()
+void RTPH264StreamreaderDelegate::closeStream()
 {
     m_RtpSession.stop();
     delete m_streamParser;
     m_streamParser = 0;
 }
 
-bool RTPH264Streamreader::isStreamOpened() const
+bool RTPH264StreamreaderDelegate::isStreamOpened() const
 {
     return m_RtpSession.isOpened();
 }

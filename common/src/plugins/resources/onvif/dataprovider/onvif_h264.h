@@ -1,30 +1,27 @@
-#ifndef cl_iqeye_onvif_serverpush1848
-#define cl_iqeye_onvif_serverpush1848
+#ifndef h264_reader_deligate_h_1158
+#define h264_reader_deligate_h_1158
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include "core/resource/resource_consumer.h"
+#include "core/datapacket/mediadatapacket.h"
 #include "utils/network/rtpsession.h"
-#include "core/dataprovider/live_stream_provider.h"
 
 
 
 class CLRtpStreamParser;
 
-class RTPH264Streamreader: public CLServerPushStreamreader, public QnLiveStreamProvider
+class RTPH264StreamreaderDelegate : public QnResourceConsumer
 {
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	RTPH264Streamreader(QnResourcePtr res);
-	virtual ~RTPH264Streamreader();
+	RTPH264StreamreaderDelegate(QnResourcePtr res, QString request);
+	virtual ~RTPH264StreamreaderDelegate();
 
 protected:
-    virtual QnAbstractMediaDataPtr getNextData();
-    virtual void openStream();
-    virtual void closeStream() ;
-    virtual bool isStreamOpened() const;
-
-    void updateStreamParamsBasedOnQuality() override {};
-    void updateStreamParamsBasedOnFps() override {};
+    QnAbstractMediaDataPtr getNextData();
+    void openStream();
+    void closeStream() ;
+    bool isStreamOpened() const;
 
 private:
     
@@ -32,6 +29,8 @@ private:
     RTPIODevice* m_rtpIo;
     CLRtpStreamParser* m_streamParser;
 
+    QString m_request;
+
 };
 
-#endif //cl_android_clien_pul1721
+#endif //h264_reader_deligate_h_1158
