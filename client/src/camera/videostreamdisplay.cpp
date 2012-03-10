@@ -422,7 +422,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     }
 
 	if (!draw || !m_drawer)
-		return Status_Displayed;
+		return Status_Skipped;
 
     if (useTmpFrame)
     {
