@@ -326,7 +326,8 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("New Tab")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-        icon(Skin::icon(QLatin1String("decorations/new_layout.png")));
+        icon(Skin::icon(QLatin1String("decorations/new_layout.png"))).
+        hoverIcon(Skin::icon(QLatin1String("decorations/new_layout_hovered.png")));
 
     factory(Qn::OpenNewWindowAction).
         flags(Qn::Main).
