@@ -12,6 +12,7 @@
 class QAction;
 class QMenu;
 
+class QnMimeData;
 class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
@@ -92,8 +93,11 @@ protected:
     
     void closeLayouts(const QnWorkbenchLayoutList &layouts);
 
+    void openNewWindow(const QStringList &args);
+
     void saveCameraSettingsFromDialog();
     Q_SLOT void updateCameraSettingsFromSelection();
+    Q_SLOT void submitDelayedDrops();
 
 protected slots:
     void at_context_aboutToBeDestroyed();
@@ -106,6 +110,7 @@ protected slots:
     void at_previousLayoutAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openNewLayoutAction_triggered();
+    void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
     void at_saveLayoutAction_triggered();
@@ -118,6 +123,7 @@ protected slots:
     
     void at_moveCameraAction_triggered();
     void at_resourceDropAction_triggered();
+    void at_delayedResourceDropAction_triggered();
     void at_resourceDropIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
@@ -157,9 +163,12 @@ private:
     QnAppServerConnectionPtr m_connection;
 
     QScopedPointer<QMenu> m_mainMenu;
+    
     QScopedPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     bool m_selectionUpdatePending;
     Qn::ActionScope m_selectionScope;
+
+    QList<QnMimeData> m_delayedDrops;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

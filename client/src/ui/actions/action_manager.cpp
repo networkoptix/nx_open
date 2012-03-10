@@ -257,6 +257,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
 
+    factory(Qn::DelayedResourceDropAction).
+        flags(Qn::NoTarget).
+        text(tr("Drop Resources Delayed"));
+
     factory(Qn::ResourceDropIntoNewLayoutAction).
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop into New Layout"));
@@ -463,6 +467,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
         text(tr("Open in a New Tab")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
+
+    factory(Qn::OpenInNewWindowAction).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
+        text(tr("Open in a New Window")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
 
     factory(Qn::OpenLayoutAction).
