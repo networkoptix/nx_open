@@ -402,7 +402,7 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
 #endif
 
-    //QnResourceDiscoveryManager::instance().start(); // T_T
+    QnResourceDiscoveryManager::instance().start(); // T_T
 
     CLDeviceSettingsDlgFactory::initialize();
 
