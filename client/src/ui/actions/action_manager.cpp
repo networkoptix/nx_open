@@ -430,6 +430,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("connect.png")));
 
+    factory(Qn::ReconnectAction).
+        flags(Qn::NoTarget).
+        text(tr("Reconnect to Server"));
+
     factory().
         flags(Qn::Main).
         separator();

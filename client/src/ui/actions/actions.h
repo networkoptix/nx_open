@@ -34,6 +34,11 @@ namespace Qn {
         ConnectionSettingsAction,
 
         /**
+         * Reconnects to the application server.
+         */
+        ReconnectAction,
+
+        /**
          * Shows / hides FPS display.
          */
         ShowFpsAction,

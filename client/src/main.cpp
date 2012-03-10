@@ -342,18 +342,15 @@ int main(int argc, char *argv[])
 
     // Create and start SessionManager
     SessionManager* sm = SessionManager::instance();
-
     QThread *thread = new QThread();
     sm->moveToThread(thread);
-
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
     QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-
     thread->start();
-    sm->start();
+    //sm->start(); // T_T
     //
 
-    QnResource::startCommandProc();
+    //QnResource::startCommandProc(); // T_T
 
     QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
@@ -405,7 +402,7 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
 #endif
 
-    QnResourceDiscoveryManager::instance().start();
+    //QnResourceDiscoveryManager::instance().start(); // T_T
 
     CLDeviceSettingsDlgFactory::initialize();
 
@@ -438,7 +435,7 @@ int main(int argc, char *argv[])
     addTestData();
 #endif
 
-    QnEventManager::instance()->run();
+    //QnEventManager::instance()->run(); // T_T
 
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
         QObject::connect(&autoTester, SIGNAL(finished()), application.data(), SLOT(quit()));
@@ -449,8 +446,11 @@ int main(int argc, char *argv[])
     qApp->processEvents();
 
     /* Open connection settings dialog. */
-    if(!authentication.isValid())
+    if(!authentication.isValid()) {
         mainWindow->context()->menu()->trigger(Qn::ConnectionSettingsAction);
+    } else {
+        mainWindow->context()->menu()->trigger(Qn::ReconnectAction);
+    }
 
     /* Drop resources if needed. */
     QString droppedResources = commandLinePreParser.value("--delayed-drop").toString();

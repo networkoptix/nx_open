@@ -50,7 +50,7 @@ private:
 
 class QnEventSource : public QObject
 {
-Q_OBJECT
+    Q_OBJECT;
 
 public:
     QnEventSource(QUrl url, int retryTimeout = 3000);
@@ -58,7 +58,7 @@ public:
     void stop();
 
 signals:
-    void stopSignal();
+    void stopped();
     void eventReceived(QnEvent event);
     void connectionClosed(QString errorString);
 
@@ -78,11 +78,10 @@ private slots:
 private:
     QUrl m_url;
     int m_retryTimeout;
-    QNetworkAccessManager qnam;
-    QNetworkReply *reply;
-    int httpGetId;
+    QNetworkAccessManager m_manager;
+    QNetworkReply *m_reply;
 
-    QnJsonStreamParser streamParser;
+    QnJsonStreamParser m_streamParser;
 };
 
 #endif // _QN_EVENT_SOURCE_

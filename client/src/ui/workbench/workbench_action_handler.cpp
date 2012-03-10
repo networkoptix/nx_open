@@ -134,6 +134,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenFolderAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectionSettingsAction),           SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
+    connect(action(Qn::ReconnectAction),                    SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
@@ -734,43 +735,43 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
-    static LoginDialog *dialog = 0;
-    if (dialog)
-        return;
-
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
 
-    dialog = new LoginDialog(context(), widget());
+    QScopedPointer<LoginDialog> dialog(new LoginDialog(context(), widget()));
     dialog->setModal(true);
-    if (dialog->exec()) {
-        const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
-        if (connection.url.isValid()) {
-            QnEventManager::instance()->stop();
-            SessionManager::instance()->stop();
+    if (!dialog->exec())
+        return;
 
-            QnAppServerConnectionFactory::setDefaultUrl(connection.url);
+    menu()->trigger(Qn::ReconnectAction);
+}
 
-            // repopulate the resource pool
-            QnResource::stopCommandProc();
-            QnResourceDiscoveryManager::instance().stop();
+void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
+    const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
+    if (!connection.url.isValid()) 
+        return;
+    
+    QnEventManager::instance()->stop();
+    SessionManager::instance()->stop();
 
-            // don't remove local resources
-            const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-            resourcePool()->removeResources(remoteResources);
+    QnAppServerConnectionFactory::setDefaultUrl(connection.url);
 
-            qnLicensePool->reset();
+    // repopulate the resource pool
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
 
-            SessionManager::instance()->start();
-            QnEventManager::instance()->run();
+    // don't remove local resources
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->removeResources(remoteResources);
 
-            QnResourceDiscoveryManager::instance().start();
-            QnResource::startCommandProc();
-        }
-    }
-    delete dialog;
-    dialog = 0;
+    qnLicensePool->reset();
+
+    SessionManager::instance()->start();
+    QnEventManager::instance()->run();
+
+    QnResourceDiscoveryManager::instance().start();
+    QnResource::startCommandProc();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
