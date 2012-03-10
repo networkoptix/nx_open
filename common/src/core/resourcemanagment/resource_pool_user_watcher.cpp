@@ -8,6 +8,13 @@ QnResourcePoolUserWatcher::QnResourcePoolUserWatcher(QnResourcePool *resourcePoo
     QObject(parent),
     m_resourcePool(resourcePool)
 {
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnUserResourcePtr>();
+
+        metaTypesInitialized = true;
+    }
+
     if(resourcePool == NULL) {
         qnNullWarning(resourcePool);
         return;

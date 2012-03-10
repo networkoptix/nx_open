@@ -120,15 +120,15 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     for(int i = 0; i <= FLAGS_MAX; i++)
         m_pixmaps[i] = QPixmap();
 
-    setPixmap(0,                    bestPixmap(icon, QIcon::Normal, QIcon::Off));
-    setPixmap(HOVERED,              bestPixmap(icon, QIcon::Active, QIcon::Off));
-    setPixmap(DISABLED,             bestPixmap(icon, QIcon::Disabled, QIcon::Off));
-    setPixmap(PRESSED,              bestPixmap(icon, QIcon::Selected, QIcon::Off));
+    setPixmap(0,                            bestPixmap(icon, QIcon::Normal, QIcon::Off));
+    setPixmap(HOVERED,                      bestPixmap(icon, QIcon::Active, QIcon::Off));
+    setPixmap(DISABLED,                     bestPixmap(icon, QIcon::Disabled, QIcon::Off));
+    setPixmap(PRESSED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::Off));
 
-    setPixmap(CHECKED,              bestPixmap(icon, QIcon::Normal, QIcon::On));
-    setPixmap(CHECKED | HOVERED,    bestPixmap(icon, QIcon::Active, QIcon::On));
-    setPixmap(CHECKED | DISABLED,   bestPixmap(icon, QIcon::Disabled, QIcon::On));
-    setPixmap(CHECKED | PRESSED,    bestPixmap(icon, QIcon::Selected, QIcon::On));
+    setPixmap(CHECKED,                      bestPixmap(icon, QIcon::Normal, QIcon::On));
+    setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::On));
+    setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QIcon::Disabled, QIcon::On));
+    setPixmap(CHECKED | PRESSED | HOVERED,  bestPixmap(icon, QIcon::Active, QIcon::On));
 }
 
 void QnImageButtonWidget::setCheckable(bool checkable) {
@@ -156,7 +156,7 @@ void QnImageButtonWidget::setDisabled(bool disabled) {
 void QnImageButtonWidget::setPressed(bool pressed) {
     if(pressed) {
         updateState(m_state | PRESSED);
-        updateState(m_state & ~HOVERED);
+        //updateState(m_state & ~HOVERED);
     } else {
         updateState(m_state & ~PRESSED);
     }
@@ -328,6 +328,18 @@ void QnImageButtonWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverMoveEvent(event);
 }
 
+void QnImageButtonWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+    event->accept();
+
+    if(rect().contains(event->pos())) {
+        updateState(m_state | HOVERED);
+    } else {
+        updateState(m_state & ~HOVERED);
+    }
+
+    base_type::mouseMoveEvent(event);
+}
+
 void QnImageButtonWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     event->accept(); /* Buttons are opaque to hover events. */
 
@@ -497,7 +509,8 @@ void QnImageButtonWidget::updateState(StateFlags state) {
         m_hoverProgress = 0.0; /* No animation here as it looks crappy. */
 
     qreal hoverProgress = isHovered() ? 1.0 : 0.0;
-    if(scene() == NULL) {
+    if(scene() == NULL || (m_state & PRESSED)) {
+        m_animator->stop();
         m_hoverProgress = hoverProgress;
     } else {
         m_animator->animateTo(hoverProgress);
@@ -568,7 +581,7 @@ bool QnZoomingImageButtonWidget::isScaledState(StateFlags state) {
 }
 
 void QnZoomingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
-
+#ifdef QN_USE_ZOOMING_BUTTONS
     qreal startScale = isScaledState(startState) ? m_scaleFactor : 1.0;
     qreal endScale = isScaledState(endState) ? m_scaleFactor : 1.0;
     qreal scale = startScale * progress + endScale * (1.0 - progress);
@@ -582,4 +595,7 @@ void QnZoomingImageButtonWidget::paint(QPainter *painter, StateFlags startState,
     } else {
         QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
     }
+#else
+    QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
+#endif
 }

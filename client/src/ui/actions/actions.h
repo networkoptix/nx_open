@@ -5,15 +5,17 @@
 
 namespace Qn {
 
-    inline QLatin1String qn_gridPositionParameter()    { return QLatin1String("_qn_gridPosition"); }
-    inline QLatin1String qn_userParameter()            { return QLatin1String("_qn_user"); }
-    inline QLatin1String qn_nameParameter()            { return QLatin1String("_qn_name"); }
-    inline QLatin1String qn_serverParameter()          { return QLatin1String("_qn_server"); }
+    inline QLatin1String qn_gridPositionParameter()         { return QLatin1String("_qn_gridPosition"); }
+    inline QLatin1String qn_userParameter()                 { return QLatin1String("_qn_user"); }
+    inline QLatin1String qn_nameParameter()                 { return QLatin1String("_qn_name"); }
+    inline QLatin1String qn_serverParameter()               { return QLatin1String("_qn_server"); }
+    inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
 #define UserParameter qn_userParameter()
 #define NameParameter qn_nameParameter()
 #define ServerParameter qn_serverParameter()
+#define SerializedResourcesParameter qn_serializedResourcesParameter()
 
     /**
      * Enum of all menu actions.
@@ -32,15 +34,36 @@ namespace Qn {
         ConnectionSettingsAction,
 
         /**
+         * Reconnects to the application server.
+         */
+        ReconnectAction,
+
+        /**
          * Shows / hides FPS display.
          */
         ShowFpsAction,
 
         /**
          * Drops provided resources on the current layout.
+         * 
+         * Parameters:
+         * 
+         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         * If not provided, Items will be dropped at the center of the layout.
          */ 
         ResourceDropAction,
-        
+
+        /**
+         * Drops provided serialized resources on the current layout after 
+         * connection to application server was established.
+         * 
+         * Parameters:
+         * 
+         * <tt>QByteArray SerializedResourcesParameter</tt> --- a serialized
+         * QnMimeData representation of a set of resources.
+         */ 
+        DelayedResourceDropAction,
+
         /**
          * Drops provided resources into a new layout.
          */ 
@@ -48,6 +71,11 @@ namespace Qn {
 
         /**
          * Moves cameras from one server to another.
+         * 
+         * Parameters.
+         * 
+         * <tt>QnVideoServerResourcePtr ServerParameter</tt> --- video server to
+         * move cameras to.
          */
         MoveCameraAction,
 
@@ -173,6 +201,11 @@ namespace Qn {
         OpenInNewLayoutAction,
 
         /**
+         * Opens selected resources in a new window.
+         */
+        OpenInNewWindowAction,
+
+        /**
          * Opens selected layout.
          */
         OpenLayoutAction,
@@ -184,6 +217,11 @@ namespace Qn {
 
         /**
          * Saves selected layout under another name.
+         * 
+         * Parameters:
+         * 
+         * <tt>QnUserResourcePtr UserParameter</tt> --- user to assign layout to.
+         * <tt>QString NameParameter</tt> --- name for the new layout.
          */
         SaveLayoutAsAction,
 
@@ -208,7 +246,7 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
-         * Opens provided cameras in an existing camera settings dialog.
+         * Opens provided resources in an existing camera settings dialog.
          */
         OpenInCameraSettingsDialogAction,
 

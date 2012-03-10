@@ -243,15 +243,13 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
-    /* Initialize everything. */
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
-
     xercesc::XMLPlatformUtils::Initialize ();
 
-//    av_log_set_callback(decoderLogCallback);
 
+    /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
@@ -264,8 +262,19 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--no-single-application", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--auth", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--screen", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
     
+
+    /* Set authentication parameters from command line. */
+    QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
+    if(authentication.isValid()) {
+        QnSettings::ConnectionData connection;
+        connection.url = authentication;
+
+        qnSettings->setLastUsedConnection(connection);
+    }
+
 
     /* Create application instance. */
     QtSingleApplication *singleApplication = NULL;
@@ -279,14 +288,6 @@ int main(int argc, char *argv[])
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(Skin::icon(QLatin1String("hdw_logo.png")));
 
-    /* Set authentication parameters from command line. */
-    QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
-    if(authentication.isValid()) {
-        QnSettings::ConnectionData connection;
-        connection.url = authentication;
-        qnSettings->setLastUsedConnection(connection);
-    }
-
     if(singleApplication) {
         QString argsMessage;
         for (int i = 1; i < argc; ++i)
@@ -298,7 +299,19 @@ int main(int argc, char *argv[])
         }
     }
 
+
+    /* Initialize connections. */
+    initAppServerConnection();
+    initAppServerEventConnection();
+    if (!qnSettings->isAfterFirstRun() && !getMoviesDirectory().isEmpty())
+        qnSettings->addAuxMediaRoot(getMoviesDirectory());
+    qnSettings->save();
+    cl_log.log(QLatin1String("Using ") + qnSettings->mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
+
+
+    /* Initialize application instance. */
     application->setStartDragDistance(20);
+    
 
     QnToolTip::instance();
 
@@ -326,34 +339,18 @@ int main(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
-    QnSettings *settings = qnSettings;
-    settings->load();
-
-	initAppServerConnection();
-    initAppServerEventConnection();
-
-	if (!settings->isAfterFirstRun() && !getMoviesDirectory().isEmpty())
-        settings->addAuxMediaRoot(getMoviesDirectory());
-
-    settings->save();
-
-    cl_log.log(QLatin1String("Using ") + settings->mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
-
 
     // Create and start SessionManager
     SessionManager* sm = SessionManager::instance();
-
     QThread *thread = new QThread();
     sm->moveToThread(thread);
-
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
     QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-
     thread->start();
-    sm->start();
+    //sm->start(); // T_T
     //
 
-    QnResource::startCommandProc();
+    //QnResource::startCommandProc(); // T_T
 
     QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
@@ -405,7 +402,7 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
 #endif
 
-    QnResourceDiscoveryManager::instance().start();
+    //QnResourceDiscoveryManager::instance().start(); // T_T
 
     CLDeviceSettingsDlgFactory::initialize();
 
@@ -425,9 +422,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    mainWindow->show();
     mainWindow->showFullScreen();
-
+    mainWindow->show();
+        
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
@@ -438,16 +435,31 @@ int main(int argc, char *argv[])
     addTestData();
 #endif
 
-    QnEventManager::instance()->run();
+    //QnEventManager::instance()->run(); // T_T
 
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
         QObject::connect(&autoTester, SIGNAL(finished()), application.data(), SLOT(quit()));
         autoTester.start();
     }
 
+    /* Process pending events before executing actions. */
+    qApp->processEvents();
+
     /* Open connection settings dialog. */
-    if(!authentication.isValid())
-        QMetaObject::invokeMethod(mainWindow->context()->menu()->action(Qn::ConnectionSettingsAction), "trigger", Qt::QueuedConnection);
+    if(!authentication.isValid()) {
+        mainWindow->context()->menu()->trigger(Qn::ConnectionSettingsAction);
+    } else {
+        mainWindow->context()->menu()->trigger(Qn::ReconnectAction);
+    }
+
+    /* Drop resources if needed. */
+    QString droppedResources = commandLinePreParser.value("--delayed-drop").toString();
+    if(!droppedResources.isEmpty()) {
+        QByteArray data = QByteArray::fromBase64(droppedResources.toLatin1());
+        QVariantMap params;
+        params.insert(Qn::SerializedResourcesParameter, data);
+        mainWindow->context()->menu()->trigger(Qn::DelayedResourceDropAction, params);
+    }
 
     int result = application->exec();
 

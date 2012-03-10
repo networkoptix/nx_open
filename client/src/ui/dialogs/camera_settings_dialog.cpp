@@ -44,7 +44,7 @@ void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
-    m_okButton->setEnabled(m_settingsWidget->mode() != QnCameraSettingsWidget::EmptyMode);
+    m_okButton->setEnabled(m_settingsWidget->mode() == QnCameraSettingsWidget::SingleMode || m_settingsWidget->mode() == QnCameraSettingsWidget::MultiMode);
 }
 
 void QnCameraSettingsDialog::at_buttonBox_clicked(QAbstractButton *button) {

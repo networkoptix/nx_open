@@ -105,15 +105,16 @@ bool QnEvent::load(const QVariant& parsed)
     return true;
 }
 
-QnEventSource::QnEventSource(QUrl url, int retryTimeout)
-    : m_url(url),
-      m_retryTimeout(retryTimeout)
+QnEventSource::QnEventSource(QUrl url, int retryTimeout): 
+    m_url(url),
+    m_retryTimeout(retryTimeout),
+    m_reply(NULL)
 {
-    connect(this, SIGNAL(stopSignal()), this, SLOT(doStop()));
-    connect(&qnam, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+    connect(this, SIGNAL(stopped()), this, SLOT(doStop()));
+    connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(slotAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
 #ifndef QT_NO_OPENSSL
-    connect(&qnam, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
+    connect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
             this, SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
 #endif
 
@@ -121,45 +122,45 @@ QnEventSource::QnEventSource(QUrl url, int retryTimeout)
 
 void QnEventSource::stop()
 {
-    emit stopSignal();
+    emit stopped();
 }
 
 void QnEventSource::doStop()
 {
-    if (reply)
-        reply->abort();
+    if (m_reply)
+        m_reply->abort();
 }
 
 void QnEventSource::startRequest()
 {
-    reply = qnam.post(QNetworkRequest(m_url), "");
-    connect(reply, SIGNAL(finished()),
+    m_reply = m_manager.post(QNetworkRequest(m_url), "");
+    connect(m_reply, SIGNAL(finished()),
             this, SLOT(httpFinished()));
-    connect(reply, SIGNAL(readyRead()),
+    connect(m_reply, SIGNAL(readyRead()),
             this, SLOT(httpReadyRead()));
-//    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
+//    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
 //            this, SLOT(slotError(QNetworkReply::NetworkError)));
 }
 /*
 void QnEventSource::slotError(QNetworkReply::NetworkError code)
 {
-    reply->deleteLater();
+    m_reply->deleteLater();
 
-    emit connectionAborted(reply->errorString());
+    emit connectionAborted(m_reply->errorString());
 }
 */
 void QnEventSource::httpFinished()
 {
-    if (!reply)
+    if (!m_reply)
         return;
 
-    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    if (reply->error()) {
+    QVariant redirectionTarget = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    if (m_reply->error()) {
         QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
-        emit connectionClosed(reply->errorString());
+        emit connectionClosed(m_reply->errorString());
     } else if (!redirectionTarget.isNull()) {
         m_url = m_url.resolved(redirectionTarget.toUrl());
-        reply->deleteLater();
+        m_reply->deleteLater();
         startRequest();
         return;
     } else {
@@ -168,22 +169,22 @@ void QnEventSource::httpFinished()
         emit connectionClosed("OK");
     }
 
-    reply->deleteLater();
-    reply = 0;
+    m_reply->deleteLater();
+    m_reply = 0;
 }
 
 void QnEventSource::httpReadyRead()
 {
-    QByteArray data = reply->readAll().data();
+    QByteArray data = m_reply->readAll().data();
 
 #ifdef QN_EVENT_SOURCE_DEBUG
     qDebug() << "Event data: " << data;
 #endif
 
-    streamParser.addData(data);
+    m_streamParser.addData(data);
 
     QVariant parsed;
-    while (streamParser.nextMessage(parsed))
+    while (m_streamParser.nextMessage(parsed))
     {
         QnEvent event;
         event.load(parsed);
@@ -210,6 +211,6 @@ void QnEventSource::sslErrors(QNetworkReply*,const QList<QSslError> &errors)
     }
     qnWarning("SSL errors: %1.", errorString);
 
-    reply->ignoreSslErrors();
+    m_reply->ignoreSslErrors();
 }
 #endif

@@ -35,10 +35,11 @@ protected:
 private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
     qreal hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const;
+    void stopHoverTracking(const QWidget *widget) const;
 
 private:
     QnNoptixStyleAnimator *m_animator;
-    QIcon m_branchClosed, m_branchOpen;
+    QIcon m_branchClosed, m_branchOpen, m_closeTab;
 };
 
 

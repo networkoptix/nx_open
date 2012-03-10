@@ -36,7 +36,9 @@ Q_GLOBAL_STATIC(QnSettings, qn_settings)
 QnSettings::QnSettings():
     m_lock(QMutex::Recursive),
     m_settings(new QSettings())
-{}
+{
+    load();
+}
 
 QnSettings *QnSettings::instance()
 {

@@ -5,6 +5,7 @@
 #include <QtGui/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
+#include <core/resourcemanagment/resource_criterion.h>
 
 #include "multiple_camera_settings_widget.h"
 #include "single_camera_settings_widget.h"
@@ -14,6 +15,10 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent):
     m_emptyTab(Qn::GeneralSettingsTab)
 {
     /* Create per-mode widgets. */
+    QLabel *invalidWidget = new QLabel(tr("Cannot edit properties for items of different types."), this);
+    invalidWidget->setAlignment(Qt::AlignCenter);
+    m_invalidWidget = invalidWidget;
+
     QLabel *emptyWidget = new QLabel(tr("No cameras selected."), this);
     emptyWidget->setAlignment(Qt::AlignCenter);
     m_emptyWidget = emptyWidget;
@@ -24,6 +29,7 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent):
 
     /* Stack per-mode widgets. */
     m_stackedWidget = new QStackedWidget(this);
+    m_stackedWidget->insertWidget(InvalidMode, m_invalidWidget);
     m_stackedWidget->insertWidget(EmptyMode, m_emptyWidget);
     m_stackedWidget->insertWidget(SingleMode, m_singleWidget);
     m_stackedWidget->insertWidget(MultiMode, m_multiWidget);
@@ -43,28 +49,37 @@ QnCameraSettingsWidget::Mode QnCameraSettingsWidget::mode() const {
     return static_cast<Mode>(m_stackedWidget->currentIndex());
 }
 
+const QnResourceList &QnCameraSettingsWidget::resources() const {
+    return m_resources;
+}
+
 const QnVirtualCameraResourceList &QnCameraSettingsWidget::cameras() const {
     return m_cameras;
 }
 
-void QnCameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &cameras) {
-    if(m_cameras == cameras)
+void QnCameraSettingsWidget::setResources(const QnResourceList &resources) {
+    if(m_resources == resources)
         return;
 
-    m_cameras = cameras;
+    m_resources = resources.toSet().toList();
+    m_cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(m_resources);
 
-    switch(m_cameras.size()) {
-    case 0: 
-        setMode(EmptyMode);
-        break;
-    case 1: 
-        m_singleWidget->setCamera(m_cameras.front());
-        setMode(SingleMode);
-        break;
-    default: 
-        m_multiWidget->setCameras(m_cameras);
-        setMode(MultiMode);
-        break;
+    if(m_cameras.size() != m_resources.size() && m_cameras.size() != 0) {
+        setMode(InvalidMode);
+    } else {
+        switch(m_cameras.size()) {
+        case 0: 
+            setMode(EmptyMode);
+            break;
+        case 1: 
+            m_singleWidget->setCamera(m_cameras.front());
+            setMode(SingleMode);
+            break;
+        default: 
+            m_multiWidget->setCameras(m_cameras);
+            setMode(MultiMode);
+            break;
+        }
     }
 }
 
@@ -160,7 +175,7 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
     bool oldHasChanges = hasChanges();
     Qn::CameraSettingsTab oldTab = currentTab();
 
-    if(m_stackedWidget->currentIndex() != EmptyMode)
+    if(m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
         disconnect(m_stackedWidget->currentWidget(), SIGNAL(hasChangesChanged()), this, SIGNAL(hasChangesChanged()));
 
     setCurrentTab(mode, oldTab);
@@ -178,7 +193,7 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
 
     m_stackedWidget->setCurrentIndex(mode);
 
-    if(m_stackedWidget->currentIndex() != EmptyMode)
+    if(m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
         connect(m_stackedWidget->currentWidget(), SIGNAL(hasChangesChanged()), this, SIGNAL(hasChangesChanged()));
 
     bool newHasChanges = hasChanges();

@@ -13,6 +13,7 @@
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
+#include <utils/common/mime_data.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
@@ -50,6 +51,7 @@
 #include "workbench_item.h"
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
+#include "workbench_resource.h"
 
 detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldStatuses):
     m_handler(handler),
@@ -65,7 +67,6 @@ void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const 
     
     deleteLater();
 }
-
 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
@@ -121,6 +122,7 @@ void QnWorkbenchActionHandler::initialize() {
 
     connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_context_aboutToBeDestroyed()));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(submitDelayedDrops()), Qt::QueuedConnection);
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -132,9 +134,11 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenFolderAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectionSettingsAction),           SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
+    connect(action(Qn::ReconnectAction),                    SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
+    connect(action(Qn::OpenInNewWindowAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
@@ -158,6 +162,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::NewUserLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_newUserLayoutAction_triggered()));
     connect(action(Qn::RenameLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_renameLayoutAction_triggered()));
     connect(action(Qn::ResourceDropAction),                 SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
+    connect(action(Qn::DelayedResourceDropAction),          SIGNAL(triggered()),    this,   SLOT(at_delayedResourceDropAction_triggered()));
     connect(action(Qn::ResourceDropIntoNewLayoutAction),    SIGNAL(triggered()),    this,   SLOT(at_resourceDropIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
@@ -319,6 +324,24 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
     }
 }
 
+void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
+    QStringList arguments = args;
+    arguments << QLatin1String("--no-single-application");
+    arguments << QLatin1String("--auth");
+    arguments << qnSettings->lastUsedConnection().url.toEncoded();
+
+    /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
+    if(widget()) {
+        int screen = qApp->desktop()->screenNumber(widget());
+        screen = (screen + 1) % qApp->desktop()->screenCount();
+
+        arguments << QLatin1String("--screen");
+        arguments << QString::number(screen);
+    }
+
+    QProcess::startDetached(qApp->applicationFilePath(), arguments);
+}
+
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if(!m_cameraSettingsDialog)
         return;
@@ -364,8 +387,22 @@ void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
         m_selectionScope = scope;
     }
 
-    QnResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(QnActionTargetTypes::resources(provider->currentTarget(scope)));
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, cameras);
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentTarget(scope));
+}
+
+void QnWorkbenchActionHandler::submitDelayedDrops() {
+    if(!context()->user())
+        return;
+
+    foreach(const QnMimeData &data, m_delayedDrops) {
+        QMimeData mimeData;
+        data.toMimeData(&mimeData);
+
+        QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
+        menu()->trigger(Qn::ResourceDropAction, resources);
+    }
+
+    m_delayedDrops.clear();
 }
 
 
@@ -391,7 +428,7 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     if(!workbench()->layouts().empty())
         return;
 
-    action(Qn::OpenNewTabAction)->trigger();
+    menu()->trigger(Qn::OpenNewTabAction);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -437,6 +474,25 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     }
 }
 
+void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
+    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    if(medias.isEmpty()) 
+        return;
+    
+    QMimeData mimeData;
+    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnMimeData data(&mimeData);
+    QByteArray serializedData;
+    QDataStream stream(&serializedData, QIODevice::WriteOnly);
+    stream << data;
+
+    QStringList arguments;
+    arguments << QLatin1String("--delayed-drop");
+    arguments << QLatin1String(serializedData.toBase64().data());
+
+    openNewWindow(arguments);
+}
+
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     QnLayoutResourcePtr resource = menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
     if(!resource)
@@ -459,21 +515,7 @@ void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openNewWindowAction_triggered() {
-    QStringList arguments;
-    arguments << QLatin1String("--no-single-application");
-    arguments << QLatin1String("--auth");
-    arguments << qnSettings->lastUsedConnection().url.toEncoded();
-
-    /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
-    if(widget()) {
-        int screen = qApp->desktop()->screenNumber(widget());
-        screen = (screen + 1) % qApp->desktop()->screenCount();
-
-        arguments << QLatin1String("--screen");
-        arguments << QString::number(screen);
-    }
-
-    QProcess::startDetached(qApp->applicationFilePath(), arguments);
+    openNewWindow(QStringList());
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout) {
@@ -623,6 +665,19 @@ void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
     }
 }
 
+void QnWorkbenchActionHandler::at_delayedResourceDropAction_triggered() {
+    QByteArray data = menu()->currentParameter(sender(), Qn::SerializedResourcesParameter).toByteArray();
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    QnMimeData mimeData;
+    stream >> mimeData;
+    if(stream.status() != QDataStream::Ok || mimeData.formats().empty())
+        return;
+
+    m_delayedDrops.push_back(mimeData);
+
+    submitDelayedDrops();
+}
+
 void QnWorkbenchActionHandler::at_resourceDropIntoNewLayoutAction_triggered() {
     QVariant target = menu()->currentTarget(sender());
     QnResourceList resources = menu()->currentResourcesTarget(sender());
@@ -680,43 +735,43 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
-    static LoginDialog *dialog = 0;
-    if (dialog)
-        return;
-
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
 
-    dialog = new LoginDialog(context(), widget());
+    QScopedPointer<LoginDialog> dialog(new LoginDialog(context(), widget()));
     dialog->setModal(true);
-    if (dialog->exec()) {
-        const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
-        if (connection.url.isValid()) {
-            QnEventManager::instance()->stop();
-            SessionManager::instance()->stop();
+    if (!dialog->exec())
+        return;
 
-            QnAppServerConnectionFactory::setDefaultUrl(connection.url);
+    menu()->trigger(Qn::ReconnectAction);
+}
 
-            // repopulate the resource pool
-            QnResource::stopCommandProc();
-            QnResourceDiscoveryManager::instance().stop();
+void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
+    const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
+    if (!connection.url.isValid()) 
+        return;
+    
+    QnEventManager::instance()->stop();
+    SessionManager::instance()->stop();
 
-            // don't remove local resources
-            const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-            resourcePool()->removeResources(remoteResources);
+    QnAppServerConnectionFactory::setDefaultUrl(connection.url);
 
-            qnLicensePool->reset();
+    // repopulate the resource pool
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
 
-            SessionManager::instance()->start();
-            QnEventManager::instance()->run();
+    // don't remove local resources
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->removeResources(remoteResources);
 
-            QnResourceDiscoveryManager::instance().start();
-            QnResource::startCommandProc();
-        }
-    }
-    delete dialog;
-    dialog = 0;
+    qnLicensePool->reset();
+
+    SessionManager::instance()->start();
+    QnEventManager::instance()->run();
+
+    QnResourceDiscoveryManager::instance().start();
+    QnResource::startCommandProc();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -730,7 +785,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnVirtualCameraResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(menu()->currentResourcesTarget(sender()).toSet().toList());
+    QnResourceList resources = menu()->currentResourcesTarget(sender());
 
     if(!m_cameraSettingsDialog) {
         m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget()));
@@ -738,20 +793,20 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         connect(m_cameraSettingsDialog.data(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
 
-    if(m_cameraSettingsDialog->widget()->cameras() != cameras) {
+    if(m_cameraSettingsDialog->widget()->resources() != resources) {
         if(m_cameraSettingsDialog->widget()->hasChanges()) {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
-                QnResourceList(m_cameraSettingsDialog->widget()->cameras()),
+                QnResourceList(m_cameraSettingsDialog->widget()->resources()),
                 tr("Cameras Not Saved"), 
-                tr("Save changes to the following %n camera(s)?", NULL, m_cameraSettingsDialog->widget()->cameras().size()),
+                tr("Save changes to the following %n camera(s)?", NULL, m_cameraSettingsDialog->widget()->resources().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
             if(button == QDialogButtonBox::Yes)
                 saveCameraSettingsFromDialog();
         }
 
-        m_cameraSettingsDialog->widget()->setCameras(cameras);
+        m_cameraSettingsDialog->widget()->setResources(resources);
     }
 
     m_cameraSettingsDialog->show();

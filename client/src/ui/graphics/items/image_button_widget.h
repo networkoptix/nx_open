@@ -94,6 +94,7 @@ protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
     virtual bool event(QEvent *event) override;
@@ -167,5 +168,6 @@ protected:
 private:
     qreal m_scaleFactor;
 };
+
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H

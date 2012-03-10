@@ -14,6 +14,7 @@ class QnCameraSettingsWidget: public QWidget {
     Q_OBJECT;
 public:
     enum Mode {
+        InvalidMode,
         EmptyMode,
         SingleMode,
         MultiMode
@@ -22,8 +23,9 @@ public:
     QnCameraSettingsWidget(QWidget *parent);
     virtual ~QnCameraSettingsWidget();
 
+    const QnResourceList &resources() const;
     const QnVirtualCameraResourceList &cameras() const;
-    void setCameras(const QnVirtualCameraResourceList &cameras);
+    void setResources(const QnResourceList &resources);
 
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
@@ -47,10 +49,12 @@ private:
     void setCurrentTab(Mode mode, Qn::CameraSettingsTab tab);
 
 private:
+    QnResourceList m_resources;
     QnVirtualCameraResourceList m_cameras;
     Qn::CameraSettingsTab m_emptyTab;
 
     QStackedWidget *m_stackedWidget;
+    QWidget *m_invalidWidget;
     QWidget *m_emptyWidget;
     QnSingleCameraSettingsWidget *m_singleWidget;
     QnMultipleCameraSettingsWidget *m_multiWidget;
