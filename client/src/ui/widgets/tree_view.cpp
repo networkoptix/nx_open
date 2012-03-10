@@ -31,7 +31,7 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
         QPoint pos = m_dragMovePos;
         if (state() == QAbstractItemView::DraggingState && viewport()->rect().contains(pos)) {
             QModelIndex index = indexAt(pos);
-            setExpanded(index, !isExpanded(index));
+            setExpanded(index, true);
         }
         m_openTimer.stop();
     }
