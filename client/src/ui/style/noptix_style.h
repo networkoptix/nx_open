@@ -35,6 +35,7 @@ protected:
 private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
     qreal hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const;
+    void stopHoverTracking(const QWidget *widget) const;
 
 private:
     QnNoptixStyleAnimator *m_animator;

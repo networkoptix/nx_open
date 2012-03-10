@@ -263,9 +263,12 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     if(sunken)
         setHoverProgress(widget, 0.0);
     qreal k = hoverProgress(option, widget, 4.0);
-    qreal d = sunken ? 0.1 : (0.1 - k * 0.1);
     QRectF rect = option->rect;
+
+#ifdef QN_USE_ZOOMING_BUTTONS
+    qreal d = sunken ? 0.1 : (0.1 - k * 0.1);
     rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
+#endif
 
     QIcon::Mode mode;
     if(!(option->state & State_Enabled)) {
@@ -275,6 +278,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     } else if(option->state & State_Sunken) {
         mode = QIcon::Active;
         k = 1.0;
+        stopHoverTracking(widget);
     } else if(option->state & State_MouseOver) {
         mode = QIcon::Active;
     } else {
@@ -302,6 +306,10 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
 
 void QnNoptixStyle::setHoverProgress(const QWidget *widget, qreal value) const {
     m_animator->setValue(widget, value);
+}
+
+void QnNoptixStyle::stopHoverTracking(const QWidget *widget) const {
+    m_animator->stop(widget);
 }
 
 qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const {
