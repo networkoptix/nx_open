@@ -132,7 +132,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->loginEdit->setText(QString());
         ui->passwordEdit->setText(QString());
 
-        ui->cameraScheduleWidget->setMaxFps(0);
+        //ui->cameraScheduleWidget->setMaxFps(0);
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
         
