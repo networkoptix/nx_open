@@ -241,7 +241,7 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
-         * Opens provided cameras in an existing camera settings dialog.
+         * Opens provided resources in an existing camera settings dialog.
          */
         OpenInCameraSettingsDialogAction,
 

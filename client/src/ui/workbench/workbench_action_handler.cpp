@@ -386,8 +386,7 @@ void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
         m_selectionScope = scope;
     }
 
-    QnResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(QnActionTargetTypes::resources(provider->currentTarget(scope)));
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, cameras);
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentTarget(scope));
 }
 
 void QnWorkbenchActionHandler::submitDelayedDrops() {
@@ -785,7 +784,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnVirtualCameraResourceList cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(menu()->currentResourcesTarget(sender()).toSet().toList());
+    QnResourceList resources = menu()->currentResourcesTarget(sender());
 
     if(!m_cameraSettingsDialog) {
         m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget()));
@@ -793,20 +792,20 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         connect(m_cameraSettingsDialog.data(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
 
-    if(m_cameraSettingsDialog->widget()->cameras() != cameras) {
+    if(m_cameraSettingsDialog->widget()->resources() != resources) {
         if(m_cameraSettingsDialog->widget()->hasChanges()) {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
-                QnResourceList(m_cameraSettingsDialog->widget()->cameras()),
+                QnResourceList(m_cameraSettingsDialog->widget()->resources()),
                 tr("Cameras Not Saved"), 
-                tr("Save changes to the following %n camera(s)?", NULL, m_cameraSettingsDialog->widget()->cameras().size()),
+                tr("Save changes to the following %n camera(s)?", NULL, m_cameraSettingsDialog->widget()->resources().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
             if(button == QDialogButtonBox::Yes)
                 saveCameraSettingsFromDialog();
         }
 
-        m_cameraSettingsDialog->widget()->setCameras(cameras);
+        m_cameraSettingsDialog->widget()->setResources(resources);
     }
 
     m_cameraSettingsDialog->show();

@@ -513,9 +513,8 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource).
-        text(tr("Open in Camera Settings Dialog")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
+        text(tr("Open in Camera Settings Dialog"));
 
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
