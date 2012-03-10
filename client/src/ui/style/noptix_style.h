@@ -39,7 +39,7 @@ private:
 
 private:
     QnNoptixStyleAnimator *m_animator;
-    QIcon m_branchClosed, m_branchOpen;
+    QIcon m_branchClosed, m_branchOpen, m_closeTab;
 };
 
 

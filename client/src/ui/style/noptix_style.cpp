@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QSet>
+#include <QToolBar>
 #include <QAbstractItemView>
 #include <utils/common/scoped_painter_rollback.h>
 #include "skin.h"
@@ -36,6 +37,10 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
 {
     m_branchClosed = Skin::icon(QLatin1String("branch_closed.png"));
     m_branchOpen = Skin::icon(QLatin1String("branch_open.png"));
+    
+    m_closeTab = Skin::icon(QLatin1String("decorations/close_tab.png"));
+    QPixmap hovered = Skin::pixmap(QLatin1String("decorations/close_tab_hovered.png"));
+    m_closeTab.addPixmap(hovered, QIcon::Active);
 }
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
@@ -212,19 +217,14 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 }
 
 bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
-    bool sunken = option->state & State_Sunken;
-    if(sunken)
-        setHoverProgress(widget, 0.0);
-    qreal d = sunken ? 0.25 : (0.2 - hoverProgress(option, widget, 4.0) * 0.1);
-    QRectF rect = option->rect;
-    rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
+    QStyleOptionToolButton buttonOption;
+    buttonOption.QStyleOption::operator=(*option);
+    buttonOption.subControls = 0;
+    buttonOption.activeSubControls = 0;
+    buttonOption.icon = m_closeTab;
+    buttonOption.toolButtonStyle = Qt::ToolButtonIconOnly;
 
-    QBrush brush = option->palette.text(); //Colors::mid( CCOLOR(tab.std, Bg), CCOLOR(tab.std, Fg), 3, 1+hovered );
-
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterPenRollback penRollback(painter, QPen(brush, qMin(rect.width(), rect.height()) * 0.2));
-    painter->drawEllipse(rect);
-    return true;
+    return drawToolButtonComplexControl(&buttonOption, painter, widget);
 }
 
 bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
@@ -247,7 +247,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     if (buttonOption->features & QStyleOptionToolButton::Arrow)
         return false; /* We don't handle arrow tool buttons,... */
 
-    if (qobject_cast<QTabBar *>(widget->parent()))
+    if (qobject_cast<QToolBar *>(widget->parent()))
         return false; /* ...toolbar buttons,... */
 
     if(hasMenuIndicator(buttonOption))
