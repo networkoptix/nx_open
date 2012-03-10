@@ -24,6 +24,7 @@
 
 #include <qmath.h>
 #include "utils/common/synctime.h"
+#include "ui/style/globals.h"
 
 //#define TIMESLIDER_ANIMATED_DRAG
 
@@ -258,10 +259,21 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     //painter->setPen(QPen(QColor(0, 87, 207), 2));
     //painter->drawRect(r);
 
+    qreal msInPixel = getMsInPixel();
+    const QnTimePeriodList& recPeriods = m_parent->recTimePeriodList(msInPixel);
+    const QnTimePeriodList& motionPeriods = m_parent->motionTimePeriodList(msInPixel);
 
     QLinearGradient linearGrad(r.topLeft(), r.bottomRight());
-    linearGrad.setColorAt(0, QColor(0, 43, 130));
-    linearGrad.setColorAt(1, QColor(186, 239, 255));
+    if (!recPeriods.isEmpty() && m_parent->viewPortPos() + m_parent->sliderRange() >= recPeriods[0].startTimeMs)
+    {
+        linearGrad.setColorAt(0, QColor(0, 0, 0));
+        linearGrad.setColorAt(1, QColor(0, 0, 0));
+    }
+    else {
+        linearGrad.setColorAt(0, QColor(0, 43, 130));
+        linearGrad.setColorAt(1, QColor(186, 239, 255));
+    }
+
     //painter->setPen(QPen(Qt::green, 0));
     painter->setBrush(linearGrad);
     //painter->drawRect(r);
@@ -269,10 +281,8 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 
     // Draw time periods
-    qreal msInPixel = getMsInPixel();
-
-    drawTimePeriods(painter, m_parent->recTimePeriodList(msInPixel), QColor(255, 0, 0));
-    drawTimePeriods(painter, m_parent->motionTimePeriodList(msInPixel), QColor(0, 255, 0));
+    drawTimePeriods(painter, recPeriods, QColor(0x238E23));
+    drawTimePeriods(painter, motionPeriods, QColor(0xff0000));
 
     r = contentsRect();
 #if 1

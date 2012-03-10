@@ -11,9 +11,9 @@ QnGlobals::QnGlobals(QObject *parent):
     setValue(SETTINGS_FONT,                         QFont()/*("Bodoni MT", 12)*/);
     setValue(SHADOW_COLOR,                          QColor(0, 0, 0, 128));
     setValue(SELECTION_COLOR,                       QColor(0, 150, 255, 110));
-    setValue(MOTION_RUBBER_BAND_BORDER_COLOR,       QColor(16, 128+16, 16, 255));
-    setValue(MOTION_RUBBER_BAND_COLOR,              QColor(0, 255, 0, 64));
-    setValue(MOTION_SELECTION_COLOR,                QColor(0, 255, 0, 40));
+    //setValue(MOTION_RUBBER_BAND_BORDER_COLOR,       QColor(16, 128+16, 16, 255));
+    //setValue(MOTION_RUBBER_BAND_COLOR,              QColor(0, 255, 0, 64));
+    //setValue(MOTION_SELECTION_COLOR,                QColor(0, 255, 0, 40));
     setValue(MOTION_MASK_RUBBER_BAND_BORDER_COLOR,  QColor(255, 255, 255, 80));
 	setValue(MOTION_MASK_RUBBER_BAND_COLOR,         QColor(255, 255, 255, 40));
     setValue(MOTION_MASK_COLOR,                     QColor(255, 255, 255, 26));
@@ -27,6 +27,21 @@ QnGlobals::QnGlobals(QObject *parent):
 
     setValue(DEFAULT_LAYOUT_CELL_ASPECT_RATIO,      4.0 / 3.0);
     setValue(DEFAULT_LAYOUT_CELL_SPACING,           QSizeF(0.1, 0.1));
+
+
+
+    const int COLOR_LIGHT = 100;
+
+    setValue(RECORD_ALWAYS_COLOR,           QColor(0, COLOR_LIGHT, 0));
+    setValue(RECORD_MOTION_COLOR,           QColor(COLOR_LIGHT, 0, 0));
+    setValue(NO_RECORD_COLOR,               QColor(COLOR_LIGHT - 32, COLOR_LIGHT - 32, COLOR_LIGHT - 32));
+    //setValue(MRS_COLOR,                     QColor(0xCD, 0x7F, 0x32));
+    //setValue(MRS_COLOR,                     QColor(0xD9, 0xD9, 0x19));  
+    setValue(MRS_COLOR,                     QColor(200, 0, 0));  
+
+    setValue(SELECTION_OPACITY_DELTA,       QColor(0, 0, 0, 0x80));
+    setValue(SELECTION_BORDER_DELTA,        QColor(48, 48, 48, 0));
+
 }
 
 QnGlobals::~QnGlobals() {

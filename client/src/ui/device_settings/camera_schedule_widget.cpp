@@ -1,5 +1,7 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
+#include "ui/style/globals.h"
+#include "ui/common/color_transform.h"
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
@@ -10,12 +12,14 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->setupUi(this);
 
     // init buttons
-    ui->btnRecordAlways->setColor(QColor(COLOR_LIGHT,0,0));
-    ui->btnRecordAlways->setCheckedColor(QColor(COLOR_LIGHT+SEL_CELL_CLR_DELTA,0,0));
-    ui->btnRecordMotion->setColor(QColor(0, COLOR_LIGHT, 0));
-    ui->btnRecordMotion->setCheckedColor(QColor(0, COLOR_LIGHT+SEL_CELL_CLR_DELTA, 0));
-    ui->btnNoRecord->setColor(QColor(NO_REC_COLOR, NO_REC_COLOR, NO_REC_COLOR));
-    ui->btnNoRecord->setCheckedColor(QColor(NO_REC_COLOR+SEL_CELL_CLR_DELTA, NO_REC_COLOR+SEL_CELL_CLR_DELTA, NO_REC_COLOR+SEL_CELL_CLR_DELTA));
+    ui->btnRecordAlways->setColor(qnGlobals->recordAlwaysColor());
+    ui->btnRecordAlways->setCheckedColor(shiftColor(qnGlobals->recordAlwaysColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+
+    ui->btnRecordMotion->setColor(qnGlobals->recordMotionColor());
+    ui->btnRecordMotion->setCheckedColor(shiftColor(qnGlobals->recordMotionColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+
+    ui->btnNoRecord->setColor(qnGlobals->noRecordColor());
+    ui->btnNoRecord->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
 
     connect(ui->btnRecordAlways,        SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
     connect(ui->btnRecordMotion,        SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));

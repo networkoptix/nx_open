@@ -1,4 +1,5 @@
 #include "qncheckedbutton.h"
+#include "ui/common/color_transform.h"
 
 QnCheckedButton::QnCheckedButton(QWidget* parent): QToolButton(parent)
 {
