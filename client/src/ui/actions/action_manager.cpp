@@ -534,7 +534,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE)));
 
     factory(Qn::EditTagsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Edit tags...")).
         shortcut(tr("Alt+T")).
         autoRepeat(false).
