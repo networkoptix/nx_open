@@ -425,9 +425,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    mainWindow->show();
     mainWindow->showFullScreen();
-
+    mainWindow->show();
+        
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
