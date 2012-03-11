@@ -517,6 +517,8 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (oldStatus == newStatus)
         return;
 
+	qDebug() << "Change status. oldValue=" << oldStatus << "new value=" << newStatus << "id=" << m_id;
+
     if (oldStatus == Offline && newStatus == Online)
         init();
 

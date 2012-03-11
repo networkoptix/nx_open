@@ -4,6 +4,7 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 #include "core/dataprovider/live_stream_provider.h"
+#include "../onvif/dataprovider/onvif_h264.h"
 
 
 class PlDlinkStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
@@ -29,11 +30,13 @@ private:
 
     QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
     QnAbstractMediaDataPtr getNextDataMJPEG();
-
     QnMetaDataV1Ptr getMetaData();
+
+    QStringList getRTPurls() const;
 
 private:
 
+    RTPH264StreamreaderDelegate mRTP264;
     CLSimpleHTTPClient* mHttpClient;
 
     bool m_h264;

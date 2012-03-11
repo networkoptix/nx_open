@@ -162,7 +162,7 @@ static QStringList getValues(const QString& line)
     return values.split(",");
 }
 
-static QString getValue(const QString& line)
+QString getValueFromString(const QString& line)
 {
     
     int index = line.indexOf("=");
@@ -186,7 +186,7 @@ void QnPlDlinkResource::init()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatus(Unauthorized);
+        setStatusIfNotDisabled(Unauthorized);
         return;
     }
 
@@ -263,11 +263,11 @@ void QnPlDlinkResource::init()
         }
         else if (line.contains("vprofilenum="))
         {
-            m_camInfo.numberOfVideoProfiles = getValue(line).toInt();
+            m_camInfo.numberOfVideoProfiles = getValueFromString(line).toInt();
         }
         else if (line.contains("qualities="))
         {
-            m_camInfo.possibleQualities = getValue(line);
+            m_camInfo.possibleQualities = getValueFromString(line);
 
             if (m_camInfo.possibleQualities.toLower().contains("good"))
                 m_camInfo.hasFixedQuality = true;
@@ -279,7 +279,7 @@ void QnPlDlinkResource::init()
                 QString s = QString("vprofileurl") + QString::number(i);
                 if (line.contains(s))
                 {
-                    m_camInfo.videoProfileUrls[i] = getValue(line);
+                    m_camInfo.videoProfileUrls[i] = getValueFromString(line);
                     break;
                 }
             }
@@ -402,7 +402,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatus(Unauthorized);
+        setStatusIfNotDisabled(Unauthorized);
         return;
     }
 

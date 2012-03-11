@@ -111,8 +111,14 @@ void RTPSession::parseSDP()
             mapNum = trackInfo[1].toUInt();
             codecName = codecInfo[0];
         }
-        else if (line.startsWith("a=control:trackid="))
-            trackNum = line.mid(QString("a=control:trackid=").length()).toUInt();
+        else if (line.startsWith("a=control:track"))
+        {
+            QByteArray lineRest = line.mid(QString("a=control:").length());
+            int i = 0;
+            for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
+            m_tracksPrefix = lineRest.left(i);
+            trackNum = lineRest.mid(i).toUInt();
+        }
     }
     if (trackNum >= 0)
         m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType));
@@ -303,8 +309,14 @@ RTPIODevice*  RTPSession::sendSetup()
         request += "SETUP ";
         request += mUrl.toString();
 
-        if (!m_sdpTracks.isEmpty())
-            request += QString("/trackID=") + QString::number(itr.key());
+        if (!m_sdpTracks.isEmpty()) {
+            request += '/';
+            if (m_tracksPrefix.isEmpty())
+                request += QString("trackID=");
+            else
+                request += m_tracksPrefix;
+            request += QByteArray::number(itr.key());
+        }
 
         request += " RTSP/1.0\r\n";
         request += "CSeq: ";

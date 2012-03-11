@@ -4,8 +4,10 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 
+
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 extern inline int getIntParam(const char* pos);
+extern QString getValueFromString(const QString& line);
 
 #pragma pack(push,1)
 struct ACS_VideoHeader
@@ -31,7 +33,8 @@ PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
 mHttpClient(0),
 m_h264(false),
-m_mpeg4(false)
+m_mpeg4(false),
+mRTP264(res)
 {
     
 }
@@ -49,14 +52,15 @@ void PlDlinkStreamReader::openStream()
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
 
+    //==== init if needed
     QnResource::ConnectionRole role = getRole();
-
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     if (!res->getCamInfo().inited())
     {
         res->init();
     }
 
+    //==== profile setup
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
@@ -71,45 +75,67 @@ void PlDlinkStreamReader::openStream()
         return;
     }
 
-
     if (cam_info_file.length()==0)
         return;
-
-    res->init(); // after we changed profile some videoprofile url might be changed
 
     if (role != QnResource::Role_SecondaryLiveVideo)
     {
         res->setMotionMaskPhysical(0);
     }
-    
-    // ok, now lets open a stream
 
-    QnDlink_cam_info info = res->getCamInfo();
-    if (info.videoProfileUrls.size() < 2)
+
+    //=====requesting a video
+
+    if (m_h264)
     {
-        qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
-        return;
+        QStringList srtpUrls =  getRTPurls();
+        if (srtpUrls.size()<2)
+        {
+            qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting 2 urls.";
+            return;
+        }
+
+        QString url = (role == QnResource::Role_SecondaryLiveVideo) ? srtpUrls.at(1) : srtpUrls.at(0);
+        mRTP264.setRequest(url);
+        mRTP264.openStream();
+    }
+    else
+    {
+        // mpeg4 or jpeg
+
+        res->init(); // after we changed profile some videoprofile url might be changed
+
+        // ok, now lets open a stream
+        QnDlink_cam_info info = res->getCamInfo();
+        if (info.videoProfileUrls.size() < 2)
+        {
+            qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting video profile URL.";
+            return;
+        }
+
+
+        QString url = (role == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
+
+        if (url.length() > 1 && url.at(0)=='/')
+            url = url.mid(1);
+
+        mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
+        mHttpClient->doGET(url);
+
     }
 
-
-    QString url = (role == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
-
-    if (url.length() > 1 && url.at(0)=='/')
-        url = url.mid(1);
-
-    mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
-    mHttpClient->doGET(url);
 }
 
 void PlDlinkStreamReader::closeStream()
 {
     delete mHttpClient;
     mHttpClient = 0;
+    mRTP264.closeStream();
 }
 
 bool PlDlinkStreamReader::isStreamOpened() const
 {
-    return ( mHttpClient && mHttpClient->isOpened() );
+    return (mHttpClient && mHttpClient->isOpened()) || mRTP264.isStreamOpened();
 }
 
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
@@ -121,8 +147,11 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
         return getMetaData();
 
 
+
+
     if (m_h264)
-        return getNextDataMPEG(CODEC_ID_H264);
+        //return getNextDataMPEG(CODEC_ID_H264);
+        return mRTP264.getNextData();
 
     if (m_mpeg4)
         return getNextDataMPEG(CODEC_ID_MPEG4);
@@ -186,7 +215,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     m_mpeg4 = false;
     m_h264 = false;
 
-    bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains("sdp");
+    bool hasSdp = false; //info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains("sdp");
 
     if (info.hasH264!="" && !hasSdp)
     {
@@ -245,6 +274,43 @@ QString PlDlinkStreamReader::composeVideoProfile()
 
     t.flush();
     return result;
+}
+
+
+QStringList PlDlinkStreamReader::getRTPurls() const
+{
+
+    QStringList result;
+
+    CLHttpStatus status;
+
+    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
+
+    QByteArray reply = downloadFile(status, "config/rtspurl.cgi",  res->getHostAddress(), 80, 1000, res->getAuth());
+
+    if (status != CL_HTTP_SUCCESS)
+    {
+        return result;
+    }
+
+
+    if (reply.size()==0)
+        return result;
+
+    QString file_s(reply);
+    QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
+
+    foreach(QString line, lines)
+    {
+        if (line.toLower().contains("urlentry="))
+        {
+            result.push_back(getValueFromString(line));
+        }
+    }
+
+    return result;
+
+
 }
 
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
