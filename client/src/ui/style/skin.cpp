@@ -8,6 +8,8 @@
 #include <QtGui/QPixmapCache>
 #include <QtGui/QStyleFactory>
 
+#include <utils/common/warnings.h>
+
 #include "noptix_style.h"
 
 #ifndef QN_SKIN_PATH
@@ -20,13 +22,13 @@
 
 namespace {
     void addPixmap(QIcon *icon, QIcon::Mode mode, const QString &path) {
-        QPixmap pixmap = Skin::pixmap(path);
+        QPixmap pixmap = qnSkin->pixmap(path);
         icon->addPixmap(pixmap, mode, QIcon::On);
         icon->addPixmap(pixmap, mode, QIcon::Off);
     }
 
     void addPixmap(QIcon *icon, QIcon::State state, const QString &path) {
-        QPixmap pixmap = Skin::pixmap(path);
+        QPixmap pixmap = qnSkin->pixmap(path);
         icon->addPixmap(pixmap, QIcon::Normal,   state);
         icon->addPixmap(pixmap, QIcon::Disabled, state);
         icon->addPixmap(pixmap, QIcon::Active,   state);
@@ -34,29 +36,43 @@ namespace {
     }
 
     void addPixmap(QIcon *icon, QIcon::Mode mode, QIcon::State state, const QString &path) {
-        QPixmap pixmap = Skin::pixmap(path);
+        QPixmap pixmap = qnSkin->pixmap(path);
         icon->addPixmap(pixmap, mode, state);
+    }
+
+    void decompose(const QString &path, QString *prefix, QString *suffix) {
+        QFileInfo info(path);
+        *prefix = info.path() + QChar('/') + info.baseName();
+        *suffix = info.completeSuffix();
+        if(!suffix->isEmpty())
+            *suffix = QChar('.') + *suffix;
     }
 
 } // anonymous namespace
 
-QString Skin::path(const QString &name)
+Q_GLOBAL_STATIC(QnSkin, qn_skinInstance);
+
+QnSkin::QnSkin() {
+    QPixmapCache::setCacheLimit(16 * 1024); // 16 MB
+}
+
+QnSkin *QnSkin::instance() {
+    return qn_skinInstance();
+}
+
+QString QnSkin::path(const QString &name)
 {
     if (name.isEmpty())
         return name;
     return QN_SKIN_PATH + QLatin1String("/skin/") + name;
 }
 
-QIcon Skin::icon(const QString &name)
+QIcon QnSkin::icon(const QString &name, const QString &checkedName)
 {
-    QFileInfo info(name);
-    QString prefix = info.path() + QChar('/') + info.baseName();
-    QString suffix = info.completeSuffix();
-    if(!suffix.isEmpty())
-        suffix = QChar('.') + suffix;
+    QString prefix, suffix, path;
+    QIcon icon(pixmap(name));
 
-    QIcon icon(pixmap(prefix + suffix));
-    QString path;
+    decompose(name, &prefix, &suffix);
 
     path = prefix + QLatin1String("_hovered") + suffix;
     if(hasPixmap(path)) 
@@ -70,50 +86,46 @@ QIcon Skin::icon(const QString &name)
     if(hasPixmap(path))
         addPixmap(&icon, QIcon::Selected, path);
 
-    path = prefix + QLatin1String("_checked") + suffix;
+    decompose(checkedName.isEmpty() ? prefix + QLatin1String("_checked") + suffix : checkedName, &prefix, &suffix);
+
+    path = prefix + suffix;
     if(hasPixmap(path))
         addPixmap(&icon, QIcon::On, path);
     
-    path = prefix + QLatin1String("_checked_hovered") + suffix;
+    path = prefix + QLatin1String("_hovered") + suffix;
     if(hasPixmap(path))
         addPixmap(&icon, QIcon::Active, QIcon::On, path);
 
-    path = prefix + QLatin1String("_checked_disabled") + suffix;
+    path = prefix + QLatin1String("_disabled") + suffix;
     if(hasPixmap(path))
         addPixmap(&icon, QIcon::Disabled, QIcon::On, path);
 
-    path = prefix + QLatin1String("_checked_selected") + suffix;
+    path = prefix + QLatin1String("_selected") + suffix;
     if(hasPixmap(path))
         addPixmap(&icon, QIcon::Selected, QIcon::On, path);
 
     return icon;
 }
 
-bool Skin::hasPixmap(const QString &name) 
+bool QnSkin::hasPixmap(const QString &name) 
 {
     return QFile::exists(path(name));
 }
 
-QPixmap Skin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
+QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
 {
-    static bool initialized = false;
-    if (!initialized) {
-        QPixmapCache::setCacheLimit(16 * 1024); // 16 MB
-        initialized = true;
-    }
-
     QString key = name;
     if (!size.isEmpty())
         key += QString(QLatin1String("_%1x%2_%3_%4")).arg(int(size.width())).arg(int(size.height())).arg(int(aspectMode)).arg(int(mode));
 
     QPixmap pixmap;
     if (!QPixmapCache::find(key, &pixmap)) {
-        pixmap = QPixmap::fromImage(QImage(Skin::path(name)), Qt::OrderedDither | Qt::OrderedAlphaDither);
+        pixmap = QPixmap::fromImage(QImage(path(name)), Qt::OrderedDither | Qt::OrderedAlphaDither);
         if (!pixmap.isNull()) {
             if (!size.isEmpty() && size != pixmap.size())
                 pixmap = pixmap.scaled(size, aspectMode, mode);
         } else {
-            qWarning("Skin: Cannot load image `%s`", qPrintable(name));
+            qnWarning("Cannot load image '%1'", name);
         }
 
         QPixmapCache::insert(key, pixmap);
@@ -122,7 +134,7 @@ QPixmap Skin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode
     return pixmap;
 }
 
-QStyle *Skin::style()
+QStyle *QnSkin::style()
 {
     QString baseStyleName;
 #ifndef Q_OS_DARWIN

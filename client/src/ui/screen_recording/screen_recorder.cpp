@@ -136,7 +136,7 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
 #if defined(CL_TRIAL_MODE) || defined(CL_FORCE_LOGO)
     //QString logoName = QString("logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
     QString logoName = QLatin1String("logo_1920_1080.png");
-    logo = Skin::pixmap(logoName); // hint: comment this line to remove logo
+    logo = qnSkin->pixmap(logoName); // hint: comment this line to remove logo
 #endif
     delete m_encoder;
     m_encoder = new DesktopFileEncoder(

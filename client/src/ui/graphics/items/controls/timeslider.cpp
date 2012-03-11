@@ -301,7 +301,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     ensureHandleRect();
     if (m_pixmap.width() == 0)
-        m_pixmap = Skin::pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        m_pixmap = qnSkin->pixmap(QLatin1String("slider-handle.png"), m_handleRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     painter->drawPixmap(m_handleRect.topLeft(), m_pixmap);
 
     //qDebug() << "timeFinal=" << (getUsecTimer() - t)/1000.0;

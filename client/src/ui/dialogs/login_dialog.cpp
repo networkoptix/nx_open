@@ -30,7 +30,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     ui->savePasswordCheckBox->hide();
 
     ui->titleLabel->setAlignment(Qt::AlignCenter);
-    ui->titleLabel->setPixmap(Skin::pixmap("logo_1920_1080.png", QSize(250, 1000), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    ui->titleLabel->setPixmap(qnSkin->pixmap("logo_1920_1080.png", QSize(250, 1000), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     resetButton->setText(tr("&Reset"));
 

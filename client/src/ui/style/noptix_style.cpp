@@ -35,9 +35,9 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     base_type(style),
     m_animator(new QnNoptixStyleAnimator(this))
 {
-    m_branchClosed = Skin::icon("branch_closed.png");
-    m_branchOpen = Skin::icon("branch_open.png");
-    m_closeTab = Skin::icon("decorations/close_tab.png");
+    m_branchClosed = qnSkin->icon("branch_closed.png");
+    m_branchOpen = qnSkin->icon("branch_open.png");
+    m_closeTab = qnSkin->icon("decorations/close_tab.png");
 }
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
@@ -203,9 +203,9 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 
     const bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
 
-    QPixmap grooveBorderPic = Skin::pixmap(QLatin1String("slider_groove_lborder.png"), grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QPixmap grooveBodyPic = Skin::pixmap(QLatin1String("slider_groove_body.png"), grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QPixmap handlePic = Skin::pixmap(hovered ? QLatin1String("slider_handle_active.png") : QLatin1String("slider_handle.png"), handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    QPixmap grooveBorderPic = qnSkin->pixmap("slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap grooveBodyPic = qnSkin->pixmap("slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap handlePic = qnSkin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     painter->drawTiledPixmap(grooveRect.adjusted(grooveBorderPic.width(), 0, -grooveBorderPic.width(), 0), grooveBodyPic);
     painter->drawPixmap(grooveRect.topLeft(), grooveBorderPic);

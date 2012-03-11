@@ -612,7 +612,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
-    togglePinButton->setIcon(Skin::icon("decorations/pin.png"));
+    togglePinButton->setIcon(Skin::icon("decorations/pin.png", "decorations/unpin.png"));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
     togglePinButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
@@ -621,7 +621,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
 #endif
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setIcon(Skin::icon("decorations/close_item.png"));
+    closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
     closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
     closeButton->setAnimationSpeed(4.0);
     connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));

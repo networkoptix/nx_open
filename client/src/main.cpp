@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
         application.reset(singleApplication);
     }
     application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(Skin::icon("hdw_logo.png"));
+    application->setWindowIcon(qnSkin->icon("hdw_logo.png"));
 
     if(singleApplication) {
         QString argsMessage;
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 
     CLDeviceSettingsDlgFactory::initialize();
 
-    qApp->setStyle(Skin::style());
+    qApp->setStyle(qnSkin->style());
 
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);

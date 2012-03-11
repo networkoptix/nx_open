@@ -19,7 +19,7 @@ static const int ICON_SIZE = 32;
 
 static inline void setDefaultSoundIcon(QLabel *label)
 {
-    label->setPixmap(Skin::pixmap(QLatin1String("microphone.png")).scaled(ICON_SIZE, ICON_SIZE));
+    label->setPixmap(qnSkin->pixmap("microphone.png", QSize(ICON_SIZE, ICON_SIZE), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 
