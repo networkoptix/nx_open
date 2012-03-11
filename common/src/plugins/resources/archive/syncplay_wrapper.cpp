@@ -638,7 +638,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                     }
                 }
                 if (d->readers[i].paused)
-                    d->readers[i].reader->resume();
+                    d->readers[i].reader->resumeMedia();
                 if (d->enabled)
                     d->readers[i].reader->setNavDelegate(this);
                 d->readers[i].paused = false;
