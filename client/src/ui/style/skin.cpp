@@ -27,12 +27,15 @@ namespace {
         icon->addPixmap(pixmap, mode, QIcon::Off);
     }
 
-    void addPixmap(QIcon *icon, QIcon::State state, const QString &path) {
-        QPixmap pixmap = qnSkin->pixmap(path);
+    void addPixmap(QIcon *icon, QIcon::State state, const QPixmap &pixmap) {
         icon->addPixmap(pixmap, QIcon::Normal,   state);
         icon->addPixmap(pixmap, QIcon::Disabled, state);
         icon->addPixmap(pixmap, QIcon::Active,   state);
         icon->addPixmap(pixmap, QIcon::Selected, state);
+    }
+
+    void addPixmap(QIcon *icon, QIcon::State state, const QString &path) {
+        addPixmap(icon, state, qnSkin->pixmap(path));
     }
 
     void addPixmap(QIcon *icon, QIcon::Mode mode, QIcon::State state, const QString &path) {
@@ -60,19 +63,12 @@ QnSkin *QnSkin::instance() {
     return qn_skinInstance();
 }
 
-QString QnSkin::path(const QString &name)
-{
-    if (name.isEmpty())
-        return name;
-    return QN_SKIN_PATH + QLatin1String("/skin/") + name;
-}
-
-QIcon QnSkin::icon(const QString &name, const QString &checkedName)
-{
+QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
     QString prefix, suffix, path;
     QIcon icon(pixmap(name));
 
     decompose(name, &prefix, &suffix);
+    QString pressedPath = prefix + QLatin1String("_pressed") + suffix;
 
     path = prefix + QLatin1String("_hovered") + suffix;
     if(hasPixmap(path)) 
@@ -87,6 +83,7 @@ QIcon QnSkin::icon(const QString &name, const QString &checkedName)
         addPixmap(&icon, QIcon::Selected, path);
 
     decompose(checkedName.isEmpty() ? prefix + QLatin1String("_checked") + suffix : checkedName, &prefix, &suffix);
+    QString checkedPressedPath = prefix + QLatin1String("_pressed") + suffix;
 
     path = prefix + suffix;
     if(hasPixmap(path))
@@ -104,16 +101,23 @@ QIcon QnSkin::icon(const QString &name, const QString &checkedName)
     if(hasPixmap(path))
         addPixmap(&icon, QIcon::Selected, QIcon::On, path);
 
+    /* At this point QIcon is constructed and will not be changed again, so we can use its cacheKey. */
+    QIcon pressedIcon(icon.pixmap(QSize(1024, 1024), QIcon::Active, QIcon::Off));
+    if(hasPixmap(pressedPath))
+        addPixmap(&pressedIcon, QIcon::Active, pressedPath);
+        
+    addPixmap(&pressedIcon, QIcon::On, icon.pixmap(QSize(1024, 1024), QIcon::Active, QIcon::On));
+    if(hasPixmap(checkedPressedPath)) 
+        addPixmap(&pressedIcon, QIcon::Active, QIcon::On, path);
+
     return icon;
 }
 
-bool QnSkin::hasPixmap(const QString &name) 
-{
+bool QnSkin::hasPixmap(const QString &name) const {
     return QFile::exists(path(name));
 }
 
-QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
-{
+QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode) {
     QString key = name;
     if (!size.isEmpty())
         key += QString(QLatin1String("_%1x%2_%3_%4")).arg(int(size.width())).arg(int(size.height())).arg(int(aspectMode)).arg(int(mode));
@@ -134,8 +138,23 @@ QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMo
     return pixmap;
 }
 
-QStyle *QnSkin::style()
-{
+QPixmap	QnSkin::pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state) const {
+    if(state == Pressed) {
+        return m_pressedIconByKey.value(icon.cacheKey()).pixmap(size, Active, state);
+    } else {
+        return icon.pixmap(size, mode, state);
+    }
+}
+
+QPixmap	QnSkin::pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode, QIcon::State state) const {
+    return pixmap(icon, QSize(w, h), mode, state);
+}
+
+QPixmap	QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::State state) const {
+    return pixmap(icon, QSize(extent, extent), mode, state);
+}
+
+QStyle *QnSkin::style() {
     QString baseStyleName;
 #ifndef Q_OS_DARWIN
 #   ifdef CL_CUSTOMIZATION_PRESET
@@ -150,4 +169,10 @@ QStyle *QnSkin::style()
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
 
     return style;
+}
+
+QString QnSkin::path(const QString &name) const {
+    if (name.isEmpty())
+        return name;
+    return QN_SKIN_PATH + QLatin1String("/skin/") + name;
 }
