@@ -12,6 +12,8 @@ class QnMultipleCameraSettingsWidget;
 
 class QnCameraSettingsWidget: public QWidget {
     Q_OBJECT;
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+
 public:
     enum Mode {
         InvalidMode,
@@ -34,6 +36,9 @@ public:
     void setCamerasActive(bool active);
 
     bool hasChanges() const;
+
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly) const;
 
     void updateFromResources();
     void submitToResources();

@@ -9,35 +9,11 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
 
+#include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
     QColor redText = QColor(255, 64, 64);
-
-    class QnNonTabMultiEventEater: public QnMultiEventEater {
-    public:
-        QnNonTabMultiEventEater(QObject *parent = NULL): QnMultiEventEater(parent) {
-            addEventType(QEvent::MouseButtonPress);
-            addEventType(QEvent::MouseButtonRelease);
-            addEventType(QEvent::MouseButtonDblClick);
-            addEventType(QEvent::MouseMove);
-            addEventType(QEvent::KeyPress);
-            addEventType(QEvent::KeyRelease);
-            addEventType(QEvent::GrabKeyboard);
-            addEventType(QEvent::GrabMouse);
-        }
-
-    protected:
-        virtual bool activate(QObject *, QEvent *event) override {
-            if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
-                QKeyEvent *e = static_cast<QKeyEvent *>(event);
-                if(e->key() == Qt::Key_Tab || e->key() == Qt::Key_Backtab)
-                    return false;
-            }
-
-            return true;
-        }
-    };
 
 } // anonymous namespace
 
@@ -45,8 +21,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     QDialog(parent),
     ui(new Ui::UserSettingsDialog()),
     m_context(context),
-    m_hasChanges(false),
-    m_eventEater(new QnNonTabMultiEventEater(this))
+    m_hasChanges(false)
 {
     if(context == NULL) 
         qnNullWarning(context);
@@ -119,16 +94,12 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         ui->confirmPasswordEdit->setVisible(visible);
         ui->confirmPasswordLabel->setVisible(visible);
         ui->passwordEdit->setReadOnly(!editable);
-        ui->passwordEdit->setReadOnly(!editable);
+        ui->confirmPasswordEdit->setReadOnly(!editable);
         break;
     case AccessRights:
         ui->accessRightsLabel->setVisible(visible);
         ui->accessRightsComboBox->setVisible(visible);
-        if(editable) {
-            ui->accessRightsComboBox->removeEventFilter(m_eventEater);
-        } else {
-            ui->accessRightsComboBox->installEventFilter(m_eventEater);
-        }
+        setReadOnly(ui->accessRightsComboBox, !editable);
         break;
     default:
         break;

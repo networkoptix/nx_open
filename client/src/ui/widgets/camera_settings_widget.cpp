@@ -141,6 +141,15 @@ bool QnCameraSettingsWidget::hasChanges() const {
     }
 }
 
+bool QnCameraSettingsWidget::isReadOnly() const {
+    return m_singleWidget->isReadOnly();
+}
+
+void QnCameraSettingsWidget::setReadOnly(bool readOnly) const {
+    m_singleWidget->setReadOnly(readOnly);
+    m_multiWidget->setReadOnly(readOnly);
+}
+
 void QnCameraSettingsWidget::updateFromResources() {
     switch(mode()) {
     case SingleMode:

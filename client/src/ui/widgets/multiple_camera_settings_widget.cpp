@@ -8,6 +8,7 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
+#include "ui/common/read_only.h"
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource_widget.h"
@@ -16,7 +17,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasChanges(false),
-    m_hasScheduleChanges(false)
+    m_hasScheduleChanges(false),
+    m_readOnly(false)
 {
     ui->setupUi(this);
 
@@ -137,7 +139,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->passwordEdit->setText(QString());
         ui->passwordEdit->setPlaceholderText(QString());
         ui->cameraScheduleWidget->setScheduleEnabled(Qt::PartiallyChecked);
-        //ui->cameraScheduleWidget->setMaxFps(0);
+        ui->cameraScheduleWidget->setMaxFps(1);
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setChangesDisabled(true);
     } else {
@@ -208,6 +210,21 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     }
 
     setHasChanges(false);
+}
+
+bool QnMultipleCameraSettingsWidget::isReadOnly() const {
+    return m_readOnly;
+}
+
+void QnMultipleCameraSettingsWidget::setReadOnly(bool readOnly) {
+    if(m_readOnly == readOnly)
+        return;
+
+    using ::setReadOnly;
+    setReadOnly(ui->loginEdit, readOnly);
+    setReadOnly(ui->passwordEdit, readOnly);
+    setReadOnly(ui->cameraScheduleWidget, readOnly);
+    m_readOnly = readOnly;
 }
 
 void QnMultipleCameraSettingsWidget::setHasChanges(bool hasChanges) {

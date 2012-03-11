@@ -22,6 +22,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
 {
     m_mouseMoveCell = QPoint(-2, -2);
     m_enabled = true;
+    m_readOnly = false;
     m_defaultParams[FirstParam] = 10;
     m_defaultParams[SecondParam] = QLatin1String("Lo");
     m_defaultParams[ColorParam] = qnGlobals->recordAlwaysColor().rgba();
@@ -301,6 +302,9 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent *event)
             emit cellActivated(cell);
         return;
     }
+    
+    if(m_readOnly)
+        return;
 
     m_mousePressPos = event->pos();
     m_mousePressed = true;
@@ -437,6 +441,17 @@ void QnScheduleGridWidget::setEnabled(bool val)
 bool QnScheduleGridWidget::isEnabled() const
 {
     return m_enabled;
+}
+
+bool QnScheduleGridWidget::isReadOnly() const {
+    return m_readOnly;
+}
+
+void QnScheduleGridWidget::setReadOnly(bool readOnly) {
+    if(m_readOnly == readOnly)
+        return;
+
+    m_readOnly = readOnly;
 }
 
 bool QnScheduleGridWidget::isValidCell(const QPoint &cell) const {

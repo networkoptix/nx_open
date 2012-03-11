@@ -96,8 +96,11 @@ protected:
     void openNewWindow(const QStringList &args);
 
     void saveCameraSettingsFromDialog();
-    Q_SLOT void updateCameraSettingsFromSelection();
-    Q_SLOT void submitDelayedDrops();
+
+protected slots:
+    void updateCameraSettingsFromSelection();
+    void updateCameraSettingsEditibility();
+    void submitDelayedDrops();
 
 protected slots:
     void at_context_aboutToBeDestroyed();

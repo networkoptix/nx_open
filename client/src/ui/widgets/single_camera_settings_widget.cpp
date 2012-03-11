@@ -6,6 +6,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "ui/common/read_only.h"
 #include "ui/device_settings/camera_schedule_widget.h"
 #include "ui/device_settings/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource_widget.h"
@@ -15,7 +16,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui(new Ui::SingleCameraSettingsWidget),
     m_motionWidget(NULL),
     m_hasChanges(false),
-    m_hasScheduleChanges(false)
+    m_hasScheduleChanges(false),
+    m_readOnly(false)
 {
     ui->setupUi(this);
     
@@ -132,7 +134,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->loginEdit->setText(QString());
         ui->passwordEdit->setText(QString());
 
-        //ui->cameraScheduleWidget->setMaxFps(0);
+        ui->cameraScheduleWidget->setMaxFps(1);
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
         
@@ -159,6 +161,22 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     }
 
     setHasChanges(false);
+}
+
+bool QnSingleCameraSettingsWidget::isReadOnly() const {
+    return m_readOnly;
+}
+
+void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
+    if(m_readOnly == readOnly)
+        return;
+
+    using ::setReadOnly;
+    setReadOnly(ui->nameEdit, readOnly);
+    setReadOnly(ui->loginEdit, readOnly);
+    setReadOnly(ui->passwordEdit, readOnly);
+    setReadOnly(ui->cameraScheduleWidget, readOnly);
+    m_readOnly = readOnly;
 }
 
 void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {

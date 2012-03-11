@@ -13,6 +13,7 @@ class QnCameraMotionMaskWidget;
 
 class QnSingleCameraSettingsWidget : public QWidget {
     Q_OBJECT;
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
 
 public:
     explicit QnSingleCameraSettingsWidget(QWidget *parent = NULL);
@@ -30,6 +31,9 @@ public:
     bool hasChanges() const {
         return m_hasChanges;
     }
+
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
 
     void updateFromResource();
     void submitToResource();
@@ -52,6 +56,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     bool m_hasChanges;
     bool m_hasScheduleChanges;
+    bool m_readOnly;
 
     QnCameraMotionMaskWidget *m_motionWidget;
 };

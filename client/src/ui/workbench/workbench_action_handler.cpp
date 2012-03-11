@@ -123,6 +123,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_context_aboutToBeDestroyed()));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(submitDelayedDrops()), Qt::QueuedConnection);
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(updateCameraSettingsEditibility()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -379,6 +380,14 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     /* Submit and save it. */
     m_cameraSettingsDialog->widget()->submitToResources();
     connection()->saveAsync(cameras, this, SLOT(at_cameras_saved(int, const QByteArray &, const QnResourceList &, int)));
+}
+
+void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
+    if(!m_cameraSettingsDialog)
+        return;
+
+    bool isAdmin = context()->user() && context()->user()->isAdmin();
+    m_cameraSettingsDialog->widget()->setReadOnly(!isAdmin);
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
@@ -782,6 +791,8 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
 
     if(!m_cameraSettingsDialog) {
         m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget()));
+        
+        updateCameraSettingsEditibility();
 
         connect(m_cameraSettingsDialog.data(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }

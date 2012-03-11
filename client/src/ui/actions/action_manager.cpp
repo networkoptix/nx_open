@@ -21,8 +21,6 @@ namespace {
         dst->addPixmap(src.pixmap(src.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
     }
 
-    const char *shortcutContextSetPropertyName = "_qn_shortcutContextSet";
-
 } // anonymous namespace
 
 
@@ -31,22 +29,23 @@ namespace {
 // -------------------------------------------------------------------------- //
 class QnActionBuilder {
 public:
-    QnActionBuilder(QnActionManager *manager, QnAction *action): m_manager(manager), m_action(action) {}
+    QnActionBuilder(QnActionManager *manager, QnAction *action): 
+        m_manager(manager), 
+        m_action(action) 
+    {
+        action->setShortcutContext(Qt::WindowShortcut);
+    }
 
     QnActionBuilder shortcut(const QKeySequence &shortcut) {
         QList<QKeySequence> shortcuts = m_action->shortcuts();
         shortcuts.push_back(shortcut);
         m_action->setShortcuts(shortcuts);
 
-        if(!m_action->property(shortcutContextSetPropertyName).isValid())
-            m_action->setShortcutContext(Qt::ApplicationShortcut);
-
         return *this;
     }
 
     QnActionBuilder shortcutContext(Qt::ShortcutContext context) {
         m_action->setShortcutContext(context);
-        m_action->setProperty(shortcutContextSetPropertyName, true);
 
         return *this;
     }
@@ -378,6 +377,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Screen Recording")).
         shortcut(tr("Alt+R")).
         shortcut(Qt::Key_MediaRecord).
+        shortcutContext(Qt::ApplicationShortcut).
         icon(Skin::icon(QLatin1String("decorations/recording.png"))).
         autoRepeat(false);
 
@@ -392,7 +392,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
         shortcut(tr("Esc")).
-        shortcutContext(Qt::WindowShortcut).
 #endif
         icon(Skin::icon(QLatin1String("decorations/fullscreen.png"))).
         hoverIcon(Skin::icon(QLatin1String("decorations/fullscreen_hovered.png"))).
@@ -442,6 +441,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("Exit")).
         shortcut(tr("Alt+F4")).
+        shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
         icon(Skin::icon(QLatin1String("decorations/exit.png"))).
