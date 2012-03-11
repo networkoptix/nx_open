@@ -15,7 +15,7 @@
 #include <QMenu>
 #include <QLabel>
 
-#include <utils/common/event_signalizer.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 

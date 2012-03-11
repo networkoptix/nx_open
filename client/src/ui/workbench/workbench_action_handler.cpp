@@ -368,9 +368,14 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         }
     }
 
+    QString oldPassword = user->getPassword();
+    user->setPassword(QLatin1String("******"));
+
     dialog->setUser(user);
     if(!dialog->exec())
         return;
+
+    user->setPassword(oldPassword);
 
     if(!dialog->hasChanges())
         return;

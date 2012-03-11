@@ -11,7 +11,7 @@
 #include <QFileOpenEvent>
 
 #include <utils/common/warnings.h>
-#include <utils/common/event_signalizer.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>

@@ -63,6 +63,7 @@ protected slots:
 private:
     QScopedPointer<Ui::UserSettingsDialog> ui;
     QWeakPointer<QnWorkbenchContext> m_context;
+    QObject *m_eventEater;
     QSet<QString> m_logins;
     QnUserResourcePtr m_user;
     bool m_valid[ElementCount];

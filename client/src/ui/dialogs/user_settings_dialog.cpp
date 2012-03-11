@@ -2,22 +2,51 @@
 #include "ui_user_settings_dialog.h"
 
 #include <QtGui/QPushButton>
+#include <QtGui/QKeyEvent>
 
 #include <core/resource/user_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
 
 #include <ui/workbench/workbench_context.h>
 
 namespace {
     QColor redText = QColor(255, 64, 64);
-}
+
+    class QnNonTabMultiEventEater: public QnMultiEventEater {
+    public:
+        QnNonTabMultiEventEater(QObject *parent = NULL): QnMultiEventEater(parent) {
+            addEventType(QEvent::MouseButtonPress);
+            addEventType(QEvent::MouseButtonRelease);
+            addEventType(QEvent::MouseButtonDblClick);
+            addEventType(QEvent::MouseMove);
+            addEventType(QEvent::KeyPress);
+            addEventType(QEvent::KeyRelease);
+            addEventType(QEvent::GrabKeyboard);
+            addEventType(QEvent::GrabMouse);
+        }
+
+    protected:
+        virtual bool activate(QObject *, QEvent *event) override {
+            if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+                QKeyEvent *e = static_cast<QKeyEvent *>(event);
+                if(e->key() == Qt::Key_Tab || e->key() == Qt::Key_Backtab)
+                    return false;
+            }
+
+            return true;
+        }
+    };
+
+} // anonymous namespace
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
     ui(new Ui::UserSettingsDialog()),
     m_context(context),
-    m_hasChanges(false)
+    m_hasChanges(false),
+    m_eventEater(new QnNonTabMultiEventEater(this))
 {
     if(context == NULL) 
         qnNullWarning(context);
@@ -95,7 +124,11 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
     case AccessRights:
         ui->accessRightsLabel->setVisible(visible);
         ui->accessRightsComboBox->setVisible(visible);
-        ui->accessRightsComboBox->setEnabled(editable);
+        if(editable) {
+            ui->accessRightsComboBox->removeEventFilter(m_eventEater);
+        } else {
+            ui->accessRightsComboBox->installEventFilter(m_eventEater);
+        }
         break;
     default:
         break;
@@ -130,13 +163,21 @@ void QnUserSettingsDialog::updateFromResource() {
     if(!m_user) {
         ui->loginEdit->clear();
         ui->passwordEdit->clear();
+        ui->passwordEdit->setPlaceholderText(QString());
         ui->confirmPasswordEdit->clear();
+        ui->confirmPasswordEdit->setPlaceholderText(QString());
         ui->accessRightsComboBox->setCurrentIndex(-1);
     } else {
+        QString placeholder(m_user->getPassword().size(), QChar('*'));
+
         ui->loginEdit->setText(m_user->getName());
-        ui->passwordEdit->setText(m_user->getPassword());
-        ui->confirmPasswordEdit->setText(m_user->getPassword());
+        ui->passwordEdit->setPlaceholderText(placeholder);
+        ui->passwordEdit->clear();
+        ui->confirmPasswordEdit->setPlaceholderText(placeholder);
+        ui->confirmPasswordEdit->clear();
         ui->accessRightsComboBox->setCurrentIndex(m_user->isAdmin() ? 1 : 0); // TODO: evil magic numbers
+
+        updatePassword();
     }
 
     setHasChanges(false);
@@ -147,7 +188,8 @@ void QnUserSettingsDialog::submitToResource() {
         return;
 
     m_user->setName(ui->loginEdit->text());
-    m_user->setPassword(ui->passwordEdit->text());
+    if(!ui->passwordEdit->text().isEmpty())
+        m_user->setPassword(ui->passwordEdit->text());
     m_user->setAdmin(ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toBool());
 
     setHasChanges(false);
@@ -213,7 +255,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         }
         break;
     case Password:
-        if(ui->passwordEdit->text().isEmpty() && ui->confirmPasswordEdit->text().isEmpty()) {
+        if(ui->passwordEdit->text().isEmpty() && ui->confirmPasswordEdit->text().isEmpty() && ui->passwordEdit->placeholderText().isEmpty()) {
             hint = tr("Password can not be empty.");
             valid = false;
         } else if(ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
