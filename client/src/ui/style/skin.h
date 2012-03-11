@@ -52,6 +52,7 @@ private:
     QString path(const QString &name) const;
 
 private:
+    QHash<QString, QIcon> m_iconByNames;
     QHash<qint64, QIcon> m_pressedIconByKey;
 };
 

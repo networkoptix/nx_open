@@ -21,27 +21,38 @@
 #endif
 
 namespace {
-    void addPixmap(QIcon *icon, QIcon::Mode mode, const QString &path) {
-        QPixmap pixmap = qnSkin->pixmap(path);
-        icon->addPixmap(pixmap, mode, QIcon::On);
-        icon->addPixmap(pixmap, mode, QIcon::Off);
-    }
+    class QnIconBuilder {
+        typedef QHash<QPair<QIcon::Mode, QIcon::State>, QPixmap> container_type;
 
-    void addPixmap(QIcon *icon, QIcon::State state, const QPixmap &pixmap) {
-        icon->addPixmap(pixmap, QIcon::Normal,   state);
-        icon->addPixmap(pixmap, QIcon::Disabled, state);
-        icon->addPixmap(pixmap, QIcon::Active,   state);
-        icon->addPixmap(pixmap, QIcon::Selected, state);
-    }
+    public:
+        void addPixmap(const QPixmap &pixmap, QIcon::Mode mode) {
+            addPixmap(pixmap, mode, QIcon::On);
+            addPixmap(pixmap, mode, QIcon::Off);
+        }
 
-    void addPixmap(QIcon *icon, QIcon::State state, const QString &path) {
-        addPixmap(icon, state, qnSkin->pixmap(path));
-    }
+        void addPixmap(const QPixmap &pixmap, QIcon::State state) {
+            addPixmap(pixmap, QIcon::Normal,   state);
+            addPixmap(pixmap, QIcon::Disabled, state);
+            addPixmap(pixmap, QIcon::Active,   state);
+            addPixmap(pixmap, QIcon::Selected, state);
+        }
 
-    void addPixmap(QIcon *icon, QIcon::Mode mode, QIcon::State state, const QString &path) {
-        QPixmap pixmap = qnSkin->pixmap(path);
-        icon->addPixmap(pixmap, mode, state);
-    }
+        void addPixmap(const QPixmap &pixmap, QIcon::Mode mode, QIcon::State state) {
+            m_pixmaps[qMakePair(mode, state)] = pixmap;
+        }
+
+        QIcon createIcon() const {
+            QIcon icon(m_pixmaps.value(qMakePair(QIcon::Normal, QIcon::Off)));
+
+            for(container_type::const_iterator pos = m_pixmaps.begin(), end = m_pixmaps.end(); pos != end; pos++)
+                icon.addPixmap(pos.value(), pos.key().first, pos.key().second);
+
+            return icon;
+        }
+
+    private:
+        container_type m_pixmaps;
+    };
 
     void decompose(const QString &path, QString *prefix, QString *suffix) {
         QFileInfo info(path);
@@ -64,52 +75,68 @@ QnSkin *QnSkin::instance() {
 }
 
 QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
+    QString key = name + QLatin1String("=^_^=") + checkedName;
+    if(m_iconByNames.contains(key))
+        return m_iconByNames.value(key);
+
     QString prefix, suffix, path;
-    QIcon icon(pixmap(name));
 
     decompose(name, &prefix, &suffix);
     QString pressedPath = prefix + QLatin1String("_pressed") + suffix;
 
+    /* Create normal icon. */
+    QnIconBuilder builder;
+    builder.addPixmap(pixmap(name), Normal, Off);
+
     path = prefix + QLatin1String("_hovered") + suffix;
     if(hasPixmap(path)) 
-        addPixmap(&icon, QIcon::Active, path);
+        builder.addPixmap(pixmap(path), Active);
     
     path = prefix + QLatin1String("_disabled") + suffix;
     if(hasPixmap(path))
-        addPixmap(&icon, QIcon::Disabled, path);
+        builder.addPixmap(pixmap(path), Disabled);
     
     path = prefix + QLatin1String("_selected") + suffix;
     if(hasPixmap(path))
-        addPixmap(&icon, QIcon::Selected, path);
+        builder.addPixmap(pixmap(path), Selected);
 
     decompose(checkedName.isEmpty() ? prefix + QLatin1String("_checked") + suffix : checkedName, &prefix, &suffix);
     QString checkedPressedPath = prefix + QLatin1String("_pressed") + suffix;
 
     path = prefix + suffix;
     if(hasPixmap(path))
-        addPixmap(&icon, QIcon::On, path);
+        builder.addPixmap(pixmap(path), On);
     
     path = prefix + QLatin1String("_hovered") + suffix;
     if(hasPixmap(path))
-        addPixmap(&icon, QIcon::Active, QIcon::On, path);
+        builder.addPixmap(pixmap(path), Active, On);
 
     path = prefix + QLatin1String("_disabled") + suffix;
     if(hasPixmap(path))
-        addPixmap(&icon, QIcon::Disabled, QIcon::On, path);
+        builder.addPixmap(pixmap(path), Disabled, On);
 
     path = prefix + QLatin1String("_selected") + suffix;
     if(hasPixmap(path))
-        addPixmap(&icon, QIcon::Selected, QIcon::On, path);
+        builder.addPixmap(pixmap(path), Selected, On);
 
-    /* At this point QIcon is constructed and will not be changed again, so we can use its cacheKey. */
-    QIcon pressedIcon(icon.pixmap(QSize(1024, 1024), QIcon::Active, QIcon::Off));
+    QIcon icon = builder.createIcon();
+
+    /* Create pressed icon. */
+    QnIconBuilder pressedBuilder;
+    pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Active, Off), Off);
+    pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Active, On), On);
+
     if(hasPixmap(pressedPath))
-        addPixmap(&pressedIcon, QIcon::Active, pressedPath);
+        pressedBuilder.addPixmap(pixmap(pressedPath), Active);
         
-    addPixmap(&pressedIcon, QIcon::On, icon.pixmap(QSize(1024, 1024), QIcon::Active, QIcon::On));
     if(hasPixmap(checkedPressedPath)) 
-        addPixmap(&pressedIcon, QIcon::Active, QIcon::On, path);
+        pressedBuilder.addPixmap(pixmap(checkedPressedPath), Active, On);
 
+    QIcon pressedIcon = pressedBuilder.createIcon();
+
+    /* Save & return. */
+    m_iconByNames[key] = icon;
+    m_pressedIconByKey[icon.cacheKey()] = pressedIcon;
     return icon;
 }
 
@@ -139,7 +166,7 @@ QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMo
 }
 
 QPixmap	QnSkin::pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state) const {
-    if(state == Pressed) {
+    if(mode == Pressed) {
         return m_pressedIconByKey.value(icon.cacheKey()).pixmap(size, Active, state);
     } else {
         return icon.pixmap(size, mode, state);

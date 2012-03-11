@@ -33,6 +33,7 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
+    m_skin(qnSkin),
     m_animator(new QnNoptixStyleAnimator(this))
 {
     m_branchClosed = qnSkin->icon("branch_closed.png");
@@ -281,7 +282,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     } else if(option->state & State_Selected) {
         mode = QIcon::Selected;
     } else if(option->state & State_Sunken) {
-        mode = QIcon::Active;
+        mode = QnSkin::Pressed;
         k = 1.0;
         stopHoverTracking(widget);
     } else if(option->state & State_MouseOver) {
@@ -303,7 +304,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
         painter->drawPixmap(rect, pixmap1, pixmap1.rect());
         painter->setOpacity(o);
     } else {
-        QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
+        QPixmap pixmap = m_skin->pixmap(buttonOption->icon, rect.toAlignedRect().size(), mode, state);
         painter->drawPixmap(rect, pixmap, pixmap.rect());
     }
     return true;

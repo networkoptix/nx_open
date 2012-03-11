@@ -16,6 +16,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/scene_utility.h>
+#include "ui/style/skin.h"
 
 namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {
@@ -31,16 +32,7 @@ namespace {
     }
 
     QPixmap bestPixmap(const QIcon &icon, QIcon::Mode mode, QIcon::State state) {
-        QList<QSize> sizes = icon.availableSizes(mode, state);
-        if(sizes.empty())
-            return QPixmap();
-
-        QSize bestSize(0, 0);
-        foreach(const QSize &size, sizes)
-            if(size.width() > bestSize.width())
-                bestSize = size;
-
-        return icon.pixmap(bestSize, mode, state);
+        return qnSkin->pixmap(icon, QSize(1024, 1024), mode, state);
     }
 
     typedef QnGlContextData<QnTextureTransitionShaderProgram> QnTextureTransitionShaderProgramStorage;
@@ -123,12 +115,12 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     setPixmap(0,                            bestPixmap(icon, QIcon::Normal, QIcon::Off));
     setPixmap(HOVERED,                      bestPixmap(icon, QIcon::Active, QIcon::Off));
     setPixmap(DISABLED,                     bestPixmap(icon, QIcon::Disabled, QIcon::Off));
-    setPixmap(PRESSED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::Off));
+    setPixmap(HOVERED | PRESSED,            bestPixmap(icon, QnSkin::Pressed, QIcon::Off));
 
     setPixmap(CHECKED,                      bestPixmap(icon, QIcon::Normal, QIcon::On));
     setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::On));
     setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QIcon::Disabled, QIcon::On));
-    setPixmap(CHECKED | PRESSED | HOVERED,  bestPixmap(icon, QIcon::Active, QIcon::On));
+    setPixmap(CHECKED | HOVERED | PRESSED,  bestPixmap(icon, QnSkin::Pressed, QIcon::On));
 }
 
 void QnImageButtonWidget::setCheckable(bool checkable) {
