@@ -15,6 +15,8 @@ public:
                           Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio,
                           Qt::TransformationMode mode = Qt::FastTransformation);
 
+    static bool hasPixmap(const QString &name);
+
     static QStyle *style();
 };
 

@@ -56,41 +56,6 @@ public:
         return *this;
     }
 
-    QnActionBuilder toggledIcon(const QIcon &toggledIcon) {
-        QIcon icon = m_action->icon();
-        
-        copyIconPixmap(toggledIcon, QIcon::Normal,      QIcon::On, &icon);
-        copyIconPixmap(toggledIcon, QIcon::Disabled,    QIcon::On, &icon);
-        copyIconPixmap(toggledIcon, QIcon::Active,      QIcon::On, &icon);
-        copyIconPixmap(toggledIcon, QIcon::Selected,    QIcon::On, &icon);
-
-        m_action->setIcon(icon);
-        m_action->setCheckable(true);
-
-        return *this;
-    }
-
-    QnActionBuilder hoverIcon(const QIcon &hoverIcon) {
-        QIcon icon = m_action->icon();
-
-        copyIconPixmap(hoverIcon,   QIcon::Active,      QIcon::On, &icon);
-        copyIconPixmap(hoverIcon,   QIcon::Active,      QIcon::Off, &icon);
-
-        m_action->setIcon(icon);
-
-        return *this;
-    }
-
-    QnActionBuilder toggledHoverIcon(const QIcon &hoverIcon) {
-        QIcon icon = m_action->icon();
-
-        copyIconPixmap(hoverIcon,   QIcon::Active,      QIcon::On, &icon);
-
-        m_action->setIcon(icon);
-
-        return *this;
-    }
-
     QnActionBuilder role(QAction::MenuRole role) {
         m_action->setMenuRole(role);
 
@@ -324,8 +289,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("New Tab")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-        icon(Skin::icon(QLatin1String("decorations/new_layout.png"))).
-        hoverIcon(Skin::icon(QLatin1String("decorations/new_layout_hovered.png")));
+        icon(Skin::icon(QLatin1String("decorations/new_layout.png")));
 
     factory(Qn::OpenNewWindowAction).
         flags(Qn::Main).
@@ -393,22 +357,17 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+Return")).
         shortcut(tr("Esc")).
 #endif
-        icon(Skin::icon(QLatin1String("decorations/fullscreen.png"))).
-        hoverIcon(Skin::icon(QLatin1String("decorations/fullscreen_hovered.png"))).
-        toggledIcon(Skin::icon(QLatin1String("decorations/unfullscreen.png"))).
-        toggledHoverIcon(Skin::icon(QLatin1String("decorations/unfullscreen_hovered.png")));
+        icon(Skin::icon(QLatin1String("decorations/fullscreen.png")));
 
     factory(Qn::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
-        icon(Skin::icon(QLatin1String("decorations/minimize.png"))).
-        hoverIcon(Skin::icon(QLatin1String("decorations/minimize_hovered.png")));
+        icon(Skin::icon(QLatin1String("decorations/minimize.png")));
 
     factory(Qn::MaximizeAction).
         flags(Qn::NoTarget).
         text(tr("Maximize")).
-        icon(Skin::icon(QLatin1String("decorations/maximize.png"))).
-        hoverIcon(Skin::icon(QLatin1String("decorations/maximize_hovered.png")));
+        icon(Skin::icon(QLatin1String("decorations/maximize.png")));
 
     factory().
         flags(Qn::Main).
@@ -420,8 +379,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/settings.png"))).
-        hoverIcon(Skin::icon(QLatin1String("decorations/settings_hovered.png")));
+        icon(Skin::icon(QLatin1String("decorations/settings.png")));
 
     factory(Qn::ConnectionSettingsAction).
         flags(Qn::Main).
@@ -444,8 +402,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/exit.png"))).
-        hoverIcon(Skin::icon(QLatin1String("decorations/exit_hovered.png")));
+        icon(Skin::icon(QLatin1String("decorations/exit.png")));
 
 
     /* Tab bar actions. */
