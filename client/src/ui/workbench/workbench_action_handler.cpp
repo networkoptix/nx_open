@@ -352,7 +352,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(!currentUser)
         return;
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog());
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     
     dialog->setElementFlags(QnUserSettingsDialog::Login, QnUserSettingsDialog::Visible);
@@ -1014,7 +1014,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QnUserResourcePtr user(new QnUserResource());
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(widget()));
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setUser(user);
     if(!dialog->exec())

@@ -6,6 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+class QnWorkbenchContext;
+
 namespace Ui {
     class UserSettingsDialog;
 }
@@ -26,7 +28,7 @@ public:
     };
     Q_DECLARE_FLAGS(ElementFlags, ElementFlag)
 
-    QnUserSettingsDialog(QWidget *parent = NULL);
+    QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent = NULL);
     virtual ~QnUserSettingsDialog();
 
     const QnUserResourcePtr &user() const;
@@ -60,6 +62,8 @@ protected slots:
 
 private:
     QScopedPointer<Ui::UserSettingsDialog> ui;
+    QWeakPointer<QnWorkbenchContext> m_context;
+    QSet<QString> m_logins;
     QnUserResourcePtr m_user;
     bool m_valid[ElementCount];
     QString m_hints[ElementCount];

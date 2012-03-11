@@ -4,17 +4,27 @@
 #include <QtGui/QPushButton>
 
 #include <core/resource/user_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
 #include <utils/common/warnings.h>
+
+#include <ui/workbench/workbench_context.h>
 
 namespace {
     QColor redText = QColor(255, 64, 64);
 }
 
-QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent): 
+QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
     ui(new Ui::UserSettingsDialog()),
+    m_context(context),
     m_hasChanges(false)
 {
+    if(context == NULL) 
+        qnNullWarning(context);
+
+    foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
+        m_logins.insert(user->getName());
+
     for(int i = 0; i < ElementCount; i++) {
         m_valid[i] = false;
         m_flags[i] = Editable | Visible;
@@ -195,6 +205,10 @@ void QnUserSettingsDialog::updateElement(Element element) {
     case Login:
         if(ui->loginEdit->text().isEmpty()) {
             hint = tr("Login can not be empty.");
+            valid = false;
+        }
+        if(m_logins.contains(ui->loginEdit->text())) {
+            hint = tr("User with specified login already exists.");
             valid = false;
         }
         break;
