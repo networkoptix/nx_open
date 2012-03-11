@@ -104,9 +104,15 @@ public:
 };
 
 
-class QnResourceSaveLayoutActionCondition: public QnTargetlessActionCondition {
+class QnLayoutItemRemovalActionCondition: public QnActionCondition {
 public:
-    QnResourceSaveLayoutActionCondition(bool isCurrent): m_current(isCurrent) {}
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
+
+
+class QnSaveLayoutActionCondition: public QnTargetlessActionCondition {
+public:
+    QnSaveLayoutActionCondition(bool isCurrent): m_current(isCurrent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
@@ -115,20 +121,9 @@ private:
 };
 
 
-class QnResourceActionUserAccessCondition: public QnTargetlessActionCondition {
+class QnLayoutCountActionCondition: public QnActionCondition {
 public:
-    QnResourceActionUserAccessCondition(bool adminRequired): m_adminRequired(adminRequired) {}
-
-    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
-
-private:
-    bool m_adminRequired;
-};
-
-
-class QnResourceActionLayoutCountCondition: public QnActionCondition {
-public:
-    QnResourceActionLayoutCountCondition(int requiredCount): m_requiredCount(requiredCount) {}
+    QnLayoutCountActionCondition(int requiredCount): m_requiredCount(requiredCount) {}
 
     virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
 
@@ -141,5 +136,7 @@ class QnTakeScreenshotActionCondition: public QnActionCondition {
 public:
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
+
+
 
 #endif // QN_ACTION_CONDITIONS_H

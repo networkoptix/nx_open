@@ -169,7 +169,21 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
     return Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnResourceSaveLayoutActionCondition::check(const QnResourceList &resources) {
+
+Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    QnUserResourcePtr user = context()->user();
+    bool isAdmin = user && user->isAdmin();
+    if(isAdmin)
+        return Qn::EnabledAction;
+
+    foreach(const QnLayoutItemIndex &item, layoutItems)
+        if(!context()->snapshotManager()->isLocal(item.layout()))
+            return Qn::DisabledAction;
+
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout;
 
     if(m_current) {
@@ -194,20 +208,8 @@ Qn::ActionVisibility QnResourceSaveLayoutActionCondition::check(const QnResource
     }
 }
 
-Qn::ActionVisibility QnResourceActionUserAccessCondition::check(const QnResourceList &resources) {
-    if(!context())
-        return Qn::InvisibleAction;
 
-    if(!context()->user())
-        return Qn::InvisibleAction;
-
-    if(m_adminRequired)
-        return context()->user()->isAdmin() ? Qn::EnabledAction : Qn::InvisibleAction;
-
-    return Qn::EnabledAction; 
-}
-
-Qn::ActionVisibility QnResourceActionLayoutCountCondition::check(const QnWorkbenchLayoutList &layouts) {
+Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &layouts) {
     if(!context())
         return Qn::InvisibleAction;
 
@@ -228,3 +230,4 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
 
     return Qn::EnabledAction;
 }
+

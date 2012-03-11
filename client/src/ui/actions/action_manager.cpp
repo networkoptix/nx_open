@@ -313,8 +313,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::NewUserAction).
         flags(Qn::Main | Qn::Tree | Qn::NoTarget | Qn::Admin).
-        text(tr("New User...")).
-        condition(new QnResourceActionUserAccessCondition(true));
+        text(tr("New User..."));
 
     factory(Qn::NewUserLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
@@ -344,7 +343,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
-        condition(new QnResourceSaveLayoutActionCondition(true));
+        condition(new QnSaveLayoutActionCondition(true));
 
     factory(Qn::SaveCurrentLayoutAsAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::Admin).
@@ -463,7 +462,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CloseAllButThisLayoutAction).
         flags(Qn::TabBar).
         text(tr("Close All But This")).
-        condition(new QnResourceActionLayoutCountCondition(2));
+        condition(new QnLayoutCountActionCondition(2));
 
 
 
@@ -500,7 +499,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SaveLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("Save Layout")).
-        condition(new QnResourceSaveLayoutActionCondition(false));
+        condition(new QnSaveLayoutActionCondition(false));
 
     factory(Qn::SaveLayoutAsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
@@ -582,10 +581,11 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RemoveLayoutItemAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItem | Qn::IntentionallyAmbiguous | Qn::EditLayout).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItem | Qn::IntentionallyAmbiguous).
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnLayoutItemRemovalActionCondition());
 
     factory(Qn::RemoveFromServerAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::IntentionallyAmbiguous | Qn::Admin).
