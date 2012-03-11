@@ -193,7 +193,7 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
         {
             QRegion oldRegion = m_motionMaskList[i];
             m_motionMaskList[i] += r;
-            if(oldRegion != m_motionMaskList[i]) {
+            if(oldRegion != m_motionMaskList[i]) { /* Note: we cannot use QRegion::contains here as it checks for overlap, not for containment. */
                 widget->addToMotionMask(r, i);
                 changed = true;
             }
