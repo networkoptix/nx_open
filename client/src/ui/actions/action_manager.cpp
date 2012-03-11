@@ -209,7 +209,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("About...")).
         role(QAction::AboutRole).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("info.png")));
+        icon(Skin::icon("info.png"));
 
     factory(Qn::ShowFpsAction).
         flags(Qn::NoTarget).
@@ -268,12 +268,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::LightMainMenuAction).
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        icon(Skin::icon(QLatin1String("logo_icon2.png")));
+        icon(Skin::icon("logo_icon2.png"));
 
     factory(Qn::DarkMainMenuAction).
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        icon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
+        icon(Skin::icon("logo_icon2_dark.png"));
 
     factory(Qn::NewUserAction).
         flags(Qn::Main | Qn::Tree | Qn::NoTarget | Qn::Admin).
@@ -289,7 +289,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("New Tab")).
         shortcut(tr("Ctrl+T")).
         autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-        icon(Skin::icon(QLatin1String("decorations/new_layout.png")));
+        icon(Skin::icon("decorations/new_layout.png"));
 
     factory(Qn::OpenNewWindowAction).
         flags(Qn::Main).
@@ -324,7 +324,7 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("File(s)...")).
             shortcut(tr("Ctrl+O")).
             autoRepeat(false).
-            icon(Skin::icon(QLatin1String("folder.png")));
+            icon(Skin::icon("folder.png"));
 
         factory(Qn::OpenFolderAction).
             flags(Qn::Main | Qn::EditLayout).
@@ -342,7 +342,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+R")).
         shortcut(Qt::Key_MediaRecord).
         shortcutContext(Qt::ApplicationShortcut).
-        icon(Skin::icon(QLatin1String("decorations/recording.png"))).
+        icon(Skin::icon("decorations/recording.png")).
         autoRepeat(false);
 
     factory(Qn::FullscreenAction).
@@ -357,17 +357,17 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+Return")).
         shortcut(tr("Esc")).
 #endif
-        icon(Skin::icon(QLatin1String("decorations/fullscreen.png")));
+        icon(Skin::icon("decorations/fullscreen.png"));
 
     factory(Qn::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
-        icon(Skin::icon(QLatin1String("decorations/minimize.png")));
+        icon(Skin::icon("decorations/minimize.png"));
 
     factory(Qn::MaximizeAction).
         flags(Qn::NoTarget).
         text(tr("Maximize")).
-        icon(Skin::icon(QLatin1String("decorations/maximize.png")));
+        icon(Skin::icon("decorations/maximize.png"));
 
     factory().
         flags(Qn::Main).
@@ -379,13 +379,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/settings.png")));
+        icon(Skin::icon("decorations/settings.png"));
 
     factory(Qn::ConnectionSettingsAction).
         flags(Qn::Main).
         text(tr("Connect to Server...")).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("connect.png")));
+        icon(Skin::icon("connect.png"));
 
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
@@ -402,7 +402,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(Skin::icon(QLatin1String("decorations/exit.png")));
+        icon(Skin::icon("decorations/exit.png"));
 
 
     /* Tab bar actions. */

@@ -35,12 +35,9 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     base_type(style),
     m_animator(new QnNoptixStyleAnimator(this))
 {
-    m_branchClosed = Skin::icon(QLatin1String("branch_closed.png"));
-    m_branchOpen = Skin::icon(QLatin1String("branch_open.png"));
-    
-    m_closeTab = Skin::icon(QLatin1String("decorations/close_tab.png"));
-    QPixmap hovered = Skin::pixmap(QLatin1String("decorations/close_tab_hovered.png"));
-    m_closeTab.addPixmap(hovered, QIcon::Active);
+    m_branchClosed = Skin::icon("branch_closed.png");
+    m_branchOpen = Skin::icon("branch_open.png");
+    m_closeTab = Skin::icon("decorations/close_tab.png");
 }
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {

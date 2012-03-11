@@ -7,23 +7,23 @@ Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 QnResourceIconCache::QnResourceIconCache(QObject *parent) {
     m_cache.insert(Unknown,                 QIcon());
-    m_cache.insert(Local,                   Skin::icon(QLatin1String("home.png")));
-    m_cache.insert(Server,                  Skin::icon(QLatin1String("server.png")));
-    m_cache.insert(Layout,                  Skin::icon(QLatin1String("layout.png")));
-    m_cache.insert(Camera,                  Skin::icon(QLatin1String("camera.png")));
-    m_cache.insert(Image,                   Skin::icon(QLatin1String("snapshot.png")));
-    m_cache.insert(Media,                   Skin::icon(QLatin1String("media.png")));
-    m_cache.insert(User,                    Skin::icon(QLatin1String("user.png")));
+    m_cache.insert(Local,                   Skin::icon("home.png"));
+    m_cache.insert(Server,                  Skin::icon("server.png"));
+    m_cache.insert(Layout,                  Skin::icon("layout.png"));
+    m_cache.insert(Camera,                  Skin::icon("camera.png"));
+    m_cache.insert(Image,                   Skin::icon("snapshot.png"));
+    m_cache.insert(Media,                   Skin::icon("media.png"));
+    m_cache.insert(User,                    Skin::icon("user.png"));
 
-    m_cache.insert(Server | Offline,        Skin::icon(QLatin1String("server_offline.png")));
-    m_cache.insert(Camera | Offline,        Skin::icon(QLatin1String("camera_offline.png")));
-    m_cache.insert(User | Offline,          Skin::icon(QLatin1String("user_offline.png")));
+    m_cache.insert(Server | Offline,        Skin::icon("server_offline.png"));
+    m_cache.insert(Camera | Offline,        Skin::icon("camera_offline.png"));
+    m_cache.insert(User | Offline,          Skin::icon("user_offline.png"));
 
-    m_cache.insert(Camera | Unauthorized,   Skin::icon(QLatin1String("camera_unauthorized.png")));
+    m_cache.insert(Camera | Unauthorized,   Skin::icon("camera_unauthorized.png"));
 
 #if 0
-    m_cache.insert(Offline,         Skin::icon(QLatin1String("offline.png")));
-    m_cache.insert(Unauthorized,    Skin::icon(QLatin1String("unauthorized.png")));
+    m_cache.insert(Offline,                 Skin::icon("offline.png"));
+    m_cache.insert(Unauthorized,            Skin::icon("unauthorized.png"));
 #endif
 }
 
