@@ -14,11 +14,12 @@ class RTPH264StreamreaderDelegate : public QnResourceConsumer
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	RTPH264StreamreaderDelegate(QnResourcePtr res, QString request);
+	RTPH264StreamreaderDelegate(QnResourcePtr res);
 	virtual ~RTPH264StreamreaderDelegate();
 
-protected:
+
     QnAbstractMediaDataPtr getNextData();
+    void setRequest(const QString& request);
     void openStream();
     void closeStream() ;
     bool isStreamOpened() const;

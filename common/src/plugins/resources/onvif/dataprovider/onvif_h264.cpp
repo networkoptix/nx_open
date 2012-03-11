@@ -4,10 +4,9 @@
 #include "utils/network/h264_rtp_parser.h"
 
 
-RTPH264StreamreaderDelegate::RTPH264StreamreaderDelegate(QnResourcePtr res, QString request):
+RTPH264StreamreaderDelegate::RTPH264StreamreaderDelegate(QnResourcePtr res):
 QnResourceConsumer(res),
-m_streamParser(0),
-m_request(request)
+m_streamParser(0)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -19,6 +18,11 @@ m_request(request)
 RTPH264StreamreaderDelegate::~RTPH264StreamreaderDelegate()
 {
     delete m_streamParser;    
+}
+
+void RTPH264StreamreaderDelegate::setRequest(const QString& request)
+{
+    m_request = request;
 }
 
 QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
