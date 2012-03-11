@@ -190,7 +190,7 @@ FORMS += \
     ui/dialogs/tags_edit_dialog.ui \
     ui/dialogs/server_settings_dialog.ui \
     ui/dialogs/layout_name_dialog.ui \
-    ui/dialogs/new_user_dialog.ui \
+    ui/dialogs/user_settings_dialog.ui \
     ui/dialogs/connection_testing_dialog.ui \
     ui/dialogs/resource_list_dialog.ui \
     youtube/youtubeuploaddialog.ui \

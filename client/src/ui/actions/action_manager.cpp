@@ -511,6 +511,11 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition());
 
+    factory(Qn::UserSettingsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        text(tr("User Settings")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
+
     // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).

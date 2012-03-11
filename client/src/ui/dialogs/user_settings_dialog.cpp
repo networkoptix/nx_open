@@ -1,0 +1,247 @@
+#include "user_settings_dialog.h"
+#include "ui_user_settings_dialog.h"
+
+#include <QtGui/QPushButton>
+
+#include <core/resource/user_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include <utils/common/warnings.h>
+
+#include <ui/workbench/workbench_context.h>
+
+namespace {
+    QColor redText = QColor(255, 64, 64);
+}
+
+QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
+    QDialog(parent),
+    ui(new Ui::UserSettingsDialog()),
+    m_context(context),
+    m_hasChanges(false)
+{
+    if(context == NULL) 
+        qnNullWarning(context);
+
+    foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
+        m_logins.insert(user->getName());
+
+    for(int i = 0; i < ElementCount; i++) {
+        m_valid[i] = false;
+        m_flags[i] = Editable | Visible;
+    }
+
+    ui->setupUi(this);
+
+    ui->accessRightsComboBox->addItem(tr("Viewer"), false);
+    ui->accessRightsComboBox->addItem(tr("Administrator"), true);
+
+    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateLogin()));
+    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
+    connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
+    connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(updateAccessRights()));
+
+    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
+    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
+    connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
+    connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(setHasChanges()));
+
+    {
+        QPalette palette = ui->hintLabel->palette();
+        palette.setColor(QPalette::WindowText, redText);
+        ui->hintLabel->setPalette(palette);
+    }
+
+    updateAll();
+}
+
+QnUserSettingsDialog::~QnUserSettingsDialog() {
+    return;
+}
+
+void QnUserSettingsDialog::setHasChanges(bool hasChanges) {
+    if(m_hasChanges == hasChanges)
+        return;
+
+    m_hasChanges = hasChanges;
+
+    emit hasChangesChanged();
+}
+
+void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) {
+    if(element < 0 || element >= ElementCount) {
+        qnWarning("Invalid element '%1'.", static_cast<int>(element));
+        return;
+    }
+    
+    m_flags[element] = flags;
+
+    bool visible = flags & Visible;
+    bool editable = flags & Editable;
+
+    switch(element) {
+    case Login:
+        ui->loginEdit->setVisible(visible);
+        ui->loginLabel->setVisible(visible);
+        ui->loginEdit->setReadOnly(!editable);
+        break;
+    case Password:
+        ui->passwordEdit->setVisible(visible);
+        ui->passwordLabel->setVisible(visible);
+        ui->confirmPasswordEdit->setVisible(visible);
+        ui->confirmPasswordLabel->setVisible(visible);
+        ui->passwordEdit->setReadOnly(!editable);
+        ui->passwordEdit->setReadOnly(!editable);
+        break;
+    case AccessRights:
+        ui->accessRightsLabel->setVisible(visible);
+        ui->accessRightsComboBox->setVisible(visible);
+        ui->accessRightsComboBox->setEnabled(editable);
+        break;
+    default:
+        break;
+    }
+
+    updateElement(element);
+}
+
+QnUserSettingsDialog::ElementFlags QnUserSettingsDialog::elementFlags(Element element) const {
+    if(element < 0 || element >= ElementCount) {
+        qnWarning("Invalid element '%1'.", static_cast<int>(element));
+        return 0;
+    }
+
+    return m_flags[element];
+}
+
+const QnUserResourcePtr &QnUserSettingsDialog::user() const {
+    return m_user;
+}
+
+void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
+    if(m_user == user)
+        return;
+
+    m_user = user;
+
+    updateFromResource();
+}
+
+void QnUserSettingsDialog::updateFromResource() {
+    if(!m_user) {
+        ui->loginEdit->clear();
+        ui->passwordEdit->clear();
+        ui->confirmPasswordEdit->clear();
+        ui->accessRightsComboBox->setCurrentIndex(-1);
+    } else {
+        ui->loginEdit->setText(m_user->getName());
+        ui->passwordEdit->setText(m_user->getPassword());
+        ui->confirmPasswordEdit->setText(m_user->getPassword());
+        ui->accessRightsComboBox->setCurrentIndex(m_user->isAdmin() ? 1 : 0); // TODO: evil magic numbers
+    }
+
+    setHasChanges(false);
+}
+
+void QnUserSettingsDialog::submitToResource() {
+    if(!m_user)
+        return;
+
+    m_user->setName(ui->loginEdit->text());
+    m_user->setPassword(ui->passwordEdit->text());
+    m_user->setAdmin(ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toBool());
+
+    setHasChanges(false);
+}
+
+void QnUserSettingsDialog::setHint(Element element, const QString &hint) {
+    if(m_hints[element] == hint)
+        return;
+
+    m_hints[element] = hint;
+
+    int i;
+    for(i = 0; i < ElementCount; i++)
+        if(!m_hints[i].isEmpty())
+            break;
+
+    QString actualHint = i == ElementCount ? QString() : m_hints[i];
+    ui->hintLabel->setText(actualHint);
+}
+
+void QnUserSettingsDialog::setValid(Element element, bool valid) {
+    if(m_valid[element] == valid)
+        return;
+
+    m_valid[element] = valid;
+
+    QPalette palette = this->palette();
+    if(!valid)
+        palette.setColor(QPalette::WindowText, redText);
+
+    switch(element) {
+    case Login:
+        ui->loginLabel->setPalette(palette);
+        break;
+    case Password:
+        ui->passwordLabel->setPalette(palette);
+        ui->confirmPasswordLabel->setPalette(palette);
+        break;
+    case AccessRights:
+        ui->accessRightsLabel->setPalette(palette);
+        break;
+    default:
+        break;
+    }
+
+    bool allValid = m_valid[Login] && m_valid[Password] && m_valid[AccessRights];
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(allValid);
+}
+
+void QnUserSettingsDialog::updateElement(Element element) {
+    bool valid = true;
+    QString hint;
+
+    switch(element) {
+    case Login:
+        if(ui->loginEdit->text().isEmpty()) {
+            hint = tr("Login can not be empty.");
+            valid = false;
+        }
+        if(m_logins.contains(ui->loginEdit->text())) {
+            hint = tr("User with specified login already exists.");
+            valid = false;
+        }
+        break;
+    case Password:
+        if(ui->passwordEdit->text().isEmpty() && ui->confirmPasswordEdit->text().isEmpty()) {
+            hint = tr("Password can not be empty.");
+            valid = false;
+        } else if(ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
+            hint = tr("Passwords do not match.");
+            valid = false;
+        }
+        break;
+    case AccessRights:
+        if(ui->accessRightsComboBox->currentIndex() == -1) {
+            hint = tr("Choose access rights.");
+            valid = false;
+        }
+        break;
+    default:
+        break;
+    }
+
+    if(m_flags[element] != (Visible | Editable)) {
+        valid = true;
+        hint = QString();
+    }
+
+    setValid(element, valid);
+    setHint(element, hint);
+}
+
+void QnUserSettingsDialog::updateAll() {
+    updateElement(AccessRights);
+    updateElement(Password);
+    updateElement(Login);
+}

@@ -166,7 +166,7 @@ void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
         return;
 
     m_hasChanges = hasChanges;
-    if(!m_hasScheduleChanges)
+    if(!m_hasChanges)
         m_hasScheduleChanges = false;
 
     emit hasChangesChanged();
