@@ -318,7 +318,7 @@ void QnMainWindow::handleMessage(const QString &message)
 {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
-    menu()->trigger(Qn::ResourceDropAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
+    menu()->trigger(Qn::DropResourcesAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
 }
 
 void QnMainWindow::updateFullScreenState() 
@@ -530,12 +530,12 @@ void QnMainWindow::dragMoveEvent(QDragMoveEvent *event) {
     event->acceptProposedAction();
 }
 
-void QnMainWindow::dragLeaveEvent(QDragLeaveEvent *event) {
+void QnMainWindow::dragLeaveEvent(QDragLeaveEvent *) {
     m_dropResources = QnResourceList();
 }
 
 void QnMainWindow::dropEvent(QDropEvent *event) {
-    m_context->menu()->trigger(Qn::ResourceDropIntoNewLayoutAction, m_dropResources);
+    m_context->menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_dropResources);
 
     event->acceptProposedAction();
 }

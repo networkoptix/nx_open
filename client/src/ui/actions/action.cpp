@@ -1,9 +1,17 @@
 #include "action.h"
-#include <QEvent>
-#include <QShortcutEvent>
-#include <QGraphicsWidget>
-#include <QCoreApplication>
+
+#include <QtCore/QCoreApplication>
+#include <QtGui/QShortcutEvent>
+#include <QtGui/QGraphicsWidget>
+
 #include <utils/common/warnings.h>
+#include <core/resource/user_resource.h>
+
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench.h>
+
 #include "action_manager.h"
 #include "action_target_provider.h"
 #include "action_conditions.h"
@@ -14,7 +22,10 @@ QnAction::QnAction(QnActionManager *manager, Qn::ActionId id, QObject *parent):
     m_manager(manager),
     m_id(id),
     m_flags(0)
-{}
+{
+    if(!manager)
+        qnNullCritical(manager);
+}
 
 QnAction::~QnAction() {}
 
@@ -63,10 +74,24 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScope scope, const QVari
     if(!(this->target() & target) && size != 0)
         return Qn::InvisibleAction;
 
+    if(requiredAccessRights()) {
+        QnUserResourcePtr user = m_manager->context()->user();
+        bool isAdmin = user && user->isAdmin();
+
+        if((requiredAccessRights() & Qn::AdminAccessRights) && !isAdmin)
+            return Qn::InvisibleAction;
+
+        if((requiredAccessRights() & Qn::EditLayout) && !isAdmin) {
+            QnWorkbenchLayout *layout = m_manager->context()->workbench()->currentLayout();
+            if(!m_manager->context()->snapshotManager()->isLocal(layout->resource()))
+                return Qn::InvisibleAction;
+        }
+    }
+
     if(m_condition)
         return m_condition.data()->check(items);
 
-    return Qn::VisibleAction;
+    return Qn::EnabledAction;
 }
 
 bool QnAction::event(QEvent *event) {
@@ -110,13 +135,8 @@ bool QnAction::event(QEvent *event) {
             }
         }
 
-        if(checkCondition(scope(), target) == Qn::VisibleAction) {
-            m_manager->m_shortcutAction = this;
-            m_manager->m_parametersByMenu[NULL] = QnActionManager::ActionParameters(target, QVariantMap());
-            activate(Trigger);
-            m_manager->m_parametersByMenu[NULL] = QnActionManager::ActionParameters();
-            m_manager->m_shortcutAction = NULL;
-        }
+        if(checkCondition(scope(), target) == Qn::EnabledAction)
+            m_manager->trigger(m_id, target);
         return true;
     }
     

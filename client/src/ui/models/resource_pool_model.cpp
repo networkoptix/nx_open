@@ -712,18 +712,12 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
-        foreach(const QnResourcePtr &resource, resources) {
-            QnMediaResourcePtr media = resource.dynamicCast<QnMediaResource>();
-            if(!media)
-                continue; /* Can drop only media resources on layout. */
+        QVariantMap params;
+        params[Qn::LayoutParameter] = QVariant::fromValue(layout);
 
-            QnLayoutItemData item;
-            item.resource.id = media->getId();
-            item.uuid = QUuid::createUuid();
-            item.flags = QnWorkbenchItem::PendingGeometryAdjustment;
+        QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(resources);
 
-            layout->addItem(item);
-        }
+        context()->menu()->trigger(Qn::OpenInLayoutAction, medias, params);
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())

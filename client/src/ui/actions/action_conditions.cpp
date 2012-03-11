@@ -80,10 +80,10 @@ Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceW
 
         if(widget->isMotionGridDisplayed()) {
             if(m_condition == HasShownGrid)
-                return Qn::VisibleAction;
+                return Qn::EnabledAction;
         } else {
             if(m_condition == HasHiddenGrid)
-                return Qn::VisibleAction;
+                return Qn::EnabledAction;
         }
     }
 
@@ -102,11 +102,11 @@ QnResourceActionCondition::~QnResourceActionCondition() {
 }
 
 Qn::ActionVisibility QnResourceActionCondition::check(const QnResourceList &resources) {
-    return checkInternal<QnResourcePtr>(resources) ? Qn::VisibleAction : Qn::InvisibleAction;
+    return checkInternal<QnResourcePtr>(resources) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnResourceActionCondition::check(const QnResourceWidgetList &widgets) {
-    return checkInternal<QnResourceWidget *>(widgets) ? Qn::VisibleAction : Qn::InvisibleAction;
+    return checkInternal<QnResourceWidget *>(widgets) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 template<class Item, class ItemSequence>
@@ -166,7 +166,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         return Qn::InvisibleAction;
     }
 
-    return Qn::VisibleAction;
+    return Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnResourceSaveLayoutActionCondition::check(const QnResourceList &resources) {
@@ -188,7 +188,7 @@ Qn::ActionVisibility QnResourceSaveLayoutActionCondition::check(const QnResource
         return Qn::InvisibleAction;
 
     if(context() && context()->snapshotManager()->isSaveable(layout)) {
-        return Qn::VisibleAction;
+        return Qn::EnabledAction;
     } else {
         return Qn::DisabledAction;
     }
@@ -202,9 +202,9 @@ Qn::ActionVisibility QnResourceActionUserAccessCondition::check(const QnResource
         return Qn::InvisibleAction;
 
     if(m_adminRequired)
-        return context()->user()->isAdmin() ? Qn::VisibleAction : Qn::InvisibleAction;
+        return context()->user()->isAdmin() ? Qn::EnabledAction : Qn::InvisibleAction;
 
-    return Qn::VisibleAction; 
+    return Qn::EnabledAction; 
 }
 
 Qn::ActionVisibility QnResourceActionLayoutCountCondition::check(const QnWorkbenchLayoutList &layouts) {
@@ -214,7 +214,7 @@ Qn::ActionVisibility QnResourceActionLayoutCountCondition::check(const QnWorkben
     if(context()->workbench()->layouts().size() < m_requiredCount)
         return Qn::DisabledAction;
 
-    return Qn::VisibleAction;
+    return Qn::EnabledAction;
 }
 
 
@@ -226,5 +226,5 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
 
-    return Qn::VisibleAction;
+    return Qn::EnabledAction;
 }

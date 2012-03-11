@@ -82,7 +82,7 @@ void QnWorkbenchLayout::setName(const QString &name) {
     emit nameChanged();
 }
 
-bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &resource) {
+bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setName(resource->getName());
     setCellAspectRatio(resource->cellAspectRatio());
     setCellSpacing(resource->cellSpacing());
@@ -94,32 +94,13 @@ bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &resource) {
     foreach(QnWorkbenchItem *item, m_items)
         item->setPinned(false);
 
-    foreach(const QnLayoutItemData itemData, resource->getItems()) {
-        QnId id = itemData.resource.id;
-        QString path = itemData.resource.path;
-
-        QnResourcePtr resource;
-        if (id.isValid())
-            resource = qnResPool->getResourceById(id);
-        else
-            resource = qnResPool->getResourceByUniqId(path);
-
-        if(resource.isNull()) {
-            qnWarning("No resource in resource pool for id '%1' or path '%s'.", id.toString(), path);
-            result = false;
-            continue;
-        }
-
-        QnWorkbenchItem *item = this->item(itemData.uuid);
+    foreach(const QnLayoutItemData data, resource->getItems()) {
+        QnWorkbenchItem *item = this->item(data.uuid);
         if(item == NULL) {
-            item = new QnWorkbenchItem(resource->getUniqueId(), itemData.uuid);
-            addItem(item);
-        } else if(item->resourceUid() != resource->getUniqueId()) {
-            qnWarning("Resource unique id of an item and corresponding item data do not match (%1 != %2)", item->resourceUid(), resource->getUniqueId());
-            result = false;
+            addItem(new QnWorkbenchItem(data, this));
+        } else {
+            result &= item->update(data);
         }
-
-        result &= item->load(itemData);
     }
 
     /* Some items may have been removed. */
@@ -139,32 +120,17 @@ bool QnWorkbenchLayout::load(const QnLayoutResourcePtr &resource) {
     return result;
 }
 
-void QnWorkbenchLayout::save(const QnLayoutResourcePtr &resource) const {
+void QnWorkbenchLayout::submit(const QnLayoutResourcePtr &resource) const {
     resource->setName(name());
     resource->setCellAspectRatio(cellAspectRatio());
     resource->setCellSpacing(cellSpacing());
 
-    QnLayoutItemDataList resources;
-    resources.reserve(items().size());
+    QnLayoutItemDataList datas;
+    datas.reserve(items().size());
+    foreach(const QnWorkbenchItem *item, items()) 
+        datas.push_back(item->data());
 
-    foreach(const QnWorkbenchItem *item, items()) {
-        QnLayoutItemData itemData;
-        
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
-        if(resource.isNull()) {
-            qnWarning("No resource in resource pool for uid '%1'.", item->resourceUid());
-            continue;
-        }
-
-        itemData.resource.id = resource->getId();
-        itemData.resource.path = resource->getUrl();
-        itemData.uuid = item->uuid();
-        item->save(itemData);
-
-        resources.push_back(itemData);
-    }
-
-    resource->setItems(resources);
+    resource->setItems(datas);
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {

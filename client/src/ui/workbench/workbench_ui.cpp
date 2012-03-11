@@ -1368,7 +1368,7 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(resource.isNull())
         return;
 
-    menu()->trigger(Qn::ResourceDropAction, resource);
+    menu()->trigger(Qn::DropResourcesAction, resource);
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {

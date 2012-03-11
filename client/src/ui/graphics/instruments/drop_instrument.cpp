@@ -130,9 +130,9 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
         QVariantMap params;
         params[Qn::GridPositionParameter] = context->workbench()->mapper()->mapToGridF(event->scenePos());
 
-        context->menu()->trigger(Qn::ResourceDropAction, m_resources, params);
+        context->menu()->trigger(Qn::DropResourcesAction, m_resources, params);
     } else {
-        context->menu()->trigger(Qn::ResourceDropIntoNewLayoutAction, m_resources);
+        context->menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_resources);
     }
 
     event->acceptProposedAction();

@@ -5,6 +5,7 @@
 #include <QGraphicsItem>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/scoped_value_rollback.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include <core/resource/resource.h>
 #include <ui/workbench/workbench_context.h>
@@ -253,20 +254,20 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+F")).
         autoRepeat(false);
 
-    factory(Qn::ResourceDropAction).
-        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
+    factory(Qn::DropResourcesAction).
+        flags(Qn::Resource | Qn::Widget | Qn::LayoutItem | Qn::Layout | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));
 
-    factory(Qn::DelayedResourceDropAction).
-        flags(Qn::NoTarget).
-        text(tr("Drop Resources Delayed"));
+    factory(Qn::DropResourcesIntoNewLayoutAction).
+        flags(Qn::Resource | Qn::Widget | Qn::LayoutItem | Qn::Layout | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Drop Resources into a New Layout"));
 
-    factory(Qn::ResourceDropIntoNewLayoutAction).
-        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Drop into New Layout"));
+    factory(Qn::DelayedDropResourcesAction).
+        flags(Qn::NoTarget | Qn::EditLayout).
+        text(tr("Delayed Drop Resources"));
 
     factory(Qn::MoveCameraAction).
-        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget).
+        flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget | Qn::Admin).
         text(tr("Move Cameras")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::network)));
 
@@ -293,7 +294,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Selection Changed"));
 
 
-
     /* Context menu actions. */
     factory(Qn::MainMenuAction).
         flags(Qn::NoTarget).
@@ -312,12 +312,12 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(Skin::icon(QLatin1String("logo_icon2_dark.png")));
 
     factory(Qn::NewUserAction).
-        flags(Qn::Main | Qn::Tree | Qn::NoTarget).
+        flags(Qn::Main | Qn::Tree | Qn::NoTarget | Qn::Admin).
         text(tr("New User...")).
         condition(new QnResourceActionUserAccessCondition(true));
 
     factory(Qn::NewUserLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("New Layout...")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
 
@@ -340,14 +340,14 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::SaveCurrentLayoutAction).
-        flags(Qn::Main | Qn::Scene | Qn::NoTarget).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::Admin).
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
         condition(new QnResourceSaveLayoutActionCondition(true));
 
     factory(Qn::SaveCurrentLayoutAsAction).
-        flags(Qn::Main | Qn::Scene | Qn::NoTarget).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::Admin).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false);
@@ -358,14 +358,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory.enterSubMenu(); {
         factory(Qn::OpenFileAction).
-            flags(Qn::Main).
+            flags(Qn::Main | Qn::EditLayout).
             text(tr("File(s)...")).
             shortcut(tr("Ctrl+O")).
             autoRepeat(false).
             icon(Skin::icon(QLatin1String("folder.png")));
 
         factory(Qn::OpenFolderAction).
-            flags(Qn::Main).
+            flags(Qn::Main | Qn::EditLayout).
             text(tr("Folder..."));
     } factory.leaveSubMenu();
 
@@ -468,6 +468,9 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     /* Resource actions. */
+    factory(Qn::OpenInLayoutAction).
+        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget | Qn::EditLayout).
+        text(tr("Open"));
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
@@ -479,18 +482,28 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open in a New Window")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
 
-    factory(Qn::OpenLayoutAction).
+    factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
         text(tr("Open Layout")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
+    factory(Qn::OpenMultipleLayoutsAction).
+        flags(Qn::Tree | Qn::MultiTarget | Qn::Resource).
+        text(tr("Open Layouts")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
+    factory(Qn::OpenAnyNumberOfLayoutsAction).
+        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::Resource).
+        text(tr("Open Layout(s)")).
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+
     factory(Qn::SaveLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("Save Layout")).
         condition(new QnResourceSaveLayoutActionCondition(false));
 
     factory(Qn::SaveLayoutAsAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("Save Layout As...")).
         condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
 
@@ -569,20 +582,20 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RemoveLayoutItemAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItem | Qn::IntentionallyAmbiguous).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItem | Qn::IntentionallyAmbiguous | Qn::EditLayout).
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
         autoRepeat(false);
 
     factory(Qn::RemoveFromServerAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::IntentionallyAmbiguous).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::IntentionallyAmbiguous | Qn::Admin).
         text(tr("Remove from Server")).
         shortcut(tr("Del")).
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition());
 
     factory(Qn::RenameLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("Rename")).
         shortcut(tr("F2")).
         autoRepeat(false).
@@ -702,17 +715,14 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, co
         return;
     }
 
-    if(action->checkCondition(action->scope(), items) != Qn::VisibleAction) {
+    if(action->checkCondition(action->scope(), items) != Qn::EnabledAction) {
         qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
         return;
     }
 
-    m_parametersByMenu[NULL] = ActionParameters(items, params);
-    m_shortcutAction = action;
-    
+    QnScopedValueRollback<ActionParameters> paramsRollback(&m_parametersByMenu[NULL], ActionParameters(items, params));
+    QnScopedValueRollback<QnAction *> actionRollback(&m_shortcutAction, action);
     action->trigger();
-
-    m_shortcutAction = NULL;
 }
 
 QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) {
@@ -776,6 +786,10 @@ Qn::ActionTarget QnActionManager::currentTargetType(QnAction *action) const {
     return QnActionTargetTypes::target(currentTarget(action));
 }
 
+QVariantMap QnActionManager::currentParameters(QnAction *action) const {
+    return currentParametersInternal(action).params;
+}
+
 QVariant QnActionManager::currentParameter(QnAction *action, const QString &name) const {
     return currentParametersInternal(action).params.value(name);
 }
@@ -811,6 +825,14 @@ QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) con
 
 Qn::ActionTarget QnActionManager::currentTargetType(QObject *sender) const {
     return QnActionTargetTypes::target(currentTarget(sender));
+}
+
+QVariantMap QnActionManager::currentParameters(QObject *sender) const {
+    if(QnAction *action = checkSender(sender)) {
+        return currentParameters(action);
+    } else {
+        return QVariantMap();
+    }
 }
 
 QVariant QnActionManager::currentParameter(QObject *sender, const QString &name) const {

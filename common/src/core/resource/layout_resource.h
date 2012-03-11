@@ -57,5 +57,7 @@ private:
     QSizeF m_cellSpacing;
 };
 
+Q_DECLARE_METATYPE(QnLayoutResourcePtr);
+Q_DECLARE_METATYPE(QnLayoutResourceList);
 
 #endif // QN_LAYOUT_RESOURCE_H

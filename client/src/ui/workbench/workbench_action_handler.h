@@ -83,13 +83,13 @@ protected:
 
     QString newLayoutName() const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
-    void addToWorkbench(const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
-    void addToWorkbench(const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
-    void addToWorkbench(const QnMediaResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
+    void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
     
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
-    void addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position = QPointF()) const;
     
     void closeLayouts(const QnWorkbenchLayoutList &layouts);
 
@@ -108,8 +108,10 @@ protected slots:
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
-    void at_openLayoutAction_triggered();
+    void at_openLayoutsAction_triggered();
     void at_openNewLayoutAction_triggered();
+    void at_openInLayoutAction_triggered();
+    void at_openInNewLayoutAction_triggered();
     void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
@@ -122,9 +124,9 @@ protected slots:
     void at_closeAllButThisLayoutAction_triggered();
     
     void at_moveCameraAction_triggered();
-    void at_resourceDropAction_triggered();
-    void at_delayedResourceDropAction_triggered();
-    void at_resourceDropIntoNewLayoutAction_triggered();
+    void at_dropResourcesAction_triggered();
+    void at_delayedDropResourcesAction_triggered();
+    void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
@@ -139,7 +141,6 @@ protected slots:
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
 
-    void at_openInNewLayoutAction_triggered();
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
     void at_removeLayoutItemAction_triggered();

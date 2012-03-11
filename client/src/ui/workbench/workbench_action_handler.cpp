@@ -137,9 +137,12 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::ReconnectAction),                    SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
+    connect(action(Qn::OpenInLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
     connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenInNewWindowAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
-    connect(action(Qn::OpenLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
+    connect(action(Qn::OpenSingleLayoutAction),             SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenMultipleLayoutsAction),          SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenAnyNumberOfLayoutsAction),       SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -162,9 +165,9 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::NewUserAction),                      SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
     connect(action(Qn::NewUserLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_newUserLayoutAction_triggered()));
     connect(action(Qn::RenameLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_renameLayoutAction_triggered()));
-    connect(action(Qn::ResourceDropAction),                 SIGNAL(triggered()),    this,   SLOT(at_resourceDropAction_triggered()));
-    connect(action(Qn::DelayedResourceDropAction),          SIGNAL(triggered()),    this,   SLOT(at_delayedResourceDropAction_triggered()));
-    connect(action(Qn::ResourceDropIntoNewLayoutAction),    SIGNAL(triggered()),    this,   SLOT(at_resourceDropIntoNewLayoutAction_triggered()));
+    connect(action(Qn::DropResourcesAction),                SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
+    connect(action(Qn::DelayedDropResourcesAction),         SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
+    connect(action(Qn::DropResourcesIntoNewLayoutAction),   SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
 }
@@ -219,25 +222,30 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     return snapshotManager()->flags(layoutResource) == Qn::LayoutIsLocal; /* Local, not changed and not being saved. */
 }
 
-void QnWorkbenchActionHandler::addToWorkbench(const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-    workbench()->currentLayout()->addItem(item);
-
-    if(usePosition) {
-        item->adjustGeometry(position);
-    } else {
-        item->adjustGeometry();
-    }
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
+    QnLayoutItemData data;
+    data.resource.id = resource->getId();
+    data.resource.path = resource->getUniqueId();
+    data.uuid = QUuid::createUuid();
+    data.flags = QnWorkbenchItem::PendingGeometryAdjustment;
+    if(usePosition)
+        data.combinedGeometry = QRectF(position, position);
+    
+    layout->addItem(data);
 }
 
-void QnWorkbenchActionHandler::addToWorkbench(const QnResourceList &resources, bool usePosition, const QPointF &position) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position) const {
     foreach(const QnResourcePtr &resource, resources)
-        addToWorkbench(resource, usePosition, position);
+        addToLayout(layout, resource, usePosition, position);
 }
 
-void QnWorkbenchActionHandler::addToWorkbench(const QnMediaResourceList &resources, bool usePosition, const QPointF &position) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnMediaResourceList &resources, bool usePosition, const QPointF &position) const {
     foreach(const QnMediaResourcePtr &resource, resources)
-        addToWorkbench(resource, usePosition, position);
+        addToLayout(layout, resource, usePosition, position);
+}
+
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, bool usePosition, const QPointF &position) const {
+    addToLayout(layout, addToResourcePool(files), usePosition, position);
 }
 
 QnResourceList QnWorkbenchActionHandler::addToResourcePool(const QList<QString> &files) const {
@@ -246,10 +254,6 @@ QnResourceList QnWorkbenchActionHandler::addToResourcePool(const QList<QString> 
 
 QnResourceList QnWorkbenchActionHandler::addToResourcePool(const QString &file) const {
     return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(file));
-}
-
-void QnWorkbenchActionHandler::addToWorkbench(const QList<QString> &files, bool usePosition, const QPointF &position) const {
-    addToWorkbench(addToResourcePool(files), usePosition, position);
 }
 
 void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts) {
@@ -343,45 +347,6 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
-void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
-    QnUserResourcePtr user = menu()->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
-    if(!user)
-        return;
-
-    QnUserResourcePtr currentUser = context()->user();
-    if(!currentUser)
-        return;
-
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    
-    dialog->setElementFlags(QnUserSettingsDialog::Login, QnUserSettingsDialog::Visible);
-    if(user->getName() == QLatin1String("admin")) {
-        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    } else if(user == currentUser) {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    } else if(!currentUser->isAdmin()) {
-        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    }
-
-    QString oldPassword = user->getPassword();
-    user->setPassword(QLatin1String("******"));
-
-    dialog->setUser(user);
-    if(!dialog->exec())
-        return;
-
-    user->setPassword(oldPassword);
-
-    if(!dialog->hasChanges())
-        return;
-
-    dialog->submitToResource();
-    connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
-}
-
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if(!m_cameraSettingsDialog)
         return;
@@ -439,7 +404,7 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         data.toMimeData(&mimeData);
 
         QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        menu()->trigger(Qn::ResourceDropAction, resources);
+        menu()->trigger(Qn::OpenInLayoutAction, resources);
     }
 
     m_delayedDrops.clear();
@@ -486,32 +451,30 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + workbench()->layouts().size()) % workbench()->layouts().size());
 }
 
-void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
+void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
+    QnLayoutResourcePtr layout = menu()->currentParameter(sender(), Qn::LayoutParameter).value<QnLayoutResourcePtr>();
+    if(!layout)
+        layout = workbench()->currentLayout()->resource();
+
+    QPointF position = menu()->currentParameter(sender(), Qn::GridPositionParameter).toPointF();
+
     QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
-    if(!widgets.empty()) {
-        menu()->trigger(Qn::OpenNewTabAction);
-
-        foreach(const QnResourceWidget *widget, widgets) {
-            QnWorkbenchItem *oldItem = widget->item();
-
-            QnWorkbenchItem *newItem = new QnWorkbenchItem(oldItem->resourceUid(), QUuid::createUuid(), this);
-            workbench()->currentLayout()->addItem(newItem);
-
-            newItem->setCombinedGeometry(oldItem->combinedGeometry());
-            newItem->setFlags(oldItem->flags());
-            newItem->setRotation(oldItem->rotation());
-        }
-
+    if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
+        foreach(const QnResourceWidget *widget, widgets)
+            layout->addItem(widget->item()->data());
         return;
     }
 
-    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
-    if(!medias.isEmpty()) {
-        menu()->trigger(Qn::OpenNewTabAction);
-        menu()->trigger(Qn::ResourceDropAction, medias);
-
+    QnMediaResourceList resources = QnResourceCriterion::filter<QnMediaResource>(menu()->currentResourcesTarget(sender()));
+    if(!resources.isEmpty()) {
+        addToLayout(layout, resources, !position.isNull(), position);
         return;
     }
+}
+
+void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
+    menu()->trigger(Qn::OpenNewTabAction);
+    menu()->trigger(Qn::OpenInLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
@@ -533,17 +496,18 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
     openNewWindow(arguments);
 }
 
-void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QnLayoutResourcePtr resource = menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
-    if(!resource)
-        return;
+void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
+    foreach(const QnResourcePtr &resource, menu()->currentResourcesTarget(sender())) {
+        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
 
-    QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(resource);
-    if(layout == NULL) {
-        layout = new QnWorkbenchLayout(resource, workbench());
-        workbench()->addLayout(layout);
+        QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
+        if(layout == NULL) {
+            layout = new QnWorkbenchLayout(layoutResource, workbench());
+            workbench()->addLayout(layout);
+        }
+        
+        workbench()->setCurrentLayout(layout);
     }
-    workbench()->setCurrentLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
@@ -689,23 +653,25 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_resourceDropAction_triggered() {
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
-    QVariant position = menu()->currentParameter(sender(), Qn::GridPositionParameter);
-    QnLayoutResourceList layouts = QnResourceCriterion::filter<QnLayoutResource>(resources);
-    QnMediaResourceList  medias  = QnResourceCriterion::filter<QnMediaResource>(resources);
-
+void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
+    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
     if(!layouts.empty()) {
-        /* Open dropped layouts. Ignore media resources in this case. */
-        foreach(const QnLayoutResourcePtr &resource, layouts)
-            menu()->trigger(Qn::OpenLayoutAction, resource);
+        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     } else {
-        /* Open dropped media resources in current layout. */
-        addToWorkbench(medias, position.canConvert(QVariant::PointF), position.toPointF());
+        /* No layouts? Just open dropped media. */
+        menu()->trigger(Qn::OpenInLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
     }
 }
 
-void QnWorkbenchActionHandler::at_delayedResourceDropAction_triggered() {
+void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
+    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    if(layouts.empty()) /* That's media drop, open new layout. */
+        menu()->trigger(Qn::OpenNewTabAction);
+
+    menu()->trigger(Qn::DropResourcesAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+}
+
+void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
     QByteArray data = menu()->currentParameter(sender(), Qn::SerializedResourcesParameter).toByteArray();
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
@@ -716,25 +682,6 @@ void QnWorkbenchActionHandler::at_delayedResourceDropAction_triggered() {
     m_delayedDrops.push_back(mimeData);
 
     submitDelayedDrops();
-}
-
-void QnWorkbenchActionHandler::at_resourceDropIntoNewLayoutAction_triggered() {
-    QVariant target = menu()->currentTarget(sender());
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
-
-    QnLayoutResourceList layouts = QnResourceCriterion::filter<QnLayoutResource>(resources);
-    if(!layouts.empty()) {
-        /* Open dropped layouts.  */
-        foreach(const QnLayoutResourcePtr &resource, layouts)
-            menu()->trigger(Qn::OpenLayoutAction, resource);
-
-        QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layouts.back().staticCast<QnLayoutResource>());
-        if(layout)
-            workbench()->setCurrentLayout(layout);
-    } else {
-        /* No layouts? Just open dropped media in a new layout. */
-        menu()->trigger(Qn::OpenInNewLayoutAction, target);
-    }
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
@@ -749,7 +696,7 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     dialog->setNameFilters(filters);
     
     if(dialog->exec())
-        addToWorkbench(dialog->selectedFiles(), false);
+        addToLayout(workbench()->currentLayout()->resource(), dialog->selectedFiles(), false);
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -759,7 +706,7 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
     dialog->setOptions(QFileDialog::ShowDirsOnly);
     
     if(dialog->exec())
-        addToWorkbench(dialog->selectedFiles(), false);
+        addToLayout(workbench()->currentLayout()->resource(), dialog->selectedFiles(), false);
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
@@ -1107,6 +1054,45 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     settings.endGroup();
 }
 
+void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
+    QnUserResourcePtr user = menu()->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
+    if(!user)
+        return;
+
+    QnUserResourcePtr currentUser = context()->user();
+    if(!currentUser)
+        return;
+
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+
+    dialog->setElementFlags(QnUserSettingsDialog::Login, QnUserSettingsDialog::Visible);
+    if(user->getName() == QLatin1String("admin")) {
+        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
+        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
+    } else if(user == currentUser) {
+        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
+    } else if(!currentUser->isAdmin()) {
+        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
+        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
+    }
+
+    QString oldPassword = user->getPassword();
+    user->setPassword(QLatin1String("******"));
+
+    dialog->setUser(user);
+    if(!dialog->exec())
+        return;
+
+    user->setPassword(oldPassword);
+
+    if(!dialog->hasChanges())
+        return;
+
+    dialog->submitToResource();
+    connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
+}
+
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
     if(status == 0) {
         resourcePool()->addResources(resources);
@@ -1186,3 +1172,4 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
     for(int i = 0; i < resources.size(); i++)
         resources[i]->setStatus(static_cast<QnResource::Status>(oldStatuses[i]));
 }
+

@@ -73,6 +73,8 @@ public:
 
     Qn::ActionTarget currentTargetType(QnAction *action) const;
 
+    QVariantMap currentParameters(QnAction *action) const;
+
     QVariant currentParameter(QnAction *action, const QString &name) const;
 
     QVariant currentTarget(QnAction *action) const;
@@ -88,6 +90,8 @@ public:
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
 
     Qn::ActionTarget currentTargetType(QObject *sender) const;
+
+    QVariantMap currentParameters(QObject *sender) const;
 
     QVariant currentParameter(QObject *sender, const QString &name) const;
 

@@ -458,7 +458,7 @@ int main(int argc, char *argv[])
         QByteArray data = QByteArray::fromBase64(droppedResources.toLatin1());
         QVariantMap params;
         params.insert(Qn::SerializedResourcesParameter, data);
-        mainWindow->context()->menu()->trigger(Qn::DelayedResourceDropAction, params);
+        mainWindow->context()->menu()->trigger(Qn::DelayedDropResourcesAction, params);
     }
 
     int result = application->exec();
