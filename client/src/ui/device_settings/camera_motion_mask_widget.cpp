@@ -34,8 +34,9 @@ namespace {
 } // anonymous namespace
 
 
-QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent)
-	: QWidget(parent)
+QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
+    QWidget(parent),
+    m_readOnly(false)
 {
 	init();
 }
@@ -75,6 +76,7 @@ void QnCameraMotionMaskWidget::init()
     m_controller->moveInstrument()->setEffective(false);
     m_controller->resizingInstrument()->setEffective(false);
     m_controller->rubberBandInstrument()->disable();
+    m_controller->itemLeftClickInstrument()->disable();
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
@@ -82,17 +84,17 @@ void QnCameraMotionMaskWidget::init()
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
     /* Create motion mask selection instrument. */
-	MotionSelectionInstrument *motionSelectionInstrument = new MotionSelectionInstrument(this);
-    motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
-	motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
-	motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
-    m_display->instrumentManager()->installInstrument(motionSelectionInstrument);
+	m_motionSelectionInstrument = new MotionSelectionInstrument(this);
+    m_motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
+	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
+	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
+    m_display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
     ForwardingInstrument *itemMouseForwardingInstrument = m_controller->itemMouseForwardingInstrument();
-	connect(motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
-	connect(motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+	connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
+	connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     /* Set up UI. */
     QVBoxLayout *layout = new QVBoxLayout();
@@ -106,8 +108,28 @@ QnCameraMotionMaskWidget::~QnCameraMotionMaskWidget()
 {
 }
 
-void QnCameraMotionMaskWidget::at_viewport_resized() {
-    m_display->fitInView(false);
+bool QnCameraMotionMaskWidget::isReadOnly() const 
+{
+    return m_readOnly;
+}
+
+void QnCameraMotionMaskWidget::setReadOnly(bool readOnly) 
+{
+    if(m_readOnly == readOnly)
+        return;
+
+    if(readOnly) {
+        m_motionSelectionInstrument->disable();
+    } else {
+        m_motionSelectionInstrument->enable();
+    }
+
+    m_readOnly = readOnly;
+}
+
+const QList<QRegion>& QnCameraMotionMaskWidget::motionMaskList() const
+{
+    return m_motionMaskList;
 }
 
 const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
@@ -144,6 +166,14 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 
     /* Consider motion mask list changed. */
     emit motionMaskListChanged();
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnCameraMotionMaskWidget::at_viewport_resized() {
+    m_display->fitInView(false);
 }
 
 void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &gridRect)
@@ -185,9 +215,4 @@ void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnRes
 
     if(changed)
         emit motionMaskListChanged();
-}
-
-const QList<QRegion>& QnCameraMotionMaskWidget::motionMaskList() const
-{
-	return m_motionMaskList;
 }

@@ -176,6 +176,8 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
+    if(m_motionWidget)
+        setReadOnly(m_motionWidget, readOnly);
     m_readOnly = readOnly;
 }
 
@@ -204,6 +206,9 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
 
     m_motionWidget = new QnCameraMotionMaskWidget(this);
     m_motionWidget->setCamera(m_camera);
+    
+    using ::setReadOnly;
+    setReadOnly(m_motionWidget, m_readOnly);
     
     QVBoxLayout *layout = new QVBoxLayout(motionWidget);
     layout->setContentsMargins(0, 0, 0, 0);
