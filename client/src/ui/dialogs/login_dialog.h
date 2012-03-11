@@ -33,6 +33,7 @@ protected:
 
 private slots:
     void updateAcceptibility();
+    void updateFocus();
 
     void at_configureConnectionsButton_clicked();
     void at_testButton_clicked();

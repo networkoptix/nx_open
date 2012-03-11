@@ -81,6 +81,8 @@ public:
 
     static QByteArray formatNetworkError(int error);
 
+    bool isReady() const;
+
 Q_SIGNALS:
     void error(int error);
 
@@ -129,7 +131,7 @@ signals:
 
 private:
     QNetworkAccessManager* m_accessManager;
-    QMutex m_accessManagerMutex;
+    mutable QMutex m_accessManagerMutex;
 
     static QAtomicInt m_handle;
 

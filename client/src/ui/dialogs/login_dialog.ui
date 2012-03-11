@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>273</height>
+    <width>346</width>
+    <height>271</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -310,6 +310,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>hostnameLineEdit</tabstop>
+  <tabstop>portSpinBox</tabstop>
+  <tabstop>loginLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>savePasswordCheckBox</tabstop>
+  <tabstop>testButton</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -320,7 +329,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>248</x>
-     <y>254</y>
+     <y>401</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -336,7 +345,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>316</x>
-     <y>260</y>
+     <y>401</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

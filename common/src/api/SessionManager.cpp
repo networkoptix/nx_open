@@ -160,6 +160,12 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, Q
     return sendGetRequest(url, objectName, QnRequestParamList(), reply, errorString);
 }
 
+bool SessionManager::isReady() const
+{
+    QMutexLocker locker(&m_accessManagerMutex);
+    return m_accessManager != 0;
+}
+
 int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray& reply, QByteArray& errorString)
 {
     SyncRequestProcessor syncProcessor;

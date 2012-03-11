@@ -42,6 +42,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     m_duplicateName(false),
     m_role(role)
 {
+
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
     devTitleFile += prefixForRole(role) + "/";
     devTitleFile += m_macAddress + "/";
@@ -253,7 +254,10 @@ void DeviceFileCatalog::deserializeTitleFile()
             }
 
             if (lastFileDuplicateName()) {
-                m_chunks.last() = chunk;
+				if (m_chunks.isEmpty())
+					m_chunks << chunk;
+				else
+					m_chunks.last() = chunk;
                 needRewriteCatalog = true;
             }       
             else 
