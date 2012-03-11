@@ -148,6 +148,7 @@ private:
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
     int m_tcpTimeout;
+    QByteArray m_tracksPrefix;
 };
 
 #endif //rtp_session_h_1935_h

@@ -501,14 +501,15 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     }
 
 
-    if (d->inJumpCount > 0)
-        return;
+    //if (d->inJumpCount > 0)
+    //    return;
 
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
-        if (i->buffering)
+        if (i->buffering && i->enabled)
             return;
     }
+
     // no more buffering
     qint64 bt = d->bufferingTime;
     d->bufferingTime = AV_NOPTS_VALUE;
