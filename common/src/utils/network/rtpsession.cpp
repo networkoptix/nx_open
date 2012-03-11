@@ -295,8 +295,9 @@ RTPIODevice*  RTPSession::sendSetup()
         m_rtpIo.setSocket(&m_tcpSock);
     for (QMap<int, SDPTrackInfo>::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
     {
-        if (getTrackType(itr.key()) == "audio") 
+        if (getTrackType(itr.key()) == "audio" || m_transport == "UDP") 
         {
+            // todo: audio (multi tracks transfer) does not supported for UDP now
             if (audioNum++ != m_selectedAudioChannel)
                 continue;
         }
