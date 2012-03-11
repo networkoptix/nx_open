@@ -279,24 +279,27 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
     if(needToAsk) {
         QDialogButtonBox::StandardButton button;
         QString name;
-        if(changedResources.size() == 1) {
-            QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
-            dialog->setWindowTitle(tr("Close Layout"));
-            dialog->setText(tr("Layout '%1' is not saved. Do you want to save it?\n\nIf yes, you may also want to change its name:").arg(changedResources[0]->getName()));
-            dialog->setName(changedResources[0]->getName());
-            dialog->exec();
-            button = dialog->clickedButton();
-            name = dialog->name();
+        if(context()->user() && context()->user()->isAdmin()) { // TODO
+            if(changedResources.size() == 1) {
+                QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
+                dialog->setWindowTitle(tr("Close Layout"));
+                dialog->setText(tr("Layout '%1' is not saved. Do you want to save it?\n\nIf yes, you may also want to change its name:").arg(changedResources[0]->getName()));
+                dialog->setName(changedResources[0]->getName());
+                dialog->exec();
+                button = dialog->clickedButton();
+                name = dialog->name();
+            } else {
+                button = QnResourceListDialog::exec(
+                    widget(),
+                    QnResourceList(changedResources),
+                    tr("Close Layouts"),
+                    tr("The following %n layouts are not saved. Do you want to save them?", NULL, changedResources.size()),
+                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+                );
+            }
         } else {
-            button = QnResourceListDialog::exec(
-                widget(),
-                QnResourceList(changedResources),
-                tr("Close Layouts"),
-                tr("The following %n layouts are not saved. Do you want to save them?", NULL, changedResources.size()),
-                QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
-            );
+            button = QDialogButtonBox::No;
         }
-
 
         if(button == QDialogButtonBox::Cancel) {
             closeAll = false;
