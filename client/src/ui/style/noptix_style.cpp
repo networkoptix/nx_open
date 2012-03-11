@@ -128,6 +128,14 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 
 void QnNoptixStyle::polish(QWidget *widget) {
     base_type::polish(widget);
+
+    if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
+        itemView->setIconSize(QSize(24, 24));
+        
+        QFont font = itemView->font();
+        font.setPointSize(9);
+        itemView->setFont(font);
+    }
 }
 
 void QnNoptixStyle::unpolish(QWidget *widget) {
