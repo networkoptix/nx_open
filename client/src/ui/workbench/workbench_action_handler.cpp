@@ -359,13 +359,11 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(user->getName() == QLatin1String("admin")) {
         dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
         dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
+    } else if(user == currentUser) {
+        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
     } else if(!currentUser->isAdmin()) {
-        if(user == currentUser) {
-            dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-        } else {
-            dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
-            dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-        }
+        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
+        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
     }
 
     QString oldPassword = user->getPassword();

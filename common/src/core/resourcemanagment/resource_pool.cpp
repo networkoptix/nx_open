@@ -9,6 +9,12 @@
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
 
+#ifdef QN_RESOURCE_POOL_DEBUG
+#   define TRACE(...) qDebug << __VA_ARGS__;
+#else
+#   define TRACE(...)
+#endif
+
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
 QnResourcePool::QnResourcePool() : QObject(),
@@ -97,15 +103,19 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, newResources.values())
     {
-        disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()));
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
-
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 
+        TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
     }
 
+    /* Add layouts for users. */
+    foreach (const QnResourcePtr &resource, newResources)
+        if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+            foreach(const QnLayoutResourcePtr &layout, user->getLayouts())
+                addResource(layout);
 }
 
 void QnResourcePool::removeResources(const QnResourceList &resources)
@@ -131,8 +141,9 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     }
 
     foreach (const QnResourcePtr &resource, removedResources) {
-        disconnect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()));
+        disconnect(resource.data(), NULL, this, NULL);
 
+        TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
         emit resourceRemoved(resource);
     }
 
