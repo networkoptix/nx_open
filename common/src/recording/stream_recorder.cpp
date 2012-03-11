@@ -32,8 +32,7 @@ m_stopOnWriteError(true),
 m_waitEOF(false),
 m_endOfData(false),
 m_lastProgress(-1),
-m_EofDateTime(AV_NOPTS_VALUE),
-m_needKeyData(false)
+m_EofDateTime(AV_NOPTS_VALUE)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -147,7 +146,6 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         if (md->timestamp - m_lastPacketTime > MAX_FRAME_DURATION*1000ll && m_currentChunkLen > 0) {
             // if multifile recording allowed, recreate file if recording hole is detected
             close();
-            m_needKeyData = true;
             m_lastPacketTime = md->timestamp;
         }
     }
@@ -155,11 +153,10 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md);
 
-    if (vd && m_needKeyData)
+    if (vd && !m_gotKeyFrame[vd->channelNumber])
     {
         if (!(vd->flags & AV_PKT_FLAG_KEY))
             return true; // skip data
-        m_needKeyData = false;
     }
 
     if (m_firstTime)
