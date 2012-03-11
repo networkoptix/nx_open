@@ -19,7 +19,8 @@ struct ReaderInfo
         cam(_cam),
         enabled(true),
         buffering(false),
-        isEOF(false)
+        isEOF(false),
+        paused(false)
     {
     }
     QnAbstractArchiveReader* reader;
@@ -28,6 +29,7 @@ struct ReaderInfo
     bool enabled;
     bool buffering;
     bool isEOF;
+    bool paused;
 };
 
 
@@ -622,18 +624,35 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
         if (d->readers[i].reader == reader) 
         {
             // Use seek for live too. to clear curent buffer
-            if (d->enabled && !d->readers[i].enabled /*&& !value && d->lastJumpTime != DATETIME_NOW*/)
+            if (!d->readers[i].enabled && !value /*&& d->lastJumpTime != DATETIME_NOW*/)
             {
                 d->readers[i].reader->setNavDelegate(0);
-                qint64 currentTime = getCurrentTime();
-                if (currentTime != AV_NOPTS_VALUE) {
-                    d->readers[i].reader->jumpToPreviousFrame(currentTime);
-                    d->readers[i].reader->setSpeed(d->speed, currentTime);
+                if (d->enabled) {
+                    qint64 currentTime = getCurrentTime();
+                    if (currentTime != AV_NOPTS_VALUE) {
+                        d->readers[i].reader->jumpToPreviousFrame(currentTime);
+                        d->readers[i].reader->setSpeed(d->speed, currentTime);
+                    }
+                    else {
+                        d->readers[i].reader->setSpeed(d->speed);
+                    }
                 }
-                else {
-                    d->readers[i].reader->setSpeed(d->speed);
+                if (d->readers[i].paused)
+                    d->readers[i].reader->resumeMedia();
+                if (d->enabled)
+                    d->readers[i].reader->setNavDelegate(this);
+                d->readers[i].paused = false;
+            }
+            else if (d->readers[i].enabled && value)
+            {
+                if (!d->readers[i].reader->isSingleShotMode())
+                {
+                    d->readers[i].reader->setNavDelegate(0);
+                    d->readers[i].reader->pauseMedia();
+                    if (d->enabled)
+                        d->readers[i].reader->setNavDelegate(this);
+                    d->readers[i].paused = true;
                 }
-                d->readers[i].reader->setNavDelegate(this);
             }
             d->readers[i].enabled = !value;
             break;

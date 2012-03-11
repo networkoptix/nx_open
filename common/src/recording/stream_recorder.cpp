@@ -51,7 +51,6 @@ void QnStreamRecorder::close()
         {
             qint64 fileLength = m_startDateTime != AV_NOPTS_VALUE  ? (m_endDateTime - m_startDateTime)/1000 : 0;
             fileFinished(fileLength, m_fileName, m_mediaProvider);
-            m_startDateTime = AV_NOPTS_VALUE;
         }
 
         if (m_packetWrited)
@@ -71,6 +70,7 @@ void QnStreamRecorder::close()
     }
     m_packetWrited = false;
     m_firstTimestamp = -1;
+    m_startDateTime = AV_NOPTS_VALUE;
 
     markNeedKeyData();
 	m_firstTime = true;
@@ -145,6 +145,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     {
         if (md->timestamp - m_lastPacketTime > MAX_FRAME_DURATION*1000ll && m_currentChunkLen > 0) {
             // if multifile recording allowed, recreate file if recording hole is detected
+            qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_lastPacketTime)/1000 << "ms";
             close();
             m_lastPacketTime = md->timestamp;
         }
