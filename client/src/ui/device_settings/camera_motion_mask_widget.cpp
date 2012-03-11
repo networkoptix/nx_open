@@ -189,11 +189,14 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
         r = gridRect.intersected(r);
         r.translate(-layout->h_position(i)*MD_WIDTH, -layout->v_position(i)*MD_HEIGHT);
 
-        if (!r.isEmpty() && !m_motionMaskList[i].contains(r)) 
+        if (!r.isEmpty()) 
         {
-            widget->addToMotionMask(r, i);
+            QRegion oldRegion = m_motionMaskList[i];
             m_motionMaskList[i] += r;
-            changed = true;
+            if(oldRegion != m_motionMaskList[i]) {
+                widget->addToMotionMask(r, i);
+                changed = true;
+            }
         }
     }
 
