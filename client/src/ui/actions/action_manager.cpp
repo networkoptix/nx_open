@@ -715,7 +715,7 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, co
         return;
     }
 
-    if(action->checkCondition(action->scope(), items) != Qn::EnabledAction) {
+    if(action->checkCondition(action->scope(), items, params) != Qn::EnabledAction) {
         qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
         return;
     }
@@ -739,7 +739,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     QMenu *result = new QMenu();
 
     foreach(QnAction *action, parent->children()) {
-        Qn::ActionVisibility visibility = action->checkCondition(scope, items);
+        Qn::ActionVisibility visibility = action->checkCondition(scope, items, QVariantMap());
         if(visibility == Qn::InvisibleAction)
             continue;
         

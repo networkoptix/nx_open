@@ -228,8 +228,11 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.resource.path = resource->getUniqueId();
     data.uuid = QUuid::createUuid();
     data.flags = QnWorkbenchItem::PendingGeometryAdjustment;
-    if(usePosition)
-        data.combinedGeometry = QRectF(position, position);
+    if(usePosition) {
+        data.combinedGeometry = QRectF(position, position); /* Desired position is encoded into a valid rect. */
+    } else {
+        data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5)); /* The fact that any position is OK is encoded into an invalid rect. */
+    }
     
     layout->addItem(data);
 }

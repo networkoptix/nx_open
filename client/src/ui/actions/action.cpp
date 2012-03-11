@@ -55,7 +55,7 @@ void QnAction::removeChild(QnAction *action) {
     m_children.removeOne(action);
 }
 
-Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScope scope, const QVariant &items) const {
+Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) const {
     if(!(this->scope() & scope) && scope != this->scope())
         return Qn::InvisibleAction;
 
@@ -82,8 +82,11 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScope scope, const QVari
             return Qn::InvisibleAction;
 
         if((requiredAccessRights() & Qn::EditLayout) && !isAdmin) {
-            QnWorkbenchLayout *layout = m_manager->context()->workbench()->currentLayout();
-            if(!m_manager->context()->snapshotManager()->isLocal(layout->resource()))
+            QnLayoutResourcePtr layout = params.value(Qn::LayoutParameter).value<QnLayoutResourcePtr>();
+            if(!layout)
+                layout = m_manager->context()->workbench()->currentLayout()->resource();
+
+            if(!m_manager->context()->snapshotManager()->isLocal(layout))
                 return Qn::InvisibleAction;
         }
     }
@@ -135,7 +138,9 @@ bool QnAction::event(QEvent *event) {
             }
         }
 
-        if(checkCondition(scope(), target) == Qn::EnabledAction)
+
+
+        if(checkCondition(scope(), target, QVariantMap()) == Qn::EnabledAction)
             m_manager->trigger(m_id, target);
         return true;
     }
