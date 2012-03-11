@@ -241,6 +241,11 @@ namespace Qn {
         TakeScreenshotAction,
 
         /**
+         * Opens user settings dialog.
+         */
+        UserSettingsAction,
+
+        /**
          * Opens camera settings dialog.
          */
         CameraSettingsAction,

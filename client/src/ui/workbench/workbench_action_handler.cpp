@@ -35,7 +35,7 @@
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/camera_settings_dialog.h>
 #include <ui/dialogs/layout_name_dialog.h>
-#include <ui/dialogs/new_user_dialog.h>
+#include <ui/dialogs/user_settings_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/preferences/preferencesdialog.h>
 #include <youtube/youtubeuploaddialog.h>
@@ -148,6 +148,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::SaveCurrentLayoutAsAction),          SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
     connect(action(Qn::CloseLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
     connect(action(Qn::CloseAllButThisLayoutAction),        SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
+    connect(action(Qn::UserSettingsAction),                 SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::SelectionChangeAction),              SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
@@ -340,6 +341,42 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     }
 
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
+}
+
+void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
+    QnUserResourcePtr user = menu()->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
+    if(!user)
+        return;
+
+    QnUserResourcePtr currentUser = context()->user();
+    if(!currentUser)
+        return;
+
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog());
+    dialog->setWindowModality(Qt::ApplicationModal);
+    
+    dialog->setElementFlags(QnUserSettingsDialog::Login, QnUserSettingsDialog::Visible);
+    if(user->getName() == QLatin1String("admin")) {
+        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
+        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
+    } else if(!currentUser->isAdmin()) {
+        if(user == currentUser) {
+            dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
+        } else {
+            dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
+            dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
+        }
+    }
+
+    dialog->setUser(user);
+    if(!dialog->exec())
+        return;
+
+    if(!dialog->hasChanges())
+        return;
+
+    dialog->submitToResource();
+    connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
@@ -975,16 +1012,15 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
-    QScopedPointer<QnNewUserDialog> dialog(new QnNewUserDialog(widget()));
+    QnUserResourcePtr user(new QnUserResource());
+
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setUser(user);
     if(!dialog->exec())
         return;
 
-    QnUserResourcePtr user(new QnUserResource());
-    user->setName(dialog->login());
-    user->setPassword(dialog->password());
-    user->setAdmin(dialog->isAdmin());
-
+    dialog->submitToResource();
     connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
