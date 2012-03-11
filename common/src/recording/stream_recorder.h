@@ -88,7 +88,6 @@ private:
     qint64 m_EofDateTime;
     bool m_endOfData;
     int m_lastProgress;
-    bool m_needKeyData;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
 };
 
