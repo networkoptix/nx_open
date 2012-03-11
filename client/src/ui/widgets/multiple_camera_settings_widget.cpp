@@ -1,6 +1,8 @@
 #include "multiple_camera_settings_widget.h"
 #include "ui_multiple_camera_settings_widget.h"
 
+#include <limits>
+
 #include <QtGui/QMessageBox>
 
 #include "core/resourcemanagment/resource_pool.h"
@@ -102,6 +104,11 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     QString login = ui->loginEdit->text().trimmed();
     QString password = ui->passwordEdit->text().trimmed();
 
+    QnScheduleTaskList scheduleTasks;
+    if(m_hasScheduleChanges)
+        foreach(const QnScheduleTask::Data &data, ui->cameraScheduleWidget->scheduleTasks())
+            scheduleTasks.append(QnScheduleTask(data));
+
     foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
         QString cameraLogin = camera->getAuth().user();
         if (!login.isEmpty())
@@ -116,12 +123,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (ui->cameraScheduleWidget->getScheduleEnabled() != Qt::PartiallyChecked)
             camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
 
-        if (m_hasScheduleChanges) {
-            QnScheduleTaskList scheduleTasks;
-            foreach(const QnScheduleTask::Data& data, ui->cameraScheduleWidget->scheduleTasks())
-                scheduleTasks.append(QnScheduleTask(data));
+        if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
-        }
     }
 
     setHasChanges(false);
@@ -144,7 +147,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
          * 1 - flag is not equal for all cameras, 2 - schedule disabled for all cameras */
         int scheduleEnabled = -1;
         QSet<QString> logins, passwords;
-        int maxFps = 0;
+        int maxFps = std::numeric_limits<int>::max();
     
         foreach (QnVirtualCameraResourcePtr camera, m_cameras) {
             if (scheduleEnabled == -1) {
@@ -156,8 +159,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             logins.insert(camera->getAuth().user());
             passwords.insert(camera->getAuth().password());
 
-            if (camera->getMaxFps() > maxFps)
-                maxFps = camera->getMaxFps();
+            maxFps = qMin(maxFps, camera->getMaxFps());
         }
 
         bool isScheduleEqual = true;
@@ -196,8 +198,13 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
         ui->cameraScheduleWidget->setScheduleEnabled(static_cast<Qt::CheckState>(scheduleEnabled));
         ui->cameraScheduleWidget->setMaxFps(maxFps);
-        ui->cameraScheduleWidget->setScheduleTasks(m_cameras.front()->getScheduleTasks());
+
         ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
+        if(isScheduleEqual) {
+            ui->cameraScheduleWidget->setScheduleTasks(m_cameras.front()->getScheduleTasks());
+        } else {
+            ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
+        }
     }
 
     setHasChanges(false);
