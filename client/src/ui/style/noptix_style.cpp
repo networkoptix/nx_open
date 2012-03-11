@@ -133,7 +133,7 @@ void QnNoptixStyle::polish(QWidget *widget) {
         itemView->setIconSize(QSize(24, 24));
         
         QFont font = itemView->font();
-        font.setPointSize(9);
+        font.setPointSize(10);
         itemView->setFont(font);
     }
 }
