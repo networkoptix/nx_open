@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
 #include <api/AppServerConnection.h>
+#include "workbench_context_aware.h"
 
 class QnWorkbench;
 class QnWorkbenchLayout;
@@ -16,19 +17,13 @@ class QnResourcePool;
  * This class performs bidirectional synchronization of instances of 
  * <tt>QnWorkbench</tt> and <tt>QnResourcePool</tt>.
  */
-class QnWorkbenchSynchronizer: public QObject {
+class QnWorkbenchSynchronizer: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 
 public:
     QnWorkbenchSynchronizer(QObject *parent = NULL);
 
     virtual ~QnWorkbenchSynchronizer();
-
-    QnWorkbenchContext *context() const {
-        return m_context;
-    }
-
-    void setContext(QnWorkbenchContext *context);
 
 public slots:
     void submit();
@@ -38,14 +33,10 @@ protected:
     void stop();
 
 protected slots:
-    void at_context_aboutToBeDestroyed();
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_workbench_layoutsChanged();
 
 private:
-    /** Associated context. */
-    QnWorkbenchContext *m_context;
-
     /** Whether changes should be propagated from workbench to resources. */
     bool m_submit;
 

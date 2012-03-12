@@ -108,8 +108,8 @@ namespace {
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *parent):
     QObject(parent),
+    QnWorkbenchContextAware(context),
     m_instrumentManager(new InstrumentManager(this)),
-    m_context(NULL),
     m_scene(NULL),
     m_view(NULL),
     m_viewportAnimator(NULL),
@@ -185,19 +185,13 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *par
     m_frameOpacityAnimator->setTimeLimit(500);
 
     /* Set up defaults. */
-    initContext(context);
     setScene(m_dummyScene);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     m_dummyScene = NULL;
 
-    initContext(NULL);
     setScene(NULL);
-}
-
-QnWorkbench *QnWorkbenchDisplay::workbench() const {
-    return m_context ? m_context->workbench() : NULL;
 }
 
 void QnWorkbenchDisplay::initSyncPlay() {
@@ -206,24 +200,11 @@ void QnWorkbenchDisplay::initSyncPlay() {
     new QnWorkbenchStreamSynchronizer(this, m_renderWatcher, this);
 }
 
-void QnWorkbenchDisplay::initContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL && m_scene != NULL)
-        deinitSceneContext();
-
-    m_context = context;
-
-    if(m_context != NULL && m_scene != NULL)
-        initSceneContext();
-}
-
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene == scene)
         return;
 
-    if(m_scene != NULL && m_context != NULL)
+    if(m_scene != NULL && context() != NULL)
         deinitSceneContext();
 
     /* Prepare new scene. */
@@ -235,12 +216,12 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
 
     /* Set up new scene.
      * It may be NULL only when this function is called from destructor. */
-    if(m_scene != NULL && m_context != NULL)
+    if(m_scene != NULL && context() != NULL)
         initSceneContext();
 }
 
 void QnWorkbenchDisplay::deinitSceneContext() {
-    assert(m_scene != NULL && m_context != NULL);
+    assert(m_scene != NULL && context() != NULL);
 
     /* Deinit scene. */
     m_instrumentManager->unregisterScene(m_scene);
@@ -273,7 +254,7 @@ void QnWorkbenchDisplay::deinitSceneContext() {
 }
 
 void QnWorkbenchDisplay::initSceneContext() {
-    assert(m_scene != NULL && m_context != NULL);
+    assert(m_scene != NULL && context() != NULL);
 
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
@@ -310,7 +291,6 @@ void QnWorkbenchDisplay::initSceneContext() {
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
     /* Connect to workbench. */
-    connect(context(),              SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_context_aboutToBeDestroyed()));
     connect(workbench(),            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
     connect(workbench(),            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
     connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
@@ -887,7 +867,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate) {
     assert(widget != NULL);
-    assert(m_context != NULL);
 
     QnWorkbenchItem *item = widget->item();
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
@@ -1092,10 +1071,6 @@ void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
         synchronizeSceneBounds();
         fitInView();
     }
-}
-
-void QnWorkbenchDisplay::at_context_aboutToBeDestroyed() {
-    initContext(new QnWorkbenchContext(qnResPool, this));
 }
 
 void QnWorkbenchDisplay::at_workbench_modeChanged() {

@@ -13,7 +13,8 @@
 #include "action_manager.h"
 
 QnActionCondition::QnActionCondition(QObject *parent): 
-    QObject(parent) 
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
 {
     QnActionTargetTypes::initialize();
 }
@@ -48,14 +49,6 @@ Qn::ActionVisibility QnActionCondition::check(const QVariant &items) {
         qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
         return Qn::InvisibleAction;
     }
-}
-
-void QnActionCondition::setManager(QnActionManager *manager) {
-    m_manager = manager;
-}
-
-QnWorkbenchContext *QnActionCondition::context() const {
-    return manager() ? manager()->context() : NULL;
 }
 
 
@@ -147,9 +140,6 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
             if(user->getName() == QLatin1String("admin"))
                 return Qn::InvisibleAction; /* Can't delete superadmin. */
 
-            if(!context()) 
-                continue;
-
             if(user == context()->user())
                 return Qn::InvisibleAction; /* Can't delete self from server. */
 
@@ -177,7 +167,7 @@ Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutIte
         return Qn::EnabledAction;
 
     foreach(const QnLayoutItemIndex &item, layoutItems)
-        if(!context()->snapshotManager()->isLocal(item.layout()))
+        if(!snapshotManager()->isLocal(item.layout()))
             return Qn::DisabledAction;
 
     return Qn::EnabledAction;
@@ -187,10 +177,7 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     QnLayoutResourcePtr layout;
 
     if(m_current) {
-        if(!context())
-            return Qn::InvisibleAction;
-
-        layout = context()->workbench()->currentLayout()->resource();
+        layout = workbench()->currentLayout()->resource();
     } else {
         if(resources.size() != 1)
             return Qn::InvisibleAction;
@@ -201,7 +188,7 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     if(!layout)
         return Qn::InvisibleAction;
 
-    if(context() && context()->snapshotManager()->isSaveable(layout)) {
+    if(snapshotManager()->isSaveable(layout)) {
         return Qn::EnabledAction;
     } else {
         return Qn::DisabledAction;
@@ -210,10 +197,7 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
 
 
 Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &layouts) {
-    if(!context())
-        return Qn::InvisibleAction;
-
-    if(context()->workbench()->layouts().size() < m_requiredCount)
+    if(workbench()->layouts().size() < m_requiredCount)
         return Qn::DisabledAction;
 
     return Qn::EnabledAction;

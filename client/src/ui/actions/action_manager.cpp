@@ -103,8 +103,6 @@ public:
     void condition(QnActionCondition *condition) {
         assert(m_action->condition() == NULL);
 
-        condition->setParent(m_action);
-        condition->setManager(m_manager);
         m_action->setCondition(condition);
     }
 
@@ -187,6 +185,7 @@ namespace {
 
 QnActionManager::QnActionManager(QObject *parent): 
     QObject(parent),
+    QnWorkbenchContextAware(parent),
     m_shortcutAction(NULL),
     m_targetProvider(NULL),
     m_root(NULL),
@@ -233,7 +232,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MoveCameraAction).
         flags(Qn::Resource | Qn::SingleTarget | Qn::MultiTarget | Qn::Admin).
         text(tr("Move Cameras")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::network)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::network), this));
 
     factory(Qn::NextLayoutAction).
         flags(Qn::NoTarget).
@@ -282,7 +281,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::NewUserLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("New Layout...")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user), this));
 
     factory(Qn::OpenNewTabAction).
         flags(Qn::Main | Qn::TabBar).
@@ -306,7 +305,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
-        condition(new QnSaveLayoutActionCondition(true));
+        condition(new QnSaveLayoutActionCondition(true, this));
 
     factory(Qn::SaveCurrentLayoutAsAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::Admin).
@@ -419,7 +418,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CloseAllButThisLayoutAction).
         flags(Qn::TabBar).
         text(tr("Close All But This")).
-        condition(new QnLayoutCountActionCondition(2));
+        condition(new QnLayoutCountActionCondition(2, this));
 
 
 
@@ -431,65 +430,65 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
         text(tr("Open in a New Tab")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media), this));
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
         text(tr("Open in a New Window")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::OneMatches, hasFlags(QnResource::media), this));
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
         text(tr("Open Layout")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout), this));
 
     factory(Qn::OpenMultipleLayoutsAction).
         flags(Qn::Tree | Qn::MultiTarget | Qn::Resource).
         text(tr("Open Layouts")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout), this));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::Resource).
         text(tr("Open Layout(s)")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout), this));
 
     factory(Qn::SaveLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("Save Layout")).
-        condition(new QnSaveLayoutActionCondition(false));
+        condition(new QnSaveLayoutActionCondition(false, this));
 
     factory(Qn::SaveLayoutAsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("Save Layout As...")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout), this));
 
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
-        condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasHiddenGrid));
+        condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasHiddenGrid, this));
 
     factory(Qn::HideMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Hide Motion Grid")).
-        condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasShownGrid));
+        condition(new QnMotionGridDisplayActionCondition(QnMotionGridDisplayActionCondition::HasShownGrid, this));
 
     factory(Qn::TakeScreenshotAction).
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Take Screenshot")).
         shortcut(tr("Alt+S")).
         autoRepeat(false).
-        condition(new QnTakeScreenshotActionCondition());
+        condition(new QnTakeScreenshotActionCondition(this));
 
     factory(Qn::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource).
         text(tr("User Settings")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::user), this));
 
     // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Camera Settings")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::live_cam), this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem | Qn::Widget).
@@ -498,7 +497,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Server Settings")).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::remote_server)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::remote_server), this));
 
 
     factory(Qn::YouTubeUploadAction).
@@ -506,14 +505,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Upload to YouTube...")).
         //shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::ARCHIVE), this));
 
     factory(Qn::EditTagsAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Edit tags...")).
         shortcut(tr("Alt+T")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::media)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::media), this));
 
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::LayoutItem).
@@ -521,13 +520,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Enter")).
         shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media), this));
 
     factory(Qn::DeleteFromDiskAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::LayoutItem).
         text(tr("Delete from Disk")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::url | QnResource::local | QnResource::media), this));
 
 
 
@@ -542,29 +541,25 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
         autoRepeat(false).
-        condition(new QnLayoutItemRemovalActionCondition());
+        condition(new QnLayoutItemRemovalActionCondition(this));
 
     factory(Qn::RemoveFromServerAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::Resource | Qn::IntentionallyAmbiguous | Qn::Admin).
         text(tr("Remove from Server")).
         shortcut(tr("Del")).
         autoRepeat(false).
-        condition(new QnResourceRemovalActionCondition());
+        condition(new QnResourceRemovalActionCondition(this));
 
     factory(Qn::RenameLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::Resource | Qn::Admin).
         text(tr("Rename")).
         shortcut(tr("F2")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout)));
+        condition(new QnResourceActionCondition(QnResourceActionCondition::AllMatch, hasFlags(QnResource::layout), this));
 }
 
 QnActionManager::~QnActionManager() {
     qDeleteAll(m_actionById);
-}
-
-void QnActionManager::setContext(QnWorkbenchContext *context) {
-    m_context = context;
 }
 
 void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) {

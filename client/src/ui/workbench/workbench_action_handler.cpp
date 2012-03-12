@@ -70,56 +70,11 @@ void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const 
 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
-    m_context(NULL),
+    QnWorkbenchContextAware(parent),
     m_connection(QnAppServerConnectionFactory::createConnection()),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope)
-{}
-
-QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
-    setContext(NULL);
-}
-
-QnWorkbench *QnWorkbenchActionHandler::workbench() const {
-    return m_context ? m_context->workbench() : NULL;
-}
-
-QnWorkbenchSynchronizer *QnWorkbenchActionHandler::synchronizer() const {
-    return m_context ? m_context->synchronizer() : NULL;
-}
-
-QnWorkbenchLayoutSnapshotManager *QnWorkbenchActionHandler::snapshotManager() const {
-    return m_context ? m_context->snapshotManager() : NULL;
-}
-
-QnActionManager *QnWorkbenchActionHandler::menu() const {
-    return m_context ? m_context->menu() : NULL;
-}
-
-QAction *QnWorkbenchActionHandler::action(const Qn::ActionId id) {
-    return m_context ? m_context->action(id) : NULL;
-}
-
-QnResourcePool *QnWorkbenchActionHandler::resourcePool() const {
-    return m_context ? m_context->resourcePool() : NULL;
-}
-
-void QnWorkbenchActionHandler::setContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL)
-        deinitialize();
-
-    m_context = context;
-
-    if(m_context != NULL)
-        initialize();
-}
-
-void QnWorkbenchActionHandler::initialize() {
-    assert(m_context != NULL);
-
+{
     connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_context_aboutToBeDestroyed()));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(submitDelayedDrops()), Qt::QueuedConnection);
@@ -173,9 +128,7 @@ void QnWorkbenchActionHandler::initialize() {
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
 }
 
-void QnWorkbenchActionHandler::deinitialize() {
-    assert(m_context != NULL);
-
+QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     disconnect(context(), NULL, this, NULL);
     disconnect(workbench(), NULL, this, NULL);
 
@@ -429,10 +382,6 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchActionHandler::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
-}
-
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     if(!user)
         return;

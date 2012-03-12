@@ -92,12 +92,13 @@ namespace {
 } // anonymous namespace
 
 
-QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
-    : QWidget(parent, flags | Qt::CustomizeWindowHint),
-      m_controller(0),
-      m_drawCustomFrame(false),
-      m_titleVisible(true),
-      m_dwm(NULL)
+QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags): 
+    QWidget(parent, flags | Qt::CustomizeWindowHint),
+    QnWorkbenchContextAware(new QnWorkbenchContext(qnResPool, this)),
+    m_controller(0),
+    m_drawCustomFrame(false),
+    m_titleVisible(true),
+    m_dwm(NULL)
 {
     /* We want to receive system menu event on Windows. */
     QnSystemMenuEvent::initialize();
@@ -146,9 +147,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
 
 
     /* Set up model & control machinery. */
-    m_context = new QnWorkbenchContext(qnResPool, this);
-
-    m_display = new QnWorkbenchDisplay(m_context, this);
+    m_display = new QnWorkbenchDisplay(context(), this);
 	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);
@@ -159,7 +158,6 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     m_ui->setFlags(QnWorkbenchUi::HIDE_WHEN_ZOOMED | QnWorkbenchUi::AFFECT_MARGINS_WHEN_NORMAL);
 
     m_actionHandler = new QnWorkbenchActionHandler(this);
-    m_actionHandler->setContext(m_context);
     m_actionHandler->setWidget(this);
 
     /* Set up actions. */
@@ -198,7 +196,6 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-    m_tabBar->setContext(m_context);
 
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
@@ -259,14 +256,6 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags)
 QnMainWindow::~QnMainWindow()
 {
     return;
-}
-
-QAction *QnMainWindow::action(const Qn::ActionId id) const {
-    return m_context ? m_context->action(id) : NULL;
-}
-
-QnActionManager *QnMainWindow::menu() const {
-    return m_context ? m_context->menu() : NULL;
 }
 
 void QnMainWindow::setTitleVisible(bool visible) 
@@ -535,7 +524,7 @@ void QnMainWindow::dragLeaveEvent(QDragLeaveEvent *) {
 }
 
 void QnMainWindow::dropEvent(QDropEvent *event) {
-    m_context->menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_dropResources);
+    menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_dropResources);
 
     event->acceptProposedAction();
 }

@@ -11,6 +11,7 @@
 #include "recording/time_period.h"
 #include "workbench.h"
 #include "workbench_item.h" /* For QnWorkbenchItem::ItemFlag. */
+#include "workbench_context_aware.h"
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -47,7 +48,7 @@ class CLCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public QObject, protected AnimationTimerListener, protected SceneUtility {
+class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected AnimationTimerListener, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
     Q_ENUMS(Layer);
@@ -132,17 +133,6 @@ public:
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument() const {
         return m_selectionOverlayHackInstrument;
     }
-
-    QnWorkbenchContext *context() const {
-        return m_context;
-    }
-    
-    /**
-     * Note that this function never returns NULL.
-     * 
-     * \returns                         Current workbench of this workbench display. 
-     */
-    QnWorkbench *workbench() const;
 
     /**
      * Note that this function never returns NULL.
@@ -331,7 +321,6 @@ protected slots:
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
 
-    void at_context_aboutToBeDestroyed();
     void at_workbench_modeChanged();
     void at_workbench_itemChanged(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
     void at_workbench_itemChanged(QnWorkbench::ItemRole role);
@@ -358,9 +347,6 @@ protected slots:
 
 private:
     /* Directly visible state */
-
-    /** Current context. */
-    QnWorkbenchContext *m_context;
 
     /** Current scene. */
     QGraphicsScene *m_scene;

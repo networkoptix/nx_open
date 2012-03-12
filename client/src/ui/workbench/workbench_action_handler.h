@@ -8,6 +8,7 @@
 
 #include <api/AppServerConnection.h>
 #include <ui/actions/actions.h>
+#include "workbench_context_aware.h"
 
 class QAction;
 class QMenu;
@@ -44,30 +45,11 @@ namespace detail {
 /**
  * This class implements logic for client actions.
  */
-class QnWorkbenchActionHandler: public QObject {
+class QnWorkbenchActionHandler: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
-
     virtual ~QnWorkbenchActionHandler();
-
-    QnWorkbenchContext *context() const {
-        return m_context;
-    }
-
-    QnWorkbench *workbench() const;
-
-    QnWorkbenchSynchronizer *synchronizer() const;
-
-    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
-
-    QnActionManager *menu() const;
-
-    QAction *action(const Qn::ActionId id);
-
-    QnResourcePool *resourcePool() const;
-
-    void setContext(QnWorkbenchContext *context);
 
     QWidget *widget() const;
 
@@ -76,9 +58,6 @@ public:
     }
 
 protected:
-    void initialize();
-    void deinitialize();
-
     const QnAppServerConnectionPtr &connection() const;
 
     QString newLayoutName() const;
@@ -103,7 +82,6 @@ protected slots:
     void submitDelayedDrops();
 
 protected slots:
-    void at_context_aboutToBeDestroyed();
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
 
@@ -164,7 +142,6 @@ protected slots:
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
-    QnWorkbenchContext *m_context;
     QWeakPointer<QWidget> m_widget;
     QnAppServerConnectionPtr m_connection;
 

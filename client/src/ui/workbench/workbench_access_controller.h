@@ -3,24 +3,28 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
+#include "workbench_context_aware.h"
 
 class QnWorkbenchContext;
 class QnResourcePool;
 
 namespace Qn {
     enum Permission {
-        /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
+        /** Generic read access. Having this access right doesn't necessary mean that all information is readable. */
         ReadPermission              = 0x00000001,   
 
-        /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
+        /** Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
         WritePermission             = 0x00000002,   
 
-        /**< Generic save access. Entity can be saved to appserver. */
+        /** Generic save access. Entity can be saved to appserver. */
         SavePermission              = 0x00000004,   
 
-        /**< Permission to edit user's password. */
-        WritePasswordPermission     = 0x00000010,
 
+        /** Permission to view associated password. Note that not all passwords are viewable even with this flag. */
+        ReadPasswordPermission      = 0x00000008,
+
+        /** Permission to edit associated password. */
+        WritePasswordPermission     = 0x00000010,
     };
 
     Q_DECLARE_FLAGS(Permissions, Permission);
@@ -35,20 +39,11 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions);
  * 
  * It hides resources that cannot be viewed by the user that is currently logged in.
  */
-class QnWorkbenchAccessController: public QObject {
+class QnWorkbenchAccessController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnWorkbenchAccessController(QObject *parent = NULL);
-
     virtual ~QnWorkbenchAccessController();
-
-    void setContext(QnWorkbenchContext *context);
-
-    QnWorkbenchContext *context() const {
-        return m_context;
-    }
-
-    QnResourcePool *resourcePool() const;
 
     Qn::Permissions permissions(const QnResourcePtr &resource);
 
@@ -62,12 +57,10 @@ protected:
     bool isAdmin() const;
 
 protected slots:
-    void at_context_aboutToBeDestroyed();
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
 
 private:
-    QnWorkbenchContext *m_context;
     QnUserResourcePtr m_user;
 };
 

@@ -28,7 +28,7 @@ extern "C" {
 	#include <libavutil/avstring.h>
 }
 
-#include "qsimd_p.h"
+#include "utils/media/sse_helper.h"
 
 #if defined __cplusplus
 // stl headers

@@ -6,6 +6,7 @@
 #include <ui/common/scene_utility.h>
 #include <ui/actions/action_target_provider.h>
 #include "workbench.h" /* For QnWorkbench::ItemRole. */
+#include "workbench_context_aware.h"
 
 class QGraphicsProxyWidget;
 
@@ -34,7 +35,7 @@ class QnHelpWidget;
 class QnActionManager;
 class QnLayoutTabBar;
 
-class QnWorkbenchUi: public QObject, public QnActionTargetProvider, protected SceneUtility {
+class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, protected SceneUtility {
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 
@@ -56,8 +57,6 @@ public:
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     QnWorkbenchDisplay *display() const;
-
-    QnWorkbench *workbench() const;
 
     Flags flags() const {
         return m_flags;
@@ -149,9 +148,6 @@ protected:
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-
-    QAction *action(const Qn::ActionId id) const;
-    QnActionManager *menu() const;
 
 protected slots:
     void updateHelpContext();

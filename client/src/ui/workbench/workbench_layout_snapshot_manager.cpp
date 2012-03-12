@@ -41,44 +41,20 @@ void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByt
 // -------------------------------------------------------------------------- //
 QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *parent):    
     QObject(parent),
-    m_context(NULL),
+    QnWorkbenchContextAware(parent),
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this)),
     m_connection(QnAppServerConnectionFactory::createConnection())
-{}
-
-QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
-    setContext(NULL);
-}
-
-void QnWorkbenchLayoutSnapshotManager::setContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL)
-        stop();
-
-    m_context = context;
-
-    if(m_context != NULL)
-        start();
-}
-
-void QnWorkbenchLayoutSnapshotManager::start() {
-    assert(m_context != NULL);
-
+{
     /* Start listening to changes. */
-    connect(context(),                  SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
-    connect(context()->resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    connect(context()->resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
 
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::stop() {
-    assert(m_context != NULL);
-
-    disconnect(context(), NULL, this, NULL);
+QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
+    disconnect(resourcePool(), NULL, this, NULL);
 
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResources())
         at_resourcePool_resourceRemoved(resource);
@@ -164,10 +140,6 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutSnapshotManager::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
-}
-
 void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
     if(!layoutResource)

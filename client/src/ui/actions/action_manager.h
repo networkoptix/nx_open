@@ -7,6 +7,7 @@
 #include <QVariant>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -18,18 +19,12 @@ class QnActionFactory;
 class QnActionBuilder;
 class QnWorkbenchContext;
 
-class QnActionManager: public QObject {
+class QnActionManager: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnActionManager(QObject *parent = NULL);
 
     virtual ~QnActionManager();
-
-    QnWorkbenchContext *context() {
-        return m_context.data();
-    }
-
-    void setContext(QnWorkbenchContext *context);
 
     QAction *action(Qn::ActionId id) const;
 
@@ -138,9 +133,6 @@ private slots:
     void at_menu_aboutToShow();
 
 private:
-    /** Associated workbench context. */
-    QWeakPointer<QnWorkbenchContext> m_context;
-
     /** Mapping from action id to action data. */ 
     QHash<Qn::ActionId, QnAction *> m_actionById;
 

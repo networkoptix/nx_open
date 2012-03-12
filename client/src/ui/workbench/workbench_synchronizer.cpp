@@ -10,57 +10,32 @@
 #include "workbench_context.h"
 
 QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
-    QObject(NULL),
-    m_context(NULL),
+    QObject(parent),
+    QnWorkbenchContextAware(parent),
     m_update(false),
     m_submit(false)
-{}
-
-QnWorkbenchSynchronizer::~QnWorkbenchSynchronizer() {
-    setContext(NULL);
-}
-
-void QnWorkbenchSynchronizer::setContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL) 
-        stop();
-
-    m_context = context;
-
-    if(m_context != NULL) 
-        start();
-}
-
-void QnWorkbenchSynchronizer::start() {
-    assert(m_context != NULL);
-
+{
     /* Clean workbench's layouts. */
-    while(!context()->workbench()->layouts().isEmpty())
-        delete context()->workbench()->layouts().back();
+    while(!workbench()->layouts().isEmpty())
+        delete workbench()->layouts().back();
 
     /* Start listening to changes. */
-    connect(context(),                  SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
-    connect(context()->resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    connect(context()->workbench(),     SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()));
+    connect(resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(workbench(),     SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()));
 
     m_submit = m_update = true;
 }
 
-void QnWorkbenchSynchronizer::stop() {
-    assert(m_context != NULL);
-
+QnWorkbenchSynchronizer::~QnWorkbenchSynchronizer() {
     m_submit = m_update = false;
 
     /* Stop listening to changes. */
-    disconnect(context(), NULL, this, NULL);
-    disconnect(context()->resourcePool(), NULL, this, NULL);
-    disconnect(context()->workbench(), NULL, this, NULL);
+    disconnect(resourcePool(), NULL, this, NULL);
+    disconnect(workbench(), NULL, this, NULL);
 
     /* Clean workbench's layouts. */
-    while(!context()->workbench()->layouts().isEmpty())
-        delete context()->workbench()->layouts().back();
+    while(!workbench()->layouts().isEmpty())
+        delete workbench()->layouts().back();
 }
 
 void QnWorkbenchSynchronizer::submit() {
@@ -73,7 +48,7 @@ void QnWorkbenchSynchronizer::submit() {
      *
      * New layout may have been added, and in this case we need to create a new
      * resource for it. */
-    foreach(QnWorkbenchLayout *layout, context()->workbench()->layouts()) {
+    foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
         QnLayoutResourcePtr resource = layout->resource();
 
         if(resource.isNull()) { 
@@ -85,7 +60,7 @@ void QnWorkbenchSynchronizer::submit() {
             synchronizer->setAutoDeleting(true);
             synchronizer->submit();
 
-            context()->resourcePool()->addResource(resource);
+            resourcePool()->addResource(resource);
             if(context()->user())
                 context()->user()->addLayout(resource); /* Leave layout a toplevel resource if there is no current user. */
         }
@@ -96,10 +71,6 @@ void QnWorkbenchSynchronizer::submit() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchSynchronizer::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
-}
-
 void QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     if(!m_update)
         return;

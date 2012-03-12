@@ -31,19 +31,10 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     /* Create dependent objects. */
     m_menu = new QnActionManager(this);
-    m_menu->setContext(this);
-
     m_synchronizer = new QnWorkbenchSynchronizer(this);
-    m_synchronizer->setContext(this);
-
     m_snapshotManager = new QnWorkbenchLayoutSnapshotManager(this);
-    m_snapshotManager->setContext(this);
-
     m_visibilityController = new QnWorkbenchLayoutVisibilityController(this);
-    m_visibilityController->setContext(this);
-
     m_accessController = new QnWorkbenchAccessController(this);
-    m_accessController->setContext(this);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {

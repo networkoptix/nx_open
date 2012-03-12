@@ -8,43 +8,15 @@
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     QObject(parent),
-    m_context(NULL)
-{}
-
-QnWorkbenchAccessController::~QnWorkbenchAccessController() {
-    setContext(NULL);
-}
-
-QnResourcePool *QnWorkbenchAccessController::resourcePool() const {
-    return m_context ? m_context->resourcePool() : NULL;
-}
-
-void QnWorkbenchAccessController::setContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL)
-        stop();
-
-    m_context = context;
-
-    if(m_context != NULL)
-        start();
-}
-
-void QnWorkbenchAccessController::start() {
-    assert(context() != NULL);
-
-    connect(context(),      SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
+    QnWorkbenchContextAware(parent)
+{
     connect(context(),      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
 
     at_context_userChanged(context()->user());
 }
 
-void QnWorkbenchAccessController::stop() {
-    assert(context() != NULL);
-
+QnWorkbenchAccessController::~QnWorkbenchAccessController() {
     disconnect(context(), NULL, this, NULL);
     disconnect(resourcePool(), NULL, this, NULL);
 
@@ -108,10 +80,6 @@ void QnWorkbenchAccessController::updateVisibility(const QnUserResourcePtr &user
 void QnWorkbenchAccessController::updateVisibility(const QnUserResourceList &users) {
     foreach(const QnUserResourcePtr &user, users)
         updateVisibility(user);
-}
-
-void QnWorkbenchAccessController::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
 }
 
 void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr &) {
