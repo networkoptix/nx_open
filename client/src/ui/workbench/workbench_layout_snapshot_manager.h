@@ -116,6 +116,8 @@ protected:
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
 
+    QnAppServerConnectionPtr connection() const;
+
 protected slots:
     void at_context_aboutToBeDestroyed();
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -136,9 +138,6 @@ private:
 
     /** Layout to flags mapping. */
     QHash<QnLayoutResourcePtr, Qn::LayoutFlags> m_flagsByLayout;
-
-    /** Appserver connection. */
-    QnAppServerConnectionPtr m_connection;
 };
 
 

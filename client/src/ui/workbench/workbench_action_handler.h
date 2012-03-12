@@ -79,7 +79,7 @@ protected:
     void initialize();
     void deinitialize();
 
-    const QnAppServerConnectionPtr &connection() const;
+    QnAppServerConnectionPtr connection() const;
 
     QString newLayoutName() const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
@@ -166,7 +166,6 @@ private:
 
     QnWorkbenchContext *m_context;
     QWeakPointer<QWidget> m_widget;
-    QnAppServerConnectionPtr m_connection;
 
     QScopedPointer<QMenu> m_mainMenu;
     

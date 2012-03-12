@@ -71,7 +71,6 @@ void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const 
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
     m_context(NULL),
-    m_connection(QnAppServerConnectionFactory::createConnection()),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope)
 {}
@@ -183,8 +182,8 @@ void QnWorkbenchActionHandler::deinitialize() {
         disconnect(action, NULL, this, NULL);
 }
 
-const QnAppServerConnectionPtr &QnWorkbenchActionHandler::connection() const {
-    return m_connection;
+QnAppServerConnectionPtr QnWorkbenchActionHandler::connection() const {
+    return QnAppServerConnectionFactory::createConnection();
 }
 
 QWidget *QnWorkbenchActionHandler::widget() const {

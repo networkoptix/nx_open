@@ -28,7 +28,6 @@ private slots:
     void connectionClosed(QString errorString);
 
 private:
-    QnAppServerConnectionPtr m_connection;
     QSharedPointer<QnEventSource> m_source;
 };
 
