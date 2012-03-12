@@ -65,7 +65,7 @@ void QnAction::removeChild(QnAction *action) {
     m_children.removeOne(action);
 }
 
-Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) const {
+Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QVariant &items, const QVariantMap &params) const {
     if(!(this->scope() & scope) && scope != this->scope())
         return Qn::InvisibleAction;
 
@@ -96,6 +96,8 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScope scope, const QVari
                 resources = QnActionTargetTypes::resources(params.value(key));
             } else if(key == Qn::CurrentLayoutParameter) {
                 resources.push_back(context()->workbench()->currentLayout()->resource());
+            } else if(key == Qn::CurrentUserParameter) {
+                resources.push_back(context()->user());
             }
 
             if(resources.empty() && key.isEmpty()) {
@@ -145,10 +147,10 @@ bool QnAction::event(QEvent *event) {
         } 
 
         QVariant target;
-        QnActionTargetProvider *targetProvider = menu()->targetProvider();
+        QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider();
         if(targetProvider != NULL) {
             if(flags() & Qn::ScopelessHotkey) {
-                target = targetProvider->currentTarget(scope());
+                target = targetProvider->currentTarget(static_cast<Qn::ActionScope>(static_cast<int>(scope())));
             } else {
                 Qn::ActionScope scope = targetProvider->currentScope();
                 if(this->scope() & scope)
@@ -157,7 +159,7 @@ bool QnAction::event(QEvent *event) {
         }
 
         if(checkCondition(scope(), target, QVariantMap()) == Qn::EnabledAction)
-            menu()->trigger(m_id, target);
+            QnWorkbenchContextAware::menu()->trigger(m_id, target);
         return true;
     }
     

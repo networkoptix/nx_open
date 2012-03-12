@@ -775,6 +775,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
             at_resource_itemAdded(layout, item);
+
+    updateBastard(resource, layout);
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {

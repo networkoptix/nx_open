@@ -93,6 +93,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
+    connect(action(Qn::OpenInCurrentLayoutAction),          SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
     connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenInNewWindowAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
     connect(action(Qn::OpenSingleLayoutAction),             SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
@@ -371,7 +372,7 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         data.toMimeData(&mimeData);
 
         QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        menu()->trigger(Qn::OpenInLayoutAction, resources);
+        menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
     }
 
     m_delayedDrops.clear();
@@ -416,8 +417,10 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     QnLayoutResourcePtr layout = menu()->currentParameter(sender(), Qn::LayoutParameter).value<QnLayoutResourcePtr>();
-    if(!layout)
-        layout = workbench()->currentLayout()->resource();
+    if(!layout) {
+        qnWarning("No layout provided.");
+        return;
+    }
 
     QPointF position = menu()->currentParameter(sender(), Qn::GridPositionParameter).toPointF();
 
@@ -435,9 +438,16 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     }
 }
 
+void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
+    QVariantMap params = menu()->currentParameters(sender());
+    params[Qn::LayoutParameter] = QVariant::fromValue(workbench()->currentLayout()->resource());
+
+    menu()->trigger(Qn::OpenInLayoutAction, menu()->currentTarget(sender()), params);
+};
+
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(Qn::OpenNewTabAction);
-    menu()->trigger(Qn::OpenInLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+    menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
@@ -622,7 +632,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     } else {
         /* No layouts? Just open dropped media. */
-        menu()->trigger(Qn::OpenInLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+        menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
     }
 }
 

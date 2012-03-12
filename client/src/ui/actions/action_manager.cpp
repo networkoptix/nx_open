@@ -92,6 +92,14 @@ public:
 
     QnActionBuilder requiredPermissions(Qn::Permissions permissions) {
         m_action->setRequiredPermissions(permissions);
+
+        return *this;
+    }
+
+    QnActionBuilder requiredPermissions(const QString &key, Qn::Permissions permissions) {
+        m_action->setRequiredPermissions(key, permissions);
+
+        return *this;
     }
 
     QnActionBuilder separator(bool isSeparator = true) {
@@ -181,9 +189,9 @@ namespace {
     }
 
     bool checkType(const QVariant &items) {
-        int type = items.userType();
-        if(type != QnActionTargetTypes::resourceList() && type != QnActionTargetTypes::widgetList() && type != QnActionTargetTypes::layoutItemList() && type != QnActionTargetTypes::layoutList()) {
-            qnWarning("Unrecognized menu target type '%1'.", items.typeName());
+        Qn::ActionTargetType type = QnActionTargetTypes::type(items);
+        if(type == 0) {
+            qnWarning("Unrecognized action target type '%1'.", items.typeName());
             return false;
         }
 
@@ -241,7 +249,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::MoveCameraAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
-        requiredPermissions(Qn::DeletePermission).
+        requiredPermissions(Qn::RemovePermission).
         text(tr("Move Cameras")).
         condition(hasFlags(QnResource::network));
 
@@ -266,6 +274,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SelectionChangeAction).
         flags(Qn::NoTarget).
         text(tr("Selection Changed"));
+
 
 
     /* Context menu actions. */
@@ -315,13 +324,16 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
+        requiredPermissions(Qn::CurrentLayoutParameter, Qn::SavePermission).
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
         condition(new QnSaveLayoutActionCondition(true, this));
 
     factory(Qn::SaveCurrentLayoutAsAction).
-        flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::Admin).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::CreateLayoutPermission).
+        requiredPermissions(Qn::CurrentLayoutParameter, Qn::SavePermission).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false);
@@ -332,14 +344,16 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory.enterSubMenu(); {
         factory(Qn::OpenFileAction).
-            flags(Qn::Main | Qn::EditLayout).
+            flags(Qn::Main).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("File(s)...")).
             shortcut(tr("Ctrl+O")).
             autoRepeat(false).
             icon(qnSkin->icon("folder.png"));
 
         factory(Qn::OpenFolderAction).
-            flags(Qn::Main | Qn::EditLayout).
+            flags(Qn::Main).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Folder..."));
     } factory.leaveSubMenu();
 
@@ -437,8 +451,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Resource actions. */
     factory(Qn::OpenInLayoutAction).
-        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::EditLayout).
+        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::LayoutParameter, Qn::WritePermission).
         text(tr("Open"));
+
+    factory(Qn::OpenInCurrentLayoutAction).
+        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+        text(tr("Open in Current Layout"));
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -466,12 +486,15 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::SaveLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::Admin).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::SavePermission).
         text(tr("Save Layout")).
         condition(new QnSaveLayoutActionCondition(false, this));
 
     factory(Qn::SaveLayoutAsAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::Admin).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::SavePermission).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::CreateLayoutPermission).
         text(tr("Save Layout As...")).
         condition(hasFlags(QnResource::layout));
 
@@ -557,14 +580,16 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnLayoutItemRemovalActionCondition(this));
 
     factory(Qn::RemoveFromServerAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous | Qn::Admin).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
+        requiredPermissions(Qn::RemovePermission).
         text(tr("Remove from Server")).
         shortcut(tr("Del")).
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
     factory(Qn::RenameLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::Admin).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::WritePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
         autoRepeat(false).
@@ -680,7 +705,7 @@ void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, co
         return;
     }
 
-    if(action->checkCondition(static_cast<Qn::ActionScope>(action->scope()), items, params) != Qn::EnabledAction) {
+    if(action->checkCondition(action->scope(), items, params) != Qn::EnabledAction) {
         qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
         return;
     }

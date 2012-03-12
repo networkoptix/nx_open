@@ -7,7 +7,6 @@
 #include "workbench.h"
 #include "workbench_synchronizer.h"
 #include "workbench_layout_snapshot_manager.h"
-#include "workbench_layout_visibility_controller.h"
 #include "workbench_access_controller.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):

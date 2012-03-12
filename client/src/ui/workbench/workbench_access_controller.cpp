@@ -50,7 +50,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         return calculatePermissions(user);
 
-    if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResourcePtr>())
+    if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return calculatePermissions(layout);
 
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
@@ -65,12 +65,12 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
         return Qn::ReadWriteSavePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission;
 
     if(isOwner()) {
-        return Qn::ReadWriteSavePermission | Qn::DeletePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
     } else if(isAdmin()) {
         if(user->isAdmin()) {
             return Qn::ReadPermission;
         } else {
-            return Qn::ReadWriteSavePermission | Qn::DeletePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
         }
     } else {
         return 0;
@@ -79,14 +79,14 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
     if(isAdmin()) {
-        return Qn::ReadWriteSavePermission | Qn::DeletePermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
         if(user != m_user) 
             return 0; /* Viewer can't view other's layouts. */
 
         if(snapshotManager()->isLocal(layout)) {
-            return Qn::ReadPermission | Qn::WritePermission | Qn::DeletePermission; /* Can structurally modify local layouts only. */
+            return Qn::ReadPermission | Qn::WritePermission | Qn::RemovePermission; /* Can structurally modify local layouts only. */
         } else {
             return Qn::ReadPermission;
         }
@@ -95,7 +95,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) {
     if(isAdmin()) {
-        return Qn::ReadWriteSavePermission | Qn::DeletePermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         return Qn::ReadPermission;
     }
@@ -103,7 +103,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtua
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &server) {
     if(isAdmin()) {
-        return Qn::ReadWriteSavePermission | Qn::DeletePermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         return Qn::ReadPermission;
     }

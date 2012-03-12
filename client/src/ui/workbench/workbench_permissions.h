@@ -15,7 +15,7 @@ namespace Qn {
         SavePermission              = 0x00000004,   
 
         /** Generic delete permission. */
-        DeletePermission            = 0x00000008,
+        RemovePermission            = 0x00000008,
 
         /** Generic read-write-save permission. */
         ReadWriteSavePermission     = ReadPermission | WritePermission | SavePermission,

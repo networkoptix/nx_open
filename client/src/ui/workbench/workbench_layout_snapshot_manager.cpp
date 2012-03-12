@@ -44,10 +44,6 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
     QnWorkbenchContextAware(parent),
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
 {
-QnAppServerConnectionPtr QnWorkbenchLayoutSnapshotManager::connection() const {
-    return QnAppServerConnectionFactory::createConnection();
-}
-
     /* Start listening to changes. */
     connect(resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     connect(resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
@@ -64,6 +60,10 @@ QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
 
     m_storage->clear();
     m_flagsByLayout.clear();
+}
+
+QnAppServerConnectionPtr QnWorkbenchLayoutSnapshotManager::connection() const {
+    return QnAppServerConnectionFactory::createConnection();
 }
 
 Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {

@@ -11,6 +11,7 @@ namespace Qn {
     inline QLatin1String qn_serverParameter()               { return QLatin1String("_qn_server"); }
     inline QLatin1String qn_layoutParameter()               { return QLatin1String("_qn_layoutParameter"); }
     inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
+    inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
@@ -19,6 +20,7 @@ namespace Qn {
 #define ServerParameter qn_serverParameter()
 #define LayoutParameter qn_layoutParameter()
 #define CurrentLayoutParameter qn_currentLayoutParameter()
+#define CurrentUserParameter qn_currentUserParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
 
     /**
@@ -203,9 +205,18 @@ namespace Qn {
          * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
          * If not provided, Items will be dropped at the center of the layout.
          * <tt>QnLayoutResourcePtr LayoutParameter</tt> --- layout to drop at.
-         * If not provided, current layout will be used.
          */ 
         OpenInLayoutAction,
+
+        /**
+         * Opens selected resources in current layout.
+         * 
+         * Parameters:
+         * 
+         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         * If not provided, Items will be dropped at the center of the layout.
+         */ 
+        OpenInCurrentLayoutAction,
 
         /**
          * Opens selected resources in a new layout.
@@ -307,7 +318,7 @@ namespace Qn {
         DeleteFromDiskAction,
 
         /**
-         * Removes an item from a layout.
+         * Removes item(s) from layout(s).
          */
         RemoveLayoutItemAction,
 

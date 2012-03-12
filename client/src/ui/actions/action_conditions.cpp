@@ -7,6 +7,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include "action_target_types.h"
@@ -70,7 +71,7 @@ Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceW
         if(!isCamera)
             continue;
 
-        if(widget->isMotionGridDisplayed() == m_requiredGridDisplayValue) {
+        if(widget->isMotionGridDisplayed() == m_requiredGridDisplayValue)
             return Qn::EnabledAction;
     }
 
@@ -130,16 +131,6 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(!resource)
             continue; /* OK to remove. */
 
-        if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
-            if(user->getName() == QLatin1String("admin"))
-                return Qn::InvisibleAction; /* Can't delete superadmin. */
-
-            if(user == context()->user())
-                return Qn::InvisibleAction; /* Can't delete self from server. */
-
-            continue;            
-        }
-
         if(resource->checkFlags(QnResource::layout))
             continue; /* OK to remove. */
 
@@ -155,13 +146,8 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 
 
 Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
-    QnUserResourcePtr user = context()->user();
-    bool isAdmin = user && user->isAdmin();
-    if(isAdmin)
-        return Qn::EnabledAction;
-
     foreach(const QnLayoutItemIndex &item, layoutItems)
-        if(!snapshotManager()->isLocal(item.layout()))
+        if(!(accessController()->permissions(item.layout()) & Qn::WritePermission))
             return Qn::DisabledAction;
 
     return Qn::EnabledAction;

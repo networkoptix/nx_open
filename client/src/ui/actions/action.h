@@ -74,13 +74,10 @@ public:
 
     void removeChild(QnAction *action);
 
-    Qn::ActionVisibility checkCondition(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) const;
+    Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QVariant &items, const QVariantMap &params) const;
 
 protected:
     virtual bool event(QEvent *event) override;
-
-    template<class ItemSequence>
-    bool satisfiesConditionInternal(Qn::ActionScope scope, const ItemSequence &items) const;
 
 private slots:
     void at_toggled(bool checked);
