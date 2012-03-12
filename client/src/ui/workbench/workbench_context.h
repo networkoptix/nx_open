@@ -14,7 +14,6 @@ class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
-class QnWorkbenchLayoutVisibilityController;
 class QnWorkbenchAccessController;
 class QnActionManager;
 
@@ -75,7 +74,6 @@ private:
     QScopedPointer<QnResourcePoolUserWatcher> m_userWatcher;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
-    QScopedPointer<QnWorkbenchLayoutVisibilityController> m_visibilityController;
     QScopedPointer<QnWorkbenchAccessController> m_accessController;
     QScopedPointer<QnActionManager> m_menu;
 };

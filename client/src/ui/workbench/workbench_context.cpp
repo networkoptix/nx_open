@@ -33,7 +33,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_menu.reset(new QnActionManager(this));
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
-    m_visibilityController.reset(new QnWorkbenchLayoutVisibilityController(this));
     m_accessController.reset(new QnWorkbenchAccessController(this));
 }
 

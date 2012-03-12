@@ -772,6 +772,7 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     Node *node = this->node(resource);
 
+    node->setBastard(snapshotManager()->isLocal(resource));
     node->setModified(snapshotManager()->isModified(resource));
 }
 

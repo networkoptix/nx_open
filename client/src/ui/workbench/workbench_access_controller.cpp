@@ -12,6 +12,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
 {
     connect(context(),      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
 
     at_context_userChanged(context()->user());
 }
@@ -23,76 +24,103 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
     at_context_userChanged(QnUserResourcePtr());
 }
 
+bool QnWorkbenchAccessController::isOwner() const {
+    return m_user && m_user->isAdmin() && m_user->getName() == QLatin1String("admin");
+}
+
 bool QnWorkbenchAccessController::isAdmin() const {
     return m_user && m_user->isAdmin();
 }
 
-#if 0
-bool QnWorkbenchAccessController::canRead(const QnUserResourcePtr &user) {
-    if(isAdmin())
-        return true;
+Qn::Permissions QnWorkbenchAccessController::calculateGlobalPermissions() {
+    if(isOwner() || isAdmin())
+        return Qn::CreateUserPermission;
 
+    return 0;
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) {
+    if(!resource)
+        return calculateGlobalPermissions();
+
+    QnResource::Status status = resource->getStatus();
+    if(status == QnResource::Disabled)
+        return 0;
+
+    if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        return calculatePermissions(user);
+
+    if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResourcePtr>())
+        return calculatePermissions(layout);
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
     if(user == m_user)
-        return true;
+        return Qn::ReadWriteSavePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission;
 
-    return false;
+    if(isOwner()) {
+        return Qn::ReadWriteSavePermission | Qn::DeletePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+    } else if(isAdmin()) {
+        if(user->isAdmin()) {
+            return Qn::ReadPermission;
+        } else {
+            return Qn::ReadWriteSavePermission | Qn::DeletePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+        }
+    } else {
+        return 0;
+    }
 }
 
-bool QnWorkbenchAccessController::canWrite(const QnUserResourcePtr &user) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
+    if(isAdmin()) {
+        return Qn::ReadWriteSavePermission | Qn::DeletePermission;
+    } else {
+        QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
+        if(user != m_user) 
+            return 0; /* Viewer can't view other's layouts. */
+
+        if(snapshotManager()->isLocal(layout)) {
+            return Qn::ReadPermission | Qn::WritePermission; /* Can structurally modify local layouts only. */
+        } else {
+            return Qn::ReadPermission;
+        }
+    }
+}
+
+void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr &resource) {
+    setPermissionsInternal(resource, calculatePermissions(resource));
+}
+
+void QnWorkbenchAccessController::updatePermissions(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources)
+        updatePermissions(resource);
 
 }
 
-bool QnWorkbenchAccessController::canSave(const QnUserResourcePtr &user) {
-    if(isAdmin())
-        return true;
+void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions) {
+    if(permissions == this->permissions(resource))
+        return;
 
-    return m_user == user;
+    m_permissionsByResource[resource] = permissions;
+    emit permissionsChanged(resource);
 }
 
-bool QnWorkbenchAccessController::canRead(const QnLayoutResourcePtr &layout) {
-    if(isAdmin())
-        return true;
 
-    QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
-    return user == m_user;
-}
-
-bool QnWorkbenchAccessController::canWrite(const QnLayoutResourcePtr &layout) {
-    if(isAdmin())
-        return true;
-
-    /* Non-admins can structurally modify local layouts only. */
-    return context()->snapshotManager()->isLocal(layout);
-}
-
-bool QnWorkbenchAccessController::canSave(const QnLayoutResourcePtr &layout) {
-    if(isAdmin())
-        return true;
-
-    return false; /* Non-admins cannot save layouts. */
-}
-#endif
-
-void QnWorkbenchAccessController::updateVisibility(const QnUserResourcePtr &user) {
-    user->setStatus(/*canRead(user)*/ user ? QnResource::Online : QnResource::Disabled);
-}
-
-void QnWorkbenchAccessController::updateVisibility(const QnUserResourceList &users) {
-    foreach(const QnUserResourcePtr &user, users)
-        updateVisibility(user);
-}
-
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
 void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr &) {
     m_user = context()->user();
 
-    updateVisibility(QnResourceCriterion::filter<QnUserResource>(resourcePool()->getResources()));
+    updatePermissions(resourcePool()->getResources());
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user)
-        return;
+    updatePermissions(resource);
+}
 
-    updateVisibility(user);
+void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+    setPermissionsInternal(resource, 0); /* So that the signal is emitted. */
+    m_permissionsByResource.remove(resource);
 }
 
