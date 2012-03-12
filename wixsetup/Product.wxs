@@ -32,6 +32,8 @@
         
         <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
         
+    	<Property Id="INSTALLTYPE" Value="0"/>
+    	
         <Property Id="NEWERFOUND" Secure="yes"/>
         <Property Id="ALLUSERS" Secure="yes"/>
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
@@ -486,9 +488,15 @@
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">NOT NEWERFOUND</Publish>
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
             
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">LicenseAccepted = "1"</Publish>
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">LicenseAccepted = "1"</Publish>
             
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+        	<Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">INSTALLTYPE=0</Publish>
+        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">INSTALLTYPE=1</Publish>
+        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">INSTALLTYPE=2</Publish>
+        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">INSTALLTYPE=3</Publish>
+        	
+            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg" Order="10">
                 <![CDATA[(NOT(&AppServerFeature=3) AND NOT(&ServerFeature=3) AND NOT(&ClientFeature=3))]]>
@@ -526,8 +534,9 @@
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4">1</Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(&AppServerFeature=3)]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature<>3)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">INSTALLTYPE=1 OR INSTALLTYPE=2</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(INSTALLTYPE<>1 AND INSTALLTYPE<>2 AND &AppServerFeature=3)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(INSTALLTYPE<>1 AND INSTALLTYPE<>2 AND &AppServerFeature<>3)]]></Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[(&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
@@ -548,9 +557,10 @@
             <Publish Dialog="ClientDlg" Control="ChangeClientMediaDir" Property="_BrowseProperty" Value="[WIXUI_CLIENT_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="ClientDlg" Control="ChangeClientMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" Order="1"><![CDATA[(NOT Installed AND &ClientFeature = 3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[(NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[(NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1">INSTALLTYPE=0</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &ClientFeature = 3 AND &AppServerFeature<>3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature=3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
             
