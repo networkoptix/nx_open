@@ -9,8 +9,8 @@
 
 class QAction;
 
-class QnResourcePoolUserWatcher;
 class QnResourcePool;
+class QnResourcePoolUserWatcher;
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;

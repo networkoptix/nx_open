@@ -112,9 +112,10 @@ void conn_detail::LicenseReplyProcessor::finished(int status, const QByteArray &
     emit finished(status, errorString, licenses, handle);
 }
 
-QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory)
+QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer)
     : m_url(url),
-      m_resourceFactory(resourceFactory)
+      m_resourceFactory(resourceFactory),
+      m_serializer(serializer)
 {
     m_requestParams.append(QnRequestParam("format", m_serializer.format()));
 }
@@ -462,7 +463,9 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QU
 {
     cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logDEBUG2);
 
-    return QnAppServerConnectionPtr(new QnAppServerConnection(url, *(theAppServerConnectionFactory()->m_resourceFactory)));
+    return QnAppServerConnectionPtr(new QnAppServerConnection(url,
+                                                              *(theAppServerConnectionFactory()->m_resourceFactory),
+                                                               theAppServerConnectionFactory()->m_serializer));
 }
 
 QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()

@@ -58,7 +58,7 @@ public:
     }
 
 protected:
-    const QnAppServerConnectionPtr &connection() const;
+    QnAppServerConnectionPtr connection() const;
 
     QString newLayoutName() const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
@@ -143,7 +143,6 @@ private:
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;
-    QnAppServerConnectionPtr m_connection;
 
     QScopedPointer<QMenu> m_mainMenu;
     

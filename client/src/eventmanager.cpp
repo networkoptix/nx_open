@@ -28,10 +28,6 @@ QnEventManager::QnEventManager()
 
 void QnEventManager::run()
 {
-    // We should invent something here. As there will be a problem if this method will be called when there are some request running.
-    // Currently everything should be fine as run() is called after stopping SessionManager, so there will be no pending request.
-    m_connection = QnAppServerConnectionFactory::createConnection();
-
     m_source->startRequest();
 }
 
@@ -85,7 +81,8 @@ void QnEventManager::eventReceived(QnEvent event)
     }
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
-        m_connection->getResourcesAsync(QString::number(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
+        QnAppServerConnectionFactory::createConnection()->
+            getResourcesAsync(QString::number(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);

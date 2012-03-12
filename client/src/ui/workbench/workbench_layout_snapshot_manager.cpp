@@ -42,9 +42,12 @@ void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByt
 QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *parent):    
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_storage(new QnWorkbenchLayoutSnapshotStorage(this)),
-    m_connection(QnAppServerConnectionFactory::createConnection())
+    m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
 {
+QnAppServerConnectionPtr QnWorkbenchLayoutSnapshotManager::connection() const {
+    return QnAppServerConnectionFactory::createConnection();
+}
+
     /* Start listening to changes. */
     connect(resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     connect(resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
@@ -99,7 +102,7 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &resource,
 
     detail::QnWorkbenchLayoutReplyProcessor *processor = new detail::QnWorkbenchLayoutReplyProcessor(this, resource);
     connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
-    m_connection->saveAsync(resource, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
+    connection()->saveAsync(resource, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
 
     setFlags(resource, flags(resource) | Qn::LayoutIsBeingSaved);
 }
