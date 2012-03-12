@@ -8,68 +8,67 @@
 #include "ui/workbench/workbench_layout_synchronizer.h"
 
 namespace {
-    int qn_widgetListMetaType = 0;
-    int qn_resourceListMetaType = 0;
-    int qn_layoutItemListMetaType = 0;
+    int qn_resource = 0;
+    int qn_user = 0;
+    int qn_layout = 0;
+    int qn_server = 0;
+    int qn_resourceList = 0;
+    int qn_widgetList = 0;
+    int qn_layoutItemList = 0;
     int qn_layoutList = 0;
 
     Q_GLOBAL_STATIC_WITH_INITIALIZER(bool, qn_initializeActionMetaTypes, {
-        qn_widgetListMetaType = qMetaTypeId<QnResourceWidgetList>();
-        qn_resourceListMetaType = qMetaTypeId<QnResourceList>();
-        qn_layoutItemListMetaType = qMetaTypeId<QnLayoutItemIndexList>();
-        qn_layoutList = qMetaTypeId<QnWorkbenchLayoutList>();
+        qn_resource         = qMetaTypeId<QnResourcePtr>();
+        qn_user             = qMetaTypeId<QnUserResourcePtr>();
+        qn_layout           = qMetaTypeId<QnLayoutResourcePtr>();
+        qn_server           = qMetaTypeId<QnVideoServerResourcePtr>();
+        qn_resourceList     = qMetaTypeId<QnResourceList>();
+        qn_widgetList       = qMetaTypeId<QnResourceWidgetList>();
+        qn_layoutItemList   = qMetaTypeId<QnLayoutItemIndexList>();
+        qn_layoutList       = qMetaTypeId<QnWorkbenchLayoutList>();
     });
 
 } // anonymous namespace
-
-int QnActionTargetTypes::resourceList() {
-    return qn_resourceListMetaType;
-}
-
-int QnActionTargetTypes::widgetList() {
-    return qn_widgetListMetaType;
-}
-
-int QnActionTargetTypes::layoutItemList() {
-    return qn_layoutItemListMetaType;
-}
-
-int QnActionTargetTypes::layoutList() {
-    return qn_layoutList;
-}
 
 void QnActionTargetTypes::initialize() {
     qn_initializeActionMetaTypes();
 }
 
 int QnActionTargetTypes::size(const QVariant &items) {
-    if(items.userType() == resourceList()) {
+    int t = items.userType();
+
+    if(t == qn_resourceList) {
         return items.value<QnResourceList>().size();
-    } else if(items.userType() == widgetList()) {
+    } else if(t == qn_widgetList) {
         return items.value<QnResourceWidgetList>().size();
-    } else if(items.userType() == layoutItemList()) {
+    } else if(t == qn_layoutItemList) {
         return items.value<QnLayoutItemIndexList>().size();
-    } else if(items.userType() == layoutList()) {
+    } else if(t == qn_layoutList) {
         return items.value<QnWorkbenchLayoutList>().size();
+    } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
+        return 1;
     } else {
         return 0;
     }
 }
 
-Qn::ActionTarget QnActionTargetTypes::target(const QVariant &items) {
-    if(items.userType() == resourceList()) {
-        return Qn::ResourceTarget;
-    } else if(items.userType() == widgetList()) {
-        return Qn::WidgetTarget;
-    } else if(items.userType() == layoutItemList()) {
-        return Qn::LayoutItemTarget;
-    } else if(items.userType() == layoutList()) {
-        return Qn::LayoutTarget;
+Qn::ActionTargetType QnActionTargetTypes::type(const QVariant &items) {
+    int t = items.userType();
+
+    if(t == qn_resourceList) {
+        return Qn::ResourceType;
+    } else if(t == qn_widgetList) {
+        return Qn::WidgetType;
+    } else if(t == qn_layoutItemList) {
+        return Qn::LayoutItemType;
+    } else if(t == qn_layoutList) {
+        return Qn::LayoutType;
+    } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
+        return Qn::ResourceType;
     } else {
-        return static_cast<Qn::ActionTarget>(0);
+        return static_cast<Qn::ActionTargetType>(0);
     }
 }
-
 
 QnResourcePtr QnActionTargetTypes::resource(QnResourceWidget *widget) {
     if(widget == NULL)
@@ -130,14 +129,28 @@ QnResourceList QnActionTargetTypes::resources(const QnWorkbenchLayoutList &layou
 }
 
 QnResourceList QnActionTargetTypes::resources(const QVariant &items) {
-    if(items.userType() == qn_resourceListMetaType) {
+    int t = items.userType();
+
+    if(t == qn_resourceList) {
         return items.value<QnResourceList>();
-    } else if(items.userType() == qn_widgetListMetaType) {
+    } else if(t == qn_widgetList) {
         return resources(items.value<QnResourceWidgetList>());
-    } else if(items.userType() == qn_layoutItemListMetaType) {
+    } else if(t == qn_layoutItemList) {
         return resources(items.value<QnLayoutItemIndexList>());
-    } else if(items.userType() == qn_layoutList) {
+    } else if(t == qn_layoutList) {
         return resources(items.value<QnWorkbenchLayoutList>());
+    } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
+        QnResourceList result;
+        if(t == qn_resource) {
+            result.push_back(items.value<QnResourcePtr>());
+        } else if(t == qn_user) {
+            result.push_back(items.value<QnUserResourcePtr>());
+        } else if(t == qn_layout) {
+            result.push_back(items.value<QnLayoutResourcePtr>());
+        } else /* if(t == qn_server) */ {
+            result.push_back(items.value<QnVideoServerResourcePtr>());
+        }
+        return result;
     } else {
         return QnResourceList();
     }
@@ -162,9 +175,9 @@ QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QnResourceWidgetLis
 }
 
 QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QVariant &items) {
-    if(items.userType() == qn_layoutItemListMetaType) {
+    if(items.userType() == qn_layoutItemList) {
         return items.value<QnLayoutItemIndexList>();
-    } else if(items.userType() == qn_widgetListMetaType) {
+    } else if(items.userType() == qn_widgetList) {
         return layoutItems(items.value<QnResourceWidgetList>());
     } else {
         return QnLayoutItemIndexList();
@@ -180,7 +193,7 @@ QnWorkbenchLayoutList QnActionTargetTypes::layouts(const QVariant &items) {
 }
 
 QnResourceWidgetList QnActionTargetTypes::widgets(const QVariant &items) {
-    if(items.userType() == qn_widgetListMetaType) {
+    if(items.userType() == qn_widgetList) {
         return items.value<QnResourceWidgetList>();
     } else {
         return QnResourceWidgetList();

@@ -12,6 +12,7 @@ class QnWorkbench;
 class QnResourcePool;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
+class QnWorkbenchAccessController;
 
 class QnWorkbenchContextAware {
 public:
@@ -35,6 +36,8 @@ protected:
     QnWorkbenchSynchronizer *synchronizer() const;
 
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
+
+    QnWorkbenchAccessController *accessController() const;
 
 private:
     QnWorkbenchContext *m_context;

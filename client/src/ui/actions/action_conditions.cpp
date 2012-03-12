@@ -35,22 +35,21 @@ Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layou
     return check(QnActionTargetTypes::resources(layouts));
 };
 
-
 Qn::ActionVisibility QnActionCondition::check(const QVariant &items) {
-    if(items.userType() == QnActionTargetTypes::resourceList()) {
-        return check(items.value<QnResourceList>());
-    } else if(items.userType() == QnActionTargetTypes::widgetList()) {
-        return check(items.value<QnResourceWidgetList>());
-    } else if(items.userType() == QnActionTargetTypes::layoutList()) {
-        return check(items.value<QnWorkbenchLayoutList>());
-    } else if(items.userType() == QnActionTargetTypes::layoutItemList()) {
-        return check(items.value<QnLayoutItemIndexList>());
-    } else {
+    switch(QnActionTargetTypes::type(items)) {
+    case Qn::ResourceType:
+        return check(QnActionTargetTypes::resources(items));
+    case Qn::WidgetType:
+        return check(QnActionTargetTypes::widgets(items));
+    case Qn::LayoutType:
+        return check(QnActionTargetTypes::layouts(items));
+    case Qn::LayoutItemType:
+        return check(QnActionTargetTypes::layoutItems(items));
+    default:
         qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
         return Qn::InvisibleAction;
     }
 }
-
 
 Qn::ActionVisibility QnTargetlessActionCondition::check(const QVariant &items) {
     if(!items.isValid()) {
@@ -71,23 +70,18 @@ Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceW
         if(!isCamera)
             continue;
 
-        if(widget->isMotionGridDisplayed()) {
-            if(m_condition == HasShownGrid)
-                return Qn::EnabledAction;
-        } else {
-            if(m_condition == HasHiddenGrid)
-                return Qn::EnabledAction;
-        }
+        if(widget->isMotionGridDisplayed() == m_requiredGridDisplayValue) {
+            return Qn::EnabledAction;
     }
 
     return Qn::InvisibleAction;
 }
 
 
-QnResourceActionCondition::QnResourceActionCondition(MatchMode matchMode, const QnResourceCriterion &criterion, QObject *parent): 
+QnResourceActionCondition::QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode, QObject *parent): 
     QnActionCondition(parent),
-    m_matchMode(matchMode),
-    m_criterion(criterion)
+    m_criterion(criterion),
+    m_matchMode(matchMode)
 {}
 
 QnResourceActionCondition::~QnResourceActionCondition() {
@@ -107,16 +101,16 @@ bool QnResourceActionCondition::checkInternal(const ItemSequence &sequence) {
     foreach(const Item &item, sequence) {
         bool matches = checkOne(item);
 
-        if(matches && m_matchMode == OneMatches)
+        if(matches && m_matchMode == Qn::Any)
             return true;
 
-        if(!matches && m_matchMode == AllMatch)
+        if(!matches && m_matchMode == Qn::All)
             return false;
     }
 
-    if(m_matchMode == OneMatches) {
+    if(m_matchMode == Qn::Any) {
         return false;
-    } else /* if(m_matchMode == AllMatch) */ {
+    } else /* if(m_matchMode == Qn::All) */ {
         return true;
     }
 }

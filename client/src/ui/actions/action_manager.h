@@ -66,7 +66,7 @@ public:
 
     void setTargetProvider(QnActionTargetProvider *targetProvider);
 
-    Qn::ActionTarget currentTargetType(QnAction *action) const;
+    Qn::ActionTargetType currentTargetType(QnAction *action) const;
 
     QVariantMap currentParameters(QnAction *action) const;
 
@@ -84,7 +84,7 @@ public:
 
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
 
-    Qn::ActionTarget currentTargetType(QObject *sender) const;
+    Qn::ActionTargetType currentTargetType(QObject *sender) const;
 
     QVariantMap currentParameters(QObject *sender) const;
 

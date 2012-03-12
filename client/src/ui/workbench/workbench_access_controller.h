@@ -4,51 +4,10 @@
 #include <QObject>
 #include <core/resource/resource_fwd.h>
 #include "workbench_context_aware.h"
+#include "workbench_permissions.h"
 
 class QnWorkbenchContext;
 class QnResourcePool;
-
-namespace Qn {
-    enum Permission {
-        /** Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        ReadPermission              = 0x00000001,   
-
-        /** Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
-        WritePermission             = 0x00000002,   
-
-        /** Generic save access. Entity can be saved to appserver. */
-        SavePermission              = 0x00000004,   
-
-        /** Generic delete permission. */
-        DeletePermission            = 0x00000008,
-
-        /** Generic read-write-save permission. */
-        ReadWriteSavePermission     = ReadPermission | WritePermission | SavePermission,
-
-
-
-        /** Permission to view associated password. Note that not all passwords are viewable even with this flag. */
-        ReadPasswordPermission      = 0x00000010,
-
-
-
-        /** Permission to edit associated password. */
-        WritePasswordPermission     = 0x00000100,
-
-        /** Permission to edit access rights. */
-        WriteAccessRightsPermission = 0x00000200,
-
-
-        /** Permission to create users. */
-        CreateUserPermission        = 0x00010000,
-    };
-
-    Q_DECLARE_FLAGS(Permissions, Permission);
-
-} // namespace Qn
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions);
-
 
 /**
  * This class implements access control.
@@ -83,10 +42,12 @@ protected slots:
 private:
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
-    Qn::Permissions calculateGlobalPermissions();
     Qn::Permissions calculatePermissions(const QnResourcePtr &resource);
     Qn::Permissions calculatePermissions(const QnUserResourcePtr &user);
     Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout);
+    Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera);
+    Qn::Permissions calculatePermissions(const QnVideoServerResourcePtr &server);
+    Qn::Permissions calculateGlobalPermissions();
 
 private:
     QnUserResourcePtr m_user;

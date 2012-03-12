@@ -48,7 +48,7 @@ public:
         return m_menu.data();
     }
 
-    QnWorkbenchAccessController *acl() const {
+    QnWorkbenchAccessController *accessController() const {
         return m_accessController.data();
     }
 

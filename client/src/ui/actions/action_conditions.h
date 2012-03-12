@@ -9,6 +9,15 @@
 #include "action_fwd.h"
 #include "actions.h"
 
+namespace Qn {
+    enum MatchMode {
+        Any, /**< Match if at least one resource satisfies the criterion. */
+        All, /**< Match only if all resources satisfy the criterion. */
+    };
+
+} // namespace Qn
+
+
 class QnWorkbenchContext;
 
 class QnActionCondition: public QObject, public QnWorkbenchContextAware {
@@ -41,34 +50,21 @@ public:
 
 class QnMotionGridDisplayActionCondition: public QnActionCondition {
 public:
-    /**
-     * Condition to check. 
-     */
-    enum Condition {
-        HasShownGrid,
-        HasHiddenGrid
-    };
-
-    QnMotionGridDisplayActionCondition(Condition condition, QObject *parent = NULL): 
+    QnMotionGridDisplayActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
         QnActionCondition(parent),
-        m_condition(condition)
+        m_requiredGridDisplayValue(requiredGridDisplayValue)
     {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 
 private:
-    Condition m_condition;
+    bool m_requiredGridDisplayValue;
 };
 
 
 class QnResourceActionCondition: public QnActionCondition {
 public:
-    enum MatchMode {
-        OneMatches, /**< Match if at least one resource satisfies the criterion. */
-        AllMatch,   /**< Match only if all resources satisfy the criterion. */
-    };
-
-    QnResourceActionCondition(MatchMode matchMode, const QnResourceCriterion &criterion, QObject *parent = NULL);
+    QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All, QObject *parent = NULL);
 
     virtual ~QnResourceActionCondition();
 
@@ -85,8 +81,8 @@ protected:
     bool checkOne(QnResourceWidget *widget);
 
 private:
-    MatchMode m_matchMode;
     QnResourceCriterion m_criterion;
+    Qn::MatchMode m_matchMode;
 };
 
 

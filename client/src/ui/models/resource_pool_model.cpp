@@ -1,19 +1,25 @@
 #include "resource_pool_model.h"
 #include <cassert>
-#include <QMimeData>
-#include <QUrl>
+
+#include <QtCore/QMimeData>
+#include <QtCore/QUrl>
+#include <QtCore/QCoreApplication>
+
 #include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
+
 #include "file_processor.h"
 
 namespace {
@@ -479,6 +485,7 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent):
     connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
     connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)), Qt::QueuedConnection);
     connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
+    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),  this, SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
 
     QnResourceList resources = resourcePool()->getResources(); 
 
@@ -554,6 +561,19 @@ bool QnResourcePoolModel::isIgnored(const QnResourcePtr &resource) const {
         return true; /* Local server resource is ignored. */
 
     return false;
+}
+
+void QnResourcePoolModel::updateBastard(const QnResourcePtr &resource, const QnLayoutResourcePtr &layout) {
+    if(!resource)
+        return;
+
+    Node *node = this->node(resource);
+
+    bool bastard = !(accessController()->permissions(resource) & Qn::ReadPermission); /* Hide non-readable resources. */
+    if(!bastard && layout)
+        bastard = snapshotManager()->isLocal(layout); /* Hide local layouts. */
+
+    node->setBastard(bastard);
 }
 
 
@@ -772,8 +792,12 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     Node *node = this->node(resource);
 
-    node->setBastard(snapshotManager()->isLocal(resource));
     node->setModified(snapshotManager()->isModified(resource));
+    updateBastard(resource, resource);
+}
+
+void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
+    updateBastard(resource, resource.dynamicCast<QnLayoutResource>());
 }
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {

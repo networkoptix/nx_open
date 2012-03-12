@@ -64,11 +64,14 @@ private:
     Node *expectedParent(Node *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
+    void updateBastard(const QnResourcePtr &resource, const QnLayoutResourcePtr &layout);
+
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
+    void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_parentIdChanged();
