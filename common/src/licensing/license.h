@@ -83,6 +83,9 @@ public:
 signals:
     void licensesChanged();
 
+protected:
+    QnLicensePool();
+
 private:
     QnLicenseList m_licenses;
     mutable QMutex m_mutex;

@@ -89,7 +89,11 @@ static bool isSignatureMatch(const QByteArray &data, const QByteArray &signature
     return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
 }
 
-Q_GLOBAL_STATIC(QnLicensePool, globalLicensePool)
+namespace {
+    class QnLicensePoolInstance: public QnLicensePool {};
+}
+
+Q_GLOBAL_STATIC(QnLicensePoolInstance, globalLicensePool)
 
 QnLicense::QnLicense(const QByteArray& name, const QByteArray& key, int cameraCount, const QByteArray& hwid, const QByteArray& signature)
     : m_name(name),
@@ -309,5 +313,10 @@ int QnLicenseList::totalCameras() const
 bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
 {
     return m_licenses.contains(key);
+}
+
+QnLicensePool::QnLicensePool()
+    : m_mutex(QMutex::Recursive)
+{
 }
 
