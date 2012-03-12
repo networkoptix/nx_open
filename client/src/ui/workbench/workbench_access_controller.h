@@ -7,6 +7,29 @@
 class QnWorkbenchContext;
 class QnResourcePool;
 
+namespace Qn {
+    enum Permission {
+        /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
+        ReadPermission              = 0x00000001,   
+
+        /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
+        WritePermission             = 0x00000002,   
+
+        /**< Generic save access. Entity can be saved to appserver. */
+        SavePermission              = 0x00000004,   
+
+        /**< Permission to edit user's password. */
+        WritePasswordPermission     = 0x00000010,
+
+    };
+
+    Q_DECLARE_FLAGS(Permissions, Permission);
+
+} // namespace Qn
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions);
+
+
 /**
  * This class implements access control.
  * 
@@ -27,13 +50,16 @@ public:
 
     QnResourcePool *resourcePool() const;
 
+    Qn::Permissions permissions(const QnResourcePtr &resource);
+
 protected:
     void start();
     void stop();
 
-    bool isAccessible(const QnUserResourcePtr &user);
-    void updateAccessRights(const QnUserResourcePtr &user);
-    void updateAccessRights(const QnUserResourceList &users);
+    void updateVisibility(const QnUserResourcePtr &user);
+    void updateVisibility(const QnUserResourceList &users);
+
+    bool isAdmin() const;
 
 protected slots:
     void at_context_aboutToBeDestroyed();
@@ -42,6 +68,7 @@ protected slots:
 
 private:
     QnWorkbenchContext *m_context;
+    QnUserResourcePtr m_user;
 };
 
 

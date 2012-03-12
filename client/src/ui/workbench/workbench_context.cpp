@@ -52,11 +52,11 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     blockSignals(signalsBlocked);
 }
 
-QAction *QnWorkbenchContext::action(const Qn::ActionId id) {
+QAction *QnWorkbenchContext::action(const Qn::ActionId id) const {
     return m_menu->action(id);
 }
 
-QnUserResourcePtr QnWorkbenchContext::user() {
+QnUserResourcePtr QnWorkbenchContext::user() const {
     return m_userWatcher->user();
 }
 

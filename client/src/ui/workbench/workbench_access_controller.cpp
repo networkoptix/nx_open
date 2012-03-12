@@ -4,6 +4,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include "workbench_context.h"
+#include "workbench_layout_snapshot_manager.h"
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     QObject(parent),
@@ -46,29 +47,65 @@ void QnWorkbenchAccessController::stop() {
 
     disconnect(context(), NULL, this, NULL);
     disconnect(resourcePool(), NULL, this, NULL);
+
+    at_context_userChanged(QnUserResourcePtr());
 }
 
-bool QnWorkbenchAccessController::isAccessible(const QnUserResourcePtr &user) {
-    QnUserResourcePtr currentUser = context()->user();
-    if(!currentUser) 
-        return false;
+bool QnWorkbenchAccessController::isAdmin() const {
+    return m_user && m_user->isAdmin();
+}
 
-    if(user == currentUser)
+bool QnWorkbenchAccessController::canRead(const QnUserResourcePtr &user) {
+    if(isAdmin())
         return true;
 
-    if(currentUser->isAdmin())
+    if(user == m_user)
         return true;
 
     return false;
 }
 
-void QnWorkbenchAccessController::updateAccessRights(const QnUserResourcePtr &user) {
-    user->setStatus(isAccessible(user) ? QnResource::Online : QnResource::Disabled);
+bool QnWorkbenchAccessController::canWrite(const QnUserResourcePtr &user) {
+
 }
 
-void QnWorkbenchAccessController::updateAccessRights(const QnUserResourceList &users) {
+bool QnWorkbenchAccessController::canSave(const QnUserResourcePtr &user) {
+    if(isAdmin())
+        return true;
+
+    return m_user == user;
+}
+
+bool QnWorkbenchAccessController::canRead(const QnLayoutResourcePtr &layout) {
+    if(isAdmin())
+        return true;
+
+    QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
+    return user == m_user;
+}
+
+bool QnWorkbenchAccessController::canWrite(const QnLayoutResourcePtr &layout) {
+    if(isAdmin())
+        return true;
+
+    /* Non-admins can structurally modify local layouts only. */
+    return context()->snapshotManager()->isLocal(layout);
+}
+
+bool QnWorkbenchAccessController::canSave(const QnLayoutResourcePtr &layout) {
+    if(isAdmin())
+        return true;
+
+    return false; /* Non-admins cannot save layouts. */
+}
+
+void QnWorkbenchAccessController::updateVisibility(const QnUserResourcePtr &user) {
+    user->setStatus(canRead(user) ? QnResource::Online : QnResource::Disabled);
+}
+
+void QnWorkbenchAccessController::updateVisibility(const QnUserResourceList &users) {
     foreach(const QnUserResourcePtr &user, users)
-        updateAccessRights(user);
+        updateVisibility(user);
 }
 
 void QnWorkbenchAccessController::at_context_aboutToBeDestroyed() {
@@ -76,7 +113,9 @@ void QnWorkbenchAccessController::at_context_aboutToBeDestroyed() {
 }
 
 void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr &) {
-    updateAccessRights(QnResourceCriterion::filter<QnUserResource>(resourcePool()->getResources()));
+    m_user = context()->user();
+
+    updateVisibility(QnResourceCriterion::filter<QnUserResource>(resourcePool()->getResources()));
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -84,6 +123,6 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     if(!user)
         return;
 
-    updateAccessRights(user);
+    updateVisibility(user);
 }
 

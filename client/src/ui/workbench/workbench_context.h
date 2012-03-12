@@ -47,9 +47,13 @@ public:
         return m_menu;
     }
 
-    QAction *action(const Qn::ActionId id);
+    QnWorkbenchAccessController *acl() const {
+        return m_accessController;
+    }
 
-    QnUserResourcePtr user();
+    QAction *action(const Qn::ActionId id) const;
+
+    QnUserResourcePtr user() const;
 
     static QnWorkbenchContext *instance(QnWorkbench *workbench);
 
