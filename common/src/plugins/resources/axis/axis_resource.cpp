@@ -25,7 +25,7 @@ QString QnPlAxisResource::manufacture() const
     return MANUFACTURE;
 }
 
-void QnPlAxisResource::setIframeDistance(int frames, int timems)
+void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
@@ -35,7 +35,7 @@ QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
     return new MJPEGtreamreader(toSharedPointer(), "mjpg/video.mjpg");
 }
 
-void QnPlAxisResource::setCropingPhysical(QRect croping)
+void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }

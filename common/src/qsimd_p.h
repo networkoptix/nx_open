@@ -159,7 +159,7 @@ enum CPUFeatures {
     AVX         = 0x2000
 };
 
-Q_CORE_EXPORT uint qDetectCPUFeatures();
+QN_EXPORT uint qDetectCPUFeatures();
 
 
 #define ALIGNMENT_PROLOGUE_16BYTES(ptr, i, length) \

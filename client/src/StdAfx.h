@@ -1,4 +1,5 @@
 #ifdef _WIN32
+#undef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
 #define NOMINMAX 
 #include <winsock2.h>

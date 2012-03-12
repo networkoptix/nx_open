@@ -157,13 +157,11 @@ float QnLiveStreamProvider::getFps() const
     QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(res);
 
-    int maxFps = res->getMaxFps();
     if (m_fps < 0) // setfps never been called
         m_fps = res->getMaxFps() - 4;
 
     m_fps = qMin((int)m_fps, res->getMaxFps());
     m_fps = qMax((int)m_fps, 1);
-
 
     return m_fps;
 }
