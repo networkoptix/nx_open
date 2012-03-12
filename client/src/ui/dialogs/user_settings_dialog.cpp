@@ -2,16 +2,20 @@
 #include "ui_user_settings_dialog.h"
 
 #include <QtGui/QPushButton>
+#include <QtGui/QKeyEvent>
 
 #include <core/resource/user_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
 
+#include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
     QColor redText = QColor(255, 64, 64);
-}
+
+} // anonymous namespace
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
@@ -90,12 +94,12 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         ui->confirmPasswordEdit->setVisible(visible);
         ui->confirmPasswordLabel->setVisible(visible);
         ui->passwordEdit->setReadOnly(!editable);
-        ui->passwordEdit->setReadOnly(!editable);
+        ui->confirmPasswordEdit->setReadOnly(!editable);
         break;
     case AccessRights:
         ui->accessRightsLabel->setVisible(visible);
         ui->accessRightsComboBox->setVisible(visible);
-        ui->accessRightsComboBox->setEnabled(editable);
+        setReadOnly(ui->accessRightsComboBox, !editable);
         break;
     default:
         break;
@@ -130,13 +134,21 @@ void QnUserSettingsDialog::updateFromResource() {
     if(!m_user) {
         ui->loginEdit->clear();
         ui->passwordEdit->clear();
+        ui->passwordEdit->setPlaceholderText(QString());
         ui->confirmPasswordEdit->clear();
+        ui->confirmPasswordEdit->setPlaceholderText(QString());
         ui->accessRightsComboBox->setCurrentIndex(-1);
     } else {
+        QString placeholder(m_user->getPassword().size(), QChar('*'));
+
         ui->loginEdit->setText(m_user->getName());
-        ui->passwordEdit->setText(m_user->getPassword());
-        ui->confirmPasswordEdit->setText(m_user->getPassword());
+        ui->passwordEdit->setPlaceholderText(placeholder);
+        ui->passwordEdit->clear();
+        ui->confirmPasswordEdit->setPlaceholderText(placeholder);
+        ui->confirmPasswordEdit->clear();
         ui->accessRightsComboBox->setCurrentIndex(m_user->isAdmin() ? 1 : 0); // TODO: evil magic numbers
+
+        updatePassword();
     }
 
     setHasChanges(false);
@@ -147,7 +159,8 @@ void QnUserSettingsDialog::submitToResource() {
         return;
 
     m_user->setName(ui->loginEdit->text());
-    m_user->setPassword(ui->passwordEdit->text());
+    if(!ui->passwordEdit->text().isEmpty())
+        m_user->setPassword(ui->passwordEdit->text());
     m_user->setAdmin(ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toBool());
 
     setHasChanges(false);
@@ -213,7 +226,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         }
         break;
     case Password:
-        if(ui->passwordEdit->text().isEmpty() && ui->confirmPasswordEdit->text().isEmpty()) {
+        if(ui->passwordEdit->text().isEmpty() && ui->confirmPasswordEdit->text().isEmpty() && ui->passwordEdit->placeholderText().isEmpty()) {
             hint = tr("Password can not be empty.");
             valid = false;
         } else if(ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {

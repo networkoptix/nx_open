@@ -106,5 +106,7 @@ void QnUserResource::updateInner(QnResourcePtr other) {
         // TODO: Doesn't work because other user's layouts are not in the pool. Ivan?
         // It may be a good idea to replace ptr-list with id-list.
         setLayouts(localOther->getLayouts());
+
+        setAdmin(localOther->isAdmin());
     }
 }

@@ -2,12 +2,14 @@
 #include "ui_camera_schedule_widget.h"
 #include "ui/style/globals.h"
 #include "ui/common/color_transform.h"
+#include "ui/common/read_only.h"
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
-    m_changesDisabled(false)
+    m_changesDisabled(false),
+    m_readOnly(false)
 {
     ui->setupUi(this);
 
@@ -64,6 +66,27 @@ void QnCameraScheduleWidget::setChangesDisabled(bool val)
 bool QnCameraScheduleWidget::isChangesDisabled() const
 {
     return m_changesDisabled;
+}
+
+bool QnCameraScheduleWidget::isReadOnly() const 
+{
+    return m_readOnly;
+}
+
+void QnCameraScheduleWidget::setReadOnly(bool readOnly)
+{
+    if(m_readOnly == readOnly)
+        return;
+
+    using ::setReadOnly;
+    setReadOnly(ui->btnRecordAlways, readOnly);
+    setReadOnly(ui->btnRecordMotion, readOnly);
+    setReadOnly(ui->btnNoRecord, readOnly);
+    setReadOnly(ui->comboBoxQuality, readOnly);
+    setReadOnly(ui->fpsSpinBox, readOnly);
+    setReadOnly(ui->chkBoxEnableSchedule, readOnly);
+    setReadOnly(ui->gridWidget, readOnly);
+    m_readOnly = readOnly;
 }
 
 QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
@@ -244,7 +267,7 @@ int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
     return 0;
 }
 
-void QnCameraScheduleWidget::updateGridParams()
+void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
 {
     if (m_disableUpdateGridParams)
         return;
@@ -265,16 +288,18 @@ void QnCameraScheduleWidget::updateGridParams()
     ui->spinBoxRecordBefore->setEnabled(motionEnabled);
     ui->spinBoxRecordAfter->setEnabled(motionEnabled);
 
-    ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorParam, color.rgba());
-    if (ui->btnNoRecord->isChecked())
-    {
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, QLatin1String("-"));
-    }
-    else
-    {
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QString::number(ui->fpsSpinBox->value()));
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->comboBoxQuality->currentText()));
+    if(!(m_readOnly && fromUserInput)) {
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorParam, color.rgba());
+        if (ui->btnNoRecord->isChecked())
+        {
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, QLatin1String("-"));
+        }
+        else
+        {
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QString::number(ui->fpsSpinBox->value()));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->comboBoxQuality->currentText()));
+        }
     }
 }
 
@@ -297,7 +322,7 @@ void QnCameraScheduleWidget::onCellActivated(const QPoint &cell)
         ui->comboBoxQuality->setCurrentIndex(qualityTextToIndex(getLongText(shortQuality)));
     }
     m_disableUpdateGridParams = false;
-    updateGridParams();
+    updateGridParams(true);
 }
 
 void QnCameraScheduleWidget::onDisplayQualityChanged(int state)
@@ -312,6 +337,8 @@ void QnCameraScheduleWidget::onDisplayFPSChanged(int state)
 
 void QnCameraScheduleWidget::setMaxFps(int value)
 {
+    if(value < ui->fpsSpinBox->minimum())
+        value = ui->fpsSpinBox->minimum(); /* Silently ignoring invalid input is OK here. */
     ui->fpsSpinBox->setMaximum(value);
 }
 

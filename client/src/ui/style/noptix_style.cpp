@@ -33,14 +33,12 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
+    m_skin(qnSkin),
     m_animator(new QnNoptixStyleAnimator(this))
 {
-    m_branchClosed = Skin::icon(QLatin1String("branch_closed.png"));
-    m_branchOpen = Skin::icon(QLatin1String("branch_open.png"));
-    
-    m_closeTab = Skin::icon(QLatin1String("decorations/close_tab.png"));
-    QPixmap hovered = Skin::pixmap(QLatin1String("decorations/close_tab_hovered.png"));
-    m_closeTab.addPixmap(hovered, QIcon::Active);
+    m_branchClosed = qnSkin->icon("branch_closed.png");
+    m_branchOpen = qnSkin->icon("branch_open.png");
+    m_closeTab = qnSkin->icon("decorations/close_tab.png");
 }
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
@@ -128,6 +126,14 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 
 void QnNoptixStyle::polish(QWidget *widget) {
     base_type::polish(widget);
+
+    if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
+        itemView->setIconSize(QSize(24, 24));
+        
+        QFont font = itemView->font();
+        font.setPointSize(10);
+        itemView->setFont(font);
+    }
 }
 
 void QnNoptixStyle::unpolish(QWidget *widget) {
@@ -198,9 +204,9 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 
     const bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
 
-    QPixmap grooveBorderPic = Skin::pixmap(QLatin1String("slider_groove_lborder.png"), grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QPixmap grooveBodyPic = Skin::pixmap(QLatin1String("slider_groove_body.png"), grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QPixmap handlePic = Skin::pixmap(hovered ? QLatin1String("slider_handle_active.png") : QLatin1String("slider_handle.png"), handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    QPixmap grooveBorderPic = qnSkin->pixmap("slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap grooveBodyPic = qnSkin->pixmap("slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap handlePic = qnSkin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     painter->drawTiledPixmap(grooveRect.adjusted(grooveBorderPic.width(), 0, -grooveBorderPic.width(), 0), grooveBodyPic);
     painter->drawPixmap(grooveRect.topLeft(), grooveBorderPic);
@@ -276,7 +282,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     } else if(option->state & State_Selected) {
         mode = QIcon::Selected;
     } else if(option->state & State_Sunken) {
-        mode = QIcon::Active;
+        mode = QnSkin::Pressed;
         k = 1.0;
         stopHoverTracking(widget);
     } else if(option->state & State_MouseOver) {
@@ -298,7 +304,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
         painter->drawPixmap(rect, pixmap1, pixmap1.rect());
         painter->setOpacity(o);
     } else {
-        QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
+        QPixmap pixmap = m_skin->pixmap(buttonOption->icon, rect.toAlignedRect().size(), mode, state);
         painter->drawPixmap(rect, pixmap, pixmap.rect());
     }
     return true;

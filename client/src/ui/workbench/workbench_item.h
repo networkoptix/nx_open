@@ -39,25 +39,38 @@ public:
     QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent = NULL);
 
     /**
+     * Constructor.
+     * 
+     * \param data                      Item data to create an item from.
+     * \param parent                    Parent of this object.
+     */
+    QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent = NULL);
+
+    /**
      * Virtual destructor.
      */
     virtual ~QnWorkbenchItem();
 
     /**
-     * Load from QnLayoutData.
+     * \returns                         Layout item data of this workbench item.
+     */
+    QnLayoutItemData data() const;
+
+    /**
+     * Update from QnLayoutData.
      *
      * Note that this function may partially fail. It does not roll back the
      * changes that were made before the failure.
      *
-     * \param itemData                  Data to load from.
-     * \returns                         Whether all fields were successfully loaded.
+     * \param data                      Data to update from.
+     * \returns                         Whether all fields were successfully updated.
      */
-    bool load(const QnLayoutItemData &itemData);
+    bool update(const QnLayoutItemData &data);
 
     /**
-     * \param[out] itemData             Data to save to.
+     * \param[out] data                 Data to submit to.
      */
-    void save(QnLayoutItemData &itemData) const;
+    void submit(QnLayoutItemData &data) const;
 
     /**
      * \returns                         Layout that this item belongs to, if any.

@@ -88,6 +88,7 @@ public:
       @param args Currently we use args for passing id. Later we can introduce more sophisticated filters here.
     */
     int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
+    int getLicensesAsync(QObject *target, const char *slot);
     int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
     int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
@@ -129,7 +130,7 @@ public:
     void stop();
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer);
 
     int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
     int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
@@ -147,7 +148,7 @@ private:
     QnResourceFactory& m_resourceFactory;
     QnVideoServerResourceFactory m_serverFactory;
 
-    QnApiPbSerializer m_serializer;
+    QnApiSerializer& m_serializer;
 
     friend class QnAppServerConnectionFactory;
 };
@@ -168,6 +169,7 @@ private:
     QMutex m_mutex;
     QUrl m_defaultUrl;
     QnResourceFactory* m_resourceFactory;
+    QnApiPbSerializer m_serializer;
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);

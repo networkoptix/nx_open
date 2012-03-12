@@ -112,9 +112,10 @@ void conn_detail::LicenseReplyProcessor::finished(int status, const QByteArray &
     emit finished(status, errorString, licenses, handle);
 }
 
-QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory)
+QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer)
     : m_url(url),
-      m_resourceFactory(resourceFactory)
+      m_resourceFactory(resourceFactory),
+      m_serializer(serializer)
 {
     m_requestParams.append(QnRequestParam("format", m_serializer.format()));
 }
@@ -277,6 +278,14 @@ int QnAppServerConnection::getResourcesAsync(const QString& args, const QString&
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     return getObjectsAsync(objectName, args, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
+int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
+{
+    conn_detail::LicenseReplyProcessor* processor = new conn_detail::LicenseReplyProcessor(m_serializer, "license");
+    QObject::connect(processor, SIGNAL(finished(int,QByteArray,QnLicenseList,int)), target, slot);
+
+    return getObjectsAsync("license", "", processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
@@ -462,7 +471,9 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QU
 {
     cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logDEBUG2);
 
-    return QnAppServerConnectionPtr(new QnAppServerConnection(url, *(theAppServerConnectionFactory()->m_resourceFactory)));
+    return QnAppServerConnectionPtr(new QnAppServerConnection(url,
+                                                              *(theAppServerConnectionFactory()->m_resourceFactory),
+                                                               theAppServerConnectionFactory()->m_serializer));
 }
 
 QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
@@ -608,3 +619,4 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
 
     return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }
+

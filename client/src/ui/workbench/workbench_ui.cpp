@@ -15,7 +15,7 @@
 #include <QMenu>
 #include <QLabel>
 
-#include <utils/common/event_signalizer.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 
@@ -95,10 +95,7 @@ namespace {
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(15, 45);
-        button->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("slide_right.png"));
-        button->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap("slide_right_hovered.png"));
-        button->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("slide_left.png"));
-        button->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::HOVERED, Skin::pixmap("slide_left_hovered.png"));
+        button->setIcon(qnSkin->icon("slide_right.png", "slide_left.png"));
         button->setCheckable(true);
         button->setAnimationSpeed(4.0);
         return button;
@@ -230,8 +227,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     m_treePinButton = new QnImageButtonWidget(m_controlsWidget);
     m_treePinButton->resize(24, 24);
-    m_treePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("pin.png"));
-    m_treePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("unpin.png"));
+    m_treePinButton->setIcon(qnSkin->icon("decorations/pin.png", "decorations/unpin.png"));
     m_treePinButton->setCheckable(true);
     m_treePinButton->setFocusProxy(m_treeItem);
 
@@ -399,8 +395,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     m_helpPinButton = new QnImageButtonWidget(m_controlsWidget);
     m_helpPinButton->resize(24, 24);
-    m_helpPinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap("pin.png"));
-    m_helpPinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap("unpin.png"));
+    m_helpPinButton->setIcon(qnSkin->icon("decorations/pin.png", "decorations/unpin.png"));
     m_helpPinButton->setCheckable(true);
     m_helpPinButton->setFocusProxy(m_helpItem);
 
@@ -1368,7 +1363,7 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(resource.isNull())
         return;
 
-    menu()->trigger(Qn::ResourceDropAction, resource);
+    menu()->trigger(Qn::DropResourcesAction, resource);
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {

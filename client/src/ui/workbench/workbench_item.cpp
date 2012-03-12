@@ -14,45 +14,81 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, 
     m_rotation(0.0)
 {}
 
+QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
+    QObject(parent),
+    m_resourceUid(data.resource.path),
+    m_uuid(data.uuid),
+    m_layout(NULL),
+    m_flags(0),
+    m_rotation(0.0)
+{
+    if(m_resourceUid.isEmpty()) {
+        qnWarning("Creating a workbench item from item data with invalid unique id.");
+
+        QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
+        if(resource)
+            m_resourceUid = resource->getUniqueId();
+    }
+
+    setFlags(static_cast<ItemFlags>(data.flags));
+    setRotation(data.rotation);
+    setCombinedGeometry(data.combinedGeometry);
+}
+
 QnWorkbenchItem::~QnWorkbenchItem() {
     if (m_layout)
         m_layout->removeItem(this);
 }
 
-bool QnWorkbenchItem::load(const QnLayoutItemData &itemData) {
-    if(itemData.uuid != uuid())
-        qnWarning("Loading item '%1' from data with different uuid (%2 != %3).", resourceUid(), itemData.uuid.toString(), uuid().toString());
+QnLayoutItemData QnWorkbenchItem::data() const {
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(m_resourceUid);
+
+    QnLayoutItemData data;
+
+    data.uuid = m_uuid;
+    data.resource.path = m_resourceUid;
+    data.resource.id = resource ? resource->getId() : QnId();
+    data.flags = flags();
+    data.rotation = rotation();
+    data.combinedGeometry = combinedGeometry();
+
+    return data;
+}
+
+bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
+    if(data.uuid != uuid())
+        qnWarning("Updating item '%1' from data with different uuid (%2 != %3).", resourceUid(), data.uuid.toString(), uuid().toString());
 
 #ifdef _DEBUG
     QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
-    if(itemData.resource.id != localId && itemData.resource.path != m_resourceUid)
-        qnWarning("Loading item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), itemData.resource.id.toString(), itemData.resource.path, m_resourceUid);
+    if(data.resource.id != localId && data.resource.path != m_resourceUid)
+        qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif
 
     bool result = true;
 
     /* Note that the order of these calls is important. */
     result &= setFlag(Pinned, false);
-    result &= setCombinedGeometry(itemData.combinedGeometry);
-    setRotation(itemData.rotation);
-    result &= setFlags(static_cast<ItemFlags>(itemData.flags));
+    result &= setCombinedGeometry(data.combinedGeometry);
+    setRotation(data.rotation);
+    result &= setFlags(static_cast<ItemFlags>(data.flags));
 
     return result;
 }
 
-void QnWorkbenchItem::save(QnLayoutItemData &itemData) const {
-    if(itemData.uuid != uuid())
-        qnWarning("Saving item '%1' to a data with different uuid (%2 != %3).", resourceUid(), itemData.uuid, uuid());
+void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
+    if(data.uuid != uuid())
+        qnWarning("Submitting item '%1' to a data with different uuid (%2 != %3).", resourceUid(), data.uuid, uuid());
 
 #ifdef _DEBUG
     QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
-    if(itemData.resource.id != localId && itemData.resource.path != m_resourceUid)
-        qnWarning("Saving item '%1' to a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), itemData.resource.id.toString(), itemData.resource.path, m_resourceUid);
+    if(data.resource.id != localId && data.resource.path != m_resourceUid)
+        qnWarning("Submitting item '%1' to a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif
 
-    itemData.flags = flags();
-    itemData.rotation = rotation();
-    itemData.combinedGeometry = combinedGeometry();
+    data.flags = flags();
+    data.rotation = rotation();
+    data.combinedGeometry = combinedGeometry();
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {

@@ -8,6 +8,8 @@
 #include "item_data_role.h"
 
 class QnResourceListModel: public QAbstractListModel {
+    Q_OBJECT;
+
 public:
     QnResourceListModel(QObject *parent = NULL);
     virtual ~QnResourceListModel();

@@ -309,7 +309,7 @@ protected:
     Layer synchronizedLayer(QnWorkbenchItem *item) const;
     Layer shadowLayer(Layer itemLayer) const;
 
-    bool addItemInternal(QnWorkbenchItem *item);
+    bool addItemInternal(QnWorkbenchItem *item, bool animate = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
     void deinitSceneContext();

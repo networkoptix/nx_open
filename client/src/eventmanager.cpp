@@ -28,10 +28,6 @@ QnEventManager::QnEventManager()
 
 void QnEventManager::run()
 {
-    // We should invent something here. As there will be a problem if this method will be called when there are some request running.
-    // Currently everything should be fine as run() is called after stopping SessionManager, so there will be no pending request.
-    m_connection = QnAppServerConnectionFactory::createConnection();
-
     m_source->startRequest();
 }
 
@@ -65,11 +61,32 @@ void QnEventManager::resourcesReceived(int status, const QByteArray& errorString
 	}
 }
 
+void QnEventManager::licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
+{
+    foreach (QnLicensePtr license, licenses.licenses())
+    {
+        // Someone wants to steal our software
+        if (!license->isValid())
+        {
+            QnLicenseList dummy;
+            dummy.setHardwareId("invalid");
+            qnLicensePool->replaceLicenses(dummy);
+            break;
+        }
+    }
+
+    qnLicensePool->replaceLicenses(licenses);
+}
+
 void QnEventManager::eventReceived(QnEvent event)
 {
     qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
 
-    if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
+    if (event.eventType == QN_EVENT_LICENSE_CHANGE)
+    {
+        QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(licensesReceived(int,QByteArray,QnLicenseList,int)));
+    }
+    else if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
     {
         QnResourcePtr resource;
         if (!event.resourceGuid.isEmpty())
@@ -85,7 +102,8 @@ void QnEventManager::eventReceived(QnEvent event)
     }
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
-        m_connection->getResourcesAsync(QString::number(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
+        QnAppServerConnectionFactory::createConnection()->
+            getResourcesAsync(QString::number(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);

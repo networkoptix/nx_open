@@ -13,6 +13,7 @@ class QnCameraScheduleWidget : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks NOTIFY scheduleTasksChanged USER true DESIGNABLE false)
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
 public:
     QnCameraScheduleWidget(QWidget *parent = 0);
@@ -29,12 +30,15 @@ public:
 
     Qt::CheckState getScheduleEnabled() const;
 
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
+
 signals:
     void scheduleTasksChanged();
     void scheduleEnabledChanged();
 
 private slots:
-    void updateGridParams();
+    void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
 
     void onDisplayQualityChanged(int state);
@@ -54,6 +58,7 @@ private:
     QScopedPointer<Ui::CameraScheduleWidget> ui;
     bool m_disableUpdateGridParams;
     bool m_changesDisabled;
+    bool m_readOnly;
 };
 
 

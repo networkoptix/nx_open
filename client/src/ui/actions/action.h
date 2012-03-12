@@ -32,6 +32,10 @@ public:
         return static_cast<Qn::ActionTarget>(static_cast<int>(m_flags) & Qn::TargetMask);
     }
 
+    Qn::ActionAccessRights requiredAccessRights() const {
+        return static_cast<Qn::ActionAccessRights>(static_cast<int>(m_flags) & Qn::AccessRightsMask);
+    }
+
     Qn::ActionFlags flags() const {
         return m_flags;
     }
@@ -64,7 +68,7 @@ public:
 
     void removeChild(QnAction *action);
 
-    Qn::ActionVisibility checkCondition(Qn::ActionScope scope, const QVariant &items) const;
+    Qn::ActionVisibility checkCondition(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) const;
 
 protected:
     virtual bool event(QEvent *event) override;

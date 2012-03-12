@@ -50,6 +50,7 @@ public:
     virtual void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) = 0;
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
 
+    virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
 

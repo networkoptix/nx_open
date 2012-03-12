@@ -155,7 +155,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     Instrument::EventTypeSet dndEventTypes = Instrument::makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop);
 
     /* Install and configure instruments. */
-    ClickInstrument *itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
+    m_itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
     m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
     ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::ITEM, this);
     ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::SCENE, this);
@@ -191,7 +191,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(selectionFixupInstrument);
     m_manager->installInstrument(m_itemMouseForwardingInstrument);
     m_manager->installInstrument(selectionFixupInstrument->preForwardingInstrument());
-    m_manager->installInstrument(itemLeftClickInstrument);
+    m_manager->installInstrument(m_itemLeftClickInstrument);
     m_manager->installInstrument(m_itemRightClickInstrument);
     m_manager->installInstrument(itemMiddleClickInstrument);
 
@@ -224,8 +224,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
-    connect(itemLeftClickInstrument,    SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(itemLeftClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemRightClickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));

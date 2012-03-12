@@ -11,7 +11,8 @@ static const int ROW_COUNT = 7;
 
 class QnScheduleGridWidget : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
 
 public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
@@ -34,6 +35,9 @@ public:
 
     void setEnabled(bool val);
     bool isEnabled() const;
+
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
 
 signals:
     void cellActivated(const QPoint &cell);
@@ -80,6 +84,7 @@ private:
     QFont m_gridFont;
 
     bool m_enabled;
+    bool m_readOnly;
 };
 
 #endif // QN_SCHEDULE_GRID_WIDGET_H

@@ -93,6 +93,10 @@ public:
         return m_rubberBandInstrument;
     }
 
+    ClickInstrument *itemLeftClickInstrument() const {
+        return m_itemLeftClickInstrument;
+    }
+
 public slots:
     void startRecording();
     void stopRecording();
@@ -195,6 +199,9 @@ private:
 
     /** Item mouse forwarding instrument. */
     ForwardingInstrument *m_itemMouseForwardingInstrument;
+
+    /** Instrument that tracks left clicks on items. */
+    ClickInstrument *m_itemLeftClickInstrument;
 
 
     /* Resizing-related state. */

@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
         application.reset(singleApplication);
     }
     application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(Skin::icon(QLatin1String("hdw_logo.png")));
+    application->setWindowIcon(qnSkin->icon("hdw_logo.png"));
 
     if(singleApplication) {
         QString argsMessage;
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 
     CLDeviceSettingsDlgFactory::initialize();
 
-    qApp->setStyle(Skin::style());
+    qApp->setStyle(qnSkin->style());
 
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
@@ -458,7 +458,7 @@ int main(int argc, char *argv[])
         QByteArray data = QByteArray::fromBase64(droppedResources.toLatin1());
         QVariantMap params;
         params.insert(Qn::SerializedResourcesParameter, data);
-        mainWindow->context()->menu()->trigger(Qn::DelayedResourceDropAction, params);
+        mainWindow->context()->menu()->trigger(Qn::DelayedDropResourcesAction, params);
     }
 
     int result = application->exec();

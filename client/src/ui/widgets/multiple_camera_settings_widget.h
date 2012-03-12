@@ -11,6 +11,7 @@ namespace Ui {
 
 class QnMultipleCameraSettingsWidget : public QWidget {
     Q_OBJECT;
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
 
 public:
     explicit QnMultipleCameraSettingsWidget(QWidget *parent);
@@ -32,6 +33,9 @@ public:
         return m_hasChanges;
     }
 
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
+
 signals:
     void hasChangesChanged();
 
@@ -49,6 +53,7 @@ private:
     QnVirtualCameraResourceList m_cameras;
     bool m_hasChanges;
     bool m_hasScheduleChanges;
+    bool m_readOnly;
 };
 
 #endif // QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H

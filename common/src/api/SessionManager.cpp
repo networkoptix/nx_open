@@ -7,7 +7,7 @@
 
 #include "utils/common/warnings.h"
 
-SessionManager* SessionManager::m_instance = 0;
+Q_GLOBAL_STATIC(SessionManager, qn_sessionManagerInstance);
 QAtomicInt SessionManager::m_handle(1);
 
 void SessionManagerReplyProcessor::at_replyReceived()
@@ -20,7 +20,7 @@ void SessionManagerReplyProcessor::at_replyReceived()
     deleteLater();
 }
 
-void SyncRequestProcessor::finished(int status, const QByteArray& reply, const QByteArray& errorString, int handle)
+void SyncRequestProcessor::at_finished(int status, const QByteArray &reply, const QByteArray &errorString, int handle)
 {
     Q_UNUSED(handle)
 
@@ -33,7 +33,7 @@ void SyncRequestProcessor::finished(int status, const QByteArray& reply, const Q
     m_condition.wakeOne();
 }
 
-int SyncRequestProcessor::wait(QByteArray& reply, QByteArray& errorString)
+int SyncRequestProcessor::wait(QByteArray &reply, QByteArray &errorString)
 {
     QMutexLocker locker(&m_mutex);
     while (!m_finished) {
@@ -57,12 +57,12 @@ SessionManager::SessionManager()
 {
     qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
 
-    connect(this, SIGNAL(asyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QObject*,const char*, int)), this, SLOT(doSendAsyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QObject*,const char*, int)));
-    connect(this, SIGNAL(asyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)), this, SLOT(doSendAsyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)));
-    connect(this, SIGNAL(asyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString,int,QObject*,const char*, int)), this, SLOT(doSendAsyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString,int,QObject*,const char*, int)));
+    connect(this, SIGNAL(asyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestParamList, QObject*, const char*, int)), this, SLOT(doSendAsyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QObject*,const char*, int)));
+    connect(this, SIGNAL(asyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestParamList, QByteArray, QObject*, const char*, int)), this, SLOT(doSendAsyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)));
+    connect(this, SIGNAL(asyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString, int, QObject*, const char*, int)), this, SLOT(doSendAsyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString,int,QObject*,const char*, int)));
 
-    connect(this, SIGNAL(stopSignal()), this, SLOT(doStop()));
-    connect(this, SIGNAL(startSignal()), this, SLOT(doStart()));
+    connect(this, SIGNAL(aboutToBeStopped()), this, SLOT(doStop()));
+    connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(doStart()));
 }
 
 SessionManager::~SessionManager()
@@ -71,14 +71,19 @@ SessionManager::~SessionManager()
         qnWarning("Deleting session manager from another thread is dangerous and may lead to unexpected crashes.");
 }
 
+SessionManager *SessionManager::instance()
+{
+    return qn_sessionManagerInstance();
+}
+
 void SessionManager::start()
 {
-    emit startSignal();
+    emit aboutToBeStarted();
 }
 
 void SessionManager::stop()
 {
-    emit stopSignal();
+    emit aboutToBeStopped();
 }
 
 void SessionManager::doStart()
@@ -100,15 +105,6 @@ void SessionManager::doStop()
         m_accessManager->deleteLater();
         m_accessManager = 0;
     }
-}
-
-SessionManager *SessionManager::instance()
-{
-    if (m_instance)
-        return m_instance;
-
-    m_instance = new SessionManager();
-    return m_instance;
 }
 
 int SessionManager::testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot)
@@ -151,7 +147,7 @@ int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, 
         connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     }
 
-    sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(finished(int,QByteArray,QByteArray,int)));
+    sendAsyncPostRequest(url, objectName, params, data, &syncProcessor, SLOT(at_finished(int,QByteArray,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
 
@@ -183,7 +179,7 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, c
         connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     }
 
-    sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(finished(int,QByteArray,QByteArray,int)));
+    sendAsyncGetRequest(url, objectName, params, &syncProcessor, SLOT(at_finished(int,QByteArray,QByteArray,int)));
     return syncProcessor.wait(reply, errorString);
 }
 
@@ -234,6 +230,7 @@ int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectNa
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
     connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), this, SLOT(processReply(int, const QByteArray &, const QByteArray &, int)), Qt::QueuedConnection);
 
     emit asyncGetRequest(replyProcessor, url, objectName, params, target, slot, handle);
 
@@ -253,6 +250,7 @@ int SessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objec
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
     connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), this, SLOT(processReply(int, const QByteArray &, const QByteArray &, int)), Qt::QueuedConnection);
 
     emit asyncDeleteRequest(replyProcessor, url, objectName, id, target, slot, handle);
 
@@ -285,6 +283,7 @@ int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectN
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
     connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(int, QByteArray, QByteArray, int)), this, SLOT(processReply(int, const QByteArray &, const QByteArray &, int)), Qt::QueuedConnection);
 
     emit asyncPostRequest(replyProcessor, url, objectName, params, data, target, slot, handle);
 
@@ -302,3 +301,8 @@ QByteArray SessionManager::formatNetworkError(int error)
 
     return errorValue;
 }
+
+void SessionManager::processReply(int status, const QByteArray &, const QByteArray &, int) {
+    emit replyReceived(status);
+}
+

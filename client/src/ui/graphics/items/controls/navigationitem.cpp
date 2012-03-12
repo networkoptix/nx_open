@@ -107,38 +107,31 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
     m_backwardButton = new QnImageButtonWidget(this);
-    m_backwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_backward.png")));
-    m_backwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_backward_hovered.png")));
+    m_backwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
     m_backwardButton->setPreferredSize(32, 18);
     m_backwardButton->setAnimationSpeed(4.0);
     m_backwardButton->setFocusProxy(this);
 
     m_stepBackwardButton = new QnImageButtonWidget(this);
-    m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward.png")));
-    m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_hovered.png")));
+    m_stepBackwardButton->setIcon(qnSkin->icon("step_backward.png"));
     m_stepBackwardButton->setPreferredSize(32, 18);
     m_stepBackwardButton->setAnimationSpeed(4.0);
     m_stepBackwardButton->setFocusProxy(this);
 
     m_playButton = new QnImageButtonWidget(this);
-    m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play.png")));
-    m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_hovered.png")));
+    m_playButton->setIcon(qnSkin->icon("play.png"));
     m_playButton->setPreferredSize(32, 30);
     m_playButton->setAnimationSpeed(4.0);
     m_playButton->setFocusProxy(this);
 
     m_stepForwardButton = new QnImageButtonWidget(this);
-    m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward.png")));
-    m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_hovered.png")));
-    m_stepForwardButton->setPixmap(QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("step_forward_disabled.png")));
+    m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
     m_stepForwardButton->setPreferredSize(32, 18);
     m_stepForwardButton->setAnimationSpeed(4.0);
     m_stepForwardButton->setFocusProxy(this);
 
     m_forwardButton = new QnImageButtonWidget(this);
-    m_forwardButton->setPixmap(0, Skin::pixmap(QLatin1String("rewind_forward.png")));
-    m_forwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("rewind_forward_hovered.png")));
-    m_forwardButton->setPixmap(QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("rewind_forward_disabled.png")));
+    m_forwardButton->setIcon(qnSkin->icon("rewind_forward.png"));
     m_forwardButton->setPreferredSize(32, 18);
     m_forwardButton->setAnimationSpeed(4.0);
     m_forwardButton->setFocusProxy(this);
@@ -190,8 +183,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_muteButton = new QnImageButtonWidget(this);
     m_muteButton->setObjectName("MuteButton");
-    m_muteButton->setPixmap(0, Skin::pixmap(QLatin1String("unmute.png")));
-    m_muteButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("mute.png")));
+    m_muteButton->setIcon(qnSkin->icon("unmute.png", "mute.png"));
     m_muteButton->setPreferredSize(20, 20);
     m_muteButton->setCheckable(true);
     m_muteButton->setChecked(m_volumeSlider->isMute());
@@ -199,11 +191,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_liveButton = new QnImageButtonWidget(this);
     m_liveButton->setObjectName("LiveButton");
-    m_liveButton->setPixmap(0,                              Skin::pixmap(QLatin1String("live.png")));
-    m_liveButton->setPixmap(QnImageButtonWidget::HOVERED,   Skin::pixmap(QLatin1String("live_hovered.png")));
-    m_liveButton->setPixmap(QnImageButtonWidget::CHECKED,   Skin::pixmap(QLatin1String("live_checked.png")));
-    m_liveButton->setPixmap(QnImageButtonWidget::DISABLED,  Skin::pixmap(QLatin1String("live_disabled.png")));
-    m_liveButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("live_disabled.png")));
+    m_liveButton->setIcon(qnSkin->icon("live.png"));
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setCheckable(true);
     m_liveButton->setChecked(m_camera && m_camera->getCamDisplay()->isRealTimeSource());
@@ -215,8 +203,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_mrsButton = new QnImageButtonWidget(this);
     m_mrsButton->setObjectName("MRSButton");
-    m_mrsButton->setPixmap(0, Skin::pixmap(QLatin1String("mrs.png")));
-    m_mrsButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("mrs_checked.png")));
+    m_mrsButton->setIcon(qnSkin->icon("mrs.png"));
     m_mrsButton->setPreferredSize(48, 24);
     m_mrsButton->setCheckable(true);
     m_mrsButton->setChecked(true);
@@ -228,10 +215,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
 
     m_syncButton = new QnImageButtonWidget(this);
     m_syncButton->setObjectName("SyncButton");
-    m_syncButton->setPixmap(0, Skin::pixmap(QLatin1String("sync.png")));
-    m_syncButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("sync_checked.png")));
-    m_syncButton->setPixmap(QnImageButtonWidget::DISABLED,  Skin::pixmap(QLatin1String("sync_disabled.png")));
-    m_syncButton->setPixmap(QnImageButtonWidget::CHECKED | QnImageButtonWidget::DISABLED, Skin::pixmap(QLatin1String("sync_disabled.png")));
+    m_syncButton->setIcon(qnSkin->icon("sync.png"));
 
     m_syncButton->setPreferredSize(48, 24);
     m_syncButton->setCheckable(true);
@@ -1086,27 +1070,21 @@ void NavigationItem::setPlaying(bool playing)
     m_playing = playing;
 
     if (m_playing) {
-        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("backward.png")));
-        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("backward_hovered.png")));
+        m_stepBackwardButton->setIcon(qnSkin->icon("backward.png"));
 
-        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("pause.png")));
-        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("pause_hovered.png")));
+        m_playButton->setIcon(qnSkin->icon("pause.png"));
 
-        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("forward.png")));
-        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("forward_hovered.png")));
+        m_stepForwardButton->setIcon(qnSkin->icon("forward.png"));
 
         m_speedSlider->setPrecision(SpeedSlider::LowPrecision);
 
         play();
     } else {
-        m_stepBackwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_backward.png")));
-        m_stepBackwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_backward_hovered.png")));
+        m_stepBackwardButton->setIcon(qnSkin->icon("step_backward.png"));
 
-        m_playButton->setPixmap(0, Skin::pixmap(QLatin1String("play.png")));
-        m_playButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("play_hovered.png")));
+        m_playButton->setIcon(qnSkin->icon("play.png"));
 
-        m_stepForwardButton->setPixmap(0, Skin::pixmap(QLatin1String("step_forward.png")));
-        m_stepForwardButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("step_forward_hovered.png")));
+        m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
 
         m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
 

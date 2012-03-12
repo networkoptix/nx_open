@@ -68,17 +68,15 @@ public:
     void setName(const QString &name);
     
     /**
-     * 
-     *
-     * \param layoutData                Resource to load layout from.
+     * \param resource                  Resource to update layout from.
      * \returns                         Whether there were no errors during loading.
      */
-    bool load(const QnLayoutResourcePtr &resource);
+    bool update(const QnLayoutResourcePtr &resource);
 
     /**
-     * \param[out] layoutData           Resource to save layout to.
+     * \param[out] layoutData           Resource to submit layout to.
      */
-    void save(const QnLayoutResourcePtr &resource) const; 
+    void submit(const QnLayoutResourcePtr &resource) const; 
 
     /**
      * \param item                      Item to check.

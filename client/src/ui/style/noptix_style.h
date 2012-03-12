@@ -4,6 +4,7 @@
 #include <QProxyStyle>
 
 class QnNoptixStyleAnimator;
+class QnSkin;
 
 class QnNoptixStyle: public QProxyStyle { 
     Q_OBJECT;
@@ -39,6 +40,7 @@ private:
 
 private:
     QnNoptixStyleAnimator *m_animator;
+    QnSkin *m_skin;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
 };
 

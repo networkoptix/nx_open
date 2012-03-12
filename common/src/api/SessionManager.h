@@ -19,18 +19,18 @@ class SyncRequestProcessor : public QObject
     Q_OBJECT
 
 public:
-    SyncRequestProcessor(QObject* parent = 0)
+    SyncRequestProcessor(QObject *parent = 0)
         : QObject(parent),
           m_finished(false)
     {
     }
 
 private slots:
-    void finished(int status, const QByteArray& data, const QByteArray& errorString, int handle);
+    void at_finished(int status, const QByteArray &data, const QByteArray &errorString, int handle);
     void at_destroy();
 
 public:
-    int wait(QByteArray& reply, QByteArray& errorString);
+    int wait(QByteArray &reply, QByteArray &errorString);
 
 private:
     bool m_finished;
@@ -83,19 +83,20 @@ public:
 
     bool isReady() const;
 
-Q_SIGNALS:
-    void error(int error);
-
-private:
-    static SessionManager* m_instance;
+signals:
+    void aboutToBeStopped();
+    void aboutToBeStarted();
+    void replyReceived(int status);
 
 private slots:
     void doStop();
     void doStart();
 
-    void doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
-    void doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
-    void doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle);
+    void doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
+    void doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestParamList &params, const QByteArray &data, QObject *target, const char *slot, int handle);
+    void doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, int id, QObject *target, const char *slot, int handle);
+
+    void processReply(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 
 public:
     SessionManager();
@@ -122,9 +123,6 @@ public:
     int testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot);
 
 signals:
-    void stopSignal();
-    void startSignal();
-
     void asyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
     void asyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
     void asyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle);

@@ -205,7 +205,7 @@ FORMS += \
 DEFINES += CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"
 # or
-#DEFINES += CL_SKIN_PATH=\\\"./trinity\\\"
+#DEFINES += QN_SKIN_PATH=\\\"./trinity\\\"
 
 
 # Define override specifier.

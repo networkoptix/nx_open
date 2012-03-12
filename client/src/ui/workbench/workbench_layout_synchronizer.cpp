@@ -150,7 +150,7 @@ void QnWorkbenchLayoutSynchronizer::update() {
         return;
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
-    m_layout->load(m_resource);
+    m_layout->update(m_resource);
 }
 
 void QnWorkbenchLayoutSynchronizer::submit() {
@@ -160,7 +160,7 @@ void QnWorkbenchLayoutSynchronizer::submit() {
     m_submitting = false;
     m_pendingItems.clear();
     QnScopedValueRollback<bool> guard(&m_update, false);
-    m_layout->save(m_resource);
+    m_layout->submit(m_resource);
 }
 
 void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
@@ -179,13 +179,7 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
             continue;
         }
 
-        QnLayoutItemData itemData;
-        itemData.resource.id = resource->getId();
-        itemData.resource.path = resource->getUrl();
-        itemData.uuid = item->uuid();
-        item->save(itemData);
-
-        m_resource->updateItem(itemData.uuid, itemData);
+        m_resource->updateItem(item->uuid(), item->data());
     }
 
     m_pendingItems.clear();
@@ -222,25 +216,8 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData
     if(m_layout->item(itemData.uuid) != NULL)
         return; /* Was called back from at_layout_itemAdded because of layout resource living in a different thread. */
 
-    QnId id = itemData.resource.id;
-    QString path = itemData.resource.path;
-
-    QnResourcePtr resource;
-    if (id.isValid())
-        resource = qnResPool->getResourceById(id);
-    else
-        resource = qnResPool->getResourceByUniqId(path);
-
-    if(resource.isNull()) {
-        qnWarning("No resource in resource pool for id '%1' or path '%2'.", id.toString(), path);
-        return;
-    }
-
     QnScopedValueRollback<bool> guard(&m_submit, false);
-
-    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), itemData.uuid);
-    m_layout->addItem(item);
-    item->load(itemData);
+    m_layout->addItem(new QnWorkbenchItem(itemData, this));
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemData &itemData) {
@@ -271,7 +248,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemDa
         return;
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
-    m_layout->item(itemData.uuid)->load(itemData);
+    m_layout->item(itemData.uuid)->update(itemData);
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged() {
@@ -306,14 +283,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     }
 
     QnScopedValueRollback<bool> guard(&m_update, false);
-
-    QnLayoutItemData itemData;
-    itemData.resource.id = resource->getId();
-    itemData.resource.path = resource->getUrl();
-    itemData.uuid = item->uuid();
-    item->save(itemData);
-
-    m_resource->addItem(itemData);
+    m_resource->addItem(item->data());
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {

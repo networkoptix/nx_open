@@ -326,7 +326,7 @@ void QnWorkbenchDisplay::initSceneContext() {
 
     /* Create items. */
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
-        addItemInternal(item);
+        addItemInternal(item, false);
 
     /* Fire signals if needed. */
     if(workbench()->mode() != m_mode)
@@ -563,7 +563,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
     bringToFront(widget(item));
 }
 
-bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
+bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     if (m_widgetByRenderer.size() >= 24) { // TODO: item limit must be changeable.
         qnDeleteLater(item);
         return false;
@@ -612,8 +612,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
-    togglePinButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("pin.png")));
-    togglePinButton->setPixmap(QnImageButtonWidget::CHECKED, Skin::pixmap(QLatin1String("unpin.png")));
+    togglePinButton->setIcon(Skin::icon("decorations/pin.png", "decorations/unpin.png"));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
     togglePinButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
@@ -622,8 +621,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
 #endif
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setPixmap(QnImageButtonWidget::DEFAULT, Skin::pixmap(QLatin1String("decorations/close_item.png")));
-    closeButton->setPixmap(QnImageButtonWidget::HOVERED, Skin::pixmap(QLatin1String("decorations/close_item_hovered.png")));
+    closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
     closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
     closeButton->setAnimationSpeed(4.0);
     connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
@@ -640,11 +638,11 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
 
-    if(item->checkFlag(QnWorkbenchItem::PendingGeometryAdjustment))
-        adjustGeometry(item, false);
-
     synchronize(widget, false);
     bringToFront(widget);
+
+    if(item->checkFlag(QnWorkbenchItem::PendingGeometryAdjustment))
+        adjustGeometry(item, animate);
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
@@ -1083,7 +1081,7 @@ void QnWorkbenchDisplay::at_viewportAnimator_finished() {
 }
 
 void QnWorkbenchDisplay::at_workbench_itemAdded(QnWorkbenchItem *item) {
-    if(addItemInternal(item)) {
+    if(addItemInternal(item, true)) {
         synchronizeSceneBounds();
         fitInView();
     }

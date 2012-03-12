@@ -25,7 +25,7 @@ ConnectionsSettingsWidget::ConnectionsSettingsWidget(QWidget *parent) :
     ui->savePasswordCheckBox->hide();
 
     m_connectionsModel = new QStandardItemModel(this);
-    m_connectionsRootItem = new QStandardItem(Skin::icon(QLatin1String("folder.png")), tr("Connections"));
+    m_connectionsRootItem = new QStandardItem(qnSkin->icon("folder.png"), tr("Connections"));
     m_connectionsModel->appendRow(m_connectionsRootItem);
 
     ui->connectionsTreeView->setModel(m_connectionsModel);
