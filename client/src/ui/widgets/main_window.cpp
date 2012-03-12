@@ -255,7 +255,13 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags):
 
 QnMainWindow::~QnMainWindow()
 {
-    return;
+    QnWorkbenchContext *context = this->context();
+    context->setParent(NULL);
+    
+    m_dwm = NULL;
+    qDeleteAll(children());
+
+    delete context;
 }
 
 void QnMainWindow::setTitleVisible(bool visible) 

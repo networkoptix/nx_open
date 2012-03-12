@@ -1,7 +1,9 @@
 #ifndef QN_WORKBENCH_CONTEXT_H
 #define QN_WORKBENCH_CONTEXT_H
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 
@@ -32,23 +34,23 @@ public:
     }
 
     QnWorkbench *workbench() const {
-        return m_workbench;
+        return m_workbench.data();
     }
 
     QnWorkbenchSynchronizer *synchronizer() const {
-        return m_synchronizer;
+        return m_synchronizer.data();
     }
 
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const {
-        return m_snapshotManager;
+        return m_snapshotManager.data();
     }
 
     QnActionManager *menu() const {
-        return m_menu;
+        return m_menu.data();
     }
 
     QnWorkbenchAccessController *acl() const {
-        return m_accessController;
+        return m_accessController.data();
     }
 
     QAction *action(const Qn::ActionId id) const;
@@ -66,14 +68,16 @@ protected slots:
     void at_resourcePool_aboutToBeDestroyed();
 
 private:
-    QnResourcePoolUserWatcher *m_userWatcher;
+    /* Note that we're using scoped pointers here as destruction order of these objects is important. */
+
     QnResourcePool *m_resourcePool;
-    QnWorkbenchSynchronizer *m_synchronizer;
-    QnWorkbenchLayoutSnapshotManager *m_snapshotManager;
-    QnWorkbenchLayoutVisibilityController *m_visibilityController;
-    QnWorkbenchAccessController *m_accessController;
-    QnActionManager *m_menu;
-    QnWorkbench *m_workbench;
+    QScopedPointer<QnWorkbench> m_workbench;
+    QScopedPointer<QnResourcePoolUserWatcher> m_userWatcher;
+    QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
+    QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
+    QScopedPointer<QnWorkbenchLayoutVisibilityController> m_visibilityController;
+    QScopedPointer<QnWorkbenchAccessController> m_accessController;
+    QScopedPointer<QnActionManager> m_menu;
 };
 
 

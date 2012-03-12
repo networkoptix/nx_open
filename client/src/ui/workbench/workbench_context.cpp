@@ -19,22 +19,22 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     }
 
     m_resourcePool = resourcePool;
-    m_userWatcher = new QnResourcePoolUserWatcher(resourcePool, this);
-    m_workbench = new QnWorkbench(this);
+    m_workbench.reset(new QnWorkbench(this));
+    m_userWatcher.reset(new QnResourcePoolUserWatcher(resourcePool, this));
     
     connect(m_resourcePool,                 SIGNAL(aboutToBeDestroyed()),                   this,                                   SLOT(at_resourcePool_aboutToBeDestroyed()));
-    connect(m_userWatcher,                  SIGNAL(userChanged(const QnUserResourcePtr &)), this,                                   SIGNAL(userChanged(const QnUserResourcePtr &)));
+    connect(m_userWatcher.data(),           SIGNAL(userChanged(const QnUserResourcePtr &)), this,                                   SIGNAL(userChanged(const QnUserResourcePtr &)));
     connect(qnSettings,                     SIGNAL(lastUsedConnectionChanged()),            this,                                   SLOT(at_settings_lastUsedConnectionChanged()));
 
     /* Update state. */
     at_settings_lastUsedConnectionChanged();
 
     /* Create dependent objects. */
-    m_menu = new QnActionManager(this);
-    m_synchronizer = new QnWorkbenchSynchronizer(this);
-    m_snapshotManager = new QnWorkbenchLayoutSnapshotManager(this);
-    m_visibilityController = new QnWorkbenchLayoutVisibilityController(this);
-    m_accessController = new QnWorkbenchAccessController(this);
+    m_menu.reset(new QnActionManager(this));
+    m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
+    m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
+    m_visibilityController.reset(new QnWorkbenchLayoutVisibilityController(this));
+    m_accessController.reset(new QnWorkbenchAccessController(this));
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
