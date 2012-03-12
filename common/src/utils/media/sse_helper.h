@@ -17,7 +17,7 @@ static inline bool useSSE2()
 #ifdef Q_OS_MAC
     return true;
 #else
-    return qDetectCPUFeatures() & SSE2;
+    return qnDetectCPUFeatures() & SSE2;
 #endif
 }
 
@@ -26,7 +26,7 @@ static inline bool useSSE3()
 #ifdef Q_OS_MAC
     return true;
 #else
-    return qDetectCPUFeatures() & SSE3;
+    return qnDetectCPUFeatures() & SSE3;
 #endif
 }
 
@@ -35,7 +35,7 @@ static inline bool useSSSE3()
 #ifdef Q_OS_MAC
     return true;
 #else
-    return qDetectCPUFeatures() & SSSE3;
+    return qnDetectCPUFeatures() & SSSE3;
 #endif
 }
 
@@ -44,7 +44,7 @@ static inline bool useSSE41()
 #ifdef Q_OS_MAC
     return true;
 #else
-    return qDetectCPUFeatures() & SSE4_1;
+    return qnDetectCPUFeatures() & SSE4_1;
 #endif
 }
 
@@ -53,7 +53,7 @@ static inline bool useSSE42()
 #ifdef Q_OS_MAC
     return true;
 #else
-    return qDetectCPUFeatures() & SSE4_2;
+    return qnDetectCPUFeatures() & SSE4_2;
 #endif
 }
 

@@ -55,6 +55,7 @@ bool QnWorkbenchAccessController::isAdmin() const {
     return m_user && m_user->isAdmin();
 }
 
+#if 0
 bool QnWorkbenchAccessController::canRead(const QnUserResourcePtr &user) {
     if(isAdmin())
         return true;
@@ -98,9 +99,10 @@ bool QnWorkbenchAccessController::canSave(const QnLayoutResourcePtr &layout) {
 
     return false; /* Non-admins cannot save layouts. */
 }
+#endif
 
 void QnWorkbenchAccessController::updateVisibility(const QnUserResourcePtr &user) {
-    user->setStatus(canRead(user) ? QnResource::Online : QnResource::Disabled);
+    user->setStatus(/*canRead(user)*/ user ? QnResource::Online : QnResource::Disabled);
 }
 
 void QnWorkbenchAccessController::updateVisibility(const QnUserResourceList &users) {
