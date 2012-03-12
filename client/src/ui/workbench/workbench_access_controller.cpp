@@ -24,6 +24,10 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
     at_context_userChanged(QnUserResourcePtr());
 }
 
+Qn::Permissions QnWorkbenchAccessController::permissions() {
+    return m_permissionsByResource.value(QnResourcePtr());
+}
+
 bool QnWorkbenchAccessController::isOwner() const {
     return m_user && m_user->isAdmin() && m_user->getName() == QLatin1String("admin");
 }
@@ -93,7 +97,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     }
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &) {
     if(isAdmin()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
@@ -101,7 +105,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtua
     }
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &server) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &) {
     if(isAdmin()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {

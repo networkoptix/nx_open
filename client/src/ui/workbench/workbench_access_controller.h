@@ -20,9 +20,11 @@ public:
     QnWorkbenchAccessController(QObject *parent = NULL);
     virtual ~QnWorkbenchAccessController();
 
-    Qn::Permissions permissions(const QnResourcePtr &resource = QnResourcePtr()) {
+    Qn::Permissions permissions(const QnResourcePtr &resource) {
         return m_permissionsByResource.value(resource);
     }
+
+    Qn::Permissions permissions();
 
 signals:
     void permissionsChanged(const QnResourcePtr &resource);
