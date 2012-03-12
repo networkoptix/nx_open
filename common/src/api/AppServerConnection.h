@@ -129,7 +129,7 @@ public:
     void stop();
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer);
 
     int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
     int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
@@ -147,7 +147,7 @@ private:
     QnResourceFactory& m_resourceFactory;
     QnVideoServerResourceFactory m_serverFactory;
 
-    QnApiPbSerializer m_serializer;
+    QnApiSerializer& m_serializer;
 
     friend class QnAppServerConnectionFactory;
 };
@@ -168,6 +168,7 @@ private:
     QMutex m_mutex;
     QUrl m_defaultUrl;
     QnResourceFactory* m_resourceFactory;
+    QnApiPbSerializer m_serializer;
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);
