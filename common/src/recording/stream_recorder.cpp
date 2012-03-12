@@ -18,13 +18,10 @@ QnAbstractDataConsumer(STORE_QUEUE_SIZE),
 m_device(dev),
 m_firstTime(true),
 m_packetWrited(false),
-m_firstTimestamp(-1),
 m_formatCtx(0),
 m_truncateInterval(0),
-m_currentChunkLen(0),
 m_startDateTime(AV_NOPTS_VALUE),
 m_endDateTime(AV_NOPTS_VALUE),
-m_lastPacketTime(AV_NOPTS_VALUE),
 m_startOffset(0),
 m_forceDefaultCtx(true),
 m_prebufferingUsec(0),
@@ -66,11 +63,9 @@ void QnStreamRecorder::close()
             avio_close(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
         m_formatCtx = 0;
-        m_lastPacketTime = AV_NOPTS_VALUE;
     }
     m_packetWrited = false;
-    m_firstTimestamp = -1;
-    m_startDateTime = AV_NOPTS_VALUE;
+    m_endDateTime = m_startDateTime = AV_NOPTS_VALUE;
 
     markNeedKeyData();
 	m_firstTime = true;
@@ -141,24 +136,22 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
 
-    if (m_lastPacketTime != AV_NOPTS_VALUE)
-    {
-        if (md->timestamp - m_lastPacketTime > MAX_FRAME_DURATION*1000ll && m_currentChunkLen > 0) {
-            // if multifile recording allowed, recreate file if recording hole is detected
-            qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_lastPacketTime)/1000 << "ms";
-            close();
-            m_lastPacketTime = md->timestamp;
-        }
+    if (m_endDateTime != AV_NOPTS_VALUE && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
+        // if multifile recording allowed, recreate file if recording hole is detected
+        qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime)/1000 << "ms";
+        close();
+    }
+    else if (m_startDateTime != AV_NOPTS_VALUE && md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
+        // if multifile recording allowed, recreate file if recording hole is detected
+        qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
+        close();
     }
 
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md);
 
-    if (vd && !m_gotKeyFrame[vd->channelNumber])
-    {
-        if (!(vd->flags & AV_PKT_FLAG_KEY))
-            return true; // skip data
-    }
+    if (vd && !m_gotKeyFrame[vd->channelNumber] && !(vd->flags & AV_PKT_FLAG_KEY))
+        return true; // skip data
 
     if (m_firstTime)
     {
@@ -185,37 +178,27 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     if (channel >= m_formatCtx->nb_streams)
         return true; // skip packet
 
-    if (m_firstTimestamp == -1)
-        m_firstTimestamp = md->timestamp;
-
-    m_endDateTime = md->timestamp;
-
     if (md->flags & AV_PKT_FLAG_KEY)
     {
         m_gotKeyFrame[channel] = true;
-        if (m_truncateInterval > 0 && md->timestamp - m_firstTimestamp > m_currentChunkLen)
+        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > m_truncateInterval)
         {
-            m_currentChunkLen += m_truncateInterval - (md->timestamp - m_firstTimestamp);
-            while (m_currentChunkLen <= 0)
-                m_currentChunkLen += m_truncateInterval;
-            //cl_log.log("chunkLen=" , m_currentChunkLen/1000000.0, cl_logALWAYS);
             close();
-            m_startDateTime = m_endDateTime;
+            m_endDateTime = m_startDateTime = md->timestamp;
 
             return saveData(md);
         }
     }
-    else if (vd && !m_gotKeyFrame[channel]) // did not got key frame so far
-        return true;
-
 
     AVPacket avPkt;
     av_init_packet(&avPkt);
     AVStream* stream = m_formatCtx->streams[channel];
     AVRational srcRate = {1, 1000000};
     Q_ASSERT(stream->time_base.num && stream->time_base.den);
-    m_lastPacketTime = md->timestamp;
-    avPkt.pts = av_rescale_q(m_lastPacketTime-m_firstTimestamp, srcRate, stream->time_base);
+
+    m_endDateTime = md->timestamp;
+
+    avPkt.pts = av_rescale_q(m_endDateTime-m_startDateTime, srcRate, stream->time_base);
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
     avPkt.stream_index= channel;
@@ -240,8 +223,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     Q_ASSERT(m_mediaProvider);
 
-    if (m_startDateTime == AV_NOPTS_VALUE)
-        m_startDateTime = mediaData->timestamp;
+    m_endDateTime = m_startDateTime = mediaData->timestamp;
+
     //QnResourcePtr resource = mediaData->dataProvider->getResource();
     // allocate container
     AVOutputFormat * outputCtx = av_guess_format("matroska",NULL,NULL);
@@ -367,7 +350,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
 void QnStreamRecorder::setTruncateInterval(int seconds)
 {
-    m_currentChunkLen = m_truncateInterval = seconds * 1000000ll;
+    m_truncateInterval = seconds * 1000000ll;
 }
 
 void QnStreamRecorder::setFileName(const QString& fileName)
