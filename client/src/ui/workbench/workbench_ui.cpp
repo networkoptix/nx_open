@@ -125,6 +125,7 @@ namespace {
 
 QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
+    QnWorkbenchContextAware(display->context()),
     m_display(display),
     m_manager(display->instrumentManager()),
     m_treePinned(false),
@@ -188,7 +189,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Tree widget. */
-    m_treeWidget = new QnResourceTreeWidget();
+    m_treeWidget = new QnResourceTreeWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_treeWidget->palette();
@@ -202,7 +203,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_treeWidget->setPalette(palette);
         m_treeWidget->setComboBoxPalette(cbPalette);
     }
-    m_treeWidget->setContext(display->context());
     m_treeWidget->resize(250, 0);
 
     m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
@@ -304,9 +304,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     
-    m_tabBarWidget = new QnLayoutTabBar();
+    m_tabBarWidget = new QnLayoutTabBar(NULL, context());
     m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
-    m_tabBarWidget->setContext(display->context());
     m_tabBarItem->setWidget(m_tabBarWidget);
 
     m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
@@ -532,14 +531,6 @@ QnWorkbenchUi::~QnWorkbenchUi() {
     return;
 }
 
-QAction *QnWorkbenchUi::action(const Qn::ActionId id) const {
-    return display()->context() ? display()->context()->action(id) : NULL;
-}
-
-QnActionManager *QnWorkbenchUi::menu() const {
-    return display()->context() ? display()->context()->menu() : NULL;
-}
-
 Qn::ActionScope QnWorkbenchUi::currentScope() const {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     if(focusItem == m_treeItem) {
@@ -579,10 +570,6 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
 
 QnWorkbenchDisplay *QnWorkbenchUi::display() const {
     return m_display;
-}
-
-QnWorkbench *QnWorkbenchUi::workbench() const {
-    return m_display->workbench();
 }
 
 void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)

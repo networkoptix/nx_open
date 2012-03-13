@@ -1,13 +1,7 @@
-#ifndef __SSE_HELPER_H__
-#define __SSE_HELPER_H__
+#ifndef QN_SSE_HELPER_H
+#define QN_SSE_HELPER_H
 
-#ifdef Q_OS_WIN
-#define QT_HAVE_SSSE3 // Intel core and above
 #include <QtCore/private/qsimd_p.h>
-#else
-#include "qsimd_p.h"
-#endif
-
 #include <xmmintrin.h>
 #include <emmintrin.h>
 #include <smmintrin.h>
@@ -57,4 +51,4 @@ static inline bool useSSE42()
 #endif
 }
 
-#endif // __SSE_HELPER_H__
+#endif // QN_SSE_HELPER_H

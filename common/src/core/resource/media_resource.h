@@ -31,7 +31,7 @@ public:
     virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
 protected:
-    CLCustomDeviceVideoLayout* m_customVideoLayout;
+    QnCustomDeviceVideoLayout* m_customVideoLayout;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

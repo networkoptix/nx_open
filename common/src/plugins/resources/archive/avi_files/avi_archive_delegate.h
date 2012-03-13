@@ -5,7 +5,7 @@
 #include "../abstract_archive_delegate.h"
 
 struct AVFormatContext;
-class CLCustomDeviceVideoLayout;
+class QnCustomDeviceVideoLayout;
 class QnAviAudioLayout;
 
 class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
@@ -37,7 +37,7 @@ protected:
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
 private:
-    bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
+    bool deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr);
     QnMediaContextPtr getCodecContext(AVStream* stream);
 protected:
     AVFormatContext* m_formatContext;
@@ -49,7 +49,7 @@ private:
     int m_audioStreamIndex;
     int m_firstVideoIndex;
     bool m_streamsFound;
-    CLCustomDeviceVideoLayout* m_videoLayout;
+    QnCustomDeviceVideoLayout* m_videoLayout;
     QnResourceAudioLayout* m_audioLayout;
     QVector<int> m_indexToChannel;
     QList<QnMediaContextPtr> m_contexts;

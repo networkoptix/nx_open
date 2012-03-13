@@ -10,23 +10,22 @@ public:
     AVVideoLayout180(){};
     virtual ~AVVideoLayout180(){};
     //returns number of video channels device has
-    virtual unsigned int numberOfChannels() const
+    virtual int numberOfChannels() const override
     {
         return 4;
     }
 
-
-    virtual unsigned int width() const
+    virtual int width() const override
     {
         return 4;
     }
 
-    virtual unsigned int height() const
+    virtual int height() const override
     {
         return 1;
     }
 
-    virtual unsigned int h_position(unsigned int channel) const
+    virtual int h_position(int channel) const override
     {
         switch(channel)
         {
@@ -46,7 +45,7 @@ public:
         }
     }
 
-    virtual unsigned int v_position(unsigned int /*channel*/) const
+    virtual int v_position(int /*channel*/) const override
     {
         return 0;
     }
@@ -60,27 +59,22 @@ public:
     virtual ~AVVideoLayout360(){};
     //returns number of video channels device has
 
-    virtual unsigned int numberOfChannels() const
+    virtual int numberOfChannels() const override
     {
         return 4;
     }
 
-    virtual unsigned int numberOfAudioChannels() const
-    {
-        return 1;
-    }
-
-    virtual unsigned int width() const
+    virtual int width() const override
     {
         return 4;
     }
 
-    virtual unsigned int height() const
+    virtual int height() const override
     {
         return 1;
     }
 
-    virtual unsigned int h_position(unsigned int channel) const
+    virtual int h_position(int channel) const override
     {
         switch(channel)
         {
@@ -100,7 +94,7 @@ public:
         }
     }
 
-    virtual unsigned int v_position(unsigned int /*channel*/) const
+    virtual int v_position(int /*channel*/) const override
     {
         return 0;
     }

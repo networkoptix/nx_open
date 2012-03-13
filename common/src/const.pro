@@ -17,6 +17,9 @@ INCLUDEPATH += $$PWD $$PWD/../build/generated
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
+INCLUDEPATH += ../contrib/qt
+SOURCES += ../contrib/qt/QtCore/private/qsimd.cpp
+
 CONFIG(debug, debug|release) {
   DESTDIR = ../bin/debug
   OBJECTS_DIR  = ../build/debug

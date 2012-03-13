@@ -288,7 +288,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     //connect(reader, SIGNAL(prevFrameOccured()), this, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
 }
 
-void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 currentTimeHint)
+void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 

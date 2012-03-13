@@ -4,6 +4,8 @@
 #include <QAction>
 #include <QWeakPointer>
 #include <core/resource/resource_fwd.h>
+#include <ui/workbench/workbench_permissions.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -13,7 +15,7 @@ class QnWorkbenchContext;
 class QnActionCondition;
 class QnActionManager;
 
-class QnAction: public QAction {
+class QnAction: public QAction, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnAction(QnActionManager *manager, Qn::ActionId id, QObject *parent = NULL);
@@ -24,17 +26,21 @@ public:
         return m_id;
     }
 
-    Qn::ActionScope scope() const {
-        return static_cast<Qn::ActionScope>(static_cast<int>(m_flags) & Qn::ScopeMask);
+    Qn::ActionScopes scope() const {
+        return static_cast<Qn::ActionScopes>(static_cast<int>(m_flags) & Qn::ScopeMask);
     }
 
-    Qn::ActionTarget target() const {
-        return static_cast<Qn::ActionTarget>(static_cast<int>(m_flags) & Qn::TargetMask);
+    Qn::ActionTargetTypes targetTypes() const {
+        return static_cast<Qn::ActionTargetTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
     }
 
-    Qn::ActionAccessRights requiredAccessRights() const {
-        return static_cast<Qn::ActionAccessRights>(static_cast<int>(m_flags) & Qn::AccessRightsMask);
+    Qn::Permissions requiredPermissions(const QString &target = QString()) const {
+        return m_requiredPermissions.value(target);
     }
+
+    void setRequiredPermissions(Qn::Permissions requiredPermissions);
+
+    void setRequiredPermissions(const QString &target, Qn::Permissions requiredPermissions);
 
     Qn::ActionFlags flags() const {
         return m_flags;
@@ -68,21 +74,18 @@ public:
 
     void removeChild(QnAction *action);
 
-    Qn::ActionVisibility checkCondition(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) const;
+    Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QVariant &items, const QVariantMap &params) const;
 
 protected:
     virtual bool event(QEvent *event) override;
-
-    template<class ItemSequence>
-    bool satisfiesConditionInternal(Qn::ActionScope scope, const ItemSequence &items) const;
 
 private slots:
     void at_toggled(bool checked);
 
 private:
-    QnActionManager *const m_manager;
     const Qn::ActionId m_id;
     Qn::ActionFlags m_flags;
+    QHash<QString, Qn::Permissions> m_requiredPermissions;
     QString m_normalText, m_toggledText;
     QWeakPointer<QnActionCondition> m_condition;
 

@@ -13,19 +13,11 @@ class QGraphicsItem;
 
 class QnActionTargetTypes {
 public:
-    static int resourceList();
-
-    static int widgetList();
-
-    static int layoutItemList();
-
-    static int layoutList();
-
     static void initialize();
 
     static int size(const QVariant &items);
 
-    static Qn::ActionTarget target(const QVariant &items);
+    static Qn::ActionTargetType type(const QVariant &items);
 
     static QnResourcePtr resource(QnResourceWidget *widget);
 

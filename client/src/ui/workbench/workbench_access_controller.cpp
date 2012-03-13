@@ -1,89 +1,171 @@
 #include "workbench_access_controller.h"
 #include <cassert>
+#include <utils/common/checked_cast.h>
 #include <core/resource/user_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_criterion.h>
 #include "workbench_context.h"
+#include "workbench_layout_snapshot_manager.h"
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     QObject(parent),
-    m_context(NULL)
-{}
-
-QnWorkbenchAccessController::~QnWorkbenchAccessController() {
-    setContext(NULL);
-}
-
-QnResourcePool *QnWorkbenchAccessController::resourcePool() const {
-    return m_context ? m_context->resourcePool() : NULL;
-}
-
-void QnWorkbenchAccessController::setContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL)
-        stop();
-
-    m_context = context;
-
-    if(m_context != NULL)
-        start();
-}
-
-void QnWorkbenchAccessController::start() {
-    assert(context() != NULL);
-
-    connect(context(),      SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
-    connect(context(),      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    QnWorkbenchContextAware(parent)
+{
+    connect(context(),          SIGNAL(userChanged(const QnUserResourcePtr &)),     this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(resourcePool(),     SIGNAL(resourceAdded(const QnResourcePtr &)),       this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(),     SIGNAL(resourceRemoved(const QnResourcePtr &)),     this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this,   SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
 
     at_context_userChanged(context()->user());
 }
 
-void QnWorkbenchAccessController::stop() {
-    assert(context() != NULL);
-
+QnWorkbenchAccessController::~QnWorkbenchAccessController() {
     disconnect(context(), NULL, this, NULL);
     disconnect(resourcePool(), NULL, this, NULL);
+
+    at_context_userChanged(QnUserResourcePtr());
 }
 
-bool QnWorkbenchAccessController::isAccessible(const QnUserResourcePtr &user) {
-    QnUserResourcePtr currentUser = context()->user();
-    if(!currentUser) 
-        return false;
-
-    if(user == currentUser)
-        return true;
-
-    if(currentUser->isAdmin())
-        return true;
-
-    return false;
+Qn::Permissions QnWorkbenchAccessController::permissions() const {
+    return m_permissionsByResource.value(QnResourcePtr());
 }
 
-void QnWorkbenchAccessController::updateAccessRights(const QnUserResourcePtr &user) {
-    user->setStatus(isAccessible(user) ? QnResource::Online : QnResource::Disabled);
+bool QnWorkbenchAccessController::isOwner() const {
+    return m_user && m_user->isAdmin() && m_user->getName() == QLatin1String("admin");
 }
 
-void QnWorkbenchAccessController::updateAccessRights(const QnUserResourceList &users) {
-    foreach(const QnUserResourcePtr &user, users)
-        updateAccessRights(user);
+bool QnWorkbenchAccessController::isAdmin() const {
+    return m_user && m_user->isAdmin();
 }
 
-void QnWorkbenchAccessController::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
+Qn::Permissions QnWorkbenchAccessController::calculateGlobalPermissions() {
+    if(isOwner() || isAdmin())
+        return Qn::CreateUserPermission;
+
+    return 0;
 }
 
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) {
+    if(!resource)
+        return calculateGlobalPermissions();
+
+    QnResource::Status status = resource->getStatus();
+    if(status == QnResource::Disabled)
+        return 0;
+
+    if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        return calculatePermissions(user);
+
+    if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+        return calculatePermissions(layout);
+
+    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        return calculatePermissions(camera);
+
+    if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
+        return calculatePermissions(server);
+
+    return 0;
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
+    if(isOwner()) {
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
+    } else if(isAdmin()) {
+        if(user->isAdmin()) {
+            return Qn::ReadPermission | Qn::CreateLayoutPermission;
+        } else {
+            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
+        }
+    } else {
+        if(user == m_user) {
+            return Qn::ReadWriteSavePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission;
+        } else {
+            return 0;
+        }
+    }
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
+    if(isAdmin()) {
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    } else {
+        QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
+        if(user != m_user) 
+            return 0; /* Viewer can't view other's layouts. */
+
+        if(snapshotManager()->isLocal(layout)) {
+            return Qn::ReadPermission | Qn::WritePermission | Qn::RemovePermission; /* Can structurally modify local layouts only. */
+        } else {
+            return Qn::ReadPermission;
+        }
+    }
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &) {
+    if(isAdmin()) {
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    } else {
+        return Qn::ReadPermission;
+    }
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &) {
+    if(isAdmin()) {
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    } else {
+        return Qn::ReadPermission;
+    }
+}
+
+void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr &resource) {
+    setPermissionsInternal(resource, calculatePermissions(resource));
+}
+
+void QnWorkbenchAccessController::updatePermissions(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources)
+        updatePermissions(resource);
+}
+
+void QnWorkbenchAccessController::updateSenderPermissions() {
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
+
+    updatePermissions(toSharedPointer(checked_cast<QnResource *>(sender)));
+}
+
+void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions) {
+    if(permissions == this->permissions(resource))
+        return;
+
+    m_permissionsByResource[resource] = permissions;
+    emit permissionsChanged(resource);
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
 void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr &) {
-    updateAccessRights(QnResourceCriterion::filter<QnUserResource>(resourcePool()->getResources()));
+    m_user = context()->user();
+
+    updatePermissions(resourcePool()->getResources());
+    updatePermissions(QnResourcePtr());
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user)
-        return;
+    connect(resource.data(), SIGNAL(parentIdChanged()), this, SLOT(updateSenderPermissions()));
+    
+    updatePermissions(resource);
+}
 
-    updateAccessRights(user);
+void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+    setPermissionsInternal(resource, 0); /* So that the signal is emitted. */
+    m_permissionsByResource.remove(resource);
+}
+
+void QnWorkbenchAccessController::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout) {
+    updatePermissions(layout);
 }
 
