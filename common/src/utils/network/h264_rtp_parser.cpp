@@ -51,21 +51,26 @@ void CLH264RtpParser::setSDPInfo(const QByteArray& data)
         }
         else if (lines[i].startsWith("a=fmtp:"))
         {
-            QList<QByteArray> values = lines[i].split(' ');
-            QList<QByteArray> fmpParam = values[0].split(':');
+            //QList<QByteArray> values = lines[i].split(' ');
+            int valueIndex = lines[i].indexOf(' ');
+            if (valueIndex == -1)
+                continue;
+
+            QList<QByteArray> fmpParam = lines[i].left(valueIndex).split(':'); //values[0].split(':');
             if (fmpParam.size() < 2 || fmpParam[1].toUInt() != m_rtpChannel)
                 continue;
-            if (values.size() < 2)
-                continue;
-            QList<QByteArray> h264Params = values[1].split(';');
+            //if (values.size() < 2)
+            //    continue;
+            QList<QByteArray> h264Params = lines[i].mid(valueIndex+1).split(';');
             for (int i = 0; i < h264Params.size(); ++i)
             {
-                if (h264Params[i].startsWith("sprop-parameter-sets"))
+                QByteArray h264Parma = h264Params[i].trimmed();
+                if (h264Parma.startsWith("sprop-parameter-sets"))
                 {
-                    int pos = h264Params[i].indexOf('=');
+                    int pos = h264Parma.indexOf('=');
                     if (pos >= 0)
                     {
-                        QByteArray h264SpsPps = h264Params[i].mid(pos+1);
+                        QByteArray h264SpsPps = h264Parma.mid(pos+1);
                         QList<QByteArray> nalUnits = h264SpsPps.split(',');
                         foreach(QByteArray nal, nalUnits)
                         {
