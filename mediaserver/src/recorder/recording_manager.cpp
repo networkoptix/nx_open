@@ -134,6 +134,10 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->stop();
         camera->stopIfNoActivity();
+        if (needStopHi)
+            recorderHiRes->clearUnprocessedData();
+        if (needStopLow)
+            recorderLowRes->clearUnprocessedData();
     }
 }
 
