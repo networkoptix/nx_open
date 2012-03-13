@@ -6,6 +6,7 @@
 namespace Qn {
 
     enum NodeType {
+        RootNode,
         LocalNode,
         ServersNode,
         UsersNode,

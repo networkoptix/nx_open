@@ -32,14 +32,21 @@ public:
         return result;
     }
 
+    /**
+     * The same as asking for permissions of the current user. 
+     */
     Qn::Permissions permissions() const;
 
-signals:
-    void permissionsChanged(const QnResourcePtr &resource);
-
-protected:
     bool isOwner() const;
     bool isAdmin() const;
+    bool isViewer() const;
+
+signals:
+    /**
+     * \param resource                  Resource for which permissions have changed. 
+     *                                  Guaranteed not to be null.
+     */
+    void permissionsChanged(const QnResourcePtr &resource);
 
 protected slots:
     void updatePermissions(const QnResourcePtr &resource);
@@ -61,7 +68,6 @@ private:
     Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout);
     Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera);
     Qn::Permissions calculatePermissions(const QnVideoServerResourcePtr &server);
-    Qn::Permissions calculateGlobalPermissions();
 
 private:
     QnUserResourcePtr m_user;
