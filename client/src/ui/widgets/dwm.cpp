@@ -527,8 +527,8 @@ bool QnDwm::widgetEvent(QEvent *event) {
         if(event->type() == QEvent::WindowStateChange && !d->widget->isFullScreen())
             QApplication::postEvent(d->widget, new QnInvocationEvent(AdjustPositionInvocation), Qt::LowEventPriority);
 
-        if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
-            d->widget->move(d->widget->pos()); 
+        //if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
+            //d->widget->move(d->widget->pos()); 
     }
 #endif
 

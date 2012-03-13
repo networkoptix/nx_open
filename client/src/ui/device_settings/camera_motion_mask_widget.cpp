@@ -48,7 +48,6 @@ void QnCameraMotionMaskWidget::init()
     /* Set up scene & view. */
     m_scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(m_scene, this);
-    m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);

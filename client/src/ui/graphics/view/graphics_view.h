@@ -56,10 +56,15 @@ class QnGraphicsView: public QGraphicsView {
 
 public:
     enum PaintFlag {
-        BACKGROUND_DONT_INVOKE_BASE = 0x1, /**< Don't invoke inherited implementation when drawing background. */
-        FOREGROUND_DONT_INVOKE_BASE = 0x2  /**< Don't invoke inherited implementation when drawing foreground. */
+        PaintInheritedBackround = 0x1,  /**< Invoke inherited implementation when drawing background. */
+        PaintInheritedForeground = 0x2  /**< Invoke inherited implementation when drawing foreground. */
     };
     Q_DECLARE_FLAGS(PaintFlags, PaintFlag);
+
+    enum BehaviorFlag {
+        CenterOnShow = 0x1,
+    };
+    Q_DECLARE_FLAGS(BehaviorFlags, BehaviorFlag);
 
     QnGraphicsView(QGraphicsScene *scene, QWidget * parent = NULL);
 
@@ -71,21 +76,32 @@ public:
 
     void setPaintFlags(PaintFlags paintFlags);
 
+    BehaviorFlags behaviorFlags() const {
+        return m_behaviorFlags;
+    }
+
+    void setBehaviorFlags(BehaviorFlags behaviorFlags);
+
     void installLayerPainter(QnLayerPainter *painter, QGraphicsScene::SceneLayer layer);
 
     void uninstallLayerPainter(QnLayerPainter *painter);
 
 protected:
+    virtual void showEvent(QShowEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
     virtual void drawForeground(QPainter *painter, const QRectF &rect) override;
 
 private:
     PaintFlags m_paintFlags;
+    BehaviorFlags m_behaviorFlags;
     QList<QnLayerPainter *> m_foregroundPainters;
     QList<QnLayerPainter *> m_backgroundPainters;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnGraphicsView::PaintFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnGraphicsView::PaintFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnGraphicsView::BehaviorFlags);
 
 #endif // QN_GRAPHICS_VIEW_H
+
+    

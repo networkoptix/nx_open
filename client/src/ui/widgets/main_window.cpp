@@ -130,7 +130,6 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags):
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     m_view = new QnGraphicsView(scene);
-    m_view->setPaintFlags(QnGraphicsView::BACKGROUND_DONT_INVOKE_BASE | QnGraphicsView::FOREGROUND_DONT_INVOKE_BASE);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
