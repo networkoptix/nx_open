@@ -52,6 +52,10 @@ void QnUserResource::addLayout(const QnLayoutResourcePtr &layout)
 
 void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout) 
 {
+    /* The reference passed here may be the only one, so after removing 
+     * the layout from layouts list, it will be destroyed. Guard prevents this. */
+    QnLayoutResourcePtr guard(layout); 
+
     bool removed;
     {
         QMutexLocker locker(&m_mutex);
