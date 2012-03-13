@@ -372,7 +372,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
 
     /* Add tree-local actions to the menu. */
     manager->redirectAction(menu.data(), Qn::RenameLayoutAction, m_renameLayoutAction);
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode)
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
 
     if(menu->isEmpty())
