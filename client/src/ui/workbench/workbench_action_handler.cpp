@@ -136,6 +136,13 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     foreach(QAction *action, menu()->actions())
         disconnect(action, NULL, this, NULL);
+
+    /* Clean up. */
+    if(m_mainMenu)
+        delete m_mainMenu.data();
+
+    if(cameraSettingsDialog())
+        delete cameraSettingsDialog();
 }
 
 QnAppServerConnectionPtr QnWorkbenchActionHandler::connection() const {
@@ -320,18 +327,18 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
 }
 
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
-    if(!m_cameraSettingsDialog)
+    if(!cameraSettingsDialog())
         return;
 
-    if(!m_cameraSettingsDialog->widget()->hasChanges())
+    if(!cameraSettingsDialog()->widget()->hasChanges())
         return;
 
-    QnVirtualCameraResourceList cameras = m_cameraSettingsDialog->widget()->cameras();
+    QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
     if(cameras.empty())
         return;
 
     /* Limit the number of active cameras. */
-    int activeCameras = resourcePool()->activeCameras() + m_cameraSettingsDialog->widget()->activeCameraCount();
+    int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();
     foreach (const QnVirtualCameraResourcePtr &camera, cameras)
         if (!camera->isScheduleDisabled())
             activeCameras--;
@@ -339,24 +346,24 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if (activeCameras > qnLicensePool->getLicenses().totalCameras()) {
         QString message = tr("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.").arg(activeCameras).arg(qnLicensePool->getLicenses().totalCameras());
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
-        m_cameraSettingsDialog->widget()->setCamerasActive(false);
+        cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
 
     /* Submit and save it. */
-    m_cameraSettingsDialog->widget()->submitToResources();
+    cameraSettingsDialog()->widget()->submitToResources();
     connection()->saveAsync(cameras, this, SLOT(at_cameras_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
-    if(!m_cameraSettingsDialog)
+    if(!cameraSettingsDialog())
         return;
 
-    Qn::Permissions permissions = accessController()->permissions(m_cameraSettingsDialog->widget()->cameras());
-    m_cameraSettingsDialog->widget()->setReadOnly(!(permissions & Qn::WritePermission));
+    Qn::Permissions permissions = accessController()->permissions(cameraSettingsDialog()->widget()->cameras());
+    cameraSettingsDialog()->widget()->setReadOnly(!(permissions & Qn::WritePermission));
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
-    if(!m_cameraSettingsDialog || m_cameraSettingsDialog->isHidden() || !m_selectionUpdatePending)
+    if(!cameraSettingsDialog() || cameraSettingsDialog()->isHidden() || !m_selectionUpdatePending)
         return;
 
     m_selectionUpdatePending = false;
@@ -413,7 +420,7 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
-    m_mainMenu.reset(menu()->newMenu(Qn::MainScope));
+    m_mainMenu = menu()->newMenu(Qn::MainScope);
 
     action(Qn::LightMainMenuAction)->setMenu(m_mainMenu.data());
     action(Qn::DarkMainMenuAction)->setMenu(m_mainMenu.data());
@@ -774,31 +781,31 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnResourceList resources = menu()->currentResourcesTarget(sender());
 
-    if(!m_cameraSettingsDialog) {
-        m_cameraSettingsDialog.reset(new QnCameraSettingsDialog(widget()));
+    if(!cameraSettingsDialog()) {
+        m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
         
         updateCameraSettingsEditibility();
 
-        connect(m_cameraSettingsDialog.data(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
 
-    if(m_cameraSettingsDialog->widget()->resources() != resources) {
-        if(m_cameraSettingsDialog->isVisible() && m_cameraSettingsDialog->widget()->hasChanges()) {
+    if(cameraSettingsDialog()->widget()->resources() != resources) {
+        if(cameraSettingsDialog()->isVisible() && cameraSettingsDialog()->widget()->hasChanges()) {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
-                QnResourceList(m_cameraSettingsDialog->widget()->resources()),
+                QnResourceList(cameraSettingsDialog()->widget()->resources()),
                 tr("Cameras Not Saved"), 
-                tr("Save changes to the following %n camera(s)?", NULL, m_cameraSettingsDialog->widget()->resources().size()),
+                tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
             if(button == QDialogButtonBox::Yes)
                 saveCameraSettingsFromDialog();
         }
 
-        m_cameraSettingsDialog->widget()->setResources(resources);
+        cameraSettingsDialog()->widget()->setResources(resources);
     }
 
-    m_cameraSettingsDialog->show();
+    cameraSettingsDialog()->show();
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
@@ -808,7 +815,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
         saveCameraSettingsFromDialog();
         break;
     case QDialogButtonBox::Cancel:
-        m_cameraSettingsDialog->widget()->updateFromResources();
+        cameraSettingsDialog()->widget()->updateFromResources();
         break;
     default:
         break;
@@ -816,7 +823,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
 }
 
 void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
-    if(!m_cameraSettingsDialog || m_cameraSettingsDialog->isHidden() || m_selectionUpdatePending)
+    if(!cameraSettingsDialog() || cameraSettingsDialog()->isHidden() || m_selectionUpdatePending)
         return;
 
     m_selectionUpdatePending = true;

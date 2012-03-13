@@ -420,7 +420,8 @@ int main(int argc, char *argv[])
 
     qApp->setStyle(qnSkin->style());
 
-    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow());
+    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
     QVariant screen = commandLinePreParser.value("--screen");

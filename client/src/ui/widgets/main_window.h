@@ -33,7 +33,7 @@ class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
     typedef QWidget base_type;
 
 public:
-    QnMainWindow(QWidget *parent = 0, Qt::WFlags flags = 0);
+    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WFlags flags = 0);
 
     virtual ~QnMainWindow();
 

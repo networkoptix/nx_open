@@ -75,6 +75,10 @@ protected:
     void openNewWindow(const QStringList &args);
 
     void saveCameraSettingsFromDialog();
+    
+    QnCameraSettingsDialog *cameraSettingsDialog() const {
+        return m_cameraSettingsDialog.data();
+    }
 
 protected slots:
     void updateCameraSettingsFromSelection();
@@ -146,9 +150,9 @@ private:
 
     QWeakPointer<QWidget> m_widget;
 
-    QScopedPointer<QMenu> m_mainMenu;
+    QWeakPointer<QMenu> m_mainMenu;
     
-    QScopedPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     bool m_selectionUpdatePending;
     Qn::ActionScope m_selectionScope;
 
