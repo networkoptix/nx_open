@@ -553,6 +553,8 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
+    workbench()->setItem(QnWorkbench::RAISED, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
+
     m_display->bringToFront(m_resizedWidget);
     m_display->gridItem()->animatedShow();
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
