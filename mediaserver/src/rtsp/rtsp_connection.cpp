@@ -25,6 +25,9 @@
 #include "utils/common/util.h"
 #include "rtsp_data_consumer.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
+#include "core/dataprovider/live_stream_provider.h"
+#include "core/resource/resource_fwd.h"
+#include "core/resource/camera_resource.h"
 
 class QnTcpListener;
 
@@ -463,10 +466,15 @@ void QnRtspConnectionProcessor::createDataProvider()
 			if (d->liveDpHi)
 				d->liveDpHi->start();
 		}
-		if (!d->liveDpLow)  {
-			d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
-			if (d->liveDpLow)
-				d->liveDpLow->start();
+		if (!d->liveDpLow && d->liveDpHi)
+        {
+            QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
+            QnLiveStreamProvider* liveHiProvider = dynamic_cast<QnLiveStreamProvider*> (d->liveDpHi);
+            if (cameraRes && liveHiProvider && cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS)
+            {
+			    d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+                d->liveDpLow->start();
+            }
 		}
 	}
 	if (!d->archiveDP) 
