@@ -370,8 +370,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     {
 					    if (firstWait)
                         {
-                            m_isLongWaiting = sign *(displayedTime - ct) > MAX_FRAME_DURATION*1000 &&
-                                              (sign > 0 && displayedTime > m_jumpTime || sign < 0 && displayedTime < m_jumpTime);
+                            m_isLongWaiting = sign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && sign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                             
 							/*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
