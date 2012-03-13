@@ -1115,6 +1115,16 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
         connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
+
+        QString newPassword = user->getPassword();
+        if(newPassword != oldPassword) {
+            /* Password was changed. Change it in global settings and hope for the best. */
+            QnSettings::ConnectionData data = qnSettings->lastUsedConnection();
+            data.url.setPassword(newPassword);
+            qnSettings->setLastUsedConnection(data);
+
+            QnAppServerConnectionFactory::setDefaultUrl(data.url);
+        }
     }
 }
 
