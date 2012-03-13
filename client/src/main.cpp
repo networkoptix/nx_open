@@ -29,7 +29,7 @@
 #include "device_plugins/server_camera/appserver.h"
 
 #define TEST_RTSP_SERVER
-#define STANDALONE_MODE
+//#define STANDALONE_MODE
 
 #include "core/resource/video_server.h"
 #include "core/resource/storage_resource.h"
