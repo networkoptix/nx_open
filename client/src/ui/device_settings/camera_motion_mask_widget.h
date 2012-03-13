@@ -52,12 +52,15 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     QList<QRegion> m_motionMaskList;
 
-    QGraphicsScene *m_scene;
-    QnGraphicsView *m_view;
+    /* Destruction order is important here, hence the scoped pointers. */
 
-    QnWorkbenchContext *m_context;
-    QnWorkbenchDisplay *m_display;
-    QnWorkbenchController *m_controller;
+    QScopedPointer<QnWorkbenchContext> m_context;
+
+    QScopedPointer<QGraphicsScene> m_scene;
+    QScopedPointer<QnGraphicsView> m_view;
+
+    QScopedPointer<QnWorkbenchDisplay> m_display;
+    QScopedPointer<QnWorkbenchController> m_controller;
 
     MotionSelectionInstrument *m_motionSelectionInstrument;
 

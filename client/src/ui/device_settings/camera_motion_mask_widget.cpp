@@ -46,8 +46,8 @@ void QnCameraMotionMaskWidget::init()
     m_motionMaskList = emptyMotionMaskList();
 
     /* Set up scene & view. */
-    m_scene = new QGraphicsScene(this);
-    m_view = new QnGraphicsView(m_scene, this);
+    m_scene.reset(new QGraphicsScene(this));
+    m_view.reset(new QnGraphicsView(m_scene.data(), this));
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
@@ -60,14 +60,14 @@ void QnCameraMotionMaskWidget::init()
     }
 
     /* Set up model & control machinery. */
-    m_context = new QnWorkbenchContext(NULL, this);
+    m_context.reset(new QnWorkbenchContext(NULL, this));
 
-    m_display = new QnWorkbenchDisplay(m_context, this);
-    m_display->setScene(m_scene);
-    m_display->setView(m_view);
+    m_display.reset(new QnWorkbenchDisplay(this));
+    m_display->setScene(m_scene.data());
+    m_display->setView(m_view.data());
     m_display->setMarginFlags(0);
 
-    m_controller = new QnWorkbenchController(m_display, this);
+    m_controller.reset(new QnWorkbenchController(m_display.data(), this));
 
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();
@@ -99,7 +99,7 @@ void QnCameraMotionMaskWidget::init()
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    layout->addWidget(m_view);
+    layout->addWidget(m_view.data());
     setLayout(layout);
 }
 
