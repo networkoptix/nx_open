@@ -20,11 +20,19 @@ public:
     QnWorkbenchAccessController(QObject *parent = NULL);
     virtual ~QnWorkbenchAccessController();
 
-    Qn::Permissions permissions(const QnResourcePtr &resource) {
+    Qn::Permissions permissions(const QnResourcePtr &resource) const {
         return m_permissionsByResource.value(resource);
     }
 
-    Qn::Permissions permissions();
+    template<class ResourceList>
+    Qn::Permissions permissions(const ResourceList &resources, const typename ResourceList::const_iterator * = NULL /* Let SFINAE filter out non-lists. */) const {
+        Qn::Permissions result = Qn::AllPermissions;
+        foreach(const QnResourcePtr &resource, resources)
+            result &= permissions(resource);
+        return result;
+    }
+
+    Qn::Permissions permissions() const;
 
 signals:
     void permissionsChanged(const QnResourcePtr &resource);
@@ -36,8 +44,10 @@ protected:
 protected slots:
     void updatePermissions(const QnResourcePtr &resource);
     void updatePermissions(const QnResourceList &resources);
+    void updateSenderPermissions();
 
     void at_context_userChanged(const QnUserResourcePtr &user);
+    
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 

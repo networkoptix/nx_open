@@ -556,13 +556,6 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     return this->node(resourcePool()->getResourceById(node->resource()->getParentId()));
 }
 
-bool QnResourcePoolModel::isIgnored(const QnResourcePtr &resource) const {
-    if((resource->flags() & QnResource::local_server) == QnResource::local_server)
-        return true; /* Local server resource is ignored. */
-
-    return false;
-}
-
 void QnResourcePoolModel::updateBastard(const QnResourcePtr &resource, const QnLayoutResourcePtr &layout) {
     if(!resource)
         return;
@@ -572,6 +565,8 @@ void QnResourcePoolModel::updateBastard(const QnResourcePtr &resource, const QnL
     bool bastard = !(accessController()->permissions(resource) & Qn::ReadPermission); /* Hide non-readable resources. */
     if(!bastard && layout)
         bastard = snapshotManager()->isLocal(layout); /* Hide local layouts. */
+    if(!bastard && (node->resourceFlags() & QnResource::local_server) == QnResource::local_server)
+        bastard = true;
 
     node->setBastard(bastard);
 }
@@ -752,9 +747,6 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     assert(resource && resource->getId().isValid());
 
-    if(isIgnored(resource))
-        return;
-
     connect(resource.data(), SIGNAL(parentIdChanged()),                                     this, SLOT(at_resource_parentIdChanged()));
     connect(resource.data(), SIGNAL(nameChanged()),                                         this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_resource_resourceChanged()));
@@ -780,9 +772,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    if(isIgnored(resource))
-        return;
-
     disconnect(resource.data(), NULL, this, NULL);
 
     Node *node = this->node(resource);

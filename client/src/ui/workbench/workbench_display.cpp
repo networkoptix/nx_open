@@ -15,6 +15,7 @@
 #include <utils/common/float.h>
 #include <utils/common/delete_later.h>
 
+#include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -50,6 +51,7 @@
 #include "workbench_grid_mapper.h"
 #include "workbench_utility.h"
 #include "workbench_context.h"
+#include "workbench_access_controller.h"
 #include "workbench.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
@@ -600,12 +602,14 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     widget->addButton(togglePinButton);
 #endif
 
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
-    closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
-    closeButton->setAnimationSpeed(4.0);
-    connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
-    widget->addButton(closeButton);
+    if(accessController()->permissions(workbench()->currentLayout()->resource()) & Qn::WritePermission) { // TODO: should autoupdate on permission changes
+        QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+        closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
+        closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+        closeButton->setAnimationSpeed(4.0);
+        connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
+        widget->addButton(closeButton);
+    }
 
     m_scene->addItem(widget);
 

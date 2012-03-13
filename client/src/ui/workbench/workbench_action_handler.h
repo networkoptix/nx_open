@@ -99,8 +99,9 @@ protected slots:
     void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
-    void at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout);
+    void at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
     void at_saveLayoutAsAction_triggered();
+    void at_saveLayoutForCurrentUserAsAction_triggered();
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();

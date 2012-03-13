@@ -1,5 +1,6 @@
 #include "workbench_access_controller.h"
 #include <cassert>
+#include <utils/common/checked_cast.h>
 #include <core/resource/user_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_criterion.h>
@@ -24,7 +25,7 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
     at_context_userChanged(QnUserResourcePtr());
 }
 
-Qn::Permissions QnWorkbenchAccessController::permissions() {
+Qn::Permissions QnWorkbenchAccessController::permissions() const {
     return m_permissionsByResource.value(QnResourcePtr());
 }
 
@@ -62,22 +63,25 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
 
     if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
         return calculatePermissions(server);
+
+    return 0;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
-    if(user == m_user)
-        return Qn::ReadWriteSavePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission;
-
     if(isOwner()) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
     } else if(isAdmin()) {
         if(user->isAdmin()) {
-            return Qn::ReadPermission;
+            return Qn::ReadPermission | Qn::CreateLayoutPermission;
         } else {
-            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
         }
     } else {
-        return 0;
+        if(user == m_user) {
+            return Qn::ReadWriteSavePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission;
+        } else {
+            return 0;
+        }
     }
 }
 
@@ -120,7 +124,14 @@ void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr &resourc
 void QnWorkbenchAccessController::updatePermissions(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources)
         updatePermissions(resource);
+}
 
+void QnWorkbenchAccessController::updateSenderPermissions() {
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
+
+    updatePermissions(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions) {
@@ -139,9 +150,12 @@ void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr
     m_user = context()->user();
 
     updatePermissions(resourcePool()->getResources());
+    updatePermissions(QnResourcePtr());
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+    connect(resource.data(), SIGNAL(parentIdChanged()), this, SLOT(updateSenderPermissions()));
+    
     updatePermissions(resource);
 }
 
@@ -149,4 +163,6 @@ void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResour
     setPermissionsInternal(resource, 0); /* So that the signal is emitted. */
     m_permissionsByResource.remove(resource);
 }
+
+
 

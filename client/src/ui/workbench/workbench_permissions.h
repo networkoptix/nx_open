@@ -5,6 +5,8 @@
 
 namespace Qn {
     enum Permission {
+        /* Generic permissions. */
+
         /** Generic read access. Having this access right doesn't necessary mean that all information is readable. */
         ReadPermission              = 0x00000001,   
 
@@ -22,10 +24,10 @@ namespace Qn {
 
 
 
+        /* User-specific permissions. */
+
         /** Permission to view associated password. Note that not all passwords are viewable even with this flag. */
         ReadPasswordPermission      = 0x00000010,
-
-
 
         /** Permission to edit associated password. */
         WritePasswordPermission     = 0x00000100,
@@ -33,12 +35,17 @@ namespace Qn {
         /** Permission to edit access rights. */
         WriteAccessRightsPermission = 0x00000200,
 
+        /** Permission to create layouts for the user. */
+        CreateLayoutPermission      = 0x00002000,
+
+
+
+        /* Global permissions. */
 
         /** Permission to create users. */
         CreateUserPermission        = 0x00001000,
 
-        /** Permission to create layouts for the user. */
-        CreateLayoutPermission      = 0x00002000,
+        AllPermissions              = 0xFFFFFFFF
     };
 
     Q_DECLARE_FLAGS(Permissions, Permission);

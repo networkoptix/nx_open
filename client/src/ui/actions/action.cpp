@@ -104,9 +104,8 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QVar
                 if((accessController()->permissions() & requirements) != requirements)
                     return Qn::InvisibleAction;
             } else {
-                foreach(const QnResourcePtr &resource, resources)
-                    if((accessController()->permissions(resource) & requirements) != requirements)
-                        return Qn::InvisibleAction;
+                if((accessController()->permissions(resources) & requirements) != requirements)
+                    return Qn::InvisibleAction;
             }
         }
     }

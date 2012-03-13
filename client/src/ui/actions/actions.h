@@ -259,6 +259,14 @@ namespace Qn {
         SaveLayoutAsAction,
 
         /**
+         * Saves selected layout under another name in current user's layouts list.
+         * 
+         * Parameters:
+         * <tt>QString NameParameter</tt> --- name for the new layout.
+         */
+        SaveLayoutForCurrentUserAsAction,
+
+        /**
          * Shows motion search grid on an item.
          */
         ShowMotionAction,

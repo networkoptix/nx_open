@@ -52,6 +52,7 @@
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_resource.h"
+#include "workbench_access_controller.h"
 
 detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldStatuses):
     m_handler(handler),
@@ -103,6 +104,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenNewWindowAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAsAction),                 SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
+    connect(action(Qn::SaveLayoutForCurrentUserAsAction),   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutForCurrentUserAsAction_triggered()));
     connect(action(Qn::SaveCurrentLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
     connect(action(Qn::SaveCurrentLayoutAsAction),          SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
     connect(action(Qn::CloseLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
@@ -218,14 +220,27 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
         return;
 
     bool needToAsk = false;
-    QnLayoutResourceList changedResources;
+    QnLayoutResourceList saveableResources, rollbackResources;
     foreach(QnWorkbenchLayout *layout, layouts) {
         QnLayoutResourcePtr resource = layout->resource();
 
+        bool changed, saveable, askable;
+
         Qn::LayoutFlags flags = snapshotManager()->flags(resource);
-        needToAsk |= (flags == (Qn::LayoutIsChanged | Qn::LayoutIsLocal)); /* Changed, local, not being saved. */
-        if(flags & Qn::LayoutIsChanged)
-            changedResources.push_back(resource);
+        askable = flags == (Qn::LayoutIsChanged | Qn::LayoutIsLocal); /* Changed, local, not being saved. */
+        changed = flags & Qn::LayoutIsChanged;
+        saveable = accessController()->permissions(resource) & Qn::SavePermission;
+
+        if(askable && saveable)
+            needToAsk = true;
+
+        if(changed) {
+            if(saveable) {
+                saveableResources.push_back(resource);
+            } else {
+                rollbackResources.push_back(resource);
+            }
+        }
     }
 
     bool closeAll = true;
@@ -233,26 +248,22 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
     if(needToAsk) {
         QDialogButtonBox::StandardButton button;
         QString name;
-        if(context()->user() && context()->user()->isAdmin()) { // TODO
-            if(changedResources.size() == 1) {
-                QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
-                dialog->setWindowTitle(tr("Close Layout"));
-                dialog->setText(tr("Layout '%1' is not saved. Do you want to save it?\n\nIf yes, you may also want to change its name:").arg(changedResources[0]->getName()));
-                dialog->setName(changedResources[0]->getName());
-                dialog->exec();
-                button = dialog->clickedButton();
-                name = dialog->name();
-            } else {
-                button = QnResourceListDialog::exec(
-                    widget(),
-                    QnResourceList(changedResources),
-                    tr("Close Layouts"),
-                    tr("The following %n layouts are not saved. Do you want to save them?", NULL, changedResources.size()),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
-                );
-            }
+        if(saveableResources.size() == 1) {
+            QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
+            dialog->setWindowTitle(tr("Close Layout"));
+            dialog->setText(tr("Layout '%1' is not saved. Do you want to save it?\n\nIf yes, you may also want to change its name:").arg(saveableResources[0]->getName()));
+            dialog->setName(saveableResources[0]->getName());
+            dialog->exec();
+            button = dialog->clickedButton();
+            name = dialog->name();
         } else {
-            button = QDialogButtonBox::No;
+            button = QnResourceListDialog::exec(
+                widget(),
+                QnResourceList(saveableResources),
+                tr("Close Layouts"),
+                tr("The following %n layouts are not saved. Do you want to save them?", NULL, saveableResources.size()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+            );
         }
 
         if(button == QDialogButtonBox::Cancel) {
@@ -266,18 +277,19 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
             saveAll = true;
 
             if(!name.isEmpty())
-                changedResources[0]->setName(name);
+                saveableResources[0]->setName(name);
         }
     }
 
     if(closeAll) {
         if(saveAll) {
-            foreach(const QnLayoutResourcePtr &resource, changedResources)
+            foreach(const QnLayoutResourcePtr &resource, saveableResources)
                 snapshotManager()->save(resource, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
         } else {
-            foreach(const QnLayoutResourcePtr &resource, changedResources)
-                snapshotManager()->restore(resource);
+            rollbackResources.append(saveableResources);
         }
+        foreach(const QnLayoutResourcePtr &resource, rollbackResources)
+            snapshotManager()->restore(resource);
 
         foreach(QnWorkbenchLayout *layout, layouts) {
             qnDeleteLater(layout);
@@ -339,8 +351,8 @@ void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!m_cameraSettingsDialog)
         return;
 
-    bool isAdmin = context()->user() && context()->user()->isAdmin();
-    m_cameraSettingsDialog->widget()->setReadOnly(!isAdmin);
+    Qn::Permissions permissions = accessController()->permissions(m_cameraSettingsDialog->widget()->cameras());
+    m_cameraSettingsDialog->widget()->setReadOnly(!(permissions & Qn::WritePermission));
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
@@ -502,6 +514,9 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
     if(!snapshotManager()->isSaveable(layout))
         return;
 
+    if(!(accessController()->permissions(layout) & Qn::SavePermission))
+        return;
+
     snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
 
@@ -513,14 +528,13 @@ void QnWorkbenchActionHandler::at_saveCurrentLayoutAction_triggered() {
     at_saveLayoutAction_triggered(workbench()->currentLayout()->resource());
 }
 
-void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout) {
+void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user) {
     if(!layout)
         return;
 
-    QnUserResourcePtr user = menu()->currentParameter(sender(), Qn::UserParameter).value<QnUserResourcePtr>();
     if(!user)
-        user = context()->user();
-    
+        return;
+
     QString name = menu()->currentParameter(sender(), Qn::NameParameter).toString();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
@@ -556,12 +570,25 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     snapshotManager()->save(newLayout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 }
 
+void QnWorkbenchActionHandler::at_saveLayoutForCurrentUserAsAction_triggered() {
+    at_saveLayoutAsAction_triggered(
+        menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>(), 
+        context()->user()
+    );
+}
+
 void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered() {
-    at_saveLayoutAsAction_triggered(menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>());
+    at_saveLayoutAsAction_triggered(
+        menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>(), 
+        menu()->currentParameter(sender(), Qn::UserParameter).value<QnUserResourcePtr>()
+    );
 }
 
 void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
-    at_saveLayoutAsAction_triggered(workbench()->currentLayout()->resource());
+    at_saveLayoutAsAction_triggered(
+        workbench()->currentLayout()->resource(),
+        context()->user()
+    );
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
@@ -1034,23 +1061,33 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(!user)
         return;
 
-    QnUserResourcePtr currentUser = context()->user();
-    if(!currentUser)
+    Qn::Permissions permissions = accessController()->permissions(user);
+    if(!(permissions & Qn::ReadPermission))
         return;
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
 
-    dialog->setElementFlags(QnUserSettingsDialog::Login, QnUserSettingsDialog::Visible);
-    if(user->getName() == QLatin1String("admin")) {
-        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    } else if(user == currentUser) {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    } else if(!currentUser->isAdmin()) {
-        dialog->setElementFlags(QnUserSettingsDialog::Password, 0);
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    }
+    QnUserSettingsDialog::ElementFlags flags = 
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
+        ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : 0);
+
+    QnUserSettingsDialog::ElementFlags loginFlags =
+        flags & QnUserSettingsDialog::Visible;
+
+    QnUserSettingsDialog::ElementFlags passwordFlags = 
+        ((permissions & Qn::ReadPasswordPermission) ? QnUserSettingsDialog::Visible : 0) |
+        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : 0);
+    passwordFlags &= flags;
+
+    QnUserSettingsDialog::ElementFlags accessRightsFlags = 
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
+        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : 0);
+    accessRightsFlags &= flags;
+
+    dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
+    dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
+    dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
 
     QString oldPassword = user->getPassword();
     user->setPassword(QLatin1String("******"));
@@ -1064,8 +1101,10 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(!dialog->hasChanges())
         return;
 
-    dialog->submitToResource();
-    connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
+    if(permissions & Qn::SavePermission) {
+        dialog->submitToResource();
+        connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
 }
 
 void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {

@@ -492,6 +492,13 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnSaveLayoutActionCondition(false, this));
 
     factory(Qn::SaveLayoutAsAction).
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::SavePermission).
+        requiredPermissions(Qn::UserParameter, Qn::CreateLayoutPermission).
+        text(tr("Save Layout As...")).
+        condition(hasFlags(QnResource::layout));
+
+    factory(Qn::SaveLayoutForCurrentUserAsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::SavePermission).
         requiredPermissions(Qn::CurrentUserParameter, Qn::CreateLayoutPermission).
@@ -738,6 +745,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             menu = newMenuRecursive(action, scope, items);
             if(menu->isEmpty()) {
                 delete menu;
+                menu = NULL;
                 visibility = Qn::InvisibleAction;
             } else {
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
