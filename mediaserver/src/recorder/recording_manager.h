@@ -41,7 +41,6 @@ public:
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
-    void onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void onTimer();
     void at_updateStorage();
 private:

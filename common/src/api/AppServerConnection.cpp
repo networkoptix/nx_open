@@ -280,6 +280,14 @@ int QnAppServerConnection::getResourcesAsync(const QString& args, const QString&
     return getObjectsAsync(objectName, args, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
+int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
+{
+    conn_detail::LicenseReplyProcessor* processor = new conn_detail::LicenseReplyProcessor(m_serializer, "license");
+    QObject::connect(processor, SIGNAL(finished(int,QByteArray,QnLicenseList,int)), target, slot);
+
+    return getObjectsAsync("license", "", processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+}
+
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, "user");
@@ -611,3 +619,4 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
 
     return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }
+

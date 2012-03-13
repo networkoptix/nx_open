@@ -61,11 +61,32 @@ void QnEventManager::resourcesReceived(int status, const QByteArray& errorString
 	}
 }
 
+void QnEventManager::licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
+{
+    foreach (QnLicensePtr license, licenses.licenses())
+    {
+        // Someone wants to steal our software
+        if (!license->isValid())
+        {
+            QnLicenseList dummy;
+            dummy.setHardwareId("invalid");
+            qnLicensePool->replaceLicenses(dummy);
+            break;
+        }
+    }
+
+    qnLicensePool->replaceLicenses(licenses);
+}
+
 void QnEventManager::eventReceived(QnEvent event)
 {
     qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
 
-    if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
+    if (event.eventType == QN_EVENT_LICENSE_CHANGE)
+    {
+        QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(licensesReceived(int,QByteArray,QnLicenseList,int)));
+    }
+    else if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
     {
         QnResourcePtr resource;
         if (!event.resourceGuid.isEmpty())

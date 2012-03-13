@@ -24,6 +24,8 @@ public slots:
 
 private slots:
     void resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
+    void licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
+
     void eventReceived(QnEvent event);
     void connectionClosed(QString errorString);
 
