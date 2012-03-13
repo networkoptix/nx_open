@@ -23,8 +23,12 @@ public:
     /* stop reading from camera if no active DataConsumers left */
     void stopIfNoActivity();
 
+    /* Mark some camera activity (RTSP client connection for example) */
     void inUse(void* user);
+
+    /* Unmark some camera activity (RTSP client connection for example) */
     void notInUse(void* user);
+
 private:
     void createReader(QnResource::ConnectionRole role);
 private:

@@ -14,8 +14,6 @@
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 
-const float MIN_SECONDARY_FPS = 2.0;
-
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -103,21 +101,28 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
         recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
     {
-        if (providerHi)
+        if (providerHi) {
+            recorderHiRes->start();
             providerHi->start();
+        }
 
         if (providerLow) {
             QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
             if (cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS)
+            {
+                if (recorderLowRes)
+                    recorderLowRes->start();
                 providerLow->start();
-            else
+            }
+            else {
+                if (recorderLowRes)
+                    recorderLowRes->stop();
                 providerLow->stop();
+                if (recorderLowRes)
+                    recorderLowRes->clearUnprocessedData();
+            }
         }
-
-        recorderHiRes->start();
-        if (recorderLowRes)
-            recorderLowRes->start();
     }
     else 
     {
@@ -134,6 +139,10 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->stop();
         camera->stopIfNoActivity();
+        if (needStopHi)
+            recorderHiRes->clearUnprocessedData();
+        if (needStopLow)
+            recorderLowRes->clearUnprocessedData();
     }
 }
 

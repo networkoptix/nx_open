@@ -25,6 +25,7 @@ class QnRecordingManager: public QThread
     Q_OBJECT
 public:
     static const int RECORDING_CHUNK_LEN = 60; // seconds
+    static const int MIN_SECONDARY_FPS = 2;
 
 
     static QnRecordingManager* instance();
