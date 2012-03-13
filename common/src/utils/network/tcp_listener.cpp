@@ -50,7 +50,7 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
         start();
         qDebug() << "RTSP server started at " << address << ":" << port;
     }
-    catch(SocketException& e) {
+    catch(SocketException &) {
         qWarning() << "Can't start TCP listener at address" << address << ":" << port;
         cl_log.log("Can't start TCP listener at address ", address.toString() + ":" + QString::number(port), cl_logERROR);
     }

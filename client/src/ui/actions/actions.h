@@ -9,14 +9,18 @@ namespace Qn {
     inline QLatin1String qn_userParameter()                 { return QLatin1String("_qn_user"); }
     inline QLatin1String qn_nameParameter()                 { return QLatin1String("_qn_name"); }
     inline QLatin1String qn_serverParameter()               { return QLatin1String("_qn_server"); }
-    inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
     inline QLatin1String qn_layoutParameter()               { return QLatin1String("_qn_layoutParameter"); }
+    inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
+    inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
+    inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
 #define UserParameter qn_userParameter()
 #define NameParameter qn_nameParameter()
 #define ServerParameter qn_serverParameter()
 #define LayoutParameter qn_layoutParameter()
+#define CurrentLayoutParameter qn_currentLayoutParameter()
+#define CurrentUserParameter qn_currentUserParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
 
     /**
@@ -201,9 +205,18 @@ namespace Qn {
          * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
          * If not provided, Items will be dropped at the center of the layout.
          * <tt>QnLayoutResourcePtr LayoutParameter</tt> --- layout to drop at.
-         * If not provided, current layout will be used.
          */ 
         OpenInLayoutAction,
+
+        /**
+         * Opens selected resources in current layout.
+         * 
+         * Parameters:
+         * 
+         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         * If not provided, Items will be dropped at the center of the layout.
+         */ 
+        OpenInCurrentLayoutAction,
 
         /**
          * Opens selected resources in a new layout.
@@ -244,6 +257,14 @@ namespace Qn {
          * <tt>QString NameParameter</tt> --- name for the new layout.
          */
         SaveLayoutAsAction,
+
+        /**
+         * Saves selected layout under another name in current user's layouts list.
+         * 
+         * Parameters:
+         * <tt>QString NameParameter</tt> --- name for the new layout.
+         */
+        SaveLayoutForCurrentUserAsAction,
 
         /**
          * Shows motion search grid on an item.
@@ -305,7 +326,7 @@ namespace Qn {
         DeleteFromDiskAction,
 
         /**
-         * Removes an item from a layout.
+         * Removes item(s) from layout(s).
          */
         RemoveLayoutItemAction,
 
@@ -345,20 +366,16 @@ namespace Qn {
         TabBarScope             = 0x10,             /**< Tab bar context menu requested. */
         ScopeMask               = 0xFF
     };
+    Q_DECLARE_FLAGS(ActionScopes, ActionScope);
 
-    enum ActionTarget {
-        ResourceTarget          = 0x100,             
-        LayoutItemTarget        = 0x200,
-        WidgetTarget            = 0x400,
-        LayoutTarget            = 0x800,
-        TargetMask              = 0xF00
+    enum ActionTargetType {
+        ResourceType            = 0x100,             
+        LayoutItemType          = 0x200,
+        WidgetType              = 0x400,
+        LayoutType              = 0x800,
+        TargetTypeMask          = 0xF00
     };
-
-    enum ActionAccessRights {
-        EditLayoutRights        = 0x1000,           /** Rights to edit current layout. */
-        AdminAccessRights       = 0x2000,           /** Administrative rights. */
-        AccessRightsMask        = 0x3000
-    };
+    Q_DECLARE_FLAGS(ActionTargetTypes, ActionTargetType)
 
     enum ActionFlag {
         /** Action can be applied when there are no targets. */
@@ -370,25 +387,17 @@ namespace Qn {
         /** Action can be applied to multiple targets. */
         MultiTarget             = 0x40000,           
 
-
         /** Action accepts resources as target. */
-        Resource                = ResourceTarget,   
+        ResourceTarget          = ResourceType,   
 
         /** Action accepts layout items as target. */
-        LayoutItem              = LayoutItemTarget, 
+        LayoutItemTarget        = LayoutItemType, 
 
         /** Action accepts resource widgets as target. */
-        Widget                  = WidgetTarget,     
+        WidgetTarget            = WidgetType,     
 
         /** Action accepts layouts as target. */
-        Layout                  = LayoutTarget,     
-
-
-        /** Action requires administrative access rights. */
-        Admin                   = AdminAccessRights,
-
-        /** Action requires the user to be able to edit current layout. */
-        EditLayout              = EditLayoutRights,
+        LayoutTarget            = LayoutType,     
 
 
         /** Action has a hotkey that is intentionally ambiguous. 
@@ -405,28 +414,35 @@ namespace Qn {
         Main                    = Qn::MainScope | NoTarget,                     
 
         /** Action can appear in scene context menu. */
-        Scene                   = Qn::SceneScope | Widget,                      
+        Scene                   = Qn::SceneScope | WidgetTarget,                      
 
         /** Action can appear in tree context menu. */
         Tree                    = Qn::TreeScope,                                
 
         /** Action can appear in slider context menu. */
-        Slider                  = Qn::SliderScope | SingleTarget | Resource,    
+        Slider                  = Qn::SliderScope | SingleTarget | ResourceTarget,    
 
         /** Action can appear in tab bar context menu. */
-        TabBar                  = Qn::TabBarScope | SingleTarget | Layout,      
+        TabBar                  = Qn::TabBarScope | SingleTarget | LayoutTarget,      
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
     
     enum ActionVisibility {
+        /** Action is not in the menu. */
         InvisibleAction,
+
+        /** Action is in the menu, but is disabled. */
         DisabledAction,
+
+        /** Action is in the menu and can be triggered. */
         EnabledAction
     };
 
 } // namespace Qn
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionTargetTypes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionFlags);
 
 #endif // QN_ACTIONS_H

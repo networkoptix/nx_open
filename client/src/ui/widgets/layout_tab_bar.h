@@ -4,26 +4,22 @@
 #include <QTabBar>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/action_target_provider.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchContext;
 class QnWorkbenchLayout;
 class QnWorkbench;
 
-class QnLayoutTabBar: public QTabBar, public QnActionTargetProvider {
+class QnLayoutTabBar: public QTabBar, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
 public:
-    QnLayoutTabBar(QWidget *parent = NULL);
+    QnLayoutTabBar(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
 
     virtual ~QnLayoutTabBar();
 
     virtual Qn::ActionScope currentScope() const override;
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
-    void setContext(QnWorkbenchContext *context);
-    QnWorkbenchContext *context() const;
-    QnWorkbench *workbench() const;
-    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
 
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
@@ -47,8 +43,6 @@ private slots:
     void at_layout_nameChanged();
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
     
-    void at_context_aboutToBeDestroyed();
-
     void at_workbench_layoutsChanged();
     void at_workbench_currentLayoutChanged();
     

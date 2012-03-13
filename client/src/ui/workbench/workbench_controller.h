@@ -7,6 +7,7 @@
 #include <ui/actions/actions.h>
 #include <core/resource/resource_fwd.h>
 #include "workbench.h"
+#include "workbench_context_aware.h"
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -46,7 +47,7 @@ class QnScreenRecorder;
  *
  * It also presents some functions for high-level scene content manipulation.
  */
-class QnWorkbenchController: public QObject, protected SceneUtility {
+class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected SceneUtility {
     Q_OBJECT;
 
 public:
@@ -64,8 +65,6 @@ public:
     virtual ~QnWorkbenchController();
 
     QnWorkbenchDisplay *display() const;
-
-    QnWorkbench *workbench() const;
 
     QnWorkbenchGridMapper *mapper() const;
 
@@ -106,9 +105,6 @@ protected:
 
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
-
-    QAction *action(const Qn::ActionId id) const;
-    QnActionManager *menu() const;
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);

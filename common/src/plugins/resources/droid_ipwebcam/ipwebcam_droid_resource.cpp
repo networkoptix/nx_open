@@ -27,7 +27,7 @@ QString QnPlDriodIpWebCamResource::manufacture() const
     return MANUFACTURE;
 }
 
-void QnPlDriodIpWebCamResource::setIframeDistance(int frames, int timems)
+void QnPlDriodIpWebCamResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
@@ -37,7 +37,7 @@ QnAbstractStreamDataProvider* QnPlDriodIpWebCamResource::createLiveDataProvider(
     return new QnPlDroidIpWebCamReader(toSharedPointer());
 }
 
-void QnPlDriodIpWebCamResource::setCropingPhysical(QRect croping)
+void QnPlDriodIpWebCamResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }

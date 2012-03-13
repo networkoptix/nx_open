@@ -1,19 +1,25 @@
 #include "resource_pool_model.h"
 #include <cassert>
-#include <QMimeData>
-#include <QUrl>
+
+#include <QtCore/QMimeData>
+#include <QtCore/QUrl>
+#include <QtCore/QCoreApplication>
+
 #include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
+
 #include "file_processor.h"
 
 namespace {
@@ -448,7 +454,7 @@ private:
 // -------------------------------------------------------------------------- //
 QnResourcePoolModel::QnResourcePoolModel(QObject *parent): 
     QAbstractItemModel(parent), 
-    m_context(NULL),
+    QnWorkbenchContextAware(parent),
     m_root(NULL)
 {
     /* Init role names. */
@@ -474,11 +480,30 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent):
 
     m_serversNode = new Node(this, Qn::ServersNode);
     m_serversNode->setParent(m_root);
+
+    /* Connect to context. */
+    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)), Qt::QueuedConnection);
+    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
+    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),  this, SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
+
+    QnResourceList resources = resourcePool()->getResources(); 
+
+    /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
+    foreach(const QnResourcePtr &resource, resources)
+        at_resPool_resourceAdded(resource);
 }
 
 QnResourcePoolModel::~QnResourcePoolModel() {
-    setContext(NULL);
-    
+    /* Disconnect from context. */
+    QnResourceList resources = resourcePool()->getResources(); 
+    disconnect(resourcePool(), NULL, this, NULL);
+    disconnect(snapshotManager(), NULL, this, NULL);
+
+    foreach(const QnResourcePtr &resource, resources)
+        at_resPool_resourceRemoved(resource);
+
+    /* Free memory. */
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
 
@@ -487,58 +512,8 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     delete m_usersNode;
 }
 
-void QnResourcePoolModel::setContext(QnWorkbenchContext *context) {
-    if(m_context != NULL)
-        stop();
-
-    m_context = context;
-
-    if(m_context != NULL)
-        start();
-}
-
-QnWorkbenchContext *QnResourcePoolModel::context() const {
-    return m_context;
-}
-
-QnResourcePool *QnResourcePoolModel::resourcePool() const {
-    return m_context ? m_context->resourcePool() : NULL;
-}
-
-QnWorkbenchLayoutSnapshotManager *QnResourcePoolModel::snapshotManager() const {
-    return m_context ? m_context->snapshotManager() : NULL;
-}
-
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
     return data(index, Qn::ResourceRole).value<QnResourcePtr>();
-}
-
-void QnResourcePoolModel::start() {
-    assert(m_context != NULL);
-
-    connect(m_context,          SIGNAL(aboutToBeDestroyed()),           this, SLOT(at_context_aboutToBeDestroyed()));
-    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
-    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)), Qt::QueuedConnection);
-    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
-
-    QnResourceList resources = resourcePool()->getResources(); 
-
-    /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
-
-    foreach(const QnResourcePtr &resource, resources)
-        at_resPool_resourceAdded(resource);
-}
-
-void QnResourcePoolModel::stop() {
-    assert(m_context != NULL);
-    
-    QnResourceList resources = resourcePool()->getResources(); 
-    disconnect(m_context, NULL, this, NULL);
-    disconnect(resourcePool(), NULL, this, NULL);
-    disconnect(snapshotManager(), NULL, this, NULL);
-
-    foreach(const QnResourcePtr &resource, resources)
-        at_resPool_resourceRemoved(resource);
 }
 
 QnResourcePoolModel::Node *QnResourcePoolModel::node(const QnResourcePtr &resource) {
@@ -581,11 +556,19 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     return this->node(resourcePool()->getResourceById(node->resource()->getParentId()));
 }
 
-bool QnResourcePoolModel::isIgnored(const QnResourcePtr &resource) const {
-    if((resource->flags() & QnResource::local_server) == QnResource::local_server)
-        return true; /* Local server resource is ignored. */
+void QnResourcePoolModel::updateBastard(const QnResourcePtr &resource, const QnLayoutResourcePtr &layout) {
+    if(!resource)
+        return;
 
-    return false;
+    Node *node = this->node(resource);
+
+    bool bastard = !(accessController()->permissions(resource) & Qn::ReadPermission); /* Hide non-readable resources. */
+    if(!bastard && layout)
+        bastard = snapshotManager()->isLocal(layout); /* Hide local layouts. */
+    if(!bastard && (node->resourceFlags() & QnResource::local_server) == QnResource::local_server)
+        bastard = true;
+
+    node->setBastard(bastard);
 }
 
 
@@ -717,7 +700,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
         QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(resources);
 
-        context()->menu()->trigger(Qn::OpenInLayoutAction, medias, params);
+        menu()->trigger(Qn::OpenInLayoutAction, medias, params);
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
@@ -734,7 +717,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             QnResourceList layouts;
             layouts.push_back(layout);
 
-            context()->menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
+            menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
         }
     } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
@@ -745,7 +728,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 QVariantMap params;
                 params[Qn::ServerParameter] = QVariant::fromValue(server);
 
-                context()->menu()->trigger(Qn::MoveCameraAction, cameras, params);
+                menu()->trigger(Qn::MoveCameraAction, cameras, params);
             }
         }
     }
@@ -763,9 +746,6 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 // -------------------------------------------------------------------------- //
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     assert(resource && resource->getId().isValid());
-
-    if(isIgnored(resource))
-        return;
 
     connect(resource.data(), SIGNAL(parentIdChanged()),                                     this, SLOT(at_resource_parentIdChanged()));
     connect(resource.data(), SIGNAL(nameChanged()),                                         this, SLOT(at_resource_resourceChanged()));
@@ -787,12 +767,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
             at_resource_itemAdded(layout, item);
+
+    updateBastard(resource, layout);
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    if(isIgnored(resource))
-        return;
-
     disconnect(resource.data(), NULL, this, NULL);
 
     Node *node = this->node(resource);
@@ -801,14 +780,15 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     // TODO: delete node here?
 }
 
-void QnResourcePoolModel::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
-}
-
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     Node *node = this->node(resource);
 
     node->setModified(snapshotManager()->isModified(resource));
+    updateBastard(resource, resource);
+}
+
+void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
+    updateBastard(resource, resource.dynamicCast<QnLayoutResource>());
 }
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {

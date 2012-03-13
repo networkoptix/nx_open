@@ -121,10 +121,10 @@ private:
 };
 
 
-QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent): 
+QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
+    QnWorkbenchContextAware(parent ? static_cast<QObject *>(parent) : context),
     ui(new Ui::ResourceTreeWidget()),
-    m_context(NULL),
     m_filterTimerId(0),
     m_ignoreFilterChanges(false)
 {
@@ -166,10 +166,30 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     connect(ui->resourceTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
     updateFilter();
+
+    /* Connect to context. */
+    m_searchDelegate->setWorkbench(workbench());
+    m_resourceDelegate->setWorkbench(workbench());
+    ui->filterLineEdit->setEnabled(true);
+    ui->typeComboBox->setEnabled(true);
+
+    at_workbench_currentLayoutChanged();
+
+    connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
+    connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
+    connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
+    connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
-    return;
+    disconnect(workbench(), NULL, this, NULL);
+
+    at_workbench_currentLayoutAboutToBeChanged();
+
+    ui->filterLineEdit->setEnabled(false);
+    ui->typeComboBox->setEnabled(false);
+    m_searchDelegate->setWorkbench(NULL);
+    m_resourceDelegate->setWorkbench(NULL);
 }
 
 QPalette QnResourceTreeWidget::comboBoxPalette() const {
@@ -191,48 +211,6 @@ void QnResourceTreeWidget::setCurrentTab(Tab tab) {
     }
 
     ui->tabWidget->setCurrentIndex(tab);
-}
-
-QnWorkbench *QnResourceTreeWidget::workbench() const {
-    return m_context ? m_context->workbench() : NULL;
-}
-
-void QnResourceTreeWidget::setContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL) {
-        disconnect(m_context, NULL, this, NULL);
-        disconnect(workbench(), NULL, this, NULL);
-
-        at_workbench_currentLayoutAboutToBeChanged();
-
-        ui->filterLineEdit->setEnabled(false);
-        ui->typeComboBox->setEnabled(false);
-        m_searchDelegate->setWorkbench(NULL);
-        m_resourceDelegate->setWorkbench(NULL);
-
-        m_resourceModel->setContext(NULL);
-    }
-
-    m_context = context;
-
-    if(m_context) {
-        m_resourceModel->setContext(context);
-
-        m_searchDelegate->setWorkbench(workbench());
-        m_resourceDelegate->setWorkbench(workbench());
-        ui->filterLineEdit->setEnabled(true);
-        ui->typeComboBox->setEnabled(true);
-
-        at_workbench_currentLayoutChanged();
-
-        connect(m_context,          SIGNAL(aboutToBeDestroyed()),                       this, SLOT(at_context_aboutToBeDestroyed()));
-        connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
-        connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
-        connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-        connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
-    }
 }
 
 void QnResourceTreeWidget::open() {
@@ -474,10 +452,6 @@ void QnResourceTreeWidget::at_workbench_itemAdded(QnWorkbenchItem *) {
 void QnResourceTreeWidget::at_workbench_itemRemoved(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
-}
-
-void QnResourceTreeWidget::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
 }
 
 void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {

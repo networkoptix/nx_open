@@ -190,6 +190,10 @@ int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectNa
 
 void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle)
 {
+    Q_UNUSED(target);
+    Q_UNUSED(slot);
+    Q_UNUSED(handle);
+
     if (!m_accessManager)
     {
         qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";
@@ -207,6 +211,10 @@ void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyPr
 
 void SessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle)
 {
+    Q_UNUSED(target);
+    Q_UNUSED(slot);
+    Q_UNUSED(handle);
+
     if (!m_accessManager)
     {
         qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";
@@ -259,6 +267,10 @@ int SessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objec
 
 void SessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle)
 {
+    Q_UNUSED(target);
+    Q_UNUSED(slot);
+    Q_UNUSED(handle);
+
     if (!m_accessManager)
     {
         qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";

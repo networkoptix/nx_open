@@ -15,6 +15,7 @@
 #include <utils/common/float.h>
 #include <utils/common/delete_later.h>
 
+#include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -50,6 +51,7 @@
 #include "workbench_grid_mapper.h"
 #include "workbench_utility.h"
 #include "workbench_context.h"
+#include "workbench_access_controller.h"
 #include "workbench.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
@@ -108,8 +110,8 @@ namespace {
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *parent):
     QObject(parent),
+    QnWorkbenchContextAware(context),
     m_instrumentManager(new InstrumentManager(this)),
-    m_context(NULL),
     m_scene(NULL),
     m_view(NULL),
     m_viewportAnimator(NULL),
@@ -184,20 +186,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *par
     m_frameOpacityAnimator->setTargetObject(this);
     m_frameOpacityAnimator->setTimeLimit(500);
 
+    /* Connect to context. */
+    connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
+
     /* Set up defaults. */
-    initContext(context);
     setScene(m_dummyScene);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     m_dummyScene = NULL;
 
-    initContext(NULL);
     setScene(NULL);
-}
-
-QnWorkbench *QnWorkbenchDisplay::workbench() const {
-    return m_context ? m_context->workbench() : NULL;
 }
 
 void QnWorkbenchDisplay::initSyncPlay() {
@@ -206,24 +205,11 @@ void QnWorkbenchDisplay::initSyncPlay() {
     new QnWorkbenchStreamSynchronizer(this, m_renderWatcher, this);
 }
 
-void QnWorkbenchDisplay::initContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL && m_scene != NULL)
-        deinitSceneContext();
-
-    m_context = context;
-
-    if(m_context != NULL && m_scene != NULL)
-        initSceneContext();
-}
-
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene == scene)
         return;
 
-    if(m_scene != NULL && m_context != NULL)
+    if(m_scene != NULL && context() != NULL)
         deinitSceneContext();
 
     /* Prepare new scene. */
@@ -235,12 +221,12 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
 
     /* Set up new scene.
      * It may be NULL only when this function is called from destructor. */
-    if(m_scene != NULL && m_context != NULL)
+    if(m_scene != NULL && context() != NULL)
         initSceneContext();
 }
 
 void QnWorkbenchDisplay::deinitSceneContext() {
-    assert(m_scene != NULL && m_context != NULL);
+    assert(m_scene != NULL && context() != NULL);
 
     /* Deinit scene. */
     m_instrumentManager->unregisterScene(m_scene);
@@ -273,7 +259,7 @@ void QnWorkbenchDisplay::deinitSceneContext() {
 }
 
 void QnWorkbenchDisplay::initSceneContext() {
-    assert(m_scene != NULL && m_context != NULL);
+    assert(m_scene != NULL && context() != NULL);
 
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
@@ -310,7 +296,6 @@ void QnWorkbenchDisplay::initSceneContext() {
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
     /* Connect to workbench. */
-    connect(context(),              SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_context_aboutToBeDestroyed()));
     connect(workbench(),            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
     connect(workbench(),            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
     connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
@@ -620,12 +605,14 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     widget->addButton(togglePinButton);
 #endif
 
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
-    closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
-    closeButton->setAnimationSpeed(4.0);
-    connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
-    widget->addButton(closeButton);
+    if(accessController()->permissions(workbench()->currentLayout()->resource()) & Qn::WritePermission) { // TODO: should autoupdate on permission changes
+        QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+        closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
+        closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+        closeButton->setAnimationSpeed(4.0);
+        connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
+        widget->addButton(closeButton);
+    }
 
     m_scene->addItem(widget);
 
@@ -887,7 +874,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate) {
     assert(widget != NULL);
-    assert(m_context != NULL);
 
     QnWorkbenchItem *item = widget->item();
     QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
@@ -1092,10 +1078,6 @@ void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
         synchronizeSceneBounds();
         fitInView();
     }
-}
-
-void QnWorkbenchDisplay::at_context_aboutToBeDestroyed() {
-    initContext(new QnWorkbenchContext(qnResPool, this));
 }
 
 void QnWorkbenchDisplay::at_workbench_modeChanged() {
@@ -1337,6 +1319,17 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged() {
         m_frameOpacityAnimator->animateTo(0.0);
     } else {
         m_frameOpacityAnimator->animateTo(1.0);
+    }
+}
+
+void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource) {
+    if(QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>()) {
+        if(QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource)) {
+            Qn::Permissions permissions = accessController()->permissions(resource);
+
+            if(!(permissions & Qn::ReadPermission))
+                workbench()->removeLayout(layout);
+        }
     }
 }
 

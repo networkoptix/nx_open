@@ -21,7 +21,7 @@ public:
 
     }
 
-    unsigned int numberOfChannels() const
+    virtual int numberOfChannels() const override
     {
         int audioNum = 0;
         int lastStreamID = -1;
@@ -42,7 +42,7 @@ public:
         return audioNum;
     }
 
-    virtual QnResourceAudioLayout::AudioTrack getAudioTrackInfo(int index) const
+    virtual QnResourceAudioLayout::AudioTrack getAudioTrackInfo(int index) const override
     {
         QnResourceAudioLayout::AudioTrack result;
         AVFormatContext* formatContext = m_owner->getFormatContext();
@@ -272,7 +272,7 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
     }
     if (m_videoLayout == 0)
     {
-        m_videoLayout = new CLCustomDeviceVideoLayout(1, 1);
+        m_videoLayout = new QnCustomDeviceVideoLayout(1, 1);
         AVMetadataTag* layoutInfo = av_metadata_get(m_formatContext->metadata,"video_layout", 0, 0);
         if (layoutInfo)
             deserializeLayout(m_videoLayout, layoutInfo->value);
@@ -384,7 +384,7 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
     return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
 }
 
-bool QnAviArchiveDelegate::deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr)
+bool QnAviArchiveDelegate::deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr)
 {
     QStringList info = layoutStr.split(';');
     for (int i = 0; i < info.size(); ++i)

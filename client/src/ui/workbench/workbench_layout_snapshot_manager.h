@@ -4,6 +4,7 @@
 #include <QObject>
 #include <core/resource/resource_fwd.h>
 #include <api/AppServerConnection.h>
+#include "workbench_context_aware.h"
 
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotStorage;
@@ -58,18 +59,12 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::LayoutFlags);
  * 
  * It also provides some functions for layout and snapshot manipulation.
  */
-class QnWorkbenchLayoutSnapshotManager: public QObject {
+class QnWorkbenchLayoutSnapshotManager: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
 
     virtual ~QnWorkbenchLayoutSnapshotManager();
-
-    QnWorkbenchContext *context() const {
-        return m_context;
-    }
-
-    void setContext(QnWorkbenchContext *context);
 
     void save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
 
@@ -108,9 +103,6 @@ signals:
     void flagsChanged(const QnLayoutResourcePtr &resource);
 
 protected:
-    void start();
-    void stop();
-
     void setFlags(const QnLayoutResourcePtr &resource, Qn::LayoutFlags flags);
 
     void connectTo(const QnLayoutResourcePtr &resource);
@@ -119,7 +111,6 @@ protected:
     QnAppServerConnectionPtr connection() const;
 
 protected slots:
-    void at_context_aboutToBeDestroyed();
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layout_saved(const QnLayoutResourcePtr &resource);
@@ -129,9 +120,6 @@ protected slots:
 
 private:
     friend class detail::QnWorkbenchLayoutReplyProcessor;
-
-    /** Associated context. */
-    QnWorkbenchContext *m_context;
 
     /** Layout state storage that this object manages. */
     QnWorkbenchLayoutSnapshotStorage *m_storage;

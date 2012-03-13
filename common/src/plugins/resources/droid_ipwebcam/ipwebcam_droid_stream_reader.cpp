@@ -2,8 +2,8 @@
 #include "utils/common/synctime.h"
 #include "ipwebcam_droid_stream_reader.h"
 
-char jpeg_start[2] = {0xff, 0xd8};
-char jpeg_end[2] = {0xff, 0xd9};
+char jpeg_start[2] = {'\xff', '\xd8'};
+char jpeg_end[2] = {'\xff', '\xd9'};
 
 int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 {
