@@ -26,14 +26,14 @@ namespace Qn {
 
         /* User-specific permissions. */
 
-        /** Permission to view associated password. Note that not all passwords are viewable even with this flag. */
-        ReadPasswordPermission      = 0x00000010,
+        /** Permission to edit login. */
+        WriteLoginPermission        = 0x00000100,
 
         /** Permission to edit associated password. */
-        WritePasswordPermission     = 0x00000100,
+        WritePasswordPermission     = 0x00000200,
 
         /** Permission to edit access rights. */
-        WriteAccessRightsPermission = 0x00000200,
+        WriteAccessRightsPermission = 0x00000400,
 
         /** Permission to create layouts for the user. */
         CreateLayoutPermission      = 0x00002000,
