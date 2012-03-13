@@ -278,6 +278,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     /* Context menu actions. */
+
     factory(Qn::MainMenuAction).
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
@@ -294,33 +295,45 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         icon(qnSkin->icon("logo_icon2_dark.png"));
 
-    factory(Qn::NewUserAction).
-        flags(Qn::Main | Qn::Tree | Qn::NoTarget).
-        requiredPermissions(Qn::CreateUserPermission).
-        text(tr("New User..."));
-
-    factory(Qn::NewUserLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredPermissions(Qn::CreateLayoutPermission).
-        text(tr("New Layout...")).
-        condition(hasFlags(QnResource::user));
-
-    factory(Qn::OpenNewTabAction).
-        flags(Qn::Main | Qn::TabBar).
-        text(tr("New Tab")).
-        shortcut(tr("Ctrl+T")).
-        autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-        icon(qnSkin->icon("decorations/new_layout.png"));
-
-    factory(Qn::OpenNewWindowAction).
+    factory(Qn::ConnectionSettingsAction).
         flags(Qn::Main).
-        text(tr("New Window")).
-        shortcut(tr("Ctrl+N")).
-        autoRepeat(false);
+        text(tr("Connect to Server...")).
+        autoRepeat(false).
+        icon(qnSkin->icon("connect.png"));
 
     factory().
         flags(Qn::Main | Qn::Tree).
         separator();
+
+    factory().
+        flags(Qn::Main | Qn::TabBar | Qn::Tree).
+        text(tr("New..."));
+
+    factory.enterSubMenu(); {
+        factory(Qn::NewUserLayoutAction).
+            flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+            requiredPermissions(Qn::CreateLayoutPermission).
+            text(tr("New Layout...")).
+            condition(hasFlags(QnResource::user));
+
+        factory(Qn::OpenNewTabAction).
+            flags(Qn::Main | Qn::TabBar).
+            text(tr("New Tab")).
+            shortcut(tr("Ctrl+T")).
+            autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
+            icon(qnSkin->icon("decorations/new_layout.png"));
+
+        factory(Qn::OpenNewWindowAction).
+            flags(Qn::Main).
+            text(tr("New Window")).
+            shortcut(tr("Ctrl+N")).
+            autoRepeat(false);
+
+        factory(Qn::NewUserAction).
+            flags(Qn::Main | Qn::Tree | Qn::NoTarget).
+            requiredPermissions(Qn::CreateUserPermission).
+            text(tr("New User..."));
+    } factory.leaveSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
@@ -338,9 +351,9 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false);
 
-    factory(Qn::OpenMenu).
+    factory().
         flags(Qn::Main).
-        text(tr("Open"));
+        text(tr("Open..."));
 
     factory.enterSubMenu(); {
         factory(Qn::OpenFileAction).
@@ -395,10 +408,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Maximize")).
         icon(qnSkin->icon("decorations/maximize.png"));
 
-    factory().
-        flags(Qn::Main).
-        separator();
-
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings")).
@@ -406,12 +415,6 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false).
         icon(qnSkin->icon("decorations/settings.png"));
-
-    factory(Qn::ConnectionSettingsAction).
-        flags(Qn::Main).
-        text(tr("Connect to Server...")).
-        autoRepeat(false).
-        icon(qnSkin->icon("connect.png"));
 
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
@@ -912,9 +915,14 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
             return true;
         }
 
-        if(action->menu() != NULL)
-            if(redirectActionRecursive(action->menu(), targetId, targetAction))
-                return true;
+        if(action->menu() != NULL) {
+            bool success = redirectActionRecursive(action->menu(), targetId, targetAction);
+            
+            if(success && action->menu()->isEmpty())
+                menu->removeAction(action);
+
+            return success;
+        }
     }
         
     return false;

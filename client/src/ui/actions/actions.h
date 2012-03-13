@@ -133,11 +133,6 @@ namespace Qn {
          */
         SaveCurrentLayoutAsAction,
 
-        /**
-         * Submenu for 'open' commands.
-         */
-        OpenMenu,
-
             /**
              * Opens a file dialog and adds selected files to the current layout.
              */
