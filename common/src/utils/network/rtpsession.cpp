@@ -324,7 +324,7 @@ RTPIODevice*  RTPSession::sendSetup()
         request += QByteArray::number(m_csec++);
         request += "\r\n";
         request += "User-Agent: Network Optix\r\n";
-        request += QString("Transport: RTP/AVP/") + m_transport + QString(";unicast");
+        request += QString("Transport: RTP/AVP/") + m_transport + QString(";unicast;");
 
         if (m_transport == "UDP")
         {
