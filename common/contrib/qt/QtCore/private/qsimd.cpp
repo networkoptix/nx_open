@@ -374,7 +374,7 @@ static const int features_indices[] = {
 
 const int features_count = (sizeof features_indices - 1) / (sizeof features_indices[0]);
 
-uint qDetectCPUFeatures()
+uint qnDetectCPUFeatures()
 {
     static QBasicAtomicInt features = Q_BASIC_ATOMIC_INITIALIZER(-1);
     if (features != -1)
@@ -396,7 +396,7 @@ uint qDetectCPUFeatures()
 
 void qDumpCPUFeatures()
 {
-    uint features = qDetectCPUFeatures();
+    uint features = qnDetectCPUFeatures();
     printf("Processor features: ");
     for (int i = 0; i < features_count; ++i) {
         if (features & (1 << i))

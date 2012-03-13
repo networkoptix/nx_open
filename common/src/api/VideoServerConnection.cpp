@@ -138,7 +138,7 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceLis
     return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
-void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& errorString, int handle)
+void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
 {
     QnTimePeriodList result;
     if(status == 0)

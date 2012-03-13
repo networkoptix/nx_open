@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QLineEdit;
 class QTabWidget;
@@ -28,7 +29,7 @@ namespace Ui {
     class ResourceTreeWidget;
 }
 
-class QnResourceTreeWidget: public QWidget, public QnActionTargetProvider {
+class QnResourceTreeWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT
 
 public:
@@ -38,21 +39,13 @@ public:
         TabCount
     };
 
-    QnResourceTreeWidget(QWidget *parent = 0);
+    QnResourceTreeWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
 
     virtual ~QnResourceTreeWidget();
 
     Tab currentTab() const;
 
     void setCurrentTab(Tab tab);
-
-    void setContext(QnWorkbenchContext *context);
-
-    QnWorkbench *workbench() const;
-
-    QnWorkbenchContext *context() const {
-        return m_context;
-    }
 
     QnResourceList selectedResources() const;
 
@@ -101,12 +94,8 @@ private slots:
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
 
-    void at_context_aboutToBeDestroyed();
-
 private:
     QScopedPointer<Ui::ResourceTreeWidget> ui;
-
-    QnWorkbenchContext *m_context;
 
     bool m_ignoreFilterChanges;
     int m_filterTimerId;

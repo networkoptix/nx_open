@@ -159,8 +159,6 @@ void serializeField(QByteArray& stream, qint64 field)
 
 bool QnTimePeriod::encode(QByteArray& stream, const QnTimePeriodList& periods)
 {
-    const quint8* curPtr = (const quint8*) stream.data();
-
     if (periods.isEmpty())
         return true;
     qint64 timePos = periods.first().startTimeMs;

@@ -415,6 +415,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8*
             bitReader.setBuffer(data+1, end);
             try {
                 int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
+
                 int slice_type = NALUnit::extractUEGolombCode(bitReader);
                 if (slice_type >= 5)
                     slice_type -= 5; // +5 flag is: all other slice at this picture must be same type

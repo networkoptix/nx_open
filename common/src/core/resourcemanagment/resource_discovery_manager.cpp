@@ -540,6 +540,7 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
     }
 
 #ifdef _DEBUG
+    Q_UNUSED(threads);
     foreach(check_if_accessible_STRUCT t, checkLst)
     {
         qDebug() << "Checking conflicts for " << t.resourceNet->getHostAddress().toString() << "  name = " << t.resourceNet->getName();

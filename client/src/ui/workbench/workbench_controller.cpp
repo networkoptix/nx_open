@@ -133,6 +133,7 @@ namespace {
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
+    QnWorkbenchContextAware(display->context()),
     m_display(display),
     m_manager(display->instrumentManager()),
     m_resizedWidget(NULL),
@@ -172,7 +173,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
-    GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(display->workbench(), this);
+    GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -329,24 +330,12 @@ QnWorkbenchController::~QnWorkbenchController() {
     m_screenRecorder->stopRecording();
 }
 
-QAction *QnWorkbenchController::action(const Qn::ActionId id) const {
-    return m_display->context() ? m_display->context()->action(id) : NULL;
-}
-
-QnActionManager *QnWorkbenchController::menu() const {
-    return m_display->context() ? m_display->context()->menu() : NULL;
-}
-
 QnWorkbenchDisplay *QnWorkbenchController::display() const {
     return m_display;
 }
 
-QnWorkbench *QnWorkbenchController::workbench() const {
-    return m_display->workbench();
-}
-
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
-    return m_display->workbench()->mapper();
+    return workbench()->mapper();
 }
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
@@ -957,7 +946,7 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         m_moveInstrument->setEffective(effective);
 
         if(widget == NULL) /* Un-raise on un-zoom. */
-            m_display->workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(QnWorkbench::RAISED, NULL);
         break;
     }
     default:

@@ -6,7 +6,7 @@ const int androidRecvPort = 5559;
 
 QnPlDroidResourceSearcher::QnPlDroidResourceSearcher()
 {
-    bool bindSucceeded = m_recvSocket.bind(androidRecvPort);
+    m_recvSocket.bind(androidRecvPort);
 }
 
 QnPlDroidResourceSearcher& QnPlDroidResourceSearcher::instance()

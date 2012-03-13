@@ -38,7 +38,7 @@ const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMed
     }
     else {
         if (m_customVideoLayout == 0)
-            m_customVideoLayout = CLCustomDeviceVideoLayout::fromString(strVal);
+            m_customVideoLayout = QnCustomDeviceVideoLayout::fromString(strVal);
         return m_customVideoLayout;
     }
 }

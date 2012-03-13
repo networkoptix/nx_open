@@ -75,7 +75,6 @@ public:
 
 	inline static bool isMarker(quint8* ptr) {return ptr[0] == ptr[1] == 0 && ptr[2] == 1;}
 	inline static quint8* findNextMarker(quint8* buffer, quint8* end) {
-		quint8* bufStart = buffer;
 		for (buffer += 2; buffer < end;)
 		{
 			if (*buffer > 1)

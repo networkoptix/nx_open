@@ -28,7 +28,7 @@ QString QnDroidResource::manufacture() const
     return MANUFACTURE;
 }
 
-void QnDroidResource::setIframeDistance(int frames, int timems)
+void QnDroidResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
@@ -38,7 +38,7 @@ QnAbstractStreamDataProvider* QnDroidResource::createLiveDataProvider()
     return new PlDroidStreamReader(toSharedPointer());;
 }
 
-void QnDroidResource::setCropingPhysical(QRect croping)
+void QnDroidResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }

@@ -26,7 +26,7 @@ QString QnPlIqResource::manufacture() const
     return MANUFACTURE;
 }
 
-void QnPlIqResource::setIframeDistance(int frames, int timems)
+void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
@@ -56,7 +56,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
     return new MJPEGtreamreader(toSharedPointer(), "now.jpg?snap=spush");
 }
 
-void QnPlIqResource::setCropingPhysical(QRect croping)
+void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }

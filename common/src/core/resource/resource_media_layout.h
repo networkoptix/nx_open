@@ -8,7 +8,7 @@ class QN_EXPORT QnDeviceLayout
 {
 public:
     //returns number of audio or video channels device has
-    virtual unsigned int numberOfChannels() const = 0;
+    virtual int numberOfChannels() const = 0;
 };
 
 class QnResourceAudioLayout: public QnDeviceLayout
@@ -28,8 +28,8 @@ class QnEmptyAudioLayout: public QnResourceAudioLayout
 {
 public:
     QnEmptyAudioLayout(): QnResourceAudioLayout() {}
-    virtual unsigned int numberOfChannels() const { return 0; }
-    virtual AudioTrack getAudioTrackInfo(int /*index*/) const { return AudioTrack(); }
+    virtual int numberOfChannels() const override { return 0; }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return AudioTrack(); }
 };
 
 class QnVideoResourceLayout: public QnDeviceLayout
@@ -39,13 +39,13 @@ public:
     virtual ~QnVideoResourceLayout() {}
 
     // returns maximum width ( in terms of channels 4x1 2x2 1x1 ans so on  )
-    virtual unsigned int width() const = 0;
+    virtual int width() const = 0;
 
     // returns maximum height ( in terms of channels 4x1 2x2 1x1 ans so on  )
-    virtual unsigned int height() const = 0;
+    virtual int height() const = 0;
 
-    virtual unsigned int h_position(unsigned int channel) const = 0; //returns horizontal position of the channel
-    virtual unsigned int v_position(unsigned int channel) const = 0; //returns vertical position of the channel
+    virtual int h_position(int channel) const = 0; //returns horizontal position of the channel
+    virtual int v_position(int channel) const = 0; //returns vertical position of the channel
 
 };
 
@@ -55,38 +55,38 @@ class QnDefaultDeviceVideoLayout : public QnVideoResourceLayout
 public:
     QnDefaultDeviceVideoLayout() {}
     virtual ~QnDefaultDeviceVideoLayout() {}
-    //returns number of video channels device has
-    virtual unsigned int numberOfChannels() const
+
+    virtual int numberOfChannels() const override
     {
         return 1;
     }
 
-    virtual unsigned int width() const
+    virtual int width() const override
     {
         return 1;
     }
 
-    virtual unsigned int height() const
+    virtual int height() const override
     {
         return 1;
     }
 
-    virtual unsigned int h_position(unsigned int /*channel*/) const
+    virtual int h_position(int /*channel*/) const override
     {
         return 0;
     }
 
-    virtual unsigned int v_position(unsigned int /*channel*/) const
+    virtual int v_position(int /*channel*/) const override
     {
         return 0;
     }
 
 };
 
-class CLCustomDeviceVideoLayout : public QnVideoResourceLayout
+class QnCustomDeviceVideoLayout : public QnVideoResourceLayout
 {
 public:
-    static CLCustomDeviceVideoLayout* fromString(const QString& value)
+    static QnCustomDeviceVideoLayout* fromString(const QString& value)
     {
         QStringList params = value.split(';');
         int width = 1;
@@ -104,31 +104,31 @@ public:
             else if (values[0] == "sensors") 
                 sensors = values[1].split(',');
         }
-        CLCustomDeviceVideoLayout* result = new CLCustomDeviceVideoLayout(width, height);
+        QnCustomDeviceVideoLayout* result = new QnCustomDeviceVideoLayout(width, height);
         for (int i = 0; i < sensors.size(); ++i)
             result->setChannel(i, sensors[i].toInt());
         return result;
     }
 
-    CLCustomDeviceVideoLayout(int width, int height):
+    QnCustomDeviceVideoLayout(int width, int height):
         m_width(width),
         m_height(height)
     {
         m_channels.resize(width*height);
     }
-    virtual ~CLCustomDeviceVideoLayout(){}
-    //returns number of video channels device has
-    virtual unsigned int numberOfChannels() const
+    virtual ~QnCustomDeviceVideoLayout(){}
+
+    virtual int numberOfChannels() const override
     {
         return m_width*m_height;
     }
 
-    virtual unsigned int width() const
+    virtual int width() const override
     {
         return m_width;
     }
 
-    virtual unsigned int height() const
+    virtual int height() const override
     {
         return m_height;
     }
@@ -161,7 +161,7 @@ public:
         m_channels[index] = channel;
     }
 
-    virtual unsigned int h_position(unsigned int channel) const
+    virtual int h_position(int channel) const override
     {
         for (int i = 0; i < m_width*m_height; ++i)
         {
@@ -172,7 +172,7 @@ public:
         return 0;
     }
 
-    virtual unsigned int v_position(unsigned int channel) const
+    virtual int v_position(int channel) const override
     {
         for (int i = 0; i < m_width*m_height; ++i)
         {
@@ -184,7 +184,6 @@ public:
     }
 
 protected:
-
     QVector<int> m_channels;
     int m_width;
     int m_height;
