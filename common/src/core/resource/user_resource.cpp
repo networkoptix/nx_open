@@ -72,7 +72,7 @@ void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout)
 
 QString QnUserResource::getUniqueId() const
 {
-    return getGuid();
+    return getName();
 }
 
 QString QnUserResource::getPassword() const

@@ -5,6 +5,14 @@
 
 namespace Qn {
 
+    enum NodeType {
+        LocalNode,
+        ServersNode,
+        UsersNode,
+        ResourceNode,   /**< Node that represents a resource. */
+        ItemNode,       /**< Node that represents a layout item. */
+    };
+
     enum ItemDataRole {
         ResourceRole        = Qt::UserRole + 1, /**< Role for QnResourcePtr. */
         ResourceFlagsRole   = Qt::UserRole + 2, /**< Role for resource flags. */
@@ -13,7 +21,6 @@ namespace Qn {
         StatusRole          = Qt::UserRole + 5, /**< Role for resource's status. */
         NodeTypeRole        = Qt::UserRole + 6, /**< Role for node type. */
     };
-
 
 
 } // namespace Qn

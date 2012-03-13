@@ -139,7 +139,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->passwordEdit->setText(QString());
         ui->passwordEdit->setPlaceholderText(QString());
         ui->cameraScheduleWidget->setScheduleEnabled(Qt::PartiallyChecked);
-        ui->cameraScheduleWidget->setMaxFps(1);
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setChangesDisabled(true);
     } else {
