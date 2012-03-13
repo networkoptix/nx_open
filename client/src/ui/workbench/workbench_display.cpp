@@ -186,6 +186,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *par
     m_frameOpacityAnimator->setTargetObject(this);
     m_frameOpacityAnimator->setTimeLimit(500);
 
+    /* Connect to context. */
+    connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
+
     /* Set up defaults. */
     setScene(m_dummyScene);
 }
@@ -1316,6 +1319,17 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged() {
         m_frameOpacityAnimator->animateTo(0.0);
     } else {
         m_frameOpacityAnimator->animateTo(1.0);
+    }
+}
+
+void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource) {
+    if(QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>()) {
+        if(QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource)) {
+            Qn::Permissions permissions = accessController()->permissions(resource);
+
+            if(!(permissions & Qn::ReadPermission))
+                workbench()->removeLayout(layout);
+        }
     }
 }
 

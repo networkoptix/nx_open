@@ -783,7 +783,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     }
 
     if(m_cameraSettingsDialog->widget()->resources() != resources) {
-        if(m_cameraSettingsDialog->widget()->hasChanges()) {
+        if(m_cameraSettingsDialog->isVisible() && m_cameraSettingsDialog->widget()->hasChanges()) {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
                 QnResourceList(m_cameraSettingsDialog->widget()->resources()),

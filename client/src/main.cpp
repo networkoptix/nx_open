@@ -243,6 +243,8 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
+    QTextStream out(stdout);
+
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
@@ -269,6 +271,8 @@ int main(int argc, char *argv[])
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
+        out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
+
         QnSettings::ConnectionData connection;
         connection.url = authentication;
 
@@ -467,7 +471,6 @@ int main(int argc, char *argv[])
         if(!autoTester.succeeded())
             result = 1;
 
-        QTextStream out(stdout);
         out << autoTester.message();
     }
 
