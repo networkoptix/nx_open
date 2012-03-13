@@ -29,7 +29,7 @@
 #include "device_plugins/server_camera/appserver.h"
 
 #define TEST_RTSP_SERVER
-//#define STANDALONE_MODE
+#define STANDALONE_MODE
 
 #include "core/resource/video_server.h"
 #include "core/resource/storage_resource.h"
@@ -47,6 +47,7 @@
 #include "ui/tooltips/tool_tip.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
+#include "plugins/resources/isd/isd_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -389,6 +390,13 @@ int main(int argc, char *argv[])
 
     QnPlIpWebCamResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+
+    QnPlISDResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+
+
+
+
 #endif
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
