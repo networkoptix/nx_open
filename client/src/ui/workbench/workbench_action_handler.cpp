@@ -969,6 +969,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setUser(user);
+    dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
     if(!dialog->exec())
         return;
 
@@ -1091,6 +1092,13 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
+    
+    if(user == context()->user()) {
+        dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
+        dialog->setCurrentPassword(qnSettings->lastUsedConnection().url.password()); // TODO: This is a totally evil hack. Store password hash/salt in user.
+    } else {
+        dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
+    }
 
     QString oldPassword = user->getPassword();
     user->setPassword(QLatin1String("******"));
