@@ -170,17 +170,20 @@ void QnSystrayWindow::findServiceInfo()
  
  void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
  {
-     switch (reason) {
-     case QSystemTrayIcon::Trigger:
-     case QSystemTrayIcon::DoubleClick:
-         //iconComboBox->setCurrentIndex((iconComboBox->currentIndex() + 1)
-         //                              % iconComboBox->count());
-         break;
-     case QSystemTrayIcon::MiddleClick:
-         showMessage();
-         break;
-     default:
-         ;
+     CURSORINFO  pci;
+     pci.cbSize = sizeof(CURSORINFO);
+
+     switch (reason) 
+     {
+        case QSystemTrayIcon::DoubleClick:
+        case QSystemTrayIcon::Trigger:
+            if (GetCursorInfo(&pci))
+                trayIcon->contextMenu()->popup(QPoint(pci.ptScreenPos.x, pci.ptScreenPos.y));
+            break;
+        case QSystemTrayIcon::MiddleClick:
+            break;
+        default:
+            ;
      }
  }
 
@@ -507,7 +510,7 @@ void QnSystrayWindow::createActions()
 
 void QnSystrayWindow::createTrayIcon()
 {
-    trayIconMenu = new QMenu(this);
+    trayIconMenu = new QMenu();
 
     trayIconMenu->addAction(m_mediaServerStartAction);
     trayIconMenu->addAction(m_mediaServerStopAction);
