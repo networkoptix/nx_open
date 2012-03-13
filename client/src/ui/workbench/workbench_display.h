@@ -73,10 +73,9 @@ public:
     /**
      * Constructor.
      * 
-     * \param context                   Context to display.
      * \param parent                    Parent object for this workbench display.
      */
-    QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *parent = NULL);
+    QnWorkbenchDisplay(QObject *parent = NULL);
 
 	/**
 	  * This is method initSyncPlay. Should be called for only main display.

@@ -108,9 +108,9 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbenchContext *context, QObject *parent):
+QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     QObject(parent),
-    QnWorkbenchContextAware(context),
+    QnWorkbenchContextAware(parent),
     m_instrumentManager(new InstrumentManager(this)),
     m_scene(NULL),
     m_view(NULL),

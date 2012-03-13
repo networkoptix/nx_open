@@ -59,15 +59,18 @@ public:
     Node(QnResourcePoolModel *model, Qn::NodeType type):
         m_model(model),
         m_type(type),
-        m_state(Invalid),
+        m_state(Normal),
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Online),
         m_modified(false)
     {
-        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode);
+        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode);
 
         switch(type) {
+        case Qn::RootNode:
+            m_name = tr("Root");
+            break;
         case Qn::LocalNode:
             m_name = tr("Local");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
@@ -454,8 +457,7 @@ private:
 // -------------------------------------------------------------------------- //
 QnResourcePoolModel::QnResourcePoolModel(QObject *parent): 
     QAbstractItemModel(parent), 
-    QnWorkbenchContextAware(parent),
-    m_root(NULL)
+    QnWorkbenchContextAware(parent)
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
@@ -468,26 +470,28 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent):
     setRoleNames(roles);
 
     /* Create root. */
-    m_root = this->node(QnResourcePtr());
-    m_root->setState(Node::Normal);
+    m_rootNode = new Node(this, Qn::RootNode);
 
     /* Create top-level nodes. */
     m_localNode = new Node(this, Qn::LocalNode);
-    m_localNode->setParent(m_root);
+    m_localNode->setParent(m_rootNode);
 
     m_usersNode = new Node(this, Qn::UsersNode);
-    m_usersNode->setParent(m_root);
+    m_usersNode->setParent(m_rootNode);
 
     m_serversNode = new Node(this, Qn::ServersNode);
-    m_serversNode->setParent(m_root);
+    m_serversNode->setParent(m_rootNode);
 
     /* Connect to context. */
     connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
     connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)), Qt::QueuedConnection);
     connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
     connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),  this, SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
+    connect(context(),          SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()), Qt::QueuedConnection);
 
     QnResourceList resources = resourcePool()->getResources(); 
+
+    at_context_userChanged();
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     foreach(const QnResourcePtr &resource, resources)
@@ -507,6 +511,7 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
 
+    delete m_rootNode;
     delete m_localNode;
     delete m_serversNode;
     delete m_usersNode;
@@ -518,6 +523,9 @@ QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
 
 QnResourcePoolModel::Node *QnResourcePoolModel::node(const QnResourcePtr &resource) {
     QnResource *index = resource.data();
+    if(!index)
+        return m_rootNode;
+
     QHash<QnResource *, Node *>::iterator pos = m_resourceNodeByResource.find(index);
     if(pos == m_resourceNodeByResource.end())
         pos = m_resourceNodeByResource.insert(index, new Node(this, resource));
@@ -533,7 +541,7 @@ QnResourcePoolModel::Node *QnResourcePoolModel::node(const QUuid &uuid) {
 
 QnResourcePoolModel::Node *QnResourcePoolModel::node(const QModelIndex &index) const {
     if(!index.isValid())
-        return m_root;
+        return m_rootNode;
 
     return static_cast<Node *>(index.internalPointer());
 }
@@ -542,10 +550,15 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     assert(node->type() == Qn::ResourceNode);
 
     if(!node->resource())
-        return m_root;
+        return m_rootNode;
 
-    if(node->resourceFlags() & QnResource::user)
-        return m_usersNode;
+    if(node->resourceFlags() & QnResource::user) {
+        if(accessController()->isViewer()) {
+            return m_rootNode;
+        } else {
+            return m_usersNode;
+        }
+    }
 
     if(node->resourceFlags() & QnResource::server)
         return m_serversNode;
@@ -556,17 +569,30 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     return this->node(resourcePool()->getResourceById(node->resource()->getParentId()));
 }
 
-void QnResourcePoolModel::updateBastard(const QnResourcePtr &resource, const QnLayoutResourcePtr &layout) {
-    if(!resource)
-        return;
+void QnResourcePoolModel::updateBastard(Node *node) {
+    QnResourcePtr resource = node->resource();
 
-    Node *node = this->node(resource);
-
-    bool bastard = !(accessController()->permissions(resource) & Qn::ReadPermission); /* Hide non-readable resources. */
-    if(!bastard && layout)
-        bastard = snapshotManager()->isLocal(layout); /* Hide local layouts. */
-    if(!bastard && (node->resourceFlags() & QnResource::local_server) == QnResource::local_server)
-        bastard = true;
+    bool bastard = false;
+    switch(node->type()) {
+    case Qn::ResourceNode: 
+        bastard = !(accessController()->permissions(resource) & Qn::ReadPermission); /* Hide non-readable resources. */
+        if(!bastard) {
+            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+            if(layout)
+                bastard = snapshotManager()->isLocal(layout); /* Hide local layouts. */
+            if(!bastard)
+                bastard = (node->resourceFlags() & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
+        }
+        break;
+    case Qn::UsersNode:
+        bastard = accessController()->isViewer();
+        break;
+    case Qn::ServersNode:
+        bastard = accessController()->isViewer();
+        break;
+    default:
+        break;
+    }
 
     node->setBastard(bastard);
 }
@@ -768,7 +794,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         foreach(const QnLayoutItemData &item, layout->getItems())
             at_resource_itemAdded(layout, item);
 
-    updateBastard(resource, layout);
+    updateBastard(node);
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -780,15 +806,24 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     // TODO: delete node here?
 }
 
+void QnResourcePoolModel::at_context_userChanged() {
+    updateBastard(m_localNode);
+    updateBastard(m_serversNode);
+    updateBastard(m_usersNode);
+
+    foreach(Node *node, m_resourceNodeByResource)
+        node->setParent(expectedParent(node));
+}
+
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     Node *node = this->node(resource);
 
     node->setModified(snapshotManager()->isModified(resource));
-    updateBastard(resource, resource);
+    updateBastard(node);
 }
 
 void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
-    updateBastard(resource, resource.dynamicCast<QnLayoutResource>());
+    updateBastard(this->node(resource));
 }
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {

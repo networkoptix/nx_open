@@ -522,11 +522,11 @@ bool QnDwm::widgetEvent(QEvent *event) {
 
         /* This is needed because when going out of full screen, position calculation 
          * breaks despite the fact that frame struts are set. Moving the widget fixes that. 
-         * However, we cannot move it right away, because if was restored from minimized state,
+         * However, we cannot move it right away, because if it was restored from minimized state,
          * then its position is not yet initialized. */
         if(event->type() == QEvent::WindowStateChange) {
             QWindowStateChangeEvent *e = static_cast<QWindowStateChangeEvent *>(event);
-            if((e->oldState() & Qt::WindowMinimized) && !(d->widget->windowState() & Qt::WindowMinimized))
+            if((e->oldState() & Qt::WindowFullScreen) && !(d->widget->windowState() & Qt::WindowFullScreen))
                 QApplication::postEvent(d->widget, new QnInvocationEvent(AdjustPositionInvocation), Qt::LowEventPriority);
         }
 

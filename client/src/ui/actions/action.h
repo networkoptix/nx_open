@@ -60,6 +60,12 @@ public:
 
     void setToggledText(const QString &toggledText);
 
+    const QString &pulledText() const {
+        return m_pulledText;
+    }
+
+    void setPulledText(const QString &pulledText);
+
     QnActionCondition *condition() const {
         return m_condition.data();
     }
@@ -86,7 +92,7 @@ private:
     const Qn::ActionId m_id;
     Qn::ActionFlags m_flags;
     QHash<QString, Qn::Permissions> m_requiredPermissions;
-    QString m_normalText, m_toggledText;
+    QString m_normalText, m_toggledText, m_pulledText;
     QWeakPointer<QnActionCondition> m_condition;
 
     QList<QnAction *> m_children;

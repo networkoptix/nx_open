@@ -92,9 +92,9 @@ namespace {
 } // anonymous namespace
 
 
-QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags): 
+QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
     QWidget(parent, flags | Qt::CustomizeWindowHint),
-    QnWorkbenchContextAware(new QnWorkbenchContext(qnResPool, this)),
+    QnWorkbenchContextAware(context),
     m_controller(0),
     m_drawCustomFrame(false),
     m_titleVisible(true),
@@ -146,7 +146,7 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags):
 
 
     /* Set up model & control machinery. */
-    m_display = new QnWorkbenchDisplay(context(), this);
+    m_display = new QnWorkbenchDisplay(this);
 	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);
@@ -254,13 +254,9 @@ QnMainWindow::QnMainWindow(QWidget *parent, Qt::WindowFlags flags):
 
 QnMainWindow::~QnMainWindow()
 {
-    QnWorkbenchContext *context = this->context();
-    context->setParent(NULL);
-    
     m_dwm = NULL;
-    qDeleteAll(children());
-
-    delete context;
+    /*while(!children().empty())
+        delete children().front();*/
 }
 
 void QnMainWindow::setTitleVisible(bool visible) 

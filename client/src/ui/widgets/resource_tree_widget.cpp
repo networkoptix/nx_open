@@ -120,6 +120,21 @@ private:
     QIcon m_recIcon;
 };
 
+class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
+public:
+    QnResourceTreeSortProxyModel(QObject *parent = NULL): QSortFilterProxyModel(parent) {}
+
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+        bool leftLocal = left.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
+        bool rightLocal = right.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
+        if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
+            return leftLocal;
+
+        return QSortFilterProxyModel::lessThan(left, right);
+    }
+};
+
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
@@ -139,7 +154,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourcePoolModel(this);
-    QSortFilterProxyModel *model = new QSortFilterProxyModel(this);
+    QSortFilterProxyModel *model = new QnResourceTreeSortProxyModel(this);
     model->setSourceModel(m_resourceModel);
     model->setSupportedDragActions(m_resourceModel->supportedDragActions());
     model->setDynamicSortFilter(true);
@@ -372,7 +387,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
 
     /* Add tree-local actions to the menu. */
     manager->redirectAction(menu.data(), Qn::RenameLayoutAction, m_renameLayoutAction);
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode)
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
 
     if(menu->isEmpty())

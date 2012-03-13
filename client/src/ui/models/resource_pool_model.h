@@ -53,12 +53,13 @@ private:
     Node *expectedParent(Node *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
-    void updateBastard(const QnResourcePtr &resource, const QnLayoutResourcePtr &layout);
+    void updateBastard(Node *node);
 
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 
+    void at_context_userChanged();
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
     void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 
@@ -72,8 +73,8 @@ private slots:
     void at_resource_itemRemoved(const QnLayoutItemData &item);
 
 private:
-    /** Root node. Considered a resource node for NULL resource. */
-    Node *m_root;
+    /** Root node. */
+    Node *m_rootNode;
 
     Node *m_serversNode, *m_localNode, *m_usersNode;
 

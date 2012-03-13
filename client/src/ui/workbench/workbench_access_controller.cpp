@@ -27,7 +27,7 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
 }
 
 Qn::Permissions QnWorkbenchAccessController::permissions() const {
-    return m_permissionsByResource.value(QnResourcePtr());
+    return m_permissionsByResource.value(m_user);
 }
 
 bool QnWorkbenchAccessController::isOwner() const {
@@ -35,19 +35,16 @@ bool QnWorkbenchAccessController::isOwner() const {
 }
 
 bool QnWorkbenchAccessController::isAdmin() const {
-    return m_user && m_user->isAdmin();
+    return m_user && m_user->isAdmin() && m_user->getName() != QLatin1String("admin");
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculateGlobalPermissions() {
-    if(isOwner() || isAdmin())
-        return Qn::CreateUserPermission;
-
-    return 0;
+bool QnWorkbenchAccessController::isViewer() const {
+    return !m_user || !m_user->isAdmin();
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) {
     if(!resource)
-        return calculateGlobalPermissions();
+        return 0;
 
     QnResource::Status status = resource->getStatus();
     if(status == QnResource::Disabled)
@@ -71,13 +68,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
     if(isOwner()) {
         if(user == m_user) {
-            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission;
+            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission | Qn::CreateUserPermission;
         } else {
             return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
         }
     } else if(isAdmin()) {
         if(user == m_user) {
-            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission;
+            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission | Qn::CreateUserPermission;
         } else if(user->isAdmin()) {
             return Qn::ReadPermission | Qn::CreateLayoutPermission;
         } else {
@@ -93,7 +90,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
-    if(isAdmin()) {
+    if(isAdmin() || isOwner()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
@@ -109,7 +106,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &) {
-    if(isAdmin()) {
+    if(isAdmin() || isOwner()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         return Qn::ReadPermission;
@@ -117,10 +114,10 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtua
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &) {
-    if(isAdmin()) {
+    if(isAdmin() || isOwner()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
-        return Qn::ReadPermission;
+        return 0;
     }
 }
 
