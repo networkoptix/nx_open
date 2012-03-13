@@ -718,7 +718,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexLi
     return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
 }
 
-void QnActionManager::copyAction(QAction *dst, QnAction *src) {
+void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignals) {
     dst->setText(src->text());
     dst->setIcon(src->icon());
     dst->setShortcuts(src->shortcuts());
@@ -728,8 +728,10 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src) {
     dst->setIconText(src->iconText());
     dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
     
-    connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
-    connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+    if(forwardSignals) {
+        connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
+        connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+    }
 }
 
 void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
@@ -939,15 +941,12 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
 
     foreach(QAction *action, actions) {
         QnAction *storedAction = qnAction(action);
-        Qn::ActionId id = storedAction ? storedAction->id() : Qn::NoAction;
-        if(id == targetId) {
+        if(storedAction && storedAction->id() == targetId) {
             int index = actions.indexOf(action);
 
             menu->removeAction(action);
             if(targetAction != NULL) {
-                targetAction->setText(action->text());
-                targetAction->setShortcuts(action->shortcuts());
-                targetAction->setIcon(action->icon());
+                copyAction(targetAction, storedAction, false);
                 menu->insertAction(index == actions.size() - 1 ? NULL : actions[index], targetAction);
             }
 

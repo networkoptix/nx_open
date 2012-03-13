@@ -116,7 +116,7 @@ protected:
         QVariantMap params;
     };
 
-    void copyAction(QAction *dst, QnAction *src);
+    void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
 
     void triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params);
 
