@@ -51,6 +51,8 @@ protected slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
+    void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout);
+
 private:
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
