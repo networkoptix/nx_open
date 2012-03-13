@@ -108,7 +108,6 @@ elif platform() == 'linux':
 if platform() == 'win32':
     copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
     copy_files(openssl_path + '/bin/*.dll', 'bin/release')
-    print openssl_path
 
 if platform() == 'mac':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')

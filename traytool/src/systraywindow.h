@@ -20,6 +20,8 @@ namespace Ui {
     class SettingsDialog;
 }
 
+bool MyIsUserAnAdmin();
+
 class QnElevationChecker : public QObject
 {
     Q_OBJECT
@@ -55,6 +57,8 @@ protected:
     virtual void closeEvent(QCloseEvent *event) override;
 
 private slots:
+    void handleMessage(const QString& message);
+
     void setIcon(int index);
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void showMessage();
