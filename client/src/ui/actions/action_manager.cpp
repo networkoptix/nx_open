@@ -16,9 +16,21 @@
 #include "action_target_provider.h"
 #include "action_target_types.h"
 
+Q_DECLARE_METATYPE(QnAction *);
+
 namespace {
     void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
         dst->addPixmap(src.pixmap(src.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
+    }
+
+    const char *sourceActionPropertyName = "_qn_sourceAction";
+
+    QnAction *qnAction(QAction *action) {
+        QnAction *result = action->property(sourceActionPropertyName).value<QnAction *>();
+        if(result)
+            return result;
+
+        return checked_cast<QnAction *>(action);
     }
 
 } // anonymous namespace
@@ -80,6 +92,13 @@ public:
         m_action->setCheckable(true);
 
         showCheckBoxInMenu(false);
+
+        return *this;
+    }
+
+    QnActionBuilder pulledText(const QString &text) {
+        m_action->setPulledText(text);
+        m_action->setFlags(m_action->flags() | Qn::Pullable);
 
         return *this;
     }
@@ -306,33 +325,37 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory().
-        flags(Qn::Main | Qn::TabBar | Qn::Tree).
+        flags(Qn::Main | Qn::TabBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));
 
     factory.enterSubMenu(); {
         factory(Qn::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
             requiredPermissions(Qn::CreateLayoutPermission).
-            text(tr("New Layout...")).
+            text(tr("Layout...")).
+            pulledText(tr("New Layout...")).
             condition(hasFlags(QnResource::user));
 
         factory(Qn::OpenNewTabAction).
             flags(Qn::Main | Qn::TabBar).
-            text(tr("New Tab")).
+            text(tr("Tab")).
+            pulledText(tr("New Tab")).
             shortcut(tr("Ctrl+T")).
             autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
             icon(qnSkin->icon("decorations/new_layout.png"));
 
         factory(Qn::OpenNewWindowAction).
             flags(Qn::Main).
-            text(tr("New Window")).
+            text(tr("Window")).
+            pulledText(tr("New Window")).
             shortcut(tr("Ctrl+N")).
             autoRepeat(false);
 
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
             requiredPermissions(Qn::CreateUserPermission).
-            text(tr("New User..."));
+            text(tr("User...")).
+            pulledText(tr("New User..."));
     } factory.leaveSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
@@ -695,7 +718,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexLi
     return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
 }
 
-void QnActionManager::copyAction(QAction *dst, const QAction *src) {
+void QnActionManager::copyAction(QAction *dst, QnAction *src) {
     dst->setText(src->text());
     dst->setIcon(src->icon());
     dst->setShortcuts(src->shortcuts());
@@ -703,6 +726,7 @@ void QnActionManager::copyAction(QAction *dst, const QAction *src) {
     dst->setChecked(src->isChecked());
     dst->setFont(src->font());
     dst->setIconText(src->iconText());
+    dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
     
     connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
     connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
@@ -742,7 +766,8 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         Qn::ActionVisibility visibility = action->checkCondition(scope, items, QVariantMap());
         if(visibility == Qn::InvisibleAction)
             continue;
-        
+
+        QString replacedText;
         QMenu *menu = NULL;
         if(action->children().size() > 0) {
             menu = newMenuRecursive(action, scope, items);
@@ -750,18 +775,31 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 delete menu;
                 menu = NULL;
                 visibility = Qn::InvisibleAction;
-            } else {
-                connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
+            } else if(menu->actions().size() == 1) {
+                QnAction *menuAction = qnAction(menu->actions()[0]);
+                if(menuAction->flags() & Qn::Pullable) {
+                    delete menu;
+                    menu = NULL;
+
+                    action = menuAction;
+                    visibility = action->checkCondition(scope, items, QVariantMap());
+                    replacedText = action->pulledText();
+                }
             }
+
+            if(menu)
+                connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
         }
 
         QAction *newAction = NULL;
-        if(visibility == Qn::DisabledAction || menu != NULL) {
+        if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL) {
             newAction = new QAction(result);
             copyAction(newAction, action);
             
             newAction->setMenu(menu);
             newAction->setDisabled(visibility == Qn::DisabledAction);
+            if(!replacedText.isEmpty())
+                newAction->setText(replacedText);
         } else {
             newAction = action;
         }

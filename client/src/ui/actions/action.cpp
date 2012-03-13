@@ -53,6 +53,10 @@ void QnAction::setToggledText(const QString &toggledText) {
     connect(this, SIGNAL(toggled(bool)), this, SLOT(at_toggled(bool)), Qt::UniqueConnection);
 }
 
+void QnAction::setPulledText(const QString &pulledText) {
+    m_pulledText = pulledText;
+}
+
 void QnAction::setCondition(QnActionCondition *condition) {
     m_condition = condition;
 }

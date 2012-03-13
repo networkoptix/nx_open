@@ -404,6 +404,10 @@ namespace Qn {
          * Action can be executed from any scope, and its target will be taken from its scope. */
         ScopelessHotkey         = 0x200000,       
 
+        /** Action can be pulled into enclosing menu if it is the only one in
+         * its submenu. It may have another text in this case. */
+        Pullable                = 0x400000,
+
 
         /** Action can appear in main menu. */
         Main                    = Qn::MainScope | NoTarget,                     
