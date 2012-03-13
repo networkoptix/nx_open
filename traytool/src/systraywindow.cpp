@@ -404,16 +404,25 @@ QnElevationChecker::QnElevationChecker(QObject* parent, QString actionName, QObj
     : QObject(parent),
     m_actionName(actionName),
     m_target(target),
-    m_slot(slot)
+    m_slot(slot),
+    m_rightWarnShowed(false)
 {
     connect(this, SIGNAL(elevationCheckPassed()), target, slot);
 }
+
 
 void QnElevationChecker::triggered()
 {
     if (MyIsUserAnAdmin())
     {
         emit elevationCheckPassed();
+    }
+    else if (QApplication::argc() > 1 && !m_rightWarnShowed)
+    {
+        // already elevated, but not admin. Prevent recursion calls here
+        QnSystrayWindow* systray = static_cast<QnSystrayWindow*> (parent());
+        systray->getTrayIcon()->showMessage(tr("Insufficient privileges to manage services"), tr("UAC must be enabled to request privileges for non-admin users"), QSystemTrayIcon::Warning, MESSAGE_DURATION);
+        m_rightWarnShowed = true;
     }
     else
     {
@@ -439,8 +448,8 @@ void QnElevationChecker::triggered()
         shExecInfo.nShow = SW_NORMAL;
         shExecInfo.hInstApp = NULL;
 
-        ShellExecuteEx(&shExecInfo);
-        qApp->exit();
+        if (ShellExecuteEx(&shExecInfo))
+            qApp->exit();
     }
 }
 

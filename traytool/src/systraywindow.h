@@ -37,6 +37,7 @@ private:
     QString m_actionName;
     QObject* m_target;
     const char* m_slot;
+    bool m_rightWarnShowed;
 };
 
 class QnSystrayWindow : public QDialog
@@ -46,7 +47,7 @@ class QnSystrayWindow : public QDialog
 public:
     QnSystrayWindow();
     virtual ~QnSystrayWindow();
-
+    QSystemTrayIcon* getTrayIcon() const { return trayIcon; }
     void executeAction(QString cmd);
     void setVisible(bool visible);
 
