@@ -615,7 +615,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::RemoveFromServerAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::RemovePermission).
-        text(tr("Remove from Server")).
+        text(tr("Delete")).
         shortcut(tr("Del")).
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
