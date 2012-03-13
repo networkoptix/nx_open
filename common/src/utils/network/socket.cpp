@@ -180,7 +180,7 @@ unsigned short Socket::getLocalPort() const
   return ntohs(addr.sin_port);
 }
 
-void Socket::setLocalPort(unsigned short localPort)  {
+bool Socket::setLocalPort(unsigned short localPort)  {
   // Bind the socket to its port
   sockaddr_in localAddr;
   memset(&localAddr, 0, sizeof(localAddr));
@@ -191,8 +191,9 @@ void Socket::setLocalPort(unsigned short localPort)  {
   if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0)
   {
       //error
+      return false;
   }
-
+  return true;
 }
 
 void Socket::setLocalAddressAndPort(const QString &localAddress,

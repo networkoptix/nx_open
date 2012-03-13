@@ -49,9 +49,9 @@ fixasfiles()
 os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
 
 if CONFIG == 'Debug':
-    output_file = 'bin/VMS-%s.%s-Debug.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
+    output_file = 'bin/HDWitness-%s.%s-Debug.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
 else:
-    output_file = 'bin/VMS-%s.%s.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
+    output_file = 'bin/HDWitness-%s.%s.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
 try:
     os.unlink(output_file)
 except OSError:
