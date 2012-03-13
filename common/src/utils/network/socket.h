@@ -82,7 +82,7 @@ public:
    *   @param localPort local port
    *   @exception SocketException thrown if setting local port fails
    */
-  void setLocalPort(unsigned short localPort) ;
+  bool setLocalPort(unsigned short localPort) ;
 
   /**
    *   Set the local port to the specified port and the local address
