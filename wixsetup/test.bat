@@ -23,9 +23,15 @@ call client.exe --test-timeout 180000 --auth "http://admin:123@127.0.0.1:8000" -
 SET TESTRESULT=%ERRORLEVEL%
 echo test errorlevel is %TESTRESULT%
 
+sc stop vmsmediaserver
+sc stop vmsappserver
+taskkill /F /IM traytool.exe
+
 CD %CURRENTDIR%
 
 call msiexec /x "bin\VMS-%VERSION%.msi" /qn /l*v uninstall.log
 echo uninstaller errorlevel is %ERRORLEVEL%
+
+rmdir /s /q "%VS90COMNTOOLS%\..\..\..\Network Optix"
 
 if "%TESTRESULT%" == "1" exit /B 1
