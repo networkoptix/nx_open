@@ -72,7 +72,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
     if(isOwner()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
     } else if(isAdmin()) {
-        if(user->isAdmin()) {
+        if(user == m_user) {
+            return Qn::ReadWriteSavePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission;
+        } else if(user->isAdmin()) {
             return Qn::ReadPermission | Qn::CreateLayoutPermission;
         } else {
             return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
