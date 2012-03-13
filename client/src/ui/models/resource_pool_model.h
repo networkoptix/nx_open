@@ -15,17 +15,6 @@ class QnLayoutItemData;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 
-namespace Qn {
-    enum NodeType {
-        LocalNode,
-        ServersNode,
-        UsersNode,
-        ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
-    };
-
-} // namespace Qn
-
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
     Q_OBJECT;
     Q_ENUMS(ItemDataRole);

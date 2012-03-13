@@ -900,13 +900,15 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
         Qn::ActionId id = m_idByAction.value(action, Qn::NoAction);
         if(id == targetId) {
             int index = actions.indexOf(action);
-            
-            targetAction->setText(action->text());
-            targetAction->setShortcuts(action->shortcuts());
-            targetAction->setIcon(action->icon());
 
             menu->removeAction(action);
-            menu->insertAction(index == actions.size() - 1 ? NULL : actions[index], targetAction);
+            if(targetAction != NULL) {
+                targetAction->setText(action->text());
+                targetAction->setShortcuts(action->shortcuts());
+                targetAction->setIcon(action->icon());
+                menu->insertAction(index == actions.size() - 1 ? NULL : actions[index], targetAction);
+            }
+
             return true;
         }
 

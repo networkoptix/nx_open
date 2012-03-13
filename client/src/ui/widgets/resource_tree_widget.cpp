@@ -369,11 +369,14 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     QnActionManager *manager = context()->menu();
 
     QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
-    if(menu->isEmpty())
-        return;
 
     /* Add tree-local actions to the menu. */
     manager->redirectAction(menu.data(), Qn::RenameLayoutAction, m_renameLayoutAction);
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode)
+        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
+
+    if(menu->isEmpty())
+        return;
 
     /* Run menu. */
     QAction *action = menu->exec(QCursor::pos());
