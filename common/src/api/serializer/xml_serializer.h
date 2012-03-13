@@ -18,7 +18,7 @@ public:
     void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data);
 
-    void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) {}
+    void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) { Q_UNUSED(cameras); Q_UNUSED(data); }
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data);
     void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data);

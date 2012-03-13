@@ -187,6 +187,11 @@
                                     </Shortcut>
                                 </File>
                             </Component>
+                            <Component Id="TrayToolQTLibraries" Guid="">
+                                <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
+                                <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
+                                <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
+                            </Component>							
                         </Directory>
 
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
@@ -413,6 +418,7 @@
             <ComponentRef Id="ServerOpenSSL"/>
             <ComponentRef Id="ServerQjson"/>
             <ComponentRef Id="TrayToolExecutable"/>
+			<ComponentRef Id="TrayToolQTLibraries"/>
             <ComponentRef Id='ProgramMenuMediaServerDir' />
         </Feature>
         

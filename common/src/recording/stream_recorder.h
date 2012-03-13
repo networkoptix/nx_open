@@ -24,7 +24,7 @@ public:
     void setFileName(const QString& fileName);
     void close();
     
-    qint64 duration() const  { return m_lastPacketTime - m_firstTimestamp; }
+    qint64 duration() const  { return m_endDateTime - m_startDateTime; }
     
     virtual bool processData(QnAbstractDataPacketPtr data);
 
@@ -34,8 +34,6 @@ public:
 
     QString fixedFileName() const;
     void setEofDateTime(qint64 value);
-public slots:
-    void closeOnEOF(); // close recording then EOF will bereaced
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -70,17 +68,14 @@ protected:
     bool m_stopOnWriteError;
 private:
     bool m_waitEOF;
-    QMutex m_closeAsyncMutex;
 
     bool m_forceDefaultCtx;
     AVFormatContext* m_formatCtx;
     bool m_packetWrited;
-    qint64 m_firstTimestamp;
     QString m_lastErrMessage;
     qint64 m_currentChunkLen;
 
     QString m_fileName;
-    qint64 m_lastPacketTime;
     qint64 m_startOffset;
     int m_prebufferingUsec;
     QQueue<QnAbstractMediaDataPtr> m_prebuffer;

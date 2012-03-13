@@ -17,9 +17,9 @@
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
-QnLayoutTabBar::QnLayoutTabBar(QWidget *parent):
+QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
-    m_context(NULL),
+    QnWorkbenchContextAware(parent ? static_cast<QObject *>(parent) : context),
     m_submit(false),
     m_update(false)
 {
@@ -33,10 +33,25 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent):
     connect(this, SIGNAL(currentChanged(int)),      this, SLOT(at_currentChanged(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),   this, SLOT(at_tabCloseRequested(int)));
     connect(this, SIGNAL(tabMoved(int, int)),       this, SLOT(at_tabMoved(int, int)));
+
+    /* Connect to context. */
+    at_workbench_layoutsChanged();
+    at_workbench_currentLayoutChanged();
+
+    connect(workbench(),        SIGNAL(layoutsChanged()),                           this, SLOT(at_workbench_layoutsChanged()));
+    connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
+    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
+
+    m_submit = m_update = true;
 }
 
 QnLayoutTabBar::~QnLayoutTabBar() {
-    setContext(NULL);
+    disconnect(workbench(), NULL, this, NULL);
+    disconnect(snapshotManager(), NULL, this, NULL);
+
+    while(count() > 0)
+        removeTab(count() - 1);
+    m_submit = m_update = false;
 }
 
 void QnLayoutTabBar::checkInvariants() const {
@@ -63,48 +78,6 @@ QVariant QnLayoutTabBar::currentTarget(Qn::ActionScope scope) const {
         result.push_back(m_layouts[currentIndex]);
 
     return QVariant::fromValue(result);
-}
-
-QnWorkbenchContext *QnLayoutTabBar::context() const {
-    return m_context;
-}
-
-QnWorkbench *QnLayoutTabBar::workbench() const {
-    return m_context ? m_context->workbench() : NULL;
-}
-
-QnWorkbenchLayoutSnapshotManager *QnLayoutTabBar::snapshotManager() const {
-    return m_context ? m_context->snapshotManager() : NULL;
-}
-
-void QnLayoutTabBar::setContext(QnWorkbenchContext *context) {
-    if(m_context == context)
-        return;
-
-    if(m_context != NULL) {
-        disconnect(m_context, NULL, this, NULL);
-        disconnect(workbench(), NULL, this, NULL);
-        disconnect(snapshotManager(), NULL, this, NULL);
-    }
-    while(count() > 0)
-        removeTab(count() - 1);
-    m_submit = m_update = false;
-
-    m_context = context;
-
-    if(m_context != NULL) {
-        at_workbench_layoutsChanged();
-        at_workbench_currentLayoutChanged();
-
-        connect(m_context,          SIGNAL(aboutToBeDestroyed()),                       this, SLOT(at_context_aboutToBeDestroyed()));
-        connect(workbench(),        SIGNAL(layoutsChanged()),                           this, SLOT(at_workbench_layoutsChanged()));
-        connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
-        connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),   this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
-
-        m_submit = m_update = true;
-    }
-
-    checkInvariants();
 }
 
 void QnLayoutTabBar::submitCurrentLayout() {
@@ -152,11 +125,6 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
 
     /* Run menu. */
     menu->exec(QCursor::pos());
-}
-
-
-void QnLayoutTabBar::at_context_aboutToBeDestroyed() {
-    setContext(NULL);
 }
 
 void QnLayoutTabBar::at_workbench_layoutsChanged() {

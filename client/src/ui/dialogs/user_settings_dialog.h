@@ -17,6 +17,7 @@ class QnUserSettingsDialog: public QDialog {
 public:
     enum Element {
         Login,
+        CurrentPassword,
         Password,
         AccessRights,
         ElementCount
@@ -44,6 +45,9 @@ public:
         return m_hasChanges;
     }
 
+    const QString &currentPassword() const;
+    void setCurrentPassword(const QString &currentPassword);
+
 signals:
     void hasChangesChanged();
 
@@ -54,6 +58,7 @@ protected:
 protected slots:
     void updateElement(Element element);
     void updateLogin() { updateElement(Login); }
+    void updateCurrentPassword() { updateElement(CurrentPassword); }
     void updatePassword() { updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
 
@@ -63,7 +68,8 @@ protected slots:
 private:
     QScopedPointer<Ui::UserSettingsDialog> ui;
     QWeakPointer<QnWorkbenchContext> m_context;
-    QSet<QString> m_logins;
+    QString m_currentPassword;
+    QHash<QString, QnResourcePtr> m_userByLogin;
     QnUserResourcePtr m_user;
     bool m_valid[ElementCount];
     QString m_hints[ElementCount];

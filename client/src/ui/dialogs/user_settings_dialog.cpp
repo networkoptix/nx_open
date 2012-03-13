@@ -27,7 +27,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
         qnNullWarning(context);
 
     foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
-        m_logins.insert(user->getName());
+        m_userByLogin[user->getName()] = user;
 
     for(int i = 0; i < ElementCount; i++) {
         m_valid[i] = false;
@@ -40,8 +40,11 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     ui->accessRightsComboBox->addItem(tr("Administrator"), true);
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateLogin()));
+    connect(ui->currentPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
+    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));
     connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
+    connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(updateAccessRights()));
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
@@ -88,6 +91,16 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         ui->loginLabel->setVisible(visible);
         ui->loginEdit->setReadOnly(!editable);
         break;
+    case CurrentPassword:
+        ui->currentPasswordEdit->setVisible(visible);
+        ui->currentPasswordLabel->setVisible(visible);
+        ui->currentPasswordEdit->setReadOnly(!editable);
+        if(visible) {
+            ui->passwordLabel->setText(tr("New Password"));
+        } else {
+            ui->passwordLabel->setText(tr("Password"));
+        }
+        break;
     case Password:
         ui->passwordEdit->setVisible(visible);
         ui->passwordLabel->setVisible(visible);
@@ -130,9 +143,20 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
     updateFromResource();
 }
 
+const QString &QnUserSettingsDialog::currentPassword() const {
+    return m_currentPassword;
+}
+
+void QnUserSettingsDialog::setCurrentPassword(const QString &currentPassword) {
+    m_currentPassword = currentPassword;
+
+    updateElement(CurrentPassword);
+}
+
 void QnUserSettingsDialog::updateFromResource() {
     if(!m_user) {
         ui->loginEdit->clear();
+        ui->currentPasswordEdit->clear();
         ui->passwordEdit->clear();
         ui->passwordEdit->setPlaceholderText(QString());
         ui->confirmPasswordEdit->clear();
@@ -142,6 +166,7 @@ void QnUserSettingsDialog::updateFromResource() {
         QString placeholder(m_user->getPassword().size(), QChar('*'));
 
         ui->loginEdit->setText(m_user->getName());
+        ui->currentPasswordEdit->clear();
         ui->passwordEdit->setPlaceholderText(placeholder);
         ui->passwordEdit->clear();
         ui->confirmPasswordEdit->setPlaceholderText(placeholder);
@@ -199,6 +224,9 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
         ui->passwordLabel->setPalette(palette);
         ui->confirmPasswordLabel->setPalette(palette);
         break;
+    case CurrentPassword:
+        ui->currentPasswordLabel->setPalette(palette);
+        break;
     case AccessRights:
         ui->accessRightsLabel->setPalette(palette);
         break;
@@ -220,9 +248,20 @@ void QnUserSettingsDialog::updateElement(Element element) {
             hint = tr("Login can not be empty.");
             valid = false;
         }
-        if(m_logins.contains(ui->loginEdit->text())) {
+        if(m_userByLogin.contains(ui->loginEdit->text()) && m_userByLogin.value(ui->loginEdit->text()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
+        }
+        break;
+    case CurrentPassword:
+        if((!ui->passwordEdit->text().isEmpty() || !ui->confirmPasswordEdit->text().isEmpty()) && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
+            if(ui->currentPasswordEdit->text().isEmpty()) {
+                hint = tr("To change your password, please enter your current password.");
+                valid = false;
+            } else {
+                hint = tr("Invalid current password.");
+                valid = false;
+            }
         }
         break;
     case Password:
@@ -256,5 +295,6 @@ void QnUserSettingsDialog::updateElement(Element element) {
 void QnUserSettingsDialog::updateAll() {
     updateElement(AccessRights);
     updateElement(Password);
+    updateElement(CurrentPassword);
     updateElement(Login);
 }

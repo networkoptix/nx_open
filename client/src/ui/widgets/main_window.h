@@ -5,6 +5,7 @@
 #include <QScopedPointer>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QTabBar;
 class QBoxLayout;
@@ -26,23 +27,18 @@ class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbenchActionHandler;
 
-class QnMainWindow : public QWidget
-{
+class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef QWidget base_type;
 
 public:
-    QnMainWindow(QWidget *parent = 0, Qt::WFlags flags = 0);
+    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WFlags flags = 0);
 
     virtual ~QnMainWindow();
 
     bool isTitleVisible() const {
         return m_titleVisible;
-    }
-
-    QnWorkbenchContext *context() const {
-        return m_context;
     }
 
 public slots:
@@ -66,10 +62,6 @@ protected:
 
     bool canAutoDelete(const QnResourcePtr &resource) const;
 
-    QAction *action(const Qn::ActionId id) const;
-
-    QnActionManager *menu() const;
-
 protected slots:
     void setTitleVisible(bool visible);
     void setFullScreen(bool fullScreen);
@@ -88,7 +80,6 @@ protected slots:
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
-    QnWorkbenchContext *m_context;
     QnWorkbenchController *m_controller;
     QnWorkbenchUi *m_ui;
     QnWorkbenchDisplay *m_display;

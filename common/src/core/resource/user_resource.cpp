@@ -52,15 +52,18 @@ void QnUserResource::addLayout(const QnLayoutResourcePtr &layout)
 
 void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout) 
 {
+    /* We may get passed a reference into layouts array, so we need to make a local copy. */
+    QnLayoutResourcePtr local = layout;
+
     bool removed;
     {
         QMutexLocker locker(&m_mutex);
 
-        removed = m_layouts.removeOne(layout); /* Removing a layout that is not there is not an error. */
+        removed = m_layouts.removeOne(local); /* Removing a layout that is not there is not an error. */
     }
 
     if(removed) {
-        layout->setParentId(QnId());
+        local->setParentId(QnId());
 
         emit resourceChanged();
     }

@@ -6,6 +6,7 @@
 #include <QUuid>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include "item_data_role.h"
 
 class QnResourceModelPrivate;
@@ -14,18 +15,7 @@ class QnLayoutItemData;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 
-namespace Qn {
-    enum NodeType {
-        LocalNode,
-        ServersNode,
-        UsersNode,
-        ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
-    };
-
-} // namespace Qn
-
-class QnResourcePoolModel : public QAbstractItemModel {
+class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
     Q_OBJECT;
     Q_ENUMS(ItemDataRole);
 
@@ -49,11 +39,6 @@ public:
     virtual bool dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
     virtual Qt::DropActions supportedDropActions() const override;
 
-    void setContext(QnWorkbenchContext *context);
-    QnWorkbenchContext *context() const;
-    QnResourcePool *resourcePool() const;
-    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
-
     QnResourcePtr resource(const QModelIndex &index) const;
 
 private:
@@ -68,13 +53,15 @@ private:
     Node *expectedParent(Node *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
-private slots:
-    void at_context_aboutToBeDestroyed();
+    void updateBastard(Node *node);
 
+private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 
+    void at_context_userChanged();
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
+    void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_parentIdChanged();
@@ -86,11 +73,8 @@ private slots:
     void at_resource_itemRemoved(const QnLayoutItemData &item);
 
 private:
-    /** Associated context. */
-    QnWorkbenchContext *m_context;
-
-    /** Root node. Considered a resource node for NULL resource. */
-    Node *m_root;
+    /** Root node. */
+    Node *m_rootNode;
 
     Node *m_serversNode, *m_localNode, *m_usersNode;
 

@@ -7,6 +7,7 @@
 #include <QVariant>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -18,18 +19,12 @@ class QnActionFactory;
 class QnActionBuilder;
 class QnWorkbenchContext;
 
-class QnActionManager: public QObject {
+class QnActionManager: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnActionManager(QObject *parent = NULL);
 
     virtual ~QnActionManager();
-
-    QnWorkbenchContext *context() {
-        return m_context.data();
-    }
-
-    void setContext(QnWorkbenchContext *context);
 
     QAction *action(Qn::ActionId id) const;
 
@@ -71,7 +66,7 @@ public:
 
     void setTargetProvider(QnActionTargetProvider *targetProvider);
 
-    Qn::ActionTarget currentTargetType(QnAction *action) const;
+    Qn::ActionTargetType currentTargetType(QnAction *action) const;
 
     QVariantMap currentParameters(QnAction *action) const;
 
@@ -89,7 +84,7 @@ public:
 
     QnResourceWidgetList currentWidgetsTarget(QnAction *action) const;
 
-    Qn::ActionTarget currentTargetType(QObject *sender) const;
+    Qn::ActionTargetType currentTargetType(QObject *sender) const;
 
     QVariantMap currentParameters(QObject *sender) const;
 
@@ -121,7 +116,7 @@ protected:
         QVariantMap params;
     };
 
-    void copyAction(QAction *dst, const QAction *src);
+    void copyAction(QAction *dst, QnAction *src);
 
     void triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params);
 
@@ -138,9 +133,6 @@ private slots:
     void at_menu_aboutToShow();
 
 private:
-    /** Associated workbench context. */
-    QWeakPointer<QnWorkbenchContext> m_context;
-
     /** Mapping from action id to action data. */ 
     QHash<Qn::ActionId, QnAction *> m_actionById;
 

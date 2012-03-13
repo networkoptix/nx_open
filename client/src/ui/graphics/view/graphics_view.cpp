@@ -21,7 +21,8 @@ void QnLayerPainter::ensureUninstalled() {
 
 QnGraphicsView::QnGraphicsView(QGraphicsScene *scene, QWidget * parent):
     QGraphicsView(scene, parent),
-    m_paintFlags(0)
+    m_paintFlags(0),
+    m_behaviorFlags(0)
 {}
 
 QnGraphicsView::~QnGraphicsView() {
@@ -34,6 +35,10 @@ QnGraphicsView::~QnGraphicsView() {
 
 void QnGraphicsView::setPaintFlags(PaintFlags paintFlags) {
     m_paintFlags = paintFlags;
+}
+
+void QnGraphicsView::setBehaviorFlags(BehaviorFlags behaviorFlags) {
+    m_behaviorFlags = behaviorFlags;
 }
 
 void QnGraphicsView::installLayerPainter(QnLayerPainter *painter, QGraphicsScene::SceneLayer layer) {
@@ -68,6 +73,14 @@ void QnGraphicsView::uninstallLayerPainter(QnLayerPainter *painter) {
     painter->m_view = NULL;
 }
 
+void QnGraphicsView::showEvent(QShowEvent *event) {
+    if(m_behaviorFlags & CenterOnShow) {
+        base_type::showEvent(event);
+    } else {
+        QAbstractScrollArea::showEvent(event); /* Skip base's implementation. */
+    }
+}
+
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
     //glFinish(); /* Finish previous frame, so that we don't get spurious delays in glTexSubImage2d. */
 
@@ -90,7 +103,7 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
 }
 
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {
-    if(!(m_paintFlags & BACKGROUND_DONT_INVOKE_BASE))
+    if(m_paintFlags & PaintInheritedBackround)
         base_type::drawBackground(painter, rect);
 
     foreach(QnLayerPainter *layerPainter, m_backgroundPainters)
@@ -98,7 +111,7 @@ void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {
 }
 
 void QnGraphicsView::drawForeground(QPainter *painter, const QRectF &rect) {
-    if(!(m_paintFlags & FOREGROUND_DONT_INVOKE_BASE))
+    if(m_paintFlags & PaintInheritedForeground)
         base_type::drawForeground(painter, rect);
 
     foreach(QnLayerPainter *layerPainter, m_foregroundPainters)

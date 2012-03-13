@@ -112,7 +112,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     }
 
     /* Add layouts for users. */
-    foreach (const QnResourcePtr &resource, newResources)
+    foreach (const QnResourcePtr &resource, resources)
         if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
             foreach(const QnLayoutResourcePtr &layout, user->getLayouts())
                 addResource(layout);

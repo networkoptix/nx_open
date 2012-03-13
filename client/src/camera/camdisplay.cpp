@@ -370,7 +370,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     {
 					    if (firstWait)
                         {
-                            m_isLongWaiting = sign *(displayedTime - ct) > MAX_FRAME_DURATION*1000;
+                            m_isLongWaiting = sign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && sign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                             
 							/*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
@@ -1212,17 +1212,21 @@ bool CLCamDisplay::isNoData() const
         return false;
     if (m_executingJump > 0 || m_executingChangeSpeed || m_buffering)
         return false;
-    if (m_isLongWaiting)
-        return true;
 
     qint64 ct = m_extTimeSrc->getCurrentTime();
     bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_jumpTime != DATETIME_NOW;
     if (!useSync || ct == DATETIME_NOW)
         return false;
 
+    return m_isLongWaiting || m_emptyPacketCounter >= 3;
+    /*
+    if (m_isLongWaiting)
+        return true;
+
     if (m_emptyPacketCounter >= 3)
         return true;
 
     int sign = m_speed >= 0 ? 1 : -1;
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
+    */
 }

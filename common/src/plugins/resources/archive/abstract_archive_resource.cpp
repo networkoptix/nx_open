@@ -18,7 +18,7 @@ QString QnAbstractArchiveResource::getUniqueId() const
 }
 
 
-void QnAbstractArchiveResource::setStatus(QnResource::Status newStatus, bool silenceMode)
+void QnAbstractArchiveResource::setStatus(QnResource::Status /*newStatus*/, bool /*silenceMode*/)
 {
     QnResource::setStatus(Online);
     return;

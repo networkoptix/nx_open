@@ -47,6 +47,7 @@
 #include "ui/tooltips/tool_tip.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
+#include "plugins/resources/isd/isd_resource_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -243,6 +244,8 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
+    QTextStream out(stdout);
+
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
@@ -269,6 +272,8 @@ int main(int argc, char *argv[])
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
+        out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
+
         QnSettings::ConnectionData connection;
         connection.url = authentication;
 
@@ -389,6 +394,13 @@ int main(int argc, char *argv[])
 
     QnPlIpWebCamResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+
+    QnPlISDResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+
+
+
+
 #endif
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
@@ -408,7 +420,8 @@ int main(int argc, char *argv[])
 
     qApp->setStyle(qnSkin->style());
 
-    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow());
+    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
     QVariant screen = commandLinePreParser.value("--screen");
@@ -467,7 +480,6 @@ int main(int argc, char *argv[])
         if(!autoTester.succeeded())
             result = 1;
 
-        QTextStream out(stdout);
         out << autoTester.message();
     }
 

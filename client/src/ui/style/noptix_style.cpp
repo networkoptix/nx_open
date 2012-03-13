@@ -128,7 +128,7 @@ void QnNoptixStyle::polish(QWidget *widget) {
     base_type::polish(widget);
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(24, 24));
+        itemView->setIconSize(QSize(18, 18));
         
         QFont font = itemView->font();
         font.setPointSize(10);

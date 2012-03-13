@@ -124,7 +124,7 @@ QString QnPlDlinkResource::manufacture() const
     return MANUFACTURE;
 }
 
-void QnPlDlinkResource::setIframeDistance(int frames, int timems)
+void QnPlDlinkResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
@@ -137,7 +137,7 @@ QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
     return new PlDlinkStreamReader(toSharedPointer());
 }
 
-void QnPlDlinkResource::setCropingPhysical(QRect croping)
+void QnPlDlinkResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }
