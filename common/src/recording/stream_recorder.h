@@ -34,8 +34,6 @@ public:
 
     QString fixedFileName() const;
     void setEofDateTime(qint64 value);
-public slots:
-    void closeOnEOF(); // close recording then EOF will bereaced
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -70,7 +68,6 @@ protected:
     bool m_stopOnWriteError;
 private:
     bool m_waitEOF;
-    QMutex m_closeAsyncMutex;
 
     bool m_forceDefaultCtx;
     AVFormatContext* m_formatCtx;

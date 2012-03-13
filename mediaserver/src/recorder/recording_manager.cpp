@@ -100,7 +100,8 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnAbstractMediaStreamDataProvider* providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProvider* providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
-    if (!isResourceDisabled(res) && recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
+    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
+        recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
     {
         if (providerHi)
             providerHi->start();
@@ -166,7 +167,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
             //    connect(recorderHiRes, SIGNAL(fpsChanged(QnServerStreamRecorder*, float)), this, SLOT(onFpsChanged(QnServerStreamRecorder*, float)));
             if (recorderLowRes) 
                 connect(camera->getLiveReader(QnResource::Role_SecondaryLiveVideo), SIGNAL(threadPaused()), recorderLowRes, SLOT(closeOnEOF()), Qt::DirectConnection);
-            connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)), Qt::QueuedConnection);
+            //connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)), Qt::QueuedConnection);
 
             m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
@@ -217,27 +218,6 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 {
     QMutexLocker lock(&m_mutex);
     return m_recordMap.contains(camera) && m_recordMap.value(camera).recorderHiRes->isRunning();
-}
-
-void QnRecordingManager::onResourceStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
-{
-    // Close file if resource is offline
-    // todo: Code is not thread safe now. So, while commented
-#if 1
-    if (newStatus != QnResource::Offline) 
-        return;
-    QnResource* res = (QnResource*) sender();
-    QnResourcePtr resPtr= res->toSharedPointer();
-    if (!resPtr)
-        return;
-    
-    QMutexLocker lock(&m_mutex);
-    Recorders recorders = m_recordMap.value(resPtr);
-    if (recorders.recorderHiRes)
-        recorders.recorderHiRes->closeOnEOF();
-    if (recorders.recorderLowRes)
-        recorders.recorderLowRes->closeOnEOF();
-#endif
 }
 
 void QnRecordingManager::onTimer()

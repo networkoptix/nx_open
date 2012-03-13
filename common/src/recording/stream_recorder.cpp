@@ -91,7 +91,6 @@ void QnStreamRecorder::flushPrebuffer()
 
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 {
-    QMutexLocker lock(&m_closeAsyncMutex);
     QnAbstractMediaDataPtr md = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!md)
         return true; // skip unknown data
@@ -394,17 +393,6 @@ QString QnStreamRecorder::fixedFileName() const
 {
     return m_fixedFileName;
 }
-
-
-void QnStreamRecorder::closeOnEOF()
-{
-    QMutexLocker lock(&m_closeAsyncMutex);
-    if (m_dataQueue.size() == 0)
-        close();
-    else
-        m_waitEOF = true;
-}
-
 
 void QnStreamRecorder::setEofDateTime(qint64 value)
 {
