@@ -938,7 +938,8 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
     QList<QAction *> actions = menu->actions();
 
     foreach(QAction *action, actions) {
-        Qn::ActionId id = m_idByAction.value(action, Qn::NoAction);
+        QnAction *storedAction = qnAction(action);
+        Qn::ActionId id = storedAction ? storedAction->id() : Qn::NoAction;
         if(id == targetId) {
             int index = actions.indexOf(action);
 
