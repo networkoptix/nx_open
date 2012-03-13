@@ -120,7 +120,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoS
     if(isAdmin()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
-        return Qn::ReadPermission;
+        return 0;
     }
 }
 
