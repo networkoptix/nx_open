@@ -70,16 +70,22 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
     if(isOwner()) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
+        if(user == m_user) {
+            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission;
+        } else {
+            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
+        }
     } else if(isAdmin()) {
-        if(user->isAdmin()) {
+        if(user == m_user) {
+            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission;
+        } else if(user->isAdmin()) {
             return Qn::ReadPermission | Qn::CreateLayoutPermission;
         } else {
-            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
+            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
         }
     } else {
         if(user == m_user) {
-            return Qn::ReadWriteSavePermission | Qn::ReadPasswordPermission | Qn::WritePasswordPermission;
+            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission;
         } else {
             return 0;
         }

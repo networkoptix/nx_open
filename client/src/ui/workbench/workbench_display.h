@@ -326,6 +326,8 @@ protected slots:
     void at_workbench_itemChanged(QnWorkbench::ItemRole role);
     void at_workbench_currentLayoutChanged();
 
+    void at_context_permissionsChanged(const QnResourcePtr &resource);
+
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
     void at_item_rotationChanged();

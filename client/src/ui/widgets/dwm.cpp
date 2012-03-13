@@ -524,8 +524,11 @@ bool QnDwm::widgetEvent(QEvent *event) {
          * breaks despite the fact that frame struts are set. Moving the widget fixes that. 
          * However, we cannot move it right away, because if was restored from minimized state,
          * then its position is not yet initialized. */
-        if(event->type() == QEvent::WindowStateChange && !d->widget->isFullScreen())
-            QApplication::postEvent(d->widget, new QnInvocationEvent(AdjustPositionInvocation), Qt::LowEventPriority);
+        if(event->type() == QEvent::WindowStateChange) {
+            QWindowStateChangeEvent *e = static_cast<QWindowStateChangeEvent *>(event);
+            if((e->oldState() & Qt::WindowMinimized) && !(d->widget->windowState() & Qt::WindowMinimized))
+                QApplication::postEvent(d->widget, new QnInvocationEvent(AdjustPositionInvocation), Qt::LowEventPriority);
+        }
 
         if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
             d->widget->move(d->widget->pos()); 

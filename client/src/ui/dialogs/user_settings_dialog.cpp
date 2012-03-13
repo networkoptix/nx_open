@@ -27,7 +27,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
         qnNullWarning(context);
 
     foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
-        m_logins.insert(user->getName());
+        m_userByLogin[user->getName()] = user;
 
     for(int i = 0; i < ElementCount; i++) {
         m_valid[i] = false;
@@ -220,7 +220,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
             hint = tr("Login can not be empty.");
             valid = false;
         }
-        if(m_logins.contains(ui->loginEdit->text())) {
+        if(m_userByLogin.contains(ui->loginEdit->text()) && m_userByLogin.value(ui->loginEdit->text()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
         }

@@ -783,7 +783,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     }
 
     if(m_cameraSettingsDialog->widget()->resources() != resources) {
-        if(m_cameraSettingsDialog->widget()->hasChanges()) {
+        if(m_cameraSettingsDialog->isVisible() && m_cameraSettingsDialog->widget()->hasChanges()) {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
                 QnResourceList(m_cameraSettingsDialog->widget()->resources()),
@@ -973,6 +973,8 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
         return;
 
     dialog->submitToResource();
+    user->setGuid(QUuid::createUuid());
+
     connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
@@ -1072,11 +1074,12 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
         ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : 0);
 
-    QnUserSettingsDialog::ElementFlags loginFlags =
-        flags & QnUserSettingsDialog::Visible;
+    QnUserSettingsDialog::ElementFlags loginFlags = 
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
+        ((permissions & Qn::WriteLoginPermission) ? QnUserSettingsDialog::Editable : 0);
 
     QnUserSettingsDialog::ElementFlags passwordFlags = 
-        ((permissions & Qn::ReadPasswordPermission) ? QnUserSettingsDialog::Visible : 0) |
+        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : 0) | /* There is no point to display flag edit field if password cannot be changed. */
         ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : 0);
     passwordFlags &= flags;
 
