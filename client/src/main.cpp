@@ -254,7 +254,6 @@ int main(int argc, char *argv[])
 #endif
     xercesc::XMLPlatformUtils::Initialize ();
 
-
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));

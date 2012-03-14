@@ -257,6 +257,8 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
         return saveAsync(camera, target, slot);
     else if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         return saveAsync(user, target, slot);
+    else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+        return saveAsync(layout, target, slot);
 
     return 0;
 }

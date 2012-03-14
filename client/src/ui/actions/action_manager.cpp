@@ -123,7 +123,7 @@ public:
 
     QnActionBuilder separator(bool isSeparator = true) {
         m_action->setSeparator(isSeparator);
-        m_action->setFlags(m_action->flags() | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
+        m_action->setFlags(m_action->flags() | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
 
         return *this;
     }
@@ -298,6 +298,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     /* Context menu actions. */
+
+    factory(Qn::FitInViewAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Fit in View"));
+
+    factory().
+        flags(Qn::Scene).
+        separator();
 
     factory(Qn::MainMenuAction).
         flags(Qn::NoTarget).
@@ -552,15 +560,21 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
-    factory().
-        flags(Qn::Scene | Qn::NoTarget);
-
-    factory(Qn::ToggleZoomedAction).
+    factory(Qn::MaximizeItemAction).
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("Toggle Fullscreen")).
+        text(tr("Maximize Item")).
         shortcut(tr("Enter")).
         shortcut(tr("Return")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnItemZoomedActionCondition(false, this));
+
+    factory(Qn::UnmaximizeItemAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Restore Item")).
+        shortcut(tr("Enter")).
+        shortcut(tr("Return")).
+        autoRepeat(false).
+        condition(new QnItemZoomedActionCondition(true, this));
 
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
@@ -605,14 +619,13 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
-
-    factory(Qn::RenameLayoutAction).
+    factory(Qn::RenameAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::WritePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::layout));
+        condition(hasFlags(QnResource::layout) || hasFlags(QnResource::media) || hasFlags(QnResource::remote_server));
 
     factory(Qn::YouTubeUploadAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
@@ -672,6 +685,14 @@ QAction *QnActionManager::action(Qn::ActionId id) const {
 
 QList<QnAction *> QnActionManager::actions() const {
     return m_actionById.values();
+}
+
+bool QnActionManager::canTrigger(Qn::ActionId id, const QnResourcePtr &resource, const QVariantMap &params) {
+    QnAction *action = m_actionById.value(id);
+    if(!action)
+        return false;
+    
+    return action->checkCondition(action->scope(), QVariant::fromValue(resource), params);
 }
 
 void QnActionManager::trigger(Qn::ActionId id, const QVariantMap &params) {
@@ -969,11 +990,12 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
         QnAction *storedAction = qnAction(action);
         if(storedAction && storedAction->id() == targetId) {
             int index = actions.indexOf(action);
+            QAction *before = index + 1 < actions.size() ? actions[index + 1] : NULL;
 
             menu->removeAction(action);
             if(targetAction != NULL) {
                 copyAction(targetAction, storedAction, false);
-                menu->insertAction(index == actions.size() - 1 ? NULL : actions[index], targetAction);
+                menu->insertAction(before, targetAction);
             }
 
             return true;

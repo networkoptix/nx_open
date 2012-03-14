@@ -201,7 +201,7 @@ void QnLayoutTabBar::at_layout_nameChanged() {
 }
 
 void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
-    updateTabText(QnWorkbenchLayout::layout(resource));
+    updateTabText(QnWorkbenchLayout::instance(resource));
 }
 
 void QnLayoutTabBar::tabInserted(int index) {

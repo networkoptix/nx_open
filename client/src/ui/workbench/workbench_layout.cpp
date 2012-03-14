@@ -61,7 +61,7 @@ QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
     return synchronizer->resource();
 }
 
-QnWorkbenchLayout *QnWorkbenchLayout::layout(const QnLayoutResourcePtr &resource) {
+QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &resource) {
     QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
     if(synchronizer == NULL)
         return NULL;

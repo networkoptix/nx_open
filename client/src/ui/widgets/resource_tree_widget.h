@@ -104,7 +104,7 @@ private:
     QnResourceTreeItemDelegate *m_resourceDelegate;
     QnResourceTreeItemDelegate *m_searchDelegate;
 
-    QAction *m_renameLayoutAction;
+    QAction *m_renameAction;
 };
 
 #endif // QN_RESOURCE_TREE_WIDGET_H

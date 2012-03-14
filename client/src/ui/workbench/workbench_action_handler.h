@@ -131,7 +131,7 @@ protected slots:
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
     void at_removeLayoutItemAction_triggered();
-    void at_renameLayoutAction_triggered();
+    void at_renameAction_triggered();
     void at_removeFromServerAction_triggered();
     
     void at_newUserAction_triggered();
@@ -140,8 +140,7 @@ protected slots:
     void at_takeScreenshotAction_triggered();
 
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
-    void at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
-    void at_cameras_saved(int status, const QByteArray& errorString, QnResourceList resources, int handle);
+    void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses);
 
