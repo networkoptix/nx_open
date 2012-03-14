@@ -72,7 +72,7 @@ PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *paren
 
 #ifndef CL_TRIAL_MODE
     licenseManagerWidget = new LicenseManagerWidget(this);
-    ui->tabWidget->insertTab(4, licenseManagerWidget, tr("Licensing"));
+    ui->tabWidget->insertTab(4, licenseManagerWidget, tr("Licenses"));
 #endif
 
     QToolButton *aboutButton = new QToolButton();

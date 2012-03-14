@@ -7,7 +7,17 @@
 namespace {
     struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem *, bool> {
         bool operator()(QGraphicsItem *item) const {
-            return item->isWidget() && (item->acceptedMouseButtons() & Qt::LeftButton);
+            if(!item->isWidget() || !(item->acceptedMouseButtons() & Qt::LeftButton))
+                return false;
+
+            QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
+            if((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint))
+                return true; /* Widget has decorations. */
+
+            if(dynamic_cast<FrameSectionQuearyable *>(widget) != NULL)
+                return true; /* No decorations, but still can be queried for frame sections. */
+
+            return false;
         }
     };
 
