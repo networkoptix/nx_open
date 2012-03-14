@@ -246,6 +246,9 @@ int main(int argc, char *argv[])
 {
     QTextStream out(stdout);
 
+    if (QDateTime::currentDateTime().date().month() >= 4) // will remove this code later 
+        exit(0);
+
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
