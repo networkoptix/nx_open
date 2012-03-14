@@ -128,6 +128,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DropResourcesIntoNewLayoutAction),   SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
+    connect(action(Qn::ExitAction),                         SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -1008,6 +1009,15 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
 
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+}
+
+void QnWorkbenchActionHandler::at_exitAction_triggered() {
+    if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
+        menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
+
+    closeLayouts(workbench()->layouts());
+
+    widget()->close();
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {

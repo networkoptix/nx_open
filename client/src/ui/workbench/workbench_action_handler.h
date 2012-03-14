@@ -138,6 +138,7 @@ protected slots:
     void at_newUserLayoutAction_triggered();
 
     void at_takeScreenshotAction_triggered();
+    void at_exitAction_triggered();
 
     void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
