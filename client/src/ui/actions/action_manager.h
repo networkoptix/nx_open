@@ -30,6 +30,10 @@ public:
 
     QList<QnAction *> actions() const;
 
+    // TODO: to hell with all these overloads. Add QnActionParameters class.
+
+    bool canTrigger(Qn::ActionId id, const QnResourcePtr &resource, const QVariantMap &params = QVariantMap());
+
     void trigger(Qn::ActionId id, const QVariantMap &params = QVariantMap());
 
     void trigger(Qn::ActionId id, const QVariant &items, const QVariantMap &params = QVariantMap());
@@ -116,7 +120,7 @@ protected:
         QVariantMap params;
     };
 
-    void copyAction(QAction *dst, QnAction *src);
+    void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
 
     void triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params);
 

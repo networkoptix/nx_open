@@ -300,6 +300,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Connect to display. */
+    m_display->scene()->installEventFilter(this);
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -311,7 +312,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
     connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
+    connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
+    connect(action(Qn::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
 
     /* Init screen recorder. */
     m_screenRecorder = new QnScreenRecorder(this);
@@ -340,7 +344,20 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
-    if (event->type() == QEvent::Close) {
+    if(watched == display()->scene() && event->type() == QEvent::KeyPress) {
+        QKeyEvent *e = static_cast<QKeyEvent *>(event);
+        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+            QList<QGraphicsItem *> items = display()->scene()->selectedItems();
+            QGraphicsItem *focusedItem = display()->scene()->focusItem();
+            if(items.size() == 1 && (items[0] == focusedItem || !focusedItem)) {
+                if(items[0] == display()->widget(QnWorkbench::ZOOMED)) {
+                    menu()->trigger(Qn::UnmaximizeItemAction, items);
+                } else {
+                    menu()->trigger(Qn::MaximizeItemAction, items);
+                }
+            }
+        }
+    } else if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
             /* Clicking on close button of a widget that is not selected should select it,
              * thus clearing the existing selection. */
@@ -552,6 +569,8 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
     if(m_resizedWidget == NULL)
         return;
+
+    workbench()->setItem(QnWorkbench::RAISED, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
     m_display->bringToFront(m_resizedWidget);
     m_display->gridItem()->animatedShow();
@@ -989,6 +1008,19 @@ void QnWorkbenchController::at_showMotionAction_triggered() {
     displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
 }
 
+void QnWorkbenchController::at_maximizeItemAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    if(widgets.empty())
+        return;
+
+    workbench()->setItem(QnWorkbench::ZOOMED, widgets[0]->item());
+}
+
+void QnWorkbenchController::at_unmaximizeItemAction_triggered() {
+    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+}
+
+
 void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
     if(checked) {
         startRecording();
@@ -997,3 +1029,6 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
     }
 }
 
+void QnWorkbenchController::at_fitInViewAction_triggered() {
+    display()->fitInView();
+}

@@ -262,6 +262,21 @@ namespace Qn {
         SaveLayoutForCurrentUserAsAction,
 
         /**
+         * Performs a fit in view operation.
+         */
+        FitInViewAction,
+
+        /**
+         * Maximizes item.
+         */
+        MaximizeItemAction,
+
+        /**
+         * Unmaximizes item.
+         */
+        UnmaximizeItemAction,
+
+        /**
          * Shows motion search grid on an item.
          */
         ShowMotionAction,
@@ -331,9 +346,13 @@ namespace Qn {
         RemoveFromServerAction,
 
         /**
-         * Opens layout name editor.
+         * Changes resource name.
+         * 
+         * Parameters:
+         * <tt>QString NameParameter</tt> --- new name for the resource. If not
+         * supplied, name dialog will pop up.
          */
-        RenameLayoutAction,
+        RenameAction,
 
         /**
          * Opens a user creation dialog.

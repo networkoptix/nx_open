@@ -27,7 +27,7 @@ namespace Qn {
         /* User-specific permissions. */
 
         /** Permission to edit login. */
-        WriteLoginPermission        = 0x00000100,
+        WriteLoginPermission        = 0x00000100, // TODO: replace with generic WriteNamePermission
 
         /** Permission to edit associated password. */
         WritePasswordPermission     = 0x00000200,

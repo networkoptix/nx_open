@@ -13,6 +13,9 @@ class QnWorkbench;
 
 class QnLayoutTabBar: public QTabBar, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
+
+    typedef QTabBar base_type;
+
 public:
     QnLayoutTabBar(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
 
@@ -25,6 +28,8 @@ signals:
     void closeRequested(QnWorkbenchLayout *layout);
 
 protected:
+    virtual QSize minimumSizeHint() const override;
+
     virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
     virtual void tabInserted(int index) override;

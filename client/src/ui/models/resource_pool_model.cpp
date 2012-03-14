@@ -282,9 +282,10 @@ public:
         
         switch(m_type) {
         case Qn::ResourceNode:
+            if(m_model->context()->menu()->canTrigger(Qn::RenameAction, m_resource))
+                result |= Qt::ItemIsEditable;
+            /* Fall through. */
         case Qn::ItemNode:
-            if(m_flags & QnResource::layout)
-                result |= Qt::ItemIsEditable; /* Only layouts are currently editable - user can change layout's name. */
             if(m_flags & (QnResource::media | QnResource::layout))
                 result |= Qt::ItemIsDragEnabled;
             break;
@@ -341,12 +342,11 @@ public:
         if(role != Qt::EditRole)
             return false;
 
-        if(m_flags & QnResource::layout) {
-            m_resource->setName(value.toString());
-            return true;
-        }
+        QVariantMap params;
+        params[Qn::NameParameter] = value.toString();
 
-        return false;
+        m_model->context()->menu()->trigger(Qn::RenameAction, m_resource, params);
+        return true;
     }
 
     bool isModified() const {

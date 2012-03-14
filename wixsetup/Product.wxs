@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="CE572797-45BF-4f1c-A783-369EA79C597E">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated"/>
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated" InstallScope="perMachine"/>
         
         <!-- Wix Variables -->
         
@@ -33,10 +33,8 @@
         <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
         
         <Property Id="NEWERFOUND" Secure="yes"/>
-        <Property Id="ALLUSERS" Secure="yes"/>
+<!--        <Property Id="ALLUSERS" Secure="yes"/> -->
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
-<!--        <Property Id="LAUNCHAPPONEXIT" Secure="yes" /> -->
-<!--        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(env.APPLICATION_NAME) Client when setup exits."  /> -->
         
         <!-- AppServer properties-->
         <Property Id="APPSERVER_PORT" Secure="yes" Value="8000"/>
@@ -68,7 +66,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                     Root="HKCU"
-                    Key="Software\Network Optix\VMS Media Client"
+                    Key="Software\Network Optix\VMS Client"
                     Name="mediaRoot"
                     Type="raw"
                     Win64="no"/>
@@ -81,8 +79,8 @@
         <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
-        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[MOVIESFOLDER]\VMS Server Media" />
-        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\VMS Client Media" />
+        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Server Media" />
+        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Client Media" />
         
         <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
         <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
@@ -131,14 +129,14 @@
             <Directory Id="SERVER_DIRECTORY" Name="Server Media">
                 <Component Id="ServerDirectoryComponent" Guid="{C259A76D-4CAA-489f-A18F-28AED0232853}" Permanent="yes">
                     <CreateFolder Directory="SERVER_DIRECTORY"/>
-                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\[ProductName] Media Server' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\VMS Media Server' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
             
             <Directory Id="CLIENT_DIRECTORY" Name="Client Media">
                 <Component Id="ClientDirectoryComponent" Guid="{953EF7FD-01CF-432f-936C-43F07BC918DE}" Permanent="yes">
                     <CreateFolder Directory="CLIENT_DIRECTORY"/>
-                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName] Client' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\VMS Client' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
             
@@ -148,16 +146,16 @@
                         <Directory Id="VmsAppServerDir" Name="AppServer">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
                                 <File Id="appserverexe" Name="appserver.exe" Source="../appserver/setup/build/exe.win32-2.7/appserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="VMS Application Server" Scope="any" IgnoreFailure="yes"/>                                                                        
+                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Application Server" Scope="any" IgnoreFailure="yes"/>                                                                        
                                 </File>
                                 
                                 <ServiceInstall Id="VmsAppServerService"
                                                 Name="VmsAppServer"
-                                                DisplayName="Network Optix VMS Application Server"
+                                                DisplayName="Network Optix Application Server"
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix VMS Application Server"
+                                                Description="Network Optix Application Server"
                                 />
                                 
                                 <ServiceControl Id="StartVmsAppServerService" Name="VmsAppServer" Start="install" Wait="no" />
@@ -179,8 +177,12 @@
                             <Component Id="TrayToolExecutable" Guid="{11772981-5229-4D14-B126-66906570AD57}">
                                 <File Id="TrayToolExe" Name="traytool.exe" Source="../traytool/bin/$(env.CONFIG)/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>                                    
-                                    
-                                    <Shortcut Id="StartmenuTrayTool" Directory="StartupFolder" Name="$(env.APPLICATION_NAME) Tray Tool"
+
+                                    <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME) Tray Assistant"
+                                              WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                    </Shortcut>
+ 
+                                    <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="$(env.APPLICATION_NAME) Tray Assistant"
                                               WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                 </File>
@@ -189,22 +191,22 @@
                                 <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
                                 <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
-                            </Component>							
+                            </Component>                            
                         </Directory>
 
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../mediaserver/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="VMS Media Server" Scope="any" IgnoreFailure="yes"/>                                    
+                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="Network Optix Media Server" Scope="any" IgnoreFailure="yes"/>                                    
                                 </File>
                                 
                                 <ServiceInstall Id="VmsMediaServerService"
                                                 Name="VmsMediaServer"
-                                                DisplayName="Network Optix VMS Media Server"
+                                                DisplayName="Network Optix Media Server"
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix VMS Media Server"
+                                                Description="Network Optix Media Server"
                                 />
                                 
                                 <ServiceControl Id="StartVmsServerService" Name="VmsMediaServer" Start="install" Wait="no" />
@@ -263,12 +265,12 @@
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
                                 <File Id="ClientExe" Name="client.exe" Source="../client/bin/$(env.CONFIG)/client.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionClient" Name="VMS Client" Scope="any" IgnoreFailure="yes"/>
+                                    <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
                                     
-                                    <Shortcut Id="StartmenuClient" Directory="ProgramMenuClientDir" Name="$(env.APPLICATION_NAME) Client"
+                                    <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
                                               WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
-                                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(env.APPLICATION_NAME) Client"
+                                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(env.APPLICATION_NAME)"
                                               WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_desktop.exe">
                                     </Shortcut>
                                 
@@ -352,24 +354,9 @@
             
             <Directory Id="ProgramMenuFolder" Name="Programs">
                 <Directory Id="ProgramMenuDir" Name="$(env.ORGANIZATION_NAME)">
-                    <Directory Id="ProgramMenuClientDir" Name="VMS Client">
-                        <Component Id="ProgramMenuClientDir" Guid="{A4C7D09A-756B-45b6-B3A2-1B2D6DCF5D2A}">
-                            <RemoveFolder Id='ProgramMenuClientDir' On='uninstall' />
-                            <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName] Client' Type='string' Value='' KeyPath='yes' />
-                        </Component>
-                    </Directory>
-                    <Directory Id="ProgramMenuMediaServerDir" Name="VMS Media Server">
-                        <Component Id="ProgramMenuMediaServerDir" Guid="{AAF5310E-3711-4980-95E9-A34CC7E137B6}">
-                            <RemoveFolder Id='ProgramMenuMediaServerDir' On='uninstall' />
-                            <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\[ProductName] Media Server' Type='string' Value='' KeyPath='yes' />
-                        </Component>
-                    </Directory>
-                    <Directory Id="ProgramMenuAppServerDir" Name="VMS Application Server">
-                        <Component Id="ProgramMenuAppServerDir" Guid="{867B6711-D56E-4b88-B4E7-68EE3DB8167D}">
-                            <RemoveFolder Id='ProgramMenuAppServerDir' On='uninstall' />
-                            <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\[ProductName] Application Server' Type='string' Value='' KeyPath='yes' />
-                        </Component>
-                    </Directory>
+                    <Component Id="UninstallProgramMenuFolder" DiskId="1" Guid="{3714E067-D4DC-4A09-9D06-EAC5BCB6ABF3}">
+                        <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
+                    </Component>
                 </Directory>
             </Directory>
             
@@ -400,10 +387,14 @@
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="AppServerConfiguration" />
-            
-            <ComponentRef Id='ProgramMenuAppServerDir' />
         </Feature>
-        
+
+        <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
+            <ComponentRef Id="TrayToolExecutable"/>
+            <ComponentRef Id="TrayToolQTLibraries"/>
+            <ComponentRef Id="UninstallProgramMenuFolder"/>            
+        </Feature>
+         
         <Feature Id="ServerFeature" Title="$(env.APPLICATION_NAME) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <ComponentRef Id='ServerDirectoryComponent'/>
@@ -415,9 +406,6 @@
             <ComponentRef Id="ServerXerces"/>
             <ComponentRef Id="ServerOpenSSL"/>
             <ComponentRef Id="ServerQjson"/>
-            <ComponentRef Id="TrayToolExecutable"/>
-			<ComponentRef Id="TrayToolQTLibraries"/>
-            <ComponentRef Id='ProgramMenuMediaServerDir' />
         </Feature>
         
         <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME) Client" Level="1"
@@ -436,7 +424,6 @@
             <ComponentRef Id="bespin" />
             <ComponentRef Id='arecontvision'/>
             
-            <ComponentRef Id='ProgramMenuClientDir' />
             <ComponentRef Id='ClientDirectoryComponent'/>
             
             <!-- <ComponentRef Id='EveDirectoryPlayWithMenuItem'/>

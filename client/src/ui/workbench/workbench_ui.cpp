@@ -76,7 +76,7 @@ namespace {
     QnImageButtonWidget *newActionButton(QAction *action, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-        qreal scaleFactor = 0.85;
+        qreal scaleFactor = 1.0; //0.85;
         qreal height = baseSize / scaleFactor;
         qreal width = height * SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
@@ -311,15 +311,24 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
+
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
-    titleLayout->addItem(m_mainMenuButton);
+    QGraphicsLinearLayout *titleLeftButtonsLayout = new QGraphicsLinearLayout();
+    titleLeftButtonsLayout->setSpacing(2);
+    titleLeftButtonsLayout->setContentsMargins(0, 4, 0, 0);
+    titleLeftButtonsLayout->addItem(m_mainMenuButton);
+    titleLayout->addItem(titleLeftButtonsLayout);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
-    titleLayout->addStretch(0x1000);
-    titleLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    titleLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
-    titleLayout->addItem(newActionButton(action(Qn::ExitAction)));
+    QGraphicsLinearLayout *titleRightButtonsLayout = new QGraphicsLinearLayout();
+    titleRightButtonsLayout->setSpacing(2);
+    titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    titleRightButtonsLayout->addStretch(0x1000);
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
+    titleLayout->addItem(titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 

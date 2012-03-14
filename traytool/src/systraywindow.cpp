@@ -12,6 +12,27 @@ static const QString APP_SERVER_NAME("VMS Application Server");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 
+bool MyIsUserAnAdmin()
+{
+   bool isAdmin = false;
+
+   DWORD bytesUsed = 0;
+
+   TOKEN_ELEVATION_TYPE tokenElevationType;
+
+   HANDLE m_hToken;
+   OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &m_hToken);
+
+   ::GetTokenInformation(m_hToken, TokenElevationType, &tokenElevationType, sizeof(tokenElevationType), &bytesUsed);
+
+   isAdmin = tokenElevationType == TokenElevationTypeFull || tokenElevationType == TokenElevationTypeDefault && IsUserAnAdmin();
+
+   if (m_hToken)
+       CloseHandle(m_hToken);
+
+   return isAdmin;
+}
+
 QnSystrayWindow::QnSystrayWindow():
     ui(new Ui::SettingsDialog),
     m_mServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
@@ -62,6 +83,16 @@ QnSystrayWindow::QnSystrayWindow():
     connect (&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
+}
+
+void QnSystrayWindow::handleMessage(const QString& message)
+{
+    if (message == "quit")
+        qApp->quit();
+    else if (message == "activate")
+    {
+        trayIcon->showMessage("Network Optix", "I'm here", QSystemTrayIcon::Information, MESSAGE_DURATION);
+    }
 }
 
 QnSystrayWindow::~QnSystrayWindow()
@@ -123,85 +154,74 @@ void QnSystrayWindow::findServiceInfo()
         m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_QUERY_STATUS);
 }
 
- void QnSystrayWindow::setVisible(bool visible)
- {
-     //minimizeAction->setEnabled(visible);
-     //maximizeAction->setEnabled(!isMaximized());
-     settingsAction->setEnabled(isMaximized() || !visible);
-     QDialog::setVisible(visible);
- }
+void QnSystrayWindow::setVisible(bool visible)
+{
+    //minimizeAction->setEnabled(visible);
+    //maximizeAction->setEnabled(!isMaximized());
+    settingsAction->setEnabled(isMaximized() || !visible);
+    QDialog::setVisible(visible);
+}
 
- /*
- void QnSystrayWindow::hideEvent( QHideEvent *event)
- {
-     if (trayIcon->isVisible()) 
-     {
-         hide();
-         event->ignore();
-     }
- }
- */
+void QnSystrayWindow::closeEvent(QCloseEvent *event)
+{
+    if (trayIcon->isVisible()) 
+    {
+        /*
+        QMessageBox::information(this, tr("Systray"),
+                                 tr("The program will keep running in the "
+                                    "system tray. To terminate the program, "
+                                    "choose <b>Quit</b> in the context menu "
+                                    "of the system tray entry."));
+       */
+        hide();
+        event->ignore();
+    }
+}
 
- void QnSystrayWindow::closeEvent(QCloseEvent *event)
- {
-     if (trayIcon->isVisible()) 
-     {
-         /*
-         QMessageBox::information(this, tr("Systray"),
-                                  tr("The program will keep running in the "
-                                     "system tray. To terminate the program, "
-                                     "choose <b>Quit</b> in the context menu "
-                                     "of the system tray entry."));
-        */
-         hide();
-         event->ignore();
-     }
- }
+void QnSystrayWindow::setIcon(int index)
+{
+    //QIcon icon = iconComboBox->itemIcon(index);
+    //trayIcon->setIcon(icon);
+    //setWindowIcon(icon);
 
- void QnSystrayWindow::setIcon(int index)
- {
-     //QIcon icon = iconComboBox->itemIcon(index);
-     //trayIcon->setIcon(icon);
-     //setWindowIcon(icon);
+    //trayIcon->setToolTip(iconComboBox->itemText(index));
+}
 
-     //trayIcon->setToolTip(iconComboBox->itemText(index));
- }
 
- 
- void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
- {
-     CURSORINFO  pci;
-     pci.cbSize = sizeof(CURSORINFO);
+void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    CURSORINFO  pci;
+    pci.cbSize = sizeof(CURSORINFO);
 
-     switch (reason) 
-     {
-        case QSystemTrayIcon::DoubleClick:
-        case QSystemTrayIcon::Trigger:
-            if (GetCursorInfo(&pci))
-                trayIcon->contextMenu()->popup(QPoint(pci.ptScreenPos.x, pci.ptScreenPos.y));
-            break;
-        case QSystemTrayIcon::MiddleClick:
-            break;
-        default:
-            ;
-     }
- }
+    switch (reason) 
+    {
+       case QSystemTrayIcon::DoubleClick:
+       case QSystemTrayIcon::Trigger:
+           if (GetCursorInfo(&pci))
+               trayIcon->contextMenu()->popup(QPoint(pci.ptScreenPos.x, pci.ptScreenPos.y));
+           break;
+       case QSystemTrayIcon::MiddleClick:
+           break;
+       default:
+           ;
+    }
+}
 
- void QnSystrayWindow::showMessage()
- {
-     /*
-     QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon(
-             typeComboBox->itemData(typeComboBox->currentIndex()).toInt());
-     trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), icon,
-                           durationSpinBox->value() * 1000);
-        */
- }
+void QnSystrayWindow::showMessage()
+{
+    /*
+    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon(
+            typeComboBox->itemData(typeComboBox->currentIndex()).toInt());
+    trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), icon,
+                          durationSpinBox->value() * 1000);
+       */
+}
 
- void QnSystrayWindow::messageClicked()
- {
-     //QMessageBox::information(0, qApp->applicationName(), m_detailedErrorText);
-       
- }
+void QnSystrayWindow::messageClicked()
+{
+    //QMessageBox::information(0, qApp->applicationName(), m_detailedErrorText);
+      
+}
 
 void QnSystrayWindow::updateServiceInfo()
 {
@@ -379,27 +399,6 @@ void QnSystrayWindow::at_appServerStopAction()
     }
 }
 
-bool MyIsUserAnAdmin()
-{
-   bool isAdmin = false;
-
-   DWORD bytesUsed = 0;
-
-   TOKEN_ELEVATION_TYPE tokenElevationType;
-
-   HANDLE m_hToken;
-   OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &m_hToken);
-
-   ::GetTokenInformation(m_hToken, TokenElevationType, &tokenElevationType, sizeof(tokenElevationType), &bytesUsed);
-
-   isAdmin = tokenElevationType == TokenElevationTypeFull || tokenElevationType == TokenElevationTypeDefault && IsUserAnAdmin();
-
-   if (m_hToken)
-       CloseHandle(m_hToken);
-
-   return isAdmin;
-}
-
 QnElevationChecker::QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot)
     : QObject(parent),
     m_actionName(actionName),
@@ -448,8 +447,8 @@ void QnElevationChecker::triggered()
         shExecInfo.nShow = SW_NORMAL;
         shExecInfo.hInstApp = NULL;
 
-        if (ShellExecuteEx(&shExecInfo))
-            qApp->exit();
+        // In case of success new process will send us "quit" signal
+        ShellExecuteEx(&shExecInfo);
     }
 }
 
