@@ -784,8 +784,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
         
-        updateCameraSettingsEditibility();
-
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
 
@@ -803,6 +801,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         }
 
         cameraSettingsDialog()->widget()->setResources(resources);
+        updateCameraSettingsEditibility();
     }
 
     cameraSettingsDialog()->show();
