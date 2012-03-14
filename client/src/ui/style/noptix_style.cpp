@@ -41,6 +41,13 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_closeTab = qnSkin->icon("decorations/close_tab.png");
 }
 
+int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
+    if(metric == PM_ToolBarIconSize)
+        return 15;
+
+    return base_type::pixelMetric(metric, option, widget);
+}
+
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     switch (control) {
     case CC_Slider:
@@ -225,6 +232,7 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     QStyleOptionToolButton buttonOption;
     buttonOption.QStyleOption::operator=(*option);
+    buttonOption.state &= ~State_Selected; /* We don't want 'selected' state overriding 'active'. */
     buttonOption.subControls = 0;
     buttonOption.activeSubControls = 0;
     buttonOption.icon = m_closeTab;

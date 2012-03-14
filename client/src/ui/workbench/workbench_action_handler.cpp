@@ -784,8 +784,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
         
-        updateCameraSettingsEditibility();
-
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
 
@@ -803,6 +801,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         }
 
         cameraSettingsDialog()->widget()->setResources(resources);
+        updateCameraSettingsEditibility();
     }
 
     cameraSettingsDialog()->show();
@@ -1077,6 +1076,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setWindowTitle(tr("User Settings"));
 
     QnUserSettingsDialog::ElementFlags flags = 
         ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 

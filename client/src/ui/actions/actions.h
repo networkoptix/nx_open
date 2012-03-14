@@ -262,6 +262,16 @@ namespace Qn {
         SaveLayoutForCurrentUserAsAction,
 
         /**
+         * Performs a fit in view operation.
+         */
+        FitInViewAction,
+
+        /**
+         * Toggles zoomed state of an item.
+         */
+        ToggleZoomedAction,
+
+        /**
          * Shows motion search grid on an item.
          */
         ShowMotionAction,

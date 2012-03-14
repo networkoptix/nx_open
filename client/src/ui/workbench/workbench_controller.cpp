@@ -311,6 +311,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
     connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(action(Qn::ToggleZoomedAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_toggleZoomedAction_triggered()));
     connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
 
     /* Init screen recorder. */
@@ -353,6 +354,10 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
             event->ignore();
             return true;
         }
+    } else if(event->type() == QEvent::KeyPress) {
+        QKeyEvent *e = static_cast<QKeyEvent *>(event);
+        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+            menu()->trigger(Qn::ToggleZoomedAction, display()->scene()->selectedItems());
     }
 
     return QObject::eventFilter(watched, event);
@@ -552,6 +557,8 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
     if(m_resizedWidget == NULL)
         return;
+
+    workbench()->setItem(QnWorkbench::RAISED, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
     m_display->bringToFront(m_resizedWidget);
     m_display->gridItem()->animatedShow();
@@ -987,6 +994,19 @@ void QnWorkbenchController::at_hideMotionAction_triggered() {
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
     displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
+}
+
+void QnWorkbenchController::at_toggleZoomedAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    if(widgets.empty())
+        return;
+
+    QnWorkbenchItem *item = widgets[0]->item();
+    if(workbench()->item(QnWorkbench::ZOOMED) == item) {
+        workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+    } else {
+        workbench()->setItem(QnWorkbench::ZOOMED, item);
+    }
 }
 
 void QnWorkbenchController::at_recordingAction_triggered(bool checked) {

@@ -76,7 +76,7 @@ namespace {
     QnImageButtonWidget *newActionButton(QAction *action, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-        qreal scaleFactor = 0.85;
+        qreal scaleFactor = 1.0; //0.85;
         qreal height = baseSize / scaleFactor;
         qreal width = height * SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 

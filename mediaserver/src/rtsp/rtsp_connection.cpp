@@ -473,7 +473,8 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (cameraRes && liveHiProvider && cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS)
             {
 			    d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
-                d->liveDpLow->start();
+                if (d->liveDpLow)
+                    d->liveDpLow->start();
             }
 		}
 	}

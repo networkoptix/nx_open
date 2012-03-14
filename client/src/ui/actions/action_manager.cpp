@@ -123,6 +123,7 @@ public:
 
     QnActionBuilder separator(bool isSeparator = true) {
         m_action->setSeparator(isSeparator);
+        m_action->setFlags(m_action->flags() | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
 
         return *this;
     }
@@ -307,12 +308,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::LightMainMenuAction).
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        icon(qnSkin->icon("logo_icon2.png"));
+        icon(qnSkin->icon("main_menu_fullscreen.png"));
 
     factory(Qn::DarkMainMenuAction).
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        icon(qnSkin->icon("logo_icon2_dark.png"));
+        icon(qnSkin->icon("main_menu_windowed.png"));
 
     factory(Qn::ConnectionSettingsAction).
         flags(Qn::Main).
@@ -358,6 +359,25 @@ QnActionManager::QnActionManager(QObject *parent):
             pulledText(tr("New User..."));
     } factory.leaveSubMenu();
 
+    factory().
+        flags(Qn::Main | Qn::Scene).
+        text(tr("Open..."));
+
+    factory.enterSubMenu(); {
+        factory(Qn::OpenFileAction).
+            flags(Qn::Main | Qn::Scene).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("File(s)...")).
+            shortcut(tr("Ctrl+O")).
+            autoRepeat(false).
+            icon(qnSkin->icon("folder.png"));
+
+        factory(Qn::OpenFolderAction).
+            flags(Qn::Main | Qn::Scene).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("Folder..."));
+    } factory.leaveSubMenu();
+
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
         requiredPermissions(Qn::CurrentLayoutParameter, Qn::SavePermission).
@@ -373,25 +393,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false);
-
-    factory().
-        flags(Qn::Main).
-        text(tr("Open..."));
-
-    factory.enterSubMenu(); {
-        factory(Qn::OpenFileAction).
-            flags(Qn::Main).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("File(s)...")).
-            shortcut(tr("Ctrl+O")).
-            autoRepeat(false).
-            icon(qnSkin->icon("folder.png"));
-
-        factory(Qn::OpenFolderAction).
-            flags(Qn::Main).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("Folder..."));
-    } factory.leaveSubMenu();
 
     factory().
         flags(Qn::Main).
@@ -433,7 +434,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
-        text(tr("System Settings")).
+        text(tr("System Settings...")).
         shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
@@ -479,12 +480,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInLayoutAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::LayoutParameter, Qn::WritePermission).
-        text(tr("Open"));
+        text(tr("Open in Layout"));
 
     factory(Qn::OpenInCurrentLayoutAction).
-        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-        text(tr("Open in Current Layout"));
+        text(tr("Open")).
+        condition(hasFlags(QnResource::media), Qn::Any);
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -495,6 +497,14 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Window")).
         condition(hasFlags(QnResource::media), Qn::Any);
+
+    factory(Qn::OpenInFolderAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Open in Containing Folder")).
+        shortcut(tr("Ctrl+Enter")).
+        shortcut(tr("Ctrl+Return")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -510,6 +520,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layout(s)")).
         condition(hasFlags(QnResource::layout));
+
+
+    factory().
+        flags(Qn::Scene | Qn::Tree).
+        separator();
+
 
     factory(Qn::SaveLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -531,6 +547,21 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Layout As...")).
         condition(hasFlags(QnResource::layout));
 
+
+    factory().
+        flags(Qn::Scene | Qn::Tree).
+        separator();
+
+    factory().
+        flags(Qn::Scene | Qn::NoTarget);
+
+    factory(Qn::ToggleZoomedAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Toggle Fullscreen")).
+        shortcut(tr("Enter")).
+        shortcut(tr("Return")).
+        autoRepeat(false);
+
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
@@ -548,26 +579,40 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition(this));
 
-    factory(Qn::UserSettingsAction).
+
+    factory().
+        flags(Qn::Scene | Qn::Tree).
+        separator();
+
+
+    factory(Qn::RemoveLayoutItemAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
+        text(tr("Remove from Layout")).
+        shortcut(tr("Del")).
+        autoRepeat(false).
+        condition(new QnLayoutItemRemovalActionCondition(this));
+
+    factory(Qn::RemoveFromServerAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
+        requiredPermissions(Qn::RemovePermission).
+        text(tr("Delete")).
+        shortcut(tr("Del")).
+        autoRepeat(false).
+        condition(new QnResourceRemovalActionCondition(this));
+
+
+    factory().
+        flags(Qn::Scene | Qn::Tree).
+        separator();
+
+
+    factory(Qn::RenameLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("User Settings")).
-        condition(hasFlags(QnResource::user));
-
-    // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
-    factory(Qn::CameraSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera Settings")).
-        condition(hasFlags(QnResource::live_cam));
-
-    factory(Qn::OpenInCameraSettingsDialogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in Camera Settings Dialog"));
-
-    factory(Qn::ServerSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Server Settings")).
-        condition(hasFlags(QnResource::remote_server));
-
+        requiredPermissions(Qn::WritePermission).
+        text(tr("Rename")).
+        shortcut(tr("F2")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::layout));
 
     factory(Qn::YouTubeUploadAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
@@ -583,50 +628,31 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(hasFlags(QnResource::media));
 
-    factory(Qn::OpenInFolderAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Open in Containing Folder")).
-        shortcut(tr("Ctrl+Enter")).
-        shortcut(tr("Ctrl+Return")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
-
     factory(Qn::DeleteFromDiskAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Delete from Disk")).
         autoRepeat(false).
         condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
 
-
-
-    /* Layout actions. */
-
-    factory().
-        flags(Qn::Scene).
-        separator();
-
-    factory(Qn::RemoveLayoutItemAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
-        text(tr("Remove from Layout")).
-        shortcut(tr("Del")).
-        autoRepeat(false).
-        condition(new QnLayoutItemRemovalActionCondition(this));
-
-    factory(Qn::RemoveFromServerAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
-        requiredPermissions(Qn::RemovePermission).
-        text(tr("Remove from Server")).
-        shortcut(tr("Del")).
-        autoRepeat(false).
-        condition(new QnResourceRemovalActionCondition(this));
-
-    factory(Qn::RenameLayoutAction).
+    factory(Qn::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredPermissions(Qn::WritePermission).
-        text(tr("Rename")).
-        shortcut(tr("F2")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::layout));
+        text(tr("User Settings...")).
+        condition(hasFlags(QnResource::user));
+
+    // TODO: add CLDeviceSettingsDlgFactory::canCreateDlg(resource) ?
+    factory(Qn::CameraSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Camera Settings...")).
+        condition(hasFlags(QnResource::live_cam));
+
+    factory(Qn::OpenInCameraSettingsDialogAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        text(tr("Open in Camera Settings Dialog"));
+
+    factory(Qn::ServerSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Settings...")).
+        condition(hasFlags(QnResource::remote_server));
 }
 
 QnActionManager::~QnActionManager() {
@@ -718,7 +744,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexLi
     return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
 }
 
-void QnActionManager::copyAction(QAction *dst, QnAction *src) {
+void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignals) {
     dst->setText(src->text());
     dst->setIcon(src->icon());
     dst->setShortcuts(src->shortcuts());
@@ -728,8 +754,10 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src) {
     dst->setIconText(src->iconText());
     dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
     
-    connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
-    connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+    if(forwardSignals) {
+        connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
+        connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+    }
 }
 
 void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
@@ -938,15 +966,13 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
     QList<QAction *> actions = menu->actions();
 
     foreach(QAction *action, actions) {
-        Qn::ActionId id = m_idByAction.value(action, Qn::NoAction);
-        if(id == targetId) {
+        QnAction *storedAction = qnAction(action);
+        if(storedAction && storedAction->id() == targetId) {
             int index = actions.indexOf(action);
 
             menu->removeAction(action);
             if(targetAction != NULL) {
-                targetAction->setText(action->text());
-                targetAction->setShortcuts(action->shortcuts());
-                targetAction->setIcon(action->icon());
+                copyAction(targetAction, storedAction, false);
                 menu->insertAction(index == actions.size() - 1 ? NULL : actions[index], targetAction);
             }
 
