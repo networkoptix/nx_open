@@ -79,6 +79,14 @@ public:
     }
 
     /**
+     * \param index                     Index of the layout to get. Index must be valid.
+     * \returns                         Layout for the given index. 
+     */
+    QnWorkbenchLayout *layout(int index) const {
+        return m_layouts[index];
+    }
+
+    /**
      * \returns                         All layouts of this workbench. May be empty. 
      */
     const QList<QnWorkbenchLayout *> &layouts() const {

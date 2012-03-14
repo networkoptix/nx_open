@@ -139,7 +139,10 @@ protected slots:
     void at_selectAllAction_triggered();
     void at_showMotionAction_triggered();
     void at_hideMotionAction_triggered();
+    void at_maximizeItemAction_triggered();
+    void at_unmaximizeItemAction_triggered();
     void at_recordingAction_triggered(bool checked);
+    void at_fitInViewAction_triggered();
 
     void at_screenRecorder_error(const QString &errorMessage);
     void at_screenRecorder_recordingStarted();

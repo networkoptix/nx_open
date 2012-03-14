@@ -86,7 +86,8 @@ void PlDlinkStreamReader::openStream()
 
     //=====requesting a video
 
-    if (m_h264)
+    if (m_h264 && false)
+    //if (m_h264) //look_for_this_comment
     {
         QStringList srtpUrls =  getRTPurls();
         if (srtpUrls.size()<2)
@@ -149,9 +150,9 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 
 
 
-    if (m_h264)
-        //return getNextDataMPEG(CODEC_ID_H264);
-        return mRTP264.getNextData();
+    if (m_h264) //look_for_this_comment
+        return getNextDataMPEG(CODEC_ID_H264);
+        //return mRTP264.getNextData();
 
     if (m_mpeg4)
         return getNextDataMPEG(CODEC_ID_MPEG4);
@@ -215,7 +216,8 @@ QString PlDlinkStreamReader::composeVideoProfile()
     m_mpeg4 = false;
     m_h264 = false;
 
-    bool hasSdp = false; //info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains("sdp");
+    //bool hasSdp = false; 
+    bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains("sdp"); //look_for_this_comment
 
     if (info.hasH264!="" && !hasSdp)
     {

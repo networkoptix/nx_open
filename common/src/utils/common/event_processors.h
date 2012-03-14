@@ -108,16 +108,39 @@ protected:
 typedef QnEventSignalizer<QnSingleEventProcessor<QnEventSignalizerBase> > QnSingleEventSignalizer;
 typedef QnEventSignalizer<QnMultiEventProcessor<QnEventSignalizerBase> >  QnMultiEventSignalizer;
 
+namespace Qn {
+    enum EventProcessingPolicy {
+        AcceptEvent,
+        IgnoreEvent,
+        KeepEvent
+    };
+}
 
 template<class Base>
 class QnEventEater: public Base {
 public:
-    QnEventEater(QObject *parent = NULL): Base(parent) {}
+    QnEventEater(QObject *parent = NULL): Base(parent), m_policy(Qn::KeepEvent) {}
+
+    QnEventEater(Qn::EventProcessingPolicy policy, QObject *parent = NULL): Base(parent), m_policy(policy) {}
 
 protected:
-    virtual bool activate(QObject *, QEvent *) override {
+    virtual bool activate(QObject *, QEvent *event) override {
+        switch(m_policy) {
+        case Qn::AcceptEvent:
+            event->accept();
+            break;
+        case Qn::IgnoreEvent:
+            event->ignore();
+            break;
+        default:
+            break;
+        }
+
         return true;
     }
+
+private:
+    Qn::EventProcessingPolicy m_policy;
 };
 
 typedef QnEventEater<QnSingleEventProcessor<QObject> > QnSingleEventEater;

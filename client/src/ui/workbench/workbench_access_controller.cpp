@@ -4,6 +4,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_criterion.h>
+#include <plugins/resources/archive/abstract_archive_resource.h>
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
 
@@ -59,6 +60,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
         return calculatePermissions(camera);
 
+    if(QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
+        return calculatePermissions(archive);
+
     if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
         return calculatePermissions(server);
 
@@ -111,6 +115,10 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtua
     } else {
         return Qn::ReadPermission;
     }
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &archive) {
+    return Qn::ReadPermission;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &) {

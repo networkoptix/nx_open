@@ -82,7 +82,7 @@ void QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved(const QnResourcePt
         return;
 
     /* Layout was removed, we need to remove it from the workbench too. */
-    QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
+    QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
     if(layout != NULL)
         delete layout;
 }

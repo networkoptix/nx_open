@@ -1,7 +1,9 @@
 #include "layout_tab_bar.h"
 
-#include <QVariant>
-#include <QContextMenuEvent>
+#include <QtCore/QVariant>
+
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QStyle>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -107,6 +109,24 @@ void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+QSize QnLayoutTabBar::minimumSizeHint() const {
+    int d = 2 * style()->pixelMetric(QStyle::PM_TabBarScrollButtonWidth, NULL, this);
+    switch(shape()) {
+    case RoundedNorth:
+    case RoundedSouth:
+    case TriangularNorth:
+    case TriangularSouth:
+        return QSize(d, sizeHint().height());
+    case RoundedWest:
+    case RoundedEast:
+    case TriangularWest:
+    case TriangularEast:
+        return QSize(sizeHint().width(), d);
+    default:
+        return QSize(); /* Just to make the compiler happy. */
+    }
+}
+
 void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     if(!context() || !context()->menu()) {
         qnWarning("Requesting context menu for a layout tab bar while no menu manager instance is available.");
@@ -181,7 +201,7 @@ void QnLayoutTabBar::at_layout_nameChanged() {
 }
 
 void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
-    updateTabText(QnWorkbenchLayout::layout(resource));
+    updateTabText(QnWorkbenchLayout::instance(resource));
 }
 
 void QnLayoutTabBar::tabInserted(int index) {

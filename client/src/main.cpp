@@ -246,11 +246,13 @@ int main(int argc, char *argv[])
 {
     QTextStream out(stdout);
 
+    if (QDateTime::currentDateTime().date().month() >= 4) // will remove this code later 
+        exit(0);
+
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
     xercesc::XMLPlatformUtils::Initialize ();
-
 
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
@@ -291,7 +293,7 @@ int main(int argc, char *argv[])
         application.reset(singleApplication);
     }
     application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(qnSkin->icon("hdw_logo.png"));
+    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
 
     if(singleApplication) {
         QString argsMessage;

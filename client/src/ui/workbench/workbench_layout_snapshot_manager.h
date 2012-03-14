@@ -15,20 +15,20 @@ namespace detail {
         Q_OBJECT
 
     public:
-        QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourcePtr &resource): 
+        QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources): 
             m_manager(manager),
-            m_resource(resource)
+            m_resources(resources)
         {}
 
     public slots:
         void at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     signals:
-        void finished(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
+        void finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     private:
         QWeakPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
-        QnLayoutResourcePtr m_resource;
+        QnLayoutResourceList m_resources;
     };
 
 } // namespace detail
@@ -63,10 +63,10 @@ class QnWorkbenchLayoutSnapshotManager: public QObject, public QnWorkbenchContex
     Q_OBJECT;
 public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
-
     virtual ~QnWorkbenchLayoutSnapshotManager();
 
     void save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
+    void save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
 
     void restore(const QnLayoutResourcePtr &resource);
 
@@ -113,8 +113,8 @@ protected:
 protected slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_layout_saved(const QnLayoutResourcePtr &resource);
-    void at_layout_saveFailed(const QnLayoutResourcePtr &resource);
+    void at_layouts_saved(const QnLayoutResourceList &resources);
+    void at_layouts_saveFailed(const QnLayoutResourceList &resources);
     void at_layout_changed(const QnLayoutResourcePtr &resource);
     void at_layout_changed();
 

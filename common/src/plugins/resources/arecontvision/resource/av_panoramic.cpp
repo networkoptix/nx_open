@@ -4,115 +4,10 @@
 #include "core/resource/resource_media_layout.h"
 
 
-class AVVideoLayout180 : public QnVideoResourceLayout
-{
-public:
-    AVVideoLayout180(){};
-    virtual ~AVVideoLayout180(){};
-    //returns number of video channels device has
-    virtual int numberOfChannels() const override
-    {
-        return 4;
-    }
-
-    virtual int width() const override
-    {
-        return 4;
-    }
-
-    virtual int height() const override
-    {
-        return 1;
-    }
-
-    virtual int h_position(int channel) const override
-    {
-        switch(channel)
-        {
-        case 0:
-            return 0;
-
-        case 1:
-            return 2;
-
-        case 2:
-            return 3;
-
-        case 3:
-            return 1;
-        default:
-            return 0;
-        }
-    }
-
-    virtual int v_position(int /*channel*/) const override
-    {
-        return 0;
-    }
-
-};
-
-class AVVideoLayout360 : public QnVideoResourceLayout
-{
-public:
-    AVVideoLayout360(){};
-    virtual ~AVVideoLayout360(){};
-    //returns number of video channels device has
-
-    virtual int numberOfChannels() const override
-    {
-        return 4;
-    }
-
-    virtual int width() const override
-    {
-        return 4;
-    }
-
-    virtual int height() const override
-    {
-        return 1;
-    }
-
-    virtual int h_position(int channel) const override
-    {
-        switch(channel)
-        {
-        case 0:
-            return 0;
-
-        case 1:
-            return 3;
-
-        case 2:
-            return 2;
-
-        case 3:
-            return 1;
-        default:
-            return 0;
-        }
-    }
-
-    virtual int v_position(int /*channel*/) const override
-    {
-        return 0;
-    }
-
-};
-
-AVVideoLayout360 avVideoLayout360;
-AVVideoLayout180 avVideoLayout180;
-
-
 
 QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
-    if (name.contains("8180") || name.contains("8185") || name.contains("20185"))
-        m_vrl = &avVideoLayout180;
-    else
-        m_vrl = &avVideoLayout360;
 }
 
 bool QnArecontPanoramicResource::hasDualStreaming() const
@@ -215,7 +110,3 @@ bool QnArecontPanoramicResource::setCamQuality(int q)
 
 }
 
-const QnVideoResourceLayout* QnArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
-{
-    return m_vrl;
-}

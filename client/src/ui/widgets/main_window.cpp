@@ -63,13 +63,7 @@ namespace {
         qreal aspectRatio = SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
         int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
         int iconWidth = iconHeight * aspectRatio;
-        button->setIconSize(QSize(iconWidth, iconHeight));
-
-        /* Tool buttons may end up having wrong aspect ratio. We don't allow that. */
-        QSize sizeHint = button->sizeHint();
-        int buttonHeight = sizeHint.height();
-        int buttonWidth = buttonHeight * aspectRatio;
-        button->setFixedSize(buttonWidth, buttonHeight);
+        button->setFixedSize(iconWidth, iconHeight);
 
         return button;
     }
@@ -182,7 +176,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::TakeScreenshotAction));
 
-    connect(action(Qn::ExitAction),         SIGNAL(triggered()),                            this,                                   SLOT(close()));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
     connect(action(Qn::MainMenuAction),     SIGNAL(triggered()),                            this,                                   SLOT(at_mainMenuAction_triggered()));
@@ -222,7 +215,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      * no way to make it transparent for non-client area windows messages. */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
-    m_titleLayout->setSpacing(0);
+    m_titleLayout->setSpacing(2);
+    m_titleLayout->addSpacing(6);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
@@ -230,6 +224,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
+    m_titleLayout->addSpacing(6);
 
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();

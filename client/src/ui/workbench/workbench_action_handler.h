@@ -39,6 +39,40 @@ namespace detail {
         QList<int> m_oldStatuses;
     };
 
+    class QnResourceReplyProcessor: public QObject {
+        Q_OBJECT;
+    public:
+        QnResourceReplyProcessor(QObject *parent = NULL);
+
+        int status() const {
+            return m_status;
+        }
+
+        const QByteArray &errorString() const {
+            return m_errorString;
+        }
+
+        const QnResourceList &resources() const {
+            return m_resources;
+        }
+
+        int handle() const {
+            return m_handle;
+        }
+
+    signals:
+        void finished(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+
+    public slots:
+        void at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+
+    private:
+        int m_status;
+        QByteArray m_errorString;
+        QnResourceList m_resources;
+        int m_handle;
+    };
+
 } // namespace detail
 
 
@@ -70,7 +104,8 @@ protected:
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
     
-    void closeLayouts(const QnWorkbenchLayoutList &layouts);
+    void closeLayouts(const QnWorkbenchLayoutList &layouts, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
+    bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
 
     void openNewWindow(const QStringList &args);
 
@@ -131,17 +166,16 @@ protected slots:
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
     void at_removeLayoutItemAction_triggered();
-    void at_renameLayoutAction_triggered();
+    void at_renameAction_triggered();
     void at_removeFromServerAction_triggered();
     
     void at_newUserAction_triggered();
     void at_newUserLayoutAction_triggered();
 
     void at_takeScreenshotAction_triggered();
+    void at_exitAction_triggered();
 
-    void at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource);
-    void at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
-    void at_cameras_saved(int status, const QByteArray& errorString, QnResourceList resources, int handle);
+    void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses);
 

@@ -62,7 +62,7 @@ void QnCameraMotionMaskWidget::init()
     /* Set up model & control machinery. */
     m_context.reset(new QnWorkbenchContext(NULL, this));
 
-    m_display.reset(new QnWorkbenchDisplay(this));
+    m_display.reset(new QnWorkbenchDisplay(m_context.data()));
     m_display->setScene(m_scene.data());
     m_display->setView(m_view.data());
     m_display->setMarginFlags(0);
@@ -158,9 +158,9 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_context->workbench()->setItem(QnWorkbench::ZOOMED, item);
 
         /* Set up the corresponding widget. */
-        m_widget = m_display->widget(item);
-        widget()->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
-        widget()->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+        QnResourceWidget *widget = m_display->widget(item);
+        widget->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
+        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
     }
 
     /* Consider motion mask list changed. */
