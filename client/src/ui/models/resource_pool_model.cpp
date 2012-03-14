@@ -282,9 +282,11 @@ public:
         
         switch(m_type) {
         case Qn::ResourceNode:
+            if(m_flags & (QnResource::layout | QnResource::media | QnResource::remote_server))
+                if(m_model->context()->accessController()->permissions(m_resource) & Qn::WritePermission)
+                    result |= Qt::ItemIsEditable;
+            /* Fall through. */
         case Qn::ItemNode:
-            if(m_flags & QnResource::layout)
-                result |= Qt::ItemIsEditable; /* Only layouts are currently editable - user can change layout's name. */
             if(m_flags & (QnResource::media | QnResource::layout))
                 result |= Qt::ItemIsDragEnabled;
             break;
