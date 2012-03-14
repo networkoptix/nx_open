@@ -267,9 +267,14 @@ namespace Qn {
         FitInViewAction,
 
         /**
-         * Toggles zoomed state of an item.
+         * Maximizes item.
          */
-        ToggleZoomedAction,
+        MaximizeItemAction,
+
+        /**
+         * Unmaximizes item.
+         */
+        UnmaximizeItemAction,
 
         /**
          * Shows motion search grid on an item.

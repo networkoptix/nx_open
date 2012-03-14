@@ -61,6 +61,14 @@ Qn::ActionVisibility QnTargetlessActionCondition::check(const QVariant &items) {
 }
 
 
+Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
+    if(widgets.size() != 1 || !widgets[0])
+        return Qn::InvisibleAction;
+
+    return ((widgets[0]->item() == workbench()->item(QnWorkbench::ZOOMED)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+
 Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widgets) {
     foreach(QGraphicsItem *item, widgets) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;

@@ -552,15 +552,22 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
-    factory().
-        flags(Qn::Scene | Qn::NoTarget);
 
-    factory(Qn::ToggleZoomedAction).
+    factory(Qn::MaximizeItemAction).
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("Toggle Fullscreen")).
+        text(tr("Maximize Item")).
         shortcut(tr("Enter")).
         shortcut(tr("Return")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnItemZoomedActionCondition(false, this));
+
+    factory(Qn::UnmaximizeItemAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Restore Item")).
+        shortcut(tr("Enter")).
+        shortcut(tr("Return")).
+        autoRepeat(false).
+        condition(new QnItemZoomedActionCondition(true, this));
 
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).

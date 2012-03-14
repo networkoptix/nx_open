@@ -48,6 +48,19 @@ public:
 };
 
 
+class QnItemZoomedActionCondition: public QnActionCondition {
+public:
+    QnItemZoomedActionCondition(bool requiredZoomedState, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_requiredZoomedState(requiredZoomedState)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+     
+private:
+    bool m_requiredZoomedState;
+};
+
 class QnMotionGridDisplayActionCondition: public QnActionCondition {
 public:
     QnMotionGridDisplayActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
