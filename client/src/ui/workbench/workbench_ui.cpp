@@ -315,11 +315,15 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
-    titleLayout->addStretch(0x1000);
-    titleLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    titleLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
-    titleLayout->addItem(newActionButton(action(Qn::ExitAction)));
+    QGraphicsLinearLayout *titleButtonsLayout = new QGraphicsLinearLayout();
+    titleButtonsLayout->setSpacing(2);
+    titleButtonsLayout->setContentsMargins(0, 4, 0, 0);
+    titleButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    titleButtonsLayout->addStretch(0x1000);
+    titleButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
+    titleButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
+    titleButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
+    titleLayout->addItem(titleButtonsLayout);
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
