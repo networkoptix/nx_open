@@ -1076,6 +1076,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setWindowTitle(tr("User Settings"));
 
     QnUserSettingsDialog::ElementFlags flags = 
         ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
