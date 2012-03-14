@@ -44,10 +44,6 @@ protected slots:
 private:
     void init();
 
-    QnResourceWidget *widget() {
-        return m_widget.data();
-    }
-
 private:
     QnVirtualCameraResourcePtr m_camera;
     QList<QRegion> m_motionMaskList;
@@ -65,8 +61,6 @@ private:
     MotionSelectionInstrument *m_motionSelectionInstrument;
 
     bool m_readOnly;
-
-    QWeakPointer<QnResourceWidget> m_widget;
 };
 
 #endif // QN_CAMERA_MOTION_MASK_WIDGET_H
