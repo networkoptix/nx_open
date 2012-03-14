@@ -41,6 +41,10 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_closeTab = qnSkin->icon("decorations/close_tab.png");
 }
 
+int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
+    return base_type::pixelMetric(metric, option, widget);
+}
+
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     switch (control) {
     case CC_Slider:
