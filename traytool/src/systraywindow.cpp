@@ -91,7 +91,7 @@ void QnSystrayWindow::handleMessage(const QString& message)
         qApp->quit();
     else if (message == "activate")
     {
-        trayIcon->showMessage("Network Optix", "I'm here", QSystemTrayIcon::Information, MESSAGE_DURATION);
+        //trayIcon->showMessage("Network Optix", "I'm here", QSystemTrayIcon::Information, MESSAGE_DURATION);
     }
 }
 
