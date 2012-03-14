@@ -12,8 +12,6 @@ public:
 
     virtual bool hasDualStreaming() const override;
 
-    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
-
     virtual void init() override;
 
 protected:

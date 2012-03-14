@@ -382,7 +382,7 @@
         <?endif?>
         </Feature>
         
-        <Feature Id="AppServerFeature" Title="Network Optix Application Server" Level="1"
+        <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Application Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
@@ -395,7 +395,7 @@
             <ComponentRef Id="UninstallProgramMenuFolder"/>            
         </Feature>
          
-        <Feature Id="ServerFeature" Title="Network Optix Media Server" Level="1"
+        <Feature Id="ServerFeature" Title="$(env.APPLICATION_NAME) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <ComponentRef Id='ServerDirectoryComponent'/>
             <ComponentRef Id='ServerConfiguration'/>
@@ -408,7 +408,7 @@
             <ComponentRef Id="ServerQjson"/>
         </Feature>
         
-        <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME)" Level="1"
+        <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <FeatureRef Id='EveMediaPlayerFileAssociations' />-->
             
