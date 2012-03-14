@@ -123,7 +123,7 @@ public:
 
     QnActionBuilder separator(bool isSeparator = true) {
         m_action->setSeparator(isSeparator);
-        m_action->setFlags(m_action->flags() | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
+        m_action->setFlags(m_action->flags() | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
 
         return *this;
     }
@@ -298,6 +298,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     /* Context menu actions. */
+
+    factory(Qn::FitInViewAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Fit in View"));
+
+    factory().
+        flags(Qn::Scene).
+        separator();
 
     factory(Qn::MainMenuAction).
         flags(Qn::NoTarget).
@@ -551,7 +559,6 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Scene | Qn::Tree).
         separator();
-
 
     factory(Qn::MaximizeItemAction).
         flags(Qn::Scene | Qn::SingleTarget).
