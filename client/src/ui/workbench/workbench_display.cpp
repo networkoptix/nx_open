@@ -1324,7 +1324,7 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged() {
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource) {
     if(QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>()) {
-        if(QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource)) {
+        if(QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource)) {
             Qn::Permissions permissions = accessController()->permissions(resource);
 
             if(!(permissions & Qn::ReadPermission))

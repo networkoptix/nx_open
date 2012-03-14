@@ -346,9 +346,13 @@ namespace Qn {
         RemoveFromServerAction,
 
         /**
-         * Opens layout name editor.
+         * Changes resource name.
+         * 
+         * Parameters:
+         * <tt>QString NameParameter</tt> --- new name for the resource. If not
+         * supplied, name dialog will pop up.
          */
-        RenameLayoutAction,
+        RenameAction,
 
         /**
          * Opens a user creation dialog.

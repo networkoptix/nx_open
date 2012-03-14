@@ -205,9 +205,11 @@ namespace QnResourceCriterionExpressions {
             result = QnResourceCriterionGroup();
             l.setMatchOperation(QnResourceCriterion::Accept);
             l.setMismatchOperation(QnResourceCriterion::Next);
+            result.addCriterion(l);
 
             r.setMatchOperation(QnResourceCriterion::Accept);
             r.setMismatchOperation(QnResourceCriterion::Next);
+            result.addCriterion(r);
 
             result.setNextOperation(QnResourceCriterion::Reject);
         }
@@ -230,9 +232,11 @@ namespace QnResourceCriterionExpressions {
             result = QnResourceCriterionGroup();
             l.setMatchOperation(QnResourceCriterion::Next);
             l.setMismatchOperation(QnResourceCriterion::Reject);
+            result.addCriterion(l);
 
             r.setMatchOperation(QnResourceCriterion::Next);
             r.setMismatchOperation(QnResourceCriterion::Reject);
+            result.addCriterion(r);
 
             result.setNextOperation(QnResourceCriterion::Accept);
         }

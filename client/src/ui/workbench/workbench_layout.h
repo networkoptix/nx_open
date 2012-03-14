@@ -50,7 +50,7 @@ public:
     /**
      * \returns                         Layout associated with the given resource, if any.
      */
-    static QnWorkbenchLayout *layout(const QnLayoutResourcePtr &resource);
+    static QnWorkbenchLayout *instance(const QnLayoutResourcePtr &resource);
 
     /**
      * Virtual destructor.

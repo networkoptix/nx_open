@@ -282,9 +282,8 @@ public:
         
         switch(m_type) {
         case Qn::ResourceNode:
-            if(m_flags & (QnResource::layout | QnResource::media | QnResource::remote_server))
-                if(m_model->context()->accessController()->permissions(m_resource) & Qn::WritePermission)
-                    result |= Qt::ItemIsEditable;
+            if(m_model->context()->menu()->canTrigger(Qn::RenameAction, m_resource))
+                result |= Qt::ItemIsEditable;
             /* Fall through. */
         case Qn::ItemNode:
             if(m_flags & (QnResource::media | QnResource::layout))

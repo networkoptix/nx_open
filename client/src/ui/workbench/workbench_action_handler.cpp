@@ -122,7 +122,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RemoveFromServerAction),             SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
     connect(action(Qn::NewUserAction),                      SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
     connect(action(Qn::NewUserLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_newUserLayoutAction_triggered()));
-    connect(action(Qn::RenameLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_renameLayoutAction_triggered()));
+    connect(action(Qn::RenameAction),                       SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
     connect(action(Qn::DropResourcesAction),                SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
     connect(action(Qn::DelayedDropResourcesAction),         SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
     connect(action(Qn::DropResourcesIntoNewLayoutAction),   SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
@@ -351,7 +351,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
 
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
-    connection()->saveAsync(cameras, this, SLOT(at_cameras_saved(int, const QByteArray &, const QnResourceList &, int)));
+    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -492,7 +492,7 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
     foreach(const QnResourcePtr &resource, menu()->currentResourcesTarget(sender())) {
         QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
 
-        QnWorkbenchLayout *layout = QnWorkbenchLayout::layout(layoutResource);
+        QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
         if(layout == NULL) {
             layout = new QnWorkbenchLayout(layoutResource, workbench());
             workbench()->addLayout(layout);
@@ -912,20 +912,35 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_renameLayoutAction_triggered() {
-    QnLayoutResourcePtr layout = menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>();
-    if(!layout)
+void QnWorkbenchActionHandler::at_renameAction_triggered() {
+    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    if(!resource)
         return;
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
-    dialog->setWindowTitle(tr("Rename Layout"));
-    dialog->setText(tr("Enter new name for the selected layout:"));
-    dialog->setName(layout->getName());
-    dialog->setWindowModality(Qt::ApplicationModal);
-    if(!dialog->exec())
+    QString name = menu()->currentParameter(sender(), Qn::NameParameter).toString();
+    if(name.isEmpty()) {
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
+        dialog->setWindowTitle(tr("Rename"));
+        dialog->setText(tr("Enter new name for the selected item:"));
+        dialog->setName(resource->getName());
+        dialog->setWindowModality(Qt::ApplicationModal);
+        if(!dialog->exec())
+            return;
+        name = dialog->name();
+    }
+
+    if(name == resource->getName())
         return;
 
-    layout->setName(dialog->name());
+    if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+        bool changed = snapshotManager()->isChanged(layout);
+        resource->setName(name);
+        if(!changed)
+            snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+    } else {
+        resource->setName(name);
+        connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+    }
 }
 
 void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
@@ -982,7 +997,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->submitToResource();
     user->setGuid(QUuid::createUuid());
 
-    connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
+    connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
@@ -1123,7 +1138,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
-        connection()->saveAsync(user, this, SLOT(at_user_saved(int, const QByteArray &, const QnResourceList &, int)));
+        connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
         if(newPassword != oldPassword) {
@@ -1137,31 +1152,47 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_user_saved(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
-    if(status == 0) {
-        resourcePool()->addResources(resources);
+void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+    if(status == 0)
         return;
-    }
 
-    if(resources.isEmpty() || resources[0].isNull()) {
-        QMessageBox::critical(widget(), tr(""), tr("Could not save user to application server. \n\nError description: '%1'").arg(QLatin1String(errorString.data())));
+    QnLayoutResourcePtr layoutResource;
+    bool layoutNeedsReopening = false;
+    if(resources.size() == 1 && (layoutResource = resources[0].dynamicCast<QnLayoutResource>())) 
+        layoutNeedsReopening = snapshotManager()->isLocal(layoutResource) && !QnWorkbenchLayout::instance(layoutResource);
+
+    if(layoutNeedsReopening) {
+        int button = QnResourceListDialog::exec(
+            widget(),
+            resources,
+            tr("Error"),
+            tr("Could not save the following layout to application server."),
+            tr("Do you want to restore this layout?"),
+            QDialogButtonBox::Yes | QDialogButtonBox::No
+        );
+        if(button == QMessageBox::Yes) {
+            QnWorkbenchLayout *layout = new QnWorkbenchLayout(layoutResource, this);
+            workbench()->addLayout(layout);
+            workbench()->setCurrentLayout(layout);
+        } else {
+            resourcePool()->removeResource(resources[0]);
+        }
     } else {
-        QMessageBox::critical(widget(), tr(""), tr("Could not save user '%1' to application server. \n\nError description: '%2'").arg(resources[0]->getName()).arg(QLatin1String(errorString.data())));
+        QnResourceListDialog::exec(
+            widget(),
+            resources,
+            tr("Error"),
+            tr("Could not save the following %n items to application server.", NULL, resources.size()),
+            tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
+            QDialogButtonBox::Ok
+        );
     }
 }
 
-void QnWorkbenchActionHandler::at_cameras_saved(int status, const QByteArray& errorString, QnResourceList resources, int handle) {
-    if (status == 0)
-        return;
-
-    QnResourceListDialog::exec(
-        widget(),
-        resources,
-        tr("Error"),
-        tr("Could not save the following %n cameras to application server.", NULL, resources.size()),
-        tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
-        QDialogButtonBox::Ok
-    );
+void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
+    QnResourceList resources;
+    resources.push_back(resource);
+    at_resources_saved(status, errorString, resources, 0);
 }
 
 void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
@@ -1169,35 +1200,6 @@ void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray 
         return;
 
     QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from application server. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
-}
-
-void QnWorkbenchActionHandler::at_layout_saved(int status, const QByteArray &errorString, const QnLayoutResourcePtr &resource) {
-    if(status == 0)   
-        return;
-
-    bool needReopening = resource->getStatus() == QnResource::Disabled && QnWorkbenchLayout::layout(resource) == NULL;
-
-    if(needReopening) {
-        QMessageBox::StandardButton button = QMessageBox::critical(
-            widget(), 
-            tr("Error"), 
-            tr("Could not save layout '%1' to application server. \n\nError description: \n%2. \n\nDo you want to restore this layout?").arg(resource->getName()).arg(QLatin1String(errorString.data())),
-            QMessageBox::Yes | QMessageBox::No
-        );
-        if(button == QMessageBox::Yes) {
-            QnWorkbenchLayout *layout = new QnWorkbenchLayout(resource, this);
-            workbench()->addLayout(layout);
-            workbench()->setCurrentLayout(layout);
-        } else {
-            resourcePool()->removeResource(resource);
-        }
-    } else {
-        QMessageBox::critical(
-            widget(), 
-            tr("Error"), 
-            tr("Could not save layout '%1' to application server. \n\nError description: \n%2.").arg(resource->getName()).arg(QLatin1String(errorString.data()))
-        );
-    }
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses) {

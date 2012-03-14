@@ -386,7 +386,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
 
     /* Add tree-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::RenameLayoutAction, m_renameLayoutAction);
+    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameLayoutAction);
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
 
