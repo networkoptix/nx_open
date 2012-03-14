@@ -11,26 +11,18 @@
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
-void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int) {
+void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
+    /* Note that we may get reply of size 0 if appserver is down.
+     * This is why we use stored list of layouts. */
     if(m_manager) {
         if(status == 0) {
-            m_manager.data()->at_layout_saved(m_resource);
+            m_manager.data()->at_layouts_saved(m_resources);
         } else {
-            m_manager.data()->at_layout_saveFailed(m_resource);
+            m_manager.data()->at_layouts_saveFailed(m_resources);
         }
     }
 
-    /* We may get reply of size 0 if appserver is down. */
-    if(resources.size() == 1) {
-        QnLayoutResourcePtr resource = resources[0].dynamicCast<QnLayoutResource>();
-        if(!resource) {
-            qnWarning("Received reply of invalid type: expected layout resource, got %1.", resources[0]->metaObject()->className());
-        } else {
-            m_resource->setId(resource->getId()); // TODO: is this needed? Try to remove.
-        }
-    }
-
-    emit finished(status, errorString, m_resource);
+    emit finished(status, errorString, QnResourceList(m_resources), handle);
 
     deleteLater();
 }
@@ -95,16 +87,23 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &resource,
         return;
     }
 
+    QnLayoutResourceList resources;
+    resources.push_back(resource);
+    save(resources, object, slot);
+}
+
+void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resources, QObject *object, const char *slot) {
     /* Submit all changes from workbench to resource. */
-    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
-    if(synchronizer)
-        synchronizer->submit();
+    foreach(const QnLayoutResourcePtr &resource, resources)
+        if(QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
+            synchronizer->submit();
 
-    detail::QnWorkbenchLayoutReplyProcessor *processor = new detail::QnWorkbenchLayoutReplyProcessor(this, resource);
-    connect(processor, SIGNAL(finished(int, const QByteArray &, const QnLayoutResourcePtr &)), object, slot);
-    connection()->saveAsync(resource, processor, SLOT(at_finished(int, const QByteArray &, QnResourceList, int)));
+    detail::QnWorkbenchLayoutReplyProcessor *processor = new detail::QnWorkbenchLayoutReplyProcessor(this, resources);
+    connect(processor, SIGNAL(finished(int, const QByteArray &, const QnResourceList &, int)), object, slot);
+    connection()->saveAsync(resources, processor, SLOT(at_finished(int, const QByteArray &, const QnResourceList &, int)));
 
-    setFlags(resource, flags(resource) | Qn::LayoutIsBeingSaved);
+    foreach(const QnLayoutResourcePtr &resource, resources)
+        setFlags(resource, flags(resource) | Qn::LayoutIsBeingSaved);
 }
 
 void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource) {
@@ -169,14 +168,17 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
     disconnectFrom(layoutResource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_saved(const QnLayoutResourcePtr &resource) {
-    m_storage->store(resource);
+void QnWorkbenchLayoutSnapshotManager::at_layouts_saved(const QnLayoutResourceList &resources) {
+    foreach(const QnLayoutResourcePtr &resource, resources) {
+        m_storage->store(resource);
 
-    setFlags(resource, 0); /* Not local, not being saved, not changed. */
+        setFlags(resource, 0); /* Not local, not being saved, not changed. */
+    }
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_saveFailed(const QnLayoutResourcePtr &resource) {
-    setFlags(resource, flags(resource) & ~Qn::LayoutIsBeingSaved);
+void QnWorkbenchLayoutSnapshotManager::at_layouts_saveFailed(const QnLayoutResourceList &resources) {
+    foreach(const QnLayoutResourcePtr &resource, resources)
+        setFlags(resource, flags(resource) & ~Qn::LayoutIsBeingSaved);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
