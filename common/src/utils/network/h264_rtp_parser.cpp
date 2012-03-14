@@ -75,8 +75,7 @@ void CLH264RtpParser::setSDPInfo(const QByteArray& data)
                         foreach(QByteArray nal, nalUnits)
                         {
                             nal = QByteArray::fromBase64(nal);
-                            m_sdpSpsPps += QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                            m_sdpSpsPps += nal;
+                            m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
                         }
                     }
                 }
@@ -96,7 +95,8 @@ void CLH264RtpParser::serializeSpsPps(CLByteArray& dst)
     }
     else
     {
-        dst.write(m_sdpSpsPps);
+        for (int i = 0; i < m_sdpSpsPps.size(); ++i)
+            dst.write(m_sdpSpsPps[i]);
     }
 }
 
@@ -245,7 +245,7 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
 
                     }
 
-                    nalUnitType = *curPtr;
+                    nalUnitType = *curPtr & 0x1f;
                     curPtr++;
                     bytesLeft--;
                     if (packetType == FU_B_PACKET)
@@ -259,16 +259,17 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
                         bytesLeft -= 2;
                     }
 
-                    if ((nalUnitType & 0x1f) >= nuSliceNonIDR && (nalUnitType  & 0x1f) <= nuSliceIDR)
+                    if (nalUnitType >= nuSliceNonIDR && nalUnitType  <= nuSliceIDR)
                     {
                         // it is slice
                         //if (firstPacketReceived)
-                        isKeyFrame = (nalUnitType & 0x1f) == nuSliceIDR;
+                        isKeyFrame = nalUnitType == nuSliceIDR;
                         if (videoData->data.size() == 0)
                         {
                             if (isKeyFrame)
                                 serializeSpsPps(videoData->data);
                             videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                            nalUnitType += 0x40;
                             videoData->data.write( (const char*) &nalUnitType, 1);
                         }
                         videoData->data.write( (const char*) curPtr, bytesLeft);
@@ -293,9 +294,17 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
                 case MTAP16_PACKET:
                 case MTAP24_PACKET:
                     // not implemented
-                    return QnAbstractMediaDataPtr();
+                    //return QnAbstractMediaDataPtr();
+                    break;
                 default:
-                    bytesLeft = 0;
+                    if (packetType >= nuSliceNonIDR && packetType  <= nuSliceIDR)
+                    {
+                        videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                        videoData->data.write((const char*) curPtr-1, bytesLeft+1);
+
+                        bytesLeft = 0;
+                        lastPacketReceived = true;
+                    }
                     break; // ignore unknown data
             }
         }

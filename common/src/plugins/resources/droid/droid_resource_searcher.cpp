@@ -15,10 +15,15 @@ QnPlDroidResourceSearcher& QnPlDroidResourceSearcher::instance()
     return inst;
 }
 
+/*
 struct DroidSearcherHelper
 {
+    DroidSearcherHelper(): connectPort(0), videoPort(0), audioPort(0), dataPort(0) {}
+    int connectPort;
     int videoPort;
+    int audioPort;
     int dataPort;
+    QString macAddr;
 };
 
 QnResourceList QnPlDroidResourceSearcher::findResources(void)
@@ -38,27 +43,32 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
         QString response(responseData);
 
         QStringList data = response.split(';');
-        if (data.size()<2)
+        if (data.size() < 3)
             continue;
 
-        if (data.at(0) != "Network Optix Cam")
+        if (data[0] != "Network Optix Cam")
             continue;
         
-        QStringList ipPorts = data.at(1).split(":");
-        if (ipPorts.size() < 2)
+        QStringList ports = data[1].split(',');
+        if (ports.size() < 4) {
+            qWarning() << "Invalid droid response. Expected at least 4 ports";
             continue;
-
-        QString ip = ipPorts.at(0);
-
-        QStringList ports = ipPorts.at(1).split(",");
-        if (ports.size() < 2)
+        }
+        QStringList ipParams = ports[0].split(':');
+        if (ipParams.size() < 2) {
+            qWarning() << "Invalid droid response. Expected IP:port";
             continue;
+        }
 
         DroidSearcherHelper t;
-        t.videoPort = ports.at(0).toInt();
-        t.dataPort = ports.at(1).toInt();
+        t.connectPort = ipParams[1].toInt();
+        t.videoPort = ports[1].toInt();
+        t.audioPort = ports[2].toInt();
+        t.dataPort = ports[3].toInt();
+        
+        t.macAddr = data[2].replace(':', '-').toUpper();
 
-        searchReslut[ip] = t;
+        searchReslut[ipParams[0]] = t;
     }
 
 
@@ -72,31 +82,100 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
 
         DroidSearcherHelper t = it.value();
 
-        QString name = "DroidLive";
-
-        //QString mac = "94-63-D1-27-55-B8";
-        QString mac = "40-FC-89-31-89-26";
-
         QnDroidResourcePtr resource ( new QnDroidResource() );
 
-        QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+        QnId rt = qnResTypePool->getResourceTypeId(manufacture(), "DroidLive");
         if (!rt.isValid())
             continue;
 
         resource->setTypeId(rt);
-        resource->setName(name);
-        resource->setMAC(mac);
+        //resource->setName(QString("Droid device ") + ip);
+        resource->setName("DroidLive");
+        resource->setMAC(t.macAddr);
         resource->setHostAddress(ha, QnDomainMemory);
         resource->setDiscoveryAddr(m_recvSocket.localAddress());
 
         resource->setVideoPort(t.videoPort);
+        resource->setAudioPort(t.audioPort);
+        resource->setConnectionPort(t.connectPort);
         resource->setDataPort(t.dataPort);
+        resource->setUrl(QString("raw://") + ip + QString(':') + t.connectPort);
 
         result.push_back(resource);
 
         ++it;
     }
     
+
+    return result;
+}
+*/
+
+QnResourceList QnPlDroidResourceSearcher::findResources(void)
+{
+
+    QSet<QHostAddress> foundDevSet; // to avoid duplicates
+    QnResourceList result;
+
+    while (m_recvSocket.hasPendingDatagrams())
+    {
+        QByteArray responseData;
+        responseData.resize(m_recvSocket.pendingDatagramSize());
+
+        QHostAddress sender;
+        quint16 senderPort;
+
+        m_recvSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+
+        QString response(responseData);
+
+        QStringList data = response.split(';');
+        if (data.size() < 3)
+            continue;
+
+        if (data[0] != "Network Optix Cam")
+            continue;
+
+        QStringList ports = data[1].split(',');
+        if (ports.size() < 4) {
+            qWarning() << "Invalid droid response. Expected at least 4 ports";
+            continue;
+        }
+        QStringList ipParams = ports[0].split(':');
+        if (ipParams.size() < 2) {
+            qWarning() << "Invalid droid response. Expected IP:port";
+            continue;
+        }
+
+        if (data[1].isEmpty() || data[2].isEmpty())
+        {
+            continue;
+        }
+    
+        QHostAddress hostAddr(ipParams[0]);
+        if (foundDevSet.contains(hostAddr))
+            continue;
+
+        foundDevSet << hostAddr;
+
+        QnDroidResourcePtr resource ( new QnDroidResource() );
+
+        QnId rt = qnResTypePool->getResourceTypeId(manufacture(), "DroidLive");
+        if (!rt.isValid())
+            continue;
+
+        resource->setTypeId(rt);
+        //resource->setName(QString("Droid device ") + ip);
+        resource->setName("DroidLive");
+        resource->setMAC(data[2].replace(':', '-').toUpper());
+        //resource->setHostAddress(hostAddr, QnDomainMemory);
+        resource->setDiscoveryAddr(m_recvSocket.localAddress());
+
+        resource->setUrl(QString("raw://") + data[1]);
+
+        result.push_back(resource);
+    }
+
 
     return result;
 }

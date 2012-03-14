@@ -17,7 +17,7 @@ public:
     virtual void setSDPInfo(const QByteArray& data);
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
-    QByteArray m_sdpSpsPps;
+    QList<QByteArray> m_sdpSpsPps;
     SPSUnit m_sps;
     int m_frequency;
     int m_rtpChannel;

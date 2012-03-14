@@ -56,6 +56,8 @@ private:
 
     void markOfflineIfNeeded();
 
+    void updateResourceStatus(QnResourcePtr res);
+
 private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
