@@ -216,7 +216,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      * no way to make it transparent for non-client area windows messages. */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
-    m_titleLayout->setSpacing(0);
+    m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
