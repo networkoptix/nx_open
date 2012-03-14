@@ -311,19 +311,24 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
+
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(0, 0, 0, 0);
-    titleLayout->addItem(m_mainMenuButton);
+    QGraphicsLinearLayout *titleLeftButtonsLayout = new QGraphicsLinearLayout();
+    titleLeftButtonsLayout->setSpacing(2);
+    titleLeftButtonsLayout->setContentsMargins(0, 4, 0, 0);
+    titleLeftButtonsLayout->addItem(m_mainMenuButton);
+    titleLayout->addItem(titleLeftButtonsLayout);
     titleLayout->addItem(m_tabBarItem);
-    QGraphicsLinearLayout *titleButtonsLayout = new QGraphicsLinearLayout();
-    titleButtonsLayout->setSpacing(2);
-    titleButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    titleButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
-    titleButtonsLayout->addStretch(0x1000);
-    titleButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    titleButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
-    titleButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
-    titleLayout->addItem(titleButtonsLayout);
+    QGraphicsLinearLayout *titleRightButtonsLayout = new QGraphicsLinearLayout();
+    titleRightButtonsLayout->setSpacing(2);
+    titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    titleRightButtonsLayout->addStretch(0x1000);
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
+    titleLayout->addItem(titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 

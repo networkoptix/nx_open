@@ -169,7 +169,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     m_searchDelegate = new QnResourceTreeItemDelegate(this);
     ui->searchTreeView->setItemDelegate(m_searchDelegate);
 
-    m_renameLayoutAction = new QAction(this);
+    m_renameAction = new QAction(this);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
@@ -386,7 +386,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
 
     /* Add tree-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameLayoutAction);
+    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
 
@@ -397,7 +397,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     QAction *action = menu->exec(QCursor::pos());
 
     /* Process tree-local actions. */
-    if(action == m_renameLayoutAction)
+    if(action == m_renameAction)
         currentItemView()->edit(currentSelectionModel()->currentIndex());
 }
 

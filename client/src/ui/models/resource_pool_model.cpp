@@ -342,12 +342,11 @@ public:
         if(role != Qt::EditRole)
             return false;
 
-        if(m_flags & QnResource::layout) {
-            m_resource->setName(value.toString());
-            return true;
-        }
+        QVariantMap params;
+        params[Qn::NameParameter] = value.toString();
 
-        return false;
+        m_model->context()->menu()->trigger(Qn::RenameAction, m_resource, params);
+        return true;
     }
 
     bool isModified() const {
