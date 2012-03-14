@@ -1359,7 +1359,8 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(resource.isNull())
         return;
 
-    menu()->trigger(Qn::DropResourcesAction, resource);
+    if(resource->flags() & QnResource::media) /* Don't open layouts this way. */
+        menu()->trigger(Qn::OpenInCurrentLayoutAction, resource);
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
