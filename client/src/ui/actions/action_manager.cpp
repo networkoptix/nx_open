@@ -308,12 +308,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::LightMainMenuAction).
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        icon(qnSkin->icon("logo_icon2.png"));
+        icon(qnSkin->icon("main_menu_fullscreen.png"));
 
     factory(Qn::DarkMainMenuAction).
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
-        icon(qnSkin->icon("logo_icon2_dark.png"));
+        icon(qnSkin->icon("main_menu_windowed.png"));
 
     factory(Qn::ConnectionSettingsAction).
         flags(Qn::Main).
