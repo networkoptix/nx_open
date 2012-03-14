@@ -67,6 +67,7 @@ private:
     Qn::Permissions calculatePermissions(const QnUserResourcePtr &user);
     Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout);
     Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera);
+    Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive);
     Qn::Permissions calculatePermissions(const QnVideoServerResourcePtr &server);
 
 private:
