@@ -1006,6 +1006,8 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     user->addLayout(layout);
 
     snapshotManager()->save(layout, this, SLOT(at_layout_saved(int, const QByteArray &, const QnLayoutResourcePtr &)));
+
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
