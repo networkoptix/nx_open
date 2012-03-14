@@ -63,13 +63,7 @@ namespace {
         qreal aspectRatio = SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
         int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
         int iconWidth = iconHeight * aspectRatio;
-        button->setIconSize(QSize(iconWidth, iconHeight));
-
-        /* Tool buttons may end up having wrong aspect ratio. We don't allow that. */
-        QSize sizeHint = button->sizeHint();
-        int buttonHeight = sizeHint.height();
-        int buttonWidth = buttonHeight * aspectRatio;
-        button->setFixedSize(buttonWidth, buttonHeight);
+        button->setFixedSize(iconWidth, iconHeight);
 
         return button;
     }

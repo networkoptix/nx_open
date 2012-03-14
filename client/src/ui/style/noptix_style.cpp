@@ -42,6 +42,9 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
 }
 
 int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
+    if(metric == PM_ToolBarIconSize)
+        return 15;
+
     return base_type::pixelMetric(metric, option, widget);
 }
 
