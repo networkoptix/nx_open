@@ -4,6 +4,7 @@ call version.py
 call version.bat
 SET VERSION=%APPLICATION_VERSION%.%BUILD_NUMBER%
 SET "CURRENTDIR=%cd%"
+SET ARTIFACTID=HDWitness
 
 echo version = %VERSION%
 
@@ -11,10 +12,10 @@ rmdir /s /q "c:\records"
 
 CD %CURRENTDIR%
 
-start /B /WAIT msiexec /I "bin\VMS-%VERSION%.msi" /qb- /Lv* "install.log" SERVER_HOST="localhost" SERVER_PORT="8000" SERVER_LOGIN="admin" SERVER_PASSWORD="123" CLIENT_APPSERVER_HOST="localhost" CLIENT_APPSERVER_PORT="8000" CLIENT_APPSERVER_LOGIN="admin" CLIENT_APPSERVER_PASSWORD="123" SERVER_DIRECTORY="c:\records"
+start /B /WAIT msiexec /I "bin\%ARTIFACTID%-%VERSION%.msi" /qb- /Lv* "install.log" SERVER_HOST="localhost" SERVER_PORT="8000" SERVER_LOGIN="admin" SERVER_PASSWORD="123" CLIENT_APPSERVER_HOST="localhost" CLIENT_APPSERVER_PORT="8000" CLIENT_APPSERVER_LOGIN="admin" CLIENT_APPSERVER_PASSWORD="123" SERVER_DIRECTORY="c:\records"
 echo installer errorlevel is %ERRORLEVEL%
 
-cd "%VS90COMNTOOLS%\..\..\..\Network Optix\VMS\Client\"
+cd "%VS90COMNTOOLS%\..\..\..\Network Optix\HD Witness\Client\"
 
 rem ugly hack! --auth parameter is applied only in second launch!
 call client.exe --test-timeout 5000 --auth "http://admin:123@127.0.0.1:8000" --test-resource-substring Server
@@ -32,7 +33,7 @@ taskkill /F /IM appserver.exe
 
 CD %CURRENTDIR%
 
-call msiexec /x "bin\VMS-%VERSION%.msi" /qn /l*v uninstall.log
+call msiexec /x "bin\%ARTIFACTID%-%VERSION%.msi" /qn /l*v uninstall.log
 echo uninstaller errorlevel is %ERRORLEVEL%
 
 rmdir /s /q "%VS90COMNTOOLS%\..\..\..\Network Optix"
