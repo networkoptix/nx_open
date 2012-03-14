@@ -183,7 +183,6 @@ void PlDroidStreamReader::openStream()
     // current version of droid software does not send data to control port
     //quint8 dataBuff[1024];
     //int readed = m_dataSock.recv(dataBuff, sizeof(dataBuff));
-    m_h264Parser.updateStreamSize(640, 480);
 }
 
 void PlDroidStreamReader::closeStream()
