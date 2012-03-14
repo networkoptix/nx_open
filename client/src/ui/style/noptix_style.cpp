@@ -232,6 +232,7 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     QStyleOptionToolButton buttonOption;
     buttonOption.QStyleOption::operator=(*option);
+    buttonOption.state &= ~State_Selected; /* We don't want 'selected' state overriding 'active'. */
     buttonOption.subControls = 0;
     buttonOption.activeSubControls = 0;
     buttonOption.icon = m_closeTab;
