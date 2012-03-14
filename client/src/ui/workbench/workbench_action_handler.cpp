@@ -253,25 +253,13 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
     bool closeAll = true;
     bool saveAll = false;
     if(needToAsk) {
-        QDialogButtonBox::StandardButton button;
-        QString name;
-        if(saveableResources.size() == 1) {
-            QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, widget()));
-            dialog->setWindowTitle(tr("Close Layout"));
-            dialog->setText(tr("Layout '%1' is not saved. Do you want to save it?\n\nIf yes, you may also want to change its name:").arg(saveableResources[0]->getName()));
-            dialog->setName(saveableResources[0]->getName());
-            dialog->exec();
-            button = dialog->clickedButton();
-            name = dialog->name();
-        } else {
-            button = QnResourceListDialog::exec(
-                widget(),
-                QnResourceList(saveableResources),
-                tr("Close Layouts"),
-                tr("The following %n layouts are not saved. Do you want to save them?", NULL, saveableResources.size()),
-                QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
-            );
-        }
+        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+            widget(),
+            QnResourceList(saveableResources),
+            tr("Close Layouts"),
+            tr("The following %n layout(s) are not saved. Do you want to save them?", NULL, saveableResources.size()),
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+        );
 
         if(button == QDialogButtonBox::Cancel) {
             closeAll = false;
@@ -282,9 +270,6 @@ void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
         } else {
             closeAll = true;
             saveAll = true;
-
-            if(!name.isEmpty())
-                saveableResources[0]->setName(name);
         }
     }
 
