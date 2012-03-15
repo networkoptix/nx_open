@@ -59,17 +59,16 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, co
     Q_UNUSED(requestHandle)
 	Q_UNUSED(errorString)
 
-    if (m_timeoutTimer.isActive())
+    if (m_timeoutTimer.isActive()) {
         m_timeoutTimer.stop();
-    else
+    } else {
         return;
+    }
 
     ui->progressBar->setValue(ui->progressBar->maximum());
-    if (status)
-    {
+    if (status) {
         ui->statusLabel->setText("Failed");
-    } else
-    {
+    } else {
         ui->statusLabel->setText("Success");
     }
 

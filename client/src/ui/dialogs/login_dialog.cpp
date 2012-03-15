@@ -12,6 +12,7 @@
 #include "connection_testing_dialog.h"
 
 #include "api/AppServerConnection.h"
+#include "api/SessionManager.h"
 
 #include "settings.h"
 
@@ -112,17 +113,19 @@ void LoginDialog::accept()
     /* Widget data may not be written out to the model yet. Force it. */
     m_dataWidgetMapper->submit();
 
-    QnSettings::ConnectionData connection;
-    connection.url = currentUrl();
-
-    if (!connection.url.isValid()) {
+    QUrl url = currentUrl();
+    if (!url.isValid()) {
         QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
         return;
     }
 
-    qnSettings->setLastUsedConnection(connection);
+    setEnabled(false);
+    setCursor(Qt::BusyCursor);
 
-    QDialog::accept();
+    SessionManager::instance()->start();
+
+    QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
+    connection->testConnectionAsync(this, SLOT(at_testFinished(int, const QByteArray &, const QByteArray &, int)));
 }
 
 void LoginDialog::reset()
@@ -206,6 +209,27 @@ void LoginDialog::updateAcceptibility()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void LoginDialog::at_testFinished(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle)
+{
+    setEnabled(true);
+    unsetCursor();
+
+    if(status != 0) {
+        QMessageBox::warning(
+            this, 
+            tr("Could not connect to application server"), 
+            tr("Connection to the application server could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
+        );
+        return;
+    }
+
+    QnSettings::ConnectionData connectionData;
+    connectionData.url = currentUrl();
+    qnSettings->setLastUsedConnection(connectionData);
+
+    QDialog::accept();
+}
+
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index)
 {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
