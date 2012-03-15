@@ -17,12 +17,6 @@ public:
     virtual ~QnAbstractResourceSearcher();
 
     /**
-     * \returns                         Name of the manufacturer for the resources this searcher adds. 
-     *                                  For example, 'AreconVision' or 'IQInVision'.
-     */ 
-    virtual QString manufacture() const = 0;
-
-    /**
      * Enables or disables this searcher.
      * 
      * \param use                       Whether this searcher should be used.
@@ -58,6 +52,13 @@ public:
     virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
 
 protected:
+
+    /**
+     * \returns                         Name of the manufacturer for the resources this searcher adds. 
+     *                                  For example, 'AreconVision' or 'IQInVision'.
+     */ 
+    virtual QString manufacture() const = 0;
+
     /**
      * This is the actual function that searches for resources. 
      * To be implemented in derived classes.

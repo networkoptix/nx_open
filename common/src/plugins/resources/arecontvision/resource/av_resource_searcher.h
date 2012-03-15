@@ -11,13 +11,15 @@ public:
     static QnPlArecontResourceSearcher& instance();
 
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
-    // return the manufacture of the server
-    virtual QString manufacture() const;
 
     // returns all available devices
     virtual QnResourceList findResources();
 
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+protected:
+    // return the manufacture of the server
+    virtual QString manufacture() const;
+
 };
 
 #endif // av_device_server_h_2107

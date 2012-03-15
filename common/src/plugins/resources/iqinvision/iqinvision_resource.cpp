@@ -39,7 +39,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
     QString name = getName();
     if (name == QLatin1String("IQA35") ||
         name == QLatin1String("IQA33N") ||
-        name == QLatin1String("IQA32N") ||
+        //name == QLatin1String("IQA32N") ||
         name == QLatin1String("IQA31") ||
         name == QLatin1String("IQ732N") ||
         name == QLatin1String("IQ732S") ||
@@ -50,6 +50,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
         name == QLatin1String("IQD32S") ||
         name == QLatin1String("IQM30S") ||
         name == QLatin1String("IQM31S") ||
+        name == QLatin1String("IQM32N") ||
         name == QLatin1String("IQM32S"))
         return new RTP264StreamReader(toSharedPointer());
         /**/
