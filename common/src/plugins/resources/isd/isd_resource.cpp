@@ -33,7 +33,26 @@ void QnPlIsdResource::setIframeDistance(int frames, int timems)
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-    return new RTP264StreamReader(toSharedPointer(), "stream1");
+    QString request = "stream1";
+
+
+    QFile file(QLatin1String("c:/isd.txt")); // Create a file handle for the file named
+    if (file.exists())
+    {
+        QString line;
+
+        if (file.open(QIODevice::ReadOnly)) // Open the file
+        {
+            QTextStream stream(&file); // Set the stream to read from myFile
+            line = stream.readLine().trimmed(); // this reads a line (QString) from the file
+
+            if (line.length() > 0)
+                request = line;
+        }
+
+    }
+
+    return new RTP264StreamReader(toSharedPointer(), request);
 }
 
 void QnPlIsdResource::setCropingPhysical(QRect croping)
