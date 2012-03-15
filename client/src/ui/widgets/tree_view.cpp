@@ -10,6 +10,18 @@ QnTreeView::~QnTreeView() {
     return;
 }
 
+void QnTreeView::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        if (state() != EditingState || hasFocus()) {
+            if (currentIndex().isValid())
+                emit enterPressed(currentIndex());
+            event->ignore();
+        }
+    }
+
+    QTreeView::keyPressEvent(event);
+}
+
 void QnTreeView::dragMoveEvent(QDragMoveEvent *event) {
     if (autoExpandDelay() >= 0) {
         m_dragMovePos = event->pos();

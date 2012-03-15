@@ -107,7 +107,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         return;
 
     m_camera->setName(ui->nameEdit->text());
-    m_camera->setHostAddress(QHostAddress(ui->ipAddressEdit->text()));
+    m_camera->setUrl(ui->ipAddressEdit->text());
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
     m_camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
@@ -144,7 +144,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         ui->nameEdit->setText(m_camera->getName());
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
-        ui->ipAddressEdit->setText(m_camera->getHostAddress().toString());
+        ui->ipAddressEdit->setText(m_camera->getUrl());
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());

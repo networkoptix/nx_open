@@ -139,7 +139,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     /* Init static text. */
     m_noDataStaticText.setText(tr("No data"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_offlineStaticText.setText(tr("Offline"));
+    m_offlineStaticText.setText(tr("No signal"));
     m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText.setText(tr("Unauthorized"));
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);

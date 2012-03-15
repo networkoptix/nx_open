@@ -10,13 +10,14 @@
 #include <utils/common/checked_cast.h>
 #include <ui/animation/accessor.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/style/skin.h>
+#include <ui/style/globals.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/scene_utility.h>
-#include "ui/style/skin.h"
 
 namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {
@@ -73,6 +74,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     m_animator = new VariantAnimator(this);
     m_animator->setTargetObject(this);
     m_animator->setAccessor(new QnImageButtonHoverProgressAccessor());
+    m_animator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
 
     /* When hovering over a button, a cursor should always change to arrow pointer. */
     setCursor(Qt::ArrowCursor);

@@ -109,31 +109,26 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_backwardButton = new QnImageButtonWidget(this);
     m_backwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
     m_backwardButton->setPreferredSize(32, 18);
-    m_backwardButton->setAnimationSpeed(4.0);
     m_backwardButton->setFocusProxy(this);
 
     m_stepBackwardButton = new QnImageButtonWidget(this);
     m_stepBackwardButton->setIcon(qnSkin->icon("step_backward.png"));
     m_stepBackwardButton->setPreferredSize(32, 18);
-    m_stepBackwardButton->setAnimationSpeed(4.0);
     m_stepBackwardButton->setFocusProxy(this);
 
     m_playButton = new QnImageButtonWidget(this);
     m_playButton->setIcon(qnSkin->icon("play.png"));
     m_playButton->setPreferredSize(32, 30);
-    m_playButton->setAnimationSpeed(4.0);
     m_playButton->setFocusProxy(this);
 
     m_stepForwardButton = new QnImageButtonWidget(this);
     m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
     m_stepForwardButton->setPreferredSize(32, 18);
-    m_stepForwardButton->setAnimationSpeed(4.0);
     m_stepForwardButton->setFocusProxy(this);
 
     m_forwardButton = new QnImageButtonWidget(this);
     m_forwardButton->setIcon(qnSkin->icon("rewind_forward.png"));
     m_forwardButton->setPreferredSize(32, 18);
-    m_forwardButton->setAnimationSpeed(4.0);
     m_forwardButton->setFocusProxy(this);
 
     connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
@@ -196,7 +191,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_liveButton->setCheckable(true);
     m_liveButton->setChecked(m_camera && m_camera->getCamDisplay()->isRealTimeSource());
     m_liveButton->setEnabled(false);
-    m_liveButton->setAnimationSpeed(4.0);
     m_liveButton->setFocusProxy(this);
 
     connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(at_liveButton_clicked(bool)));
@@ -208,7 +202,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_mrsButton->setCheckable(true);
     m_mrsButton->setChecked(true);
     m_mrsButton->hide();
-    m_mrsButton->setAnimationSpeed(4.0);
     m_mrsButton->setFocusProxy(this);
 
     connect(m_mrsButton, SIGNAL(clicked()), this, SIGNAL(clearMotionSelection()));
@@ -220,7 +213,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_syncButton->setPreferredSize(48, 24);
     m_syncButton->setCheckable(true);
     m_syncButton->setChecked(true);
-    m_syncButton->setAnimationSpeed(4.0);
     m_syncButton->setFocusProxy(this);
     m_syncButton->setEnabled(false);
 
@@ -413,7 +405,8 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
 
     if (m_camera)
     {
-        connect(m_camera->getCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
+        // Use QueuedConnection connection because of deadlock. Signal can came from before jump and speed changing can call pauseMedia (because of speed slider animation).
+        connect(m_camera->getCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)), Qt::QueuedConnection);
 
         QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 

@@ -228,23 +228,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             }
 
             // seems like resource is in the pool and has OK ip
-            if (rpNetRes)
-            {
-                if (rpNetRes->getStatus() == QnResource::Offline) 
-                {
-                     if (rpNetRes->needUpdateStatus())// if this net resource in the pool and must be after DISABLE => OFFLINE STATE after D&D from one server to another
-                        rpNetRes->setStatusIfNotDisabled(QnResource::Online);
-
-                     if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
-                         rpNetRes->setStatusIfNotDisabled(QnResource::Online);
-
-                }
-                
-
-                rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
-            }
-
-
+            updateResourceStatus(rpNetRes);
 
             it = resources.erase(it); // do not need to investigate OK resources
 
@@ -408,7 +392,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             if (newNetRes)
             {
                 QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-                if (rpNetRes)
+                if (rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress())
                 {
                     // if such network resource is in pool and has diff IP => should keep it
                     rpNetRes->setHostAddress(newNetRes->getHostAddress(), QnDomainMemory);
@@ -435,7 +419,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 }
                 else
                 {
-                    Q_ASSERT(false);
+                    if (rpNetRes)
+                        updateResourceStatus(rpNetRes);
+
+                    //Q_ASSERT(false);
+                    continue;
                 }
             }
 
@@ -518,6 +506,29 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
 
     }
     
+}
+
+void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
+{
+    // seems like resource is in the pool and has OK ip
+    QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
+
+    if (rpNetRes)
+    {
+        if (rpNetRes->getStatus() == QnResource::Offline) 
+        {
+            if (rpNetRes->needUpdateStatus())// if this net resource in the pool and must be after DISABLE => OFFLINE STATE after D&D from one server to another
+                rpNetRes->setStatusIfNotDisabled(QnResource::Online);
+
+            if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
+                rpNetRes->setStatusIfNotDisabled(QnResource::Online);
+
+        }
+
+
+        rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
+    }
+
 }
 
 void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundList, int threads)

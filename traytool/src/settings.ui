@@ -186,7 +186,7 @@
      </widget>
      <widget class="QWidget" name="tabAppServer">
       <attribute name="title">
-       <string>Application Server parameters</string>
+       <string>Application Server settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>

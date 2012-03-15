@@ -1,4 +1,5 @@
 #include "preferencesdialog.h"
+#include "ui_preferences.h"
 
 #include <QDir>
 #include <QToolButton>
@@ -37,26 +38,32 @@ static inline QString cameraInfoString(QnResourcePtr resource)
 }
 
 
-PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *parent)
-    : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
-      connectionsSettingsWidget(0), videoRecorderWidget(0), youTubeSettingsWidget(0), licenseManagerWidget(0)
+PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
+    QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
+    ui(new Ui::PreferencesDialog()),
+    connectionsSettingsWidget(0), 
+    videoRecorderWidget(0), 
+    youTubeSettingsWidget(0), 
+    licenseManagerWidget(0)
 {
     if(!context)
         qnNullWarning(context);
 
-    setupUi(this);
+    ui->setupUi(this);
 
-    connect(auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+    ui->lookAndFeelGroupBox->hide(); // TODO: Cannot edit max number of items on the scene.
+
+    connect(ui->auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(auxMediaFolderSelectionChanged()));
 
 
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
-    tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
+    ui->tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
 
-    tabWidget->removeTab(2); // ###
+    ui->tabWidget->removeTab(2); // ###
 
     videoRecorderWidget = new RecordingSettingsWidget(this);
-    tabWidget->insertTab(2, videoRecorderWidget, tr("Screen Recorder"));
+    ui->tabWidget->insertTab(2, videoRecorderWidget, tr("Screen Recorder"));
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
@@ -65,13 +72,13 @@ PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *paren
 
 #ifndef CL_TRIAL_MODE
     licenseManagerWidget = new LicenseManagerWidget(this);
-    tabWidget->insertTab(4, licenseManagerWidget, tr("License"));
+    ui->tabWidget->insertTab(4, licenseManagerWidget, tr("Licenses"));
 #endif
 
     QToolButton *aboutButton = new QToolButton();
     aboutButton->setDefaultAction(context ? context->action(Qn::AboutAction) : NULL);
     aboutButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    buttonBox->addButton(aboutButton, QDialogButtonBox::HelpRole);
+    ui->buttonBox->addButton(aboutButton, QDialogButtonBox::HelpRole);
 
     qnSettings->fillData(m_settingsData);
 
@@ -88,8 +95,8 @@ PreferencesDialog::~PreferencesDialog()
 
 void PreferencesDialog::accept()
 {
-    m_settingsData.maxVideoItems = maxVideoItemsSpinBox->value();
-    m_settingsData.downmixAudio = downmixAudioCheckBox->isChecked();
+    m_settingsData.maxVideoItems = ui->maxVideoItemsSpinBox->value();
+    m_settingsData.downmixAudio = ui->downmixAudioCheckBox->isChecked();
 
     QnSettings *settings = qnSettings;
     settings->update(m_settingsData);
@@ -120,34 +127,34 @@ void PreferencesDialog::accept()
 
 void PreferencesDialog::updateView()
 {
-    mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
+    ui->mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
-    auxMediaRootsList->clear();
+    ui->auxMediaRootsList->clear();
     foreach (const QString &auxMediaRoot, m_settingsData.auxMediaRoots)
-        auxMediaRootsList->addItem(QDir::toNativeSeparators(auxMediaRoot));
+        ui->auxMediaRootsList->addItem(QDir::toNativeSeparators(auxMediaRoot));
 
     const QList<QNetworkAddressEntry> ipv4entries = getAllIPv4AddressEntries();
 
-    networkInterfacesList->clear();
+    ui->networkInterfacesList->clear();
     foreach (const QNetworkAddressEntry &entry, ipv4entries)
-        networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
+        ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
-    camerasList->clear();
+    ui->camerasList->clear();
     foreach (const CameraNameAndInfo &camera, m_cameras)
-        camerasList->addItem(camera.first);
+        ui->camerasList->addItem(camera.first);
 
     if (ipv4entries.isEmpty())
-        cameraStatusLabel->setText(tr("No IP addresses detected. Ensure you either have static IP or there is DHCP server in your network."));
+        ui->cameraStatusLabel->setText(tr("No IP addresses detected. Ensure you either have static IP or there is DHCP server in your network."));
     else if (m_cameras.isEmpty())
-        cameraStatusLabel->setText(tr("No cameras detected. If you're connected to router check that it doesn't block broadcasts."));
+        ui->cameraStatusLabel->setText(tr("No cameras detected. If you're connected to router check that it doesn't block broadcasts."));
     else
-        cameraStatusLabel->setText(QString());
+        ui->cameraStatusLabel->setText(QString());
 
-    totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
+    ui->totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
 
-    maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
+    ui->maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
 
-    downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
+    ui->downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
 }
 
 void PreferencesDialog::updateStoredConnections()
@@ -191,7 +198,7 @@ void PreferencesDialog::mainMediaFolderBrowse()
 
 void PreferencesDialog::auxMediaFolderSelectionChanged()
 {
-    auxRemovePushButton->setEnabled(!auxMediaRootsList->selectedItems().isEmpty());
+    ui->auxRemovePushButton->setEnabled(!ui->auxMediaRootsList->selectedItems().isEmpty());
 }
 
 void PreferencesDialog::auxMediaFolderBrowse()
@@ -219,7 +226,7 @@ void PreferencesDialog::auxMediaFolderBrowse()
 
 void PreferencesDialog::auxMediaFolderRemove()
 {
-    foreach (QListWidgetItem *item, auxMediaRootsList->selectedItems())
+    foreach (QListWidgetItem *item, ui->auxMediaRootsList->selectedItems())
         m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
 
     updateView();
@@ -228,10 +235,10 @@ void PreferencesDialog::auxMediaFolderRemove()
 void PreferencesDialog::cameraSelected(int row)
 {
     if (row >= 0 && row < m_cameras.size())
-        cameraInfoLabel->setText(m_cameras[row].second);
+        ui->cameraInfoLabel->setText(m_cameras[row].second);
 }
 
 void PreferencesDialog::setCurrentPage(PreferencesDialog::SettingsPage page)
 {
-    tabWidget->setCurrentIndex(int(page));
+    ui->tabWidget->setCurrentIndex(int(page));
 }

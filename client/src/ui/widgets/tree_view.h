@@ -15,7 +15,11 @@ public:
 
     virtual ~QnTreeView();
 
+signals:
+    void enterPressed(const QModelIndex &index);
+
 protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;

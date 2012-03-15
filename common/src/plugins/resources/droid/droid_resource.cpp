@@ -35,7 +35,7 @@ void QnDroidResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnDroidResource::createLiveDataProvider()
 {
-    return new PlDroidStreamReader(toSharedPointer());;
+    return new PlDroidStreamReader(toSharedPointer());
 }
 
 void QnDroidResource::setCropingPhysical(QRect /*croping*/)
@@ -48,26 +48,18 @@ bool QnDroidResource::hasDualStreaming() const
     return false;
 }
 
-void QnDroidResource::setDataPort(int port)
+QHostAddress QnDroidResource::getHostAddress() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    m_dataPort = port;
+    QString url = getUrl();
+    int start = QString("raw://").length();
+    int end = url.indexOf(':', start);
+    if (start >= 0 && end > start)
+        return QHostAddress(url.mid(start, end-start));
+    else
+        return QHostAddress();
 }
 
-int QnDroidResource::getDataPort() const
+bool QnDroidResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_dataPort;
-}
-
-void QnDroidResource::setVideoPort(int port)
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    m_videoPort = port;
-}
-
-int QnDroidResource::getVideoPort() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_videoPort;
+    return false;
 }

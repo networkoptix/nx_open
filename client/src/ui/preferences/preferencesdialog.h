@@ -1,9 +1,10 @@
 #ifndef PREFERENCESDIALOG_H
 #define PREFERENCESDIALOG_H
 
-#include "ui_preferences.h"
+#include <QtGui/QDialog>
 
 #include "settings.h"
+
 
 class QnWorkbenchContext;
 
@@ -12,7 +13,11 @@ class LicenseManagerWidget;
 class RecordingSettingsWidget;
 class YouTubeSettingsWidget;
 
-class PreferencesDialog : public QDialog, Ui::PreferencesDialog
+namespace Ui {
+    class PreferencesDialog;
+}
+
+class PreferencesDialog : public QDialog
 {
     Q_OBJECT
 
@@ -47,6 +52,7 @@ private Q_SLOTS:
 private:
     Q_DISABLE_COPY(PreferencesDialog)
 
+    QScopedPointer<Ui::PreferencesDialog> ui;
     QnSettings::Data m_settingsData;
     ConnectionsSettingsWidget *connectionsSettingsWidget;
     RecordingSettingsWidget *videoRecorderWidget;

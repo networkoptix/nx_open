@@ -38,6 +38,7 @@ private slots:
     void at_configureConnectionsButton_clicked();
     void at_testButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
+    void at_testFinished(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle);
 
 private:
     Q_DISABLE_COPY(LoginDialog)
