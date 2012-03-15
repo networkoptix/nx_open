@@ -28,15 +28,15 @@
                 <Control Type="Text" Id="PortLabel" Width="21" Height="17" X="269" Y="68" Text="Port" />
                 <Control Type="Text" Id="LoginLabel" Width="32" Height="17" X="25" Y="92" Text="Login" />
                 <Control Type="Text" Id="PasswordLabel" Width="46" Height="15" X="190" Y="92" Text="Password" />
-                <Control Type="Edit" Id="Port" Width="55" Height="15" X="296" Y="67" Property="SERVER_PORT" >
+                <Control Type="Edit" Id="Port" Width="55" Height="15" X="296" Y="67" Property="SERVER_APPSERVER_PORT" >
                     <Condition Action="disable"><![CDATA[(&AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(&AppServerFeature<>3)]]></Condition>
                 </Control>
-                <Control Type="Edit" Id="Login" X="75" Y="89" Width="101" Height="15" Property="SERVER_LOGIN">
+                <Control Type="Edit" Id="Login" X="75" Y="89" Width="101" Height="15" Property="SERVER_APPSERVER_LOGIN">
                     <Condition Action="disable"><![CDATA[(&AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(&AppServerFeature<>3)]]></Condition>
                 </Control>
-                <Control Type="Edit" Id="Password" Width="111" Height="15" X="241" Y="89" Property="SERVER_PASSWORD" >
+                <Control Type="Edit" Id="Password" Width="111" Height="15" X="241" Y="89" Property="SERVER_APPSERVER_PASSWORD" >
                     <Condition Action="disable"><![CDATA[(&AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(&AppServerFeature<>3)]]></Condition>
                 </Control>
@@ -49,7 +49,7 @@
                 <Control Id="ServerMediaDir" Type="PathEdit" Height="15" Width="197" X="93" Y="158" Property="WIXUI_SERVER_DIRECTORY" Indirect="yes" />
                 <Control Id="groupBox1" Type="GroupBox" Height="66" Width="345" X="15" Y="49" Text="Application Server" />
                 <Control Id="ChangeServerMediaDir" Type="PushButton" Height="17" Width="56" X="296" Y="158" Text="Browse" />
-                <Control Id="Host" Type="Edit" Height="15" Width="182" X="75" Y="65" Property="SERVER_HOST" >
+                <Control Id="Host" Type="Edit" Height="15" Width="182" X="75" Y="65" Property="SERVER_APPSERVER_HOST" >
                     <Condition Action="disable"><![CDATA[(&AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(&AppServerFeature<>3)]]></Condition>
                 </Control>
