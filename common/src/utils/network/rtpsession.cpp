@@ -90,18 +90,19 @@ void RTPSession::parseSDP()
     int trackNum = -1;
     foreach(QByteArray line, lines)
     {
-        line = line.trimmed().toLower();
-        if (line.startsWith("m="))
+        line = line.trimmed();
+        QByteArray lineLower = line.toLower();
+        if (lineLower.startsWith("m="))
         {
             if (trackNum >= 0) {
                 m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType));
                 trackNum = -1;
             }
-            codecType = line.mid(2).split(' ')[0];
+            codecType = lineLower.mid(2).split(' ')[0];
         }
-        if (line.startsWith("a=rtpmap"))
+        if (lineLower.startsWith("a=rtpmap"))
         {
-            QList<QByteArray> params = line.split(' ');
+            QList<QByteArray> params = lineLower.split(' ');
             if (params.size() < 2)
                 continue; // invalid data format. skip
             QList<QByteArray> trackInfo = params[0].split(':');
@@ -111,9 +112,9 @@ void RTPSession::parseSDP()
             mapNum = trackInfo[1].toUInt();
             codecName = codecInfo[0];
         }
-        else if (line.startsWith("a=control:track"))
+        else if (lineLower.startsWith("a=control:track"))
         {
-            QByteArray lineRest = line.mid(QString("a=control:").length());
+            QByteArray lineRest = line.mid(QByteArray("a=control:").length());
             int i = 0;
             for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
             m_tracksPrefix = lineRest.left(i);
@@ -328,7 +329,7 @@ RTPIODevice*  RTPSession::sendSetup()
 
         if (m_transport == "UDP")
         {
-            request += ";client_port=";
+            request += "client_port=";
             request += QString::number(m_udpSock.getLocalPort());
             request += ',';
             request += QString::number(m_rtcpUdpSock.getLocalPort());

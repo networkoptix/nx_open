@@ -1,7 +1,6 @@
-#include "../onvif/dataprovider/onvif_mjpeg.h"
-#include "../onvif/dataprovider/onvif_h264.h"
 #include "isd_resource.h"
-#include "isd_stream_reader.h"
+#include "../onvif/dataprovider/rtp264_stream_provider.h"
+
 
 const char* QnPlIsdResource::MANUFACTURE = "ISD";
 
@@ -34,7 +33,26 @@ void QnPlIsdResource::setIframeDistance(int frames, int timems)
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-    return new PlISDStreamReader(toSharedPointer());
+    QString request = "stream1";
+
+
+    QFile file(QLatin1String("c:/isd.txt")); // Create a file handle for the file named
+    if (file.exists())
+    {
+        QString line;
+
+        if (file.open(QIODevice::ReadOnly)) // Open the file
+        {
+            QTextStream stream(&file); // Set the stream to read from myFile
+            line = stream.readLine().trimmed(); // this reads a line (QString) from the file
+
+            if (line.length() > 0)
+                request = line;
+        }
+
+    }
+
+    return new RTP264StreamReader(toSharedPointer(), request);
 }
 
 void QnPlIsdResource::setCropingPhysical(QRect croping)
