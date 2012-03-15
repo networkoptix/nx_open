@@ -44,6 +44,23 @@
 							</arguments>
 						</configuration>
 					</execution>
+
+					<execution>
+						<id>package-NetworkCA-with-msbuild</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${msbuild.exe}</executable>
+							<workingDirectory>${basedir}/NetworkCA</workingDirectory>		
+							<arguments>
+								<argument>NetworkCA.vcproj</argument>
+								<argument>/t:Rebuild</argument>
+								<argument>/p:Configuration=${msbuild.configuration}</argument>
+							</arguments>
+						</configuration>
+					</execution>	
 					
 					<execution>
 						<id>package-EveAssocCA-with-msbuild</id>
