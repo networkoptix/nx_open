@@ -1,28 +1,23 @@
-#ifndef onvif_device_server_h_2054
-#define onvif_device_server_h_2054
+#ifndef onvif_ws_resource_searcher_h
+#define onvif_ws_resource_searcher_h
 
-
-#include "core/resource/network_resource.h"
 #include "core/resourcemanagment/resource_searcher.h"
 
 
-class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlOnvifWsSearcher : public QnAbstractNetworkResourceSearcher
 {
-protected:
-    OnvifResourceSearcher();
+    QnPlOnvifWsSearcher();
+
 public:
-    
+    static QnPlOnvifWsSearcher& instance();
 
-	~OnvifResourceSearcher();
+    QnResourceList findResources(void);
 
-    bool isProxy() const;
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    // return the manufacture of the server
+    virtual QString manufacture() const;
 
-    virtual QnResourceList findResources();
-
-protected:
-    virtual QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData) = 0;
-private:
-    void checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress);
+    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
 };
 
-#endif // avigilon_device_server_h_1809
+#endif // dlink_device_server_h_2219
