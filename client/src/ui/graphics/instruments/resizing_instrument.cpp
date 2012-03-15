@@ -7,17 +7,7 @@
 namespace {
     struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem *, bool> {
         bool operator()(QGraphicsItem *item) const {
-            if(!item->isWidget() || !(item->acceptedMouseButtons() & Qt::LeftButton))
-                return false;
-
-            QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
-            if((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint))
-                return true; /* Widget has decorations. */
-
-            if(dynamic_cast<FrameSectionQuearyable *>(widget) != NULL)
-                return true; /* No decorations, but still can be queried for frame sections. */
-
-            return false;
+            return item->isWidget() && (item->acceptedMouseButtons() & Qt::LeftButton);
         }
     };
 
@@ -89,6 +79,9 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 
     /* Check frame section. */
     FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(widget);
+    if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
+        return false; /* Has no decorations and not queryable for frame sections. */
+
     QPointF itemPos = widget->mapFromScene(view->mapToScene(event->pos()));
     Qt::WindowFrameSection section;
     if(queryable == NULL) {
