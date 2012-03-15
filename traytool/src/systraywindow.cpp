@@ -151,6 +151,9 @@ void QnSystrayWindow::findServiceInfo()
         m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_ALL_ACCESS);
     if (m_appServerHandle == 0)
         m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_QUERY_STATUS);
+
+    if (!m_mediaServerHandle && !m_appServerHandle)
+        showMessage("No HDWitness servers component installed");
 }
 
 void QnSystrayWindow::setVisible(bool visible)
@@ -242,6 +245,8 @@ void QnSystrayWindow::updateServiceInfo()
 
     int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, MEDIA_SERVER_NAME,       m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
     int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
+
+    settingsAction->setVisible(m_mediaServerHandle || m_appServerHandle);
 
     if (appServerStatus == SERVICE_STOPPED) 
     {
@@ -462,6 +467,7 @@ void QnSystrayWindow::createActions()
     settingsAction = new QAction(tr("&Settings"), this);
     m_actionList.append(NameAndAction("showSettings", settingsAction));
     connectElevatedAction(settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
+    settingsAction->setVisible(m_mediaServerHandle || m_appServerHandle);
 
     m_showMediaServerLogAction = new QAction(tr("&Show Media server log"), this);
     m_actionList.append(NameAndAction("showMediaServerLog", m_showMediaServerLogAction));
@@ -588,6 +594,9 @@ void QnSystrayWindow::onSettingsAction()
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
+
+    ui->tabAppServer->setEnabled(m_appServerHandle != 0);
+    ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
 
     showNormal();
 }
