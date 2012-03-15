@@ -86,7 +86,6 @@ namespace {
         button->setMaximumSize(width, height);
         button->setMinimumSize(width, height);
         button->setDefaultAction(action);
-        button->setAnimationSpeed(4.0);
         button->setCached(true);
 
         return button;
@@ -97,7 +96,6 @@ namespace {
         button->resize(15, 45);
         button->setIcon(qnSkin->icon("slide_right.png", "slide_left.png"));
         button->setCheckable(true);
-        button->setAnimationSpeed(4.0);
         return button;
     }
 

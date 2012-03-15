@@ -22,20 +22,13 @@ public:
 
     virtual bool hasDualStreaming() const override;
 
-    void setDataPort(int port);
-    int getDataPort() const;
-
-    void setVideoPort(int port);
-    int getVideoPort() const;
-
-
+    virtual QHostAddress getHostAddress() const override;
+    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain) override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping) override;
 
 private:
-    int m_videoPort;
-    int m_dataPort;
 };
 
 typedef QnSharedResourcePointer<QnDroidResource> QnDroidResourcePtr;

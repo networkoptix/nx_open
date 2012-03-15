@@ -1,7 +1,7 @@
-#include "onvif_h264.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "core/resource/network_resource.h"
 #include "utils/network/h264_rtp_parser.h"
+#include "h264_rtp_reader.h"
 
 
 RTPH264StreamreaderDelegate::RTPH264StreamreaderDelegate(QnResourcePtr res):
@@ -51,7 +51,11 @@ void RTPH264StreamreaderDelegate::openStream()
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
     QString url;
-    QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString() << "/" << m_request;
+    if (m_request.length() > 0)
+        QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString() << "/" << m_request;
+    else
+        QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+
 
     if (m_RtpSession.open(url))
     {

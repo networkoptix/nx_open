@@ -167,11 +167,14 @@ void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     connect(resource.data(), SIGNAL(parentIdChanged()), this, SLOT(updateSenderPermissions()));
+    connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateSenderPermissions()));
     
     updatePermissions(resource);
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+    disconnect(resource.data(), NULL, this, NULL);
+
     setPermissionsInternal(resource, 0); /* So that the signal is emitted. */
     m_permissionsByResource.remove(resource);
 }

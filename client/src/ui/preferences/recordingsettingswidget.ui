@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>384</height>
+    <height>390</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -80,7 +80,7 @@
          <string comment="Grabs Eve window"/>
         </property>
         <property name="text">
-         <string>Eve window</string>
+         <string>HD Witness Window</string>
         </property>
        </widget>
       </item>

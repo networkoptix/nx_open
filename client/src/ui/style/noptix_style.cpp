@@ -8,8 +8,9 @@
 #include <QToolBar>
 #include <QAbstractItemView>
 #include <utils/common/scoped_painter_rollback.h>
-#include "skin.h"
 #include "noptix_style_animator.h"
+#include "globals.h"
+#include "skin.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -211,8 +212,8 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
     
     const QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
     QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
-    handleRect.setSize(handleRect.size() * 2);
-    handleRect.moveTopLeft(handleRect.topLeft() - QPoint(handleRect.width(), handleRect.height()) / 4);
+    //handleRect.setSize(handleRect.size() * 2);
+    //handleRect.moveTopLeft(handleRect.topLeft() - QPoint(handleRect.width(), handleRect.height()) / 4);
 
     const bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
 
@@ -229,13 +230,15 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
         handlePic = m_skin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
-    painter->drawTiledPixmap(grooveRect.adjusted(grooveBorderPic.width(), 0, -grooveBorderPic.width(), 0), grooveBodyPic);
-    painter->drawPixmap(grooveRect.topLeft(), grooveBorderPic);
+    int d = grooveRect.height();
+
+    painter->drawPixmap(grooveRect.adjusted(d, 0, -d, 0), grooveBodyPic, grooveBodyPic.rect());
+    painter->drawPixmap(QRectF(grooveRect.topLeft(), QSizeF(d, d)), grooveBorderPic, grooveBorderPic.rect());
     {
         QTransform oldTransform = painter->transform();
         painter->translate(grooveRect.left() + grooveRect.width(), grooveRect.top());
         painter->scale(-1.0, 1.0);
-        painter->drawPixmap(0, 0, grooveBorderPic);
+        painter->drawPixmap(QRectF(QPointF(0, 0), QSizeF(d, d)), grooveBorderPic, grooveBorderPic.rect());
         painter->setTransform(oldTransform);
     }
 
@@ -290,7 +293,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     bool sunken = option->state & State_Sunken;
     if(sunken)
         setHoverProgress(widget, 0.0);
-    qreal k = hoverProgress(option, widget, 4.0);
+    qreal k = hoverProgress(option, widget, 1000.0 / qnGlobals->opacityChangePeriod());
     QRectF rect = option->rect;
 
 #ifdef QN_USE_ZOOMING_BUTTONS

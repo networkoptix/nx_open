@@ -9,9 +9,9 @@
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
     Q_OBJECT
-    Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
-    Q_PROPERTY(QnMacAddress macAddress READ getMAC WRITE setMAC)
-    Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
+    //Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
+    //Q_PROPERTY(QnMacAddress macAddress READ getMAC WRITE setMAC)
+    //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
 public:
     enum QnNetworkStatus
@@ -33,7 +33,7 @@ public:
 
     QString getUniqueId() const;
 
-    QHostAddress getHostAddress() const;
+    virtual QHostAddress getHostAddress() const;
     virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);
 
     QnMacAddress getMAC() const;

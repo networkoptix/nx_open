@@ -5,14 +5,6 @@
 
 #include "systraywindow.h"
 
-QString getOwnUsername()
-{
-    TCHAR winUserName[UNLEN + 1]; // UNLEN is defined in LMCONS.H
-    DWORD winUserNameSize = sizeof(winUserName);
-    GetUserName(winUserName, &winUserNameSize);
-    return QString::fromUtf16(winUserName);
-}
-
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(traytool);
@@ -29,7 +21,7 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
     // Each user may have it's own traytool running.
-    QtSingleApplication app(getOwnUsername(), argc, argv);
+    QtSingleApplication app(QLatin1String(ORGANIZATION_NAME) + QLatin1String(APPLICATION_NAME), argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());

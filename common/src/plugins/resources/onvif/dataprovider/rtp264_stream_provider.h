@@ -1,18 +1,21 @@
-#ifndef isd_stream_reader_h_2015
-#define isd_stream_reader_h_2015
+#ifndef h264_stream_provider_h_2015
+#define h264_stream_provider_h_2015
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "core/dataprovider/live_stream_provider.h"
-#include "../onvif/dataprovider/onvif_h264.h"
+#include "utils/network/h264_rtp_reader.h"
 
 
-class PlISDStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class RTP264StreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 public:
-    PlISDStreamReader(QnResourcePtr res);
-    virtual ~PlISDStreamReader();
+    RTP264StreamReader(QnResourcePtr res, const QString& request = "");
+    virtual ~RTP264StreamReader();
 
+    void setRequest(const QString& request);
 protected:
+    
+
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;
     virtual void closeStream() override;
@@ -20,13 +23,14 @@ protected:
 
 
     void updateStreamParamsBasedOnQuality() override {};
-        
+
     void updateStreamParamsBasedOnFps() override {};
 private:
 
     RTPH264StreamreaderDelegate mRTP264;
+    QString m_request;
 
 
 };
 
-#endif //isd_stream_reader_h_2015
+#endif //h264_stream_provider_h_2015
