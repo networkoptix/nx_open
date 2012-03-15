@@ -175,8 +175,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(editingFinished()),          this,               SLOT(forceUpdateFilter()));
     connect(ui->clearFilterButton,  SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
-    connect(ui->resourceTreeView,   SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
-    connect(ui->searchTreeView,     SIGNAL(activated(QModelIndex)),     this,               SLOT(at_treeView_activated(QModelIndex)));
+    connect(ui->resourceTreeView,   SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->resourceTreeView,   SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+    connect(ui->searchTreeView,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->searchTreeView,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
@@ -231,7 +233,7 @@ void QnResourceTreeWidget::setCurrentTab(Tab tab) {
 void QnResourceTreeWidget::open() {
     QAbstractItemView *view = ui->tabWidget->currentIndex() == 0 ? ui->resourceTreeView : ui->searchTreeView;
     foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
-        at_treeView_activated(index);
+        at_treeView_doubleClicked(index);
 }
 
 QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout *layout, bool create) const {
@@ -490,10 +492,15 @@ void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
     emit currentTabChanged();
 }
 
-void QnResourceTreeWidget::at_treeView_activated(const QModelIndex &index) {
+void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
         emit activated(resource);
 }
 
+void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (resource && !(resource->flags() & QnResource::layout)) /* Layouts cannot be activated by double clicking. */
+        emit activated(resource);
+}
 

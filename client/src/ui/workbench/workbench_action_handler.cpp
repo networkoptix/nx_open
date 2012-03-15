@@ -251,14 +251,20 @@ QnResourceList QnWorkbenchActionHandler::addToResourcePool(const QString &file) 
 }
 
 bool QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply) {
-    if(layouts.empty())
+    QnLayoutResourceList resources;
+    foreach(QnWorkbenchLayout *layout, layouts)
+        resources.push_back(layout->resource());
+
+    return closeLayouts(resources, waitForReply);
+}
+
+bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply) {
+    if(resources.empty())
         return true;
 
     bool needToAsk = false;
     QnLayoutResourceList saveableResources, rollbackResources;
-    foreach(QnWorkbenchLayout *layout, layouts) {
-        QnLayoutResourcePtr resource = layout->resource();
-
+    foreach(const QnLayoutResourcePtr &resource, resources) {
         bool changed, saveable, askable;
 
         Qn::LayoutFlags flags = snapshotManager()->flags(resource);
@@ -308,7 +314,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
         }
 
         if(!waitForReply || saveableResources.empty()) {
-            closeLayouts(layouts, rollbackResources, saveableResources, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+            closeLayouts(resources, rollbackResources, saveableResources, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
             return true;
         } else {
             QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(widget()));
@@ -327,7 +333,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
             QScopedPointer<detail::QnResourceReplyProcessor> processor(new detail::QnResourceReplyProcessor(this));
             connect(processor.data(), SIGNAL(finished(int, const QByteArray &, const QnResourceList &, int)), dialog.data(), SLOT(accept()));
 
-            closeLayouts(layouts, rollbackResources, saveableResources, processor.data(), SLOT(at_replyReceived(int, const QByteArray &, const QnResourceList &, int)));
+            closeLayouts(resources, rollbackResources, saveableResources, processor.data(), SLOT(at_replyReceived(int, const QByteArray &, const QnResourceList &, int)));
             dialog->exec();
 
             QnWorkbenchLayoutList currentLayouts = workbench()->layouts();
@@ -339,18 +345,18 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts
     }
 }
 
-void QnWorkbenchActionHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot) {
+void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot) {
     if(!saveResources.empty())
         snapshotManager()->save(saveResources, object, slot);
 
     foreach(const QnLayoutResourcePtr &resource, rollbackResources)
         snapshotManager()->restore(resource);
 
-    foreach(QnWorkbenchLayout *layout, layouts) {
-        QnLayoutResourcePtr resource = layout->resource();
-
-        workbench()->removeLayout(layout);
-        delete layout;
+    foreach(const QnLayoutResourcePtr &resource, resources) {
+        if(QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(resource)) {
+            workbench()->removeLayout(layout);
+            delete layout;
+        }
 
         Qn::LayoutFlags flags = snapshotManager()->flags(resource);
         if((flags & (Qn::LayoutIsLocal | Qn::LayoutIsBeingSaved)) == Qn::LayoutIsLocal) /* Local, not being saved. */
@@ -1079,7 +1085,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
         menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
 
-    if(closeLayouts(workbench()->layouts(), true))
+    if(closeLayouts(QnResourceCriterion::filter<QnLayoutResource>(resourcePool()->getResources()), true))
         qApp->closeAllWindows();
 }
 
