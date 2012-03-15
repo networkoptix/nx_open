@@ -14,10 +14,11 @@ public:
     QnResourceList findResources(void);
 
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
-    // return the manufacture of the server
-    virtual QString manufacture() const;
 
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+protected:
+    // return the manufacture of the server
+    virtual QString manufacture() const;
 
 private:
     QUdpSocket m_recvSocket;
