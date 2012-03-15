@@ -32,15 +32,15 @@
         
         <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
         
-    	<Property Id="INSTALLTYPE" Value="0"/>
-    	<Property Id="ADVANCEDTYPE" Value="0"/>
-    	
+        <Property Id="INSTALLTYPE" Value="0"/>
+        <Property Id="ADVANCEDTYPE" Value="0"/>
+        
         <Property Id="NEWERFOUND" Secure="yes"/>
 <!--        <Property Id="ALLUSERS" Secure="yes"/> -->
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         
-    	<Property Id="BUSYPORT" Secure="yes"/>
-    	
+        <Property Id="BUSYPORT" Secure="yes"/>
+        
         <!-- AppServer properties-->
         <Property Id="APPSERVER_PORT" Secure="yes" Value="8000"/>
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
@@ -78,20 +78,20 @@
         </Property>
         
         <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
-        <Binary Id="NetworkCA.dll" SourceFile="NetworkCA\Debug\NetworkCA.dll" />
+        <Binary Id="NetworkCA.dll" SourceFile="NetworkCA\Release\NetworkCA.dll" />
         <Binary Id="EveAssocCA.dll" SourceFile="EveAssocCA\Release\EveAssocCA.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
-    	
-    	<CustomAction Id="FindFreePorts" BinaryKey="NetworkCA.dll" DllEntry="FindFreePorts" />
-    	<CustomAction Id="CheckPorts" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
-    	<CustomAction Id="CheckPorts2" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
-    	
-    	<CustomAction Id="AssignFreePort1" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
-    	<CustomAction Id="AssignFreePort2" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
-    	<CustomAction Id="AssignFreePort3" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
+        
+        <CustomAction Id="FindFreePorts" BinaryKey="NetworkCA.dll" DllEntry="FindFreePorts" />
+        <CustomAction Id="CheckPorts" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
+        <CustomAction Id="CheckPorts2" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
+        
+        <CustomAction Id="AssignFreePort1" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
+        <CustomAction Id="AssignFreePort2" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
+        <CustomAction Id="AssignFreePort3" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
         
         <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Server Media" />
         <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Client Media" />
@@ -117,10 +117,10 @@
         </Upgrade>
         
         <InstallUISequence>
-        	<Custom Action="FindFreePorts" Before="AssignFreePort1"/>
-    		<Custom Action="AssignFreePort1" Before="AssignFreePort2"/>
-    		<Custom Action="AssignFreePort2" Before="AssignFreePort3"/>
-    		<Custom Action="AssignFreePort3" Before="SetMoviesFolder"/>
+            <Custom Action="FindFreePorts" Before="AssignFreePort1"/>
+            <Custom Action="AssignFreePort1" Before="AssignFreePort2"/>
+            <Custom Action="AssignFreePort2" Before="AssignFreePort3"/>
+            <Custom Action="AssignFreePort3" Before="SetMoviesFolder"/>
             <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
             
             <Custom Action="ResetClientFolder" Before="AssignClientFolder"/>
@@ -173,8 +173,9 @@
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix Application Server"
-                                />
+                                                Description="Network Optix Application Server">
+                                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
+                                </ServiceInstall>
                                 
                                 <ServiceControl Id="StartVmsAppServerService" Name="VmsAppServer" Start="install" Wait="no" />
                                 <ServiceControl Id="StopVmsAppServerService" Name="VmsAppServer" Stop="both" Wait="yes" Remove="uninstall" />
@@ -224,8 +225,9 @@
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix Media Server"
-                                />
+                                                Description="Network Optix Media Server">
+                                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
+                                </ServiceInstall>
                                 
                                 <ServiceControl Id="StartVmsServerService" Name="VmsMediaServer" Start="install" Wait="no" />
                                 <ServiceControl Id="StopVmsServerService" Name="VmsMediaServer" Stop="both" Wait="yes" Remove="uninstall" />
@@ -499,13 +501,13 @@
             
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">LicenseAccepted = "1"</Publish>
             
-        	<Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
-        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">INSTALLTYPE=0</Publish>
-        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
-        	
-        	<Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
-        	<Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
-        	
+            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">INSTALLTYPE=0</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
+            
+            <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
+            <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
+            
             <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="AdvancedTypeDlg">1</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg" Order="10">
@@ -531,10 +533,10 @@
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT]" Order="1">1</Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2">1</Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
-        	
+            <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT]" Order="1">1</Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2">1</Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
+            
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[(NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[(NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
             
@@ -546,42 +548,42 @@
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4">1</Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4">1</Publish>
-        	
-        	<Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="AppServerDlg">1</Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4">1</Publish>
+            
+            <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="AppServerDlg">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="MediaServerDlg"><![CDATA[(NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK"  Value="VerifyReadyDlg"><![CDATA[(NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
 
-        	<Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
+            <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
-        	
+            
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(&AppServerFeature=3)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature<>3)]]></Publish>
             
-        	<!--  OR (&AppServerFeature=3 AND (SERVER_RTSP_PORT=APPSERVER_PORT OR SERVER_API_PORT=APPSERVER_PORT)) -->
-<!--        	<Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="1">
-        		<![CDATA[SERVER_RTSP_PORT=SERVER_API_PORT]]>
-        	</Publish> -->
+            <!--  OR (&AppServerFeature=3 AND (SERVER_RTSP_PORT=APPSERVER_PORT OR SERVER_API_PORT=APPSERVER_PORT)) -->
+<!--            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="1">
+                <![CDATA[SERVER_RTSP_PORT=SERVER_API_PORT]]>
+            </Publish> -->
 
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[(&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="3"><![CDATA[(&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
-                    	
+                        
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN]" Order="4">1</Publish>
-        	<Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[SERVER_APPSERVER_PASSWORD]" Order="4">1</Publish>
-        	
-        	<Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1">1</Publish>
-        	<Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2">1</Publish>
-        	<Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
-        	
-        	<Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[SERVER_APPSERVER_PASSWORD]" Order="4">1</Publish>
+            
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
+            
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="ClientDlg"><![CDATA[(&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg"><![CDATA[(&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
-        	
+            
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[(&ServerFeature=3)]]></Publish>
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(&AppServerFeature = 3 AND &ServerFeature<>3)]]></Publish>
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature<>3)]]></Publish>
