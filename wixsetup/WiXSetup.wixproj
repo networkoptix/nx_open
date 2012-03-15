@@ -28,11 +28,13 @@
     <StartAction>Project</StartAction>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AdvancedTypeDlg.wxs" />
     <Compile Include="AppServerDlg.wxs" />
     <Compile Include="AppServerFiles.wxs" />
     <Compile Include="ClientDlg.wxs" />
     <Compile Include="DowngradeWarningDlg.wxs" />
     <Compile Include="FileAssociations.wxs" />
+    <Compile Include="InstallTypeDlg.wxs" />
     <Compile Include="MyFeaturesDlg.wxs" />
     <Compile Include="MediaServerDlg.wxs" />
     <Compile Include="Product.wxs" />

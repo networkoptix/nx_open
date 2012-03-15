@@ -29,7 +29,7 @@
                 <Control Type="Text" Id="LoginLabel" Width="50" Height="17" X="15" Y="117" Text="Login" />
                 <Control Type="Text" Id="PasswordLabel" Width="50" Height="17" X="14" Y="138" Text="Password" />
                 <Control Type="Edit" Id="Port" Width="272" Height="15" X="83" Y="96" Property="APPSERVER_PORT" />
-                <Control Type="Edit" Id="Login" X="83" Y="115" Width="272" Height="15" Property="APPSERVER_LOGIN" />
+                <Control Type="Edit" Id="Login" X="83" Y="115" Width="272" Height="15" Property="APPSERVER_LOGIN" Disabled="yes"/>
                 <Control Type="Edit" Id="Password" Width="272" Height="15" X="83" Y="136" Property="APPSERVER_PASSWORD" />
                 <Control Id="groupBox1" Type="GroupBox" Height="77" Width="351" X="9" Y="80" Text="Network" />
             </Dialog>
