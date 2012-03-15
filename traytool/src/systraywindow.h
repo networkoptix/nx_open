@@ -58,10 +58,12 @@ protected:
 
 private slots:
     void handleMessage(const QString& message);
+    
+    void onDelayedMessage();
 
     void setIcon(int index);
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void showMessage();
+    void showMessage(const QString& message);
     void messageClicked();
 
     void at_mediaServerStartAction();
@@ -128,16 +130,17 @@ private:
 
     bool m_needStartMediaServer;
     bool m_needStartAppServer;
-    bool m_waitingMediaServerStopping;
-    bool m_waitingAppServerStopping;
-    bool m_waitingMediaServerStarted;
-    bool m_waitingAppServerStarted;
     int m_skipTicks;
 
     typedef QPair<QString, QAction*> NameAndAction;
     typedef QList<NameAndAction> NameActionList;
 
+    int m_prevMediaServerStatus;
+    int m_prevAppServerStatus;
+
     NameActionList m_actionList;
+    QTime m_lastMessageTimer;
+    QQueue<QString> m_delayedMessages;
 };
 
 #endif
