@@ -21,9 +21,17 @@ bool MyIsUserAnAdmin()
    TOKEN_ELEVATION_TYPE tokenElevationType;
 
    HANDLE m_hToken;
-   OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &m_hToken);
+   if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &m_hToken) == FALSE)
+   {
+       return false;
+   }
 
-   ::GetTokenInformation(m_hToken, TokenElevationType, &tokenElevationType, sizeof(tokenElevationType), &bytesUsed);
+   if (::GetTokenInformation(m_hToken, TokenElevationType, &tokenElevationType, sizeof(tokenElevationType), &bytesUsed) == FALSE)
+   {
+       if (m_hToken)
+           CloseHandle(m_hToken);
+       return IsUserAnAdmin();
+   }
 
    isAdmin = tokenElevationType == TokenElevationTypeFull || tokenElevationType == TokenElevationTypeDefault && IsUserAnAdmin();
 
