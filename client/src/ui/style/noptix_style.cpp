@@ -8,8 +8,9 @@
 #include <QToolBar>
 #include <QAbstractItemView>
 #include <utils/common/scoped_painter_rollback.h>
-#include "skin.h"
 #include "noptix_style_animator.h"
+#include "globals.h"
+#include "skin.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -290,7 +291,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     bool sunken = option->state & State_Sunken;
     if(sunken)
         setHoverProgress(widget, 0.0);
-    qreal k = hoverProgress(option, widget, 4.0);
+    qreal k = hoverProgress(option, widget, 1000.0 / qnGlobals->opacityChangePeriod());
     QRectF rect = option->rect;
 
 #ifdef QN_USE_ZOOMING_BUTTONS
