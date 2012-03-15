@@ -4,7 +4,8 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 #include "core/dataprovider/live_stream_provider.h"
-#include "../onvif/dataprovider/onvif_h264.h"
+#include "utils/network/h264_rtp_reader.h"
+
 
 
 class PlDlinkStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
