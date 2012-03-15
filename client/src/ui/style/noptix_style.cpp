@@ -212,8 +212,8 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
     
     const QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
     QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
-    handleRect.setSize(handleRect.size() * 2);
-    handleRect.moveTopLeft(handleRect.topLeft() - QPoint(handleRect.width(), handleRect.height()) / 4);
+    //handleRect.setSize(handleRect.size() * 2);
+    //handleRect.moveTopLeft(handleRect.topLeft() - QPoint(handleRect.width(), handleRect.height()) / 4);
 
     const bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
 
