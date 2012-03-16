@@ -63,6 +63,7 @@ QnCameraPool::~QnCameraPool()
 
 void QnCameraPool::addCameras(int count, QStringList fileList, double fps, int offlineFreq)
 {
+    qDebug() << "Add" << count << "cameras from file(s)" << fileList << "fps=" << fps << "offlineFreq=" << offlineFreq;
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < count; ++i)
     {
