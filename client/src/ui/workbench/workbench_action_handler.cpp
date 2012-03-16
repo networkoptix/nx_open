@@ -461,10 +461,10 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     if(!user)
         return;
 
-    menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, QnResourceList(user->getLayouts()));
+    //menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, QnResourceList(user->getLayouts()));
 
-    /* Delete empty orphaned layouts, move non-empty to the new user. */
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
+    /* Delete empty orphaned layouts, move non-empty to the new user. /*
+    /*foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout)) {
                 if(layout->getItems().empty()) {
@@ -474,7 +474,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
                 }
             }
         }
-    }
+    }*/
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
@@ -628,10 +628,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         newLayout = QnLayoutResourcePtr(new QnLayoutResource());
         newLayout->setGuid(QUuid::createUuid());
         newLayout->setName(name);
-
+        newLayout->setParentId(user->getId());
         context()->resourcePool()->addResource(newLayout);
-        if(user)
-            user->addLayout(newLayout);
 
         QnLayoutItemDataList items = layout->getItems().values();
         for(int i = 0; i < items.size(); i++)
@@ -1081,9 +1079,8 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
+    layout->setParentId(user->getId());
     resourcePool()->addResource(layout);
-
-    user->addLayout(layout);
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
