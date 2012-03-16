@@ -721,11 +721,16 @@ bool QnResource::isDisabled() const
 
 void QnResource::setDisabled(bool disabled)
 {
-	QMutexLocker mutexLocker(&m_mutex);
+    bool oldDisabled = m_disabled;
 
-	if (m_disabled != disabled)
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+
+        m_disabled = disabled;
+    }
+
+    if (oldDisabled != disabled)
 		emit disabledChanged();
 
-	m_disabled = disabled;
 }
 
