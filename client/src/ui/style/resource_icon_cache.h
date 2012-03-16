@@ -19,11 +19,13 @@ public:
         Unknown,
         Local,
         Server,
+        Servers,
         Layout,
         Camera,
         Image,
         Media,
         User,
+        Users,
         TypeMask = 0xFF,
 
         Offline = (QnResource::Offline + 1) << 8,
